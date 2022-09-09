@@ -42,7 +42,7 @@ export class TableHeaderService extends Bootstrap {
     this.actionService.addHandler({
       id: 'table-header-menu-base-handler',
       isActionApplicable(context, action) {
-        const menu = context.find(DATA_CONTEXT_MENU, DATA_VIEWER_DATA_MODEL_TOOLS_MENU);
+        const menu = context.hasValue(DATA_CONTEXT_MENU, DATA_VIEWER_DATA_MODEL_TOOLS_MENU);
         const model = context.tryGet(DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL);
         const resultIndex = context.tryGet(DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX);
 

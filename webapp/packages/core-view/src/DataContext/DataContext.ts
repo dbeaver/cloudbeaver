@@ -15,7 +15,7 @@ import type { DeleteVersionedContextCallback, IDataContext } from './IDataContex
 import type { IDataContextProvider } from './IDataContextProvider';
 
 export class DataContext implements IDataContext {
-  private readonly map: Map<DataContextGetter<any>, any>;
+  readonly map: Map<DataContextGetter<any>, any>;
   private readonly versions: MetadataMap<DataContextGetter<any>, number>;
   fallback?: IDataContextProvider;
 
@@ -40,7 +40,7 @@ export class DataContext implements IDataContext {
     return this.map.has(context) || this.fallback?.has(context) || false;
   }
 
-  find<T>(context: DataContextGetter<T>, value: T): boolean {
+  hasValue<T>(context: DataContextGetter<T>, value: T): boolean {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     let provider: IDataContextProvider = this;
 
@@ -53,6 +53,25 @@ export class DataContext implements IDataContext {
         provider = provider.fallback;
       } else {
         return false;
+      }
+    }
+  }
+
+  find<T>(context: DataContextGetter<T>, predicate: (value: T) => boolean): T | undefined {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let provider: IDataContextProvider = this;
+
+    while (true) {
+      const value = provider.map.get(context);
+
+      if (predicate(value)) {
+        return value;
+      }
+
+      if (provider.fallback) {
+        provider = provider.fallback;
+      } else {
+        return undefined;
       }
     }
   }

@@ -31,7 +31,7 @@ export class TabsBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'tabs-base-handler',
       isActionApplicable: (context, action) => {
-        const menu = context.find(DATA_CONTEXT_MENU, MENU_TAB);
+        const menu = context.hasValue(DATA_CONTEXT_MENU, MENU_TAB);
         const state = context.tryGet(DATA_CONTEXT_TABS_CONTEXT);
         const tab = context.tryGet(DATA_CONTEXT_TAB_ID);
 
