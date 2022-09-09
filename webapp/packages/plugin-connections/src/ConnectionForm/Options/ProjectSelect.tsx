@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import type React from 'react';
 
 import { Combobox, useMapResource } from '@cloudbeaver/core-blocks';
@@ -21,7 +22,7 @@ interface Props {
   disabled?: boolean;
 }
 
-export function ProjectSelect(props: Props) {
+export const ProjectSelect = observer(function ProjectSelect(props: Props) {
   const translate = useTranslate();
 
   const projectsLoader = useMapResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey);
@@ -57,4 +58,4 @@ export function ProjectSelect(props: Props) {
       {translate('connections_connection_project')}
     </Combobox>
   );
-}
+});
