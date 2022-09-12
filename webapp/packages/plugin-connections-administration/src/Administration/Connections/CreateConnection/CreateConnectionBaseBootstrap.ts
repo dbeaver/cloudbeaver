@@ -9,17 +9,12 @@
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
 import { CreateConnectionService } from '../CreateConnectionService';
-import { ConnectionManualService } from './Manual/ConnectionManualService';
 import { CustomConnection } from './Manual/CustomConnection';
-import { ConnectionSearchService } from './Search/ConnectionSearchService';
-import { SearchDatabase } from './Search/SearchDatabase';
 
 @injectable()
 export class CreateConnectionBaseBootstrap extends Bootstrap {
   constructor(
     private readonly createConnectionService: CreateConnectionService,
-    private readonly connectionManualService: ConnectionManualService,
-    private readonly connectionSearchService: ConnectionSearchService
   ) {
     super();
   }
@@ -30,19 +25,6 @@ export class CreateConnectionBaseBootstrap extends Bootstrap {
       name: 'connections_connection_create_custom',
       order: 1,
       panel: () => CustomConnection,
-    });
-    this.createConnectionService.tabsContainer.add({
-      key: 'search',
-      name: 'connections_connection_create_search_database',
-      order: 2,
-      panel: () => SearchDatabase,
-      onOpen: () => this.connectionSearchService.load(),
-      options: {
-        configurationWizard: {
-          activationPriority: 2,
-        },
-        close: () => this.connectionSearchService.close(),
-      },
     });
   }
 
