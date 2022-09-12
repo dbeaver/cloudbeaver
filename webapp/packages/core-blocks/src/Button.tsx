@@ -57,7 +57,6 @@ const buttonStyles = css`
         text-decoration: none;
       }
     }
-    
   `;
 
 const buttonMod = {
