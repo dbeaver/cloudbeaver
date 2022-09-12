@@ -24,7 +24,7 @@ const nestedStyles = css`
   NavigationNodeNested {
     padding-left: 8px !important;
   }
-  TreeNode:only-child {
+  TreeNode {
     & Control {
       /*display: none;*/
     }

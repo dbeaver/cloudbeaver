@@ -24,10 +24,10 @@ const nestedStyles = css`
   TreeNode {
     margin-top: 8px;
   }
-  NavigationNodeNested {
+  /*NavigationNodeNested {
     padding-left: 8px !important;
-  }
-  TreeNode:only-child {
+  }*/
+  TreeNode {
     & Control {
       /*display: none;*/
     }
