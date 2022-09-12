@@ -60,7 +60,11 @@ export interface ISQLEditorData {
   executeQueryNewTab(): Promise<void>;
   showExecutionPlan(): Promise<void>;
   executeScript(): Promise<void>;
-  getHintProposals(position: number, simple: boolean): Promise<SQLProposal[]>;
+  getHintProposals(
+    position: number,
+    word: string,
+    simple: boolean
+  ): Promise<SQLProposal[]>;
   executeQueryAction<T>(
     segment: ISQLScriptSegment | undefined,
     action: (query: ISQLScriptSegment) => Promise<T>,
