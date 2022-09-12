@@ -26,7 +26,7 @@ const nestedStyles = css`
   }
   TreeNode:only-child {
     & Control {
-      display: none;
+      /*display: none;*/
     }
     & NavigationNodeNested {
       padding-left: 0 !important;
