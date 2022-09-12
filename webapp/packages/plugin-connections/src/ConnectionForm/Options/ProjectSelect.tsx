@@ -5,35 +5,39 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type React from 'react';
-import { useEffect } from 'react';
+import { observer } from 'mobx-react-lite';
 
 import { Combobox, useMapResource } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { Project, ProjectsResource } from '@cloudbeaver/core-projects';
+import { Project, ProjectsResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 interface Props {
-  value: string;
+  value: string | null;
   onChange: (value: string) => void;
   readOnly?: boolean;
   disabled?: boolean;
   inline?: boolean;
 }
 
-export function ProjectSelect(props: Props) {
+export const ProjectSelect = observer(function ProjectSelect(props: Props) {
   const translate = useTranslate();
 
-  const projectsLoader = useMapResource(ProjectSelect, ProjectsResource, CachedMapAllKey);
+  const projectsService = useService(ProjectsService);
+  const projectsLoader = useMapResource(ProjectSelect, ProjectsResource, CachedMapAllKey, {
+    onData: () => {
+      if (!props.value && projectsService.activeProject) {
+        props.onChange(projectsService.activeProject.id);
+      }
+    },
+  });
+
+  const value = props.value ?? projectsService.activeProject?.id;
+
   const projects = projectsLoader.data as Project[];
 
   const possibleOptions = projects.filter(project => project.canCreateConnections);
-
-  useEffect(() => {
-    if (!props.value && possibleOptions[0]) {
-      props.onChange(possibleOptions[0].id);
-    }
-  }, [projects]);
 
   function handleProjectSelect(projectId: string) {
     const project = projectsLoader.resource.get(projectId);
@@ -43,11 +47,10 @@ export function ProjectSelect(props: Props) {
     }
   }
 
-
   return  (
     <Combobox
       name='projectId'
-      value={props.value}
+      value={value ?? ''}
       items={projects}
       keySelector={project => project.id}
       valueSelector={project => project.name}
@@ -65,4 +68,4 @@ export function ProjectSelect(props: Props) {
       {translate('connections_connection_project')}
     </Combobox>
   );
-}
+});
