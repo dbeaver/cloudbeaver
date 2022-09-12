@@ -6,14 +6,15 @@
     <extension point="io.cloudbeaver.service">
         <service id="resource.manager" label="Resource management " description="Resource management  services" class="io.cloudbeaver.service.rm.WebServiceBindingRM">
             <permission id="project-resource-view" label="Project Resource View" description="Allow read only access to resources"
-                        category="general" scope="project"/>
+                        category="resources" scope="project"/>
             <permission id="project-resource-edit" label="Project Resource Edit" description="Allow write access to resources"
-                        category="general" scope="project"/>
+                        category="resources" scope="project"/>
 
-            <permission id="project-connection-view" label="Project Connection View" description="Allow view connections in the project"
-                        category="general" scope="project"/>
-            <permission id="project-connection-edit" label="Project Connections Edit"
-                        description="Allow create/edit connections in the project" category="general" scope="project"/>
+            <permission id="project-data-source-view" label="Project Dat Source View" description="Allow view data sources in the project"
+                        category="data-sources" scope="project"/>
+            <permission id="project-data-source-edit" label="Project Data Source Edit"
+                        description="Allow create/edit data sources in the project"
+                        category="data-sources" scope="project"/>
 
 <!--            <permission id="project-admin" label="Project Admin" description="Allow manage access to the project" category="general"-->
 <!--                        scope="project"/>-->

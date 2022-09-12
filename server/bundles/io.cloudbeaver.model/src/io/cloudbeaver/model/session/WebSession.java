@@ -335,7 +335,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             RMProject[] rmProjects =  controller.listAccessibleProjects();
             for (RMProject project : rmProjects) {
                 VirtualProjectImpl virtualProject = createVirtualProject(project);
-                if (!virtualProject.getRmProject().getProjectPermissions().contains(RMProjectPermission.CONNECTIONS_EDIT.getPermissionId())) {
+                if (!virtualProject.getRmProject().getProjectPermissions().contains(RMProjectPermission.DATA_SOURCES_EDIT.getPermissionId())) {
                     // Projects for which user don't have edit permission can't be saved. So mark the as in memory
                     virtualProject.setInMemory(true);
                 }

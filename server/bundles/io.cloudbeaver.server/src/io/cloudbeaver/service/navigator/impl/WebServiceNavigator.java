@@ -442,7 +442,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     private boolean hasNodeEditPermission(DBNNode node, RMProject rmProject) {
         var projectPermissions = rmProject.getProjectPermissions();
         if (node instanceof DBNDataSource || node instanceof DBNLocalFolder) {
-            return projectPermissions.contains(RMProjectPermission.CONNECTIONS_EDIT.getPermissionId());
+            return projectPermissions.contains(RMProjectPermission.DATA_SOURCES_EDIT.getPermissionId());
         } else if (node instanceof DBNAbstractResourceManagerNode) {
             return projectPermissions.contains(RMProjectPermission.RESOURCE_EDIT.getPermissionId());
         }

@@ -29,6 +29,7 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.registry,
  io.cloudbeaver.server,
  io.cloudbeaver.service,
+ io.cloudbeaver.service.security,
  io.cloudbeaver.service.sql,
  io.cloudbeaver.utils
 Automatic-Module-Name: io.cloudbeaver.model

@@ -17,6 +17,11 @@ type RMResource {
     length: Int!
 }
 
+input RMProjectPermissions {
+    subjectId: String!
+    permissions: [String!]!
+}
+
 extend type Query {
 
     # List accessible projects
@@ -26,7 +31,12 @@ extend type Query {
 
     rmProject(projectId: String!): RMProject!
 
-    # List accessible projects
+    rmListProjectPermissions: AdminPermissionInfo
+
+    rmListProjectGrantedPermissions(projectId: String!): [AdminObjectGrantInfo!]!
+    rmListSubjectProjectsPermissionGrants(subjectId: String!): [AdminObjectGrantInfo!]!
+
+
     rmListResources(
         projectId: String!,
         folder: String,
@@ -70,4 +80,7 @@ extend type Mutation {
         description: String): RMProject!
 
     rmDeleteProject(projectId: ID!): Boolean!
+
+    rmSetProjectPermissions(projectId: String!, permissions: [RMProjectPermissions!]!): Boolean!
+
 }

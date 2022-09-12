@@ -173,8 +173,8 @@ public class LocalResourceController implements RMController {
         switch (projectType) {
             case GLOBAL:
                 return credentialsProvider.hasPermission(DBWConstants.PERMISSION_ADMIN)
-                    ? Set.of(RMProjectPermission.RESOURCE_EDIT, RMProjectPermission.CONNECTIONS_EDIT)
-                    : Set.of(RMProjectPermission.RESOURCE_VIEW, RMProjectPermission.CONNECTIONS_VIEW);
+                    ? Set.of(RMProjectPermission.RESOURCE_EDIT, RMProjectPermission.DATA_SOURCES_EDIT)
+                    : Set.of(RMProjectPermission.RESOURCE_VIEW, RMProjectPermission.DATA_SOURCES_VIEW);
             case SHARED:
                 if(projectId == null) {
                     throw new DBException("Project id required");
@@ -185,7 +185,7 @@ public class LocalResourceController implements RMController {
                     .map(RMProjectPermission::fromPermission)
                     .collect(Collectors.toSet());
             case USER:
-                return  Set.of(RMProjectPermission.RESOURCE_EDIT, RMProjectPermission.CONNECTIONS_EDIT);
+                return  Set.of(RMProjectPermission.RESOURCE_EDIT, RMProjectPermission.DATA_SOURCES_EDIT);
             default:
                 throw new DBException("Unknown project type:" + projectType);
         }
@@ -745,10 +745,9 @@ public class LocalResourceController implements RMController {
         return new RMProjectName(prefix, name);
     }
 
-    public static boolean isShared(String projectId) {
+    public static boolean isGlobalProject(String projectId) {
         RMProjectName rmProjectName = parseProjectName(projectId);
-        return RMProject.Type.SHARED.getPrefix().equals(rmProjectName.getPrefix()) ||
-            RMProject.Type.GLOBAL.getPrefix().equals(rmProjectName.getPrefix());
+        return RMProject.Type.GLOBAL.getPrefix().equals(rmProjectName.getPrefix());
     }
 
 }
