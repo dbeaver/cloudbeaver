@@ -14,7 +14,7 @@ import { SqlEditorTabService } from './SqlEditorTabService';
 
 export const sqlEditorTabPluginManifest: PluginManifest = {
   info: {
-    name: 'Sql Editor Plugin',
+    name: 'Sql Editor Navigation Tab Plugin',
   },
 
   providers: [

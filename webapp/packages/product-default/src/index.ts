@@ -15,6 +15,7 @@ import spreadsheetNew from '@cloudbeaver/plugin-data-spreadsheet-new';
 import dataViewer from '@cloudbeaver/plugin-data-viewer';
 import datasourceContextSwitch from '@cloudbeaver/plugin-datasource-context-switch';
 import ddlViewer from '@cloudbeaver/plugin-ddl-viewer';
+import devTools from '@cloudbeaver/plugin-devtools';
 import gisViewer from '@cloudbeaver/plugin-gis-viewer';
 import help from '@cloudbeaver/plugin-help';
 import localization from '@cloudbeaver/plugin-localization';
@@ -44,6 +45,7 @@ import versionUpdate from '@cloudbeaver/plugin-version-update-administration';
 import { defaultProductManifest } from './manifest';
 
 const PLUGINS: PluginManifest[] = [
+  devTools,
   administration,
   spreadsheetNew,
   authentication,

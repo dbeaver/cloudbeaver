@@ -62,6 +62,10 @@ export const BASE_CONTAINERS_STYLES = css`
       &[parent] {
         padding: 24px;
 
+        &[compact] {
+          padding: 16px;
+        }
+
         &[dense] {
           padding: 8px;
         }
@@ -69,6 +73,10 @@ export const BASE_CONTAINERS_STYLES = css`
 
       &[gap] {
         gap: 24px;
+
+        &[compact] {
+          gap: 16px;
+        }
 
         &[dense] {
           gap: 8px;

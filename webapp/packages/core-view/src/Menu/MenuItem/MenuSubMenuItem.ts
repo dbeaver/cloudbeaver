@@ -12,15 +12,24 @@ import { MenuItem } from './MenuItem';
 
 export class MenuSubMenuItem extends MenuItem implements IMenuSubMenuItem {
   readonly menu: IMenu;
+  readonly label?: string;
+  readonly icon?: string;
+  readonly tooltip?: string;
   readonly events?: IMenuSubMenuEvents;
   readonly hidden: boolean;
 
   constructor(
     menu: IMenu,
+    label?: string,
+    icon?: string,
+    tooltip?: string,
     events?: IMenuSubMenuEvents
   ) {
     super(menu.id);
     this.menu = menu;
+    this.label = label;
+    this.icon = icon;
+    this.tooltip = tooltip;
     this.hidden = false;
     this.events = events;
   }
