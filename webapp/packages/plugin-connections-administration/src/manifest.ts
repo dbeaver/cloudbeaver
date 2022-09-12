@@ -12,7 +12,6 @@ import { ConnectionsAdministrationNavService } from './Administration/Connection
 import { ConnectionsAdministrationService } from './Administration/Connections/ConnectionsAdministrationService';
 import { CreateConnectionBaseBootstrap } from './Administration/Connections/CreateConnection/CreateConnectionBaseBootstrap';
 import { ConnectionManualService } from './Administration/Connections/CreateConnection/Manual/ConnectionManualService';
-import { ConnectionSearchService } from './Administration/Connections/CreateConnection/Search/ConnectionSearchService';
 import { CreateConnectionService } from './Administration/Connections/CreateConnectionService';
 import { ConnectionAccessTabService } from './ConnectionForm/ConnectionAccess/ConnectionAccessTabService';
 import { LocaleService } from './LocaleService';
@@ -28,7 +27,6 @@ export const connectionPlugin: PluginManifest = {
     ConnectionsAdministrationNavService,
     CreateConnectionService,
     ConnectionManualService,
-    ConnectionSearchService,
     CreateConnectionBaseBootstrap,
     ConnectionAccessTabService,
   ],

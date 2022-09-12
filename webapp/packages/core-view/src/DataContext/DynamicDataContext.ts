@@ -15,6 +15,10 @@ export class DynamicDataContext implements IDataContext {
   fallback: IDataContext;
   contexts: Map<DataContextGetter<any>, DeleteVersionedContextCallback>;
 
+  get map() {
+    return this.fallback.map;
+  }
+
   constructor(fallback: IDataContext) {
     this.fallback = fallback;
     this.contexts = new Map();
@@ -56,8 +60,12 @@ export class DynamicDataContext implements IDataContext {
     return this.fallback.get(context);
   }
 
-  find <T>(context: DataContextGetter<T>, value: T): boolean {
-    return this.fallback.find(context, value);
+  hasValue <T>(context: DataContextGetter<T>, value: T): boolean {
+    return this.fallback.hasValue(context, value);
+  }
+
+  find<T>(context: DataContextGetter<T>, predicate: (value: T) => boolean): T | undefined {
+    return this.fallback.find(context, predicate);
   }
 
   tryGet <T>(context: DataContextGetter<T>): T | undefined {

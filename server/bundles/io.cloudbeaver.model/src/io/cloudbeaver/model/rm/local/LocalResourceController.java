@@ -204,7 +204,7 @@ public class LocalResourceController implements RMController {
     public RMProject createProject(@NotNull String name, @Nullable String description) throws DBException {
         if (!Files.exists(sharedProjectsPath)) {
             try {
-                Files.createDirectory(sharedProjectsPath);
+                Files.createDirectories(sharedProjectsPath);
             } catch (IOException e) {
                 throw new DBException("Error creating shared project path", e);
             }
@@ -216,7 +216,7 @@ public class LocalResourceController implements RMController {
             throw new DBException("Project '" + name + "' already exists");
         }
         try {
-            Files.createDirectory(getProjectPath(project.getId()));
+            Files.createDirectories(getProjectPath(project.getId()));
             return project;
         } catch (IOException e) {
             throw new DBException("Error creating project path", e);
@@ -354,7 +354,7 @@ public class LocalResourceController implements RMController {
         }
         try {
             if (isFolder) {
-                Files.createDirectory(targetPath);
+                Files.createDirectories(targetPath);
             } else {
                 Files.createFile(targetPath);
             }
