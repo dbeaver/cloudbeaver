@@ -29,6 +29,7 @@ type Props<T = Record<string, any>> = ExtractContainerProps<T> & React.PropsWith
   localState?: MetadataMap<string, any>;
   lazy?: boolean;
   manual?: boolean;
+  autoSelect?: boolean;
   tabList?: string[];
   enabledBaseActions?: boolean;
   onChange?: (tab: ITabData<T>) => void;
@@ -43,6 +44,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   localState,
   children,
   lazy = false,
+  autoSelect = true,
   manual,
   tabList,
   enabledBaseActions,
@@ -53,10 +55,16 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   const props = rest as any as T;
   if (
     !selectedId
-    && currentTabId === undefined
-    && container
+    && (currentTabId === undefined || currentTabId === null)
+    && autoSelect
   ) {
-    const displayed = container.getIdList(props);
+    let displayed: string[] = [];
+
+    if (container) {
+      displayed = container.getIdList(props);
+    } else if (tabList) {
+      displayed = tabList;
+    }
 
     if (displayed.length > 0) {
       selectedId = displayed[0];

@@ -100,6 +100,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(forwar
           menuData={menuData}
           rtl={rtl}
           menu={menu.current}
+          modal={modal}
           style={style}
           onItemClose={handlers.handleItemClose}
         />

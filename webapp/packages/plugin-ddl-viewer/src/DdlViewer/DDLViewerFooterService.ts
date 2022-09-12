@@ -31,7 +31,7 @@ export class DDLViewerFooterService {
     this.actionsService.addHandler({
       id: 'ddl-viewer-footer-base-handler',
       isActionApplicable(context, action) {
-        const menu = context.find(DATA_CONTEXT_MENU, MENU_DDL_VIEWER_FOOTER);
+        const menu = context.hasValue(DATA_CONTEXT_MENU, MENU_DDL_VIEWER_FOOTER);
         const node = context.tryGet(DATA_CONTEXT_DDL_VIEWER_NODE);
 
         if (!menu || !node) {

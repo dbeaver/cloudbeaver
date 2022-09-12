@@ -80,14 +80,16 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
     }
   };
 
-  if (presentations.length <= 1 && type === DataPresentationType.main) {
+  const main = type === DataPresentationType.main;
+
+  if (presentations.length <= 1 && main) {
     return null;
   }
 
   return styled(style)(
     <table-left-bar className={className}>
-      <TabsState currentTabId={presentationId}>
-        <TabList {...use({ flexible: type === DataPresentationType.main })}>
+      <TabsState currentTabId={presentationId} autoSelect={main}>
+        <TabList {...use({ flexible: main })}>
           {presentations.map(presentation => (
             <Tab
               key={presentation.id}

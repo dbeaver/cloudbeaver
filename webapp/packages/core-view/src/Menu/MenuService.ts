@@ -114,7 +114,7 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
       }
 
       if (creator.menus) {
-        const applicable = creator.menus.some(menu => contexts.find(DATA_CONTEXT_MENU, menu));
+        const applicable = creator.menus.some(menu => contexts.hasValue(DATA_CONTEXT_MENU, menu));
 
         if (!applicable) {
           return false;
