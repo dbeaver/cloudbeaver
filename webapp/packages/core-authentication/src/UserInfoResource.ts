@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable, runInAction } from 'mobx';
+import { computed, makeObservable, observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ISyncExecutor, ITask, AutoRunningTask, whileTask } from '@cloudbeaver/core-executor';
@@ -253,7 +253,7 @@ UserInfoIncludes
 
   protected resetIncludes(): void {
     const metadata = this.getMetadata();
-    metadata.includes = [...this.defaultIncludes];
+    metadata.includes = observable([...this.defaultIncludes]);
   }
 
   getIncludes(key: void): string[] {

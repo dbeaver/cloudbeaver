@@ -39,6 +39,9 @@ export const menuPanelStyles = css`
       outline: none;
       z-index: 999;
     }
+    MenuPanel[submenu] {
+      margin-top: -12px;
+    }
     menu-box {
       composes: theme-typography--body2 theme-elevation-z5 from global;
       min-width: 140px;
@@ -56,6 +59,12 @@ export const menuPanelStyles = css`
       &:not([|hasBindings]) menu-item-binding {
         width: 0;
       }
+    }
+
+    Menu[modal] menu-box {
+      overflow: auto;
+      max-height: 80vh;
+      overflow-x: hidden;
     }
 
     MenuItem, MenuItemCheckbox, MenuItemRadio {
@@ -109,6 +118,7 @@ export const menuPanelStyles = css`
       align-items: center;
       height: 30px;
       padding: 0 4px;
+
       & menu-item-text, & menu-item-binding  {
         display: block;
         padding: 0 4px;
@@ -143,6 +153,15 @@ export const menuPanelStyles = css`
       }
       & Loader {
         width: 16px;
+      }
+    }
+
+    Menu[rtl] {
+      & menu-item-text {
+        text-align: right;
+      }
+      & menu-panel-item menu-item-content Icon {
+        transform: rotate(90deg);
       }
     }
   `;

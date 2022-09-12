@@ -8,7 +8,7 @@
 
 import type { ISyncContextLoader } from '@cloudbeaver/core-executor';
 
-import type { App } from './App';
+import { App } from './App';
 import type { IServiceConstructor, IServiceInjector } from './IApp';
 import { injectable } from './injectable';
 

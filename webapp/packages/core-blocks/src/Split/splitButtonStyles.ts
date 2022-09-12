@@ -24,7 +24,7 @@ export const buttonStyles = css`
     }
 
     button {
-      composes: theme-button theme-button_unelevated theme-button_background from global;
+      composes: theme-button theme-button_unelevated theme-button_background theme-elevation-z3 from global;
       opacity: 0;
       transition-property: opacity, box-shadow !important;
     }
