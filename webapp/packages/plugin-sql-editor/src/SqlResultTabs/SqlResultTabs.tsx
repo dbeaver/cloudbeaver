@@ -90,13 +90,12 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
     return styled(style)(<TextPlaceholder>{translate('sql_editor_placeholder')}</TextPlaceholder>);
   }
 
-  const currentId = state.currentTabId || '';
   const tabList = orderedTabs.map(tab => tab.id);
 
   return styled(style)(
     <wrapper>
       <TabsState
-        currentTabId={currentId}
+        currentTabId={state.currentTabId}
         tabList={tabList}
         enabledBaseActions
         onChange={handleSelect}
