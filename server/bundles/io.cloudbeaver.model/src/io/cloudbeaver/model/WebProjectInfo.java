@@ -57,25 +57,25 @@ public class WebProjectInfo {
 
     @Property
     public boolean isCanEditDataSources() {
-        return hasDatasourcePermission(RMProjectPermission.DATA_SOURCES_EDIT);
+        return hasDataSourcePermission(RMProjectPermission.DATA_SOURCES_EDIT);
     }
 
     @Property
     public boolean isCanViewDataSources() {
-        return hasDatasourcePermission(RMProjectPermission.DATA_SOURCES_VIEW);
+        return hasDataSourcePermission(RMProjectPermission.DATA_SOURCES_VIEW);
     }
 
     @Property
     public boolean isCanEditResources() {
-        return hasDatasourcePermission(RMProjectPermission.RESOURCE_EDIT);
+        return hasDataSourcePermission(RMProjectPermission.RESOURCE_EDIT);
     }
 
     @Property
     public boolean isCanViewResources() {
-        return hasDatasourcePermission(RMProjectPermission.RESOURCE_VIEW);
+        return hasDataSourcePermission(RMProjectPermission.RESOURCE_VIEW);
     }
 
-    private boolean hasDatasourcePermission(RMProjectPermission permission) {
+    private boolean hasDataSourcePermission(RMProjectPermission permission) {
         return SMUtils.isRMAdmin(session)
             || project.getRmProject().getProjectPermissions().contains(permission.getPermissionId());
     }

@@ -10,9 +10,9 @@
             <permission id="project-resource-edit" label="Project Resource Edit" description="Allow write access to resources"
                         category="resources" scope="project"/>
 
-            <permission id="project-data-source-view" label="Project Dat Source View" description="Allow view data sources in the project"
-                        category="data-sources" scope="project"/>
-            <permission id="project-data-source-edit" label="Project Data Source Edit"
+            <permission id="project-datasource-view" label="Project Dat Source View" description="Allow view data sources in the project"
+                        category="datasources" scope="project"/>
+            <permission id="project-datasource-edit" label="Project Data Source Edit"
                         description="Allow create/edit data sources in the project"
                         category="data-sources" scope="project"/>
 
