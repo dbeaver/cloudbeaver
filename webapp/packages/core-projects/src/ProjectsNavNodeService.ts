@@ -11,18 +11,18 @@ import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { NAV_NODE_TYPE_PROJECT } from './NAV_NODE_TYPE_PROJECT';
-import { Project, ProjectsResource } from './ProjectsResource';
+import { ProjectInfo, ProjectInfoResource } from './ProjectInfoResource';
 
 @injectable()
 export class ProjectsNavNodeService {
 
   constructor(
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly projectsResource: ProjectsResource
+    private readonly projectsResource: ProjectInfoResource
   ) {
   }
 
-  getProject(nodeId: string): Project | undefined {
+  getProject(nodeId: string): ProjectInfo | undefined {
     const parentIds = [...this.navNodeInfoResource.getParents(nodeId), nodeId];
     const parents = this.navNodeInfoResource.get(resourceKeyList(parentIds));
 
@@ -35,7 +35,7 @@ export class ProjectsNavNodeService {
     return this.getByNodeId(projectNode.id);
   }
 
-  getByNodeId(nodeId: string): Project | undefined {
+  getByNodeId(nodeId: string): ProjectInfo | undefined {
     return this.projectsResource.get(nodeId.replace('resource://', ''));
   }
 

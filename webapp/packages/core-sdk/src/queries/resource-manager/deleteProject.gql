@@ -1,0 +1,3 @@
+mutation deleteProject($projectId: ID!) {
+  rmDeleteProject(projectId: $projectId)
+}

@@ -59,6 +59,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
   node,
   dndElement,
   dndPlaceholder,
+  className,
 }, ref) {
   const treeNodeContext = useContext(TreeNodeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
@@ -83,7 +84,12 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
   }
 
   return styled(TREE_NODE_STYLES, styles)(
-    <TreeNodeControl ref={ref} onClick={onClickHandler} {...use({ outdated, editing, dragging: dndElement })}>
+    <TreeNodeControl
+      ref={ref}
+      onClick={onClickHandler}
+      {...use({ outdated, editing, dragging: dndElement })}
+      className={className}
+    >
       <TreeNodeName title={node.name}>
         {editing ? (
           <NavigationNodeEditor node={node} onClose={() => setEditing(false)} />

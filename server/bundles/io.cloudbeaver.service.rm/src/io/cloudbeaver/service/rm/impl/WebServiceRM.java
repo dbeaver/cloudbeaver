@@ -128,7 +128,9 @@ public class WebServiceRM implements DBWServiceRM {
         @NotNull WebSession session, @NotNull String name, @Nullable String description
     ) throws DBWebException {
         try {
-            return getResourceController(session).createProject(name, description);
+            RMProject rmProject = getResourceController(session).createProject(name, description);
+            session.createVirtualProject(rmProject);
+            return rmProject;
         } catch (DBException e) {
             throw new DBWebException("Error creating project", e);
         }

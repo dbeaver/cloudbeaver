@@ -113,6 +113,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       <Control
         ref={setRef}
         dndElement={dndData.state.isDragging}
+        style={style}
         node={node}
       />
       {(expanded || externalExpanded) && (

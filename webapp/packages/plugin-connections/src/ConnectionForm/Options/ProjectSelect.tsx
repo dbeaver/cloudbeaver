@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Combobox, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { Project, ProjectsResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { ProjectInfo, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 interface Props {
@@ -25,7 +25,7 @@ export const ProjectSelect = observer(function ProjectSelect(props: Props) {
   const translate = useTranslate();
 
   const projectsService = useService(ProjectsService);
-  const projectsLoader = useMapResource(ProjectSelect, ProjectsResource, CachedMapAllKey, {
+  const projectsLoader = useMapResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey, {
     onData: () => {
       if (!props.value && projectsService.activeProject) {
         props.onChange(projectsService.activeProject.id);
@@ -34,8 +34,7 @@ export const ProjectSelect = observer(function ProjectSelect(props: Props) {
   });
 
   const value = props.value ?? projectsService.activeProject?.id;
-
-  const projects = projectsLoader.data as Project[];
+  const projects = projectsLoader.data as ProjectInfo[];
 
   const possibleOptions = projects.filter(project => project.canCreateConnections);
 

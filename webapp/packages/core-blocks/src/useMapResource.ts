@@ -14,6 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, ResourceKey, CachedMapResourceValue, CachedMapResourceKey, CachedMapResourceArguments, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter, isResourceKeyList } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
+import { getComputed } from './getComputed';
 import type { ILoadableState } from './Loader/ILoadableState';
 import { useObservableRef } from './useObservableRef';
 
@@ -55,6 +56,7 @@ interface IMapResourceState<TResource extends CachedMapResource<any, any, any>> 
   loaded: boolean;
   resource: TResource;
   isOutdated: () => boolean;
+  reload: () => void;
 }
 
 interface IMapResourceListResult<
@@ -276,6 +278,7 @@ export function useMapResource<
     preloaded: computed,
     exception: observable.ref,
     loading: observable.ref,
+    resource: observable.ref,
   }, {
     exceptionObserved: false,
     resource,
@@ -363,20 +366,22 @@ export function useMapResource<
     loading: computed,
   }, false);
 
-  // TODO: getComputed skips update somehow ...
-  const outdated = (
-    !result.loading
-    && (result.outdated || !result.loaded)
-  );
-
-  const preloaded = refObj.preloaded; // make mobx subscription
+  const canLoad = getComputed(() => (
+    (
+      !keyRef.actual
+      || result.outdated
+      || !result.loaded
+    )
+    && refObj.preloaded
+    && keyRef.key !== null
+    && (
+      result.exception === null
+      || (Array.isArray(result.exception) && !result.exception.some(Boolean))
+    )
+  ));
 
   useEffect(() => {
-    if (!preloaded || (!outdated && keyRef.actual) || keyRef.key === null) {
-      return;
-    }
-
-    if (result.exception === null || (Array.isArray(result.exception) && !result.exception.some(Boolean))) {
+    if (canLoad) {
       (refObj as any)[loadFunctionName]();
     }
   });

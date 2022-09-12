@@ -3,6 +3,7 @@ export * from './App';
 export * from './AppContext';
 export * from './Bootstrap';
 export * from './Dependency';
+export * from './dependencyInjectorContext';
 export * from './DIService';
 export * from './injectable';
 export * from './PluginManifest';

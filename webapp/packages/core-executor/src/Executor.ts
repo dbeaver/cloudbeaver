@@ -9,6 +9,7 @@
 import { flat } from '@cloudbeaver/core-utils';
 
 import { ExecutionContext } from './ExecutionContext';
+import { executionExceptionContext } from './executionExceptionContext';
 import { ExecutorHandlersCollection } from './ExecutorHandlersCollection';
 import { ExecutorInterrupter, IExecutorInterrupter } from './ExecutorInterrupter';
 import type { IExecutionContext, IExecutionContextProvider } from './IExecutionContext';
@@ -68,8 +69,15 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
     context: IExecutionContext<T>,
     scoped: Array<IExecutorHandlersCollection<T>>
   ): Promise<IExecutionContextProvider<T>> {
-    const interrupter = context.getContext(ExecutorInterrupter.interruptContext);
     scoped = [...collection.collections, ...scoped];
+
+    context.addContextCreators(collection.contextCreators as any);
+
+    for (const scope of scoped) {
+      context.addContextCreators(scope.contextCreators as any);
+    }
+
+    const interrupter = context.getContext(ExecutorInterrupter.interruptContext);
 
     await this.executeChain(collection, data, context, 'before');
 
@@ -83,7 +91,11 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
       for (const scope of scoped) {
         await this.executeHandlers(data, context, scope.handlers, interrupter);
       }
-    } finally {
+    } catch (exception: any) {
+      const exceptionContext = context.getContext(executionExceptionContext);
+      exceptionContext.setException(exception);
+      throw exception;
+    }  finally {
       await this.executeHandlers(data, context, collection.postHandlers);
 
       for (const scope of scoped) {
@@ -158,6 +170,7 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
 
     this.scheduler.schedule(data, async () => {
       const context = new ExecutionContext(data);
+      context.addContextCreators(this.contextCreators as any);
 
       try {
         await handler(data, context);

@@ -1,0 +1,7 @@
+fragment SharedProject on RMProject {
+  id
+  name
+  shared
+  description
+  projectPermissions
+}

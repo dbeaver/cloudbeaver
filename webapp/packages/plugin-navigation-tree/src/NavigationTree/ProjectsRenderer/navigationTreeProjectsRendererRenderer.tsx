@@ -14,7 +14,6 @@ import { Translate } from '@cloudbeaver/core-localization';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT } from '@cloudbeaver/core-projects';
 
-import { useChildren } from '../../NodesManager/useChildren';
 import { useNode } from '../../NodesManager/useNode';
 import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent';
 import { NavigationNodeRenderer } from '../ElementsTree/NavigationTreeNode/NavigationNodeRenderer';
@@ -25,8 +24,16 @@ const nestedStyles = css`
   TreeNode {
     margin-top: 8px;
   }
-  NavigationNodeNested {
+  /*NavigationNodeNested {
     padding-left: 8px !important;
+  }*/
+  TreeNode {
+    & Control {
+      /*display: none;*/
+    }
+    & NavigationNodeNested {
+      padding-left: 0 !important;
+    }
   }
 `;
 

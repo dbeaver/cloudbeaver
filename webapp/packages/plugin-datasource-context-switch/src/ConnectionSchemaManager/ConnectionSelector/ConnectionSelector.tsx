@@ -27,15 +27,17 @@ import { MENU_CONNECTION_SELECTOR } from '../MENU_CONNECTION_SELECTOR';
 
 const menuStyles = css`
   Menu {
-    max-height: 400px;
-    overflow: auto;
+    & menu-box {
+      max-height: 80vh;
+      overflow: auto;
+    }
     & menu-panel-item {
-        overflow-x: hidden;
+      overflow-x: hidden;
     }
     & menu-item-text {
-        max-width: 400px;
-        overflow-x: hidden;
-        text-overflow: ellipsis;
+      max-width: 400px;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
     }
   }
 `;

@@ -218,9 +218,13 @@ public class LocalResourceController implements RMController {
         }
         validateResourcePath(name);
         RMProject project;
-        project = makeProjectFromPath(sharedProjectsPath.resolve(name), Set.of(), RMProject.Type.SHARED, false);
-        if (project == null) {
+        var projectPath = sharedProjectsPath.resolve(name);
+        if (Files.exists(projectPath)) {
             throw new DBException("Project '" + name + "' already exists");
+        }
+        project = makeProjectFromPath(projectPath, Set.of(), RMProject.Type.SHARED, false);
+        if (project == null) {
+            throw new DBException("Project '" + name + "' not created");
         }
         try {
             Files.createDirectories(getProjectPath(project.getId()));

@@ -11,7 +11,7 @@ import { action, makeObservable, runInAction, toJS } from 'mobx';
 import { createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { ProjectsResource, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { getUniqueName, isValuesEqual } from '@cloudbeaver/core-utils';
 
@@ -26,7 +26,7 @@ import { Options } from './Options';
 @injectable()
 export class ConnectionOptionsTabService extends Bootstrap {
   constructor(
-    private readonly projectsResource: ProjectsResource,
+    private readonly projectsResource: ProjectInfoResource,
     private readonly connectionFormService: ConnectionFormService,
     private readonly dbDriverResource: DBDriverResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
