@@ -22,7 +22,7 @@ export class NotificationItemController implements IInitializableController {
   isDetailsDialogOpen = false;
   private notification!: INotification<any>;
 
-  constructor(private commonDialogService: CommonDialogService) {
+  constructor(private readonly commonDialogService: CommonDialogService) {
     makeObservable(this, {
       isDetailsDialogOpen: observable,
     });
@@ -35,7 +35,11 @@ export class NotificationItemController implements IInitializableController {
       this.handleShowDetails = this.showDetails.bind(this);
     }
 
-    if (notification.type !== ENotificationType.Error && !notification.persistent) {
+    if (
+      notification.type !== ENotificationType.Error
+      && !notification.persistent
+      && notification.autoClose !== false
+    ) {
       this.closeAfter = FadeTimeout;
     }
   }

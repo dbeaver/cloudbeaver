@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable } from 'mobx';
+import { computed, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { EPermission, SessionPermissionsResource, ServerConfigResource } from '@cloudbeaver/core-root';
@@ -37,7 +37,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
     super();
     permissionsResource.require(this, EPermission.public);
 
-    this.serverConfigResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
+    this.serverConfigResource.onDataOutdated.addHandler(() => this.markOutdated());
 
     makeObservable(this, {
       enabledDrivers: computed,
@@ -69,19 +69,21 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
         includeDriverParameters: false,
         includeDriverProperties: false,
         includeProviderProperties: false,
-        ...this.getIncludesMap(driverId, includes),
+        ...this.getIncludesMap(driverId, (all ? this.defaultIncludes : includes)),
       });
-
-      if (all) {
-        this.resetIncludes();
-        this.data.clear();
-      }
 
       if (driverId && !drivers.some(driver => driver.id === driverId)) {
         throw new Error('Driver is not found');
       }
 
-      this.updateDriver(...drivers);
+      runInAction(() => {
+        if (all) {
+          const removedDrivers = this.keys.filter(key => !drivers.some(driver => driver.id === key));
+          this.delete(resourceKeyList(removedDrivers));
+        }
+
+        this.updateDriver(...drivers);
+      });
     });
 
     return this.data;
@@ -91,6 +93,6 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
     const keys = resourceKeyList(drivers.map(driver => driver.id));
 
     const oldDriver = this.get(keys);
-    this.set(keys, oldDriver.map((oldDriver, i) => ({ ...oldDriver, ...drivers[i] })));
+    this.set(keys, oldDriver.map((oldDriver, i) => (Object.assign(oldDriver ?? {}, drivers[i]))));
   }
 }
