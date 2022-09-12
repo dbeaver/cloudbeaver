@@ -18,16 +18,11 @@ import { action } from 'mobx';
 import type { IControlledCodeMirror } from 'react-codemirror2';
 
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
-import type { SqlCompletionProposal } from '@cloudbeaver/core-sdk';
 
 import type { ISQLEditorData } from '../ISQLEditorData';
 import type { SQLCodeEditorController } from '../SQLCodeEditor/SQLCodeEditorController';
 
 interface ISQLCodeEditorPanelData {
-  proposalsWordFrom: Position | null;
-  proposalsWord: string | null;
-  proposalsMode: boolean | null;
-  proposals: SqlCompletionProposal[] | null;
   readonly activeSuggest: boolean;
   readonly bindings: Omit<IControlledCodeMirror, 'value'>;
   closeHint(): void;
@@ -51,7 +46,6 @@ export function useSQLCodeEditorPanel(
   controller: SQLCodeEditorController | null
 ): ISQLCodeEditorPanelData {
   const editorPanelData = useObservableRef<ISQLCodeEditorPanelDataPrivate>(() => ({
-    proposals: null,
     activeSuggest: true,
     options: {
       theme: 'material',
@@ -225,38 +219,11 @@ export function useSQLCodeEditorPanel(
           : from
       );
 
-      const proposalWord = word.slice(0, 1);
-      let proposals = editorPanelData.proposals;
-
-      if (
-        proposals === null
-        || editorPanelData.proposalsWord !== proposalWord
-        || editorPanelData.proposalsMode !== options.completeSingle
-        || editorPanelData.proposalsWordFrom?.ch !== from.ch
-        || editorPanelData.proposalsWordFrom.line !== from.line
-        || !word.startsWith(editorPanelData.proposalsWord)
-      ) {
-        const proposalsMode = options.completeSingle ?? false;
-        editorPanelData.proposalsMode = proposalsMode;
-        editorPanelData.proposalsWord = proposalWord;
-        editorPanelData.proposalsWordFrom = from;
-        editorPanelData.proposals = [];
-
-        proposals = await editorPanelData.data.getHintProposals(cursorPosition, !options.completeSingle);
-
-        if (
-          editorPanelData.proposalsWord === proposalWord
-          && editorPanelData.proposalsWordFrom === from
-          && editorPanelData.proposalsMode === proposalsMode
-        ) {
-          editorPanelData.proposals = proposals;
-
-          if (editor.state.completionActive && proposals.length > 0) {
-            editor.state.completionActive.update();
-            return;
-          }
-        }
-      }
+      let proposals = await editorPanelData.data.getHintProposals(
+        cursorPosition,
+        word,
+        !options.completeSingle
+      );
 
       proposals = proposals.filter(
         ({ displayString }) => (
