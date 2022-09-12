@@ -202,7 +202,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
                     onChange={handleKeyUpload}
                   >
                     <Button
-                      type="button"
+                      tag="div"
                       disabled={disabled || readonly || !enabled}
                       mod={['outlined']}
                     >
