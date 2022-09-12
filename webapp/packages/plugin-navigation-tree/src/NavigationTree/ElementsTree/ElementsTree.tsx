@@ -83,6 +83,7 @@ interface Props extends IElementsTreeOptions {
   selectionTree?: boolean;
   control?: NavTreeControlComponent;
   emptyPlaceholder?: React.FC;
+  big?: boolean;
   style?: ComponentStyle;
   className?: string;
   navNodeFilterCompare?: NavNodeFilterCompareFn;
@@ -103,6 +104,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   filters = [],
   renderers = [],
   expandStateGetters,
+  big,
   style,
   className,
   getChildren,
@@ -288,7 +290,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   return styled(useStyles(TREE_NODE_STYLES, styles, style))(
     <>
       <ElementsTreeTools tree={tree} style={style} />
-      <tree-box>
+      <tree-box {...use({ big })}>
         <ElementsTreeLoader
           root={root}
           context={context}

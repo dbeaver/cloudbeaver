@@ -22,6 +22,7 @@ export function filterContainerFakeProps<T extends IContainerProps>(props: T): O
     gap,
     grid,
     dense,
+    compact,
     ...rest
   } = filterLayoutFakeProps(props);
 
