@@ -22,6 +22,7 @@ interface IMenuItemElementProps {
   icon?: string | React.ReactNode;
   menu?: boolean;
   loading?: boolean;
+  panelAvailable?: boolean;
   style?: ComponentStyle;
 }
 
@@ -31,6 +32,7 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
   binding,
   icon,
   menu,
+  panelAvailable,
   loading = false,
   style = [],
 }) {
@@ -52,7 +54,7 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
       </menu-item-binding>
       <menu-item-content>
         {loading && <Loader small fullSize />}
-        {menu && !loading && <Icon name="arrow" viewBox="0 0 16 16" />}
+        {panelAvailable !== false && menu && !loading && <Icon name="arrow" viewBox="0 0 16 16" />}
       </menu-item-content>
     </menu-panel-item>
 
