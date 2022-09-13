@@ -11,7 +11,7 @@ import { runInAction } from 'mobx';
 import { AdminObjectGrantInfo, EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmProject, ResourceKeyList, AdminSubjectType, RmProjectPermissions } from '@cloudbeaver/core-sdk';
+import { GraphQLService, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmProject, ResourceKeyList, RmProjectPermissions } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 const newSymbol = Symbol('new-project');
