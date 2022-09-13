@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { uuid } from '@cloudbeaver/core-utils';
 
@@ -19,6 +19,10 @@ interface Props extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLIn
 const styles = css`
   label {
     cursor: pointer;
+
+    &[|disabled] {
+      cursor: default;
+    }
   }
 `;
 
@@ -39,7 +43,7 @@ export const UploadArea: React.FC<Props> = function UploadArea({ id, reset, clas
   return styled(styles)(
     <>
       <input {...rest} type='file' id={_id} hidden onChange={handleChange} />
-      <label htmlFor={_id} className={className} title={rest.title}>
+      <label htmlFor={_id} {...use({ disabled: rest.disabled })} className={className} title={rest.title}>
         {children}
       </label>
     </>

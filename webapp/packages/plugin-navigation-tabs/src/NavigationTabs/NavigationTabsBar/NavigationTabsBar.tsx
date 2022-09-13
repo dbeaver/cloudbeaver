@@ -73,7 +73,11 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
   }, []);
 
   if (navigation.tabIdList.length === 0) {
-    return <TextPlaceholder>{translate('app_shared_navigationTabsBar_placeholder')}</TextPlaceholder>;
+    return (
+      <TextPlaceholder>
+        {translate('app_shared_navigationTabsBar_placeholder')}
+      </TextPlaceholder>
+    );
   }
 
   return styled(style)(

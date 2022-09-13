@@ -1255,7 +1255,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
             if (userIdFromCreds == null) {
                 var error = "Invalid user credentials";
-                updateAuthStatus(authId, SMAuthStatus.ERROR, authInfo.getAuthData(), error);
+                updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
                 return SMAuthInfo.error(authId, error);
             }
             if (activeUserId == null) {
@@ -1288,7 +1288,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
             } catch (SQLException e) {
                 var error = "Error during token generation";
-                updateAuthStatus(authId, SMAuthStatus.ERROR, authInfo.getAuthData(), error);
+                updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
                 throw new SMException(error, e);
             }
         }
