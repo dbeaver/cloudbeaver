@@ -10,6 +10,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
 import { ResourceFoldersBootstrap } from './NavNodes/ResourceFoldersBootstrap';
+import { ResourcesProjectsNavNodeService } from './NavNodes/ResourcesProjectsNavNodeService';
 import { NavResourceNodeService } from './NavResourceNodeService';
 import { PluginBootstrap } from './PluginBootstrap';
 import { ResourceManagerResource } from './ResourceManagerResource';
@@ -28,5 +29,6 @@ export const resourceManagerPlugin: PluginManifest = {
     NavResourceNodeService,
     ResourceFoldersBootstrap,
     ResourceProjectsResource,
+    ResourcesProjectsNavNodeService,
   ],
 };

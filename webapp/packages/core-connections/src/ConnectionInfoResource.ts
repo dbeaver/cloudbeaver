@@ -84,7 +84,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     this.addAlias(
       isConnectionInfoProjectKey,
       param => resourceKeyList(this.keys.filter(key => key.projectId === param.mark)),
-      true
+      (a, b) => a.mark === b.mark
     );
 
     // in case when session was refreshed all data depended on connection info

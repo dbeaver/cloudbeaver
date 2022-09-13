@@ -15,35 +15,49 @@ import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 interface Props {
   value: string | null;
+  filter?: (project: ProjectInfo) => boolean;
   onChange: (value: string) => void;
+  autoHide?: boolean;
   readOnly?: boolean;
   disabled?: boolean;
   inline?: boolean;
 }
 
-export const ProjectSelect = observer(function ProjectSelect(props: Props) {
+export const ProjectSelect = observer(function ProjectSelect({
+  value,
+  filter = project => project.canEditDataSources,
+  autoHide,
+  readOnly,
+  disabled,
+  inline,
+  onChange,
+}: Props) {
   const translate = useTranslate();
 
   const projectsService = useService(ProjectsService);
   const projectsLoader = useMapResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey, {
     onData: () => {
-      if (!props.value && projectsService.activeProject) {
-        props.onChange(projectsService.activeProject.id);
+      if (!value && projectsService.activeProject) {
+        onChange(projectsService.activeProject.id);
       }
     },
   });
 
-  const value = props.value ?? projectsService.activeProject?.id;
+  value = value ?? projectsService.activeProject?.id ?? null;
   const projects = projectsLoader.data as ProjectInfo[];
 
-  const possibleOptions = projects.filter(project => project.canEditDataSources);
+  const possibleOptions = projects.filter(filter);
 
   function handleProjectSelect(projectId: string) {
     const project = projectsLoader.resource.get(projectId);
 
-    if (project?.canEditDataSources) {
-      props.onChange(projectId);
+    if (project && filter(project)) {
+      onChange(projectId);
     }
+  }
+
+  if (autoHide && possibleOptions.length <= 1) {
+    return null;
   }
 
   return  (
@@ -55,11 +69,11 @@ export const ProjectSelect = observer(function ProjectSelect(props: Props) {
       valueSelector={project => project.name}
       titleSelector={project => project.description}
       isDisabled={project => !project.canEditDataSources}
-      readOnly={props.readOnly || possibleOptions.length <= 1}
+      readOnly={readOnly || possibleOptions.length <= 1}
       searchable={projects.length > 10}
-      disabled={props.disabled}
+      disabled={disabled}
       loading={projectsLoader.isLoading()}
-      inline={props.inline}
+      inline={inline}
       tiny
       fill
       onSelect={handleProjectSelect}

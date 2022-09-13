@@ -10,13 +10,13 @@ import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, useFocus, useObservableRef } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, useFocus, useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { ProjectsService, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { useStyles } from '@cloudbeaver/core-theming';
-import { ProjectSelect } from '@cloudbeaver/plugin-connections/src/ConnectionForm/Options/ProjectSelect';
+import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
 const style = css`
   fill {
@@ -30,7 +30,7 @@ interface Payload {
 
 export interface ISaveScriptDialogResult {
   name: string;
-  projectId: string;
+  projectId: string | null;
 }
 
 interface State extends ISaveScriptDialogResult {
@@ -49,11 +49,10 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
 }) {
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
-  const projectsService = useService(ProjectsService);
 
   const state = useObservableRef<State>(() => ({
     name: payload.defaultScriptName ?? '',
-    projectId: projectsService.activeProject?.id ?? PROJECT_GLOBAL_ID,
+    projectId: null,
     errorMessage: null,
     validate() {
       this.errorMessage = null;
@@ -99,7 +98,7 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
           <Button
             type="button"
             mod={['unelevated']}
-            disabled={!state.name.trim()}
+            disabled={!state.name.trim() || state.projectId === null}
             onClick={state.submit}
           >
             <Translate token='ui_processing_save' />
@@ -121,6 +120,8 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
           </InputField>
           <ProjectSelect
             value={state.projectId}
+            filter={p => p.canEditResources}
+            autoHide
             onChange={projectId => {state.projectId = projectId;}}
           />
         </Container>

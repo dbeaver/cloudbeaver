@@ -49,7 +49,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
           .filter(([key, context]) => context.projectId === param.mark)
           .map(([key]) => key)
       ),
-      true
+      (a, b) => a.mark === b.mark
     );
 
     permissionsResource

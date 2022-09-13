@@ -12,16 +12,17 @@ import { untracked } from 'mobx';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConnectionFolder, ConnectionFolderProjectKey, ConnectionFolderResource, ConnectionInfoResource, CONNECTION_FOLDER_NAME_VALIDATION, createConnectionFolderParam, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { ENodeMoveType, getNodesFromContext, INodeMoveData, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, nodeDeleteContext } from '@cloudbeaver/core-navigation-tree';
+import { ENodeMoveType, getNodesFromContext, INodeMoveData, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, nodeDeleteContext, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT, ProjectsNavNodeService, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, type IElementsTree } from '@cloudbeaver/plugin-navigation-tree';
+import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
 import { NAV_NODE_TYPE_CONNECTION } from './NAV_NODE_TYPE_CONNECTION';
 
@@ -30,6 +31,7 @@ interface ITargetNode {
   folderId?: string;
 
   projectNodeId: string;
+  selectProject: boolean;
 }
 
 @injectable()
@@ -47,7 +49,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly projectsResource: ProjectInfoResource,
+    private readonly projectInfoResource: ProjectInfoResource,
     private readonly projectsNavNodeService: ProjectsNavNodeService
   ) {
     super();
@@ -106,7 +108,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
 
-        if (!tree || !this.userInfoResource.data) {
+        if (!tree || !this.userInfoResource.data || tree.baseRoot !== ROOT_NODE_PATH) {
           return false;
         }
         const targetNode = this.getTargetNode(tree);
@@ -159,7 +161,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       return;
     }
 
-    await this.projectsResource.load(CachedMapAllKey);
+    await this.projectInfoResource.load(CachedMapAllKey);
 
     const move = contexts.getContext(navNodeMoveContext);
     const nodes = getNodesFromContext(moveContexts);
@@ -253,34 +255,38 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         await this.connectionFolderResource.load(ConnectionFolderProjectKey(targetNode.projectId));
 
-        let folder: ConnectionFolder | undefined;
+        let parentFolder: ConnectionFolder | undefined;
 
         if (targetNode.folderId) {
-          folder = this.connectionFolderResource.fromNodeId(targetNode.folderId);
+          parentFolder = this.connectionFolderResource.fromNodeId(targetNode.folderId);
 
-          if (!folder) {
+          if (!parentFolder) {
             this.notificationService.logError({ title:'Can\'t create folder', message: 'Folder not found' });
             return;
           }
         }
 
-        const result = await this.commonDialogService.open(RenameDialog, {
+        const result = await this.commonDialogService.open(FolderDialog, {
           value: this.localizationService.translate('ui_folder_new'),
+          projectId: targetNode.projectId,
           title: 'core_view_action_new_folder',
-          subTitle: folder?.id,
+          subTitle: parentFolder?.id,
           icon: '/icons/folder.svg#root',
           create: true,
-          validation: (name, setMessage) => {
-            const trimmed = name.trim();
+          selectProject: targetNode.selectProject,
+          validation: async ({ folder, projectId }, setMessage) => {
+            const trimmed = folder.trim();
 
-            if (trimmed.length === 0 || !name.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
+            if (trimmed.length === 0 || !folder.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
               setMessage('connections_connection_folder_validation');
               return false;
             }
 
+            await this.connectionFolderResource.load(ConnectionFolderProjectKey(projectId));
+
             return !this.connectionFolderResource.has(createConnectionFolderParam(
-              targetNode.projectId,
-              createPath(folder?.id, trimmed)
+              projectId,
+              createPath(parentFolder?.id, trimmed)
             ));
           },
         });
@@ -288,13 +294,13 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
           try {
             await this.connectionFolderResource.create(createConnectionFolderParam(
-              targetNode.projectId,
-              result
-            ), folder?.id);
+              result.projectId,
+              result.folder
+            ), parentFolder?.id);
             this.navTreeResource.markOutdated(
               targetNode.folderId !== undefined
                 ? targetNode.folderId
-                : targetNode.projectNodeId
+                : this.projectsNavNodeService.getProjectNodeId(result.projectId)
             );
           } catch (exception: any) {
             this.notificationService.logException(exception, 'Can\'t create folder');
@@ -318,10 +324,22 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
   }
 
   private getTargetNode(tree: IElementsTree): ITargetNode | undefined {
+    untracked(() => this.projectInfoResource.load(CachedMapAllKey));
     const selected = tree.getSelected();
 
     if (selected.length === 0) {
-      selected.push(tree.root);
+      const editableProjects = this.projectInfoResource.values.filter(project => project.canEditDataSources);
+
+      if (editableProjects.length > 0) {
+        const project = editableProjects[0];
+
+        return {
+          projectId: project.id,
+          projectNodeId: this.projectsNavNodeService.getProjectNodeId(project.id),
+          selectProject: editableProjects.length > 1,
+        };
+      }
+      return;
     }
 
     const targetFolder = selected[0];
@@ -333,7 +351,6 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       return;
     }
 
-    untracked(() => this.projectsResource.load(CachedMapAllKey));
 
     const project = this.projectsNavNodeService.getByNodeId(projectNode.id);
 
@@ -350,6 +367,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       projectId: project.id,
       folderId: targetFolderNode?.id,
       projectNodeId: projectNode.id,
+      selectProject: false,
     };
   }
 }

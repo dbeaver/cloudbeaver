@@ -85,6 +85,10 @@ export class PluginBootstrap extends Bootstrap {
 
           if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
             try {
+              if (!result.projectId) {
+                throw new Error('Project not selected');
+              }
+
               await this.resourceProjectsResource.load();
               const scriptName = `${result.name.trim()}.${SCRIPT_EXTENSION}`;
               const folder = createPath(RESOURCES_NODE_PATH, result.projectId);
