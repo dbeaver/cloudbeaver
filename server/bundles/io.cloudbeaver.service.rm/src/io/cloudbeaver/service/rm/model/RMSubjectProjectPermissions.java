@@ -1,5 +1,6 @@
 package io.cloudbeaver.service.rm.model;
 
+import org.eclipse.passage.lic.internal.json.Json;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
 import java.util.*;
@@ -7,11 +8,10 @@ import java.util.*;
 public class RMSubjectProjectPermissions {
     private final Map<String, Set<String>> subjectPermissions = new HashMap<>();
 
-    public RMSubjectProjectPermissions(Map<String, Object> params) {
-        for (Map.Entry<String, Object> entry : params.entrySet()) {
-            String subjectId = entry.getKey();
-            Map<String, Object> subjectParams = JSONUtils.getObject(params, subjectId);
-            Set<String> permissions = new HashSet<>(JSONUtils.getStringList(subjectParams, "permissions"));
+    public RMSubjectProjectPermissions(List<Map<String, Object>> params) {
+        for (Map<String, Object> userPerms : params) {
+            String subjectId = JSONUtils.getString(userPerms, "subjectId");
+            Set<String> permissions = new HashSet<>(JSONUtils.getStringList(userPerms, "permissions"));
             this.subjectPermissions.put(subjectId, permissions);
         }
     }
