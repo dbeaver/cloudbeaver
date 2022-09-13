@@ -12,7 +12,7 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class SharedProjectPermissionsResource extends CachedDataResource<PermissionInfo[], void | any> {
+export class ProjectPermissionsResource extends CachedDataResource<PermissionInfo[], void | any> {
   constructor(
     private readonly graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource
@@ -25,6 +25,6 @@ export class SharedProjectPermissionsResource extends CachedDataResource<Permiss
   protected async loader(): Promise<PermissionInfo[]> {
     const { permissions } = await this.graphQLService.sdk.getProjectPermissionsList();
 
-    return permissions as any as PermissionInfo[];
+    return permissions;
   }
 }

@@ -1,3 +1,4 @@
 export * from './SharedProjectsResource';
-export * from './SharedProjectPermissionsResource';
+export * from './ProjectPermissionsResource';
+export * from './EProjectPermission';
 export { resourceManagerManifest } from './manifest';

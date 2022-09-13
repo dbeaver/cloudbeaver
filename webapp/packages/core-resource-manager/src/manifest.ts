@@ -8,7 +8,7 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { SharedProjectPermissionsResource } from './SharedProjectPermissionsResource';
+import { ProjectPermissionsResource } from './ProjectPermissionsResource';
 import { SharedProjectsResource } from './SharedProjectsResource';
 
 
@@ -19,6 +19,6 @@ export const resourceManagerManifest: PluginManifest = {
 
   providers: [
     SharedProjectsResource,
-    SharedProjectPermissionsResource,
+    ProjectPermissionsResource,
   ],
 };

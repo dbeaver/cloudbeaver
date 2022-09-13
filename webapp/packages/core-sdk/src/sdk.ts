@@ -882,7 +882,7 @@ export interface Query {
   readSessionLog: Array<LogEntry>;
   revokeUserRole?: Maybe<Scalars['Boolean']>;
   rmListProjectGrantedPermissions: Array<AdminObjectGrantInfo>;
-  rmListProjectPermissions?: Maybe<AdminPermissionInfo>;
+  rmListProjectPermissions: Array<AdminPermissionInfo>;
   rmListProjects: Array<RmProject>;
   rmListResources: Array<RmResource>;
   rmListSharedProjects: Array<RmProject>;
@@ -2494,7 +2494,7 @@ export type GetProjectGrantedPermissionsQuery = { grantedPermissions: Array<{ su
 export type GetProjectPermissionsListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProjectPermissionsListQuery = { permissions?: { id: string, label?: string, description?: string, category?: string } };
+export type GetProjectPermissionsListQuery = { permissions: Array<{ id: string, label?: string, description?: string, category?: string }> };
 
 export type GetResourceListQueryVariables = Exact<{
   projectId: Scalars['String'];
