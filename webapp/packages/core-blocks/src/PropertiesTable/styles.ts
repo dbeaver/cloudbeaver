@@ -19,6 +19,7 @@ export const PROPERTIES_TABLE_STYLES = css`
       box-sizing: border-box;
       display: inline-flex;
       border-bottom: solid 1px;
+      align-items: center;
     }
     properties-header-name, properties-header-value {
       composes: theme-typography--caption from global;
@@ -30,6 +31,8 @@ export const PROPERTIES_TABLE_STYLES = css`
     properties-header-name {
       flex: 0 0 auto;
       width: 300px;
+      display: flex;
+      align-items: center;
     }
     properties-header-add {
       flex: 0 0 auto;
@@ -53,6 +56,14 @@ export const PROPERTIES_TABLE_STYLES = css`
       width: 100%;
       height: 24px;
       pointer-events: none;
+    }
+
+    ShadowInput {
+      composes: theme-background-surface from global;
+      box-sizing: border-box;
+      height: 24px;
+      flex: 1;
+      margin-left: 8px;
     }
   `;
 
