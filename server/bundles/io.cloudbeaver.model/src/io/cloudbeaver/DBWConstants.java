@@ -16,13 +16,15 @@
  */
 package io.cloudbeaver;
 
+import org.jkiss.dbeaver.model.access.DBAPermissionRealm;
+
 /**
  * General constants
  */
 public class DBWConstants {
 
-    public static final String PERMISSION_PUBLIC = "public";
-    public static final String PERMISSION_ADMIN = "admin";
+    public static final String PERMISSION_PUBLIC = DBAPermissionRealm.PERMISSION_PUBLIC;
+    public static final String PERMISSION_ADMIN = DBAPermissionRealm.PERMISSION_ADMIN;
 
     public static final String PERMISSION_CONFIGURATION_MANAGER = "configuration-manager";
 
