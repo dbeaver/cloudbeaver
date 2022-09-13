@@ -31,7 +31,7 @@ extend type Query {
 
     rmProject(projectId: String!): RMProject!
 
-    rmListProjectPermissions: AdminPermissionInfo
+    rmListProjectPermissions: [AdminPermissionInfo!]!
 
     rmListProjectGrantedPermissions(projectId: String!): [AdminObjectGrantInfo!]!
     rmListSubjectProjectsPermissionGrants(subjectId: String!): [AdminObjectGrantInfo!]!
