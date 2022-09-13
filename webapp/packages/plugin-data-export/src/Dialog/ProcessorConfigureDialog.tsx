@@ -125,10 +125,10 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
       <TabsState currentTabId={currentTabId} onChange={handleTabChange}>
         <TabList>
           <Tab tabId={SETTINGS_TABS.EXTRACTION} style={UNDERLINE_TAB_STYLES}>
-            {translate('data_transfer_extraction_settings')}
+            {translate('data_transfer_format_settings')}
           </Tab>
           <Tab tabId={SETTINGS_TABS.OUTPUT} style={UNDERLINE_TAB_STYLES}>
-            {translate('data_transfer_output')}
+            {translate('data_transfer_output_settings')}
           </Tab>
         </TabList>
       </TabsState>
