@@ -7,6 +7,7 @@ import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.service.admin.AdminPermissionInfo;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.security.SMConstants;
 
@@ -14,11 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SMUtils {
-    public static boolean isAdmin(WebSession webSession) {
+    public static boolean isAdmin(SMCredentialsProvider webSession) {
         return webSession.hasPermission(DBWConstants.PERMISSION_ADMIN);
     }
 
-    public static boolean isRMAdmin(WebSession webSession) {
+    public static boolean isRMAdmin(SMCredentialsProvider webSession) {
         return isAdmin(webSession) || webSession.hasPermission(RMConstants.PERMISSION_RM_ADMIN);
     }
 

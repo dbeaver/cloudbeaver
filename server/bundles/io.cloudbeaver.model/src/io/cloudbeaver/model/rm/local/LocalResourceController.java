@@ -19,6 +19,7 @@ package io.cloudbeaver.model.rm.local;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.rm.RMUtils;
+import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.eclipse.core.runtime.IPath;
@@ -172,20 +173,24 @@ public class LocalResourceController implements RMController {
 
         switch (projectType) {
             case GLOBAL:
-                return credentialsProvider.hasPermission(DBWConstants.PERMISSION_ADMIN)
-                    ? Set.of(RMProjectPermission.RESOURCE_EDIT, RMProjectPermission.DATA_SOURCES_EDIT)
+                return SMUtils.isRMAdmin(credentialsProvider)
+                    ? Set.of(RMProjectPermission.PROJECT_ADMIN)
                     : Set.of(RMProjectPermission.RESOURCE_VIEW, RMProjectPermission.DATA_SOURCES_VIEW);
             case SHARED:
-                if(projectId == null) {
+                if (projectId == null) {
                     throw new DBException("Project id required");
                 }
+                if (SMUtils.isRMAdmin(credentialsProvider)) {
+                    return Set.of(RMProjectPermission.PROJECT_ADMIN);
+                }
+
                 return smController.getObjectPermissions(activeUserCreds.getUserId(), projectId, SMObjects.PROJECT)
                     .getPermissions()
                     .stream()
                     .map(RMProjectPermission::fromPermission)
                     .collect(Collectors.toSet());
             case USER:
-                return  Set.of(RMProjectPermission.RESOURCE_EDIT, RMProjectPermission.DATA_SOURCES_EDIT);
+                return Set.of(RMProjectPermission.RESOURCE_EDIT, RMProjectPermission.DATA_SOURCES_EDIT);
             default:
                 throw new DBException("Unknown project type:" + projectType);
         }
