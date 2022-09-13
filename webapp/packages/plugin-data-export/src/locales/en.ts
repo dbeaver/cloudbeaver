@@ -12,4 +12,6 @@ export default [
   ['data_transfer_notification_delete', 'Delete'],
   ['data_transfer_exporting_table', 'Table:'],
   ['data_transfer_exporting_sql', 'SQL:'],
+  ['data_transfer_extraction_settings', 'Extraction'],
+  ['data_transfer_output', 'Output'],
 ];

@@ -26,6 +26,7 @@ const styles = css`
     PropertiesTable {
       flex: 1;
       overflow: hidden;
+      padding: 12px 0;
     }
     message {
       margin: auto;
@@ -124,10 +125,10 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
       <TabsState currentTabId={currentTabId} onChange={handleTabChange}>
         <TabList>
           <Tab tabId={SETTINGS_TABS.EXTRACTION} style={UNDERLINE_TAB_STYLES}>
-            Extraction
+            {translate('data_transfer_extraction_settings')}
           </Tab>
           <Tab tabId={SETTINGS_TABS.OUTPUT} style={UNDERLINE_TAB_STYLES}>
-            Output
+            {translate('data_transfer_output')}
           </Tab>
         </TabList>
       </TabsState>
