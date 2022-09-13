@@ -8,6 +8,7 @@ Bundle-Release-Date: 20220905
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
-Require-Bundle: io.cloudbeaver.server
+Require-Bundle: io.cloudbeaver.server,
+ io.cloudbeaver.service.admin
 Bundle-Localization: OSGI-INF/l10n/bundle
 Automatic-Module-Name: io.cloudbeaver.service.rm
