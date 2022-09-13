@@ -16,14 +16,14 @@ type DataTransferProcessorInfo {
 
 input DataTransferOutputSettingsInput {
     insertBom: Boolean
-    encoding: Boolean
-    timestampPattern: Boolean
+    encoding: String
+    timestampPattern: String
 }
 
 type DataTransferOutputSettings {
     insertBom: Boolean!
-    encoding: Boolean!
-    timestampPattern: Boolean!
+    encoding: String!
+    timestampPattern: String!
 }
 
 type DataTransferDefaultExportSettings {
