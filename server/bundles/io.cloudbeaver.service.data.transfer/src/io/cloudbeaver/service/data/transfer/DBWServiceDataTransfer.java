@@ -21,6 +21,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.data.transfer.impl.WebDataTransferDefaultExportSettings;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferParameters;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferStreamProcessor;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
@@ -51,4 +52,5 @@ public interface DBWServiceDataTransfer extends DBWService {
     @WebAction
     Boolean dataTransferRemoveDataFile(WebSession session, String dataFileId) throws DBWebException;
 
+    WebDataTransferDefaultExportSettings defaultExportSettings();
 }

@@ -14,6 +14,23 @@ type DataTransferProcessorInfo {
     isHTML: Boolean
 }
 
+input DataTransferOutputSettingsInput {
+    insertBom: Boolean
+    encoding: Boolean
+    timestampPattern: Boolean
+}
+
+type DataTransferOutputSettings {
+    insertBom: Boolean!
+    encoding: Boolean!
+    timestampPattern: Boolean!
+}
+
+type DataTransferDefaultExportSettings {
+    outputSettings : DataTransferOutputSettings!
+    supportedEncodings: [String!]!
+}
+
 input DataTransferParameters {
     # Processor ID
     processorId: ID!
@@ -22,6 +39,8 @@ input DataTransferParameters {
     settings: Object
     # Processor properties. See DataTransferProcessorInfo.properties
     processorProperties: Object!
+    # Consumer properties. See StreamConsumerSettings
+    outputSettings: DataTransferOutputSettingsInput
     # Data filter settings
     filter: SQLDataFilter
 }
@@ -30,6 +49,8 @@ extend type Query {
 
     # Available transfer processors
     dataTransferAvailableStreamProcessors: [ DataTransferProcessorInfo! ]!
+
+    dataTransferDefaultExportSettings: DataTransferDefaultExportSettings!
 
     dataTransferExportDataFromContainer(
         projectId: ID,
