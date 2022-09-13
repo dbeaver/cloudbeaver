@@ -185,7 +185,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     }
 
     if (type === ENodeMoveType.CanDrop) {
-      if (targetProject?.canCreateConnections) {
+      if (targetProject?.canEditDataSources) {
         move.setCanMove(true);
       }
     } else {
@@ -337,7 +337,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
     const project = this.projectsNavNodeService.getByNodeId(projectNode.id);
 
-    if (!project?.canCreateConnections) {
+    if (!project?.canEditDataSources) {
       return;
     }
 

@@ -36,12 +36,12 @@ export const ProjectSelect = observer(function ProjectSelect(props: Props) {
   const value = props.value ?? projectsService.activeProject?.id;
   const projects = projectsLoader.data as ProjectInfo[];
 
-  const possibleOptions = projects.filter(project => project.canCreateConnections);
+  const possibleOptions = projects.filter(project => project.canEditDataSources);
 
   function handleProjectSelect(projectId: string) {
     const project = projectsLoader.resource.get(projectId);
 
-    if (project?.canCreateConnections) {
+    if (project?.canEditDataSources) {
       props.onChange(projectId);
     }
   }
@@ -54,7 +54,7 @@ export const ProjectSelect = observer(function ProjectSelect(props: Props) {
       keySelector={project => project.id}
       valueSelector={project => project.name}
       titleSelector={project => project.description}
-      isDisabled={project => !project.canCreateConnections}
+      isDisabled={project => !project.canEditDataSources}
       readOnly={props.readOnly || possibleOptions.length <= 1}
       searchable={projects.length > 10}
       disabled={props.disabled}

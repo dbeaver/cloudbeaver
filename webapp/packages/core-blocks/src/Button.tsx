@@ -109,6 +109,7 @@ export const Button = observer<ButtonProps>(function Button({
   mod,
   styles,
   tag = 'button',
+  type = 'button',
   disabled = false,
   loading,
   loader,
@@ -143,7 +144,14 @@ export const Button = observer<ButtonProps>(function Button({
 
   const Button = tag;
   return styled(useStyles(styles, buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
-    <Button {...rest} disabled={disabled} {...use({ loading })} className={className} onClick={state.click}>
+    <Button
+      {...rest}
+      type={type}
+      disabled={disabled}
+      {...use({ loading })}
+      className={className}
+      onClick={state.click}
+    >
       <ripple />
       {icon && <button-icon><Icon name={icon} viewBox={viewBox} /></button-icon>}
       <button-label as='span'>{children}</button-label>

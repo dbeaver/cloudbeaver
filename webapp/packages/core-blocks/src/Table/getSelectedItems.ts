@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function getSelectedItems(items: Map<any, boolean>): any[] {
-  const result: any[] = [];
+export function getSelectedItems<T>(items: Map<T, boolean>): T[] {
+  const result: T[] = [];
 
   for (const [key, value] of items) {
     if (value) {

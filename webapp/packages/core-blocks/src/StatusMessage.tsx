@@ -55,7 +55,7 @@ export const StatusMessage = observer<Props>(function StatusMessage({
 }) {
   const translate = useTranslate();
   const errorDetails = useErrorDetails(exception);
-  message = (message ? translate(message) : message) ?? errorDetails.details?.name;
+  message = (message ? translate(message) : message) ?? errorDetails.details?.message;
   let icon = '/icons/info_icon.svg';
 
   if (status === ENotificationType.Error || exception !== null) {
