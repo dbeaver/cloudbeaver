@@ -15,7 +15,7 @@ export default [
   ['plugin_resource_manager_sync_script_error', 'Не удалось синхронизировать данные редактора'],
   ['plugin_resource_manager_delete_script_error', 'Возникла ошибка при удалении скрипта'],
   ['plugin_resource_manager_script_not_found_title', 'Не удалось найти привязанный скрипт'],
-  ['plugin_resource_manager_script_delete_confirmation', 'Вы удаляете "{args.name}". Удалить?'],
+  ['plugin_resource_manager_script_delete_confirmation', 'Вы удаляете "{arg:name}". Удалить?'],
   ['plugin_resource_manager_script_not_found_message', 'Возможно скрипт был удален или переименован. Будет использовано последнее известное значение'],
   ['plugin_resource_manager_script_name_invalid_characters_message', 'Имя скрипта может содержать следующие символы "_-$.()@" и не может начинаться с точки'],
 ];
