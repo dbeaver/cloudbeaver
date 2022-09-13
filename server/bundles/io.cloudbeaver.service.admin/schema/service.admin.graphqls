@@ -119,7 +119,7 @@ extend type Query {
     listRoles(roleId: ID): [AdminRoleInfo!]!
     listPermissions: [AdminPermissionInfo!]!
 
-    createUser(userId: ID!): AdminUserInfo!
+    createUser(userId: ID!, enabled: Boolean!): AdminUserInfo!
     deleteUser(userId: ID!): Boolean
 
     createRole(roleId: ID!, roleName: String, description: String): AdminRoleInfo!

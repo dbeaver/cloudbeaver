@@ -105,6 +105,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
               properties={joinedProperties.get()}
               propertiesState={formState.config.properties}
               readOnly={formState.readonly}
+              filterable
               onAdd={state.add}
               onRemove={state.remove}
             />
