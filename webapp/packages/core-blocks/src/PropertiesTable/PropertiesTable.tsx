@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
+import { computed, toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo, useState } from 'react';
 import styled from 'reshadow';
@@ -45,7 +45,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
   const sortedProperties = useMemo(() => computed(() => propsRef.properties
     .slice()
     .sort((a, b) => (a.displayName ?? '').localeCompare(b.displayName ?? ''))
-    .filter(p => p.displayName?.includes(filterValue) ?? true )
+    .filter(p => p.key.toLocaleLowerCase().includes(filterValue.toLocaleLowerCase()))
   ), [propsRef.properties, filterValue]);
 
   const changeName = useCallback((id: string, key: string) => {
