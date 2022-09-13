@@ -109,10 +109,13 @@ export class LocalizationService extends Bootstrap {
     }
 
     if (typeof translation === 'string') {
-      return Object.entries(args).reduce<string>(
-        (translation, [key, value]) => translation.replace(`{args.${key}}`, value),
+      translation = Object.entries(args).reduce<string>(
+        (translation, [key, value]) => translation.replace(`{arg:${key}}`, value),
         translation
-      ) as T;
+      ) as string;
+
+      translation = translation.replace(/({alias:(\w*?)})/g, (substr, group1, group2) => this.translate(group2));
+      return translation as T;
     }
 
     if (fallback !== undefined) {
