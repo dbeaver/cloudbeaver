@@ -139,7 +139,12 @@ export const PropertyItem = observer<Props>(function PropertyItem({
   const handleRemove = useCallback(() => onRemove(property.id), [property]);
 
   useLayoutEffect(() => {
-    if (keyInputRef.current && isDeletable && property.new) {
+    if (
+      keyInputRef.current
+      && isDeletable
+      && property.new
+      && !(document.activeElement instanceof HTMLInputElement)
+    ) {
       keyInputRef.current.focus();
     }
   }, [property]);

@@ -961,6 +961,7 @@ export interface QueryCreateRoleArgs {
 
 
 export interface QueryCreateUserArgs {
+  enabled: Scalars['Boolean'];
   userId: Scalars['ID'];
 }
 
@@ -1704,6 +1705,7 @@ export type SaveUserMetaParametersQuery = { setUserMetaParameterValues: boolean 
 
 export type CreateUserQueryVariables = Exact<{
   userId: Scalars['ID'];
+  enabled: Scalars['Boolean'];
   includeMetaParameters: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
@@ -3147,8 +3149,8 @@ export const SaveUserMetaParametersDocument = `
 }
     `;
 export const CreateUserDocument = `
-    query createUser($userId: ID!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
-  user: createUser(userId: $userId) {
+    query createUser($userId: ID!, $enabled: Boolean!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  user: createUser(userId: $userId, enabled: $enabled) {
     ...AdminUserInfo
   }
 }

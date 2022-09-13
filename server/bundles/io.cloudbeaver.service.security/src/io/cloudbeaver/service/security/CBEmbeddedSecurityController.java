@@ -107,7 +107,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     // Users
 
     @Override
-    public void createUser(String userId, Map<String, String> metaParameters) throws DBException {
+    public void createUser(String userId, Map<String, String> metaParameters, boolean enabled) throws DBException {
         if (isSubjectExists(userId)) {
             throw new DBCException("User or role '" + userId + "' already exists");
         }
@@ -116,7 +116,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 createAuthSubject(dbCon, userId, SUBJECT_USER);
                 try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER(USER_ID,IS_ACTIVE,CREATE_TIME) VALUES(?,?,?)")) {
                     dbStat.setString(1, userId);
-                    dbStat.setString(2, CHAR_BOOL_TRUE);
+                    dbStat.setString(2, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
                     dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
                     dbStat.execute();
                 }
@@ -1360,7 +1360,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             userId = userIdFromCredentials;
             if (!isSubjectExists(userId)) {
                 var newUser = new SMUser(userId);
-                createUser(newUser.getUserId(), newUser.getMetaParameters());
+                createUser(newUser.getUserId(), newUser.getMetaParameters(), true);
                 String defaultRoleName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserRole();
                 if (!CommonUtils.isEmpty(defaultRoleName)) {
                     setUserRoles(userId, new String[]{defaultRoleName}, userId);
