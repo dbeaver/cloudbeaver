@@ -126,6 +126,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                     }
                 }
             }
+            permissionInfos.sort(Comparator.comparing(AdminPermissionInfo::getLabel));
             return permissionInfos;
         } catch (Exception e) {
             throw new DBWebException("Error reading users", e);
