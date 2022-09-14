@@ -78,7 +78,7 @@ export const ProjectSelect = observer(function ProjectSelect({
       fill
       onSelect={handleProjectSelect}
     >
-      {translate('connections_connection_project')}
+      {translate('plugin_projects_project_select_label')}
     </Combobox>
   );
 });
