@@ -161,7 +161,7 @@ public class LocalResourceController implements RMController {
         return accessibleSharedProjects
             .stream()
             .map(projectPermission -> makeProjectFromPath(
-                sharedProjectsPath.resolve(projectPermission.getObjectId()),
+                sharedProjectsPath.resolve(parseProjectName(projectPermission.getObjectId()).getName()),
                 projectPermission.getPermissions().stream().map(RMProjectPermission::fromPermission).collect(Collectors.toSet()),
                 RMProject.Type.SHARED, true)
             )
@@ -178,11 +178,12 @@ public class LocalResourceController implements RMController {
                     ? Set.of(RMProjectPermission.PROJECT_ADMIN)
                     : Set.of(RMProjectPermission.RESOURCE_VIEW, RMProjectPermission.DATA_SOURCES_VIEW);
             case SHARED:
-                if (projectId == null) {
-                    throw new DBException("Project id required");
-                }
                 if (SMUtils.isRMAdmin(credentialsProvider)) {
                     return Set.of(RMProjectPermission.PROJECT_ADMIN);
+                }
+
+                if (projectId == null) {
+                    throw new DBException("Project id required");
                 }
 
                 return smController.getObjectPermissions(activeUserCreds.getUserId(), projectId, SMObjects.PROJECT)
@@ -204,8 +205,17 @@ public class LocalResourceController implements RMController {
             if (!Files.exists(sharedProjectsPath)) {
                 return new RMProject[0];
             }
-            return Files.list(sharedProjectsPath)
-                .map((Path path) -> makeProjectFromPath(path, Set.of(), RMProject.Type.SHARED, false))
+            var projects = new ArrayList<RMProject>();
+            var allPaths = Files.list(sharedProjectsPath).collect(Collectors.toList());
+            for (Path path : allPaths) {
+                var projectPerms = getProjectPermissions(
+                    makeProjectIdFromPath(path, RMProject.Type.SHARED),
+                    RMProject.Type.SHARED
+                );
+                var rmProject = makeProjectFromPath(path, projectPerms, RMProject.Type.SHARED, false);
+                projects.add(rmProject);
+            }
+            return projects.stream()
                 .filter(Objects::nonNull)
                 .toArray(RMProject[]::new);
         } catch (IOException e) {
@@ -249,6 +259,7 @@ public class LocalResourceController implements RMController {
         }
         try {
             CommonUtils.deleteDirectory(targetPath);
+            smController.deleteAllObjectPermissions(projectId, SMObjects.PROJECT);
         } catch (IOException e) {
             throw new DBException("Error deleting project '" + project.getName() + "'", e);
         }
@@ -530,11 +541,16 @@ public class LocalResourceController implements RMController {
     }
 
 
+    private String makeProjectIdFromPath(Path path, RMProject.Type type) {
+        String projectName = path.getFileName().toString();
+        return type.getPrefix() + "_" + projectName;
+    }
+
     private RMProject makeProjectFromId(String projectId, boolean loadPermissions) throws DBException {
         var projectName = parseProjectName(projectId);
         var projectPath = getProjectPath(projectId);
         Set<RMProjectPermission> permissions = Set.of();
-        if(loadPermissions && credentialsProvider.getActiveUserCredentials() != null) {
+        if (loadPermissions && credentialsProvider.getActiveUserCredentials() != null) {
             permissions = getProjectPermissions(projectId, projectName.getType());
         }
         return makeProjectFromPath(projectPath, permissions, projectName.getType(), false);
@@ -560,7 +576,7 @@ public class LocalResourceController implements RMController {
         RMProject project = new RMProject();
         String projectName = path.getFileName().toString();
         project.setName(projectName);
-        project.setId(type.getPrefix() + "_" + projectName);
+        project.setId(makeProjectIdFromPath(path, type));
         project.setType(type);
         project.setProjectPermissions(allProjectPermissions);
         if (Files.exists(path)) {
