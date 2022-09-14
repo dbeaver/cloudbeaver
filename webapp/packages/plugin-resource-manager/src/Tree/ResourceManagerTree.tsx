@@ -7,17 +7,21 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader, useDataResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { createPath } from '@cloudbeaver/core-utils';
+import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { CaptureView } from '@cloudbeaver/core-view';
-import { NavigationTreeService, ElementsTree, NavigationNodeControl } from '@cloudbeaver/plugin-navigation-tree';
+import { NavigationTreeService, ElementsTree } from '@cloudbeaver/plugin-navigation-tree';
 
 import { ResourceProjectsResource } from '../ResourceProjectsResource';
 import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
+import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';
+import { navigationTreeProjectsExpandStateGetter } from './ProjectsRenderer/navigationTreeProjectsExpandStateGetter';
+import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navigationTreeProjectsRendererRenderer';
 
 const styles = css`
   CaptureView {
@@ -54,18 +58,35 @@ const styles = css`
 
 export const ResourceManagerTree = observer(function ResourceManagerTree() {
   const translate = useTranslate();
+  const navNodeInfoResource = useService(NavNodeInfoResource);
+  const navTreeResource = useService(NavTreeResource);
   const navTreeService = useService(NavigationTreeService);
 
   const { resource } = useDataResource(ResourceManagerTree, ResourceProjectsResource, undefined);
+
+  const projectsRendererRenderer = useMemo(
+    () => navigationTreeProjectsRendererRenderer(navNodeInfoResource),
+    [navNodeInfoResource]
+  );
+  const projectsExpandStateGetter = useMemo(
+    () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource),
+    [navNodeInfoResource]
+  );
+  const projectFilter = useMemo(
+    () => navigationTreeProjectFilter(navNodeInfoResource, navTreeResource),
+    [navNodeInfoResource, navTreeResource]
+  );
 
   return styled(styles)(
     <Loader state={resource}>
       <CaptureView view={navTreeService}>
         <ElementsTree
-          root={createPath(RESOURCES_NODE_PATH, resource.userProject?.id)}
+          root={RESOURCES_NODE_PATH}
           getChildren={navTreeService.getChildren}
           loadChildren={navTreeService.loadNestedNodes}
-          control={NavigationNodeControl}
+          filters={[projectFilter]}
+          renderers={[projectsRendererRenderer]}
+          expandStateGetters={[projectsExpandStateGetter]}
           emptyPlaceholder={() => styled(styles)(
             <center>
               <message>

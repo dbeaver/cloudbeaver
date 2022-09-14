@@ -10,32 +10,37 @@ import { runInAction } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { GraphQLService, ProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { SharedProjectsResource } from '@cloudbeaver/core-resource-manager';
+import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList } from '@cloudbeaver/core-sdk';
 
-export type Project = ProjectInfo;
+export type ProjectInfo = SchemaProjectInfo;
 
 @injectable()
-export class ProjectsResource extends CachedMapResource<string, Project> {
+export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly sharedProjectsResource: SharedProjectsResource,
     private readonly userInfoResource: UserInfoResource,
   ) {
     super([]);
 
     this.sync(this.userInfoResource);
+    this.sharedProjectsResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
+    this.sharedProjectsResource.onItemAdd.addHandler(() => this.markOutdated());
+    this.sharedProjectsResource.onItemDelete.addHandler(() => this.markOutdated());
     this.userInfoResource.onUserChange.addPostHandler(() => {
       this.clear();
     });
   }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, Project>> {
+  protected async loader(key: ResourceKey<string>): Promise<Map<string, ProjectInfo>> {
     const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
 
     const { projects } = await this.graphQLService.sdk.getProjectList();
 
     runInAction(() => {
       if (all) {
-        this.data.clear();
+        this.delete(resourceKeyList(this.keys.filter(id => !projects.some(project => project.id === id))));
       }
 
       this.set(resourceKeyList(projects.map(project => project.id)), projects);

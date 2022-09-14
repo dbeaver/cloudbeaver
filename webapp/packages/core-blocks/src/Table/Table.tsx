@@ -8,7 +8,7 @@
 
 import { observable, computed, action } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import styled, { use } from 'reshadow';
 
 import { useObjectRef } from '../useObjectRef';
@@ -33,6 +33,23 @@ export const Table = observer<React.PropsWithChildren<Props>>(function Table({
 
   const [selected] = useState<Map<any, boolean>>(() => selectedItems || observable(new Map()));
   const [expanded] = useState<Map<any, boolean>>(() => expandedItems || observable(new Map()));
+
+  useEffect(action(() => {
+    if (!keys) {
+      return;
+    }
+
+    const removeSelected = Array.from(selected.keys()).filter(key => !keys.includes(key));
+    const removeExpanded = Array.from(expanded.keys()).filter(key => !keys.includes(key));
+
+    for (const id of removeSelected) {
+      selected.delete(id);
+    }
+
+    for (const id of removeExpanded) {
+      expanded.delete(id);
+    }
+  }), [keys]);
 
   const state: ITableState = useObservableRef(() => ({
     get selectableItems() {

@@ -86,8 +86,8 @@ export class PluginBootstrap extends Bootstrap {
           if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
             try {
               await this.resourceProjectsResource.load();
-              const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
-              const folder = createPath(RESOURCES_NODE_PATH, this.resourceProjectsResource.userProject?.id);
+              const scriptName = `${result.name.trim()}.${SCRIPT_EXTENSION}`;
+              const folder = createPath(RESOURCES_NODE_PATH, result.projectId);
               const resourceData = this.navResourceNodeService.getResourceData(folder);
 
               if (!resourceData) {

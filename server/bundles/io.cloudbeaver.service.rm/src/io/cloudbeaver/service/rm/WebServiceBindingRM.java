@@ -38,6 +38,10 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
         model.getQueryType()
             .dataFetcher("rmListProjects",
                 env -> getService(env).listProjects(getWebSession(env)))
+            .dataFetcher("rmListSharedProjects",
+                env -> getService(env).listSharedProjects(getWebSession(env)))
+            .dataFetcher("rmProject",
+                env -> getService(env).getProject(getWebSession(env), env.getArgument("projectId")))
             .dataFetcher("rmListResources",
                 env -> getService(env).listResources(getWebSession(env),
                     env.getArgument("projectId"),

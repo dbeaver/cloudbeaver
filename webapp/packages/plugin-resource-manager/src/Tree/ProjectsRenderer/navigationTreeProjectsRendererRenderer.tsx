@@ -12,12 +12,9 @@ import styled, { css } from 'reshadow';
 import { TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import { Translate } from '@cloudbeaver/core-localization';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { NAV_NODE_TYPE_PROJECT } from '@cloudbeaver/core-projects';
+import { type IElementsTreeCustomRenderer, type NavigationNodeRendererComponent, useNode, NavigationNodeRenderer } from '@cloudbeaver/plugin-navigation-tree';
 
-import { useNode } from '../../NodesManager/useNode';
-import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent';
-import { NavigationNodeRenderer } from '../ElementsTree/NavigationTreeNode/NavigationNodeRenderer';
-import type { IElementsTreeCustomRenderer } from '../ElementsTree/useElementsTree';
+import { NAV_NODE_TYPE_RM_PROJECT } from '../../NAV_NODE_TYPE_RM_PROJECT';
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
 
 const nestedStyles = css`
@@ -41,7 +38,7 @@ export function navigationTreeProjectsRendererRenderer(
   return nodeId => {
     const node = navNodeInfoResource.get(nodeId);
 
-    if (node?.nodeType === NAV_NODE_TYPE_PROJECT) {
+    if (node?.nodeType === NAV_NODE_TYPE_RM_PROJECT) {
       return ProjectRenderer;
     }
 

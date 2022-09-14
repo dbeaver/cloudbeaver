@@ -13,12 +13,7 @@ import { IconOrImage, Link } from '@cloudbeaver/core-blocks';
 import { ENotificationType } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-localization';
 
-interface Props {
-  message: string | undefined | null;
-  status: ENotificationType | undefined;
-  onShowDetails?: () => void;
-  className?: string;
-}
+import { useErrorDetails } from './useErrorDetails';
 
 const styles = css`
   status-message {
@@ -43,15 +38,34 @@ const styles = css`
   }
 `;
 
-export const StatusMessage = observer<Props>(function StatusMessage({ status, message, onShowDetails, className }) {
+interface Props {
+  message?: string | null;
+  status?: ENotificationType;
+  exception?: Error | null;
+  onShowDetails?: () => void;
+  className?: string;
+}
+
+export const StatusMessage = observer<Props>(function StatusMessage({
+  status,
+  message,
+  exception = null,
+  onShowDetails,
+  className,
+}) {
   const translate = useTranslate();
-  message = message ? translate(message) : message;
+  const errorDetails = useErrorDetails(exception);
+  message = (message ? translate(message) : message) ?? errorDetails.details?.name;
   let icon = '/icons/info_icon.svg';
 
-  if (status === ENotificationType.Error) {
+  if (status === ENotificationType.Error || exception !== null) {
     icon = '/icons/error_icon.svg';
   } else if (status === ENotificationType.Success) {
     icon = '/icons/success_icon.svg';
+  }
+
+  if (errorDetails.details?.hasDetails && !onShowDetails) {
+    onShowDetails = errorDetails.open;
   }
 
   return styled(styles)(

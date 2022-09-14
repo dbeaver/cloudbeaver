@@ -20,6 +20,7 @@ import { coreNavigationTree } from '@cloudbeaver/core-navigation-tree';
 import { corePluginManifest } from '@cloudbeaver/core-plugin';
 import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreProjectsManifest } from '@cloudbeaver/core-projects';
+import { resourceManagerManifest } from '@cloudbeaver/core-resource-manager';
 import { coreRootManifest } from '@cloudbeaver/core-root';
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
@@ -61,6 +62,7 @@ export const coreManifests: PluginManifest[] = [
   coreConnectionsManifest,
   coreAdministrationManifest,
   codeDialogsManifest,
+  resourceManagerManifest,
   coreAppManifest,
   coreNavigationTree,
 ];

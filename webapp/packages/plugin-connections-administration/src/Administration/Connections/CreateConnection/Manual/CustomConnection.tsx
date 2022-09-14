@@ -13,7 +13,7 @@ import { useMemo } from 'react';
 import { Loader, useMapResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { ProjectsResource, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { ConnectionManualService } from './ConnectionManualService';
@@ -27,7 +27,7 @@ export const CustomConnection = observer(function CustomConnection() {
     dbDriverResource.resource.enabledDrivers.slice().sort(dbDriverResource.resource.compare)
   )), [dbDriverResource]);
 
-  useMapResource(CustomConnection, ProjectsResource, CachedMapAllKey);
+  useMapResource(CustomConnection, ProjectInfoResource, CachedMapAllKey);
 
   function select(driverId: string) {
     connectionManualService.select(PROJECT_GLOBAL_ID, driverId);

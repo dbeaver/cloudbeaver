@@ -34,9 +34,9 @@ import {
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { Project, ProjectsResource, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { usePermission } from '@cloudbeaver/core-root';
-import { CachedMapAllKey, CachedMapEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedMapEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
@@ -44,6 +44,7 @@ import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 import { ConnectionFormService } from '../ConnectionFormService';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { ParametersForm } from './ParametersForm';
+import { ProjectSelect } from './ProjectSelect';
 import { useOptions } from './useOptions';
 
 const styles = css`
@@ -116,16 +117,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     optionsHook.setAuthModel(model);
   }, []);
 
-  const projectsLoader = useMapResource(Options, ProjectsResource, CachedMapAllKey);
-  const projects = projectsLoader.data as Project[];
-
-  function handleProjectSelect(projectId: string) {
-    const project = projectsLoader.resource.get(projectId);
-
-    if (project?.canCreateConnections) {
-      state.setProject(projectId);
-    }
-  }
 
   const driverMap = useMapResource(
     Options,
@@ -304,24 +295,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               >
                 {translate('connections_connection_name')}
               </InputField>
-              <Combobox
-                name='projectId'
+              <ProjectSelect
                 value={state.projectId ?? PROJECT_GLOBAL_ID}
-                items={projects}
-                keySelector={project => project.id}
-                valueSelector={project => project.name}
-                titleSelector={project => project.description}
-                isDisabled={project => !project.canCreateConnections}
-                searchable={projects.length > 10}
-                readOnly={readonly || edit || projects.length < 2}
+                readOnly={readonly || edit}
                 disabled={disabled}
-                loading={projectsLoader.isLoading()}
-                tiny
-                fill
-                onSelect={handleProjectSelect}
-              >
-                {translate('connections_connection_project')}
-              </Combobox>
+                onChange={projectId => state.setProject(projectId)}
+              />
               {!config.template && (
                 <InputField
                   type="text"

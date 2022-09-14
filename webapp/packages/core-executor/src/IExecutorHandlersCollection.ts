@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IExecutionContextProvider } from './IExecutionContext';
+import type { IAsyncContextLoader, IContextLoader, IExecutionContextProvider, ISyncContextLoader } from './IExecutionContext';
 import type { IExecutorHandler } from './IExecutorHandler';
 
 export type ExecutorDataFilter<T> = (data: T, contexts: IExecutionContextProvider<T>) => boolean;
@@ -25,8 +25,18 @@ export interface IExecutorHandlersCollection<T = unknown, TResult = any | Promis
   readonly postHandlers: Array<IExecutorHandler<T, TResult>>;
   readonly chain: Array<IChainLink<T, TResult>>;
   readonly collections: Array<IExecutorHandlersCollection<T, TResult>>;
+  readonly contextCreators: Map<IContextLoader<any, T>, IContextLoader<any, T>>;
 
   setInitialDataGetter(getter: () => T): this;
+
+  addContextCreator<TContext>(
+    context: ISyncContextLoader<TContext, T>,
+    creator: ISyncContextLoader<TContext, T>
+  ): this;
+  addContextCreator<TContext>(
+    context: IAsyncContextLoader<TContext, T>,
+    creator: IAsyncContextLoader<TContext, T>
+  ): this;
 
   before: <TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>) => this;
   next: <TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>) => this;

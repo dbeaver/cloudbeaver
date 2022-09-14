@@ -8,6 +8,7 @@
 
 import { makeObservable, observable } from 'mobx';
 
+import type { IContextLoader, ISyncContextLoader, IAsyncContextLoader } from './IExecutionContext';
 import type { IExecutorHandler } from './IExecutorHandler';
 import type { ExecutorDataFilter, ExecutorDataMap, IChainLink, IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 
@@ -16,12 +17,14 @@ implements IExecutorHandlersCollection<T, TResult> {
   handlers: Array<IExecutorHandler<T, TResult>> = [];
   postHandlers: Array<IExecutorHandler<T, TResult>> = [];
   chain: Array<IChainLink<T, TResult>> = [];
+  readonly contextCreators: Map<IContextLoader<any, T>, IContextLoader<any, T>>;
   readonly collections: Array<IExecutorHandlersCollection<T, TResult>>;
   protected initialDataGetter: (() => T) | null;
   private readonly links: Map<IExecutorHandlersCollection<any, TResult>, IExecutorHandlersCollection<T, TResult>>;
 
   constructor() {
     this.links = new Map();
+    this.contextCreators = new Map();
     this.collections = [];
     this.initialDataGetter = null;
 
@@ -32,6 +35,22 @@ implements IExecutorHandlersCollection<T, TResult> {
       collections: observable.shallow,
       links: observable.shallow,
     });
+  }
+
+  addContextCreator<TContext>(
+    context: ISyncContextLoader<TContext, T>,
+    creator: ISyncContextLoader<TContext, T>
+  ): this;
+  addContextCreator<TContext>(
+    context: IAsyncContextLoader<TContext, T>,
+    creator: IAsyncContextLoader<TContext, T>
+  ): this;
+  addContextCreator<TContext>(
+    context: IContextLoader<TContext, T>,
+    creator: IContextLoader<TContext, T>
+  ): this {
+    this.contextCreators.set(context, creator);
+    return this;
   }
 
   setInitialDataGetter(getter: (() => T) | null): this {

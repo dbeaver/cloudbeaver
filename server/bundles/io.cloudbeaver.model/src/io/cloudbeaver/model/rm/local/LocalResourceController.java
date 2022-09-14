@@ -62,6 +62,7 @@ public class LocalResourceController implements RMController {
     private static final Log log = Log.getLog(LocalResourceController.class);
 
     private static final String FILE_REGEX = "(?U)[\\w.$()@/\\\\ -]+";
+    private static final String PROJECT_REGEX = "(?U)[\\w.$()@ -]+"; // slash not allowed in project name
 
     public static final String DEFAULT_CHANGE_ID = "0";
 
@@ -123,20 +124,7 @@ public class LocalResourceController implements RMController {
         //TODO refactor after implement current user api in sm
         var activeUserCreds = credentialsProvider.getActiveUserCredentials();
         if (Files.exists(sharedProjectsPath) && activeUserCreds != null && activeUserCreds.getUserId() != null) {
-            var accessibleSharedProjects = smController.getAllAvailableObjectsPermissions(
-                activeUserCreds.getUserId(),
-                SMObjects.PROJECT
-            );
-
-            projects = accessibleSharedProjects
-                .stream()
-                .map(projectPermission -> makeProjectFromPath(
-                    sharedProjectsPath.resolve(projectPermission.getObjectId()),
-                    projectPermission.getPermissions().stream().map(RMProjectPermission::fromPermission).collect(Collectors.toSet()),
-                    RMProject.Type.SHARED, true)
-                )
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+            projects = readAccessibleSharedProjects(activeUserCreds.getUserId());
         } else {
             projects = new ArrayList<>();
         }
@@ -158,6 +146,26 @@ public class LocalResourceController implements RMController {
             projects.add(0, userProject);
         }
         return projects.toArray(new RMProject[0]);
+    }
+
+    private List<RMProject> readAccessibleSharedProjects(@NotNull String userId) throws DBException {
+        if (credentialsProvider.hasPermission(DBWConstants.PERMISSION_ADMIN) || credentialsProvider.hasPermission(RMConstants.PERMISSION_RM_ADMIN)) {
+            return new ArrayList<>(Arrays.asList(listAllSharedProjects()));
+        }
+        var accessibleSharedProjects = smController.getAllAvailableObjectsPermissions(
+            userId,
+            SMObjects.PROJECT
+        );
+
+        return accessibleSharedProjects
+            .stream()
+            .map(projectPermission -> makeProjectFromPath(
+                sharedProjectsPath.resolve(projectPermission.getObjectId()),
+                projectPermission.getPermissions().stream().map(RMProjectPermission::fromPermission).collect(Collectors.toSet()),
+                RMProject.Type.SHARED, true)
+            )
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
     }
 
     private Set<RMProjectPermission> getProjectPermissions(@Nullable String projectId, RMProject.Type projectType) throws DBException {
@@ -209,11 +217,15 @@ public class LocalResourceController implements RMController {
                 throw new DBException("Error creating shared project path", e);
             }
         }
-        validateResourcePath(name);
+        validateResourcePath(name, PROJECT_REGEX);
         RMProject project;
-        project = makeProjectFromPath(sharedProjectsPath.resolve(name), Set.of(), RMProject.Type.SHARED, false);
-        if (project == null) {
+        var projectPath = sharedProjectsPath.resolve(name);
+        if (Files.exists(projectPath)) {
             throw new DBException("Project '" + name + "' already exists");
+        }
+        project = makeProjectFromPath(projectPath, Set.of(), RMProject.Type.SHARED, false);
+        if (project == null) {
+            throw new DBException("Project '" + name + "' not created");
         }
         try {
             Files.createDirectories(getProjectPath(project.getId()));
@@ -477,11 +489,15 @@ public class LocalResourceController implements RMController {
     }
 
     private void validateResourcePath(String resourcePath) throws DBException {
+        validateResourcePath(resourcePath, FILE_REGEX);
+    }
+
+    private void validateResourcePath(String resourcePath, String regex) throws DBException {
         if (resourcePath.startsWith(".")) {
             throw new DBException("Resource path '" + resourcePath + "' can't start with dot");
         }
-        if (!resourcePath.matches(FILE_REGEX)) {
-            String illegalCharacters = resourcePath.replaceAll(FILE_REGEX, " ").strip();
+        if (!resourcePath.matches(regex)) {
+            String illegalCharacters = resourcePath.replaceAll(regex, " ").strip();
             throw new DBException("Resource path '" + resourcePath + "' contains illegal characters: " + illegalCharacters);
         }
     }

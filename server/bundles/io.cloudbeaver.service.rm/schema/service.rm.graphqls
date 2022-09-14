@@ -1,7 +1,7 @@
 # Metadata queries
 
 type RMProject {
-    id: String!
+    id: ID!
     name: String!
     description: String
     shared: Boolean!
@@ -21,6 +21,10 @@ extend type Query {
 
     # List accessible projects
     rmListProjects: [RMProject!]!
+
+    rmListSharedProjects: [RMProject!]!
+
+    rmProject(projectId: String!): RMProject!
 
     # List accessible projects
     rmListResources(
@@ -61,8 +65,9 @@ extend type Mutation {
         forceOverwrite: Boolean!): String!
 
     rmCreateProject(
+        projectId: ID,
         projectName: String!,
-        description: String): ProjectInfo
+        description: String): RMProject!
 
     rmDeleteProject(projectId: ID!): Boolean!
 }

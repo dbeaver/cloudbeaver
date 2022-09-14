@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ISyncContextLoader } from '@cloudbeaver/core-executor';
+import type { IExecutorHandlersCollection, ISyncContextLoader } from '@cloudbeaver/core-executor';
 
 import { App } from './App';
+import { dependencyInjectorContext } from './dependencyInjectorContext';
 import type { IServiceConstructor, IServiceInjector } from './IApp';
 import { injectable } from './injectable';
 
@@ -22,7 +23,11 @@ export class DIService {
     private readonly app: App
   ) { }
 
-  dependencyInjectorContext: ISyncContextLoader<<T>(ctor: IServiceConstructor<T>) => T> = (
+  addDIContext(context: IExecutorHandlersCollection<any>): void {
+    context.addContextCreator(dependencyInjectorContext, this.dependencyInjectorContext);
+  }
+
+  private readonly dependencyInjectorContext: ISyncContextLoader<<T>(ctor: IServiceConstructor<T>) => T> = (
     () => this.serviceInjector.getServiceByClass.bind(this)
   );
 }

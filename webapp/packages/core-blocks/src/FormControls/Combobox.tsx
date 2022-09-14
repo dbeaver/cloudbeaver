@@ -24,6 +24,15 @@ import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormCon
 import { FormContext } from './FormContext';
 
 const styles = css`
+    field[|inline] {
+      display: flex;
+      align-items: center;
+
+      & field-label {
+        padding-right: 8px;
+        padding-bottom: 0;
+      }
+    }
     field input {
       margin: 0;
     }
@@ -137,6 +146,7 @@ type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>,
   iconSelector?: (item: TValue) => string | React.ReactElement | undefined;
   isDisabled?: (item: TValue) => boolean;
   onSwitch?: (state: boolean) => void;
+  inline?: boolean;
 };
 
 type ControlledProps<TKey, TValue> = BaseProps<TKey, TValue> & {
@@ -174,6 +184,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   searchable,
   readOnly,
   disabled,
+  inline,
   keySelector = v => v,
   valueSelector = v => v,
   iconSelector,
@@ -337,7 +348,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   }
 
   return styled(useStyles(baseFormControlStyles, baseValidFormControlStyles, styles))(
-    <field className={className}>
+    <field className={className} {...use({ inline })}>
       {children && <field-label title={title}>{children}{rest.required && ' *'}</field-label>}
       <input-box>
         {(icon || loading) && (
