@@ -91,7 +91,9 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
         });
       });
     } finally {
-      this.delete(resourceKeyList(deleted));
+      if (deleted.length > 0) {
+        this.delete(resourceKeyList(deleted));
+      }
     }
   }
 

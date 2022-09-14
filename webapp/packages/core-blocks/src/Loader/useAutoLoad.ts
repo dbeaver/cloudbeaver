@@ -14,7 +14,7 @@ export interface IAutoLoadable extends ILoadableState {
   load: () => void;
 }
 
-export function useAutoLoad(state: IAutoLoadable, enabled: boolean) {
+export function useAutoLoad(state: IAutoLoadable, enabled = true) {
   const load = enabled && !state.isLoaded();
 
   useEffect(() => {
