@@ -5,15 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { IProperty, PropertiesTable, ErrorMessage, ObjectPropertyInfoForm } from '@cloudbeaver/core-blocks';
+import { IProperty, PropertiesTable, ErrorMessage } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import type { DataTransferOutputSettings, DataTransferProcessorInfo, GQLErrorCatcher, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { DataTransferOutputSettings, DataTransferProcessorInfo, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { ITabData, Tab, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
@@ -41,10 +40,6 @@ const styles = css`
 
     TabList {
       margin: 0 10px;
-    }
-
-    content {
-      margin: 24px;
     }
 
     ObjectPropertyInfoForm {
@@ -109,7 +104,7 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
       footer={(
         <ProcessorConfigureDialogFooter
           isExporting={isExporting}
-          isFinalStep={currentTabId === SETTINGS_TABS.OUTPUT}
+          isFinalStep={currentTabId === SETTINGS_TABS.OUTPUT || !!processor.isBinary}
           onExport={onExport}
           onBack={handleBackClick}
           onCancel={onClose}
@@ -121,29 +116,25 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
       noBodyPadding
       onReject={onClose}
     >
-      <TabsState currentTabId={currentTabId} onChange={handleTabChange}>
-        <TabList>
-          <Tab tabId={SETTINGS_TABS.EXTRACTION} style={UNDERLINE_TAB_STYLES}>
-            {translate('data_transfer_format_settings')}
-          </Tab>
-          <Tab tabId={SETTINGS_TABS.OUTPUT} style={UNDERLINE_TAB_STYLES}>
-            {translate('data_transfer_output_settings')}
-          </Tab>
-        </TabList>
-      </TabsState>
+      {!processor.isBinary ? (
+        <TabsState currentTabId={currentTabId} onChange={handleTabChange}>
+          <TabList>
+            <Tab tabId={SETTINGS_TABS.EXTRACTION} style={UNDERLINE_TAB_STYLES}>
+              {translate('data_transfer_format_settings')}
+            </Tab>
+            <Tab tabId={SETTINGS_TABS.OUTPUT} style={UNDERLINE_TAB_STYLES}>
+              {translate('data_transfer_output_settings')}
+            </Tab>
+          </TabList>
+        </TabsState>
+      ) : null}
       {currentTabId === SETTINGS_TABS.EXTRACTION ? (
         <PropertiesTable
           properties={properties}
           propertiesState={processorProperties}
         />
       ) : (
-        <content>
-          <OutputOptionsForm outputSettings={outputSettings} />
-          {/* <ObjectPropertyInfoForm
-            properties={outputProperties}
-            state={processorOutputProperties}
-          /> */}
-        </content>
+        <OutputOptionsForm outputSettings={outputSettings} />
       )}
 
       {error.responseMessage && (
@@ -155,5 +146,4 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
       )}
     </CommonDialogWrapper>
   );
-}
-);
+});
