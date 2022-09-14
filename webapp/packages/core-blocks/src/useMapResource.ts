@@ -226,7 +226,7 @@ export function useMapResource<
       try {
         const active = await actions?.isActive?.(resource);
 
-        if (active === false || actions?.active === false) {
+        if (active === false) {
           return;
         }
 
@@ -374,6 +374,7 @@ export function useMapResource<
     )
     && refObj.preloaded
     && keyRef.key !== null
+    && actions?.active !== false
     && (
       result.exception === null
       || (Array.isArray(result.exception) && !result.exception.some(Boolean))
@@ -385,6 +386,10 @@ export function useMapResource<
       (refObj as any)[loadFunctionName]();
     }
   });
+
+  // if (canLoad && !refObj.loading) {
+  //   throw (refObj as any)[loadFunctionName]();
+  // }
 
   return result;
 }

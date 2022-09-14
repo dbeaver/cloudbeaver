@@ -15,6 +15,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { ACTION_OPEN_IN_TAB, IActiveView, View } from '@cloudbeaver/core-view';
 
 import type { ITab } from './ITab';
@@ -90,7 +91,9 @@ export class NavigationTabsService extends View<ITab> {
       state: observable,
       currentTab: computed,
       currentTabId: computed,
-      tabIdList: computed,
+      tabIdList: computed<string[]>({
+        equals: isArraysEqual,
+      }),
       openTab: action,
       selectTab: action,
       closeTab: action,

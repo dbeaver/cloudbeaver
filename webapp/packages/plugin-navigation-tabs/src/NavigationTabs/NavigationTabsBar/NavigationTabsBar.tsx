@@ -94,7 +94,7 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
       >
         {navigation.tabIdList.map(tabId => (
           <TabPanel key={tabId} tabId={tabId} lazy>
-            <TabHandlerPanel tabId={tabId} />
+            {() => <TabHandlerPanel tabId={tabId} />}
           </TabPanel>
         ))}
       </TabsBox>
