@@ -222,8 +222,26 @@ export interface ConnectionInfo {
   useUrl: Scalars['Boolean'];
 }
 
+export interface DataTransferDefaultExportSettings {
+  outputSettings: DataTransferOutputSettings;
+  supportedEncodings: Array<Scalars['String']>;
+}
+
+export interface DataTransferOutputSettings {
+  encoding: Scalars['String'];
+  insertBom: Scalars['Boolean'];
+  timestampPattern: Scalars['String'];
+}
+
+export interface DataTransferOutputSettingsInput {
+  encoding?: InputMaybe<Scalars['String']>;
+  insertBom?: InputMaybe<Scalars['Boolean']>;
+  timestampPattern?: InputMaybe<Scalars['String']>;
+}
+
 export interface DataTransferParameters {
   filter?: InputMaybe<SqlDataFilter>;
+  outputSettings?: InputMaybe<DataTransferOutputSettingsInput>;
   processorId: Scalars['ID'];
   processorProperties: Scalars['Object'];
   settings?: InputMaybe<Scalars['Object']>;
@@ -830,6 +848,7 @@ export interface Query {
   createRole: AdminRoleInfo;
   createUser: AdminUserInfo;
   dataTransferAvailableStreamProcessors: Array<DataTransferProcessorInfo>;
+  dataTransferDefaultExportSettings: DataTransferDefaultExportSettings;
   dataTransferExportDataFromContainer: AsyncTaskInfo;
   dataTransferExportDataFromResults: AsyncTaskInfo;
   dataTransferRemoveDataFile?: Maybe<Scalars['Boolean']>;
@@ -2134,6 +2153,11 @@ export type ExportDataFromResultsQueryVariables = Exact<{
 
 
 export type ExportDataFromResultsQuery = { taskInfo: { id: string, name?: string, running: boolean, status?: string, taskResult?: any, error?: { message?: string, errorCode?: string, errorType?: string, stackTrace?: string } } };
+
+export type GetDataTransferDefaultParametersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetDataTransferDefaultParametersQuery = { settings: { supportedEncodings: Array<string>, outputSettings: { insertBom: boolean, encoding: string, timestampPattern: string } } };
 
 export type GetDataTransferProcessorsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3506,6 +3530,18 @@ export const ExportDataFromResultsDocument = `
   }
 }
     ${AsyncTaskInfoFragmentDoc}`;
+export const GetDataTransferDefaultParametersDocument = `
+    query getDataTransferDefaultParameters {
+  settings: dataTransferDefaultExportSettings {
+    outputSettings {
+      insertBom
+      encoding
+      timestampPattern
+    }
+    supportedEncodings
+  }
+}
+    `;
 export const GetDataTransferProcessorsDocument = `
     query getDataTransferProcessors {
   processors: dataTransferAvailableStreamProcessors {
@@ -4325,6 +4361,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     exportDataFromResults(variables: ExportDataFromResultsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExportDataFromResultsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<ExportDataFromResultsQuery>(ExportDataFromResultsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'exportDataFromResults', 'query');
+    },
+    getDataTransferDefaultParameters(variables?: GetDataTransferDefaultParametersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetDataTransferDefaultParametersQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetDataTransferDefaultParametersQuery>(GetDataTransferDefaultParametersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getDataTransferDefaultParameters', 'query');
     },
     getDataTransferProcessors(variables?: GetDataTransferProcessorsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetDataTransferProcessorsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetDataTransferProcessorsQuery>(GetDataTransferProcessorsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getDataTransferProcessors', 'query');

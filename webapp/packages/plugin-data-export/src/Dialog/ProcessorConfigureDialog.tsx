@@ -13,7 +13,7 @@ import styled, { css } from 'reshadow';
 import { IProperty, PropertiesTable, ErrorMessage, ObjectPropertyInfoForm } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import type { DataTransferProcessorInfo, GQLErrorCatcher, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { DataTransferOutputSettings, DataTransferProcessorInfo, GQLErrorCatcher, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { ITabData, Tab, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
@@ -56,8 +56,7 @@ interface Props {
   processor: DataTransferProcessorInfo;
   properties: IProperty[];
   processorProperties: any;
-  outputProperties: ObjectPropertyInfo[];
-  processorOutputProperties: Record<string, any>;
+  outputSettings: Partial<DataTransferOutputSettings>;
   error: GQLErrorCatcher;
   isExporting: boolean;
   onShowDetails: () => void;
@@ -75,8 +74,7 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
   processor,
   properties,
   processorProperties,
-  outputProperties,
-  processorOutputProperties,
+  outputSettings,
   error,
   isExporting,
   onShowDetails,
@@ -140,7 +138,7 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
         />
       ) : (
         <content>
-          <OutputOptionsForm />
+          <OutputOptionsForm outputSettings={outputSettings} />
           {/* <ObjectPropertyInfoForm
             properties={outputProperties}
             state={processorOutputProperties}

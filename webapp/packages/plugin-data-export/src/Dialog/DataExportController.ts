@@ -13,10 +13,11 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { DataTransferProcessorInfo, GQLErrorCatcher, ObjectPropertyInfo, ObjectPropertyLength } from '@cloudbeaver/core-sdk';
+import { DataTransferOutputSettings, DataTransferProcessorInfo, GQLErrorCatcher, ObjectPropertyInfo, ObjectPropertyLength } from '@cloudbeaver/core-sdk';
 
 import { DataExportService } from '../DataExportService';
 import type { IExportContext } from '../IExportContext';
+import { DefaultExportOutputSettingsResource } from './DefaultExportOutputSettingsResource';
 
 export enum DataExportStep {
   DataTransferProcessor,
@@ -44,8 +45,7 @@ export class DataExportController implements IInitializableController, IDestruct
   processorProperties: any = {};
   properties: IProperty[] = [];
 
-  processorOutputProperties: Record<string, any> = {};
-  outputProperties: ObjectPropertyInfo[] = [];
+  outputSettings: Partial<DataTransferOutputSettings> = {};
 
   readonly error = new GQLErrorCatcher();
 
@@ -56,7 +56,8 @@ export class DataExportController implements IInitializableController, IDestruct
   constructor(
     private readonly dataExportService: DataExportService,
     private readonly notificationService: NotificationService,
-    private readonly commonDialogService: CommonDialogService
+    private readonly commonDialogService: CommonDialogService,
+    private readonly defaultExportOutputSettingsResource: DefaultExportOutputSettingsResource,
   ) {
     makeObservable(this, {
       step: observable,
@@ -65,8 +66,7 @@ export class DataExportController implements IInitializableController, IDestruct
       processors: computed,
       processorProperties: observable,
       properties: observable,
-      processorOutputProperties: observable,
-      outputProperties: observable,
+      outputSettings: observable,
     });
   }
 
@@ -74,6 +74,7 @@ export class DataExportController implements IInitializableController, IDestruct
     this.context = context;
     this.close = close;
     this.loadProcessors();
+    this.loadDefaultOutputSettings();
   }
 
   destruct(): void {
@@ -93,6 +94,7 @@ export class DataExportController implements IInitializableController, IDestruct
           processorId: this.processor.id,
           processorProperties: this.processorProperties,
           filter: this.context.filter,
+          outputSettings: this.outputSettings,
         }
       );
       this.close();
@@ -128,51 +130,6 @@ export class DataExportController implements IInitializableController, IDestruct
 
     this.processorProperties = {};
 
-    this.outputProperties = [{
-      category: undefined,
-      dataType: 'String',
-      defaultValue: 'UTF-8',
-      description: 'Encoding',
-      displayName: 'Encoding',
-      features: [],
-      id: 'encoding',
-      length: ObjectPropertyLength.Short,
-      order: 1,
-      validValues: ['UTF-8', 'CP1251'],
-      value: null,
-    }, {
-      category: undefined,
-      dataType: 'String',
-      defaultValue: 'yyyyMMddHHmm',
-      description: 'Timestamp pattern',
-      displayName: 'Timestamp pattern',
-      features: [],
-      id: 'timestamp',
-      length: ObjectPropertyLength.Long,
-      order: 2,
-      validValues: undefined,
-      value: null,
-    }, {
-      category: undefined,
-      dataType: 'Boolean',
-      defaultValue: null,
-      description: 'Insert BOM',
-      displayName: 'Insert BOM',
-      features: [],
-      id: 'insertBOM',
-      length: ObjectPropertyLength.Long,
-      order: 3,
-      validValues: undefined,
-      value: null,
-    }];
-
-    this.processorOutputProperties = this.outputProperties.reduce((acc, property) => {
-      if (property.id) {
-        acc[property.id] = property.defaultValue;
-      }
-      return acc;
-    }, {} as Record<string, any>);
-
     this.step = DataExportStep.Configure;
     this.error.clear();
   };
@@ -188,6 +145,17 @@ export class DataExportController implements IInitializableController, IDestruct
       await this.dataExportService.processors.load();
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load data export processors');
+    }
+  }
+
+  private async loadDefaultOutputSettings() {
+    try {
+      const data = await this.defaultExportOutputSettingsResource.load();
+      if (data) {
+        Object.assign(this.outputSettings, data.outputSettings);
+      }
+    } catch (exception: any) {
+      this.notificationService.logException(exception, 'Can\'t load output settings');
     }
   }
 }

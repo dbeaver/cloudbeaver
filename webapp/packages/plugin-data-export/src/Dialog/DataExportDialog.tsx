@@ -28,10 +28,9 @@ export const DataExportDialog: DialogComponent<IExportContext> = observer(functi
         processor={controller.processor}
         properties={controller.properties}
         processorProperties={controller.processorProperties}
-        outputProperties={controller.outputProperties}
-        processorOutputProperties={controller.processorOutputProperties}
         error={controller.error}
         isExporting={controller.isExporting}
+        outputSettings={controller.outputSettings}
         onShowDetails={controller.showDetails}
         onBack={() => controller.setStep(DataExportStep.DataTransferProcessor)}
         onClose={rejectDialog}
