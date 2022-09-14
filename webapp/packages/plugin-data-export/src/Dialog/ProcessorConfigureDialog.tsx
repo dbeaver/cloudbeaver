@@ -17,6 +17,7 @@ import type { DataTransferProcessorInfo, GQLErrorCatcher, ObjectPropertyInfo } f
 import { useStyles } from '@cloudbeaver/core-theming';
 import { ITabData, Tab, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
+import { OutputOptionsForm } from './OutputOptionsForm';
 import { ProcessorConfigureDialogFooter } from './ProcessorConfigureDialogFooter';
 
 const styles = css`
@@ -43,7 +44,7 @@ const styles = css`
     }
 
     content {
-      margin: 0 24px;
+      margin: 24px;
     }
 
     ObjectPropertyInfoForm {
@@ -139,10 +140,11 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
         />
       ) : (
         <content>
-          <ObjectPropertyInfoForm
+          <OutputOptionsForm />
+          {/* <ObjectPropertyInfoForm
             properties={outputProperties}
             state={processorOutputProperties}
-          />
+          /> */}
         </content>
       )}
 
