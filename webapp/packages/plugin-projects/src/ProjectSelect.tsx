@@ -43,7 +43,6 @@ export const ProjectSelect = observer(function ProjectSelect({
     },
   });
 
-  value = value ?? projectsService.activeProject?.id ?? null;
   const projects = projectsLoader.data as ProjectInfo[];
 
   const possibleOptions = projects.filter(filter);

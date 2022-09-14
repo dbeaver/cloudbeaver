@@ -10,11 +10,9 @@ import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, useFocus, useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
+import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, useFocus, useObservableRef } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { Translate, useTranslate } from '@cloudbeaver/core-localization';
-import { ProjectsService, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { useStyles } from '@cloudbeaver/core-theming';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
