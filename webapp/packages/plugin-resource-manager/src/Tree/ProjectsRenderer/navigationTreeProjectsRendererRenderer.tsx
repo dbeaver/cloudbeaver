@@ -20,14 +20,11 @@ import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
 const nestedStyles = css`
   TreeNode {
     margin-top: 8px;
-  }
-  NavigationNodeNested {
-    padding-left: 8px !important;
-  }
-  TreeNode {
-    & Control {
-      /*display: none;*/
+
+    &:only-child Control {
+      display: none;
     }
+
     & NavigationNodeNested {
       padding-left: 0 !important;
     }

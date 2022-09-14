@@ -63,6 +63,7 @@ public class LocalResourceController implements RMController {
     private static final Log log = Log.getLog(LocalResourceController.class);
 
     private static final String FILE_REGEX = "(?U)[\\w.$()@/\\\\ -]+";
+    private static final String PROJECT_REGEX = "(?U)[\\w.$()@ -]+"; // slash not allowed in project name
 
     public static final String DEFAULT_CHANGE_ID = "0";
 
@@ -221,7 +222,7 @@ public class LocalResourceController implements RMController {
                 throw new DBException("Error creating shared project path", e);
             }
         }
-        validateResourcePath(name);
+        validateResourcePath(name, PROJECT_REGEX);
         RMProject project;
         var projectPath = sharedProjectsPath.resolve(name);
         if (Files.exists(projectPath)) {
@@ -493,11 +494,15 @@ public class LocalResourceController implements RMController {
     }
 
     private void validateResourcePath(String resourcePath) throws DBException {
+        validateResourcePath(resourcePath, FILE_REGEX);
+    }
+
+    private void validateResourcePath(String resourcePath, String regex) throws DBException {
         if (resourcePath.startsWith(".")) {
             throw new DBException("Resource path '" + resourcePath + "' can't start with dot");
         }
-        if (!resourcePath.matches(FILE_REGEX)) {
-            String illegalCharacters = resourcePath.replaceAll(FILE_REGEX, " ").strip();
+        if (!resourcePath.matches(regex)) {
+            String illegalCharacters = resourcePath.replaceAll(regex, " ").strip();
             throw new DBException("Resource path '" + resourcePath + "' contains illegal characters: " + illegalCharacters);
         }
     }
