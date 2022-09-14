@@ -10,7 +10,7 @@ import { action, computed, makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { debounce } from '@cloudbeaver/core-utils';
+import { debounce, isArraysEqual } from '@cloudbeaver/core-utils';
 import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IResourceNodeInfo, IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
@@ -54,6 +54,14 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     return this.lastAction;
   }
 
+  get features():ESqlDataSourceFeatures[] {
+    if (this.isReadonly()) {
+      return [];
+    }
+
+    return [ESqlDataSourceFeatures.setName];
+  }
+
   private _script: string;
   private saved: boolean;
   private actions?: IResourceActions;
@@ -74,13 +82,15 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.saved = true;
     this.loading = false;
     this.loaded = false;
-    this.features = [ESqlDataSourceFeatures.setName];
     this.debouncedWrite = debounce(this.debouncedWrite.bind(this), VALUE_SYNC_DELAY);
 
     makeObservable<this, '_script' | 'lastAction' | 'loading' | 'loaded'>(this, {
       script: computed,
       executionContext: computed,
       nodeInfo: computed,
+      features: computed<ESqlDataSourceFeatures[]>({
+        equals: isArraysEqual,
+      }),
       _script: observable,
       lastAction: observable,
       loading: observable,
@@ -126,6 +136,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   canRename(name: string | null): boolean {
+    if (this.isReadonly()) {
+      return false;
+    }
+
     if (!name) {
       return false;
     }
