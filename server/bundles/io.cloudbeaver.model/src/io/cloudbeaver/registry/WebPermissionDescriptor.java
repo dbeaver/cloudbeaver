@@ -54,4 +54,9 @@ public class WebPermissionDescriptor {
     public String getScope() {
         return cfg.getAttribute("scope");
     }
+
+    @Override
+    public String toString() {
+        return getScope() + ":" + getId();
+    }
 }

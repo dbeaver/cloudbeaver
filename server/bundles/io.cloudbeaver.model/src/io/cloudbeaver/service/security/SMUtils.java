@@ -1,7 +1,6 @@
 package io.cloudbeaver.service.security;
 
 import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebPermissionDescriptor;
 import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
@@ -9,9 +8,9 @@ import io.cloudbeaver.service.admin.AdminPermissionInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.rm.RMConstants;
-import org.jkiss.dbeaver.model.security.SMConstants;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class SMUtils {
@@ -32,6 +31,7 @@ public class SMUtils {
                 }
             }
         }
+        permissionInfos.sort(Comparator.comparing(AdminPermissionInfo::getLabel));
         return permissionInfos;
     }
 }
