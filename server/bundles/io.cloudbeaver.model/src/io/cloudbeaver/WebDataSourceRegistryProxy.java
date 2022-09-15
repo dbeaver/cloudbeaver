@@ -1,6 +1,5 @@
 package io.cloudbeaver;
 
-import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -251,12 +250,6 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     @Override
     public void notifyDataSourceListeners(DBPEvent event) {
         dataSourceRegistry.notifyDataSourceListeners(event);
-    }
-
-    @NotNull
-    @Override
-    public ISecurePreferences getSecurePreferences() {
-        return dataSourceRegistry.getSecurePreferences();
     }
 
     @Override
