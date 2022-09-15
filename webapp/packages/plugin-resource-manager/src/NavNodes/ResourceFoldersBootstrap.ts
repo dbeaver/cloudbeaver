@@ -117,32 +117,25 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     const move = contexts.getContext(navNodeMoveContext);
     const nodes = getNodesFromContext(moveContexts);
     const nodeIdList = nodes.map(node => node.id);
-    const children = this.navTreeResource.get(targetNode.id);
-    const data = this.navResourceNodeService.getResourceData(targetNode.id);
+    const children = this.navTreeResource.get(targetNode.id) ?? [];
+    const targetProject = this.resourcesProjectsNavNodeService.getProject(targetNode.id);
 
-    if (!data) {
+    if (!targetProject?.canEditResources || (!targetNode.folder && targetNode.nodeType !== NAV_NODE_TYPE_RM_PROJECT)) {
       return;
     }
 
-    await this.resourceProjectsResource.load();
-    const projectPath = createPath(RESOURCES_NODE_PATH, this.resourceProjectsResource.userProject?.id);
+    const supported = nodes.every(node => {
+      if (
+        ![NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE].includes(node.nodeType!)
+        || targetProject !== this.resourcesProjectsNavNodeService.getProject(node.id)
+        || children.includes(node.id)
+        || targetNode.id === node.id
+      ) {
+        return false;
+      }
 
-    if (!(this.resourceProjectsResource.userProject?.id === data.key.projectId)) {
-      return;
-    }
-
-    const supported = (
-      (
-        [NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE].includes(targetNode.nodeType!)
-        || targetNode.id === projectPath
-      )
-      && (targetNode.folder || NAV_NODE_TYPE_RM_PROJECT === targetNode.nodeType)
-      && nodes.every(node => (
-        node.nodeType === NAV_NODE_TYPE_RM_RESOURCE
-        && node.id !== targetNode.id
-        && !children?.includes(node.id)
-      ))
-    );
+      return true;
+    });
 
     if (!supported) {
       return;
