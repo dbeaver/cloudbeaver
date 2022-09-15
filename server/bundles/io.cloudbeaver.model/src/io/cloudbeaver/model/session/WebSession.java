@@ -16,7 +16,10 @@
  */
 package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.*;
+import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.DataSourceFilter;
+import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -352,7 +355,9 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     public VirtualProjectImpl createVirtualProject(RMProject project) {
         // Do not filter data sources from user project
-        DataSourceFilter filter = project.getType() == RMProject.Type.USER ? x -> true : this::isDataSourceAccessible;
+        DataSourceFilter filter = project.getType() == RMProject.Type.GLOBAL
+            ? this::isDataSourceAccessible
+            : x -> true;
         VirtualProjectImpl sessionProject = application.createProjectImpl(
             project,
             sessionAuthContext,

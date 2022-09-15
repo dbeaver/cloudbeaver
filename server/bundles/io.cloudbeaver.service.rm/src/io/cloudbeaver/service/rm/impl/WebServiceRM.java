@@ -171,6 +171,7 @@ public class WebServiceRM implements DBWServiceRM {
         try {
             SMController sm = webSession.getSecurityController();
             //TODO one 'setObjectPermissions' call
+            sm.deleteAllObjectPermissions(projectId, SMObjects.PROJECT);
             for (Map.Entry<String, Set<String>> entry : projectPermissions.getSubjectPermissions().entrySet()) {
                 String subjectId = entry.getKey();
                 Set<String> permissions = entry.getValue();
