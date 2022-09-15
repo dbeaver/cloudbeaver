@@ -6,12 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { toJS } from 'mobx';
-
 import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { isLocalConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
@@ -26,7 +25,8 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
   constructor(
     private readonly connectionFormService: ConnectionFormService,
     private readonly userInfoResource: UserInfoResource,
-    private readonly authProvidersResource: AuthProvidersResource
+    private readonly authProvidersResource: AuthProvidersResource,
+    private readonly localizationService: LocalizationService
   ) {
     super();
   }
@@ -71,11 +71,10 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
     await this.userInfoResource.load(undefined, []);
     const provider = await this.authProvidersResource.load(providerId);
 
-    console.log(toJS(this.userInfoResource.data?.authTokens));
-
     if (!this.userInfoResource.hasToken(providerId)) {
       context.readonly = true;
-      context.setStatusMessage(`You need to sign in with "${provider.label}" credentials to work with connection.`);
+      const message = this.localizationService.translate('connections_public_connection_cloud_auth_required', undefined, { providerLabel: provider.label });
+      context.setStatusMessage(message);
     }
   }
 }
