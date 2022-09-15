@@ -27,6 +27,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
+import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -51,7 +52,6 @@ import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.InputStream;
@@ -89,11 +89,7 @@ public class WebServiceUtils extends WebCommonUtils {
 
     @NotNull
     public static DBPDataSourceRegistry getGlobalDataSourceRegistry() throws DBWebException {
-        DBPDataSourceRegistry registry = DBWorkbench.getPlatform().getWorkspace().getDefaultDataSourceRegistry();
-        if (registry == null) {
-            throw new DBWebException("No activate data source registry");
-        }
-        return registry;
+        return WebDataSourceUtils.getGlobalDataSourceRegistry();
     }
 
     public static DBPDataSourceRegistry getGlobalRegistry(WebSession session) {

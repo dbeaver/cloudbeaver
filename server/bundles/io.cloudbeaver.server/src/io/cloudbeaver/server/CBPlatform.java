@@ -27,7 +27,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
-import org.jkiss.dbeaver.model.app.DBASecureStorage;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderRegistry;
@@ -236,12 +235,6 @@ public class CBPlatform extends BasePlatformImpl {
     @Override
     public DBACertificateStorage getCertificateStorage() {
         return certificateStorage;
-    }
-
-    @NotNull
-    @Override
-    public DBASecureStorage getSecureStorage() {
-        return application.getSecureStorage();
     }
 
     @NotNull
