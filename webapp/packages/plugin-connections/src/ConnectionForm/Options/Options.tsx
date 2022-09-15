@@ -89,7 +89,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
 
   const adminPermission = usePermission(EAdminPermission.admin);
   const authentication = useAuthenticationAction({
-    origin: info?.origin ?? { type: AUTH_PROVIDER_LOCAL_ID, displayName: 'Local' },
+    providerId: info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
   });
 
   useFormValidator(submittingHandlers.for(service.formValidationTask), formRef.current);

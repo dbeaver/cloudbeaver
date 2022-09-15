@@ -9,7 +9,7 @@
 import { observable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { AppAuthService, AuthInfoService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AppAuthService, AuthInfoService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, RequestedProvider, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import type { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -224,8 +224,8 @@ export class AuthenticationService extends Bootstrap {
     }
   }
 
-  private readonly requestAuthProviderHandler: IExecutorHandler<ObjectOrigin> = async (data, contexts) => {
-    if (data.type === AUTH_PROVIDER_LOCAL_ID) {
+  private readonly requestAuthProviderHandler: IExecutorHandler<RequestedProvider> = async (data, contexts) => {
+    if (data.providerId === AUTH_PROVIDER_LOCAL_ID) {
       const provider = contexts.getContext(AuthProviderContext);
       provider.auth();
       return;
@@ -234,15 +234,15 @@ export class AuthenticationService extends Bootstrap {
     await this.authProvidersResource.loadAll();
     await this.userInfoResource.load(undefined, []);
 
-    if (!this.authProvidersResource.has(data.subType ?? data.type)) {
+    if (!this.authProvidersResource.has(data.providerId)) {
       return;
     }
 
-    if (!this.userInfoResource.hasToken(data.type, data.subType)) {
-      await this.auth(false, { providerId: data.subType ?? data.type });
+    if (!this.userInfoResource.hasToken(data.providerId)) {
+      await this.auth(false, { providerId: data.providerId });
     }
 
-    if (this.userInfoResource.hasToken(data.type, data.subType)) {
+    if (this.userInfoResource.hasToken(data.providerId)) {
       const provider = contexts.getContext(AuthProviderContext);
       provider.auth();
     }

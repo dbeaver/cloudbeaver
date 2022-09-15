@@ -21,7 +21,7 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
 }) {
   const translate = useTranslate();
   const authentication = useAuthenticationAction({
-    origin: state.info?.origin ?? { type: AUTH_PROVIDER_LOCAL_ID, displayName: 'Local' },
+    providerId: state.info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
     onAuthenticate: () => state.loadConnectionInfo(),
   });
 

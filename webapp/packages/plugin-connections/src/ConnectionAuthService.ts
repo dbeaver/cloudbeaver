@@ -80,8 +80,8 @@ export class ConnectionAuthService extends Dependency {
       return connection;
     }
 
-    if (connection.origin) {
-      const state = await this.authProviderService.requireProvider(connection.origin);
+    if (connection.requiredAuth) {
+      const state = await this.authProviderService.requireProvider(connection.requiredAuth);
 
       if (!state) {
         return connection;

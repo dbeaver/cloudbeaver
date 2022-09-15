@@ -6,7 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { toJS } from 'mobx';
+
+import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { isLocalConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -23,7 +25,8 @@ import { OriginInfoTab } from './OriginInfoTab';
 export class ConnectionOriginInfoTabService extends Bootstrap {
   constructor(
     private readonly connectionFormService: ConnectionFormService,
-    private readonly userInfoResource: UserInfoResource
+    private readonly userInfoResource: UserInfoResource,
+    private readonly authProvidersResource: AuthProvidersResource
   ) {
     super();
   }
@@ -56,16 +59,23 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
     configuration.include('includeOrigin');
   }
 
-  private formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
-    if (!data.info?.origin || data.info.origin.type === AUTH_PROVIDER_LOCAL_ID || data.mode !== 'edit') {
+  private async formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
+    const providerId = data.info?.requiredAuth;
+
+    if (!providerId || providerId === AUTH_PROVIDER_LOCAL_ID || data.mode !== 'edit') {
       return;
     }
 
     const context = contexts.getContext(connectionFormStateContext);
 
-    if (!this.userInfoResource.hasOrigin(data.info.origin)) {
+    await this.userInfoResource.load(undefined, []);
+    const provider = await this.authProvidersResource.load(providerId);
+
+    console.log(toJS(this.userInfoResource.data?.authTokens));
+
+    if (!this.userInfoResource.hasToken(providerId)) {
       context.readonly = true;
-      context.setStatusMessage(`You need to sign in with ${data.info.origin.displayName} credentials to work with connection.`);
+      context.setStatusMessage(`You need to sign in with "${provider.label}" credentials to work with connection.`);
     }
   }
 }
