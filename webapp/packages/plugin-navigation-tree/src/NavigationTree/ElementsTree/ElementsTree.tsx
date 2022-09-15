@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useCallback, useEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, Loader, TreeNodeNested, TreeNodeNestedMessage, TREE_NODE_STYLES, useFolderExplorer, useMapResource, useObjectRef } from '@cloudbeaver/core-blocks';
+import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, Loader, PlaceholderElement, TreeNodeNested, TreeNodeNestedMessage, TREE_NODE_STYLES, useFolderExplorer, useMapResource, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { Translate } from '@cloudbeaver/core-localization';
@@ -22,6 +22,7 @@ import { IElementsTreeContext, ElementsTreeContext } from './ElementsTreeContext
 import { ElementsTreeLoader } from './ElementsTreeLoader';
 import { elementsTreeNameFilter } from './elementsTreeNameFilter';
 import { ElementsTreeTools } from './ElementsTreeTools/ElementsTreeTools';
+import type { IElementsTreeSettingsProps } from './ElementsTreeTools/NavigationTreeSettings/ElementsTreeSettingsService';
 import type { NavTreeControlComponent } from './NavigationNodeComponent';
 import { NavigationNodeNested } from './NavigationTreeNode/NavigationNode/NavigationNodeNested';
 import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement';
@@ -44,6 +45,14 @@ const styles = css`
     display: flex;
     flex: 1;
     flex-direction: column;
+
+    & tree-elements {
+      position: relative;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
   }
 
   tree-box {
@@ -86,6 +95,7 @@ interface Props extends IElementsTreeOptions {
   big?: boolean;
   style?: ComponentStyle;
   className?: string;
+  settingsElements?: PlaceholderElement<IElementsTreeSettingsProps>[];
   navNodeFilterCompare?: NavNodeFilterCompareFn;
   onClick?: (node: NavNode) => Promise<void> | void;
   onOpen?: (node: NavNode, folder: boolean) => Promise<void> | void;
@@ -104,6 +114,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
   filters = [],
   renderers = [],
   expandStateGetters,
+  settingsElements,
   big,
   style,
   className,
@@ -289,45 +300,47 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
   return styled(useStyles(TREE_NODE_STYLES, styles, style))(
     <>
-      <ElementsTreeTools tree={tree} style={style} />
+      <ElementsTreeTools tree={tree} settingsElements={settingsElements} style={style} />
       <tree-box {...use({ big })}>
-        <ElementsTreeLoader
-          root={root}
-          context={context}
-          emptyPlaceholder={emptyPlaceholder}
-          childrenState={tree}
-          hasChildren={hasChildren}
-        >
-          <ElementsTreeContext.Provider value={context}>
-            <box className={className}>
-              <FolderExplorer state={folderExplorer}>
-                <tree ref={dropOutside.mouse.reference} as="div" onClick={handleClick}>
-                  {settings?.showFolderExplorerPath && <FolderExplorerPath getName={getName} canSkip={canSkip} />}
-                  <drop-outside
-                    ref={dndBox.setRef}
-                    {...use({
-                      showDropOutside: dropOutside.showDropOutside,
-                      active: dropOutside.zoneActive,
-                      bottom: dropOutside.bottom,
-                    })}
-                  >
-                    <TreeNodeNested root>
-                      <TreeNodeNestedMessage><Translate token='app_navigationTree_drop_here' /></TreeNodeNestedMessage>
-                    </TreeNodeNested>
-                  </drop-outside>
-                  <NavigationNodeNested
-                    ref={dropOutside.nestedRef}
-                    nodeId={root}
-                    component={NavigationNodeElement}
-                    path={folderExplorer.state.path}
-                    root
-                  />
+        <ElementsTreeContext.Provider value={context}>
+          <box className={className}>
+            <FolderExplorer state={folderExplorer}>
+              <tree ref={dropOutside.mouse.reference} as="div" onClick={handleClick}>
+                {settings?.showFolderExplorerPath && <FolderExplorerPath getName={getName} canSkip={canSkip} />}
+                <drop-outside
+                  ref={dndBox.setRef}
+                  {...use({
+                    showDropOutside: dropOutside.showDropOutside,
+                    active: dropOutside.zoneActive,
+                    bottom: dropOutside.bottom,
+                  })}
+                >
+                  <TreeNodeNested root>
+                    <TreeNodeNestedMessage><Translate token='app_navigationTree_drop_here' /></TreeNodeNestedMessage>
+                  </TreeNodeNested>
+                </drop-outside>
+                <ElementsTreeLoader
+                  root={root}
+                  context={context}
+                  emptyPlaceholder={emptyPlaceholder}
+                  childrenState={tree}
+                  hasChildren={hasChildren}
+                >
+                  <tree-elements>
+                    <NavigationNodeNested
+                      ref={dropOutside.nestedRef}
+                      nodeId={root}
+                      component={NavigationNodeElement}
+                      path={folderExplorer.state.path}
+                      root
+                    />
+                  </tree-elements>
                   {loaderAvailable && <Loader state={tree} overlay={hasChildren} />}
-                </tree>
-              </FolderExplorer>
-            </box>
-          </ElementsTreeContext.Provider>
-        </ElementsTreeLoader>
+                </ElementsTreeLoader>
+              </tree>
+            </FolderExplorer>
+          </box>
+        </ElementsTreeContext.Provider>
       </tree-box>
     </>
   );

@@ -20,7 +20,7 @@ function isDefined<T>(val: T | undefined | null): val is T {
 export function elementsTreeNameFilter(
   navTreeResource: NavTreeResource,
   navNodeInfoResource: NavNodeInfoResource,
-  compare: NavNodeFilterCompareFn = compareNodes
+  compare: NavNodeFilterCompareFn = elementsTreeNameFilterNode
 ): IElementsTreeFilter {
   return (filter: string, node: NavNode, children: string[], state: MetadataMap<string, ITreeNodeState>) => {
     const nodeState = state.get(node.id);
@@ -79,7 +79,7 @@ function filterNode(
   // return false;
 }
 
-function compareNodes(node: NavNode, filter: string): EEquality {
+export function elementsTreeNameFilterNode(node: NavNode, filter: string): EEquality {
   const nodeName = node.name?.toLowerCase().trim();
   const filterToLower = filter.toLowerCase().trim();
 
