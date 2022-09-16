@@ -142,6 +142,11 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         return true;
     }
 
+    @Override
+    public WebDataTransferDefaultExportSettings defaultExportSettings() {
+        return new WebDataTransferDefaultExportSettings();
+    }
+
     private WebAsyncTaskInfo asyncExportFromDataContainer(WebSQLProcessor sqlProcessor, WebDataTransferParameters parameters, DBSDataContainer dataContainer,
                                                           @Nullable WebSQLResultsInfo resultsInfo) {
         sqlProcessor.getWebSession().addInfoMessage("Export data");
@@ -213,9 +218,17 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
         StreamConsumerSettings settings = new StreamConsumerSettings();
 
-        settings.setOutputEncodingBOM(false);
         settings.setOutputFolder(exportFile.getParent().toAbsolutePath().toString());
         settings.setOutputFilePattern(exportFile.getFileName().toString());
+
+        WebDataTransferOutputSettings outputSettings = parameters.getOutputSettings();
+        settings.setOutputEncodingBOM(outputSettings.isInsertBom());
+        if (!CommonUtils.isEmpty(outputSettings.getEncoding())) {
+            settings.setOutputEncoding(outputSettings.getEncoding());
+        }
+        if (!CommonUtils.isEmpty(outputSettings.getTimestampPattern())) {
+            settings.setOutputTimestampPattern(outputSettings.getTimestampPattern());
+        }
 
         Map<String, Object> properties = new HashMap<>();
 
@@ -241,7 +254,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         DatabaseProducerSettings producerSettings = new DatabaseProducerSettings();
         producerSettings.setExtractType(DatabaseProducerSettings.ExtractType.SINGLE_QUERY);
         producerSettings.setQueryRowCount(false);
-        producerSettings.setOpenNewConnections(CommonUtils.getOption(parameters.getSettings(), "openNewConnection"));
+        producerSettings.setOpenNewConnections(CommonUtils.getOption(parameters.getDbProducerSettings(), "openNewConnection"));
 
         producer.transferData(monitor, consumer, null, producerSettings, null);
 

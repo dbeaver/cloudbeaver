@@ -32,16 +32,20 @@ const styles = css`
 
 interface Props {
   isExporting: boolean;
+  isFinalStep: boolean;
   onCancel: () => void;
   onExport: () => void;
   onBack: () => void;
+  onNext: () => void;
 }
 
 export const ProcessorConfigureDialogFooter = observer<Props>(function ProcessorConfigureDialogFooter({
   isExporting,
+  isFinalStep,
   onCancel,
   onExport,
   onBack,
+  onNext,
 }) {
   const translate = useTranslate();
 
@@ -64,14 +68,25 @@ export const ProcessorConfigureDialogFooter = observer<Props>(function Processor
       >
         {translate('ui_processing_cancel')}
       </Button>
-      <Button
-        type="button"
-        mod={['unelevated']}
-        disabled={isExporting}
-        onClick={onExport}
-      >
-        {translate('data_transfer_dialog_export')}
-      </Button>
+      {isFinalStep ? (
+        <Button
+          type="button"
+          mod={['unelevated']}
+          disabled={isExporting}
+          onClick={onExport}
+        >
+          {translate('data_transfer_dialog_export')}
+        </Button>
+      ) : (
+        <Button
+          type="button"
+          mod={['unelevated']}
+          disabled={isExporting}
+          onClick={onNext}
+        >
+          {translate('ui_stepper_next')}
+        </Button>
+      )}
     </controls>
   );
 }
