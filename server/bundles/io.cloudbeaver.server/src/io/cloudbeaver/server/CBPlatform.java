@@ -286,16 +286,20 @@ public class CBPlatform extends BasePlatformImpl {
                     if (!WebDriverRegistry.getInstance().isDriverEnabled(driver)) {
                         continue;
                     }
-                    boolean hasAllFiles = true;
+                    boolean hasAllFiles = true, hasJars = false;
                     for (DBPDriverLibrary lib : libraries) {
                         if (!lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
-                            (lib.getLocalFile() == null || !Files.exists(lib.getLocalFile()))) {
+                            (lib.getLocalFile() == null || !Files.exists(lib.getLocalFile())))
+                        {
                             hasAllFiles = false;
                             log.error("\tDriver '" + driver.getId() + "' is missing library '" + lib.getDisplayName() + "'");
-                            break;
+                        } else {
+                            if (lib.getType() == DBPDriverLibrary.FileType.jar) {
+                                hasJars = true;
+                            }
                         }
                     }
-                    if (hasAllFiles) {
+                    if (hasAllFiles || hasJars) {
                         applicableDrivers.add(driver);
                     }
                 }
