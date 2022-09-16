@@ -12,7 +12,6 @@ import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.net.DBWNetworkProfile;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
 import org.jkiss.dbeaver.registry.DataSourceConfigurationManager;
 import org.jkiss.dbeaver.registry.DataSourcePersistentRegistry;
@@ -250,11 +249,6 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     @Override
     public void notifyDataSourceListeners(DBPEvent event) {
         dataSourceRegistry.notifyDataSourceListeners(event);
-    }
-
-    @Override
-    public DBSSecretController getSecretController() {
-        return dataSourceRegistry.getSecretController();
     }
 
     @Nullable
