@@ -19,8 +19,8 @@ package io.cloudbeaver.model;
 import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.sql.WebDataFormat;
-import io.cloudbeaver.utils.WebCommonUtils;
 import io.cloudbeaver.utils.CBModelConstants;
+import io.cloudbeaver.utils.WebCommonUtils;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
@@ -288,14 +288,13 @@ public class WebConnectionInfo {
         }
 
         // Fill session and user provided credentials
-        boolean hasContextCredentials = session.hasContextCredentials();
         DBPConnectionConfiguration configWithAuth = new DBPConnectionConfiguration(dataSourceContainer.getConnectionConfiguration());
         session.provideAuthParameters(session.getProgressMonitor(), dataSourceContainer, configWithAuth);
 
 
         DBPPropertySource credentialsSource = authModel.createCredentialsSource(dataSourceContainer, configWithAuth);
         return Arrays.stream(credentialsSource.getProperties())
-            .filter(p -> WebCommonUtils.isAuthPropertyApplicable(p, hasContextCredentials))
+            .filter(p -> WebCommonUtils.isAuthPropertyApplicable(p, session.getContextCredentialsProviders()))
             .map(p -> new WebPropertyInfo(session, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
     }
 

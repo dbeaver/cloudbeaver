@@ -22,12 +22,15 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.DBPObject;
+import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.auth.AuthProperty;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 public class WebCommonUtils {
 
@@ -44,13 +47,21 @@ public class WebCommonUtils {
             .map(p -> new WebPropertyInfo(session, p, propertyCollector)).toArray(WebPropertyInfo[]::new);
     }
 
-    public static boolean isAuthPropertyApplicable(DBPPropertyDescriptor prop, boolean hasContextCredentials) {
-        if (hasContextCredentials && prop instanceof ObjectPropertyDescriptor) {
+    public static boolean isAuthPropertyApplicable(
+        DBPPropertyDescriptor prop,
+        @NotNull Collection<DBACredentialsProvider> credentialsProviders
+    ) {
+        if (!CommonUtils.isEmpty(credentialsProviders) && prop instanceof ObjectPropertyDescriptor) {
             if (((ObjectPropertyDescriptor) prop).isHidden()) {
                 return false;
             }
             AuthProperty authProperty = ((ObjectPropertyDescriptor) prop).getAnnotation(AuthProperty.class);
-            if (authProperty != null) return !authProperty.contextProvided();
+            if (authProperty != null) {
+                var requiredContext = authProperty.authContextType();
+                return CommonUtils.isEmpty(requiredContext)
+                    || credentialsProviders.stream()
+                    .noneMatch(provider -> provider.getAuthContextType().equals(requiredContext));
+            }
         }
         return true;
     }
