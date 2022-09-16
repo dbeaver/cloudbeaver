@@ -565,27 +565,29 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             throw new DBException("Error parsing server configuration", e);
         }
 
+        // Backward compatibility: load configs map
+        appConfiguration.loadLegacyCustomConfigs();
+
         // Merge new config with old one
-        {
-            Map<String, Object> mergedPlugins = Stream.concat(
-                    prevConfig.getPlugins().entrySet().stream(),
-                    appConfiguration.getPlugins().entrySet().stream()
-                )
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
-            appConfiguration.setPlugins(mergedPlugins);
-
-            // Backward compatibility: load configs map
-            appConfiguration.loadLegacyCustomConfigs();
-
-            Set<SMAuthProviderCustomConfiguration> mergedAuthProviders = Stream.concat(
-                    prevConfig.getAuthCustomConfigurations().stream(),
-                    appConfiguration.getAuthCustomConfigurations().stream()
-                )
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-            appConfiguration.setAuthProvidersConfigurations(mergedAuthProviders);
-        }
+        mergeOldConfiguration(prevConfig);
 
         patchConfigurationWithProperties(productConfiguration);
+    }
+
+    protected void mergeOldConfiguration(CBAppConfig prevConfig) {
+        Map<String, Object> mergedPlugins = Stream.concat(
+                prevConfig.getPlugins().entrySet().stream(),
+                appConfiguration.getPlugins().entrySet().stream()
+            )
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
+        appConfiguration.setPlugins(mergedPlugins);
+
+        Set<SMAuthProviderCustomConfiguration> mergedAuthProviders = Stream.concat(
+                prevConfig.getAuthCustomConfigurations().stream(),
+                appConfiguration.getAuthCustomConfigurations().stream()
+            )
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+        appConfiguration.setAuthProvidersConfigurations(mergedAuthProviders);
     }
 
     @NotNull
