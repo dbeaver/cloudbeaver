@@ -21,10 +21,10 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
 }) {
   const translate = useTranslate();
   const authentication = useAuthenticationAction({
-    origin: state.info?.origin ?? { type: AUTH_PROVIDER_LOCAL_ID, displayName: 'Local' },
+    providerId: state.info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
   });
 
-  const authorized = authentication.type === AUTH_PROVIDER_LOCAL_ID || authentication.authorized;
+  const authorized = authentication.providerId === AUTH_PROVIDER_LOCAL_ID || authentication.authorized;
 
   return (
     <>

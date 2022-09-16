@@ -62,16 +62,8 @@ UserInfoIncludes
     return this.data?.userId || 'anonymous';
   }
 
-  hasOrigin(origin: ObjectOrigin): boolean {
-    if (!this.data) {
-      return false;
-    }
-
-    return this.hasToken(origin.type, origin.subType);
-  }
-
-  hasToken(type: string, subType?: string): boolean {
-    if (type === AUTH_PROVIDER_LOCAL_ID) {
+  hasToken(providerId: string): boolean {
+    if (providerId === AUTH_PROVIDER_LOCAL_ID) {
       return true;
     }
 
@@ -81,8 +73,7 @@ UserInfoIncludes
 
     // TODO: will be changed due wrong origin in authTokens
     return (
-      this.data.authTokens.some(token => token.origin.type === (subType ?? type))
-      || this.data.authTokens.some(token => token.origin.type === type && token.origin.subType === subType)
+      this.data.authTokens.some(token => token.authProvider === providerId)
     );
   }
 

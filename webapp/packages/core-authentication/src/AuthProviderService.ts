@@ -29,9 +29,13 @@ interface IServiceDescriptionLink extends IServiceDescriptionLinkOptions {
   id: string;
 }
 
+export interface RequestedProvider {
+  providerId: string;
+}
+
 @injectable()
 export class AuthProviderService {
-  readonly requestAuthProvider: IExecutor<ObjectOrigin>;
+  readonly requestAuthProvider: IExecutor<RequestedProvider>;
 
   private readonly serviceDescriptionLinker: IServiceDescriptionLink[]; // TODO: probably should be replaced by PlaceholderContainer
 
@@ -53,18 +57,8 @@ export class AuthProviderService {
     });
   }
 
-  async requireProvider(type: string, subType?: string): Promise<boolean>;
-  async requireProvider(origin: ObjectOrigin): Promise<boolean>;
-  async requireProvider(origin: ObjectOrigin | string, subType?: string): Promise<boolean> {
-    if (typeof origin === 'string') {
-      origin = {
-        displayName: '',
-        type: origin,
-        subType,
-      };
-    }
-
-    const contexts = await this.requestAuthProvider.execute(origin);
+  async requireProvider(providerId: string): Promise<boolean> {
+    const contexts = await this.requestAuthProvider.execute({ providerId });
     const provider = contexts.getContext(AuthProviderContext);
 
     return provider.get();

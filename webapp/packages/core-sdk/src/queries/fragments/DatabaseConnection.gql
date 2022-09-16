@@ -23,6 +23,8 @@ fragment DatabaseConnection on ConnectionInfo {
   properties
   providerProperties
 
+  requiredAuth
+
   features
   supportedDataFormats
   configurationType
