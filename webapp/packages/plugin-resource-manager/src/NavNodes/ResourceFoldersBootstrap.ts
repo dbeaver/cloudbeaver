@@ -146,7 +146,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     } else {
       try {
         await this.navTreeResource.moveTo(resourceKeyList(nodeIdList), targetNode.id);
-        await this.navTreeResource.refreshTree(RESOURCES_NODE_PATH);
+        await this.navTreeResource.refreshTree(RESOURCES_NODE_PATH, true);
       } catch (exception: any) {
         this.notificationService.logException(exception, 'plugin_resource_manager_folder_move_failed');
       }

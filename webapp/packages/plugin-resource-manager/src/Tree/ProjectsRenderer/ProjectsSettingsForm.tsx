@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { type PlaceholderComponent, BASE_CONTAINERS_STYLES, Switch, PlaceholderElement } from '@cloudbeaver/core-blocks';
@@ -14,7 +15,7 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import type { IElementsTreeSettingsProps } from '@cloudbeaver/plugin-navigation-tree';
 
 
-export const ProjectsSettingsForm: PlaceholderComponent<IElementsTreeSettingsProps>  = function ProjectsSettingsForm({
+export const ProjectsSettingsForm: PlaceholderComponent<IElementsTreeSettingsProps>  = observer(function ProjectsSettingsForm({
   tree: { root, settings },
   style,
 }) {
@@ -40,7 +41,7 @@ export const ProjectsSettingsForm: PlaceholderComponent<IElementsTreeSettingsPro
       </Switch>
     </>
   );
-};
+});
 
 export const ProjectsSettingsPlaceholderElement: PlaceholderElement<IElementsTreeSettingsProps> = {
   id: 'settings-project',
