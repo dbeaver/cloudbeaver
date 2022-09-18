@@ -62,7 +62,7 @@ export class NavigationTabsService extends View<ITab> {
         && tab.userId === this.userInfoResource.getId()
         && (
           tab.projectId === null
-          || this.projectsService.activeProjectIds.includes(tab.projectId)
+          || this.projectsService.activeProjects.some(project => project.id === tab.projectId)
         )
       ))
       .map(tab => tab.id);
