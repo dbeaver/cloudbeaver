@@ -16,7 +16,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NavTreeResource, NavNodeManagerService, NavNodeInfoResource, type INodeMoveData, navNodeMoveContext, getNodesFromContext, ENodeMoveType, type NavNode } from '@cloudbeaver/core-navigation-tree';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, MenuService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider } from '@cloudbeaver/core-view';
@@ -51,6 +51,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     private readonly navResourceNodeService: NavResourceNodeService,
     private readonly resourceManagerResource: ResourceManagerResource,
     private readonly resourceProjectsResource: ResourceProjectsResource,
+    private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
@@ -239,7 +240,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     const selected = tree.getSelected();
 
     if (selected.length === 0) {
-      const editableProjects = this.projectInfoResource.values.filter(project => project.canEditResources);
+      const editableProjects = this.projectsService.activeProjects.filter(project => project.canEditResources);
 
       if (editableProjects.length > 0) {
         const project = editableProjects[0];

@@ -46,6 +46,11 @@ public class WebProjectInfo {
     }
 
     @Property
+    public boolean isShared() {
+        return project.getRmProject().isShared();
+    }
+
+    @Property
     public String getName() {
         return project.getName();
     }

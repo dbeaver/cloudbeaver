@@ -14,6 +14,7 @@ import { useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
 import { NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import { ProjectsNavNodeService, ProjectsService } from '@cloudbeaver/core-projects';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
 import { CaptureView } from '@cloudbeaver/core-view';
 
@@ -30,7 +31,7 @@ import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreePr
 import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigationTreeProjectSearchCompare';
 import { navigationTreeProjectsExpandStateGetter } from './ProjectsRenderer/navigationTreeProjectsExpandStateGetter';
 import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navigationTreeProjectsRendererRenderer';
-import { ProjectsSettingsForm, ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm';
+import { ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm';
 import { useNavigationTree } from './useNavigationTree';
 
 const navigationTreeStyles = css`
@@ -76,6 +77,8 @@ const elementsTreeStyles = css`
   `;
 
 export const NavigationTree = observer(function NavigationTree() {
+  const projectsNavNodeService = useService(ProjectsNavNodeService);
+  const projectsService = useService(ProjectsService);
   const navTreeService = useService(NavigationTreeService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
@@ -106,8 +109,8 @@ export const NavigationTree = observer(function NavigationTree() {
     [navNodeInfoResource]
   );
   const projectFilter = useMemo(
-    () => navigationTreeProjectFilter(navNodeInfoResource, navTreeResource),
-    [navNodeInfoResource, navTreeResource]
+    () => navigationTreeProjectFilter(projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource),
+    [projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource]
   );
 
   const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);

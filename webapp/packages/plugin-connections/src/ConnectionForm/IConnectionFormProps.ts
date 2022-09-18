@@ -8,7 +8,7 @@
 
 import type { IFormStateInfo } from '@cloudbeaver/core-blocks';
 import type { DatabaseConnection, IConnectionsResource } from '@cloudbeaver/core-connections';
-import type { IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
+import type { IExecutor, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -36,6 +36,7 @@ export interface IConnectionFormState {
   readonly info: DatabaseConnection | undefined;
   readonly readonly: boolean;
   readonly submittingTask: IExecutorHandlersCollection<IConnectionFormSubmitData>;
+  readonly closeTask: IExecutor;
 
   readonly load: () => Promise<void>;
   readonly loadConnectionInfo: () => Promise<DatabaseConnection | undefined>;
@@ -51,6 +52,7 @@ export interface IConnectionFormState {
   readonly save: () => Promise<void>;
   readonly test: () => Promise<void>;
   readonly checkFormState: () => Promise<IFormStateInfo | null>;
+  readonly close: () => Promise<void>;
   readonly dispose: () => void;
 }
 

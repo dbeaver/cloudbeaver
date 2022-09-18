@@ -1,6 +1,7 @@
 query getProjectList {
   projects: listProjects {
     id
+    shared
     name
     description
     canEditDataSources

@@ -368,6 +368,7 @@ type NavigatorSettings {
 
 type ProjectInfo {
     id: String!
+    shared: Boolean!
     name: String!
     description: String
     canEditDataSources: Boolean!

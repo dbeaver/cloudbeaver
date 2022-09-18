@@ -12,7 +12,6 @@ export const topMenuStyles = css`
     checkbox {
       composes: theme-checkbox_surface from global;
     }
-
     Button {
       composes: theme-ripple from global;
     }
@@ -25,35 +24,32 @@ export const topMenuStyles = css`
     }
     MenuTrigger, Button {
       height: 100%;
-      padding: 0 16px !important;
-      padding-right: 0!important;
+      padding: 0 8px !important;
   
       & box > div {
         display: block;
       }
       & box > Icon {
-        background: #47a0dd;
-        width: 16px;
+        width: 14px;
         height: 100%;
-        padding: 0 16px;
+        padding: 0 4px;
       }
       & IconOrImage {
         display: block;
         width: 24px;
       }
       & menu-trigger-icon {
-        margin-right: 8px;
+        margin-right: 4px;
       }
       & menu-trigger-text {
         max-width: 240px;
         overflow-x: hidden;
         text-overflow: ellipsis;
-        padding-right: 16px;
       }
-      &:hover box > Icon,
+      /*&:hover box > Icon,
       &:global([aria-expanded="true"]) box > Icon {
         background: #236ea0;
-      }
+      }*/
     }
     MenuItem,
     MenuItemCheckbox,

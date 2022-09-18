@@ -54,7 +54,6 @@ export const TopMenuItem = observer<IProps>(function TopMenuItem({ menuItem, sty
         title={title}
         icon={menuItem.icon}
         style={style}
-        menu
       />
     </MenuTrigger>
   );

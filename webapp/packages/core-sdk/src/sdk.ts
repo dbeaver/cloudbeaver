@@ -850,6 +850,7 @@ export interface ProjectInfo {
   description?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   name: Scalars['String'];
+  shared: Scalars['Boolean'];
 }
 
 export interface Query {
@@ -2467,7 +2468,7 @@ export type NavRenameNodeMutation = { navRenameNode?: string };
 export type GetProjectListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProjectListQuery = { projects: Array<{ id: string, name: string, description?: string, canEditDataSources: boolean, canViewDataSources: boolean, canEditResources: boolean, canViewResources: boolean }> };
+export type GetProjectListQuery = { projects: Array<{ id: string, shared: boolean, name: string, description?: string, canEditDataSources: boolean, canViewDataSources: boolean, canEditResources: boolean, canViewResources: boolean }> };
 
 export type CreateProjectMutationVariables = Exact<{
   projectId?: InputMaybe<Scalars['ID']>;
@@ -3996,6 +3997,7 @@ export const GetProjectListDocument = `
     query getProjectList {
   projects: listProjects {
     id
+    shared
     name
     description
     canEditDataSources

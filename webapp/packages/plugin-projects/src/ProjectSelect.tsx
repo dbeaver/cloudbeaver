@@ -37,20 +37,19 @@ export const ProjectSelect = observer(function ProjectSelect({
   const projectsService = useService(ProjectsService);
   const projectsLoader = useMapResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey, {
     onData: () => {
-      if (!value && projectsService.activeProject) {
-        onChange(projectsService.activeProject.id);
+      if (!value && projectsService.defaultProject) {
+        onChange(projectsService.defaultProject.id);
       }
     },
   });
 
-  const projects = projectsLoader.data as ProjectInfo[];
-
-  const possibleOptions = projects.filter(filter);
+  const projects = projectsService.activeProjects;
+  const possibleOptions = projects
+    .filter(filter)
+    .map(project => project.id);
 
   function handleProjectSelect(projectId: string) {
-    const project = projectsLoader.resource.get(projectId);
-
-    if (project && filter(project)) {
+    if (possibleOptions.includes(projectId)) {
       onChange(projectId);
     }
   }

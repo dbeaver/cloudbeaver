@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 
 import type { IConnectionsResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 
 import { ConnectionFormService } from './ConnectionFormService';
 import { ConnectionFormState } from './ConnectionFormState';
@@ -19,9 +20,14 @@ export function useConnectionFormState(
   resource: IConnectionsResource,
   configure?: (state: IConnectionFormState) => any
 ): IConnectionFormState {
+  const projectsService = useService(ProjectsService);
+  const projectInfoResource = useService(ProjectInfoResource);
+
   const service = useService(ConnectionFormService);
   const [state] = useState<IConnectionFormState>(() => {
     const state = new ConnectionFormState(
+      projectsService,
+      projectInfoResource,
       service,
       resource,
     );

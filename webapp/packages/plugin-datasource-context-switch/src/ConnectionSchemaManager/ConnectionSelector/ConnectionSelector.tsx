@@ -70,7 +70,6 @@ const styles = css`
     display: flex;
     height: 100%;
     visibility: hidden;
-    background: #338ecc;
       
     &[use|isVisible] {
       visibility: visible;
@@ -172,7 +171,7 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
             title={connection?.name || 'app_topnavbar_connection_schema_manager_not_selected'}
             icon={driver?.icon}
             style={[menuStyles, connectionMenu, removeDisableEffect]}
-            menu={connectionSelectorService.isConnectionChangeable}
+            // menu={connectionSelectorService.isConnectionChangeable}
             loading={loading}
             secondary
           />
@@ -190,10 +189,10 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
             title={objectContainerName}
             icon={objectContainerIcon}
             style={[menuStyles, removeDisableEffect]}
-            menu={
-              connectionSelectorService.isObjectCatalogChangeable
-            || connectionSelectorService.isObjectSchemaChangeable
-            }
+            // menu={
+            //   connectionSelectorService.isObjectCatalogChangeable
+            // || connectionSelectorService.isObjectSchemaChangeable
+            // }
             loading={loading}
             secondary
           />
