@@ -10,7 +10,7 @@ import { css } from 'reshadow';
 
 export const settingsMenuStyles = css`
   ContextMenu {
-    padding: 0 16px !important;
+    padding: 0 8px !important;
     height: 48px;
     cursor: pointer;
     background: none;

@@ -23,7 +23,7 @@ const styles = css`
       height: 100%;
       display: flex;
       align-items: center;
-      padding: 0 16px;
+      padding: 0 8px;
       cursor: pointer;
     }
     IconOrImage {
