@@ -10,6 +10,7 @@ import { makeObservable, observable } from 'mobx';
 
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { IExecutor, Executor, IExecutionContextProvider, ISyncContextLoader } from '@cloudbeaver/core-executor';
+import { ProjectsNavNodeService } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import type { IDataContextProvider } from '@cloudbeaver/core-view';
@@ -114,6 +115,7 @@ export class NavNodeManagerService extends Bootstrap {
   constructor(
     readonly navTree: NavTreeResource,
     readonly navNodeInfoResource: NavNodeInfoResource,
+    private readonly projectsNavNodeService: ProjectsNavNodeService,
     navigationService: NavigationService
   ) {
     super();
@@ -327,7 +329,7 @@ export class NavNodeManagerService extends Bootstrap {
     data
   ) => {
     let nodeId = data.nodeId;
-    const projectId = data.projectId;
+    let projectId = data.projectId;
     let parentId = data.parentId;
     let folderId = '';
     let name: string | undefined;
@@ -354,6 +356,10 @@ export class NavNodeManagerService extends Bootstrap {
 
         if (data.folderId) {
           folderId = data.folderId;
+        }
+
+        if (!projectId) {
+          projectId = this.projectsNavNodeService.getProject(node.id)?.id;
         }
       }
     }
