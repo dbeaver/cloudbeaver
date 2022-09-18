@@ -71,11 +71,18 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       id: 'tree-tools-menu-resource-folders-handler',
       isActionApplicable: (context, action) => {
         const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
-        if (!tree?.baseRoot.startsWith(RESOURCES_NODE_PATH) || !this.userInfoResource.data) {
+
+        if (
+          ![ACTION_NEW_FOLDER].includes(action)
+          || !tree?.baseRoot.startsWith(RESOURCES_NODE_PATH)
+          || !this.userInfoResource.data
+        ) {
           return false;
         }
 
-        return [ACTION_NEW_FOLDER].includes(action);
+        const targetNode = this.getTargetNode(tree);
+
+        return targetNode !== undefined;
       },
       isDisabled: (context, action) => {
         const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
