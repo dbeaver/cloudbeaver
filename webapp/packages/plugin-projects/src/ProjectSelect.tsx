@@ -54,7 +54,7 @@ export const ProjectSelect = observer(function ProjectSelect({
     }
   }
 
-  if (autoHide && possibleOptions.length <= 1) {
+  if (autoHide && projects.length <= 1) {
     return null;
   }
 

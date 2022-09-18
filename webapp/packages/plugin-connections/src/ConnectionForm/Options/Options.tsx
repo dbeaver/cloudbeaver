@@ -299,6 +299,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 value={state.projectId ?? PROJECT_GLOBAL_ID}
                 readOnly={readonly || edit}
                 disabled={disabled}
+                autoHide
                 onChange={projectId => state.setProject(projectId)}
               />
               {!config.template && (
