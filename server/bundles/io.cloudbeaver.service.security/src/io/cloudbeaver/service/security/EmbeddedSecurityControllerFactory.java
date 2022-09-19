@@ -33,13 +33,26 @@ import java.util.Map;
 public class EmbeddedSecurityControllerFactory {
     private static volatile CBDatabase DB_INSTANCE;
 
+
     /**
-     * Create new security controller instance
+     * Create new security controller instance with default configuration
      */
     public CBEmbeddedSecurityController createSecurityService(
         WebApplication application,
         Map<String, Object> databaseConfig,
         SMCredentialsProvider credentialsProvider
+    ) throws DBException {
+        return createSecurityService(application, databaseConfig, credentialsProvider, new SMControllerConfiguration());
+    }
+
+    /**
+     * Create new security controller instance with custom configuration
+     */
+    public CBEmbeddedSecurityController createSecurityService(
+        WebApplication application,
+        Map<String, Object> databaseConfig,
+        SMCredentialsProvider credentialsProvider,
+        SMControllerConfiguration smConfig
     ) throws DBException {
         boolean initDb = false;
         if (DB_INSTANCE == null) {
@@ -50,7 +63,9 @@ public class EmbeddedSecurityControllerFactory {
                 }
             }
         }
-        var securityController = createEmbeddedSecurityController(application, DB_INSTANCE, credentialsProvider);
+        var securityController = createEmbeddedSecurityController(
+            application, DB_INSTANCE, credentialsProvider, smConfig
+        );
         if (initDb) {
             //FIXME circular dependency
             DB_INSTANCE.setAdminSecurityController(securityController);
@@ -76,8 +91,9 @@ public class EmbeddedSecurityControllerFactory {
     protected CBEmbeddedSecurityController createEmbeddedSecurityController(
         WebApplication application,
         CBDatabase database,
-        SMCredentialsProvider credentialsProvider
+        SMCredentialsProvider credentialsProvider,
+        SMControllerConfiguration smConfig
     ) {
-        return new CBEmbeddedSecurityController(application, database, credentialsProvider);
+        return new CBEmbeddedSecurityController(application, database, credentialsProvider, smConfig);
     }
 }
