@@ -64,6 +64,11 @@ public class WebDatabaseAuthModel {
     }
 
     @Property
+    public String getRequiredAuth() {
+        return model.getRequiredAuthProviderId();
+    }
+
+    @Property
     public WebPropertyInfo[] getProperties() throws DBWebException {
         boolean hasContextCredentials = webSession.hasContextCredentials();
 

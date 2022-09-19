@@ -172,6 +172,7 @@ type DatabaseAuthModel {
     icon: String
     # checks if the auth model needs a configuration on a local file system
     requiresLocalConfiguration: Boolean
+    requiredAuth: String
 
     properties: [ObjectPropertyInfo!]!
 }
