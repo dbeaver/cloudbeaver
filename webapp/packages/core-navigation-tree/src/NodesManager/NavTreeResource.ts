@@ -12,6 +12,7 @@ import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { EPermission, SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
@@ -74,6 +75,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     private readonly navTreeSettingsService: NavTreeSettingsService,
     private readonly sessionDataResource: SessionDataResource,
     private readonly userInfoResource: UserInfoResource,
+    private readonly projectInfoResource: ProjectInfoResource,
     permissionsResource: SessionPermissionsResource,
   ) {
     super();
@@ -108,6 +110,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     // navNodeInfoResource.preloadResource(this);
     this.outdateResource(navNodeInfoResource);
     this.updateResource(navNodeInfoResource);
+    this.projectInfoResource.onDataOutdated.addHandler(() => this.markOutdated());
     this.sessionDataResource.outdateResource(this);
     this.userInfoResource.onUserChange.addHandler(action(() => {
       this.clear();
