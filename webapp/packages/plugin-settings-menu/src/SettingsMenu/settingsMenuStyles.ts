@@ -10,7 +10,7 @@ import { css } from 'reshadow';
 
 export const settingsMenuStyles = css`
   ContextMenu {
-    padding: 0 8px !important;
+    padding: 0 16px !important;
     height: 48px;
     cursor: pointer;
     background: none;
@@ -31,6 +31,11 @@ export const settingsMenuStyles = css`
     }
     & Icon {
       transform: rotate(90deg);
+    }
+  }
+  @media only screen and (max-width: 1200px) {
+    ContextMenu {
+      padding: 0 8px !important;
     }
   }
 `;

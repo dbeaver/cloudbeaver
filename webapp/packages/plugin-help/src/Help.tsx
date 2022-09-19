@@ -22,10 +22,15 @@ const styles = css`
       height: 100%;
       display: flex;
       align-items: center;
-      padding: 0 8px;
+      padding: 0 16px;
       cursor: pointer;  
       & IconOrImage {
         width: 24px;
+      }
+    }
+    @media only screen and (max-width: 1200px) {
+      container {
+        padding: 0 8px;
       }
     }
   `;
