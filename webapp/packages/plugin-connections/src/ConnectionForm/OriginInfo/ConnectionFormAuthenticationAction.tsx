@@ -10,7 +10,6 @@ import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { Button, PlaceholderComponent } from '@cloudbeaver/core-blocks';
-import { isLocalConnection } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 
@@ -44,7 +43,7 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
 export const ConnectionFormAuthenticationAction: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormAuthenticationAction({
   state,
 }) {
-  if (!state.info || isLocalConnection(state.info)) {
+  if (!state.info || !state.info.requiredAuth) {
     return null;
   }
 
