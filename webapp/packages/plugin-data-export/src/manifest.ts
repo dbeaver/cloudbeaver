@@ -14,6 +14,7 @@ import { DataExportProcessService } from './DataExportProcessService';
 import { DataExportService } from './DataExportService';
 import { DataExportSettingsService } from './DataExportSettingsService';
 import { DataTransferProcessorsResource } from './DataTransferProcessorsResource';
+import { DefaultExportOutputSettingsResource } from './Dialog/DefaultExportOutputSettingsResource';
 import { LocaleService } from './LocaleService';
 
 export const manifest: PluginManifest = {
@@ -29,5 +30,6 @@ export const manifest: PluginManifest = {
     DataExportProcessService,
     DataTransferProcessorsResource,
     LocaleService,
+    DefaultExportOutputSettingsResource,
   ],
 };
