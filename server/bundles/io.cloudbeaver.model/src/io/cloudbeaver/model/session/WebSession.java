@@ -51,6 +51,7 @@ import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
+import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -352,7 +353,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     public VirtualProjectImpl createVirtualProject(RMProject project) {
         // Do not filter data sources from user project
-        DataSourceFilter filter = project.getType() == RMProject.Type.USER ? x -> true : this::isDataSourceAccessible;
+        DataSourceFilter filter = project.getType() == RMProjectType.USER ? x -> true : this::isDataSourceAccessible;
         VirtualProjectImpl sessionProject = application.createProjectImpl(
             project,
             sessionAuthContext,

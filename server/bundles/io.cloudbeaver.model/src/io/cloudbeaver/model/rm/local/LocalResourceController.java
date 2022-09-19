@@ -132,16 +132,16 @@ public class LocalResourceController implements RMController {
         //FIXME: remove legacy global project support
         //admin has all edit access
         //user has only read access
-        var globalProjectPermissions = getProjectPermissions(globalProjectName, RMProject.Type.GLOBAL);
+        var globalProjectPermissions = getProjectPermissions(globalProjectName, RMProjectType.GLOBAL);
 
-        RMProject globalProject = makeProjectFromPath(getGlobalProjectPath(), globalProjectPermissions, RMProject.Type.GLOBAL, true);
+        RMProject globalProject = makeProjectFromPath(getGlobalProjectPath(), globalProjectPermissions, RMProjectType.GLOBAL, true);
         if (globalProject != null) {
             projects.add(globalProject);
         }
 
         //user has full access to his private project
-        var userProjectPermission = getProjectPermissions(null, RMProject.Type.USER);
-        RMProject userProject = makeProjectFromPath(getPrivateProjectPath(), userProjectPermission, RMProject.Type.USER, false);
+        var userProjectPermission = getProjectPermissions(null, RMProjectType.USER);
+        RMProject userProject = makeProjectFromPath(getPrivateProjectPath(), userProjectPermission, RMProjectType.USER, false);
         if (userProject != null) {
             projects.add(0, userProject);
         }
@@ -162,13 +162,13 @@ public class LocalResourceController implements RMController {
             .map(projectPermission -> makeProjectFromPath(
                 sharedProjectsPath.resolve(projectPermission.getObjectId()),
                 projectPermission.getPermissions().stream().map(RMProjectPermission::fromPermission).collect(Collectors.toSet()),
-                RMProject.Type.SHARED, true)
+                RMProjectType.SHARED, true)
             )
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
 
-    private Set<RMProjectPermission> getProjectPermissions(@Nullable String projectId, RMProject.Type projectType) throws DBException {
+    private Set<RMProjectPermission> getProjectPermissions(@Nullable String projectId, RMProjectType projectType) throws DBException {
         var activeUserCreds = credentialsProvider.getActiveUserCredentials();
 
         switch (projectType) {
@@ -200,7 +200,7 @@ public class LocalResourceController implements RMController {
                 return new RMProject[0];
             }
             return Files.list(sharedProjectsPath)
-                .map((Path path) -> makeProjectFromPath(path, Set.of(), RMProject.Type.SHARED, false))
+                .map((Path path) -> makeProjectFromPath(path, Set.of(), RMProjectType.SHARED, false))
                 .filter(Objects::nonNull)
                 .toArray(RMProject[]::new);
         } catch (IOException e) {
@@ -223,7 +223,7 @@ public class LocalResourceController implements RMController {
         if (Files.exists(projectPath)) {
             throw new DBException("Project '" + name + "' already exists");
         }
-        project = makeProjectFromPath(projectPath, Set.of(), RMProject.Type.SHARED, false);
+        project = makeProjectFromPath(projectPath, Set.of(), RMProjectType.SHARED, false);
         if (project == null) {
             throw new DBException("Project '" + name + "' not created");
         }
@@ -535,7 +535,7 @@ public class LocalResourceController implements RMController {
         return makeProjectFromPath(projectPath, permissions, projectName.getType(), false);
     }
 
-    private RMProject makeProjectFromPath(Path path, Set<RMProjectPermission> permissions, RMProject.Type type, boolean checkExistence) {
+    private RMProject makeProjectFromPath(Path path, Set<RMProjectPermission> permissions, RMProjectType type, boolean checkExistence) {
         if (path == null) {
             return null;
         }
@@ -573,7 +573,7 @@ public class LocalResourceController implements RMController {
 
     private Path getProjectPath(String projectId) throws DBException {
         RMProjectName project = parseProjectName(projectId);
-        RMProject.Type type = project.getType();
+        RMProjectType type = project.getType();
         String projectName = project.getName();
         switch (type) {
             case GLOBAL:
@@ -728,12 +728,8 @@ public class LocalResourceController implements RMController {
             return name;
         }
 
-        public RMProject.Type getType() {
-            switch (prefix) {
-                case RMProject.PREFIX_GLOBAL: return RMProject.Type.GLOBAL;
-                case RMProject.PREFIX_SHARED: return RMProject.Type.SHARED;
-                default: return RMProject.Type.USER;
-            }
+        public RMProjectType getType() {
+            return RMProjectType.getByPrefix(prefix);
         }
     }
     public static RMProjectName parseProjectName(String projectId) {
@@ -741,7 +737,7 @@ public class LocalResourceController implements RMController {
         String name;
         int divPos = projectId.indexOf("_");
         if (divPos < 0) {
-            prefix = RMProject.Type.USER.getPrefix();
+            prefix = RMProjectType.USER.getPrefix();
             name = projectId;
         } else {
             prefix = projectId.substring(0, divPos);
@@ -752,8 +748,8 @@ public class LocalResourceController implements RMController {
 
     public static boolean isShared(String projectId) {
         RMProjectName rmProjectName = parseProjectName(projectId);
-        return RMProject.Type.SHARED.getPrefix().equals(rmProjectName.getPrefix()) ||
-            RMProject.Type.GLOBAL.getPrefix().equals(rmProjectName.getPrefix());
+        return RMProjectType.SHARED.getPrefix().equals(rmProjectName.getPrefix()) ||
+            RMProjectType.GLOBAL.getPrefix().equals(rmProjectName.getPrefix());
     }
 
 }
