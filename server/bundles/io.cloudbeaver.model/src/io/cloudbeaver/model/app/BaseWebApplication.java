@@ -69,6 +69,11 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return null;
     }
 
+    @Override
+    public boolean isHeadlessMode() {
+        return true;
+    }
+
     @Nullable
     protected Path loadServerConfiguration() throws DBException {
         String configPath = DEFAULT_CONFIG_FILE_PATH;
