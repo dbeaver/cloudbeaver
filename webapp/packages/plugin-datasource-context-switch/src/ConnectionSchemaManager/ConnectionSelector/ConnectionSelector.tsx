@@ -161,7 +161,7 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
     <connection-selector {...use({ isVisible })}>
       <ContextMenu
         menu={connectionsMenu}
-        placement="bottom-end"
+        placement="bottom-start"
         style={[menuStyles, connectionMenu, topMenuStyles, removeDisableEffect]}
         disclosure
         modal
@@ -179,7 +179,7 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
       </ContextMenu>
       <ContextMenu
         menu={dataContainerMenu}
-        placement="bottom-end"
+        placement="bottom-start"
         style={[menuStyles, topMenuStyles]}
         disclosure
         modal
