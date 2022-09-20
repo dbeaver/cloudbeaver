@@ -33,6 +33,9 @@ import java.util.Map;
 public class EmbeddedSecurityControllerFactory {
     private static volatile CBDatabase DB_INSTANCE;
 
+    public static CBDatabase getDbInstance() {
+        return DB_INSTANCE;
+    }
 
     /**
      * Create new security controller instance with default configuration
