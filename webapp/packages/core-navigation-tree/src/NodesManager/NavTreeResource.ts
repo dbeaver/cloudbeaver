@@ -23,7 +23,8 @@ import {
   resourceKeyList,
   NavNodeChildrenQuery as fake,
   ResourceKeyUtils,
-  ICachedMapResourceMetadata
+  ICachedMapResourceMetadata,
+  CachedMapAllKey
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -110,7 +111,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     // navNodeInfoResource.preloadResource(this);
     this.outdateResource(navNodeInfoResource);
     this.updateResource(navNodeInfoResource);
-    this.projectInfoResource.onDataOutdated.addHandler(() => this.markOutdated());
+    this.sync(this.projectInfoResource, () => CachedMapAllKey);
     this.sessionDataResource.outdateResource(this);
     this.userInfoResource.onUserChange.addHandler(action(() => {
       this.clear();
