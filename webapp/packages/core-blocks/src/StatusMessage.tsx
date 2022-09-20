@@ -39,7 +39,7 @@ const styles = css`
 `;
 
 interface Props {
-  message?: string | null;
+  message?: string | string[] | null;
   status?: ENotificationType;
   exception?: Error | null;
   onShowDetails?: () => void;
@@ -55,7 +55,12 @@ export const StatusMessage = observer<Props>(function StatusMessage({
 }) {
   const translate = useTranslate();
   const errorDetails = useErrorDetails(exception);
-  message = (message ? translate(message) : message) ?? errorDetails.details?.name;
+
+  if (Array.isArray(message)) {
+    message = message.map(m => translate(m)).join(', ');
+  }
+
+  message = message ?? errorDetails.details?.message;
   let icon = '/icons/info_icon.svg';
 
   if (status === ENotificationType.Error || exception !== null) {

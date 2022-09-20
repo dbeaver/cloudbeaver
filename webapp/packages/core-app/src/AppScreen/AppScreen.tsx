@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { memo } from 'react';
+
 import { Placeholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { TopNavBar } from '@cloudbeaver/plugin-top-app-bar';
@@ -13,7 +15,7 @@ import { TopNavBar } from '@cloudbeaver/plugin-top-app-bar';
 import { AppScreenService } from './AppScreenService';
 import { Main } from './Main';
 
-export function AppScreen() {
+export const AppScreen = memo(function AppScreen() {
   const appScreenService = useService(AppScreenService);
   return (
     <>
@@ -22,4 +24,4 @@ export function AppScreen() {
       <Main />
     </>
   );
-}
+});

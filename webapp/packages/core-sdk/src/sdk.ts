@@ -47,6 +47,17 @@ export interface AdminConnectionSearchInfo {
   possibleDrivers: Array<Scalars['ID']>;
 }
 
+export interface AdminObjectGrantInfo {
+  objectPermissions: AdminObjectPermissions;
+  subjectId: Scalars['ID'];
+  subjectType: AdminSubjectType;
+}
+
+export interface AdminObjectPermissions {
+  objectId: Scalars['ID'];
+  permissions: Array<Scalars['String']>;
+}
+
 export interface AdminPermissionInfo {
   category?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
@@ -389,6 +400,7 @@ export interface Mutation {
   rmDeleteProject: Scalars['Boolean'];
   rmDeleteResource?: Maybe<Scalars['Boolean']>;
   rmMoveResource: Scalars['String'];
+  rmSetProjectPermissions: Scalars['Boolean'];
   rmWriteResourceStringContent: Scalars['String'];
   setConnectionNavigatorSettings: ConnectionInfo;
   setUserConfigurationParameter: Scalars['Boolean'];
@@ -577,6 +589,12 @@ export interface MutationRmDeleteResourceArgs {
 export interface MutationRmMoveResourceArgs {
   newResourcePath?: InputMaybe<Scalars['String']>;
   oldResourcePath: Scalars['String'];
+  projectId: Scalars['String'];
+}
+
+
+export interface MutationRmSetProjectPermissionsArgs {
+  permissions: Array<RmProjectPermissions>;
   projectId: Scalars['String'];
 }
 
@@ -825,8 +843,10 @@ export interface ProductInfo {
 }
 
 export interface ProjectInfo {
-  canCreateConnections: Scalars['Boolean'];
-  canViewConnections: Scalars['Boolean'];
+  canEditDataSources: Scalars['Boolean'];
+  canEditResources: Scalars['Boolean'];
+  canViewDataSources: Scalars['Boolean'];
+  canViewResources: Scalars['Boolean'];
   description?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   name: Scalars['String'];
@@ -880,9 +900,12 @@ export interface Query {
   networkHandlers: Array<NetworkHandlerDescriptor>;
   readSessionLog: Array<LogEntry>;
   revokeUserRole?: Maybe<Scalars['Boolean']>;
+  rmListProjectGrantedPermissions: Array<AdminObjectGrantInfo>;
+  rmListProjectPermissions: Array<AdminPermissionInfo>;
   rmListProjects: Array<RmProject>;
   rmListResources: Array<RmResource>;
   rmListSharedProjects: Array<RmProject>;
+  rmListSubjectProjectsPermissionGrants: Array<AdminObjectGrantInfo>;
   rmProject: RmProject;
   rmReadResourceAsString: Scalars['String'];
   saveAuthProviderConfiguration: AdminAuthProviderConfiguration;
@@ -1129,12 +1152,22 @@ export interface QueryRevokeUserRoleArgs {
 }
 
 
+export interface QueryRmListProjectGrantedPermissionsArgs {
+  projectId: Scalars['String'];
+}
+
+
 export interface QueryRmListResourcesArgs {
   folder?: InputMaybe<Scalars['String']>;
   nameMask?: InputMaybe<Scalars['String']>;
   projectId: Scalars['String'];
   readHistory?: InputMaybe<Scalars['Boolean']>;
   readProperties?: InputMaybe<Scalars['Boolean']>;
+}
+
+
+export interface QueryRmListSubjectProjectsPermissionGrantsArgs {
+  subjectId: Scalars['String'];
 }
 
 
@@ -1309,6 +1342,11 @@ export interface RmProject {
   name: Scalars['String'];
   projectPermissions: Array<Scalars['String']>;
   shared: Scalars['Boolean'];
+}
+
+export interface RmProjectPermissions {
+  permissions: Array<Scalars['String']>;
+  subjectId: Scalars['String'];
 }
 
 export interface RmResource {
@@ -2189,6 +2227,8 @@ export type NavGetStructContainersQueryVariables = Exact<{
 
 export type NavGetStructContainersQuery = { navGetStructContainers: { supportsCatalogChange: boolean, supportsSchemaChange: boolean, catalogList: Array<{ catalog: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }, schemaList: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> }>, schemaList: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> } };
 
+export type AdminObjectGrantInfoFragment = { subjectId: string, subjectType: AdminSubjectType, objectPermissions: { objectId: string, permissions: Array<string> } };
+
 export type AdminPermissionInfoFragment = { id: string, label?: string, description?: string, category?: string };
 
 export type AdminRoleInfoFragment = { roleId: string, roleName?: string, description?: string, rolePermissions: Array<string> };
@@ -2427,7 +2467,7 @@ export type NavRenameNodeMutation = { navRenameNode?: string };
 export type GetProjectListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProjectListQuery = { projects: Array<{ id: string, name: string, description?: string, canCreateConnections: boolean, canViewConnections: boolean }> };
+export type GetProjectListQuery = { projects: Array<{ id: string, name: string, description?: string, canEditDataSources: boolean, canViewDataSources: boolean, canEditResources: boolean, canViewResources: boolean }> };
 
 export type CreateProjectMutationVariables = Exact<{
   projectId?: InputMaybe<Scalars['ID']>;
@@ -2470,6 +2510,18 @@ export type GetProjectQueryVariables = Exact<{
 
 export type GetProjectQuery = { project: { id: string, name: string, shared: boolean, description?: string, projectPermissions: Array<string> } };
 
+export type GetProjectGrantedPermissionsQueryVariables = Exact<{
+  projectId: Scalars['String'];
+}>;
+
+
+export type GetProjectGrantedPermissionsQuery = { grantedPermissions: Array<{ subjectId: string, subjectType: AdminSubjectType, objectPermissions: { objectId: string, permissions: Array<string> } }> };
+
+export type GetProjectPermissionsListQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetProjectPermissionsListQuery = { permissions: Array<{ id: string, label?: string, description?: string, category?: string }> };
+
 export type GetResourceListQueryVariables = Exact<{
   projectId: Scalars['String'];
   folder?: InputMaybe<Scalars['String']>;
@@ -2507,6 +2559,14 @@ export type ReadResourceQueryVariables = Exact<{
 
 
 export type ReadResourceQuery = { value: string };
+
+export type SetProjectPermissionsMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  permissions: Array<RmProjectPermissions> | RmProjectPermissions;
+}>;
+
+
+export type SetProjectPermissionsMutation = { rmSetProjectPermissions: boolean };
 
 export type WriteResourceContentMutationVariables = Exact<{
   projectId: Scalars['String'];
@@ -2640,6 +2700,16 @@ export type SqlGenerateEntityQueryQueryVariables = Exact<{
 
 export type SqlGenerateEntityQueryQuery = { sqlGenerateEntityQuery: string };
 
+export const AdminObjectGrantInfoFragmentDoc = `
+    fragment AdminObjectGrantInfo on AdminObjectGrantInfo {
+  subjectId
+  subjectType
+  objectPermissions {
+    objectId
+    permissions
+  }
+}
+    `;
 export const AdminPermissionInfoFragmentDoc = `
     fragment AdminPermissionInfo on AdminPermissionInfo {
   id
@@ -3928,8 +3998,10 @@ export const GetProjectListDocument = `
     id
     name
     description
-    canCreateConnections
-    canViewConnections
+    canEditDataSources
+    canViewDataSources
+    canEditResources
+    canViewResources
   }
 }
     `;
@@ -3974,6 +4046,20 @@ export const GetProjectDocument = `
   }
 }
     ${SharedProjectFragmentDoc}`;
+export const GetProjectGrantedPermissionsDocument = `
+    query getProjectGrantedPermissions($projectId: String!) {
+  grantedPermissions: rmListProjectGrantedPermissions(projectId: $projectId) {
+    ...AdminObjectGrantInfo
+  }
+}
+    ${AdminObjectGrantInfoFragmentDoc}`;
+export const GetProjectPermissionsListDocument = `
+    query getProjectPermissionsList {
+  permissions: rmListProjectPermissions {
+    ...AdminPermissionInfo
+  }
+}
+    ${AdminPermissionInfoFragmentDoc}`;
 export const GetResourceListDocument = `
     query getResourceList($projectId: String!, $folder: String, $nameMask: String, $readProperties: Boolean, $readHistory: Boolean) {
   resources: rmListResources(
@@ -4022,6 +4108,11 @@ export const ReadResourceDocument = `
     projectId: $projectId
     resourcePath: $resourcePath
   )
+}
+    `;
+export const SetProjectPermissionsDocument = `
+    mutation setProjectPermissions($projectId: String!, $permissions: [RMProjectPermissions!]!) {
+  rmSetProjectPermissions(projectId: $projectId, permissions: $permissions)
 }
     `;
 export const WriteResourceContentDocument = `
@@ -4535,6 +4626,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getProject(variables: GetProjectQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProjectQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProjectQuery>(GetProjectDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProject', 'query');
     },
+    getProjectGrantedPermissions(variables: GetProjectGrantedPermissionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProjectGrantedPermissionsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProjectGrantedPermissionsQuery>(GetProjectGrantedPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProjectGrantedPermissions', 'query');
+    },
+    getProjectPermissionsList(variables?: GetProjectPermissionsListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProjectPermissionsListQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProjectPermissionsListQuery>(GetProjectPermissionsListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProjectPermissionsList', 'query');
+    },
     getResourceList(variables: GetResourceListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetResourceListQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetResourceListQuery>(GetResourceListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getResourceList', 'query');
     },
@@ -4549,6 +4646,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     readResource(variables: ReadResourceQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ReadResourceQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<ReadResourceQuery>(ReadResourceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'readResource', 'query');
+    },
+    setProjectPermissions(variables: SetProjectPermissionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetProjectPermissionsMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<SetProjectPermissionsMutation>(SetProjectPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setProjectPermissions', 'mutation');
     },
     writeResourceContent(variables: WriteResourceContentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<WriteResourceContentMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<WriteResourceContentMutation>(WriteResourceContentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'writeResourceContent', 'mutation');

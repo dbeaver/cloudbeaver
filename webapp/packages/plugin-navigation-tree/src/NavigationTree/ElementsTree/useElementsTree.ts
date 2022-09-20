@@ -59,6 +59,7 @@ export interface IElementsTreeSettings {
   saveFilter: boolean;
   showFolderExplorerPath: boolean;
   configurable: boolean;
+  projects: boolean;
 }
 
 export interface IElementsTreeOptions {

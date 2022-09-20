@@ -3,7 +3,9 @@ query getProjectList {
     id
     name
     description
-    canCreateConnections
-    canViewConnections
+    canEditDataSources
+    canViewDataSources
+    canEditResources
+    canViewResources
   }
 }

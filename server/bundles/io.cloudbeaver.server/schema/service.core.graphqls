@@ -370,8 +370,10 @@ type ProjectInfo {
     id: String!
     name: String!
     description: String
-    canCreateConnections: Boolean!
-    canViewConnections: Boolean!
+    canEditDataSources: Boolean!
+    canViewDataSources: Boolean!
+    canEditResources: Boolean!
+    canViewResources: Boolean!
 }
 
 type LogEntry {

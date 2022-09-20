@@ -346,7 +346,7 @@ public class WebConnectionInfo {
 
     @Property
     public boolean isCanEdit() {
-        return hasProjectPermission(RMProjectPermission.CONNECTIONS_EDIT);
+        return hasProjectPermission(RMProjectPermission.DATA_SOURCES_EDIT);
     }
 
     @Property

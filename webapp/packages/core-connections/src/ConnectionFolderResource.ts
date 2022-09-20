@@ -52,7 +52,7 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
     this.addAlias(
       isConnectionFolderProjectKey,
       param => resourceKeyList(this.keys.filter(key => key.projectId === param.mark)),
-      true
+      (a, b) => a.mark === b.mark
     );
 
     makeObservable<this>(this, {

@@ -143,11 +143,14 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     return true;
   }
 
-  async refreshTree(navNodeId: string): Promise<void> {
+  async refreshTree(navNodeId: string, silent = false): Promise<void> {
     await this.graphQLService.sdk.navRefreshNode({
       nodePath: navNodeId,
     });
-    this.markTreeOutdated(navNodeId);
+
+    if (!silent) {
+      this.markTreeOutdated(navNodeId);
+    }
     await this.onNodeRefresh.execute(navNodeId);
   }
 

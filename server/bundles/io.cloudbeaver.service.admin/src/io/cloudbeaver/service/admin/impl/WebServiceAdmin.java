@@ -37,6 +37,7 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
+import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -118,18 +119,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public List<AdminPermissionInfo> listPermissions(@NotNull WebSession webSession) throws DBWebException {
         try {
-            List<AdminPermissionInfo> permissionInfos = new ArrayList<>();
-            for (WebServiceDescriptor wsd : WebServiceRegistry.getInstance().getWebServices()) {
-                for (WebPermissionDescriptor pd : wsd.getPermissions()) {
-                    if(SMConstants.SUBJECT_PERMISSION_SCOPE.equals(pd.getScope())) {
-                        permissionInfos.add(new AdminPermissionInfo(pd));
-                    }
-                }
-            }
-            permissionInfos.sort(Comparator.comparing(AdminPermissionInfo::getLabel));
-            return permissionInfos;
+            return SMUtils.findPermissions(SMConstants.SUBJECT_PERMISSION_SCOPE);
         } catch (Exception e) {
-            throw new DBWebException("Error reading users", e);
+            throw new DBWebException("Error reading permissions", e);
         }
     }
 

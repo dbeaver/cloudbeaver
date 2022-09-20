@@ -27,8 +27,10 @@ import { getNavigationTreeUserSettingsId } from './getNavigationTreeUserSettings
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter';
 import { NavigationTreeService } from './NavigationTreeService';
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';
+import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigationTreeProjectSearchCompare';
 import { navigationTreeProjectsExpandStateGetter } from './ProjectsRenderer/navigationTreeProjectsExpandStateGetter';
 import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navigationTreeProjectsRendererRenderer';
+import { ProjectsSettingsForm, ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm';
 import { useNavigationTree } from './useNavigationTree';
 
 const navigationTreeStyles = css`
@@ -108,6 +110,8 @@ export const NavigationTree = observer(function NavigationTree() {
     [navNodeInfoResource, navTreeResource]
   );
 
+  const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);
+
   if (!isEnabled) {
     return null;
   }
@@ -119,7 +123,9 @@ export const NavigationTree = observer(function NavigationTree() {
         localState={navTreeService.treeState}
         filters={[duplicateFilter, connectionGroupFilter, projectFilter]}
         renderers={[projectsRendererRenderer, navigationTreeConnectionGroupRenderer]}
+        navNodeFilterCompare={navigationTreeProjectSearchCompare}
         expandStateGetters={[projectsExpandStateGetter]}
+        settingsElements={settingsElements}
         emptyPlaceholder={() => styled(navigationTreeStyles)(
           <center>
             <message>

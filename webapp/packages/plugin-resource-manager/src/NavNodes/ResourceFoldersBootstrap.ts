@@ -11,15 +11,17 @@ import { untracked } from 'mobx';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { CONNECTION_FOLDER_NAME_VALIDATION } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { RenameDialog, DialogueStateResult, CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { DialogueStateResult, CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NavTreeResource, NavNodeManagerService, NavNodeInfoResource, type INodeMoveData, navNodeMoveContext, getNodesFromContext, ENodeMoveType, type NavNode } from '@cloudbeaver/core-navigation-tree';
-import { ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, MenuService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, type IElementsTree } from '@cloudbeaver/plugin-navigation-tree';
+import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
 import { NAV_NODE_TYPE_RM_PROJECT } from '../NAV_NODE_TYPE_RM_PROJECT';
 import { NavResourceNodeService } from '../NavResourceNodeService';
@@ -27,6 +29,15 @@ import { ResourceManagerResource } from '../ResourceManagerResource';
 import { ResourceProjectsResource } from '../ResourceProjectsResource';
 import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
 import { NAV_NODE_TYPE_RM_RESOURCE } from './NAV_NODE_TYPE_RM_RESOURCE';
+import { ResourcesProjectsNavNodeService } from './ResourcesProjectsNavNodeService';
+
+interface ITargetNode {
+  projectId: string;
+  folderId?: string;
+
+  projectNodeId: string;
+  selectProject: boolean;
+}
 
 @injectable()
 export class ResourceFoldersBootstrap extends Bootstrap {
@@ -40,10 +51,12 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     private readonly navResourceNodeService: NavResourceNodeService,
     private readonly resourceManagerResource: ResourceManagerResource,
     private readonly resourceProjectsResource: ResourceProjectsResource,
+    private readonly projectInfoResource: ProjectInfoResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-    private readonly navNodeInfoResource: NavNodeInfoResource
+    private readonly navNodeInfoResource: NavNodeInfoResource,
+    private readonly resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService
   ) {
     super();
   }
@@ -104,32 +117,25 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     const move = contexts.getContext(navNodeMoveContext);
     const nodes = getNodesFromContext(moveContexts);
     const nodeIdList = nodes.map(node => node.id);
-    const children = this.navTreeResource.get(targetNode.id);
-    const data = this.navResourceNodeService.getResourceData(targetNode.id);
+    const children = this.navTreeResource.get(targetNode.id) ?? [];
+    const targetProject = this.resourcesProjectsNavNodeService.getProject(targetNode.id);
 
-    if (!data) {
+    if (!targetProject?.canEditResources || (!targetNode.folder && targetNode.nodeType !== NAV_NODE_TYPE_RM_PROJECT)) {
       return;
     }
 
-    await this.resourceProjectsResource.load();
-    const projectPath = createPath(RESOURCES_NODE_PATH, this.resourceProjectsResource.userProject?.id);
+    const supported = nodes.every(node => {
+      if (
+        ![NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE].includes(node.nodeType!)
+        || targetProject !== this.resourcesProjectsNavNodeService.getProject(node.id)
+        || children.includes(node.id)
+        || targetNode.id === node.id
+      ) {
+        return false;
+      }
 
-    if (!(this.resourceProjectsResource.userProject?.id === data.key.projectId)) {
-      return;
-    }
-
-    const supported = (
-      (
-        [NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE].includes(targetNode.nodeType!)
-        || targetNode.id === projectPath
-      )
-      && (targetNode.folder || NAV_NODE_TYPE_RM_PROJECT === targetNode.nodeType)
-      && nodes.every(node => (
-        node.nodeType === NAV_NODE_TYPE_RM_RESOURCE
-        && node.id !== targetNode.id
-        && !children?.includes(node.id)
-      ))
-    );
+      return true;
+    });
 
     if (!supported) {
       return;
@@ -140,7 +146,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     } else {
       try {
         await this.navTreeResource.moveTo(resourceKeyList(nodeIdList), targetNode.id);
-        await this.navTreeResource.refreshTree(RESOURCES_NODE_PATH);
+        await this.navTreeResource.refreshTree(RESOURCES_NODE_PATH, true);
       } catch (exception: any) {
         this.notificationService.logException(exception, 'plugin_resource_manager_folder_move_failed');
       }
@@ -164,51 +170,49 @@ export class ResourceFoldersBootstrap extends Bootstrap {
           return;
         }
 
-        const folderData = this.navResourceNodeService.getResourceData(targetNode.id);
+        let parentFolder: string | undefined;
 
-        if (!folderData) {
-          return;
+        if (targetNode.folderId) {
+          const folderData = this.navResourceNodeService.getResourceData(targetNode.folderId);
+
+          if (folderData) {
+            parentFolder = folderData.resourcePath;
+          }
         }
 
-        let { key } = folderData;
+        await this.resourceManagerResource.load({ projectId: targetNode.projectId, folder: parentFolder });
 
-        await this.resourceManagerResource.load(key);
-        const resourceData = this.resourceManagerResource.getResource(key, folderData.name);
-
-        if (resourceData?.folder) {
-          key = { ...key, folder: createPath(key.folder, resourceData.name) };
-          await this.resourceManagerResource.load(key);
-        }
-
-        const result = await this.commonDialogService.open(RenameDialog, {
+        const result = await this.commonDialogService.open(FolderDialog, {
           value: this.localizationService.translate('ui_folder_new'),
+          projectId: targetNode.projectId,
           title: 'core_view_action_new_folder',
-          subTitle: key.folder,
+          subTitle: parentFolder,
           icon: '/icons/folder.svg#root',
           create: true,
-          validation: (name, setMessage) => {
-            const trimmed = name.trim();
+          selectProject: targetNode.selectProject,
+          validation: async ({ folder, projectId }, setMessage) => {
+            const trimmed = folder.trim();
 
-            if (trimmed.length === 0 || !name.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
+            if (trimmed.length === 0 || !folder.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
               setMessage('connections_connection_folder_validation');
               return false;
             }
 
-            const folder = this.resourceManagerResource.getResource(key, trimmed);
+            await this.resourceManagerResource.load({ projectId: projectId, folder: parentFolder });
 
-            return folder === undefined;
+            return !this.resourceManagerResource.hasResource({ projectId: projectId, folder: parentFolder }, trimmed);
           },
         });
 
         if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
           try {
             await this.resourceManagerResource.createResource(
-              key.projectId,
-              createPath(key.folder, result),
+              result.projectId,
+              createPath(parentFolder, result.folder),
               true
             );
 
-            this.navTreeResource.refreshTree(targetNode.parentId);
+            this.navTreeResource.refreshTree(this.resourcesProjectsNavNodeService.getProjectNodeId(result.projectId));
           } catch (exception: any) {
             this.notificationService.logException(exception, 'Error occurred while renaming');
           }
@@ -230,26 +234,51 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     }
   }
 
-  private getTargetNode(tree: IElementsTree): NavNode | undefined {
+  private getTargetNode(tree: IElementsTree): ITargetNode | undefined {
+    untracked(() => this.projectInfoResource.load(CachedMapAllKey));
     const selected = tree.getSelected();
 
     if (selected.length === 0) {
-      selected.push(tree.root);
+      const editableProjects = this.projectInfoResource.values.filter(project => project.canEditResources);
+
+      if (editableProjects.length > 0) {
+        const project = editableProjects[0];
+
+        return {
+          projectId: project.id,
+          projectNodeId: this.resourcesProjectsNavNodeService.getProjectNodeId(project.id),
+          selectProject: editableProjects.length > 1,
+        };
+      }
+      return;
     }
 
-    let targetFolder = selected[0];
-    let targetNode = this.navNodeInfoResource.get(targetFolder);
+    const targetFolder = selected[0];
+    const parentIds = [...this.navNodeInfoResource.getParents(targetFolder), targetFolder];
+    const parents = this.navNodeInfoResource.get(resourceKeyList(parentIds));
+    const projectNode = parents.find(parent => parent?.nodeType === NAV_NODE_TYPE_RM_PROJECT);
 
-    if (![NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE].includes(targetNode?.nodeType as any)) {
-      targetFolder = tree.baseRoot;
-      targetNode = this.navNodeInfoResource.get(targetFolder);
+    if (!projectNode) {
+      return;
     }
 
-    const projectPath = createPath(RESOURCES_NODE_PATH, this.resourceProjectsResource.userProject?.id);
-    if (!targetNode?.id.startsWith(projectPath)) {
-      targetNode = undefined;
+
+    const project = this.resourcesProjectsNavNodeService.getByNodeId(projectNode.id);
+
+    if (!project?.canEditResources) {
+      return;
     }
 
-    return targetNode;
+    const targetFolderNode = parents
+      .slice()
+      .reverse()
+      .find(parent => parent?.nodeType === NAV_NODE_TYPE_RM_RESOURCE && parent.folder);
+
+    return {
+      projectId: project.id,
+      folderId: targetFolderNode?.id,
+      projectNodeId: projectNode.id,
+      selectProject: false,
+    };
   }
 }
