@@ -210,24 +210,9 @@ public class WebSQLUtils {
                 switch ((String)typeAttr) {
                     case WebSQLConstants.VALUE_TYPE_CONTENT: {
                         if (map.get(WebSQLConstants.ATTR_BINARY) != null) {
-                            DBDContentStorage storage;
-                            Path openFile = WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER.resolve((String) map.get("fileName"));
-                            Object tempValue = ((DBDAttributeBinding) attribute).getValueHandler().getValueFromObject(
-                                    session,
-                                    attribute,
-                                    null, false, true);
-                            storage = new ExternalContentStorage(DBWorkbench.getPlatform(), openFile);
-                            if (tempValue instanceof DBDContent) {
-                                try {
-                                    ((DBDContent) tempValue).updateContents(session.getProgressMonitor(), storage);
-                                } catch (Exception e) {
-                                    throw new DBCException("Error with inserting file into DB");
-                                }
-                            }
-                            value = tempValue;
-                        } else {
-                            value = map.get(WebSQLConstants.ATTR_TEXT);
+                            throw new DBCException("Binary content edit is not supported yet");
                         }
+                        value = map.get(WebSQLConstants.ATTR_TEXT);
                         break;
                     }
                     default: {
