@@ -127,6 +127,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     // Port this server listens on. If set the 0 a random port is assigned which may be obtained with getLocalPort()
+    @Override
     public int getServerPort() {
         return serverPort;
     }
@@ -556,27 +557,29 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             throw new DBException("Error parsing server configuration", e);
         }
 
+        // Backward compatibility: load configs map
+        appConfiguration.loadLegacyCustomConfigs();
+
         // Merge new config with old one
-        {
-            Map<String, Object> mergedPlugins = Stream.concat(
-                    prevConfig.getPlugins().entrySet().stream(),
-                    appConfiguration.getPlugins().entrySet().stream()
-                )
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
-            appConfiguration.setPlugins(mergedPlugins);
-
-            // Backward compatibility: load configs map
-            appConfiguration.loadLegacyCustomConfigs();
-
-            Set<SMAuthProviderCustomConfiguration> mergedAuthProviders = Stream.concat(
-                    prevConfig.getAuthCustomConfigurations().stream(),
-                    appConfiguration.getAuthCustomConfigurations().stream()
-                )
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-            appConfiguration.setAuthProvidersConfigurations(mergedAuthProviders);
-        }
+        mergeOldConfiguration(prevConfig);
 
         patchConfigurationWithProperties(productConfiguration);
+    }
+
+    protected void mergeOldConfiguration(CBAppConfig prevConfig) {
+        Map<String, Object> mergedPlugins = Stream.concat(
+                prevConfig.getPlugins().entrySet().stream(),
+                appConfiguration.getPlugins().entrySet().stream()
+            )
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
+        appConfiguration.setPlugins(mergedPlugins);
+
+        Set<SMAuthProviderCustomConfiguration> mergedAuthProviders = Stream.concat(
+                prevConfig.getAuthCustomConfigurations().stream(),
+                appConfiguration.getAuthCustomConfigurations().stream()
+            )
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+        appConfiguration.setAuthProvidersConfigurations(mergedAuthProviders);
     }
 
     @NotNull
@@ -699,7 +702,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         shutdown();
     }
 
-    private void shutdown() {
+    protected void shutdown() {
         try {
             if (securityController instanceof CBEmbeddedSecurityController) {
                 ((CBEmbeddedSecurityController) securityController).shutdown();
@@ -784,7 +787,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         configurationMode = CommonUtils.isEmpty(serverName);
     }
 
-    private Map<String, Object> readRuntimeConfigurationProperties() throws DBException {
+    protected Map<String, Object> readRuntimeConfigurationProperties() throws DBException {
         File runtimeConfigFile = getRuntimeAppConfigFile();
         return readConfiguration(runtimeConfigFile);
     }
