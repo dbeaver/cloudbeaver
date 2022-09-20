@@ -23,11 +23,16 @@ import type { ITab } from './ITab';
 import { TabHandler, TabHandlerOptions, TabHandlerEvent } from './TabHandler';
 import { TabNavigationContext, ITabNavigationContext } from './TabNavigationContext';
 
-interface TabsState {
-  tabs: string[];
+interface INavigatorHistory {
   history: string[];
   currentId: string | null;
 }
+
+interface TabsState {
+  tabs: string[];
+}
+
+const MULTI_PROJECTS = '@://multi_projects//';
 
 const NAVIGATION_TABS_BASE_KEY = 'navigation_tabs';
 
@@ -36,6 +41,7 @@ export class NavigationTabsService extends View<ITab> {
   handlers = new Map<string, TabHandler>();
   tabsMap = new Map<string, ITab>();
   state = new Map<string, TabsState>();
+  historyState = new Map<string, INavigatorHistory>();
 
   get currentTab(): ITab | undefined {
     if (this.currentTabId) {
@@ -46,10 +52,10 @@ export class NavigationTabsService extends View<ITab> {
 
   get currentTabId(): string | null {
     if (
-      this.userTabsState.currentId !== null
-      && this.tabIdList.includes(this.userTabsState.currentId)
+      this.history.currentId !== null
+      && this.tabIdList.includes(this.history.currentId)
     ) {
-      return this.userTabsState.currentId;
+      return this.history.currentId;
     }
 
     return null;
@@ -68,14 +74,29 @@ export class NavigationTabsService extends View<ITab> {
       .map(tab => tab.id);
   }
 
+  get history(): INavigatorHistory {
+    let projectId = MULTI_PROJECTS;
+
+    if (this.projectsService.activeProjects.length === 1) {
+      projectId = this.projectsService.activeProjects[0].id;
+    }
+
+    if (!this.historyState.has(projectId)) {
+      this.historyState.set(projectId, {
+        history: [],
+        currentId: null,
+      });
+    }
+
+    return this.historyState.get(projectId)!;
+  }
+
   get userTabsState(): TabsState {
     const userId = this.userInfoResource.getId();
 
     if (!this.state.has(userId)) {
       this.state.set(userId, {
         tabs: [],
-        history: [],
-        currentId: null,
       });
     }
 
@@ -108,6 +129,7 @@ export class NavigationTabsService extends View<ITab> {
       handlers: observable,
       tabsMap: observable,
       state: observable,
+      historyState: observable,
       currentTab: computed,
       currentTabId: computed,
       tabIdList: computed<string[]>({
@@ -143,14 +165,28 @@ export class NavigationTabsService extends View<ITab> {
     );
 
     this.autoSaveService.withAutoSave(
-      this.state,
-      NAVIGATION_TABS_BASE_KEY,
+      this.historyState,
+      `${NAVIGATION_TABS_BASE_KEY}_history`,
       map => {
         for (const [key, value] of Array.from(map.entries())) {
           if (
             !['object', 'string'].includes(typeof value.currentId)
             || !Array.isArray(value.history)
-            || !Array.isArray(value.tabs)
+          ) {
+            map.delete(key);
+          }
+        }
+        return map;
+      }
+    );
+
+    this.autoSaveService.withAutoSave(
+      this.state,
+      NAVIGATION_TABS_BASE_KEY,
+      map => {
+        for (const [key, value] of Array.from(map.entries())) {
+          if (
+            !Array.isArray(value.tabs)
           ) {
             map.delete(key);
           }
@@ -160,7 +196,6 @@ export class NavigationTabsService extends View<ITab> {
     );
 
     this.userInfoResource.onDataUpdate.addHandler(this.unloadTabs.bind(this));
-    this.projectsService.onActiveProjectChange.addHandler(this.resetHistory.bind(this));
   }
 
   openTab(tab: ITab, isSelected?: boolean): void {
@@ -174,7 +209,7 @@ export class NavigationTabsService extends View<ITab> {
 
   selectTab(tabId: string | null, skipHandlers?: boolean): void {
     if (tabId === null) {
-      this.userTabsState.currentId = null;
+      this.history.currentId = null;
       return;
     }
 
@@ -191,10 +226,10 @@ export class NavigationTabsService extends View<ITab> {
       return;
     }
 
-    if (this.userTabsState.currentId !== tabId) {
-      this.userTabsState.history = this.userTabsState.history.filter(id => id !== tabId);
-      this.userTabsState.history.unshift(tabId);
-      this.userTabsState.currentId = tabId;
+    if (this.history.currentId !== tabId) {
+      this.history.history = this.history.history.filter(id => id !== tabId);
+      this.history.history.unshift(tabId);
+      this.history.currentId = tabId;
       this.onTabSelect.execute(tab);
     }
 
@@ -238,14 +273,14 @@ export class NavigationTabsService extends View<ITab> {
       if (tab) {
         this.onTabClose.execute(tab);
 
-        this.userTabsState.history = this.userTabsState.history.filter(id => id !== tabId);
+        this.history.history = this.history.history.filter(id => id !== tabId);
         this.tabsMap.delete(tabId);
         this.userTabsState.tabs = this.userTabsState.tabs.filter(id => id !== tabId);
       }
     });
 
-    if (ResourceKeyUtils.includes(key, this.userTabsState.currentId)) {
-      this.selectTab(this.userTabsState.history.shift() ?? '', skipHandlers);
+    if (ResourceKeyUtils.includes(key, this.history.currentId)) {
+      this.selectTab(this.history.history.shift() ?? '', skipHandlers);
     }
   }
 
@@ -368,22 +403,17 @@ export class NavigationTabsService extends View<ITab> {
     runInAction(() => {
       this.closeTabSilent(resourceKeyList(removedTabs), true);
 
-      if (this.userTabsState.currentId) {
-        const tab = this.tabsMap.get(this.userTabsState.currentId);
+      if (this.history.currentId) {
+        const tab = this.tabsMap.get(this.history.currentId);
 
         if (tab) {
-          this.selectTab(this.userTabsState.currentId);
+          this.selectTab(this.history.currentId);
           this.onTabSelect.execute(tab);
         }
       }
 
       this.onInit.execute(true);
     });
-  }
-
-  private resetHistory() {
-    this.userTabsState.history = [];
-    this.userTabsState.currentId = null;
   }
 
   private async callHandlerCallback(tab: ITab, selector: (handler: TabHandler) => TabHandlerEvent | undefined) {
