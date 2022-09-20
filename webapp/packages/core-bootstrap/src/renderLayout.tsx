@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { Body } from '@cloudbeaver/core-app';
-import { ErrorBoundary } from '@cloudbeaver/core-blocks';
+import { ErrorBoundary, Loader } from '@cloudbeaver/core-blocks';
 import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
 
 export function renderLayout(serviceInjector: IServiceInjector): void {
@@ -19,7 +20,9 @@ export function renderLayout(serviceInjector: IServiceInjector): void {
   root.render(
     <ErrorBoundary root>
       <AppContext app={serviceInjector}>
-        <Body />
+        <Suspense fallback={<Loader />}>
+          <Body />
+        </Suspense>
       </AppContext>
     </ErrorBoundary>
   );

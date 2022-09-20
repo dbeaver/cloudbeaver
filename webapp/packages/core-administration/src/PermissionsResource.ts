@@ -8,9 +8,10 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionDataResource } from '@cloudbeaver/core-root';
-import { GraphQLService, AdminPermissionInfo, CachedMapResource, CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { GraphQLService, CachedMapResource, CachedMapAllKey, AdminPermissionInfoFragment, AdminObjectGrantInfoFragment } from '@cloudbeaver/core-sdk';
 
-export type PermissionInfo = AdminPermissionInfo;
+export type PermissionInfo = AdminPermissionInfoFragment;
+export type AdminObjectGrantInfo = AdminObjectGrantInfoFragment;
 
 @injectable()
 export class PermissionsResource extends CachedMapResource<string, PermissionInfo> {

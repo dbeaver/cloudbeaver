@@ -45,7 +45,7 @@ export const TopMenuItem = observer<IProps>(function TopMenuItem({ menuItem, sty
       panel={menuItem.panel}
       disabled={menuItem.isDisabled}
       style={joinStyles(style, topMenuStyles)}
-      placement="bottom-end"
+      placement="bottom-start"
       modal
       disclosure
       onClick={() => menuItem.onClick?.()}
@@ -54,7 +54,6 @@ export const TopMenuItem = observer<IProps>(function TopMenuItem({ menuItem, sty
         title={title}
         icon={menuItem.icon}
         style={style}
-        menu
       />
     </MenuTrigger>
   );

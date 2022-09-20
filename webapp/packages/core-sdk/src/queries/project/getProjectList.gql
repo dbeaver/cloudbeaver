@@ -1,9 +1,12 @@
 query getProjectList {
   projects: listProjects {
     id
+    shared
     name
     description
-    canCreateConnections
-    canViewConnections
+    canEditDataSources
+    canViewDataSources
+    canEditResources
+    canViewResources
   }
 }

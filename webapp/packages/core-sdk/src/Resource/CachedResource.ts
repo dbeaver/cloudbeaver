@@ -25,12 +25,12 @@ export interface IDataError<TParam> {
 }
 
 export type IParamAlias<TParam> = {
-  getter: false;
   param: TParam;
   getAlias: (param: TParam) => TParam;
+  isEqual: undefined;
 } | {
-  getter: true;
   param: (param: TParam) => boolean;
+  isEqual: (paramA: TParam, paramB: TParam) => boolean;
   getAlias: (param: TParam) => TParam;
 };
 
@@ -227,7 +227,7 @@ export abstract class CachedResource<
 
   isAlias(key: TParam): boolean {
     return this.paramAliases.some(alias => {
-      if ('getter' in alias && alias.getter) {
+      if ('isEqual' in alias && alias.isEqual) {
         return alias.param(key);
       } else {
         return alias.param === key;
@@ -344,11 +344,19 @@ export abstract class CachedResource<
   addAlias<T extends TParam>(
     param: (param: TParam) => param is T,
     getAlias: (param: T) => TParam,
-    getter: true
+    isEqual: (paramA: T, paramB: T) => boolean
   ): void;
-  addAlias(param: (param: TParam) => boolean, getAlias: (param: TParam) => TParam, getter: true): void;
-  addAlias(param: TParam | ((param: TParam) => boolean), getAlias: (param: TParam) => TParam, getter?: boolean): void {
-    this.paramAliases.push({ param, getAlias, getter } as IParamAlias<TParam>);
+  addAlias(
+    param: (param: TParam) => boolean,
+    getAlias: (param: TParam) => TParam,
+    isEqual: (paramA: TParam, paramB: TParam) => boolean
+  ): void;
+  addAlias(
+    param: TParam | ((param: TParam) => boolean),
+    getAlias: (param: TParam) => TParam,
+    isEqual?: (paramA: TParam, paramB: TParam) => boolean
+  ): void {
+    this.paramAliases.push({ param, getAlias, isEqual } as IParamAlias<TParam>);
   }
 
   transformParam(param: TParam): TParam {
@@ -358,7 +366,7 @@ export abstract class CachedResource<
 
     if (deep < 10) {
       for (const alias of this.paramAliases) {
-        if ('getter' in alias && alias.getter) {
+        if ('isEqual' in alias && alias.isEqual) {
           if (alias.param(param)) {
             param = alias.getAlias(param);
             deep++;
@@ -452,8 +460,8 @@ export abstract class CachedResource<
     }
 
     return this.paramAliases.some(alias => {
-      if ('getter' in alias && alias.getter) {
-        return alias.param(param) && alias.param(second);
+      if ('isEqual' in alias && alias.isEqual) {
+        return alias.param(param) && alias.param(second) && alias.isEqual(param, second);
       }
 
       return false;

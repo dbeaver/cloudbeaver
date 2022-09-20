@@ -182,7 +182,9 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
 
         private void checkObjectActionPermissions(Method method, WebProjectAction objectAction, Object[] args) throws DBException {
             WebSession webSession = findWebSession(env);
-
+            if (webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
+                return;
+            }
             String[] requireProjectPermissions = objectAction.requireProjectPermissions();
             if (requireProjectPermissions.length > 0) {
                 int objectIdArgumentIndex = -1;

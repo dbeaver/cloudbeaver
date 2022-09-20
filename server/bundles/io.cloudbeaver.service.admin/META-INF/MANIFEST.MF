@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: io.cloudbeaver.service.admin;singleton:=true
-Bundle-Version: 1.0.56.qualifier
-Bundle-Release-Date: 20220905
+Bundle-Version: 1.0.57.qualifier
+Bundle-Release-Date: 20220926
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .

@@ -14,7 +14,7 @@ import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeName, TREE_NODE_
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource, type INodeActions } from '@cloudbeaver/core-navigation-tree';
-import { NavigationNodeEditor, NavTreeControlComponent, NavTreeControlProps, TreeNodeMenu } from '@cloudbeaver/plugin-navigation-tree';
+import { ElementsTreeContext, NavigationNodeEditor, NavTreeControlComponent, NavTreeControlProps, TreeNodeMenu } from '@cloudbeaver/plugin-navigation-tree';
 
 
 const styles = css`
@@ -59,6 +59,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
   dndPlaceholder,
   className,
 }, ref) {
+  const elementsTreeContext = useContext(ElementsTreeContext);
   const treeNodeContext = useContext(TreeNodeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
@@ -79,6 +80,10 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
 
   function onClickHandler(event: React.MouseEvent<HTMLDivElement>) {
     treeNodeContext.select(event.ctrlKey || event.metaKey);
+  }
+
+  if (elementsTreeContext?.tree.settings?.projects === false) {
+    return null;
   }
 
   return styled(TREE_NODE_STYLES, styles)(

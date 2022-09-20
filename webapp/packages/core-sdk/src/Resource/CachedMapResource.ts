@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, makeObservable, observable, runInAction } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { MetadataMap } from '@cloudbeaver/core-utils';
+import { isArraysEqual, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { CachedResource, CachedResourceKey, ICachedResourceMetadata } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
@@ -95,8 +95,12 @@ export abstract class CachedMapResource<
       clear: action,
       dataSet: action,
       dataDelete: action,
-      values: computed,
-      keys: computed,
+      values: computed<TValue[]>({
+        equals: isArraysEqual,
+      }),
+      keys: computed<TKey[]>({
+        equals: isArraysEqual,
+      }),
     });
   }
 

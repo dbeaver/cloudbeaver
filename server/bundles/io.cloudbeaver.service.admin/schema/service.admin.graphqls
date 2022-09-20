@@ -11,6 +11,17 @@ type AdminConnectionGrantInfo {
     subjectType: AdminSubjectType!
 }
 
+type AdminObjectPermissions {
+    objectId: ID!
+    permissions: [String!]!
+}
+
+type AdminObjectGrantInfo {
+    subjectId: ID!
+    subjectType: AdminSubjectType!
+    objectPermissions: AdminObjectPermissions!
+}
+
 type AdminConnectionSearchInfo {
     displayName: String!
     host: String!

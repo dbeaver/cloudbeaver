@@ -11,6 +11,7 @@ import { observable, makeObservable, action } from 'mobx';
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 import { ConnectionFormService, ConnectionFormState, IConnectionFormState } from '@cloudbeaver/plugin-connections';
@@ -35,7 +36,9 @@ export class CreateConnectionService {
     private readonly connectionsAdministrationNavService: ConnectionsAdministrationNavService,
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly connectionFormService: ConnectionFormService,
-    private readonly connectionInfoResource: ConnectionInfoResource
+    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly projectsService: ProjectsService,
+    private readonly projectInfoResource: ProjectInfoResource
   ) {
     this.data = null;
     this.tabsContainer = new TabsContainer();
@@ -108,9 +111,13 @@ export class CreateConnectionService {
 
   setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]): void {
     this.data = new ConnectionFormState(
+      this.projectsService,
+      this.projectInfoResource,
       this.connectionFormService,
       this.connectionInfoResource
     );
+
+    this.data.closeTask.addHandler(this.cancelCreate.bind(this));
 
     this.data
       .setOptions('create', 'admin')

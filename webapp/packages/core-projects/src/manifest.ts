@@ -10,7 +10,6 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
 import { ProjectInfoResource } from './ProjectInfoResource';
-import { ProjectsNavNodeService } from './ProjectsNavNodeService';
 import { ProjectsService } from './ProjectsService';
 
 export const manifest: PluginManifest = {
@@ -22,6 +21,5 @@ export const manifest: PluginManifest = {
     ProjectInfoResource,
     ProjectsService,
     LocaleService,
-    ProjectsNavNodeService,
   ],
 };

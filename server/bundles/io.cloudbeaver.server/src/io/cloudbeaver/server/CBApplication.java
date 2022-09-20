@@ -40,9 +40,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPApplication;
-import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
-import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -129,6 +127,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     // Port this server listens on. If set the 0 a random port is assigned which may be obtained with getLocalPort()
+    @Override
     public int getServerPort() {
         return serverPort;
     }
@@ -226,6 +225,8 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
     @Override
     protected void startServer() {
+        CBPlatform.setApplication(this);
+
         Path configPath = null;
         try {
             configPath = loadServerConfiguration();
@@ -263,8 +264,6 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             log.error("Error setting workspace location to " + workspaceLocation, e);
             return;
         }
-
-        CBPlatform.setApplication(this);
 
         log.debug(GeneralUtils.getProductName() + " " + GeneralUtils.getProductVersion() + " is starting"); //$NON-NLS-1$
         log.debug("\tOS: " + System.getProperty(StandardConstants.ENV_OS_NAME) + " " + System.getProperty(StandardConstants.ENV_OS_VERSION) + " (" + System.getProperty(StandardConstants.ENV_OS_ARCH) + ")");
@@ -470,12 +469,6 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     @Nullable
-    public SMSession getServerSession(DBRProgressMonitor monitor) throws DBException {
-        DBPWorkspace workspace = DBWorkbench.getPlatform().getWorkspace();
-        return workspace.getAuthContext().getSpaceSession(monitor, workspace, false);
-    }
-
-    @Nullable
     @Override
     protected Path loadServerConfiguration() throws DBException {
         Path path = super.loadServerConfiguration();
@@ -564,27 +557,29 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             throw new DBException("Error parsing server configuration", e);
         }
 
+        // Backward compatibility: load configs map
+        appConfiguration.loadLegacyCustomConfigs();
+
         // Merge new config with old one
-        {
-            Map<String, Object> mergedPlugins = Stream.concat(
-                    prevConfig.getPlugins().entrySet().stream(),
-                    appConfiguration.getPlugins().entrySet().stream()
-                )
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
-            appConfiguration.setPlugins(mergedPlugins);
-
-            // Backward compatibility: load configs map
-            appConfiguration.loadLegacyCustomConfigs();
-
-            Set<SMAuthProviderCustomConfiguration> mergedAuthProviders = Stream.concat(
-                    prevConfig.getAuthCustomConfigurations().stream(),
-                    appConfiguration.getAuthCustomConfigurations().stream()
-                )
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-            appConfiguration.setAuthProvidersConfigurations(mergedAuthProviders);
-        }
+        mergeOldConfiguration(prevConfig);
 
         patchConfigurationWithProperties(productConfiguration);
+    }
+
+    protected void mergeOldConfiguration(CBAppConfig prevConfig) {
+        Map<String, Object> mergedPlugins = Stream.concat(
+                prevConfig.getPlugins().entrySet().stream(),
+                appConfiguration.getPlugins().entrySet().stream()
+            )
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (o, o2) -> o2));
+        appConfiguration.setPlugins(mergedPlugins);
+
+        Set<SMAuthProviderCustomConfiguration> mergedAuthProviders = Stream.concat(
+                prevConfig.getAuthCustomConfigurations().stream(),
+                appConfiguration.getAuthCustomConfigurations().stream()
+            )
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+        appConfiguration.setAuthProvidersConfigurations(mergedAuthProviders);
     }
 
     @NotNull
@@ -707,7 +702,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         shutdown();
     }
 
-    private void shutdown() {
+    protected void shutdown() {
         try {
             if (securityController instanceof CBEmbeddedSecurityController) {
                 ((CBEmbeddedSecurityController) securityController).shutdown();
@@ -792,7 +787,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         configurationMode = CommonUtils.isEmpty(serverName);
     }
 
-    private Map<String, Object> readRuntimeConfigurationProperties() throws DBException {
+    protected Map<String, Object> readRuntimeConfigurationProperties() throws DBException {
         File runtimeConfigFile = getRuntimeAppConfigFile();
         return readConfiguration(runtimeConfigFile);
     }

@@ -6,19 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable, untracked } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { NavTreeResource, NavNodeInfoResource, INavNodeMoveData, INavNodeRenameData } from '@cloudbeaver/core-navigation-tree';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { NetworkStateService, WindowEventsService } from '@cloudbeaver/core-root';
-import { ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { throttle } from '@cloudbeaver/core-utils';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { NavResourceNodeService, ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
+import { NavResourceNodeService, ResourceManagerService, ResourcesProjectsNavNodeService } from '@cloudbeaver/plugin-resource-manager';
 import { getSqlEditorName, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
@@ -44,8 +45,10 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     private readonly navTreeResource: NavTreeResource,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navigationTabsService: NavigationTabsService,
+    private readonly projectInfoResource: ProjectInfoResource,
     private readonly windowEventsService: WindowEventsService,
     private readonly sqlEditorTabResourceService: SqlEditorTabResourceService,
+    private readonly resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
     localStorageSaveService: LocalStorageSaveService,
   ) {
     super();
@@ -113,7 +116,16 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
         });
 
         dataSource.setInfo({
-          isReadonly: () => !this.networkStateService.state,
+          isReadonly: (dataSource: ResourceSqlDataSource) => {
+            if (!dataSource.nodeInfo) {
+              return true;
+            }
+
+            untracked(() => this.projectInfoResource.load(CachedMapAllKey));
+            const project = this.resourcesProjectsNavNodeService.getProject(dataSource.nodeInfo.nodeId);
+
+            return !this.networkStateService.state || !project?.canEditResources;
+          },
         });
 
         return dataSource;

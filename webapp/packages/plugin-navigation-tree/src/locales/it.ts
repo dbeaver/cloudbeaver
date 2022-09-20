@@ -29,4 +29,6 @@ export default [
   ['app_navigationTree_connection_group_user', 'Connessioni Utente'],
   ['app_navigationTree_empty_placeholder', 'Nessuna Connessione.\nUsa il menù in altro per impostare una nuova connessione.'],
   ['app_navigationTree_drop_here', 'Drop here...'],
+  ['plugin_navigation_tree_settings_projects_description', 'Displays elements under project groups'],
+  ['plugin_navigation_tree_settings_projects_title', 'Group by Project'],
 ];

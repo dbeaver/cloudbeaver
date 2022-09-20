@@ -36,7 +36,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
       title: 'app_shared_connectionMenu_custom',
       isHidden: () => (
         !this.serverConfigResource.data?.supportsCustomConnections
-        || !this.projectsService.activeProject?.canCreateConnections
+        || !this.projectsService.activeProjects.some(project => project.canEditDataSources)
       ),
       onClick: () => this.openConnectionsDialog(),
     });

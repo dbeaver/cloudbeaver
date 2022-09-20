@@ -28,6 +28,10 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
     return this._executionContext;
   }
 
+  get features(): ESqlDataSourceFeatures[] {
+    return [ESqlDataSourceFeatures.setName];
+  }
+
   private _name: string | null;
   private _script: string;
   private _executionContext?: IConnectionExecutionContextInfo;
@@ -41,7 +45,6 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
     this._name = name;
     this._script = script;
     this._executionContext = executionContext;
-    this.features = [ESqlDataSourceFeatures.setName];
     this.outdated = false;
 
     makeObservable<this, '_script' | '_executionContext'>(this, {

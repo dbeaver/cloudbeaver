@@ -193,14 +193,16 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
           </actions>
           <tools onMouseDown={preventFocus}>
             <SqlEditorActionsMenu state={state} />
-            <button
-              disabled={data.isDisabled || data.isScriptEmpty}
-              title={translate('sql_editor_sql_format_button_tooltip')}
-              hidden={data.activeSegmentMode.activeSegmentMode}
-              onClick={data.formatScript}
-            >
-              <StaticImage icon="/icons/sql_format_sm.svg" />
-            </button>
+            {!data.readonly && (
+              <button
+                disabled={data.isDisabled || data.isScriptEmpty}
+                title={translate('sql_editor_sql_format_button_tooltip')}
+                hidden={data.activeSegmentMode.activeSegmentMode}
+                onClick={data.formatScript}
+              >
+                <StaticImage icon="/icons/sql_format_sm.svg" />
+              </button>
+            )}
             <button
               disabled={!trimmedValue}
               title={translate('sql_editor_download_script_tooltip')}
@@ -209,7 +211,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
             >
               <StaticImage icon='/icons/export.svg' />
             </button>
-            {!data.activeSegmentMode.activeSegmentMode && (
+            {!data.activeSegmentMode.activeSegmentMode && !data.readonly && (
               <UploadArea
                 accept='.sql'
                 title={translate('sql_editor_upload_script_tooltip')}

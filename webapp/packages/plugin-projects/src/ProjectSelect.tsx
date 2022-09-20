@@ -10,43 +10,58 @@ import { observer } from 'mobx-react-lite';
 import { Combobox, useMapResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import { ProjectInfo, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { ProjectInfo, ProjectInfoResource, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 interface Props {
   value: string | null;
+  filter?: (project: ProjectInfo) => boolean;
   onChange: (value: string) => void;
+  autoHide?: boolean;
   readOnly?: boolean;
   disabled?: boolean;
   inline?: boolean;
 }
 
-export const ProjectSelect = observer(function ProjectSelect(props: Props) {
+export const ProjectSelect = observer(function ProjectSelect({
+  value,
+  filter = project => project.canEditDataSources,
+  autoHide,
+  readOnly,
+  disabled,
+  inline,
+  onChange,
+}: Props) {
   const translate = useTranslate();
 
   const projectsService = useService(ProjectsService);
   const projectsLoader = useMapResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey, {
     onData: () => {
-      if (!props.value && projectsService.activeProject) {
-        props.onChange(projectsService.activeProject.id);
+      if (!value && projectsService.defaultProject) {
+        onChange(projectsService.defaultProject.id);
       }
     },
   });
 
-  const value = props.value ?? projectsService.activeProject?.id;
-  const projects = projectsLoader.data as ProjectInfo[];
+  const projects = projectsService.activeProjects
+    .slice()
+    .sort(projectInfoSortByName);
 
-  const possibleOptions = projects.filter(project => project.canCreateConnections);
+  const possibleOptions = projects
+    .filter(filter)
+    .map(project => project.id);
 
   function handleProjectSelect(projectId: string) {
-    const project = projectsLoader.resource.get(projectId);
-
-    if (project?.canCreateConnections) {
-      props.onChange(projectId);
+    if (possibleOptions.includes(projectId)) {
+      onChange(projectId);
     }
   }
 
-  return  (
+  if (autoHide && projects.length <= 1) {
+    return null;
+  }
+
+  return (
     <Combobox
       name='projectId'
       value={value ?? ''}
@@ -54,17 +69,17 @@ export const ProjectSelect = observer(function ProjectSelect(props: Props) {
       keySelector={project => project.id}
       valueSelector={project => project.name}
       titleSelector={project => project.description}
-      isDisabled={project => !project.canCreateConnections}
-      readOnly={props.readOnly || possibleOptions.length <= 1}
+      isDisabled={project => !project.canEditDataSources}
+      readOnly={readOnly || possibleOptions.length <= 1}
       searchable={projects.length > 10}
-      disabled={props.disabled}
+      disabled={disabled}
       loading={projectsLoader.isLoading()}
-      inline={props.inline}
+      inline={inline}
       tiny
       fill
       onSelect={handleProjectSelect}
     >
-      {translate('connections_connection_project')}
+      {translate('plugin_projects_project_select_label')}
     </Combobox>
   );
 });
