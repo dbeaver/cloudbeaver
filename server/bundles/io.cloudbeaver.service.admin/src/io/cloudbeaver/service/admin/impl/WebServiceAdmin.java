@@ -366,7 +366,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         DBPDataSourceRegistry registry = getGlobalRegistry(webSession);
         DBPDataSourceContainer dataSource = WebServiceUtils.createConnectionFromConfig(config, registry);
         registry.addDataSource(dataSource);
-        registry.flushConfig();
+        dataSource.persistConfiguration();
         webSession.addInfoMessage(
             "New connection was created - " + WebServiceUtils.getConnectionContainerInfo(dataSource)
         );
@@ -454,7 +454,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             "Delete connection - " + WebServiceUtils.getConnectionContainerInfo(dataSource)
         );
         getGlobalRegistry(webSession).removeDataSource(dataSource);
-        getGlobalRegistry(webSession).flushConfig();
 
         try {
             webSession.getAdminSecurityController()

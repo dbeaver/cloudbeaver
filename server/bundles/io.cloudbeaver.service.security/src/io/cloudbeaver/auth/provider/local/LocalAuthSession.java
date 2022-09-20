@@ -17,8 +17,6 @@
 package io.cloudbeaver.auth.provider.local;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMAuthSpace;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
@@ -71,17 +69,6 @@ public class LocalAuthSession implements SMSession {
     @Override
     public LocalDateTime getSessionStart() {
         return webSession.getSessionStart();
-    }
-
-    @Override
-    public boolean isApplicationSession() {
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public DBPProject getSingletonProject() {
-        return webSession.getSingletonProject();
     }
 
     @Override

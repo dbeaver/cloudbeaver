@@ -40,9 +40,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPApplication;
-import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
-import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -468,12 +466,6 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
     protected SMAdminController createGlobalSecurityController() throws DBException {
         return new EmbeddedSecurityControllerFactory().createSecurityService(this, databaseConfiguration, new NoAuthCredentialsProvider());
-    }
-
-    @Nullable
-    public SMSession getServerSession(DBRProgressMonitor monitor) throws DBException {
-        DBPWorkspace workspace = DBWorkbench.getPlatform().getWorkspace();
-        return workspace.getAuthContext().getSpaceSession(monitor, workspace, false);
     }
 
     @Nullable
