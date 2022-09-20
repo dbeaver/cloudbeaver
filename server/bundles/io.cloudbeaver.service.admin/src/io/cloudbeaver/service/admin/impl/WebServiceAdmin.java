@@ -29,7 +29,6 @@ import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebFeatureRegistry;
 import io.cloudbeaver.registry.WebPermissionDescriptor;
-import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
@@ -49,7 +48,7 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
-import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
@@ -767,7 +766,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     private DBPDataSourceRegistry getGlobalRegistry(WebSession session) {
         String globalConfigurationName = CBApplication.getInstance().getDefaultProjectName();
-        return session.getProjectById(RMProject.Type.GLOBAL.getPrefix() + "_" + globalConfigurationName).getDataSourceRegistry();
+        return session.getProjectById(RMProjectType.GLOBAL.getPrefix() + "_" + globalConfigurationName).getDataSourceRegistry();
     }
 
     private void validatePermissions(@NotNull String expectedScope, @NotNull Collection<String> permissions) throws DBWebException {
