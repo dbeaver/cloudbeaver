@@ -125,11 +125,15 @@ export class SqlEditorTabService extends Bootstrap {
     };
   }
 
+  attachToProject(tab: ITab<ISqlEditorTabState>, projectId: string | null): void {
+    tab.projectId = projectId;
+  }
+
   resetConnectionInfo(tab: ITab<ISqlEditorTabState>): void {
     const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
 
     dataSource?.setExecutionContext(undefined);
-    tab.projectId = null;
+    this.attachToProject(tab, null);
   }
 
   private async handleConnectionDelete(key: ResourceKey<IConnectionInfoParams>) {
@@ -228,7 +232,7 @@ export class SqlEditorTabService extends Bootstrap {
         }
       } else {
         dataSource.setExecutionContext({ ...executionContext.context });
-        tab.projectId = executionContext.context.projectId;
+        this.attachToProject(tab, executionContext.context.projectId);
       }
     }
   }
@@ -348,7 +352,7 @@ export class SqlEditorTabService extends Bootstrap {
     const state = await this.sqlEditorService.setConnection(tab.handlerState, connectionKey, catalogId, schemaId);
 
     if (state) {
-      tab.projectId = connectionKey.projectId;
+      this.attachToProject(tab, connectionKey.projectId);
     }
 
     return state;
