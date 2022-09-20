@@ -34,7 +34,6 @@ import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
 import org.jkiss.dbeaver.registry.DataSourceFolder;
-import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.util.ArrayList;
@@ -185,7 +184,7 @@ public class WebNavigatorNodeInfo {
             return features.toArray(new String[0]);
         }
         VirtualProjectImpl project = session.getProjectById(node.getOwnerProject().getId());
-        if (!project.getRmProject().getProjectPermissions().contains(RMProjectPermission.CONNECTIONS_EDIT.getPermissionId())) {
+        if (!project.getRmProject().getProjectPermissions().contains(RMProjectPermission.DATA_SOURCES_EDIT.getPermissionId())) {
             return features.toArray(new String[0]);
         }
         if (node instanceof DBNLocalFolder || node instanceof DBNResourceManagerResource) {

@@ -16,7 +16,6 @@ const styles = css`
     display: flex;
     align-items: center;
     margin-right: 16px;
-    width: 250px;
     cursor: pointer;
   }
 

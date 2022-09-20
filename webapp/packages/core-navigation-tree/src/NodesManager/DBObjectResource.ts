@@ -33,7 +33,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     this.addAlias(
       isDBObjectParentKey,
       param => resourceKeyList(navTreeResource.get(param.mark) || []),
-      true
+      (a, b) => a.mark === b.mark
     );
     // this.preloadResource(this.navNodeInfoResource);
     this.navNodeInfoResource.outdateResource(this);

@@ -40,11 +40,11 @@ import { CachedMapEmptyKey, DriverConfigurationType, resourceKeyList } from '@cl
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
+import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
 import { ConnectionFormService } from '../ConnectionFormService';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { ParametersForm } from './ParametersForm';
-import { ProjectSelect } from './ProjectSelect';
 import { useOptions } from './useOptions';
 
 const styles = css`
@@ -299,6 +299,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 value={state.projectId ?? PROJECT_GLOBAL_ID}
                 readOnly={readonly || edit}
                 disabled={disabled}
+                autoHide
                 onChange={projectId => state.setProject(projectId)}
               />
               {!config.template && (

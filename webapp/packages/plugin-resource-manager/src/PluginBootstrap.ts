@@ -7,16 +7,9 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { NotificationService } from '@cloudbeaver/core-events';
-import { LocalizationService } from '@cloudbeaver/core-localization';
-import { DATA_CONTEXT_NAV_NODE } from '@cloudbeaver/core-navigation-tree';
 import { SideBarPanelService } from '@cloudbeaver/core-ui';
-import { ActionService, ACTION_DELETE, MenuService } from '@cloudbeaver/core-view';
-import { isScript } from '@cloudbeaver/plugin-sql-editor-navigation-tab-resource';
 import { EMainMenu, MainMenuService } from '@cloudbeaver/plugin-top-app-bar';
 
-import { NavResourceNodeService, PROJECT_NODE_TYPE, RESOURCE_NODE_TYPE } from './NavResourceNodeService';
 import { ResourceManager } from './ResourceManager';
 import { ResourceManagerService } from './ResourceManagerService';
 
@@ -26,12 +19,6 @@ export class PluginBootstrap extends Bootstrap {
     private readonly mainMenuService: MainMenuService,
     private readonly resourceManagerService: ResourceManagerService,
     private readonly sideBarPanelService: SideBarPanelService,
-    private readonly navResourceNodeService: NavResourceNodeService,
-    private readonly notificationService: NotificationService,
-    private readonly commonDialogService: CommonDialogService,
-    private readonly actionService: ActionService,
-    private readonly menuService: MenuService,
-    private readonly localizationService: LocalizationService,
   ) {
     super();
   }
@@ -57,56 +44,6 @@ export class PluginBootstrap extends Bootstrap {
       isHidden: () => !this.resourceManagerService.active,
       onClose: this.resourceManagerService.togglePanel,
       panel: () => ResourceManager,
-    });
-
-    this.actionService.addHandler({
-      id: 'resource-manager-base-actions',
-      isActionApplicable: (context, action) => {
-        if (!context.has(DATA_CONTEXT_NAV_NODE)) {
-          return false;
-        }
-
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
-
-        if (action === ACTION_DELETE) {
-          return isScript(node.id);
-        }
-
-        return false;
-      },
-      handler: async (context, action) => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
-
-        if (action === ACTION_DELETE) {
-          const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
-            title: 'ui_data_delete_confirmation',
-            message: this.localizationService.translate('plugin_resource_manager_script_delete_confirmation', undefined, { name: node.name }),
-            confirmActionText: 'ui_delete',
-          });
-
-          if (result === DialogueStateResult.Resolved) {
-            try {
-              const resourceData = this.navResourceNodeService.getResourceData(node.id);
-
-              if (!resourceData) {
-                throw new Error('Can\'t find resource');
-              }
-
-              await this.navResourceNodeService.delete(resourceData);
-            } catch (exception: any) {
-              this.notificationService.logException(exception, 'plugin_resource_manager_delete_script_error');
-            }
-          }
-        }
-      },
-    });
-
-    this.menuService.addCreator({
-      isApplicable: context => {
-        const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
-        return !!node?.nodeType && [PROJECT_NODE_TYPE, RESOURCE_NODE_TYPE].includes(node.nodeType);
-      },
-      getItems: (context, items) => items,
     });
   }
 

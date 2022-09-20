@@ -18,11 +18,10 @@ const styles = css`
   menu-wrapper {
     display: flex;
     height: 100%;
-    background: #338ecc;
   }
   TopMenuItem {
     text-transform: uppercase;
-    font-weight: 700;
+    font-weight: 500;
     height: 100%;
   }
 `;

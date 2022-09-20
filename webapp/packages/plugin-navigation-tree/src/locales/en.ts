@@ -31,4 +31,6 @@ export default [
   ['app_navigationTree_connection_group_shared', 'Shared Connections'],
   ['app_navigationTree_empty_placeholder', 'No Connections.\nUse the top menu to setup connection to your database.'],
   ['app_navigationTree_drop_here', 'Drop here...'],
+  ['plugin_navigation_tree_settings_projects_description', 'Displays elements under project groups'],
+  ['plugin_navigation_tree_settings_projects_title', 'Group by Project'],
 ];

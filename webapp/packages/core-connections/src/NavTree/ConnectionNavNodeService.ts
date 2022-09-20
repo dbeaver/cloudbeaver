@@ -10,8 +10,7 @@ import { action, makeObservable } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { INodeNavigationData, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
-import { ProjectsNavNodeService } from '@cloudbeaver/core-projects';
+import { INodeNavigationData, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { type ResourceKey, ResourceKeyUtils, resourceKeyList, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { Connection, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';

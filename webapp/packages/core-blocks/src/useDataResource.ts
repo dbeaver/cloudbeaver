@@ -12,6 +12,7 @@ import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedDataResource, CachedDataResourceContext, CachedDataResourceGetter, CachedDataResourceParam, CachedResourceData, CachedResourceIncludeArgs, isResourceKeyList } from '@cloudbeaver/core-sdk';
 
+import { getComputed } from './getComputed';
 import type { ILoadableState } from './Loader/ILoadableState';
 import { useObjectRef } from './useObjectRef';
 
@@ -102,7 +103,7 @@ export function useDataResource<
     async [loadFunctionName](refresh?: boolean) {
       const { key, includes, loading, resource, actions, prevData } = this;
 
-      if (loading || actions?.active === false) {
+      if (loading) {
         return;
       }
 
@@ -195,15 +196,21 @@ export function useDataResource<
     },
   }));
 
-  useEffect(() => {
-    if ((!outdated && !refObj.firstRender) || refObj.key === null) {
-      return;
-    }
+  const canLoad = getComputed(() => (
+    result.exception === null
+    && actions?.active !== false
+    && !((!outdated && !refObj.firstRender) || refObj.key === null)
+  ));
 
-    if (result.exception === null) {
+  useEffect(() => {
+    if (canLoad) {
       (refObj as any)[loadFunctionName]();
     }
   });
+
+  // if (canLoad) {
+  //   throw (refObj as any)[loadFunctionName]();
+  // }
 
   return result;
 }

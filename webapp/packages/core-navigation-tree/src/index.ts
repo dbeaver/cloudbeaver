@@ -22,3 +22,4 @@ export * from './NodesManager/INodeActions';
 
 export * from './NodesManager/NodeManagerUtils';
 export * from './NodesManager/EntityTypes';
+export * from './NodesManager/ProjectsNavNodeService';

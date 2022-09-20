@@ -53,19 +53,19 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   ...rest
 }: Props<T>): React.ReactElement | null {
   const props = rest as any as T;
+  let displayed: string[] = [];
+
+  if (container) {
+    displayed = container.getIdList(props);
+  } else if (tabList) {
+    displayed = tabList;
+  }
+
   if (
     !selectedId
     && (currentTabId === undefined || currentTabId === null)
     && autoSelect
   ) {
-    let displayed: string[] = [];
-
-    if (container) {
-      displayed = container.getIdList(props);
-    } else if (tabList) {
-      displayed = tabList;
-    }
-
     if (displayed.length > 0) {
       selectedId = displayed[0];
     }
@@ -96,16 +96,15 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     tabList,
   });
 
-  if (currentTabId !== undefined) {
+  if (currentTabId !== undefined && currentTabId !== null) {
     state.selectedId = currentTabId;
     dynamic.selectedId = currentTabId;
   }
 
-  if (dynamic.container && dynamic.selectedId && selectedId) {
-    const displayed = dynamic.container.getIdList(props);
+  if (displayed.length > 0 && dynamic.selectedId && selectedId) {
     const tabExists = displayed.includes(dynamic.selectedId);
 
-    if (displayed.length > 0 && !tabExists) {
+    if (!tabExists) {
       if (displayed.includes(selectedId)) {
         state.selectedId = selectedId;
       } else {
@@ -137,7 +136,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   }, []);
 
   useEffect(() => {
-    if (currentTabId !== undefined) {
+    if (currentTabId !== undefined && currentTabId !== null) {
       return;
     }
 
@@ -145,7 +144,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       tabId: state.selectedId!,
       props,
     });
-  }, [state.selectedId]);
+  }, [currentTabId, state.selectedId]);
 
   useEffect(() => {
     if (state.selectedId) {

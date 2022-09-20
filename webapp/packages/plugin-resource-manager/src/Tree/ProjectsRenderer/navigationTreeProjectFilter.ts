@@ -8,13 +8,17 @@
 
 
 import type { NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import type { ProjectsService } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { IElementsTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
 import { NAV_NODE_TYPE_RM_PROJECT } from '../../NAV_NODE_TYPE_RM_PROJECT';
+import type { ResourcesProjectsNavNodeService } from '../../NavNodes/ResourcesProjectsNavNodeService';
 import { RESOURCES_NODE_PATH } from '../../RESOURCES_NODE_PATH';
 
 export function navigationTreeProjectFilter(
+  resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
+  projectsService: ProjectsService,
   navNodeInfoResource: NavNodeInfoResource,
   navTreeResource: NavTreeResource,
 ): IElementsTreeFilter {
@@ -26,7 +30,18 @@ export function navigationTreeProjectFilter(
     const nodes = navNodeInfoResource
       .get(resourceKeyList(children))
       .filter<NavNode>((node => node !== undefined) as (node: NavNode | undefined) => node is NavNode)
-      .filter(node => node.nodeType !== NAV_NODE_TYPE_RM_PROJECT || navTreeResource.get(node.id)?.length)
+      .filter(node => {
+        if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT) {
+          const project = resourcesProjectsNavNodeService.getProject(node.id);
+
+          if (!project || !projectsService.activeProjects.includes(project)) {
+            return false;
+          }
+
+          return navTreeResource.get(node.id)?.length;
+        }
+        return true;
+      })
       .map(node => node.id);
 
     return nodes;

@@ -8,11 +8,10 @@
 
 import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { App, Bootstrap, DIService, injectable, IServiceConstructor } from '@cloudbeaver/core-di';
-import { PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
+import { PermissionsService } from '@cloudbeaver/core-root';
 import { CachedResource } from '@cloudbeaver/core-sdk';
 import { ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_SUBMENU_ITEM, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
-import { MainMenuService } from '@cloudbeaver/plugin-top-app-bar';
 import { MENU_USER_PROFILE } from '@cloudbeaver/plugin-user-profile';
 
 import { ACTION_DEVTOOLS } from './actions/ACTION_DEVTOOLS';
@@ -34,10 +33,8 @@ export class PluginBootstrap extends Bootstrap {
     private readonly diService: DIService,
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
-    private readonly mainMenuService: MainMenuService,
     private readonly devToolsService: DevToolsService,
-    private readonly permissionsService: PermissionsService,
-    private readonly serverConfigResource: ServerConfigResource
+    private readonly permissionsService: PermissionsService
   ) {
     super();
   }

@@ -370,10 +370,13 @@ type NavigatorSettings {
 
 type ProjectInfo {
     id: String!
+    shared: Boolean!
     name: String!
     description: String
-    canCreateConnections: Boolean!
-    canViewConnections: Boolean!
+    canEditDataSources: Boolean!
+    canViewDataSources: Boolean!
+    canEditResources: Boolean!
+    canViewResources: Boolean!
 }
 
 type LogEntry {

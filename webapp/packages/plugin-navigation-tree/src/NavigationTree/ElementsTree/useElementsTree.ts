@@ -15,6 +15,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { type NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { MetadataMap, throttle } from '@cloudbeaver/core-utils';
 
@@ -59,6 +60,7 @@ export interface IElementsTreeSettings {
   saveFilter: boolean;
   showFolderExplorerPath: boolean;
   configurable: boolean;
+  projects: boolean;
 }
 
 export interface IElementsTreeOptions {
@@ -117,6 +119,7 @@ export interface IElementsTree extends ILoadableState {
 }
 
 export function useElementsTree(options: IOptions): IElementsTree {
+  const projectsService = useService(ProjectsService);
   const notificationService = useService(NotificationService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
@@ -578,6 +581,11 @@ export function useElementsTree(options: IOptions): IElementsTree {
   useExecutor({
     executor: navNodeInfoResource.onDataOutdated,
     postHandlers: [loadTreeThreshold],
+  });
+
+  useExecutor({
+    executor: projectsService.onActiveProjectChange,
+    handlers: [loadTreeThreshold],
   });
 
   useExecutor({
