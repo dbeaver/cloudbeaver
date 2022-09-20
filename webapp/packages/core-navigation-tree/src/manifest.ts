@@ -13,6 +13,7 @@ import { DBObjectResource } from './NodesManager/DBObjectResource';
 import { NavNodeInfoResource } from './NodesManager/NavNodeInfoResource';
 import { NavNodeManagerService } from './NodesManager/NavNodeManagerService';
 import { NavTreeResource } from './NodesManager/NavTreeResource';
+import { ProjectsNavNodeService } from './NodesManager/ProjectsNavNodeService';
 
 export const coreNavigationTree: PluginManifest = {
   info: {
@@ -25,5 +26,6 @@ export const coreNavigationTree: PluginManifest = {
     DBObjectResource,
     NavNodeInfoResource,
     NavTreeResource,
+    ProjectsNavNodeService,
   ],
 };

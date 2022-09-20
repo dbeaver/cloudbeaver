@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { NAV_NODE_TYPE_PROJECT, ProjectsNavNodeService, ProjectsService } from '@cloudbeaver/core-projects';
+import type { NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
+import { NAV_NODE_TYPE_PROJECT, ProjectsService } from '@cloudbeaver/core-projects';
 
 import type { IElementsTreeNodeExpandInfoGetter } from '../ElementsTree/useElementsTree';
 

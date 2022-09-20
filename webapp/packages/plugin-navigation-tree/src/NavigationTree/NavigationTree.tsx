@@ -13,8 +13,8 @@ import styled, { css } from 'reshadow';
 import { useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { Translate } from '@cloudbeaver/core-localization';
-import { NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
-import { ProjectsNavNodeService, ProjectsService } from '@cloudbeaver/core-projects';
+import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { usePermission, EPermission } from '@cloudbeaver/core-root';
 import { CaptureView } from '@cloudbeaver/core-view';
 

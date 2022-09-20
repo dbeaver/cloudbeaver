@@ -10,7 +10,6 @@ import { makeObservable, observable } from 'mobx';
 
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { IExecutor, Executor, IExecutionContextProvider, ISyncContextLoader } from '@cloudbeaver/core-executor';
-import { ProjectsNavNodeService } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import type { IDataContextProvider } from '@cloudbeaver/core-view';
@@ -22,6 +21,7 @@ import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource';
 import { navNodeMoveContext } from './navNodeMoveContext';
 import { NavTreeResource } from './NavTreeResource';
 import { NodeManagerUtils } from './NodeManagerUtils';
+import { ProjectsNavNodeService } from './ProjectsNavNodeService';
 
 export enum NavigationType {
   open,
