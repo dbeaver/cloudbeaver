@@ -15,11 +15,6 @@
             <permission id="project-connection-edit" label="Project Connections Edit"
                         description="Allow create/edit connections in the project" category="general" scope="project"/>
 
-            <permission id="project-task-view" label="Project Tasks View"
-                        description="Allow view tasks in the project" category="general" scope="project"/>
-            <permission id="project-task-edit" label="Project Tasks Edit"
-                        description="Allow create/edit tasks in the project" category="general" scope="project"/>
-
 <!--            <permission id="project-admin" label="Project Admin" description="Allow manage access to the project" category="general"-->
 <!--                        scope="project"/>-->
 
