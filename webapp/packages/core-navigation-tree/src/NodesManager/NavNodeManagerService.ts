@@ -21,6 +21,7 @@ import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource';
 import { navNodeMoveContext } from './navNodeMoveContext';
 import { NavTreeResource } from './NavTreeResource';
 import { NodeManagerUtils } from './NodeManagerUtils';
+import { ProjectsNavNodeService } from './ProjectsNavNodeService';
 
 export enum NavigationType {
   open,
@@ -114,6 +115,7 @@ export class NavNodeManagerService extends Bootstrap {
   constructor(
     readonly navTree: NavTreeResource,
     readonly navNodeInfoResource: NavNodeInfoResource,
+    private readonly projectsNavNodeService: ProjectsNavNodeService,
     navigationService: NavigationService
   ) {
     super();
@@ -327,7 +329,7 @@ export class NavNodeManagerService extends Bootstrap {
     data
   ) => {
     let nodeId = data.nodeId;
-    const projectId = data.projectId;
+    let projectId = data.projectId;
     let parentId = data.parentId;
     let folderId = '';
     let name: string | undefined;
@@ -354,6 +356,10 @@ export class NavNodeManagerService extends Bootstrap {
 
         if (data.folderId) {
           folderId = data.folderId;
+        }
+
+        if (!projectId) {
+          projectId = this.projectsNavNodeService.getProject(node.id)?.id;
         }
       }
     }

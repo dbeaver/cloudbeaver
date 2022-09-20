@@ -13,7 +13,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
-import { ProjectsService, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource, ProjectsService, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { ConnectionFormService, ConnectionFormState, IConnectionFormState } from '@cloudbeaver/plugin-connections';
@@ -38,6 +38,7 @@ export class ConnectionSearchService {
     private readonly optionsPanelService: OptionsPanelService,
     private readonly commonDialogService: CommonDialogService,
     private readonly projectsService: ProjectsService,
+    private readonly projectInfoResource: ProjectInfoResource
   ) {
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
 
@@ -148,9 +149,13 @@ export class ConnectionSearchService {
   select(database: AdminConnectionSearchInfo): void {
     if (!this.formState) {
       this.formState = new ConnectionFormState(
+        this.projectsService,
+        this.projectInfoResource,
         this.connectionFormService,
         this.connectionInfoResource
       );
+
+      this.formState.closeTask.addHandler(this.goBack.bind(this));
     }
 
     this.formState
@@ -158,7 +163,7 @@ export class ConnectionSearchService {
         'create',
         'public'
       )
-      .setConfig(this.projectsService.activeProject?.id ?? PROJECT_GLOBAL_ID, {
+      .setConfig(this.projectsService.defaultProject?.id ?? PROJECT_GLOBAL_ID, {
         ...this.connectionInfoResource.getEmptyConfig(),
         driverId: database.defaultDriver,
         host: database.host,

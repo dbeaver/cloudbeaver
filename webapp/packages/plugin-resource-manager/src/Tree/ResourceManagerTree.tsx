@@ -14,9 +14,11 @@ import { Loader, useDataResource, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CaptureView } from '@cloudbeaver/core-view';
 import { NavigationTreeService, ElementsTree, IElementsTreeSettings, createElementsTreeSettings, validateElementsTreeSettings, getNavigationTreeUserSettingsId } from '@cloudbeaver/plugin-navigation-tree';
 
+import { ResourcesProjectsNavNodeService } from '../NavNodes/ResourcesProjectsNavNodeService';
 import { ResourceProjectsResource } from '../ResourceProjectsResource';
 import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';
@@ -62,6 +64,9 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
   const root = RESOURCES_NODE_PATH;
 
   const translate = useTranslate();
+
+  const resourcesProjectsNavNodeService = useService(ResourcesProjectsNavNodeService);
+  const projectsService = useService(ProjectsService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
   const navTreeService = useService(NavigationTreeService);
@@ -69,7 +74,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
   const settings = useUserData<IElementsTreeSettings>(
     getNavigationTreeUserSettingsId(root),
     createElementsTreeSettings,
-    () => {},
+    () => { },
     validateElementsTreeSettings
   );
 
@@ -80,12 +85,30 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
     [navNodeInfoResource]
   );
   const projectsExpandStateGetter = useMemo(
-    () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource),
-    [navNodeInfoResource]
+    () => navigationTreeProjectsExpandStateGetter(
+      navNodeInfoResource,
+      projectsService,
+      resourcesProjectsNavNodeService
+    ),
+    [
+      navNodeInfoResource,
+      projectsService,
+      resourcesProjectsNavNodeService,
+    ]
   );
   const projectFilter = useMemo(
-    () => navigationTreeProjectFilter(navNodeInfoResource, navTreeResource),
-    [navNodeInfoResource, navTreeResource]
+    () => navigationTreeProjectFilter(
+      resourcesProjectsNavNodeService,
+      projectsService,
+      navNodeInfoResource,
+      navTreeResource
+    ),
+    [
+      resourcesProjectsNavNodeService,
+      projectsService,
+      navNodeInfoResource,
+      navTreeResource,
+    ]
   );
 
   const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);

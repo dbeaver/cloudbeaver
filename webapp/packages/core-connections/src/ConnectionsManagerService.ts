@@ -6,12 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, makeObservable } from 'mobx';
+
 import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { ConnectionInfoResource, Connection, createConnectionParam } from './ConnectionInfoResource';
 import { ContainerResource, IStructContainers, ObjectContainer } from './ContainerResource';
@@ -24,6 +28,10 @@ export interface IConnectionExecutorData {
 
 @injectable()
 export class ConnectionsManagerService {
+  get projectConnections(): Connection[] {
+    return this.connectionInfo.values
+      .filter(connection => this.projectsService.activeProjects.some(project => project.id === connection.projectId));
+  }
   readonly connectionExecutor: IExecutor<IConnectionInfoParams | null>;
   readonly onDisconnect: IExecutor<IConnectionExecutorData>;
   readonly onDelete: IExecutor<IConnectionExecutorData>;
@@ -35,6 +43,7 @@ export class ConnectionsManagerService {
     readonly containerContainers: ContainerResource,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
+    private readonly projectsService: ProjectsService,
   ) {
     this.disconnecting = false;
 
@@ -51,6 +60,12 @@ export class ConnectionsManagerService {
 
     this.connectionExecutor.addHandler(() => connectionInfo.load(CachedMapAllKey));
     this.onDelete.before(this.onDisconnect);
+
+    makeObservable(this, {
+      projectConnections: computed<Connection[]>({
+        equals: isArraysEqual,
+      }),
+    });
   }
 
   async requireConnection(key: IConnectionInfoParams | null = null): Promise<Connection | null> {
@@ -131,9 +146,9 @@ export class ConnectionsManagerService {
 
   hasAnyConnection(connected?: boolean): boolean {
     if (connected) {
-      return this.connectionInfo.values.some(connection => connection.connected);
+      return this.projectConnections.some(connection => connection.connected);
     }
-    return !!this.connectionInfo.values.length;
+    return !!this.projectConnections.length;
   }
 
   connectionContext() {
@@ -157,7 +172,7 @@ export class ConnectionsManagerService {
     const { controller, notification } = this.notificationService.processNotification(() => ProcessSnackbar, {}, { title: 'Disconnecting...' });
 
     try {
-      for (const connection of this.connectionInfo.values) {
+      for (const connection of this.projectConnections) {
         await this._closeConnectionAsync(connection);
       }
       notification.close();

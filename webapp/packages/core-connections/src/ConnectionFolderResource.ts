@@ -156,8 +156,8 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
 
   isKeyEqual(param: IConnectionFolderParam, second: IConnectionFolderParam): boolean {
     return (
-      param.projectId.localeCompare(second.projectId, undefined, { sensitivity: 'accent' }) === 0
-      && param.folderId.localeCompare(second.folderId, undefined, { sensitivity: 'accent' }) === 0
+      param.projectId === second.projectId
+      && param.folderId === second.folderId
     );
   }
 

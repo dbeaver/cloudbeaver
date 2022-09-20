@@ -18,20 +18,16 @@ import { NavigationTree } from '@cloudbeaver/plugin-navigation-tree';
 import { RightArea } from './RightArea';
 
 const mainStyles = css`
-    space {
-      composes: theme-typography--body2 theme-background-primary from global;
-    }
-    Pane {
-      composes: theme-background-surface theme-text-on-surface from global;
-      display: flex;
-    }
-    Pane:first-child {
-      position: relative;
-    }
-    Pane:last-child {
-      overflow: hidden;
-    }
-  `;
+  space {
+    composes: theme-typography--body2 theme-background-primary from global;
+  }
+  Pane {
+    composes: theme-background-surface theme-text-on-surface from global;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+  }
+`;
 
 export const Main = observer(function Main() {
   const sideBarPanelService = useService(SideBarPanelService);

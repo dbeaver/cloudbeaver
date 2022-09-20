@@ -28,6 +28,11 @@ const styles = css`
         width: 24px;
       }
     }
+    @media only screen and (max-width: 1200px) {
+      container {
+        padding: 0 8px;
+      }
+    }
   `;
 
 export const Help = observer(function Help() {

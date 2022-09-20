@@ -58,7 +58,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
       getItems: (context, items) => {
         items = [...items];
 
-        const connections = this.connectionInfoResource.values
+        const connections = this.connectionsManagerService.projectConnections
           .filter(connection => !connection.template)
           .sort((a, b) => {
             if (a.connected === b.connected) {
