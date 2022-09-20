@@ -225,6 +225,8 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
     @Override
     protected void startServer() {
+        CBPlatform.setApplication(this);
+
         Path configPath = null;
         try {
             configPath = loadServerConfiguration();
@@ -262,8 +264,6 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             log.error("Error setting workspace location to " + workspaceLocation, e);
             return;
         }
-
-        CBPlatform.setApplication(this);
 
         log.debug(GeneralUtils.getProductName() + " " + GeneralUtils.getProductVersion() + " is starting"); //$NON-NLS-1$
         log.debug("\tOS: " + System.getProperty(StandardConstants.ENV_OS_NAME) + " " + System.getProperty(StandardConstants.ENV_OS_VERSION) + " (" + System.getProperty(StandardConstants.ENV_OS_ARCH) + ")");
