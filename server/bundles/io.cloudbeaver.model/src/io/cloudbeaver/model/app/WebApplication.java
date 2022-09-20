@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
 
@@ -56,6 +57,8 @@ public interface WebApplication extends DBPApplication {
 
     SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
+    DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
+
     RMController getResourceController(
         @NotNull SMCredentialsProvider credentialsProvider,
         @NotNull SMController smController
@@ -70,4 +73,11 @@ public interface WebApplication extends DBPApplication {
     default String getRootURI() {
         return "";
     }
+
+    String getApplicationInstanceId() throws DBException;
+
+    /**
+     * Port this server listens on
+     */
+    int getServerPort();
 }

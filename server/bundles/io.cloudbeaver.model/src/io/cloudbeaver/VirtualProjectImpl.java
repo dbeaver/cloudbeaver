@@ -87,6 +87,11 @@ public class VirtualProjectImpl extends BaseProjectImpl {
 
     }
 
+    @Override
+    public boolean isUseSecretStorage() {
+        return false;
+    }
+
     @NotNull
     public RMProject getRmProject() {
         return this.project;

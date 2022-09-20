@@ -45,7 +45,7 @@ export default [
   ['connections_connection_host', 'Host'],
   ['connections_connection_port', 'Port'],
   ['connections_connection_template', 'Template'],
-  ['connections_connection_test', 'Test Connection'],
+  ['connections_connection_test', 'Test'],
   ['connections_connection_test_fail', 'Connection test failed'],
   ['connections_connection_create_fail', 'Fail to create connection'],
   ['connections_connection_save_fail', 'Fail to save connection'],

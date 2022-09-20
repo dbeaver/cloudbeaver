@@ -172,13 +172,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return application;
     }
 
-    @Override
-    public boolean isApplicationSession() {
-        return false;
-    }
-
     @NotNull
-    @Override
     public DBPProject getSingletonProject() {
         return defaultProject;
     }
