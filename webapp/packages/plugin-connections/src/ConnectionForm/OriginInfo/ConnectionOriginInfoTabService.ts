@@ -6,15 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { isLocalConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
-import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormState } from '../IConnectionFormProps';
 import { ConnectionFormAuthenticationAction } from './ConnectionFormAuthenticationAction';
 import { OriginInfo } from './OriginInfo';
@@ -24,9 +21,6 @@ import { OriginInfoTab } from './OriginInfoTab';
 export class ConnectionOriginInfoTabService extends Bootstrap {
   constructor(
     private readonly connectionFormService: ConnectionFormService,
-    private readonly userInfoResource: UserInfoResource,
-    private readonly authProvidersResource: AuthProvidersResource,
-    private readonly localizationService: LocalizationService
   ) {
     super();
   }
@@ -44,9 +38,6 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
     this.connectionFormService.configureTask
       .addHandler(this.configure.bind(this));
 
-    this.connectionFormService.formStateTask
-      .addHandler(this.formState.bind(this));
-
     this.connectionFormService.actionsContainer
       .add(ConnectionFormAuthenticationAction, 0);
   }
@@ -57,24 +48,5 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
     const configuration = contexts.getContext(connectionFormConfigureContext);
 
     configuration.include('includeOrigin');
-  }
-
-  private async formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
-    const providerId = data.info?.requiredAuth;
-
-    if (!providerId || providerId === AUTH_PROVIDER_LOCAL_ID || data.mode !== 'edit') {
-      return;
-    }
-
-    const context = contexts.getContext(connectionFormStateContext);
-
-    await this.userInfoResource.load(undefined, []);
-    const provider = await this.authProvidersResource.load(providerId);
-
-    if (!this.userInfoResource.hasToken(providerId)) {
-      context.readonly = true;
-      const message = this.localizationService.translate('connections_public_connection_cloud_auth_required', undefined, { providerLabel: provider.label });
-      context.setStatusMessage(message);
-    }
   }
 }

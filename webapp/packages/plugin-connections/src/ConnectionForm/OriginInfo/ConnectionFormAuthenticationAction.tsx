@@ -9,7 +9,8 @@
 import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { Button, PlaceholderComponent } from '@cloudbeaver/core-blocks';
+import { Button, getComputed, PlaceholderComponent, useMapResource } from '@cloudbeaver/core-blocks';
+import { DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 
@@ -19,8 +20,21 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
   state,
 }) {
   const translate = useTranslate();
+  const driverMap = useMapResource(
+    ConnectionFormAuthenticationAction,
+    DBDriverResource,
+    state.config.driverId || null
+  );
+
+  const driver = driverMap.data;
+  const { data: authModel } = useMapResource(
+    ConnectionFormAuthenticationAction,
+    DatabaseAuthModelsResource,
+    getComputed(() => state.config.authModelId || state.info?.authModel || driver?.defaultAuthModel || null)
+  );
+
   const authentication = useAuthenticationAction({
-    providerId: state.info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
+    providerId: authModel?.requiredAuth ?? state.info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
     onAuthenticate: () => state.loadConnectionInfo(),
   });
 
@@ -43,7 +57,20 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
 export const ConnectionFormAuthenticationAction: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormAuthenticationAction({
   state,
 }) {
-  if (!state.info || !state.info.requiredAuth) {
+  const driverMap = useMapResource(
+    ConnectionFormAuthenticationAction,
+    DBDriverResource,
+    state.config.driverId || null
+  );
+
+  const driver = driverMap.data;
+  const { data: authModel } = useMapResource(
+    ConnectionFormAuthenticationAction,
+    DatabaseAuthModelsResource,
+    getComputed(() => state.config.authModelId || state.info?.authModel || driver?.defaultAuthModel || null)
+  );
+
+  if (!authModel?.requiredAuth && !state.info?.requiredAuth) {
     return null;
   }
 

@@ -88,9 +88,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   } = state;
 
   const adminPermission = usePermission(EAdminPermission.admin);
-  const authentication = useAuthenticationAction({
-    providerId: info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
-  });
 
   useFormValidator(submittingHandlers.for(service.formValidationTask), formRef.current);
   const optionsHook = useOptions(state);
@@ -159,6 +156,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
       onData: data => optionsHook.setAuthModel(data),
     }
   );
+
+  const authentication = useAuthenticationAction({
+    providerId: authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
+  });
 
   const isURLConfiguration = config.configurationType === DriverConfigurationType.Url;
   const edit = state.mode === 'edit';
@@ -326,7 +327,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 state={config}
                 disabled={edit || disabled}
                 readOnly={readonly}
-                // autoHide // maybe better to use autoHide
+              // autoHide // maybe better to use autoHide
               >
                 {translate('connections_connection_template')}
               </FieldCheckbox>
@@ -343,7 +344,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           </Group>
         </Container>
         <Container medium gap>
-          {(!driver?.anonymousAccess && authentication.authorized) && (
+          {(!driver?.anonymousAccess && (authentication.authorized || !edit)) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
               {availableAuthModels.length > 1 && (

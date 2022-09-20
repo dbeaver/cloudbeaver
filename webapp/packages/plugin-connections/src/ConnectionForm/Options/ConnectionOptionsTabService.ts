@@ -8,9 +8,11 @@
 
 import { action, makeObservable, runInAction, toJS } from 'mobx';
 
+import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ProjectInfoResource, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { getUniqueName, isValuesEqual } from '@cloudbeaver/core-utils';
@@ -29,6 +31,9 @@ export class ConnectionOptionsTabService extends Bootstrap {
     private readonly projectsResource: ProjectInfoResource,
     private readonly connectionFormService: ConnectionFormService,
     private readonly dbDriverResource: DBDriverResource,
+    private readonly userInfoResource: UserInfoResource,
+    private readonly localizationService: LocalizationService,
+    private readonly authProvidersResource: AuthProvidersResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
   ) {
     super();
@@ -56,7 +61,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
       .addHandler(this.save.bind(this));
 
     this.connectionFormService.formStateTask
-      .addHandler(this.formState.bind(this));
+      .addHandler(this.formState.bind(this))
+      .addHandler(this.formAuthState.bind(this));
 
     this.connectionFormService.configureTask
       .addHandler(this.configure.bind(this));
@@ -293,6 +299,30 @@ export class ConnectionOptionsTabService extends Bootstrap {
     runInAction(() => {
       Object.assign(config, tempConfig);
     });
+  }
+
+  private async formAuthState(
+    data: IConnectionFormState,
+    contexts: IExecutionContextProvider<IConnectionFormState>
+  ) {
+    const config = contexts.getContext(connectionConfigContext);
+    const stateContext = contexts.getContext(connectionFormStateContext);
+
+    const driver = await this.dbDriverResource.load(config.driverId!, ['includeProviderProperties']);
+    const authModel = await this.databaseAuthModelsResource.load(
+      config.authModelId ?? data.info?.authModel ?? driver.defaultAuthModel
+    );
+
+    const providerId = authModel.requiredAuth ?? data.info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
+
+    await this.userInfoResource.load(undefined, []);
+
+    if (!this.userInfoResource.hasToken(providerId)) {
+      const provider = await this.authProvidersResource.load(providerId);
+      const message = this.localizationService.translate('connections_public_connection_cloud_auth_required', undefined, { providerLabel: provider.label });
+      stateContext.setStatusMessage(message);
+      stateContext.readonly = data.mode === 'edit';
+    }
   }
 
   private async formState(

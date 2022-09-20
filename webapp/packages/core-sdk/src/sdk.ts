@@ -285,6 +285,7 @@ export interface DatabaseAuthModel {
   icon?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   properties: Array<ObjectPropertyInfo>;
+  requiredAuth?: Maybe<Scalars['String']>;
   requiresLocalConfiguration?: Maybe<Scalars['Boolean']>;
 }
 
@@ -2088,7 +2089,7 @@ export type ExecutionContextUpdateMutation = { context: boolean };
 export type GetAuthModelsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAuthModelsQuery = { models: Array<{ id: string, displayName: string, description?: string, icon?: string, requiresLocalConfiguration?: boolean, properties: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> };
+export type GetAuthModelsQuery = { models: Array<{ id: string, displayName: string, description?: string, icon?: string, requiresLocalConfiguration?: boolean, requiredAuth?: string, properties: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> };
 
 export type GetConnectionFoldersQueryVariables = Exact<{
   projectId?: InputMaybe<Scalars['ID']>;
@@ -3529,6 +3530,7 @@ export const GetAuthModelsDocument = `
     description
     icon
     requiresLocalConfiguration
+    requiredAuth
     properties {
       id
       displayName
