@@ -95,7 +95,7 @@ export const NavigationTree = observer(function NavigationTree() {
   const settings = useUserData<IElementsTreeSettings>(
     getNavigationTreeUserSettingsId(root),
     createElementsTreeSettings,
-    () => {},
+    () => { },
     validateElementsTreeSettings
   );
 
@@ -105,8 +105,8 @@ export const NavigationTree = observer(function NavigationTree() {
     [navNodeInfoResource]
   );
   const projectsExpandStateGetter = useMemo(
-    () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource),
-    [navNodeInfoResource]
+    () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource, projectsService, projectsNavNodeService),
+    [navNodeInfoResource, projectsService, projectsNavNodeService]
   );
   const projectFilter = useMemo(
     () => navigationTreeProjectFilter(projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource),

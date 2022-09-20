@@ -12,7 +12,7 @@ import type { MenuCreatorItem } from './IMenuItemsCreator';
 export function menuExtractActions(items: MenuCreatorItem[], actions: IAction[]): IAction[] {
   const list: IAction[] = [];
 
-  for (const action of actions){
+  for (const action of actions) {
     const index = items.indexOf(action);
     if (index > -1) {
       items.splice(index, 1);

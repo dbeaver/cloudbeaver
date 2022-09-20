@@ -74,7 +74,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
   const settings = useUserData<IElementsTreeSettings>(
     getNavigationTreeUserSettingsId(root),
     createElementsTreeSettings,
-    () => {},
+    () => { },
     validateElementsTreeSettings
   );
 
@@ -85,8 +85,16 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
     [navNodeInfoResource]
   );
   const projectsExpandStateGetter = useMemo(
-    () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource),
-    [navNodeInfoResource]
+    () => navigationTreeProjectsExpandStateGetter(
+      navNodeInfoResource,
+      projectsService,
+      resourcesProjectsNavNodeService
+    ),
+    [
+      navNodeInfoResource,
+      projectsService,
+      resourcesProjectsNavNodeService,
+    ]
   );
   const projectFilter = useMemo(
     () => navigationTreeProjectFilter(

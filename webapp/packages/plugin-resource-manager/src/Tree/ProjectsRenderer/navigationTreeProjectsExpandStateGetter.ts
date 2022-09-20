@@ -7,13 +7,18 @@
  */
 
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import type { ProjectsService } from '@cloudbeaver/core-projects';
 import type { IElementsTreeNodeExpandInfoGetter } from '@cloudbeaver/plugin-navigation-tree';
 
 import { NAV_NODE_TYPE_RM_PROJECT } from '../../NAV_NODE_TYPE_RM_PROJECT';
+import type { ResourcesProjectsNavNodeService } from '../../NavNodes/ResourcesProjectsNavNodeService';
+
 
 
 export function navigationTreeProjectsExpandStateGetter(
-  navNodeInfoResource: NavNodeInfoResource
+  navNodeInfoResource: NavNodeInfoResource,
+  projectsService: ProjectsService,
+  resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
 ): IElementsTreeNodeExpandInfoGetter {
 
   return nodeId => {
@@ -23,8 +28,14 @@ export function navigationTreeProjectsExpandStateGetter(
       return null;
     }
 
+    let active = false;
+    const project = resourcesProjectsNavNodeService.getByNodeId(nodeId);
+    if (project) {
+      active = projectsService.activeProjects.includes(project);
+    }
+
     return {
-      expanded: true,
+      expanded: active,
       expandable: false,
     };
   };

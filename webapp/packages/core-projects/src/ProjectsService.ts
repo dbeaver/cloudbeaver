@@ -24,11 +24,23 @@ interface IProjectsUserSettings {
 
 @injectable()
 export class ProjectsService {
+  get userProject(): ProjectInfo | undefined {
+    let project: ProjectInfo | undefined;
+
+    if (this.userInfoResource.data) {
+      project =  this.projectInfoResource.getUserProject(this.userInfoResource.data.userId);
+    } else {
+      project = this.projectInfoResource.get('anonymous');
+    }
+
+    return project;
+  }
+
   get activeProjects(): ProjectInfo[] {
     let activeProjects: ProjectInfo[] = [];
 
     if (activeProjects.length === 0 && this.activeProjectIds.length > 0) {
-      activeProjects =  this.projectsResource
+      activeProjects =  this.projectInfoResource
         .get(resourceKeyList(this.activeProjectIds))
         .filter(Boolean) as ProjectInfo[];
     }
@@ -43,22 +55,14 @@ export class ProjectsService {
     }
 
     if (activeProjects.length === 0) {
-      activeProjects = [...this.projectsResource.values];
+      activeProjects = [...this.projectInfoResource.values];
     }
 
     return activeProjects;
   }
 
   get defaultProject(): ProjectInfo | undefined {
-    let project: ProjectInfo | undefined;
-
-    if (this.userInfoResource.data) {
-      project =  this.projectsResource.get(this.userInfoResource.data.userId);
-    }
-
-    if (!project && this.projectsResource.has('anonymous')) {
-      project = this.projectsResource.get('anonymous');
-    }
+    let project = this.userProject;
 
     if (!project && this.activeProjects.length > 0) {
       project = this.activeProjects[0];
@@ -81,7 +85,7 @@ export class ProjectsService {
   readonly getActiveProjectTask: ISyncExecutor;
 
   constructor(
-    private readonly projectsResource: ProjectInfoResource,
+    private readonly projectInfoResource: ProjectInfoResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly userDataService: UserDataService,
     navigationService: NavigationService
@@ -92,6 +96,8 @@ export class ProjectsService {
     this.onActiveProjectChange.before(navigationService.navigationTask);
 
     makeObservable(this, {
+      userProject: computed,
+      defaultProject: computed,
       activeProjects: computed<ProjectInfo[]>({
         equals: isArraysEqual,
       }),
@@ -104,6 +110,6 @@ export class ProjectsService {
   }
 
   async load(): Promise<void> {
-    await this.projectsResource.load(CachedMapAllKey);
+    await this.projectInfoResource.load(CachedMapAllKey);
   }
 }
