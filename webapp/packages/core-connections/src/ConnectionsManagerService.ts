@@ -30,7 +30,7 @@ export interface IConnectionExecutorData {
 export class ConnectionsManagerService {
   get projectConnections(): Connection[] {
     return this.connectionInfo.values
-      .filter(connection => this.projectsService.activeProjectIds.includes(connection.projectId));
+      .filter(connection => this.projectsService.activeProjects.some(project => project.id === connection.projectId));
   }
   readonly connectionExecutor: IExecutor<IConnectionInfoParams | null>;
   readonly onDisconnect: IExecutor<IConnectionExecutorData>;
