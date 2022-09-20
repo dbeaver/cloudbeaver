@@ -8,6 +8,7 @@
 
 export interface ITabOptions<T = any> {
   id?: string;
+  projectId: string | null;
   handlerId: string;
   handlerState: T;
 }
@@ -15,5 +16,6 @@ export interface ITabOptions<T = any> {
 export interface ITab<T = any> extends ITabOptions<T> {
   id: string;
   userId: string;
+  projectId: string | null;
   restored: boolean;
 }

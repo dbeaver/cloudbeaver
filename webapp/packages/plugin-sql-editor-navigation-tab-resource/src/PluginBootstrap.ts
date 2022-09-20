@@ -11,6 +11,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeManagerService, NavTreeResource, NavNodeInfoResource, NodeManagerUtils, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { DATA_CONTEXT_TAB_ID } from '@cloudbeaver/core-ui';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
@@ -36,6 +37,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly notificationService: NotificationService,
     private readonly sqlEditorNavigatorService: SqlEditorNavigatorService,
     private readonly resourceManagerService: ResourceManagerService,
+    private readonly projectsService: ProjectsService,
     private readonly resourceProjectsResource: ResourceProjectsResource,
     private readonly sqlEditorTabResourceService: SqlEditorTabResourceService,
     private readonly commonDialogService: CommonDialogService,
@@ -58,6 +60,10 @@ export class PluginBootstrap extends Bootstrap {
           const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
 
           if (!state || !tabId) {
+            return false;
+          }
+
+          if (!this.projectsService.activeProjects.some(project => project.canEditResources)) {
             return false;
           }
 
@@ -85,6 +91,10 @@ export class PluginBootstrap extends Bootstrap {
 
           if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
             try {
+              if (!result.projectId) {
+                throw new Error('Project not selected');
+              }
+
               await this.resourceProjectsResource.load();
               const scriptName = `${result.name.trim()}.${SCRIPT_EXTENSION}`;
               const folder = createPath(RESOURCES_NODE_PATH, result.projectId);

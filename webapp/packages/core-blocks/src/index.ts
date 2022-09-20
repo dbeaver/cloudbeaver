@@ -17,6 +17,7 @@ export * from './layout/BASE_LAYOUT_GRID_STYLES';
 export * from './layout/TopAppBar';
 
 export * from './Loader/Loader';
+export * from './Loader/useAutoLoad';
 export * from './Loader/ILoadableState';
 
 export * from './Marks/ConnectionMark';

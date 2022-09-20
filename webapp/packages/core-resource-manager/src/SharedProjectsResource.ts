@@ -8,14 +8,16 @@
 
 import { runInAction } from 'mobx';
 
-import { EAdminPermission } from '@cloudbeaver/core-administration';
+import { AdminObjectGrantInfo, EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmProject, ResourceKeyList } from '@cloudbeaver/core-sdk';
+import { GraphQLService, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmProject, ResourceKeyList, RmProjectPermissions } from '@cloudbeaver/core-sdk';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 const newSymbol = Symbol('new-project');
 
 export type SharedProject = RmProject;
+export type ProjectPermission = RmProjectPermissions;
 type SharedProjectNew = SharedProject & { [newSymbol]: boolean };
 
 interface IProjectConfig {
@@ -42,6 +44,21 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
       return true;
     }
     return newSymbol in this.get(id)!;
+  }
+
+  async setAccessSubjects(projectId: string, permissions: ProjectPermission[]): Promise<void> {
+    await this.graphQLService.sdk.setProjectPermissions({
+      projectId,
+      permissions,
+    });
+  }
+
+  async loadAccessSubjects(projectId: string): Promise<AdminObjectGrantInfo[]> {
+    const { grantedPermissions } = await this.graphQLService.sdk.getProjectGrantedPermissions({
+      projectId,
+    });
+
+    return grantedPermissions;
   }
 
   async create(config: IProjectConfig): Promise<SharedProject> {
@@ -74,7 +91,9 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
         });
       });
     } finally {
-      this.delete(resourceKeyList(deleted));
+      if (deleted.length > 0) {
+        this.delete(resourceKeyList(deleted));
+      }
     }
   }
 
@@ -108,4 +127,13 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     const data = this.data.get(key);
     this.data.set(key, Object.assign(data ?? {}, value));
   }
+}
+
+export function isEqualSharedProjectGrantInfo(a: AdminObjectGrantInfo, b: AdminObjectGrantInfo): boolean {
+  return (
+    a.subjectId === b.subjectId
+    && a.subjectType === b.subjectType
+    && a.objectPermissions.objectId === b.objectPermissions.objectId
+    && isArraysEqual(a.objectPermissions.permissions, b.objectPermissions.permissions)
+  );
 }

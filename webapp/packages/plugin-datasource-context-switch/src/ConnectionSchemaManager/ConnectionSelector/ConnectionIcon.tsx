@@ -14,7 +14,6 @@ import { DBDriverResource, ConnectionInfoResource } from '@cloudbeaver/core-conn
 import { useStyles } from '@cloudbeaver/core-theming';
 import type { MenuBaseItemIconComponent } from '@cloudbeaver/core-view';
 
-import { ConnectionSelector } from './ConnectionSelector';
 import type { IConnectionSelectorExtraProps } from './IConnectionSelectorExtraProps';
 
 const connectionIconStyle = css`
@@ -32,13 +31,13 @@ export const ConnectionIcon: MenuBaseItemIconComponent<IConnectionSelectorExtraP
   const styles = useStyles(style, connectionIconStyle);
 
   const connection = useMapResource(
-    ConnectionSelector,
+    ConnectionInfo,
     ConnectionInfoResource,
     connectionKey
   );
   const driverId = connection.data?.driverId;
 
-  const driver = useMapResource(ConnectionSelector, DBDriverResource, driverId!, {
+  const driver = useMapResource(ConnectionInfo, DBDriverResource, driverId!, {
     active: driverId !== undefined,
   });
 

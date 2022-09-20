@@ -432,8 +432,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
     private void checkProjectEditAccess(DBNNode node, WebSession session) throws DBException {
         var project = session.getProjectById(node.getOwnerProject().getId());
-        if (project == null
-            || !hasNodeEditPermission(node, project.getRmProject())
+        if (project == null || !hasNodeEditPermission(node, project.getRmProject())
         ) {
             throw new DBException("Access denied");
         }
@@ -442,7 +441,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     private boolean hasNodeEditPermission(DBNNode node, RMProject rmProject) {
         var projectPermissions = rmProject.getProjectPermissions();
         if (node instanceof DBNDataSource || node instanceof DBNLocalFolder) {
-            return projectPermissions.contains(RMProjectPermission.CONNECTIONS_EDIT.getPermissionId());
+            return projectPermissions.contains(RMProjectPermission.DATA_SOURCES_EDIT.getPermissionId());
         } else if (node instanceof DBNAbstractResourceManagerNode) {
             return projectPermissions.contains(RMProjectPermission.RESOURCE_EDIT.getPermissionId());
         }

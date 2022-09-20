@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.rm.impl.WebServiceRM;
+import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
 import org.jkiss.utils.CommonUtils;
 
 /**
@@ -53,6 +54,15 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
                 env -> getService(env).readResourceAsString(getWebSession(env),
                     env.getArgument("projectId"),
                     env.getArgument("resourcePath")))
+            .dataFetcher("rmListProjectPermissions", env -> getService(env).listProjectPermissions())
+            .dataFetcher("rmListProjectGrantedPermissions", env -> getService(env).listProjectGrantedPermissions(
+                getWebSession(env),
+                env.getArgument("projectId")
+            ))
+            .dataFetcher("rmListSubjectProjectsPermissionGrants", env -> getService(env).listSubjectProjectsPermissionGrants(
+                getWebSession(env),
+                env.getArgument("subjectId")
+            ))
         ;
         model.getMutationType()
             .dataFetcher("rmCreateResource",
@@ -79,6 +89,11 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
             .dataFetcher("rmDeleteProject", env -> getService(env).deleteProject(
                 getWebSession(env),
                 getProjectReference(env)
+            ))
+            .dataFetcher("rmSetProjectPermissions", env -> getService(env).setProjectPermissions(
+                getWebSession(env),
+                env.getArgument("projectId"),
+                new RMSubjectProjectPermissions(env.getArgument("permissions"))
             ))
         ;
 

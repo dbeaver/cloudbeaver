@@ -85,11 +85,11 @@ export class NavNodeContextMenuService extends Bootstrap {
             ? this.coreSettingsService.settings.getValue('app.metadata.editing')
             : this.navTreeSettingsService.settings.getValue('editing');
 
-          if (!globalPermission) {
+          if (!globalPermission || !node.features) {
             return false;
           }
 
-          return !!node.features?.includes(ENodeFeature.canRename);
+          return node.features.includes(ENodeFeature.canRename);
         }
 
         if (action === ACTION_DELETE) {
@@ -97,11 +97,11 @@ export class NavNodeContextMenuService extends Bootstrap {
             ? this.coreSettingsService.settings.getValue('app.metadata.deleting')
             : this.navTreeSettingsService.settings.getValue('deleting');
 
-          if (!globalPermission) {
+          if (!globalPermission || !node.features) {
             return false;
           }
 
-          return !!node.features?.includes(ENodeFeature.canDelete);
+          return node.features.includes(ENodeFeature.canDelete);
         }
 
         if (action === ACTION_OPEN) {

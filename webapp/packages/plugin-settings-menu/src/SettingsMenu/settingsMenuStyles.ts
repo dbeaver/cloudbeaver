@@ -33,4 +33,9 @@ export const settingsMenuStyles = css`
       transform: rotate(90deg);
     }
   }
+  @media only screen and (max-width: 1200px) {
+    ContextMenu {
+      padding: 0 8px !important;
+    }
+  }
 `;

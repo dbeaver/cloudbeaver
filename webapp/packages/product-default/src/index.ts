@@ -24,6 +24,7 @@ import navigationTabs from '@cloudbeaver/plugin-navigation-tabs';
 import navigationTree from '@cloudbeaver/plugin-navigation-tree';
 import objectViewer from '@cloudbeaver/plugin-object-viewer';
 import productPlugin from '@cloudbeaver/plugin-product';
+import projects from '@cloudbeaver/plugin-projects';
 import resourceManager from '@cloudbeaver/plugin-resource-manager';
 import resourceManagerAdministration from '@cloudbeaver/plugin-resource-manager-administration';
 import root from '@cloudbeaver/plugin-root';
@@ -84,6 +85,7 @@ const PLUGINS: PluginManifest[] = [
   navigationTabs,
   root,
   toolsPanel,
+  projects,
 ];
 
 bootstrap(PLUGINS);

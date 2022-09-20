@@ -136,7 +136,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     if (state.projectId !== null && state.mode === 'create') {
       const project = this.projectsResource.get(state.projectId);
 
-      if (!project?.canCreateConnections) {
+      if (!project?.canEditDataSources) {
         validation.error('plugin_connections_connection_form_project_invalid');
       }
     }

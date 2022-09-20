@@ -34,4 +34,6 @@ export default [
   ['app_navigationTree_connection_group_shared', 'Общие подключения'],
   ['app_navigationTree_empty_placeholder', 'Нет подключений.\nИспользуйте верхнее меню для создания подключения к базе.'],
   ['app_navigationTree_drop_here', 'Drop here...'],
+  ['plugin_navigation_tree_settings_projects_description', 'Группировать элементы по проектам'],
+  ['plugin_navigation_tree_settings_projects_title', 'Группировать по проектам'],
 ];

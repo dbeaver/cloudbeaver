@@ -13,6 +13,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ConnectionConfig, ResourceKey } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
@@ -37,6 +38,8 @@ export class PublicConnectionFormService {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionAuthService: ConnectionAuthService,
     private readonly authenticationService: AuthenticationService,
+    private readonly projectsService: ProjectsService,
+    private readonly projectInfoResource: ProjectInfoResource
   ) {
     this.formState = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
@@ -76,9 +79,13 @@ export class PublicConnectionFormService {
 
     if (!this.formState) {
       this.formState = new ConnectionFormState(
+        this.projectsService,
+        this.projectInfoResource,
         this.connectionFormService,
         this.connectionInfoResource
       );
+
+      this.formState.closeTask.addHandler(this.close.bind(this, true));
     }
 
     this.formState

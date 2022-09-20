@@ -17,15 +17,19 @@
 package io.cloudbeaver.service.rm;
 
 import io.cloudbeaver.*;
-import io.cloudbeaver.model.WebProjectInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
+import io.cloudbeaver.service.admin.AdminPermissionInfo;
+import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
+import org.jkiss.dbeaver.model.security.SMObjectPermissionsGrant;
+
+import java.util.List;
 
 /**
  * Web service API
@@ -99,4 +103,30 @@ public interface DBWServiceRM extends DBWService {
     boolean deleteProject(
         @NotNull WebSession session,
         @NotNull @WebObjectId String projectId) throws DBWebException;
+
+    @WebAction(requirePermissions = {RMConstants.PERMISSION_RM_ADMIN})
+    List<AdminPermissionInfo> listProjectPermissions() throws DBWebException;
+
+    @WebProjectAction(
+        requireProjectPermissions = RMConstants.PERMISSION_PROJECT_ADMIN
+    )
+    boolean setProjectPermissions(
+        @NotNull WebSession webSession,
+        @NotNull @WebObjectId String projectId,
+        @NotNull RMSubjectProjectPermissions projectPermissions
+    ) throws DBWebException;
+
+    @WebProjectAction(
+        requireProjectPermissions = RMConstants.PERMISSION_PROJECT_ADMIN
+    )
+    List<SMObjectPermissionsGrant> listProjectGrantedPermissions(
+        @NotNull WebSession webSession,
+        @NotNull @WebObjectId String projectId
+    ) throws DBWebException;
+
+    @WebAction(requirePermissions = {RMConstants.PERMISSION_RM_ADMIN})
+    List<SMObjectPermissionsGrant> listSubjectProjectsPermissionGrants(
+        @NotNull WebSession webSession,
+        @NotNull String subjectId
+    ) throws DBWebException;
 }

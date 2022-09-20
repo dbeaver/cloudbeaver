@@ -125,12 +125,12 @@ implements IInitializableController, IDestructibleController, IConnectionControl
 
     await this.projectsService.load();
 
-    if (!this.projectsService.activeProject) {
-      this.notificationService.logError({ title: 'core_projects_project_not' });
+    if (!this.projectsService.defaultProject) {
+      this.notificationService.logError({ title: 'core_projects_no_default_project' });
       return;
     }
 
-    const projectId = this.projectsService.activeProject.id;
+    const projectId = this.projectsService.defaultProject.id;
     this.isConnecting = true;
     this.clearError();
     try {

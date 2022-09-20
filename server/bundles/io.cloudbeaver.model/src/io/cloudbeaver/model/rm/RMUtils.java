@@ -49,7 +49,7 @@ public class RMUtils {
         RMProject project = new RMProject("anonymous");
         project.setId("anonymous");
         project.setType(RMProject.Type.USER);
-        project.setProjectPermissions(RMProjectPermission.CONNECTIONS_EDIT.getAllPermissions());
+        project.setProjectPermissions(RMProjectPermission.DATA_SOURCES_EDIT.getAllPermissions());
         return project;
     }
 }

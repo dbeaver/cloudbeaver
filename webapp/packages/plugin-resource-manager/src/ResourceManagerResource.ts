@@ -28,6 +28,12 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
     return parts.slice(0, parts.length - 1).join('/');
   }
 
+  hasResource(key: IResourceManagerParams, resourcePath: string): boolean {
+    const resources = this.get(key);
+
+    return resources?.some(resource => resource.name === resourcePath) === true;
+  }
+
   getResource(key: IResourceManagerParams, resourcePath: string): RmResourceInfo | undefined {
     const resources = this.get(key);
 

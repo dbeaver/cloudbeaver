@@ -28,4 +28,8 @@ describe('Is array equals', () => {
   test('should return "false" when arrays length is different and the second array is larger', () => {
     expect(isArraysEqual([1, true], [1, true, '1'])).toBe(false);
   });
+
+  test('should use isEqual argument if passed', () => {
+    expect(isArraysEqual([{ a:1 }], [{ a: 1 }], (a, b) => a.a === b.a)).toBe(true);
+  });
 });
