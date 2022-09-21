@@ -2242,7 +2242,11 @@ export type AllNavigatorSettingsFragment = { showSystemObjects: boolean, showUti
 
 export type AsyncTaskInfoFragment = { id: string, name?: string, running: boolean, status?: string, taskResult?: any, error?: { message?: string, errorCode?: string, errorType?: string, stackTrace?: string } };
 
+export type AuthProviderConfigurationInfoFragment = { id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string };
+
 export type AuthProviderConfigurationParametersFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number };
+
+export type AuthProviderInfoFragment = { id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> };
 
 export type AuthTokenFragment = { authProvider: string, authConfiguration?: string, loginTime: any, message?: string, origin: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> } };
 
@@ -2792,6 +2796,46 @@ export const AuthProviderConfigurationParametersFragmentDoc = `
   order
 }
     `;
+export const AuthProviderConfigurationInfoFragmentDoc = `
+    fragment AuthProviderConfigurationInfo on AuthProviderConfiguration {
+  id
+  displayName
+  iconURL
+  description
+  signInLink
+  signOutLink
+  metadataLink
+}
+    `;
+export const AuthProviderInfoFragmentDoc = `
+    fragment AuthProviderInfo on AuthProviderInfo {
+  id
+  label
+  icon
+  description
+  defaultProvider
+  configurable
+  configurations {
+    ...AuthProviderConfigurationInfo
+  }
+  credentialProfiles {
+    id
+    label
+    description
+    credentialParameters {
+      id
+      displayName
+      description
+      admin
+      user
+      identifying
+      possibleValues
+      encryption
+    }
+  }
+  requiredFeatures
+}
+    ${AuthProviderConfigurationInfoFragmentDoc}`;
 export const AuthTokenFragmentDoc = `
     fragment AuthToken on UserAuthToken {
   authProvider
@@ -3163,40 +3207,10 @@ export const GetAuthProviderConfigurationsDocument = `
 export const GetAuthProvidersDocument = `
     query getAuthProviders {
   providers: authProviders {
-    id
-    label
-    icon
-    description
-    defaultProvider
-    configurable
-    configurations {
-      id
-      displayName
-      iconURL
-      description
-      signInLink
-      signOutLink
-      metadataLink
-    }
-    credentialProfiles {
-      id
-      label
-      description
-      credentialParameters {
-        id
-        displayName
-        description
-        admin
-        user
-        identifying
-        possibleValues
-        encryption
-      }
-    }
-    requiredFeatures
+    ...AuthProviderInfo
   }
 }
-    `;
+    ${AuthProviderInfoFragmentDoc}`;
 export const GetAuthStatusDocument = `
     query getAuthStatus($authId: ID!, $linkUser: Boolean, $customIncludeOriginDetails: Boolean!) {
   authInfo: authUpdateStatus(authId: $authId, linkUser: $linkUser) {
