@@ -16,7 +16,10 @@
  */
 package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.*;
+import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.DataSourceFilter;
+import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -169,13 +172,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return application;
     }
 
-    @Override
-    public boolean isApplicationSession() {
-        return false;
-    }
-
     @NotNull
-    @Override
     public DBPProject getSingletonProject() {
         return defaultProject;
     }
@@ -335,7 +332,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
             RMProject[] rmProjects =  controller.listAccessibleProjects();
             for (RMProject project : rmProjects) {
                 VirtualProjectImpl virtualProject = createVirtualProject(project);
-                if (!virtualProject.getRmProject().getProjectPermissions().contains(RMProjectPermission.CONNECTIONS_EDIT.getPermissionId())) {
+                if (!virtualProject.getRmProject().getProjectPermissions().contains(RMProjectPermission.DATA_SOURCES_EDIT.getPermissionId())) {
                     // Projects for which user don't have edit permission can't be saved. So mark the as in memory
                     virtualProject.setInMemory(true);
                 }
@@ -352,7 +349,9 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     public VirtualProjectImpl createVirtualProject(RMProject project) {
         // Do not filter data sources from user project
-        DataSourceFilter filter = project.getType() == RMProject.Type.USER ? x -> true : this::isDataSourceAccessible;
+        DataSourceFilter filter = project.getType() == RMProject.Type.GLOBAL
+            ? this::isDataSourceAccessible
+            : x -> true;
         VirtualProjectImpl sessionProject = application.createProjectImpl(
             project,
             sessionAuthContext,

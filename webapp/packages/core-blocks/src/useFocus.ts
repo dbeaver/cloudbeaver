@@ -22,6 +22,7 @@ interface FocusOptions {
 interface IState<T extends HTMLElement> {
   focus: boolean;
   reference: T | null;
+  lastFocus: HTMLElement | null;
   setRef: (ref: T | null) => void;
   updateFocus: () => void;
   focusFirstChild: () => void;
@@ -38,6 +39,7 @@ export function useFocus<T extends HTMLElement>({
     () => ({
       reference: null,
       focus: false,
+      lastFocus: null,
       setRef(ref: T | null) {
         if (this.reference !== ref) {
           this.reference = ref;
@@ -47,6 +49,13 @@ export function useFocus<T extends HTMLElement>({
       },
       updateFocus() {
         if (this.reference) {
+          if (
+            document.activeElement instanceof HTMLElement
+              && document.activeElement !== this.reference
+          ) {
+            this.lastFocus = document.activeElement;
+          }
+
           if (optionsRef.autofocus) {
             this.reference.focus();
           }
@@ -83,6 +92,7 @@ export function useFocus<T extends HTMLElement>({
     }),
     {
       focus: observable.ref,
+      lastFocus: observable.ref,
       reference: observable.ref,
       setRef: action.bound,
       updateFocus: action.bound,
@@ -123,6 +133,10 @@ export function useFocus<T extends HTMLElement>({
       reference.removeEventListener('focusout', blurHandler);
     };
   }, [state.reference]);
+
+  useEffect(() => () => {
+    state.lastFocus?.focus();
+  }, []);
 
   return [state.setRef, state];
 }

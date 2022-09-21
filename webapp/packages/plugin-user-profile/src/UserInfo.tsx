@@ -18,23 +18,28 @@ import { useStyles } from '@cloudbeaver/core-theming';
 import { UserProfileService } from './UserProfileService';
 
 const styles = css`
+  user {
+    composes: theme-ripple from global;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    cursor: pointer;
+  }
+  IconOrImage {
+    display: block;
+    width: 24px;
+  }
+  user-name {
+    display: block;
+    line-height: initial;
+    margin-left: 8px;
+  }
+  @media only screen and (max-width: 1200px) {
     user {
-      composes: theme-ripple from global;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      cursor: pointer;
+      padding: 0 8px;
     }
-    IconOrImage {
-      display: block;
-      width: 24px;
-    }
-    user-name {
-      display: block;
-      line-height: initial;
-      margin-left: 8px;
-    }
+  }
 `;
 
 interface Props {

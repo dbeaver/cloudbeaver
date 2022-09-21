@@ -13,6 +13,8 @@ import { injectable } from '@cloudbeaver/core-di';
 import { SharedProjectsResource } from '@cloudbeaver/core-resource-manager';
 import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList } from '@cloudbeaver/core-sdk';
 
+import { PROJECT_GLOBAL_ID } from './PROJECT_GLOBAL_ID';
+
 export type ProjectInfo = SchemaProjectInfo;
 
 @injectable()
@@ -33,6 +35,10 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
     });
   }
 
+  getUserProject(userId: string): ProjectInfo | undefined {
+    return this.get(`u_${userId}`);
+  }
+
   protected async loader(key: ResourceKey<string>): Promise<Map<string, ProjectInfo>> {
     const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
 
@@ -48,4 +54,20 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
 
     return this.data;
   }
+}
+
+export function projectInfoSortByName(a: ProjectInfo, b: ProjectInfo) {
+  if (a.id === b.id) {
+    return 0;
+  }
+
+  if (a.id === PROJECT_GLOBAL_ID) {
+    return -1;
+  }
+
+  if (a.shared !== b.shared) {
+    return +a.shared + +b.shared;
+  }
+
+  return a.name.localeCompare(b.name);
 }

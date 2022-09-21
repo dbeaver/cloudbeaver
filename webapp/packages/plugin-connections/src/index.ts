@@ -2,7 +2,6 @@ import { connectionPlugin } from './manifest';
 export * from './ConnectionAuthentication/IConnectionAuthenticationConfig';
 export * from './ConnectionAuthentication/ConnectionAuthenticationForm';
 export * from './ConnectionForm/Options/ConnectionOptionsTabService';
-export * from './ConnectionForm/Options/ProjectSelect';
 export * from './ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService';
 export * from './ConnectionForm/SSH/ConnectionSSHTabService';
 export * from './ConnectionForm/OriginInfo/ConnectionOriginInfoTabService';

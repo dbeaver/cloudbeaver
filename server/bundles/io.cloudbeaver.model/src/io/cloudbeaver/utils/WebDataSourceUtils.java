@@ -26,6 +26,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -76,10 +77,11 @@ public class WebDataSourceUtils {
 
     @NotNull
     public static DBPDataSourceRegistry getGlobalDataSourceRegistry() throws DBWebException {
-        DBPDataSourceRegistry registry = DBWorkbench.getPlatform().getWorkspace().getDefaultDataSourceRegistry();
-        if (registry == null) {
-            throw new DBWebException("No activate data source registry");
+        DBPProject activeProject = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
+        if (activeProject != null) {
+            return activeProject.getDataSourceRegistry();
         }
-        return registry;
+
+        throw new DBWebException("No activate data source registry");
     }
 }

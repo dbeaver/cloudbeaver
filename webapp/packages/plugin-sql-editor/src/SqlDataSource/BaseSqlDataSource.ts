@@ -20,7 +20,9 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   abstract get executionContext(): IConnectionExecutionContextInfo | undefined;
   exception?: Error | Error[] | null | undefined;
   message?: string;
-  features: ESqlDataSourceFeatures[];
+  get features(): ESqlDataSourceFeatures[] {
+    return [];
+  }
   readonly onSetScript: ISyncExecutor<string>;
 
   protected outdated: boolean;
@@ -29,7 +31,6 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     this.message = undefined;
     this.outdated = true;
     this.onSetScript = new SyncExecutor();
-    this.features = [];
 
     makeObservable<this, 'outdated'>(this, {
       exception: observable.ref,

@@ -115,19 +115,25 @@ export class SqlEditorTabService extends Bootstrap {
       source,
     );
 
-    this.sqlDataSourceService.create(handlerState, dataSourceKey, { name, script });
+    const datasource = this.sqlDataSourceService.create(handlerState, dataSourceKey, { name, script });
 
     return {
       id: editorId,
+      projectId: datasource.executionContext?.projectId ?? null,
       handlerId: sqlEditorTabHandlerKey,
       handlerState,
     };
   }
 
-  resetConnectionInfo(state: ISqlEditorTabState): void {
-    const dataSource = this.sqlDataSourceService.get(state.editorId);
+  attachToProject(tab: ITab<ISqlEditorTabState>, projectId: string | null): void {
+    tab.projectId = projectId;
+  }
+
+  resetConnectionInfo(tab: ITab<ISqlEditorTabState>): void {
+    const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
 
     dataSource?.setExecutionContext(undefined);
+    this.attachToProject(tab, null);
   }
 
   private async handleConnectionDelete(key: ResourceKey<IConnectionInfoParams>) {
@@ -149,7 +155,7 @@ export class SqlEditorTabService extends Bootstrap {
         );
 
         if (this.connectionInfoResource.includes(key, contextConnection)) {
-          this.resetConnectionInfo(tab.handlerState);
+          this.resetConnectionInfo(tab);
         }
       }
     }
@@ -221,11 +227,12 @@ export class SqlEditorTabService extends Bootstrap {
           );
 
           if (!this.connectionInfoResource.has(contextConnection)) {
-            this.resetConnectionInfo(tab.handlerState);
+            this.resetConnectionInfo(tab);
           }
         }
       } else {
         dataSource.setExecutionContext({ ...executionContext.context });
+        this.attachToProject(tab, executionContext.context.projectId);
       }
     }
   }
@@ -252,7 +259,7 @@ export class SqlEditorTabService extends Bootstrap {
           ResourceKeyUtils.includes(key, dataSource.executionContext!.id)
           && !this.connectionInfoResource.has(contextConnection)
         ) {
-          this.resetConnectionInfo(tab.handlerState);
+          this.resetConnectionInfo(tab);
         }
       }
     }
@@ -296,7 +303,7 @@ export class SqlEditorTabService extends Bootstrap {
       );
 
       if (!this.connectionInfoResource.has(contextConnection)) {
-        this.resetConnectionInfo(tab.handlerState);
+        this.resetConnectionInfo(tab);
       }
     }
 
@@ -342,7 +349,13 @@ export class SqlEditorTabService extends Bootstrap {
     catalogId?: string,
     schemaId?: string
   ) {
-    return await this.sqlEditorService.setConnection(tab.handlerState, connectionKey, catalogId, schemaId);
+    const state = await this.sqlEditorService.setConnection(tab.handlerState, connectionKey, catalogId, schemaId);
+
+    if (state) {
+      this.attachToProject(tab, connectionKey.projectId);
+    }
+
+    return state;
   }
 
   private async setObjectCatalogId(containerId: string, tab: ITab<ISqlEditorTabState>) {

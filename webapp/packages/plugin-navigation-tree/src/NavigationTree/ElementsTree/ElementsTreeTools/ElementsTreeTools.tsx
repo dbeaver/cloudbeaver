@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { IconButton, useMapResource } from '@cloudbeaver/core-blocks';
+import { IconButton, PlaceholderElement, useMapResource } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
@@ -21,6 +21,7 @@ import type { IElementsTree } from '../useElementsTree';
 import { ElementsTreeFilter } from './ElementsTreeFilter';
 import { ElementsTreeToolsMenu } from './ElementsTreeToolsMenu';
 import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT';
+import type { IElementsTreeSettingsProps } from './NavigationTreeSettings/ElementsTreeSettingsService';
 import { NavigationTreeSettings } from './NavigationTreeSettings/NavigationTreeSettings';
 
 const toolsStyles = css`
@@ -73,11 +74,13 @@ const toolsStyles = css`
 
 interface Props {
   tree: IElementsTree;
+  settingsElements?: PlaceholderElement<IElementsTreeSettingsProps>[];
   style?: ComponentStyle;
 }
 
 export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(function ElementsTreeTools({
   tree,
+  settingsElements,
   style,
   children,
 }) {
@@ -120,7 +123,7 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
         />
       </actions>
       {tree.settings && opened && (
-        <NavigationTreeSettings root={tree.baseRoot} settings={tree.settings} style={style} />
+        <NavigationTreeSettings tree={tree} elements={settingsElements} style={style} />
       )}
       <ElementsTreeFilter tree={tree} style={style} />
       {children}

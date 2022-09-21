@@ -33,13 +33,20 @@ import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.impl.app.LocalSecretController;
+import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.dbeaver.utils.RuntimeUtils;
+import org.jkiss.utils.CommonUtils;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -133,8 +140,13 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     @Override
+    public DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
+        return new LocalSecretController("user/" + credentialsProvider.getActiveUserCredentials().getUserId());
+    }
+
+    @Override
     public RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider, @NotNull SMController smController) {
-        return  LocalResourceController.builder(credentialsProvider, smController).build();
+        return LocalResourceController.builder(credentialsProvider, smController).build();
 
     }
 
@@ -175,4 +187,15 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     protected abstract void startServer() throws DBException;
+
+    @Override
+    public String getApplicationInstanceId() throws DBException {
+        try {
+            byte[] macAddress = RuntimeUtils.getLocalMacAddress();
+            String appId = ApplicationRegistry.getInstance().getApplication().getId();
+            return appId + "_" + CommonUtils.toHexString(macAddress) + getServerPort();
+        } catch (Exception e) {
+            throw new DBException("Error during generation instance id generation", e);
+        }
+    }
 }

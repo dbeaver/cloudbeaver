@@ -29,13 +29,16 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
     return this.state.executionContext;
   }
 
+  get features(): ESqlDataSourceFeatures[] {
+    return [ESqlDataSourceFeatures.setName];
+  }
+
   private readonly state: ILocalStorageSqlDataSourceState;
 
   constructor(state: ILocalStorageSqlDataSourceState) {
     super();
     this.state = state;
     this.outdated = false;
-    this.features = [ESqlDataSourceFeatures.setName];
 
     makeObservable(this, {
       script: computed,

@@ -43,13 +43,13 @@ export class CustomConnectionController implements IInitializableController {
   onDriverSelect = async (driverId: string) => {
     await this.projectsService.load();
 
-    if (!this.projectsService.activeProject) {
-      this.notificationService.logError({ title: 'core_projects_project_not' });
+    if (!this.projectsService.defaultProject) {
+      this.notificationService.logError({ title: 'core_projects_no_default_project' });
       return;
     }
 
     const state = await this.publicConnectionFormService.open(
-      this.projectsService.activeProject.id,
+      this.projectsService.defaultProject.id,
       { driverId },
       this.drivers.map(driver => driver.id)
     );

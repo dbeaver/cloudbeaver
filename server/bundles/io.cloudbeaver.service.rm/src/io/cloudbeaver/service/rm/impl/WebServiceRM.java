@@ -17,9 +17,11 @@
 package io.cloudbeaver.service.rm.impl;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.WebProjectInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.admin.AdminPermissionInfo;
 import io.cloudbeaver.service.rm.DBWServiceRM;
+import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
+import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -27,8 +29,12 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
+import org.jkiss.dbeaver.model.security.*;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Web service implementation
@@ -145,6 +151,61 @@ public class WebServiceRM implements DBWServiceRM {
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error deleting project", e);
+        }
+    }
+
+    @Override
+    public List<AdminPermissionInfo> listProjectPermissions() throws DBWebException {
+        try {
+            return SMUtils.findPermissions(SMConstants.PROJECT_PERMISSION_SCOPE);
+        } catch (Exception e) {
+            throw new DBWebException("Error reading project permissions", e);
+        }
+    }
+
+    @Override
+    public boolean setProjectPermissions(@NotNull WebSession webSession,
+                                         @NotNull String projectId,
+                                         @NotNull RMSubjectProjectPermissions projectPermissions
+    ) throws DBWebException {
+        try {
+            SMController sm = webSession.getSecurityController();
+            //TODO one 'setObjectPermissions' call
+            sm.deleteAllObjectPermissions(projectId, SMObjects.PROJECT);
+            for (Map.Entry<String, Set<String>> entry : projectPermissions.getSubjectPermissions().entrySet()) {
+                String subjectId = entry.getKey();
+                Set<String> permissions = entry.getValue();
+                sm.setObjectPermissions(
+                    Set.of(projectId),
+                    SMObjects.PROJECT,
+                    Set.of(subjectId),
+                    permissions,
+                    webSession.getUserId()
+                );
+            }
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error granting project permissions", e);
+        }
+    }
+
+    @Override
+    public List<SMObjectPermissionsGrant> listProjectGrantedPermissions(@NotNull WebSession webSession, @NotNull String projectId) throws DBWebException {
+        SMController sm = webSession.getSecurityController();
+        try {
+            return sm.getObjectPermissionGrants(projectId, SMObjects.PROJECT);
+        } catch (DBException e) {
+            throw new DBWebException("Error reading project permission grants", e);
+        }
+    }
+
+    @Override
+    public List<SMObjectPermissionsGrant> listSubjectProjectsPermissionGrants(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException {
+        try {
+            SMAdminController sm = webSession.getAdminSecurityController();
+            return sm.getSubjectObjectPermissionGrants(subjectId, SMObjects.PROJECT);
+        } catch (DBException e) {
+            throw new DBWebException("Error reading project permission grants", e);
         }
     }
 

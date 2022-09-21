@@ -47,7 +47,7 @@ export class ConnectionAuthService extends Dependency {
       if (!this.connectionsManagerService.hasAnyConnection()) {
         return;
       }
-      connectionKey = this.connectionInfoResource.keys[0];
+      connectionKey = createConnectionParam(this.connectionsManagerService.projectConnections[0]);
     }
 
     try {

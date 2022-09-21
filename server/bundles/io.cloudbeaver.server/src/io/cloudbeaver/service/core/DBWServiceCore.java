@@ -111,32 +111,32 @@ public interface DBWServiceCore extends DBWService {
         @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
         @Nullable Boolean saveCredentials) throws DBWebException;
 
-    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionInfo createConnection(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
         @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
 
-    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionInfo updateConnection(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
         @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
 
-    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     boolean deleteConnection(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
         @NotNull String connectionId) throws DBWebException;
 
-    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionInfo createConnectionFromTemplate(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
         @NotNull String templateId,
         @Nullable String connectionName) throws DBWebException;
 
-    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionInfo copyConnectionFromNode(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
@@ -162,14 +162,14 @@ public interface DBWServiceCore extends DBWService {
     ///////////////////////////////////////////
     // Folders
 
-    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionFolderInfo createConnectionFolder(
         @NotNull WebSession session,
         @Nullable @WebObjectId String projectId,
         @NotNull String parentNodePath,
         @NotNull String newName) throws DBWebException;
 
-    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionFolderInfo renameConnectionFolder(
         @NotNull WebSession session,
         @Nullable @WebObjectId
@@ -177,7 +177,7 @@ public interface DBWServiceCore extends DBWService {
         @NotNull String folderPath,
         @NotNull String newName) throws DBWebException;
 
-    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_CONNECTIONS_EDIT})
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     boolean deleteConnectionFolder(
         @NotNull WebSession session,
         @Nullable @WebObjectId String projectId,
