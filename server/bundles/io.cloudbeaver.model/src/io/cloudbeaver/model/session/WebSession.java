@@ -86,8 +86,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     private static final Log log = Log.getLog(WebSession.class);
 
     public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("CloudBeaver");
-    public static final SMObjectType CB_DATASOURCE_OBJECT = new SMObjectType("datasource");
-
+    private static final String WEB_SESSION_AUTH_CONTEXT_TYPE = "web-session";
     private static final String ATTR_LOCALE = "locale";
 
     private static final AtomicInteger TASK_ID = new AtomicInteger();
@@ -873,8 +872,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    public boolean hasContextCredentials() {
-        return getAdapter(DBACredentialsProvider.class) != null;
+    public List<DBACredentialsProvider> getContextCredentialsProviders() {
+        return getAdapters(DBACredentialsProvider.class);
     }
 
     // Auth credentials provider
@@ -883,13 +882,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     public boolean provideAuthParameters(@NotNull DBRProgressMonitor monitor, @NotNull DBPDataSourceContainer dataSourceContainer, @NotNull DBPConnectionConfiguration configuration) {
         try {
             // Properties from nested auth sessions
-            // FIXME: we need to support multiple credential providers (e.g. multiple clouds).
-            DBACredentialsProvider nestedProvider = getAdapter(DBACredentialsProvider.class);
-            if (nestedProvider != null) {
-                if (!nestedProvider.provideAuthParameters(monitor, dataSourceContainer, configuration)) {
-                    return false;
-                }
+            for (DBACredentialsProvider contextCredentialsProvider : getContextCredentialsProviders()) {
+                contextCredentialsProvider.provideAuthParameters(monitor, dataSourceContainer, configuration);
             }
+
             WebConnectionInfo webConnectionInfo = findWebConnectionInfo(dataSourceContainer.getId());
             if (webConnectionInfo != null) {
                 WebDataSourceUtils.saveCredentialsInDataSource(webConnectionInfo, dataSourceContainer, configuration);
@@ -927,19 +923,42 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return true;
     }
 
+    @NotNull
+    @Override
+    public String getAuthContextType() {
+        return WEB_SESSION_AUTH_CONTEXT_TYPE;
+    }
+
     // May be called to extract auth information from session
     @Override
     public <T> T getAdapter(Class<T> adapter) {
         synchronized (authTokens) {
             for (WebAuthInfo authInfo : authTokens) {
-                if (authInfo != null && authInfo.getAuthSession() != null) {
-                    if (adapter.isInstance(authInfo.getAuthSession())) {
-                        return adapter.cast(authInfo.getAuthSession());
-                    }
+                if (isAuthInfoInstanceOf(authInfo, adapter)) {
+                    return adapter.cast(authInfo.getAuthSession());
                 }
             }
         }
         return null;
+    }
+
+    @NotNull
+    public <T> List<T> getAdapters(Class<T> adapter) {
+        synchronized (authTokens) {
+            return authTokens.stream()
+                .filter(token -> isAuthInfoInstanceOf(token, adapter))
+                .map(token -> adapter.cast(token.getAuthSession()))
+                .collect(Collectors.toList());
+        }
+    }
+
+    private <T> boolean isAuthInfoInstanceOf(WebAuthInfo authInfo, Class<T> adapter) {
+        if (authInfo != null && authInfo.getAuthSession() != null) {
+            if (adapter.isInstance(authInfo.getAuthSession())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     ///////////////////////////////////////////////////////
