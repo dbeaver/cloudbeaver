@@ -21,8 +21,11 @@ export class TemplateConnectionsService {
     ) {
       return this.templateConnectionsResource.data
         .filter(
-          connection => this.projectsService.activeProjects.some(
-            project => project.id === connection.projectId || project.id === PROJECT_GLOBAL_ID
+          connection => (
+            connection.projectId === PROJECT_GLOBAL_ID
+            || this.projectsService.activeProjects.some(
+              project => project.id === connection.projectId
+            )
           )
         );
     }
