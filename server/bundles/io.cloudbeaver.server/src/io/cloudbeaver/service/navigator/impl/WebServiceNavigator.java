@@ -29,6 +29,7 @@ import io.cloudbeaver.service.navigator.DBWServiceNavigator;
 import io.cloudbeaver.service.navigator.WebCatalog;
 import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import io.cloudbeaver.service.navigator.WebStructContainers;
+import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -432,7 +433,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
     private void checkProjectEditAccess(DBNNode node, WebSession session) throws DBException {
         var project = session.getProjectById(node.getOwnerProject().getId());
-        if (project == null || !hasNodeEditPermission(node, project.getRmProject())
+        if (project == null || !hasNodeEditPermission(node, project.getRmProject()) || !SMUtils.isRMAdmin(session)
         ) {
             throw new DBException("Access denied");
         }
