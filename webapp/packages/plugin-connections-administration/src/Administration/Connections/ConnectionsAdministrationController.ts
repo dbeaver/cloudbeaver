@@ -13,7 +13,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 @injectable()
@@ -33,7 +33,7 @@ export class ConnectionsAdministrationController {
   get connectionsData(): [IConnectionInfoParams, DatabaseConnection][] {
     return Array.from(this.connectionInfoResource.data.entries())
       .slice()
-      .filter(([key]) => key.projectId === PROJECT_GLOBAL_ID) // TODO: rework?
+      .filter(([key]) => this.projectInfoResource.get(key.projectId)?.shared) // TODO: rework?
       .sort(([, connectionA], [, connectionB]) => compareConnectionsInfo(
         connectionA,
         connectionB
@@ -49,6 +49,7 @@ export class ConnectionsAdministrationController {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly localizationService: LocalizationService,
+    private readonly projectInfoResource: ProjectInfoResource
   ) {
     makeObservable(this, {
       isProcessing: observable,

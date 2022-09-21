@@ -26,7 +26,7 @@ export class ConnectionAccessTabService extends Bootstrap {
     private readonly connectionFormService: ConnectionFormService,
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly permissionsResource: PermissionsService
+    private readonly permissionsResource: PermissionsService,
   ) {
     super();
     this.key = 'access';
@@ -39,8 +39,10 @@ export class ConnectionAccessTabService extends Bootstrap {
       title: 'connections_connection_edit_access',
       order: 4,
       stateGetter: context => this.stateGetter(context),
-      isHidden: (_, context) => context?.state.projectId !== PROJECT_GLOBAL_ID
-        || !this.permissionsResource.has(EAdminPermission.admin),
+      isHidden: (_, context) => (
+        context?.state.projectId !== PROJECT_GLOBAL_ID
+        || !this.permissionsResource.has(EAdminPermission.admin)
+      ),
       isDisabled: (tabId, props) => !props?.state.config.driverId
         || this.administrationScreenService.isConfigurationMode,
       panel: () => ConnectionAccess,
@@ -71,7 +73,7 @@ export class ConnectionAccessTabService extends Bootstrap {
   ) {
     if (
       data.submitType === 'test'
-      || data.state.projectId !== PROJECT_GLOBAL_ID // TODO: must be controlled by user's project access rights
+      || data.state.projectId !== PROJECT_GLOBAL_ID
       || !this.permissionsResource.has(EAdminPermission.admin)
     ) {
       return;

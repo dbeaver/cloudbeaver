@@ -44,6 +44,7 @@ import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
 import { ConnectionFormService } from '../ConnectionFormService';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
+import { ConnectionOptionsTabService } from './ConnectionOptionsTabService';
 import { ParametersForm } from './ParametersForm';
 import { useOptions } from './useOptions';
 
@@ -75,6 +76,7 @@ const driverConfiguration: IDriverConfiguration[] = [
 export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({
   state,
 }) {
+  const connectionOptionsTabService = useService(ConnectionOptionsTabService);
   const service = useService(ConnectionFormService);
   const formRef = useRef<HTMLFormElement>(null);
   const translate = useTranslate();
@@ -162,8 +164,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
 
   const isURLConfiguration = config.configurationType === DriverConfigurationType.Url;
   const edit = state.mode === 'edit';
-  const globalProject = state.projectId === PROJECT_GLOBAL_ID;
   const originLocal = !info || isLocalConnection(info);
+  const templateAvailable = connectionOptionsTabService.isTemplateAvailable(state);
 
   const availableAuthModels = applicableAuthModels.filter(model => !!model && (
     adminPermission
@@ -319,7 +321,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 </InputField>
               )}
             </Container>
-            {adminPermission && originLocal && globalProject && (
+            {templateAvailable && (
               <FieldCheckbox
                 id={config.connectionId}
                 name="template"

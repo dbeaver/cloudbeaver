@@ -14,6 +14,7 @@ import { MainMenuService, EMainMenu } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionDialog } from './ConnectionDialog/ConnectionDialog';
 import { TemplateConnectionsResource } from './TemplateConnectionsResource';
+import { TemplateConnectionsService } from './TemplateConnectionsService';
 
 @injectable()
 export class TemplateConnectionPluginBootstrap extends Bootstrap {
@@ -22,7 +23,8 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
     private readonly templateConnectionsResource: TemplateConnectionsResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
-    private readonly permissionsService: PermissionsService
+    private readonly permissionsService: PermissionsService,
+    private readonly templateConnectionsService: TemplateConnectionsService
   ) {
     super();
   }
@@ -34,7 +36,10 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
       order: 1,
       titleGetter: this.getMenuTitle.bind(this),
       onClick: this.openConnectionsDialog.bind(this),
-      isHidden: () => !this.permissionsService.has(EPermission.public) || !this.templateConnectionsResource.data.length,
+      isHidden: () => (
+        !this.permissionsService.has(EPermission.public)
+        || !this.templateConnectionsService.projectTemplates.length
+      ),
     });
   }
 
