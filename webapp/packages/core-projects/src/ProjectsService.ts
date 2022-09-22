@@ -64,7 +64,7 @@ export class ProjectsService {
   get defaultProject(): ProjectInfo | undefined {
     let project = this.userProject;
 
-    if (!project && this.activeProjects.length > 0) {
+    if ((!project || this.activeProjectIds.length > 0) && this.activeProjects.length > 0) {
       project = this.activeProjects[0];
     }
 
