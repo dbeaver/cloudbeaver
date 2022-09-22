@@ -71,11 +71,10 @@ public class WebDatabaseAuthModel {
 
     @Property
     public WebPropertyInfo[] getProperties() throws DBWebException {
-        boolean hasContextCredentials = webSession.hasContextCredentials();
 
         DBPPropertySource credentialsSource = model.createCredentialsSource(null, null);
         return Arrays.stream(credentialsSource.getProperties())
-            .filter(p -> WebServiceUtils.isAuthPropertyApplicable(p, hasContextCredentials))
+            .filter(p -> WebServiceUtils.isAuthPropertyApplicable(p, webSession.getContextCredentialsProviders()))
             .map(p -> new WebPropertyInfo(webSession, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
     }
 
