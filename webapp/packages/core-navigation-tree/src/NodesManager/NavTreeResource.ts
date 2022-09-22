@@ -111,7 +111,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     // navNodeInfoResource.preloadResource(this);
     this.outdateResource(navNodeInfoResource);
     this.updateResource(navNodeInfoResource);
-    this.sync(this.projectInfoResource, () => CachedMapAllKey);
+    this.sync(this.projectInfoResource, () => CachedMapAllKey, () => CachedMapAllKey);
     this.sessionDataResource.outdateResource(this);
     this.userInfoResource.onUserChange.addHandler(action(() => {
       this.clear();
