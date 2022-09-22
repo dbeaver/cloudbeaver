@@ -8,12 +8,12 @@
 
 import { observer } from 'mobx-react-lite';
 import React, { useCallback } from 'react';
-import { MenuItem, MenuSeparator, MenuStateReturn } from 'reakit/Menu';
+import { MenuItem, MenuItemCheckbox, MenuSeparator, MenuStateReturn } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
-import { MenuItemElement, menuPanelStyles } from '@cloudbeaver/core-blocks';
+import { Checkbox, MenuItemElement, menuPanelStyles } from '@cloudbeaver/core-blocks';
 import { ComponentStyle, joinStyles, useStyles } from '@cloudbeaver/core-theming';
-import { IMenuItem, IMenuData, MenuSubMenuItem, MenuSeparatorItem, MenuActionItem, MenuBaseItem, MenuCustomItem } from '@cloudbeaver/core-view';
+import { IMenuItem, IMenuData, MenuSubMenuItem, MenuSeparatorItem, MenuActionItem, MenuBaseItem, MenuCustomItem, MenuCheckboxItem } from '@cloudbeaver/core-view';
 
 import { MenuActionElement } from './MenuActionElement';
 import { SubMenuElement } from './SubMenuElement';
@@ -33,10 +33,10 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
   item, modal, rtl, menuData, menu, onItemClose, style,
 }) {
   const styles = useStyles(menuPanelStyles, style);
-  const onClick = useCallback(() => {
+  const onClick = useCallback((keepMenuOpen = true) => {
     item.events?.onSelect?.();
 
-    if (!(item instanceof MenuSubMenuItem)) {
+    if (!(item instanceof MenuSubMenuItem) && keepMenuOpen) {
       onItemClose?.();
     }
   }, [item, onItemClose]);
@@ -70,7 +70,7 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
         subMenu={item}
         style={style}
         onItemClose={onItemClose}
-        onClick={onClick}
+        onClick={() => onClick()}
       />
     );
   }
@@ -88,6 +88,29 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
         style={style}
         onClick={onClick}
       />
+    );
+  }
+
+  if (item instanceof MenuCheckboxItem) {
+    return styled(styles)(
+      <MenuItemCheckbox
+        {...menu}
+        {...use({ hidden: item.hidden })}
+        id={item.id}
+        aria-label={item.label}
+        disabled={item.disabled}
+        name={item.id}
+        value={item.label}
+        checked={item.checked}
+        onClick={() => onClick(false)}
+      >
+        <MenuItemElement
+          label={item.label}
+          icon={<Checkbox checked={item.checked} mod={['primary', 'small']} style={style} ripple={false} />}
+          tooltip={item.tooltip}
+          style={style}
+        />
+      </MenuItemCheckbox>
     );
   }
 
