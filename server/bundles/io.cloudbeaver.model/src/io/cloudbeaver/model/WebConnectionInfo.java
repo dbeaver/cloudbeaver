@@ -289,14 +289,13 @@ public class WebConnectionInfo {
         }
 
         // Fill session and user provided credentials
-        boolean hasContextCredentials = session.hasContextCredentials();
         DBPConnectionConfiguration configWithAuth = new DBPConnectionConfiguration(dataSourceContainer.getConnectionConfiguration());
         session.provideAuthParameters(session.getProgressMonitor(), dataSourceContainer, configWithAuth);
 
 
         DBPPropertySource credentialsSource = authModel.createCredentialsSource(dataSourceContainer, configWithAuth);
         return Arrays.stream(credentialsSource.getProperties())
-            .filter(p -> WebCommonUtils.isAuthPropertyApplicable(p, hasContextCredentials))
+            .filter(p -> WebCommonUtils.isAuthPropertyApplicable(p, session.getContextCredentialsProviders()))
             .map(p -> new WebPropertyInfo(session, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
     }
 
