@@ -9,7 +9,7 @@
 import { AdministrationScreenService, EAdminPermission } from '@cloudbeaver/core-administration';
 import { ConnectionInfoResource, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { PermissionsService } from '@cloudbeaver/core-root';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
@@ -40,8 +40,8 @@ export class ConnectionAccessTabService extends Bootstrap {
       order: 4,
       stateGetter: context => this.stateGetter(context),
       isHidden: (_, context) => (
-        context?.state.projectId !== PROJECT_GLOBAL_ID
-        || !this.permissionsResource.has(EAdminPermission.admin)
+        !context
+        || !this.isAccessTabActive(context.state)
       ),
       isDisabled: (tabId, props) => !props?.state.config.driverId
         || this.administrationScreenService.isConfigurationMode,
@@ -49,13 +49,26 @@ export class ConnectionAccessTabService extends Bootstrap {
     });
 
     this.connectionFormService.formSubmittingTask
-      .addHandler(this.save.bind(this));
+      .addHandler(executorHandlerFilter(
+        data => this.isAccessTabActive(data.state),
+        this.save.bind(this)
+      ));
 
     this.connectionFormService.formStateTask
-      .addHandler(this.formState.bind(this));
+      .addHandler(executorHandlerFilter(
+        this.isAccessTabActive.bind(this),
+        this.formState.bind(this)
+      ));
   }
 
   load(): void { }
+
+  private isAccessTabActive(state: IConnectionFormState): boolean {
+    return (
+      state.projectId === PROJECT_GLOBAL_ID
+      && this.permissionsResource.has(EAdminPermission.admin)
+    );
+  }
 
   private stateGetter(context: IConnectionFormProps): MetadataValueGetter<string, IConnectionAccessTabState> {
     return () => ({
@@ -73,8 +86,7 @@ export class ConnectionAccessTabService extends Bootstrap {
   ) {
     if (
       data.submitType === 'test'
-      || data.state.projectId !== PROJECT_GLOBAL_ID
-      || !this.permissionsResource.has(EAdminPermission.admin)
+      || !data.state.projectId
     ) {
       return;
     }
@@ -112,9 +124,6 @@ export class ConnectionAccessTabService extends Bootstrap {
     data: IConnectionFormState,
     contexts: IExecutionContextProvider<IConnectionFormState>
   ) {
-    if (data.type === 'public') {
-      return;
-    }
     const config = contexts.getContext(connectionConfigContext);
     const state = this.connectionFormService.tabsContainer.getTabState<IConnectionAccessTabState>(
       data.partsState,

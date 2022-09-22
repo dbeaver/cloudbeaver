@@ -97,7 +97,12 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         || this.readonlyState
         || !!this.dataSource?.isOutdated()
         || !!this.dataSource?.isReadonly()
+        || !this.editing
       );
+    },
+
+    get editing(): boolean {
+      return this.dataSource?.isEditing() ?? false;
     },
 
     get isLineScriptEmpty(): boolean {
@@ -283,6 +288,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       );
     },
 
+    async switchEditing(): Promise<void> {
+      this.dataSource?.setEditing(!this.dataSource.isEditing());
+    },
+
     async executeScript(): Promise<void> {
       if (this.isDisabled || this.isScriptEmpty) {
         return;
@@ -447,6 +456,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     executeQueryNewTab: action.bound,
     showExecutionPlan: action.bound,
     executeScript: action.bound,
+    switchEditing: action.bound,
     activeSegmentMode: computed,
     dialect: computed,
     activeSegment: computed,

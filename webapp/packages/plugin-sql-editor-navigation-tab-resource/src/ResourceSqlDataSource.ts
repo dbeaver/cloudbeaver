@@ -82,6 +82,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.saved = true;
     this.loading = false;
     this.loaded = false;
+    this.editing = false;
     this.debouncedWrite = debounce(this.debouncedWrite.bind(this), VALUE_SYNC_DELAY);
 
     makeObservable<this, '_script' | 'lastAction' | 'loading' | 'loaded'>(this, {
