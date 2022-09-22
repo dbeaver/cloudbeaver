@@ -8,7 +8,7 @@
 
 import type { Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { ProjectsService, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 
 import { TemplateConnectionsResource } from './TemplateConnectionsResource';
 
@@ -19,19 +19,14 @@ export class TemplateConnectionsService {
       this.projectsService.userProject
       && this.projectsService.activeProjects.includes(this.projectsService.userProject)
     ) {
-      return this.templateConnectionsResource.data
-        .filter(
-          connection => (
-            connection.projectId === PROJECT_GLOBAL_ID
-            || this.projectsService.activeProjects.some(
-              project => project.id === connection.projectId
-            )
-          )
-        );
+      return this.templateConnectionsResource.data;
     }
 
-    return this.templateConnectionsResource.data
-      .filter(connection => this.projectsService.activeProjects.some(project => project.id === connection.projectId));
+    // return this.templateConnectionsResource.data
+    //   .filter(
+    // connection => this.projectsService.activeProjects.some(project => project.id === connection.projectId)
+    // );
+    return [];
   }
   constructor(
     private readonly templateConnectionsResource: TemplateConnectionsResource,
