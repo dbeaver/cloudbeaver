@@ -97,7 +97,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
 
     permissionsResource.require(this, EPermission.public);
-    this.sync(this.projectInfoResource, () => CachedMapAllKey);
+    this.sync(this.projectInfoResource, () => CachedMapAllKey, () => CachedMapAllKey);
 
     sessionDataResource.onDataOutdated.addHandler(() => {
       this.sessionUpdate = true;
