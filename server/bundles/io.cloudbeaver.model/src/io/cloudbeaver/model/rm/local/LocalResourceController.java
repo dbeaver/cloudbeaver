@@ -774,7 +774,7 @@ public class LocalResourceController implements RMController {
 
     public static boolean isPrivateProject(String projectId, String userId) {
         RMProjectName rmProjectName = parseProjectName(projectId);
-        return RMProject.Type.USER.getPrefix().equals(rmProjectName.getPrefix()) &&
+        return RMProjectType.USER.getPrefix().equals(rmProjectName.getPrefix()) &&
             rmProjectName.name.equals(userId);
     }
 
