@@ -39,6 +39,12 @@ public class RMUtils {
         }
     }
 
+    /**
+     * Different types of project have different location on the workspace. Method returns path to the project.
+     *
+     * @param projectId project name or other identifier
+     * @return path to the project based on the name of projects and prefixes that it contains
+     */
     @NotNull
     public static Path getProjectPathByName(@NotNull String projectId) {
         if (!projectId.contains("_") || projectId.startsWith("_")) {
