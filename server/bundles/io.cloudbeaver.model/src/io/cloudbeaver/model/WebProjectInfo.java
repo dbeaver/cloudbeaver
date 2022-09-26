@@ -81,7 +81,6 @@ public class WebProjectInfo {
     }
 
     private boolean hasDataSourcePermission(RMProjectPermission permission) {
-        return SMUtils.isRMAdmin(session)
-            || project.getRmProject().getProjectPermissions().contains(permission.getPermissionId());
+        return SMUtils.hasProjectPermission(session, project.getRmProject(), permission);
     }
 }

@@ -58,7 +58,6 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
           style={style}
         />
       </MenuItemRadio>
-
     );
   }
 
