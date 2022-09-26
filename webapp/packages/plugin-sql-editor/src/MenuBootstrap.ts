@@ -39,16 +39,24 @@ export class MenuBootstrap extends Bootstrap {
   register(): void {
     this.actionService.addHandler({
       id: 'sql-editor-actions',
-      isActionApplicable: (contexts, action) => (
-        [
-          ACTION_SQL_EDITOR_EXECUTE,
-          ACTION_SQL_EDITOR_EXECUTE_NEW,
-          ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
-          ACTION_SQL_EDITOR_FORMAT,
-          ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
-        ].includes(action)
-        && contexts.has(DATA_CONTEXT_SQL_EDITOR_DATA)
-      ),
+      isActionApplicable: (contexts, action): boolean => {
+        const sqlEditorData = contexts.tryGet(DATA_CONTEXT_SQL_EDITOR_DATA);
+
+        if (action === ACTION_SQL_EDITOR_FORMAT && sqlEditorData?.readonly) {
+          return false;
+        }
+
+        return (
+          [
+            ACTION_SQL_EDITOR_EXECUTE,
+            ACTION_SQL_EDITOR_EXECUTE_NEW,
+            ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
+            ACTION_SQL_EDITOR_FORMAT,
+            ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+          ].includes(action)
+          && sqlEditorData !== undefined
+        );
+      },
       isDisabled: (context, action) => !context.has(DATA_CONTEXT_SQL_EDITOR_DATA),
       handler: this.sqlEditorActionHandler.bind(this),
     });

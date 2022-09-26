@@ -16,9 +16,9 @@ import { DATA_CONTEXT_TAB_ID } from '@cloudbeaver/core-ui';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, RESOURCES_NODE_PATH, ResourceProjectsResource } from '@cloudbeaver/plugin-resource-manager';
+import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, RESOURCES_NODE_PATH, ResourceProjectsResource, ResourcesProjectsNavNodeService } from '@cloudbeaver/plugin-resource-manager';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
-import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+import { isSQLEditorTab, SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { isScript } from './isScript';
 import { ResourceSqlDataSource } from './ResourceSqlDataSource';
@@ -45,6 +45,8 @@ export class PluginBootstrap extends Bootstrap {
     private readonly menuService: MenuService,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
+    private readonly sqlEditorTabService: SqlEditorTabService,
+    private readonly resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
   ) {
     super();
   }
@@ -251,6 +253,9 @@ export class PluginBootstrap extends Bootstrap {
           if (previousDataSource) {
             dataSource.setExecutionContext(previousDataSource.executionContext);
           }
+
+          const project = this.resourcesProjectsNavNodeService.getProject(nodeId);
+          this.sqlEditorTabService.attachToProject(context.tab, project?.id ?? null);
         }
       }
     } catch (exception) {

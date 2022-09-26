@@ -37,6 +37,7 @@ import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -144,9 +145,23 @@ public class WebServiceCore implements DBWServiceCore {
     ) throws DBWebException {
         List<WebConnectionInfo> result = new ArrayList<>();
         if (projectId == null) {
-            projectId = WebServiceUtils.getGlobalRegistry(webSession).getProject().getId();
+            for (DBPProject project : webSession.getAccessibleProjects()) {
+                getTemplateConnectionsFromProject(webSession, project, result);
+            }
+        } else {
+            DBPProject project = webSession.getProjectById(projectId);
+            getTemplateConnectionsFromProject(webSession, project, result);
         }
-        DBPDataSourceRegistry registry = webSession.getProjectById(projectId).getDataSourceRegistry();
+        webSession.filterAccessibleConnections(result);
+        return result;
+    }
+
+    private void getTemplateConnectionsFromProject(
+        @NotNull WebSession webSession,
+        @NotNull DBPProject project,
+        List<WebConnectionInfo> result
+    ) {
+        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         for (DBPDataSourceContainer ds : registry.getDataSources()) {
             if (ds.isTemplate() &&
                 CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver()))
@@ -154,9 +169,6 @@ public class WebServiceCore implements DBWServiceCore {
                 result.add(new WebConnectionInfo(webSession, ds));
             }
         }
-        webSession.filterAccessibleConnections(result);
-
-        return result;
     }
 
     @Override

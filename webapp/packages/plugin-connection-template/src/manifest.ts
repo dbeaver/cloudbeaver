@@ -11,6 +11,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService';
 import { TemplateConnectionPluginBootstrap } from './TemplateConnectionPluginBootstrap';
 import { TemplateConnectionsResource } from './TemplateConnectionsResource';
+import { TemplateConnectionsService } from './TemplateConnectionsService';
 
 export const connectionTemplate: PluginManifest = {
   info: {
@@ -21,5 +22,6 @@ export const connectionTemplate: PluginManifest = {
     TemplateConnectionsResource,
     LocaleService,
     TemplateConnectionPluginBootstrap,
+    TemplateConnectionsService,
   ],
 };

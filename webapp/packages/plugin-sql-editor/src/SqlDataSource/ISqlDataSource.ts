@@ -21,12 +21,14 @@ export interface ISqlDataSource extends ILoadableState {
   readonly features: ESqlDataSourceFeatures[];
 
   isReadonly(): boolean;
+  isEditing(): boolean;
   isOutdated(): boolean;
   markOutdated(): void;
   markUpdated(): void;
   canRename(name: string | null): boolean;
   setName(name: string | null): void;
   setScript(script: string): void;
+  setEditing(state: boolean): void;
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void;
   load(): Promise<void> | void;
   dispose(): Promise<void> | void;

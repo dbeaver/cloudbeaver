@@ -8,6 +8,8 @@ import io.cloudbeaver.service.admin.AdminPermissionInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.rm.RMConstants;
+import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -22,6 +24,14 @@ public class SMUtils {
         return isAdmin(webSession) || webSession.hasPermission(RMConstants.PERMISSION_RM_ADMIN);
     }
 
+    public static boolean hasProjectPermission(
+        SMCredentialsProvider credentialsProvider,
+        RMProject project,
+        RMProjectPermission projectPermission
+    ) {
+        return isRMAdmin(credentialsProvider) || project.getProjectPermissions().contains(projectPermission.getPermissionId());
+    }
+
     public static List<AdminPermissionInfo> findPermissions(@NotNull String permissionsScope) {
         List<AdminPermissionInfo> permissionInfos = new ArrayList<>();
         for (WebServiceDescriptor wsd : WebServiceRegistry.getInstance().getWebServices()) {
@@ -34,4 +44,5 @@ public class SMUtils {
         permissionInfos.sort(Comparator.comparing(AdminPermissionInfo::getLabel));
         return permissionInfos;
     }
+
 }
