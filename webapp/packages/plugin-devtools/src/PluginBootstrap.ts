@@ -54,30 +54,30 @@ export class PluginBootstrap extends Bootstrap {
     });
 
 
-    this.actionService.addHandler({
-      id: 'devtools',
-      isActionApplicable: (context, action) => [
-        ACTION_DEVTOOLS,
-      ].includes(action),
-      isChecked: (context, action) => {
+    // this.actionService.addHandler({
+    //   id: 'devtools',
+    //   isActionApplicable: (context, action) => [
+    //     ACTION_DEVTOOLS,
+    //   ].includes(action),
+    //   isChecked: (context, action) => {
 
-        switch (action) {
-          case ACTION_DEVTOOLS: {
-            return this.devToolsService.isEnabled;
-          }
-        }
+    //     switch (action) {
+    //       case ACTION_DEVTOOLS: {
+    //         return this.devToolsService.isEnabled;
+    //       }
+    //     }
 
-        return false;
-      },
-      handler: (context, action) => {
-        switch (action) {
-          case ACTION_DEVTOOLS: {
-            this.devToolsService.switch();
-            break;
-          }
-        }
-      },
-    });
+    //     return false;
+    //   },
+    //   handler: (context, action) => {
+    //     switch (action) {
+    //       case ACTION_DEVTOOLS: {
+    //         this.devToolsService.switch();
+    //         break;
+    //       }
+    //     }
+    //   },
+    // });
 
     this.menuService.addCreator({
       isApplicable: context => {
