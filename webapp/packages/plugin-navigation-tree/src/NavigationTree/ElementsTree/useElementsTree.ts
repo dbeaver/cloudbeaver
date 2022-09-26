@@ -9,13 +9,13 @@
 import { action, computed, observable, runInAction } from 'mobx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { IFolderExplorerContext, ILoadableState, useExecutor, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
+import { IFolderExplorerContext, ILoadableState, useExecutor, useMapResource, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { type NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { ProjectsService } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { MetadataMap, throttle } from '@cloudbeaver/core-utils';
 
@@ -577,6 +577,12 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const loadTreeThreshold = useCallback(throttle(function refreshRoot() {
     functionsRef.loadTree(options.root);
   }, 100), []);
+
+  useMapResource(useElementsTree, ProjectInfoResource, CachedMapAllKey, {
+    onData: () => {
+      loadTreeThreshold();
+    },
+  });
 
   useExecutor({
     executor: navNodeInfoResource.onDataOutdated,

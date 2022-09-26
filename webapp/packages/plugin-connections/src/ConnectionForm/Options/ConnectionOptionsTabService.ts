@@ -8,12 +8,14 @@
 
 import { action, makeObservable, runInAction, toJS } from 'mobx';
 
+import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
+import { createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { ProjectInfoResource, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { PermissionsService } from '@cloudbeaver/core-root';
 import { CachedMapAllKey, DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { getUniqueName, isValuesEqual } from '@cloudbeaver/core-utils';
 
@@ -28,13 +30,14 @@ import { Options } from './Options';
 @injectable()
 export class ConnectionOptionsTabService extends Bootstrap {
   constructor(
-    private readonly projectsResource: ProjectInfoResource,
+    private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionFormService: ConnectionFormService,
     private readonly dbDriverResource: DBDriverResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly localizationService: LocalizationService,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
+    private readonly permissionsService: PermissionsService
   ) {
     super();
 
@@ -72,6 +75,28 @@ export class ConnectionOptionsTabService extends Bootstrap {
   }
 
   load(): void { }
+
+  isProjectShared(state: IConnectionFormState): boolean {
+    if (state.projectId === null) {
+      return false;
+    }
+
+    const project = this.projectInfoResource.get(state.projectId);
+
+    if (!project) {
+      return false;
+    }
+
+    return project.shared;
+  }
+
+  isTemplateAvailable(state: IConnectionFormState): boolean {
+    const isProjectShared = this.isProjectShared(state);
+    const adminPermission = this.permissionsService.has(EAdminPermission.admin);
+    const originLocal = !state.info || isLocalConnection(state.info);
+
+    return adminPermission && originLocal && isProjectShared;
+  }
 
   private async save(
     {
@@ -140,7 +165,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     if (state.projectId !== null && state.mode === 'create') {
-      const project = this.projectsResource.get(state.projectId);
+      const project = this.projectInfoResource.get(state.projectId);
 
       if (!project?.canEditDataSources) {
         validation.error('plugin_connections_connection_form_project_invalid');
@@ -243,7 +268,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     tempConfig.description = state.config.description;
 
-    tempConfig.template = state.projectId === PROJECT_GLOBAL_ID ? state.config.template : false;
+    tempConfig.template = this.isTemplateAvailable(state) ? state.config.template : false;
 
     tempConfig.driverId = state.config.driverId;
 

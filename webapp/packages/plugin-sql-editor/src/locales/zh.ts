@@ -10,6 +10,7 @@ export default [
   ['sql_editor_sql_execution_new_tab_button_tooltip', '在新选项卡中执行SQL语句（Ctrl + \\）（Shift + Ctrl + Enter）'],
   ['sql_editor_sql_execution_script_button_tooltip', '执行SQL脚本（Alt + X）'],
   ['sql_editor_sql_format_button_tooltip', '格式化SQL脚本（Shift + Ctrl + F）'],
+  ['sql_editor_sql_execution_script_lock_tooltip', 'Lock editor to prevent modifications'],
   ['sql_editor_sql_statistics_unavailable', '统计不可用'],
   ['sql_editor_sql_execution_queries', '查询：'],
   ['sql_editor_sql_execution_executing', '执行...'],

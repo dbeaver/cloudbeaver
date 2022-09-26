@@ -223,6 +223,14 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
                 </upload>
               </UploadArea>
             )}
+            <button
+              disabled={data.isDisabled}
+              title={translate('sql_editor_sql_execution_script_lock_tooltip')}
+              hidden={data.dataSource?.isReadonly() ?? true}
+              onClick={data.switchEditing}
+            >
+              <StaticImage icon={data.editing ? '/icons/sql_unlock_sm.svg' : '/icons/sql_lock_sm.svg'} />
+            </button>
           </tools>
         </container>
         <TabPanelList />

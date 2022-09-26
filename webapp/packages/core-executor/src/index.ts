@@ -5,6 +5,7 @@ export * from './TaskScheduler/TaskScheduler';
 export * from './ExecutionContext';
 export * from './executionExceptionContext';
 export * from './Executor';
+export * from './executorHandlerFilter';
 export * from './ExecutorHandlersCollection';
 export * from './ExecutorInterrupter';
 export * from './IExecutionContext';
