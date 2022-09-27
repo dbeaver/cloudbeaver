@@ -9,7 +9,7 @@
 import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
+import { PermissionsService } from '@cloudbeaver/core-root';
 import { MainMenuService, EMainMenu } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionSearchService } from './Search/ConnectionSearchService';
@@ -18,7 +18,6 @@ import { ConnectionSearchService } from './Search/ConnectionSearchService';
 export class SearchConnectionPluginBootstrap extends Bootstrap {
   constructor(
     private readonly mainMenuService: MainMenuService,
-    private readonly serverConfigResource: ServerConfigResource,
     private readonly projectsService: ProjectsService,
     private readonly permissionsService: PermissionsService,
     private readonly connectionSearchService: ConnectionSearchService,
