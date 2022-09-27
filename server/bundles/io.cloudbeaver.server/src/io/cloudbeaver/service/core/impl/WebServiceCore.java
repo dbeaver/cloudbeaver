@@ -358,8 +358,9 @@ public class WebServiceCore implements DBWServiceCore {
             newDataSource.setName(CommonUtils.notNull(connectionConfig.getName(), "NewConnection"));
         }
 
-        sessionRegistry.addDataSource(newDataSource);
         try {
+            sessionRegistry.addDataSource(newDataSource);
+
             sessionRegistry.checkForErrors();
         } catch (DBException e) {
             sessionRegistry.removeDataSource(newDataSource);
@@ -400,8 +401,8 @@ public class WebServiceCore implements DBWServiceCore {
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
         WebServiceUtils.saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
 
-        sessionRegistry.updateDataSource(dataSource);
         try {
+            sessionRegistry.updateDataSource(dataSource);
             sessionRegistry.checkForErrors();
         } catch (DBException e) {
             throw new DBWebException("Failed to update connection", e);
@@ -445,8 +446,9 @@ public class WebServiceCore implements DBWServiceCore {
         if (!CommonUtils.isEmpty(connectionName)) {
             newDataSource.setName(connectionName);
         }
-        projectRegistry.addDataSource(newDataSource);
         try {
+            projectRegistry.addDataSource(newDataSource);
+
             projectRegistry.checkForErrors();
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e.getCause());
@@ -626,7 +628,11 @@ public class WebServiceCore implements DBWServiceCore {
             try {
                 registry.checkForErrors();
             } catch (DBException e) {
-                registry.addDataSource(dataSourceContainer);
+                try {
+                    registry.addDataSource(dataSourceContainer);
+                } catch (DBException ex) {
+                    log.error("Error re-adding after delete attempt", e);
+                }
                 throw new DBWebException("Failed to delete connection", e);
             }
             webSession.removeConnection(connectionInfo);
