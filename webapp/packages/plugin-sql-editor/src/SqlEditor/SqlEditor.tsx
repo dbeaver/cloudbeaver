@@ -224,7 +224,6 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
               </UploadArea>
             )}
             <button
-              disabled={data.isDisabled}
               title={translate('sql_editor_sql_execution_script_lock_tooltip')}
               hidden={data.dataSource?.isReadonly() ?? true}
               onClick={data.switchEditing}
