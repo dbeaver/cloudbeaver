@@ -9,7 +9,8 @@
 import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { Button, PlaceholderComponent } from '@cloudbeaver/core-blocks';
+import { Button, getComputed, PlaceholderComponent, useMapResource } from '@cloudbeaver/core-blocks';
+import { DBDriverResource, DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
 import { useTranslate } from '@cloudbeaver/core-localization';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 
@@ -20,11 +21,23 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
   onCancel,
 }) {
   const translate = useTranslate();
+  const driverMap = useMapResource(
+    ConnectionFormBaseActions,
+    DBDriverResource,
+    state.config.driverId || null
+  );
+
+  const driver = driverMap.data;
+  const { data: authModel } = useMapResource(
+    ConnectionFormBaseActions,
+    DatabaseAuthModelsResource,
+    getComputed(() => state.config.authModelId || state.info?.authModel || driver?.defaultAuthModel || null)
+  );
   const authentication = useAuthenticationAction({
-    origin: state.info?.origin ?? { type: AUTH_PROVIDER_LOCAL_ID, displayName: 'Local' },
+    providerId: authModel?.requiredAuth ?? state.info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
   });
 
-  const authorized = authentication.type === AUTH_PROVIDER_LOCAL_ID || authentication.authorized;
+  const authorized = authentication.providerId === AUTH_PROVIDER_LOCAL_ID || authentication.authorized;
 
   return (
     <>

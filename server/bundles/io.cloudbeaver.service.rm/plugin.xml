@@ -16,7 +16,8 @@
                         description="Allow create/edit connections in the project"
                         category="data-sources" scope="project"/>
 
-<!--            <permission id="project-admin" label="Project Admin" description="Allow manage access to the project" category="general"-->
+
+            <!--            <permission id="project-admin" label="Project Admin" description="Allow manage access to the project" category="general"-->
 <!--                        scope="project"/>-->
 
 <!--            <permission id="rm-admin" label="Resource Manager Admin" description="Allow create/delete projects, manage project access"-->

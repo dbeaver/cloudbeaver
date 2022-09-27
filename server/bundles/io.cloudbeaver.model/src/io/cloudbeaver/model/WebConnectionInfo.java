@@ -359,6 +359,11 @@ public class WebConnectionInfo {
         return dataSourceContainer.getProject().getId();
     }
 
+    @Property
+    public String getRequiredAuth() {
+        return dataSourceContainer.getRequiredExternalAuth();
+    }
+
     private boolean hasProjectPermission(RMProjectPermission projectPermission) {
         DBPProject project = dataSourceContainer.getProject();
         if (!(project instanceof VirtualProjectImpl)) {

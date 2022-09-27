@@ -12,21 +12,21 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
-  AuthProviderInfo,
   CachedMapResource,
   ResourceKey,
   resourceKeyList,
   ResourceKeyUtils,
   isResourceKeyList,
   CachedMapAllKey,
-  AuthProviderConfiguration as BaseAuthProviderConfiguration,
+  AuthProviderInfoFragment,
+  AuthProviderConfigurationInfoFragment,
 } from '@cloudbeaver/core-sdk';
 
 import { AuthConfigurationsResource } from './AuthConfigurationsResource';
 import { AuthSettingsService } from './AuthSettingsService';
 
-export type AuthProvider = AuthProviderInfo;
-export type AuthProviderConfiguration = BaseAuthProviderConfiguration;
+export type AuthProvider = AuthProviderInfoFragment;
+export type AuthProviderConfiguration = AuthProviderConfigurationInfoFragment;
 
 @injectable()
 export class AuthProvidersResource extends CachedMapResource<string, AuthProvider> {

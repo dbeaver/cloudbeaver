@@ -11,11 +11,9 @@ import { computed, observable } from 'mobx';
 import { AuthProviderService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 
 interface IAuthenticationAction {
-  type: string;
-  subType?: string;
+  providerId: string;
   authorized: boolean;
   auth: () => Promise<void>;
 }
@@ -23,36 +21,22 @@ interface IAuthenticationAction {
 export type Options = {
   onAuthenticate?: () => Promise<any> | void;
   onClose?: () => Promise<void> | void;
-} & ({
-  origin: ObjectOrigin;
-} | {
-  type: string;
-  subType?: string;
-});
+  providerId: string;
+};
 
 export function useAuthenticationAction(options: Options): IAuthenticationAction {
   const authProviderService = useService(AuthProviderService);
   const userInfoService = useService(UserInfoResource);
-  let type: string;
-  let subType: string | undefined;
-
-  if ('origin' in options) {
-    type = options.origin.type;
-    subType = options.origin.subType;
-  } else {
-    type = options.type;
-    subType = options.subType;
-  }
 
   return useObservableRef(() => ({
     authenticating: false,
     get authorized() {
-      return !this.authenticating && userInfoService.hasToken(this.type, this.subType);
+      return !this.authenticating && userInfoService.hasToken(this.providerId);
     },
     async auth() {
       this.authenticating = true;
       try {
-        const result = await authProviderService.requireProvider(this.type, this.subType);
+        const result = await authProviderService.requireProvider(this.providerId);
 
         if (result) {
           await this.onAuthenticate?.();
@@ -66,9 +50,9 @@ export function useAuthenticationAction(options: Options): IAuthenticationAction
   }), {
     authorized: computed,
     authenticating: observable.ref,
+    providerId: observable.ref,
   }, {
-    type,
-    subType,
+    providerId: options.providerId,
     onAuthenticate: options.onAuthenticate,
     onClose: options.onClose,
   }, ['auth']);
