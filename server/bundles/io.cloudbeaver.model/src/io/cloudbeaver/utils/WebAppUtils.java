@@ -25,7 +25,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMAuthenticationManager;
-import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -161,6 +161,6 @@ public class WebAppUtils {
 
     public static String getGlobalProjectId() {
         String globalConfigurationName = getWebApplication().getDefaultProjectName();
-        return RMProject.Type.GLOBAL.getPrefix() + "_" + globalConfigurationName;
+        return RMProjectType.GLOBAL.getPrefix() + "_" + globalConfigurationName;
     }
 }
