@@ -329,7 +329,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         refreshAccessibleConnectionIds();
         try {
             RMController controller = application.getResourceController(this, getSecurityController());
-            RMProject[] rmProjects =  controller.listAccessibleProjects();
+            RMProject[] rmProjects = controller.listAccessibleProjects();
             for (RMProject project : rmProjects) {
                 VirtualProjectImpl virtualProject = createVirtualProject(project);
                 if (!virtualProject.getRmProject().getProjectPermissions().contains(RMProjectPermission.DATA_SOURCES_EDIT.getPermissionId())) {
@@ -993,6 +993,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         userContext.refreshSMSession();
     }
 
+    @Nullable
     public VirtualProjectImpl getProjectById(@Nullable String projectId) {
         if (projectId == null) {
             return defaultProject;
