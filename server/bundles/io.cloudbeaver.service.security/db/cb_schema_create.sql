@@ -289,7 +289,7 @@ CREATE TABLE CB_USER_SECRETS
 (
     USER_ID                        VARCHAR(128) NOT NULL,
     SECRET_ID                      VARCHAR(512) NOT NULL,
-    SECRET_VALUE                   VARCHAR(30000) NOT NULL,
+    SECRET_VALUE                   VARCHAR(65000) NOT NULL,
 
     SECRET_LABEL                   VARCHAR(128),
     SECRET_DESCRIPTION             VARCHAR(1024),
