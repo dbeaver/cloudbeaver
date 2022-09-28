@@ -10,7 +10,7 @@
 import { untracked } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { ConnectionFolder, ConnectionFolderProjectKey, ConnectionFolderResource, ConnectionInfoResource, CONNECTION_FOLDER_NAME_VALIDATION, createConnectionFolderParam, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConnectionFolder, ConnectionFolderProjectKey, ConnectionFolderResource, ConnectionInfoResource, ConnectionsManagerService, CONNECTION_FOLDER_NAME_VALIDATION, createConnectionFolderParam, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -46,11 +46,11 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly connectionFolderResource: ConnectionFolderResource,
+    private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly projectInfoResource: ProjectInfoResource,
-    private readonly projectsService: ProjectsService,
     private readonly projectsNavNodeService: ProjectsNavNodeService
   ) {
     super();
@@ -331,7 +331,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     const selected = tree.getSelected();
 
     if (selected.length === 0) {
-      const editableProjects = this.projectsService.activeProjects.filter(project => project.canEditDataSources);
+      const editableProjects = this.connectionsManagerService.createConnectionProjects;
 
       if (editableProjects.length > 0) {
         const project = editableProjects[0];

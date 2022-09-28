@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ProjectsService } from '@cloudbeaver/core-projects';
@@ -21,6 +22,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly projectsService: ProjectsService,
+    private readonly connectionsManagerService: ConnectionsManagerService
   ) {
     super();
   }
@@ -36,7 +38,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
       title: 'app_shared_connectionMenu_custom',
       isHidden: () => (
         !this.serverConfigResource.data?.supportsCustomConnections
-        || !this.projectsService.activeProjects.some(project => project.canEditDataSources)
+        || this.connectionsManagerService.createConnectionProjects.length === 0
       ),
       onClick: () => this.openConnectionsDialog(),
     });
