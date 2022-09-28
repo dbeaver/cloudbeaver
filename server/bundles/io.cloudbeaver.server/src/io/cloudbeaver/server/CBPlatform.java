@@ -47,7 +47,6 @@ import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.osgi.framework.Bundle;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -145,7 +144,7 @@ public class CBPlatform extends BasePlatformImpl {
         this.queryManager.registerMetaListener(qmLogWriter);
 
         this.certificateStorage = new DefaultCertificateStorage(
-            new File(WebPlatformActivator.getInstance().getStateLocation().toFile(), "security"));
+            WebPlatformActivator.getInstance().getStateLocation().toFile().toPath().resolve("security"));
 
         super.initialize();
 
