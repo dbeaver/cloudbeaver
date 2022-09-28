@@ -25,6 +25,7 @@ import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.model.session.WebAuthInfo;
+import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
@@ -981,4 +982,8 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         patchConfigurationWithProperties(configProps, varResolver);
     }
 
+    @NotNull
+    public WebDriverRegistry getDriverRegistry() {
+        return WebDriverRegistry.getInstance();
+    }
 }
