@@ -48,6 +48,7 @@ import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWNetworkHandler;
 import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHImplementation;
+import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
@@ -345,8 +346,11 @@ public class WebServiceCore implements DBWServiceCore {
         @Nullable String projectId,
         @NotNull WebConnectionConfig connectionConfig
     ) throws DBWebException {
-        if (!webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) &&
-            !CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()
+        var project = webSession.getProjectById(projectId);
+        var rmProject = project.getRmProject();
+        if (rmProject.getType() == RMProjectType.USER
+            && !webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)
+            && !CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()
         ) {
             throw new DBWebException("New connection create is restricted by server configuration");
         }
