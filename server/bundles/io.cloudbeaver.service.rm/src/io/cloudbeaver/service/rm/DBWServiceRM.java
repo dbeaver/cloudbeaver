@@ -20,6 +20,7 @@ import io.cloudbeaver.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
 import io.cloudbeaver.service.admin.AdminPermissionInfo;
+import io.cloudbeaver.service.rm.model.RMProjectPermissions;
 import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -114,6 +115,13 @@ public interface DBWServiceRM extends DBWService {
         @NotNull WebSession webSession,
         @NotNull @WebObjectId String projectId,
         @NotNull RMSubjectProjectPermissions projectPermissions
+    ) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean setSubjectProjectPermissions(
+        @NotNull WebSession webSession,
+        @NotNull String subjectId,
+        @NotNull RMProjectPermissions projectPermissions
     ) throws DBWebException;
 
     @WebProjectAction(

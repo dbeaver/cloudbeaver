@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.admin.AdminPermissionInfo;
 import io.cloudbeaver.service.rm.DBWServiceRM;
+import io.cloudbeaver.service.rm.model.RMProjectPermissions;
 import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
 import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.code.NotNull;
@@ -170,10 +171,34 @@ public class WebServiceRM implements DBWServiceRM {
     ) throws DBWebException {
         try {
             SMController sm = webSession.getSecurityController();
-            //TODO one 'setObjectPermissions' call
             sm.deleteAllObjectPermissions(projectId, SMObjects.PROJECT);
             for (Map.Entry<String, Set<String>> entry : projectPermissions.getSubjectPermissions().entrySet()) {
                 String subjectId = entry.getKey();
+                Set<String> permissions = entry.getValue();
+                sm.setObjectPermissions(
+                    Set.of(projectId),
+                    SMObjects.PROJECT,
+                    Set.of(subjectId),
+                    permissions,
+                    webSession.getUserId()
+                );
+            }
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error granting project permissions", e);
+        }
+    }
+
+    @Override
+    public boolean setSubjectProjectPermissions(
+        @NotNull WebSession webSession,
+        @NotNull String subjectId,
+        @NotNull RMProjectPermissions projectPermissions
+    ) throws DBWebException {
+        try {
+            SMController sm = webSession.getSecurityController();
+            for (Map.Entry<String, Set<String>> entry : projectPermissions.getProjectPermissions().entrySet()) {
+                String projectId = entry.getKey();
                 Set<String> permissions = entry.getValue();
                 sm.setObjectPermissions(
                     Set.of(projectId),
