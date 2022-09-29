@@ -645,8 +645,10 @@ public class WebServiceCore implements DBWServiceCore {
     // Projects
     @Override
     public List<WebProjectInfo> getProjects(@NotNull WebSession session) {
+        var customConnectionsEnabled = CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections();
         return session.getAccessibleProjects().stream()
-            .map(pr -> new WebProjectInfo(session, pr)).collect(Collectors.toList());
+            .map(pr -> new WebProjectInfo(session, pr, customConnectionsEnabled))
+            .collect(Collectors.toList());
     }
 
     // Folders
