@@ -61,6 +61,14 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     return grantedPermissions;
   }
 
+  async loadSubjectAccess(subjectId: string): Promise<AdminObjectGrantInfo[]> {
+    const { grantedPermissions } = await this.graphQLService.sdk.getSubjectProjectsPermissions({
+      subjectId,
+    });
+
+    return grantedPermissions;
+  }
+
   async create(config: IProjectConfig): Promise<SharedProject> {
     const { project } = await this.graphQLService.sdk.createProject({
       projectId: config.id,
