@@ -120,7 +120,9 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
   });
 
   function resolveHandler() {
-    resolveDialog({ folder: state.value, projectId: state.projectId });
+    if (state.valid) {
+      resolveDialog({ folder: state.value, projectId: state.projectId });
+    }
   }
 
   useEffect(() => {
