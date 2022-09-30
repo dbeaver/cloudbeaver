@@ -8,7 +8,7 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { compareConnectionsInfo, ConnectionInfoResource, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { compareNewConnectionsInfo, ConnectionInfoResource, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -37,7 +37,7 @@ export class ConnectionsAdministrationController {
         project => project.id === key.projectId
         && project.shared
       ))
-      .sort(([, connectionA], [, connectionB]) => compareConnectionsInfo(
+      .sort(([, connectionA], [, connectionB]) => compareNewConnectionsInfo(
         connectionA,
         connectionB
       ));

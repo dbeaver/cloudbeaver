@@ -10,7 +10,6 @@ import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { MainMenuService, EMainMenu } from '@cloudbeaver/plugin-top-app-bar';
 
 import { CustomConnectionDialog } from './CustomConnection/CustomConnectionDialog';
@@ -20,7 +19,6 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
   constructor(
     private readonly mainMenuService: MainMenuService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly serverConfigResource: ServerConfigResource,
     private readonly projectsService: ProjectsService,
     private readonly connectionsManagerService: ConnectionsManagerService
   ) {
@@ -33,12 +31,11 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     });
 
     this.mainMenuService.registerMenuItem(EMainMenu.mainMenuConnectionsPanel, {
-      id: 'сustomConnection',
+      id: 'customConnection',
       order: 2,
       title: 'app_shared_connectionMenu_custom',
       isHidden: () => (
-        !this.serverConfigResource.data?.supportsCustomConnections
-        || this.connectionsManagerService.createConnectionProjects.length === 0
+        !this.projectsService.activeProjects.some(project => project.canEditDataSources)
       ),
       onClick: () => this.openConnectionsDialog(),
     });

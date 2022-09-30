@@ -11,6 +11,7 @@ import { runInAction } from 'mobx';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { SharedProjectsResource } from '@cloudbeaver/core-resource-manager';
+import { EPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { PROJECT_GLOBAL_ID } from './PROJECT_GLOBAL_ID';
@@ -23,10 +24,12 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
     private readonly graphQLService: GraphQLService,
     private readonly sharedProjectsResource: SharedProjectsResource,
     private readonly userInfoResource: UserInfoResource,
+    sessionPermissionsResource: SessionPermissionsResource
   ) {
     super([]);
 
     this.sync(this.userInfoResource);
+    sessionPermissionsResource.require(this, EPermission.public);
     this.sharedProjectsResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
     this.sharedProjectsResource.onItemAdd.addHandler(() => this.markOutdated());
     this.sharedProjectsResource.onItemDelete.addHandler(() => this.markOutdated());
