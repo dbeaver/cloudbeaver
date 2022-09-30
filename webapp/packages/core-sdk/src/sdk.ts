@@ -403,6 +403,7 @@ export interface Mutation {
   rmDeleteResource?: Maybe<Scalars['Boolean']>;
   rmMoveResource: Scalars['String'];
   rmSetProjectPermissions: Scalars['Boolean'];
+  rmSetSubjectProjectPermissions: Scalars['Boolean'];
   rmWriteResourceStringContent: Scalars['String'];
   setConnectionNavigatorSettings: ConnectionInfo;
   setUserConfigurationParameter: Scalars['Boolean'];
@@ -596,8 +597,14 @@ export interface MutationRmMoveResourceArgs {
 
 
 export interface MutationRmSetProjectPermissionsArgs {
-  permissions: Array<RmProjectPermissions>;
+  permissions: Array<RmSubjectProjectPermissions>;
   projectId: Scalars['String'];
+}
+
+
+export interface MutationRmSetSubjectProjectPermissionsArgs {
+  permissions: Array<RmProjectPermissions>;
+  subject: Scalars['String'];
 }
 
 
@@ -1349,13 +1356,18 @@ export interface RmProject {
 
 export interface RmProjectPermissions {
   permissions: Array<Scalars['String']>;
-  subjectId: Scalars['String'];
+  projectId: Scalars['String'];
 }
 
 export interface RmResource {
   folder: Scalars['Boolean'];
   length: Scalars['Int'];
   name: Scalars['String'];
+}
+
+export interface RmSubjectProjectPermissions {
+  permissions: Array<Scalars['String']>;
+  subjectId: Scalars['String'];
 }
 
 export enum ResultDataFormat {
@@ -2576,11 +2588,19 @@ export type ReadResourceQuery = { value: string };
 
 export type SetProjectPermissionsMutationVariables = Exact<{
   projectId: Scalars['String'];
-  permissions: Array<RmProjectPermissions> | RmProjectPermissions;
+  permissions: Array<RmSubjectProjectPermissions> | RmSubjectProjectPermissions;
 }>;
 
 
 export type SetProjectPermissionsMutation = { rmSetProjectPermissions: boolean };
+
+export type SetSubjectProjectsPermissionsMutationVariables = Exact<{
+  subject: Scalars['String'];
+  permissions: Array<RmProjectPermissions> | RmProjectPermissions;
+}>;
+
+
+export type SetSubjectProjectsPermissionsMutation = { rmSetSubjectProjectPermissions: boolean };
 
 export type WriteResourceContentMutationVariables = Exact<{
   projectId: Scalars['String'];
@@ -4145,8 +4165,13 @@ export const ReadResourceDocument = `
 }
     `;
 export const SetProjectPermissionsDocument = `
-    mutation setProjectPermissions($projectId: String!, $permissions: [RMProjectPermissions!]!) {
+    mutation setProjectPermissions($projectId: String!, $permissions: [RMSubjectProjectPermissions!]!) {
   rmSetProjectPermissions(projectId: $projectId, permissions: $permissions)
+}
+    `;
+export const SetSubjectProjectsPermissionsDocument = `
+    mutation setSubjectProjectsPermissions($subject: String!, $permissions: [RMProjectPermissions!]!) {
+  rmSetSubjectProjectPermissions(subject: $subject, permissions: $permissions)
 }
     `;
 export const WriteResourceContentDocument = `
@@ -4686,6 +4711,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     setProjectPermissions(variables: SetProjectPermissionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetProjectPermissionsMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<SetProjectPermissionsMutation>(SetProjectPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setProjectPermissions', 'mutation');
+    },
+    setSubjectProjectsPermissions(variables: SetSubjectProjectsPermissionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetSubjectProjectsPermissionsMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<SetSubjectProjectsPermissionsMutation>(SetSubjectProjectsPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setSubjectProjectsPermissions', 'mutation');
     },
     writeResourceContent(variables: WriteResourceContentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<WriteResourceContentMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<WriteResourceContentMutation>(WriteResourceContentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'writeResourceContent', 'mutation');

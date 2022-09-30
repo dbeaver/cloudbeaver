@@ -27,7 +27,7 @@ export interface IRoleFormStatus {
   messages: string[];
   exception: Error | null;
   info: (message: string) => void;
-  error: (message: string, exception?: Error) => void;
+  error: (exception: Error | null, message?: string) => void;
 }
 
 @injectable()
@@ -86,8 +86,10 @@ export class RoleFormService {
     info(message: string) {
       this.messages.push(message);
     },
-    error(message: string, exception: Error | null = null) {
-      this.messages.push(message);
+    error(exception: Error | null, message?: string) {
+      if (message) {
+        this.messages.push(message);
+      }
       this.saved = false;
       this.exception = exception;
     },

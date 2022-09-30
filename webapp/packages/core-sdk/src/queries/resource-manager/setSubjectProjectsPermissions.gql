@@ -1,0 +1,9 @@
+mutation setSubjectProjectsPermissions(
+  $subject: String!
+  $permissions: [RMProjectPermissions!]!
+) {
+  rmSetSubjectProjectPermissions(
+    subject: $subject
+    permissions: $permissions
+  )
+}

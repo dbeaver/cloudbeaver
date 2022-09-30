@@ -11,13 +11,14 @@ import { runInAction } from 'mobx';
 import { AdminObjectGrantInfo, EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmProject, ResourceKeyList, RmProjectPermissions } from '@cloudbeaver/core-sdk';
+import { GraphQLService, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmProject, ResourceKeyList, RmProjectPermissions, RmSubjectProjectPermissions } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 const newSymbol = Symbol('new-project');
 
 export type SharedProject = RmProject;
-export type ProjectPermission = RmProjectPermissions;
+export type ProjectPermission = RmSubjectProjectPermissions;
+export type ProjectSubjectPermission = RmProjectPermissions;
 type SharedProjectNew = SharedProject & { [newSymbol]: boolean };
 
 interface IProjectConfig {
@@ -49,6 +50,13 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
   async setAccessSubjects(projectId: string, permissions: ProjectPermission[]): Promise<void> {
     await this.graphQLService.sdk.setProjectPermissions({
       projectId,
+      permissions,
+    });
+  }
+
+  async setSubjectProjectsAccess(subject: string, permissions: ProjectSubjectPermission[]): Promise<void> {
+    await this.graphQLService.sdk.setSubjectProjectsPermissions({
+      subject,
       permissions,
     });
   }
