@@ -34,7 +34,7 @@ interface IFolderDialogState {
   message: string | undefined;
   valid: boolean;
   payload: FolderDialogPayload;
-  validate: () => void;
+  validate: () => Promise<void>;
   setMessage: (message: string) => void;
   setProjectId: (projectId: string) => void;
 }
@@ -119,7 +119,8 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
     payload,
   });
 
-  function resolveHandler() {
+  async function resolveHandler() {
+    await state.validate();
     if (state.valid) {
       resolveDialog({ folder: state.value, projectId: state.projectId });
     }
