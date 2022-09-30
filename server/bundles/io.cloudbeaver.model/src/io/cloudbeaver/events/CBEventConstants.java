@@ -16,6 +16,9 @@
  */
 package io.cloudbeaver.events;
 
+/**
+ * CB event constants
+ */
 public interface CBEventConstants {
     String CLOUDBEAVER_CONFIG_CHANGED = "cb_config_changed";
 }

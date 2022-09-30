@@ -16,8 +16,20 @@
  */
 package io.cloudbeaver.events;
 
+import org.jkiss.code.NotNull;
+
+/**
+ * CB web event handlers
+ */
 public interface CBEventHandler {
+    /**
+     * Expected cb event type
+     */
+    @NotNull
     String getSupportedEventType();
 
-    void handleEvent(CBEvent event);
+    /**
+     * Handle associated cb event
+     */
+    void handleEvent(@NotNull CBEvent event);
 }

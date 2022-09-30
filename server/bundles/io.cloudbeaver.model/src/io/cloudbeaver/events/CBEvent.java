@@ -20,6 +20,9 @@ import org.jkiss.code.NotNull;
 
 import java.util.Map;
 
+/**
+ * CloudBeaver event
+ */
 public class CBEvent {
     @NotNull
     private final String eventType;

@@ -19,6 +19,7 @@ package io.cloudbeaver.events.registry;
 import io.cloudbeaver.events.CBEventHandler;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.jkiss.code.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,15 +37,16 @@ public class CBEventHandlersRegistry {
         return instance;
     }
 
+    @NotNull
     public List<CBEventHandler> getEventHandlers() {
         List<CBEventHandlerDescriptor> eventHandlerDescriptors = readDescriptors();
 
         return eventHandlerDescriptors.stream()
             .map(CBEventHandlerDescriptor::getInstance)
             .collect(Collectors.toList());
-
     }
 
+    @NotNull
     private List<CBEventHandlerDescriptor> readDescriptors() {
         var result = new ArrayList<CBEventHandlerDescriptor>();
         var registry = Platform.getExtensionRegistry();

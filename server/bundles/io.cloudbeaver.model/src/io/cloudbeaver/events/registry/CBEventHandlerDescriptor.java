@@ -22,6 +22,9 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.impl.AbstractDescriptor;
 
+/**
+ * CB event handler descriptor
+ */
 public class CBEventHandlerDescriptor extends AbstractDescriptor {
     private final ObjectType implType;
 

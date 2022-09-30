@@ -19,6 +19,7 @@ package io.cloudbeaver.events;
 import io.cloudbeaver.events.registry.CBEventHandlersRegistry;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
@@ -39,12 +40,18 @@ public class CBEventController {
 
     private final List<CBEvent> eventsPool = new ArrayList<>();
 
-    public void addEvent(CBEvent event) {
+    /**
+     * Add cb event to the event pool
+     */
+    public void addEvent(@NotNull CBEvent event) {
         synchronized (eventsPool) {
             eventsPool.add(event);
         }
     }
 
+    /**
+     * Add cb event to the event pool
+     */
     public void scheduleCheckJob() {
         new CBEventCheckJob().schedule();
     }
