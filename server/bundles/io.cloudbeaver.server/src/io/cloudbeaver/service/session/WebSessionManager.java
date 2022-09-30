@@ -188,4 +188,9 @@ public class WebSessionManager {
         }
     }
 
+    public Collection<WebSession> getAllActiveSessions() {
+        synchronized (sessionMap) {
+            return sessionMap.values();
+        }
+    }
 }

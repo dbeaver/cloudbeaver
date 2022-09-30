@@ -386,6 +386,11 @@ type LogEntry {
     stackTrace: String
 }
 
+type CBEvent {
+    eventType: String!
+    eventData: Object!
+}
+
 ####################################################
 # Input types
 ####################################################
@@ -503,6 +508,8 @@ extend type Query {
     listProjects: [ ProjectInfo! ]!
 
     readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]!
+
+    readSessionEvents(maxEntries: Int!): [ CBEvent! ]!
 }
 
 extend type Mutation {

@@ -15,6 +15,7 @@
         </factory>
     </extension>
 
+
     <!-- Needed to instantiate connections thru navigator model -->
     <extension point="org.jkiss.dbeaver.service">
         <service name="org.jkiss.dbeaver.runtime.DBServiceConnections" class="io.cloudbeaver.server.WebServiceConnectionsImpl"/>
@@ -22,13 +23,16 @@
 
     <extension point="io.cloudbeaver.service">
         <service id="core" label="Core service" description="Core services" class="io.cloudbeaver.service.core.WebServiceBindingCore">
-            <permission id="public" label="Public access" category="general" scope="subject" description="Provides access to the data management interface"/>
+            <permission id="public" label="Public access" category="general" scope="subject"
+                        description="Provides access to the data management interface"/>
             <permission id="access" label="Data source access" category="general" scope="datasource"/>
         </service>
-        <service id="navigator" label="Database navigator" description="Database navigator services" class="io.cloudbeaver.service.navigator.WebServiceBindingNavigator">
+        <service id="navigator" label="Database navigator" description="Database navigator services"
+                 class="io.cloudbeaver.service.navigator.WebServiceBindingNavigator">
             <premission id="navigate" label="Navigate over database metadata"/>
         </service>
-        <service id="sql" label="SQL processing" description="SQL processing and data read services" class="io.cloudbeaver.service.sql.WebServiceBindingSQL">
+        <service id="sql" label="SQL processing" description="SQL processing and data read services"
+                 class="io.cloudbeaver.service.sql.WebServiceBindingSQL">
             <premission id="data.read" label="Data read" scope="data"/>
             <premission id="data.update" label="Data update" scope="data"/>
             <premission id="data.insert" label="Data insert" scope="data"/>
@@ -42,6 +46,10 @@
     </extension>
     <extension point="io.cloudbeaver.valueSerializer">
         <serializer type="geometry" class="io.cloudbeaver.server.data.WebGeometryValueSerializer"/>
+    </extension>
+
+    <extension point="io.cloudbeaver.event.handler">
+        <eventHandler class="io.cloudbeaver.server.events.CBConfigurationChangedEventHandler"/>
     </extension>
 
 </plugin>
