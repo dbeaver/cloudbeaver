@@ -88,6 +88,6 @@ extend type Mutation {
 
     rmSetProjectPermissions(projectId: String!, permissions: [RMSubjectProjectPermissions!]!): Boolean!
 
-    rmSetSubjectProjectPermissions(subject: String!, permissions: [RMProjectPermissions!]!): Boolean!
+    rmSetSubjectProjectPermissions(subjectId: String!, permissions: [RMProjectPermissions!]!): Boolean!
 
 }
