@@ -27,6 +27,7 @@ import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.core.DBWServiceCore;
+import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
@@ -645,7 +646,9 @@ public class WebServiceCore implements DBWServiceCore {
     // Projects
     @Override
     public List<WebProjectInfo> getProjects(@NotNull WebSession session) {
-        var customConnectionsEnabled = CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections();
+        var customConnectionsEnabled =
+            CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()
+                || SMUtils.isRMAdmin(session);
         return session.getAccessibleProjects().stream()
             .map(pr -> new WebProjectInfo(session, pr, customConnectionsEnabled))
             .collect(Collectors.toList());
