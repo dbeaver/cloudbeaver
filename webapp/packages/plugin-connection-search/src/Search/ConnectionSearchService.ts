@@ -8,12 +8,12 @@
 
 import { observable, makeObservable } from 'mobx';
 
-import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
-import { ProjectInfoResource, ProjectsService, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { ConnectionFormService, ConnectionFormState, IConnectionFormState } from '@cloudbeaver/plugin-connections';
@@ -38,7 +38,8 @@ export class ConnectionSearchService {
     private readonly optionsPanelService: OptionsPanelService,
     private readonly commonDialogService: CommonDialogService,
     private readonly projectsService: ProjectsService,
-    private readonly projectInfoResource: ProjectInfoResource
+    private readonly projectInfoResource: ProjectInfoResource,
+    private readonly connectionsManagerService: ConnectionsManagerService
   ) {
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
 
@@ -147,6 +148,13 @@ export class ConnectionSearchService {
   }
 
   select(database: AdminConnectionSearchInfo): void {
+    const projects = this.connectionsManagerService.createConnectionProjects;
+
+    if (projects.length === 0) {
+      this.notificationService.logError({ title: 'core_projects_no_default_project' });
+      return;
+    }
+
     if (!this.formState) {
       this.formState = new ConnectionFormState(
         this.projectsService,
@@ -163,12 +171,15 @@ export class ConnectionSearchService {
         'create',
         'public'
       )
-      .setConfig(this.projectsService.defaultProject?.id ?? PROJECT_GLOBAL_ID, {
-        ...this.connectionInfoResource.getEmptyConfig(),
-        driverId: database.defaultDriver,
-        host: database.host,
-        port: `${database.port}`,
-      })
+      .setConfig(
+        projects[0].id,
+        {
+          ...this.connectionInfoResource.getEmptyConfig(),
+          driverId: database.defaultDriver,
+          host: database.host,
+          port: `${database.port}`,
+        }
+      )
       .setAvailableDrivers(database.possibleDrivers);
 
     this.formState.load();

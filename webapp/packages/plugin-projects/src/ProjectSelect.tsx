@@ -70,7 +70,7 @@ export const ProjectSelect = observer(function ProjectSelect({
       keySelector={project => project.id}
       valueSelector={project => project.name}
       titleSelector={project => project.description}
-      isDisabled={project => !project.canEditDataSources}
+      isDisabled={project => !filter(project)}
       readOnly={readOnly || possibleOptions.length <= 1}
       searchable={projects.length > 10}
       disabled={disabled}
