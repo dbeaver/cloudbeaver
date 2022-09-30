@@ -68,8 +68,12 @@ export function projectInfoSortByName(a: ProjectInfo, b: ProjectInfo) {
     return -1;
   }
 
+  if (b.id === PROJECT_GLOBAL_ID) {
+    return 1;
+  }
+
   if (a.shared !== b.shared) {
-    return +a.shared + +b.shared;
+    return +a.shared - +b.shared;
   }
 
   return a.name.localeCompare(b.name);

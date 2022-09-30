@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ProjectsService } from '@cloudbeaver/core-projects';
@@ -19,6 +20,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     private readonly mainMenuService: MainMenuService,
     private readonly commonDialogService: CommonDialogService,
     private readonly projectsService: ProjectsService,
+    private readonly connectionsManagerService: ConnectionsManagerService
   ) {
     super();
   }
