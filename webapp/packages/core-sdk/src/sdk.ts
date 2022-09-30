@@ -604,7 +604,7 @@ export interface MutationRmSetProjectPermissionsArgs {
 
 export interface MutationRmSetSubjectProjectPermissionsArgs {
   permissions: Array<RmProjectPermissions>;
-  subject: Scalars['String'];
+  subjectId: Scalars['String'];
 }
 
 
@@ -2595,7 +2595,7 @@ export type SetProjectPermissionsMutationVariables = Exact<{
 export type SetProjectPermissionsMutation = { rmSetProjectPermissions: boolean };
 
 export type SetSubjectProjectsPermissionsMutationVariables = Exact<{
-  subject: Scalars['String'];
+  subjectId: Scalars['String'];
   permissions: Array<RmProjectPermissions> | RmProjectPermissions;
 }>;
 
@@ -4170,8 +4170,8 @@ export const SetProjectPermissionsDocument = `
 }
     `;
 export const SetSubjectProjectsPermissionsDocument = `
-    mutation setSubjectProjectsPermissions($subject: String!, $permissions: [RMProjectPermissions!]!) {
-  rmSetSubjectProjectPermissions(subject: $subject, permissions: $permissions)
+    mutation setSubjectProjectsPermissions($subjectId: String!, $permissions: [RMProjectPermissions!]!) {
+  rmSetSubjectProjectPermissions(subjectId: $subjectId, permissions: $permissions)
 }
     `;
 export const WriteResourceContentDocument = `
