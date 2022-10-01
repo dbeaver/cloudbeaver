@@ -20,11 +20,13 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
+import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.*;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.meta.Association;
@@ -160,17 +162,20 @@ public class WebNavigatorNodeInfo {
             isShared = !((DBNDatabaseNode) node).getOwnerProject().getName().equals(session.getUserId());
         } else if (node instanceof DBNLocalFolder) {
             DataSourceFolder folder = (DataSourceFolder) ((DBNLocalFolder) node).getFolder();
-            String projectName = folder.getDataSourceRegistry().getProject().getName();
+            DBPProject project = folder.getDataSourceRegistry().getProject();
+            String projectName = project.getName();
             Set<DBPDataSourceFolder> tempFolders = folder.getDataSourceRegistry().getTemporaryFolders();
             isShared = !projectName.equals(session.getUserId()) || tempFolders.contains(folder);
+            if (hasNodePermission(RMProjectPermission.DATA_SOURCES_EDIT)) {
+                features.add(NODE_FEATURE_CAN_RENAME);
+                features.add(NODE_FEATURE_CAN_DELETE);
+            }
         }
         if (isShared) {
             features.add(NODE_FEATURE_SHARED);
         }
         if (node instanceof DBNDatabaseNode) {
-            VirtualProjectImpl project = session.getProjectById(node.getOwnerProject().getId());
-            RMProject rmProject = project.getRmProject();
-            boolean canEditDatasources = SMUtils.hasProjectPermission(session, rmProject, RMProjectPermission.DATA_SOURCES_EDIT);
+            boolean canEditDatasources = hasNodePermission(RMProjectPermission.DATA_SOURCES_EDIT);
             DBSObject object = ((DBNDatabaseNode) node).getObject();
             if (object != null && canEditDatasources) {
                 DBEObjectMaker objectManager = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
@@ -188,15 +193,22 @@ public class WebNavigatorNodeInfo {
         if (node instanceof DBNRoot) {
             return features.toArray(new String[0]);
         }
-        if (node instanceof DBNLocalFolder || node instanceof DBNResourceManagerResource) {
-            VirtualProjectImpl project = session.getProjectById(node.getOwnerProject().getId());
-            RMProject rmProject = project.getRmProject();
-            if (SMUtils.hasProjectPermission(session, rmProject, RMProjectPermission.RESOURCE_EDIT)) {
+        if (node instanceof DBNAbstractResourceManagerNode) {
+            if (hasNodePermission(RMProjectPermission.RESOURCE_EDIT)) {
                 features.add(NODE_FEATURE_CAN_RENAME);
                 features.add(NODE_FEATURE_CAN_DELETE);
             }
         }
         return features.toArray(new String[0]);
+    }
+
+    private boolean hasNodePermission(RMProjectPermission permission) {
+        VirtualProjectImpl project = session.getProjectById(getProjectId());
+        if (project == null) {
+            return false;
+        }
+        RMProject rmProject = project.getRmProject();
+        return SMUtils.hasProjectPermission(session, rmProject, permission);
     }
 
     ///////////////////////////////////
