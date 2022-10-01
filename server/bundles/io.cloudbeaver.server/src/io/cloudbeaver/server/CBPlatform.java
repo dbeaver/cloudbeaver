@@ -78,7 +78,6 @@ public class CBPlatform extends BasePlatformImpl {
     private DBACertificateStorage certificateStorage;
     private WebWorkspace workspace;
 
-    private WebSessionManager sessionManager;
     private final List<DBPDriver> applicableDrivers = new ArrayList<>();
 
     public static CBPlatform getInstance() {
@@ -149,8 +148,6 @@ public class CBPlatform extends BasePlatformImpl {
         super.initialize();
 
         refreshApplicableDrivers();
-
-        sessionManager = WebSessionManager.getInstance();
 
         new WebSessionMonitorJob(this).scheduleMonitor();
 
@@ -272,7 +269,7 @@ public class CBPlatform extends BasePlatformImpl {
     }
 
     public WebSessionManager getSessionManager() {
-        return sessionManager;
+        return application.getSessionManager();
     }
 
     public void refreshApplicableDrivers() {

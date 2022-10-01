@@ -82,7 +82,8 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
-public class WebSession extends AbstractSessionPersistent implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
+public class WebSession extends AbstractSessionPersistent
+    implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -143,7 +144,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     @NotNull
     @Override
     public SMAuthSpace getSessionSpace() {
-        return defaultProject;
+        return DBWorkbench.getPlatform().getWorkspace();
     }
 
     @Override
