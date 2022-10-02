@@ -109,7 +109,7 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     }
 
     @Override
-    public void addDataSource(@NotNull DBPDataSourceContainer dataSource) {
+    public void addDataSource(@NotNull DBPDataSourceContainer dataSource) throws DBException {
         dataSourceRegistry.addDataSource(dataSource);
     }
 
@@ -119,7 +119,7 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     }
 
     @Override
-    public void updateDataSource(@NotNull DBPDataSourceContainer dataSource) {
+    public void updateDataSource(@NotNull DBPDataSourceContainer dataSource) throws DBException {
         dataSourceRegistry.updateDataSource(dataSource);
     }
 
