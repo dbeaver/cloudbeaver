@@ -31,6 +31,7 @@ import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.security.EmbeddedSecurityControllerFactory;
+import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -119,6 +120,8 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     private boolean enableSecurityManager = false;
     private String localHostAddress;
     private final List<InetAddress> localInetAddresses = new ArrayList<>();
+
+    private WebSessionManager sessionManager;
 
     public CBApplication() {
     }
@@ -982,6 +985,16 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         patchConfigurationWithProperties(configProps, varResolver);
     }
 
+    public WebSessionManager getSessionManager() {
+        if (sessionManager == null) {
+            sessionManager = createSessionManager();
+        }
+        return sessionManager;
+    }
+
+    protected WebSessionManager createSessionManager() {
+        return new WebSessionManager(this);
+    }
     @NotNull
     public WebDriverRegistry getDriverRegistry() {
         return WebDriverRegistry.getInstance();

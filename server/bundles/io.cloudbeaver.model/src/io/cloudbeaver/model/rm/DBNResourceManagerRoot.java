@@ -77,7 +77,7 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
             List<? extends DBPProject> projectList = getParentNode().getModel().getModelProjects();
             SMSession session = null;
             for (DBPProject project : projectList) {
-                session = getParentNode().getModel().getModelAuthContext().getSpaceSession(monitor, project, false);
+                session = getParentNode().getModel().getModelAuthContext().getSpaceSession(monitor, project.getWorkspace(), false);
                 if (session instanceof WebSession) {
                     break;
                 }

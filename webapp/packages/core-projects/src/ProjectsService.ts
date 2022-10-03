@@ -10,7 +10,7 @@ import { computed, makeObservable } from 'mobx';
 
 import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
@@ -104,9 +104,14 @@ export class ProjectsService {
     });
   }
 
-  setActiveProjects(projects: ProjectInfo[]): void {
+  async setActiveProjects(projects: ProjectInfo[]): Promise<boolean> {
+    const context = await this.onActiveProjectChange.execute();
+
+    if (ExecutorInterrupter.isInterrupted(context)) {
+      return false;
+    }
     this.userProjectsSettings.activeProjectIds = projects.map(project => project.id);
-    this.onActiveProjectChange.execute();
+    return true;
   }
 
   async load(): Promise<void> {

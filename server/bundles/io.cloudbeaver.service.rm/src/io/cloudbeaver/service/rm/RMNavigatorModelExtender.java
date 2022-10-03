@@ -31,14 +31,14 @@ public class RMNavigatorModelExtender implements DBNModelExtender {
         if (parentNode instanceof DBNProject && WebAppUtils.getWebApplication().getAppConfiguration().isResourceManagerEnabled()) {
             // We need project to get access to data source registry.
             // In order to register cloud connections there.
-            return createCloudNodes((DBNProject) parentNode);
+            return createRMNodes((DBNProject) parentNode);
         } else {
             return null;
         }
     }
 
-    private DBNNode[] createCloudNodes(DBNProject root) {
-        return new DBNNode[] {
+    private DBNNode[] createRMNodes(DBNProject root) {
+        return new DBNNode[]{
             new DBNResourceManagerRoot(root)
         };
     }

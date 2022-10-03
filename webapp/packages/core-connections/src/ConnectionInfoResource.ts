@@ -510,6 +510,10 @@ export function isNewConnection(connection: Connection | NewConnection): connect
 }
 
 export function compareConnectionsInfo(a: DatabaseConnection, b: DatabaseConnection): number {
+  return a.name.localeCompare(b.name);
+}
+
+export function compareNewConnectionsInfo(a: DatabaseConnection, b: DatabaseConnection): number {
   if (isNewConnection(a) && isNewConnection(b)) {
     return b.timestamp - a.timestamp;
   }
@@ -522,7 +526,7 @@ export function compareConnectionsInfo(a: DatabaseConnection, b: DatabaseConnect
     return -1;
   }
 
-  return a.name.localeCompare(b.name);
+  return compareConnectionsInfo(a, b);
 }
 
 export function createConnectionParam(
