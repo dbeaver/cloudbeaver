@@ -18,9 +18,11 @@ export class AppAuthService extends Bootstrap {
     const config = this.serverService.config.data;
     const user = this.userInfoResource.data;
 
-    return !!config?.anonymousAccessEnabled
-    || this.serverService.config.configurationMode
-    || user !== null;
+    return (
+      !!config?.anonymousAccessEnabled
+      || this.serverService.config.configurationMode
+      || user !== null
+    );
   }
 
   readonly auth: IExecutor<boolean>;

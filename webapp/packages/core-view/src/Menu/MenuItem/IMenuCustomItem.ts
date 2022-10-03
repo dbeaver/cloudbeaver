@@ -21,6 +21,7 @@ export type ICustomMenuItemComponent<TExtraProps = unknown> = React.FC<ICustomMe
 export interface ICustomMenuItemProps<TExtraProps = unknown> {
   item: IMenuCustomItem<TExtraProps>;
   style?: ComponentStyle;
+  onClick?: (keepMenuOpen: boolean) => void;
   className?: string;
 }
 

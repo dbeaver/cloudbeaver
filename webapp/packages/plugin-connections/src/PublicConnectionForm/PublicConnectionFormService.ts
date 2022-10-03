@@ -8,6 +8,7 @@
 
 import { action, makeObservable, observable } from 'mobx';
 
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConnectionInfoResource, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -37,6 +38,7 @@ export class PublicConnectionFormService {
     private readonly connectionFormService: ConnectionFormService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionAuthService: ConnectionAuthService,
+    private readonly userInfoResource: UserInfoResource,
     private readonly authenticationService: AuthenticationService,
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource
@@ -47,7 +49,7 @@ export class PublicConnectionFormService {
     this.connectionInfoResource.onItemDelete.addPostHandler(this.closeDeleted);
 
     this.authenticationService.onLogin.addHandler(async (event, context) => {
-      if (event === 'before') {
+      if (event === 'before' && this.userInfoResource.data === null) {
         const confirmed = await this.showUnsavedChangesDialog();
         if (!confirmed) {
           ExecutorInterrupter.interrupt(context);

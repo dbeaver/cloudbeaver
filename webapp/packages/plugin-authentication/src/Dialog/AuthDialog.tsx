@@ -84,7 +84,9 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
     && state.activeProvider?.id !== undefined
     && !userInfo.hasToken(state.activeProvider.id);
 
-  const showTabs = (dialogData.providers.length + dialogData.configurations.length) > 1;
+  const showTabs = (
+    (dialogData.providers.length + dialogData.configurations.length) > 1
+  );
   const federate = state.tabId === FEDERATED_AUTH;
 
   let dialogTitle = translate('authentication_login_dialog_title');

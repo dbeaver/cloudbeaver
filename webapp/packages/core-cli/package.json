@@ -73,6 +73,7 @@
     "jest": "~28.1.2",
     "jest-allure": "^0.1.3",
     "jest-environment-jsdom": "~28.1.2",
-    "jest-jasmine2": "^28.1.3"
+    "jest-jasmine2": "^28.1.3",
+    "http-proxy": "^1.18.1"
   }
 }

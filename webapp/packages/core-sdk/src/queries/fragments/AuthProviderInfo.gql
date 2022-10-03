@@ -1,0 +1,42 @@
+fragment AuthProviderInfo on AuthProviderInfo {
+    id
+    label
+    icon
+    description
+    defaultProvider
+
+    #configurationParameters {
+    #  id
+    #  displayName
+    #  description
+    #  category
+    #  dataType
+    #  value
+    #  validValues
+    #  defaultValue
+    #  features
+    #}
+
+    configurable
+    configurations {
+      ...AuthProviderConfigurationInfo
+    }
+
+    credentialProfiles {
+      id
+      label
+      description
+
+      credentialParameters {
+        id
+        displayName
+        description
+        admin
+        user
+        identifying
+        possibleValues
+        encryption
+      }
+    }
+    requiredFeatures
+}

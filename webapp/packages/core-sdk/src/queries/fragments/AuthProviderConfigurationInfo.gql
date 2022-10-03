@@ -1,0 +1,9 @@
+fragment AuthProviderConfigurationInfo on AuthProviderConfiguration {
+  id
+  displayName
+  iconURL
+  description
+  signInLink
+  signOutLink
+  metadataLink
+}

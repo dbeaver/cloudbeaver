@@ -18,6 +18,7 @@ package io.cloudbeaver.model;
 
 import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebDataFormat;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebCommonUtils;
@@ -358,12 +359,16 @@ public class WebConnectionInfo {
         return dataSourceContainer.getProject().getId();
     }
 
+    @Property
+    public String getRequiredAuth() {
+        return dataSourceContainer.getRequiredExternalAuth();
+    }
+
     private boolean hasProjectPermission(RMProjectPermission projectPermission) {
         DBPProject project = dataSourceContainer.getProject();
         if (!(project instanceof VirtualProjectImpl)) {
             return false;
         }
-        VirtualProjectImpl virtualProject = (VirtualProjectImpl) project;
-        return virtualProject.getRmProject().getProjectPermissions().contains(projectPermission.getPermissionId());
+        return SMUtils.hasProjectPermission(session, ((VirtualProjectImpl) project).getRmProject(), projectPermission);
     }
 }

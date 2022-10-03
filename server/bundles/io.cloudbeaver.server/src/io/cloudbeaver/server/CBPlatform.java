@@ -47,7 +47,6 @@ import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.osgi.framework.Bundle;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -79,7 +78,6 @@ public class CBPlatform extends BasePlatformImpl {
     private DBACertificateStorage certificateStorage;
     private WebWorkspace workspace;
 
-    private WebSessionManager sessionManager;
     private final List<DBPDriver> applicableDrivers = new ArrayList<>();
 
     public static CBPlatform getInstance() {
@@ -145,13 +143,11 @@ public class CBPlatform extends BasePlatformImpl {
         this.queryManager.registerMetaListener(qmLogWriter);
 
         this.certificateStorage = new DefaultCertificateStorage(
-            new File(WebPlatformActivator.getInstance().getStateLocation().toFile(), "security"));
+            WebPlatformActivator.getInstance().getStateLocation().toFile().toPath().resolve("security"));
 
         super.initialize();
 
         refreshApplicableDrivers();
-
-        sessionManager = WebSessionManager.getInstance();
 
         new WebSessionMonitorJob(this).scheduleMonitor();
 
@@ -273,7 +269,7 @@ public class CBPlatform extends BasePlatformImpl {
     }
 
     public WebSessionManager getSessionManager() {
-        return sessionManager;
+        return application.getSessionManager();
     }
 
     public void refreshApplicableDrivers() {

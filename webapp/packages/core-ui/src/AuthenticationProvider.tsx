@@ -11,7 +11,6 @@ import styled, { css } from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, Button, Container, GroupItem } from '@cloudbeaver/core-blocks';
 import { useTranslate } from '@cloudbeaver/core-localization';
-import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 import { useStyles } from '@cloudbeaver/core-theming';
 
 import { useAuthenticationAction } from './useAuthenticationAction';
@@ -28,12 +27,8 @@ export type Props = {
   onClose?: () => void;
   children?: () => React.ReactNode;
   className?: string;
-} & ({
-  origin: ObjectOrigin;
-} | {
-  type: string;
-  subType?: string;
-});
+  providerId: string;
+};
 
 export const AuthenticationProvider = observer<Props>(function AuthenticationProvider(props) {
   const translate = useTranslate();

@@ -22,6 +22,7 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
 
@@ -61,6 +62,11 @@ public class WebDatabaseAuthModel {
     @Property
     public boolean getRequiresLocalConfiguration() {
         return model.requiresLocalConfiguration();
+    }
+
+    @Property
+    public String getRequiredAuth() {
+        return CommonUtils.isEmpty(model.getRequiredAuthProviderId()) ? null : model.getRequiredAuthProviderId();
     }
 
     @Property

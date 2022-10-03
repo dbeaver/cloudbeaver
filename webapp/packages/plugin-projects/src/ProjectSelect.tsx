@@ -35,13 +35,6 @@ export const ProjectSelect = observer(function ProjectSelect({
   const translate = useTranslate();
 
   const projectsService = useService(ProjectsService);
-  const projectsLoader = useMapResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey, {
-    onData: () => {
-      if (!value && projectsService.defaultProject) {
-        onChange(projectsService.defaultProject.id);
-      }
-    },
-  });
 
   const projects = projectsService.activeProjects
     .slice()
@@ -50,6 +43,14 @@ export const ProjectSelect = observer(function ProjectSelect({
   const possibleOptions = projects
     .filter(filter)
     .map(project => project.id);
+
+  const projectsLoader = useMapResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey, {
+    onData: () => {
+      if (!value && possibleOptions.length > 0) {
+        onChange(possibleOptions[0]);
+      }
+    },
+  });
 
   function handleProjectSelect(projectId: string) {
     if (possibleOptions.includes(projectId)) {
@@ -69,7 +70,7 @@ export const ProjectSelect = observer(function ProjectSelect({
       keySelector={project => project.id}
       valueSelector={project => project.name}
       titleSelector={project => project.description}
-      isDisabled={project => !project.canEditDataSources}
+      isDisabled={project => !filter(project)}
       readOnly={readOnly || possibleOptions.length <= 1}
       searchable={projects.length > 10}
       disabled={disabled}

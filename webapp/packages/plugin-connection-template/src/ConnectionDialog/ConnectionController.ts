@@ -19,6 +19,7 @@ import { getUniqueName } from '@cloudbeaver/core-utils';
 import type { IConnectionAuthenticationConfig } from '@cloudbeaver/plugin-connections';
 
 import { TemplateConnectionsResource } from '../TemplateConnectionsResource';
+import { TemplateConnectionsService } from '../TemplateConnectionsService';
 
 export enum ConnectionStep {
   ConnectionTemplateSelect,
@@ -54,7 +55,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   private isDistructed = false;
 
   get templateConnections(): Connection[] {
-    return this.templateConnectionsResource.data;
+    return this.templateConnectionsService.projectTemplates;
   }
 
   get dbDrivers(): Map<string, DBDriver> {
@@ -82,6 +83,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     private readonly dbDriverResource: DBDriverResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly templateConnectionsResource: TemplateConnectionsResource,
+    private readonly templateConnectionsService: TemplateConnectionsService,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly projectsService: ProjectsService,
@@ -130,20 +132,19 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       return;
     }
 
-    const projectId = this.projectsService.defaultProject.id;
     this.isConnecting = true;
     this.clearError();
     try {
       const connectionNames = this.connectionInfoResource.values.map(connection => connection.name);
       const uniqueConnectionName = getUniqueName(this.template.name || 'Template connection', connectionNames);
       const connection = await this.connectionInfoResource.createFromTemplate(
-        projectId,
+        this.template.projectId,
         this.template.id,
         uniqueConnectionName
       );
 
       try {
-        await this.connectionInfoResource.init(this.getConfig(projectId, connection.id));
+        await this.connectionInfoResource.init(this.getConfig(connection.projectId, connection.id));
 
         this.notificationService.logSuccess({ title: 'Connection is established', message: connection.name });
         this.onClose();

@@ -54,6 +54,7 @@ import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
+import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -81,7 +82,8 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
-public class WebSession extends AbstractSessionPersistent implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
+public class WebSession extends AbstractSessionPersistent
+    implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -142,7 +144,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     @NotNull
     @Override
     public SMAuthSpace getSessionSpace() {
-        return defaultProject;
+        return DBWorkbench.getPlatform().getWorkspace();
     }
 
     @Override
@@ -328,7 +330,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         refreshAccessibleConnectionIds();
         try {
             RMController controller = application.getResourceController(this, getSecurityController());
-            RMProject[] rmProjects =  controller.listAccessibleProjects();
+            RMProject[] rmProjects = controller.listAccessibleProjects();
             for (RMProject project : rmProjects) {
                 VirtualProjectImpl virtualProject = createVirtualProject(project);
                 if (!virtualProject.getRmProject().getProjectPermissions().contains(RMProjectPermission.DATA_SOURCES_EDIT.getPermissionId())) {
@@ -348,7 +350,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     public VirtualProjectImpl createVirtualProject(RMProject project) {
         // Do not filter data sources from user project
-        DataSourceFilter filter = project.getType() == RMProject.Type.GLOBAL
+        DataSourceFilter filter = project.getType() == RMProjectType.GLOBAL
             ? this::isDataSourceAccessible
             : x -> true;
         VirtualProjectImpl sessionProject = application.createProjectImpl(
@@ -992,6 +994,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         userContext.refreshSMSession();
     }
 
+    @Nullable
     public VirtualProjectImpl getProjectById(@Nullable String projectId) {
         if (projectId == null) {
             return defaultProject;
