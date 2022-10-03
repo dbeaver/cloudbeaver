@@ -356,8 +356,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         webSession.addInfoMessage("Create new connection");
         DBPDataSourceRegistry registry = getGlobalRegistry(webSession);
         DBPDataSourceContainer dataSource = WebServiceUtils.createConnectionFromConfig(config, registry);
-        registry.addDataSource(dataSource);
-        dataSource.persistConfiguration();
+        try {
+            registry.addDataSource(dataSource);
+        } catch (DBException e) {
+            throw new DBWebException("Error adding datasource", e);
+        }
+
         webSession.addInfoMessage(
             "New connection was created - " + WebServiceUtils.getConnectionContainerInfo(dataSource)
         );

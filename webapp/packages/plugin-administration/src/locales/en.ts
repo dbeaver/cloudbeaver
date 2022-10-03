@@ -27,8 +27,8 @@ export default [
   ['administration_configuration_wizard_configuration_server_session_lifetime_description', 'Here you may specify the number of minutes that you wish the session to be allowed to remain idle before it expires'],
 
   ['administration_configuration_wizard_configuration_plugins', 'Configuration'],
-  ['administration_configuration_wizard_configuration_custom_connections', 'Enable custom connections'],
-  ['administration_configuration_wizard_configuration_custom_connections_description', 'Allows users to create custom connections. Otherwise, all new connections can be created from the administration part only'],
+  ['administration_configuration_wizard_configuration_custom_connections', 'Enable private connections'],
+  ['administration_configuration_wizard_configuration_custom_connections_description', 'Allows users to create private connections. Otherwise, all new connections can be created from the administration part only'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Navigator simple view'],
   ['administration_configuration_wizard_configuration_navigation_tree_view_description', "By default, all user's new connections will contain only basic information in navigation tree"],
 

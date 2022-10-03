@@ -22,14 +22,17 @@ import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
+import org.jkiss.dbeaver.model.rm.RMProjectType;
 
 public class WebProjectInfo {
     private final WebSession session;
     private final VirtualProjectImpl project;
+    private final boolean customPrivateConnectionsEnabled;
 
-    public WebProjectInfo(WebSession session, VirtualProjectImpl project) {
+    public WebProjectInfo(WebSession session, VirtualProjectImpl project, boolean customPrivateConnectionsEnabled) {
         this.session = session;
         this.project = project;
+        this.customPrivateConnectionsEnabled = customPrivateConnectionsEnabled;
     }
 
     public WebSession getSession() {
@@ -62,6 +65,9 @@ public class WebProjectInfo {
 
     @Property
     public boolean isCanEditDataSources() {
+        if (project.getRmProject().getType() == RMProjectType.USER && !customPrivateConnectionsEnabled) {
+            return false;
+        }
         return hasDataSourcePermission(RMProjectPermission.DATA_SOURCES_EDIT);
     }
 

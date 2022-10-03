@@ -47,6 +47,12 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     return newSymbol in this.get(id)!;
   }
 
+  cleanNewFlags(): void {
+    for (const project of this.data.values()) {
+      (project as SharedProjectNew)[newSymbol] = false;
+    }
+  }
+
   async setAccessSubjects(projectId: string, permissions: ProjectPermission[]): Promise<void> {
     await this.graphQLService.sdk.setProjectPermissions({
       projectId,

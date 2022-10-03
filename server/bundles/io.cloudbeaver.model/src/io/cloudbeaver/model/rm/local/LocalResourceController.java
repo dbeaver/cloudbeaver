@@ -42,6 +42,7 @@ import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.IOUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -258,7 +259,7 @@ public class LocalResourceController implements RMController {
             throw new DBException("Project '" + project.getName() + "' doesn't exists");
         }
         try {
-            CommonUtils.deleteDirectory(targetPath);
+            IOUtils.deleteDirectory(targetPath);
             smController.deleteAllObjectPermissions(projectId, SMObjects.PROJECT);
         } catch (IOException e) {
             throw new DBException("Error deleting project '" + project.getName() + "'", e);
@@ -422,7 +423,7 @@ public class LocalResourceController implements RMController {
         List<RMResource> rmResourcePath = makeResourcePath(projectId, targetPath, recursive);
         try {
             if (targetPath.toFile().isDirectory()) {
-                CommonUtils.deleteDirectory(targetPath);
+                IOUtils.deleteDirectory(targetPath);
             } else {
                 Files.delete(targetPath);
             }

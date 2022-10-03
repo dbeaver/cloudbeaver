@@ -13,7 +13,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
-import { ProjectsService } from '@cloudbeaver/core-projects';
+import { ProjectInfo, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
@@ -31,6 +31,11 @@ export class ConnectionsManagerService {
   get projectConnections(): Connection[] {
     return this.connectionInfo.values
       .filter(connection => this.projectsService.activeProjects.some(project => project.id === connection.projectId));
+  }
+  get createConnectionProjects(): ProjectInfo[] {
+    return this.projectsService.activeProjects
+      .filter(project => project.canEditDataSources)
+      .sort(projectInfoSortByName);
   }
   readonly connectionExecutor: IExecutor<IConnectionInfoParams | null>;
   readonly onDisconnect: IExecutor<IConnectionExecutorData>;
@@ -63,6 +68,9 @@ export class ConnectionsManagerService {
 
     makeObservable(this, {
       projectConnections: computed<Connection[]>({
+        equals: isArraysEqual,
+      }),
+      createConnectionProjects: computed<ProjectInfo[]>({
         equals: isArraysEqual,
       }),
     });
