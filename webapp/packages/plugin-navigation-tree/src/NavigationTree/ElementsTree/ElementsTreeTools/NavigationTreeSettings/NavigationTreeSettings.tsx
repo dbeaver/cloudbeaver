@@ -9,9 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, Placeholder, PlaceholderElement } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Group, Placeholder, PlaceholderElement, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { ElementsTreeSettingsService, IElementsTreeSettingsProps } from './ElementsTreeSettingsService';
 

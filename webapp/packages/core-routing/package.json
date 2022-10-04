@@ -15,11 +15,13 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-executor": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0",
     "router5": "~8.0.1",
     "router5-plugin-browser": "~8.0.1"
   },
   "peerDependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
     "mobx": "~6.x.x",
     "mobx-react-lite": "~3.x.x"
   }

@@ -10,11 +10,12 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Icon } from './Icon';
 import { Loader } from './Loader/Loader';
 import { useObservableRef } from './useObservableRef';
+import { useStyles } from './useStyles';
 
 const buttonStyles = css`
     button-label {

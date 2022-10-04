@@ -11,12 +11,12 @@ import styled, { css, use } from 'reshadow';
 
 import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
 import {
-  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder, Checkbox
+  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder, Checkbox, useTranslate
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 
 import { UsersAdministrationService } from '../UsersAdministrationService';
 import { UserEdit } from './UserEdit';
@@ -53,7 +53,7 @@ export const User = observer<Props>(function User({ user, selectable }) {
   const enabledCheckboxTitle = usersService.isActiveUser(user.userId)
     ? translate('administration_roles_role_granted_users_permission_denied') : undefined;
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <TableItem item={user.userId} expandElement={UserEdit} selectDisabled={!selectable}>
       {selectable && (
         <TableColumnValue centerContent flex>

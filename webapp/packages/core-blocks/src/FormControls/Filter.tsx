@@ -10,10 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { IconButton } from '../IconButton';
 import { useFocus } from '../useFocus';
+import { useStyles } from '../useStyles';
 import { InputField } from './InputField';
 
 const filterStyles = css`

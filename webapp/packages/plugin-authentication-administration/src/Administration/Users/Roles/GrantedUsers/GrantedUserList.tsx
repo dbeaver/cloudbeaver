@@ -22,12 +22,14 @@ import {
   Button,
   useObjectRef,
   getComputed,
-  getSelectedItems
+  getSelectedItems,
+  useTranslate,
+  useStyles
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { getFilteredUsers } from './getFilteredUsers';
 import { GrantedUsersTableHeader, IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader';

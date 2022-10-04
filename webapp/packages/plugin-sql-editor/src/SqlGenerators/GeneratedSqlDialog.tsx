@@ -11,13 +11,11 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button, ErrorMessage, Loader, useClipboard, useErrorDetails, useObservableRef } from '@cloudbeaver/core-blocks';
+import { Button, ErrorMessage, Loader, useClipboard, useErrorDetails, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { GQLErrorCatcher, SqlDialectInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { SQLCodeEditorLoader, SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
 
 import { SqlGeneratorsResource } from './SqlGeneratorsResource';
@@ -62,7 +60,6 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   rejectDialog,
   payload,
 }) {
-  const style = useStyles(styles);
   const translate = useTranslate();
   const copy = useClipboard();
 
@@ -118,7 +115,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
       });
   });
 
-  return styled(style)(
+  return styled(styles)(
     <CommonDialogWrapper
       size='large'
       title='app_shared_sql_generators_dialog_title'
@@ -144,7 +141,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
     >
       <wrapper>
         <Loader loading={state.loading}>
-          {() => styled(style)(
+          {() => styled(styles)(
             <SQLCodeEditorLoader
               bindings={{
                 autoCursor: false,

@@ -9,10 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Container, InputField } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { BASE_CONTAINERS_STYLES, Container, InputField, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 interface Props {
   config: ConnectionConfig;

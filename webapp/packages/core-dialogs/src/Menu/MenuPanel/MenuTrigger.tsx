@@ -15,8 +15,8 @@ import {
 } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
-import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
+import { useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type {
   IMenuItem, IMenuPanel

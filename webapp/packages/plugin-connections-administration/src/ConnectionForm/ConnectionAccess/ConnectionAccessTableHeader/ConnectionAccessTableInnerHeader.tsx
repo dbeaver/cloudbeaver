@@ -9,9 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TableColumnHeader, TableHeader, TableSelect } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { TableColumnHeader, TableHeader, TableSelect, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+
+
 
 interface Props {
   disabled?: boolean;

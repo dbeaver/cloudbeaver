@@ -8,10 +8,10 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { Button } from '@cloudbeaver/core-blocks';
 import type { ENotificationType } from '@cloudbeaver/core-events';
-import { useTranslate } from '@cloudbeaver/core-localization';
 
+import { Button } from '../Button';
+import { useTranslate } from '../localization/useTranslate';
 import { useStateDelay } from '../useStateDelay';
 import { SnackbarBody } from './SnackbarMarkups/SnackbarBody';
 import { SnackbarContent } from './SnackbarMarkups/SnackbarContent';

@@ -9,8 +9,7 @@
 import { useContext } from 'react';
 import styled from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
+import { useStyles } from '../useStyles';
 import { Styles } from './styles';
 
 interface Props {

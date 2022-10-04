@@ -8,7 +8,9 @@
 
 import styled, { css } from 'reshadow';
 
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
+
+import { useStyles } from './useStyles';
 
 interface Props {
   description?: React.ReactElement | string;

@@ -9,8 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { ILoadableState, Loader, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
-import { Translate } from '@cloudbeaver/core-localization';
+import { ILoadableState, Loader, Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+
 
 import type { IElementsTreeContext } from './ElementsTreeContext';
 

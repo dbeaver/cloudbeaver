@@ -10,10 +10,8 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { Button, IconOrImage, useErrorDetails, useObservableRef, useStateDelay } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { Button, IconOrImage, useErrorDetails, useObservableRef, useStateDelay, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerErrorType } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 
@@ -127,7 +125,7 @@ export const TableError = observer<Props>(function TableViewer({
     icon = '/icons/info_icon.svg';
   }
 
-  return styled(useStyles(style))(
+  return styled(style)(
     <error {...use({ animated, collapsed: !errorInfo.display, errorHidden })} className={className}>
       <error-body>
         <IconOrImage icon={icon} title={error.details?.message} onClick={() => errorInfo.show()} />

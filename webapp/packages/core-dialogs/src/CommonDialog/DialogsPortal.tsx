@@ -11,9 +11,9 @@ import { useMemo } from 'react';
 import { DialogBackdrop } from 'reakit/Dialog';
 import styled from 'reshadow';
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { CommonDialogService, DialogInternal } from './CommonDialogService';
 import { DialogContext, IDialogContext } from './DialogContext';

@@ -9,7 +9,7 @@
 import { useEffect, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { IconButton } from '../../IconButton';
 
@@ -59,14 +59,13 @@ interface Props {
 export const SnackbarWrapper: React.FC<React.PropsWithChildren<Props>> = function SnackbarWrapper({
   closing = false, persistent, onClose, children, className,
 }) {
-  const styles = useStyles(SNACKBAR_WRAPPER_STYLES);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  return styled(styles)(
+  return styled(SNACKBAR_WRAPPER_STYLES)(
     <notification as="div" className={className} {...use({ mounted, closing })}>
       {children}
       {!persistent && onClose && (

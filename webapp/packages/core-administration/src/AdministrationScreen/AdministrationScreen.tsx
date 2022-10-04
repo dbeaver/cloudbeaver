@@ -9,8 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
+import { usePermission } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { usePermission } from '@cloudbeaver/core-root';
 import type { ScreenComponent } from '@cloudbeaver/core-routing';
 
 import { Administration } from '../Administration/Administration';

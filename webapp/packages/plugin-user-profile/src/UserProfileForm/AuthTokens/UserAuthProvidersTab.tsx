@@ -9,8 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { Tab } from '@cloudbeaver/core-ui';
 
 interface Props {

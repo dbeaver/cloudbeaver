@@ -9,9 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Group, GroupItem, GroupTitle, InputField } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_CONTAINERS_STYLES, Button, Group, GroupItem, GroupTitle, InputField, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { useChangePassword } from './useChangePassword';
 
@@ -21,7 +19,7 @@ export const ChangePassword = observer(function ChangePassword() {
 
   const disabled = state.submitting;
 
-  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+  return styled(BASE_CONTAINERS_STYLES)(
     <Group form gap>
       <GroupTitle>{translate('plugin_user_profile_authentication_change_password')}</GroupTitle>
       <InputField

@@ -11,8 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useUserData } from '@cloudbeaver/core-blocks';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { useStyles, useUserData } from '@cloudbeaver/core-blocks';
 import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsContainer, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 

@@ -9,9 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { BASE_TABLE_STYLES, IconOrImage, Link } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_TABLE_STYLES, IconOrImage, Link, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+
+
 
 import type { ILogEntry } from './ILogEntry';
 

@@ -9,11 +9,9 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { IProperty, PropertiesTable, ErrorMessage } from '@cloudbeaver/core-blocks';
+import { IProperty, PropertiesTable, ErrorMessage, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import type { DataTransferOutputSettings, DataTransferProcessorInfo, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { ITabData, Tab, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { OutputOptionsForm } from './OutputOptionsForm';

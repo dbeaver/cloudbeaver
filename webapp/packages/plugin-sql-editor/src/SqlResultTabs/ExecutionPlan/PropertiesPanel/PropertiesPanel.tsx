@@ -11,10 +11,8 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Table, TableHeader, TableColumnHeader, TableBody, TextPlaceholder } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { Table, TableHeader, TableColumnHeader, TableBody, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo, SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import { isVisibleProperty } from '../useExecutionPlanTreeState';
 import { PropertiesPanelItemsGroup } from './PropertiesPanelItemsGroup';
@@ -35,7 +33,6 @@ interface Props {
 }
 
 export const PropertiesPanel = observer<Props>(function PropertiesPanel({ selectedNode, nodeList, className }) {
-  const style = useStyles(styles);
   const translate = useTranslate();
 
   const { general, details } = useMemo(() => computed(() => {
@@ -66,7 +63,7 @@ export const PropertiesPanel = observer<Props>(function PropertiesPanel({ select
   const nameColumnTitle = translate('sql_execution_plan_properties_panel_name');
   const valueColumnTitle = translate('sql_execution_plan_properties_panel_value');
 
-  return styled(style)(
+  return styled(styles)(
     <Table className={className}>
       <TableHeader>
         <TableColumnHeader title={nameColumnTitle}>

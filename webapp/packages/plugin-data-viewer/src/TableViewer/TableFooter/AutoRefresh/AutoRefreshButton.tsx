@@ -9,8 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css }  from 'reshadow';
 
-import { Icon, Menu, MenuItem, MenuItemElement, TimerIcon } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { Icon, Menu, MenuItem, MenuItemElement, TimerIcon, useTranslate } from '@cloudbeaver/core-blocks';
 import { declensionOfNumber } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';

@@ -9,11 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { getComputed, Loader, useStateDelay } from '@cloudbeaver/core-blocks';
+import { getComputed, Loader, useStateDelay, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { DBObjectResource } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { NavNodeViewService, useNode, useChildren } from '@cloudbeaver/plugin-navigation-tree';
 

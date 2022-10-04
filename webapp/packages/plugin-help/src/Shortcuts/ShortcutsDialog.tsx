@@ -8,10 +8,10 @@
 
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, Group, GroupTitle, Link } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, Container, Group, GroupTitle, Link, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 
 import { Shortcut } from './Shortcut';
 import { DATA_VIEWER_SHORTCUTS, NAVIGATION_TREE_SHORTCUTS, SQL_EDITOR_SHORTCUTS } from './SHORTCUTS_DATA';

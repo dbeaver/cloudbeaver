@@ -9,10 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { use } from 'reshadow';
 
-import { Checkbox, Icon, IconOrImage, Loader, Radio } from '@cloudbeaver/core-blocks';
+import { Checkbox, Icon, IconOrImage, Loader, Radio, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import type { IMenuItem } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { menuPanelStyles } from './menuPanelStyles';
 

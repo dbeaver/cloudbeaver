@@ -9,11 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Button, useClipboard, useMapResource } from '@cloudbeaver/core-blocks';
+import { Button, useClipboard, useMapResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionDialectResource, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 import { SQLCodeEditorLoader } from '@cloudbeaver/plugin-sql-editor';
 

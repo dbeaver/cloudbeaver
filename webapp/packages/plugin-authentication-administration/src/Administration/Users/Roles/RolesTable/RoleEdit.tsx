@@ -11,9 +11,9 @@ import { useRef, useEffect, useContext, useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { RolesResource } from '@cloudbeaver/core-authentication';
-import { TableContext } from '@cloudbeaver/core-blocks';
+import { TableContext, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { RoleForm } from '../RoleForm';
 import { useRoleFormState } from '../useRoleFormState';

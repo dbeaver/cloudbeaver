@@ -9,10 +9,14 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { Icon, IconOrImage, Loader, useStateDelay } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { Icon } from '../Icon';
+import { IconOrImage } from '../IconOrImage';
+import { Loader } from '../Loader/Loader';
+import { useTranslate } from '../localization/useTranslate';
+import { useStateDelay } from '../useStateDelay';
+import { useStyles } from '../useStyles';
 import { menuPanelStyles } from './menuPanelStyles';
 
 interface IMenuItemElementProps {

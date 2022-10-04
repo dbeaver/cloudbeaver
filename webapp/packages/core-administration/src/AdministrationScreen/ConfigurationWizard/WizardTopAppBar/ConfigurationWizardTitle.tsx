@@ -8,7 +8,7 @@
 
 import styled, { css } from 'reshadow';
 
-import { Translate } from '@cloudbeaver/core-localization';
+import { Translate } from '@cloudbeaver/core-blocks';
 
 const styles = css`
   wizard-title {

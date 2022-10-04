@@ -10,9 +10,9 @@ import { observer } from 'mobx-react-lite';
 import type { ButtonHTMLAttributes } from 'react';
 import styled from 'reshadow';
 
+import { useTranslate, useStyles, joinStyles } from '@cloudbeaver/core-blocks';
 import { IMenuItem, MenuTrigger } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, ComponentStyle, joinStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { topMenuStyles } from './topMenuStyles';
 import { TopNavButton } from './TopNavButton';

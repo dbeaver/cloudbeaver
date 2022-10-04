@@ -11,11 +11,9 @@ import { useCallback } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { Table, TableHeader, TableColumnHeader, TableBody, ToolsAction, ToolsPanel, Loader, useTable, BASE_LAYOUT_GRID_STYLES } from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, ToolsAction, ToolsPanel, Loader, useTable, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { IVersion, VersionResource } from '@cloudbeaver/core-version';
 
 import { Version } from './Version';

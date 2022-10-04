@@ -6,12 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import {
-  autorun,
-  ObservableMap,
-  set,
-  toJS
-} from 'mobx';
+import { autorun, ObservableMap, set, toJS } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 

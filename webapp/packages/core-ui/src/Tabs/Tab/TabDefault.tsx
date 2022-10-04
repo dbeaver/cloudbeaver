@@ -9,8 +9,9 @@
 import { useMemo } from 'react';
 import styled from 'reshadow';
 
-import { Translate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+
+import { Translate, useStyles } from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { TabContext } from '../TabContext';
 import type { ITabData } from '../TabsContainer/ITabsContainer';

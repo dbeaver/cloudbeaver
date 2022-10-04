@@ -9,10 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Button } from '@cloudbeaver/core-blocks';
+import { Button, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 
 const dialogStyle = css`
   footer {
@@ -36,7 +36,7 @@ export const SessionExpiredDialog: DialogComponent<null, null> = observer(functi
     window.location.reload();
   }
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <CommonDialogWrapper
       size='small'
       title='app_root_session_expired_title'

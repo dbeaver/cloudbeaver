@@ -14,8 +14,10 @@
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
+  "dependencies": {
+    "@cloudbeaver/core-di": "~0.1.0"
+  },
   "peerDependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
     "mobx": "~6.x.x"
   }
 }

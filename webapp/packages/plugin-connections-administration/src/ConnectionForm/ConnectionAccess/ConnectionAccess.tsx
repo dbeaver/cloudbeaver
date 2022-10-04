@@ -21,11 +21,11 @@ import {
   Group,
   Container,
   InfoItem,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { isCloudConnection } from '@cloudbeaver/core-connections';
-import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import type { IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 
@@ -55,7 +55,6 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
   state: formState,
 }) {
   const state = useConnectionAccessState(formState.info);
-  const style = useStyles(styles, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
 
   const { selected } = useTab(tabId, state.load);
@@ -86,9 +85,9 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
     info = 'cloud_connections_access_placeholder';
   }
 
-  return styled(style)(
+  return styled(styles, BASE_CONTAINERS_STYLES)(
     <Loader state={[users, roles, state.state]}>
-      {() => styled(style)(
+      {() => styled(styles, BASE_CONTAINERS_STYLES)(
         <ColoredContainer parent gap vertical>
           {!users.resource.values.length && !roles.resource.values.length ? (
             <Group keepSize large>

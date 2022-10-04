@@ -23,11 +23,12 @@ import {
   useObjectRef,
   getComputed,
   getSelectedItems,
+  useTranslate,
+  useStyles,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { getFilteredUsers } from './getFilteredUsers';
 import { GrantedUsersTableHeader, IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader';

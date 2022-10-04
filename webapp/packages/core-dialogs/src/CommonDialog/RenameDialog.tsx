@@ -11,9 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, useFocus, useObservableRef } from '@cloudbeaver/core-blocks';
-import { Translate, useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, useFocus, useObservableRef, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { throttleAsync } from '@cloudbeaver/core-utils';
 
 import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
@@ -118,7 +116,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
             mod={['outlined']}
             onClick={rejectDialog}
           >
-            <Translate token='ui_processing_cancel' />
+            {translate('ui_processing_cancel')}
           </Button>
           <fill />
           <Button
@@ -127,7 +125,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
             disabled={!state.valid}
             onClick={() => resolveDialog(state.value)}
           >
-            <Translate token={confirmActionText || (create ? 'ui_create' : 'ui_rename')} />
+            {translate(confirmActionText || (create ? 'ui_create' : 'ui_rename'))}
           </Button>
         </>
       )}

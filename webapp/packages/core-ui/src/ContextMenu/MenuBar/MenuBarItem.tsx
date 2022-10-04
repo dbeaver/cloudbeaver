@@ -10,9 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 import styled from 'reshadow';
 
-import { IconOrImage, Loader, useStateDelay } from '@cloudbeaver/core-blocks';
-import { Translate, useTranslate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import { IconOrImage, Loader, useStateDelay, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 interface Props extends Omit<React.DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, 'style'> {
   label?: string;
@@ -38,7 +37,7 @@ export const MenuBarItem = observer<Props, HTMLButtonElement>(forwardRef(functio
     <menu-bar-item ref={ref} as='button' {...rest} title={title} aria-label={title}>
       {loading && <Loader small fullSize />}
       {!loading && icon && <IconOrImage icon={icon} viewBox={viewBox} />}
-      {label && <item-label><Translate token={label} /></item-label>}
+      {label && <item-label>{translate(label)}</item-label>}
     </menu-bar-item>
   );
 }));

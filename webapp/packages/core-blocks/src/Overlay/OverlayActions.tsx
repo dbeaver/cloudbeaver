@@ -9,8 +9,6 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
 import { OVERLAY_BASE_STYLES } from './OVERLAY_BASE_STYLES';
 
 interface Props {
@@ -21,7 +19,7 @@ export const OverlayActions = observer<React.PropsWithChildren<Props>>(function 
   className,
   children,
 }) {
-  return styled(useStyles(OVERLAY_BASE_STYLES))(
+  return styled(OVERLAY_BASE_STYLES)(
     <actions className={className}>
       {children}
     </actions>

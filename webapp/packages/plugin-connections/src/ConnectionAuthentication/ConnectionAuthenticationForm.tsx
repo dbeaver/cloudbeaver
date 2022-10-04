@@ -9,11 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Container, FieldCheckbox, Group, GroupTitle, ObjectPropertyInfoForm, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Container, FieldCheckbox, Group, GroupTitle, ObjectPropertyInfoForm, TextPlaceholder, useMapResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import type { IConnectionAuthenticationConfig } from './IConnectionAuthenticationConfig';
 import { NetworkHandlers } from './NetworkHandlers';

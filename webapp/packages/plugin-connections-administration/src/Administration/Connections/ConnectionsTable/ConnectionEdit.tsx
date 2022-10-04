@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 
 import { ConnectionInfoResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { ConnectionForm, useConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 const styles = css`
@@ -53,7 +52,7 @@ export const ConnectionEdit = observer<Props>(function ConnectionEditNew({
   data.config.connectionId = item.connectionId;
   data.projectId = item.projectId;
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <box ref={boxRef} as='div'>
       <ConnectionForm
         state={data}

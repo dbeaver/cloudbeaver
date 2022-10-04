@@ -9,9 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { splitStyles, Split, ResizerControls, Pane, ErrorBoundary, useSplitUserState } from '@cloudbeaver/core-blocks';
+import { splitStyles, Split, ResizerControls, Pane, ErrorBoundary, useSplitUserState, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 import { SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
 import { NavigationTree } from '@cloudbeaver/plugin-navigation-tree';
 

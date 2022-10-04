@@ -11,9 +11,9 @@ import { useMemo, useState } from 'react';
 import { Tab as BaseTab } from 'reakit/Tab';
 import styled, { use } from 'reshadow';
 
-import { getComputed, Icon } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import { getComputed, Icon, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { IDataContext, useMenu } from '@cloudbeaver/core-view';
 
 import { ContextMenu } from '../../ContextMenu/ContextMenu';

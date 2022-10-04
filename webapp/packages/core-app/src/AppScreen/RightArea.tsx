@@ -19,11 +19,12 @@ import {
   splitHorizontalStyles,
   splitStyles,
   SlideOverlay,
+  useStyles,
   ErrorBoundary,
   useSplitUserState
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { NavigationTabsBar } from '@cloudbeaver/plugin-navigation-tabs';
 import { ToolsPanelService, ToolsPanel } from '@cloudbeaver/plugin-tools-panel';

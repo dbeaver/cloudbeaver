@@ -9,7 +9,7 @@
 import type { DetailedHTMLProps, IframeHTMLAttributes } from 'react';
 import styled, { css } from 'reshadow';
 
-import {  useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from './useStyles';
 
 const styles = css`
     iframe {

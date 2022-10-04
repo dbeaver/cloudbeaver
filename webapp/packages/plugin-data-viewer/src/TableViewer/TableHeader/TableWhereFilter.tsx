@@ -9,9 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import type { PlaceholderComponent } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { PlaceholderComponent, useTranslate } from '@cloudbeaver/core-blocks';
 import { InlineEditor } from '@cloudbeaver/core-ui';
 
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService';
@@ -32,7 +30,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
   const translate = useTranslate();
   const state = useWhereFilter(model, resultIndex);
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <InlineEditor
       name="data_where"
       value={state.filter}

@@ -9,10 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TextPlaceholder, Loader, ExceptionMessage, useMapResource, ColoredContainer, Group, ObjectPropertyInfoForm, BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, Loader, ExceptionMessage, useMapResource, ColoredContainer, Group, ObjectPropertyInfoForm, BASE_CONTAINERS_STYLES, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { createConnectionParam } from '@cloudbeaver/core-connections';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';

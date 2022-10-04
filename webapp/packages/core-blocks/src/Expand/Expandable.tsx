@@ -11,9 +11,10 @@ import { forwardRef, ReactNode, useImperativeHandle } from 'react';
 import { Disclosure, DisclosureContent, DisclosureStateReturn, useDisclosureState } from 'reakit';
 import styled, { css, use } from 'reshadow';
 
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { IconOrImage } from '../IconOrImage';
+import { useStyles } from '../useStyles';
 
 export type ExpandableState = Pick<DisclosureStateReturn, 'setVisible' | 'show' | 'hide' | 'toggle' | 'visible'>;
 

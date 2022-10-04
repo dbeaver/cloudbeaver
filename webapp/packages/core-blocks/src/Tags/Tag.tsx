@@ -9,8 +9,6 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
 import { IconOrImage } from '../IconOrImage';
 
 export interface ITag {
@@ -71,9 +69,7 @@ interface Props extends ITag {
 }
 
 export const Tag = observer<Props>(function Tag({ id, label, icon, onRemove, className }) {
-  const styles = useStyles(style);
-
-  return styled(styles)(
+  return styled(style)(
     <tag-container as='li' title={label} className={className}>
       {icon && (
         <tag-icon>

@@ -16,8 +16,7 @@ import { MapContainer, GeoJSON, LayersControl, TileLayer } from 'react-leaflet';
 import type { TileLayerProps } from 'react-leaflet';
 import styled, { css } from 'reshadow';
 
-import { useSplit } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { useSplit, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IResultSetElementKey, IResultSetValue } from '@cloudbeaver/plugin-data-viewer';
 
 import baseStyles from './styles/base.scss';

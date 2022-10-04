@@ -11,13 +11,12 @@ import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AuthInfoService, AuthProvider, AuthProviderConfiguration, comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
-import { Filter, IconOrImage, Link, Cell, getComputed, TextPlaceholder, usePromiseState, Loader, Button } from '@cloudbeaver/core-blocks';
+import { Filter, IconOrImage, Link, Cell, getComputed, TextPlaceholder, usePromiseState, Loader, Button, useTranslate, useStyles, Translate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
-import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { AuthenticationService } from '../../AuthenticationService';
 

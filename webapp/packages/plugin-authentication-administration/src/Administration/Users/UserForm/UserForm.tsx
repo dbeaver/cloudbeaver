@@ -9,11 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Loader, SubmittingForm, Button, useFocus, StatusMessage } from '@cloudbeaver/core-blocks';
+import { Loader, SubmittingForm, Button, useFocus, StatusMessage, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { TabsState, TabList, TabPanelList, UNDERLINE_TAB_STYLES, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { UserFormController } from './UserFormController';
@@ -109,7 +107,7 @@ export const UserForm = observer<Props>(function UserForm({
 
   controller.update(user, editing, onCancel);
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <TabsState container={service.tabsContainer} user={user} controller={controller} editing={editing}>
       <box>
         <connection-top-bar>

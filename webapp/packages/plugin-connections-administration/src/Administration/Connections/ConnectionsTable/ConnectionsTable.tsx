@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  Table, TableHeader, TableColumnHeader, TableBody, TableSelect
+  Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useTranslate
 } from '@cloudbeaver/core-blocks';
 import { DatabaseConnection, IConnectionInfoParams, serializeConnectionParam } from '@cloudbeaver/core-connections';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 
 import { Connection } from './Connection';
 
@@ -43,7 +43,7 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
 }) {
   const translate = useTranslate();
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
       <TableHeader>
         <TableColumnHeader min flex centerContent>

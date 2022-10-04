@@ -10,8 +10,8 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import type { AuthProvider, IAuthCredentials } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, Combobox, Group, InputField, useFocus } from '@cloudbeaver/core-blocks';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_CONTAINERS_STYLES, Combobox, Group, InputField, useFocus, useStyles } from '@cloudbeaver/core-blocks';
+
 
 interface Props {
   provider: AuthProvider;

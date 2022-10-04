@@ -9,9 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, GroupItem } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_CONTAINERS_STYLES, Button, Container, GroupItem, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+
+
 
 import { useAuthenticationAction } from './useAuthenticationAction';
 

@@ -11,10 +11,10 @@ import { ButtonHTMLAttributes, forwardRef, useRef } from 'react';
 import type { MenuInitialState } from 'reakit/Menu';
 import styled from 'reshadow';
 
-import { getComputed, IMenuState, Menu, menuPanelStyles, useObjectRef } from '@cloudbeaver/core-blocks';
+import { getComputed, IMenuState, Menu, menuPanelStyles, useObjectRef, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { IMenuData, MenuActionItem, MenuService } from '@cloudbeaver/core-view';
 
 import { MenuItemRenderer } from './MenuItemRenderer';

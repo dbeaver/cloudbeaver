@@ -10,8 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled, { css } from 'reshadow';
 
-import { getComputed, IconOrImage } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { getComputed, IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
 import type { HeaderRendererProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { DataGridContext } from '../DataGridContext';

@@ -11,9 +11,9 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, IProperty, Loader, PropertiesTable, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, IProperty, Loader, PropertiesTable, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 

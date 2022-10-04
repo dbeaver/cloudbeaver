@@ -8,7 +8,7 @@
 
 import styled, { css, use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 const styles = css`
     status {
@@ -35,7 +35,7 @@ interface Props {
 }
 
 export const ConnectionMark: React.FC<Props> = function ConnectionMark({ connected, className }) {
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <status {...use({ connected })} className={className} />
   );
 };

@@ -10,13 +10,13 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useLayoutEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, useAppLoadingScreen, useDataResource } from '@cloudbeaver/core-blocks';
+import { Loader, useAppLoadingScreen, useDataResource, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
-import { ThemeService, useStyles } from '@cloudbeaver/core-theming';
+import { ThemeService } from '@cloudbeaver/core-theming';
 import { DNDProvider } from '@cloudbeaver/core-ui';
 import { useAppVersion } from '@cloudbeaver/plugin-version';
 

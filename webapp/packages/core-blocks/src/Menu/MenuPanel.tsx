@@ -11,10 +11,11 @@ import { Children } from 'react';
 import { Menu, MenuStateReturn } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { ErrorBoundary } from '../ErrorBoundary';
 import { getComputed } from '../getComputed';
+import { useStyles } from '../useStyles';
 import { MenuEmptyItem } from './MenuEmptyItem';
 import { menuPanelStyles } from './menuPanelStyles';
 

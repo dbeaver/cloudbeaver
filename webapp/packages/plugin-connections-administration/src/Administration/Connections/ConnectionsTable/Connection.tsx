@@ -14,7 +14,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { DatabaseConnection, DBDriverResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { ConnectionsAdministrationService } from '../ConnectionsAdministrationService';
 import { ConnectionEdit } from './ConnectionEdit';
@@ -47,7 +47,7 @@ export const Connection = observer<Props>(function Connection({ connectionKey, c
   const connectionsAdministrationService = useService(ConnectionsAdministrationService);
   const icon = driversResource.get(connection.driverId)?.icon;
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <TableItem item={connectionKey} expandElement={ConnectionEdit}>
       <TableColumnValue centerContent flex>
         <TableItemSelect />

@@ -9,11 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { type PlaceholderComponent, BASE_CONTAINERS_STYLES, Switch, PlaceholderElement } from '@cloudbeaver/core-blocks';
+import { type PlaceholderComponent, BASE_CONTAINERS_STYLES, Switch, PlaceholderElement, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IElementsTreeSettingsProps } from '../ElementsTree/ElementsTreeTools/NavigationTreeSettings/ElementsTreeSettingsService';
 

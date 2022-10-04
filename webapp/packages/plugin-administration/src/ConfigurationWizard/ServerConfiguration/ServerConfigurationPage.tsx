@@ -10,12 +10,11 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES, ConfigurationWizardService } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupItem, GroupTitle, ToolsAction, Loader, Placeholder, SubmittingForm, useFocus, useFormValidator, ToolsPanel } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupItem, GroupTitle, ToolsAction, Loader, Placeholder, SubmittingForm, useFocus, useFormValidator, ToolsPanel, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm';
 import { ServerConfigurationFeaturesForm } from './Form/ServerConfigurationFeaturesForm';

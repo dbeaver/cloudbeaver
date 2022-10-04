@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 import { TableItem, TableColumnValue, EventTableItemSelectionFlag } from '@cloudbeaver/core-blocks';
 import { EventContext } from '@cloudbeaver/core-events';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IExecutionPlanNode } from './ExecutionPlanTreeContext';
 import { Expand } from './Expand';
@@ -43,7 +42,6 @@ interface Props {
 }
 
 export const NestedNode: React.FC<Props> = function NestedNode({ columns, node, depth, className }) {
-  const style = useStyles(styles);
   const [expanded, setExpanded] = useState(true);
 
   const expand = useCallback((event: React.MouseEvent<any, MouseEvent>) => {
@@ -53,7 +51,7 @@ export const NestedNode: React.FC<Props> = function NestedNode({ columns, node, 
 
   const hasChildren = node.children.length > 0;
 
-  return styled(style)(
+  return styled(styles)(
     <>
       <TableItem key={`${node.id}_${depth}`} className={className} item={node.id} selectOnItem>
         {columns.map((column, idx) => {

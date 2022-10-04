@@ -8,7 +8,7 @@
 
 import styled from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { BASE_TAB_STYLES } from './BASE_TAB_STYLES';
 
@@ -17,7 +17,7 @@ interface IProps {
 }
 
 export const TabTitle: React.FC<React.PropsWithChildren<IProps>> = function TabTitle({ children, className }) {
-  return styled(useStyles(BASE_TAB_STYLES))(
+  return styled(BASE_TAB_STYLES)(
     <tab-title className={className}>
       {children || <placeholder />}
     </tab-title>

@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Combobox, useMapResource } from '@cloudbeaver/core-blocks';
+import { Combobox, useMapResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { ProjectInfo, ProjectInfoResource, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 

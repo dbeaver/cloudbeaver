@@ -9,10 +9,12 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { IconOrImage, Link } from '@cloudbeaver/core-blocks';
 import { ENotificationType } from '@cloudbeaver/core-events';
-import { useTranslate } from '@cloudbeaver/core-localization';
 
+
+import { IconOrImage } from './IconOrImage';
+import { Link } from './Link';
+import { useTranslate } from './localization/useTranslate';
 import { useErrorDetails } from './useErrorDetails';
 
 const styles = css`

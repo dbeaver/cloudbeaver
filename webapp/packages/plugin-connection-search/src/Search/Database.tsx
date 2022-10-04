@@ -16,7 +16,7 @@ import {
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 const styles = css`
     ListItemIcon {
@@ -66,7 +66,7 @@ export const Database = observer<Props>(function Database({ database, onSelect }
   const host = database.host + ':' + database.port;
   const name = database.displayName !== database.host ? database.displayName + ' (' + host + ')' : host;
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <ListItem onClick={select}>
       <ListItemIcon>
         {orderedDrivers.map(driverId => <StaticImage key={driverId} icon={drivers.get(driverId)?.icon} />)}

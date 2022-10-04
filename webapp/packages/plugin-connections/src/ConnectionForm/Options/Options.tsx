@@ -30,14 +30,13 @@ import {
   Radio,
   RadioGroup,
   FormFieldDescription,
+  useTranslate,
+  usePermission,
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
-import { usePermission } from '@cloudbeaver/core-root';
 import { CachedMapEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
@@ -190,7 +189,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const providerPropertiesWithoutBoolean = driver?.providerProperties.slice().filter(property => property.dataType !== 'Boolean');
   const booleanProviderProperties = driver?.providerProperties.slice().filter(property => property.dataType === 'Boolean');
 
-  return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
+  return styled(styles, BASE_CONTAINERS_STYLES)(
     <SubmittingForm ref={formRef} disabled={driverMap.isLoading()} onChange={handleFormChange}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>

@@ -10,9 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled, { css } from 'reshadow';
 
-import { getComputed, Icon, Loader } from '@cloudbeaver/core-blocks';
 import { EventContext } from '@cloudbeaver/core-events';
 
+import { getComputed } from '../../getComputed';
+import { Icon } from '../../Icon';
+import { Loader } from '../../Loader/Loader';
 import { useStateDelay } from '../../useStateDelay';
 import { EventTreeNodeExpandFlag } from './EventTreeNodeExpandFlag';
 import { TreeNodeContext } from './TreeNodeContext';

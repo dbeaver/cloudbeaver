@@ -10,10 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useCallback } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
 import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import { useStyles } from '../useStyles';
 import { baseFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 import { RadioGroupContext } from './RadioGroupContext';

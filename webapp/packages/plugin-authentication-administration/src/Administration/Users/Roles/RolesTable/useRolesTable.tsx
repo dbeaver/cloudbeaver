@@ -9,11 +9,11 @@
 import { computed, observable } from 'mobx';
 
 import { compareRoles, RoleInfo, RolesResource } from '@cloudbeaver/core-authentication';
-import { ILoadableState, TableState, useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
+import { ILoadableState, TableState, useMapResource, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 interface State {

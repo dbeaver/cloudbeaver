@@ -8,8 +8,6 @@
 
 import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
 export const topAppBarStyles = css`
     header {
       composes: theme-background-primary theme-text-on-primary theme-typography--body2 from global;
@@ -26,7 +24,7 @@ interface Props extends React.PropsWithChildren {
 }
 
 export const TopAppBar: React.FC<Props> = function TopAppBar({ children, className }) {
-  return styled(useStyles(topAppBarStyles))(
+  return styled(topAppBarStyles)(
     <header className={className}>
       {children}
     </header>

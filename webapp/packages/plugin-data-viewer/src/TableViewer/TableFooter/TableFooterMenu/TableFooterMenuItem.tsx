@@ -10,10 +10,8 @@ import { observer } from 'mobx-react-lite';
 import type { ButtonHTMLAttributes } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { IconOrImage, ToolsAction } from '@cloudbeaver/core-blocks';
+import { IconOrImage, ToolsAction, useTranslate } from '@cloudbeaver/core-blocks';
 import { IMenuItem, MenuTrigger } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 type Props = ButtonHTMLAttributes<any> & {
   menuItem: IMenuItem;
@@ -54,10 +52,9 @@ export const TableFooterMenuItem = observer<Props>(function TableFooterMenuItem(
   ...props
 }) {
   const translate = useTranslate();
-  const styles = useStyles(tableFooterMenuStyles);
 
   if (!menuItem.panel) {
-    return styled(styles)(
+    return styled(tableFooterMenuStyles)(
       <ToolsAction
         {...props}
         {...use({ hidden: menuItem.isHidden })}
@@ -72,7 +69,7 @@ export const TableFooterMenuItem = observer<Props>(function TableFooterMenuItem(
     );
   }
 
-  return styled(styles)(
+  return styled(tableFooterMenuStyles)(
     <MenuTrigger
       {...props}
       {...use({ hidden: menuItem.isHidden })}

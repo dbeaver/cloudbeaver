@@ -7,8 +7,7 @@
  */
 
 import { useService } from '@cloudbeaver/core-di';
-
-import { PermissionsService } from './PermissionsService';
+import { PermissionsService } from '@cloudbeaver/core-root';
 
 export function usePermission(key: string): boolean {
   const permissionsService = useService(PermissionsService);

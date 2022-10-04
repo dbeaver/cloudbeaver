@@ -10,10 +10,9 @@ import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { IconButton, PlaceholderElement, useMapResource } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { IconButton, PlaceholderElement, useMapResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE';

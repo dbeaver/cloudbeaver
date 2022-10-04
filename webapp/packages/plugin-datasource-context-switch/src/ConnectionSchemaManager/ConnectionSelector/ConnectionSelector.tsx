@@ -10,13 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { getComputed, useDataResource, useMapResource } from '@cloudbeaver/core-blocks';
+import { getComputed, useDataResource, useMapResource, usePermission, useStyles } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ContainerResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
-import { EPermission, usePermission } from '@cloudbeaver/core-root';
+import { EPermission } from '@cloudbeaver/core-root';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { ContextMenu, OptionsPanelService } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { topMenuStyles, TopNavButton } from '@cloudbeaver/plugin-top-app-bar';

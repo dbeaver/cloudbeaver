@@ -10,11 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage } from '@cloudbeaver/core-blocks';
+import { Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { AuthConfigurationFormService } from './AuthConfigurationFormService';
@@ -110,7 +108,7 @@ export const AuthConfigurationForm = observer<Props>(function AuthConfigurationF
 }) {
   const translate = useTranslate();
   const props = useObjectRef({ onSave });
-  const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
+  const style = useStyles(BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES);
   const styles = useStyles(style, BASE_CONTAINERS_STYLES, topBarStyles, formStyles);
   const service = useService(AuthConfigurationFormService);
 

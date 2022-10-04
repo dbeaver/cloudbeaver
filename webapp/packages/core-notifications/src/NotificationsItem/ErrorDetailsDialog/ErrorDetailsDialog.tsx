@@ -10,10 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo } from 'react';
 import styled from 'reshadow';
 
-import { useClipboard, Button, Iframe, Textarea } from '@cloudbeaver/core-blocks';
+import { useClipboard, Button, Iframe, Textarea, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 
 import { ErrorModel, IErrorInfo } from './ErrorModel';
 import { dialogStyle, styles } from './styles';

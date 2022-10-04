@@ -10,9 +10,9 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { Group, GroupTitle, BASE_CONTAINERS_STYLES, InputField } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { Group, GroupTitle, BASE_CONTAINERS_STYLES, InputField, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+
+
 
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState';
 

@@ -11,11 +11,11 @@ import styled, { css, use } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useMapResource, ToolsAction, ToolsPanel, Loader, BASE_LAYOUT_GRID_STYLES } from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useMapResource, ToolsAction, ToolsPanel, Loader, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 import { filterUndefined } from '@cloudbeaver/core-utils';
 
 import { CreateUser } from './CreateUser';

@@ -11,11 +11,10 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Group, GroupTitle, BASE_CONTAINERS_STYLES, useMapResource, Combobox, Tags, ITag, Tag } from '@cloudbeaver/core-blocks';
+import { Group, GroupTitle, BASE_CONTAINERS_STYLES, useMapResource, Combobox, Tags, ITag, Tag, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey, resourceKeyList, ServerConfigInput } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 
 interface Props {

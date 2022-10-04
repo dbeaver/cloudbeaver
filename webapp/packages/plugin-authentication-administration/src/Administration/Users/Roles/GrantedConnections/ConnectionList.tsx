@@ -9,7 +9,7 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import {
   Table,
@@ -22,12 +22,13 @@ import {
   useObjectRef,
   getComputed,
   getSelectedItems,
+  useTranslate,
+  useStyles,
 } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import type { DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { getFilteredConnections } from './getFilteredConnections';
 import { GrantedConnectionsTableHeader, IFilterState } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader';

@@ -10,9 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, FieldCheckbox, Group, InputField, SubmittingForm } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, Container, FieldCheckbox, Group, InputField, SubmittingForm, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 
 import type { IAutoRefreshSettings } from './IAutoRefreshSettings';
 

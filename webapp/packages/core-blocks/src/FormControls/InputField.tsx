@@ -10,12 +10,14 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef, useCallback, useContext, useState } from 'react';
 import styled, { use, css } from 'reshadow';
 
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { Icon } from '../Icon';
+import { useTranslate } from '../localization/useTranslate';
 import { useCombinedHandler } from '../useCombinedHandler';
+import { useStyles } from '../useStyles';
 import { baseFormControlStyles, baseInvalidFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';

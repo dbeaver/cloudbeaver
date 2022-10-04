@@ -9,11 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { IconButton, Loader, StaticImage, Icon, useMapResource } from '@cloudbeaver/core-blocks';
+import { IconButton, Loader, StaticImage, Icon, useMapResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { ConnectionForm } from '@cloudbeaver/plugin-connections';
 

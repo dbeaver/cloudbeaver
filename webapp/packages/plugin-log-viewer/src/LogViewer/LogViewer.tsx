@@ -10,9 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useSplitUserState } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useSplitUserState, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+
+
 
 import { LogViewerInfoPanel } from './LogViewerInfoPanel';
 import { LogViewerTable } from './LogViewerTable';

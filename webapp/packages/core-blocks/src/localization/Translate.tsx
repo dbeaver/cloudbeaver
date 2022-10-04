@@ -8,7 +8,8 @@
 
 import { observer } from 'mobx-react-lite';
 
-import type { TLocalizationToken } from './TLocalizationToken';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
+
 import { useTranslate } from './useTranslate';
 
 interface Props {

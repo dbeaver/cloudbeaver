@@ -11,11 +11,9 @@ import styled, { css } from 'reshadow';
 
 import {
   Split, Pane, ResizerControls, splitStyles, TextPlaceholder,
-  Table, TableHeader, TableColumnHeader, TableBody, Textarea, useSplitUserState
+  Table, TableHeader, TableColumnHeader, TableBody, Textarea, useSplitUserState, useTranslate
 } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import type { SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import { NestedNode } from './NestedNode';
 import { useExecutionPlanTreeState } from './useExecutionPlanTreeState';
@@ -53,12 +51,11 @@ interface Props {
 export const ExecutionPlanTreeBlock = observer<Props>(function ExecutionPlanTreeBlock({
   nodeList, query, onNodeSelect, className,
 }) {
-  const style = useStyles(styles, splitStyles);
   const translate = useTranslate();
   const splitState = useSplitUserState('execution-plan-block');
   const state = useExecutionPlanTreeState(nodeList, onNodeSelect);
 
-  return styled(style)(
+  return styled(styles, splitStyles)(
     <Split
       {...splitState}
       className={className}

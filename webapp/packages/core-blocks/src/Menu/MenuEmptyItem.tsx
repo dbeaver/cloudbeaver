@@ -9,9 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { useTranslate } from '../localization/useTranslate';
+import { useStyles } from '../useStyles';
 import { MenuItem } from './MenuItem';
 import { MenuItemElement } from './MenuItemElement';
 import { menuPanelStyles } from './menuPanelStyles';

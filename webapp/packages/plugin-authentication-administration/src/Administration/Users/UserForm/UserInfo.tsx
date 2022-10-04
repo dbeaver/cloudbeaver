@@ -11,9 +11,9 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, FieldCheckbox, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useDataResource } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, FieldCheckbox, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useDataResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+
+
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IUserFormProps } from './UserFormService';

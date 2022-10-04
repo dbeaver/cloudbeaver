@@ -11,11 +11,9 @@ import React, { useContext } from 'react';
 import styled from 'reshadow';
 
 import { AuthProviderService, AuthProvidersResource, AuthSettingsService, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, FormContext, Group, GroupTitle, Loader, PlaceholderComponent, Switch, useExecutor, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, FormContext, Group, GroupTitle, Loader, PlaceholderComponent, Switch, useExecutor, useMapResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
 
 import { ServerConfigurationAdminForm } from './ServerConfigurationAdminForm';

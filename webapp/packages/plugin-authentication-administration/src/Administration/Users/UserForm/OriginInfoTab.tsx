@@ -9,8 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { Translate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { Translate, useStyles } from '@cloudbeaver/core-blocks';
 import { TabTitle, Tab, TabContainerTabComponent } from '@cloudbeaver/core-ui';
 
 import { getOriginTabId } from './getOriginTabId';

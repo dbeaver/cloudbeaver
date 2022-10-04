@@ -9,7 +9,8 @@
 import { PropsWithChildren, ReactNode, forwardRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { ITabData } from '../TabsContainer/ITabsContainer';

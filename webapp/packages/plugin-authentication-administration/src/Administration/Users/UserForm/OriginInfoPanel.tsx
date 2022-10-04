@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
-import { TextPlaceholder, Loader, ExceptionMessage, BASE_CONTAINERS_STYLES, ColoredContainer, ObjectPropertyInfoForm, Group } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, Loader, ExceptionMessage, BASE_CONTAINERS_STYLES, ColoredContainer, ObjectPropertyInfoForm, Group, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import { getOriginTabId } from './getOriginTabId';

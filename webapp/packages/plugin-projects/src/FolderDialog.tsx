@@ -11,10 +11,8 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, useFocus, useObservableRef } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, Translate, useFocus, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { Translate, useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { throttleAsync } from '@cloudbeaver/core-utils';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
@@ -132,7 +130,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
 
   const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
 
-  return styled(useStyles(style, BASE_CONTAINERS_STYLES))(
+  return styled(style, BASE_CONTAINERS_STYLES)(
     <CommonDialogWrapper
       size='small'
       subTitle={subTitle}

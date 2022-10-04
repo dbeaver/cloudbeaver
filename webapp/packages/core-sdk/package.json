@@ -18,6 +18,9 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0",
+    "@cloudbeaver/core-executor": "~0.1.0",
     "graphql-request": "~4.3.0"
   },
   "devDependencies": {
@@ -31,7 +34,6 @@
     "graphql": "~16.x.x"
   },
   "peerDependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
     "mobx": "~6.x.x"
   }
 }

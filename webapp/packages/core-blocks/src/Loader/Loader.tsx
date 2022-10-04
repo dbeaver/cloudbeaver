@@ -11,13 +11,15 @@ import { observer } from 'mobx-react-lite';
 import { useState, useEffect, useContext, useRef } from 'react';
 import styled, { use } from 'reshadow';
 
-import { Translate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { Button } from '../Button';
 import { ExceptionMessage } from '../ExceptionMessage';
+import { Translate } from '../localization/Translate';
 import { StaticImage } from '../StaticImage';
+import { useStyles } from '../useStyles';
 import type { ILoadableState } from './ILoadableState';
 import { ILoaderContext, LoaderContext } from './LoaderContext';
 import { loaderStyles, overlayStyles } from './loaderStyles';

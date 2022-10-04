@@ -9,11 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
-import {
-  VERTICAL_ROTATED_TAB_STYLES, Tab, TabIcon, TabTitle, BASE_TAB_STYLES
-} from '@cloudbeaver/core-ui';
+
+import { useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { VERTICAL_ROTATED_TAB_STYLES, Tab, TabIcon, TabTitle, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDataPresentationOptions } from '../../DataPresentationService';
