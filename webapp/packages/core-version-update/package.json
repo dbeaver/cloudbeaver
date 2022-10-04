@@ -24,6 +24,6 @@
     "mobx": "~6.x.x"
   },
   "devDependencies": {
-    "@types/semver": "~7.3.9"
+    "@types/semver": "~7.3.12"
   }
 }

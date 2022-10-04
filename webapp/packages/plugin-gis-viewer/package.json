@@ -14,7 +14,7 @@
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@cloudbeaver/core-administration": "~0.1.0",
     "@cloudbeaver/core-app": "~0.1.0",
     "@cloudbeaver/core-authentication": "~0.1.0",
@@ -38,15 +38,15 @@
     "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
     "@cloudbeaver/plugin-data-viewer": "~0.1.0",
+    "leaflet": "~1.9.1",
+    "react-leaflet": "~4.1.0",
+    "wellknown": "~0.5.0"
+  },
+  "peerDependencies": {
     "mobx": "~6.x.x",
     "mobx-react-lite": "~3.x.x",
     "react": "~18.x.x",
     "reshadow": "~0.x.x"
-  },
-  "dependencies": {
-    "leaflet": "~1.8.0",
-    "react-leaflet": "~4.0.0",
-    "wellknown": "~0.5.0"
   },
   "devDependencies": {
     "@types/react-leaflet": "~2.8.2",

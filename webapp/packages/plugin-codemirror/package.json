@@ -15,13 +15,6 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
-    "codemirror": "~5.65.5",
-    "react-codemirror2": "~7.2.1"
-  },
-  "devDependencies": {
-    "@types/codemirror": "~5.60.5"
-  },
-  "peerDependencies": {
     "@cloudbeaver/core-administration": "~0.1.0",
     "@cloudbeaver/core-app": "~0.1.0",
     "@cloudbeaver/core-authentication": "~0.1.0",
@@ -45,6 +38,13 @@
     "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
     "@cloudbeaver/plugin-administration": "~0.1.0",
+    "codemirror": "~5.65.9",
+    "react-codemirror2": "~7.2.1"
+  },
+  "devDependencies": {
+    "@types/codemirror": "~5.60.5"
+  },
+  "peerDependencies": {
     "react": "~18.x.x",
     "mobx": "~6.x.x",
     "mobx-react-lite": "~3.x.x",
