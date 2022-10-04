@@ -68,6 +68,10 @@ public class WebAuthProviderInfo {
         return descriptor.isConfigurable();
     }
 
+    public boolean isTrusted() {
+        return descriptor.isTrusted();
+    }
+
     public List<WebAuthProviderConfiguration> getConfigurations() {
         List<WebAuthProviderConfiguration> result = new ArrayList<>();
         for (SMAuthProviderCustomConfiguration cfg : CBApplication.getInstance().getAppConfiguration().getAuthCustomConfigurations()) {
