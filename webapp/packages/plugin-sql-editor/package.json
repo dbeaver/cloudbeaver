@@ -15,7 +15,7 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "test": "core-cli-test"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@cloudbeaver/plugin-codemirror": "~0.1.0",
     "@cloudbeaver/plugin-data-viewer": "~0.1.0",
     "@cloudbeaver/core-administration": "~0.1.0",
@@ -41,7 +41,9 @@
     "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
     "@cloudbeaver/plugin-navigation-tabs": "~0.1.0",
-    "@cloudbeaver/core-navigation-tree": "~0.1.0",
+    "@cloudbeaver/core-navigation-tree": "~0.1.0"
+  },
+  "peerDependencies": {
     "react": "~18.x.x",
     "mobx": "~6.x.x",
     "mobx-react-lite": "~3.x.x",
