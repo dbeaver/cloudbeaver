@@ -25,8 +25,8 @@ import {
 import { AuthConfigurationsResource } from './AuthConfigurationsResource';
 import { AuthSettingsService } from './AuthSettingsService';
 
-export type AuthProvider = AuthProviderInfoFragment;
-export type AuthProviderConfiguration = AuthProviderConfigurationInfoFragment;
+export type AuthProvider = NonNullable<AuthProviderInfoFragment>;
+export type AuthProviderConfiguration = NonNullable<AuthProviderConfigurationInfoFragment>;
 
 @injectable()
 export class AuthProvidersResource extends CachedMapResource<string, AuthProvider> {

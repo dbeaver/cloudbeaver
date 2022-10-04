@@ -13,9 +13,7 @@ import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@
 import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
 import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useMapResource, ToolsAction, ToolsPanel, Loader, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
-
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-
 import { filterUndefined } from '@cloudbeaver/core-utils';
 
 import { CreateUser } from './CreateUser';
@@ -72,7 +70,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
   const controller = useController(UsersTableController);
   const usersResource = useMapResource(UsersTable, UsersResource, CachedMapAllKey);
   const isLocalProviderAvailable = controller.isLocalProviderAvailable;
-  const users = usersResource.data
+  const users = usersResource.resource.values
     .filter<AdminUser>(filterUndefined)
     .sort((a, b) => {
       if (usersResource.resource.isNew(a.userId) === usersResource.resource.isNew(b.userId)) {

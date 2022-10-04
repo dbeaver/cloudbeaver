@@ -112,7 +112,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
       await this.setConnections(userId, grantedConnections);
       await this.setMetaParameters(userId, metaParameters);
-      const user = await this.refresh(userId) as AdminUserNew;
+      const user = await this.refresh(userId) as unknown as AdminUserNew;
       user[NEW_USER_SYMBOL] = true;
     } catch (exception: any) {
       this.delete(userId);

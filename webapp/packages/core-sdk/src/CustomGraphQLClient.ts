@@ -37,7 +37,7 @@ export class CustomGraphQLClient extends GraphQLClient {
   ): Promise<T> {
     return this.interceptors.reduce(
       (accumulator, interceptor) => interceptor(accumulator),
-      this.overrideRequest<T>(document, variables, requestHeaders)
+      this.overrideRequest<T, V>(document, variables, requestHeaders)
     );
   }
 
@@ -71,7 +71,7 @@ export class CustomGraphQLClient extends GraphQLClient {
       const requestOptions  = parseRequestArgs(documentOrOptions, variables, requestHeaders);
       const { query, operationName } = resolveRequestDocument(requestOptions.document);
 
-      const response = await this.rawRequest<T>(query, variables, requestHeaders);
+      const response = await this.rawRequest<T, V>(query, variables, requestHeaders);
 
       // TODO: seems here can be undefined
       return response.data;

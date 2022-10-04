@@ -14,7 +14,11 @@ let id = 0;
 
 @injectable()
 export class LocalStorageSaveService {
-  withAutoSave<T>(store: T, name?: string, remap?: (savedStore: T) => T): void {
+  withAutoSave<T extends Record<any, any> | Map<any, any>>(
+    store: T,
+    name?: string,
+    remap?: (savedStore: T) => T
+  ): void {
     let firstRun = true;
     const storeId = name || ++id;
 
@@ -25,7 +29,7 @@ export class LocalStorageSaveService {
         if (state) {
           try {
             const parsed = this.parseData(store, state, remap);
-            set(store, parsed);
+            set<T>(store, parsed);
           } catch (e: any) {
             console.log('Error when parsing local storage value', e);
           }
