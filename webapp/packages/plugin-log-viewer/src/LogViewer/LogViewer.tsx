@@ -12,8 +12,6 @@ import styled, { css } from 'reshadow';
 
 import { Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useSplitUserState, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 
-
-
 import { LogViewerInfoPanel } from './LogViewerInfoPanel';
 import { LogViewerTable } from './LogViewerTable';
 import { useLogViewer } from './useLogViewer';
