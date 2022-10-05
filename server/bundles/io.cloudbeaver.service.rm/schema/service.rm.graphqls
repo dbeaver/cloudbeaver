@@ -17,8 +17,13 @@ type RMResource {
     length: Int!
 }
 
-input RMProjectPermissions {
+input RMSubjectProjectPermissions {
     subjectId: String!
+    permissions: [String!]!
+}
+
+input RMProjectPermissions {
+    projectId: String!
     permissions: [String!]!
 }
 
@@ -81,6 +86,8 @@ extend type Mutation {
 
     rmDeleteProject(projectId: ID!): Boolean!
 
-    rmSetProjectPermissions(projectId: String!, permissions: [RMProjectPermissions!]!): Boolean!
+    rmSetProjectPermissions(projectId: String!, permissions: [RMSubjectProjectPermissions!]!): Boolean!
+
+    rmSetSubjectProjectPermissions(subjectId: String!, permissions: [RMProjectPermissions!]!): Boolean!
 
 }

@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { useTabState } from 'reakit/Tab';
 
-import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { Executor, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
@@ -113,8 +113,9 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     }
   }
 
-  useEffect(() => {
-    const openHandler: IExecutorHandler<ITabData<T>> = (data, contexts) => {
+  useExecutor({
+    executor: openExecutor,
+    handlers: [function openHandler(data, contexts) {
       dynamic.open?.(data);
       if (dynamic.selectedId === data.tabId) {
         ExecutorInterrupter.interrupt(contexts);
@@ -122,18 +123,15 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       }
       dynamic.selectedId = data.tabId;
       dynamic.state.setSelectedId(data.tabId);
-    };
-    const closeHandler: IExecutorHandler<ITabData<T>> = data => dynamic.close?.(data);
+    }],
+  });
 
-    openExecutor.addHandler(openHandler);
-    closeExecutor.addHandler(closeHandler);
-
-    return () => {
-      // probably not needed, executors destroyed with component
-      openExecutor.removeHandler(openHandler);
-      closeExecutor.removeHandler(closeHandler);
-    };
-  }, []);
+  useExecutor({
+    executor: closeExecutor,
+    handlers: [function closeHandler(data) {
+      dynamic.close?.(data);
+    }],
+  });
 
   useEffect(() => {
     if (currentTabId !== undefined && currentTabId !== null) {

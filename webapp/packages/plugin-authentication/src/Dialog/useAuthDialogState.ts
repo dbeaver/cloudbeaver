@@ -95,7 +95,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         return true;
       }
 
-      if (provider.configurable) {
+      if (provider.configurable || provider.trusted) {
         return false;
       }
 

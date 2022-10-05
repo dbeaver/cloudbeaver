@@ -110,7 +110,13 @@ export const UserForm = observer<Props>(function UserForm({
   controller.update(user, editing, onCancel);
 
   return styled(useStyles(styles))(
-    <TabsState container={service.tabsContainer} user={user} controller={controller} editing={editing}>
+    <TabsState
+      localState={controller.partsState}
+      container={service.tabsContainer}
+      user={user}
+      controller={controller}
+      editing={editing}
+    >
       <box>
         <connection-top-bar>
           <connection-top-bar-tabs>
