@@ -4,6 +4,7 @@ fragment AuthProviderInfo on AuthProviderInfo {
     icon
     description
     defaultProvider
+    trusted
 
     #configurationParameters {
     #  id
