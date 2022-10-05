@@ -154,6 +154,7 @@ export interface AuthProviderInfo {
   id: Scalars['ID'];
   label: Scalars['String'];
   requiredFeatures: Array<Scalars['String']>;
+  trusted: Scalars['Boolean'];
 }
 
 export enum AuthStatus {
@@ -1738,7 +1739,7 @@ export type GetAuthProviderConfigurationsQuery = { configurations: Array<{ provi
 export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAuthProvidersQuery = { providers: Array<{ id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> }> };
+export type GetAuthProvidersQuery = { providers: Array<{ id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, trusted: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> }> };
 
 export type GetAuthStatusQueryVariables = Exact<{
   authId: Scalars['ID'];
@@ -2258,7 +2259,7 @@ export type AuthProviderConfigurationInfoFragment = { id: string, displayName: s
 
 export type AuthProviderConfigurationParametersFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number };
 
-export type AuthProviderInfoFragment = { id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> };
+export type AuthProviderInfoFragment = { id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, trusted: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> };
 
 export type AuthTokenFragment = { authProvider: string, authConfiguration?: string, loginTime: any, message?: string, origin: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> } };
 
@@ -2841,6 +2842,7 @@ export const AuthProviderInfoFragmentDoc = `
   icon
   description
   defaultProvider
+  trusted
   configurable
   configurations {
     ...AuthProviderConfigurationInfo
