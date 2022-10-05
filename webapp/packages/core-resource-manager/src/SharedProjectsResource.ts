@@ -11,13 +11,14 @@ import { runInAction } from 'mobx';
 import { AdminObjectGrantInfo, EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmProject, ResourceKeyList, RmProjectPermissions } from '@cloudbeaver/core-sdk';
+import { GraphQLService, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmProject, ResourceKeyList, RmProjectPermissions, RmSubjectProjectPermissions } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 const newSymbol = Symbol('new-project');
 
 export type SharedProject = RmProject;
-export type ProjectPermission = RmProjectPermissions;
+export type ProjectPermission = RmSubjectProjectPermissions;
+export type ProjectSubjectPermission = RmProjectPermissions;
 type SharedProjectNew = SharedProject & { [newSymbol]: boolean };
 
 interface IProjectConfig {
@@ -59,9 +60,24 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     });
   }
 
+  async setSubjectProjectsAccess(subjectId: string, permissions: ProjectSubjectPermission[]): Promise<void> {
+    await this.graphQLService.sdk.setSubjectProjectsPermissions({
+      subjectId,
+      permissions,
+    });
+  }
+
   async loadAccessSubjects(projectId: string): Promise<AdminObjectGrantInfo[]> {
     const { grantedPermissions } = await this.graphQLService.sdk.getProjectGrantedPermissions({
       projectId,
+    });
+
+    return grantedPermissions;
+  }
+
+  async loadSubjectAccess(subjectId: string): Promise<AdminObjectGrantInfo[]> {
+    const { grantedPermissions } = await this.graphQLService.sdk.getSubjectProjectsPermissions({
+      subjectId,
     });
 
     return grantedPermissions;
