@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { NotificationsItem } from './NotificationsItem/NotificationsItem';
 
@@ -29,7 +29,7 @@ const styles = css`
 export const Notifications = observer(function Notifications() {
   const notificationService = useService(NotificationService);
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <Portal>
       <notifications as="div">
         {notificationService.visibleNotifications.map(notification => (

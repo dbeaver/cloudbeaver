@@ -9,10 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, GroupTitle, Switch } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { BASE_CONTAINERS_STYLES, Group, GroupTitle, Switch, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 interface Props {
   serverConfig: ServerConfigInput;

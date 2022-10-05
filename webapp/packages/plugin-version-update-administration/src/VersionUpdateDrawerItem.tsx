@@ -10,11 +10,9 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
-import { useMapResource } from '@cloudbeaver/core-blocks';
+import { Translate, useMapResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-ui';
 import { VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';

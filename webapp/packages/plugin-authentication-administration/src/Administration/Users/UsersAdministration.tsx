@@ -10,10 +10,10 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { ToolsPanel } from '@cloudbeaver/core-blocks';
+import { ToolsPanel, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 import { BASE_TAB_STYLES, ITabData, Tab, TabList, TabPanel, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { MetaParameters } from './MetaParameters/MetaParameters';

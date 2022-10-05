@@ -10,10 +10,9 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AuthProvidersResource } from '@cloudbeaver/core-authentication';
-import { IconOrImage, Link, Cell, useMapResource, Loader, getComputed } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { IconOrImage, Link, Cell, useMapResource, Loader, getComputed, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { resourceKeyList, UserInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 const styles = css`
     container {

@@ -15,11 +15,10 @@ import {
   SubmittingForm,
   Loader,
   useFocus,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { ConnectionAuthenticationForm } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionController, ConnectionStep } from './ConnectionController';
@@ -57,7 +56,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
     subtitle = controller.template.name;
   }
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <CommonDialogWrapper
       size='large'
       title="basicConnection_connectionDialog_newConnection"

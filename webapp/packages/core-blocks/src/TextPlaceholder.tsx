@@ -8,8 +8,6 @@
 
 import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
 const TextPlaceholderStyles = css`
     div {
       flex: 1;
@@ -30,7 +28,7 @@ interface Props {
 }
 
 export const TextPlaceholder: React.FC<React.PropsWithChildren<Props>> = function TextPlaceholder(props) {
-  return styled(useStyles(TextPlaceholderStyles))(
+  return styled(TextPlaceholderStyles)(
     <div>
       <span className={props.className}>
         {props.children}

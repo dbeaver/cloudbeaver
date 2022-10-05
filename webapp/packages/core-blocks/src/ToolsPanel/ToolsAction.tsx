@@ -9,8 +9,6 @@
 import type { ButtonHTMLAttributes } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
 import { IconOrImage } from '../IconOrImage';
 
 const styles = css`
@@ -44,7 +42,7 @@ interface Props extends ButtonHTMLAttributes<any> {
 }
 
 export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox, children, ...rest }) {
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <button type='button' {...rest}>
       {icon && <IconOrImage icon={icon} viewBox={viewBox} />}
       {children && <button-label>{children}</button-label>}

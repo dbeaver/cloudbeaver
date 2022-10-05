@@ -9,9 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Filter } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { Filter, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+
+
 
 export interface IFilterState {
   filterValue: string;

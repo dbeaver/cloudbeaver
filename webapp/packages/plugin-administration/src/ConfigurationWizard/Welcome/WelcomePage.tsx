@@ -8,9 +8,9 @@
 
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, GroupItem } from '@cloudbeaver/core-blocks';
-import { Translate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, GroupItem, Translate } from '@cloudbeaver/core-blocks';
+
+
 
 const styles = css`
   p {
@@ -24,7 +24,7 @@ const styles = css`
 `;
 
 export const WelcomePage: React.FC = function WelcomePage() {
-  return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
+  return styled(styles, BASE_CONTAINERS_STYLES)(
     <ColoredContainer wrap gap overflow parent>
       <Group form>
         <h3><Translate token='administration_configuration_wizard_welcome_title' /></h3>

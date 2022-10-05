@@ -9,9 +9,10 @@
 import type React from 'react';
 import styled, { css } from 'reshadow';
 
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Icon } from './Icon';
+import { useStyles } from './useStyles';
 
 const style = css`
   timer {

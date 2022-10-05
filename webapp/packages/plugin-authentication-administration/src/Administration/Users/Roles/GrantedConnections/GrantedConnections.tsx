@@ -13,13 +13,12 @@ import styled, { css } from 'reshadow';
 
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group,
-  InfoItem, Loader, TextPlaceholder, useMapResource
+  InfoItem, Loader, TextPlaceholder, useMapResource, useStyles, useTranslate
 } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoProjectKey, ConnectionInfoResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
-import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { IRoleFormProps } from '../IRoleFormProps';

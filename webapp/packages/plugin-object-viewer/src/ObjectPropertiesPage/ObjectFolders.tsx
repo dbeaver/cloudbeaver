@@ -10,11 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder, useMapResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { NavNodeManagerService, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { BASE_TAB_STYLES, ITabData, TabList, TabPanel, TabsState, useTabLocalState, verticalTabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
@@ -64,9 +62,9 @@ interface IProps {
 
 export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   const translate = useTranslate();
+  const style = useStyles(BASE_TAB_STYLES, verticalTabStyles, styles);
   const navNodeManagerService = useService(NavNodeManagerService);
   const navNodeViewService = useService(NavNodeViewService);
-  const style = useStyles(BASE_TAB_STYLES, verticalTabStyles, styles);
   const innerTabState = useTabLocalState(() => new MetadataMap<string, any>());
 
   const nodeId = tab.handlerState.objectId;
@@ -107,7 +105,7 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   });
 
   return styled(style)(
-    <Loader state={children} style={style}>{() => styled(style)(
+    <Loader state={children} style={tabStyles}>{() => styled(style)(
       <>
         {folders.length > 0 ? (
           <TabsState currentTabId={folderId} orientation='vertical' localState={innerTabState} lazy onChange={openFolder}>

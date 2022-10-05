@@ -11,10 +11,11 @@ import React, { forwardRef, useEffect } from 'react';
 import { MenuButton, MenuInitialState, useMenuState } from 'reakit/Menu';
 import styled from 'reshadow';
 
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { ErrorBoundary } from '../ErrorBoundary';
 import { useObjectRef } from '../useObjectRef';
+import { useStyles } from '../useStyles';
 import { MenuPanel } from './MenuPanel';
 import { menuPanelStyles } from './menuPanelStyles';
 import { IMenuState, MenuStateContext } from './MenuStateContext';

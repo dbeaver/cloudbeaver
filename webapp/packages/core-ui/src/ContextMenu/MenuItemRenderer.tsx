@@ -11,8 +11,8 @@ import React, { useCallback } from 'react';
 import { MenuItem, MenuItemCheckbox, MenuSeparator, MenuStateReturn } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
-import { Checkbox, MenuItemElement, menuPanelStyles } from '@cloudbeaver/core-blocks';
-import { ComponentStyle, joinStyles, useStyles } from '@cloudbeaver/core-theming';
+import { Checkbox, joinStyles, MenuItemElement, menuPanelStyles, useStyles } from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { IMenuItem, IMenuData, MenuSubMenuItem, MenuSeparatorItem, MenuActionItem, MenuBaseItem, MenuCustomItem, MenuCheckboxItem } from '@cloudbeaver/core-view';
 
 import { MenuActionElement } from './MenuActionElement';

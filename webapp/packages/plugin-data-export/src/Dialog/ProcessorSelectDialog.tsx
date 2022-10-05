@@ -9,9 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Loader } from '@cloudbeaver/core-blocks';
+import { Loader, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 import { useNode } from '@cloudbeaver/plugin-navigation-tree';
 

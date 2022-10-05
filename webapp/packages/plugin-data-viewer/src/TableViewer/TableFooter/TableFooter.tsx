@@ -12,7 +12,7 @@ import styled, { css, use } from 'reshadow';
 
 import { SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataViewerSettingsService } from '../../DataViewerSettingsService';
@@ -107,7 +107,7 @@ export const TableFooter = observer<Props>(function TableFooter({
 
   const disabled = model.isLoading() || model.isDisabled(resultIndex);
 
-  return styled(useStyles(tableFooterStyles))(
+  return styled(tableFooterStyles)(
     <ToolsPanel>
       {/* <reload aria-disabled={disabled} onClick={() => model.refresh()}>
         <IconOrImage icon='reload' viewBox="0 0 16 16" />

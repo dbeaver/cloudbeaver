@@ -10,12 +10,10 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  Button, SnackbarWrapper, SnackbarStatus, SnackbarContent, SnackbarBody, SnackbarFooter
+  Button, SnackbarWrapper, SnackbarStatus, SnackbarContent, SnackbarBody, SnackbarFooter, useTranslate
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationComponentProps } from '@cloudbeaver/core-events';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 
 import { ExportNotificationController } from './ExportNotificationController';
@@ -54,7 +52,7 @@ export const ExportNotification = observer<Props>(function ExportNotification({
   const translate = useTranslate();
   const { title, status, message } = controller.status;
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <SnackbarWrapper persistent={status === ENotificationType.Loading} onClose={controller.delete}>
       <SnackbarStatus status={status} />
       <SnackbarContent>

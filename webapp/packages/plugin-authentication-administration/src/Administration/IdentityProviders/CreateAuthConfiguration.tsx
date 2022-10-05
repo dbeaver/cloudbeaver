@@ -9,10 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { IconButton } from '@cloudbeaver/core-blocks';
+import { IconButton, Translate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { Translate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import { AuthConfigurationForm } from './AuthConfigurationForm';
 import { CreateAuthConfigurationService } from './CreateAuthConfigurationService';
@@ -50,14 +48,13 @@ const styles = css`
   `;
 
 export const CreateAuthConfiguration: React.FC = observer(function CreateAuthConfiguration() {
-  const style = useStyles(styles);
   const service = useService(CreateAuthConfigurationService);
 
   if (!service.data) {
     return null;
   }
 
-  return styled(style)(
+  return styled(styles)(
     <configuration-create>
       <title-bar>
         <Translate token='administration_identity_providers_configuration_add' />

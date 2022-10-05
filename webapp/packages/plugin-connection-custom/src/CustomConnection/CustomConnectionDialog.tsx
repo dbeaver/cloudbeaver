@@ -8,9 +8,10 @@
 
 import { observer } from 'mobx-react-lite';
 
+import { useTranslate } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 
 import { CustomConnectionController } from './CustomConnectionController';
 import { DriverSelectorDialog } from './DriverSelectorDialog/DriverSelectorDialog';

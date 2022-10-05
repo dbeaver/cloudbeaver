@@ -15,11 +15,11 @@ export interface IAutoLoadable extends ILoadableState {
 }
 
 export function useAutoLoad(state: IAutoLoadable, enabled = true) {
-  const load = enabled && !state.isLoaded();
+  const canBeLoaded = enabled && !state.isLoaded();
 
   useEffect(() => {
-    if (load) {
+    if (canBeLoaded) {
       state.load();
     }
-  }, [state, load]);
+  });
 }

@@ -9,10 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { AuthConfiguration } from './AuthConfiguration';
 

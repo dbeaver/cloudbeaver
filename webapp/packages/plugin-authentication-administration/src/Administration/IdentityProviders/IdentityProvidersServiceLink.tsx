@@ -7,9 +7,9 @@
  */
 
 import type { ServiceDescriptionComponent } from '@cloudbeaver/core-authentication';
-import { Link } from '@cloudbeaver/core-blocks';
+import { Link, Translate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { Translate } from '@cloudbeaver/core-localization';
+
 
 import { AuthConfigurationsAdministrationNavService } from './AuthConfigurationsAdministrationNavService';
 

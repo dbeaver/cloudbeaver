@@ -12,7 +12,6 @@ import styled from 'reshadow';
 import { AuthInfoService, DATA_CONTEXT_USER } from '@cloudbeaver/core-authentication';
 import { Icon } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { topMenuStyles } from '@cloudbeaver/plugin-top-app-bar';
@@ -22,7 +21,6 @@ import { MENU_USER_PROFILE } from './MENU_USER_PROFILE';
 import { userMenuStyles } from './userMenuStyles';
 
 export const UserMenu = observer(function UserMenu() {
-  const style = useStyles(userMenuStyles);
   const authInfoService = useService(AuthInfoService);
   const menu = useMenu({ menu: MENU_USER_PROFILE });
 
@@ -32,7 +30,7 @@ export const UserMenu = observer(function UserMenu() {
     return null;
   }
 
-  return styled(style)(
+  return styled(userMenuStyles)(
     <>
       <UserInfo info={authInfoService.userInfo} />
       <ContextMenu menu={menu} style={[topMenuStyles]} rtl modal>

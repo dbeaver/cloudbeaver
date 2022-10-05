@@ -9,9 +9,10 @@
 import { observer } from 'mobx-react-lite';
 
 import { INotificationProcessExtraProps, ENotificationType, NotificationComponent } from '@cloudbeaver/core-events';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 
 import { Button } from '../Button';
+import { useTranslate } from '../localization/useTranslate';
 import { useErrorDetails } from '../useErrorDetails';
 import { useStateDelay } from '../useStateDelay';
 import { SnackbarBody } from './SnackbarMarkups/SnackbarBody';

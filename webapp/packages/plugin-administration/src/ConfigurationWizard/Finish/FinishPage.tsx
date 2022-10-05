@@ -10,10 +10,10 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { ConfigurationWizardService } from '@cloudbeaver/core-administration';
-import { BASE_LAYOUT_GRID_STYLES, Button, useFocus } from '@cloudbeaver/core-blocks';
+import { BASE_LAYOUT_GRID_STYLES, Button, useFocus, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 
 const styles = css`
     layout-grid {

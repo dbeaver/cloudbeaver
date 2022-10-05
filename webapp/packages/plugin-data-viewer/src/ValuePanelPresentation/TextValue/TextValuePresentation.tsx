@@ -10,12 +10,10 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, IconOrImage, Textarea, useObservableRef } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, IconOrImage, Textarea, useObservableRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { QuotasService } from '@cloudbeaver/core-root';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { bytesToSize } from '@cloudbeaver/core-utils';
 import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';

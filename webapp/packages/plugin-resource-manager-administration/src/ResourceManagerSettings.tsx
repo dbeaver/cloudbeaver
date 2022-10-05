@@ -9,8 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, GroupTitle, PlaceholderComponent, Switch } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { BASE_CONTAINERS_STYLES, GroupTitle, PlaceholderComponent, Switch, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
 
 export const ResourceManagerSettings: PlaceholderComponent<IConfigurationPlaceholderProps> = observer(

@@ -6,16 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, toJS } from 'mobx';
+import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo, useState } from 'react';
 import styled from 'reshadow';
 
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
-
 import { Button } from '../Button';
 import { ShadowInput } from '../FormControls/ShadowInput';
+import { useTranslate } from '../localization/useTranslate';
 import { useObjectRef } from '../useObjectRef';
 import type { IProperty } from './IProperty';
 import { PropertyItem } from './PropertyItem';
@@ -112,7 +110,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
     []
   );
 
-  return styled(useStyles(PROPERTIES_TABLE_STYLES))(
+  return styled(PROPERTIES_TABLE_STYLES)(
     <properties className={className}>
       <properties-header>
         <properties-header-name>

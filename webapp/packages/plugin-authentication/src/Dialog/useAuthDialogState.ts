@@ -51,7 +51,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
 
   const primaryId = authProvidersResource.resource.getPrimary();
   const adminPageActive = administrationScreenService.isAdministrationPageActive;
-  const providers = authProvidersResource.data
+  const providers = authProvidersResource.resource.values
     .filter(notEmptyProvider)
     .sort(compareProviders);
 

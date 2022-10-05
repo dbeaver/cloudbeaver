@@ -9,10 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, IconOrImage } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { BASE_CONTAINERS_STYLES, IconOrImage, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { UNDERLINE_TAB_STYLES, TabList, TabsState, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import type { IUserProfileFormState } from './IUserProfileFormState';

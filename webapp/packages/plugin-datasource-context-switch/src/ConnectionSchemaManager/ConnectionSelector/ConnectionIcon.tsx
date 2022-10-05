@@ -9,9 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { ConnectionMark, IconOrImage, useMapResource } from '@cloudbeaver/core-blocks';
+import { ConnectionMark, IconOrImage, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
-import { useStyles } from '@cloudbeaver/core-theming';
 import type { MenuBaseItemIconComponent } from '@cloudbeaver/core-view';
 
 import type { IConnectionSelectorExtraProps } from './IConnectionSelectorExtraProps';

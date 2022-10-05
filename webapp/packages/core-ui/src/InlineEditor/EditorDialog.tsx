@@ -12,10 +12,10 @@ import {
 } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button } from '@cloudbeaver/core-blocks';
+import { Button, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 
 const dialogStyle = css`
   footer {

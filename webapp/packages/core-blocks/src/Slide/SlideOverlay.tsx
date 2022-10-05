@@ -8,8 +8,6 @@
 
 import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
 import { Icon } from '../Icon';
 
 interface Props {
@@ -43,7 +41,7 @@ export const SlideOverlay: React.FC<Props> = function SlideOverlay({
   className,
   onClick,
 }) {
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <div className={className} onClick={onClick}>
       <icon-btn>
         <Icon name="angle" viewBox="0 0 15 8" />

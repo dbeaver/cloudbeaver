@@ -9,10 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Cell, IconOrImage } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Cell, IconOrImage, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 

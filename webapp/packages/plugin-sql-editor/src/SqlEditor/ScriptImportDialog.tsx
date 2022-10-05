@@ -8,10 +8,10 @@
 
 import styled, { css } from 'reshadow';
 
-import { Button } from '@cloudbeaver/core-blocks';
+import { Button, Translate } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { Translate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 
 const style = css`
   footer {
@@ -34,7 +34,7 @@ export const ScriptImportDialog: DialogComponent<null, boolean> = function Scrip
   rejectDialog,
   className,
 }) {
-  return styled(useStyles(style))(
+  return styled(style)(
     <CommonDialogWrapper
       size='small'
       title='ui_changes_might_be_lost'

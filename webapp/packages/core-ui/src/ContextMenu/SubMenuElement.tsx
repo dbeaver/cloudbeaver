@@ -10,9 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef, useRef } from 'react';
 import styled from 'reshadow';
 
-import { getComputed, IMenuState, Menu, MenuItemElement, menuPanelStyles, useObjectRef } from '@cloudbeaver/core-blocks';
+import { getComputed, IMenuState, Menu, MenuItemElement, menuPanelStyles, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { DATA_CONTEXT_MENU_NESTED, DATA_CONTEXT_SUBMENU_ITEM, IMenuData, IMenuSubMenuItem, MenuActionItem, MenuService, useMenu } from '@cloudbeaver/core-view';
 
 import type { IMenuItemRendererProps } from './MenuItemRenderer';

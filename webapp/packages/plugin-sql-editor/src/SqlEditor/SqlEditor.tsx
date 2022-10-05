@@ -10,9 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { StaticImage, UploadArea } from '@cloudbeaver/core-blocks';
+import { StaticImage, UploadArea, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';

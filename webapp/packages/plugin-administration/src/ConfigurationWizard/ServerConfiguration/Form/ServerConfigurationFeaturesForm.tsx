@@ -11,12 +11,10 @@ import { useContext } from 'react';
 import styled from 'reshadow';
 
 import { AdministrationSettingsService } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, FormContext, GroupTitle, Loader, PlaceholderComponent, Switch, useDataResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, FormContext, GroupTitle, Loader, PlaceholderComponent, Switch, useDataResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { FeaturesResource } from '@cloudbeaver/core-root';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
 
 export const ServerConfigurationFeaturesForm: PlaceholderComponent<IConfigurationPlaceholderProps> = observer(function ServerConfigurationFeaturesForm({

@@ -13,7 +13,6 @@ import { Icon } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { MenuTrigger } from '@cloudbeaver/core-dialogs';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { useStyles } from '@cloudbeaver/core-theming';
 import type { IDatabaseDataModel, IDataPresentationActions, IDataTableActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from '../../DataGridContextMenu/DataGridContextMenuService';
@@ -39,7 +38,6 @@ export const CellMenu = observer<Props>(function CellMenu({
   onStateSwitch,
 }) {
   const dataGridContextMenuService = useService(DataGridContextMenuService);
-  const style = useStyles(cellMenuStyles);
 
   const panel = dataGridContextMenuService.constructMenuWithContext(
     model, actions, spreadsheetActions, resultIndex, cellKey
@@ -62,7 +60,7 @@ export const CellMenu = observer<Props>(function CellMenu({
     EventContext.set(event, EventStopPropagationFlag);
   }
 
-  return styled(style)(
+  return styled(cellMenuStyles)(
     <cell-menu
       as='div'
       onMouseUp={markStopPropagation}

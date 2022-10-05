@@ -10,10 +10,10 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, BASE_LAYOUT_GRID_STYLES, ToolsAction, ToolsPanel } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, BASE_LAYOUT_GRID_STYLES, ToolsAction, ToolsPanel, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 
 import { CreateRole } from './CreateRole';
 import { CreateRoleService } from './CreateRoleService';

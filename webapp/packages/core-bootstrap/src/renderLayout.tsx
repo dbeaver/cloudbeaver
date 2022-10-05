@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Suspense } from 'react';
+import { StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { Body } from '@cloudbeaver/core-app';
@@ -18,6 +18,7 @@ export function renderLayout(serviceInjector: IServiceInjector): void {
   const root = createRoot(container!);
 
   root.render(
+    // <StrictMode>
     <ErrorBoundary root>
       <AppContext app={serviceInjector}>
         <Suspense fallback={<Loader />}>
@@ -25,5 +26,6 @@ export function renderLayout(serviceInjector: IServiceInjector): void {
         </Suspense>
       </AppContext>
     </ErrorBoundary>
+    // </StrictMode>
   );
 }

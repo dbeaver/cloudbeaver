@@ -9,8 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Radio, TextPlaceholder } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { Radio, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';

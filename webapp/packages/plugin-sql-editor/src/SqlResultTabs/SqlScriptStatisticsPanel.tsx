@@ -9,9 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IStatisticsTab } from '../ISqlEditorTabState';

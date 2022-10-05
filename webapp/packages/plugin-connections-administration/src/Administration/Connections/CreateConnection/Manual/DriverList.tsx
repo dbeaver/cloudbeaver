@@ -10,9 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { useState, useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { ItemListSearch, ItemList, useFocus } from '@cloudbeaver/core-blocks';
+import { ItemListSearch, ItemList, useFocus, useTranslate } from '@cloudbeaver/core-blocks';
 import type { DBDriver } from '@cloudbeaver/core-connections';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 
 import { Driver } from './Driver';
 

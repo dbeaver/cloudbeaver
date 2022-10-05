@@ -16,8 +16,6 @@ import {
 } from 'reakit/Menu';
 import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
 import { BASE_DROPDOWN_STYLES } from '../FormControls/BASE_DROPDOWN_STYLES';
 
 const styles = css`
@@ -84,7 +82,7 @@ export const PropertyValueSelector = observer<React.PropsWithChildren<Props>>(fu
 
   const visible = menu.visible;
 
-  return styled(useStyles(BASE_DROPDOWN_STYLES, styles))(
+  return styled(BASE_DROPDOWN_STYLES, styles)(
     <>
       <MenuButton {...menu} className={className} visible={visible}>{children}</MenuButton>
       <Menu {...menu} ref={menuRef} visible={visible} aria-label={propertyName} modal>

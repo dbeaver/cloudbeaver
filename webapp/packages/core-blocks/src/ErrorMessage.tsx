@@ -9,10 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 
 import { Button } from './Button';
 import { IconOrImage } from './IconOrImage';
+import { useTranslate } from './localization/useTranslate';
 
 const styles = css`
   message {

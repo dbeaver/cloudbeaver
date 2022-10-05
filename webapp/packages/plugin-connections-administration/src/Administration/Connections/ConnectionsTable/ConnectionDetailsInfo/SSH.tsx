@@ -9,9 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { PlaceholderComponent, StaticImage, useMapResource } from '@cloudbeaver/core-blocks';
+import { PlaceholderComponent, StaticImage, useMapResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 
 import type { IConnectionDetailsPlaceholderProps } from '../../ConnectionsAdministrationService';
 import { CONNECTION_DETAILS_STYLES } from './ConnectionDetailsStyles';

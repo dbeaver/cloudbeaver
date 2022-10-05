@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage, Loader, ErrorMessage, useErrorDetails } from '@cloudbeaver/core-blocks';
+import { Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage, Loader, ErrorMessage, useErrorDetails, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormService } from './ConnectionFormService';

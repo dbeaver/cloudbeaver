@@ -9,7 +9,6 @@
 import styled, { css, use } from 'reshadow';
 
 import { Icon } from '@cloudbeaver/core-blocks';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 interface Props {
   expanded: boolean;
@@ -33,7 +32,7 @@ const styles = css`
   `;
 
 export const Expand: React.FC<Props> = function Expand({ expanded, onClick, className }) {
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <Icon
       className={className}
       name='arrow'

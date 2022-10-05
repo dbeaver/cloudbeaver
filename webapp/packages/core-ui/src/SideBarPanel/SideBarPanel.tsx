@@ -9,7 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+
+import { useStyles } from '@cloudbeaver/core-blocks';
 import { BASE_TAB_STYLES, TabList, TabPanelList, TabsContainer, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 const tabsStyles = css`

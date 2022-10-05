@@ -8,8 +8,7 @@
 
 import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
+import { useStyles } from '../../useStyles';
 import { baseFormControlStyles, baseValidFormControlStyles } from '../baseFormControlStyles';
 import { isControlPresented } from '../isControlPresented';
 import { Checkbox, CheckboxBaseProps, CheckboxType, ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';

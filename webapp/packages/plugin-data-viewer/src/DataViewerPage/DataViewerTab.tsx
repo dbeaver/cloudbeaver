@@ -9,10 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
+import { useStyles, Translate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { Translate } from '@cloudbeaver/core-localization';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
 import type { ObjectPageTabComponent } from '@cloudbeaver/plugin-object-viewer';
 

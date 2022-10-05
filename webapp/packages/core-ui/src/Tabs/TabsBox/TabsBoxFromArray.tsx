@@ -9,7 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { BASE_TAB_STYLES } from '../Tab/BASE_TAB_STYLES';
 import { Tab } from '../Tab/Tab';

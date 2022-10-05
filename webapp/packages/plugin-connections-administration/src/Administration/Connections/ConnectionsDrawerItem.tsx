@@ -9,9 +9,8 @@
 import styled from 'reshadow';
 
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
+import { useStyles, Translate } from '@cloudbeaver/core-blocks';
 import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-ui';
-import { Translate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 export const ConnectionsDrawerItem: React.FC<AdministrationItemDrawerProps> = function ConnectionsDrawerItem({
   item, onSelect, style, disabled, configurationWizard,

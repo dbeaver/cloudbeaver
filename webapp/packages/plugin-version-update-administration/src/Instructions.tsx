@@ -9,9 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, GroupItem, GroupTitle } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_CONTAINERS_STYLES, Group, GroupItem, GroupTitle, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 
 const style = css`
   GroupItem {

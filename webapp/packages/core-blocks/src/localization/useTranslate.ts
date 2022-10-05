@@ -7,9 +7,7 @@
  */
 
 import { useService } from '@cloudbeaver/core-di';
-
-import { LocalizationService } from './LocalizationService';
-import type { TLocalizationToken } from './TLocalizationToken';
+import { TLocalizationToken, LocalizationService } from '@cloudbeaver/core-localization';
 
 export function useTranslate(): (<T extends TLocalizationToken | undefined>(
   token: T,

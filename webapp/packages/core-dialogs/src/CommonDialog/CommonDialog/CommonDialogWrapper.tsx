@@ -11,9 +11,9 @@ import { useContext, useEffect } from 'react';
 import { Dialog, useDialogState } from 'reakit/Dialog';
 import styled, { use } from 'reshadow';
 
-import { Icon, IconOrImage } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import { Icon, IconOrImage, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { DialogContext } from '../DialogContext';
 import { dialogStyles } from '../styles';

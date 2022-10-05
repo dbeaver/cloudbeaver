@@ -21,7 +21,9 @@ import 'codemirror/addon/selection/mark-selection';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/addon/hint/show-hint.css';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
+import { useStyles } from '@cloudbeaver/core-blocks';
 
 import type { ICodeEditorProps } from './ICodeEditorProps';
 import { SqlEditorStyles } from './theme';

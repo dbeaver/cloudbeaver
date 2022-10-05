@@ -11,12 +11,10 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, TextPlaceholder, Button, useMapResource, useObservableRef, getComputed } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder, Button, useMapResource, useObservableRef, getComputed, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { TabsBox, TabPanel, useTabLocalState, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { TabHandlerPanelComponent } from '@cloudbeaver/plugin-navigation-tabs';

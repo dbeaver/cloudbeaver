@@ -9,10 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { IconButton } from '@cloudbeaver/core-blocks';
+import { IconButton, Translate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { Translate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 
 import { CreateRoleService } from './CreateRoleService';
 import { RoleForm } from './RoleForm';
@@ -50,14 +50,13 @@ const styles = css`
   `;
 
 export const CreateRole: React.FC = observer(function CreateRole() {
-  const style = useStyles(styles);
   const service = useService(CreateRoleService);
 
   if (!service.data) {
     return null;
   }
 
-  return styled(style)(
+  return styled(styles)(
     <role-create>
       <title-bar>
         <Translate token='administration_roles_role_creation' />

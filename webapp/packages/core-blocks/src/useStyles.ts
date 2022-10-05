@@ -9,18 +9,11 @@
 import { useMemo, useRef, useState } from 'react';
 import { create } from 'reshadow';
 
-import { useExecutor } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { ComponentStyle, BaseStyles, Style, ThemeService } from '@cloudbeaver/core-theming';
 import { flat } from '@cloudbeaver/core-utils';
 
-import { ThemeService } from './ThemeService';
-import type { ClassCollection } from './themeUtils';
-
-export type BaseStyles = ClassCollection;
-export type ThemeSelector = (theme: string) => Promise<undefined | BaseStyles | BaseStyles[]>;
-export type Style = BaseStyles | ThemeSelector;
-export type DynamicStyle = Style | boolean | undefined;
-export type ComponentStyle = DynamicStyle | DynamicStyle[];
+import { useExecutor } from './useExecutor';
 
 /**
  * Changes styles depending on theme

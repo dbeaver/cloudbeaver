@@ -9,8 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Button } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { Button, useTranslate } from '@cloudbeaver/core-blocks';
+
 
 const styles = css`
   footer-container {

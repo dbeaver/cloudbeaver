@@ -8,7 +8,7 @@
 
 import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 interface Props {
   className?: string;
@@ -22,7 +22,7 @@ const styles = css`
   `;
 
 export const Code: React.FC<React.PropsWithChildren<Props>> = function Code({ children, className }) {
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <code-container className={className}>
       <code>
         {children}

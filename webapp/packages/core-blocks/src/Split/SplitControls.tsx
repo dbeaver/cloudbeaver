@@ -10,7 +10,7 @@ import { SplitContext } from 'go-split';
 import { useContext } from 'react';
 import styled, { use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { useObjectRef } from '../useObjectRef';
 import { buttonStyles } from './splitButtonStyles';
@@ -19,7 +19,6 @@ export const SplitControls: React.FC = function SplitControls() {
   const {
     size, split, mode, setMode, isMainSecond, getContainerSize, ...splitContext
   } = useContext(SplitContext);
-  const styles = useStyles(buttonStyles);
 
   const inverse = isMainSecond();
 
@@ -54,7 +53,7 @@ export const SplitControls: React.FC = function SplitControls() {
     },
   }), { mode, setMode }, ['handleCollapse', 'handleExpand']);
 
-  return styled(styles)(
+  return styled(buttonStyles)(
     <container
       onMouseDown={splitContext.onMouseDown}
       onTouchStart={splitContext.onTouchStart}

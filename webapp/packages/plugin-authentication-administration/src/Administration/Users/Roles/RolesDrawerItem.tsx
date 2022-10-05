@@ -10,8 +10,8 @@ import styled from 'reshadow';
 
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-ui';
-import { Translate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 
 export const RolesDrawerItem: React.FC<AdministrationItemDrawerProps> = function RolesDrawerItem({
   item,

@@ -7,6 +7,7 @@
  */
 
 import { injectable as inversifyInjectable, inject as inversifyInject } from 'inversify';
+import type { DecoratorTarget } from 'inversify/lib/annotation/decorator_utils';
 
 import type { ValueToken } from './InjectionToken';
 
@@ -14,6 +15,8 @@ export function injectable(): (target: any) => any {
   return inversifyInjectable();
 }
 
-export function inject<T>(token: ValueToken<T>): (target: T, targetKey: string, index?: number | undefined) => void {
-  return inversifyInject(token);
+export function inject<T>(
+  token: ValueToken<T>
+): (target: DecoratorTarget<T>, targetKey: string, index?: number) => void {
+  return inversifyInject<T>(token);
 }

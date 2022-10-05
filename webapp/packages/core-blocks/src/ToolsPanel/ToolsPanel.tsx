@@ -8,8 +8,6 @@
 
 import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
 const styles = css`
   container {
     height: 48px;
@@ -22,7 +20,7 @@ interface Props {
 }
 
 export const ToolsPanel: React.FC<React.PropsWithChildren<Props>> = function ToolsPanel({ className, children }) {
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <container className={className}>
       {children}
     </container>

@@ -9,8 +9,6 @@
 import { observer } from 'mobx-react-lite';
 import styled, { use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
 import { OVERLAY_BASE_STYLES } from './OVERLAY_BASE_STYLES';
 
 interface Props {
@@ -25,13 +23,11 @@ export const Overlay = observer<React.PropsWithChildren<Props>>(function Overlay
   className,
   children,
 }) {
-  const styles = useStyles(OVERLAY_BASE_STYLES);
-
   if (!active) {
     return null;
   }
 
-  return styled(styles)(
+  return styled(OVERLAY_BASE_STYLES)(
     <overlay className={className} {...use({ active, fill })}>
       <box>
         {children}

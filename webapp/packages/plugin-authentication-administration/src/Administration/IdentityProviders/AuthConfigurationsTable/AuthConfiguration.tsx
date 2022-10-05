@@ -16,7 +16,6 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import { AuthConfigurationsAdministrationService } from '../AuthConfigurationsAdministrationService';
 import { AuthConfigurationEdit } from './AuthConfigurationEdit';
@@ -48,7 +47,7 @@ export const AuthConfiguration = observer<Props>(function AuthConfiguration({ co
 
   const icon = configuration.iconURL || resource.data?.icon;
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <TableItem item={configuration.id} expandElement={AuthConfigurationEdit}>
       <TableColumnValue centerContent flex>
         <TableItemSelect />

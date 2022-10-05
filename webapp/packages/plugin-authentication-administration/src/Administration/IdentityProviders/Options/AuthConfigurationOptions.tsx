@@ -14,11 +14,9 @@ import { AuthConfigurationParametersResource, AuthProvidersResource } from '@clo
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Combobox, FieldCheckbox, Group, GroupTitle,
   InputField, Link, ObjectPropertyInfoForm, SubmittingForm,
-  Textarea, useClipboard, useMapResource, useObjectPropertyCategories
+  Textarea, useClipboard, useMapResource, useObjectPropertyCategories, useStyles, useTranslate
 } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { AuthProviderConfigurationParametersFragment, CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IAuthConfigurationFormProps } from '../IAuthConfigurationFormProps';

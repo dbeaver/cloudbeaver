@@ -10,9 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useTranslate } from '@cloudbeaver/core-localization';
-
 import { Checkbox } from '../FormControls/Checkboxes/Checkbox';
+import { useTranslate } from '../localization/useTranslate';
 import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 import { TableContext } from './TableContext';
 

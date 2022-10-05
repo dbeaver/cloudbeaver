@@ -8,8 +8,7 @@
 
 import styled, { css } from 'reshadow';
 
-import { Translate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { Translate } from '@cloudbeaver/core-blocks';
 
 import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent';
 import { NAVIGATION_TREE_CONNECTION_GROUPS } from './navigationTreeConnectionGroupFilter';
@@ -39,8 +38,8 @@ const styles = css`
   `;
 
 const ManageableGroup: NavigationNodeRendererComponent = function ManageableGroup() {
-  return styled(useStyles(styles))(<connection-group><Translate token='app_navigationTree_connection_group_user' /></connection-group>);
+  return styled(styles)(<connection-group><Translate token='app_navigationTree_connection_group_user' /></connection-group>);
 };
 const UnManageableGroup: NavigationNodeRendererComponent = function UnManageableGroup() {
-  return styled(useStyles(styles))(<connection-group><Translate token='app_navigationTree_connection_group_shared' /></connection-group>);
+  return styled(styles)(<connection-group><Translate token='app_navigationTree_connection_group_shared' /></connection-group>);
 };

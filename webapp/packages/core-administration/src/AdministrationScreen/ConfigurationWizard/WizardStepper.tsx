@@ -9,10 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Button } from '@cloudbeaver/core-blocks';
+import { Button, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 
 import { ConfigurationWizardService } from './ConfigurationWizardService';
 

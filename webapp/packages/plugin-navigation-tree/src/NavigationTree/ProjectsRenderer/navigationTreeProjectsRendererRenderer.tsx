@@ -10,8 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
-import { Translate } from '@cloudbeaver/core-localization';
+import { Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT } from '@cloudbeaver/core-projects';
 

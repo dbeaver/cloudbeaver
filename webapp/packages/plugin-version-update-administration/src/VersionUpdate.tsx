@@ -11,10 +11,9 @@ import styled, { css } from 'reshadow';
 import { gte } from 'semver';
 
 import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 
 import { Instructions } from './Instructions';

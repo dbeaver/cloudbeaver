@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useRef, useState, useLayoutEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { ShadowInput } from '../FormControls/ShadowInput';
 import { Icon } from '../Icon';
@@ -151,7 +151,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({
 
   const focus = menuOpen;
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <property-item>
       <property-name title={property.description} {...use({ error })}>
         <ShadowInput

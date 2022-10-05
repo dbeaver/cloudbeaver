@@ -10,12 +10,11 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AdministrationItemContentProps, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { Loader, useMapResource, ToolsAction, ToolsPanel, BASE_LAYOUT_GRID_STYLES } from '@cloudbeaver/core-blocks';
+import { Loader, useMapResource, ToolsAction, ToolsPanel, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles, Translate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useController, useService } from '@cloudbeaver/core-di';
-import { Translate, useTranslate } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { ConnectionsAdministrationController } from './ConnectionsAdministrationController';
 import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable';

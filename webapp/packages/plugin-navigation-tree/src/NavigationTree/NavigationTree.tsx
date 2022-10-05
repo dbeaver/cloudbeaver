@@ -10,12 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useUserData } from '@cloudbeaver/core-blocks';
+import { Translate, usePermission, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { Translate } from '@cloudbeaver/core-localization';
 import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { usePermission, EPermission } from '@cloudbeaver/core-root';
+import { EPermission } from '@cloudbeaver/core-root';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavNodeViewService } from '../NodesManager/NavNodeView/NavNodeViewService';

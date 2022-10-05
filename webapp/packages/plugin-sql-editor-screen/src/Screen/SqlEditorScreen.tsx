@@ -9,10 +9,9 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { Loader, TextPlaceholder, useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder, useMapResource, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextResource, ConnectionExecutionContextService, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import type { ScreenComponent } from '@cloudbeaver/core-routing';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';

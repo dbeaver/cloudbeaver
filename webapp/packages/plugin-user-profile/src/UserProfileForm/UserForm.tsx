@@ -10,10 +10,8 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, Button, IconOrImage } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { BASE_CONTAINERS_STYLES, Button, IconOrImage, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { BASE_TAB_STYLES, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { AuthenticationPanel } from './Authentication/AuthenticationPanel';

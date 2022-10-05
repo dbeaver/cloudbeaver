@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 
 import { getComputed, StaticImage } from '@cloudbeaver/core-blocks';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import type { HeaderRendererProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { DataGridContext } from '../DataGridContext';
@@ -107,7 +106,7 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
     dataGridContext.focus();
   }
 
-  return styled(useStyles(headerStyles))(
+  return styled(headerStyles)(
     <table-header>
       <shrink-container as='div' title={columnTooltip} onClick={handleClick}>
         <icon>
