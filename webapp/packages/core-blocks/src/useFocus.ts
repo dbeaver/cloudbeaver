@@ -26,6 +26,7 @@ interface IState<T extends HTMLElement> {
   setRef: (ref: T | null) => void;
   updateFocus: () => void;
   focusFirstChild: () => void;
+  restoreFocus: () => void;
 }
 
 export function useFocus<T extends HTMLElement>({
@@ -51,7 +52,8 @@ export function useFocus<T extends HTMLElement>({
         if (this.reference) {
           if (
             document.activeElement instanceof HTMLElement
-              && document.activeElement !== this.reference
+            && document.activeElement !== this.reference
+            && (optionsRef.autofocus || optionsRef.focusFirstChild)
           ) {
             this.lastFocus = document.activeElement;
           }
@@ -61,6 +63,8 @@ export function useFocus<T extends HTMLElement>({
           }
 
           this.focusFirstChild();
+        } else {
+          this.restoreFocus();
         }
       },
       focusFirstChild() {
@@ -89,6 +93,14 @@ export function useFocus<T extends HTMLElement>({
           }
         }
       },
+      restoreFocus() {
+        if (this.lastFocus?.tabIndex === -1) {
+          return;
+        }
+
+        this.lastFocus?.focus();
+        this.lastFocus = null;
+      },
     }),
     {
       focus: observable.ref,
@@ -96,6 +108,7 @@ export function useFocus<T extends HTMLElement>({
       reference: observable.ref,
       setRef: action.bound,
       updateFocus: action.bound,
+      restoreFocus: action.bound,
     },
     false,
     undefined,
@@ -135,7 +148,7 @@ export function useFocus<T extends HTMLElement>({
   }, [state.reference]);
 
   useEffect(() => () => {
-    state.lastFocus?.focus();
+    state.restoreFocus();
   }, []);
 
   return [state.setRef, state];

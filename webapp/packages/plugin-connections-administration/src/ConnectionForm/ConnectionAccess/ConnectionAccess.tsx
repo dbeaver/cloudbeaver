@@ -21,6 +21,7 @@ import {
   Group,
   Container,
   InfoItem,
+  useAutoLoad,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { isCloudConnection } from '@cloudbeaver/core-connections';
@@ -57,7 +58,9 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
   const state = useConnectionAccessState(formState.info);
   const translate = useTranslate();
 
-  const { selected } = useTab(tabId, state.load);
+  const { selected } = useTab(tabId);
+
+  useAutoLoad(state, selected);
 
   const users = useMapResource(ConnectionAccess, UsersResource, CachedMapAllKey);
   const roles = useMapResource(ConnectionAccess, RolesResource, CachedMapAllKey);

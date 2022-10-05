@@ -133,9 +133,9 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
 
     @Override
     public void rename(DBRProgressMonitor monitor, String newName) throws DBException {
+        String resourceName = resource.getName();
         try {
             if (newName.indexOf('.') == -1) {
-                String resourceName = resource.getName();
                 int indexOfExt = resourceName.indexOf('.');
                 if (indexOfExt > 0) {
                     String ext = resourceName.substring(indexOfExt + 1);
@@ -151,6 +151,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
 
             }
         } catch (Exception e) {
+            resource.setName(resourceName);
             throw new DBException("Can't rename resource", e);
         }
     }

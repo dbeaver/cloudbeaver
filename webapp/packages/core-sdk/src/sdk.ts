@@ -154,6 +154,7 @@ export interface AuthProviderInfo {
   id: Scalars['ID'];
   label: Scalars['String'];
   requiredFeatures: Array<Scalars['String']>;
+  trusted: Scalars['Boolean'];
 }
 
 export enum AuthStatus {
@@ -403,6 +404,7 @@ export interface Mutation {
   rmDeleteResource?: Maybe<Scalars['Boolean']>;
   rmMoveResource: Scalars['String'];
   rmSetProjectPermissions: Scalars['Boolean'];
+  rmSetSubjectProjectPermissions: Scalars['Boolean'];
   rmWriteResourceStringContent: Scalars['String'];
   setConnectionNavigatorSettings: ConnectionInfo;
   setUserConfigurationParameter: Scalars['Boolean'];
@@ -596,8 +598,14 @@ export interface MutationRmMoveResourceArgs {
 
 
 export interface MutationRmSetProjectPermissionsArgs {
-  permissions: Array<RmProjectPermissions>;
+  permissions: Array<RmSubjectProjectPermissions>;
   projectId: Scalars['String'];
+}
+
+
+export interface MutationRmSetSubjectProjectPermissionsArgs {
+  permissions: Array<RmProjectPermissions>;
+  subjectId: Scalars['String'];
 }
 
 
@@ -1349,13 +1357,18 @@ export interface RmProject {
 
 export interface RmProjectPermissions {
   permissions: Array<Scalars['String']>;
-  subjectId: Scalars['String'];
+  projectId: Scalars['String'];
 }
 
 export interface RmResource {
   folder: Scalars['Boolean'];
   length: Scalars['Int'];
   name: Scalars['String'];
+}
+
+export interface RmSubjectProjectPermissions {
+  permissions: Array<Scalars['String']>;
+  subjectId: Scalars['String'];
 }
 
 export enum ResultDataFormat {
@@ -1726,7 +1739,7 @@ export type GetAuthProviderConfigurationsQuery = { configurations: Array<{ provi
 export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAuthProvidersQuery = { providers: Array<{ id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> }> };
+export type GetAuthProvidersQuery = { providers: Array<{ id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, trusted: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> }> };
 
 export type GetAuthStatusQueryVariables = Exact<{
   authId: Scalars['ID'];
@@ -2246,7 +2259,7 @@ export type AuthProviderConfigurationInfoFragment = { id: string, displayName: s
 
 export type AuthProviderConfigurationParametersFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number };
 
-export type AuthProviderInfoFragment = { id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> };
+export type AuthProviderInfoFragment = { id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, trusted: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> };
 
 export type AuthTokenFragment = { authProvider: string, authConfiguration?: string, loginTime: any, message?: string, origin: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> } };
 
@@ -2550,6 +2563,13 @@ export type GetSharedProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetSharedProjectsQuery = { projects: Array<{ id: string, name: string, shared: boolean, description?: string, projectPermissions: Array<string> }> };
 
+export type GetSubjectProjectsPermissionsQueryVariables = Exact<{
+  subjectId: Scalars['String'];
+}>;
+
+
+export type GetSubjectProjectsPermissionsQuery = { grantedPermissions: Array<{ subjectId: string, subjectType: AdminSubjectType, objectPermissions: { objectId: string, permissions: Array<string> } }> };
+
 export type MoveResourceMutationVariables = Exact<{
   projectId: Scalars['String'];
   oldPath: Scalars['String'];
@@ -2569,11 +2589,19 @@ export type ReadResourceQuery = { value: string };
 
 export type SetProjectPermissionsMutationVariables = Exact<{
   projectId: Scalars['String'];
-  permissions: Array<RmProjectPermissions> | RmProjectPermissions;
+  permissions: Array<RmSubjectProjectPermissions> | RmSubjectProjectPermissions;
 }>;
 
 
 export type SetProjectPermissionsMutation = { rmSetProjectPermissions: boolean };
+
+export type SetSubjectProjectsPermissionsMutationVariables = Exact<{
+  subjectId: Scalars['String'];
+  permissions: Array<RmProjectPermissions> | RmProjectPermissions;
+}>;
+
+
+export type SetSubjectProjectsPermissionsMutation = { rmSetSubjectProjectPermissions: boolean };
 
 export type WriteResourceContentMutationVariables = Exact<{
   projectId: Scalars['String'];
@@ -2814,6 +2842,7 @@ export const AuthProviderInfoFragmentDoc = `
   icon
   description
   defaultProvider
+  trusted
   configurable
   configurations {
     ...AuthProviderConfigurationInfo
@@ -4113,6 +4142,13 @@ export const GetSharedProjectsDocument = `
   }
 }
     ${SharedProjectFragmentDoc}`;
+export const GetSubjectProjectsPermissionsDocument = `
+    query getSubjectProjectsPermissions($subjectId: String!) {
+  grantedPermissions: rmListSubjectProjectsPermissionGrants(subjectId: $subjectId) {
+    ...AdminObjectGrantInfo
+  }
+}
+    ${AdminObjectGrantInfoFragmentDoc}`;
 export const MoveResourceDocument = `
     mutation moveResource($projectId: String!, $oldPath: String!, $newPath: String!) {
   rmMoveResource(
@@ -4131,8 +4167,13 @@ export const ReadResourceDocument = `
 }
     `;
 export const SetProjectPermissionsDocument = `
-    mutation setProjectPermissions($projectId: String!, $permissions: [RMProjectPermissions!]!) {
+    mutation setProjectPermissions($projectId: String!, $permissions: [RMSubjectProjectPermissions!]!) {
   rmSetProjectPermissions(projectId: $projectId, permissions: $permissions)
+}
+    `;
+export const SetSubjectProjectsPermissionsDocument = `
+    mutation setSubjectProjectsPermissions($subjectId: String!, $permissions: [RMProjectPermissions!]!) {
+  rmSetSubjectProjectPermissions(subjectId: $subjectId, permissions: $permissions)
 }
     `;
 export const WriteResourceContentDocument = `
@@ -4661,6 +4702,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getSharedProjects(variables?: GetSharedProjectsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSharedProjectsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetSharedProjectsQuery>(GetSharedProjectsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSharedProjects', 'query');
     },
+    getSubjectProjectsPermissions(variables: GetSubjectProjectsPermissionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSubjectProjectsPermissionsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSubjectProjectsPermissionsQuery>(GetSubjectProjectsPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSubjectProjectsPermissions', 'query');
+    },
     moveResource(variables: MoveResourceMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<MoveResourceMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<MoveResourceMutation>(MoveResourceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'moveResource', 'mutation');
     },
@@ -4669,6 +4713,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     setProjectPermissions(variables: SetProjectPermissionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetProjectPermissionsMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<SetProjectPermissionsMutation>(SetProjectPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setProjectPermissions', 'mutation');
+    },
+    setSubjectProjectsPermissions(variables: SetSubjectProjectsPermissionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetSubjectProjectsPermissionsMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<SetSubjectProjectsPermissionsMutation>(SetSubjectProjectsPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setSubjectProjectsPermissions', 'mutation');
     },
     writeResourceContent(variables: WriteResourceContentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<WriteResourceContentMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<WriteResourceContentMutation>(WriteResourceContentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'writeResourceContent', 'mutation');

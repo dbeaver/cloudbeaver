@@ -1376,9 +1376,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             userId = userIdFromCredentials;
         }
         if (authProvider.isTrusted()) {
-            if (WebAppUtils.getWebApplication().isMultiNode()) {
-                throw new SMException("Authorization through trusted provider is not available in multi node");
-            }
             Object reverseProxyUserRoles = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_ROLES);
             if (reverseProxyUserRoles instanceof List) {
                 setUserRoles(userId, ((List<?>) reverseProxyUserRoles).stream().map(Object::toString).toArray(String[]::new), userId);
