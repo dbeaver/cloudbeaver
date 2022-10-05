@@ -51,7 +51,8 @@ export function useFocus<T extends HTMLElement>({
         if (this.reference) {
           if (
             document.activeElement instanceof HTMLElement
-              && document.activeElement !== this.reference
+            && document.activeElement !== this.reference
+            && (optionsRef.autofocus || optionsRef.focusFirstChild)
           ) {
             this.lastFocus = document.activeElement;
           }
@@ -135,6 +136,10 @@ export function useFocus<T extends HTMLElement>({
   }, [state.reference]);
 
   useEffect(() => () => {
+    if (state.lastFocus?.tabIndex === -1) {
+      return;
+    }
+
     state.lastFocus?.focus();
   }, []);
 
