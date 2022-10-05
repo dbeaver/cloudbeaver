@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.rm.impl.WebServiceRM;
+import io.cloudbeaver.service.rm.model.RMProjectPermissions;
 import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
 import org.jkiss.utils.CommonUtils;
 
@@ -94,6 +95,11 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
                 getWebSession(env),
                 env.getArgument("projectId"),
                 new RMSubjectProjectPermissions(env.getArgument("permissions"))
+            ))
+            .dataFetcher("rmSetSubjectProjectPermissions", env -> getService(env).setSubjectProjectPermissions(
+                getWebSession(env),
+                env.getArgument("subjectId"),
+                new RMProjectPermissions(env.getArgument("permissions"))
             ))
         ;
 

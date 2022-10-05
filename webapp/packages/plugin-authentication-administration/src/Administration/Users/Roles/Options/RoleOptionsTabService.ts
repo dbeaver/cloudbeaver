@@ -116,9 +116,9 @@ export class RoleOptionsTabService extends Bootstrap {
       }
     } catch (exception: any) {
       if (create) {
-        status.error('administration_roles_role_create_error', exception);
+        status.error(exception, 'administration_roles_role_create_error');
       } else {
-        status.error('administration_roles_role_save_error', exception);
+        status.error(exception, 'administration_roles_role_save_error');
       }
     }
   }
