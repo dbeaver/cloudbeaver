@@ -99,6 +99,7 @@ export function useFocus<T extends HTMLElement>({
         }
 
         this.lastFocus?.focus();
+        this.lastFocus = null;
       },
     }),
     {
