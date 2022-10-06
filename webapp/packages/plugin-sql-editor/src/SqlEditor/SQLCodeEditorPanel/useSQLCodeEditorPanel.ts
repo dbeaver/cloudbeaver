@@ -108,6 +108,7 @@ export function useSQLCodeEditorPanel(
       this.data.setCursor(cursorPosition);
 
       const ignoredChanges = ['+delete', 'undo', 'complete'];
+      const updateHighlight = throttle(() => this.highlightActiveQuery(), 1000);
 
       // TODO: probably should be moved to SQLCodeEditorController
       editor.on('changes', (cm, changes) => {
@@ -169,7 +170,7 @@ export function useSQLCodeEditorPanel(
             }
           }
         }
-        this.highlightActiveQuery();
+        updateHighlight();
       });
 
       this.highlightActiveQuery();
@@ -278,7 +279,7 @@ export function useSQLCodeEditorPanel(
     data, controller,
   });
 
-  const updateHighlight = useCallback(throttle(() => editorPanelData.highlightActiveQuery(), 300), [editorPanelData]);
+  const updateHighlight = useCallback(throttle(() => editorPanelData.highlightActiveQuery(), 1000), [editorPanelData]);
 
   useExecutor({
     executor: data.onUpdate,
