@@ -109,6 +109,7 @@ export function useSQLCodeEditorPanel(
 
       const ignoredChanges = ['+delete', 'undo', 'complete'];
       const updateHighlight = throttle(() => this.highlightActiveQuery(), 1000);
+      const resetLineStateHighlight = throttle(() => this.controller?.resetLineStateHighlight(), 1000);
 
       // TODO: probably should be moved to SQLCodeEditorController
       editor.on('changes', (cm, changes) => {
@@ -120,7 +121,7 @@ export function useSQLCodeEditorPanel(
           this.data.updateParserScriptsThrottle();
         }
 
-        this.controller?.resetLineStateHighlight();
+        resetLineStateHighlight();
         if (!this.activeSuggest) {
           return;
         }
