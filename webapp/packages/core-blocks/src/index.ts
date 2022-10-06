@@ -146,6 +146,7 @@ export * from './Link';
 export * from './Cell';
 export * from './UploadArea';
 export * from './ErrorMessage';
+export * from './preventFocusHandler';
 export * from './StatusMessage';
 export * from './ExceptionMessage';
 export * from './getComputed';
