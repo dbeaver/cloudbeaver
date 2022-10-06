@@ -15,9 +15,11 @@ import type {
   ShowHintOptions,
 } from 'codemirror';
 import { action } from 'mobx';
+import { useCallback } from 'react';
 import type { IControlledCodeMirror } from 'react-codemirror2';
 
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
+import { throttle } from '@cloudbeaver/core-utils';
 
 import type { ISQLEditorData } from '../ISQLEditorData';
 import type { SQLCodeEditorController } from '../SQLCodeEditor/SQLCodeEditorController';
@@ -276,11 +278,11 @@ export function useSQLCodeEditorPanel(
     data, controller,
   });
 
+  const updateHighlight = useCallback(throttle(() => editorPanelData.highlightActiveQuery(), 300), [editorPanelData]);
+
   useExecutor({
     executor: data.onUpdate,
-    handlers:[function updateHighlight() {
-      editorPanelData.highlightActiveQuery();
-    }],
+    handlers:[updateHighlight],
   });
 
   useExecutor({
