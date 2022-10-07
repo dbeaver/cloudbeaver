@@ -129,10 +129,10 @@ public interface DBWServiceCore extends DBWService {
         @Nullable @WebObjectId String projectId,
         @NotNull String connectionId) throws DBWebException;
 
-    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
+    @WebAction
     WebConnectionInfo createConnectionFromTemplate(
         @NotNull WebSession webSession,
-        @Nullable @WebObjectId String projectId,
+        @NotNull String projectId,
         @NotNull String templateId,
         @Nullable String connectionName) throws DBWebException;
 
