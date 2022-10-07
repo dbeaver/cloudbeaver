@@ -13,7 +13,6 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { ProjectsService } from '@cloudbeaver/core-projects';
 import { DatabaseAuthModel, DetailsError, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 import type { IConnectionAuthenticationConfig } from '@cloudbeaver/plugin-connections';
@@ -86,7 +85,6 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     private readonly templateConnectionsService: TemplateConnectionsService,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly projectsService: ProjectsService,
     private readonly dbAuthModelsResource: DatabaseAuthModelsResource
   ) {
     makeObservable(this, {
@@ -122,13 +120,6 @@ implements IInitializableController, IDestructibleController, IConnectionControl
 
   onConnect = async (): Promise<void> => {
     if (!this.template) {
-      return;
-    }
-
-    await this.projectsService.load();
-
-    if (!this.projectsService.defaultProject) {
-      this.notificationService.logError({ title: 'core_projects_no_default_project' });
       return;
     }
 

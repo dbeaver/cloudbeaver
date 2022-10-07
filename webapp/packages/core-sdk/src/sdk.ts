@@ -506,7 +506,7 @@ export interface MutationCreateConnectionFolderArgs {
 
 export interface MutationCreateConnectionFromTemplateArgs {
   connectionName?: InputMaybe<Scalars['String']>;
-  projectId?: InputMaybe<Scalars['ID']>;
+  projectId: Scalars['ID'];
   templateId: Scalars['ID'];
 }
 
