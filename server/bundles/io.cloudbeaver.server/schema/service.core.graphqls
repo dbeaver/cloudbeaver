@@ -528,7 +528,7 @@ extend type Mutation {
 
     deleteConnection( id: ID!, projectId: ID ): Boolean!
 
-    createConnectionFromTemplate( templateId: ID!, connectionName: String, projectId: ID ): ConnectionInfo!
+    createConnectionFromTemplate( templateId: ID!, projectId: ID!, connectionName: String ): ConnectionInfo!
 
     # Create new folder
     createConnectionFolder(parentFolderPath: ID, folderName: String!, projectId: ID ): ConnectionFolderInfo!
