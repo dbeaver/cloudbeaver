@@ -15,9 +15,11 @@ import type {
   ShowHintOptions,
 } from 'codemirror';
 import { action } from 'mobx';
+import { useCallback } from 'react';
 import type { IControlledCodeMirror } from 'react-codemirror2';
 
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
+import { throttle } from '@cloudbeaver/core-utils';
 
 import type { ISQLEditorData } from '../ISQLEditorData';
 import type { SQLCodeEditorController } from '../SQLCodeEditor/SQLCodeEditorController';
@@ -106,6 +108,8 @@ export function useSQLCodeEditorPanel(
       this.data.setCursor(cursorPosition);
 
       const ignoredChanges = ['+delete', 'undo', 'complete'];
+      const updateHighlight = throttle(() => this.highlightActiveQuery(), 1000);
+      const resetLineStateHighlight = throttle(() => this.controller?.resetLineStateHighlight(), 1000);
 
       // TODO: probably should be moved to SQLCodeEditorController
       editor.on('changes', (cm, changes) => {
@@ -117,7 +121,7 @@ export function useSQLCodeEditorPanel(
           this.data.updateParserScriptsThrottle();
         }
 
-        this.controller?.resetLineStateHighlight();
+        resetLineStateHighlight();
         if (!this.activeSuggest) {
           return;
         }
@@ -167,7 +171,7 @@ export function useSQLCodeEditorPanel(
             }
           }
         }
-        this.highlightActiveQuery();
+        updateHighlight();
       });
 
       this.highlightActiveQuery();
@@ -276,11 +280,11 @@ export function useSQLCodeEditorPanel(
     data, controller,
   });
 
+  const updateHighlight = useCallback(throttle(() => editorPanelData.highlightActiveQuery(), 1000), [editorPanelData]);
+
   useExecutor({
     executor: data.onUpdate,
-    handlers:[function updateHighlight() {
-      editorPanelData.highlightActiveQuery();
-    }],
+    handlers:[updateHighlight],
   });
 
   useExecutor({
