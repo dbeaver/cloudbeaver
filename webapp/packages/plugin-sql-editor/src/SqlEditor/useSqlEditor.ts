@@ -478,7 +478,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     commonDialogService,
   });
 
-  data.init();
+  untracked(() => data.init());
 
   useExecutor({
     executor: data.dataSource?.onSetScript,
