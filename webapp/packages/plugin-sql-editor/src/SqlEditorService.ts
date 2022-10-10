@@ -11,7 +11,7 @@ import { observable } from 'mobx';
 import { Connection, ConnectionExecutionContextProjectKey, ConnectionExecutionContextResource, ConnectionExecutionContextService, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionExecutionContext, IConnectionExecutionContextInfo, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { Executor } from '@cloudbeaver/core-executor';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 import { SqlDataSourceService, ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
@@ -28,7 +28,7 @@ export interface IQueryChangeData {
 
 @injectable()
 export class SqlEditorService {
-  readonly onQueryChange: Executor<IQueryChangeData>;
+  readonly onQueryChange: ISyncExecutor<IQueryChangeData>;
 
   constructor(
     private readonly graphQLService: GraphQLService,
@@ -39,7 +39,7 @@ export class SqlEditorService {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly sqlDataSourceService: SqlDataSourceService
   ) {
-    this.onQueryChange = new Executor();
+    this.onQueryChange = new SyncExecutor();
   }
 
   getState(
