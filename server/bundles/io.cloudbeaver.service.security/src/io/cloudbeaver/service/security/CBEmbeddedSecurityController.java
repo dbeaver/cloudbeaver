@@ -861,7 +861,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     UUID.randomUUID().toString(),
                     smTokens.getSmAccessToken(),
                     smTokens.getSmRefreshToken(),
-                    new SMAuthPermissions(null, smSessionId, permissions, null),
+                    new SMAuthPermissions(null, smSessionId, permissions),
                     Map.of()
                 );
             }
@@ -1296,7 +1296,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                     smTokens = generateNewSessionToken(smSessionId, activeUserId, authInfo.getAuthRole(), dbCon);
                     permissions = new SMAuthPermissions(
-                        activeUserId, smSessionId, getUserPermissions(activeUserId, authInfo.getAuthRole()), null);
+                        activeUserId, smSessionId, getUserPermissions(activeUserId, authInfo.getAuthRole()));
                     txn.commit();
                 }
             } catch (SQLException e) {
@@ -1462,7 +1462,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             throw new DBCException("Error reading token info in database", e);
         }
         var permissions = userId == null ? getAnonymousUserPermissions() : getUserPermissions(userId, authRole);
-        return new SMAuthPermissions(userId, sessionId, permissions, authRole);
+        return new SMAuthPermissions(userId, sessionId, permissions);
     }
 
     @Override
