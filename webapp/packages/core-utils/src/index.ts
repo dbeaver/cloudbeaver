@@ -34,6 +34,7 @@ export * from './isImageFormat';
 export * from './getCookies';
 export * from './getUniqueName';
 export * from './isMapsEqual';
+export * from './isObjectsEqual';
 export * from './openCenteredPopup';
 export * from './download';
 export * from './getTextFileReadingProcess';
