@@ -14,8 +14,8 @@ import { ConnectionExecutionContextService, createConnectionParam } from '@cloud
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
-import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
-import { isObjectsEqual, throttleAsync } from '@cloudbeaver/core-utils';
+import type { SqlCompletionProposal, SqlDialectInfo } from '@cloudbeaver/core-sdk';
+import { createLastPromiseGetter, LastPromiseGetter, isObjectsEqual, throttleAsync } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import type { ISqlDataSource } from '../SqlDataSource/ISqlDataSource';
@@ -38,6 +38,7 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly commonDialogService: CommonDialogService;
   readonly sqlResultTabsService: SqlResultTabsService;
   readonly dataSource: ISqlDataSource | undefined;
+  readonly getLastAutocomplete: LastPromiseGetter<SqlCompletionProposal[]>;
 
   cursor: ICursor;
   readonlyState: boolean;
@@ -96,7 +97,12 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         || this.readonlyState
         || !!this.dataSource?.isOutdated()
         || !!this.dataSource?.isReadonly()
+        || !this.editing
       );
+    },
+
+    get editing(): boolean {
+      return this.dataSource?.isEditing() ?? false;
     },
 
     get isLineScriptEmpty(): boolean {
@@ -179,22 +185,37 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       this.onUpdate.execute();
     },
 
-    getHintProposals: throttleAsync(async function getHintProposals(this: ISQLEditorDataPrivate, position, simple) {
+    getLastAutocomplete: createLastPromiseGetter(),
+
+    getHintProposals: throttleAsync(async function getHintProposals(
+      this: ISQLEditorDataPrivate,
+      position,
+      word,
+      simple
+    ) {
       if (!this.dataSource?.executionContext) {
         return [];
       }
 
-      const proposals = await this.sqlEditorService
+      const { connectionId, id, defaultSchema, defaultCatalog } = this.dataSource.executionContext;
+
+      return this.getLastAutocomplete([
+        connectionId,
+        id,
+        defaultSchema,
+        defaultCatalog,
+        position,
+        simple,
+        word.slice(0, 1),
+      ], () => this.sqlEditorService
         .getAutocomplete(
-          this.dataSource.executionContext.connectionId,
-          this.dataSource.executionContext.id,
+          connectionId,
+          id,
           this.value,
           position,
           undefined,
           simple
-        );
-
-      return proposals;
+        ));
     }, 1000 / 3),
 
     async formatScript(): Promise<void> {
@@ -265,6 +286,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           query.query,
         )
       );
+    },
+
+    async switchEditing(): Promise<void> {
+      this.dataSource?.setEditing(!this.dataSource.isEditing());
     },
 
     async executeScript(): Promise<void> {
@@ -431,6 +456,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     executeQueryNewTab: action.bound,
     showExecutionPlan: action.bound,
     executeScript: action.bound,
+    switchEditing: action.bound,
     activeSegmentMode: computed({
       equals: isObjectsEqual,
     }),
@@ -454,7 +480,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     commonDialogService,
   });
 
-  data.init();
+  untracked(() => data.init());
 
   useExecutor({
     executor: data.dataSource?.onSetScript,

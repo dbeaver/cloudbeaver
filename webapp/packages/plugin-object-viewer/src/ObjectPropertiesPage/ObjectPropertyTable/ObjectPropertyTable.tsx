@@ -11,9 +11,8 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, TextPlaceholder, useMapResource } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder, useMapResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { NavTreeResource, DBObjectResource, type DBObject, DBObjectParentKey } from '@cloudbeaver/core-navigation-tree';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 

@@ -9,9 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Filter, useFocus } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import { Filter, useFocus, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { IElementsTree } from '../useElementsTree';
 

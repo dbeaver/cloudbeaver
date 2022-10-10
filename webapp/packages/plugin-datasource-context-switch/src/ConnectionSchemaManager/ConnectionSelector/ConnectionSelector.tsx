@@ -10,13 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { getComputed, useDataResource, useMapResource } from '@cloudbeaver/core-blocks';
+import { getComputed, useDataResource, useMapResource, usePermission, useStyles } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ContainerResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
-import { EPermission, usePermission } from '@cloudbeaver/core-root';
+import { EPermission } from '@cloudbeaver/core-root';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { ContextMenu, OptionsPanelService } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { topMenuStyles, TopNavButton } from '@cloudbeaver/plugin-top-app-bar';
@@ -27,15 +26,17 @@ import { MENU_CONNECTION_SELECTOR } from '../MENU_CONNECTION_SELECTOR';
 
 const menuStyles = css`
   Menu {
-    max-height: 400px;
-    overflow: auto;
+    & menu-box {
+      max-height: 80vh;
+      overflow: auto;
+    }
     & menu-panel-item {
-        overflow-x: hidden;
+      overflow-x: hidden;
     }
     & menu-item-text {
-        max-width: 400px;
-        overflow-x: hidden;
-        text-overflow: ellipsis;
+      max-width: 400px;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
     }
   }
 `;
@@ -68,7 +69,6 @@ const styles = css`
     display: flex;
     height: 100%;
     visibility: hidden;
-    background: #338ecc;
       
     &[use|isVisible] {
       visibility: visible;
@@ -160,7 +160,7 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
     <connection-selector {...use({ isVisible })}>
       <ContextMenu
         menu={connectionsMenu}
-        placement="bottom-end"
+        placement="bottom-start"
         style={[menuStyles, connectionMenu, topMenuStyles, removeDisableEffect]}
         disclosure
         modal
@@ -170,7 +170,7 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
             title={connection?.name || 'app_topnavbar_connection_schema_manager_not_selected'}
             icon={driver?.icon}
             style={[menuStyles, connectionMenu, removeDisableEffect]}
-            menu={connectionSelectorService.isConnectionChangeable}
+            // menu={connectionSelectorService.isConnectionChangeable}
             loading={loading}
             secondary
           />
@@ -178,7 +178,7 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
       </ContextMenu>
       <ContextMenu
         menu={dataContainerMenu}
-        placement="bottom-end"
+        placement="bottom-start"
         style={[menuStyles, topMenuStyles]}
         disclosure
         modal
@@ -188,10 +188,10 @@ export const ConnectionSelector = observer(function ConnectionSelector() {
             title={objectContainerName}
             icon={objectContainerIcon}
             style={[menuStyles, removeDisableEffect]}
-            menu={
-              connectionSelectorService.isObjectCatalogChangeable
-            || connectionSelectorService.isObjectSchemaChangeable
-            }
+            // menu={
+            //   connectionSelectorService.isObjectCatalogChangeable
+            // || connectionSelectorService.isObjectSchemaChangeable
+            // }
             loading={loading}
             secondary
           />

@@ -13,7 +13,7 @@ import {
   TableItem, TableColumnValue, TableItemSelect, TableItemExpand
 } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 const styles = css`
   TableColumnValue[expand] {
@@ -27,7 +27,7 @@ interface Props {
 }
 
 export const MetadataParam = observer<Props>(function MetadataParam({ param, selectable }) {
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <TableItem item={param.id} selectDisabled={!selectable}>
       {selectable && (
         <TableColumnValue centerContent flex>

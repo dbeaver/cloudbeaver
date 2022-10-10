@@ -17,7 +17,13 @@ export interface IExecutionContextProvider<TData> {
 }
 
 export interface IExecutionContext<TData> extends IExecutionContextProvider<TData> {
+  readonly parent?: IExecutionContext<any>;
   readonly contexts: Map<IContextLoader<any, TData>, any>;
+  readonly contextCreators: Map<IContextLoader<any, TData>, IContextLoader<any, TData>>;
+
+  addContextCreators(
+    creators: [IContextLoader<any, TData>, IContextLoader<any, TData>][]
+  ): void;
 }
 
 export type IAsyncContextLoader<T = any, TData = any> = (

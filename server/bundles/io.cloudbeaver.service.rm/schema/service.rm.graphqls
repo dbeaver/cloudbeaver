@@ -1,7 +1,7 @@
 # Metadata queries
 
 type RMProject {
-    id: String!
+    id: ID!
     name: String!
     description: String
     shared: Boolean!
@@ -17,12 +17,31 @@ type RMResource {
     length: Int!
 }
 
+input RMSubjectProjectPermissions {
+    subjectId: String!
+    permissions: [String!]!
+}
+
+input RMProjectPermissions {
+    projectId: String!
+    permissions: [String!]!
+}
+
 extend type Query {
 
     # List accessible projects
     rmListProjects: [RMProject!]!
 
-    # List accessible projects
+    rmListSharedProjects: [RMProject!]!
+
+    rmProject(projectId: String!): RMProject!
+
+    rmListProjectPermissions: [AdminPermissionInfo!]!
+
+    rmListProjectGrantedPermissions(projectId: String!): [AdminObjectGrantInfo!]!
+
+    rmListSubjectProjectsPermissionGrants(subjectId: String!): [AdminObjectGrantInfo!]!
+
     rmListResources(
         projectId: String!,
         folder: String,
@@ -61,8 +80,14 @@ extend type Mutation {
         forceOverwrite: Boolean!): String!
 
     rmCreateProject(
+        projectId: ID,
         projectName: String!,
-        description: String): ProjectInfo
+        description: String): RMProject!
 
     rmDeleteProject(projectId: ID!): Boolean!
+
+    rmSetProjectPermissions(projectId: String!, permissions: [RMSubjectProjectPermissions!]!): Boolean!
+
+    rmSetSubjectProjectPermissions(subjectId: String!, permissions: [RMProjectPermissions!]!): Boolean!
+
 }

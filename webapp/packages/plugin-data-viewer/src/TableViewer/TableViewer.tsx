@@ -14,7 +14,7 @@ import styled, { css } from 'reshadow';
 import { Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useObjectRef, useObservableRef, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { ResultSetConstraintAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import { DataPresentationService, DataPresentationType } from '../DataPresentationService';
@@ -104,7 +104,6 @@ export const TableViewer = observer<Props>(function TableViewer({
   onPresentationChange,
   onValuePresentationChange,
 }) {
-  const styles = useStyles(viewerStyles, splitStyles);
   const dataPresentationService = useService(DataPresentationService);
   const tableViewerStorageService = useService(TableViewerStorageService);
   const dataModel = tableViewerStorageService.get(tableId);
@@ -240,7 +239,7 @@ export const TableViewer = observer<Props>(function TableViewer({
   && overlay
   && resultExist;
 
-  return styled(styles)(
+  return styled(viewerStyles, splitStyles)(
     <table-viewer className={className}>
       <table-content>
         <TablePresentationBar

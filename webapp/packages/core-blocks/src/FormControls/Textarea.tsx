@@ -10,9 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import { useStyles } from '../useStyles';
 import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 

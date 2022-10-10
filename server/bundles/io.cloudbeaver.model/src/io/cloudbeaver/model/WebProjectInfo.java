@@ -18,17 +18,21 @@ package io.cloudbeaver.model;
 
 import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
+import org.jkiss.dbeaver.model.rm.RMProjectType;
 
 public class WebProjectInfo {
     private final WebSession session;
     private final VirtualProjectImpl project;
+    private final boolean customPrivateConnectionsEnabled;
 
-    public WebProjectInfo(WebSession session, VirtualProjectImpl project) {
+    public WebProjectInfo(WebSession session, VirtualProjectImpl project, boolean customPrivateConnectionsEnabled) {
         this.session = session;
         this.project = project;
+        this.customPrivateConnectionsEnabled = customPrivateConnectionsEnabled;
     }
 
     public WebSession getSession() {
@@ -45,6 +49,11 @@ public class WebProjectInfo {
     }
 
     @Property
+    public boolean isShared() {
+        return project.getRmProject().isShared();
+    }
+
+    @Property
     public String getName() {
         return project.getName();
     }
@@ -55,16 +64,29 @@ public class WebProjectInfo {
     }
 
     @Property
-    public boolean isCanCreateConnections() {
-        return hasRmPermission(RMProjectPermission.CONNECTIONS_EDIT);
+    public boolean isCanEditDataSources() {
+        if (project.getRmProject().getType() == RMProjectType.USER && !customPrivateConnectionsEnabled) {
+            return false;
+        }
+        return hasDataSourcePermission(RMProjectPermission.DATA_SOURCES_EDIT);
     }
 
     @Property
-    public boolean isCanViewConnections() {
-        return hasRmPermission(RMProjectPermission.CONNECTIONS_VIEW);
+    public boolean isCanViewDataSources() {
+        return hasDataSourcePermission(RMProjectPermission.DATA_SOURCES_VIEW);
     }
 
-    private boolean hasRmPermission(RMProjectPermission permission) {
-        return project.getRmProject().getProjectPermissions().contains(permission.getPermissionId());
+    @Property
+    public boolean isCanEditResources() {
+        return hasDataSourcePermission(RMProjectPermission.RESOURCE_EDIT);
+    }
+
+    @Property
+    public boolean isCanViewResources() {
+        return hasDataSourcePermission(RMProjectPermission.RESOURCE_VIEW);
+    }
+
+    private boolean hasDataSourcePermission(RMProjectPermission permission) {
+        return SMUtils.hasProjectPermission(session, project.getRmProject(), permission);
     }
 }

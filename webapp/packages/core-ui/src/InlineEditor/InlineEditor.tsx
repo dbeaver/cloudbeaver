@@ -12,10 +12,10 @@ import {
 } from 'react';
 import styled, { use } from 'reshadow';
 
-import { Icon, IconOrImage, Loader, useObjectRef } from '@cloudbeaver/core-blocks';
+import { Icon, IconOrImage, Loader, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { EditorDialog } from './EditorDialog';
 import { InlineEditorStyles } from './styles';

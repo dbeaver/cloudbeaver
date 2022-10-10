@@ -42,7 +42,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
     this.menuService.setHandler({
       id: 'connection-selector-base',
-      isApplicable: context => context.find(DATA_CONTEXT_MENU, MENU_CONNECTION_SELECTOR),
+      isApplicable: context => context.hasValue(DATA_CONTEXT_MENU, MENU_CONNECTION_SELECTOR),
       isLoading: () => this.connectionSelectorLoading,
       isDisabled: () => (
         !this.connectionSchemaManagerService.isConnectionChangeable
@@ -58,7 +58,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
       getItems: (context, items) => {
         items = [...items];
 
-        const connections = this.connectionInfoResource.values
+        const connections = this.connectionsManagerService.projectConnections
           .filter(connection => !connection.template)
           .sort((a, b) => {
             if (a.connected === b.connected) {
@@ -104,7 +104,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
     this.menuService.setHandler({
       id: 'connection-data-container-selector-base',
-      isApplicable: context => context.find(DATA_CONTEXT_MENU, MENU_CONNECTION_DATA_CONTAINER_SELECTOR),
+      isApplicable: context => context.hasValue(DATA_CONTEXT_MENU, MENU_CONNECTION_DATA_CONTAINER_SELECTOR),
       isDisabled: () => (
         !this.connectionSchemaManagerService.currentConnection?.connected
         || this.connectionSelectorLoading

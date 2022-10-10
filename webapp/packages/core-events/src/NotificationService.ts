@@ -145,15 +145,15 @@ export class NotificationService {
     return { controller: processController, notification };
   }
 
-  logInfo<T>(notification: INotificationOptions<T>): INotification<T> {
+  logInfo<T extends INotificationExtraProps<any>>(notification: INotificationOptions<T>): INotification<T> {
     return this.notify(notification, ENotificationType.Info);
   }
 
-  logSuccess<T>(notification: INotificationOptions<T>): INotification<T> {
+  logSuccess<T extends INotificationExtraProps<any>>(notification: INotificationOptions<T>): INotification<T> {
     return this.notify(notification, ENotificationType.Success);
   }
 
-  logError<T>(notification: INotificationOptions<T>): INotification<T> {
+  logError<T extends INotificationExtraProps<any>>(notification: INotificationOptions<T>): INotification<T> {
     return this.notify(notification, ENotificationType.Error);
   }
 

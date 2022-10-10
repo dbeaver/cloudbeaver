@@ -11,7 +11,6 @@ import { useRef, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
@@ -74,7 +73,7 @@ export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = ob
     }
   }
 
-  return styled(useStyles(BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES))(
+  return styled(BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES)(
     <TabsState
       currentTabId={currentTabId}
       container={service.tabs}

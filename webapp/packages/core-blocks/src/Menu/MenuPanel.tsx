@@ -11,9 +11,11 @@ import { Children } from 'react';
 import { Menu, MenuStateReturn } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { ErrorBoundary } from '../ErrorBoundary';
 import { getComputed } from '../getComputed';
+import { useStyles } from '../useStyles';
 import { MenuEmptyItem } from './MenuEmptyItem';
 import { menuPanelStyles } from './menuPanelStyles';
 
@@ -26,6 +28,7 @@ export interface IMenuPanelProps {
   getHasBindings?: () => boolean;
   children: React.ReactNode | (() => React.ReactNode);
   rtl?: boolean;
+  submenu?: boolean;
   style?: ComponentStyle;
   className?: string;
 }
@@ -59,13 +62,15 @@ export const MenuPanel = observer<IMenuPanelProps>(function MenuPanel({
   }
 
   return styled(styles)(
-    <Menu {...menu} aria-label={label} className={className} visible={panelAvailable}>
-      <menu-box dir={rtl ? 'rtl' : undefined} {...use({ hasBindings })}>
-        {Children.count(renderedChildren) === 0 && (
-          <MenuEmptyItem style={style} />
-        )}
-        {renderedChildren}
-      </menu-box>
-    </Menu>
+    <ErrorBoundary>
+      <Menu {...menu} aria-label={label} className={className} visible={panelAvailable}>
+        <menu-box dir={rtl ? 'rtl' : undefined} {...use({ hasBindings })}>
+          {Children.count(renderedChildren) === 0 && (
+            <MenuEmptyItem style={style} />
+          )}
+          {renderedChildren}
+        </menu-box>
+      </Menu>
+    </ErrorBoundary>
   );
 });

@@ -14,7 +14,7 @@
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@cloudbeaver/core-browser": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
     "@cloudbeaver/core-connections": "~0.1.0",
@@ -38,7 +38,9 @@
     "@cloudbeaver/plugin-top-app-bar": "~0.1.0",
     "@cloudbeaver/plugin-navigation-tree": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor": "~0.1.0",
-    "@cloudbeaver/plugin-sql-editor-navigation-tab": "~0.1.0",
+    "@cloudbeaver/plugin-sql-editor-navigation-tab": "~0.1.0"
+  },
+  "peerDependencies": {
     "react": "~18.x.x",
     "react-dom": "~18.x.x",
     "reakit": "~1.x.x",

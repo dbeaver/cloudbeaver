@@ -1,6 +1,7 @@
 const { merge } = require('webpack-merge');
 const { resolve } = require('path');
 const webpack = require('webpack');
+const httpProxy = require('http-proxy');
 const fs = require('fs');
 
 const commonConfig = require('./webpack.config.js');
@@ -47,6 +48,15 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
       '/api': {
         target: env.server,
       },
+    },
+    onListening: function (devServer) {
+      if (!devServer) {
+        throw new Error('webpack-dev-server is not defined');
+      }
+
+      const port = devServer.server.address().port;
+      console.log(`Proxy from http://localhost:8080 to http://127.0.0.1:${port}`);
+      httpProxy.createProxyServer({ target:`http://127.0.0.1:${port}` }).listen(8080);
     },
   },
   devtool: 'eval-source-map',

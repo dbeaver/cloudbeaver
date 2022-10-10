@@ -11,6 +11,7 @@ import { action, computed, makeObservable, observable } from 'mobx';
 import type { IFormStateInfo } from '@cloudbeaver/core-blocks';
 import { createConnectionParam, DatabaseConnection, IConnectionInfoParams, IConnectionsResource } from '@cloudbeaver/core-connections';
 import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
+import type { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ConnectionConfig, ResourceKey } from '@cloudbeaver/core-sdk';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
@@ -83,6 +84,7 @@ export class ConnectionFormState implements IConnectionFormState {
   readonly resource: IConnectionsResource;
   readonly service: ConnectionFormService;
   readonly submittingTask: IExecutor<IConnectionFormSubmitData>;
+  readonly closeTask: IExecutor;
 
   private readonly _id: string;
   private stateInfo: IFormStateInfo | null;
@@ -91,6 +93,8 @@ export class ConnectionFormState implements IConnectionFormState {
   private _availableDrivers: string[];
 
   constructor(
+    private readonly projectsService: ProjectsService,
+    private readonly projectInfoResource: ProjectInfoResource,
     service: ConnectionFormService,
     resource: IConnectionsResource
   ) {
@@ -107,11 +111,14 @@ export class ConnectionFormState implements IConnectionFormState {
     this.formStateTask = new Executor<IConnectionFormState>(this, () => true);
     this.loadConnectionTask = new Executor<IConnectionFormState>(this, () => true);
     this.submittingTask = new Executor();
+    this.closeTask = new Executor();
     this.statusMessage = null;
     this.configured = false;
     this.mode = 'create';
     this.type = 'public';
 
+
+    this.syncProject = this.syncProject.bind(this);
     this.syncInfo = this.syncInfo.bind(this);
     this.test = this.test.bind(this);
     this.save = this.save.bind(this);
@@ -125,6 +132,12 @@ export class ConnectionFormState implements IConnectionFormState {
 
     this.resource.onItemAdd
       .addHandler(this.syncInfo);
+
+    this.projectInfoResource.onDataUpdate
+      .addHandler(this.syncProject);
+
+    this.projectsService.onActiveProjectChange
+      .addHandler(this.syncProject);
 
     this.submittingTask.addPostHandler(async (data, contexts) => {
       const status = contexts.getContext(service.connectionStatusContext);
@@ -254,6 +267,14 @@ export class ConnectionFormState implements IConnectionFormState {
   dispose(): void {
     this.resource.onItemAdd
       .removeHandler(this.syncInfo);
+    this.projectInfoResource.onDataUpdate
+      .removeHandler(this.syncProject);
+    this.projectsService.onActiveProjectChange
+      .removeHandler(this.syncProject);
+  }
+
+  async close(): Promise<void> {
+    await this.closeTask.execute();
   }
 
   private updateFormState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>): void {
@@ -285,6 +306,17 @@ export class ConnectionFormState implements IConnectionFormState {
     }
 
     this.loadConnectionInfo();
+  }
+
+  private async syncProject() {
+    if (!this.projectId) {
+      return;
+    }
+
+    const project = this.projectInfoResource.get(this.projectId);
+    if (!project?.canEditDataSources || !this.projectsService.activeProjects.includes(project)) {
+      await this.close();
+    }
   }
 
   private async loadInfo(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {

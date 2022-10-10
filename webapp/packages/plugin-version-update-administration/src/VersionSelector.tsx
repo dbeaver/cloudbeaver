@@ -13,7 +13,6 @@ import styled, { css } from 'reshadow';
 import { BASE_CONTAINERS_STYLES, Combobox, Container, Group, GroupItem } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { IVersion, VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
@@ -33,7 +32,6 @@ const style = css`
 `;
 
 export const VersionSelector = observer<Props>(function VersionSelector({ versions }) {
-  const styles = useStyles(BASE_CONTAINERS_STYLES, style);
   const versionUpdateService = useService(VersionUpdateService);
   const versionResource = useService(VersionResource);
   const serverConfigResource = useService(ServerConfigResource);
@@ -49,7 +47,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
   const version = versions.find(v => v.number === selected);
   const Instruction = versionUpdateService.instructionGetter?.();
 
-  return styled(styles)(
+  return styled(BASE_CONTAINERS_STYLES, style)(
     <Container gap>
       <Group gap large>
         <Combobox

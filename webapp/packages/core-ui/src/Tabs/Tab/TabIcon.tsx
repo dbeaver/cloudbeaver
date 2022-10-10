@@ -8,8 +8,8 @@
 
 import styled from 'reshadow';
 
-import { IconOrImage } from '@cloudbeaver/core-blocks';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { IconOrImage, useStyles } from '@cloudbeaver/core-blocks';
+
 
 import { BASE_TAB_STYLES } from './BASE_TAB_STYLES';
 

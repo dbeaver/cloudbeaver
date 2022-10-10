@@ -10,8 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled from 'reshadow';
 
-import { getComputed, TreeNode, useObjectRef } from '@cloudbeaver/core-blocks';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { getComputed, TreeNode, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+
 
 import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';

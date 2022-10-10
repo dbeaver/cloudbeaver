@@ -14,7 +14,7 @@
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@cloudbeaver/core-administration": "~0.1.0",
     "@cloudbeaver/core-authentication": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
@@ -29,7 +29,9 @@
     "@cloudbeaver/core-settings": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
-    "@cloudbeaver/core-navigation-tree": "~0.1.0",
+    "@cloudbeaver/core-navigation-tree": "~0.1.0"
+  },
+  "peerDependencies": {
     "react": "~18.x.x",
     "react-dom": "~18.x.x",
     "reakit": "~1.x.x",

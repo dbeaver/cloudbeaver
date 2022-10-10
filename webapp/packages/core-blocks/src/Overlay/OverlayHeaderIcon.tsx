@@ -8,8 +8,6 @@
 
 import styled from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
 import { IconOrImage } from '../IconOrImage';
 import { OVERLAY_BASE_STYLES } from './OVERLAY_BASE_STYLES';
 
@@ -20,13 +18,11 @@ interface Props {
 }
 
 export const OverlayHeaderIcon: React.FC<React.PropsWithChildren<Props>> = function OverlayHeaderIcon({ icon, viewBox, className, children }) {
-  const style = useStyles(OVERLAY_BASE_STYLES);
-
   if (!icon && !children) {
     return null;
   }
 
-  return styled(style)(
+  return styled(OVERLAY_BASE_STYLES)(
     <icon-container className={className}>
       {icon && <IconOrImage icon={icon} viewBox={viewBox} />}
       {children}

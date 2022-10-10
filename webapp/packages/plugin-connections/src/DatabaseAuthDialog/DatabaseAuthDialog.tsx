@@ -15,11 +15,11 @@ import {
   Loader,
   useFocus,
   ErrorMessage,
+  useStyles,
 } from '@cloudbeaver/core-blocks';
 import { IConnectionInfoParams, useConnectionInfo, useDBDriver } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import { ConnectionAuthenticationForm } from '../ConnectionAuthentication/ConnectionAuthenticationForm';
 import { DBAuthDialogController } from './DBAuthDialogController';

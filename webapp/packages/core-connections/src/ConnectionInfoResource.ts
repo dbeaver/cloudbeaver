@@ -10,6 +10,7 @@ import { action, makeObservable, observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ExecutorInterrupter, ISyncExecutor } from '@cloudbeaver/core-executor';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { EPermission, NavigatorViewSettings, SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
@@ -71,6 +72,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   private readonly nodeIdMap: Map<string, IConnectionInfoParams>;
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly projectInfoResource: ProjectInfoResource,
     sessionDataResource: SessionDataResource,
     permissionsResource: SessionPermissionsResource
   ) {
@@ -84,7 +86,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     this.addAlias(
       isConnectionInfoProjectKey,
       param => resourceKeyList(this.keys.filter(key => key.projectId === param.mark)),
-      true
+      (a, b) => a.mark === b.mark
     );
 
     // in case when session was refreshed all data depended on connection info
@@ -95,6 +97,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
 
     permissionsResource.require(this, EPermission.public);
+    this.sync(this.projectInfoResource, () => CachedMapAllKey, () => CachedMapAllKey);
 
     sessionDataResource.onDataOutdated.addHandler(() => {
       this.sessionUpdate = true;
@@ -507,6 +510,10 @@ export function isNewConnection(connection: Connection | NewConnection): connect
 }
 
 export function compareConnectionsInfo(a: DatabaseConnection, b: DatabaseConnection): number {
+  return a.name.localeCompare(b.name);
+}
+
+export function compareNewConnectionsInfo(a: DatabaseConnection, b: DatabaseConnection): number {
   if (isNewConnection(a) && isNewConnection(b)) {
     return b.timestamp - a.timestamp;
   }
@@ -519,7 +526,7 @@ export function compareConnectionsInfo(a: DatabaseConnection, b: DatabaseConnect
     return -1;
   }
 
-  return a.name.localeCompare(b.name);
+  return compareConnectionsInfo(a, b);
 }
 
 export function createConnectionParam(

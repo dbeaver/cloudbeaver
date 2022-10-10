@@ -10,7 +10,6 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { Icon } from '@cloudbeaver/core-blocks';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { topMenuStyles } from '@cloudbeaver/plugin-top-app-bar';
@@ -21,7 +20,7 @@ import { TOP_NAV_BAR_SETTINGS_MENU } from './TOP_NAV_BAR_SETTINGS_MENU';
 export const SettingsMenu = observer(function SettingsMenu() {
   const menu = useMenu({ menu: TOP_NAV_BAR_SETTINGS_MENU });
 
-  return styled(useStyles(settingsMenuStyles))(
+  return styled(settingsMenuStyles)(
     <ContextMenu
       menu={menu}
       style={[topMenuStyles, settingsMenuStyles]}

@@ -9,10 +9,14 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { Icon, IconOrImage, Loader, useStateDelay } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { Icon } from '../Icon';
+import { IconOrImage } from '../IconOrImage';
+import { Loader } from '../Loader/Loader';
+import { useTranslate } from '../localization/useTranslate';
+import { useStateDelay } from '../useStateDelay';
+import { useStyles } from '../useStyles';
 import { menuPanelStyles } from './menuPanelStyles';
 
 interface IMenuItemElementProps {
@@ -22,6 +26,7 @@ interface IMenuItemElementProps {
   icon?: string | React.ReactNode;
   menu?: boolean;
   loading?: boolean;
+  panelAvailable?: boolean;
   style?: ComponentStyle;
 }
 
@@ -31,6 +36,7 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
   binding,
   icon,
   menu,
+  panelAvailable,
   loading = false,
   style = [],
 }) {
@@ -52,7 +58,7 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
       </menu-item-binding>
       <menu-item-content>
         {loading && <Loader small fullSize />}
-        {menu && !loading && <Icon name="arrow" viewBox="0 0 16 16" />}
+        {panelAvailable !== false && menu && !loading && <Icon name="arrow" viewBox="0 0 16 16" />}
       </menu-item-content>
     </menu-panel-item>
 

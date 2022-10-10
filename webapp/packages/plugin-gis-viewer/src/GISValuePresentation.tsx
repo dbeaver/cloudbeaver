@@ -10,8 +10,7 @@ import { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 import wellknown from 'wellknown';
 
-import { TextPlaceholder } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import { IDatabaseResultSet, ResultSetSelectAction, IResultSetElementKey, IDatabaseDataModel, ResultSetViewAction, ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
 
 import { CrsInput } from './CrsInput';

@@ -10,9 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { StaticImage, UploadArea } from '@cloudbeaver/core-blocks';
+import { getComputed, preventFocusHandler, StaticImage, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
@@ -20,9 +19,8 @@ import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import { ISqlEditorModeProps, SqlEditorModeService } from '../SqlEditorModeService';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA';
 import type { ISqlEditorProps } from './ISqlEditorProps';
-import { SqlEditorActionsMenu } from './SqlEditorActionsMenu';
+import { SqlEditorTools } from './SqlEditorTools';
 import { useSqlEditor } from './useSqlEditor';
-import { useTools } from './useTools';
 
 const styles = css`
     button, upload {
@@ -52,13 +50,6 @@ const styles = css`
       flex-direction: column;
       align-items: center;
       user-select: none;
-    }
-
-    tools {
-      width: 32px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
   
     button, upload {
@@ -106,11 +97,12 @@ const tabStyles = css`
   }
 `;
 
+const tabListStyles = [BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, tabStyles];
+
 export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, className }) {
   const translate = useTranslate();
   const sqlEditorModeService = useService(SqlEditorModeService);
   const data = useSqlEditor(state);
-  const tools = useTools(state);
   const [modesState] = useState(() => new MetadataMap<string, any>());
 
   useMemo(() => {
@@ -121,30 +113,12 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
     context?.set(DATA_CONTEXT_SQL_EDITOR_DATA, data);
   });
 
-  function preventFocus(event: React.MouseEvent<HTMLButtonElement>) {
-    event.preventDefault();
-  }
-
-  async function handleScriptUpload(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      throw new Error('File is not found');
-    }
-
-    const prevScript = data.value.trim();
-    const script = await tools.tryReadScript(file, prevScript);
-
-    if (script) {
-      data.setQuery(script);
-    }
-  }
-
   function handleModeSelect(tab: ITabData<ISqlEditorModeProps>) {
     state.currentModeId = tab.tabId;
   }
 
-  const trimmedValue = data.value.trim();
+  const disabled = getComputed(() => data.isLineScriptEmpty || data.isDisabled);
+  const isActiveSegmentMode = getComputed(() => data.activeSegmentMode.activeSegmentMode);
 
   return styled(styles, BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, tabStyles)(
     <TabsState
@@ -158,32 +132,32 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
     >
       <sql-editor className={className}>
         <container>
-          <actions onMouseDown={preventFocus}>
+          <actions onMouseDown={preventFocusHandler}>
             <button
-              disabled={data.isLineScriptEmpty || data.isDisabled}
+              disabled={disabled}
               title={translate('sql_editor_sql_execution_button_tooltip')}
               onClick={data.executeQuery}
             >
               <StaticImage icon="/icons/sql_exec.svg" />
             </button>
             <button
-              disabled={data.isLineScriptEmpty || data.isDisabled}
+              disabled={disabled}
               title={translate('sql_editor_sql_execution_new_tab_button_tooltip')}
               onClick={data.executeQueryNewTab}
             >
               <StaticImage icon="/icons/sql_exec_new.svg" />
             </button>
             <button
-              disabled={data.isDisabled || data.isScriptEmpty}
+              disabled={disabled}
               title={translate('sql_editor_sql_execution_script_button_tooltip')}
-              hidden={data.activeSegmentMode.activeSegmentMode}
+              hidden={isActiveSegmentMode}
               onClick={data.executeScript}
             >
               <StaticImage icon="/icons/sql_script_exec.svg" />
             </button>
             {data.dialect?.supportsExplainExecutionPlan && (
               <button
-                disabled={data.isLineScriptEmpty || data.isDisabled}
+                disabled={disabled}
                 title={translate('sql_editor_execution_plan_button_tooltip')}
                 onClick={data.showExecutionPlan}
               >
@@ -191,41 +165,11 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
               </button>
             )}
           </actions>
-          <tools onMouseDown={preventFocus}>
-            <SqlEditorActionsMenu state={state} />
-            <button
-              disabled={data.isDisabled || data.isScriptEmpty}
-              title={translate('sql_editor_sql_format_button_tooltip')}
-              hidden={data.activeSegmentMode.activeSegmentMode}
-              onClick={data.formatScript}
-            >
-              <StaticImage icon="/icons/sql_format_sm.svg" />
-            </button>
-            <button
-              disabled={!trimmedValue}
-              title={translate('sql_editor_download_script_tooltip')}
-              hidden={data.activeSegmentMode.activeSegmentMode}
-              onClick={() => tools.downloadScript(trimmedValue)}
-            >
-              <StaticImage icon='/icons/export.svg' />
-            </button>
-            {!data.activeSegmentMode.activeSegmentMode && (
-              <UploadArea
-                accept='.sql'
-                title={translate('sql_editor_upload_script_tooltip')}
-                reset
-                onChange={handleScriptUpload}
-              >
-                <upload>
-                  <StaticImage icon='/icons/import.svg' />
-                </upload>
-              </UploadArea>
-            )}
-          </tools>
+          <SqlEditorTools data={data} state={state} style={styles} />
         </container>
         <TabPanelList />
         <tabs>
-          <TabList style={[BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, tabStyles]} />
+          <TabList style={tabListStyles} />
         </tabs>
       </sql-editor>
     </TabsState>

@@ -8,13 +8,12 @@
 
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import styled from 'reshadow';
 
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
-
 import { Button } from '../Button';
+import { ShadowInput } from '../FormControls/ShadowInput';
+import { useTranslate } from '../localization/useTranslate';
 import { useObjectRef } from '../useObjectRef';
 import type { IProperty } from './IProperty';
 import { PropertyItem } from './PropertyItem';
@@ -31,6 +30,7 @@ interface Props {
   onAdd?: () => void;
   onRemove?: (property: IProperty) => void;
   className?: string;
+  filterable?: boolean;
 }
 
 export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
@@ -38,8 +38,13 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
   const translate = useTranslate();
   const propsRef = useObjectRef({ ...props });
 
-  const sortedProperties = useMemo(() => computed(() => propsRef.properties.slice().sort(
-    (a, b) => (a?.displayName ?? '').localeCompare(b?.displayName ?? ''))), [propsRef.properties]);
+  const [filterValue, setFilterValue] = useState('');
+
+  const sortedProperties = useMemo(() => computed(() => propsRef.properties
+    .slice()
+    .sort((a, b) => (a.displayName ?? '').localeCompare(b.displayName ?? ''))
+    .filter(p => p.key.toLocaleLowerCase().includes(filterValue.toLocaleLowerCase()))
+  ), [propsRef.properties, filterValue]);
 
   const changeName = useCallback((id: string, key: string) => {
     const { properties, propertiesState, onKeyChange } = propsRef;
@@ -105,11 +110,20 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
     []
   );
 
-  return styled(useStyles(PROPERTIES_TABLE_STYLES))(
+  return styled(PROPERTIES_TABLE_STYLES)(
     <properties className={className}>
       <properties-header>
         <properties-header-name>
-          {translate('block_properties_table_name')}
+          <div>
+            {translate('block_properties_table_name')}
+          </div>
+          {props.filterable ? (
+            <ShadowInput
+              value={filterValue}
+              placeholder={translate('block_properties_table_filter_name')}
+              onChange={setFilterValue}
+            />
+          ) : null}
         </properties-header-name>
         <properties-header-value>
           {translate('block_properties_table_value')}

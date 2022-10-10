@@ -8,11 +8,13 @@
 
 import { action, makeObservable, observable } from 'mobx';
 
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConnectionInfoResource, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ConnectionConfig, ResourceKey } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
@@ -36,7 +38,10 @@ export class PublicConnectionFormService {
     private readonly connectionFormService: ConnectionFormService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionAuthService: ConnectionAuthService,
+    private readonly userInfoResource: UserInfoResource,
     private readonly authenticationService: AuthenticationService,
+    private readonly projectsService: ProjectsService,
+    private readonly projectInfoResource: ProjectInfoResource
   ) {
     this.formState = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
@@ -44,7 +49,7 @@ export class PublicConnectionFormService {
     this.connectionInfoResource.onItemDelete.addPostHandler(this.closeDeleted);
 
     this.authenticationService.onLogin.addHandler(async (event, context) => {
-      if (event === 'before') {
+      if (event === 'before' && this.userInfoResource.data === null) {
         const confirmed = await this.showUnsavedChangesDialog();
         if (!confirmed) {
           ExecutorInterrupter.interrupt(context);
@@ -76,9 +81,13 @@ export class PublicConnectionFormService {
 
     if (!this.formState) {
       this.formState = new ConnectionFormState(
+        this.projectsService,
+        this.projectInfoResource,
         this.connectionFormService,
         this.connectionInfoResource
       );
+
+      this.formState.closeTask.addHandler(this.close.bind(this, true));
     }
 
     this.formState

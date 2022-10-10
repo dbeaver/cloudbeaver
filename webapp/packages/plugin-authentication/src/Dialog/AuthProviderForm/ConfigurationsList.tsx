@@ -11,13 +11,12 @@ import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AuthInfoService, AuthProvider, AuthProviderConfiguration, comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
-import { Filter, IconOrImage, Link, Cell, getComputed, TextPlaceholder, usePromiseState, Loader, Button } from '@cloudbeaver/core-blocks';
+import { Filter, IconOrImage, Link, Cell, getComputed, TextPlaceholder, usePromiseState, Loader, Button, useTranslate, useStyles, Translate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
-import { Translate, useTranslate } from '@cloudbeaver/core-localization';
-import type { AuthProviderInfo, UserInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+import type { UserInfo } from '@cloudbeaver/core-sdk';
+
 
 import { AuthenticationService } from '../../AuthenticationService';
 
@@ -60,7 +59,7 @@ interface IProviderConfiguration {
 }
 
 interface Props {
-  activeProvider: AuthProviderInfo | null;
+  activeProvider: AuthProvider | null;
   activeConfiguration: AuthProviderConfiguration | null;
   providers: AuthProvider[];
   onAuthorize?: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
@@ -100,10 +99,10 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
   let filteredConfigurations: IProviderConfiguration[];
 
   if (!search) {
-    filteredConfigurations =  sortedConfigurations;
+    filteredConfigurations = sortedConfigurations;
   }
 
-  filteredConfigurations =  sortedConfigurations.filter(({ configuration }) => {
+  filteredConfigurations = sortedConfigurations.filter(({ configuration }) => {
     const target = `${configuration.displayName}${configuration.description || ''}`;
     return target.toUpperCase().includes(search.toUpperCase());
   });

@@ -47,7 +47,7 @@ export class ConnectionAuthService extends Dependency {
       if (!this.connectionsManagerService.hasAnyConnection()) {
         return;
       }
-      connectionKey = this.connectionInfoResource.keys[0];
+      connectionKey = createConnectionParam(this.connectionsManagerService.projectConnections[0]);
     }
 
     try {
@@ -80,8 +80,8 @@ export class ConnectionAuthService extends Dependency {
       return connection;
     }
 
-    if (connection.origin) {
-      const state = await this.authProviderService.requireProvider(connection.origin);
+    if (connection.requiredAuth) {
+      const state = await this.authProviderService.requireProvider(connection.requiredAuth);
 
       if (!state) {
         return connection;

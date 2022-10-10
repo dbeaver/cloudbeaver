@@ -1,0 +1,8 @@
+fragment AdminObjectGrantInfo on AdminObjectGrantInfo {
+    subjectId
+    subjectType
+    objectPermissions {
+        objectId
+        permissions
+    }
+}

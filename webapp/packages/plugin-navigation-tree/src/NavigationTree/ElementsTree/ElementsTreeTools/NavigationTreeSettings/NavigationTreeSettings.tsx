@@ -9,11 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, GroupTitle, Switch } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import { BASE_CONTAINERS_STYLES, Group, Placeholder, PlaceholderElement, useStyles } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 
-import type { IElementsTreeSettings } from '../../useElementsTree';
+
+import { ElementsTreeSettingsService, IElementsTreeSettingsProps } from './ElementsTreeSettingsService';
 
 const expandStyles = css`
   settings {
@@ -30,70 +30,29 @@ const expandStyles = css`
   }
 `;
 
-interface Props {
-  root: string;
-  settings: IElementsTreeSettings;
-  style?: ComponentStyle;
+interface Props extends IElementsTreeSettingsProps {
+  elements?: PlaceholderElement<IElementsTreeSettingsProps>[];
   className?: string;
 }
 
 export const NavigationTreeSettings = observer<Props>(function NavigationTreeSettings({
-  root,
-  settings,
+  elements,
+  tree,
   style,
   className,
 }) {
   const styles = useStyles(BASE_CONTAINERS_STYLES, expandStyles, style);
-  const translate = useTranslate();
+  const elementsTreeSettingsService = useService(ElementsTreeSettingsService);
 
   return styled(styles)(
     <settings className={className}>
       <Group keepSize form gap dense>
-        <GroupTitle>{translate('ui_settings')}</GroupTitle>
-        <Switch
-          id={`${root}.filter`}
-          name="filter"
-          state={settings}
-          disabled={!settings.configurable}
-          title={translate('app_navigationTree_settings_filter_description')}
-          mod={['primary', 'dense']}
-          small
-        >
-          {translate('app_navigationTree_settings_filter_title')}
-        </Switch>
-        <Switch
-          id={`${root}.filterAll`}
-          name="filterAll"
-          state={settings}
-          disabled={!settings.filter || !settings.configurable}
-          title={translate('app_navigationTree_settings_filter_all_description')}
-          mod={['primary', 'dense']}
-          small
-        >
-          {translate('app_navigationTree_settings_filter_all_title')}
-        </Switch>
-        <Switch
-          id={`${root}.saveExpanded`}
-          name="saveExpanded"
-          state={settings}
-          disabled={!settings.configurable}
-          title={translate('app_navigationTree_settings_state_description')}
-          mod={['primary', 'dense']}
-          small
-        >
-          {translate('app_navigationTree_settings_state_title')}
-        </Switch>
-        <Switch
-          id={`${root}.foldersTree`}
-          name="foldersTree"
-          state={settings}
-          disabled={!settings.configurable}
-          title={translate('app_navigationTree_settings_folders_description')}
-          mod={['primary', 'dense']}
-          small
-        >
-          {translate('app_navigationTree_settings_folders_title')}
-        </Switch>
+        <Placeholder
+          container={elementsTreeSettingsService.placeholder}
+          elements={elements}
+          tree={tree}
+          style={style}
+        />
       </Group>
     </settings>
   );

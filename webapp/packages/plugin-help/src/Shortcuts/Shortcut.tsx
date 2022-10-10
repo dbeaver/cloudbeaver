@@ -8,8 +8,10 @@
 
 import styled, { css } from 'reshadow';
 
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+
+
+
 
 import type { IShortcut } from './IShortcut';
 
@@ -48,7 +50,7 @@ const style = css`
 export const Shortcut: React.FC<Props> = function Shortcut({ shortcut }) {
   const translate = useTranslate();
 
-  return styled(useStyles(style))(
+  return styled(style)(
     <shortcut-container>
       <shortcut-label>
         {translate(shortcut.label)}

@@ -9,12 +9,12 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 
 interface Props {
-  model: IDatabaseDataModel<any>;
+  model: IDatabaseDataModel;
   resultIndex: number;
 }
 

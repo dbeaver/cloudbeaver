@@ -17,7 +17,11 @@ export * from './layout/BASE_LAYOUT_GRID_STYLES';
 export * from './layout/TopAppBar';
 
 export * from './Loader/Loader';
+export * from './Loader/useAutoLoad';
 export * from './Loader/ILoadableState';
+
+export * from './localization/Translate';
+export * from './localization/useTranslate';
 
 export * from './Marks/ConnectionMark';
 
@@ -142,6 +146,7 @@ export * from './Link';
 export * from './Cell';
 export * from './UploadArea';
 export * from './ErrorMessage';
+export * from './preventFocusHandler';
 export * from './StatusMessage';
 export * from './ExceptionMessage';
 export * from './getComputed';
@@ -166,11 +171,13 @@ export * from './useMapResource';
 export * from './useMouse';
 export * from './useObjectRef';
 export * from './useObservableRef';
+export * from './usePermission';
 export * from './usePromiseState';
 export * from './useStateDelay';
 export * from './useErrorDetails';
 export * from './useAppLoadingScreen';
 export * from './useInterval';
+export * from './useStyles';
 export * from './BlocksLocaleService';
 export * from './Snackbars/NotificationMark';
 export * from './Snackbars/SnackbarMarkups/SnackbarWrapper';

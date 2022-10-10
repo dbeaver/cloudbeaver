@@ -10,7 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled from 'reshadow';
 
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext, useDataContext } from '@cloudbeaver/core-view';
 

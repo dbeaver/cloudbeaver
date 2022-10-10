@@ -10,10 +10,9 @@ import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, useFocus, useObservableRef } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, Translate, useFocus, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { Translate, useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
 const style = css`
   fill {
@@ -25,8 +24,12 @@ interface Payload {
   defaultScriptName?: string;
 }
 
-interface State {
-  value: string;
+export interface ISaveScriptDialogResult {
+  name: string;
+  projectId: string | null;
+}
+
+interface State extends ISaveScriptDialogResult {
   errorMessage: string | null;
   validate: () => void;
   submit: () => Promise<void>;
@@ -34,7 +37,7 @@ interface State {
 
 const regex = /^(?!\.)[\p{L}\w\-$.\s()@]+$/u;
 
-export const SaveScriptDialog: DialogComponent<Payload, string> = observer(function SaveScriptDialog({
+export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult> = observer(function SaveScriptDialog({
   payload,
   resolveDialog,
   rejectDialog,
@@ -44,12 +47,13 @@ export const SaveScriptDialog: DialogComponent<Payload, string> = observer(funct
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
   const state = useObservableRef<State>(() => ({
-    value: payload.defaultScriptName ?? '',
+    name: payload.defaultScriptName ?? '',
+    projectId: null,
     errorMessage: null,
     validate() {
       this.errorMessage = null;
 
-      const valid = regex.test(this.value.trim());
+      const valid = regex.test(this.name.trim());
 
       if (!valid) {
         this.errorMessage = translate('plugin_resource_manager_script_name_invalid_characters_message');
@@ -59,17 +63,18 @@ export const SaveScriptDialog: DialogComponent<Payload, string> = observer(funct
       this.validate();
 
       if (!this.errorMessage) {
-        resolveDialog(this.value);
+        resolveDialog(this);
       }
     },
   }), {
-    value: observable.ref,
+    name: observable.ref,
+    projectId: observable.ref,
     errorMessage: observable.ref,
     validate: action.bound,
     submit: action.bound,
   }, false);
 
-  return styled(useStyles(style, BASE_CONTAINERS_STYLES))(
+  return styled(style, BASE_CONTAINERS_STYLES)(
     <CommonDialogWrapper
       size='small'
       title={translate('plugin_resource_manager_save_script')}
@@ -89,7 +94,7 @@ export const SaveScriptDialog: DialogComponent<Payload, string> = observer(funct
           <Button
             type="button"
             mod={['unelevated']}
-            disabled={!state.value.trim()}
+            disabled={!state.name.trim() || state.projectId === null}
             onClick={state.submit}
           >
             <Translate token='ui_processing_save' />
@@ -100,15 +105,21 @@ export const SaveScriptDialog: DialogComponent<Payload, string> = observer(funct
       onReject={rejectDialog}
     >
       <SubmittingForm ref={focusedRef} onSubmit={state.submit}>
-        <Container center>
+        <Container center gap>
           <InputField
-            name='value'
+            name='name'
             state={state}
             error={!!state.errorMessage}
             description={state.errorMessage ?? undefined}
           >
             {translate('ui_name') + ':'}
           </InputField>
+          <ProjectSelect
+            value={state.projectId}
+            filter={p => p.canEditResources}
+            autoHide
+            onChange={projectId => {state.projectId = projectId;}}
+          />
         </Container>
       </SubmittingForm>
     </CommonDialogWrapper>

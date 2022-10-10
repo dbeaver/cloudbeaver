@@ -47,6 +47,17 @@ export interface AdminConnectionSearchInfo {
   possibleDrivers: Array<Scalars['ID']>;
 }
 
+export interface AdminObjectGrantInfo {
+  objectPermissions: AdminObjectPermissions;
+  subjectId: Scalars['ID'];
+  subjectType: AdminSubjectType;
+}
+
+export interface AdminObjectPermissions {
+  objectId: Scalars['ID'];
+  permissions: Array<Scalars['String']>;
+}
+
 export interface AdminPermissionInfo {
   category?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
@@ -143,6 +154,7 @@ export interface AuthProviderInfo {
   id: Scalars['ID'];
   label: Scalars['String'];
   requiredFeatures: Array<Scalars['String']>;
+  trusted: Scalars['Boolean'];
 }
 
 export enum AuthStatus {
@@ -213,6 +225,7 @@ export interface ConnectionInfo {
   provided: Scalars['Boolean'];
   providerProperties: Scalars['Object'];
   readOnly: Scalars['Boolean'];
+  requiredAuth?: Maybe<Scalars['String']>;
   saveCredentials: Scalars['Boolean'];
   serverName?: Maybe<Scalars['String']>;
   serverVersion?: Maybe<Scalars['String']>;
@@ -222,8 +235,26 @@ export interface ConnectionInfo {
   useUrl: Scalars['Boolean'];
 }
 
+export interface DataTransferDefaultExportSettings {
+  outputSettings: DataTransferOutputSettings;
+  supportedEncodings: Array<Scalars['String']>;
+}
+
+export interface DataTransferOutputSettings {
+  encoding: Scalars['String'];
+  insertBom: Scalars['Boolean'];
+  timestampPattern: Scalars['String'];
+}
+
+export interface DataTransferOutputSettingsInput {
+  encoding?: InputMaybe<Scalars['String']>;
+  insertBom?: InputMaybe<Scalars['Boolean']>;
+  timestampPattern?: InputMaybe<Scalars['String']>;
+}
+
 export interface DataTransferParameters {
   filter?: InputMaybe<SqlDataFilter>;
+  outputSettings?: InputMaybe<DataTransferOutputSettingsInput>;
   processorId: Scalars['ID'];
   processorProperties: Scalars['Object'];
   settings?: InputMaybe<Scalars['Object']>;
@@ -255,6 +286,7 @@ export interface DatabaseAuthModel {
   icon?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   properties: Array<ObjectPropertyInfo>;
+  requiredAuth?: Maybe<Scalars['String']>;
   requiresLocalConfiguration?: Maybe<Scalars['Boolean']>;
 }
 
@@ -330,6 +362,7 @@ export interface DriverInfo {
   promotedScore?: Maybe<Scalars['Int']>;
   providerId?: Maybe<Scalars['ID']>;
   providerProperties: Array<ObjectPropertyInfo>;
+  requiresDatabaseName?: Maybe<Scalars['Boolean']>;
   requiresServerName?: Maybe<Scalars['Boolean']>;
   sampleURL?: Maybe<Scalars['String']>;
 }
@@ -365,11 +398,13 @@ export interface Mutation {
   openSession: SessionInfo;
   readLobValue: Scalars['String'];
   refreshSessionConnections?: Maybe<Scalars['Boolean']>;
-  rmCreateProject?: Maybe<ProjectInfo>;
+  rmCreateProject: RmProject;
   rmCreateResource: Scalars['String'];
   rmDeleteProject: Scalars['Boolean'];
   rmDeleteResource?: Maybe<Scalars['Boolean']>;
   rmMoveResource: Scalars['String'];
+  rmSetProjectPermissions: Scalars['Boolean'];
+  rmSetSubjectProjectPermissions: Scalars['Boolean'];
   rmWriteResourceStringContent: Scalars['String'];
   setConnectionNavigatorSettings: ConnectionInfo;
   setUserConfigurationParameter: Scalars['Boolean'];
@@ -471,7 +506,7 @@ export interface MutationCreateConnectionFolderArgs {
 
 export interface MutationCreateConnectionFromTemplateArgs {
   connectionName?: InputMaybe<Scalars['String']>;
-  projectId?: InputMaybe<Scalars['ID']>;
+  projectId: Scalars['ID'];
   templateId: Scalars['ID'];
 }
 
@@ -531,6 +566,7 @@ export interface MutationReadLobValueArgs {
 
 export interface MutationRmCreateProjectArgs {
   description?: InputMaybe<Scalars['String']>;
+  projectId?: InputMaybe<Scalars['ID']>;
   projectName: Scalars['String'];
 }
 
@@ -558,6 +594,18 @@ export interface MutationRmMoveResourceArgs {
   newResourcePath?: InputMaybe<Scalars['String']>;
   oldResourcePath: Scalars['String'];
   projectId: Scalars['String'];
+}
+
+
+export interface MutationRmSetProjectPermissionsArgs {
+  permissions: Array<RmSubjectProjectPermissions>;
+  projectId: Scalars['String'];
+}
+
+
+export interface MutationRmSetSubjectProjectPermissionsArgs {
+  permissions: Array<RmProjectPermissions>;
+  subjectId: Scalars['String'];
 }
 
 
@@ -805,11 +853,14 @@ export interface ProductInfo {
 }
 
 export interface ProjectInfo {
-  canCreateConnections: Scalars['Boolean'];
-  canViewConnections: Scalars['Boolean'];
+  canEditDataSources: Scalars['Boolean'];
+  canEditResources: Scalars['Boolean'];
+  canViewDataSources: Scalars['Boolean'];
+  canViewResources: Scalars['Boolean'];
   description?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   name: Scalars['String'];
+  shared: Scalars['Boolean'];
 }
 
 export interface Query {
@@ -829,6 +880,7 @@ export interface Query {
   createRole: AdminRoleInfo;
   createUser: AdminUserInfo;
   dataTransferAvailableStreamProcessors: Array<DataTransferProcessorInfo>;
+  dataTransferDefaultExportSettings: DataTransferDefaultExportSettings;
   dataTransferExportDataFromContainer: AsyncTaskInfo;
   dataTransferExportDataFromResults: AsyncTaskInfo;
   dataTransferRemoveDataFile?: Maybe<Scalars['Boolean']>;
@@ -859,8 +911,13 @@ export interface Query {
   networkHandlers: Array<NetworkHandlerDescriptor>;
   readSessionLog: Array<LogEntry>;
   revokeUserRole?: Maybe<Scalars['Boolean']>;
+  rmListProjectGrantedPermissions: Array<AdminObjectGrantInfo>;
+  rmListProjectPermissions: Array<AdminPermissionInfo>;
   rmListProjects: Array<RmProject>;
   rmListResources: Array<RmResource>;
+  rmListSharedProjects: Array<RmProject>;
+  rmListSubjectProjectsPermissionGrants: Array<AdminObjectGrantInfo>;
+  rmProject: RmProject;
   rmReadResourceAsString: Scalars['String'];
   saveAuthProviderConfiguration: AdminAuthProviderConfiguration;
   saveUserMetaParameter: ObjectPropertyInfo;
@@ -957,6 +1014,7 @@ export interface QueryCreateRoleArgs {
 
 
 export interface QueryCreateUserArgs {
+  enabled: Scalars['Boolean'];
   userId: Scalars['ID'];
 }
 
@@ -1105,12 +1163,27 @@ export interface QueryRevokeUserRoleArgs {
 }
 
 
+export interface QueryRmListProjectGrantedPermissionsArgs {
+  projectId: Scalars['String'];
+}
+
+
 export interface QueryRmListResourcesArgs {
   folder?: InputMaybe<Scalars['String']>;
   nameMask?: InputMaybe<Scalars['String']>;
   projectId: Scalars['String'];
   readHistory?: InputMaybe<Scalars['Boolean']>;
   readProperties?: InputMaybe<Scalars['Boolean']>;
+}
+
+
+export interface QueryRmListSubjectProjectsPermissionGrantsArgs {
+  subjectId: Scalars['String'];
+}
+
+
+export interface QueryRmProjectArgs {
+  projectId: Scalars['String'];
 }
 
 
@@ -1276,16 +1349,26 @@ export interface RmProject {
   createTime: Scalars['DateTime'];
   creator: Scalars['String'];
   description?: Maybe<Scalars['String']>;
-  id: Scalars['String'];
+  id: Scalars['ID'];
   name: Scalars['String'];
   projectPermissions: Array<Scalars['String']>;
   shared: Scalars['Boolean'];
+}
+
+export interface RmProjectPermissions {
+  permissions: Array<Scalars['String']>;
+  projectId: Scalars['String'];
 }
 
 export interface RmResource {
   folder: Scalars['Boolean'];
   length: Scalars['Int'];
   name: Scalars['String'];
+}
+
+export interface RmSubjectProjectPermissions {
+  permissions: Array<Scalars['String']>;
+  subjectId: Scalars['String'];
 }
 
 export enum ResultDataFormat {
@@ -1656,7 +1739,7 @@ export type GetAuthProviderConfigurationsQuery = { configurations: Array<{ provi
 export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAuthProvidersQuery = { providers: Array<{ id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> }> };
+export type GetAuthProvidersQuery = { providers: Array<{ id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, trusted: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> }> };
 
 export type GetAuthStatusQueryVariables = Exact<{
   authId: Scalars['ID'];
@@ -1695,6 +1778,7 @@ export type SaveUserMetaParametersQuery = { setUserMetaParameterValues: boolean 
 
 export type CreateUserQueryVariables = Exact<{
   userId: Scalars['ID'];
+  enabled: Scalars['Boolean'];
   includeMetaParameters: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
@@ -1808,7 +1892,7 @@ export type CreateConnectionConfigurationQueryVariables = Exact<{
 }>;
 
 
-export type CreateConnectionConfigurationQuery = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
+export type CreateConnectionConfigurationQuery = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
 
 export type CreateConnectionConfigurationFromNodeQueryVariables = Exact<{
   nodePath: Scalars['String'];
@@ -1820,7 +1904,7 @@ export type CreateConnectionConfigurationFromNodeQueryVariables = Exact<{
 }>;
 
 
-export type CreateConnectionConfigurationFromNodeQuery = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
+export type CreateConnectionConfigurationFromNodeQuery = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
 
 export type DeleteConnectionConfigurationQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -1846,7 +1930,7 @@ export type GetConnectionsQueryVariables = Exact<{
 }>;
 
 
-export type GetConnectionsQuery = { connections: Array<{ id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } }> };
+export type GetConnectionsQuery = { connections: Array<{ id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } }> };
 
 export type GetSubjectConnectionAccessQueryVariables = Exact<{
   subjectId?: InputMaybe<Scalars['ID']>;
@@ -1889,7 +1973,7 @@ export type UpdateConnectionConfigurationQueryVariables = Exact<{
 }>;
 
 
-export type UpdateConnectionConfigurationQuery = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
+export type UpdateConnectionConfigurationQuery = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
 
 export type CloseConnectionMutationVariables = Exact<{
   projectId: Scalars['ID'];
@@ -1901,7 +1985,7 @@ export type CloseConnectionMutationVariables = Exact<{
 }>;
 
 
-export type CloseConnectionMutation = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
+export type CloseConnectionMutation = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
 
 export type CreateConnectionMutationVariables = Exact<{
   projectId: Scalars['ID'];
@@ -1913,7 +1997,7 @@ export type CreateConnectionMutationVariables = Exact<{
 }>;
 
 
-export type CreateConnectionMutation = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
+export type CreateConnectionMutation = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
 
 export type CreateConnectionFolderMutationVariables = Exact<{
   projectId: Scalars['ID'];
@@ -1935,7 +2019,7 @@ export type CreateConnectionFromNodeMutationVariables = Exact<{
 }>;
 
 
-export type CreateConnectionFromNodeMutation = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
+export type CreateConnectionFromNodeMutation = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
 
 export type CreateConnectionFromTemplateMutationVariables = Exact<{
   projectId: Scalars['ID'];
@@ -1948,7 +2032,7 @@ export type CreateConnectionFromTemplateMutationVariables = Exact<{
 }>;
 
 
-export type CreateConnectionFromTemplateMutation = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
+export type CreateConnectionFromTemplateMutation = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
 
 export type DeleteConnectionMutationVariables = Exact<{
   projectId: Scalars['ID'];
@@ -2018,7 +2102,7 @@ export type ExecutionContextUpdateMutation = { context: boolean };
 export type GetAuthModelsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAuthModelsQuery = { models: Array<{ id: string, displayName: string, description?: string, icon?: string, requiresLocalConfiguration?: boolean, properties: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> };
+export type GetAuthModelsQuery = { models: Array<{ id: string, displayName: string, description?: string, icon?: string, requiresLocalConfiguration?: boolean, requiredAuth?: string, properties: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> };
 
 export type GetConnectionFoldersQueryVariables = Exact<{
   projectId?: InputMaybe<Scalars['ID']>;
@@ -2037,7 +2121,7 @@ export type GetTemplateConnectionsQueryVariables = Exact<{
 }>;
 
 
-export type GetTemplateConnectionsQuery = { connections: Array<{ id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } }> };
+export type GetTemplateConnectionsQuery = { connections: Array<{ id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } }> };
 
 export type GetUserConnectionsQueryVariables = Exact<{
   projectId?: InputMaybe<Scalars['ID']>;
@@ -2049,7 +2133,7 @@ export type GetUserConnectionsQueryVariables = Exact<{
 }>;
 
 
-export type GetUserConnectionsQuery = { connections: Array<{ id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } }> };
+export type GetUserConnectionsQuery = { connections: Array<{ id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } }> };
 
 export type InitConnectionMutationVariables = Exact<{
   projectId: Scalars['ID'];
@@ -2064,7 +2148,7 @@ export type InitConnectionMutationVariables = Exact<{
 }>;
 
 
-export type InitConnectionMutation = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
+export type InitConnectionMutation = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
 
 export type RefreshSessionConnectionsMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -2082,7 +2166,7 @@ export type SetConnectionNavigatorSettingsMutationVariables = Exact<{
 }>;
 
 
-export type SetConnectionNavigatorSettingsMutation = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
+export type SetConnectionNavigatorSettingsMutation = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
 
 export type TestConnectionMutationVariables = Exact<{
   projectId: Scalars['ID'];
@@ -2109,7 +2193,7 @@ export type UpdateConnectionMutationVariables = Exact<{
 }>;
 
 
-export type UpdateConnectionMutation = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
+export type UpdateConnectionMutation = { connection: { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } } };
 
 export type ExportDataFromContainerQueryVariables = Exact<{
   projectId: Scalars['ID'];
@@ -2131,6 +2215,11 @@ export type ExportDataFromResultsQueryVariables = Exact<{
 
 
 export type ExportDataFromResultsQuery = { taskInfo: { id: string, name?: string, running: boolean, status?: string, taskResult?: any, error?: { message?: string, errorCode?: string, errorType?: string, stackTrace?: string } } };
+
+export type GetDataTransferDefaultParametersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetDataTransferDefaultParametersQuery = { settings: { supportedEncodings: Array<string>, outputSettings: { insertBom: boolean, encoding: string, timestampPattern: string } } };
 
 export type GetDataTransferProcessorsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2154,6 +2243,8 @@ export type NavGetStructContainersQueryVariables = Exact<{
 
 export type NavGetStructContainersQuery = { navGetStructContainers: { supportsCatalogChange: boolean, supportsSchemaChange: boolean, catalogList: Array<{ catalog: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }, schemaList: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> }>, schemaList: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> } };
 
+export type AdminObjectGrantInfoFragment = { subjectId: string, subjectType: AdminSubjectType, objectPermissions: { objectId: string, permissions: Array<string> } };
+
 export type AdminPermissionInfoFragment = { id: string, label?: string, description?: string, category?: string };
 
 export type AdminRoleInfoFragment = { roleId: string, roleName?: string, description?: string, rolePermissions: Array<string> };
@@ -2164,13 +2255,17 @@ export type AllNavigatorSettingsFragment = { showSystemObjects: boolean, showUti
 
 export type AsyncTaskInfoFragment = { id: string, name?: string, running: boolean, status?: string, taskResult?: any, error?: { message?: string, errorCode?: string, errorType?: string, stackTrace?: string } };
 
+export type AuthProviderConfigurationInfoFragment = { id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string };
+
 export type AuthProviderConfigurationParametersFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number };
+
+export type AuthProviderInfoFragment = { id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, trusted: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> };
 
 export type AuthTokenFragment = { authProvider: string, authConfiguration?: string, loginTime: any, message?: string, origin: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> } };
 
 export type ConnectionFolderInfoFragment = { id: string, projectId: string, description?: string };
 
-export type DatabaseConnectionFragment = { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } };
+export type DatabaseConnectionFragment = { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, provided: boolean, useUrl: boolean, readOnly: boolean, saveCredentials: boolean, folder?: string, nodePath?: string, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, configurationType?: DriverConfigurationType, authNeeded: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties?: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } };
 
 export type DatabaseDriverFragment = { id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }> };
 
@@ -2187,6 +2282,8 @@ export type ObjectOriginInfoFragment = { type: string, subType?: string, display
 export type SqlScriptInfoFragment = { queries: Array<{ start: number, end: number }> };
 
 export type SessionStateFragment = { createTime: string, lastAccessTime: string, cacheExpired: boolean, locale: string, actionParameters?: any, valid: boolean, remainingTime: number };
+
+export type SharedProjectFragment = { id: string, name: string, shared: boolean, description?: string, projectPermissions: Array<string> };
 
 export type UserConnectionAuthPropertiesFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number };
 
@@ -2390,7 +2487,16 @@ export type NavRenameNodeMutation = { navRenameNode?: string };
 export type GetProjectListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProjectListQuery = { projects: Array<{ id: string, name: string, description?: string, canCreateConnections: boolean, canViewConnections: boolean }> };
+export type GetProjectListQuery = { projects: Array<{ id: string, shared: boolean, name: string, description?: string, canEditDataSources: boolean, canViewDataSources: boolean, canEditResources: boolean, canViewResources: boolean }> };
+
+export type CreateProjectMutationVariables = Exact<{
+  projectId?: InputMaybe<Scalars['ID']>;
+  projectName: Scalars['String'];
+  description?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type CreateProjectMutation = { project: { id: string, name: string, shared: boolean, description?: string, projectPermissions: Array<string> } };
 
 export type CreateResourceMutationVariables = Exact<{
   projectId: Scalars['String'];
@@ -2401,6 +2507,13 @@ export type CreateResourceMutationVariables = Exact<{
 
 export type CreateResourceMutation = { rmCreateResource: string };
 
+export type DeleteProjectMutationVariables = Exact<{
+  projectId: Scalars['ID'];
+}>;
+
+
+export type DeleteProjectMutation = { rmDeleteProject: boolean };
+
 export type DeleteResourceMutationVariables = Exact<{
   projectId: Scalars['String'];
   resourcePath: Scalars['String'];
@@ -2409,6 +2522,25 @@ export type DeleteResourceMutationVariables = Exact<{
 
 
 export type DeleteResourceMutation = { rmDeleteResource?: boolean };
+
+export type GetProjectQueryVariables = Exact<{
+  projectId: Scalars['String'];
+}>;
+
+
+export type GetProjectQuery = { project: { id: string, name: string, shared: boolean, description?: string, projectPermissions: Array<string> } };
+
+export type GetProjectGrantedPermissionsQueryVariables = Exact<{
+  projectId: Scalars['String'];
+}>;
+
+
+export type GetProjectGrantedPermissionsQuery = { grantedPermissions: Array<{ subjectId: string, subjectType: AdminSubjectType, objectPermissions: { objectId: string, permissions: Array<string> } }> };
+
+export type GetProjectPermissionsListQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetProjectPermissionsListQuery = { permissions: Array<{ id: string, label?: string, description?: string, category?: string }> };
 
 export type GetResourceListQueryVariables = Exact<{
   projectId: Scalars['String'];
@@ -2426,6 +2558,18 @@ export type GetResourceProjectListQueryVariables = Exact<{ [key: string]: never;
 
 export type GetResourceProjectListQuery = { projects: Array<{ id: string, name: string, shared: boolean, description?: string, projectPermissions: Array<string> }> };
 
+export type GetSharedProjectsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetSharedProjectsQuery = { projects: Array<{ id: string, name: string, shared: boolean, description?: string, projectPermissions: Array<string> }> };
+
+export type GetSubjectProjectsPermissionsQueryVariables = Exact<{
+  subjectId: Scalars['String'];
+}>;
+
+
+export type GetSubjectProjectsPermissionsQuery = { grantedPermissions: Array<{ subjectId: string, subjectType: AdminSubjectType, objectPermissions: { objectId: string, permissions: Array<string> } }> };
+
 export type MoveResourceMutationVariables = Exact<{
   projectId: Scalars['String'];
   oldPath: Scalars['String'];
@@ -2442,6 +2586,22 @@ export type ReadResourceQueryVariables = Exact<{
 
 
 export type ReadResourceQuery = { value: string };
+
+export type SetProjectPermissionsMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  permissions: Array<RmSubjectProjectPermissions> | RmSubjectProjectPermissions;
+}>;
+
+
+export type SetProjectPermissionsMutation = { rmSetProjectPermissions: boolean };
+
+export type SetSubjectProjectsPermissionsMutationVariables = Exact<{
+  subjectId: Scalars['String'];
+  permissions: Array<RmProjectPermissions> | RmProjectPermissions;
+}>;
+
+
+export type SetSubjectProjectsPermissionsMutation = { rmSetSubjectProjectPermissions: boolean };
 
 export type WriteResourceContentMutationVariables = Exact<{
   projectId: Scalars['String'];
@@ -2575,6 +2735,16 @@ export type SqlGenerateEntityQueryQueryVariables = Exact<{
 
 export type SqlGenerateEntityQueryQuery = { sqlGenerateEntityQuery: string };
 
+export const AdminObjectGrantInfoFragmentDoc = `
+    fragment AdminObjectGrantInfo on AdminObjectGrantInfo {
+  subjectId
+  subjectType
+  objectPermissions {
+    objectId
+    permissions
+  }
+}
+    `;
 export const AdminPermissionInfoFragmentDoc = `
     fragment AdminPermissionInfo on AdminPermissionInfo {
   id
@@ -2654,6 +2824,47 @@ export const AuthProviderConfigurationParametersFragmentDoc = `
   order
 }
     `;
+export const AuthProviderConfigurationInfoFragmentDoc = `
+    fragment AuthProviderConfigurationInfo on AuthProviderConfiguration {
+  id
+  displayName
+  iconURL
+  description
+  signInLink
+  signOutLink
+  metadataLink
+}
+    `;
+export const AuthProviderInfoFragmentDoc = `
+    fragment AuthProviderInfo on AuthProviderInfo {
+  id
+  label
+  icon
+  description
+  defaultProvider
+  trusted
+  configurable
+  configurations {
+    ...AuthProviderConfigurationInfo
+  }
+  credentialProfiles {
+    id
+    label
+    description
+    credentialParameters {
+      id
+      displayName
+      description
+      admin
+      user
+      identifying
+      possibleValues
+      encryption
+    }
+  }
+  requiredFeatures
+}
+    ${AuthProviderConfigurationInfoFragmentDoc}`;
 export const AuthTokenFragmentDoc = `
     fragment AuthToken on UserAuthToken {
   authProvider
@@ -2720,6 +2931,7 @@ export const DatabaseConnectionFragmentDoc = `
   url
   properties
   providerProperties
+  requiredAuth
   features
   supportedDataFormats
   configurationType
@@ -2865,6 +3077,15 @@ export const SessionStateFragmentDoc = `
   actionParameters
   valid
   remainingTime
+}
+    `;
+export const SharedProjectFragmentDoc = `
+    fragment SharedProject on RMProject {
+  id
+  name
+  shared
+  description
+  projectPermissions
 }
     `;
 export const UserConnectionNetworkHandlerPropertiesFragmentDoc = `
@@ -3015,40 +3236,10 @@ export const GetAuthProviderConfigurationsDocument = `
 export const GetAuthProvidersDocument = `
     query getAuthProviders {
   providers: authProviders {
-    id
-    label
-    icon
-    description
-    defaultProvider
-    configurable
-    configurations {
-      id
-      displayName
-      iconURL
-      description
-      signInLink
-      signOutLink
-      metadataLink
-    }
-    credentialProfiles {
-      id
-      label
-      description
-      credentialParameters {
-        id
-        displayName
-        description
-        admin
-        user
-        identifying
-        possibleValues
-        encryption
-      }
-    }
-    requiredFeatures
+    ...AuthProviderInfo
   }
 }
-    `;
+    ${AuthProviderInfoFragmentDoc}`;
 export const GetAuthStatusDocument = `
     query getAuthStatus($authId: ID!, $linkUser: Boolean, $customIncludeOriginDetails: Boolean!) {
   authInfo: authUpdateStatus(authId: $authId, linkUser: $linkUser) {
@@ -3099,8 +3290,8 @@ export const SaveUserMetaParametersDocument = `
 }
     `;
 export const CreateUserDocument = `
-    query createUser($userId: ID!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
-  user: createUser(userId: $userId) {
+    query createUser($userId: ID!, $enabled: Boolean!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  user: createUser(userId: $userId, enabled: $enabled) {
     ...AdminUserInfo
   }
 }
@@ -3382,6 +3573,7 @@ export const GetAuthModelsDocument = `
     description
     icon
     requiresLocalConfiguration
+    requiredAuth
     properties {
       id
       displayName
@@ -3503,6 +3695,18 @@ export const ExportDataFromResultsDocument = `
   }
 }
     ${AsyncTaskInfoFragmentDoc}`;
+export const GetDataTransferDefaultParametersDocument = `
+    query getDataTransferDefaultParameters {
+  settings: dataTransferDefaultExportSettings {
+    outputSettings {
+      insertBom
+      encoding
+      timestampPattern
+    }
+    supportedEncodings
+  }
+}
+    `;
 export const GetDataTransferProcessorsDocument = `
     query getDataTransferProcessors {
   processors: dataTransferAvailableStreamProcessors {
@@ -3840,13 +4044,27 @@ export const GetProjectListDocument = `
     query getProjectList {
   projects: listProjects {
     id
+    shared
     name
     description
-    canCreateConnections
-    canViewConnections
+    canEditDataSources
+    canViewDataSources
+    canEditResources
+    canViewResources
   }
 }
     `;
+export const CreateProjectDocument = `
+    mutation createProject($projectId: ID, $projectName: String!, $description: String) {
+  project: rmCreateProject(
+    projectId: $projectId
+    projectName: $projectName
+    description: $description
+  ) {
+    ...SharedProject
+  }
+}
+    ${SharedProjectFragmentDoc}`;
 export const CreateResourceDocument = `
     mutation createResource($projectId: String!, $resourcePath: String!, $isFolder: Boolean!) {
   rmCreateResource(
@@ -3854,6 +4072,11 @@ export const CreateResourceDocument = `
     resourcePath: $resourcePath
     isFolder: $isFolder
   )
+}
+    `;
+export const DeleteProjectDocument = `
+    mutation deleteProject($projectId: ID!) {
+  rmDeleteProject(projectId: $projectId)
 }
     `;
 export const DeleteResourceDocument = `
@@ -3865,6 +4088,27 @@ export const DeleteResourceDocument = `
   )
 }
     `;
+export const GetProjectDocument = `
+    query getProject($projectId: String!) {
+  project: rmProject(projectId: $projectId) {
+    ...SharedProject
+  }
+}
+    ${SharedProjectFragmentDoc}`;
+export const GetProjectGrantedPermissionsDocument = `
+    query getProjectGrantedPermissions($projectId: String!) {
+  grantedPermissions: rmListProjectGrantedPermissions(projectId: $projectId) {
+    ...AdminObjectGrantInfo
+  }
+}
+    ${AdminObjectGrantInfoFragmentDoc}`;
+export const GetProjectPermissionsListDocument = `
+    query getProjectPermissionsList {
+  permissions: rmListProjectPermissions {
+    ...AdminPermissionInfo
+  }
+}
+    ${AdminPermissionInfoFragmentDoc}`;
 export const GetResourceListDocument = `
     query getResourceList($projectId: String!, $folder: String, $nameMask: String, $readProperties: Boolean, $readHistory: Boolean) {
   resources: rmListResources(
@@ -3891,6 +4135,20 @@ export const GetResourceProjectListDocument = `
   }
 }
     `;
+export const GetSharedProjectsDocument = `
+    query getSharedProjects {
+  projects: rmListSharedProjects {
+    ...SharedProject
+  }
+}
+    ${SharedProjectFragmentDoc}`;
+export const GetSubjectProjectsPermissionsDocument = `
+    query getSubjectProjectsPermissions($subjectId: String!) {
+  grantedPermissions: rmListSubjectProjectsPermissionGrants(subjectId: $subjectId) {
+    ...AdminObjectGrantInfo
+  }
+}
+    ${AdminObjectGrantInfoFragmentDoc}`;
 export const MoveResourceDocument = `
     mutation moveResource($projectId: String!, $oldPath: String!, $newPath: String!) {
   rmMoveResource(
@@ -3906,6 +4164,16 @@ export const ReadResourceDocument = `
     projectId: $projectId
     resourcePath: $resourcePath
   )
+}
+    `;
+export const SetProjectPermissionsDocument = `
+    mutation setProjectPermissions($projectId: String!, $permissions: [RMSubjectProjectPermissions!]!) {
+  rmSetProjectPermissions(projectId: $projectId, permissions: $permissions)
+}
+    `;
+export const SetSubjectProjectsPermissionsDocument = `
+    mutation setSubjectProjectsPermissions($subjectId: String!, $permissions: [RMProjectPermissions!]!) {
+  rmSetSubjectProjectPermissions(subjectId: $subjectId, permissions: $permissions)
 }
     `;
 export const WriteResourceContentDocument = `
@@ -4323,6 +4591,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     exportDataFromResults(variables: ExportDataFromResultsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExportDataFromResultsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<ExportDataFromResultsQuery>(ExportDataFromResultsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'exportDataFromResults', 'query');
     },
+    getDataTransferDefaultParameters(variables?: GetDataTransferDefaultParametersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetDataTransferDefaultParametersQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetDataTransferDefaultParametersQuery>(GetDataTransferDefaultParametersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getDataTransferDefaultParameters', 'query');
+    },
     getDataTransferProcessors(variables?: GetDataTransferProcessorsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetDataTransferProcessorsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetDataTransferProcessorsQuery>(GetDataTransferProcessorsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getDataTransferProcessors', 'query');
     },
@@ -4401,11 +4672,26 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getProjectList(variables?: GetProjectListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProjectListQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProjectListQuery>(GetProjectListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProjectList', 'query');
     },
+    createProject(variables: CreateProjectMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateProjectMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateProjectMutation>(CreateProjectDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createProject', 'mutation');
+    },
     createResource(variables: CreateResourceMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateResourceMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<CreateResourceMutation>(CreateResourceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createResource', 'mutation');
     },
+    deleteProject(variables: DeleteProjectMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteProjectMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteProjectMutation>(DeleteProjectDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteProject', 'mutation');
+    },
     deleteResource(variables: DeleteResourceMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteResourceMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<DeleteResourceMutation>(DeleteResourceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteResource', 'mutation');
+    },
+    getProject(variables: GetProjectQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProjectQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProjectQuery>(GetProjectDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProject', 'query');
+    },
+    getProjectGrantedPermissions(variables: GetProjectGrantedPermissionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProjectGrantedPermissionsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProjectGrantedPermissionsQuery>(GetProjectGrantedPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProjectGrantedPermissions', 'query');
+    },
+    getProjectPermissionsList(variables?: GetProjectPermissionsListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProjectPermissionsListQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProjectPermissionsListQuery>(GetProjectPermissionsListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProjectPermissionsList', 'query');
     },
     getResourceList(variables: GetResourceListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetResourceListQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetResourceListQuery>(GetResourceListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getResourceList', 'query');
@@ -4413,11 +4699,23 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getResourceProjectList(variables?: GetResourceProjectListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetResourceProjectListQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetResourceProjectListQuery>(GetResourceProjectListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getResourceProjectList', 'query');
     },
+    getSharedProjects(variables?: GetSharedProjectsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSharedProjectsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSharedProjectsQuery>(GetSharedProjectsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSharedProjects', 'query');
+    },
+    getSubjectProjectsPermissions(variables: GetSubjectProjectsPermissionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSubjectProjectsPermissionsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSubjectProjectsPermissionsQuery>(GetSubjectProjectsPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSubjectProjectsPermissions', 'query');
+    },
     moveResource(variables: MoveResourceMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<MoveResourceMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<MoveResourceMutation>(MoveResourceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'moveResource', 'mutation');
     },
     readResource(variables: ReadResourceQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ReadResourceQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<ReadResourceQuery>(ReadResourceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'readResource', 'query');
+    },
+    setProjectPermissions(variables: SetProjectPermissionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetProjectPermissionsMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<SetProjectPermissionsMutation>(SetProjectPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setProjectPermissions', 'mutation');
+    },
+    setSubjectProjectsPermissions(variables: SetSubjectProjectsPermissionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetSubjectProjectsPermissionsMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<SetSubjectProjectsPermissionsMutation>(SetSubjectProjectsPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setSubjectProjectsPermissions', 'mutation');
     },
     writeResourceContent(variables: WriteResourceContentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<WriteResourceContentMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<WriteResourceContentMutation>(WriteResourceContentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'writeResourceContent', 'mutation');

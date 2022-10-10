@@ -30,19 +30,20 @@ import {
   Radio,
   RadioGroup,
   FormFieldDescription,
+  useTranslate,
+  usePermission,
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { Project, ProjectsResource, PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
-import { usePermission } from '@cloudbeaver/core-root';
-import { CachedMapAllKey, CachedMapEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { CachedMapEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
+import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
 import { ConnectionFormService } from '../ConnectionFormService';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
+import { ConnectionOptionsTabService } from './ConnectionOptionsTabService';
 import { ParametersForm } from './ParametersForm';
 import { useOptions } from './useOptions';
 
@@ -74,6 +75,7 @@ const driverConfiguration: IDriverConfiguration[] = [
 export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({
   state,
 }) {
+  const connectionOptionsTabService = useService(ConnectionOptionsTabService);
   const service = useService(ConnectionFormService);
   const formRef = useRef<HTMLFormElement>(null);
   const translate = useTranslate();
@@ -87,9 +89,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   } = state;
 
   const adminPermission = usePermission(EAdminPermission.admin);
-  const authentication = useAuthenticationAction({
-    origin: info?.origin ?? { type: AUTH_PROVIDER_LOCAL_ID, displayName: 'Local' },
-  });
 
   useFormValidator(submittingHandlers.for(service.formValidationTask), formRef.current);
   const optionsHook = useOptions(state);
@@ -116,16 +115,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     optionsHook.setAuthModel(model);
   }, []);
 
-  const projectsLoader = useMapResource(Options, ProjectsResource, CachedMapAllKey);
-  const projects = projectsLoader.data as Project[];
-
-  function handleProjectSelect(projectId: string) {
-    const project = projectsLoader.resource.get(projectId);
-
-    if (project?.canCreateConnections) {
-      state.setProject(projectId);
-    }
-  }
 
   const driverMap = useMapResource(
     Options,
@@ -169,10 +158,14 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     }
   );
 
+  const authentication = useAuthenticationAction({
+    providerId: authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
+  });
+
   const isURLConfiguration = config.configurationType === DriverConfigurationType.Url;
   const edit = state.mode === 'edit';
-  const globalProject = state.projectId === PROJECT_GLOBAL_ID;
   const originLocal = !info || isLocalConnection(info);
+  const templateAvailable = connectionOptionsTabService.isTemplateAvailable(state);
 
   const availableAuthModels = applicableAuthModels.filter(model => !!model && (
     adminPermission
@@ -196,7 +189,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const providerPropertiesWithoutBoolean = driver?.providerProperties.slice().filter(property => property.dataType !== 'Boolean');
   const booleanProviderProperties = driver?.providerProperties.slice().filter(property => property.dataType === 'Boolean');
 
-  return styled(useStyles(styles, BASE_CONTAINERS_STYLES))(
+  return styled(styles, BASE_CONTAINERS_STYLES)(
     <SubmittingForm ref={formRef} disabled={driverMap.isLoading()} onChange={handleFormChange}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
@@ -304,24 +297,13 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               >
                 {translate('connections_connection_name')}
               </InputField>
-              <Combobox
-                name='projectId'
+              <ProjectSelect
                 value={state.projectId ?? PROJECT_GLOBAL_ID}
-                items={projects}
-                keySelector={project => project.id}
-                valueSelector={project => project.name}
-                titleSelector={project => project.description}
-                isDisabled={project => !project.canCreateConnections}
-                searchable={projects.length > 10}
-                readOnly={readonly || edit || projects.length < 2}
+                readOnly={readonly || edit}
                 disabled={disabled}
-                loading={projectsLoader.isLoading()}
-                tiny
-                fill
-                onSelect={handleProjectSelect}
-              >
-                {translate('connections_connection_project')}
-              </Combobox>
+                autoHide
+                onChange={projectId => state.setProject(projectId)}
+              />
               {!config.template && (
                 <InputField
                   type="text"
@@ -339,14 +321,14 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 </InputField>
               )}
             </Container>
-            {adminPermission && originLocal && globalProject && (
+            {templateAvailable && (
               <FieldCheckbox
                 id={config.connectionId}
                 name="template"
                 state={config}
                 disabled={edit || disabled}
                 readOnly={readonly}
-                // autoHide // maybe better to use autoHide
+              // autoHide // maybe better to use autoHide
               >
                 {translate('connections_connection_template')}
               </FieldCheckbox>
@@ -363,7 +345,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           </Group>
         </Container>
         <Container medium gap>
-          {(!driver?.anonymousAccess && authentication.authorized) && (
+          {(!driver?.anonymousAccess && (authentication.authorized || !edit)) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
               {availableAuthModels.length > 1 && (

@@ -9,6 +9,7 @@
 import { flat } from '@cloudbeaver/core-utils';
 
 import { ExecutionContext } from './ExecutionContext';
+import { executionExceptionContext } from './executionExceptionContext';
 import { ExecutorHandlersCollection } from './ExecutorHandlersCollection';
 import { ExecutorInterrupter, IExecutorInterrupter } from './ExecutorInterrupter';
 import type { IExecutionContext, IExecutionContextProvider } from './IExecutionContext';
@@ -55,8 +56,15 @@ export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implem
     context: IExecutionContext<T>,
     scoped: Array<IExecutorHandlersCollection<T>>
   ): IExecutionContextProvider<T> {
-    const interrupter = context.getContext(ExecutorInterrupter.interruptContext);
     scoped = [...collection.collections, ...scoped];
+
+    context.addContextCreators(collection.contextCreators as any);
+
+    for (const scope of scoped) {
+      context.addContextCreators(scope.contextCreators as any);
+    }
+
+    const interrupter = context.getContext(ExecutorInterrupter.interruptContext);
 
     this.executeChain(collection, data, context, 'before');
 
@@ -70,6 +78,10 @@ export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implem
       for (const scope of scoped) {
         this.executeHandlers(data, context, scope.handlers, interrupter);
       }
+    } catch (exception: any) {
+      const exceptionContext = context.getContext(executionExceptionContext);
+      exceptionContext.setException(exception);
+      throw exception;
     } finally {
       this.executeHandlers(data, context, collection.postHandlers);
 
@@ -143,6 +155,8 @@ export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implem
 
     const data = this.initialDataGetter();
     const context = new ExecutionContext(data);
+
+    context.addContextCreators(this.contextCreators as any);
 
     try {
       handler(data, context);

@@ -30,4 +30,6 @@ public interface DBWServiceServerConfigurator extends DBWServiceBinding {
 
     void configureServer(@NotNull DBPApplication application, @Nullable WebSession session, @NotNull CBAppConfig appConfig) throws DBException;
 
+    void reloadConfiguration(@NotNull CBAppConfig appConfig) throws DBException;
+
 }

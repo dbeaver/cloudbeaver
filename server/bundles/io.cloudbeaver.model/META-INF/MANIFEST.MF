@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: io.cloudbeaver.model;singleton:=true
-Bundle-Version: 1.0.12.qualifier
-Bundle-Release-Date: 20220905
+Bundle-Version: 1.0.14.qualifier
+Bundle-Release-Date: 20221010
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
@@ -29,6 +29,8 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.registry,
  io.cloudbeaver.server,
  io.cloudbeaver.service,
+ io.cloudbeaver.service.admin,
+ io.cloudbeaver.service.security,
  io.cloudbeaver.service.sql,
  io.cloudbeaver.utils
 Automatic-Module-Name: io.cloudbeaver.model

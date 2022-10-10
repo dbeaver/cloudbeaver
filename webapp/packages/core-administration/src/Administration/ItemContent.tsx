@@ -8,9 +8,9 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
 import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';

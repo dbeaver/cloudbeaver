@@ -10,8 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button, Textarea, useClipboard } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { Button, Textarea, useClipboard, useTranslate } from '@cloudbeaver/core-blocks';
+
 
 import type { ILogEntry } from './ILogEntry';
 

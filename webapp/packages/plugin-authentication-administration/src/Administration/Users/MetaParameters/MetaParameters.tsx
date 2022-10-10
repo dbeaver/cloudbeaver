@@ -11,10 +11,10 @@ import styled, { css, use } from 'reshadow';
 
 import type { IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useDataResource, ToolsPanel, ToolsAction, Loader, BASE_LAYOUT_GRID_STYLES } from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useDataResource, ToolsPanel, ToolsAction, Loader, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 
 import { CreateMetaParameter } from './CreateMetaParameter';
 import { CreateMetaParameterService } from './CreateMetaParameterService';

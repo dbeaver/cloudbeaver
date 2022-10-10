@@ -8,54 +8,113 @@
 
 import { computed, makeObservable } from 'mobx';
 
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { Executor, ExecutorInterrupter, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { NavigationService } from '@cloudbeaver/core-ui';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-import { Project, ProjectsResource } from './ProjectsResource';
+import { activeProjectsContext } from './activeProjectsContext';
+import { ProjectInfo, ProjectInfoResource } from './ProjectInfoResource';
+
+interface IProjectsUserSettings {
+  activeProjectIds: string[];
+}
 
 @injectable()
 export class ProjectsService {
-  get activeProject(): Project | undefined {
-    let project: Project | undefined;
+  get userProject(): ProjectInfo | undefined {
+    let project: ProjectInfo | undefined;
 
-    if (this.activeProjectId) {
-      project = this.projectsResource.get(this.activeProjectId);
-    }
-
-    if (!project && this.userInfoResource.data) {
-      project =  this.projectsResource.get(this.userInfoResource.data.userId);
-    }
-
-    if (!project && this.projectsResource.has('anonymous')) {
-      project = this.projectsResource.get('anonymous');
-    }
-
-    if (!project && this.projectsResource.values.length > 0) {
-      project = this.projectsResource.values[0];
+    if (this.userInfoResource.data) {
+      project =  this.projectInfoResource.getUserProject(this.userInfoResource.data.userId);
+    } else {
+      project = this.projectInfoResource.get('anonymous');
     }
 
     return project;
   }
 
-  private activeProjectId: string | null;
+  get activeProjects(): ProjectInfo[] {
+    let activeProjects: ProjectInfo[] = [];
+
+    if (activeProjects.length === 0 && this.activeProjectIds.length > 0) {
+      activeProjects =  this.projectInfoResource
+        .get(resourceKeyList(this.activeProjectIds))
+        .filter(Boolean) as ProjectInfo[];
+    }
+
+    if (activeProjects.length === 0) {
+      const contexts = this.getActiveProjectTask.execute();
+      const projectsContext = contexts.getContext(activeProjectsContext);
+
+      if (projectsContext.activeProjects.length > 0) {
+        activeProjects = projectsContext.activeProjects;
+      }
+    }
+
+    if (activeProjects.length === 0) {
+      activeProjects = [...this.projectInfoResource.values];
+    }
+
+    return activeProjects;
+  }
+
+  get defaultProject(): ProjectInfo | undefined {
+    let project = this.userProject;
+
+    if ((!project || this.activeProjectIds.length > 0) && this.activeProjects.length > 0) {
+      project = this.activeProjects[0];
+    }
+
+    return project;
+  }
+
+  get activeProjectIds(): string[] {
+    return this.userProjectsSettings.activeProjectIds;
+  }
+
+  get userProjectsSettings(): IProjectsUserSettings {
+    return this.userDataService.getUserData('projects-settings', () => ({
+      activeProjectIds: [],
+    }), data => Array.isArray(data.activeProjectIds));
+  }
+
+  readonly onActiveProjectChange: IExecutor;
+  readonly getActiveProjectTask: ISyncExecutor;
 
   constructor(
-    private readonly projectsResource: ProjectsResource,
-    private readonly userInfoResource: UserInfoResource
+    private readonly projectInfoResource: ProjectInfoResource,
+    private readonly userInfoResource: UserInfoResource,
+    private readonly userDataService: UserDataService,
+    navigationService: NavigationService
   ) {
-    this.activeProjectId = null;
+    this.getActiveProjectTask = new SyncExecutor();
+    this.onActiveProjectChange = new Executor();
+
+    this.onActiveProjectChange.before(navigationService.navigationTask);
 
     makeObservable(this, {
-      activeProject: computed,
+      userProject: computed,
+      defaultProject: computed,
+      activeProjects: computed<ProjectInfo[]>({
+        equals: isArraysEqual,
+      }),
     });
   }
 
-  setActiveProject(project: Project): void {
-    this.activeProjectId = project.id;
+  async setActiveProjects(projects: ProjectInfo[]): Promise<boolean> {
+    const context = await this.onActiveProjectChange.execute();
+
+    if (ExecutorInterrupter.isInterrupted(context)) {
+      return false;
+    }
+    this.userProjectsSettings.activeProjectIds = projects.map(project => project.id);
+    return true;
   }
 
   async load(): Promise<void> {
-    await this.projectsResource.load(CachedMapAllKey);
+    await this.projectInfoResource.load(CachedMapAllKey);
   }
 }

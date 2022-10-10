@@ -18,9 +18,10 @@ package io.cloudbeaver.model;
 
 import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebDataFormat;
-import io.cloudbeaver.utils.WebCommonUtils;
 import io.cloudbeaver.utils.CBModelConstants;
+import io.cloudbeaver.utils.WebCommonUtils;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
@@ -288,14 +289,13 @@ public class WebConnectionInfo {
         }
 
         // Fill session and user provided credentials
-        boolean hasContextCredentials = session.hasContextCredentials();
         DBPConnectionConfiguration configWithAuth = new DBPConnectionConfiguration(dataSourceContainer.getConnectionConfiguration());
         session.provideAuthParameters(session.getProgressMonitor(), dataSourceContainer, configWithAuth);
 
 
         DBPPropertySource credentialsSource = authModel.createCredentialsSource(dataSourceContainer, configWithAuth);
         return Arrays.stream(credentialsSource.getProperties())
-            .filter(p -> WebCommonUtils.isAuthPropertyApplicable(p, hasContextCredentials))
+            .filter(p -> WebCommonUtils.isAuthPropertyApplicable(p, session.getContextCredentialsProviders()))
             .map(p -> new WebPropertyInfo(session, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
     }
 
@@ -346,7 +346,7 @@ public class WebConnectionInfo {
 
     @Property
     public boolean isCanEdit() {
-        return hasProjectPermission(RMProjectPermission.CONNECTIONS_EDIT);
+        return hasProjectPermission(RMProjectPermission.DATA_SOURCES_EDIT);
     }
 
     @Property
@@ -359,12 +359,16 @@ public class WebConnectionInfo {
         return dataSourceContainer.getProject().getId();
     }
 
+    @Property
+    public String getRequiredAuth() {
+        return dataSourceContainer.getRequiredExternalAuth();
+    }
+
     private boolean hasProjectPermission(RMProjectPermission projectPermission) {
         DBPProject project = dataSourceContainer.getProject();
         if (!(project instanceof VirtualProjectImpl)) {
             return false;
         }
-        VirtualProjectImpl virtualProject = (VirtualProjectImpl) project;
-        return virtualProject.getRmProject().getProjectPermissions().contains(projectPermission.getPermissionId());
+        return SMUtils.hasProjectPermission(session, ((VirtualProjectImpl) project).getRmProject(), projectPermission);
     }
 }

@@ -14,12 +14,10 @@ import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
   Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputField,
   FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container, Textarea,
-  UploadArea, Combobox, Expandable, EXPANDABLE_FORM_STYLES
+  UploadArea, Combobox, Expandable, EXPANDABLE_FORM_STYLES, useTranslate, useStyles
 } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { getTextFileReadingProcess } from '@cloudbeaver/core-utils';
 
@@ -202,7 +200,8 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
                     onChange={handleKeyUpload}
                   >
                     <Button
-                      tag='div'
+                      tag="div"
+                      disabled={disabled || readonly || !enabled}
                       mod={['outlined']}
                     >
                       {translate('ui_file')}

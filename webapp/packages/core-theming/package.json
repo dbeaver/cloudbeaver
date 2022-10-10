@@ -16,6 +16,13 @@
     "test": "core-cli-test"
   },
   "dependencies": {
+    "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-events": "~0.1.0",
+    "@cloudbeaver/core-executor": "~0.1.0",
+    "@cloudbeaver/core-root": "~0.1.0",
+    "@cloudbeaver/core-plugin": "~0.1.0",
+    "@cloudbeaver/core-settings": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0",
     "@material/button": "~4.0.0",
     "@material/elevation": "~4.0.0",
     "@material/layout-grid": "~4.0.0",
@@ -27,12 +34,7 @@
     "@material/checkbox": "~4.0.0"
   },
   "peerDependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-events": "~0.1.0",
-    "@cloudbeaver/core-settings": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
     "mobx": "~6.x.x",
-    "mobx-react-lite": "~3.x.x",
     "react": "~18.x.x",
     "reshadow": "~0.x.x"
   }

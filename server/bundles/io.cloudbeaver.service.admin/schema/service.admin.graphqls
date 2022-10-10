@@ -11,6 +11,17 @@ type AdminConnectionGrantInfo {
     subjectType: AdminSubjectType!
 }
 
+type AdminObjectPermissions {
+    objectId: ID!
+    permissions: [String!]!
+}
+
+type AdminObjectGrantInfo {
+    subjectId: ID!
+    subjectType: AdminSubjectType!
+    objectPermissions: AdminObjectPermissions!
+}
+
 type AdminConnectionSearchInfo {
     displayName: String!
     host: String!
@@ -108,7 +119,7 @@ extend type Query {
     listRoles(roleId: ID): [AdminRoleInfo!]!
     listPermissions: [AdminPermissionInfo!]!
 
-    createUser(userId: ID!): AdminUserInfo!
+    createUser(userId: ID!, enabled: Boolean!): AdminUserInfo!
     deleteUser(userId: ID!): Boolean
 
     createRole(roleId: ID!, roleName: String, description: String): AdminRoleInfo!

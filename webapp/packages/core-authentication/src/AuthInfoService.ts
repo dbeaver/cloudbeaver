@@ -8,11 +8,11 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { type ITask, AutoRunningTask } from '@cloudbeaver/core-executor';
-import { AuthInfo, AuthProviderConfiguration, AuthStatus, UserInfo } from '@cloudbeaver/core-sdk';
+import { AuthInfo, AuthStatus, UserInfo } from '@cloudbeaver/core-sdk';
 import { WindowsService } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import { AuthProvidersResource } from './AuthProvidersResource';
+import { AuthProvidersResource, AuthProviderConfiguration } from './AuthProvidersResource';
 import { type ILoginOptions, UserInfoResource } from './UserInfoResource';
 
 @injectable()

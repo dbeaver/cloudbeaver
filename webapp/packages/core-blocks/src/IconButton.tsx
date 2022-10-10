@@ -9,10 +9,11 @@
 import { Button, ButtonProps } from 'reakit/Button';
 import styled, { css } from 'reshadow';
 
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Icon } from './Icon';
 import { StaticImage } from './StaticImage';
+import { useStyles } from './useStyles';
 
 const styles = css`
   Button {

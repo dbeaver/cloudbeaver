@@ -9,9 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps';
+import { useStyles } from '../../useStyles';
 import { baseFormControlStyles, baseValidFormControlStyles } from '../baseFormControlStyles';
 import { isControlPresented } from '../isControlPresented';
 import type { ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';

@@ -20,21 +20,26 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   abstract get executionContext(): IConnectionExecutionContextInfo | undefined;
   exception?: Error | Error[] | null | undefined;
   message?: string;
-  features: ESqlDataSourceFeatures[];
+  get features(): ESqlDataSourceFeatures[] {
+    return [];
+  }
   readonly onSetScript: ISyncExecutor<string>;
 
   protected outdated: boolean;
+  protected editing: boolean;
+
   constructor() {
     this.exception = undefined;
     this.message = undefined;
     this.outdated = true;
+    this.editing = true;
     this.onSetScript = new SyncExecutor();
-    this.features = [];
 
-    makeObservable<this, 'outdated'>(this, {
+    makeObservable<this, 'outdated' | 'editing'>(this, {
       exception: observable.ref,
       outdated: observable.ref,
       message: observable.ref,
+      editing: observable.ref,
     });
   }
 
@@ -45,6 +50,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   abstract canRename(name: string | null): boolean;
   abstract setName(name: string | null): void;
   abstract setExecutionContext(executionContext?: IConnectionExecutionContextInfo | undefined): void;
+
+  isEditing(): boolean {
+    return this.editing;
+  }
 
   isReadonly(): boolean {
     return true;
@@ -76,6 +85,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     }
 
     return true;
+  }
+
+  setEditing(state: boolean): void {
+    this.editing = state;
   }
 
   load(): Promise<void> | void { }

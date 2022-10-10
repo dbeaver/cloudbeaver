@@ -159,7 +159,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebAuthProviderInfo[] getAuthProviders() {
         return AuthProviderRegistry.getInstance().getAuthProviders()
-            .stream().filter(f -> !f.isTrusted()).map(WebAuthProviderInfo::new)
+            .stream().map(WebAuthProviderInfo::new)
             .toArray(WebAuthProviderInfo[]::new);
     }
 

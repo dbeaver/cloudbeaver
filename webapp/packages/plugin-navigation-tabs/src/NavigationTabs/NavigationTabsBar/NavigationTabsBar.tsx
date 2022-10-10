@@ -11,11 +11,9 @@ import { useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { TextPlaceholder, useExecutor } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useExecutor, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
-import { TabsBox, TabPanel, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { TabsBox, TabPanel, BASE_TAB_STYLES, ITabData } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavigationTabsService } from '../NavigationTabsService';
@@ -62,6 +60,10 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
     await navigation.restoreTabs();
   }
 
+  function handleTabChange(tab: ITabData<any>) {
+    handleSelect(tab.tabId);
+  }
+
   useExecutor({
     executor: userInfoResource.onDataUpdate,
     postHandlers: [unloadTabs, restoreTabs],
@@ -73,7 +75,11 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
   }, []);
 
   if (navigation.tabIdList.length === 0) {
-    return <TextPlaceholder>{translate('app_shared_navigationTabsBar_placeholder')}</TextPlaceholder>;
+    return (
+      <TextPlaceholder>
+        {translate('app_shared_navigationTabsBar_placeholder')}
+      </TextPlaceholder>
+    );
   }
 
   return styled(style)(
@@ -86,11 +92,13 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
         tabList={navigation.tabIdList}
         style={styles}
         tabIndex={0}
+        autoSelect
         enabledBaseActions
+        onChange={handleTabChange}
       >
         {navigation.tabIdList.map(tabId => (
           <TabPanel key={tabId} tabId={tabId} lazy>
-            <TabHandlerPanel tabId={tabId} />
+            {() => <TabHandlerPanel tabId={tabId} />}
           </TabPanel>
         ))}
       </TabsBox>

@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: io.cloudbeaver.server;singleton:=true
-Bundle-Version: 22.2.0.qualifier
-Bundle-Release-Date: 20220905
+Bundle-Version: 22.2.2.qualifier
+Bundle-Release-Date: 20221010
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: io.cloudbeaver.server.CBPlatformActivator

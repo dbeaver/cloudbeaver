@@ -9,10 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { IconOrImage } from '@cloudbeaver/core-blocks';
+import { IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 
 import { ShortcutsDialog } from './Shortcuts/ShortcutsDialog';
 
@@ -26,6 +26,11 @@ const styles = css`
       cursor: pointer;  
       & IconOrImage {
         width: 24px;
+      }
+    }
+    @media only screen and (max-width: 1200px) {
+      container {
+        padding: 0 8px;
       }
     }
   `;

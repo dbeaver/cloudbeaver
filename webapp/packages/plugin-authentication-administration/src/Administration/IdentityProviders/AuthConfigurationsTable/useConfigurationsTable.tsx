@@ -9,11 +9,11 @@
 import { computed, observable } from 'mobx';
 
 import { AuthConfigurationsResource, compareAuthConfigurations } from '@cloudbeaver/core-authentication';
-import { TableState, useObservableRef } from '@cloudbeaver/core-blocks';
+import { TableState, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 import { AdminAuthProviderConfiguration, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 interface State {

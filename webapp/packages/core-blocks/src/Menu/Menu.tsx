@@ -11,9 +11,11 @@ import React, { forwardRef, useEffect } from 'react';
 import { MenuButton, MenuInitialState, useMenuState } from 'reakit/Menu';
 import styled from 'reshadow';
 
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { ErrorBoundary } from '../ErrorBoundary';
 import { useObjectRef } from '../useObjectRef';
+import { useStyles } from '../useStyles';
 import { MenuPanel } from './MenuPanel';
 import { menuPanelStyles } from './menuPanelStyles';
 import { IMenuState, MenuStateContext } from './MenuStateContext';
@@ -25,6 +27,7 @@ interface IMenuProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
   style?: ComponentStyle;
   disclosure?: boolean;
   placement?: MenuInitialState['placement'];
+  submenu?: boolean;
   modal?: boolean;
   visible?: boolean;
   rtl?: boolean;
@@ -48,6 +51,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
   getHasBindings,
   onVisibleSwitch,
   modal,
+  submenu,
   rtl,
   ...props
 }, ref) {
@@ -64,18 +68,49 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
     propsRef.onVisibleSwitch?.(menu.visible);
   }, [menu.visible]);
 
+  let menuVisible = menu.visible;
+
+  if (panelAvailable === false) {
+    menuVisible = false;
+  }
+
 
   if (React.isValidElement(children) && disclosure) {
     return styled(styles)(
+      <ErrorBoundary>
+        <MenuStateContext.Provider value={menu}>
+          <MenuButton ref={ref} {...menu} visible={menuVisible} {...props} {...children.props}>
+            {disclosureProps => React.cloneElement(children, { ...disclosureProps, ...children.props })}
+          </MenuButton>
+          <MenuPanel
+            label={label}
+            menu={menu}
+            style={style}
+            rtl={rtl}
+            submenu={submenu}
+            panelAvailable={panelAvailable}
+            hasBindings={hasBindings}
+            getHasBindings={getHasBindings}
+          >
+            {items}
+          </MenuPanel>
+        </MenuStateContext.Provider>
+      </ErrorBoundary>
+    );
+  }
+
+  return styled(styles)(
+    <ErrorBoundary>
       <MenuStateContext.Provider value={menu}>
-        <MenuButton ref={ref} {...menu} {...props} {...children.props}>
-          {disclosureProps => React.cloneElement(children, { ...disclosureProps, ...children.props })}
+        <MenuButton ref={ref} {...menu} visible={menuVisible} {...props}>
+          <box>{children}</box>
         </MenuButton>
         <MenuPanel
           label={label}
           menu={menu}
           style={style}
           rtl={rtl}
+          submenu={submenu}
           panelAvailable={panelAvailable}
           hasBindings={hasBindings}
           getHasBindings={getHasBindings}
@@ -83,25 +118,6 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
           {items}
         </MenuPanel>
       </MenuStateContext.Provider>
-    );
-  }
-
-  return styled(styles)(
-    <MenuStateContext.Provider value={menu}>
-      <MenuButton ref={ref} {...menu} {...props}>
-        <box>{children}</box>
-      </MenuButton>
-      <MenuPanel
-        label={label}
-        menu={menu}
-        style={style}
-        rtl={rtl}
-        panelAvailable={panelAvailable}
-        hasBindings={hasBindings}
-        getHasBindings={getHasBindings}
-      >
-        {items}
-      </MenuPanel>
-    </MenuStateContext.Provider>
+    </ErrorBoundary>
   );
 }));

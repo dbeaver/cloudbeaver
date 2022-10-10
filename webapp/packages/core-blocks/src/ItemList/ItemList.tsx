@@ -8,8 +8,9 @@
 
 import styled from 'reshadow';
 
-import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { useStyles } from '../useStyles';
 import { Styles, ITEM_LIST_STYLES } from './styles';
 
 interface Props {

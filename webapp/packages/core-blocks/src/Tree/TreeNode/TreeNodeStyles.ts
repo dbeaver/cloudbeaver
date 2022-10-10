@@ -129,7 +129,7 @@ export const TREE_NODE_STYLES = css`
       composes: theme-typography--caption from global;
       padding: 4px 12px;
 
-      [big] {
+      &[big] {
         padding: 4px 24px;
       }
     }

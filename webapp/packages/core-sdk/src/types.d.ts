@@ -1,8 +1,6 @@
-export module 'graphql-request/dist/types' {
-  export interface GraphQLError {
-    extensions?: {
-      stackTrace?: string;
-      webErrorCode?: string;
-    };
+export module 'graphql/error/GraphQLError' {
+  export interface GraphQLErrorExtensions {
+    stackTrace?: string;
+    webErrorCode?: string;
   }
 }

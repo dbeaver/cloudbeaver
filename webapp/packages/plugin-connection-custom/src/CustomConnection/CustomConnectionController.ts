@@ -8,15 +8,16 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { DBDriver, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionsManagerService, DBDriver, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ProjectsService } from '@cloudbeaver/core-projects';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { PublicConnectionFormService } from '@cloudbeaver/plugin-connections';
 
 @injectable()
 export class CustomConnectionController implements IInitializableController {
-  isLoading = true;
+  isLoading: boolean;
   onClose!: () => void;
 
   get drivers(): DBDriver[] {
@@ -27,11 +28,16 @@ export class CustomConnectionController implements IInitializableController {
     private readonly dbDriverResource: DBDriverResource,
     private readonly notificationService: NotificationService,
     private readonly projectsService: ProjectsService,
-    private readonly publicConnectionFormService: PublicConnectionFormService
+    private readonly publicConnectionFormService: PublicConnectionFormService,
+    private readonly connectionsManagerService: ConnectionsManagerService
   ) {
+    this.isLoading = true;
+
     makeObservable(this, {
       isLoading: observable,
-      drivers: computed,
+      drivers: computed<DBDriver[]>({
+        equals: isArraysEqual,
+      }),
     });
   }
 
@@ -43,13 +49,15 @@ export class CustomConnectionController implements IInitializableController {
   onDriverSelect = async (driverId: string) => {
     await this.projectsService.load();
 
-    if (!this.projectsService.activeProject) {
-      this.notificationService.logError({ title: 'core_projects_project_not' });
+    const projects = this.connectionsManagerService.createConnectionProjects;
+
+    if (projects.length === 0) {
+      this.notificationService.logError({ title: 'core_projects_no_default_project' });
       return;
     }
 
     const state = await this.publicConnectionFormService.open(
-      this.projectsService.activeProject.id,
+      projects[0].id,
       { driverId },
       this.drivers.map(driver => driver.id)
     );

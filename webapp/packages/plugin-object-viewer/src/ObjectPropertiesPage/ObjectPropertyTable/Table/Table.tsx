@@ -10,12 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { IScrollState, useControlledScroll, useTable } from '@cloudbeaver/core-blocks';
+import { IScrollState, Translate, useControlledScroll, useStyles, useTable } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { Translate } from '@cloudbeaver/core-localization';
 import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { isDefined, TextTools } from '@cloudbeaver/core-utils';
 import DataGrid from '@cloudbeaver/plugin-react-data-grid';

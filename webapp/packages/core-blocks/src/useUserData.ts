@@ -11,7 +11,7 @@ import { useEffect, useRef } from 'react';
 import { UserDataService } from '@cloudbeaver/core-authentication';
 import { useService } from '@cloudbeaver/core-di';
 
-export function useUserData<T>(
+export function useUserData<T extends Record<any, any>>(
   key: string,
   defaultValue: () => T,
   onUpdate?: (data: T) => void,

@@ -22,11 +22,12 @@ import {
   Button,
   useObjectRef,
   getComputed,
-  getSelectedItems
+  getSelectedItems,
+  useTranslate
 } from '@cloudbeaver/core-blocks';
-import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { ConnectionAccessTableHeader, IFilterState } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader';
 import { ConnectionAccessTableInnerHeader } from './ConnectionAccessTableHeader/ConnectionAccessTableInnerHeader';
@@ -72,7 +73,6 @@ export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAc
   onEdit,
 }) {
   const props = useObjectRef({ onRevoke, onEdit });
-  const style = useStyles(styles, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
@@ -97,7 +97,7 @@ export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAc
     }
   }
 
-  return styled(style)(
+  return styled(styles, BASE_CONTAINERS_STYLES)(
     <Group box medium overflow>
       <container>
         <ConnectionAccessTableHeader filterState={filterState} disabled={disabled}>

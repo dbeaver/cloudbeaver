@@ -99,6 +99,7 @@ export class ObjectViewerTabService {
     const initTab = (): ITab<IObjectViewerTabState> | null => {
       if (!tabInfo.tab && isSupported()) {
         tabInfo.openNewTab<IObjectViewerTabState>({
+          projectId: nodeInfo.projectId ?? null,
           handlerId: objectViewerTabHandlerKey,
           handlerState: {
             projectId: nodeInfo.projectId,

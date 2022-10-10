@@ -9,10 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { use, css } from 'reshadow';
 
-import { getComputed, TreeNode } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNode, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService, DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES } from '@cloudbeaver/core-navigation-tree';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { useDNDData } from '@cloudbeaver/core-ui';
 import {  useDataContext } from '@cloudbeaver/core-view';
 
@@ -113,6 +112,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       <Control
         ref={setRef}
         dndElement={dndData.state.isDragging}
+        style={style}
         node={node}
       />
       {(expanded || externalExpanded) && (

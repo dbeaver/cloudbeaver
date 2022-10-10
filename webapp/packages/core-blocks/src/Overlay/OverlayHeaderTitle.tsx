@@ -8,8 +8,6 @@
 
 import styled from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
 import { OVERLAY_BASE_STYLES } from './OVERLAY_BASE_STYLES';
 
 interface Props {
@@ -17,7 +15,7 @@ interface Props {
 }
 
 export const OverlayHeaderTitle: React.FC<React.PropsWithChildren<Props>> = function OverlayHeaderTitle({ className, children }) {
-  return styled(useStyles(OVERLAY_BASE_STYLES))(
+  return styled(OVERLAY_BASE_STYLES)(
     <header-title className={className}>
       <h3>{children}</h3>
     </header-title>

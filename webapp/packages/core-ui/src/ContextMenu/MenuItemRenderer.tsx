@@ -8,12 +8,12 @@
 
 import { observer } from 'mobx-react-lite';
 import React, { useCallback } from 'react';
-import { MenuItem, MenuSeparator, MenuStateReturn } from 'reakit/Menu';
+import { MenuItem, MenuItemCheckbox, MenuSeparator, MenuStateReturn } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
-import { MenuItemElement, menuPanelStyles } from '@cloudbeaver/core-blocks';
-import { ComponentStyle, joinStyles, useStyles } from '@cloudbeaver/core-theming';
-import { IMenuItem, IMenuData, MenuSubMenuItem, MenuSeparatorItem, MenuActionItem, MenuBaseItem } from '@cloudbeaver/core-view';
+import { Checkbox, joinStyles, MenuItemElement, menuPanelStyles, useStyles } from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { IMenuItem, IMenuData, MenuSubMenuItem, MenuSeparatorItem, MenuActionItem, MenuBaseItem, MenuCustomItem, MenuCheckboxItem } from '@cloudbeaver/core-view';
 
 import { MenuActionElement } from './MenuActionElement';
 import { SubMenuElement } from './SubMenuElement';
@@ -23,38 +23,54 @@ export interface IMenuItemRendererProps extends Omit<React.ButtonHTMLAttributes<
   item: IMenuItem;
   menuData: IMenuData;
   menu: MenuStateReturn; // from reakit useMenuState
+  modal?: boolean;
   rtl?: boolean;
   onItemClose?: () => void;
   style?: ComponentStyle;
 }
 
 export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuItemRenderer({
-  item, rtl, menuData, menu, onItemClose, style,
+  item, modal, rtl, menuData, menu, onItemClose, style,
 }) {
   const styles = useStyles(menuPanelStyles, style);
-  const onClick = useCallback(() => {
+  const onClick = useCallback((keepMenuOpen = true) => {
     item.events?.onSelect?.();
 
-    if (!(item instanceof MenuSubMenuItem)) {
+    if (!(item instanceof MenuSubMenuItem) && keepMenuOpen) {
       onItemClose?.();
     }
   }, [item, onItemClose]);
+
+  if (item instanceof MenuCustomItem) {
+    const CustomMenuItem = item.getComponent();
+
+    return styled(styles)(
+      <CustomMenuItem
+        item={item}
+        menu={menu}
+        menuData={menuData}
+        style={style}
+        onClick={onClick}
+      />
+    );
+  }
 
   if (item instanceof MenuSubMenuItem) {
     return styled(styles)(
       <MenuItem
         {...menu}
+        {...{ as: SubMenuElement }}
         {...use({ hidden: item.hidden })}
         id={item.id}
         aria-label={item.menu.label}
         itemRenderer={MenuItemRenderer}
-        rtl={rtl}
+        menuRtl={rtl}
         menuData={menuData}
+        menuModal={modal}
         subMenu={item}
         style={style}
         onItemClose={onItemClose}
-        onClick={onClick}
-        {...{ as: SubMenuElement }}
+        onClick={() => onClick()}
       />
     );
   }
@@ -68,9 +84,33 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
       <MenuActionElement
         item={item}
         menu={menu}
+        menuData={menuData}
         style={style}
         onClick={onClick}
       />
+    );
+  }
+
+  if (item instanceof MenuCheckboxItem) {
+    return styled(styles)(
+      <MenuItemCheckbox
+        {...menu}
+        {...use({ hidden: item.hidden })}
+        id={item.id}
+        aria-label={item.label}
+        disabled={item.disabled}
+        name={item.id}
+        value={item.label}
+        checked={item.checked}
+        onClick={() => onClick(false)}
+      >
+        <MenuItemElement
+          label={item.label}
+          icon={<Checkbox checked={item.checked} mod={['primary', 'small']} style={style} ripple={false} />}
+          tooltip={item.tooltip}
+          style={style}
+        />
+      </MenuItemCheckbox>
     );
   }
 

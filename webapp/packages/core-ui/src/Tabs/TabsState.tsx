@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { useTabState } from 'reakit/Tab';
 
-import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { Executor, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
@@ -29,6 +29,7 @@ type Props<T = Record<string, any>> = ExtractContainerProps<T> & React.PropsWith
   localState?: MetadataMap<string, any>;
   lazy?: boolean;
   manual?: boolean;
+  autoSelect?: boolean;
   tabList?: string[];
   enabledBaseActions?: boolean;
   onChange?: (tab: ITabData<T>) => void;
@@ -43,6 +44,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   localState,
   children,
   lazy = false,
+  autoSelect = true,
   manual,
   tabList,
   enabledBaseActions,
@@ -51,13 +53,19 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   ...rest
 }: Props<T>): React.ReactElement | null {
   const props = rest as any as T;
+  let displayed: string[] = [];
+
+  if (container) {
+    displayed = container.getIdList(props);
+  } else if (tabList) {
+    displayed = tabList;
+  }
+
   if (
     !selectedId
-    && currentTabId === undefined
-    && container
+    && (currentTabId === undefined || currentTabId === null)
+    && autoSelect
   ) {
-    const displayed = container.getIdList(props);
-
     if (displayed.length > 0) {
       selectedId = displayed[0];
     }
@@ -88,16 +96,15 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     tabList,
   });
 
-  if (currentTabId !== undefined) {
+  if (currentTabId !== undefined && currentTabId !== null) {
     state.selectedId = currentTabId;
     dynamic.selectedId = currentTabId;
   }
 
-  if (dynamic.container && dynamic.selectedId && selectedId) {
-    const displayed = dynamic.container.getIdList(props);
+  if (displayed.length > 0 && dynamic.selectedId && selectedId) {
     const tabExists = displayed.includes(dynamic.selectedId);
 
-    if (displayed.length > 0 && !tabExists) {
+    if (!tabExists) {
       if (displayed.includes(selectedId)) {
         state.selectedId = selectedId;
       } else {
@@ -106,8 +113,9 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     }
   }
 
-  useEffect(() => {
-    const openHandler: IExecutorHandler<ITabData<T>> = (data, contexts) => {
+  useExecutor({
+    executor: openExecutor,
+    handlers: [function openHandler(data, contexts) {
       dynamic.open?.(data);
       if (dynamic.selectedId === data.tabId) {
         ExecutorInterrupter.interrupt(contexts);
@@ -115,21 +123,18 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       }
       dynamic.selectedId = data.tabId;
       dynamic.state.setSelectedId(data.tabId);
-    };
-    const closeHandler: IExecutorHandler<ITabData<T>> = data => dynamic.close?.(data);
+    }],
+  });
 
-    openExecutor.addHandler(openHandler);
-    closeExecutor.addHandler(closeHandler);
-
-    return () => {
-      // probably not needed, executors destroyed with component
-      openExecutor.removeHandler(openHandler);
-      closeExecutor.removeHandler(closeHandler);
-    };
-  }, []);
+  useExecutor({
+    executor: closeExecutor,
+    handlers: [function closeHandler(data) {
+      dynamic.close?.(data);
+    }],
+  });
 
   useEffect(() => {
-    if (currentTabId !== undefined) {
+    if (currentTabId !== undefined && currentTabId !== null) {
       return;
     }
 
@@ -137,7 +142,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       tabId: state.selectedId!,
       props,
     });
-  }, [state.selectedId]);
+  }, [currentTabId, state.selectedId]);
 
   useEffect(() => {
     if (state.selectedId) {

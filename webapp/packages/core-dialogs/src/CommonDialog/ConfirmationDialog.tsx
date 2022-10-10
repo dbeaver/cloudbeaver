@@ -8,9 +8,9 @@
 
 import styled, { css } from 'reshadow';
 
-import { Button } from '@cloudbeaver/core-blocks';
-import { TLocalizationToken, Translate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { Button, Translate, useStyles } from '@cloudbeaver/core-blocks';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
+
 
 import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
 import type { DialogComponent, DialogueStateResult } from './CommonDialogService';

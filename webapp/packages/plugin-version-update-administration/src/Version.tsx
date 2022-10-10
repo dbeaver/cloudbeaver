@@ -9,8 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TableItem, TableColumnValue, TableItemExpand } from '@cloudbeaver/core-blocks';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { TableItem, TableColumnValue, TableItemExpand, useStyles } from '@cloudbeaver/core-blocks';
 import type { IVersion } from '@cloudbeaver/core-version';
 
 import { VersionInfo } from './VersionInfo';

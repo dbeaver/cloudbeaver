@@ -21,13 +21,15 @@ import {
   Button,
   useObjectRef,
   getSelectedItems,
-  getComputed
+  getComputed,
+  useTranslate,
+  useStyles
 } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { getFilteredConnections } from './getFilteredConnections';
 import { GrantedConnectionsTableHeader, IFilterState } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader';

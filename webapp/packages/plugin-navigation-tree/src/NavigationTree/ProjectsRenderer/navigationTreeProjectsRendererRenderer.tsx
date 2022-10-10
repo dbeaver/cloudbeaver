@@ -7,15 +7,15 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import { useContext } from 'react';
+import styled, { css, use } from 'reshadow';
 
-import { TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
-import { Translate } from '@cloudbeaver/core-localization';
+import { Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT } from '@cloudbeaver/core-projects';
 
-import { useChildren } from '../../NodesManager/useChildren';
 import { useNode } from '../../NodesManager/useNode';
+import { ElementsTreeContext } from '../ElementsTree/ElementsTreeContext';
 import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent';
 import { NavigationNodeRenderer } from '../ElementsTree/NavigationTreeNode/NavigationNodeRenderer';
 import type { IElementsTreeCustomRenderer } from '../ElementsTree/useElementsTree';
@@ -24,9 +24,19 @@ import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
 const nestedStyles = css`
   TreeNode {
     margin-top: 8px;
-  }
-  NavigationNodeNested {
-    padding-left: 8px !important;
+
+    &:only-child,
+    &[|hideProjects] {
+      margin-top: 0px;
+
+      & Control {
+        display: none;
+      }
+    }
+
+    & NavigationNodeNested {
+      padding-left: 0 !important;
+    }
   }
 `;
 
@@ -53,7 +63,9 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
   className,
   expanded,
 }) {
+  const elementsTreeContext = useContext(ElementsTreeContext);
   const { node } = useNode(nodeId);
+  const hideProjects = elementsTreeContext?.tree.settings?.projects === false;
 
   if (!node) {
     return styled(TREE_NODE_STYLES)(
@@ -63,7 +75,7 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
     );
   }
 
-  return (
+  return styled(nestedStyles)(
     <NavigationNodeRenderer
       node={node}
       path={path}
@@ -73,6 +85,7 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
       control={NavigationNodeProjectControl}
       style={nestedStyles}
       component={component}
+      {...use({ hideProjects })}
     />
   );
 });

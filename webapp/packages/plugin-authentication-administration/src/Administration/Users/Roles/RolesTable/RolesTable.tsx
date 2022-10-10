@@ -10,9 +10,9 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import type { RoleInfo } from '@cloudbeaver/core-authentication';
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, Loader, ILoadableState } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, Loader, ILoadableState, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+
+
 
 import { Role } from './Role';
 

@@ -18,8 +18,6 @@
 package io.cloudbeaver.auth.provider.fa;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.*;
 
 import java.time.LocalDateTime;
@@ -61,17 +59,6 @@ public abstract class AbstractSessionFederated implements SMSessionFederated {
     @Override
     public LocalDateTime getSessionStart() {
         return parentSession.getSessionStart();
-    }
-
-    @Override
-    public boolean isApplicationSession() {
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public DBPProject getSingletonProject() {
-        return parentSession.getSingletonProject();
     }
 
     @Override

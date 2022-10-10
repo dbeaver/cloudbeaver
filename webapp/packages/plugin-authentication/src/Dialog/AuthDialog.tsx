@@ -10,11 +10,9 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { AuthProvider, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { SubmittingForm, Loader, ErrorMessage, TextPlaceholder, Link, useErrorDetails } from '@cloudbeaver/core-blocks';
+import { SubmittingForm, Loader, ErrorMessage, TextPlaceholder, Link, useErrorDetails, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { Translate, useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { TabsState, TabList, Tab, TabTitle, UNDERLINE_TAB_STYLES, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { AuthenticationService } from '../AuthenticationService';
@@ -84,7 +82,9 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
     && state.activeProvider?.id !== undefined
     && !userInfo.hasToken(state.activeProvider.id);
 
-  const showTabs = (dialogData.providers.length + dialogData.configurations.length) > 1;
+  const showTabs = (
+    (dialogData.providers.length + dialogData.configurations.length) > 1
+  );
   const federate = state.tabId === FEDERATED_AUTH;
 
   let dialogTitle = translate('authentication_login_dialog_title');
@@ -131,7 +131,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
           {translate('authentication_provider_disabled')}
           {authenticationService.configureAuthProvider && (
             <Link onClick={() => { navToSettings(); }}>
-              <Translate token="ui_configure" />
+              {translate('ui_configure')}
             </Link>
           )}
         </TextPlaceholder>

@@ -18,6 +18,7 @@
 import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
+import type { ISqlDataSource } from '../SqlDataSource/ISqlDataSource';
 import type { SQLProposal } from '../SqlEditorService';
 import type { SQLParser, ISQLScriptSegment } from '../SQLParser';
 import type { ISQLEditorMode } from './SQLEditorModeContext';
@@ -40,10 +41,12 @@ export interface ISQLEditorData {
   readonly activeSegment: ISQLScriptSegment | undefined;
   readonly cursorSegment: ISQLScriptSegment | undefined;
   readonly readonly: boolean;
+  readonly editing: boolean;
   readonly isLineScriptEmpty: boolean;
   readonly isScriptEmpty: boolean;
   readonly isDisabled: boolean;
   readonly value: string;
+  readonly dataSource: ISqlDataSource | undefined;
   readonly onExecute: ISyncExecutor<boolean>;
   readonly onSegmentExecute: ISyncExecutor<ISegmentExecutionData>;
   readonly onFormat: ISyncExecutor<[ISQLScriptSegment, string]>;
@@ -60,7 +63,12 @@ export interface ISQLEditorData {
   executeQueryNewTab(): Promise<void>;
   showExecutionPlan(): Promise<void>;
   executeScript(): Promise<void>;
-  getHintProposals(position: number, simple: boolean): Promise<SQLProposal[]>;
+  switchEditing(): Promise<void>;
+  getHintProposals(
+    position: number,
+    word: string,
+    simple: boolean
+  ): Promise<SQLProposal[]>;
   executeQueryAction<T>(
     segment: ISQLScriptSegment | undefined,
     action: (query: ISQLScriptSegment) => Promise<T>,

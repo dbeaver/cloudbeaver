@@ -22,6 +22,6 @@ export class PluginBootstrap extends Bootstrap {
   async load(): Promise<void> { }
 
   register(): void {
-    this.topNavService.placeholder.add(Help, 4);
+    this.topNavService.placeholder.add(Help, 5);
   }
 }

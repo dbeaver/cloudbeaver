@@ -10,9 +10,9 @@ import { observer } from 'mobx-react-lite';
 import type { ButtonHTMLAttributes } from 'react';
 import styled from 'reshadow';
 
+import { useTranslate, useStyles, joinStyles } from '@cloudbeaver/core-blocks';
 import { IMenuItem, MenuTrigger } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, ComponentStyle, joinStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { topMenuStyles } from './topMenuStyles';
 import { TopNavButton } from './TopNavButton';
@@ -45,7 +45,7 @@ export const TopMenuItem = observer<IProps>(function TopMenuItem({ menuItem, sty
       panel={menuItem.panel}
       disabled={menuItem.isDisabled}
       style={joinStyles(style, topMenuStyles)}
-      placement="bottom-end"
+      placement="bottom-start"
       modal
       disclosure
       onClick={() => menuItem.onClick?.()}
@@ -54,7 +54,6 @@ export const TopMenuItem = observer<IProps>(function TopMenuItem({ menuItem, sty
         title={title}
         icon={menuItem.icon}
         style={style}
-        menu
       />
     </MenuTrigger>
   );

@@ -9,9 +9,11 @@
 import { PropsWithChildren, ReactNode, forwardRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
+import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { TabsState } from '../TabsState';
 
 const styles = css`
@@ -42,13 +44,15 @@ const styles = css`
 `;
 
 type TabsBoxProps = PropsWithChildren<{
-  currentTabId: string;
+  currentTabId: string | null;
   tabs?: ReactNode;
   tabIndex?: number;
   localState?: MetadataMap<string, any>;
   tabList?: string[];
   enabledBaseActions?: boolean;
+  autoSelect?: boolean;
   className?: string;
+  onChange?: (tab: ITabData<any>) => void;
   style?: ComponentStyle;
 }>;
 
@@ -59,8 +63,10 @@ export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox
   localState,
   tabList,
   enabledBaseActions,
+  autoSelect,
   children,
   className,
+  onChange,
   style,
 }, ref) {
   return styled(styles, useStyles(style))(
@@ -68,7 +74,9 @@ export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox
       currentTabId={currentTabId}
       localState={localState}
       tabList={tabList}
+      autoSelect={autoSelect}
       enabledBaseActions={enabledBaseActions}
+      onChange={onChange}
     >
       <tabs-box ref={ref} as="div" className={className} tabIndex={tabIndex}>
         {tabs && <tabs>{tabs}</tabs>}

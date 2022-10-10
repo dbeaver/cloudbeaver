@@ -10,9 +10,7 @@ import { observer } from 'mobx-react-lite';
 import ReactMarkdown from 'react-markdown';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Container, Group, GroupItem, GroupTitle, useMapResource } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { BASE_CONTAINERS_STYLES, Container, Group, GroupItem, GroupTitle, useMapResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { VersionResource } from '@cloudbeaver/core-version';
 
 interface Props {

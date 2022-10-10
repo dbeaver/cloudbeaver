@@ -1,50 +1,5 @@
 query getAuthProviders {
   providers: authProviders {
-    id
-    label
-    icon
-    description
-    defaultProvider
-
-    #configurationParameters {
-    #  id
-    #  displayName
-    #  description
-    #  category
-    #  dataType
-    #  value
-    #  validValues
-    #  defaultValue
-    #  features
-    #}
-
-    configurable
-    configurations {
-      id
-      displayName
-      iconURL
-      description
-      signInLink
-      signOutLink
-      metadataLink
-    }
-
-    credentialProfiles {
-      id
-      label
-      description
-
-      credentialParameters {
-        id
-        displayName
-        description
-        admin
-        user
-        identifying
-        possibleValues
-        encryption
-      }
-    }
-    requiredFeatures
+    ...AuthProviderInfo
   } 
 }

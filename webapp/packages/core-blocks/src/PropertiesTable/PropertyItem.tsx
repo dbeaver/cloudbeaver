@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useRef, useState, useLayoutEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { ShadowInput } from '../FormControls/ShadowInput';
 import { Icon } from '../Icon';
@@ -139,14 +139,19 @@ export const PropertyItem = observer<Props>(function PropertyItem({
   const handleRemove = useCallback(() => onRemove(property.id), [property]);
 
   useLayoutEffect(() => {
-    if (keyInputRef.current && isDeletable && property.new) {
+    if (
+      keyInputRef.current
+      && isDeletable
+      && property.new
+      && !(document.activeElement instanceof HTMLInputElement)
+    ) {
       keyInputRef.current.focus();
     }
   }, [property]);
 
   const focus = menuOpen;
 
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <property-item>
       <property-name title={property.description} {...use({ error })}>
         <ShadowInput

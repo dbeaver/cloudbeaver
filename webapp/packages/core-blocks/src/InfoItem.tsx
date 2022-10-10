@@ -9,9 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TLocalizationToken, useTranslate } from '@cloudbeaver/core-localization';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
 import { IconOrImage } from './IconOrImage';
+import { useTranslate } from './localization/useTranslate';
 
 export interface IInfoItem {
   info: TLocalizationToken;

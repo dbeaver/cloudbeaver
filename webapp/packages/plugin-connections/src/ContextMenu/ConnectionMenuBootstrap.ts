@@ -6,13 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { Connection, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual, NavigatorViewSettings } from '@cloudbeaver/core-root';
+import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual, NavigatorViewSettings, PermissionsService } from '@cloudbeaver/core-root';
 import { ActionService, ACTION_DELETE, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
+import { ConnectionsSettingsService } from '../ConnectionsSettingsService';
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService';
 import { ACTION_CONNECTION_DISCONNECT } from './Actions/ACTION_CONNECTION_DISCONNECT';
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT';
@@ -32,6 +34,8 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     private readonly publicConnectionFormService: PublicConnectionFormService,
+    private readonly connectionsSettingsService: ConnectionsSettingsService,
+    private readonly permissionsService: PermissionsService,
   ) {
     super();
   }
@@ -39,6 +43,13 @@ export class ConnectionMenuBootstrap extends Bootstrap {
   register(): void | Promise<void> {
     this.menuService.addCreator({
       isApplicable: context => {
+        if (
+          this.connectionsSettingsService.settings.getValue('hideConnectionViewForUsers')
+          && !this.permissionsService.has(EAdminPermission.admin)
+        ) {
+          return false;
+        }
+
         const connection = context.tryGet(DATA_CONTEXT_CONNECTION);
 
         if (!connection?.connected) {

@@ -68,9 +68,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private static final Log log = Log.getLog(CBEmbeddedSecurityController.class);
 
-    private static final int ACCESS_TOKEN_TTL_IN_MINUTES = 20;
-    private static final int REFRESH_TOKEN_TTL_IN_HOURS = 24;
-
     protected static final String CHAR_BOOL_TRUE = "Y";
     protected static final String CHAR_BOOL_FALSE = "N";
 
@@ -84,10 +81,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     protected final CBDatabase database;
     protected final SMCredentialsProvider credentialsProvider;
 
-    public CBEmbeddedSecurityController(WebApplication application, CBDatabase database, SMCredentialsProvider credentialsProvider) {
+    private final SMControllerConfiguration smConfig;
+
+    public CBEmbeddedSecurityController(
+        WebApplication application,
+        CBDatabase database,
+        SMCredentialsProvider credentialsProvider,
+        SMControllerConfiguration smConfig
+    ) {
         this.application = application;
         this.database = database;
         this.credentialsProvider = credentialsProvider;
+        this.smConfig = smConfig;
     }
 
     private boolean isSubjectExists(String subjectId) throws DBCException {
@@ -107,7 +112,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     // Users
 
     @Override
-    public void createUser(String userId, Map<String, String> metaParameters) throws DBException {
+    public void createUser(String userId, Map<String, String> metaParameters, boolean enabled) throws DBException {
         if (isSubjectExists(userId)) {
             throw new DBCException("User or role '" + userId + "' already exists");
         }
@@ -116,7 +121,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 createAuthSubject(dbCon, userId, SUBJECT_USER);
                 try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER(USER_ID,IS_ACTIVE,CREATE_TIME) VALUES(?,?,?)")) {
                     dbStat.setString(1, userId);
-                    dbStat.setString(2, CHAR_BOOL_TRUE);
+                    dbStat.setString(2, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
                     dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
                     dbStat.execute();
                 }
@@ -1255,7 +1260,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
             if (userIdFromCreds == null) {
                 var error = "Invalid user credentials";
-                updateAuthStatus(authId, SMAuthStatus.ERROR, authInfo.getAuthData(), error);
+                updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
                 return SMAuthInfo.error(authId, error);
             }
             if (activeUserId == null) {
@@ -1288,7 +1293,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
             } catch (SQLException e) {
                 var error = "Error during token generation";
-                updateAuthStatus(authId, SMAuthStatus.ERROR, authInfo.getAuthData(), error);
+                updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
                 throw new SMException(error, e);
             }
         }
@@ -1360,7 +1365,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             userId = userIdFromCredentials;
             if (!isSubjectExists(userId)) {
                 var newUser = new SMUser(userId);
-                createUser(newUser.getUserId(), newUser.getMetaParameters());
+                createUser(newUser.getUserId(), newUser.getMetaParameters(), true);
                 String defaultRoleName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserRole();
                 if (!CommonUtils.isEmpty(defaultRoleName)) {
                     setUserRoles(userId, new String[]{defaultRoleName}, userId);
@@ -1371,9 +1376,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             userId = userIdFromCredentials;
         }
         if (authProvider.isTrusted()) {
-            if (WebAppUtils.getWebApplication().isMultiNode()) {
-                throw new SMException("Authorization through trusted provider is not available in multi node");
-            }
             Object reverseProxyUserRoles = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_ROLES);
             if (reverseProxyUserRoles instanceof List) {
                 setUserRoles(userId, ((List<?>) reverseProxyUserRoles).stream().map(Object::toString).toArray(String[]::new), userId);
@@ -1406,12 +1408,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             } else {
                 dbStat.setString(3, userId);
             }
-            var accessTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(ACCESS_TOKEN_TTL_IN_MINUTES));
+            var accessTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(smConfig.getAccessTokenTtl()));
             dbStat.setTimestamp(4, accessTokenExpirationTime);
 
             String smRefreshToken = SecurityUtils.generatePassword(32);
             dbStat.setString(5, smRefreshToken);
-            var refreshTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusHours(REFRESH_TOKEN_TTL_IN_HOURS));
+            var refreshTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(smConfig.getRefreshTokenTtl()));
             dbStat.setTimestamp(6, refreshTokenExpirationTime);
 
             dbStat.execute();

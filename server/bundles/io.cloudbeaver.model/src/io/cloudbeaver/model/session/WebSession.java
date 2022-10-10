@@ -16,7 +16,10 @@
  */
 package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.*;
+import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.DataSourceFilter;
+import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -51,6 +54,7 @@ import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
+import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -78,13 +82,13 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
-public class WebSession extends AbstractSessionPersistent implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
+public class WebSession extends AbstractSessionPersistent
+    implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
     public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("CloudBeaver");
-    public static final SMObjectType CB_DATASOURCE_OBJECT = new SMObjectType("datasource");
-
+    private static final String WEB_SESSION_AUTH_CONTEXT_TYPE = "web-session";
     private static final String ATTR_LOCALE = "locale";
 
     private static final AtomicInteger TASK_ID = new AtomicInteger();
@@ -140,7 +144,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     @NotNull
     @Override
     public SMAuthSpace getSessionSpace() {
-        return defaultProject;
+        return DBWorkbench.getPlatform().getWorkspace();
     }
 
     @Override
@@ -169,13 +173,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return application;
     }
 
-    @Override
-    public boolean isApplicationSession() {
-        return false;
-    }
-
     @NotNull
-    @Override
     public DBPProject getSingletonProject() {
         return defaultProject;
     }
@@ -242,7 +240,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     }
 
     public synchronized boolean hasPermission(String perm) {
-        return getSessionPermissions().contains(perm);
+        return getSessionPermissions().contains(DBWConstants.PERMISSION_ADMIN) ||
+            getSessionPermissions().contains(perm);
     }
 
     public synchronized boolean isAuthorizedInSecurityManager() {
@@ -331,10 +330,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         refreshAccessibleConnectionIds();
         try {
             RMController controller = application.getResourceController(this, getSecurityController());
-            RMProject[] rmProjects =  controller.listAccessibleProjects();
+            RMProject[] rmProjects = controller.listAccessibleProjects();
             for (RMProject project : rmProjects) {
                 VirtualProjectImpl virtualProject = createVirtualProject(project);
-                if (!virtualProject.getRmProject().getProjectPermissions().contains(RMProjectPermission.CONNECTIONS_EDIT.getPermissionId())) {
+                if (!virtualProject.getRmProject().getProjectPermissions().contains(RMProjectPermission.DATA_SOURCES_EDIT.getPermissionId())) {
                     // Projects for which user don't have edit permission can't be saved. So mark the as in memory
                     virtualProject.setInMemory(true);
                 }
@@ -351,7 +350,9 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
 
     public VirtualProjectImpl createVirtualProject(RMProject project) {
         // Do not filter data sources from user project
-        DataSourceFilter filter = project.getType() == RMProject.Type.USER ? x -> true : this::isDataSourceAccessible;
+        DataSourceFilter filter = project.getType() == RMProjectType.GLOBAL
+            ? this::isDataSourceAccessible
+            : x -> true;
         VirtualProjectImpl sessionProject = application.createProjectImpl(
             project,
             sessionAuthContext,
@@ -873,8 +874,8 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         }
     }
 
-    public boolean hasContextCredentials() {
-        return getAdapter(DBACredentialsProvider.class) != null;
+    public List<DBACredentialsProvider> getContextCredentialsProviders() {
+        return getAdapters(DBACredentialsProvider.class);
     }
 
     // Auth credentials provider
@@ -883,13 +884,10 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
     public boolean provideAuthParameters(@NotNull DBRProgressMonitor monitor, @NotNull DBPDataSourceContainer dataSourceContainer, @NotNull DBPConnectionConfiguration configuration) {
         try {
             // Properties from nested auth sessions
-            // FIXME: we need to support multiple credential providers (e.g. multiple clouds).
-            DBACredentialsProvider nestedProvider = getAdapter(DBACredentialsProvider.class);
-            if (nestedProvider != null) {
-                if (!nestedProvider.provideAuthParameters(monitor, dataSourceContainer, configuration)) {
-                    return false;
-                }
+            for (DBACredentialsProvider contextCredentialsProvider : getContextCredentialsProviders()) {
+                contextCredentialsProvider.provideAuthParameters(monitor, dataSourceContainer, configuration);
             }
+
             WebConnectionInfo webConnectionInfo = findWebConnectionInfo(dataSourceContainer.getId());
             if (webConnectionInfo != null) {
                 WebDataSourceUtils.saveCredentialsInDataSource(webConnectionInfo, dataSourceContainer, configuration);
@@ -927,19 +925,42 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         return true;
     }
 
+    @NotNull
+    @Override
+    public String getAuthContextType() {
+        return WEB_SESSION_AUTH_CONTEXT_TYPE;
+    }
+
     // May be called to extract auth information from session
     @Override
     public <T> T getAdapter(Class<T> adapter) {
         synchronized (authTokens) {
             for (WebAuthInfo authInfo : authTokens) {
-                if (authInfo != null && authInfo.getAuthSession() != null) {
-                    if (adapter.isInstance(authInfo.getAuthSession())) {
-                        return adapter.cast(authInfo.getAuthSession());
-                    }
+                if (isAuthInfoInstanceOf(authInfo, adapter)) {
+                    return adapter.cast(authInfo.getAuthSession());
                 }
             }
         }
         return null;
+    }
+
+    @NotNull
+    public <T> List<T> getAdapters(Class<T> adapter) {
+        synchronized (authTokens) {
+            return authTokens.stream()
+                .filter(token -> isAuthInfoInstanceOf(token, adapter))
+                .map(token -> adapter.cast(token.getAuthSession()))
+                .collect(Collectors.toList());
+        }
+    }
+
+    private <T> boolean isAuthInfoInstanceOf(WebAuthInfo authInfo, Class<T> adapter) {
+        if (authInfo != null && authInfo.getAuthSession() != null) {
+            if (adapter.isInstance(authInfo.getAuthSession())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     ///////////////////////////////////////////////////////
@@ -973,6 +994,7 @@ public class WebSession extends AbstractSessionPersistent implements SMSession, 
         userContext.refreshSMSession();
     }
 
+    @Nullable
     public VirtualProjectImpl getProjectById(@Nullable String projectId) {
         if (projectId == null) {
             return defaultProject;

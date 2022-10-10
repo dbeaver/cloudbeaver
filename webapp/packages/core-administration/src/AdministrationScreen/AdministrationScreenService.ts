@@ -196,8 +196,10 @@ export class AdministrationScreenService {
   }
 
   isAdministrationRouteActive(routeName: string): boolean {
-    return this.screenService.isActive(routeName, AdministrationScreenService.screenName)
-    || this.screenService.isActive(routeName, AdministrationScreenService.setupName);
+    return (
+      this.screenService.isActive(routeName, AdministrationScreenService.screenName)
+      || this.screenService.isActive(routeName, AdministrationScreenService.setupName)
+    );
   }
 
   async handleDeactivate(state: RouterState, nextState: RouterState): Promise<void> {

@@ -98,20 +98,21 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   }: UserCreateOptions): Promise<AdminUser> {
     const { user } = await this.graphQLService.sdk.createUser({
       userId,
+      enabled,
       ...this.getDefaultIncludes(),
       ...this.getIncludesMap(userId),
     });
 
     try {
       await this.updateCredentials(userId, credentials);
-      await this.enableUser(userId, enabled, true);
+
       for (const roleId of roles) {
         await this.grantRole(userId, roleId, true);
       }
 
       await this.setConnections(userId, grantedConnections);
       await this.setMetaParameters(userId, metaParameters);
-      const user = await this.refresh(userId) as AdminUserNew;
+      const user = await this.refresh(userId) as unknown as AdminUserNew;
       user[NEW_USER_SYMBOL] = true;
     } catch (exception: any) {
       this.delete(userId);

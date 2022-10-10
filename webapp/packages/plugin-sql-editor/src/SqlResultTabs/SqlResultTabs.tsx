@@ -9,10 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
 import { ITabData, TabsState, TabList, TabPanel, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
@@ -90,13 +88,12 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
     return styled(style)(<TextPlaceholder>{translate('sql_editor_placeholder')}</TextPlaceholder>);
   }
 
-  const currentId = state.currentTabId || '';
   const tabList = orderedTabs.map(tab => tab.id);
 
   return styled(style)(
     <wrapper>
       <TabsState
-        currentTabId={currentId}
+        currentTabId={state.currentTabId}
         tabList={tabList}
         enabledBaseActions
         onChange={handleSelect}

@@ -5,6 +5,7 @@ import io.cloudbeaver.model.app.BaseWebApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
+import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.nio.file.Path;
@@ -38,6 +39,28 @@ public class RMUtils {
         }
     }
 
+    /**
+     * Different types of project have different location on the workspace. Method returns path to the project.
+     *
+     * @param projectId project name or other identifier
+     * @return path to the project based on the name of projects and prefixes that it contains
+     */
+    @NotNull
+    public static Path getProjectPathByName(@NotNull String projectId) {
+        if (!projectId.contains("_") || projectId.startsWith("_")) {
+            return getRootPath().resolve(BaseWebApplication.getInstance().getDefaultProjectName());
+        }
+        String prefix = projectId.substring(0, projectId.indexOf("_"));
+        switch (RMProjectType.getByPrefix(prefix)) {
+            case GLOBAL:
+                return getRootPath().resolve(BaseWebApplication.getInstance().getDefaultProjectName());
+            case SHARED:
+                return getSharedProjectsPath().resolve(projectId);
+            default:
+                return getUserProjectsPath().resolve(projectId);
+        }
+    }
+
     public static Set<String> parseProjectPermissions(Set<String> permissions) {
        return permissions.stream()
            .map(RMProjectPermission::fromPermission).filter(Objects::nonNull)
@@ -48,8 +71,8 @@ public class RMUtils {
     public static RMProject createAnonymousProject() {
         RMProject project = new RMProject("anonymous");
         project.setId("anonymous");
-        project.setType(RMProject.Type.USER);
-        project.setProjectPermissions(RMProjectPermission.CONNECTIONS_EDIT.getAllPermissions());
+        project.setType(RMProjectType.USER);
+        project.setProjectPermissions(RMProjectPermission.DATA_SOURCES_EDIT.getAllPermissions());
         return project;
     }
 }

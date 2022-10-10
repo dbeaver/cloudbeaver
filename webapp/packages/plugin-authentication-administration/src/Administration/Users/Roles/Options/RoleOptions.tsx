@@ -11,10 +11,10 @@ import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { PermissionsResource } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, FieldCheckbox, Group, GroupTitle, InputField, SubmittingForm, Textarea, useMapResource } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, FieldCheckbox, Group, GroupTitle, InputField, SubmittingForm, Textarea, useMapResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IRoleFormProps } from '../IRoleFormProps';

@@ -3,11 +3,12 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: io.cloudbeaver.service.rm;singleton:=true
-Bundle-Version: 1.0.9.qualifier
-Bundle-Release-Date: 20220905
+Bundle-Version: 1.0.11.qualifier
+Bundle-Release-Date: 20221010
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
-Require-Bundle: io.cloudbeaver.server
+Require-Bundle: io.cloudbeaver.server,
+ io.cloudbeaver.service.admin
 Bundle-Localization: OSGI-INF/l10n/bundle
 Automatic-Module-Name: io.cloudbeaver.service.rm

@@ -9,8 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { IconOrImage } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
 import { EOrder, getNextOrder, IDatabaseDataModel, ResultSetConstraintAction } from '@cloudbeaver/plugin-data-viewer';
 
 const styles = css`

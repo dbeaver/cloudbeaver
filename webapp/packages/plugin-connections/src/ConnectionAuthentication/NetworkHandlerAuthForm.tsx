@@ -9,11 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, FieldCheckbox, GroupTitle, InputField, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, FieldCheckbox, GroupTitle, InputField, useMapResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource } from '@cloudbeaver/core-connections';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 interface Props {
   id: string;

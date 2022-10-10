@@ -9,11 +9,13 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { PermissionsService, EPermission } from '@cloudbeaver/core-root';
 import { MainMenuService, EMainMenu } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionDialog } from './ConnectionDialog/ConnectionDialog';
 import { TemplateConnectionsResource } from './TemplateConnectionsResource';
+import { TemplateConnectionsService } from './TemplateConnectionsService';
 
 @injectable()
 export class TemplateConnectionPluginBootstrap extends Bootstrap {
@@ -22,7 +24,9 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
     private readonly templateConnectionsResource: TemplateConnectionsResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
-    private readonly permissionsService: PermissionsService
+    private readonly permissionsService: PermissionsService,
+    private readonly templateConnectionsService: TemplateConnectionsService,
+    private readonly projectsService: ProjectsService,
   ) {
     super();
   }
@@ -34,7 +38,11 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
       order: 1,
       titleGetter: this.getMenuTitle.bind(this),
       onClick: this.openConnectionsDialog.bind(this),
-      isHidden: () => !this.permissionsService.has(EPermission.public) || !this.templateConnectionsResource.data.length,
+      isHidden: () => (
+        !this.permissionsService.has(EPermission.public)
+        || !this.projectsService.userProject?.canEditDataSources
+        || !this.templateConnectionsService.projectTemplates.length
+      ),
     });
   }
 
@@ -54,6 +62,7 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
 
   private async loadTemplateConnections() {
     try {
+      await this.projectsService.load();
       await this.templateConnectionsResource.load();
     } catch (error: any) {
       this.notificationService.logException(error, 'Template Connections loading failed');

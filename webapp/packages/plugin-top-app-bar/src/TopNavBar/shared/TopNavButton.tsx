@@ -11,9 +11,8 @@ import { ButtonHTMLAttributes, forwardRef } from 'react';
 import { Button } from 'reakit/Button';
 import styled, { css, use } from 'reshadow';
 
-import { Icon, IconOrImage, Loader } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
+import { Icon, IconOrImage, Loader, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { topMenuStyles } from './topMenuStyles';
 

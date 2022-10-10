@@ -9,12 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, ColoredContainer, FormFieldDescription, Group, IconOrImage, Link, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, ColoredContainer, FormFieldDescription, Group, IconOrImage, Link, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { ThemeService, useStyles } from '@cloudbeaver/core-theming';
+import { ThemeService } from '@cloudbeaver/core-theming';
 import { useAppVersion } from '@cloudbeaver/plugin-version';
 
 const dialogStyles = css`
@@ -41,7 +40,6 @@ const productInfoDialogStyles = css`
 export const ProductInfoDialog = observer<DialogComponentProps<null>>(
   function ProductInfoDialog(props) {
     const translate = useTranslate();
-    const styles = useStyles(BASE_CONTAINERS_STYLES, productInfoDialogStyles);
     const serverConfigResource = useService(ServerConfigResource);
     const themeService = useService(ThemeService);
 
@@ -50,7 +48,7 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(
     const productInfo = serverConfigResource.data?.productInfo;
     const logoIcon = themeService.currentThemeId === 'light' ? '/icons/product-logo_light.svg' : '/icons/product-logo_dark.svg';
 
-    return styled(styles)(
+    return styled(BASE_CONTAINERS_STYLES, productInfoDialogStyles)(
       <CommonDialogWrapper
         size='large'
         title="app_product_info"

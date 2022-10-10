@@ -15,7 +15,7 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "test": "core-cli-test"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-sdk": "~0.1.0",
     "@cloudbeaver/core-plugin": "~0.1.0",

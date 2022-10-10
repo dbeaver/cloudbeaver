@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { usePermission } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { usePermission, ServerService } from '@cloudbeaver/core-root';
+import { ServerService } from '@cloudbeaver/core-root';
 import type { ServerConfig } from '@cloudbeaver/core-sdk';
 
 import { EAdminPermission } from './EAdminPermission';

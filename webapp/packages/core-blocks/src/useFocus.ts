@@ -22,9 +22,11 @@ interface FocusOptions {
 interface IState<T extends HTMLElement> {
   focus: boolean;
   reference: T | null;
+  lastFocus: HTMLElement | null;
   setRef: (ref: T | null) => void;
   updateFocus: () => void;
   focusFirstChild: () => void;
+  restoreFocus: () => void;
 }
 
 export function useFocus<T extends HTMLElement>({
@@ -38,6 +40,7 @@ export function useFocus<T extends HTMLElement>({
     () => ({
       reference: null,
       focus: false,
+      lastFocus: null,
       setRef(ref: T | null) {
         if (this.reference !== ref) {
           this.reference = ref;
@@ -47,11 +50,21 @@ export function useFocus<T extends HTMLElement>({
       },
       updateFocus() {
         if (this.reference) {
+          if (
+            document.activeElement instanceof HTMLElement
+            && document.activeElement !== this.reference
+            && (optionsRef.autofocus || optionsRef.focusFirstChild)
+          ) {
+            this.lastFocus = document.activeElement;
+          }
+
           if (optionsRef.autofocus) {
             this.reference.focus();
           }
 
           this.focusFirstChild();
+        } else {
+          this.restoreFocus();
         }
       },
       focusFirstChild() {
@@ -80,12 +93,22 @@ export function useFocus<T extends HTMLElement>({
           }
         }
       },
+      restoreFocus() {
+        if (this.lastFocus?.tabIndex === -1) {
+          return;
+        }
+
+        this.lastFocus?.focus();
+        this.lastFocus = null;
+      },
     }),
     {
       focus: observable.ref,
+      lastFocus: observable.ref,
       reference: observable.ref,
       setRef: action.bound,
       updateFocus: action.bound,
+      restoreFocus: action.bound,
     },
     false,
     undefined,
@@ -123,6 +146,10 @@ export function useFocus<T extends HTMLElement>({
       reference.removeEventListener('focusout', blurHandler);
     };
   }, [state.reference]);
+
+  useEffect(() => () => {
+    state.restoreFocus();
+  }, []);
 
   return [state.setRef, state];
 }

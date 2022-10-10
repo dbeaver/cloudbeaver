@@ -10,10 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef, useRef } from 'react';
 import styled from 'reshadow';
 
-import { getComputed, IMenuState, Menu, MenuItemElement, menuPanelStyles, useObjectRef } from '@cloudbeaver/core-blocks';
+import { getComputed, IMenuState, Menu, MenuItemElement, menuPanelStyles, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
-import { DATA_CONTEXT_MENU_NESTED, IMenuData, IMenuSubMenuItem, MenuActionItem, MenuService, useMenu } from '@cloudbeaver/core-view';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { DATA_CONTEXT_MENU_NESTED, DATA_CONTEXT_SUBMENU_ITEM, IMenuData, IMenuSubMenuItem, MenuActionItem, MenuService, useMenu } from '@cloudbeaver/core-view';
 
 import type { IMenuItemRendererProps } from './MenuItemRenderer';
 
@@ -21,7 +21,8 @@ interface ISubMenuElementProps extends Omit<React.ButtonHTMLAttributes<any>, 'st
   menuData: IMenuData;
   subMenu: IMenuSubMenuItem;
   itemRenderer: React.FC<IMenuItemRendererProps>;
-  rtl?: boolean;
+  menuModal?: boolean;
+  menuRtl?: boolean;
   onItemClose?: () => void;
   style?: ComponentStyle;
 }
@@ -32,7 +33,8 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
     subMenu,
     itemRenderer,
     style,
-    rtl,
+    menuModal: modal,
+    menuRtl: rtl,
     onItemClose,
     ...rest
   },
@@ -43,6 +45,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
   const styles = useStyles(menuPanelStyles, style);
   const subMenuData = useMenu({ menu: subMenu.menu, context: menuData.context });
   subMenuData.context.set(DATA_CONTEXT_MENU_NESTED, true);
+  subMenuData.context.set(DATA_CONTEXT_SUBMENU_ITEM, subMenu);
 
   const handler = menuService.getHandler(subMenuData.context);
   const hidden = getComputed(() => handler?.isHidden?.(subMenuData.context));
@@ -72,6 +75,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
   const loading = getComputed(() => handler?.isLoading?.(subMenuData.context));
   const disabled = getComputed(() => handler?.isDisabled?.(subMenuData.context));
   const MenuItemRenderer = itemRenderer;
+  const panelAvailable = subMenuData.available && !loading;
 
   return styled(styles)(
     <Menu
@@ -84,22 +88,28 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
           item={item}
           menuData={subMenuData}
           menu={menu.current}
+          rtl={rtl}
+          modal={modal}
           style={style}
           onItemClose={handlers.handleItemClose}
         />
       ))}
       rtl={rtl}
+      modal={modal}
       style={style}
-      panelAvailable={subMenuData.available && !loading}
+      placement={rtl ? 'left-start' : 'right-start'}
+      panelAvailable={panelAvailable}
       disabled={disabled}
       getHasBindings={handlers.hasBindings}
+      submenu
       onVisibleSwitch={handlers.handleVisibleSwitch}
       {...rest}
     >
       <MenuItemElement
-        label={subMenu.menu.label}
-        icon={subMenu.menu.icon}
-        tooltip={subMenu.menu.tooltip}
+        label={subMenu.label ?? subMenu.menu.label}
+        icon={subMenu.icon ?? subMenu.menu.icon}
+        tooltip={subMenu.tooltip ?? subMenu.menu.tooltip}
+        panelAvailable={panelAvailable}
         loading={loading}
         style={style}
         menu

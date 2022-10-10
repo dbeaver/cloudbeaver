@@ -68,7 +68,7 @@ public class CBDatabase {
     public static final String SCHEMA_UPDATE_SQL_PATH = "db/cb_schema_update_";
 
     private static final int LEGACY_SCHEMA_VERSION = 1;
-    private static final int CURRENT_SCHEMA_VERSION = 9;
+    private static final int CURRENT_SCHEMA_VERSION = 10;
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
@@ -246,7 +246,7 @@ public class CBDatabase {
 
         if (adminUser == null) {
             adminUser = new SMUser(adminName);
-            adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters());
+            adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters(), true);
         }
 
         if (!CommonUtils.isEmpty(adminPassword)) {

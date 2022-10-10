@@ -8,12 +8,12 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { compareConnectionsInfo, ConnectionInfoResource, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { compareNewConnectionsInfo, ConnectionInfoResource, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 @injectable()
@@ -33,8 +33,11 @@ export class ConnectionsAdministrationController {
   get connectionsData(): [IConnectionInfoParams, DatabaseConnection][] {
     return Array.from(this.connectionInfoResource.data.entries())
       .slice()
-      .filter(([key]) => key.projectId === PROJECT_GLOBAL_ID) // TODO: rework?
-      .sort(([, connectionA], [, connectionB]) => compareConnectionsInfo(
+      .filter(([key]) => this.projectsService.activeProjects.some(
+        project => project.id === key.projectId
+        && project.shared
+      ))
+      .sort(([, connectionA], [, connectionB]) => compareNewConnectionsInfo(
         connectionA,
         connectionB
       ));
@@ -49,6 +52,7 @@ export class ConnectionsAdministrationController {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly localizationService: LocalizationService,
+    private readonly projectsService: ProjectsService
   ) {
     makeObservable(this, {
       isProcessing: observable,

@@ -17,7 +17,6 @@
 
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.service.session.WebSessionManager;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
@@ -27,7 +26,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
-import org.jkiss.dbeaver.model.app.DBASecureStorage;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderRegistry;
@@ -48,7 +46,6 @@ import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.osgi.framework.Bundle;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -80,7 +77,6 @@ public class CBPlatform extends BasePlatformImpl {
     private DBACertificateStorage certificateStorage;
     private WebWorkspace workspace;
 
-    private WebSessionManager sessionManager;
     private final List<DBPDriver> applicableDrivers = new ArrayList<>();
 
     public static CBPlatform getInstance() {
@@ -146,13 +142,11 @@ public class CBPlatform extends BasePlatformImpl {
         this.queryManager.registerMetaListener(qmLogWriter);
 
         this.certificateStorage = new DefaultCertificateStorage(
-            new File(WebPlatformActivator.getInstance().getStateLocation().toFile(), "security"));
+            WebPlatformActivator.getInstance().getStateLocation().toFile().toPath().resolve("security"));
 
         super.initialize();
 
         refreshApplicableDrivers();
-
-        sessionManager = WebSessionManager.getInstance();
 
         new WebSessionMonitorJob(this).scheduleMonitor();
 
@@ -239,12 +233,6 @@ public class CBPlatform extends BasePlatformImpl {
     }
 
     @NotNull
-    @Override
-    public DBASecureStorage getSecureStorage() {
-        return application.getSecureStorage();
-    }
-
-    @NotNull
     public Path getTempFolder(DBRProgressMonitor monitor, String name) {
         if (tempFolder == null) {
             // Make temp folder
@@ -280,7 +268,7 @@ public class CBPlatform extends BasePlatformImpl {
     }
 
     public WebSessionManager getSessionManager() {
-        return sessionManager;
+        return application.getSessionManager();
     }
 
     public void refreshApplicableDrivers() {
@@ -290,19 +278,23 @@ public class CBPlatform extends BasePlatformImpl {
             for (DBPDriver driver : dspd.getEnabledDrivers()) {
                 List<? extends DBPDriverLibrary> libraries = driver.getDriverLibraries();
                 {
-                    if (!WebDriverRegistry.getInstance().isDriverEnabled(driver)) {
+                    if (!application.getDriverRegistry().isDriverEnabled(driver)) {
                         continue;
                     }
-                    boolean hasAllFiles = true;
+                    boolean hasAllFiles = true, hasJars = false;
                     for (DBPDriverLibrary lib : libraries) {
                         if (!lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
-                            (lib.getLocalFile() == null || !lib.getLocalFile().exists())) {
+                            (lib.getLocalFile() == null || !Files.exists(lib.getLocalFile())))
+                        {
                             hasAllFiles = false;
                             log.error("\tDriver '" + driver.getId() + "' is missing library '" + lib.getDisplayName() + "'");
-                            break;
+                        } else {
+                            if (lib.getType() == DBPDriverLibrary.FileType.jar) {
+                                hasJars = true;
+                            }
                         }
                     }
-                    if (hasAllFiles) {
+                    if (hasAllFiles || hasJars) {
                         applicableDrivers.add(driver);
                     }
                 }

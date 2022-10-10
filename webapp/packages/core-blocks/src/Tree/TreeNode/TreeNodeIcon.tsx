@@ -8,8 +8,10 @@
 
 import styled, { css } from 'reshadow';
 
-import { StaticImage } from '@cloudbeaver/core-blocks';
-import { ComponentStyle, useStyles } from '@cloudbeaver/core-theming';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
+
+import { StaticImage } from '../../StaticImage';
+import { useStyles } from '../../useStyles';
 
 const styles = css`
   StaticImage {

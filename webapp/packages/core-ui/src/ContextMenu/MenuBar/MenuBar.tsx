@@ -11,7 +11,8 @@ import { forwardRef, useCallback } from 'react';
 import { MenuInitialState, MenuSeparator } from 'reakit';
 import styled, { use } from 'reshadow';
 
-import { useStyles, ComponentStyle } from '@cloudbeaver/core-theming';
+import { useStyles } from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { DATA_CONTEXT_MENU_NESTED, IMenuActionItem, IMenuData, IMenuItem, MenuActionItem, MenuBaseItem, MenuSeparatorItem, MenuSubMenuItem, useMenu } from '@cloudbeaver/core-view';
 
 import { ContextMenu } from '../ContextMenu';

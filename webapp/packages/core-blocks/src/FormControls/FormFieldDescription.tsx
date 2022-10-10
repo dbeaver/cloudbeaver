@@ -8,10 +8,11 @@
 
 import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import { useStyles } from '../useStyles';
 import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 
 const style = css`

@@ -128,6 +128,8 @@ export function useOptions(state: IConnectionFormState) {
           }
         }
       }
+
+      refObject.state.checkFormState();
     },
   });
 }

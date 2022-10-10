@@ -15,6 +15,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource, type INodeActions } from '@cloudbeaver/core-navigation-tree';
 
+import { ElementsTreeContext } from '../ElementsTree/ElementsTreeContext';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../ElementsTree/NavigationNodeComponent';
 import { NavigationNodeEditor } from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeEditor';
 import { TreeNodeMenu } from '../ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenu';
@@ -59,8 +60,10 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
   node,
   dndElement,
   dndPlaceholder,
+  className,
 }, ref) {
   const treeNodeContext = useContext(TreeNodeContext);
+  const elementsTreeContext = useContext(ElementsTreeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
   const selected = treeNodeContext.selected;
@@ -82,8 +85,17 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     treeNodeContext.select(event.ctrlKey || event.metaKey);
   }
 
+  if (elementsTreeContext?.tree.settings?.projects === false) {
+    return null;
+  }
+
   return styled(TREE_NODE_STYLES, styles)(
-    <TreeNodeControl ref={ref} onClick={onClickHandler} {...use({ outdated, editing, dragging: dndElement })}>
+    <TreeNodeControl
+      ref={ref}
+      onClick={onClickHandler}
+      {...use({ outdated, editing, dragging: dndElement })}
+      className={className}
+    >
       <TreeNodeName title={node.name}>
         {editing ? (
           <NavigationNodeEditor node={node} onClose={() => setEditing(false)} />

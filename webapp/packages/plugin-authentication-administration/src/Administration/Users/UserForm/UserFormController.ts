@@ -8,15 +8,19 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { compareRoles, isLocalUser, RoleInfo, RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { AdminUser, compareRoles, isLocalUser, RoleInfo, RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { ConnectionInfoProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
+import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
-import { GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo, CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo } from '@cloudbeaver/core-sdk';
+import { MetadataMap } from '@cloudbeaver/core-utils';
+
+import type { IUserFormState } from './UserFormService';
 
 interface IStatusMessage {
   status: ENotificationType;
@@ -41,6 +45,7 @@ export class UserFormController implements IInitializableController, IDestructib
   credentials: IUserCredentials;
   enabled: boolean;
   statusMessage: IStatusMessage | null;
+  partsState: MetadataMap<string, any>;
 
   get connections(): DatabaseConnection[] {
     return this.connectionInfoResource.get(ConnectionInfoProjectKey(PROJECT_GLOBAL_ID)) as DatabaseConnection[];
@@ -58,6 +63,7 @@ export class UserFormController implements IInitializableController, IDestructib
 
   readonly error: GQLErrorCatcher;
 
+  readonly afterSubmitTask: Executor<IUserFormState>;
   private isDestructed: boolean;
   private connectionAccessChanged: boolean;
   private connectionAccessLoaded: boolean;
@@ -72,18 +78,8 @@ export class UserFormController implements IInitializableController, IDestructib
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly dbDriverResource: DBDriverResource
   ) {
-    makeObservable(this, {
-      selectedConnections: observable,
-      grantedConnections: observable,
-      isSaving: observable,
-      isLoading: observable,
-      credentials: observable,
-      enabled: observable.ref,
-      statusMessage: observable,
-      connections: computed,
-      roles: computed,
-    });
-
+    this.partsState = new MetadataMap();
+    this.afterSubmitTask = new Executor();
     this.selectedConnections = new Map();
     this.grantedConnections = [];
     this.isSaving = false;
@@ -101,6 +97,18 @@ export class UserFormController implements IInitializableController, IDestructib
     this.connectionAccessChanged = false;
     this.connectionAccessLoaded = false;
     this.statusMessage = null;
+
+    makeObservable(this, {
+      selectedConnections: observable,
+      grantedConnections: observable,
+      isSaving: observable,
+      isLoading: observable,
+      credentials: observable,
+      enabled: observable.ref,
+      statusMessage: observable,
+      connections: computed,
+      roles: computed,
+    });
   }
 
   init(): void { }
@@ -129,8 +137,9 @@ export class UserFormController implements IInitializableController, IDestructib
 
     this.isSaving = true;
     try {
+      let user: AdminUser;
       if (!this.editing) {
-        await this.usersResource.create({
+        user = await this.usersResource.create({
           userId: this.credentials.login,
           credentials: {
             profile: '0',
@@ -141,6 +150,7 @@ export class UserFormController implements IInitializableController, IDestructib
           metaParameters: this.credentials.metaParameters,
           grantedConnections: this.getGrantedConnections(),
         });
+
         this.collapse();
         this.notificationService.logSuccess({ title: 'authentication_administration_user_created' });
       } else {
@@ -157,9 +167,25 @@ export class UserFormController implements IInitializableController, IDestructib
         await this.saveUserStatus();
         await this.saveConnectionPermissions();
         await this.saveMetaParameters();
-        await this.usersResource.refresh(this.user.userId);
+        user = await this.usersResource.refresh(this.user.userId);
+
         this.notificationService.logSuccess({ title: 'authentication_administration_user_updated' });
       }
+
+      const context = await this.afterSubmitTask.execute({
+        user,
+        partsState: this.partsState,
+        props: {
+          controller: this,
+          user: this.user,
+          editing: this.editing,
+        },
+      });
+
+      if (ExecutorInterrupter.isInterrupted(context)) {
+        return;
+      }
+
       this.error.clear();
       this.statusMessage = null;
     } catch (exception: any) {

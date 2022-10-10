@@ -9,8 +9,6 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-theming';
-
 import type { ObjectPagePanelComponent } from '../ObjectPage/ObjectPage';
 import { ObjectFolders } from './ObjectFolders';
 
@@ -27,9 +25,7 @@ const viewerStyles = css`
 export const ObjectPropertiesPagePanel: ObjectPagePanelComponent = observer(function ObjectPropertiesPagePanel({
   tab,
 }) {
-  const style = useStyles(viewerStyles);
-
-  return styled(style)(
+  return styled(viewerStyles)(
     <wrapper>
       <ObjectFolders tab={tab} />
     </wrapper>

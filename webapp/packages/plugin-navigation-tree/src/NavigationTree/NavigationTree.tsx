@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useUserData } from '@cloudbeaver/core-blocks';
+import { Translate, usePermission, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { Translate } from '@cloudbeaver/core-localization';
-import { NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
-import { usePermission, EPermission } from '@cloudbeaver/core-root';
+import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import { ProjectsService } from '@cloudbeaver/core-projects';
+import { EPermission } from '@cloudbeaver/core-root';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavNodeViewService } from '../NodesManager/NavNodeView/NavNodeViewService';
@@ -27,8 +27,10 @@ import { getNavigationTreeUserSettingsId } from './getNavigationTreeUserSettings
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter';
 import { NavigationTreeService } from './NavigationTreeService';
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';
+import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigationTreeProjectSearchCompare';
 import { navigationTreeProjectsExpandStateGetter } from './ProjectsRenderer/navigationTreeProjectsExpandStateGetter';
 import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navigationTreeProjectsRendererRenderer';
+import { ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm';
 import { useNavigationTree } from './useNavigationTree';
 
 const navigationTreeStyles = css`
@@ -74,6 +76,8 @@ const elementsTreeStyles = css`
   `;
 
 export const NavigationTree = observer(function NavigationTree() {
+  const projectsNavNodeService = useService(ProjectsNavNodeService);
+  const projectsService = useService(ProjectsService);
   const navTreeService = useService(NavigationTreeService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
@@ -90,7 +94,7 @@ export const NavigationTree = observer(function NavigationTree() {
   const settings = useUserData<IElementsTreeSettings>(
     getNavigationTreeUserSettingsId(root),
     createElementsTreeSettings,
-    () => {},
+    () => { },
     validateElementsTreeSettings
   );
 
@@ -100,13 +104,15 @@ export const NavigationTree = observer(function NavigationTree() {
     [navNodeInfoResource]
   );
   const projectsExpandStateGetter = useMemo(
-    () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource),
-    [navNodeInfoResource]
+    () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource, projectsService, projectsNavNodeService),
+    [navNodeInfoResource, projectsService, projectsNavNodeService]
   );
   const projectFilter = useMemo(
-    () => navigationTreeProjectFilter(navNodeInfoResource, navTreeResource),
-    [navNodeInfoResource, navTreeResource]
+    () => navigationTreeProjectFilter(projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource),
+    [projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource]
   );
+
+  const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);
 
   if (!isEnabled) {
     return null;
@@ -119,7 +125,9 @@ export const NavigationTree = observer(function NavigationTree() {
         localState={navTreeService.treeState}
         filters={[duplicateFilter, connectionGroupFilter, projectFilter]}
         renderers={[projectsRendererRenderer, navigationTreeConnectionGroupRenderer]}
+        navNodeFilterCompare={navigationTreeProjectSearchCompare}
         expandStateGetters={[projectsExpandStateGetter]}
+        settingsElements={settingsElements}
         emptyPlaceholder={() => styled(navigationTreeStyles)(
           <center>
             <message>

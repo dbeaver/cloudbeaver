@@ -9,12 +9,12 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { SubmittingForm, useFocus, Button } from '@cloudbeaver/core-blocks';
+import { SubmittingForm, useFocus, Button, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useDBDriver } from '@cloudbeaver/core-connections';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
+
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { ConnectionAuthenticationForm } from './ConnectionAuthenticationForm';
 

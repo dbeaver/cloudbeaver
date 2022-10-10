@@ -14,13 +14,11 @@ import styled, { css } from 'reshadow';
 import {
   Table, TableHeader, TableColumnHeader, TableBody,
   TableItem, TableColumnValue, TableItemSelect, StaticImage,
-  TextPlaceholder, ColoredContainer, BASE_CONTAINERS_STYLES, Group
+  TextPlaceholder, ColoredContainer, BASE_CONTAINERS_STYLES, Group, useTranslate, useStyles
 } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { AdminSubjectType } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IUserFormProps } from './UserFormService';

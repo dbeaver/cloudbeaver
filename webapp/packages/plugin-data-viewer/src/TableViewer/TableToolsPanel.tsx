@@ -9,8 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TextPlaceholder } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';

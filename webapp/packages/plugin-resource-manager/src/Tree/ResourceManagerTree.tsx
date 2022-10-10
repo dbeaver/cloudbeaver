@@ -7,17 +7,24 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, useDataResource } from '@cloudbeaver/core-blocks';
+import { Loader, useDataResource, useTranslate, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { createPath } from '@cloudbeaver/core-utils';
+import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CaptureView } from '@cloudbeaver/core-view';
-import { NavigationTreeService, ElementsTree, NavigationNodeControl } from '@cloudbeaver/plugin-navigation-tree';
+import { NavigationTreeService, ElementsTree, IElementsTreeSettings, createElementsTreeSettings, validateElementsTreeSettings, getNavigationTreeUserSettingsId } from '@cloudbeaver/plugin-navigation-tree';
 
+import { ResourcesProjectsNavNodeService } from '../NavNodes/ResourcesProjectsNavNodeService';
 import { ResourceProjectsResource } from '../ResourceProjectsResource';
 import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
+import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';
+import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigationTreeProjectSearchCompare';
+import { navigationTreeProjectsExpandStateGetter } from './ProjectsRenderer/navigationTreeProjectsExpandStateGetter';
+import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navigationTreeProjectsRendererRenderer';
+import { ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm';
 
 const styles = css`
   CaptureView {
@@ -53,19 +60,71 @@ const styles = css`
 
 
 export const ResourceManagerTree = observer(function ResourceManagerTree() {
+  const root = RESOURCES_NODE_PATH;
+
   const translate = useTranslate();
+
+  const resourcesProjectsNavNodeService = useService(ResourcesProjectsNavNodeService);
+  const projectsService = useService(ProjectsService);
+  const navNodeInfoResource = useService(NavNodeInfoResource);
+  const navTreeResource = useService(NavTreeResource);
   const navTreeService = useService(NavigationTreeService);
 
+  const settings = useUserData<IElementsTreeSettings>(
+    getNavigationTreeUserSettingsId(root),
+    createElementsTreeSettings,
+    () => { },
+    validateElementsTreeSettings
+  );
+
   const { resource } = useDataResource(ResourceManagerTree, ResourceProjectsResource, undefined);
+
+  const projectsRendererRenderer = useMemo(
+    () => navigationTreeProjectsRendererRenderer(navNodeInfoResource),
+    [navNodeInfoResource]
+  );
+  const projectsExpandStateGetter = useMemo(
+    () => navigationTreeProjectsExpandStateGetter(
+      navNodeInfoResource,
+      projectsService,
+      resourcesProjectsNavNodeService
+    ),
+    [
+      navNodeInfoResource,
+      projectsService,
+      resourcesProjectsNavNodeService,
+    ]
+  );
+  const projectFilter = useMemo(
+    () => navigationTreeProjectFilter(
+      resourcesProjectsNavNodeService,
+      projectsService,
+      navNodeInfoResource,
+      navTreeResource
+    ),
+    [
+      resourcesProjectsNavNodeService,
+      projectsService,
+      navNodeInfoResource,
+      navTreeResource,
+    ]
+  );
+
+  const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);
 
   return styled(styles)(
     <Loader state={resource}>
       <CaptureView view={navTreeService}>
         <ElementsTree
-          root={createPath(RESOURCES_NODE_PATH, resource.userProject?.id)}
+          root={root}
           getChildren={navTreeService.getChildren}
           loadChildren={navTreeService.loadNestedNodes}
-          control={NavigationNodeControl}
+          settings={settings}
+          filters={[projectFilter]}
+          renderers={[projectsRendererRenderer]}
+          expandStateGetters={[projectsExpandStateGetter]}
+          navNodeFilterCompare={navigationTreeProjectSearchCompare}
+          settingsElements={settingsElements}
           emptyPlaceholder={() => styled(styles)(
             <center>
               <message>

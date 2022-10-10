@@ -9,11 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { TabTitle, Tab, TabContainerTabComponent } from '@cloudbeaver/core-ui';
-import { useMapResource } from '@cloudbeaver/core-blocks';
+import { Translate, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
-import { Translate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+import { TabTitle, Tab, TabContainerTabComponent } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 

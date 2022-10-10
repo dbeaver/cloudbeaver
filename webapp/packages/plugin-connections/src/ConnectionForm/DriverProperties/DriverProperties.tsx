@@ -11,10 +11,10 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, IProperty, Loader, PropertiesTable, useMapResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, IProperty, Loader, PropertiesTable, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
@@ -66,10 +66,10 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
     DBDriverResource,
     { key: (selected && formState.config.driverId) || null, includes: ['includeDriverProperties'] },
     {
-      isActive: () => selected && !!formState.config.driverId,
+      active: selected && !!formState.config.driverId,
       onData: driver => {
         for (const key of Object.keys(formState.config.properties)) {
-          if (driver.driverProperties?.some(property => property.id === key)
+          if (driver.driverProperties.some(property => property.id === key)
            || state.propertiesList.some(property => property.key === key)) {
             continue;
           }
@@ -105,6 +105,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
               properties={joinedProperties.get()}
               propertiesState={formState.config.properties}
               readOnly={formState.readonly}
+              filterable
               onAdd={state.add}
               onRemove={state.remove}
             />

@@ -10,10 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Switch } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { BASE_CONTAINERS_STYLES, Switch, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual } from '@cloudbeaver/core-root';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState';
 

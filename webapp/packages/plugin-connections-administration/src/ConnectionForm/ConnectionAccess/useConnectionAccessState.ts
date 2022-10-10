@@ -8,7 +8,7 @@
 
 import { action, computed, observable } from 'mobx';
 
-import { useObservableRef } from '@cloudbeaver/core-blocks';
+import { IAutoLoadable, useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -18,8 +18,7 @@ import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
 
-
-interface State {
+interface State extends IAutoLoadable {
   state: IConnectionAccessTabState;
   changed: boolean;
   edit: () => void;
@@ -34,8 +33,15 @@ export function useConnectionAccessState(connection: DatabaseConnectionFragment 
   const state = useTabState<IConnectionAccessTabState>();
 
   return useObservableRef(() => ({
+    exception: null as Error | null,
     get changed() {
       return !isArraysEqual(this.state.initialGrantedSubjects, this.state.grantedSubjects);
+    },
+    isLoading() {
+      return this.state.loading;
+    },
+    isLoaded() {
+      return this.state.loaded;
     },
     edit() {
       this.state.editing = !this.state.editing;
@@ -46,8 +52,14 @@ export function useConnectionAccessState(connection: DatabaseConnectionFragment 
     grant(subjectIds: string[]) {
       this.state.grantedSubjects.push(...subjectIds);
     },
-    async load() {
-      if (this.state.loaded || this.state.loading) {
+    async load(reload = false) {
+      let loaded = this.exception || this.state.loaded;
+
+      if (reload) {
+        loaded = false;
+      }
+
+      if (loaded || this.state.loading) {
         return;
       }
 
@@ -62,14 +74,29 @@ export function useConnectionAccessState(connection: DatabaseConnectionFragment 
         }
 
         this.state.loaded = true;
+        this.exception = null;
       } catch (exception: any) {
         this.notificationService.logException(exception, 'connections_connection_edit_access_load_failed');
+        this.exception = exception;
       } finally {
         this.state.loading = false;
       }
     },
+    async reload() {
+      this.load(true);
+    },
   }),
-  { state: observable.ref, changed: computed, edit: action.bound, revoke: action.bound, grant: action.bound },
+  {
+    exception: observable.ref,
+    state: observable.ref,
+    changed: computed,
+    edit: action.bound,
+    isLoading: action.bound,
+    isLoaded: action.bound,
+    reload: action.bound,
+    revoke: action.bound,
+    grant: action.bound,
+  },
   { state, connection, resource, notificationService },
   ['load']);
 }

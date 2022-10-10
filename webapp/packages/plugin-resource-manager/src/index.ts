@@ -9,3 +9,4 @@ export * from './SaveScriptDialog';
 export * from './ResourceManagerService';
 export * from './ResourceProjectsResource';
 export * from './RESOURCES_NODE_PATH';
+export * from './NavNodes/ResourcesProjectsNavNodeService';

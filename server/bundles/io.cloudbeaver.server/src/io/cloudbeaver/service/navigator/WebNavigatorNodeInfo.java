@@ -20,21 +20,24 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
+import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.*;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
 import org.jkiss.dbeaver.registry.DataSourceFolder;
-import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.util.ArrayList;
@@ -159,16 +162,22 @@ public class WebNavigatorNodeInfo {
             isShared = !((DBNDatabaseNode) node).getOwnerProject().getName().equals(session.getUserId());
         } else if (node instanceof DBNLocalFolder) {
             DataSourceFolder folder = (DataSourceFolder) ((DBNLocalFolder) node).getFolder();
-            String projectName = folder.getDataSourceRegistry().getProject().getName();
+            DBPProject project = folder.getDataSourceRegistry().getProject();
+            String projectName = project.getName();
             Set<DBPDataSourceFolder> tempFolders = folder.getDataSourceRegistry().getTemporaryFolders();
             isShared = !projectName.equals(session.getUserId()) || tempFolders.contains(folder);
+            if (hasNodePermission(RMProjectPermission.DATA_SOURCES_EDIT)) {
+                features.add(NODE_FEATURE_CAN_RENAME);
+                features.add(NODE_FEATURE_CAN_DELETE);
+            }
         }
         if (isShared) {
             features.add(NODE_FEATURE_SHARED);
         }
         if (node instanceof DBNDatabaseNode) {
+            boolean canEditDatasources = hasNodePermission(RMProjectPermission.DATA_SOURCES_EDIT);
             DBSObject object = ((DBNDatabaseNode) node).getObject();
-            if (object != null) {
+            if (object != null && canEditDatasources) {
                 DBEObjectMaker objectManager = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
                     object.getClass(), DBEObjectMaker.class);
                 if (objectManager != null && objectManager.canDeleteObject(object)) {
@@ -184,15 +193,22 @@ public class WebNavigatorNodeInfo {
         if (node instanceof DBNRoot) {
             return features.toArray(new String[0]);
         }
-        VirtualProjectImpl project = session.getProjectById(node.getOwnerProject().getId());
-        if (!project.getRmProject().getProjectPermissions().contains(RMProjectPermission.CONNECTIONS_EDIT.getPermissionId())) {
-            return features.toArray(new String[0]);
-        }
-        if (node instanceof DBNLocalFolder || node instanceof DBNResourceManagerResource) {
-            features.add(NODE_FEATURE_CAN_RENAME);
-            features.add(NODE_FEATURE_CAN_DELETE);
+        if (node instanceof DBNAbstractResourceManagerNode) {
+            if (hasNodePermission(RMProjectPermission.RESOURCE_EDIT)) {
+                features.add(NODE_FEATURE_CAN_RENAME);
+                features.add(NODE_FEATURE_CAN_DELETE);
+            }
         }
         return features.toArray(new String[0]);
+    }
+
+    private boolean hasNodePermission(RMProjectPermission permission) {
+        VirtualProjectImpl project = session.getProjectById(getProjectId());
+        if (project == null) {
+            return false;
+        }
+        RMProject rmProject = project.getRmProject();
+        return SMUtils.hasProjectPermission(session, rmProject, permission);
     }
 
     ///////////////////////////////////

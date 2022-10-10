@@ -11,13 +11,14 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeManagerService, NavTreeResource, NavNodeInfoResource, NodeManagerUtils, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { DATA_CONTEXT_TAB_ID } from '@cloudbeaver/core-ui';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, RESOURCES_NODE_PATH, ResourceProjectsResource } from '@cloudbeaver/plugin-resource-manager';
+import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, RESOURCES_NODE_PATH, ResourceProjectsResource, ResourcesProjectsNavNodeService } from '@cloudbeaver/plugin-resource-manager';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
-import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+import { isSQLEditorTab, SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { isScript } from './isScript';
 import { ResourceSqlDataSource } from './ResourceSqlDataSource';
@@ -36,6 +37,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly notificationService: NotificationService,
     private readonly sqlEditorNavigatorService: SqlEditorNavigatorService,
     private readonly resourceManagerService: ResourceManagerService,
+    private readonly projectsService: ProjectsService,
     private readonly resourceProjectsResource: ResourceProjectsResource,
     private readonly sqlEditorTabResourceService: SqlEditorTabResourceService,
     private readonly commonDialogService: CommonDialogService,
@@ -43,6 +45,8 @@ export class PluginBootstrap extends Bootstrap {
     private readonly menuService: MenuService,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
+    private readonly sqlEditorTabService: SqlEditorTabService,
+    private readonly resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
   ) {
     super();
   }
@@ -58,6 +62,10 @@ export class PluginBootstrap extends Bootstrap {
           const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
 
           if (!state || !tabId) {
+            return false;
+          }
+
+          if (!this.projectsService.activeProjects.some(project => project.canEditResources)) {
             return false;
           }
 
@@ -85,9 +93,13 @@ export class PluginBootstrap extends Bootstrap {
 
           if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
             try {
+              if (!result.projectId) {
+                throw new Error('Project not selected');
+              }
+
               await this.resourceProjectsResource.load();
-              const scriptName = `${result.trim()}.${SCRIPT_EXTENSION}`;
-              const folder = createPath(RESOURCES_NODE_PATH, this.resourceProjectsResource.userProject?.id);
+              const scriptName = `${result.name.trim()}.${SCRIPT_EXTENSION}`;
+              const folder = createPath(RESOURCES_NODE_PATH, result.projectId);
               const resourceData = this.navResourceNodeService.getResourceData(folder);
 
               if (!resourceData) {
@@ -241,6 +253,9 @@ export class PluginBootstrap extends Bootstrap {
           if (previousDataSource) {
             dataSource.setExecutionContext(previousDataSource.executionContext);
           }
+
+          const project = this.resourcesProjectsNavNodeService.getProject(nodeId);
+          this.sqlEditorTabService.attachToProject(context.tab, project?.id ?? null);
         }
       }
     } catch (exception) {

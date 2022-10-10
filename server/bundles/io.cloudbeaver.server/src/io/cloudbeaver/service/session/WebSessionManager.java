@@ -37,24 +37,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Various constants
+ * Web session manager
  */
 public class WebSessionManager {
 
     private static final Log log = Log.getLog(WebSessionManager.class);
 
-    private static WebSessionManager instance;
-
-    public synchronized static WebSessionManager getInstance() {
-        if (instance == null) {
-            instance = new WebSessionManager();
-        }
-        return instance;
-    }
-
+    private final CBApplication application;
     private final Map<String, WebSession> sessionMap = new HashMap<>();
 
-    public WebSessionManager() {
+    public WebSessionManager(CBApplication application) {
+        this.application = application;
     }
 
     public WebSession closeSession(@NotNull HttpServletRequest request) throws DBException {
@@ -71,6 +64,10 @@ public class WebSessionManager {
             }
         }
         return null;
+    }
+
+    protected CBApplication getApplication() {
+        return application;
     }
 
     public boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException {
@@ -95,17 +92,11 @@ public class WebSessionManager {
         HttpSession httpSession = request.getSession(true);
         String sessionId = httpSession.getId();
         WebSession webSession;
-        long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
         synchronized (sessionMap) {
             webSession = sessionMap.get(sessionId);
             if (webSession == null) {
-                CBApplication application = CBApplication.getInstance();
-                Map<String, DBWSessionHandler> sessionHandlers = WebHandlerRegistry.getInstance().getSessionHandlers()
-                    .stream()
-                    .collect(Collectors.toMap(WebSessionHandlerDescriptor::getId, WebSessionHandlerDescriptor::getInstance));
                 try {
-
-                    webSession = new WebSession(httpSession, application, sessionHandlers, maxSessionIdleTime);
+                    webSession = createWebSessionImpl(httpSession);
                 } catch (DBException e) {
                     throw new DBWebException("Failed to create web session", e);
                 }
@@ -125,13 +116,25 @@ public class WebSessionManager {
                 if (updateInfo) {
                     // Update only once per request
                     if (!CommonUtils.toBoolean(request.getAttribute("sessionUpdated"))) {
-                        webSession.updateInfo(request, response, maxSessionIdleTime);
+                        webSession.updateInfo(request, response, application.getMaxSessionIdleTime());
                         request.setAttribute("sessionUpdated", true);
                     }
                 }
             }
         }
         return webSession;
+    }
+
+    @NotNull
+    protected WebSession createWebSessionImpl(@NotNull HttpSession httpSession) throws DBException {
+        return new WebSession(httpSession, application, getSessionHandlers(), application.getMaxSessionIdleTime());
+    }
+
+    @NotNull
+    protected Map<String, DBWSessionHandler> getSessionHandlers() {
+        return WebHandlerRegistry.getInstance().getSessionHandlers()
+            .stream()
+            .collect(Collectors.toMap(WebSessionHandlerDescriptor::getId, WebSessionHandlerDescriptor::getInstance));
     }
 
     @Nullable

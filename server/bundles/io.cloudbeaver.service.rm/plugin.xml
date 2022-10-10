@@ -5,17 +5,19 @@
 
     <extension point="io.cloudbeaver.service">
         <service id="resource.manager" label="Resource management " description="Resource management  services" class="io.cloudbeaver.service.rm.WebServiceBindingRM">
-            <permission id="project-resource-view" label="Project Resource View" description="Allow read only access to resources"
-                        category="general" scope="project"/>
-            <permission id="project-resource-edit" label="Project Resource Edit" description="Allow write access to resources"
-                        category="general" scope="project"/>
+            <permission id="project-resource-view" label="Resource View" description="Allow read only access to resources"
+                        category="resources" scope="project"/>
+            <permission id="project-resource-edit" label="Resource Edit" description="Allow write access to resources"
+                        category="resources" scope="project"/>
 
-            <permission id="project-connection-view" label="Project Connection View" description="Allow view connections in the project"
-                        category="general" scope="project"/>
-            <permission id="project-connection-edit" label="Project Connections Edit"
-                        description="Allow create/edit connections in the project" category="general" scope="project"/>
+            <permission id="project-datasource-view" label="Connection View" description="Allow view connections in the project"
+                        category="datasources" scope="project"/>
+            <permission id="project-datasource-edit" label="Connection Edit"
+                        description="Allow create/edit connections in the project"
+                        category="data-sources" scope="project"/>
 
-<!--            <permission id="project-admin" label="Project Admin" description="Allow manage access to the project" category="general"-->
+
+            <!--            <permission id="project-admin" label="Project Admin" description="Allow manage access to the project" category="general"-->
 <!--                        scope="project"/>-->
 
 <!--            <permission id="rm-admin" label="Resource Manager Admin" description="Allow create/delete projects, manage project access"-->

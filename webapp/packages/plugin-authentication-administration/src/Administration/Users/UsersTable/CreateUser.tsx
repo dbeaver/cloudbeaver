@@ -8,9 +8,10 @@
 
 import styled, { css } from 'reshadow';
 
-import { Translate } from '@cloudbeaver/core-localization';
+
+import { Translate } from '@cloudbeaver/core-blocks';
 import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
-import { useStyles } from '@cloudbeaver/core-theming';
+
 
 import { UserForm } from '../UserForm/UserForm';
 
@@ -54,7 +55,7 @@ export const CreateUser: React.FC<Props> = function CreateUser({
   user,
   onCancel,
 }) {
-  return styled(useStyles(styles))(
+  return styled(styles)(
     <user-create>
       <title-bar><Translate token='authentication_administration_user_connections_user_add' /></title-bar>
       <user-create-content>

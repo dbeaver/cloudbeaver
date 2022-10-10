@@ -10,10 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { css } from 'reshadow';
 
-import { Button, InputField } from '@cloudbeaver/core-blocks';
+import { Button, InputField, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { useTranslate } from '@cloudbeaver/core-localization';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 
 export const dialogStyle = css`

@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 
 import { Split, Pane, ResizerControls, splitStyles, Loader, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useStyles } from '@cloudbeaver/core-theming';
 
 import type { IExecutionPlanTab } from '../../ISqlEditorTabState';
 import { ExecutionPlanTreeBlock } from './ExecutionPlanTreeBlock';
@@ -35,7 +34,6 @@ interface Props {
 export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPanel({
   executionPlanTab,
 }) {
-  const style = useStyles(styles, splitStyles);
   const sqlExecutionPlanService = useService(SqlExecutionPlanService);
   const data = sqlExecutionPlanService.data.get(executionPlanTab.tabId);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
@@ -50,7 +48,7 @@ export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPa
     );
   }
 
-  return styled(style)(
+  return styled(styles, splitStyles)(
     <Split
       {...splitState}
       mode={selectedNode ? splitState.mode : 'minimize'}

@@ -8,8 +8,8 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { Button, PlaceholderComponent } from '@cloudbeaver/core-blocks';
-import { useTranslate } from '@cloudbeaver/core-localization';
+import { Button, PlaceholderComponent, useTranslate } from '@cloudbeaver/core-blocks';
+
 
 import type { IAuthConfigurationFormProps } from './IAuthConfigurationFormProps';
 

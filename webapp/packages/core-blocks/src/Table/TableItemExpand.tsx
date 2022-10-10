@@ -11,9 +11,9 @@ import { useContext, useCallback } from 'react';
 import styled, { use } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
-import { useTranslate } from '@cloudbeaver/core-localization';
 
 import { Icon } from '../Icon';
+import { useTranslate } from '../localization/useTranslate';
 import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 import { EventTableItemExpandFlag } from './EventTableItemExpandFlag';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';

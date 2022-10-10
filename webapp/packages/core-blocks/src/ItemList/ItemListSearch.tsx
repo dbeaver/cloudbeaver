@@ -11,10 +11,12 @@ import {
 } from 'react';
 import styled, { use } from 'reshadow';
 
-import { useTranslate } from '@cloudbeaver/core-localization';
-import { useStyles } from '@cloudbeaver/core-theming';
+
+
 
 import { IconButton } from '../IconButton';
+import { useTranslate } from '../localization/useTranslate';
+import { useStyles } from '../useStyles';
 import { Styles } from './styles';
 
 interface IProps {

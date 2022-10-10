@@ -9,8 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { Translate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { Translate } from '@cloudbeaver/core-localization';
 import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
 import type { NavigationNodeRendererComponent } from '../NavigationNodeComponent';

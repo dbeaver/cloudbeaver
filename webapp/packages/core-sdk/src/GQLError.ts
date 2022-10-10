@@ -25,7 +25,7 @@ export class GQLError extends DetailsError {
 
     if (typeof clientError.response.error === 'string') {
       message = clientError.response.error;
-    } else if (clientError.response.errors && clientError.response.errors.length > 0){
+    } else if (clientError.response.errors && clientError.response.errors.length > 0) {
       message = clientError.response.errors
         .map(e => e.message)
         .join('\n');
@@ -37,7 +37,7 @@ export class GQLError extends DetailsError {
     this.name = 'Server Error';
     this.response = clientError.response;
     this.request = clientError.request;
-    
+
     if (typeof clientError.response.error === 'string') {
       this.isTextBody = true;
     } else {

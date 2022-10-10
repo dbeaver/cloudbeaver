@@ -44,7 +44,7 @@ public class WebDriverRegistry {
 
     private final Set<String> webDrivers = new HashSet<>();
 
-    private WebDriverRegistry() {
+    protected WebDriverRegistry() {
     }
 
     private void loadExtensions(IExtensionRegistry registry) {
