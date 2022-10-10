@@ -404,6 +404,7 @@ export interface Mutation {
   rmDeleteResource?: Maybe<Scalars['Boolean']>;
   rmMoveResource: Scalars['String'];
   rmSetProjectPermissions: Scalars['Boolean'];
+  rmSetResourceProperty: Scalars['Boolean'];
   rmSetSubjectProjectPermissions: Scalars['Boolean'];
   rmWriteResourceStringContent: Scalars['String'];
   setConnectionNavigatorSettings: ConnectionInfo;
@@ -600,6 +601,14 @@ export interface MutationRmMoveResourceArgs {
 export interface MutationRmSetProjectPermissionsArgs {
   permissions: Array<RmSubjectProjectPermissions>;
   projectId: Scalars['String'];
+}
+
+
+export interface MutationRmSetResourcePropertyArgs {
+  name: Scalars['ID'];
+  projectId: Scalars['String'];
+  resourcePath: Scalars['String'];
+  value?: InputMaybe<Scalars['String']>;
 }
 
 
@@ -1364,6 +1373,7 @@ export interface RmResource {
   folder: Scalars['Boolean'];
   length: Scalars['Int'];
   name: Scalars['String'];
+  properties: Scalars['Object'];
 }
 
 export interface RmSubjectProjectPermissions {
@@ -2551,7 +2561,7 @@ export type GetResourceListQueryVariables = Exact<{
 }>;
 
 
-export type GetResourceListQuery = { resources: Array<{ name: string, folder: boolean, length: number }> };
+export type GetResourceListQuery = { resources: Array<{ name: string, folder: boolean, length: number, properties: any }> };
 
 export type GetResourceProjectListQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2594,6 +2604,16 @@ export type SetProjectPermissionsMutationVariables = Exact<{
 
 
 export type SetProjectPermissionsMutation = { rmSetProjectPermissions: boolean };
+
+export type SetResourcePropertyMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  resourcePath: Scalars['String'];
+  name: Scalars['ID'];
+  value?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type SetResourcePropertyMutation = { rmSetResourceProperty: boolean };
 
 export type SetSubjectProjectsPermissionsMutationVariables = Exact<{
   subjectId: Scalars['String'];
@@ -4121,6 +4141,7 @@ export const GetResourceListDocument = `
     name
     folder
     length
+    properties
   }
 }
     `;
@@ -4169,6 +4190,16 @@ export const ReadResourceDocument = `
 export const SetProjectPermissionsDocument = `
     mutation setProjectPermissions($projectId: String!, $permissions: [RMSubjectProjectPermissions!]!) {
   rmSetProjectPermissions(projectId: $projectId, permissions: $permissions)
+}
+    `;
+export const SetResourcePropertyDocument = `
+    mutation setResourceProperty($projectId: String!, $resourcePath: String!, $name: ID!, $value: String) {
+  rmSetResourceProperty(
+    projectId: $projectId
+    resourcePath: $resourcePath
+    name: $name
+    value: $value
+  )
 }
     `;
 export const SetSubjectProjectsPermissionsDocument = `
@@ -4713,6 +4744,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     setProjectPermissions(variables: SetProjectPermissionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetProjectPermissionsMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<SetProjectPermissionsMutation>(SetProjectPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setProjectPermissions', 'mutation');
+    },
+    setResourceProperty(variables: SetResourcePropertyMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetResourcePropertyMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<SetResourcePropertyMutation>(SetResourcePropertyDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setResourceProperty', 'mutation');
     },
     setSubjectProjectsPermissions(variables: SetSubjectProjectsPermissionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetSubjectProjectsPermissionsMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<SetSubjectProjectsPermissionsMutation>(SetSubjectProjectsPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setSubjectProjectsPermissions', 'mutation');

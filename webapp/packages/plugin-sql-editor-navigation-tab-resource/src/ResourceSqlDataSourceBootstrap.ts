@@ -8,7 +8,6 @@
 
 import { action, makeObservable, observable, untracked } from 'mobx';
 
-import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -70,11 +69,6 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
             || !['string', 'undefined'].includes(typeof value.name)
             || !['string', 'undefined'].includes(typeof value.nodeInfo?.nodeId)
             || !['undefined', 'object'].includes(typeof value.nodeInfo?.parents)
-            || !['undefined', 'object'].includes(typeof value.executionContext)
-            || !['string', 'undefined'].includes(typeof value.executionContext?.connectionId)
-            || !['string', 'undefined'].includes(typeof value.executionContext?.id)
-            || !['string', 'undefined'].includes(typeof value.executionContext?.defaultCatalog)
-            || !['string', 'undefined'].includes(typeof value.executionContext?.defaultSchema)
           ) {
             map.delete(key);
           }
@@ -97,9 +91,12 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
           this.navNodeInfoResource,
           this.createState(
             editorId,
-            options?.executionContext,
           )
         );
+
+        if (options?.executionContext) {
+          dataSource.setExecutionContext(options.executionContext);
+        }
 
         if (options?.script) {
           dataSource.setScript(options.script);
@@ -113,6 +110,8 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
           rename: this.rename.bind(this),
           read: this.read.bind(this),
           write: this.write.bind(this),
+          getProperty: this.getProperty.bind(this),
+          setProperty: this.setProperty.bind(this),
         });
 
         dataSource.setInfo({
@@ -169,14 +168,12 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
   private createState(
     editorId: string,
-    executionContext?: IConnectionExecutionContextInfo,
     nodeInfo?: IResourceNodeInfo
   ): IResourceSqlDataSourceState {
     let state = this.dataSourceStateState.get(editorId);
 
     if (!state) {
       state = observable<IResourceSqlDataSourceState>({
-        executionContext,
         nodeInfo,
       });
 
@@ -303,6 +300,55 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       }
 
       await this.navResourceNodeService.write(resourceData, value);
+    } catch (exception) {
+      this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
+      throw exception;
+    }
+  }
+
+  private async getProperty(
+    dataSource: ResourceSqlDataSource,
+    nodeId: string,
+    name: string
+  ): Promise<string | undefined> {
+    if (!dataSource.nodeInfo) {
+      throw new Error('Node info is not provided');
+    }
+
+    try {
+      await this.navTreeResource.preloadNodeParents(dataSource.nodeInfo.parents, dataSource.nodeInfo.nodeId);
+      const resourceData = this.navResourceNodeService.getResourceData(nodeId);
+
+      if (!resourceData) {
+        throw new Error('Can\'t find resource');
+      }
+
+      return await this.navResourceNodeService.getProperty(resourceData, name);
+    } catch (exception) {
+      this.notificationService.logException(exception as any, 'plugin_resource_manager_sync_script_error');
+      throw exception;
+    }
+  }
+
+  private async setProperty(
+    dataSource: ResourceSqlDataSource,
+    nodeId: string,
+    name: string,
+    value: string
+  ): Promise<void> {
+    if (!this.resourceManagerService.enabled || !dataSource.nodeInfo) {
+      return;
+    }
+
+    try {
+      await this.navTreeResource.preloadNodeParents(dataSource.nodeInfo.parents, dataSource.nodeInfo.nodeId);
+      const resourceData = this.navResourceNodeService.getResourceData(nodeId);
+
+      if (!resourceData) {
+        return;
+      }
+
+      await this.navResourceNodeService.setProperty(resourceData, name, value);
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
       throw exception;

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
@@ -23,9 +23,12 @@ interface IResourceActions {
   rename(dataSource: ResourceSqlDataSource, nodeId: string, name: string): Promise<string>;
   read(dataSource: ResourceSqlDataSource, nodeId: string): Promise<string>;
   write(dataSource: ResourceSqlDataSource, nodeId: string, value: string): Promise<void>;
+  getProperty(dataSource: ResourceSqlDataSource, nodeId: string,  name: string): Promise<string | undefined>;
+  setProperty(dataSource: ResourceSqlDataSource, nodeId: string, name: string, value: string): Promise<void>;
 }
 
 const VALUE_SYNC_DELAY = 1 * 1000;
+const EXECUTION_CONTEXT_BINDING = 'execution-context-binding';
 
 export class ResourceSqlDataSource extends BaseSqlDataSource {
   static key = 'resource';
@@ -43,7 +46,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   get executionContext(): IConnectionExecutionContextInfo | undefined {
-    return this.state.executionContext;
+    return this.resourceProperty;
   }
 
   get nodeInfo(): IResourceNodeInfo | undefined {
@@ -64,10 +67,12 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   private _script: string;
   private saved: boolean;
+  private propertySaved: boolean;
   private actions?: IResourceActions;
   private info?: IResourceInfo;
   private lastAction?: () => Promise<void>;
   private readonly state: IResourceSqlDataSourceState;
+  private resourceProperty: IConnectionExecutionContextInfo | undefined;
 
   private loading: boolean;
   private loaded: boolean;
@@ -80,11 +85,13 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.state = state;
     this._script = '';
     this.saved = true;
+    this.propertySaved = true;
     this.loading = false;
     this.loaded = false;
     this.debouncedWrite = debounce(this.debouncedWrite.bind(this), VALUE_SYNC_DELAY);
+    this.debouncedSetProperty = debounce(this.debouncedSetProperty.bind(this), VALUE_SYNC_DELAY);
 
-    makeObservable<this, '_script' | 'lastAction' | 'loading' | 'loaded'>(this, {
+    makeObservable<this, '_script' | 'lastAction' | 'loading' | 'loaded' | 'resourceProperty'>(this, {
       script: computed,
       executionContext: computed,
       nodeInfo: computed,
@@ -92,9 +99,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
         equals: isArraysEqual,
       }),
       _script: observable,
-      lastAction: observable,
+      lastAction: observable.ref,
       loading: observable,
       loaded: observable,
+      resourceProperty: observable,
       setScript: action,
       setNodeInfo: action,
     });
@@ -171,7 +179,9 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
-    this.state.executionContext = executionContext;
+    this.resourceProperty = toJS(executionContext);
+    this.propertySaved = false;
+    this.debouncedSetProperty();
   }
 
   async rename(name: string | null) {
@@ -225,6 +235,9 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     try {
       this.exception = null;
       this._script = await this.actions.read(this, this.nodeInfo.nodeId);
+
+      await this.updateProperty();
+
       this.state.name = this.name ?? undefined;
       this.markUpdated();
       this.loaded = true;
@@ -260,7 +273,50 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     }
   }
 
+  async setProperty() {
+    if (!this.actions || !this.nodeInfo || this.propertySaved || !this.loaded) {
+      return;
+    }
+
+    this.lastAction = this.setProperty.bind(this);
+    this.loading = true;
+    this.message = 'Update info...';
+
+    try {
+      this.exception = null;
+      await this.actions.setProperty(
+        this,
+        this.nodeInfo.nodeId,
+        EXECUTION_CONTEXT_BINDING,
+        JSON.stringify(toJS(this.resourceProperty))
+      );
+      await this.updateProperty();
+      this.markUpdated();
+      this.propertySaved = true;
+    } catch (exception: any) {
+      this.exception = exception;
+    } finally {
+      this.loading = false;
+      this.message = undefined;
+    }
+  }
+
+  private async updateProperty() {
+    if (!this.actions || !this.nodeInfo) {
+      return;
+    }
+
+    const propertyValue = await this.actions.getProperty(this, this.nodeInfo.nodeId, EXECUTION_CONTEXT_BINDING);
+    if (propertyValue) {
+      this.resourceProperty = JSON.parse(propertyValue);
+    }
+  }
+
   private debouncedWrite() {
     this.write();
+  }
+
+  private debouncedSetProperty() {
+    this.setProperty();
   }
 }

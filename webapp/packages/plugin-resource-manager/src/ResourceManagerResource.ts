@@ -8,6 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapResource, GraphQLService, ResourceKey, ResourceKeyUtils, RmResource } from '@cloudbeaver/core-sdk';
+import { isValuesEqual } from '@cloudbeaver/core-utils';
 
 export type RmResourceInfo = RmResource;
 export interface IResourceManagerParams {
@@ -55,6 +56,23 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
     // this.set();
   }
 
+  async setResourceProperty(projectId: string, resourcePath: string, name: string, value: string) {
+    await this.graphQLService.sdk.setResourceProperty({
+      projectId,
+      resourcePath,
+      name,
+      value,
+    });
+
+    const folder = this.getFolder(resourcePath);
+
+    const resource = this.getResource({ projectId, folder }, resourcePath);
+
+    if (resource) {
+      resource.properties[name] = value;
+    }
+  }
+
   async createResource(projectId: string, resourcePath: string, folder: boolean) {
     await this.graphQLService.sdk.createResource({
       projectId,
@@ -62,7 +80,7 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
       isFolder: folder,
     });
 
-    await this.load({ projectId, folder:folder ? resourcePath : this.getFolder(resourcePath) });
+    await this.load({ projectId, folder: folder ? resourcePath : this.getFolder(resourcePath) });
   }
 
   async writeResource(projectId: string, resourcePath: string, data: string, forceOverwrite: boolean) {
@@ -98,7 +116,7 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
       return key;
     }
 
-    const ref = this.keys.find(k => k.projectId === key.projectId && k.folder === key.folder);
+    const ref = this.keys.find(k => k.projectId === key.projectId && isValuesEqual(k.folder, key.folder, ''));
 
     if (ref) {
       return ref;

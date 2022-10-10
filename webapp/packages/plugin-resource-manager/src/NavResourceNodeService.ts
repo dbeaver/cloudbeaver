@@ -65,6 +65,21 @@ export class NavResourceNodeService {
     );
   }
 
+  async setProperty(resourceData: IResourceData, name: string, value: string) {
+    await this.resourceManagerResource.setResourceProperty(
+      resourceData.key.projectId,
+      resourceData.resourcePath,
+      name,
+      value,
+    );
+  }
+
+  async getProperty(resourceData: IResourceData, name: string): Promise<string | undefined> {
+    const resource = await this.loadResourceInfo(resourceData);
+
+    return resource?.properties[name];
+  }
+
   getResourceData(nodeId: string): IResourceData | undefined {
     if (!isRMNavNode(nodeId)) {
       return;
