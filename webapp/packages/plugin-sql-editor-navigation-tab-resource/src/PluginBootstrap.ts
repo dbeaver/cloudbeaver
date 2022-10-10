@@ -128,7 +128,7 @@ export class PluginBootstrap extends Bootstrap {
                   parents,
                 });
 
-                if (previousDataSource) {
+                if (previousDataSource && previousDataSource.executionContext) {
                   dataSource.setExecutionContext(previousDataSource.executionContext);
                 }
               }
@@ -250,7 +250,7 @@ export class PluginBootstrap extends Bootstrap {
             parents,
           });
 
-          if (previousDataSource) {
+          if (previousDataSource && previousDataSource.executionContext) {
             dataSource.setExecutionContext(previousDataSource.executionContext);
           }
 

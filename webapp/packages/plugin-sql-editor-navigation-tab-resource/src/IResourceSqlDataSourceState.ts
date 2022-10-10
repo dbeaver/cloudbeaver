@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
-
 export interface IResourceNodeInfo {
   nodeId: string;
   parents: string[];
@@ -16,5 +14,4 @@ export interface IResourceNodeInfo {
 export interface IResourceSqlDataSourceState {
   name?: string;
   nodeInfo?: IResourceNodeInfo;
-  executionContext?: IConnectionExecutionContextInfo;
 }
