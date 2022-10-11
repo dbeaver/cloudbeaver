@@ -66,25 +66,25 @@ export interface AdminPermissionInfo {
   provider: Scalars['String'];
 }
 
-export interface AdminRoleInfo {
+export enum AdminSubjectType {
+  Team = 'team',
+  User = 'user'
+}
+
+export interface AdminTeamInfo {
   description?: Maybe<Scalars['String']>;
   grantedConnections: Array<AdminConnectionGrantInfo>;
   grantedUsers: Array<Scalars['ID']>;
-  roleId: Scalars['ID'];
-  roleName?: Maybe<Scalars['String']>;
-  rolePermissions: Array<Scalars['ID']>;
-}
-
-export enum AdminSubjectType {
-  Role = 'role',
-  User = 'user'
+  teamId: Scalars['ID'];
+  teamName?: Maybe<Scalars['String']>;
+  teamPermissions: Array<Scalars['ID']>;
 }
 
 export interface AdminUserInfo {
   configurationParameters: Scalars['Object'];
   enabled: Scalars['Boolean'];
   grantedConnections: Array<AdminConnectionGrantInfo>;
-  grantedRoles: Array<Scalars['ID']>;
+  grantedTeams: Array<Scalars['ID']>;
   linkedAuthProviders: Array<Scalars['String']>;
   metaParameters: Scalars['Object'];
   origins: Array<ObjectOrigin>;
@@ -877,7 +877,7 @@ export interface Query {
   connectionInfo: ConnectionInfo;
   copyConnectionConfiguration: ConnectionInfo;
   createConnectionConfiguration: ConnectionInfo;
-  createRole: AdminRoleInfo;
+  createTeam: AdminTeamInfo;
   createUser: AdminUserInfo;
   dataTransferAvailableStreamProcessors: Array<DataTransferProcessorInfo>;
   dataTransferDefaultExportSettings: DataTransferDefaultExportSettings;
@@ -886,20 +886,20 @@ export interface Query {
   dataTransferRemoveDataFile?: Maybe<Scalars['Boolean']>;
   deleteAuthProviderConfiguration: Scalars['Boolean'];
   deleteConnectionConfiguration?: Maybe<Scalars['Boolean']>;
-  deleteRole?: Maybe<Scalars['Boolean']>;
+  deleteTeam?: Maybe<Scalars['Boolean']>;
   deleteUser?: Maybe<Scalars['Boolean']>;
   deleteUserMetaParameter: Scalars['Boolean'];
   driverList: Array<DriverInfo>;
   enableUser?: Maybe<Scalars['Boolean']>;
   getConnectionSubjectAccess: Array<AdminConnectionGrantInfo>;
   getSubjectConnectionAccess: Array<AdminConnectionGrantInfo>;
-  grantUserRole?: Maybe<Scalars['Boolean']>;
+  grantUserTeam?: Maybe<Scalars['Boolean']>;
   listAuthProviderConfigurationParameters: Array<ObjectPropertyInfo>;
   listAuthProviderConfigurations: Array<AdminAuthProviderConfiguration>;
   listFeatureSets: Array<WebFeatureSet>;
   listPermissions: Array<AdminPermissionInfo>;
   listProjects: Array<ProjectInfo>;
-  listRoles: Array<AdminRoleInfo>;
+  listTeams: Array<AdminTeamInfo>;
   listUserProfileProperties: Array<ObjectPropertyInfo>;
   listUsers: Array<AdminUserInfo>;
   metadataGetNodeDDL?: Maybe<Scalars['String']>;
@@ -910,7 +910,7 @@ export interface Query {
   navRefreshNode?: Maybe<Scalars['Boolean']>;
   networkHandlers: Array<NetworkHandlerDescriptor>;
   readSessionLog: Array<LogEntry>;
-  revokeUserRole?: Maybe<Scalars['Boolean']>;
+  revokeUserTeam?: Maybe<Scalars['Boolean']>;
   rmListProjectGrantedPermissions: Array<AdminObjectGrantInfo>;
   rmListProjectPermissions: Array<AdminPermissionInfo>;
   rmListProjects: Array<RmProject>;
@@ -942,7 +942,7 @@ export interface Query {
   sqlSupportedOperations: Array<DataTypeLogicalOperation>;
   templateConnections: Array<ConnectionInfo>;
   updateConnectionConfiguration: ConnectionInfo;
-  updateRole: AdminRoleInfo;
+  updateTeam: AdminTeamInfo;
   userConnections: Array<ConnectionInfo>;
 }
 
@@ -1006,10 +1006,10 @@ export interface QueryCreateConnectionConfigurationArgs {
 }
 
 
-export interface QueryCreateRoleArgs {
+export interface QueryCreateTeamArgs {
   description?: InputMaybe<Scalars['String']>;
-  roleId: Scalars['ID'];
-  roleName?: InputMaybe<Scalars['String']>;
+  teamId: Scalars['ID'];
+  teamName?: InputMaybe<Scalars['String']>;
 }
 
 
@@ -1051,8 +1051,8 @@ export interface QueryDeleteConnectionConfigurationArgs {
 }
 
 
-export interface QueryDeleteRoleArgs {
-  roleId: Scalars['ID'];
+export interface QueryDeleteTeamArgs {
+  teamId: Scalars['ID'];
 }
 
 
@@ -1088,8 +1088,8 @@ export interface QueryGetSubjectConnectionAccessArgs {
 }
 
 
-export interface QueryGrantUserRoleArgs {
-  roleId: Scalars['ID'];
+export interface QueryGrantUserTeamArgs {
+  teamId: Scalars['ID'];
   userId: Scalars['ID'];
 }
 
@@ -1104,8 +1104,8 @@ export interface QueryListAuthProviderConfigurationsArgs {
 }
 
 
-export interface QueryListRolesArgs {
-  roleId?: InputMaybe<Scalars['ID']>;
+export interface QueryListTeamsArgs {
+  teamId?: InputMaybe<Scalars['ID']>;
 }
 
 
@@ -1157,8 +1157,8 @@ export interface QueryReadSessionLogArgs {
 }
 
 
-export interface QueryRevokeUserRoleArgs {
-  roleId: Scalars['ID'];
+export interface QueryRevokeUserTeamArgs {
+  teamId: Scalars['ID'];
   userId: Scalars['ID'];
 }
 
@@ -1237,7 +1237,7 @@ export interface QuerySetSubjectConnectionAccessArgs {
 
 export interface QuerySetSubjectPermissionsArgs {
   permissions: Array<Scalars['ID']>;
-  roleId: Scalars['ID'];
+  teamId: Scalars['ID'];
 }
 
 
@@ -1333,10 +1333,10 @@ export interface QueryUpdateConnectionConfigurationArgs {
 }
 
 
-export interface QueryUpdateRoleArgs {
+export interface QueryUpdateTeamArgs {
   description?: InputMaybe<Scalars['String']>;
-  roleId: Scalars['ID'];
-  roleName?: InputMaybe<Scalars['String']>;
+  teamId: Scalars['ID'];
+  teamName?: InputMaybe<Scalars['String']>;
 }
 
 
@@ -1629,7 +1629,7 @@ export type GetPermissionsListQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetPermissionsListQuery = { permissions: Array<{ id: string, label?: string, description?: string, category?: string }> };
 
 export type SetSubjectPermissionsQueryVariables = Exact<{
-  roleId: Scalars['ID'];
+  teamId: Scalars['ID'];
   permissions: Array<Scalars['ID']> | Scalars['ID'];
 }>;
 
@@ -1643,44 +1643,44 @@ export type AsyncTaskCancelMutationVariables = Exact<{
 
 export type AsyncTaskCancelMutation = { result?: boolean };
 
-export type CreateRoleQueryVariables = Exact<{
-  roleId: Scalars['ID'];
-  roleName?: InputMaybe<Scalars['String']>;
+export type CreateTeamQueryVariables = Exact<{
+  teamId: Scalars['ID'];
+  teamName?: InputMaybe<Scalars['String']>;
   description?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type CreateRoleQuery = { role: { roleId: string, roleName?: string, description?: string, rolePermissions: Array<string> } };
+export type CreateTeamQuery = { team: { teamId: string, teamName?: string, description?: string, teamPermissions: Array<string> } };
 
-export type DeleteRoleQueryVariables = Exact<{
-  roleId: Scalars['ID'];
+export type DeleteTeamQueryVariables = Exact<{
+  teamId: Scalars['ID'];
 }>;
 
 
-export type DeleteRoleQuery = { deleteRole?: boolean };
+export type DeleteTeamQuery = { deleteTeam?: boolean };
 
-export type GetRoleGrantedUsersQueryVariables = Exact<{
-  roleId: Scalars['ID'];
+export type GetTeamGrantedUsersQueryVariables = Exact<{
+  teamId: Scalars['ID'];
 }>;
 
 
-export type GetRoleGrantedUsersQuery = { role: Array<{ grantedUsers: Array<string> }> };
+export type GetTeamGrantedUsersQuery = { team: Array<{ grantedUsers: Array<string> }> };
 
-export type GetRolesListQueryVariables = Exact<{
-  roleId?: InputMaybe<Scalars['ID']>;
+export type GetTeamsListQueryVariables = Exact<{
+  teamId?: InputMaybe<Scalars['ID']>;
 }>;
 
 
-export type GetRolesListQuery = { roles: Array<{ roleId: string, roleName?: string, description?: string, rolePermissions: Array<string> }> };
+export type GetTeamsListQuery = { teams: Array<{ teamId: string, teamName?: string, description?: string, teamPermissions: Array<string> }> };
 
-export type UpdateRoleQueryVariables = Exact<{
-  roleId: Scalars['ID'];
-  roleName?: InputMaybe<Scalars['String']>;
+export type UpdateTeamQueryVariables = Exact<{
+  teamId: Scalars['ID'];
+  teamName?: InputMaybe<Scalars['String']>;
   description?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type UpdateRoleQuery = { role: { roleId: string, roleName?: string, description?: string, rolePermissions: Array<string> } };
+export type UpdateTeamQuery = { team: { teamId: string, teamName?: string, description?: string, teamPermissions: Array<string> } };
 
 export type AuthChangeLocalPasswordQueryVariables = Exact<{
   oldPassword: Scalars['String'];
@@ -1784,7 +1784,7 @@ export type CreateUserQueryVariables = Exact<{
 }>;
 
 
-export type CreateUserQuery = { user: { userId: string, grantedRoles: Array<string>, linkedAuthProviders: Array<string>, metaParameters?: any, enabled: boolean, origins: Array<{ type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> } };
+export type CreateUserQuery = { user: { userId: string, grantedTeams: Array<string>, linkedAuthProviders: Array<string>, metaParameters?: any, enabled: boolean, origins: Array<{ type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> } };
 
 export type DeleteUserQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -1822,23 +1822,23 @@ export type GetUsersListQueryVariables = Exact<{
 }>;
 
 
-export type GetUsersListQuery = { users: Array<{ userId: string, grantedRoles: Array<string>, linkedAuthProviders: Array<string>, metaParameters?: any, enabled: boolean, origins: Array<{ type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> }> };
+export type GetUsersListQuery = { users: Array<{ userId: string, grantedTeams: Array<string>, linkedAuthProviders: Array<string>, metaParameters?: any, enabled: boolean, origins: Array<{ type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> }> };
 
-export type GrantUserRoleQueryVariables = Exact<{
+export type GrantUserTeamQueryVariables = Exact<{
   userId: Scalars['ID'];
-  roleId: Scalars['ID'];
+  teamId: Scalars['ID'];
 }>;
 
 
-export type GrantUserRoleQuery = { grantUserRole?: boolean };
+export type GrantUserTeamQuery = { grantUserTeam?: boolean };
 
-export type RevokeUserRoleQueryVariables = Exact<{
+export type RevokeUserTeamQueryVariables = Exact<{
   userId: Scalars['ID'];
-  roleId: Scalars['ID'];
+  teamId: Scalars['ID'];
 }>;
 
 
-export type RevokeUserRoleQuery = { revokeUserRole?: boolean };
+export type RevokeUserTeamQuery = { revokeUserTeam?: boolean };
 
 export type SetConnectionsQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -2247,9 +2247,9 @@ export type AdminObjectGrantInfoFragment = { subjectId: string, subjectType: Adm
 
 export type AdminPermissionInfoFragment = { id: string, label?: string, description?: string, category?: string };
 
-export type AdminRoleInfoFragment = { roleId: string, roleName?: string, description?: string, rolePermissions: Array<string> };
+export type AdminTeamInfoFragment = { teamId: string, teamName?: string, description?: string, teamPermissions: Array<string> };
 
-export type AdminUserInfoFragment = { userId: string, grantedRoles: Array<string>, linkedAuthProviders: Array<string>, metaParameters?: any, enabled: boolean, origins: Array<{ type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> };
+export type AdminUserInfoFragment = { userId: string, grantedTeams: Array<string>, linkedAuthProviders: Array<string>, metaParameters?: any, enabled: boolean, origins: Array<{ type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> };
 
 export type AllNavigatorSettingsFragment = { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean };
 
@@ -2753,12 +2753,12 @@ export const AdminPermissionInfoFragmentDoc = `
   category
 }
     `;
-export const AdminRoleInfoFragmentDoc = `
-    fragment AdminRoleInfo on AdminRoleInfo {
-  roleId
-  roleName
+export const AdminTeamInfoFragmentDoc = `
+    fragment AdminTeamInfo on AdminTeamInfo {
+  teamId
+  teamName
   description
-  rolePermissions
+  teamPermissions
 }
     `;
 export const ObjectOriginInfoFragmentDoc = `
@@ -2785,7 +2785,7 @@ export const ObjectOriginInfoFragmentDoc = `
 export const AdminUserInfoFragmentDoc = `
     fragment AdminUserInfo on AdminUserInfo {
   userId
-  grantedRoles
+  grantedTeams
   linkedAuthProviders
   metaParameters @include(if: $includeMetaParameters)
   origins {
@@ -3111,8 +3111,8 @@ export const GetPermissionsListDocument = `
 }
     ${AdminPermissionInfoFragmentDoc}`;
 export const SetSubjectPermissionsDocument = `
-    query setSubjectPermissions($roleId: ID!, $permissions: [ID!]!) {
-  permissions: setSubjectPermissions(roleId: $roleId, permissions: $permissions) {
+    query setSubjectPermissions($teamId: ID!, $permissions: [ID!]!) {
+  permissions: setSubjectPermissions(teamId: $teamId, permissions: $permissions) {
     ...AdminPermissionInfo
   }
 }
@@ -3122,47 +3122,47 @@ export const AsyncTaskCancelDocument = `
   result: asyncTaskCancel(id: $taskId)
 }
     `;
-export const CreateRoleDocument = `
-    query createRole($roleId: ID!, $roleName: String, $description: String) {
-  role: createRole(
-    roleId: $roleId
-    roleName: $roleName
+export const CreateTeamDocument = `
+    query createTeam($teamId: ID!, $teamName: String, $description: String) {
+  team: createTeam(
+    teamId: $teamId
+    teamName: $teamName
     description: $description
   ) {
-    ...AdminRoleInfo
+    ...AdminTeamInfo
   }
 }
-    ${AdminRoleInfoFragmentDoc}`;
-export const DeleteRoleDocument = `
-    query deleteRole($roleId: ID!) {
-  deleteRole(roleId: $roleId)
+    ${AdminTeamInfoFragmentDoc}`;
+export const DeleteTeamDocument = `
+    query deleteTeam($teamId: ID!) {
+  deleteTeam(teamId: $teamId)
 }
     `;
-export const GetRoleGrantedUsersDocument = `
-    query getRoleGrantedUsers($roleId: ID!) {
-  role: listRoles(roleId: $roleId) {
+export const GetTeamGrantedUsersDocument = `
+    query getTeamGrantedUsers($teamId: ID!) {
+  team: listTeams(teamId: $teamId) {
     grantedUsers
   }
 }
     `;
-export const GetRolesListDocument = `
-    query getRolesList($roleId: ID) {
-  roles: listRoles(roleId: $roleId) {
-    ...AdminRoleInfo
+export const GetTeamsListDocument = `
+    query getTeamsList($teamId: ID) {
+  teams: listTeams(teamId: $teamId) {
+    ...AdminTeamInfo
   }
 }
-    ${AdminRoleInfoFragmentDoc}`;
-export const UpdateRoleDocument = `
-    query updateRole($roleId: ID!, $roleName: String, $description: String) {
-  role: updateRole(
-    roleId: $roleId
-    roleName: $roleName
+    ${AdminTeamInfoFragmentDoc}`;
+export const UpdateTeamDocument = `
+    query updateTeam($teamId: ID!, $teamName: String, $description: String) {
+  team: updateTeam(
+    teamId: $teamId
+    teamName: $teamName
     description: $description
   ) {
-    ...AdminRoleInfo
+    ...AdminTeamInfo
   }
 }
-    ${AdminRoleInfoFragmentDoc}`;
+    ${AdminTeamInfoFragmentDoc}`;
 export const AuthChangeLocalPasswordDocument = `
     query authChangeLocalPassword($oldPassword: String!, $newPassword: String!) {
   authChangeLocalPassword(oldPassword: $oldPassword, newPassword: $newPassword)
@@ -3328,14 +3328,14 @@ export const GetUsersListDocument = `
   }
 }
     ${AdminUserInfoFragmentDoc}`;
-export const GrantUserRoleDocument = `
-    query grantUserRole($userId: ID!, $roleId: ID!) {
-  grantUserRole(userId: $userId, roleId: $roleId)
+export const GrantUserTeamDocument = `
+    query grantUserTeam($userId: ID!, $teamId: ID!) {
+  grantUserTeam(userId: $userId, teamId: $teamId)
 }
     `;
-export const RevokeUserRoleDocument = `
-    query revokeUserRole($userId: ID!, $roleId: ID!) {
-  revokeUserRole(userId: $userId, roleId: $roleId)
+export const RevokeUserTeamDocument = `
+    query revokeUserTeam($userId: ID!, $teamId: ID!) {
+  revokeUserTeam(userId: $userId, teamId: $teamId)
 }
     `;
 export const SetConnectionsDocument = `
@@ -4399,20 +4399,20 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     asyncTaskCancel(variables: AsyncTaskCancelMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AsyncTaskCancelMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<AsyncTaskCancelMutation>(AsyncTaskCancelDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'asyncTaskCancel', 'mutation');
     },
-    createRole(variables: CreateRoleQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateRoleQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateRoleQuery>(CreateRoleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createRole', 'query');
+    createTeam(variables: CreateTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateTeamQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateTeamQuery>(CreateTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createTeam', 'query');
     },
-    deleteRole(variables: DeleteRoleQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteRoleQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteRoleQuery>(DeleteRoleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteRole', 'query');
+    deleteTeam(variables: DeleteTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteTeamQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteTeamQuery>(DeleteTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteTeam', 'query');
     },
-    getRoleGrantedUsers(variables: GetRoleGrantedUsersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetRoleGrantedUsersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetRoleGrantedUsersQuery>(GetRoleGrantedUsersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getRoleGrantedUsers', 'query');
+    getTeamGrantedUsers(variables: GetTeamGrantedUsersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTeamGrantedUsersQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetTeamGrantedUsersQuery>(GetTeamGrantedUsersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTeamGrantedUsers', 'query');
     },
-    getRolesList(variables?: GetRolesListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetRolesListQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetRolesListQuery>(GetRolesListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getRolesList', 'query');
+    getTeamsList(variables?: GetTeamsListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTeamsListQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetTeamsListQuery>(GetTeamsListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTeamsList', 'query');
     },
-    updateRole(variables: UpdateRoleQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateRoleQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateRoleQuery>(UpdateRoleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateRole', 'query');
+    updateTeam(variables: UpdateTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateTeamQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateTeamQuery>(UpdateTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateTeam', 'query');
     },
     authChangeLocalPassword(variables: AuthChangeLocalPasswordQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AuthChangeLocalPasswordQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<AuthChangeLocalPasswordQuery>(AuthChangeLocalPasswordDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'authChangeLocalPassword', 'query');
@@ -4468,11 +4468,11 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getUsersList(variables: GetUsersListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUsersListQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetUsersListQuery>(GetUsersListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUsersList', 'query');
     },
-    grantUserRole(variables: GrantUserRoleQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GrantUserRoleQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GrantUserRoleQuery>(GrantUserRoleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'grantUserRole', 'query');
+    grantUserTeam(variables: GrantUserTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GrantUserTeamQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GrantUserTeamQuery>(GrantUserTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'grantUserTeam', 'query');
     },
-    revokeUserRole(variables: RevokeUserRoleQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RevokeUserRoleQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<RevokeUserRoleQuery>(RevokeUserRoleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'revokeUserRole', 'query');
+    revokeUserTeam(variables: RevokeUserTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RevokeUserTeamQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<RevokeUserTeamQuery>(RevokeUserTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'revokeUserTeam', 'query');
     },
     setConnections(variables: SetConnectionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetConnectionsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<SetConnectionsQuery>(SetConnectionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setConnections', 'query');

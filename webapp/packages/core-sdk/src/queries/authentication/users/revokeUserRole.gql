@@ -1,3 +1,0 @@
-query revokeUserRole($userId: ID!, $roleId: ID!) {
-  revokeUserRole(userId: $userId, roleId: $roleId)
-}

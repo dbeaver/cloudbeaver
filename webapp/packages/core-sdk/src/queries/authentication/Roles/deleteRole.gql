@@ -1,3 +1,0 @@
-query deleteRole($roleId: ID!) {
-  deleteRole(roleId: $roleId)
-}

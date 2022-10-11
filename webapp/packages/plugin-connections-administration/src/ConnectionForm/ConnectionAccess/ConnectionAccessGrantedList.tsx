@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import type { RoleInfo } from '@cloudbeaver/core-authentication';
+import type { TeamInfo } from '@cloudbeaver/core-authentication';
 import {
   Table,
   TableBody,
@@ -32,7 +32,7 @@ import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 import { ConnectionAccessTableHeader, IFilterState } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader';
 import { ConnectionAccessTableInnerHeader } from './ConnectionAccessTableHeader/ConnectionAccessTableInnerHeader';
 import { ConnectionAccessTableItem } from './ConnectionAccessTableItem';
-import { getFilteredRoles, getFilteredUsers } from './getFilteredSubjects';
+import { getFilteredTeams, getFilteredUsers } from './getFilteredSubjects';
 
 const styles = css`
     Table {
@@ -59,7 +59,7 @@ const styles = css`
 
 interface Props {
   grantedUsers: AdminUserInfoFragment[];
-  grantedRoles: RoleInfo[];
+  grantedTeams: TeamInfo[];
   disabled: boolean;
   onRevoke: (subjectIds: string[]) => void;
   onEdit: () => void;
@@ -67,7 +67,7 @@ interface Props {
 
 export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAccessGrantedList({
   grantedUsers,
-  grantedRoles,
+  grantedTeams,
   disabled,
   onRevoke,
   onEdit,
@@ -84,9 +84,9 @@ export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAc
     selectedSubjects.clear();
   }, []);
 
-  const roles = getFilteredRoles(grantedRoles, filterState.filterValue);
+  const teams = getFilteredTeams(grantedTeams, filterState.filterValue);
   const users = getFilteredUsers(grantedUsers, filterState.filterValue);
-  const keys = roles.map(role => role.roleId).concat(users.map(user => user.userId));
+  const keys = teams.map(team => team.teamId).concat(users.map(user => user.userId));
 
   let tableInfoText: TLocalizationToken = 'connections_connection_access_admin_info';
   if (!keys.length) {
@@ -113,15 +113,15 @@ export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAc
                   {translate(tableInfoText)}
                 </TableColumnValue>
               </TableItem>
-              {roles.map(role => (
+              {teams.map(team => (
                 <ConnectionAccessTableItem
-                  key={role.roleId}
-                  id={role.roleId}
-                  name={role.roleName || ''}
-                  tooltip={role.roleName}
-                  description={role.description}
-                  icon='/icons/role.svg'
-                  iconTooltip={translate('authentication_role_icon_tooltip')}
+                  key={team.teamId}
+                  id={team.teamId}
+                  name={team.teamName || ''}
+                  tooltip={team.teamName}
+                  description={team.description}
+                  icon='/icons/team.svg'
+                  iconTooltip={translate('authentication_team_icon_tooltip')}
                   disabled={disabled}
                 />
               ))}

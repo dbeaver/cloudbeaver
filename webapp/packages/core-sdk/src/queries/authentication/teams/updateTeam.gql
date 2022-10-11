@@ -1,0 +1,5 @@
+query updateTeam($teamId: ID!, $teamName: String, $description: String ) {
+  team: updateTeam(teamId: $teamId, teamName: $teamName, description: $description) {
+    ...AdminTeamInfo
+  }
+}

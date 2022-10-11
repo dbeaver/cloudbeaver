@@ -1,6 +1,6 @@
 fragment AdminUserInfo on AdminUserInfo {
   userId
-  grantedRoles
+  grantedTeams
   linkedAuthProviders
   metaParameters @include(if: $includeMetaParameters)
   

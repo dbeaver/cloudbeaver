@@ -1,0 +1,6 @@
+fragment AdminTeamInfo on AdminTeamInfo {
+  teamId
+  teamName
+  description
+  teamPermissions
+}

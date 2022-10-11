@@ -5,7 +5,6 @@ export default [
   ['authentication_administration_user_connections_access_connections_load_fail', 'Errore in fase di caricamento delle connessioni'],
   ['authentication_administration_user_connections_access', 'Accesso alle connessioni'],
   ['authentication_administration_user_connections_access_granted_by', 'Permesso da'],
-  ['authentication_administration_user_connections_access_granted_role', 'Ruolo:'],
   ['authentication_administration_user_connections_access_granted_directly', 'Direttamente'],
   ['authentication_administration_user_connections_access_granted_unmanaged', 'Non gestito'],
   ['authentication_administration_user_connections_empty', 'Nessuna connessione disponibile'],
