@@ -364,6 +364,7 @@ public class LocalResourceController implements RMController {
     ) throws IOException {
         try (Stream<Path> files = Files.list(folderPath)) {
             return files.filter(path -> !path.getFileName().toString().startsWith(".")) // skip hidden files
+                .sorted(Comparator.comparing(path -> path.getFileName().toString(), String.CASE_INSENSITIVE_ORDER))
                 .map((Path path) -> makeResourceFromPath(projectId, path, readProperties, readHistory, recursive))
                 .filter(Objects::nonNull)
                 .toArray(RMResource[]::new);
