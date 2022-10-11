@@ -40,6 +40,7 @@ export class TeamFormService {
   readonly prepareConfigTask: IExecutorHandlersCollection<ITeamFormSubmitData>;
   readonly formValidationTask: IExecutorHandlersCollection<ITeamFormSubmitData>;
   readonly formSubmittingTask: IExecutorHandlersCollection<ITeamFormSubmitData>;
+  readonly afterFormSubmittingTask: IExecutorHandlersCollection<ITeamFormSubmitData>;
   readonly formStateTask: IExecutorHandlersCollection<ITeamFormState>;
 
   constructor(
@@ -51,12 +52,14 @@ export class TeamFormService {
     this.fillConfigTask = new ExecutorHandlersCollection();
     this.prepareConfigTask = new ExecutorHandlersCollection();
     this.formSubmittingTask = new ExecutorHandlersCollection();
+    this.afterFormSubmittingTask = new ExecutorHandlersCollection();
     this.formValidationTask = new ExecutorHandlersCollection();
     this.formStateTask = new ExecutorHandlersCollection();
 
     this.formSubmittingTask
       .before(this.formValidationTask)
-      .before(this.prepareConfigTask);
+      .before(this.prepareConfigTask)
+      .next(this.afterFormSubmittingTask);
 
     this.formStateTask
       .before<ITeamFormSubmitData>(this.prepareConfigTask, state => ({ state, submitType: 'submit' }));

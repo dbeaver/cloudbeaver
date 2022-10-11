@@ -42,7 +42,7 @@ export class GrantedUsersTabService extends Bootstrap {
       panel: () => GrantedUsers,
     });
 
-    this.teamFormService.formSubmittingTask.addHandler(this.save.bind(this));
+    this.teamFormService.afterFormSubmittingTask.addHandler(this.save.bind(this));
   }
 
   load(): void { }

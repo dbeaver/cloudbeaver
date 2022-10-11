@@ -88,8 +88,8 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo> {
     return grantInfo;
   }
 
-  async setSubjectPermissions(teamId: string, permissions: string[]): Promise<void> {
-    const team = this.get(teamId);
+  async setSubjectPermissions(subjectId: string, permissions: string[]): Promise<void> {
+    const team = this.get(subjectId);
 
     if (team && isArraysEqual(team.teamPermissions, permissions)) {
       return;
@@ -97,13 +97,13 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo> {
 
     const {
       permissions: newPermissions,
-    } = await this.graphQLService.sdk.setSubjectPermissions({ teamId, permissions });
+    } = await this.graphQLService.sdk.setSubjectPermissions({ subjectId, permissions });
 
     if (team) {
       team.teamPermissions = newPermissions.map(permission => permission.id);
     } else {
       // TODO: update permissions for team instead
-      await this.loader(teamId);
+      await this.loader(subjectId);
     }
   }
 

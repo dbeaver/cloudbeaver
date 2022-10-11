@@ -1237,7 +1237,7 @@ export interface QuerySetSubjectConnectionAccessArgs {
 
 export interface QuerySetSubjectPermissionsArgs {
   permissions: Array<Scalars['ID']>;
-  teamId: Scalars['ID'];
+  subjectId: Scalars['ID'];
 }
 
 
@@ -1629,7 +1629,7 @@ export type GetPermissionsListQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetPermissionsListQuery = { permissions: Array<{ id: string, label?: string, description?: string, category?: string }> };
 
 export type SetSubjectPermissionsQueryVariables = Exact<{
-  teamId: Scalars['ID'];
+  subjectId: Scalars['ID'];
   permissions: Array<Scalars['ID']> | Scalars['ID'];
 }>;
 
@@ -1642,45 +1642,6 @@ export type AsyncTaskCancelMutationVariables = Exact<{
 
 
 export type AsyncTaskCancelMutation = { result?: boolean };
-
-export type CreateTeamQueryVariables = Exact<{
-  teamId: Scalars['ID'];
-  teamName?: InputMaybe<Scalars['String']>;
-  description?: InputMaybe<Scalars['String']>;
-}>;
-
-
-export type CreateTeamQuery = { team: { teamId: string, teamName?: string, description?: string, teamPermissions: Array<string> } };
-
-export type DeleteTeamQueryVariables = Exact<{
-  teamId: Scalars['ID'];
-}>;
-
-
-export type DeleteTeamQuery = { deleteTeam?: boolean };
-
-export type GetTeamGrantedUsersQueryVariables = Exact<{
-  teamId: Scalars['ID'];
-}>;
-
-
-export type GetTeamGrantedUsersQuery = { team: Array<{ grantedUsers: Array<string> }> };
-
-export type GetTeamsListQueryVariables = Exact<{
-  teamId?: InputMaybe<Scalars['ID']>;
-}>;
-
-
-export type GetTeamsListQuery = { teams: Array<{ teamId: string, teamName?: string, description?: string, teamPermissions: Array<string> }> };
-
-export type UpdateTeamQueryVariables = Exact<{
-  teamId: Scalars['ID'];
-  teamName?: InputMaybe<Scalars['String']>;
-  description?: InputMaybe<Scalars['String']>;
-}>;
-
-
-export type UpdateTeamQuery = { team: { teamId: string, teamName?: string, description?: string, teamPermissions: Array<string> } };
 
 export type AuthChangeLocalPasswordQueryVariables = Exact<{
   oldPassword: Scalars['String'];
@@ -1775,6 +1736,45 @@ export type SaveUserMetaParametersQueryVariables = Exact<{
 
 
 export type SaveUserMetaParametersQuery = { setUserMetaParameterValues: boolean };
+
+export type CreateTeamQueryVariables = Exact<{
+  teamId: Scalars['ID'];
+  teamName?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type CreateTeamQuery = { team: { teamId: string, teamName?: string, description?: string, teamPermissions: Array<string> } };
+
+export type DeleteTeamQueryVariables = Exact<{
+  teamId: Scalars['ID'];
+}>;
+
+
+export type DeleteTeamQuery = { deleteTeam?: boolean };
+
+export type GetTeamGrantedUsersQueryVariables = Exact<{
+  teamId: Scalars['ID'];
+}>;
+
+
+export type GetTeamGrantedUsersQuery = { team: Array<{ grantedUsers: Array<string> }> };
+
+export type GetTeamsListQueryVariables = Exact<{
+  teamId?: InputMaybe<Scalars['ID']>;
+}>;
+
+
+export type GetTeamsListQuery = { teams: Array<{ teamId: string, teamName?: string, description?: string, teamPermissions: Array<string> }> };
+
+export type UpdateTeamQueryVariables = Exact<{
+  teamId: Scalars['ID'];
+  teamName?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type UpdateTeamQuery = { team: { teamId: string, teamName?: string, description?: string, teamPermissions: Array<string> } };
 
 export type CreateUserQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -3111,8 +3111,11 @@ export const GetPermissionsListDocument = `
 }
     ${AdminPermissionInfoFragmentDoc}`;
 export const SetSubjectPermissionsDocument = `
-    query setSubjectPermissions($teamId: ID!, $permissions: [ID!]!) {
-  permissions: setSubjectPermissions(teamId: $teamId, permissions: $permissions) {
+    query setSubjectPermissions($subjectId: ID!, $permissions: [ID!]!) {
+  permissions: setSubjectPermissions(
+    subjectId: $subjectId
+    permissions: $permissions
+  ) {
     ...AdminPermissionInfo
   }
 }
@@ -3122,47 +3125,6 @@ export const AsyncTaskCancelDocument = `
   result: asyncTaskCancel(id: $taskId)
 }
     `;
-export const CreateTeamDocument = `
-    query createTeam($teamId: ID!, $teamName: String, $description: String) {
-  team: createTeam(
-    teamId: $teamId
-    teamName: $teamName
-    description: $description
-  ) {
-    ...AdminTeamInfo
-  }
-}
-    ${AdminTeamInfoFragmentDoc}`;
-export const DeleteTeamDocument = `
-    query deleteTeam($teamId: ID!) {
-  deleteTeam(teamId: $teamId)
-}
-    `;
-export const GetTeamGrantedUsersDocument = `
-    query getTeamGrantedUsers($teamId: ID!) {
-  team: listTeams(teamId: $teamId) {
-    grantedUsers
-  }
-}
-    `;
-export const GetTeamsListDocument = `
-    query getTeamsList($teamId: ID) {
-  teams: listTeams(teamId: $teamId) {
-    ...AdminTeamInfo
-  }
-}
-    ${AdminTeamInfoFragmentDoc}`;
-export const UpdateTeamDocument = `
-    query updateTeam($teamId: ID!, $teamName: String, $description: String) {
-  team: updateTeam(
-    teamId: $teamId
-    teamName: $teamName
-    description: $description
-  ) {
-    ...AdminTeamInfo
-  }
-}
-    ${AdminTeamInfoFragmentDoc}`;
 export const AuthChangeLocalPasswordDocument = `
     query authChangeLocalPassword($oldPassword: String!, $newPassword: String!) {
   authChangeLocalPassword(oldPassword: $oldPassword, newPassword: $newPassword)
@@ -3289,6 +3251,47 @@ export const SaveUserMetaParametersDocument = `
   setUserMetaParameterValues(userId: $userId, parameters: $parameters)
 }
     `;
+export const CreateTeamDocument = `
+    query createTeam($teamId: ID!, $teamName: String, $description: String) {
+  team: createTeam(
+    teamId: $teamId
+    teamName: $teamName
+    description: $description
+  ) {
+    ...AdminTeamInfo
+  }
+}
+    ${AdminTeamInfoFragmentDoc}`;
+export const DeleteTeamDocument = `
+    query deleteTeam($teamId: ID!) {
+  deleteTeam(teamId: $teamId)
+}
+    `;
+export const GetTeamGrantedUsersDocument = `
+    query getTeamGrantedUsers($teamId: ID!) {
+  team: listTeams(teamId: $teamId) {
+    grantedUsers
+  }
+}
+    `;
+export const GetTeamsListDocument = `
+    query getTeamsList($teamId: ID) {
+  teams: listTeams(teamId: $teamId) {
+    ...AdminTeamInfo
+  }
+}
+    ${AdminTeamInfoFragmentDoc}`;
+export const UpdateTeamDocument = `
+    query updateTeam($teamId: ID!, $teamName: String, $description: String) {
+  team: updateTeam(
+    teamId: $teamId
+    teamName: $teamName
+    description: $description
+  ) {
+    ...AdminTeamInfo
+  }
+}
+    ${AdminTeamInfoFragmentDoc}`;
 export const CreateUserDocument = `
     query createUser($userId: ID!, $enabled: Boolean!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
   user: createUser(userId: $userId, enabled: $enabled) {
@@ -4399,21 +4402,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     asyncTaskCancel(variables: AsyncTaskCancelMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AsyncTaskCancelMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<AsyncTaskCancelMutation>(AsyncTaskCancelDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'asyncTaskCancel', 'mutation');
     },
-    createTeam(variables: CreateTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateTeamQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateTeamQuery>(CreateTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createTeam', 'query');
-    },
-    deleteTeam(variables: DeleteTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteTeamQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteTeamQuery>(DeleteTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteTeam', 'query');
-    },
-    getTeamGrantedUsers(variables: GetTeamGrantedUsersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTeamGrantedUsersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetTeamGrantedUsersQuery>(GetTeamGrantedUsersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTeamGrantedUsers', 'query');
-    },
-    getTeamsList(variables?: GetTeamsListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTeamsListQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetTeamsListQuery>(GetTeamsListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTeamsList', 'query');
-    },
-    updateTeam(variables: UpdateTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateTeamQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateTeamQuery>(UpdateTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateTeam', 'query');
-    },
     authChangeLocalPassword(variables: AuthChangeLocalPasswordQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AuthChangeLocalPasswordQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<AuthChangeLocalPasswordQuery>(AuthChangeLocalPasswordDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'authChangeLocalPassword', 'query');
     },
@@ -4449,6 +4437,21 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     saveUserMetaParameters(variables: SaveUserMetaParametersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SaveUserMetaParametersQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<SaveUserMetaParametersQuery>(SaveUserMetaParametersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'saveUserMetaParameters', 'query');
+    },
+    createTeam(variables: CreateTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateTeamQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateTeamQuery>(CreateTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createTeam', 'query');
+    },
+    deleteTeam(variables: DeleteTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteTeamQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteTeamQuery>(DeleteTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteTeam', 'query');
+    },
+    getTeamGrantedUsers(variables: GetTeamGrantedUsersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTeamGrantedUsersQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetTeamGrantedUsersQuery>(GetTeamGrantedUsersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTeamGrantedUsers', 'query');
+    },
+    getTeamsList(variables?: GetTeamsListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTeamsListQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetTeamsListQuery>(GetTeamsListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTeamsList', 'query');
+    },
+    updateTeam(variables: UpdateTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateTeamQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateTeamQuery>(UpdateTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateTeam', 'query');
     },
     createUser(variables: CreateUserQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateUserQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<CreateUserQuery>(CreateUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createUser', 'query');
