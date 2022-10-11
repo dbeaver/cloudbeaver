@@ -12,12 +12,10 @@ import styled, { css } from 'reshadow';
 import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
 import { ToolsPanel, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-
-
 import { BASE_TAB_STYLES, ITabData, Tab, TabList, TabPanel, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { MetaParameters } from './MetaParameters/MetaParameters';
-import { RolesPage } from './Roles/RolesPage';
+import { TeamsPage } from './Teams/TeamsPage';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 import { UsersTable } from './UsersTable/UsersTable';
 
@@ -63,7 +61,7 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
       <ToolsPanel>
         <TabList style={style}>
           <Tab tabId={EUsersAdministrationSub.Users} style={style}>{translate('authentication_administration_item_users')}</Tab>
-          <Tab tabId={EUsersAdministrationSub.Roles} style={style}>{translate('administration_roles_tab_title')}</Tab>
+          <Tab tabId={EUsersAdministrationSub.Teams} style={style}>{translate('administration_teams_tab_title')}</Tab>
           {/* <Tab
             tabId={EUsersAdministrationSub.MetaProperties}
             style={style}
@@ -75,8 +73,8 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
       <TabPanel tabId={EUsersAdministrationSub.Users}>
         <UsersTable sub={sub} param={param} />
       </TabPanel>
-      <TabPanel tabId={EUsersAdministrationSub.Roles}>
-        <RolesPage sub={sub} param={param} />
+      <TabPanel tabId={EUsersAdministrationSub.Teams}>
+        <TeamsPage sub={sub} param={param} />
       </TabPanel>
       <TabPanel tabId={EUsersAdministrationSub.MetaProperties}>
         <MetaParameters />

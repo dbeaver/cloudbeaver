@@ -1,0 +1,3 @@
+query grantUserTeam($userId: ID!, $teamId: ID!) {
+  grantUserTeam(userId: $userId, teamId: $teamId)
+}

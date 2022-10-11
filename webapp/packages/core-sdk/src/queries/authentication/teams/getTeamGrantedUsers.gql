@@ -1,0 +1,5 @@
+query getTeamGrantedUsers($teamId: ID!) {
+  team: listTeams(teamId: $teamId) {
+    grantedUsers
+  }
+}

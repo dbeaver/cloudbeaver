@@ -1,5 +1,5 @@
-query setSubjectPermissions($roleId: ID!, $permissions: [ID!]! ) {
-  permissions: setSubjectPermissions(roleId: $roleId, permissions: $permissions) {
+query setSubjectPermissions($teamId: ID!, $permissions: [ID!]! ) {
+  permissions: setSubjectPermissions(teamId: $teamId, permissions: $permissions) {
     ...AdminPermissionInfo
   }
 }
