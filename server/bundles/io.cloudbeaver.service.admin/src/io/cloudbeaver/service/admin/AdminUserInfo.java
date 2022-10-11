@@ -25,7 +25,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.security.SMObjects;
-import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 
@@ -71,12 +70,8 @@ public class AdminUserInfo {
     }
 
     @Property
-    public String[] getGrantedTeams() throws DBException {
-        if (user.getTeams() == null) {
-            SMTeam[] userTeams = session.getSecurityController().getUserTeams(getUserId());
-            user.setTeams(userTeams);
-        }
-        return user.getGrantedTeams();
+    public String[] getGrantedTeams() {
+        return user.getTeams();
     }
 
     @Property

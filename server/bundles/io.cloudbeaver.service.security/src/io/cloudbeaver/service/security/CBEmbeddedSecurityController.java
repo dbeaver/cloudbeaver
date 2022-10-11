@@ -216,6 +216,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                 }
             }
+            // Metas
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT META_ID,META_VALUE FROM CB_USER_META WHERE USER_ID=?")) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -225,6 +226,17 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                             dbResult.getString(2)
                         );
                     }
+                }
+            }
+            // Teams
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT TEAM_ID FROM CB_USER_TEAM WHERE USER_ID=?")) {
+                dbStat.setString(1, userId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    List<String> teamIDs = new ArrayList<>();
+                    while (dbResult.next()) {
+                        teamIDs.add(dbResult.getString(1));
+                    }
+                    user.setUserTeams(teamIDs.toArray(new String[0]));
                 }
             }
             return user;
@@ -267,6 +279,24 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                                 dbResult.getString(2),
                                 dbResult.getString(3)
                             );
+                        }
+                    }
+                }
+            }
+            // Read teams
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT USER_ID,TEAM_ID FROM CB_USER_TEAM" +
+                (CommonUtils.isEmpty(userNameMask) ? "" : " WHERE USER_ID=?"))) {
+                if (!CommonUtils.isEmpty(userNameMask)) {
+                    dbStat.setString(1, userNameMask);
+                }
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        String userId = dbResult.getString(1);
+                        String teamId = dbResult.getString(2);
+                        SMUser user = result.get(userId);
+                        if (user != null) {
+                            String[] teams = ArrayUtils.add(String.class, user.getUserTeams(), teamId);
+                            user.setUserTeams(teams);
                         }
                     }
                 }
@@ -1355,7 +1385,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
             userId = userIdFromCredentials;
             if (!isSubjectExists(userId)) {
-                var newUser = new SMUser(userId);
+                var newUser = new SMUser(userId, true);
                 createUser(newUser.getUserId(), newUser.getMetaParameters(), true);
                 String defaultTeamName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserTeam();
                 if (!CommonUtils.isEmpty(defaultTeamName)) {
