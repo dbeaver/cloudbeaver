@@ -17,7 +17,7 @@
 package io.cloudbeaver.model.user;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.security.user.SMRole;
+import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 
 import java.util.*;
@@ -35,7 +35,7 @@ public class WebUser {
 
     private boolean enabled;
 
-    private SMRole[] roles = null;
+    private SMTeam[] teams = null;
 
     private String activeAuthModel;
     private final Map<String, Map<String, Object>> authCredentials = new HashMap<>();
@@ -70,12 +70,8 @@ public class WebUser {
         this.enabled = enabled;
     }
 
-    public String[] getGrantedRoles() {
-        return Arrays.stream(roles).map(SMRole::getRoleId).toArray(String[]::new);
-    }
-
-    public boolean hasRole(String roleId) {
-        return Arrays.stream(roles).anyMatch(r -> r.getRoleId().equals(roleId));
+    public String[] getGrantedTeams() {
+        return Arrays.stream(teams).map(SMTeam::getTeamId).toArray(String[]::new);
     }
 
     public Map<String, String> getMetaParameters() {
@@ -98,12 +94,12 @@ public class WebUser {
         return Collections.unmodifiableMap(configurationParameters);
     }
 
-    public SMRole[] getRoles() {
-        return roles;
+    public SMTeam[] getTeams() {
+        return teams;
     }
 
-    public void setRoles(SMRole[] roles) {
-        this.roles = roles;
+    public void setTeams(SMTeam[] teams) {
+        this.teams = teams;
     }
 
     @Override

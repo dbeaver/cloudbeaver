@@ -1,7 +1,7 @@
 
 enum AdminSubjectType {
     user,
-    role
+    team
 }
 
 type AdminConnectionGrantInfo {
@@ -35,7 +35,7 @@ type AdminUserInfo {
 
     metaParameters: Object!
     configurationParameters: Object!
-    grantedRoles: [ID!]!
+    grantedTeams: [ID!]!
     grantedConnections: [AdminConnectionGrantInfo!]!
 
     origins: [ObjectOrigin!]!
@@ -44,15 +44,15 @@ type AdminUserInfo {
     enabled: Boolean!
 }
 
-type AdminRoleInfo {
-    roleId: ID!
-    roleName: String
+type AdminTeamInfo {
+    teamId: ID!
+    teamName: String
     description: String
 
     grantedUsers: [ID!]!
     grantedConnections: [AdminConnectionGrantInfo!]!
 
-    rolePermissions: [ID!]!
+    teamPermissions: [ID!]!
 }
 
 type AdminPermissionInfo {
@@ -113,23 +113,23 @@ input ServerConfigInput {
 
 extend type Query {
 
-    #### Users and roles
+    #### Users and teams
 
     listUsers(userId: ID): [AdminUserInfo!]!
-    listRoles(roleId: ID): [AdminRoleInfo!]!
+    listTeams(teamId: ID): [AdminTeamInfo!]!
     listPermissions: [AdminPermissionInfo!]!
 
     createUser(userId: ID!, enabled: Boolean!): AdminUserInfo!
     deleteUser(userId: ID!): Boolean
 
-    createRole(roleId: ID!, roleName: String, description: String): AdminRoleInfo!
-    updateRole(roleId: ID!, roleName: String, description: String): AdminRoleInfo!
-    deleteRole(roleId: ID!): Boolean
+    createTeam(teamId: ID!, teamName: String, description: String): AdminTeamInfo!
+    updateTeam(teamId: ID!, teamName: String, description: String): AdminTeamInfo!
+    deleteTeam(teamId: ID!): Boolean
 
-    grantUserRole(userId: ID!, roleId: ID!): Boolean
-    revokeUserRole(userId: ID!, roleId: ID!): Boolean
+    grantUserTeam(userId: ID!, teamId: ID!): Boolean
+    revokeUserTeam(userId: ID!, teamId: ID!): Boolean
 
-    setSubjectPermissions(roleId: ID!, permissions: [ID!]!): [AdminPermissionInfo!]!
+    setSubjectPermissions(teamId: ID!, permissions: [ID!]!): [AdminPermissionInfo!]!
 
     setUserCredentials(userId: ID!, providerId: ID!, credentials: Object!): Boolean
 

@@ -21,54 +21,54 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.security.SMObjects;
-import org.jkiss.dbeaver.model.security.user.SMRole;
+import org.jkiss.dbeaver.model.security.user.SMTeam;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Web role info
+ * Web team info
  */
-public class AdminRoleInfo {
+public class AdminTeamInfo {
 
     private final WebSession session;
-    private final SMRole role;
-    private List<String> rolePermissions;
+    private final SMTeam team;
+    private List<String> teamPermissions;
 
-    public AdminRoleInfo(WebSession session, SMRole role) {
-        this.role = role;
+    public AdminTeamInfo(WebSession session, SMTeam team) {
+        this.team = team;
         this.session = session;
-        this.rolePermissions = new ArrayList<>(role.getPermissions());
+        this.teamPermissions = new ArrayList<>(team.getPermissions());
     }
 
-    public String getRoleId() {
-        return role.getRoleId();
+    public String getTeamId() {
+        return team.getTeamId();
     }
 
-    public String getRoleName() {
-        return role.getName();
+    public String getTeamName() {
+        return team.getName();
     }
 
     public String getDescription() {
-        return role.getDescription();
+        return team.getDescription();
     }
 
-    public List<String> getRolePermissions() {
-        return rolePermissions;
+    public List<String> getTeamPermissions() {
+        return teamPermissions;
     }
 
-    public void setRolePermissions(List<String> rolePermissions) {
-        this.rolePermissions = rolePermissions;
+    public void setTeamPermissions(List<String> teamPermissions) {
+        this.teamPermissions = teamPermissions;
     }
 
     @Property
     public SMDataSourceGrant[] getGrantedConnections() throws DBException {
         return session.getAdminSecurityController()
-            .getSubjectObjectPermissionGrants(getRoleId(), SMObjects.DATASOURCE)
+            .getSubjectObjectPermissionGrants(getTeamId(), SMObjects.DATASOURCE)
             .stream()
             .map(objectPermission -> new SMDataSourceGrant(
                 objectPermission.getObjectPermissions().getObjectId(),
-                getRoleId(),
+                getTeamId(),
                 objectPermission.getSubjectType()
             ))
             .toArray(SMDataSourceGrant[]::new);
@@ -76,7 +76,7 @@ public class AdminRoleInfo {
 
     @Property
     public String[] getGrantedUsers() throws DBException {
-        return session.getAdminSecurityController().getRoleSubjects(getRoleId());
+        return session.getAdminSecurityController().getTeamMembers(getTeamId());
     }
 
 }

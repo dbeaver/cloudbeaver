@@ -36,7 +36,7 @@ import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
-import org.jkiss.dbeaver.model.security.user.SMRole;
+import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
@@ -269,11 +269,11 @@ public class CBDatabase {
     }
 
     private void grantAdminPermissionsToUser(String userId) throws DBException {
-        // Grant all roles
-        SMRole[] allRoles = adminSecurityController.readAllRoles();
-        adminSecurityController.setUserRoles(
+        // Grant all teams
+        SMTeam[] allTeams = adminSecurityController.readAllTeams();
+        adminSecurityController.setUserTeams(
             userId,
-            Arrays.stream(allRoles).map(SMRole::getRoleId).toArray(String[]::new),
+            Arrays.stream(allTeams).map(SMTeam::getTeamId).toArray(String[]::new),
             userId);
     }
 
@@ -345,12 +345,12 @@ public class CBDatabase {
                 String adminName = initialData.getAdminName();
                 String adminPassword = initialData.getAdminPassword();
 
-                if (!CommonUtils.isEmpty(initialData.getRoles())) {
-                    // Create roles
-                    for (SMRole role : initialData.getRoles()) {
-                        adminSecurityController.createRole(role.getRoleId(), role.getName(), role.getDescription(), adminName);
+                if (!CommonUtils.isEmpty(initialData.getTeams())) {
+                    // Create teams
+                    for (SMTeam team : initialData.getTeams()) {
+                        adminSecurityController.createTeam(team.getTeamId(), team.getName(), team.getDescription(), adminName);
                         if (adminName != null) {
-                            adminSecurityController.setSubjectPermissions(role.getRoleId(), new ArrayList<>(role.getPermissions()), adminName);
+                            adminSecurityController.setSubjectPermissions(team.getTeamId(), new ArrayList<>(team.getPermissions()), adminName);
                         }
                     }
                 }

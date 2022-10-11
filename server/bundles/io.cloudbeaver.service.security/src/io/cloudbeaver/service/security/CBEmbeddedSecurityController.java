@@ -46,7 +46,7 @@ import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
-import org.jkiss.dbeaver.model.security.user.SMRole;
+import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
@@ -73,7 +73,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     protected static final String CHAR_BOOL_FALSE = "N";
 
     private static final String SUBJECT_USER = "U";
-    private static final String SUBJECT_ROLE = "R";
+    private static final String SUBJECT_TEAM = "R";
     private static final Type MAP_STRING_OBJECT_TYPE = new TypeToken<Map<String, Object>>() {
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
@@ -115,7 +115,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     @Override
     public void createUser(String userId, Map<String, String> metaParameters, boolean enabled) throws DBException {
         if (isSubjectExists(userId)) {
-            throw new DBCException("User or role '" + userId + "' already exists");
+            throw new DBCException("User or team '" + userId + "' already exists");
         }
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
@@ -157,15 +157,15 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Override
-    public void setUserRoles(String userId, String[] roleIds, String grantorId) throws DBCException {
+    public void setUserTeams(String userId, String[] teamIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER_ROLE WHERE USER_ID=?", userId);
-                if (!ArrayUtils.isEmpty(roleIds)) {
+                if (!ArrayUtils.isEmpty(teamIds)) {
                     try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_ROLE(USER_ID,ROLE_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")) {
-                        for (String roleId : roleIds) {
+                        for (String teamId : teamIds) {
                             dbStat.setString(1, userId);
-                            dbStat.setString(2, roleId);
+                            dbStat.setString(2, teamId);
                             dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
                             dbStat.setString(4, grantorId);
                             dbStat.execute();
@@ -175,28 +175,28 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 txn.commit();
             }
         } catch (SQLException e) {
-            throw new DBCException("Error saving user roles in database", e);
+            throw new DBCException("Error saving user teams in database", e);
         }
     }
 
     @NotNull
     @Override
-    public SMRole[] getUserRoles(String userId) throws DBException {
+    public SMTeam[] getUserTeams(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT R.* FROM CB_USER_ROLE UR,CB_ROLE R " +
                     "WHERE UR.USER_ID=? AND UR.ROLE_ID=R.ROLE_ID")) {
                 dbStat.setString(1, userId);
-                List<SMRole> roles = new ArrayList<>();
+                List<SMTeam> teams = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
-                        roles.add(fetchRole(dbResult));
+                        teams.add(fetchTeam(dbResult));
                     }
                 }
-                return roles.toArray(new SMRole[0]);
+                return teams.toArray(new SMTeam[0]);
             }
         } catch (SQLException e) {
-            throw new DBCException("Error while reading user roles", e);
+            throw new DBCException("Error while reading user teams", e);
         }
     }
 
@@ -534,7 +534,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
             }
         } catch (SQLException e) {
-            throw new DBCException("Error saving role in database", e);
+            throw new DBCException("Error reading user credentials", e);
         }
     }
 
@@ -557,56 +557,56 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
             }
         } catch (SQLException e) {
-            throw new DBCException("Error saving role in database", e);
+            throw new DBCException("Error reading user linked providers", e);
         }
     }
 
     ///////////////////////////////////////////
-    // Roles
+    // Teams
 
     @NotNull
     @Override
-    public SMRole[] readAllRoles() throws DBCException {
+    public SMTeam[] readAllTeams() throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            Map<String, SMRole> roles = new LinkedHashMap<>();
+            Map<String, SMTeam> teams = new LinkedHashMap<>();
             try (Statement dbStat = dbCon.createStatement()) {
                 try (ResultSet dbResult = dbStat.executeQuery("SELECT * FROM CB_ROLE ORDER BY ROLE_ID")) {
                     while (dbResult.next()) {
-                        SMRole role = fetchRole(dbResult);
-                        roles.put(role.getRoleId(), role);
+                        SMTeam team = fetchTeam(dbResult);
+                        teams.put(team.getTeamId(), team);
                     }
                 }
                 try (ResultSet dbResult = dbStat.executeQuery("SELECT SUBJECT_ID,PERMISSION_ID\n" +
                     "FROM CB_AUTH_PERMISSIONS AP,CB_ROLE R\n" +
                     "WHERE AP.SUBJECT_ID=R.ROLE_ID\n")) {
                     while (dbResult.next()) {
-                        SMRole role = roles.get(dbResult.getString(1));
-                        if (role != null) {
-                            role.addPermission(dbResult.getString(2));
+                        SMTeam team = teams.get(dbResult.getString(1));
+                        if (team != null) {
+                            team.addPermission(dbResult.getString(2));
                         }
                     }
                 }
             }
-            return roles.values().toArray(new SMRole[0]);
+            return teams.values().toArray(new SMTeam[0]);
         } catch (SQLException e) {
-            throw new DBCException("Error reading roles from database", e);
+            throw new DBCException("Error reading teams from database", e);
         }
     }
 
     @Override
-    public SMRole findRole(String roleId) throws DBCException {
-        return Arrays.stream(readAllRoles())
-            .filter(r -> r.getRoleId().equals(roleId))
+    public SMTeam findTeam(String teamId) throws DBCException {
+        return Arrays.stream(readAllTeams())
+            .filter(r -> r.getTeamId().equals(teamId))
             .findFirst().orElse(null);
     }
 
     @NotNull
     @Override
-    public String[] getRoleSubjects(String roleId) throws DBCException {
+    public String[] getTeamMembers(String teamId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT USER_ID FROM CB_USER_ROLE WHERE ROLE_ID=?")) {
-                dbStat.setString(1, roleId);
+                dbStat.setString(1, teamId);
                 List<String> subjects = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
@@ -616,49 +616,50 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 return subjects.toArray(new String[0]);
             }
         } catch (SQLException e) {
-            throw new DBCException("Error while reading role subjects", e);
+            throw new DBCException("Error while reading team members", e);
         }
     }
 
     @NotNull
-    private SMRole fetchRole(ResultSet dbResult) throws SQLException {
-        return new SMRole(dbResult.getString("ROLE_ID"),
+    private SMTeam fetchTeam(ResultSet dbResult) throws SQLException {
+        return new SMTeam(
+            dbResult.getString("ROLE_ID"),
             dbResult.getString("ROLE_NAME"),
             dbResult.getString("ROLE_DESCRIPTION")
         );
     }
 
     @Override
-    public void createRole(String roleId, String name, String description, String grantor) throws DBCException {
-        if (isSubjectExists(roleId)) {
-            throw new DBCException("User or role '" + roleId + "' already exists");
+    public void createTeam(String teamId, String name, String description, String grantor) throws DBCException {
+        if (isSubjectExists(teamId)) {
+            throw new DBCException("User or team '" + teamId + "' already exists");
         }
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                createAuthSubject(dbCon, roleId, SUBJECT_ROLE);
+                createAuthSubject(dbCon, teamId, SUBJECT_TEAM);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     "INSERT INTO CB_ROLE(ROLE_ID,ROLE_NAME,ROLE_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)")) {
-                    dbStat.setString(1, roleId);
+                    dbStat.setString(1, teamId);
                     dbStat.setString(2, CommonUtils.notEmpty(name));
                     dbStat.setString(3, CommonUtils.notEmpty(description));
                     dbStat.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
                     dbStat.execute();
                 }
 
-                insertPermissions(dbCon, roleId,
+                insertPermissions(dbCon, teamId,
                     new String[] {DBWConstants.PERMISSION_PUBLIC} , grantor);
 
                 txn.commit();
             }
         } catch (SQLException e) {
-            throw new DBCException("Error saving role in database", e);
+            throw new DBCException("Error saving tem in database", e);
         }
     }
 
     @Override
-    public void updateRole(String roleId, String name, String description) throws DBCException {
-        if (!isSubjectExists(roleId)) {
-            throw new DBCException("Role '" + roleId + "' doesn't exists");
+    public void updateTeam(String teamId, String name, String description) throws DBCException {
+        if (!isSubjectExists(teamId)) {
+            throw new DBCException("Team '" + teamId + "' doesn't exists");
         }
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
@@ -666,45 +667,45 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     "UPDATE CB_ROLE SET ROLE_NAME=?,ROLE_DESCRIPTION=? WHERE ROLE_ID=?")) {
                     dbStat.setString(1, CommonUtils.notEmpty(name));
                     dbStat.setString(2, CommonUtils.notEmpty(description));
-                    dbStat.setString(3, roleId);
+                    dbStat.setString(3, teamId);
                     if (dbStat.executeUpdate() <= 0) {
-                        throw new DBCException("Role '" + roleId + "' doesn't exist");
+                        throw new DBCException("Team '" + teamId + "' doesn't exist");
                     }
                 }
                 txn.commit();
             }
         } catch (SQLException e) {
-            throw new DBCException("Error updating role info in database", e);
+            throw new DBCException("Error updating team info in database", e);
         }
     }
 
     @Override
-    public void deleteRole(String roleId) throws DBCException {
+    public void deleteTeam(String teamId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT COUNT(*) FROM CB_USER_ROLE WHERE ROLE_ID=?")) {
-                dbStat.setString(1, roleId);
+                dbStat.setString(1, teamId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
                         int userCount = dbResult.getInt(1);
                         if (userCount > 0) {
-                            throw new DBCException("Role can't be deleted. There are " + userCount + " user(s) who have this role. Un-assign role first.");
+                            throw new DBCException("Team can't be deleted. There are " + userCount + " user(s) who have this team. Un-assign team first.");
                         }
                     }
                 }
             }
 
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                deleteAuthSubject(dbCon, roleId);
+                deleteAuthSubject(dbCon, teamId);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     "DELETE FROM CB_ROLE WHERE ROLE_ID=?")) {
-                    dbStat.setString(1, roleId);
+                    dbStat.setString(1, teamId);
                     dbStat.execute();
                 }
                 txn.commit();
             }
         } catch (SQLException e) {
-            throw new DBCException("Error deleting role from database", e);
+            throw new DBCException("Error deleting team from database", e);
         }
     }
 
@@ -721,7 +722,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 txn.commit();
             }
         } catch (SQLException e) {
-            throw new DBCException("Error saving role permissions in database", e);
+            throw new DBCException("Error saving subject permissions in database", e);
         }
     }
 
@@ -754,7 +755,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
             return permissions;
         } catch (SQLException e) {
-            throw new DBCException("Error saving role in database", e);
+            throw new DBCException("Error reading subject permissions", e);
         }
     }
 
@@ -871,8 +872,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     private Set<String> getAnonymousUserPermissions() throws DBException {
-        var anonymousUserRole = ((WebApplication) DBWorkbench.getPlatform().getApplication()).getAppConfiguration().getAnonymousUserRole();
-        return getSubjectPermissions(anonymousUserRole);
+        var anonymousUserTeam = ((WebApplication) DBWorkbench.getPlatform().getApplication()).getAppConfiguration().getAnonymousUserTeam();
+        return getSubjectPermissions(anonymousUserTeam);
     }
 
     @Override
@@ -1374,9 +1375,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             if (!isSubjectExists(userId)) {
                 var newUser = new SMUser(userId);
                 createUser(newUser.getUserId(), newUser.getMetaParameters(), true);
-                String defaultRoleName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserRole();
-                if (!CommonUtils.isEmpty(defaultRoleName)) {
-                    setUserRoles(userId, new String[]{defaultRoleName}, userId);
+                String defaultTeamName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserTeam();
+                if (!CommonUtils.isEmpty(defaultTeamName)) {
+                    setUserTeams(userId, new String[]{defaultTeamName}, userId);
                 }
             }
             setUserCredentials(userId, authProviderId, userCredentials);
@@ -1384,9 +1385,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             userId = userIdFromCredentials;
         }
         if (authProvider.isTrusted()) {
-            Object reverseProxyUserRoles = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_ROLES);
-            if (reverseProxyUserRoles instanceof List) {
-                setUserRoles(userId, ((List<?>) reverseProxyUserRoles).stream().map(Object::toString).toArray(String[]::new), userId);
+            Object reverseProxyUserTeams = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS);
+            if (reverseProxyUserTeams instanceof List) {
+                setUserTeams(userId, ((List<?>) reverseProxyUserTeams).stream().map(Object::toString).toArray(String[]::new), userId);
             }
         }
         return userId;
@@ -1395,7 +1396,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     protected SMTokens generateNewSessionToken(
         @NotNull String smSessionId,
         @Nullable String userId,
-        @Nullable String authRole, @NotNull Connection dbCon
+        @Nullable String authRole,
+        @NotNull Connection dbCon
     ) throws SQLException, DBException {
         JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE SESSION_ID=?", smSessionId);
         return generateNewSessionTokens(smSessionId, userId, authRole, dbCon);
@@ -1648,10 +1650,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private Set<String> getAllLinkedSubjects(String subjectId) throws DBException {
         Set<String> allSubjects = new HashSet<>();
         allSubjects.add(subjectId);
-        var userRoleIds = Arrays.stream(getUserRoles(subjectId))
-            .map(SMRole::getRoleId)
+        var userTeamIds = Arrays.stream(getUserTeams(subjectId))
+            .map(SMTeam::getTeamId)
             .collect(Collectors.toSet());
-        allSubjects.addAll(userRoleIds);
+        allSubjects.addAll(userTeamIds);
         return allSubjects;
     }
 
