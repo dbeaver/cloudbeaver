@@ -16,7 +16,7 @@ type RMResource {
     folder: Boolean!
     length: Int!
     # Properties map
-    properties: Object!
+    properties: Object
 }
 
 input RMSubjectProjectPermissions {
