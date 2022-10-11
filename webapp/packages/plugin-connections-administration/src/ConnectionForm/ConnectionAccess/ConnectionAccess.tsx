@@ -62,8 +62,8 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
 
   useAutoLoad(state, selected);
 
-  const users = useMapResource(ConnectionAccess, UsersResource, CachedMapAllKey);
-  const teams = useMapResource(ConnectionAccess, TeamsResource, CachedMapAllKey);
+  const users = useMapResource(ConnectionAccess, UsersResource, CachedMapAllKey, { active: selected });
+  const teams = useMapResource(ConnectionAccess, TeamsResource, CachedMapAllKey, { active: selected });
 
   const grantedUsers = useMemo(() => computed(() => users.resource.values
     .filter(user => state.state.grantedSubjects.includes(user.userId))
