@@ -51,6 +51,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
 
   const state = useGrantedConnections(formState.config, formState.mode);
   const { selected } = useTab(tabId);
+  const loaded = state.state.loaded;
 
   const dbDriverResource = useMapResource(
     GrantedConnections,
@@ -70,10 +71,10 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
   ), [state.state.grantedSubjects, connections.resource]);
 
   useEffect(() => {
-    if (selected && !state.state.loaded) {
+    if (selected && !loaded) {
       state.load();
     }
-  }, [selected, state.state.loaded]);
+  });
 
   if (!selected) {
     return null;

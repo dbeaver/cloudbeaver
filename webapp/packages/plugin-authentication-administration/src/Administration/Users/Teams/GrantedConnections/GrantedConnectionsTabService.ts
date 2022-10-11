@@ -43,7 +43,7 @@ export class GrantedConnectionsTabService extends Bootstrap {
       panel: () => GrantedConnections,
     });
 
-    this.teamFormService.formSubmittingTask.addHandler(this.save.bind(this));
+    this.teamFormService.afterFormSubmittingTask.addHandler(this.save.bind(this));
   }
 
   load(): Promise<void> | void { }
