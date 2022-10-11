@@ -644,7 +644,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         Map<String, Object> configProps = new LinkedHashMap<>();
         if (configFile.exists()) {
             log.debug("Read configuration [" + configFile.getAbsolutePath() + "]");
-            readConfigurationFile(configFile, configProperties);
+            readConfigurationFile(configFile, this.configProperties); // saves original configuration file
             readConfigurationFile(configFile, configProps);
             patchConfigurationWithProperties(configProps); // patch original properties
         }
@@ -873,7 +873,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         Map<String, Object> rootConfig = new LinkedHashMap<>();
         {
             var serverConfigProperties = new LinkedHashMap<String, Object>();
-            var originServerConfig = getServerConfigProps(configProperties);
+            var originServerConfig = getServerConfigProps(this.configProperties); // get server properties from original configuration file
             rootConfig.put("server", serverConfigProperties);
             if (!CommonUtils.isEmpty(newServerName)) {
                 putToRuntimeConfig(originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_NAME, newServerName);
@@ -1027,6 +1027,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return WebDriverRegistry.getInstance();
     }
 
+    // gets info about patterns from original configuration file and saves it to runtime config
     private void putToRuntimeConfig(Map<String, Object> oldConfig, Map<String, Object> newConfig, String key, Object defaultValue) {
         Object oldValue = oldConfig.get(key);
         if (oldValue instanceof String && GeneralUtils.isVariablePattern((String) oldValue)) {
