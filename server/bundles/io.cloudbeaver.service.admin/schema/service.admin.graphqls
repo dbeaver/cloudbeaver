@@ -129,7 +129,7 @@ extend type Query {
     grantUserTeam(userId: ID!, teamId: ID!): Boolean
     revokeUserTeam(userId: ID!, teamId: ID!): Boolean
 
-    setSubjectPermissions(teamId: ID!, permissions: [ID!]!): [AdminPermissionInfo!]!
+    setSubjectPermissions(subjectId: ID!, permissions: [ID!]!): [AdminPermissionInfo!]!
 
     setUserCredentials(userId: ID!, providerId: ID!, credentials: Object!): Boolean
 
