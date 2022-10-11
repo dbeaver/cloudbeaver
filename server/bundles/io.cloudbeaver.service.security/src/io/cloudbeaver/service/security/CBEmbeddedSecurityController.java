@@ -160,9 +160,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public void setUserTeams(String userId, String[] teamIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER_ROLE WHERE USER_ID=?", userId);
+                JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER_TEAM WHERE USER_ID=?", userId);
                 if (!ArrayUtils.isEmpty(teamIds)) {
-                    try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_ROLE(USER_ID,ROLE_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")) {
+                    try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_TEAM(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")) {
                         for (String teamId : teamIds) {
                             dbStat.setString(1, userId);
                             dbStat.setString(2, teamId);
@@ -184,8 +184,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public SMTeam[] getUserTeams(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT R.* FROM CB_USER_ROLE UR,CB_ROLE R " +
-                    "WHERE UR.USER_ID=? AND UR.ROLE_ID=R.ROLE_ID")) {
+                "SELECT R.* FROM CB_USER_TEAM UR,CB_TEAM R " +
+                    "WHERE UR.USER_ID=? AND UR.TEAM_ID=R.TEAM_ID")) {
                 dbStat.setString(1, userId);
                 List<SMTeam> teams = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -570,15 +570,15 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             Map<String, SMTeam> teams = new LinkedHashMap<>();
             try (Statement dbStat = dbCon.createStatement()) {
-                try (ResultSet dbResult = dbStat.executeQuery("SELECT * FROM CB_ROLE ORDER BY ROLE_ID")) {
+                try (ResultSet dbResult = dbStat.executeQuery("SELECT * FROM CB_TEAM ORDER BY TEAM_ID")) {
                     while (dbResult.next()) {
                         SMTeam team = fetchTeam(dbResult);
                         teams.put(team.getTeamId(), team);
                     }
                 }
                 try (ResultSet dbResult = dbStat.executeQuery("SELECT SUBJECT_ID,PERMISSION_ID\n" +
-                    "FROM CB_AUTH_PERMISSIONS AP,CB_ROLE R\n" +
-                    "WHERE AP.SUBJECT_ID=R.ROLE_ID\n")) {
+                    "FROM CB_AUTH_PERMISSIONS AP,CB_TEAM R\n" +
+                    "WHERE AP.SUBJECT_ID=R.TEAM_ID\n")) {
                     while (dbResult.next()) {
                         SMTeam team = teams.get(dbResult.getString(1));
                         if (team != null) {
@@ -605,7 +605,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public String[] getTeamMembers(String teamId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT USER_ID FROM CB_USER_ROLE WHERE ROLE_ID=?")) {
+                "SELECT USER_ID FROM CB_USER_TEAM WHERE TEAM_ID=?")) {
                 dbStat.setString(1, teamId);
                 List<String> subjects = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -623,9 +623,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     @NotNull
     private SMTeam fetchTeam(ResultSet dbResult) throws SQLException {
         return new SMTeam(
-            dbResult.getString("ROLE_ID"),
-            dbResult.getString("ROLE_NAME"),
-            dbResult.getString("ROLE_DESCRIPTION")
+            dbResult.getString("TEAM_ID"),
+            dbResult.getString("TEAM_NAME"),
+            dbResult.getString("TEAM_DESCRIPTION")
         );
     }
 
@@ -638,7 +638,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 createAuthSubject(dbCon, teamId, SUBJECT_TEAM);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "INSERT INTO CB_ROLE(ROLE_ID,ROLE_NAME,ROLE_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)")) {
+                    "INSERT INTO CB_TEAM(TEAM_ID,TEAM_NAME,TEAM_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)")) {
                     dbStat.setString(1, teamId);
                     dbStat.setString(2, CommonUtils.notEmpty(name));
                     dbStat.setString(3, CommonUtils.notEmpty(description));
@@ -664,7 +664,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "UPDATE CB_ROLE SET ROLE_NAME=?,ROLE_DESCRIPTION=? WHERE ROLE_ID=?")) {
+                    "UPDATE CB_TEAM SET TEAM_NAME=?,TEAM_DESCRIPTION=? WHERE TEAM_ID=?")) {
                     dbStat.setString(1, CommonUtils.notEmpty(name));
                     dbStat.setString(2, CommonUtils.notEmpty(description));
                     dbStat.setString(3, teamId);
@@ -683,7 +683,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public void deleteTeam(String teamId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT COUNT(*) FROM CB_USER_ROLE WHERE ROLE_ID=?")) {
+                "SELECT COUNT(*) FROM CB_USER_TEAM WHERE TEAM_ID=?")) {
                 dbStat.setString(1, teamId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
@@ -698,7 +698,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 deleteAuthSubject(dbCon, teamId);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "DELETE FROM CB_ROLE WHERE ROLE_ID=?")) {
+                    "DELETE FROM CB_TEAM WHERE TEAM_ID=?")) {
                     dbStat.setString(1, teamId);
                     dbStat.execute();
                 }
@@ -765,8 +765,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT DISTINCT AP.PERMISSION_ID FROM CB_AUTH_PERMISSIONS AP,CB_USER_ROLE UR\n" +
-                    "WHERE UR.ROLE_ID=AP.SUBJECT_ID AND UR.USER_ID=?")) {
+                "SELECT DISTINCT AP.PERMISSION_ID FROM CB_AUTH_PERMISSIONS AP,CB_USER_TEAM UR\n" +
+                    "WHERE UR.TEAM_ID=AP.SUBJECT_ID AND UR.USER_ID=?")) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
