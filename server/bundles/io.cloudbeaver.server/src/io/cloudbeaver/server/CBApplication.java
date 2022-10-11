@@ -124,7 +124,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     private String localHostAddress;
     private final List<InetAddress> localInetAddresses = new ArrayList<>();
 
-    private final CBEventController eventController = new CBEventController();
+    protected final CBEventController eventController = new CBEventController();
 
     private WebSessionManager sessionManager;
 
@@ -348,7 +348,6 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         }
 
         eventController.scheduleCheckJob();
-        ;
 
         runWebServer();
 
