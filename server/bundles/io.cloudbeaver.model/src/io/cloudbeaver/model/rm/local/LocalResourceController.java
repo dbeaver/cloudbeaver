@@ -167,6 +167,7 @@ public class LocalResourceController implements RMController {
                 RMProjectType.SHARED, true)
             )
             .filter(Objects::nonNull)
+            .sorted(Comparator.comparing(RMProject::getDisplayName))
             .collect(Collectors.toList());
     }
 
