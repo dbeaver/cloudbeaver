@@ -824,25 +824,15 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 + "VALUES(?,?,?,?,?,?,?,?,?)")) {
             dbStat.setString(1, sessionId);
             dbStat.setString(2, appSessionId);
-            if (userId != null) {
-                dbStat.setString(3, userId);
-            } else {
-                dbStat.setNull(3, Types.VARCHAR);
-            }
+            JDBCUtils.setStringOrNull(dbStat, 3, userId);
 
             Timestamp currentTS = new Timestamp(System.currentTimeMillis());
             dbStat.setTimestamp(4, currentTS);
             dbStat.setTimestamp(5, currentTS);
-            if (parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS) != null) {
-                dbStat.setString(6, parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS).toString());
-            } else {
-                dbStat.setNull(6, Types.VARCHAR);
-            }
-            if (parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT) != null) {
-                dbStat.setString(7, parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT).toString());
-            } else {
-                dbStat.setNull(7, Types.VARCHAR);
-            }
+            JDBCUtils.setStringOrNull(dbStat, 6, CommonUtils.truncateString(CommonUtils.toString(
+                parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS), null), 128));
+            JDBCUtils.setStringOrNull(dbStat, 7, CommonUtils.truncateString(CommonUtils.toString(
+                parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT), null), 255));
             dbStat.setString(8, database.getInstanceId());
             dbStat.setString(9, sessionType.getSessionType());
             dbStat.execute();
@@ -1022,16 +1012,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "UPDATE CB_AUTH_ATTEMPT SET AUTH_STATUS=?,AUTH_ERROR=?,SESSION_ID=? WHERE AUTH_ID=?")) {
                 dbStat.setString(1, authStatus.toString());
-                if (error != null) {
-                    dbStat.setString(2, error);
-                } else {
-                    dbStat.setNull(2, Types.VARCHAR);
-                }
-                if (smSessionId != null) {
-                    dbStat.setString(3, smSessionId);
-                } else {
-                    dbStat.setNull(3, Types.VARCHAR);
-                }
+                JDBCUtils.setStringOrNull(dbStat, 2, error);
+                JDBCUtils.setStringOrNull(dbStat, 3, smSessionId);
                 dbStat.setString(4, authId);
                 if (dbStat.executeUpdate() <= 0) {
                     throw new DBCException("Auth attempt '" + authId + "' doesn't exist");
@@ -1416,16 +1398,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             String smAccessToken = SecurityUtils.generatePassword(32);
             dbStat.setString(1, smAccessToken);
             dbStat.setString(2, smSessionId);
-            if (userId == null) {
-                dbStat.setNull(3, Types.VARCHAR);
-            } else {
-                dbStat.setString(3, userId);
-            }
-            if (authRole == null) {
-                dbStat.setNull(4, Types.VARCHAR);
-            } else {
-                dbStat.setString(4, authRole);
-            }
+            JDBCUtils.setStringOrNull(dbStat, 3, userId);
+            JDBCUtils.setStringOrNull(dbStat, 4, authRole);
             var accessTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(smConfig.getAccessTokenTtl()));
             dbStat.setTimestamp(5, accessTokenExpirationTime);
 
@@ -1511,22 +1485,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "UPDATE CB_SESSION SET USER_ID=?,LAST_ACCESS_TIME=?,LAST_ACCESS_REMOTE_ADDRESS=?,LAST_ACCESS_USER_AGENT=?,LAST_ACCESS_INSTANCE_ID=? WHERE SESSION_ID=?")) {
-                if (userId == null) {
-                    dbStat.setNull(1, Types.VARCHAR);
-                } else {
-                    dbStat.setString(1, userId);
-                }
+                JDBCUtils.setStringOrNull(dbStat, 1, userId);
                 dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-                if (parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS) != null) {
-                    dbStat.setString(3, CommonUtils.truncateString(parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS).toString(), 128));
-                } else {
-                    dbStat.setNull(3, Types.VARCHAR);
-                }
-                if (parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT) != null) {
-                    dbStat.setString(4, CommonUtils.truncateString(parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT).toString(), 255));
-                } else {
-                    dbStat.setNull(4, Types.VARCHAR);
-                }
+                JDBCUtils.setStringOrNull(dbStat, 3, CommonUtils.truncateString(CommonUtils.toString(
+                    parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_ADDRESS), null), 128));
+                JDBCUtils.setStringOrNull(dbStat, 4, CommonUtils.truncateString(CommonUtils.toString(
+                    parameters.get(SMConstants.SESSION_PARAM_LAST_REMOTE_USER_AGENT), null), 255));
                 dbStat.setString(5, database.getInstanceId());
 
                 dbStat.setString(6, sessionId);
