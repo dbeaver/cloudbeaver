@@ -23,7 +23,7 @@ interface IMousePosition {
 type DraggingCallback = (
   startPosition: IDraggingPosition,
   currentPosition: IDraggingPosition,
-  event: React.MouseEvent<HTMLDivElement, MouseEvent> | MouseEvent
+  event: React.MouseEvent<HTMLDivElement> | MouseEvent
 ) => void;
 
 interface IDraggingState {
@@ -37,7 +37,7 @@ interface IDraggingState {
 interface IDraggingCallbacks {
   onDragStart?: (
     startPosition: IDraggingPosition,
-    event: React.MouseEvent<HTMLDivElement, MouseEvent> | MouseEvent
+    event: React.MouseEvent<HTMLDivElement> | MouseEvent
   ) => void;
   onDragOver?: DraggingCallback;
   onDragEnd?: DraggingCallback;
@@ -56,7 +56,7 @@ function getDelta(startPosition: IMousePosition | null, currentPosition: IMouseP
   return Math.max(xDelta, yDelta);
 }
 
-function getCellPositionFromEvent(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+function getCellPositionFromEvent(event: React.MouseEvent<HTMLDivElement>) {
   const target = event.target as HTMLElement;
   const cell = target.closest('[role="gridcell"]') as HTMLElement | null;
 
@@ -96,7 +96,7 @@ export function useGridDragging(props: IDraggingCallbacks) {
     mouseDown: false,
   }), false);
 
-  const onMouseDownHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const onMouseDownHandler = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     const position = getCellPositionFromEvent(event);
 
     if (!position) {
@@ -108,7 +108,7 @@ export function useGridDragging(props: IDraggingCallbacks) {
     state.startDraggingCell = { colIdx: position.colIdx, rowIdx: position.rowIdx };
   }, []);
 
-  const onMouseMoveHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const onMouseMoveHandler = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     if (!state.mouseDown) {
       return;
     }
@@ -155,7 +155,7 @@ export function useGridDragging(props: IDraggingCallbacks) {
     }
   }, []);
 
-  const onMouseUpHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent> | MouseEvent) => {
+  const onMouseUpHandler = useCallback((event: React.MouseEvent<HTMLDivElement> | MouseEvent) => {
     state.mouseDown = false;
     state.startMousePosition = null;
 

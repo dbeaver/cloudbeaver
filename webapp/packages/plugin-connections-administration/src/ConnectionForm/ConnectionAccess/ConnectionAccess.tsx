@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   TextPlaceholder,
   Loader,
@@ -62,22 +62,22 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
 
   useAutoLoad(state, selected);
 
-  const users = useMapResource(ConnectionAccess, UsersResource, CachedMapAllKey);
-  const roles = useMapResource(ConnectionAccess, RolesResource, CachedMapAllKey);
+  const users = useMapResource(ConnectionAccess, UsersResource, CachedMapAllKey, { active: selected });
+  const teams = useMapResource(ConnectionAccess, TeamsResource, CachedMapAllKey, { active: selected });
 
   const grantedUsers = useMemo(() => computed(() => users.resource.values
     .filter(user => state.state.grantedSubjects.includes(user.userId))
   ), [state.state.grantedSubjects, users.resource]);
 
-  const grantedRoles = useMemo(() => computed(() => roles.resource.values
-    .filter(role => state.state.grantedSubjects.includes(role.roleId))
-  ), [state.state.grantedSubjects, roles.resource]);
+  const grantedTeams = useMemo(() => computed(() => teams.resource.values
+    .filter(team => state.state.grantedSubjects.includes(team.teamId))
+  ), [state.state.grantedSubjects, teams.resource]);
 
   if (!selected) {
     return null;
   }
 
-  const loading = users.isLoading() || roles.isLoading() || state.state.loading;
+  const loading = users.isLoading() || teams.isLoading() || state.state.loading;
   const cloud = formState.info ? isCloudConnection(formState.info) : false;
   const disabled = loading || !state.state.loaded || formState.disabled || cloud;
   let info: TLocalizationToken | null = null;
@@ -89,10 +89,10 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
   }
 
   return styled(styles, BASE_CONTAINERS_STYLES)(
-    <Loader state={[users, roles, state.state]}>
+    <Loader state={[users, teams, state.state]}>
       {() => styled(styles, BASE_CONTAINERS_STYLES)(
         <ColoredContainer parent gap vertical>
-          {!users.resource.values.length && !roles.resource.values.length ? (
+          {!users.resource.values.length && !teams.resource.values.length ? (
             <Group keepSize large>
               <TextPlaceholder>{translate('connections_administration_connection_access_empty')}</TextPlaceholder>
             </Group>
@@ -102,7 +102,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
               <Container gap overflow>
                 <ConnectionAccessGrantedList
                   grantedUsers={grantedUsers.get()}
-                  grantedRoles={grantedRoles.get()}
+                  grantedTeams={grantedTeams.get()}
                   disabled={disabled}
                   onEdit={state.edit}
                   onRevoke={state.revoke}
@@ -110,7 +110,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
                 {state.state.editing && (
                   <ConnectionAccessList
                     userList={users.resource.values}
-                    roleList={roles.resource.values}
+                    teamList={teams.resource.values}
                     grantedSubjects={state.state.grantedSubjects}
                     disabled={disabled}
                     onGrant={state.grant}

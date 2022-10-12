@@ -17,7 +17,7 @@ export class MetadataMap<TKey, TValue> {
 
   private syncData: Array<[TKey, TValue]> | null;
 
-  constructor(private defaultValueGetter?: DefaultValueGetter<TKey, TValue>) {
+  constructor(private readonly defaultValueGetter?: DefaultValueGetter<TKey, TValue>) {
     this.data = observable(new Map());
     this.length = 0;
     this.syncData = null;
@@ -74,7 +74,7 @@ export class MetadataMap<TKey, TValue> {
 
     const value = provider(key, this);
     untracked(() => {
-      this.set(key, value);
+      this.set(key, observable(value as any));
       this.length++;
     });
     return this.data.get(key)!;

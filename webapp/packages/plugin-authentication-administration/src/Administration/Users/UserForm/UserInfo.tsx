@@ -12,8 +12,6 @@ import styled, { css } from 'reshadow';
 
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
 import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, FieldCheckbox, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useDataResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
-
-
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IUserFormProps } from './UserFormService';
@@ -32,8 +30,8 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
   const translate = useTranslate();
   const userMetaParameters = useDataResource(UserInfo, UserMetaParametersResource, undefined);
 
-  const handleRoleChange = useCallback(
-    (roleId: string, value: boolean) => { controller.credentials.roles.set(roleId, value); },
+  const handleTeamChange = useCallback(
+    (teamId: string, value: boolean) => { controller.credentials.teams.set(teamId, value); },
     []
   );
 
@@ -98,19 +96,19 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
         >
           {translate('authentication_user_enabled')}
         </FieldCheckbox>
-        <GroupTitle>{translate('authentication_user_role')}</GroupTitle>
-        {controller.roles.map(role => {
-          const label = `${role.roleId}${role.roleName && role.roleName !== role.roleId ? ' (' + role.roleName + ')' : ''}`;
-          const tooltip = `${label}${role.description ? '\n' + role.description : ''}`;
+        <GroupTitle>{translate('authentication_user_team')}</GroupTitle>
+        {controller.teams.map(team => {
+          const label = `${team.teamId}${team.teamName && team.teamName !== team.teamId ? ' (' + team.teamName + ')' : ''}`;
+          const tooltip = `${label}${team.description ? '\n' + team.description : ''}`;
           return (
             <FieldCheckbox
-              key={role.roleId}
-              id={`${controller.user.userId}_${role.roleId}`}
+              key={team.teamId}
+              id={`${controller.user.userId}_${team.teamId}`}
               title={tooltip}
-              name='role'
-              checked={!!controller.credentials.roles.get(role.roleId)}
+              name='team'
+              checked={!!controller.credentials.teams.get(team.teamId)}
               disabled={controller.isSaving}
-              onChange={checked => handleRoleChange(role.roleId, checked)}
+              onChange={checked => handleTeamChange(team.teamId, checked)}
             >
               {label}
             </FieldCheckbox>

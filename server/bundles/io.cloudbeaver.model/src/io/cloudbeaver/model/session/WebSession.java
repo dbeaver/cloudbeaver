@@ -408,7 +408,7 @@ public class WebSession extends AbstractSessionPersistent
     private Set<String> readAccessibleConnectionIds() {
         WebUser user = getUser();
         String subjectId = user == null ?
-            application.getAppConfiguration().getAnonymousUserRole() : user.getUserId();
+            application.getAppConfiguration().getAnonymousUserTeam() : user.getUserId();
 
         try {
             return getSecurityController()

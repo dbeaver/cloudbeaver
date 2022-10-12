@@ -161,7 +161,7 @@ public class WebSessionAuthProcessor {
                     providerConfig,
                     userCredentials);
 
-                if (!configMode && securityController.getUserPermissions(userId).isEmpty()) {
+                if (!configMode && securityController.getUserPermissions(userId, authInfo.getAuthRole()).isEmpty()) {
                     throw new DBWebException("Access denied (no permissions)");
                 }
                 if (!configMode && !securityController.getUserById(userId).isEnabled()) {
