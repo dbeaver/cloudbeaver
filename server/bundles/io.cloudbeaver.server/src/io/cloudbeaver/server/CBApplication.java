@@ -109,7 +109,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     protected final Map<String, Object> databaseConfiguration = new HashMap<>();
     private final CBAppConfig appConfiguration = new CBAppConfig();
     private Map<String, String> externalProperties = new LinkedHashMap<>();
-    private Map<String, Object> configProperties = new LinkedHashMap<>();
+    private Map<String, Object> originalConfigurationProperties = new LinkedHashMap<>();
 
     // Persistence
     private SMAdminController securityController;
@@ -644,8 +644,10 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         Map<String, Object> configProps = new LinkedHashMap<>();
         if (configFile.exists()) {
             log.debug("Read configuration [" + configFile.getAbsolutePath() + "]");
-            readConfigurationFile(configFile, this.configProperties); // saves original configuration file
-            readConfigurationFile(configFile, configProps);
+            // saves original configuration file
+            this.originalConfigurationProperties.putAll(readConfigurationFile(configFile));
+
+            configProps.putAll(readConfigurationFile(configFile));
             patchConfigurationWithProperties(configProps); // patch original properties
         }
 
@@ -672,10 +674,9 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return configProps;
     }
 
-    private void readConfigurationFile(File configFile, Map<String, Object> configProps) throws DBException {
+    private Map<String, Object> readConfigurationFile(File configFile) throws DBException {
         try (Reader reader = new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)) {
-            configProps.putAll(JSONUtils.parseMap(getGson(), reader));
-
+            return JSONUtils.parseMap(getGson(), reader);
         } catch (IOException e) {
             throw new DBException("Error parsing server configuration", e);
         }
@@ -873,7 +874,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         Map<String, Object> rootConfig = new LinkedHashMap<>();
         {
             var serverConfigProperties = new LinkedHashMap<String, Object>();
-            var originServerConfig = getServerConfigProps(this.configProperties); // get server properties from original configuration file
+            var originServerConfig = getServerConfigProps(this.originalConfigurationProperties); // get server properties from original configuration file
             rootConfig.put("server", serverConfigProperties);
             if (!CommonUtils.isEmpty(newServerName)) {
                 putToRuntimeConfig(originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_NAME, newServerName);
@@ -897,7 +898,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         }
         {
             var appConfigProperties = new LinkedHashMap<String, Object>();
-            Map<String, Object> oldAppConfig = JSONUtils.getObject(configProperties, "app");
+            Map<String, Object> oldAppConfig = JSONUtils.getObject(this.originalConfigurationProperties, "app");
             rootConfig.put("app", appConfigProperties);
 
             putToRuntimeConfig(
