@@ -8,6 +8,7 @@ fragment NavNodeInfo on NavigatorNodeInfo {
   inline
   navigable
   features
+  projectId
   object {
     features
   }

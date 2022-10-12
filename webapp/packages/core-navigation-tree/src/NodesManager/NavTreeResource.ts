@@ -49,6 +49,7 @@ export interface INavNodeMoveData {
 }
 
 export interface INavNodeRenameData {
+  projectId?: string;
   nodeId: string;
   newNodeId: string;
 }
@@ -264,6 +265,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
     this.markOutdated(node.parentId);
     await this.onNodeRename.execute({
+      projectId: node.projectId,
       nodeId: node.id,
       newNodeId,
     });

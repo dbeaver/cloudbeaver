@@ -124,6 +124,7 @@ export class PluginBootstrap extends Bootstrap {
                 const parents = NodeManagerUtils.parentsFromPath(nodeId);
 
                 dataSource.setNodeInfo({
+                  projectId: result.projectId,
                   nodeId,
                   parents,
                 });
@@ -246,6 +247,7 @@ export class PluginBootstrap extends Bootstrap {
           const parents = NodeManagerUtils.parentsFromPath(nodeId);
 
           dataSource.setNodeInfo({
+            projectId: node.projectId,
             nodeId,
             parents,
           });

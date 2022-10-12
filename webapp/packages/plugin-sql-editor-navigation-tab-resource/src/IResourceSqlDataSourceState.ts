@@ -6,12 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+
 export interface IResourceNodeInfo {
   nodeId: string;
+  projectId?: string;
   parents: string[];
 }
 
 export interface IResourceSqlDataSourceState {
   name?: string;
   nodeInfo?: IResourceNodeInfo;
+  executionContext?: IConnectionExecutionContextInfo;
 }

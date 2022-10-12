@@ -68,7 +68,13 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
             !['undefined', 'object'].includes(typeof value.nodeInfo)
             || !['string', 'undefined'].includes(typeof value.name)
             || !['string', 'undefined'].includes(typeof value.nodeInfo?.nodeId)
+            || !['string', 'undefined'].includes(typeof value.nodeInfo?.projectId)
             || !['undefined', 'object'].includes(typeof value.nodeInfo?.parents)
+            || !['undefined', 'object'].includes(typeof value.executionContext)
+            || !['string', 'undefined'].includes(typeof value.executionContext?.connectionId)
+            || !['string', 'undefined'].includes(typeof value.executionContext?.id)
+            || !['string', 'undefined'].includes(typeof value.executionContext?.defaultCatalog)
+            || !['string', 'undefined'].includes(typeof value.executionContext?.defaultSchema)
           ) {
             map.delete(key);
           }
@@ -110,8 +116,8 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
           rename: this.rename.bind(this),
           read: this.read.bind(this),
           write: this.write.bind(this),
-          getProperty: this.getProperty.bind(this),
-          setProperty: this.setProperty.bind(this),
+          getProperties: this.getProperties.bind(this),
+          setProperties: this.setProperties.bind(this),
         });
 
         dataSource.setInfo({
@@ -306,11 +312,10 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     }
   }
 
-  private async getProperty(
+  private async getProperties(
     dataSource: ResourceSqlDataSource,
-    nodeId: string,
-    name: string
-  ): Promise<string | undefined> {
+    nodeId: string
+  ): Promise<Record<string, any>> {
     if (!dataSource.nodeInfo) {
       throw new Error('Node info is not provided');
     }
@@ -323,21 +328,20 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
         throw new Error('Can\'t find resource');
       }
 
-      return await this.navResourceNodeService.getProperty(resourceData, name);
+      return await this.navResourceNodeService.getProperties(resourceData);
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_resource_manager_sync_script_error');
       throw exception;
     }
   }
 
-  private async setProperty(
+  private async setProperties(
     dataSource: ResourceSqlDataSource,
     nodeId: string,
-    name: string,
-    value: string
-  ): Promise<void> {
+    diff: Record<string, any>
+  ): Promise<Record<string, any>> {
     if (!this.resourceManagerService.enabled || !dataSource.nodeInfo) {
-      return;
+      return {};
     }
 
     try {
@@ -345,10 +349,10 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       const resourceData = this.navResourceNodeService.getResourceData(nodeId);
 
       if (!resourceData) {
-        return;
+        return {};
       }
 
-      await this.navResourceNodeService.setProperty(resourceData, name, value);
+      return await this.navResourceNodeService.setProperties(resourceData, diff);
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
       throw exception;
