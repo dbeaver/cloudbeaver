@@ -65,19 +65,18 @@ export class NavResourceNodeService {
     );
   }
 
-  async setProperty(resourceData: IResourceData, name: string, value: string) {
-    await this.resourceManagerResource.setResourceProperty(
+  async setProperties(resourceData: IResourceData, diff: Record<string, any>): Promise<Record<string, any>> {
+    return await this.resourceManagerResource.setResourceProperties(
       resourceData.key.projectId,
       resourceData.resourcePath,
-      name,
-      value,
+      diff
     );
   }
 
-  async getProperty(resourceData: IResourceData, name: string): Promise<string | undefined> {
+  async getProperties(resourceData: IResourceData): Promise<Record<string, any>> {
     const resource = await this.loadResourceInfo(resourceData);
 
-    return resource?.properties[name];
+    return resource?.properties ?? {};
   }
 
   getResourceData(nodeId: string): IResourceData | undefined {

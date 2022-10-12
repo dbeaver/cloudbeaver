@@ -4,7 +4,7 @@ mutation setResourceProperty(
     $name: ID!
     $value: String
 ) {
-    rmSetResourceProperty(
+    properties: rmSetResourceProperty(
         projectId: $projectId
         resourcePath: $resourcePath
         name: $name

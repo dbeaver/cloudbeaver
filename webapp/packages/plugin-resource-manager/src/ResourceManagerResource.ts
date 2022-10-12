@@ -56,21 +56,42 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
     // this.set();
   }
 
-  async setResourceProperty(projectId: string, resourcePath: string, name: string, value: string) {
-    await this.graphQLService.sdk.setResourceProperty({
-      projectId,
-      resourcePath,
-      name,
-      value,
-    });
-
+  async setResourceProperties(
+    projectId: string,
+    resourcePath: string,
+    diff: Record<string, any>
+  ): Promise<Record<string, any>> {
     const folder = this.getFolder(resourcePath);
 
+    let properties: Record<string, any> | undefined;
+
+    await this.load({ projectId, folder });
     const resource = this.getResource({ projectId, folder }, resourcePath);
 
     if (resource) {
-      resource.properties[name] = value;
+      properties = resource.properties;
     }
+
+    for (const [name, value] of Object.entries(diff)) {
+      if (properties?.[name] === value) {
+        continue;
+      }
+
+      const { properties: newProperties } = await this.graphQLService.sdk.setResourceProperty({
+        projectId,
+        resourcePath,
+        name,
+        value,
+      });
+
+      // properties = newProperties;
+    }
+
+    if (properties && resource) {
+      resource.properties = properties;
+    }
+
+    return resource?.properties ?? {};
   }
 
   async createResource(projectId: string, resourcePath: string, folder: boolean) {

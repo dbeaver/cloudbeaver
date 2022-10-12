@@ -15,6 +15,12 @@ import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-s
 
 import type { IResourceNodeInfo, IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
 
+interface IResourceProperties {
+  'default-datasource'?: string;
+  'default-catalog'?: string;
+  'default-schema'?: string;
+}
+
 interface IResourceInfo {
   isReadonly?: (dataSource: ResourceSqlDataSource) => boolean;
 }
@@ -23,12 +29,18 @@ interface IResourceActions {
   rename(dataSource: ResourceSqlDataSource, nodeId: string, name: string): Promise<string>;
   read(dataSource: ResourceSqlDataSource, nodeId: string): Promise<string>;
   write(dataSource: ResourceSqlDataSource, nodeId: string, value: string): Promise<void>;
-  getProperty(dataSource: ResourceSqlDataSource, nodeId: string,  name: string): Promise<string | undefined>;
-  setProperty(dataSource: ResourceSqlDataSource, nodeId: string, name: string, value: string): Promise<void>;
+  getProperties(
+    dataSource: ResourceSqlDataSource,
+    nodeId: string
+  ): Promise<Record<string, any>>;
+  setProperties(
+    dataSource: ResourceSqlDataSource,
+    nodeId: string,
+    diff: Record<string, any>
+  ): Promise<Record<string, any>>;
 }
 
 const VALUE_SYNC_DELAY = 1 * 1000;
-const EXECUTION_CONTEXT_BINDING = 'execution-context-binding';
 
 export class ResourceSqlDataSource extends BaseSqlDataSource {
   static key = 'resource';
@@ -46,7 +58,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   get executionContext(): IConnectionExecutionContextInfo | undefined {
-    return this.resourceProperty;
+    return this.state.executionContext;
   }
 
   get nodeInfo(): IResourceNodeInfo | undefined {
@@ -72,7 +84,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   private info?: IResourceInfo;
   private lastAction?: () => Promise<void>;
   private readonly state: IResourceSqlDataSourceState;
-  private resourceProperty: IConnectionExecutionContextInfo | undefined;
+  private resourceProperties: IResourceProperties;
 
   private loading: boolean;
   private loaded: boolean;
@@ -88,10 +100,11 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.propertySaved = true;
     this.loading = false;
     this.loaded = false;
+    this.resourceProperties = {};
     this.debouncedWrite = debounce(this.debouncedWrite.bind(this), VALUE_SYNC_DELAY);
     this.debouncedSetProperty = debounce(this.debouncedSetProperty.bind(this), VALUE_SYNC_DELAY);
 
-    makeObservable<this, '_script' | 'lastAction' | 'loading' | 'loaded' | 'resourceProperty'>(this, {
+    makeObservable<this, '_script' | 'lastAction' | 'loading' | 'loaded' | 'resourceProperties'>(this, {
       script: computed,
       executionContext: computed,
       nodeInfo: computed,
@@ -102,7 +115,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       lastAction: observable.ref,
       loading: observable,
       loaded: observable,
-      resourceProperty: observable,
+      resourceProperties: observable,
       setScript: action,
       setNodeInfo: action,
     });
@@ -179,7 +192,12 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
-    this.resourceProperty = toJS(executionContext);
+    this.state.executionContext = toJS(executionContext);
+
+    this.resourceProperties['default-datasource'] = executionContext?.connectionId;
+    this.resourceProperties['default-catalog'] = executionContext?.defaultCatalog;
+    this.resourceProperties['default-schema'] = executionContext?.defaultSchema;
+
     this.propertySaved = false;
     this.debouncedSetProperty();
   }
@@ -284,11 +302,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
     try {
       this.exception = null;
-      await this.actions.setProperty(
+      await this.actions.setProperties(
         this,
         this.nodeInfo.nodeId,
-        EXECUTION_CONTEXT_BINDING,
-        JSON.stringify(toJS(this.resourceProperty))
+        toJS(this.resourceProperties)
       );
       await this.updateProperty();
       this.markUpdated();
@@ -306,10 +323,32 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       return;
     }
 
-    const propertyValue = await this.actions.getProperty(this, this.nodeInfo.nodeId, EXECUTION_CONTEXT_BINDING);
-    if (propertyValue) {
-      this.resourceProperty = JSON.parse(propertyValue);
+    this.resourceProperties = toJS(await this.actions.getProperties(this, this.nodeInfo.nodeId));
+
+    const connectionId =  this.resourceProperties['default-datasource'];
+    const defaultCatalog = this.resourceProperties['default-catalog'];
+    const defaultSchema = this.resourceProperties['default-schema'];
+
+    if (!connectionId || !this.nodeInfo.projectId) {
+      return;
     }
+
+    let id = this.state.executionContext?.id ?? '-1';
+
+    if (
+      this.state.executionContext?.connectionId !== connectionId
+      || this.nodeInfo.projectId !== this.state.executionContext.projectId
+    ) {
+      id = '-1';
+    }
+
+    this.state.executionContext = {
+      id,
+      projectId: this.nodeInfo.projectId,
+      connectionId,
+      defaultCatalog,
+      defaultSchema,
+    };
   }
 
   private debouncedWrite() {
