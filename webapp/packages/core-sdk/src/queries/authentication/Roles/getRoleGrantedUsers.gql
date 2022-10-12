@@ -1,5 +1,0 @@
-query getRoleGrantedUsers($roleId: ID!) {
-  role: listRoles(roleId: $roleId) {
-    grantedUsers
-  }
-}

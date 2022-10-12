@@ -50,7 +50,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
   const localConnections = useMemo(() => computed(
     () => controller.connections.filter(connection => !isCloudConnection(connection))
   ), [controller.connections]);
-  const isAdmin = controller.user.grantedRoles.includes('admin');
+  const isAdmin = controller.user.grantedTeams.includes('admin');
 
   if (controller.connections.length === 0) {
     return styled(style)(
@@ -97,11 +97,11 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
             {localConnections.get().map(connection => {
               const connectionPermission = getConnectionPermission(connection.id);
               const driver = driversResource.get(connection.driverId);
-              const isRoleProvided = connectionPermission?.subjectType === AdminSubjectType.Role;
+              const isTeamProvided = connectionPermission?.subjectType === AdminSubjectType.Team;
 
               let grantedBy = '';
-              if (isRoleProvided) {
-                grantedBy = `${translate('authentication_administration_user_connections_access_granted_role')} ${connectionPermission.subjectId}`;
+              if (isTeamProvided) {
+                grantedBy = `${translate('authentication_administration_user_connections_access_granted_team')} ${connectionPermission.subjectId}`;
               } else if (connectionPermission) {
                 grantedBy = translate('authentication_administration_user_connections_access_granted_directly');
               }
@@ -110,12 +110,12 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
                 <TableItem
                   key={connection.id}
                   item={connection.id}
-                  selectDisabled={isRoleProvided}
+                  selectDisabled={isTeamProvided}
                 >
                   <TableColumnValue centerContent flex>
                     <TableItemSelect
-                      disabled={loading || isRoleProvided}
-                      checked={isRoleProvided}
+                      disabled={loading || isTeamProvided}
+                      checked={isTeamProvided}
                     />
                   </TableColumnValue>
                   <TableColumnValue><StaticImage icon={driver?.icon} /></TableColumnValue>

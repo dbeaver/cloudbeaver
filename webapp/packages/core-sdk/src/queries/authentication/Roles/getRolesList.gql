@@ -1,5 +1,0 @@
-query getRolesList($roleId: ID) {
-  roles: listRoles(roleId: $roleId) {
-    ...AdminRoleInfo
-  } 
-}

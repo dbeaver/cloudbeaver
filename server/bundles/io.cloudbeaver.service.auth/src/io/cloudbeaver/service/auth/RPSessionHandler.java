@@ -67,14 +67,14 @@ public class RPSessionHandler implements DBWSessionHandler {
         }
         SMAuthProviderExternal<?> authProviderExternal = (SMAuthProviderExternal<?>) authProvider.getInstance();
         String userName = request.getHeader(RPAuthProvider.X_USER);
-        String roles = request.getHeader(RPAuthProvider.X_ROLE);
-        List<String> userRoles = roles == null ? Collections.emptyList() : List.of(roles.split("\\|"));
+        String teams = request.getHeader(RPAuthProvider.X_ROLE);
+        List<String> userTeams = teams == null ? Collections.emptyList() : List.of(teams.split("\\|"));
         if (userName != null) {
             try {
                 Map<String, Object> credentials = new HashMap<>();
                 credentials.put("user", userName);
                 Map<String, Object> sessionParameters = webSession.getSessionParameters();
-                sessionParameters.put(SMConstants.SESSION_PARAM_TRUSTED_USER_ROLES, userRoles);
+                sessionParameters.put(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS, userTeams);
                 Map<String, Object> userCredentials = authProviderExternal.authExternalUser(
                     webSession.getProgressMonitor(), sessionParameters, credentials);
                 String currentSmSessionId = webSession.getUser() == null ? null : webSession.getUserContext().getSmSessionId();

@@ -32,10 +32,10 @@ export const ConnectionAccessTableInnerHeader = observer<Props>(function Connect
   return styled(useStyles(styles))(
     <TableHeader className={className}>
       <TableColumnHeader min>
-        <TableSelect id='selectUsersAndRoles' disabled={disabled} />
+        <TableSelect id='selectUsersAndTeams' disabled={disabled} />
       </TableColumnHeader>
       <TableColumnHeader min />
-      <TableColumnHeader>{translate('connections_connection_access_user_or_role_name')}</TableColumnHeader>
+      <TableColumnHeader>{translate('connections_connection_access_user_or_team_name')}</TableColumnHeader>
       <TableColumnHeader>{translate('connections_connection_description')}</TableColumnHeader>
     </TableHeader>
   );

@@ -17,38 +17,26 @@
 package io.cloudbeaver.model.user;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.security.user.SMRole;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Web user.
  */
 public class WebUser {
     @NotNull
-    private final String userId;
+    private final SMUser user;
     private String displayName;
 
-    private final Map<String, String> metaParameters = new LinkedHashMap<>();
-    private final Map<String, Object> configurationParameters = new LinkedHashMap<>();
-
-    private boolean enabled;
-
-    private SMRole[] roles = null;
-
-    private String activeAuthModel;
-    private final Map<String, Map<String, Object>> authCredentials = new HashMap<>();
-
     public WebUser(@NotNull SMUser smUser) {
-        this.userId = smUser.getUserId();
-        this.metaParameters.putAll(smUser.getMetaParameters());
-        this.enabled = smUser.isEnabled();
+        this.user = smUser;
     }
 
     @NotNull
     public String getUserId() {
-        return userId;
+        return user.getUserId();
     }
 
     /**
@@ -63,61 +51,41 @@ public class WebUser {
     }
 
     public boolean getEnabled() {
-        return enabled;
+        return user.isEnabled();
     }
 
     public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public String[] getGrantedRoles() {
-        return Arrays.stream(roles).map(SMRole::getRoleId).toArray(String[]::new);
-    }
-
-    public boolean hasRole(String roleId) {
-        return Arrays.stream(roles).anyMatch(r -> r.getRoleId().equals(roleId));
+        user.enableUser(enabled);
     }
 
     public Map<String, String> getMetaParameters() {
-        return Collections.unmodifiableMap(metaParameters);
-    }
-
-    public String getMetaParameter(String name) {
-        return metaParameters.get(name);
+        return Collections.unmodifiableMap(user.getMetaParameters());
     }
 
     public void setMetaParameter(String name, String value) {
-        metaParameters.put(name, value);
-    }
-
-    public void removeMetaParameter(String name) {
-        metaParameters.remove(name);
+        user.setMetaParameter(name, value);
     }
 
     public Map<String, Object> getConfigurationParameters() {
-        return Collections.unmodifiableMap(configurationParameters);
+        return Collections.emptyMap();
     }
 
-    public SMRole[] getRoles() {
-        return roles;
-    }
-
-    public void setRoles(SMRole[] roles) {
-        this.roles = roles;
+    public String[] getTeams() {
+        return user.getUserTeams();
     }
 
     @Override
     public int hashCode() {
-        return userId.hashCode();
+        return user.getUserId().hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof WebUser && ((WebUser) obj).userId.equals(this.userId);
+        return obj instanceof WebUser && ((WebUser) obj).user.getUserId().equals(this.user.getUserId());
     }
 
     @Override
     public String toString() {
-        return userId;
+        return user.getUserId();
     }
 }
