@@ -50,7 +50,9 @@ public class CEServerTestSuite {
         } else {
             System.out.println("Start CBApplication");
             testApp = new CBApplication();
-            thread = new Thread(() -> testApp.start(null));
+            thread = new Thread(() -> {
+                testApp.start(null);
+            });
             thread.start();
             client = HttpClient.newBuilder()
                 .cookieHandler(new CookieManager())

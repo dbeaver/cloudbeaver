@@ -45,35 +45,35 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         model.getQueryType()
             .dataFetcher("listUsers",
                 env -> getService(env).listUsers(getWebSession(env), env.getArgument("userId")))
-            .dataFetcher("listRoles",
-                env -> getService(env).listRoles(getWebSession(env), env.getArgument("roleId")))
+            .dataFetcher("listTeams",
+                env -> getService(env).listTeams(getWebSession(env), env.getArgument("teamId")))
             .dataFetcher("listPermissions",
                 env -> getService(env).listPermissions(getWebSession(env)))
             .dataFetcher("createUser",
                 env -> getService(env).createUser(getWebSession(env), env.getArgument("userId"), env.getArgument("enabled")))
             .dataFetcher("deleteUser",
                 env -> getService(env).deleteUser(getWebSession(env), env.getArgument("userId")))
-            .dataFetcher("createRole",
-                env -> getService(env).createRole(
+            .dataFetcher("createTeam",
+                env -> getService(env).createTeam(
                     getWebSession(env),
-                    env.getArgument("roleId"),
-                    env.getArgument("roleName"),
+                    env.getArgument("teamId"),
+                    env.getArgument("teamName"),
                     env.getArgument("description")))
-            .dataFetcher("updateRole",
-                env -> getService(env).updateRole(
+            .dataFetcher("updateTeam",
+                env -> getService(env).updateTeam(
                     getWebSession(env),
-                    env.getArgument("roleId"),
-                    env.getArgument("roleName"),
+                    env.getArgument("teamId"),
+                    env.getArgument("teamName"),
                     env.getArgument("description")))
-            .dataFetcher("deleteRole",
-                env -> getService(env).deleteRole(getWebSession(env), env.getArgument("roleId")))
+            .dataFetcher("deleteTeam",
+                env -> getService(env).deleteTeam(getWebSession(env), env.getArgument("teamId")))
 
-            .dataFetcher("grantUserRole",
-                env -> getService(env).grantUserRole(getWebSession(env), env.getArgument("userId"), env.getArgument("roleId")))
-            .dataFetcher("revokeUserRole",
-                env -> getService(env).revokeUserRole(getWebSession(env), env.getArgument("userId"), env.getArgument("roleId")))
+            .dataFetcher("grantUserTeam",
+                env -> getService(env).grantUserTeam(getWebSession(env), env.getArgument("userId"), env.getArgument("teamId")))
+            .dataFetcher("revokeUserTeam",
+                env -> getService(env).revokeUserTeam(getWebSession(env), env.getArgument("userId"), env.getArgument("teamId")))
             .dataFetcher("setSubjectPermissions",
-                env -> getService(env).setSubjectPermissions(getWebSession(env), env.getArgument("roleId"), env.getArgument("permissions")))
+                env -> getService(env).setSubjectPermissions(getWebSession(env), env.getArgument("subjectId"), env.getArgument("permissions")))
         .dataFetcher("setUserCredentials",
             env -> getService(env).setUserCredentials(getWebSession(env), env.getArgument("userId"), env.getArgument("providerId"), env.getArgument("credentials")))
         .dataFetcher("enableUser",

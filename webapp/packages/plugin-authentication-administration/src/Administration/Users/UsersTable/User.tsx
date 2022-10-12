@@ -37,7 +37,7 @@ interface Props {
 
 export const User = observer<Props>(function User({ user, selectable }) {
   const usersAdministrationService = useService(UsersAdministrationService);
-  const roles = user.grantedRoles.join(', ');
+  const teams = user.grantedTeams.join(', ');
   const usersService = useService(UsersResource);
   const notificationService = useService(NotificationService);
   const translate = useTranslate();
@@ -51,7 +51,7 @@ export const User = observer<Props>(function User({ user, selectable }) {
   }
 
   const enabledCheckboxTitle = usersService.isActiveUser(user.userId)
-    ? translate('administration_roles_role_granted_users_permission_denied') : undefined;
+    ? translate('administration_teams_team_granted_users_permission_denied') : undefined;
 
   return styled(styles)(
     <TableItem item={user.userId} expandElement={UserEdit} selectDisabled={!selectable}>
@@ -64,7 +64,7 @@ export const User = observer<Props>(function User({ user, selectable }) {
         <TableItemExpand />
       </TableColumnValue>
       <TableColumnValue title={user.userId} expand ellipsis>{user.userId}</TableColumnValue>
-      <TableColumnValue title={roles} ellipsis>{roles}</TableColumnValue>
+      <TableColumnValue title={teams} ellipsis>{teams}</TableColumnValue>
       <TableColumnValue>
         <Checkbox
           checked={user.enabled}

@@ -15,13 +15,13 @@ import { CreateAuthConfigurationService } from './Administration/IdentityProvide
 import { AuthConfigurationOptionsTabService } from './Administration/IdentityProviders/Options/AuthConfigurationOptionsTabService';
 import { ServerConfigurationAuthenticationBootstrap } from './Administration/ServerConfiguration/ServerConfigurationAuthenticationBootstrap';
 import { CreateMetaParameterService } from './Administration/Users/MetaParameters/CreateMetaParameterService';
-import { CreateRoleService } from './Administration/Users/Roles/CreateRoleService';
-import { GrantedConnectionsTabService } from './Administration/Users/Roles/GrantedConnections/GrantedConnectionsTabService';
-import { GrantedUsersTabService } from './Administration/Users/Roles/GrantedUsers/GrantedUsersTabService';
-import { RoleOptionsTabService } from './Administration/Users/Roles/Options/RoleOptionsTabService';
-import { RoleFormService } from './Administration/Users/Roles/RoleFormService';
-import { RolesAdministrationNavService } from './Administration/Users/Roles/RolesAdministrationNavService';
-import { RolesAdministrationService } from './Administration/Users/Roles/RolesAdministrationService';
+import { CreateTeamService } from './Administration/Users/Teams/CreateTeamService';
+import { GrantedConnectionsTabService } from './Administration/Users/Teams/GrantedConnections/GrantedConnectionsTabService';
+import { GrantedUsersTabService } from './Administration/Users/Teams/GrantedUsers/GrantedUsersTabService';
+import { TeamOptionsTabService } from './Administration/Users/Teams/Options/TeamOptionsTabService';
+import { TeamFormService } from './Administration/Users/Teams/TeamFormService';
+import { TeamsAdministrationNavService } from './Administration/Users/Teams/TeamsAdministrationNavService';
+import { TeamsAdministrationService } from './Administration/Users/Teams/TeamsAdministrationService';
 import { UserFormBaseBootstrap } from './Administration/Users/UserForm/UserFormBaseBootstrap';
 import { UserFormService } from './Administration/Users/UserForm/UserFormService';
 import { UsersAdministrationNavigationService } from './Administration/Users/UsersAdministrationNavigationService';
@@ -50,11 +50,11 @@ export const manifest: PluginManifest = {
     AuthConfigurationsAdministrationNavService,
     AuthConfigurationFormService,
     AuthConfigurationOptionsTabService,
-    RolesAdministrationService,
-    CreateRoleService,
-    RolesAdministrationNavService,
-    RoleFormService,
-    RoleOptionsTabService,
+    TeamsAdministrationService,
+    CreateTeamService,
+    TeamsAdministrationNavService,
+    TeamFormService,
+    TeamOptionsTabService,
     GrantedUsersTabService,
     GrantedConnectionsTabService,
   ],

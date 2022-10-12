@@ -53,7 +53,7 @@ import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.security.SMObjects;
-import org.jkiss.dbeaver.model.security.user.SMRole;
+import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
@@ -95,22 +95,22 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @NotNull
     @Override
-    public List<AdminRoleInfo> listRoles(@NotNull WebSession webSession, String roleId) throws DBWebException {
+    public List<AdminTeamInfo> listTeams(@NotNull WebSession webSession, String teamName) throws DBWebException {
         try {
-            List<AdminRoleInfo> roles = new ArrayList<>();
-            if (CommonUtils.isEmpty(roleId)) {
-                for (SMRole role : webSession.getAdminSecurityController().readAllRoles()) {
-                    roles.add(new AdminRoleInfo(webSession, role));
+            List<AdminTeamInfo> teams = new ArrayList<>();
+            if (CommonUtils.isEmpty(teamName)) {
+                for (SMTeam team : webSession.getAdminSecurityController().readAllTeams()) {
+                    teams.add(new AdminTeamInfo(webSession, team));
                 }
             } else {
-                SMRole role = webSession.getAdminSecurityController().findRole(roleId);
-                if (role != null) {
-                    roles.add(new AdminRoleInfo(webSession, role));
+                SMTeam team = webSession.getAdminSecurityController().findTeam(teamName);
+                if (team != null) {
+                    teams.add(new AdminTeamInfo(webSession, team));
                 }
             }
-            return roles;
+            return teams;
         } catch (Exception e) {
-            throw new DBWebException("Error reading roles", e);
+            throw new DBWebException("Error reading teams", e);
         }
     }
 
@@ -158,126 +158,126 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @NotNull
     @Override
-    public AdminRoleInfo createRole(@NotNull WebSession webSession, String roleId, String roleName, String description) throws DBWebException {
-        if (roleId.isEmpty()) {
-            throw new DBWebException("Empty role ID");
+    public AdminTeamInfo createTeam(@NotNull WebSession webSession, String teamId, String teamName, String description) throws DBWebException {
+        if (teamId.isEmpty()) {
+            throw new DBWebException("Empty team ID");
         }
-        webSession.addInfoMessage("Create new role - " + roleId);
+        webSession.addInfoMessage("Create new team - " + teamId);
         try {
-            webSession.getAdminSecurityController().createRole(roleId, roleName, description, webSession.getUser().getUserId());
-            SMRole newRole = webSession.getAdminSecurityController().findRole(roleId);
-            return new AdminRoleInfo(webSession, newRole);
+            webSession.getAdminSecurityController().createTeam(teamId, teamName, description, webSession.getUser().getUserId());
+            SMTeam newTeam = webSession.getAdminSecurityController().findTeam(teamId);
+            return new AdminTeamInfo(webSession, newTeam);
         } catch (Exception e) {
-            throw new DBWebException("Error creating new role", e);
+            throw new DBWebException("Error creating new team", e);
         }
     }
 
     @NotNull
     @Override
-    public AdminRoleInfo updateRole(@NotNull WebSession webSession, String roleId, String roleName, String description) throws DBWebException {
-        if (roleId.isEmpty()) {
-            throw new DBWebException("Empty role ID");
+    public AdminTeamInfo updateTeam(@NotNull WebSession webSession, String teamId, String teamName, String description) throws DBWebException {
+        if (teamId.isEmpty()) {
+            throw new DBWebException("Empty team ID");
         }
 
-        webSession.addInfoMessage("Update role - " + roleId);
+        webSession.addInfoMessage("Update team - " + teamId);
 
         try {
-            webSession.getAdminSecurityController().updateRole(roleId, roleName, description);
-            SMRole newRole = webSession.getAdminSecurityController().findRole(roleId);
-            return new AdminRoleInfo(webSession, newRole);
+            webSession.getAdminSecurityController().updateTeam(teamId, teamName, description);
+            SMTeam newTeam = webSession.getAdminSecurityController().findTeam(teamId);
+            return new AdminTeamInfo(webSession, newTeam);
         } catch (Exception e) {
-            throw new DBWebException("Error updating role " + roleId, e);
+            throw new DBWebException("Error updating team " + teamId, e);
         }
     }
 
     @Override
-    public boolean deleteRole(@NotNull WebSession webSession, String roleId) throws DBWebException {
+    public boolean deleteTeam(@NotNull WebSession webSession, String teamId) throws DBWebException {
         try {
-            webSession.addInfoMessage("Delete role - " + roleId);
+            webSession.addInfoMessage("Delete team - " + teamId);
 
             var adminSecurityController = webSession.getAdminSecurityController();
-            SMRole[] userRoles = adminSecurityController.getUserRoles(webSession.getUser().getUserId());
-            if (Arrays.stream(userRoles).anyMatch(DBRole -> DBRole.getRoleId().equals(roleId))) {
-                throw new DBWebException("You can not delete your own role");
+            SMTeam[] userTeams = adminSecurityController.getUserTeams(webSession.getUser().getUserId());
+            if (Arrays.stream(userTeams).anyMatch(team -> team.getTeamId().equals(teamId))) {
+                throw new DBWebException("You can not delete your own team");
             }
-            adminSecurityController.deleteRole(roleId);
+            adminSecurityController.deleteTeam(teamId);
             return true;
         } catch (Exception e) {
-            throw new DBWebException("Error deleting role", e);
+            throw new DBWebException("Error deleting team", e);
         }
     }
 
     @Override
-    public boolean grantUserRole(@NotNull WebSession webSession, String user, String role) throws DBWebException {
+    public boolean grantUserTeam(@NotNull WebSession webSession, String user, String team) throws DBWebException {
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
-            throw new DBWebException("Cannot grant role in anonymous mode");
+            throw new DBWebException("Cannot grant team in anonymous mode");
         }
         if (CommonUtils.equalObjects(user, webSession.getUser().getUserId())) {
             throw new DBWebException("You cannot edit your own permissions");
         }
         try {
             var adminSecurityController = webSession.getAdminSecurityController();
-            SMRole[] userRoles = adminSecurityController.getUserRoles(user);
-            List<String> roleIds = Arrays.stream(userRoles).map(SMRole::getRoleId).collect(Collectors.toList());
-            if (!roleIds.contains(role)) {
-                roleIds.add(role);
-                adminSecurityController.setUserRoles(user, roleIds.toArray(new String[0]), grantor.getUserId());
+            SMTeam[] userTeams = adminSecurityController.getUserTeams(user);
+            List<String> teamIds = Arrays.stream(userTeams).map(SMTeam::getTeamId).collect(Collectors.toList());
+            if (!teamIds.contains(team)) {
+                teamIds.add(team);
+                adminSecurityController.setUserTeams(user, teamIds.toArray(new String[0]), grantor.getUserId());
             } else {
-                throw new DBWebException("User '" + user + "' already has role '" + role + "'");
+                throw new DBWebException("User '" + user + "' already has team '" + team + "'");
             }
             return true;
         } catch (Exception e) {
-            throw new DBWebException("Error granting role", e);
+            throw new DBWebException("Error granting team", e);
         }
     }
 
     @Override
-    public boolean revokeUserRole(@NotNull WebSession webSession, String user, String role) throws DBWebException {
+    public boolean revokeUserTeam(@NotNull WebSession webSession, String user, String team) throws DBWebException {
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
-            throw new DBWebException("Cannot grant role in anonymous mode");
+            throw new DBWebException("Cannot revoke team in anonymous mode");
         }
         if (CommonUtils.equalObjects(user, webSession.getUser().getUserId())) {
             throw new DBWebException("You cannot edit your own permissions");
         }
         try {
             var adminSecurityController = webSession.getAdminSecurityController();
-            SMRole[] userRoles = adminSecurityController.getUserRoles(user);
-            List<String> roleIds = Arrays.stream(userRoles).map(SMRole::getRoleId).collect(Collectors.toList());
-            if (roleIds.contains(role)) {
-                roleIds.remove(role);
-                adminSecurityController.setUserRoles(user, roleIds.toArray(new String[0]), grantor.getUserId());
+            SMTeam[] userTeams = adminSecurityController.getUserTeams(user);
+            List<String> teamIds = Arrays.stream(userTeams).map(SMTeam::getTeamId).collect(Collectors.toList());
+            if (teamIds.contains(team)) {
+                teamIds.remove(team);
+                adminSecurityController.setUserTeams(user, teamIds.toArray(new String[0]), grantor.getUserId());
             } else {
-                throw new DBWebException("User '" + user + "' doesn't have role '" + role + "'");
+                throw new DBWebException("User '" + user + "' doesn't have team '" + team + "'");
             }
             return true;
         } catch (Exception e) {
-            throw new DBWebException("Error revoking role", e);
+            throw new DBWebException("Error revoking team", e);
         }
     }
 
     @Override
-    public List<AdminPermissionInfo> setSubjectPermissions(@NotNull WebSession webSession, String roleID, List<String> permissions) throws DBWebException {
+    public List<AdminPermissionInfo> setSubjectPermissions(@NotNull WebSession webSession, String subjectID, List<String> permissions) throws DBWebException {
         validatePermissions(SMConstants.SUBJECT_PERMISSION_SCOPE, permissions);
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
             throw new DBWebException("Cannot change permissions in anonymous mode");
         }
-        if (CommonUtils.equalObjects(roleID, CBConstants.DEFAULT_ADMIN_ROLE)) {
-            throw new DBWebException("Cannot change permissions for role '" + roleID + "'");
+        if (CommonUtils.equalObjects(subjectID, CBConstants.DEFAULT_ADMIN_TEAM)) {
+            throw new DBWebException("Cannot change permissions for team '" + subjectID + "'");
         }
-        webSession.addInfoMessage("Set permissions to subject - " + roleID);
+        webSession.addInfoMessage("Set permissions to subject - " + subjectID);
 
         try {
-            webSession.getAdminSecurityController().setSubjectPermissions(roleID, permissions, grantor.getUserId());
-            Set<String> subjectPermissions = webSession.getAdminSecurityController().getSubjectPermissions(roleID);
+            webSession.getAdminSecurityController().setSubjectPermissions(subjectID, permissions, grantor.getUserId());
+            Set<String> subjectPermissions = webSession.getAdminSecurityController().getSubjectPermissions(subjectID);
             webSession.refreshUserData();
             return listPermissions(webSession).stream()
                 .filter(p -> subjectPermissions.contains(p.getId()))
                 .collect(Collectors.toList());
         } catch (Exception e) {
-            throw new DBWebException("Error setting role permissions", e);
+            throw new DBWebException("Error setting subject permissions", e);
         }
     }
 
@@ -690,7 +690,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
-            throw new DBWebException("Cannot grant role in anonymous mode");
+            throw new DBWebException("Cannot grant connection access in anonymous mode");
         }
         try {
             var adminSM = webSession.getAdminSecurityController();

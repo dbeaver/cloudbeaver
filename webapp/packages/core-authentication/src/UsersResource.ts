@@ -37,7 +37,7 @@ type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId'>;
 
 interface UserCreateOptions {
   userId: string;
-  roles: string[];
+  teams: string[];
   credentials: IAuthCredentials;
   metaParameters: Record<string, any>;
   grantedConnections: string[];
@@ -66,7 +66,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   getEmptyUser(): AdminUserInfo {
     return {
       userId: '',
-      grantedRoles: [],
+      grantedTeams: [],
       grantedConnections: [],
       configurationParameters: {},
       metaParameters: {},
@@ -94,7 +94,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   }
 
   async create({
-    userId, roles, credentials, metaParameters, grantedConnections, enabled,
+    userId, teams, credentials, metaParameters, grantedConnections, enabled,
   }: UserCreateOptions): Promise<AdminUser> {
     const { user } = await this.graphQLService.sdk.createUser({
       userId,
@@ -106,8 +106,8 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     try {
       await this.updateCredentials(userId, credentials);
 
-      for (const roleId of roles) {
-        await this.grantRole(userId, roleId, true);
+      for (const teamId of teams) {
+        await this.grantTeam(userId, teamId, true);
       }
 
       await this.setConnections(userId, grantedConnections);
@@ -122,16 +122,16 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     return this.get(user.userId)!;
   }
 
-  async grantRole(userId: string, roleId: string, skipUpdate?: boolean): Promise<void> {
-    await this.graphQLService.sdk.grantUserRole({ userId, roleId });
+  async grantTeam(userId: string, teamId: string, skipUpdate?: boolean): Promise<void> {
+    await this.graphQLService.sdk.grantUserTeam({ userId, teamId });
 
     if (!skipUpdate) {
       await this.refresh(userId);
     }
   }
 
-  async revokeRole(userId: string, roleId: string, skipUpdate?: boolean): Promise<void> {
-    await this.graphQLService.sdk.revokeUserRole({ userId, roleId });
+  async revokeTeam(userId: string, teamId: string, skipUpdate?: boolean): Promise<void> {
+    await this.graphQLService.sdk.revokeUserTeam({ userId, teamId });
 
     if (!skipUpdate) {
       await this.refresh(userId);
