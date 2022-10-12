@@ -8,7 +8,7 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { AdminUser, compareRoles, isLocalUser, RoleInfo, RolesResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { AdminUser, compareTeams, isLocalUser, TeamInfo, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { ConnectionInfoProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -32,7 +32,7 @@ interface IUserCredentials {
   password: string;
   passwordRepeat: string;
   metaParameters: Record<string, any>;
-  roles: Map<string, boolean>;
+  teams: Map<string, boolean>;
 }
 
 @injectable()
@@ -51,8 +51,8 @@ export class UserFormController implements IInitializableController, IDestructib
     return this.connectionInfoResource.get(ConnectionInfoProjectKey(PROJECT_GLOBAL_ID)) as DatabaseConnection[];
   }
 
-  get roles(): RoleInfo[] {
-    return this.rolesResource.values.slice().sort(compareRoles);
+  get teams(): TeamInfo[] {
+    return this.teamsResource.values.slice().sort(compareTeams);
   }
 
   get local(): boolean {
@@ -73,7 +73,7 @@ export class UserFormController implements IInitializableController, IDestructib
   constructor(
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly rolesResource: RolesResource,
+    private readonly teamsResource: TeamsResource,
     private readonly usersResource: UsersResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly dbDriverResource: DBDriverResource
@@ -89,7 +89,7 @@ export class UserFormController implements IInitializableController, IDestructib
       password: '',
       passwordRepeat: '',
       metaParameters: {},
-      roles: new Map(),
+      teams: new Map(),
     };
     this.enabled = true;
     this.error = new GQLErrorCatcher();
@@ -107,7 +107,7 @@ export class UserFormController implements IInitializableController, IDestructib
       enabled: observable.ref,
       statusMessage: observable,
       connections: computed,
-      roles: computed,
+      teams: computed,
     });
   }
 
@@ -119,7 +119,7 @@ export class UserFormController implements IInitializableController, IDestructib
     this.editing = editing;
     this.collapse = collapse;
     if (prevUser !== this.user) {
-      this.loadRoles();
+      this.loadTeams();
     }
   }
 
@@ -146,7 +146,7 @@ export class UserFormController implements IInitializableController, IDestructib
             credentials: { password: this.credentials.password },
           },
           enabled: this.enabled,
-          roles: this.getGrantedRoles(),
+          teams: this.getGrantedTeams(),
           metaParameters: this.credentials.metaParameters,
           grantedConnections: this.getGrantedConnections(),
         });
@@ -163,7 +163,7 @@ export class UserFormController implements IInitializableController, IDestructib
             }
           );
         }
-        await this.updateRoles();
+        await this.updateTeams();
         await this.saveUserStatus();
         await this.saveConnectionPermissions();
         await this.saveMetaParameters();
@@ -223,7 +223,7 @@ export class UserFormController implements IInitializableController, IDestructib
 
         this.selectedConnections.clear();
         for (const connection of this.grantedConnections) {
-          if (connection.subjectType !== AdminSubjectType.Role) {
+          if (connection.subjectType !== AdminSubjectType.Team) {
             this.selectedConnections.set(connection.dataSourceId, true);
           }
         }
@@ -250,7 +250,7 @@ export class UserFormController implements IInitializableController, IDestructib
         return;
       }
 
-      if (this.rolesResource.has(this.credentials.login)) {
+      if (this.teamsResource.has(this.credentials.login)) {
         this.setStatusMessage('authentication_user_login_cant_be_used', ENotificationType.Error);
         return;
       }
@@ -274,20 +274,20 @@ export class UserFormController implements IInitializableController, IDestructib
     return true;
   }
 
-  private async updateRoles() {
-    for (const [roleId, checked] of this.credentials.roles) {
+  private async updateTeams() {
+    for (const [teamId, checked] of this.credentials.teams) {
       if (checked) {
-        if (!this.user.grantedRoles.includes(roleId)) {
-          await this.usersResource.grantRole(this.user.userId, roleId, true);
+        if (!this.user.grantedTeams.includes(teamId)) {
+          await this.usersResource.grantTeam(this.user.userId, teamId, true);
         }
       } else {
-        await this.usersResource.revokeRole(this.user.userId, roleId, true);
+        await this.usersResource.revokeTeam(this.user.userId, teamId, true);
       }
     }
   }
 
-  private getGrantedRoles() {
-    return Array.from(this.credentials.roles.keys()).filter(roleId => this.credentials.roles.get(roleId));
+  private getGrantedTeams() {
+    return Array.from(this.credentials.teams.keys()).filter(teamId => this.credentials.teams.get(teamId));
   }
 
   private getGrantedConnections() {
@@ -297,7 +297,7 @@ export class UserFormController implements IInitializableController, IDestructib
           connectionPermission => connectionPermission.dataSourceId === connectionId
         );
         return this.selectedConnections.get(connectionId)
-          && connectionPermission?.subjectType !== AdminSubjectType.Role;
+          && connectionPermission?.subjectType !== AdminSubjectType.Team;
       });
   }
 
@@ -321,12 +321,12 @@ export class UserFormController implements IInitializableController, IDestructib
     await this.loadConnectionsAccess();
   }
 
-  private async loadRoles() {
+  private async loadTeams() {
     try {
-      await this.rolesResource.loadAll();
+      await this.teamsResource.loadAll();
       await this.loadUser();
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Can\'t load roles');
+      this.notificationService.logException(exception, 'Can\'t load teams');
     } finally {
       this.isLoading = false;
     }
@@ -336,7 +336,7 @@ export class UserFormController implements IInitializableController, IDestructib
     try {
       this.credentials.metaParameters = this.user.metaParameters;
       this.credentials.login = this.user.userId;
-      this.credentials.roles = new Map(this.user.grantedRoles.map(roleId => ([roleId, true])));
+      this.credentials.teams = new Map(this.user.grantedTeams.map(teamId => ([teamId, true])));
       this.enabled = this.user.enabled;
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load user');

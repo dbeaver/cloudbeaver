@@ -16,14 +16,14 @@
  */
 package io.cloudbeaver.service.security.db;
 
-import org.jkiss.dbeaver.model.security.user.SMRole;
+import org.jkiss.dbeaver.model.security.user.SMTeam;
 
 import java.util.List;
 
 class CBDatabaseInitialData {
     private String adminName = "cbadmin";
     private String adminPassword = "cbadmin20";
-    private List<SMRole> roles;
+    private List<SMTeam> teams;
 
     public String getAdminName() {
         return adminName;
@@ -33,11 +33,11 @@ class CBDatabaseInitialData {
         return adminPassword;
     }
 
-    public List<SMRole> getRoles() {
-        return roles;
+    public List<SMTeam> getTeams() {
+        return teams;
     }
 
-    public void setRoles(List<SMRole> roles) {
-        this.roles = roles;
+    public void setTeams(List<SMTeam> teams) {
+        this.teams = teams;
     }
 }

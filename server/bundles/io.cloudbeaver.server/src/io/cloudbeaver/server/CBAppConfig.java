@@ -50,7 +50,9 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
 
     private boolean redirectOnFederatedAuth;
     private boolean anonymousAccessEnabled;
+    @Deprecated
     private String anonymousUserRole;
+    private String anonymousUserTeam;
 
     private String[] enabledDrivers;
     private String[] disabledDrivers;
@@ -61,7 +63,8 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
     public CBAppConfig() {
         super();
         this.anonymousAccessEnabled = false;
-        this.anonymousUserRole = DEFAULT_APP_ANONYMOUS_ROLE_NAME;
+        this.anonymousUserRole = DEFAULT_APP_ANONYMOUS_TEAM_NAME;
+        this.anonymousUserTeam = DEFAULT_APP_ANONYMOUS_TEAM_NAME;
         this.supportsCustomConnections = true;
         this.supportsConnectionBrowser = false;
         this.supportsUserWorkspaces = false;
@@ -81,6 +84,7 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
         super(src);
         this.anonymousAccessEnabled = src.anonymousAccessEnabled;
         this.anonymousUserRole = src.anonymousUserRole;
+        this.anonymousUserTeam = src.anonymousUserTeam;
         this.supportsCustomConnections = src.supportsCustomConnections;
         this.supportsConnectionBrowser = src.supportsConnectionBrowser;
         this.supportsUserWorkspaces = src.supportsUserWorkspaces;
@@ -102,8 +106,8 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
     }
 
     @Override
-    public String getAnonymousUserRole() {
-        return anonymousUserRole;
+    public String getAnonymousUserTeam() {
+        return CommonUtils.notNull(anonymousUserTeam, anonymousUserRole);
     }
 
     public void setAnonymousAccessEnabled(boolean anonymousAccessEnabled) {
