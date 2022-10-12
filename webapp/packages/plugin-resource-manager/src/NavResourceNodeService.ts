@@ -66,7 +66,7 @@ export class NavResourceNodeService {
   }
 
   async setProperties(resourceData: IResourceData, diff: Record<string, any>): Promise<Record<string, any>> {
-    return await this.resourceManagerResource.setResourceProperties(
+    return await this.resourceManagerResource.setProperties(
       resourceData.key.projectId,
       resourceData.resourcePath,
       diff
@@ -74,9 +74,12 @@ export class NavResourceNodeService {
   }
 
   async getProperties(resourceData: IResourceData): Promise<Record<string, any>> {
-    const resource = await this.loadResourceInfo(resourceData);
+    const resource = await this.resourceManagerResource.loadProperties(
+      resourceData.key.projectId,
+      resourceData.resourcePath
+    );
 
-    return resource?.properties ?? {};
+    return resource;
   }
 
   getResourceData(nodeId: string): IResourceData | undefined {

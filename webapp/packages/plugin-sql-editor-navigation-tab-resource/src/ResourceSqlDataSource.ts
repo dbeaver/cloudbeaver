@@ -9,8 +9,9 @@
 import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import { TaskScheduler } from '@cloudbeaver/core-executor';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { debounce, isArraysEqual } from '@cloudbeaver/core-utils';
+import { debounce, isArraysEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IResourceNodeInfo, IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
@@ -79,15 +80,14 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   private _script: string;
   private saved: boolean;
-  private propertySaved: boolean;
   private actions?: IResourceActions;
   private info?: IResourceInfo;
   private lastAction?: () => Promise<void>;
   private readonly state: IResourceSqlDataSourceState;
   private resourceProperties: IResourceProperties;
 
-  private loading: boolean;
   private loaded: boolean;
+  private readonly scheduler: TaskScheduler;
 
   constructor(
     private readonly navNodeInfoResource: NavNodeInfoResource,
@@ -97,14 +97,12 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.state = state;
     this._script = '';
     this.saved = true;
-    this.propertySaved = true;
-    this.loading = false;
     this.loaded = false;
     this.resourceProperties = {};
+    this.scheduler = new TaskScheduler(() => true);
     this.debouncedWrite = debounce(this.debouncedWrite.bind(this), VALUE_SYNC_DELAY);
-    this.debouncedSetProperty = debounce(this.debouncedSetProperty.bind(this), VALUE_SYNC_DELAY);
 
-    makeObservable<this, '_script' | 'lastAction' | 'loading' | 'loaded' | 'resourceProperties'>(this, {
+    makeObservable<this, '_script' | 'lastAction' | 'loaded' | 'resourceProperties'>(this, {
       script: computed,
       executionContext: computed,
       nodeInfo: computed,
@@ -113,7 +111,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       }),
       _script: observable,
       lastAction: observable.ref,
-      loading: observable,
       loaded: observable,
       resourceProperties: observable,
       setScript: action,
@@ -134,12 +131,13 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   isLoading(): boolean {
-    return this.loading;
+    return this.scheduler.executing;
   }
 
   setNodeInfo(nodeInfo?: IResourceNodeInfo): void {
     this.state.nodeInfo = nodeInfo;
     this.markOutdated();
+    this.setProperty(toJS(this.resourceProperties));
     this.saved = true;
     this.loaded = false;
   }
@@ -198,124 +196,118 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.resourceProperties['default-catalog'] = executionContext?.defaultCatalog;
     this.resourceProperties['default-schema'] = executionContext?.defaultSchema;
 
-    this.propertySaved = false;
-    this.debouncedSetProperty();
+    this.setProperty(toJS(this.resourceProperties));
   }
 
   async rename(name: string | null) {
     await this.write();
 
-    if (
-      !this.actions
+    await this.scheduler.schedule(undefined, async () => {
+      if (
+        !this.actions
       || !this.nodeInfo
       || !this.saved
       || !name?.trim()
-    ) {
-      return;
-    }
-
-    if (!name.toLowerCase().endsWith('.sql')) {
-      name += '.sql';
-    }
-
-    this.lastAction = this.rename.bind(this, name);
-    this.loading = true;
-    this.message = 'Renaming script...';
-
-    try {
-      this.exception = null;
-      this.nodeInfo.nodeId = await this.actions.rename(this, this.nodeInfo.nodeId, name);
-
-      if (this.nodeInfo.parents.length > 0) {
-        this.nodeInfo.parents.splice(this.nodeInfo.parents.length - 1, 1, this.nodeInfo.nodeId);
+      ) {
+        return;
       }
 
-      this.markOutdated();
-      this.saved = true;
-      this.loaded = false;
-    } catch (exception: any) {
-      this.exception = exception;
-    } finally {
-      this.loading = false;
-      this.message = undefined;
-    }
+      if (!name.toLowerCase().endsWith('.sql')) {
+        name += '.sql';
+      }
+
+      this.lastAction = this.rename.bind(this, name);
+      this.message = 'Renaming script...';
+
+      try {
+        this.exception = null;
+        this.nodeInfo.nodeId = await this.actions.rename(this, this.nodeInfo.nodeId, name);
+
+        if (this.nodeInfo.parents.length > 0) {
+          this.nodeInfo.parents.splice(this.nodeInfo.parents.length - 1, 1, this.nodeInfo.nodeId);
+        }
+
+        this.markOutdated();
+        this.saved = true;
+        this.loaded = false;
+      } catch (exception: any) {
+        this.exception = exception;
+      } finally {
+        this.message = undefined;
+      }
+    });
   }
 
   async read() {
-    if (!this.actions || !this.nodeInfo || !this.isOutdated() || !this.saved) {
-      return;
-    }
+    await this.scheduler.schedule(undefined, async () => {
+      if (!this.actions || !this.nodeInfo || !this.isOutdated() || !this.saved) {
+        return;
+      }
 
-    this.lastAction = this.read.bind(this);
-    this.loading = true;
-    this.message = 'Reading script...';
+      this.lastAction = this.read.bind(this);
+      this.message = 'Reading script...';
 
-    try {
-      this.exception = null;
-      this._script = await this.actions.read(this, this.nodeInfo.nodeId);
-
-      await this.updateProperty();
-
-      this.state.name = this.name ?? undefined;
-      this.markUpdated();
-      this.loaded = true;
-      super.setScript(this.script);
-    } catch (exception: any) {
-      this.exception = exception;
-    } finally {
-      this.loading = false;
-      this.message = undefined;
-    }
+      try {
+        this.exception = null;
+        this._script = await this.actions.read(this, this.nodeInfo.nodeId);
+        this.state.name = this.name ?? undefined;
+        this.markUpdated();
+        this.loaded = true;
+        super.setScript(this.script);
+      } catch (exception: any) {
+        this.exception = exception;
+      } finally {
+        this.message = undefined;
+      }
+    });
   }
 
   async write() {
-    if (!this.actions || !this.nodeInfo || this.saved) {
-      return;
-    }
+    await this.scheduler.schedule(undefined, async () => {
+      if (!this.actions || !this.nodeInfo || this.saved) {
+        return;
+      }
 
-    this.lastAction = this.write.bind(this);
-    this.loading = true;
-    this.message = 'Saving script...';
+      this.lastAction = this.write.bind(this);
+      this.message = 'Saving script...';
 
-    try {
-      this.exception = null;
-      await this.actions.write(this, this.nodeInfo.nodeId, this.script);
-      this.state.name = this.name ?? undefined;
-      this.saved = true;
-      this.markUpdated();
-    } catch (exception: any) {
-      this.exception = exception;
-    } finally {
-      this.loading = false;
-      this.message = undefined;
-    }
+      try {
+        this.exception = null;
+        await this.actions.write(this, this.nodeInfo.nodeId, this.script);
+        this.state.name = this.name ?? undefined;
+        this.saved = true;
+        this.markUpdated();
+      } catch (exception: any) {
+        this.exception = exception;
+      } finally {
+        this.message = undefined;
+      }
+    });
   }
 
-  async setProperty() {
-    if (!this.actions || !this.nodeInfo || this.propertySaved || !this.loaded) {
-      return;
-    }
+  async setProperty(properties: IResourceProperties) {
+    await this.scheduler.schedule(undefined, async () => {
+      if (!this.actions || !this.nodeInfo) {
+        return;
+      }
 
-    this.lastAction = this.setProperty.bind(this);
-    this.loading = true;
-    this.message = 'Update info...';
+      this.lastAction = this.setProperty.bind(this, properties);
+      this.message = 'Update info...';
 
-    try {
-      this.exception = null;
-      await this.actions.setProperties(
-        this,
-        this.nodeInfo.nodeId,
-        toJS(this.resourceProperties)
-      );
-      await this.updateProperty();
-      this.markUpdated();
-      this.propertySaved = true;
-    } catch (exception: any) {
-      this.exception = exception;
-    } finally {
-      this.loading = false;
-      this.message = undefined;
-    }
+      try {
+        this.exception = null;
+        await this.actions.setProperties(
+          this,
+          this.nodeInfo.nodeId,
+          properties
+        );
+        await this.updateProperty();
+      } catch (exception: any) {
+        this.exception = exception;
+      } finally {
+        this.message = undefined;
+      }
+    });
   }
 
   private async updateProperty() {
@@ -329,33 +321,31 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     const defaultCatalog = this.resourceProperties['default-catalog'];
     const defaultSchema = this.resourceProperties['default-schema'];
 
-    if (!connectionId || !this.nodeInfo.projectId) {
+    if (!this.nodeInfo.projectId) {
       return;
     }
 
-    let id = this.state.executionContext?.id ?? '-1';
-
-    if (
-      this.state.executionContext?.connectionId !== connectionId
-      || this.nodeInfo.projectId !== this.state.executionContext.projectId
-    ) {
-      id = '-1';
+    if (connectionId) {
+      if (
+        !isValuesEqual(this.state.executionContext?.connectionId, connectionId, null)
+        || !isValuesEqual(this.state.executionContext?.defaultCatalog, defaultCatalog, null)
+        || !isValuesEqual(this.state.executionContext?.defaultSchema, defaultSchema, null)
+        || !isValuesEqual(this.state.executionContext?.projectId, this.nodeInfo.projectId, null)
+      ) {
+        this.state.executionContext = {
+          id: '-1',
+          projectId: this.nodeInfo.projectId,
+          connectionId,
+          defaultCatalog,
+          defaultSchema,
+        };
+      }
+    } else {
+      this.state.executionContext = undefined;
     }
-
-    this.state.executionContext = {
-      id,
-      projectId: this.nodeInfo.projectId,
-      connectionId,
-      defaultCatalog,
-      defaultSchema,
-    };
   }
 
   private debouncedWrite() {
     this.write();
-  }
-
-  private debouncedSetProperty() {
-    this.setProperty();
   }
 }

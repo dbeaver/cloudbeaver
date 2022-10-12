@@ -24,6 +24,11 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
     super();
   }
 
+  getResourceName(resourcePath: string): string {
+    const parts = resourcePath.split('/');
+    return parts[parts.length - 1];
+  }
+
   getFolder(resourcePath: string): string {
     const parts = resourcePath.split('/');
     return parts.slice(0, parts.length - 1).join('/');
@@ -56,42 +61,79 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
     // this.set();
   }
 
-  async setResourceProperties(
+  async loadProperties(
+    projectId: string,
+    resourcePath: string
+  ): Promise<Record<string, any>> {
+    const folder = this.getFolder(resourcePath);
+    const nameMask = this.getResourceName(resourcePath);
+    const key: IResourceManagerParams = { projectId, folder };
+
+    await this.load(key);
+    await this.performUpdate(key, undefined, async () => {
+      const { resources } = await this.graphQLService.sdk.getResourceList({
+        projectId,
+        folder,
+        nameMask,
+        readProperties: true,
+      });
+
+      const currentResources = this.get(key);
+      const resource = this.getResource(key, resourcePath);
+
+      if (resource) {
+        currentResources?.splice(
+          currentResources.indexOf(resource),
+          1,
+          ...resources.map(resource => ({ properties: {}, ...resource }))
+        );
+      }
+
+      // this.dataSet(
+      //   key,
+      //   resources.map(resource => ({ properties: {}, ...resource }))
+      // );
+    }, () => {
+      const resource = this.getResource(key, resourcePath);
+      return resource?.properties && this.isLoaded(key) && !this.isOutdated(key);
+    });
+
+    return this.getResource(key, resourcePath)?.properties;
+  }
+
+  async setProperties(
     projectId: string,
     resourcePath: string,
     diff: Record<string, any>
   ): Promise<Record<string, any>> {
     const folder = this.getFolder(resourcePath);
+    const key: IResourceManagerParams = { projectId, folder };
+    const propertiesPatch: Record<string, any> = {};
+    const properties = await this.loadProperties(projectId, resourcePath);
 
-    let properties: Record<string, any> | undefined;
+    await this.performUpdate(key, undefined, async () => {
+      for (const [name, value] of Object.entries(diff)) {
+        if (
+          properties[name] === value
+        || (value === null && !(value in properties))
+        ) {
+          continue;
+        }
 
-    await this.load({ projectId, folder });
-    const resource = this.getResource({ projectId, folder }, resourcePath);
+        await this.graphQLService.sdk.setResourceProperty({
+          projectId,
+          resourcePath,
+          name,
+          value,
+        });
 
-    if (resource) {
-      properties = resource.properties;
-    }
-
-    for (const [name, value] of Object.entries(diff)) {
-      if (properties?.[name] === value) {
-        continue;
+        propertiesPatch[name] = value;
       }
 
-      const { properties: newProperties } = await this.graphQLService.sdk.setResourceProperty({
-        projectId,
-        resourcePath,
-        name,
-        value,
-      });
+      Object.assign(properties, propertiesPatch);
+    });
 
-      // properties = newProperties;
-    }
-
-    if (properties && resource) {
-      resource.properties = properties;
-    }
-
-    return resource?.properties ?? {};
+    return properties;
   }
 
   async createResource(projectId: string, resourcePath: string, folder: boolean) {
@@ -156,7 +198,7 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
         folder,
       });
 
-      this.dataSet(key, resources);
+      this.dataSet(key, resources.map(({ properties, ...resource }) => resource));
     });
 
     return this.data;
