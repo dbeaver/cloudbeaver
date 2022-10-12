@@ -59,6 +59,10 @@ export default [
 
   ['administration_teams_team_description', '描述'],
   ['administration_teams_team_permissions', 'Permissions'],
+  ['administration_teams_team_info_created', 'Team created'],
+  ['administration_teams_team_info_updated', 'Team updated'],
+  ['administration_teams_team_info_id_invalid', "Field '{alias:administration_teams_team_id}' can't be empty"],
+  ['administration_teams_team_info_exists', "A team with ID '{arg:teamId}' already exists"],
 
   ['administration_teams_team_granted_users_tab_title', '用户'],
   ['administration_teams_team_granted_users_search_placeholder', '搜索用户ID...'],

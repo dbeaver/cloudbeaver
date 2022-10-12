@@ -20,6 +20,11 @@ export default [
   ['authentication_administration_user_created', 'Utente creato con successo'],
   ['authentication_administration_user_create_failed', 'Errore di creazione nuovo utente'],
 
+  ['administration_teams_team_info_created', 'Team created'],
+  ['administration_teams_team_info_updated', 'Team updated'],
+  ['administration_teams_team_info_id_invalid', "Field '{alias:administration_teams_team_id}' can't be empty"],
+  ['administration_teams_team_info_exists', "A team with ID '{arg:teamId}' already exists"],
+
   ['administration_configuration_wizard_configuration_admin', 'Credenziali amministrative'],
   ['administration_configuration_wizard_configuration_admin_name', 'Login'],
   ['administration_configuration_wizard_configuration_admin_password', 'Password'],

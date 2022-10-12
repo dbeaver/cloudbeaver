@@ -9,6 +9,7 @@
 import { TeamsResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 
 import { teamContext } from '../Contexts/teamContext';
@@ -21,6 +22,7 @@ export class TeamOptionsTabService extends Bootstrap {
   constructor(
     private readonly teamFormService: TeamFormService,
     private readonly teamResource: TeamsResource,
+    private readonly localizationService: LocalizationService
   ) {
     super();
   }
@@ -84,11 +86,13 @@ export class TeamOptionsTabService extends Bootstrap {
 
     if (state.mode === 'create') {
       if (!state.config.teamId.trim()) {
-        validation.error("Field 'Team ID' can't be empty");
+        validation.error('administration_teams_team_info_id_invalid');
       }
 
       if (this.teamResource.has(state.config.teamId)) {
-        validation.error(`A team with ID "${state.config.teamId}" already exists`);
+        validation.error(this.localizationService.translate('administration_teams_team_info_exists', undefined, {
+          teamId: state.config.teamId,
+        }));
       }
     }
   }
@@ -107,11 +111,11 @@ export class TeamOptionsTabService extends Bootstrap {
     try {
       if (create) {
         const team = await this.teamResource.createTeam(config);
-        status.info('Team created');
+        status.info('administration_teams_team_info_created');
         status.info(team.teamId);
       } else {
         const team = await this.teamResource.updateTeam(config);
-        status.info('Team updated');
+        status.info('administration_teams_team_info_updated');
         status.info(team.teamId);
       }
     } catch (exception: any) {
