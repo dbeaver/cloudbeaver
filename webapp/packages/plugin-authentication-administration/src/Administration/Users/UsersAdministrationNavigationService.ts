@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 
 export enum EUsersAdministrationSub {
   Users = 'users',
-  Roles = 'roles',
+  Teams = 'teams',
   MetaProperties = 'metaProperties'
 }
 

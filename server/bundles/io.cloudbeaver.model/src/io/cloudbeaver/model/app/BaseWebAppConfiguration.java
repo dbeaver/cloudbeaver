@@ -26,30 +26,30 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
-    public static final String DEFAULT_APP_ANONYMOUS_ROLE_NAME = "user";
+    public static final String DEFAULT_APP_ANONYMOUS_TEAM_NAME = "user";
 
     protected final Map<String, Object> plugins;
-    protected String defaultUserRole;
+    protected String defaultUserTeam;
     protected boolean resourceManagerEnabled;
     protected String[] enabledFeatures;
 
     public BaseWebAppConfiguration() {
         this.plugins = new LinkedHashMap<>();
-        this.defaultUserRole = DEFAULT_APP_ANONYMOUS_ROLE_NAME;
+        this.defaultUserTeam = DEFAULT_APP_ANONYMOUS_TEAM_NAME;
         this.resourceManagerEnabled = true;
         this.enabledFeatures = null;
     }
 
     public BaseWebAppConfiguration(BaseWebAppConfiguration src) {
         this.plugins = new LinkedHashMap<>(src.plugins);
-        this.defaultUserRole = src.defaultUserRole;
+        this.defaultUserTeam = src.defaultUserTeam;
         this.resourceManagerEnabled = src.resourceManagerEnabled;
         this.enabledFeatures = src.enabledFeatures;
     }
 
     @Override
-    public String getDefaultUserRole() {
-        return defaultUserRole;
+    public String getDefaultUserTeam() {
+        return defaultUserTeam;
     }
 
     @Override

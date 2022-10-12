@@ -1,0 +1,5 @@
+query createTeam($teamId: ID!, $teamName: String, $description: String ) {
+  team: createTeam(teamId: $teamId, teamName: $teamName, description: $description) {
+    ...AdminTeamInfo
+  }
+}

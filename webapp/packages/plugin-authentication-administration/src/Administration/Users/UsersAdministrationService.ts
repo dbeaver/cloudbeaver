@@ -7,11 +7,11 @@
  */
 
 import { AdministrationItemService } from '@cloudbeaver/core-administration';
-import { AdminUser, RolesResource } from '@cloudbeaver/core-authentication';
+import { AdminUser, TeamsResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
-import { CreateRoleService } from './Roles/CreateRoleService';
+import { CreateTeamService } from './Teams/CreateTeamService';
 import { UsersAdministration } from './UsersAdministration';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 import { UsersDrawerItem } from './UsersDrawerItem';
@@ -29,8 +29,8 @@ export class UsersAdministrationService extends Bootstrap {
   constructor(
     private readonly administrationItemService: AdministrationItemService,
     private readonly createUserService: CreateUserService,
-    private readonly rolesResource: RolesResource,
-    private readonly createRoleService: CreateRoleService,
+    private readonly teamsResource: TeamsResource,
+    private readonly createTeamService: CreateTeamService,
   ) {
     super();
   }
@@ -48,11 +48,11 @@ export class UsersAdministrationService extends Bootstrap {
           onDeActivate: this.cancelCreate.bind(this),
         },
         {
-          name: EUsersAdministrationSub.Roles,
-          onActivate: this.loadRoles.bind(this),
+          name: EUsersAdministrationSub.Teams,
+          onActivate: this.loadTeams.bind(this),
           onDeActivate: (configurationWizard, outside) => {
             if (outside) {
-              this.rolesResource.cleanNewFlags();
+              this.teamsResource.cleanNewFlags();
             }
           },
         },
@@ -72,9 +72,9 @@ export class UsersAdministrationService extends Bootstrap {
     }
   }
 
-  private async loadRoles(param: string | null) {
+  private async loadTeams(param: string | null) {
     if (param === 'create') {
-      this.createRoleService.fillData();
+      this.createTeamService.fillData();
     }
   }
 }

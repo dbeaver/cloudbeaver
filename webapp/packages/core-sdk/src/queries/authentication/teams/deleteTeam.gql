@@ -1,0 +1,3 @@
+query deleteTeam($teamId: ID!) {
+  deleteTeam(teamId: $teamId)
+}

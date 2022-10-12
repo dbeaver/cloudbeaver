@@ -432,17 +432,17 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public WebConnectionInfo createConnectionFromTemplate(
         @NotNull WebSession webSession,
-        @Nullable String projectId,
+        @NotNull String projectId,
         @NotNull String templateId,
         @Nullable String connectionName) throws DBWebException
     {
-        DBPDataSourceRegistry templateRegistry = WebServiceUtils.getGlobalRegistry(webSession);
+        DBPDataSourceRegistry templateRegistry = webSession.getProjectById(projectId).getDataSourceRegistry();
         DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(templateId);
         if (dataSourceTemplate == null) {
             throw new DBWebException("Template data source '" + templateId + "' not found");
         }
 
-        DBPDataSourceRegistry projectRegistry = webSession.getProjectById(projectId).getDataSourceRegistry();
+        DBPDataSourceRegistry projectRegistry = webSession.getSingletonProject().getDataSourceRegistry();
         DBPDataSourceContainer newDataSource = projectRegistry.createDataSource(dataSourceTemplate);
 
         ((DataSourceDescriptor) newDataSource).setNavigatorSettings(
