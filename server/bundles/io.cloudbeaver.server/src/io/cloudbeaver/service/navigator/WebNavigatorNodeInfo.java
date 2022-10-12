@@ -84,7 +84,7 @@ public class WebNavigatorNodeInfo {
     public String getProjectId() {
         DBPProject project = node.getOwnerProject();
 
-        if(project == null) {
+        if (project == null) {
             return null;
         }
 
