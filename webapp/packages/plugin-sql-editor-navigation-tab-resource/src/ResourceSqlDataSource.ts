@@ -11,7 +11,7 @@ import { action, computed, makeObservable, observable, toJS } from 'mobx';
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { debounce, isArraysEqual, isValuesEqual } from '@cloudbeaver/core-utils';
+import { debounce, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IResourceNodeInfo, IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
@@ -137,7 +137,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   setNodeInfo(nodeInfo?: IResourceNodeInfo): void {
     this.state.nodeInfo = nodeInfo;
     this.markOutdated();
-    this.setProperty(toJS(this.resourceProperties));
+    this.setProperties(toJS(this.resourceProperties));
     this.saved = true;
     this.loaded = false;
   }
@@ -196,7 +196,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.resourceProperties['default-catalog'] = executionContext?.defaultCatalog;
     this.resourceProperties['default-schema'] = executionContext?.defaultSchema;
 
-    this.setProperty(toJS(this.resourceProperties));
+    this.setProperties(toJS(this.resourceProperties));
   }
 
   async rename(name: string | null) {
@@ -285,23 +285,27 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     });
   }
 
-  async setProperty(properties: IResourceProperties) {
+  async setProperties(properties: IResourceProperties) {
     await this.scheduler.schedule(undefined, async () => {
       if (!this.actions || !this.nodeInfo) {
         return;
       }
 
-      this.lastAction = this.setProperty.bind(this, properties);
+      this.lastAction = this.setProperties.bind(this, properties);
       this.message = 'Update info...';
 
       try {
         this.exception = null;
-        await this.actions.setProperties(
-          this,
-          this.nodeInfo.nodeId,
-          properties
-        );
-        await this.updateProperty();
+
+        if (!this.isReadonly()) {
+          await this.actions.setProperties(
+            this,
+            this.nodeInfo.nodeId,
+            properties
+          );
+        }
+
+        await this.updateProperties();
       } catch (exception: any) {
         this.exception = exception;
       } finally {
@@ -310,12 +314,18 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     });
   }
 
-  private async updateProperty() {
+  private async updateProperties() {
     if (!this.actions || !this.nodeInfo) {
       return;
     }
 
+    const previousProperties = this.resourceProperties;
+
     this.resourceProperties = toJS(await this.actions.getProperties(this, this.nodeInfo.nodeId));
+
+    if (isObjectsEqual(previousProperties, this.resourceProperties) && this.isReadonly()) {
+      return;
+    }
 
     const connectionId =  this.resourceProperties['default-datasource'];
     const defaultCatalog = this.resourceProperties['default-catalog'];
