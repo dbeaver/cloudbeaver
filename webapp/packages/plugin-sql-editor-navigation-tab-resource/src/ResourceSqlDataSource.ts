@@ -192,6 +192,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
     this.state.executionContext = toJS(executionContext);
 
+    if (this.isReadonly()) {
+      return;
+    }
+
     this.resourceProperties['default-datasource'] = executionContext?.connectionId;
     this.resourceProperties['default-catalog'] = executionContext?.defaultCatalog;
     this.resourceProperties['default-schema'] = executionContext?.defaultSchema;
@@ -286,6 +290,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   async setProperties(properties: IResourceProperties) {
+    if (Object.keys(properties).length === 0) {
+      return;
+    }
+
     await this.scheduler.schedule(undefined, async () => {
       if (!this.actions || !this.nodeInfo) {
         return;
@@ -323,7 +331,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
     this.resourceProperties = toJS(await this.actions.getProperties(this, this.nodeInfo.nodeId));
 
-    if (isObjectsEqual(previousProperties, this.resourceProperties) && this.isReadonly()) {
+    if (isObjectsEqual(toJS(previousProperties), toJS(this.resourceProperties)) && this.isReadonly()) {
       return;
     }
 
