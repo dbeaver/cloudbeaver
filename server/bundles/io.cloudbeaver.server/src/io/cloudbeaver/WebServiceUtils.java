@@ -24,6 +24,7 @@ import io.cloudbeaver.model.WebConnectionFolderInfo;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
@@ -44,21 +45,20 @@ import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
-import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
+import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
+import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Various constants
@@ -339,5 +339,17 @@ public class WebServiceUtils extends WebCommonUtils {
         return project.getId().equals(RMProjectType.GLOBAL.getPrefix() + "_" + CBApplication.getInstance().getDefaultProjectName());
     }
 
+    public static List<AuthProviderDescriptor> getEnabledAuthProviders() {
+        List<AuthProviderDescriptor> result = new ArrayList<>();
+        CBAppConfig appConfig = CBApplication.getInstance().getAppConfiguration();
+        String[] authProviders = appConfig.getEnabledAuthProviders();
+        for (String apId : authProviders) {
+            AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(apId);
+            if (authProvider != null) {
+                result.add(authProvider);
+            }
+        }
+        return result;
+    }
 
 }

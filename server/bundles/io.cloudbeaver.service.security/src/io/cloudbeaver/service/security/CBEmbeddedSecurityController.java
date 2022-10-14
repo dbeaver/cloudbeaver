@@ -474,7 +474,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private String findUserByCredentials(String authProviderId, Map<String, Object> authParameters) throws DBCException {
         AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         Map<String, Object> identCredentials = new LinkedHashMap<>();
-        for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(authParameters.keySet())) {
+        String[] propNames = authParameters.keySet().toArray(new String[0]);
+        for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(propNames)) {
             if (prop.isIdentifying()) {
                 String propId = CommonUtils.toString(prop.getId());
                 Object paramValue = authParameters.get(propId);
