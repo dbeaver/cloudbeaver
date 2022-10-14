@@ -167,6 +167,7 @@ public class LocalResourceController implements RMController {
                 RMProjectType.SHARED, true)
             )
             .filter(Objects::nonNull)
+            .sorted(Comparator.comparing(RMProject::getDisplayName))
             .collect(Collectors.toList());
     }
 
@@ -368,6 +369,7 @@ public class LocalResourceController implements RMController {
                     String fileName = path.getFileName().toString();
                     return (nameMask == null || nameMask.equals(fileName)) && !fileName.startsWith(".");
                 }) // skip hidden files
+                .sorted(Comparator.comparing(path -> path.getFileName().toString(), String.CASE_INSENSITIVE_ORDER))
                 .map((Path path) -> makeResourceFromPath(projectId, path, nameMask, readProperties, readHistory, recursive))
                 .filter(Objects::nonNull)
                 .toArray(RMResource[]::new);
