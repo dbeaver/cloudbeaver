@@ -364,6 +364,10 @@ public class WebServiceCore implements DBWServiceCore {
         webSession.addInfoMessage("Create new connection");
         DBPDataSourceRegistry sessionRegistry = webSession.getProjectById(projectId).getDataSourceRegistry();
 
+        // we don't need to save credentials for templates
+        if (connectionConfig.isTemplate()) {
+            connectionConfig.setSaveCredentials(false);
+        }
         DBPDataSourceContainer newDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
         if (CommonUtils.isEmpty(newDataSource.getName())) {
             newDataSource.setName(CommonUtils.notNull(connectionConfig.getName(), "NewConnection"));

@@ -82,7 +82,8 @@ public class WebNavigatorNodeInfo {
 
     @Property
     public String getProjectId() {
-        return node.getOwnerProject().getId();
+        DBPProject ownerProject = node.getOwnerProject();
+        return ownerProject == null ? null : ownerProject.getId();
     }
 
     @Property

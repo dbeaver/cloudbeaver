@@ -1,0 +1,5 @@
+query getTeamsList($teamId: ID) {
+  teams: listTeams(teamId: $teamId) {
+    ...AdminTeamInfo
+  } 
+}

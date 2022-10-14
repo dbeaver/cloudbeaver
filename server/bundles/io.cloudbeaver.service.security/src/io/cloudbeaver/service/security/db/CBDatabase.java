@@ -36,7 +36,7 @@ import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
-import org.jkiss.dbeaver.model.security.user.SMRole;
+import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
@@ -68,7 +68,7 @@ public class CBDatabase {
     public static final String SCHEMA_UPDATE_SQL_PATH = "db/cb_schema_update_";
 
     private static final int LEGACY_SCHEMA_VERSION = 1;
-    private static final int CURRENT_SCHEMA_VERSION = 10;
+    private static final int CURRENT_SCHEMA_VERSION = 11;
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
@@ -245,7 +245,7 @@ public class CBDatabase {
         SMUser adminUser = adminSecurityController.getUserById(adminName);
 
         if (adminUser == null) {
-            adminUser = new SMUser(adminName);
+            adminUser = new SMUser(adminName, true);
             adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters(), true);
         }
 
@@ -269,11 +269,11 @@ public class CBDatabase {
     }
 
     private void grantAdminPermissionsToUser(String userId) throws DBException {
-        // Grant all roles
-        SMRole[] allRoles = adminSecurityController.readAllRoles();
-        adminSecurityController.setUserRoles(
+        // Grant all teams
+        SMTeam[] allTeams = adminSecurityController.readAllTeams();
+        adminSecurityController.setUserTeams(
             userId,
-            Arrays.stream(allRoles).map(SMRole::getRoleId).toArray(String[]::new),
+            Arrays.stream(allTeams).map(SMTeam::getTeamId).toArray(String[]::new),
             userId);
     }
 
@@ -345,12 +345,12 @@ public class CBDatabase {
                 String adminName = initialData.getAdminName();
                 String adminPassword = initialData.getAdminPassword();
 
-                if (!CommonUtils.isEmpty(initialData.getRoles())) {
-                    // Create roles
-                    for (SMRole role : initialData.getRoles()) {
-                        adminSecurityController.createRole(role.getRoleId(), role.getName(), role.getDescription(), adminName);
+                if (!CommonUtils.isEmpty(initialData.getTeams())) {
+                    // Create teams
+                    for (SMTeam team : initialData.getTeams()) {
+                        adminSecurityController.createTeam(team.getTeamId(), team.getName(), team.getDescription(), adminName);
                         if (adminName != null) {
-                            adminSecurityController.setSubjectPermissions(role.getRoleId(), new ArrayList<>(role.getPermissions()), adminName);
+                            adminSecurityController.setSubjectPermissions(team.getTeamId(), new ArrayList<>(team.getPermissions()), adminName);
                         }
                     }
                 }

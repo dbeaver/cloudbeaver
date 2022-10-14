@@ -1,7 +1,7 @@
 {
   "name": "@cloudbeaver/product-default",
   "sideEffects": false,
-  "version": "22.2.2",
+  "version": "22.2.3",
   "description": "",
   "license": "Apache-2.0",
   "main": "lib/index.js",

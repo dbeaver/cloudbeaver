@@ -24,13 +24,13 @@ import java.util.Map;
  * Application configuration
  */
 public interface WebAppConfiguration {
-    String getAnonymousUserRole();
+    String getAnonymousUserTeam();
 
     boolean isAnonymousAccessEnabled();
 
     <T> T getResourceQuota(String quotaId);
 
-    String getDefaultUserRole();
+    String getDefaultUserTeam();
 
     <T> T getPluginOption(@NotNull String pluginId, @NotNull String option);
 

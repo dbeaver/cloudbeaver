@@ -1,3 +1,0 @@
-query grantUserRole($userId: ID!, $roleId: ID!) {
-  grantUserRole(userId: $userId, roleId: $roleId)
-}

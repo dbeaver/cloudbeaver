@@ -820,15 +820,15 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
     private void grantAnonymousAccessToConnections(CBAppConfig appConfig, String adminName) {
         try {
-            String anonymousRoleId = appConfig.getAnonymousUserRole();
+            String anonymousTeamId = appConfig.getAnonymousUserTeam();
             var securityController = getSecurityController();
             for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
-                var datasourcePermissions = securityController.getObjectPermissions(anonymousRoleId, ds.getId(), SMObjects.DATASOURCE);
+                var datasourcePermissions = securityController.getObjectPermissions(anonymousTeamId, ds.getId(), SMObjects.DATASOURCE);
                 if (CommonUtils.isEmpty(datasourcePermissions.getPermissions())) {
                     securityController.setObjectPermissions(
                         Set.of(ds.getId()),
                         SMObjects.DATASOURCE,
-                        Set.of(anonymousRoleId),
+                        Set.of(anonymousTeamId),
                         Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION),
                         adminName
                     );
