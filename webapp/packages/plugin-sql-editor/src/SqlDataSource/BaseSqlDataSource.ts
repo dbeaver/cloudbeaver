@@ -20,6 +20,11 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   abstract get executionContext(): IConnectionExecutionContextInfo | undefined;
   exception?: Error | Error[] | null | undefined;
   message?: string;
+
+  get projectId(): string | null {
+    return null;
+  }
+
   get features(): ESqlDataSourceFeatures[] {
     return [];
   }
@@ -89,6 +94,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
   setEditing(state: boolean): void {
     this.editing = state;
+  }
+
+  setProject(projectId: string | null): void {
+
   }
 
   load(): Promise<void> | void { }

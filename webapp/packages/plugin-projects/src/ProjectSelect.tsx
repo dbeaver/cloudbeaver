@@ -45,7 +45,10 @@ export const ProjectSelect = observer(function ProjectSelect({
 
   const projectsLoader = useMapResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey, {
     onData: () => {
-      if (!value && possibleOptions.length > 0) {
+      if (
+        (!value && possibleOptions.length > 0)
+        || (value && !possibleOptions.includes(value))
+      ) {
         onChange(possibleOptions[0]);
       }
     },

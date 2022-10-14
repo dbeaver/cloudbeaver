@@ -58,6 +58,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     return this._script;
   }
 
+  get projectId(): string | null {
+    return this.nodeInfo?.projectId ?? null;
+  }
+
   get executionContext(): IConnectionExecutionContextInfo | undefined {
     return this.state.executionContext;
   }
@@ -137,7 +141,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   setNodeInfo(nodeInfo?: IResourceNodeInfo): void {
     this.state.nodeInfo = nodeInfo;
     this.markOutdated();
-    this.setProperties(toJS(this.resourceProperties));
     this.saved = true;
     this.loaded = false;
   }
@@ -152,6 +155,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   setName(name: string | null): void {
     this.rename(name);
+  }
+
+  setProject(projectId: string | null): void {
+
   }
 
   canRename(name: string | null): boolean {
@@ -187,9 +194,19 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   async load(): Promise<void> {
     await this.read();
+    await this.updateProperties();
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
+    if (
+      this.nodeInfo?.projectId
+      && executionContext?.projectId
+      && this.nodeInfo.projectId !== executionContext.projectId
+    ) {
+      console.warn('Cant change execution context because of different projects');
+      return;
+    }
+
     this.state.executionContext = toJS(executionContext);
 
     if (this.isReadonly()) {
