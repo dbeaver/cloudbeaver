@@ -877,21 +877,21 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             var originServerConfig = getServerConfigProps(this.originalConfigurationProperties); // get server properties from original configuration file
             rootConfig.put("server", serverConfigProperties);
             if (!CommonUtils.isEmpty(newServerName)) {
-                putToRuntimeConfig(originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_NAME, newServerName);
+                copyConfigValue(originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_NAME, newServerName);
             }
             if (!CommonUtils.isEmpty(newServerURL)) {
-                putToRuntimeConfig(
+                copyConfigValue(
                         originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, newServerURL);
             }
             if (sessionExpireTime > 0) {
-                putToRuntimeConfig(
+                copyConfigValue(
                         originServerConfig, serverConfigProperties, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
             }
             var databaseConfigProperties = new LinkedHashMap<String, Object>();
             Map<String, Object> oldRuntimeDBConfig = JSONUtils.getObject(originServerConfig, CBConstants.PARAM_DB_CONFIGURATION);
             if (!CommonUtils.isEmpty(databaseConfiguration)) {
                 for (Map.Entry<String, Object> mp : databaseConfiguration.entrySet()) {
-                    putToRuntimeConfig(oldRuntimeDBConfig, databaseConfigProperties, mp.getKey(), mp.getValue());
+                    copyConfigValue(oldRuntimeDBConfig, databaseConfigProperties, mp.getKey(), mp.getValue());
                 }
                 serverConfigProperties.put(CBConstants.PARAM_DB_CONFIGURATION, databaseConfigProperties);
             }
@@ -901,29 +901,29 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             Map<String, Object> oldAppConfig = JSONUtils.getObject(this.originalConfigurationProperties, "app");
             rootConfig.put("app", appConfigProperties);
 
-            putToRuntimeConfig(
+            copyConfigValue(
                     oldAppConfig, appConfigProperties, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
-            putToRuntimeConfig(
+            copyConfigValue(
                     oldAppConfig, appConfigProperties, "supportsCustomConnections", appConfig.isSupportsCustomConnections());
-            putToRuntimeConfig(
+            copyConfigValue(
                     oldAppConfig, appConfigProperties, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
-            putToRuntimeConfig(
+            copyConfigValue(
                     oldAppConfig, appConfigProperties, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
-            putToRuntimeConfig(
+            copyConfigValue(
                     oldAppConfig, appConfigProperties, "enableReverseProxyAuth", appConfig.isEnabledReverseProxyAuth());
-            putToRuntimeConfig(
+            copyConfigValue(
                     oldAppConfig, appConfigProperties, "forwardProxy", appConfig.isEnabledForwardProxy());
-            putToRuntimeConfig(
+            copyConfigValue(
                     oldAppConfig, appConfigProperties, "linkExternalCredentialsWithUser", appConfig.isLinkExternalCredentialsWithUser());
-            putToRuntimeConfig(
+            copyConfigValue(
                     oldAppConfig, appConfigProperties, "redirectOnFederatedAuth", appConfig.isRedirectOnFederatedAuth());
-            putToRuntimeConfig(
+            copyConfigValue(
                     oldAppConfig, appConfigProperties, CBConstants.PARAM_RESOURCE_MANAGER_ENABLED, appConfig.isResourceManagerEnabled());
 
             Map<String, Object> resourceQuotas = new LinkedHashMap<>();
             Map<String, Object> originResourceQuotas = JSONUtils.getObject(oldAppConfig, CBConstants.PARAM_RESOURCE_QUOTAS);
             for (Map.Entry<String, Object> mp : appConfig.getResourceQuotas().entrySet()) {
-                putToRuntimeConfig(originResourceQuotas, appConfigProperties, mp.getKey(), mp.getValue());
+                copyConfigValue(originResourceQuotas, resourceQuotas, mp.getKey(), mp.getValue());
             }
             appConfigProperties.put(CBConstants.PARAM_RESOURCE_QUOTAS, resourceQuotas);
 
@@ -1029,17 +1029,34 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     // gets info about patterns from original configuration file and saves it to runtime config
-    private void putToRuntimeConfig(Map<String, Object> oldConfig, Map<String, Object> newConfig, String key, Object defaultValue) {
-        Object oldValue = oldConfig.get(key);
-        if (oldValue instanceof String && GeneralUtils.isVariablePattern((String) oldValue)) {
-            String extractedVariable = GeneralUtils.extractVariableName((String) oldValue);
-            if (extractedVariable != null) {
-                newConfig.put(key, GeneralUtils.variablePattern(extractedVariable + ":" + defaultValue));
-            } else {
-                newConfig.put(key, defaultValue);
+    private void copyConfigValue(Map<String, Object> oldConfig, Map<String, Object> newConfig, String key, Object defaultValue) {
+        Object value = oldConfig.get(key);
+        if (value instanceof Map && defaultValue instanceof Map) {
+            Map<String, Object> subValue = new LinkedHashMap<>();
+            Map<String, Object> oldConfigValue = JSONUtils.getObject(oldConfig, key);
+            for (Map.Entry<String, Object> entry : oldConfigValue.entrySet()) {
+                copyConfigValue(oldConfigValue, subValue, entry.getKey(), ((Map) defaultValue).get(entry.getKey()));
             }
+            newConfig.put(key, subValue);
         } else {
-            newConfig.put(key, defaultValue);
+            Object newConfigValue = getExtractedValue(oldConfig.get(key), defaultValue);
+            newConfig.put(key, newConfigValue);
+        }
+    }
+
+    private Object getExtractedValue(Object oldValue, Object newValue) {
+        if (!(oldValue instanceof String)) {
+            return newValue;
+        }
+        String value = (String) oldValue;
+        if (!GeneralUtils.isVariablePattern(value)) {
+            return newValue;
+        }
+        String extractedVariable = GeneralUtils.extractVariableName(value);
+        if (extractedVariable != null) {
+            return GeneralUtils.variablePattern(extractedVariable + ":" + newValue);
+        } else {
+            return newValue;
         }
     }
 }
