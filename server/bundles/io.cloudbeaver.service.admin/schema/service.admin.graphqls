@@ -42,6 +42,7 @@ type AdminUserInfo {
 
     linkedAuthProviders: [String!]!
     enabled: Boolean!
+    authRole: String
 }
 
 type AdminTeamInfo {
