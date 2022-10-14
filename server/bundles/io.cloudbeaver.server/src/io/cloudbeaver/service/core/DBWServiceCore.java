@@ -85,7 +85,7 @@ public interface DBWServiceCore extends DBWService {
     @WebAction
     List<WebServerMessage> readSessionLog(@NotNull WebSession webSession, Integer maxEntries, Boolean clearEntries) throws DBWebException;
 
-    @WebAction
+    @WebAction(requirePermissions = {})
     List<CBEvent> readSessionEvents(@NotNull WebSession webSession, Integer maxEntries) throws DBWebException;
 
     @WebAction(requirePermissions = {})

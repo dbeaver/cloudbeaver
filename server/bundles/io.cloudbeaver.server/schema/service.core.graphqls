@@ -386,8 +386,12 @@ type LogEntry {
     stackTrace: String
 }
 
+enum CBEventType {
+    cb_config_changed
+}
+
 type CBEvent {
-    eventType: String!
+    eventType: CBEventType!
     eventData: Object!
 }
 
