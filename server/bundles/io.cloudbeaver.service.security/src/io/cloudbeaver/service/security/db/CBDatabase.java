@@ -196,19 +196,25 @@ public class CBDatabase {
     }
 
     //TODO move out
-    public void finishConfiguration(@NotNull String adminName, @Nullable String adminPassword, @NotNull List<WebAuthInfo> authInfoList) throws DBException {
+    public void finishConfiguration(
+        @NotNull String adminName,
+        @Nullable String adminPassword,
+        @NotNull List<WebAuthInfo> authInfoList
+    ) throws DBException {
         if (!application.isConfigurationMode()) {
             throw new DBException("Database is already configured");
         }
 
         log.info("Configure CB database security");
         CBDatabaseInitialData initialData = getInitialData();
-        if (initialData != null && !CommonUtils.isEmpty(initialData.getAdminName()) && !CommonUtils.equalObjects(initialData.getAdminName(), adminName)) {
+        if (initialData != null && !CommonUtils.isEmpty(initialData.getAdminName())
+            && !CommonUtils.equalObjects(initialData.getAdminName(), adminName)
+        ) {
             // Delete old admin user
             adminSecurityController.deleteUser(initialData.getAdminName());
         }
         // Create new admin user
-        createAdminUser(adminName, adminPassword);
+        createAdminUser(adminName, adminPassword, null);
 
         // Associate all auth credentials with admin user
         for (WebAuthInfo ai : authInfoList) {
@@ -241,12 +247,16 @@ public class CBDatabase {
     }
 
     @NotNull
-    private SMUser createAdminUser(@NotNull String adminName, @Nullable String adminPassword) throws DBException {
+    private SMUser createAdminUser(
+        @NotNull String adminName,
+        @Nullable String adminPassword,
+        @Nullable String adminAuthRole
+    ) throws DBException {
         SMUser adminUser = adminSecurityController.getUserById(adminName);
 
         if (adminUser == null) {
             adminUser = new SMUser(adminName, true);
-            adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters(), true);
+            adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters(), true, adminAuthRole);
         }
 
         if (!CommonUtils.isEmpty(adminPassword)) {
@@ -344,6 +354,7 @@ public class CBDatabase {
 
                 String adminName = initialData.getAdminName();
                 String adminPassword = initialData.getAdminPassword();
+                String adminAuthRole = initialData.getAdminPassword();
 
                 if (!CommonUtils.isEmpty(initialData.getTeams())) {
                     // Create teams
@@ -357,7 +368,7 @@ public class CBDatabase {
 
                 if (!CommonUtils.isEmpty(adminName)) {
                     // Create admin user
-                    createAdminUser(adminName, adminPassword);
+                    createAdminUser(adminName, adminPassword, adminAuthRole);
                 }
             } finally {
                 exclusiveConnection = null;

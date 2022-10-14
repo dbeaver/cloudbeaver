@@ -113,17 +113,29 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     // Users
 
     @Override
-    public void createUser(String userId, Map<String, String> metaParameters, boolean enabled) throws DBException {
+    public void createUser(
+        @NotNull String userId,
+        @Nullable Map<String, String> metaParameters,
+        boolean enabled,
+        @Nullable String defaultAuthRole
+    ) throws DBException {
         if (isSubjectExists(userId)) {
             throw new DBCException("User or team '" + userId + "' already exists");
         }
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 createAuthSubject(dbCon, userId, SUBJECT_USER);
-                try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER(USER_ID,IS_ACTIVE,CREATE_TIME) VALUES(?,?,?)")) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "INSERT INTO CB_USER(USER_ID,IS_ACTIVE,CREATE_TIME,DEFAULT_AUTH_ROLE) VALUES(?,?,?)")
+                ) {
                     dbStat.setString(1, userId);
                     dbStat.setString(2, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
                     dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                    if (CommonUtils.isEmpty(defaultAuthRole)) {
+                        dbStat.setNull(4, Types.VARCHAR);
+                    } else {
+                        dbStat.setString(4, defaultAuthRole);
+                    }
                     dbStat.execute();
                 }
                 if (!CommonUtils.isEmpty(metaParameters)) {
@@ -1268,11 +1280,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
         Map<String, Object> storedUserData = new LinkedHashMap<>();
         for (String authProviderId : authProviderIds) {
-            var userCredentials = (Map<String, Object>) authInfo.getAuthData().get(authProviderId);
+            var userAuthData = (Map<String, Object>) authInfo.getAuthData().get(authProviderId);
             var userIdFromCreds = findOrCreateExternalUserByCredentials(
                 authProviderId,
                 authAttemptSessionInfo.getSessionParams(),
-                userCredentials,
+                userAuthData,
                 finishAuthMonitor,
                 activeUserId,
                 activeUserId == null
@@ -1288,7 +1300,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
             storedUserData.put(
                 authProviderId,
-                saveSecuredCreds ? userCredentials : filterSecuredUserData(userCredentials, getAuthProvider(authProviderId))
+                saveSecuredCreds ? userAuthData : filterSecuredUserData(userAuthData, getAuthProvider(authProviderId))
             );
         }
 
@@ -1386,7 +1398,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             userId = userIdFromCredentials;
             if (!isSubjectExists(userId)) {
                 var newUser = new SMUser(userId, true);
-                createUser(newUser.getUserId(), newUser.getMetaParameters(), true);
+                createUser(newUser.getUserId(),
+                    newUser.getMetaParameters(),
+                    true,
+                    resolveUserAuthRole(authProvider, userCredentials)
+                );
                 String defaultTeamName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserTeam();
                 if (!CommonUtils.isEmpty(defaultTeamName)) {
                     setUserTeams(userId, new String[]{defaultTeamName}, userId);
@@ -1403,6 +1419,15 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
         }
         return userId;
+    }
+
+    @Nullable
+    private String resolveUserAuthRole(
+        @NotNull AuthProviderDescriptor authProvider,
+        @NotNull Map<String, Object> userAuthData
+    ) {
+        //TODO implement logic
+        return null;
     }
 
     protected SMTokens generateNewSessionToken(

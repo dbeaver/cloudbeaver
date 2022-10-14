@@ -23,6 +23,7 @@ import java.util.List;
 class CBDatabaseInitialData {
     private String adminName = "cbadmin";
     private String adminPassword = "cbadmin20";
+    private String adminAuthRole = null;
     private List<SMTeam> teams;
 
     public String getAdminName() {
@@ -31,6 +32,10 @@ class CBDatabaseInitialData {
 
     public String getAdminPassword() {
         return adminPassword;
+    }
+
+    public String getAdminAuthRole() {
+        return adminAuthRole;
     }
 
     public List<SMTeam> getTeams() {
