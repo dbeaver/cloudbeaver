@@ -5,6 +5,8 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebServletHandlerDescriptor;
 import io.cloudbeaver.server.CBAppConfig;
@@ -21,8 +23,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
-import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
-import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -86,7 +86,7 @@ public class CBStaticServlet extends DefaultServlet {
         String[] authProviders = appConfig.getEnabledAuthProviders();
         if (authProviders.length == 1) {
             String authProviderId = authProviders[0];
-            AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
+            WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
             if (authProvider != null && authProvider.isConfigurable()) {
                 SMAuthProviderCustomConfiguration activeAuthConfig = null;
                 for (SMAuthProviderCustomConfiguration cfg : appConfig.getAuthCustomConfigurations()) {

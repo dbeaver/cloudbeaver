@@ -25,6 +25,8 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionAuthProcessor;
 import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebUserProfileRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
@@ -40,8 +42,6 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
 import org.jkiss.dbeaver.model.security.user.SMUser;
-import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
-import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
@@ -163,7 +163,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public WebAuthProviderInfo[] getAuthProviders() {
-        return AuthProviderRegistry.getInstance().getAuthProviders()
+        return WebAuthProviderRegistry.getInstance().getAuthProviders()
             .stream().map(WebAuthProviderInfo::new)
             .toArray(WebAuthProviderInfo[]::new);
     }
@@ -184,7 +184,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     public WebPropertyInfo[] listUserProfileProperties(@NotNull WebSession webSession) {
         List<DBPPropertyDescriptor> props = new ArrayList<>();
 
-        for (AuthProviderDescriptor ap : WebServiceUtils.getEnabledAuthProviders()) {
+        for (WebAuthProviderDescriptor ap : WebServiceUtils.getEnabledAuthProviders()) {
             List<DBPPropertyDescriptor> metaProps = ap.getMetaProperties(SMSubjectType.user);
             if (!CommonUtils.isEmpty(metaProps)) {
                 props.addAll(metaProps);

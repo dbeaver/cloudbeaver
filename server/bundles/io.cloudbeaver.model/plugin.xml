@@ -3,4 +3,7 @@
 
 <plugin>
     <extension-point id="io.cloudbeaver.service" name="Web services" schema="schema/io.cloudbeaver.service.exsd"/>
+    <extension-point id="io.cloudbeaver.feature" name="Web features" schema="schema/io.cloudbeaver.feature.exsd"/>
+    <extension-point id="io.cloudbeaver.valueSerializer" name="Web value serializers" schema="schema/io.cloudbeaver.valueSerializer.exsd"/>
+    <extension-point id="org.jkiss.dbeaver.auth.provider" name="%extension-point.org.jkiss.dbeaver.authProvider.name" schema="schema/org.jkiss.dbeaver.authProvider.exsd"/>
 </plugin>

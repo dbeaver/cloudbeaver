@@ -25,6 +25,8 @@ import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.model.session.WebAuthInfo;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
 import io.cloudbeaver.service.security.internal.RefreshTokenInfo;
@@ -45,8 +47,6 @@ import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 import org.jkiss.dbeaver.model.security.user.*;
-import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
-import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -402,7 +402,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     ///////////////////////////////////////////
     // Credentials
 
-    private static SMAuthCredentialsProfile getCredentialProfileByParameters(AuthProviderDescriptor authProvider, Set<String> keySet) {
+    private static SMAuthCredentialsProfile getCredentialProfileByParameters(WebAuthProviderDescriptor authProvider, Set<String> keySet) {
         List<SMAuthCredentialsProfile> credentialProfiles = authProvider.getCredentialProfiles();
         if (credentialProfiles.size() > 1) {
             for (SMAuthCredentialsProfile profile : credentialProfiles) {
@@ -430,7 +430,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             throw new DBException("Another user is already linked to the specified credentials");
         }
         List<String[]> transformedCredentials;
-        AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+        WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         try {
             SMAuthCredentialsProfile credProfile = getCredentialProfileByParameters(authProvider, credentials.keySet());
             transformedCredentials = credentials.entrySet().stream().map(cred -> {
@@ -472,7 +472,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Nullable
     private String findUserByCredentials(String authProviderId, Map<String, Object> authParameters) throws DBCException {
-        AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+        WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         Map<String, Object> identCredentials = new LinkedHashMap<>();
         String[] propNames = authParameters.keySet().toArray(new String[0]);
         for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(propNames)) {
@@ -541,7 +541,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public Map<String, Object> getUserCredentials(String userId, String authProviderId) throws DBCException {
-        AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+        WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT CRED_ID,CRED_VALUE FROM CB_USER_CREDENTIALS\n" +
@@ -923,7 +923,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 Map<String, Object> securedUserIdentifyingCredentials = userCredentials;
-                AuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
+                WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
                 var authProviderInstance = authProviderDescriptor.getInstance();
                 if (SMAuthProviderExternal.class.isAssignableFrom(authProviderInstance.getClass())) {
                     var authProviderExternal = (SMAuthProviderExternal<?>) authProviderInstance;
@@ -968,7 +968,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private Map<String, Object> filterSecuredUserData(
         Map<String, Object> userIdentifyingCredentials,
-        AuthProviderDescriptor authProviderDescriptor
+        WebAuthProviderDescriptor authProviderDescriptor
     ) {
         SMAuthCredentialsProfile credProfile = getCredentialProfileByParameters(authProviderDescriptor, userIdentifyingCredentials.keySet());
         return userIdentifyingCredentials.entrySet()
@@ -1376,7 +1376,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @Nullable String activeUserId,
         boolean createNewUserIfNotExist
     ) throws DBException {
-        AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+        WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
         String userId = findUserByCredentials(authProviderId, userCredentials);
         String userIdFromCredentials;
@@ -1491,12 +1491,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
         WebAuthConfiguration appConfiguration = (WebAuthConfiguration) application.getAppConfiguration();
         Set<SMAuthProviderCustomConfiguration> customConfigurations = appConfiguration.getAuthCustomConfigurations();
-        List<SMAuthProviderDescriptor> providers = AuthProviderRegistry.getInstance().getAuthProviders().stream()
+        List<SMAuthProviderDescriptor> providers = WebAuthProviderRegistry.getInstance().getAuthProviders().stream()
             .filter(ap ->
                 !ap.isTrusted() &&
                     appConfiguration.isAuthProviderEnabled(ap.getId()) &&
                     (!ap.isConfigurable() || hasProviderConfiguration(ap, customConfigurations)))
-            .map(AuthProviderDescriptor::createDescriptorBean).collect(Collectors.toList());
+            .map(WebAuthProviderDescriptor::createDescriptorBean).collect(Collectors.toList());
 
         if (!CommonUtils.isEmpty(customConfigurations)) {
             // Attach custom configs to providers
@@ -1514,7 +1514,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         return providers.toArray(new SMAuthProviderDescriptor[0]);
     }
 
-    private static boolean hasProviderConfiguration(AuthProviderDescriptor ap, Set<SMAuthProviderCustomConfiguration> customConfigurations) {
+    private static boolean hasProviderConfiguration(WebAuthProviderDescriptor ap, Set<SMAuthProviderCustomConfiguration> customConfigurations) {
         for (SMAuthProviderCustomConfiguration cc : customConfigurations) {
             if (!cc.isDisabled() && cc.getProvider().equals(ap.getId())) {
                 return true;
@@ -1803,7 +1803,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     "INSERT INTO CB_AUTH_PROVIDER(PROVIDER_ID,IS_ENABLED) VALUES(?,'Y')")) {
-                    for (AuthProviderDescriptor authProvider : AuthProviderRegistry.getInstance().getAuthProviders()) {
+                    for (WebAuthProviderDescriptor authProvider : WebAuthProviderRegistry.getInstance().getAuthProviders()) {
                         if (!registeredProviders.contains(authProvider.getId())) {
                             dbStat.setString(1, authProvider.getId());
                             dbStat.executeUpdate();
@@ -1833,8 +1833,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private AuthProviderDescriptor getAuthProvider(String authProviderId) throws DBCException {
-        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
+    private WebAuthProviderDescriptor getAuthProvider(String authProviderId) throws DBCException {
+        WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
         if (authProvider == null) {
             throw new DBCException("Auth provider not found: " + authProviderId);
         }

@@ -20,13 +20,13 @@ import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.auth.SMSessionPrincipal;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class WebAuthInfo implements SMSessionPrincipal {
 
     private final WebSession session;
     private final WebUser user;
-    private final AuthProviderDescriptor authProvider;
+    private final WebAuthProviderDescriptor authProvider;
     private WebAuthProviderConfiguration authProviderConfiguration;
     private SMSession authSession;
     private final OffsetDateTime loginTime;
@@ -52,7 +52,7 @@ public class WebAuthInfo implements SMSessionPrincipal {
     public WebAuthInfo(
         @NotNull WebSession session,
         @NotNull WebUser user,
-        @NotNull AuthProviderDescriptor authProvider,
+        @NotNull WebAuthProviderDescriptor authProvider,
         @NotNull DBWUserIdentity userIdentity,
         @NotNull SMSession authSession,
         @NotNull OffsetDateTime loginTime) {
@@ -112,7 +112,7 @@ public class WebAuthInfo implements SMSessionPrincipal {
         return userIdentity;
     }
 
-    public AuthProviderDescriptor getAuthProviderDescriptor() {
+    public WebAuthProviderDescriptor getAuthProviderDescriptor() {
         return authProvider;
     }
 
