@@ -29,9 +29,10 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { objectNavNodeProvider, NodeManagerUtils, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { projectProvider, projectSetter, projectSetterState } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, NavNodeInfoFragment, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationTabsService, TabHandler, ITab, ITabOptions } from '@cloudbeaver/plugin-navigation-tabs';
-import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
+import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, SqlDataSourceService, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
 
 import { isSQLEditorTab } from './isSQLEditorTab';
 import { SqlEditorPanel } from './SqlEditorPanel';
@@ -75,9 +76,12 @@ export class SqlEditorTabService extends Bootstrap {
       canClose: this.handleCanTabClose.bind(this),
       extensions: [
         objectNavNodeProvider(this.getNavNode.bind(this)),
+        projectSetterState(this.getProjectSetState.bind(this)),
+        projectProvider(this.getProjectId.bind(this)),
         connectionProvider(this.getConnectionId.bind(this)),
         objectCatalogProvider(this.getObjectCatalogId.bind(this)),
         objectSchemaProvider(this.getObjectSchemaId.bind(this)),
+        projectSetter(this.setProjectId.bind(this)),
         connectionSetter((connectionId, tab) => this.setConnectionId(tab, connectionId)),
         objectCatalogSetter(this.setObjectCatalogId.bind(this)),
         objectSchemaSetter(this.setObjectSchemaId.bind(this)),
@@ -318,6 +322,18 @@ export class SqlEditorTabService extends Bootstrap {
     return true;
   }
 
+  private getProjectId(tab: ITab<ISqlEditorTabState>): string | undefined {
+    const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+
+    return dataSource?.projectId ?? undefined;
+  }
+
+  private getProjectSetState(tab: ITab<ISqlEditorTabState>): boolean {
+    const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+
+    return !!dataSource?.features.includes(ESqlDataSourceFeatures.setProject);
+  }
+
   private getConnectionId(tab: ITab<ISqlEditorTabState>): IConnectionInfoParams | undefined {
     const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
 
@@ -341,6 +357,15 @@ export class SqlEditorTabService extends Bootstrap {
     const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
     const context = this.connectionExecutionContextResource.get(dataSource?.executionContext?.id ?? '');
     return context?.defaultSchema;
+  }
+
+  private setProjectId(projectId: string | null, tab: ITab<ISqlEditorTabState>): boolean {
+    const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+
+    dataSource?.setProject(projectId);
+    this.attachToProject(tab, projectId);
+
+    return true;
   }
 
   async setConnectionId(

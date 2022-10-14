@@ -58,6 +58,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     return this._script;
   }
 
+  get projectId(): string | null {
+    return this.nodeInfo?.projectId ?? null;
+  }
+
   get executionContext(): IConnectionExecutionContextInfo | undefined {
     return this.state.executionContext;
   }
@@ -137,7 +141,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   setNodeInfo(nodeInfo?: IResourceNodeInfo): void {
     this.state.nodeInfo = nodeInfo;
     this.markOutdated();
-    this.setProperties(toJS(this.resourceProperties));
     this.saved = true;
     this.loaded = false;
   }
@@ -152,6 +155,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   setName(name: string | null): void {
     this.rename(name);
+  }
+
+  setProject(projectId: string | null): void {
+
   }
 
   canRename(name: string | null): boolean {
@@ -187,10 +194,24 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   async load(): Promise<void> {
     await this.read();
+    await this.updateProperties();
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
+    if (
+      this.nodeInfo?.projectId
+      && executionContext?.projectId
+      && this.nodeInfo.projectId !== executionContext.projectId
+    ) {
+      console.warn('Cant change execution context because of different projects');
+      return;
+    }
+
     this.state.executionContext = toJS(executionContext);
+
+    if (this.isReadonly()) {
+      return;
+    }
 
     this.resourceProperties['default-datasource'] = executionContext?.connectionId;
     this.resourceProperties['default-catalog'] = executionContext?.defaultCatalog;
@@ -286,6 +307,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   async setProperties(properties: IResourceProperties) {
+    if (Object.keys(properties).length === 0) {
+      return;
+    }
+
     await this.scheduler.schedule(undefined, async () => {
       if (!this.actions || !this.nodeInfo) {
         return;
@@ -323,7 +348,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
     this.resourceProperties = toJS(await this.actions.getProperties(this, this.nodeInfo.nodeId));
 
-    if (isObjectsEqual(previousProperties, this.resourceProperties) && this.isReadonly()) {
+    if (isObjectsEqual(toJS(previousProperties), toJS(this.resourceProperties)) && this.isReadonly()) {
       return;
     }
 

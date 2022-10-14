@@ -157,7 +157,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     originalKey: ResourceKey<string>
   ): Promise<Map<string, IConnectionExecutionContextInfo>> {
     let projectId: string | undefined;
-    const all = this.includes(originalKey, CachedMapAllKey);
+    const all = this.isAliasEqual(originalKey, CachedMapAllKey);
     const isProjectFolders = isConnectionExecutionContextProjectKey(originalKey);
     originalKey = this.transformParam(originalKey);
 
