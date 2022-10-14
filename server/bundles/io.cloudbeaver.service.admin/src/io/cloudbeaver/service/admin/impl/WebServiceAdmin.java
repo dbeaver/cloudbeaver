@@ -759,9 +759,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public Boolean setUserMetaParameterValues(WebSession webSession, String userId, Map<String, Object> parameters) throws DBWebException {
+    public Boolean setUserMetaParameterValues(WebSession webSession, String userId, Map<String, String> parameters) throws DBWebException {
         try {
-            webSession.getAdminSecurityController().setUserMeta(userId, parameters);
+            webSession.getAdminSecurityController().setSubjectMetas(userId, parameters);
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error changing user '" + userId + "' meta parameters", e);

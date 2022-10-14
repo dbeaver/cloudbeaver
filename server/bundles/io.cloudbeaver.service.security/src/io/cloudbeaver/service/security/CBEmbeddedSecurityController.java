@@ -44,10 +44,7 @@ import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
-import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
-import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
-import org.jkiss.dbeaver.model.security.user.SMTeam;
-import org.jkiss.dbeaver.model.security.user.SMUser;
+import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -126,16 +123,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
                     dbStat.execute();
                 }
-                if (!CommonUtils.isEmpty(metaParameters)) {
-                    try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_META(USER_ID,META_ID,META_VALUE) VALUES(?,?,?)")) {
-                        dbStat.setString(1, userId);
-                        for (Map.Entry<String, String> mp : metaParameters.entrySet()) {
-                            dbStat.setString(2, mp.getKey());
-                            dbStat.setString(3, mp.getValue());
-                            dbStat.execute();
-                        }
-                    }
-                }
+                saveSubjectMetas(dbCon, userId, metaParameters);
                 txn.commit();
             }
         } catch (SQLException e) {
@@ -216,18 +204,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                 }
             }
-            // Metas
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT META_ID,META_VALUE FROM CB_USER_META WHERE USER_ID=?")) {
-                dbStat.setString(1, userId);
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    while (dbResult.next()) {
-                        user.setMetaParameter(
-                            dbResult.getString(1),
-                            dbResult.getString(2)
-                        );
-                    }
-                }
-            }
+            readSubjectMetas(dbCon, user);
             // Teams
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT TEAM_ID FROM CB_USER_TEAM WHERE USER_ID=?")) {
                 dbStat.setString(1, userId);
@@ -264,25 +241,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                 }
             }
-            // Read metas
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT USER_ID,META_ID,META_VALUE FROM CB_USER_META" +
-                (CommonUtils.isEmpty(userNameMask) ? "" : " WHERE USER_ID=?"))) {
-                if (!CommonUtils.isEmpty(userNameMask)) {
-                    dbStat.setString(1, userNameMask);
-                }
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    while (dbResult.next()) {
-                        String userId = dbResult.getString(1);
-                        SMUser user = result.get(userId);
-                        if (user != null) {
-                            user.setMetaParameter(
-                                dbResult.getString(2),
-                                dbResult.getString(3)
-                            );
-                        }
-                    }
-                }
-            }
+            readSubjectsMetas(dbCon, SMSubjectType.user, userNameMask, result);
             // Read teams
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT USER_ID,TEAM_ID FROM CB_USER_TEAM" +
                 (CommonUtils.isEmpty(userNameMask) ? "" : " WHERE USER_ID=?"))) {
@@ -307,30 +266,67 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    @Override
-    public void setUserMeta(String userId, Map<String, Object> metaParameters) throws DBCException {
-        try (Connection dbCon = database.openConnection()) {
-            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                // Delete old metas
-                try (PreparedStatement dbStat = dbCon.prepareStatement("DELETE FROM CB_USER_META WHERE USER_ID=?")) {
-                    dbStat.setString(1, userId);
-                    dbStat.execute();
+    private void cleanupSubjectMeta(Connection dbCon, String subjectId) throws SQLException {
+        // Delete old metas
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "DELETE FROM CB_SUBJECT_META WHERE SUBJECT_ID=?")) {
+            dbStat.setString(1, subjectId);
+            dbStat.execute();
+        }
+    }
+
+    private void readSubjectMetas(Connection dbCon, SMSubject subject) throws SQLException {
+        // Metas
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "SELECT META_ID,META_VALUE FROM CB_SUBJECT_META WHERE SUBJECT_ID=?")) {
+            dbStat.setString(1, subject.getSubjectId());
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    subject.setMetaParameter(
+                        dbResult.getString(1),
+                        dbResult.getString(2)
+                    );
                 }
-                if (!metaParameters.isEmpty()) {
-                    // Insert new metas
-                    try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_META(USER_ID,META_ID,META_VALUE) VALUES(?,?,?)")) {
-                        dbStat.setString(1, userId);
-                        for (Map.Entry<String, Object> mpe : metaParameters.entrySet()) {
-                            dbStat.setString(2, mpe.getKey());
-                            dbStat.setString(3, CommonUtils.toString(mpe.getValue()));
-                            dbStat.execute();
-                        }
+            }
+        }
+    }
+
+    private void readSubjectsMetas(Connection dbCon, SMSubjectType subjectType, String nameMask, Map<String, ? extends SMSubject> result) throws SQLException {
+        // Read metas
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "SELECT m.SUBJECT_ID,m.META_ID,m.META_VALUE FROM CB_AUTH_SUBJECT s, CB_SUBJECT_META m\n" +
+                "WHERE s.SUBJECT_TYPE=? AND s.SUBJECT_ID=m.SUBJECT_ID" +
+            (CommonUtils.isEmpty(nameMask) ? "" : " AND s.SUBJECT_ID=?"))) {
+            dbStat.setString(1, subjectType.getCode());
+            if (!CommonUtils.isEmpty(nameMask)) {
+                dbStat.setString(2, nameMask);
+            }
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    String subjectId = dbResult.getString(1);
+                    SMSubject subject = result.get(subjectId);
+                    if (subject != null) {
+                        subject.setMetaParameter(
+                            dbResult.getString(2),
+                            dbResult.getString(3)
+                        );
                     }
                 }
-                txn.commit();
             }
-        } catch (SQLException e) {
-            throw new DBCException("Error while loading users", e);
+        }
+    }
+
+    private void saveSubjectMetas(Connection dbCon, String subjectId, Map<String, String> metaParameters) throws SQLException {
+        if (!CommonUtils.isEmpty(metaParameters)) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "INSERT INTO CB_SUBJECT_META(SUBJECT_ID,META_ID,META_VALUE) VALUES(?,?,?)")) {
+                dbStat.setString(1, subjectId);
+                for (Map.Entry<String, String> mp : metaParameters.entrySet()) {
+                    dbStat.setString(2, mp.getKey());
+                    dbStat.setString(3, mp.getValue());
+                    dbStat.execute();
+                }
+            }
         }
     }
 
@@ -617,6 +613,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                 }
             }
+            readSubjectsMetas(dbCon, SMSubjectType.team,null, teams);
             return teams.values().toArray(new SMTeam[0]);
         } catch (SQLException e) {
             throw new DBCException("Error reading teams from database", e);
@@ -740,7 +737,22 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     ///////////////////////////////////////////
-    // Permissions
+    // Subject functions
+
+    @Override
+    public void setSubjectMetas(String userId, Map<String, String> metaParameters) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                cleanupSubjectMeta(dbCon, userId);
+                if (!metaParameters.isEmpty()) {
+                    saveSubjectMetas(dbCon, userId, metaParameters);
+                }
+                txn.commit();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while loading users", e);
+        }
+    }
 
     @Override
     public void setSubjectPermissions(String subjectId, List<String> permissionIds, String grantorId) throws DBException {
