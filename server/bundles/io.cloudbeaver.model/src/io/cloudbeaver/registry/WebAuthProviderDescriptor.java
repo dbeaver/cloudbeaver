@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Auth service descriptor
+ * Auth provider descriptor
  */
 public class WebAuthProviderDescriptor extends AbstractDescriptor {
 

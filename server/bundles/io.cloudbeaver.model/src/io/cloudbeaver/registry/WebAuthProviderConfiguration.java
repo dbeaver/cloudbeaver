@@ -14,10 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.user;
+package io.cloudbeaver.registry;
 
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
-import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
@@ -27,7 +26,7 @@ import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import java.util.Map;
 
 /**
- * WebAuthProviderInfo.
+ * WebAuthProviderConfiguration.
  */
 public class WebAuthProviderConfiguration {
 
