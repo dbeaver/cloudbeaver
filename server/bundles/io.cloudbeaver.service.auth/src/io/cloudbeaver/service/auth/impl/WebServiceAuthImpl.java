@@ -184,14 +184,16 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     public WebPropertyInfo[] listUserProfileProperties(@NotNull WebSession webSession) {
         List<DBPPropertyDescriptor> props = new ArrayList<>();
 
+        // First add user profile properties
+        props.addAll(WebUserProfileRegistry.getInstance().getProperties());
+
+        // Add metas from enabled auth providers
         for (WebAuthProviderDescriptor ap : WebServiceUtils.getEnabledAuthProviders()) {
             List<DBPPropertyDescriptor> metaProps = ap.getMetaProperties(SMSubjectType.user);
             if (!CommonUtils.isEmpty(metaProps)) {
                 props.addAll(metaProps);
             }
         }
-
-        props.addAll(WebUserProfileRegistry.getInstance().getProperties());
 
         return props.stream()
             .map(p -> new WebPropertyInfo(webSession, p, null))
