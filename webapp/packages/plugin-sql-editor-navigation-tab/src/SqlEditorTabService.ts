@@ -215,7 +215,10 @@ export class SqlEditorTabService extends Bootstrap {
       isSQLEditorTab(tab => {
         const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
 
-        return !!dataSource?.executionContext;
+        return (
+          !!dataSource?.executionContext
+          && ResourceKeyUtils.includes(key, dataSource.executionContext.id)
+        );
       })
     );
 

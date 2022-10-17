@@ -115,7 +115,7 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
       for (const [name, value] of Object.entries(diff)) {
         if (
           properties[name] === value
-        || (value === null && !(value in properties))
+        || (value === null && !(name in properties))
         ) {
           continue;
         }

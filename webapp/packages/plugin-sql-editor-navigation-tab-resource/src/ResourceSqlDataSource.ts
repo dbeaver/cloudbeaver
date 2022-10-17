@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, makeObservable, observable, toJS } from 'mobx';
+import { action, computed, makeObservable, observable, runInAction, toJS } from 'mobx';
 
-import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import { IConnectionExecutionContextInfo, NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { debounce, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
@@ -117,6 +117,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       lastAction: observable.ref,
       loaded: observable,
       resourceProperties: observable,
+      setExecutionContext: action,
       setScript: action,
       setNodeInfo: action,
     });
@@ -207,9 +208,20 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       return;
     }
 
-    this.state.executionContext = toJS(executionContext);
+    if (
+      !isObjectsEqual(toJS(this.state.executionContext), toJS(executionContext))
+    ) {
+      this.state.executionContext = toJS(executionContext);
+    }
 
-    if (this.isReadonly()) {
+    if (
+      this.isReadonly()
+      || (
+        this.resourceProperties['default-datasource'] === executionContext?.connectionId
+        && this.resourceProperties['default-catalog'] === executionContext?.defaultCatalog
+        && this.resourceProperties['default-schema'] === executionContext?.defaultSchema
+      )
+    ) {
       return;
     }
 
@@ -346,38 +358,42 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
     const previousProperties = this.resourceProperties;
 
-    this.resourceProperties = toJS(await this.actions.getProperties(this, this.nodeInfo.nodeId));
+    const resourceProperties = await this.actions.getProperties(this, this.nodeInfo.nodeId);
 
-    if (isObjectsEqual(toJS(previousProperties), toJS(this.resourceProperties)) && this.isReadonly()) {
-      return;
-    }
+    runInAction(() => {
+      this.resourceProperties = toJS(resourceProperties);
 
-    const connectionId =  this.resourceProperties['default-datasource'];
-    const defaultCatalog = this.resourceProperties['default-catalog'];
-    const defaultSchema = this.resourceProperties['default-schema'];
+      if (isObjectsEqual(toJS(previousProperties), toJS(this.resourceProperties)) && this.isReadonly()) {
+        return;
+      }
 
-    if (!this.nodeInfo.projectId) {
-      return;
-    }
+      const connectionId =  this.resourceProperties['default-datasource'];
+      const defaultCatalog = this.resourceProperties['default-catalog'];
+      const defaultSchema = this.resourceProperties['default-schema'];
 
-    if (connectionId) {
-      if (
-        !isValuesEqual(this.state.executionContext?.connectionId, connectionId, null)
+      if (!this.nodeInfo!.projectId) {
+        return;
+      }
+
+      if (connectionId) {
+        if (
+          !isValuesEqual(this.state.executionContext?.connectionId, connectionId, null)
         || !isValuesEqual(this.state.executionContext?.defaultCatalog, defaultCatalog, null)
         || !isValuesEqual(this.state.executionContext?.defaultSchema, defaultSchema, null)
-        || !isValuesEqual(this.state.executionContext?.projectId, this.nodeInfo.projectId, null)
-      ) {
-        this.state.executionContext = {
-          id: '-1',
-          projectId: this.nodeInfo.projectId,
-          connectionId,
-          defaultCatalog,
-          defaultSchema,
-        };
+        || !isValuesEqual(this.state.executionContext?.projectId, this.nodeInfo!.projectId, null)
+        ) {
+          this.state.executionContext = {
+            id: NOT_INITIALIZED_CONTEXT_ID,
+            projectId: this.nodeInfo!.projectId,
+            connectionId,
+            defaultCatalog,
+            defaultSchema,
+          };
+        }
+      } else {
+        this.state.executionContext = undefined;
       }
-    } else {
-      this.state.executionContext = undefined;
-    }
+    });
   }
 
   private debouncedWrite() {
