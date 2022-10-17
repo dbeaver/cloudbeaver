@@ -227,7 +227,10 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<CBEvent> readSessionEvents(@NotNull WebSession webSession, Integer maxEntries) throws DBWebException {
+    public List<CBEvent> readSessionEvents(@Nullable WebSession webSession, Integer maxEntries) throws DBWebException {
+        if (webSession == null) {
+            return Collections.emptyList();
+        }
         return webSession.getSessionEvents(maxEntries);
     }
 
