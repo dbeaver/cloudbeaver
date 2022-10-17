@@ -21,6 +21,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
+import io.cloudbeaver.events.CBEvent;
+import io.cloudbeaver.events.CBEventConstants;
+import io.cloudbeaver.events.CBEventController;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -120,6 +123,8 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     private boolean enableSecurityManager = false;
     private String localHostAddress;
     private final List<InetAddress> localInetAddresses = new ArrayList<>();
+
+    protected final CBEventController eventController = new CBEventController();
 
     private WebSessionManager sessionManager;
 
@@ -342,6 +347,8 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             System.setSecurityManager(new SecurityManager());
         }
 
+        eventController.scheduleCheckJob();
+
         runWebServer();
 
         log.debug("Shutdown");
@@ -440,7 +447,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
     @NotNull
     private File getRuntimeAppConfigFile() {
-       return getDataDirectory(true).resolve(CBConstants.RUNTIME_APP_CONFIG_FILE_NAME).toFile();
+        return getDataDirectory(true).resolve(CBConstants.RUNTIME_APP_CONFIG_FILE_NAME).toFile();
     }
 
     @NotNull
@@ -789,6 +796,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         }
 
         configurationMode = CommonUtils.isEmpty(serverName);
+        eventController.addEvent(new CBEvent(CBEventConstants.CLOUDBEAVER_CONFIG_CHANGED));
     }
 
     protected Map<String, Object> readRuntimeConfigurationProperties() throws DBException {

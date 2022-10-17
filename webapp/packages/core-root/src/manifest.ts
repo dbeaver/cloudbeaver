@@ -12,11 +12,13 @@ import { FeaturesResource } from './FeaturesResource';
 import { NetworkStateService } from './NetworkStateService';
 import { PermissionsService } from './PermissionsService';
 import { QuotasService } from './QuotasService';
+import { ServerConfigEventHandler } from './ServerConfigEventHandler';
 import { ServerConfigResource } from './ServerConfigResource';
 import { ServerService } from './ServerService';
 import { ServerSettingsService } from './ServerSettingsService';
 import { SessionActionService } from './SessionActionService';
 import { SessionDataResource } from './SessionDataResource';
+import { SessionEventSource } from './SessionEventSource';
 import { SessionExpireService } from './SessionExpireService';
 import { SessionPermissionsResource } from './SessionPermissionsResource';
 import { SessionResource } from './SessionResource';
@@ -46,5 +48,7 @@ export const manifest: PluginManifest = {
     SessionSettingsService,
     WindowEventsService,
     QuotasService,
+    ServerConfigEventHandler,
+    SessionEventSource,
   ],
 };

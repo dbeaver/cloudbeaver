@@ -20,6 +20,7 @@ package io.cloudbeaver.service.core.impl;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.events.CBEvent;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
@@ -237,6 +238,14 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public List<WebServerMessage> readSessionLog(@NotNull WebSession webSession, Integer maxEntries, Boolean clearEntries) {
         return webSession.readLog(maxEntries, clearEntries);
+    }
+
+    @Override
+    public List<CBEvent> readSessionEvents(@Nullable WebSession webSession, Integer maxEntries) throws DBWebException {
+        if (webSession == null) {
+            return Collections.emptyList();
+        }
+        return webSession.getSessionEvents(maxEntries);
     }
 
     @Override
