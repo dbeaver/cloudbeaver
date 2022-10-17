@@ -27,6 +27,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMAuthenticationManager;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.Cookie;
@@ -90,6 +91,47 @@ public class WebAppUtils {
         }
 
         return resultConfig;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> mergeConfigurationsWithVariables(Map<String, Object> origin, Map<String, Object> additional) {
+        var resultConfig = new HashMap<String, Object>();
+        Set<String> rootKeys = new HashSet<>(additional.keySet());
+
+        for (var rootKey : rootKeys) {
+            var originValue = origin.get(rootKey);
+            var additionalValue = additional.get(rootKey);
+
+            if (additionalValue == null) {
+                continue;
+            }
+
+            if (originValue instanceof Map) {
+                var resultValue = mergeConfigurationsWithVariables((Map<String, Object>) originValue, (Map<String, Object>) additionalValue);
+                resultConfig.put(rootKey, resultValue);
+            } else {
+                resultConfig.put(rootKey, getExtractedValue(originValue, additionalValue));
+            }
+
+        }
+
+        return resultConfig;
+    }
+
+    public static Object getExtractedValue(Object oldValue, Object newValue) {
+        if (!(oldValue instanceof String)) {
+            return newValue;
+        }
+        String value = (String) oldValue;
+        if (!GeneralUtils.isVariablePattern(value)) {
+            return newValue;
+        }
+        String extractedVariable = GeneralUtils.extractVariableName(value);
+        if (extractedVariable != null) {
+            return GeneralUtils.variablePattern(extractedVariable + ":" + newValue);
+        } else {
+            return newValue;
+        }
     }
 
 

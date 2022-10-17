@@ -674,7 +674,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return configProps;
     }
 
-    private Map<String, Object> readConfigurationFile(File configFile) throws DBException {
+    public Map<String, Object> readConfigurationFile(File configFile) throws DBException {
         try (Reader reader = new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)) {
             return JSONUtils.parseMap(getGson(), reader);
         } catch (IOException e) {
@@ -1039,24 +1039,8 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             }
             newConfig.put(key, subValue);
         } else {
-            Object newConfigValue = getExtractedValue(oldConfig.get(key), defaultValue);
+            Object newConfigValue = WebAppUtils.getExtractedValue(oldConfig.get(key), defaultValue);
             newConfig.put(key, newConfigValue);
-        }
-    }
-
-    private Object getExtractedValue(Object oldValue, Object newValue) {
-        if (!(oldValue instanceof String)) {
-            return newValue;
-        }
-        String value = (String) oldValue;
-        if (!GeneralUtils.isVariablePattern(value)) {
-            return newValue;
-        }
-        String extractedVariable = GeneralUtils.extractVariableName(value);
-        if (extractedVariable != null) {
-            return GeneralUtils.variablePattern(extractedVariable + ":" + newValue);
-        } else {
-            return newValue;
         }
     }
 }
