@@ -104,7 +104,7 @@ public class WebSessionAuthProcessor {
             var newAuthInfos = new ArrayList<WebAuthInfo>();
             for (Map.Entry<String, Object> entry : authInfo.getAuthData().entrySet()) {
                 String providerId = entry.getKey();
-                Map<String, Object> userCredentials = (Map<String, Object>) entry.getValue();
+                Map<String, Object> authAttrs = (Map<String, Object>) entry.getValue();
 
                 var authProviderDescriptor = getAuthProvider(providerId);
                 SMAuthProvider<?> authProviderInstance = authProviderDescriptor.getInstance();
@@ -127,7 +127,7 @@ public class WebSessionAuthProcessor {
                 if (authProviderExternal != null && !configMode && !alreadyLoggedIn) {
                     // We may need to associate new credentials with active user
                     if (linkWithActiveUser) {
-                        securityController.setUserCredentials(userId, authProviderDescriptor.getId(), userCredentials);
+                        securityController.setUserCredentials(userId, authProviderDescriptor.getId(), authAttrs);
                     }
                 }
 
@@ -143,7 +143,7 @@ public class WebSessionAuthProcessor {
                             authProviderExternal.getUserIdentity(
                                 webSession.getProgressMonitor(),
                                 providerConfig,
-                                userCredentials);
+                                authAttrs);
                     } catch (DBException e) {
                         log.debug("Error reading auth display name from provider " + providerId, e);
                     }
@@ -159,7 +159,7 @@ public class WebSessionAuthProcessor {
                     webSession.getProgressMonitor(),
                     webSession,
                     providerConfig,
-                    userCredentials);
+                    authAttrs);
 
                 if (!configMode && securityController.getUserPermissions(userId, authInfo.getAuthRole()).isEmpty()) {
                     throw new DBWebException("Access denied (no permissions)");
@@ -177,7 +177,7 @@ public class WebSessionAuthProcessor {
                     OffsetDateTime.now());
                 webAuthInfo.setMessage("Authenticated with " + authProviderDescriptor.getLabel() + " provider");
                 if (configMode) {
-                    webAuthInfo.setUserCredentials(userCredentials);
+                    webAuthInfo.setUserCredentials(authAttrs);
                 }
 
                 webSession.addAuthInfo(webAuthInfo);
