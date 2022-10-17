@@ -214,7 +214,7 @@ public class CBDatabase {
             adminSecurityController.deleteUser(initialData.getAdminName());
         }
         // Create new admin user
-        createAdminUser(adminName, adminPassword, null);
+        createAdminUser(adminName, adminPassword);
 
         // Associate all auth credentials with admin user
         for (WebAuthInfo ai : authInfoList) {
@@ -249,14 +249,13 @@ public class CBDatabase {
     @NotNull
     private SMUser createAdminUser(
         @NotNull String adminName,
-        @Nullable String adminPassword,
-        @Nullable String adminAuthRole
+        @Nullable String adminPassword
     ) throws DBException {
         SMUser adminUser = adminSecurityController.getUserById(adminName);
 
         if (adminUser == null) {
-            adminUser = new SMUser(adminName, true, adminAuthRole);
-            adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters(), true, adminAuthRole);
+            adminUser = new SMUser(adminName, true, "administrator");
+            adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters(), true, adminUser.getAuthRole());
         }
 
         if (!CommonUtils.isEmpty(adminPassword)) {
@@ -354,7 +353,6 @@ public class CBDatabase {
 
                 String adminName = initialData.getAdminName();
                 String adminPassword = initialData.getAdminPassword();
-                String adminAuthRole = initialData.getAdminPassword();
 
                 if (!CommonUtils.isEmpty(initialData.getTeams())) {
                     // Create teams
@@ -368,7 +366,7 @@ public class CBDatabase {
 
                 if (!CommonUtils.isEmpty(adminName)) {
                     // Create admin user
-                    createAdminUser(adminName, adminPassword, adminAuthRole);
+                    createAdminUser(adminName, adminPassword);
                 }
             } finally {
                 exclusiveConnection = null;

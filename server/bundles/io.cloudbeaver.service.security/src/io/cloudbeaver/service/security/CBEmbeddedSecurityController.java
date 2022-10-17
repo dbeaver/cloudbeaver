@@ -1344,7 +1344,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
                     smTokens = generateNewSessionToken(smSessionId, activeUserId, tokenAuthRole, dbCon);
                     permissions = new SMAuthPermissions(
-                        activeUserId, smSessionId, getUserPermissions(activeUserId, tokenAuthRole));
+                        activeUserId, smSessionId, getUserPermissions(activeUserId, tokenAuthRole)
+                    );
                     txn.commit();
                 }
             } catch (SQLException e) {
@@ -1366,7 +1367,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Nullable
-    private String readUserAuthRole(String userId) throws DBException {
+    protected String readUserAuthRole(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT DEFAULT_AUTH_ROLE FROM CB_USER WHERE USER_ID=?"
@@ -1390,13 +1391,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             return null;
         }
         var currentAuthRole = readUserAuthRole(userId);
-        if (authRole == null) {
-            return currentAuthRole;
+        String expectedAuthRole = resolveUserAuthRole(currentAuthRole, authRole);
+        if (!Objects.equals(currentAuthRole, expectedAuthRole)) {
+            setUserAuthRole(userId, expectedAuthRole);
         }
-        if (!Objects.equals(currentAuthRole, authRole)) {
-            setUserAuthRole(userId, authRole);
-        }
-        return authRole;
+        return expectedAuthRole;
     }
 
     private AuthAttemptSessionInfo readAuthAttemptSessionInfo(@NotNull String authId) throws DBException {
@@ -1479,12 +1478,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Nullable
-    private String resolveUserAuthRole(
-        @NotNull AuthProviderDescriptor authProvider,
-        @NotNull Map<String, Object> userAuthData
+    protected String resolveUserAuthRole(
+        @Nullable String currentAuthRole,
+        @Nullable String newAuthRole
     ) {
-        //TODO read from external auth somehow
-        return null;
+        return newAuthRole == null ? currentAuthRole : newAuthRole;
     }
 
     protected SMTokens generateNewSessionToken(
