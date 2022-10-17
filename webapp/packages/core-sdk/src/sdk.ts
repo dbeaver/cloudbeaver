@@ -163,6 +163,15 @@ export enum AuthStatus {
   Success = 'SUCCESS'
 }
 
+export interface CbEvent {
+  eventData: Scalars['Object'];
+  eventType: CbEventType;
+}
+
+export enum CbEventType {
+  CbConfigChanged = 'cb_config_changed'
+}
+
 export interface ConnectionConfig {
   authModelId?: InputMaybe<Scalars['ID']>;
   configurationType?: InputMaybe<DriverConfigurationType>;
@@ -909,6 +918,7 @@ export interface Query {
   navNodeParents: Array<NavigatorNodeInfo>;
   navRefreshNode?: Maybe<Scalars['Boolean']>;
   networkHandlers: Array<NetworkHandlerDescriptor>;
+  readSessionEvents: Array<CbEvent>;
   readSessionLog: Array<LogEntry>;
   revokeUserTeam?: Maybe<Scalars['Boolean']>;
   rmListProjectGrantedPermissions: Array<AdminObjectGrantInfo>;
@@ -1148,6 +1158,11 @@ export interface QueryNavNodeParentsArgs {
 
 export interface QueryNavRefreshNodeArgs {
   nodePath: Scalars['ID'];
+}
+
+
+export interface QueryReadSessionEventsArgs {
+  maxEntries: Scalars['Int'];
 }
 
 
@@ -2638,6 +2653,13 @@ export type ChangeSessionLanguageMutationVariables = Exact<{
 
 
 export type ChangeSessionLanguageMutation = { changeSessionLanguage?: boolean };
+
+export type GetSessionEventsQueryVariables = Exact<{
+  maxEntries: Scalars['Int'];
+}>;
+
+
+export type GetSessionEventsQuery = { events: Array<{ eventType: CbEventType, eventData: any }> };
 
 export type OpenSessionMutationVariables = Exact<{
   defaultLocale?: InputMaybe<Scalars['String']>;
@@ -4215,6 +4237,14 @@ export const ChangeSessionLanguageDocument = `
   changeSessionLanguage(locale: $locale)
 }
     `;
+export const GetSessionEventsDocument = `
+    query getSessionEvents($maxEntries: Int!) {
+  events: readSessionEvents(maxEntries: $maxEntries) {
+    eventType
+    eventData
+  }
+}
+    `;
 export const OpenSessionDocument = `
     mutation openSession($defaultLocale: String) {
   session: openSession(defaultLocale: $defaultLocale) {
@@ -4734,6 +4764,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ChangeSessionLanguageMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'changeSessionLanguage', 'mutation');
+    },
+    getSessionEvents(variables: GetSessionEventsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSessionEventsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSessionEventsQuery>(GetSessionEventsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSessionEvents', 'query');
     },
     openSession(variables?: OpenSessionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<OpenSessionMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<OpenSessionMutation>(OpenSessionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'openSession', 'mutation');

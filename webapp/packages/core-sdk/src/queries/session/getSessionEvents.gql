@@ -1,0 +1,10 @@
+query getSessionEvents(
+  $maxEntries: Int!
+) {
+  events: readSessionEvents(
+    maxEntries: $maxEntries
+  ) {
+    eventType
+    eventData
+  }
+}

@@ -73,7 +73,9 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 getWebSession(env), getProjectReference(env), env.getArgument("id")))
 
             .dataFetcher("listProjects", env -> getService(env).getProjects(getWebSession(env)))
-
+            .dataFetcher("readSessionEvents", env -> getService(env).readSessionEvents(
+                findWebSession(env), env.getArgument("maxEntries")
+            ))
             .dataFetcher("readSessionLog", env -> {
                 // CB-90. Log read mustn't extend session lifetime and mustn't fail if there is no session.
                 WebSession session = findWebSession(env);

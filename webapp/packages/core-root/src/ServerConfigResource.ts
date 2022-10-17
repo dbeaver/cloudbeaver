@@ -13,6 +13,7 @@ import { GraphQLService, CachedDataResource, ServerConfig, ServerConfigInput, Na
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { isNavigatorViewSettingsEqual } from './ConnectionNavigatorViewSettings';
+import { ServerConfigEventHandler } from './ServerConfigEventHandler';
 
 @injectable()
 export class ServerConfigResource extends CachedDataResource<ServerConfig | null> {
@@ -20,7 +21,8 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
   navigatorSettingsUpdate: NavigatorSettingsInput;
 
   constructor(
-    private readonly graphQLService: GraphQLService
+    private readonly graphQLService: GraphQLService,
+    serverConfigEventHandler: ServerConfigEventHandler,
   ) {
     super(null);
 
@@ -41,6 +43,8 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
       unlinkUpdate: action,
       syncUpdateData: action,
     });
+
+    serverConfigEventHandler.on(this, () => undefined);
   }
 
   get redirectOnFederatedAuth(): boolean {
