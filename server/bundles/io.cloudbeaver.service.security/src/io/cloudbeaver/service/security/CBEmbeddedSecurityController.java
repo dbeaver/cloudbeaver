@@ -821,7 +821,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @NotNull
     @Override
-    public Set<String> getUserPermissions(String userId, String authRole) throws DBException {
+    public Set<String> getUserPermissions(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
             try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -847,6 +847,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error reading user permissions", e);
         }
+    }
+
+    protected Set<String> getUserPermissions(String userId, String authRole) throws DBException {
+        return getUserPermissions(userId);
     }
 
     ///////////////////////////////////////////
@@ -1547,7 +1551,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error reading token info in database", e);
         }
-        var permissions = userId == null ? getAnonymousUserPermissions() : getUserPermissions(userId, authRole);
+        var permissions = userId == null ? getAnonymousUserPermissions() : getUserPermissions(userId);
         return new SMAuthPermissions(userId, sessionId, permissions);
     }
 
