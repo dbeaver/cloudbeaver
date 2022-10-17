@@ -91,7 +91,7 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
         if (children == null) {
             List<DBNResourceManagerResource> rfList = new ArrayList<>();
             for (RMResource resource : getResourceController().listResources(
-                project.getId(), null, null, false, false, false)) {
+                project.getId(), null, null, true, false, false)) {
 
                 rfList.add(new DBNResourceManagerResource(this, resource));
             }

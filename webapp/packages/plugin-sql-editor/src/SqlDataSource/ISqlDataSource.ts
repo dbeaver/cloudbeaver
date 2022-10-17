@@ -15,6 +15,7 @@ import type { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
 export interface ISqlDataSource extends ILoadableState {
   readonly name: string | null;
   readonly script: string;
+  readonly projectId: string | null;
   readonly executionContext?: IConnectionExecutionContextInfo;
   readonly message?: string;
   readonly onSetScript: ISyncExecutor<string>;
@@ -27,6 +28,7 @@ export interface ISqlDataSource extends ILoadableState {
   markUpdated(): void;
   canRename(name: string | null): boolean;
   setName(name: string | null): void;
+  setProject(projectId: string | null): void;
   setScript(script: string): void;
   setEditing(state: boolean): void;
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void;

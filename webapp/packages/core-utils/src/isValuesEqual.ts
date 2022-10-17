@@ -9,7 +9,7 @@
 export function isValuesEqual<T extends string | boolean | number>(
   first: T | null | undefined,
   second: T | null | undefined,
-  defaultValue?: T
+  defaultValue?: T | null | undefined
 ): boolean {
   return (first ?? defaultValue) === (second ?? defaultValue);
 }

@@ -43,7 +43,7 @@ import java.util.Set;
 public class WebServiceRM implements DBWServiceRM {
 
     @Override
-    public RMProject[] listProjects(WebSession webSession) throws DBWebException {
+    public RMProject[] listProjects(@NotNull WebSession webSession) throws DBWebException {
         try {
             return getResourceController(webSession).listAccessibleProjects();
         } catch (DBException e) {
@@ -71,7 +71,13 @@ public class WebServiceRM implements DBWServiceRM {
 
     @NotNull
     @Override
-    public RMResource[] listResources(WebSession webSession, @NotNull String projectId, @Nullable String folder, @Nullable String nameMask, boolean readProperties, boolean readHistory) throws DBException {
+    public RMResource[] listResources(@NotNull WebSession webSession,
+                                      @NotNull String projectId,
+                                      @Nullable String folder,
+                                      @Nullable String nameMask,
+                                      boolean readProperties,
+                                      boolean readHistory
+    ) throws DBException {
         checkIsRmEnabled(webSession);
         try {
             return getResourceController(webSession).listResources(projectId, folder, nameMask, readProperties, readHistory, false);
@@ -80,8 +86,40 @@ public class WebServiceRM implements DBWServiceRM {
         }
     }
 
+    /**
+     * Sets resource property.
+     *
+     * @param webSession    the web session
+     * @param projectId     the project id
+     * @param resourcePath  the resource path
+     * @param propertyName  the property name
+     * @param propertyValue the property value
+     * @return the resource property
+     * @throws DBException the db exception
+     */
+    @NotNull
     @Override
-    public String readResourceAsString(@NotNull WebSession webSession, @NotNull String projectId, @NotNull String resourcePath) throws DBException {
+    public String setResourceProperty(@NotNull WebSession webSession,
+                                      @NotNull String projectId,
+                                      @NotNull String resourcePath,
+                                      @NotNull String propertyName,
+                                      @Nullable Object propertyValue
+    ) throws DBException {
+        checkIsRmEnabled(webSession);
+        try {
+            getResourceController(webSession).setResourceProperty(projectId, resourcePath, propertyName, propertyValue);
+            return Boolean.TRUE.toString();
+        } catch (DBException e) {
+            String message = String.format("Error setting property [%s] for the the resource: [%s]", resourcePath, propertyName);
+            throw new DBWebException(message, e);
+        }
+    }
+
+    @Override
+    public String readResourceAsString(@NotNull WebSession webSession,
+                                       @NotNull String projectId,
+                                       @NotNull String resourcePath
+    ) throws DBException {
         checkIsRmEnabled(webSession);
         try {
             byte[] data = getResourceController(webSession).getResourceContents(projectId, resourcePath);
@@ -92,7 +130,11 @@ public class WebServiceRM implements DBWServiceRM {
     }
 
     @Override
-    public String createResource(@NotNull WebSession webSession, @NotNull String projectId, @NotNull String resourcePath, boolean isFolder) throws DBException {
+    public String createResource(@NotNull WebSession webSession,
+                                 @NotNull String projectId,
+                                 @NotNull String resourcePath,
+                                 boolean isFolder
+    ) throws DBException {
         checkIsRmEnabled(webSession);
         try {
             return getResourceController(webSession).createResource(projectId, resourcePath, isFolder);
@@ -102,7 +144,10 @@ public class WebServiceRM implements DBWServiceRM {
     }
 
     @Override
-    public boolean deleteResource(@NotNull WebSession webSession, @NotNull String projectId, @NotNull String resourcePath) throws DBException {
+    public boolean deleteResource(@NotNull WebSession webSession,
+                                  @NotNull String projectId,
+                                  @NotNull String resourcePath
+    ) throws DBException {
         checkIsRmEnabled(webSession);
         try {
             getResourceController(webSession).deleteResource(projectId, resourcePath, false);
@@ -215,7 +260,9 @@ public class WebServiceRM implements DBWServiceRM {
     }
 
     @Override
-    public List<SMObjectPermissionsGrant> listProjectGrantedPermissions(@NotNull WebSession webSession, @NotNull String projectId) throws DBWebException {
+    public List<SMObjectPermissionsGrant> listProjectGrantedPermissions(@NotNull WebSession webSession,
+                                                                        @NotNull String projectId
+    ) throws DBWebException {
         SMController sm = webSession.getSecurityController();
         try {
             return sm.getObjectPermissionGrants(projectId, SMObjects.PROJECT);
@@ -225,7 +272,9 @@ public class WebServiceRM implements DBWServiceRM {
     }
 
     @Override
-    public List<SMObjectPermissionsGrant> listSubjectProjectsPermissionGrants(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException {
+    public List<SMObjectPermissionsGrant> listSubjectProjectsPermissionGrants(@NotNull WebSession webSession,
+                                                                              @NotNull String subjectId
+    ) throws DBWebException {
         try {
             SMAdminController sm = webSession.getAdminSecurityController();
             return sm.getSubjectObjectPermissionGrants(subjectId, SMObjects.PROJECT);

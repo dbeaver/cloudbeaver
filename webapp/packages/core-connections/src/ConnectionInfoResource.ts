@@ -391,7 +391,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     includes: CachedResourceIncludeArgs<Connection, ConnectionInfoIncludes>
   ): Promise<Map<IConnectionInfoParams, Connection>> {
     let projectId: string | undefined;
-    const all = this.includes(originalKey, CachedMapAllKey);
+    const all = this.isAliasEqual(originalKey, CachedMapAllKey);
     const isProjectKey = isConnectionInfoProjectKey(originalKey);
     const key = this.transformParam(originalKey);
 
@@ -417,6 +417,10 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
           ...this.getDefaultIncludes(),
           ...this.getIncludesMap(key, includes),
         });
+
+        if (connectionId && !connections.some(connection => connection.id === connectionId)) {
+          throw new Error(`Connection is not found (${connectionId})`);
+        }
 
         runInAction(() => {
           if (all) {
