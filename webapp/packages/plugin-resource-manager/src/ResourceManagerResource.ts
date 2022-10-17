@@ -36,14 +36,16 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
 
   hasResource(key: IResourceManagerParams, resourcePath: string): boolean {
     const resources = this.get(key);
+    const name = this.getResourceName(resourcePath);
 
-    return resources?.some(resource => resource.name === resourcePath) === true;
+    return resources?.some(resource => resource.name === name) === true;
   }
 
   getResource(key: IResourceManagerParams, resourcePath: string): RmResourceInfo | undefined {
     const resources = this.get(key);
+    const name = this.getResourceName(resourcePath);
 
-    return resources?.find(resource => resource.name === resourcePath);
+    return resources?.find(resource => resource.name === name);
   }
 
   async move(projectId: string, oldPath: string, newPath: string): Promise<void> {
@@ -98,7 +100,7 @@ export class ResourceManagerResource extends CachedMapResource<IResourceManagerP
       return resource?.properties && this.isLoaded(key) && !this.isOutdated(key);
     });
 
-    return this.getResource(key, resourcePath)?.properties;
+    return this.getResource(key, resourcePath)?.properties ?? {};
   }
 
   async setProperties(
