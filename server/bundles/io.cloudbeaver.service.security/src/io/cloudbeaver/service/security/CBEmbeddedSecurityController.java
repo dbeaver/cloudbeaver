@@ -1301,7 +1301,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             permissions = getTokenPermissions(smTokens.getSmAccessToken());
         }
         String activeUserId = permissions == null ? null : permissions.getUserId();
-        String tokenAuthRole = updateUserAuthRoleIfNeeded(activeUserId, authInfo.getAuthRole());
 
         Map<String, Object> storedUserData = new LinkedHashMap<>();
         for (String authProviderId : authProviderIds) {
@@ -1313,7 +1312,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 finishAuthMonitor,
                 activeUserId,
                 activeUserId == null,
-                tokenAuthRole
+                authInfo.getAuthRole()
             );
 
             if (userIdFromCreds == null) {
@@ -1330,7 +1329,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             );
         }
 
-
+        String tokenAuthRole = updateUserAuthRoleIfNeeded(activeUserId, authInfo.getAuthRole());
         if (smTokens == null && permissions == null) {
             try (Connection dbCon = database.openConnection()) {
                 try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
@@ -1462,7 +1461,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 createUser(userId,
                     Map.of(),
                     true,
-                    authRole
+                    resolveUserAuthRole(null, authRole)
                 );
                 String defaultTeamName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserTeam();
                 if (!CommonUtils.isEmpty(defaultTeamName)) {
