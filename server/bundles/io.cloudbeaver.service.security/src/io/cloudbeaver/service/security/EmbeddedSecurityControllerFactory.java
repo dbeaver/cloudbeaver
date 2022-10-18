@@ -19,7 +19,7 @@ package io.cloudbeaver.service.security;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
-import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.db.CBDatabaseConfig;
 import org.jkiss.dbeaver.DBException;
@@ -41,7 +41,7 @@ public class EmbeddedSecurityControllerFactory {
      * Create new security controller instance with default configuration
      */
     public CBEmbeddedSecurityController createSecurityService(
-        WebApplication application,
+        WebAuthApplication application,
         Map<String, Object> databaseConfig,
         SMCredentialsProvider credentialsProvider
     ) throws DBException {
@@ -52,7 +52,7 @@ public class EmbeddedSecurityControllerFactory {
      * Create new security controller instance with custom configuration
      */
     public CBEmbeddedSecurityController createSecurityService(
-        WebApplication application,
+        WebAuthApplication application,
         Map<String, Object> databaseConfig,
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig
@@ -78,7 +78,7 @@ public class EmbeddedSecurityControllerFactory {
         return securityController;
     }
 
-    private synchronized void initDatabase(WebApplication application, Map<String, Object> databaseConfig) {
+    private synchronized void initDatabase(WebAuthApplication application, Map<String, Object> databaseConfig) {
         CBDatabaseConfig databaseConfiguration = new CBDatabaseConfig();
         InstanceCreator<CBDatabaseConfig> dbConfigCreator = type -> databaseConfiguration;
         InstanceCreator<CBDatabaseConfig.Pool> dbPoolConfigCreator = type -> databaseConfiguration.getPool();
@@ -92,7 +92,7 @@ public class EmbeddedSecurityControllerFactory {
     }
 
     protected CBEmbeddedSecurityController createEmbeddedSecurityController(
-        WebApplication application,
+        WebAuthApplication application,
         CBDatabase database,
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig

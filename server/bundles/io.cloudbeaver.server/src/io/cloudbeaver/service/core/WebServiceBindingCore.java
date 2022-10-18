@@ -179,6 +179,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
 
         model.getRuntimeWiring().type(TypeRuntimeWiring.newTypeWiring("AsyncTaskResult").typeResolver(TypeResolutionEnvironment::getObject)
         );
+
     }
 
     private WebConnectionConfig getConnectionConfig(DataFetchingEnvironment env) {

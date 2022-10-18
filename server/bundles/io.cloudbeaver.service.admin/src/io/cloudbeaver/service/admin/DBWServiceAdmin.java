@@ -53,7 +53,12 @@ public interface DBWServiceAdmin extends DBWService {
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     @NotNull
-    AdminUserInfo createUser(@NotNull WebSession webSession, String userName, @NotNull Boolean enabled) throws DBWebException;
+    AdminUserInfo createUser(
+        @NotNull WebSession webSession,
+        String userName,
+        @NotNull Boolean enabled,
+        @Nullable String authRole
+    ) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean deleteUser(@NotNull WebSession webSession, String userName) throws DBWebException;
