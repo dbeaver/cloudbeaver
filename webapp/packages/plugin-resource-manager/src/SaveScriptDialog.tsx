@@ -22,6 +22,7 @@ const style = css`
 
 interface Payload {
   defaultScriptName?: string;
+  projectId?: string | null;
 }
 
 export interface ISaveScriptDialogResult {
@@ -48,7 +49,7 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
 
   const state = useObservableRef<State>(() => ({
     name: payload.defaultScriptName ?? '',
-    projectId: null,
+    projectId: payload.projectId ?? null,
     errorMessage: null,
     validate() {
       this.errorMessage = null;
@@ -116,7 +117,7 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
           </InputField>
           <ProjectSelect
             value={state.projectId}
-            filter={p => p.canEditResources}
+            filter={p => (p.canEditResources && p.id === (payload.projectId ?? p.id))}
             autoHide
             onChange={projectId => {state.projectId = projectId;}}
           />

@@ -59,7 +59,17 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         items = [...items];
 
         const connections = this.connectionsManagerService.projectConnections
-          .filter(connection => !connection.template)
+          .filter(connection => {
+            if (
+              !this.connectionSchemaManagerService.isProjectChangeable
+              && this.connectionSchemaManagerService.activeProjectId
+              && connection.projectId !== this.connectionSchemaManagerService.activeProjectId
+            ) {
+              return false;
+            }
+
+            return !connection.template;
+          })
           .sort((a, b) => {
             if (a.connected === b.connected) {
               return compareConnectionsInfo(a, b);

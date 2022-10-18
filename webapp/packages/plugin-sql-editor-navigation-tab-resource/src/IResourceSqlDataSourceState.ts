@@ -10,6 +10,7 @@ import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connecti
 
 export interface IResourceNodeInfo {
   nodeId: string;
+  projectId?: string;
   parents: string[];
 }
 
