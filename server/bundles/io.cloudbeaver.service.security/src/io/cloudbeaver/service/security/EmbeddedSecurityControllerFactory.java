@@ -19,7 +19,6 @@ package io.cloudbeaver.service.security;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
-import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.db.CBDatabaseConfig;
@@ -93,7 +92,7 @@ public class EmbeddedSecurityControllerFactory {
     }
 
     protected CBEmbeddedSecurityController createEmbeddedSecurityController(
-        WebApplication application,
+        WebAuthApplication application,
         CBDatabase database,
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig

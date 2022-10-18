@@ -24,6 +24,7 @@ public class SMControllerConfiguration {
 
     private int accessTokenTtl = DEFAULT_ACCESS_TOKEN_TTL;
     private int refreshTokenTtl = DEFAULT_REFRESH_TOKEN_TTL;
+    private String defaultAuthRole = null;
 
     public int getAccessTokenTtl() {
         return accessTokenTtl;
@@ -39,5 +40,13 @@ public class SMControllerConfiguration {
 
     public void setRefreshTokenTtl(int refreshTokenTtl) {
         this.refreshTokenTtl = refreshTokenTtl;
+    }
+
+    public String getDefaultAuthRole() {
+        return defaultAuthRole;
+    }
+
+    public void setDefaultAuthRole(String defaultAuthRole) {
+        this.defaultAuthRole = defaultAuthRole;
     }
 }

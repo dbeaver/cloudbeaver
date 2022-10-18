@@ -23,6 +23,7 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.service.security.db.CBDatabase;
@@ -78,14 +79,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
 
-    protected final WebApplication application;
+    protected final WebAuthApplication application;
     protected final CBDatabase database;
     protected final SMCredentialsProvider credentialsProvider;
 
-    private final SMControllerConfiguration smConfig;
+    protected final SMControllerConfiguration smConfig;
 
     public CBEmbeddedSecurityController(
-        WebApplication application,
+        WebAuthApplication application,
         CBDatabase database,
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig
@@ -1300,6 +1301,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             permissions = getTokenPermissions(smTokens.getSmAccessToken());
         }
         String activeUserId = permissions == null ? null : permissions.getUserId();
+        String tokenAuthRole = updateUserAuthRoleIfNeeded(activeUserId, authInfo.getAuthRole());
 
         Map<String, Object> storedUserData = new LinkedHashMap<>();
         for (String authProviderId : authProviderIds) {
@@ -1311,7 +1313,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 finishAuthMonitor,
                 activeUserId,
                 activeUserId == null,
-                authInfo.getAuthRole()
+                tokenAuthRole
             );
 
             if (userIdFromCreds == null) {
@@ -1328,7 +1330,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             );
         }
 
-        String tokenAuthRole = updateUserAuthRoleIfNeeded(activeUserId, authInfo.getAuthRole());
 
         if (smTokens == null && permissions == null) {
             try (Connection dbCon = database.openConnection()) {
@@ -1485,7 +1486,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     protected String resolveUserAuthRole(
         @Nullable String currentAuthRole,
         @Nullable String newAuthRole
-    ) {
+    ) throws SMException {
         return newAuthRole == null ? currentAuthRole : newAuthRole;
     }
 
