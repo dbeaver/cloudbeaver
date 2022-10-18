@@ -21,6 +21,7 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.events.CBEvent;
+import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
@@ -52,7 +53,6 @@ import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHImplementation;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.registry.BaseProjectImpl;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
@@ -402,6 +402,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
         webSession.addConnection(connectionInfo);
         webSession.addInfoMessage("New connection was created - " + WebServiceUtils.getConnectionContainerInfo(newDataSource));
+        WebServiceUtils.addProjectUpdatedEvent(List.of(projectId));
         return connectionInfo;
     }
 
@@ -439,7 +440,7 @@ public class WebServiceCore implements DBWServiceCore {
         } catch (DBException e) {
             throw new DBWebException("Failed to update connection", e);
         }
-
+        WebServiceUtils.addProjectUpdatedEvent(List.of(projectId));
         return connectionInfo;
     }
 
@@ -453,6 +454,7 @@ public class WebServiceCore implements DBWServiceCore {
         webSession.addInfoMessage("Delete connection - " +
             WebServiceUtils.getConnectionContainerInfo(connectionInfo.getDataSourceContainer()));
         closeAndDeleteConnection(webSession, projectId, connectionId, true);
+        WebServiceUtils.addProjectUpdatedEvent(List.of(projectId));
         return true;
     }
 
@@ -529,6 +531,7 @@ public class WebServiceCore implements DBWServiceCore {
             WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
             dataSourceRegistry.checkForErrors();
             webSession.addConnection(connectionInfo);
+            WebServiceUtils.addProjectUpdatedEvent(List.of(projectId));
             return connectionInfo;
         } catch (DBException e) {
             throw new DBWebException("Error copying connection", e);
@@ -707,7 +710,7 @@ public class WebServiceCore implements DBWServiceCore {
             DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
             WebConnectionFolderInfo folderInfo = new WebConnectionFolderInfo(session, newFolder);
             WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
-
+            WebServiceUtils.addProjectUpdatedEvent(List.of(projectId));
             return folderInfo;
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
@@ -725,6 +728,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(session, projectId, folderPath);
         folderInfo.getDataSourceFolder().setName(newName);
         WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
+        WebServiceUtils.addProjectUpdatedEvent(List.of(projectId));
         return folderInfo;
     }
 
@@ -742,6 +746,7 @@ public class WebServiceCore implements DBWServiceCore {
             DBPDataSourceRegistry sessionRegistry = session.getProjectById(projectId).getDataSourceRegistry();
             sessionRegistry.removeFolder(folderInfo.getDataSourceFolder(), false);
             WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
+            WebServiceUtils.addProjectUpdatedEvent(List.of(projectId));
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
         }
@@ -756,6 +761,7 @@ public class WebServiceCore implements DBWServiceCore {
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor)connectionInfo.getDataSourceContainer());
         dataSourceDescriptor.setNavigatorSettings(settings);
         dataSourceDescriptor.persistConfiguration();
+        WebServiceUtils.addProjectUpdatedEvent(List.of(projectId));
         return connectionInfo;
     }
 

@@ -19,6 +19,8 @@ package io.cloudbeaver;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
+import io.cloudbeaver.events.CBEvent;
+import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionFolderInfo;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
@@ -58,6 +60,7 @@ import org.jkiss.utils.CommonUtils;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -337,6 +340,12 @@ public class WebServiceUtils extends WebCommonUtils {
 
     public static boolean isGlobalProject(DBPProject project) {
         return project.getId().equals(RMProjectType.GLOBAL.getPrefix() + "_" + CBApplication.getInstance().getDefaultProjectName());
+    }
+
+    public static void addProjectUpdatedEvent(List<String> projectIds) {
+        CBApplication.getInstance().getEventController().addEvent(
+            new CBEvent(CBEventConstants.CLOUDBEAVER_PROJECT_UPDATED, Map.of("projects", projectIds))
+        );
     }
 
 
