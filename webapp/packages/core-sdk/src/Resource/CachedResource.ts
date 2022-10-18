@@ -493,14 +493,14 @@ export abstract class CachedResource<
     param: TParam,
     context: TContext,
     update: (param: TParam, context: TContext) => Promise<T>,
-    exitCheck: () => boolean
+    exitCheck: (param: TParam, context: TContext) => boolean
   ): Promise<T | undefined>;
 
   protected async performUpdate<T>(
     param: TParam,
     context: TContext,
     update: (param: TParam, context: TContext) => Promise<T>,
-    exitCheck?: () => boolean
+    exitCheck?: (param: TParam, context: TContext) => boolean
   ): Promise<T | undefined> {
     const contexts = await this.beforeLoad.execute(param);
 
@@ -510,7 +510,7 @@ export abstract class CachedResource<
 
     await this.scheduler.waitRelease(param);
 
-    if (exitCheck?.()) {
+    if (exitCheck?.(param, context)) {
       return;
     }
 
@@ -519,7 +519,7 @@ export abstract class CachedResource<
       param,
       async () => {
         // repeated because previous task maybe has been load requested data
-        if (exitCheck?.()) {
+        if (exitCheck?.(param, context)) {
           return;
         }
 

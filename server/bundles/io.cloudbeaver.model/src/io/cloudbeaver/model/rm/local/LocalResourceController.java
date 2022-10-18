@@ -347,7 +347,7 @@ public class LocalResourceController implements RMController {
             if (!folderPath.startsWith(projectPath)) {
                 throw new DBException("Invalid folder path");
             }
-            return readChildResources(projectId, folderPath, readProperties, readHistory, recursive);
+            return readChildResources(projectId, folderPath, nameMask, readProperties, readHistory, recursive);
         } catch (NoSuchFileException e) {
             throw new DBException("Invalid resource folder " + folder);
         } catch (IOException e) {
@@ -359,14 +359,18 @@ public class LocalResourceController implements RMController {
     private RMResource[] readChildResources(
         @NotNull String projectId,
         @NotNull Path folderPath,
+        @Nullable String nameMask,
         boolean readProperties,
         boolean readHistory,
         boolean recursive
     ) throws IOException {
         try (Stream<Path> files = Files.list(folderPath)) {
-            return files.filter(path -> !path.getFileName().toString().startsWith(".")) // skip hidden files
+            return files.filter(path -> {
+                    String fileName = path.getFileName().toString();
+                    return (nameMask == null || nameMask.equals(fileName)) && !fileName.startsWith(".");
+                }) // skip hidden files
                 .sorted(Comparator.comparing(path -> path.getFileName().toString(), String.CASE_INSENSITIVE_ORDER))
-                .map((Path path) -> makeResourceFromPath(projectId, path, readProperties, readHistory, recursive))
+                .map((Path path) -> makeResourceFromPath(projectId, path, nameMask, readProperties, readHistory, recursive))
                 .filter(Objects::nonNull)
                 .toArray(RMResource[]::new);
         }
@@ -631,7 +635,7 @@ public class LocalResourceController implements RMController {
 
         for (var resourceName : relativeResourcePath) {
             resourcePath = resourcePath.resolve(resourceName);
-            result.add(makeResourceFromPath(projectId, resourcePath, false, false, recursive));
+            result.add(makeResourceFromPath(projectId, resourcePath, null, false, false, recursive));
         }
 
         return result;
@@ -640,6 +644,7 @@ public class LocalResourceController implements RMController {
     private RMResource makeResourceFromPath(
         @NotNull String projectId,
         @NotNull Path path,
+        @Nullable String nameMask,
         boolean readProperties,
         boolean readHistory,
         boolean recursive
@@ -687,7 +692,7 @@ public class LocalResourceController implements RMController {
 
         if (recursive && resource.isFolder()) {
             try {
-                resource.setChildren(readChildResources(projectId, path, readProperties, readHistory, true));
+                resource.setChildren(readChildResources(projectId, path, nameMask, readProperties, readHistory, true));
             } catch (IOException e) {
                 log.error(e);
             }

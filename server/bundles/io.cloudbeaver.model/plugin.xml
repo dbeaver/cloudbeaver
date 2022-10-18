@@ -3,4 +3,5 @@
 
 <plugin>
     <extension-point id="io.cloudbeaver.service" name="Web services" schema="schema/io.cloudbeaver.service.exsd"/>
+    <extension-point id="io.cloudbeaver.event.handler" name="Wev event handler" schema="schema/io.cloudbeaver.event.handler.exsd"/>
 </plugin>

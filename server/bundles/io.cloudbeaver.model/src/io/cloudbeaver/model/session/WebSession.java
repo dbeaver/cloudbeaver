@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.events.CBEvent;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -124,6 +125,7 @@ public class WebSession extends AbstractSessionPersistent
     private final WebApplication application;
     private final Map<String, DBWSessionHandler> sessionHandlers;
     private final WebUserContext userContext;
+    private final List<CBEvent> sessionEvents = new ArrayList<>();
 
     public WebSession(HttpSession httpSession,
                       WebApplication application,
@@ -721,6 +723,27 @@ public class WebSession extends AbstractSessionPersistent
 
     public void addInfoMessage(String message) {
         addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.INFO, message));
+    }
+
+    public void addSessionEvent(CBEvent event) {
+        synchronized (sessionEvents) {
+            sessionEvents.add(event);
+        }
+    }
+
+    public List<CBEvent> getSessionEvents(int eventsCount) {
+        synchronized (sessionEvents) {
+            List<CBEvent> result;
+            if (sessionEvents.size() <= eventsCount) {
+                result = List.copyOf(sessionEvents);
+                sessionEvents.clear();
+            } else {
+                var subList = sessionEvents.subList(0, eventsCount - 1);
+                result = List.copyOf(subList);
+                subList.clear();
+            }
+            return result;
+        }
     }
 
     public List<WebServerMessage> readLog(Integer maxEntries, Boolean clearLog) {

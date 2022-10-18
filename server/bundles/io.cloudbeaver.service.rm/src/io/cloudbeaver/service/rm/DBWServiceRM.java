@@ -58,6 +58,25 @@ public interface DBWServiceRM extends DBWService {
         boolean readProperties,
         boolean readHistory) throws DBException;
 
+    /**
+     * Sets resource property.
+     *
+     * @param webSession    the web session
+     * @param projectId     the project id
+     * @param resourcePath  the resource path
+     * @param propertyName  the property name
+     * @param propertyValue the property value
+     * @return the resource property
+     * @throws DBException the db exception
+     */
+    @WebProjectAction(requireProjectPermissions = RMConstants.PERMISSION_PROJECT_RESOURCE_EDIT)
+    String setResourceProperty(
+        @NotNull WebSession webSession,
+        @NotNull @WebObjectId String projectId,
+        @NotNull String resourcePath,
+        @NotNull String propertyName,
+        @Nullable Object propertyValue) throws DBException;
+
     @WebProjectAction(
         requireProjectPermissions = RMConstants.PERMISSION_PROJECT_RESOURCE_VIEW
     )

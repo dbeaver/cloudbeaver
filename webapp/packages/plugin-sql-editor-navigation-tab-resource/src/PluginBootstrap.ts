@@ -11,13 +11,14 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeManagerService, NavTreeResource, NavNodeInfoResource, NodeManagerUtils, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
-import { ProjectsService } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { DATA_CONTEXT_TAB_ID } from '@cloudbeaver/core-ui';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, RESOURCES_NODE_PATH, ResourceProjectsResource, ResourcesProjectsNavNodeService } from '@cloudbeaver/plugin-resource-manager';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
+import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, RESOURCES_NODE_PATH, ResourcesProjectsNavNodeService } from '@cloudbeaver/plugin-resource-manager';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { isScript } from './isScript';
@@ -31,14 +32,13 @@ export class PluginBootstrap extends Bootstrap {
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly navTreeResource: NavTreeResource,
     private readonly navResourceNodeService: NavResourceNodeService,
-    private readonly sqlEditorService: SqlEditorService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navigationTabsService: NavigationTabsService,
     private readonly notificationService: NotificationService,
     private readonly sqlEditorNavigatorService: SqlEditorNavigatorService,
     private readonly resourceManagerService: ResourceManagerService,
     private readonly projectsService: ProjectsService,
-    private readonly resourceProjectsResource: ResourceProjectsResource,
+    private readonly projectInfoResource: ProjectInfoResource,
     private readonly sqlEditorTabResourceService: SqlEditorTabResourceService,
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
@@ -86,20 +86,33 @@ export class PluginBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_SAVE) {
+          let projectId = dataSource.executionContext?.projectId ?? null;
+          await this.projectInfoResource.load(CachedMapAllKey);
           const name = getSqlEditorName(state, dataSource);
+
+          if (projectId) {
+            const project = this.projectInfoResource.get(projectId);
+
+            if (!project?.canEditResources) {
+              projectId = null;
+            }
+          }
+
           const result = await this.commonDialogService.open(SaveScriptDialog, {
             defaultScriptName: name,
+            projectId,
           });
 
           if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
             try {
-              if (!result.projectId) {
+              projectId = result.projectId;
+
+              if (!projectId) {
                 throw new Error('Project not selected');
               }
 
-              await this.resourceProjectsResource.load();
               const scriptName = `${result.name.trim()}.${SCRIPT_EXTENSION}`;
-              const folder = createPath(RESOURCES_NODE_PATH, result.projectId);
+              const folder = createPath(RESOURCES_NODE_PATH, projectId);
               const resourceData = this.navResourceNodeService.getResourceData(folder);
 
               if (!resourceData) {
@@ -108,7 +121,6 @@ export class PluginBootstrap extends Bootstrap {
               }
 
               const nodeId = await this.navResourceNodeService.saveScript(resourceData, scriptName, dataSource.script);
-
 
               await this.navTreeResource.preloadNodeParents(NodeManagerUtils.parentsFromPath(nodeId), nodeId);
               const node = await this.navNodeInfoResource.load(nodeId);
@@ -124,16 +136,16 @@ export class PluginBootstrap extends Bootstrap {
                 const parents = NodeManagerUtils.parentsFromPath(nodeId);
 
                 dataSource.setNodeInfo({
+                  projectId,
                   nodeId,
                   parents,
                 });
 
-                if (previousDataSource) {
+                if (previousDataSource?.executionContext) {
                   dataSource.setExecutionContext(previousDataSource.executionContext);
                 }
               }
 
-              this.sqlEditorService.setName(node.name ?? scriptName, state);
               this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: node.name });
 
               if (!this.resourceManagerService.active) {
@@ -178,7 +190,7 @@ export class PluginBootstrap extends Bootstrap {
     }
 
     try {
-      const nodeInfo = await contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
+      const nodeInfo = contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
       const node = await this.navNodeInfoResource.load(data.nodeId);
 
       if (node.nodeType !== RESOURCE_NODE_TYPE || !isScript(node.id)) {
@@ -246,11 +258,12 @@ export class PluginBootstrap extends Bootstrap {
           const parents = NodeManagerUtils.parentsFromPath(nodeId);
 
           dataSource.setNodeInfo({
+            projectId: node.projectId,
             nodeId,
             parents,
           });
 
-          if (previousDataSource) {
+          if (previousDataSource?.executionContext) {
             dataSource.setExecutionContext(previousDataSource.executionContext);
           }
 
