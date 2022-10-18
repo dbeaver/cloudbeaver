@@ -33,6 +33,8 @@ export const ConnectionExecutionContextProjectKey = (projectId: string) => resou
   projectId
 );
 
+export const NOT_INITIALIZED_CONTEXT_ID = '-1';
+
 @injectable()
 export class ConnectionExecutionContextResource extends CachedMapResource<string, IConnectionExecutionContextInfo> {
   constructor(
@@ -157,7 +159,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     originalKey: ResourceKey<string>
   ): Promise<Map<string, IConnectionExecutionContextInfo>> {
     let projectId: string | undefined;
-    const all = this.includes(originalKey, CachedMapAllKey);
+    const all = this.isAliasEqual(originalKey, CachedMapAllKey);
     const isProjectFolders = isConnectionExecutionContextProjectKey(originalKey);
     originalKey = this.transformParam(originalKey);
 
@@ -259,4 +261,12 @@ function isConnectionExecutionContextProjectKey(
   param: ResourceKey<string>
 ): param is ResourceKeyList<string> {
   return isResourceKeyList(param) && param.list.includes(connectionExecutionContextProjectKeySymbol);
+}
+
+export function getRealExecutionContextId(id: string | undefined | null): string | null {
+  if (id === NOT_INITIALIZED_CONTEXT_ID) {
+    return null;
+  }
+
+  return id ?? null;
 }

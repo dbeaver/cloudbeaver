@@ -20,6 +20,7 @@ package io.cloudbeaver.service.core.impl;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.events.CBEvent;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
@@ -51,6 +52,7 @@ import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHImplementation;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.registry.BaseProjectImpl;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
@@ -177,12 +179,25 @@ public class WebServiceCore implements DBWServiceCore {
     public List<WebConnectionFolderInfo> getConnectionFolders(
         @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id
     ) throws DBWebException {
+        if (projectId == null) {
+            return webSession.getAccessibleProjects().stream()
+                .flatMap(pr -> getConnectionFoldersFromProject(webSession, pr).stream())
+                .collect(Collectors.toList());
+        }
         if (id != null) {
             WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(webSession, projectId, id);
             return Collections.singletonList(folderInfo);
         }
-        return webSession.getProjectById(projectId).getDataSourceRegistry().getAllFolders().stream()
-            .map(f -> new WebConnectionFolderInfo(webSession, f)).collect(Collectors.toList());
+        DBPProject project = webSession.getProjectById(projectId);
+        return getConnectionFoldersFromProject(webSession, project);
+    }
+
+    private List<WebConnectionFolderInfo> getConnectionFoldersFromProject(
+        @NotNull WebSession webSession,
+        @NotNull DBPProject project
+    ) {
+        return project.getDataSourceRegistry().getAllFolders().stream()
+                .map(f -> new WebConnectionFolderInfo(webSession, f)).collect(Collectors.toList());
     }
 
     @Override
@@ -223,6 +238,14 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public List<WebServerMessage> readSessionLog(@NotNull WebSession webSession, Integer maxEntries, Boolean clearEntries) {
         return webSession.readLog(maxEntries, clearEntries);
+    }
+
+    @Override
+    public List<CBEvent> readSessionEvents(@Nullable WebSession webSession, Integer maxEntries) throws DBWebException {
+        if (webSession == null) {
+            return Collections.emptyList();
+        }
+        return webSession.getSessionEvents(maxEntries);
     }
 
     @Override

@@ -88,4 +88,8 @@ public class WebUser {
     public String toString() {
         return user.getUserId();
     }
+
+    public String getAuthRole() {
+        return user.getAuthRole();
+    }
 }

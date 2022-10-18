@@ -5,6 +5,8 @@ export * from './Resource/CachedMapResource';
 export * from './Resource/CachedResource';
 export * from './Resource/CachedResourceIncludes';
 export * from './Resource/ResourceKeyList';
+export * from './Resource/EventSource';
+export * from './Resource/ResourceEventHandler';
 export * from './CustomGraphQLClient';
 export * from './DetailsError';
 export * from './EnvironmentService';

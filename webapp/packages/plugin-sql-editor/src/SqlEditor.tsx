@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles, Overlay, OverlayMessage, OverlayActions, Button, useMapResource, getComputed, OverlayHeader, OverlayHeaderIcon, OverlayHeaderTitle, OverlayHeaderSubTitle, useSplitUserState, Loader, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
-import { ConnectionExecutionContextResource, ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionExecutionContextResource, ConnectionInfoResource, createConnectionParam, DBDriverResource, getRealExecutionContextId } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { CaptureView } from '@cloudbeaver/core-view';
@@ -74,10 +74,7 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
     SqlEditor,
     ConnectionInfoResource,
     dataSource?.executionContext
-      ? ({
-        projectId: dataSource.executionContext.projectId,
-        connectionId: dataSource.executionContext.connectionId,
-      })
+      ? createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId)
       : null
   );
   const driver = useMapResource(SqlEditor, DBDriverResource, connection.data?.driverId ?? null);
@@ -88,13 +85,13 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   const context = useMapResource(
     SqlEditor,
     ConnectionExecutionContextResource,
-    connected ? (dataSource?.executionContext?.id ?? null) : null
+    connected ? getRealExecutionContextId(dataSource?.executionContext?.id) : null
   );
 
   const initializingContext = getComputed(() => connection.isLoading() || context.isLoading());
   const initExecutionContext = getComputed(() => (
     context.data === undefined
-    && dataSource?.executionContext !== undefined
+    && connection.data !== undefined
   ));
 
   async function cancelConnection() {

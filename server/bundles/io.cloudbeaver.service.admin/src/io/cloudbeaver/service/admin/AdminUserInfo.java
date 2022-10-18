@@ -55,6 +55,11 @@ public class AdminUserInfo {
     }
 
     @Property
+    public String getAuthRole() {
+        return user.getAuthRole();
+    }
+
+    @Property
     public Map<String, String> getMetaParameters() {
         return user.getMetaParameters();
     }

@@ -23,13 +23,14 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMWAuthProviderFederated;
 import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
-import io.cloudbeaver.service.security.internal.RefreshTokenInfo;
+import io.cloudbeaver.service.security.internal.SMTokenInfo;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -75,14 +76,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
 
-    protected final WebApplication application;
+    protected final WebAuthApplication application;
     protected final CBDatabase database;
     protected final SMCredentialsProvider credentialsProvider;
 
-    private final SMControllerConfiguration smConfig;
+    protected final SMControllerConfiguration smConfig;
 
     public CBEmbeddedSecurityController(
-        WebApplication application,
+        WebAuthApplication application,
         CBDatabase database,
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig
@@ -110,17 +111,29 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     // Users
 
     @Override
-    public void createUser(String userId, Map<String, String> metaParameters, boolean enabled) throws DBException {
+    public void createUser(
+        @NotNull String userId,
+        @Nullable Map<String, String> metaParameters,
+        boolean enabled,
+        @Nullable String defaultAuthRole
+    ) throws DBException {
         if (isSubjectExists(userId)) {
             throw new DBCException("User or team '" + userId + "' already exists");
         }
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 createAuthSubject(dbCon, userId, SUBJECT_USER);
-                try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER(USER_ID,IS_ACTIVE,CREATE_TIME) VALUES(?,?,?)")) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    "INSERT INTO CB_USER(USER_ID,IS_ACTIVE,CREATE_TIME,DEFAULT_AUTH_ROLE) VALUES(?,?,?,?)")
+                ) {
                     dbStat.setString(1, userId);
                     dbStat.setString(2, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
                     dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                    if (CommonUtils.isEmpty(defaultAuthRole)) {
+                        dbStat.setNull(4, Types.VARCHAR);
+                    } else {
+                        dbStat.setString(4, defaultAuthRole);
+                    }
                     dbStat.execute();
                 }
                 saveSubjectMetas(dbCon, userId, metaParameters);
@@ -192,13 +205,16 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public SMUser getUserById(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             SMUser user;
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER WHERE USER_ID=?")) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM CB_USER WHERE USER_ID=?"
+            )) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
                         String userName = dbResult.getString(1);
                         String active = dbResult.getString(2);
-                        user = new SMUser(userName, CHAR_BOOL_TRUE.equals(active));
+                        String authRole = dbResult.getString(3);
+                        user = new SMUser(userName, CHAR_BOOL_TRUE.equals(active), authRole);
                     } else {
                         return null;
                     }
@@ -228,8 +244,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             Map<String, SMUser> result = new LinkedHashMap<>();
             // Read users
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER" +
-                (CommonUtils.isEmpty(userNameMask) ? "\nORDER BY USER_ID" : " WHERE USER_ID=?"))) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM CB_USER" +
+                    (CommonUtils.isEmpty(userNameMask) ? "\nORDER BY USER_ID" : " WHERE USER_ID=?"))) {
                 if (!CommonUtils.isEmpty(userNameMask)) {
                     dbStat.setString(1, userNameMask);
                 }
@@ -237,7 +254,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     while (dbResult.next()) {
                         String userId = dbResult.getString(1);
                         String active = dbResult.getString(2);
-                        result.put(userId, new SMUser(userId, CHAR_BOOL_TRUE.equals(active)));
+                        String authRole = dbResult.getString(3);
+                        result.put(userId, new SMUser(userId, CHAR_BOOL_TRUE.equals(active), authRole));
                     }
                 }
             }
@@ -396,6 +414,19 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
         } catch (SQLException e) {
             throw new DBCException("Error while updating user configuration", e);
+        }
+    }
+
+    @Override
+    public void setUserAuthRole(@NotNull String userId, @Nullable String authRole) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement("UPDATE CB_USER SET DEFAULT_AUTH_ROLE=? WHERE USER_ID=?")) {
+                dbStat.setString(1, authRole);
+                dbStat.setString(2, userId);
+                dbStat.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while updating user authentication role", e);
         }
     }
 
@@ -804,7 +835,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @NotNull
     @Override
-    public Set<String> getUserPermissions(String userId, String authRole) throws DBException {
+    public Set<String> getUserPermissions(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
             try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -830,6 +861,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error reading user permissions", e);
         }
+    }
+
+    protected Set<String> getUserPermissions(String userId, String authRole) throws DBException {
+        return getUserPermissions(userId);
     }
 
     ///////////////////////////////////////////
@@ -1173,17 +1208,17 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public SMTokens refreshSession(@NotNull String refreshToken) throws DBException {
         var currentUserCreds = getCurrentUserCreds();
         var currentUserAccessToken = currentUserCreds.getSmToken();
-        String currentUserAuthRole = null; // FIXME: read role from auth token
+        String currentUserAuthRole = readTokenAuthRole(currentUserAccessToken);
 
-        var expectedRefreshTokenInfo = findRefreshToken(currentUserAccessToken);
+        var smTokenInfo = readAccessTokenInfo(currentUserAccessToken);
 
-        if (!expectedRefreshTokenInfo.getRefreshToken().equals(refreshToken)) {
+        if (!smTokenInfo.getRefreshToken().equals(refreshToken)) {
             throw new SMException("Invalid refresh token");
         }
 
         try (var dbCon = database.openConnection()) {
             invalidateUserTokens(currentUserAccessToken);
-            return generateNewSessionToken(expectedRefreshTokenInfo.getSessionId(), expectedRefreshTokenInfo.getUserId(), currentUserAuthRole, dbCon);
+            return generateNewSessionToken(smTokenInfo.getSessionId(), smTokenInfo.getUserId(), currentUserAuthRole, dbCon);
         } catch (SQLException e) {
             throw new DBException("Error refreshing sm session", e);
         }
@@ -1221,10 +1256,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private RefreshTokenInfo findRefreshToken(String smAccessToken) throws DBException {
+    private SMTokenInfo readAccessTokenInfo(String smAccessToken) throws DBException {
         try (Connection dbCon = database.openConnection();
              PreparedStatement dbStat = dbCon.prepareStatement(
-                 "SELECT REFRESH_TOKEN_ID,SESSION_ID,USER_ID,REFRESH_TOKEN_EXPIRATION_TIME FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?"
+                 "SELECT REFRESH_TOKEN_ID,SESSION_ID,USER_ID,REFRESH_TOKEN_EXPIRATION_TIME,AUTH_ROLE FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?"
              )
         ) {
             dbStat.setString(1, smAccessToken);
@@ -1236,10 +1271,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 var sessionId = dbResult.getString(2);
                 var userId = dbResult.getString(3);
                 var expiredDate = dbResult.getTimestamp(4);
+                var authRole = dbResult.getString(5);
                 if (Timestamp.from(Instant.now()).after(expiredDate)) {
                     throw new SMRefreshTokenExpiredException("Refresh token expired");
                 }
-                return new RefreshTokenInfo(refreshToken, sessionId, userId);
+                return new SMTokenInfo(smAccessToken, refreshToken, sessionId, userId, authRole);
             }
         } catch (SQLException e) {
             throw new DBCException("Error reading token info in database", e);
@@ -1281,14 +1317,15 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
         Map<String, Object> storedUserData = new LinkedHashMap<>();
         for (String authProviderId : authProviderIds) {
-            var userCredentials = (Map<String, Object>) authInfo.getAuthData().get(authProviderId);
+            var userAuthData = (Map<String, Object>) authInfo.getAuthData().get(authProviderId);
             var userIdFromCreds = findOrCreateExternalUserByCredentials(
                 authProviderId,
                 authAttemptSessionInfo.getSessionParams(),
-                userCredentials,
+                userAuthData,
                 finishAuthMonitor,
                 activeUserId,
-                activeUserId == null
+                activeUserId == null,
+                authInfo.getAuthRole()
             );
 
             if (userIdFromCreds == null) {
@@ -1301,10 +1338,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
             storedUserData.put(
                 authProviderId,
-                saveSecuredCreds ? userCredentials : filterSecuredUserData(userCredentials, getAuthProvider(authProviderId))
+                saveSecuredCreds ? userAuthData : filterSecuredUserData(userAuthData, getAuthProvider(authProviderId))
             );
         }
 
+        String tokenAuthRole = updateUserAuthRoleIfNeeded(activeUserId, authInfo.getAuthRole());
         if (smTokens == null && permissions == null) {
             try (Connection dbCon = database.openConnection()) {
                 try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
@@ -1320,9 +1358,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     } else {
                         smSessionId = authAttemptSessionInfo.getSmSessionId();
                     }
-                    smTokens = generateNewSessionToken(smSessionId, activeUserId, authInfo.getAuthRole(), dbCon);
+
+                    smTokens = generateNewSessionToken(smSessionId, activeUserId, tokenAuthRole, dbCon);
                     permissions = new SMAuthPermissions(
-                        activeUserId, smSessionId, getUserPermissions(activeUserId, authInfo.getAuthRole()));
+                        activeUserId, smSessionId, getUserPermissions(activeUserId, tokenAuthRole)
+                    );
                     txn.commit();
                 }
             } catch (SQLException e) {
@@ -1341,6 +1381,38 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             permissions,
             authInfo.getAuthData()
         );
+    }
+
+    @Nullable
+    protected String readUserAuthRole(String userId) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT DEFAULT_AUTH_ROLE FROM CB_USER WHERE USER_ID=?"
+            )) {
+                dbStat.setString(1, userId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    if (!dbResult.next()) {
+                        throw new SMException("User not found");
+                    }
+                    return dbResult.getString(1);
+
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBException("Failed to update user auth role", e);
+        }
+    }
+
+    private String updateUserAuthRoleIfNeeded(@Nullable String userId, @Nullable String authRole) throws DBException {
+        if (userId == null) {
+            return null;
+        }
+        var currentAuthRole = readUserAuthRole(userId);
+        String expectedAuthRole = resolveUserAuthRole(currentAuthRole, authRole);
+        if (!Objects.equals(currentAuthRole, expectedAuthRole)) {
+            setUserAuthRole(userId, expectedAuthRole);
+        }
+        return expectedAuthRole;
     }
 
     private AuthAttemptSessionInfo readAuthAttemptSessionInfo(@NotNull String authId) throws DBException {
@@ -1374,7 +1446,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @NotNull Map<String, Object> userCredentials,
         @NotNull DBRProgressMonitor progressMonitor,
         @Nullable String activeUserId,
-        boolean createNewUserIfNotExist
+        boolean createNewUserIfNotExist,
+        String authRole
     ) throws DBException {
         WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
@@ -1398,8 +1471,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
             userId = userIdFromCredentials;
             if (!isSubjectExists(userId)) {
-                var newUser = new SMUser(userId, true);
-                createUser(newUser.getUserId(), newUser.getMetaParameters(), true);
+                createUser(userId,
+                    Map.of(),
+                    true,
+                    resolveUserAuthRole(null, authRole)
+                );
                 String defaultTeamName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserTeam();
                 if (!CommonUtils.isEmpty(defaultTeamName)) {
                     setUserTeams(userId, new String[]{defaultTeamName}, userId);
@@ -1416,6 +1492,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
         }
         return userId;
+    }
+
+    @Nullable
+    protected String resolveUserAuthRole(
+        @Nullable String currentAuthRole,
+        @Nullable String newAuthRole
+    ) throws SMException {
+        return newAuthRole == null ? currentAuthRole : newAuthRole;
     }
 
     protected SMTokens generateNewSessionToken(
@@ -1480,7 +1564,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error reading token info in database", e);
         }
-        var permissions = userId == null ? getAnonymousUserPermissions() : getUserPermissions(userId, authRole);
+        var permissions = userId == null ? getAnonymousUserPermissions() : getUserPermissions(userId);
         return new SMAuthPermissions(userId, sessionId, permissions);
     }
 
@@ -1788,6 +1872,25 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     ///////////////////////////////////////////
     // Utils
+
+    protected String readTokenAuthRole(String smAccessToken) throws DBException {
+        try (Connection dbCon = database.openConnection();
+             PreparedStatement dbStat = dbCon.prepareStatement(
+                 "SELECT AUTH_ROLE FROM CB_AUTH_TOKEN " +
+                     "WHERE TOKEN_ID=?"
+             )
+        ) {
+            dbStat.setString(1, smAccessToken);
+            try (var dbResult = dbStat.executeQuery()) {
+                if (!dbResult.next()) {
+                    throw new SMException("Invalid token");
+                }
+                return dbResult.getString(1);
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading lm role in database", e);
+        }
+    }
 
     public void initializeMetaInformation() throws DBCException {
         try (Connection dbCon = database.openConnection()) {

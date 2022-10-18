@@ -81,7 +81,6 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
                     env.getArgument("resourcePath"),
                     env.getArgument("data"),
                     env.getArgument("forceOverwrite")))
-
             .dataFetcher("rmCreateProject", env -> getService(env).createProject(
                 getWebSession(env),
                 env.getArgument("projectName"),
@@ -96,12 +95,18 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
                 env.getArgument("projectId"),
                 new RMSubjectProjectPermissions(env.getArgument("permissions"))
             ))
+            .dataFetcher("rmSetResourceProperty", env -> getService(env).setResourceProperty(
+                getWebSession(env),
+                env.getArgument("projectId"),
+                env.getArgument("resourcePath"),
+                env.getArgument("name"),
+                env.getArgument("value")
+            ))
             .dataFetcher("rmSetSubjectProjectPermissions", env -> getService(env).setSubjectProjectPermissions(
                 getWebSession(env),
                 env.getArgument("subjectId"),
                 new RMProjectPermissions(env.getArgument("permissions"))
             ))
         ;
-
     }
 }

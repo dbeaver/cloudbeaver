@@ -42,6 +42,7 @@ type AdminUserInfo {
 
     linkedAuthProviders: [String!]!
     enabled: Boolean!
+    authRole: String
 }
 
 type AdminTeamInfo {
@@ -119,7 +120,7 @@ extend type Query {
     listTeams(teamId: ID): [AdminTeamInfo!]!
     listPermissions: [AdminPermissionInfo!]!
 
-    createUser(userId: ID!, enabled: Boolean!): AdminUserInfo!
+    createUser(userId: ID!, enabled: Boolean!, authRole: String): AdminUserInfo!
     deleteUser(userId: ID!): Boolean
 
     createTeam(teamId: ID!, teamName: String, description: String): AdminTeamInfo!

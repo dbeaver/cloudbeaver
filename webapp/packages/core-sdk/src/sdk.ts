@@ -163,6 +163,15 @@ export enum AuthStatus {
   Success = 'SUCCESS'
 }
 
+export interface CbEvent {
+  eventData: Scalars['Object'];
+  eventType: CbEventType;
+}
+
+export enum CbEventType {
+  CbConfigChanged = 'cb_config_changed'
+}
+
 export interface ConnectionConfig {
   authModelId?: InputMaybe<Scalars['ID']>;
   configurationType?: InputMaybe<DriverConfigurationType>;
@@ -404,6 +413,7 @@ export interface Mutation {
   rmDeleteResource?: Maybe<Scalars['Boolean']>;
   rmMoveResource: Scalars['String'];
   rmSetProjectPermissions: Scalars['Boolean'];
+  rmSetResourceProperty: Scalars['Boolean'];
   rmSetSubjectProjectPermissions: Scalars['Boolean'];
   rmWriteResourceStringContent: Scalars['String'];
   setConnectionNavigatorSettings: ConnectionInfo;
@@ -600,6 +610,14 @@ export interface MutationRmMoveResourceArgs {
 export interface MutationRmSetProjectPermissionsArgs {
   permissions: Array<RmSubjectProjectPermissions>;
   projectId: Scalars['String'];
+}
+
+
+export interface MutationRmSetResourcePropertyArgs {
+  name: Scalars['ID'];
+  projectId: Scalars['String'];
+  resourcePath: Scalars['String'];
+  value?: InputMaybe<Scalars['String']>;
 }
 
 
@@ -909,6 +927,7 @@ export interface Query {
   navNodeParents: Array<NavigatorNodeInfo>;
   navRefreshNode?: Maybe<Scalars['Boolean']>;
   networkHandlers: Array<NetworkHandlerDescriptor>;
+  readSessionEvents: Array<CbEvent>;
   readSessionLog: Array<LogEntry>;
   revokeUserTeam?: Maybe<Scalars['Boolean']>;
   rmListProjectGrantedPermissions: Array<AdminObjectGrantInfo>;
@@ -1151,6 +1170,11 @@ export interface QueryNavRefreshNodeArgs {
 }
 
 
+export interface QueryReadSessionEventsArgs {
+  maxEntries: Scalars['Int'];
+}
+
+
 export interface QueryReadSessionLogArgs {
   clearEntries?: InputMaybe<Scalars['Boolean']>;
   maxEntries?: InputMaybe<Scalars['Int']>;
@@ -1364,6 +1388,7 @@ export interface RmResource {
   folder: Scalars['Boolean'];
   length: Scalars['Int'];
   name: Scalars['String'];
+  properties?: Maybe<Scalars['Object']>;
 }
 
 export interface RmSubjectProjectPermissions {
@@ -2241,7 +2266,7 @@ export type NavGetStructContainersQueryVariables = Exact<{
 }>;
 
 
-export type NavGetStructContainersQuery = { navGetStructContainers: { supportsCatalogChange: boolean, supportsSchemaChange: boolean, catalogList: Array<{ catalog: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }, schemaList: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> }>, schemaList: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> } };
+export type NavGetStructContainersQuery = { navGetStructContainers: { supportsCatalogChange: boolean, supportsSchemaChange: boolean, catalogList: Array<{ catalog: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }, schemaList: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> }>, schemaList: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> } };
 
 export type AdminObjectGrantInfoFragment = { subjectId: string, subjectType: AdminSubjectType, objectPermissions: { objectId: string, permissions: Array<string> } };
 
@@ -2273,7 +2298,7 @@ export type ExecutionContextInfoFragment = { id: string, projectId: string, conn
 
 export type NavNodeDbObjectInfoFragment = { id: string, object?: { type?: string, features?: Array<string>, properties?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> } };
 
-export type NavNodeInfoFragment = { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> };
+export type NavNodeInfoFragment = { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> };
 
 export type NavNodePropertiesFragment = { id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number };
 
@@ -2434,7 +2459,7 @@ export type GetNodeParentsQueryVariables = Exact<{
 }>;
 
 
-export type GetNodeParentsQuery = { node: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }, parents: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> };
+export type GetNodeParentsQuery = { node: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }, parents: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> };
 
 export type NavDeleteNodesMutationVariables = Exact<{
   nodePaths: Array<Scalars['ID']> | Scalars['ID'];
@@ -2459,7 +2484,7 @@ export type NavNodeChildrenQueryVariables = Exact<{
 }>;
 
 
-export type NavNodeChildrenQuery = { navNodeChildren: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }>, navNodeInfo: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> } };
+export type NavNodeChildrenQuery = { navNodeChildren: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }>, navNodeInfo: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> } };
 
 export type NavNodeInfoQueryVariables = Exact<{
   nodePath: Scalars['ID'];
@@ -2467,7 +2492,7 @@ export type NavNodeInfoQueryVariables = Exact<{
 }>;
 
 
-export type NavNodeInfoQuery = { navNodeInfo: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> } };
+export type NavNodeInfoQuery = { navNodeInfo: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> } };
 
 export type NavRefreshNodeQueryVariables = Exact<{
   nodePath: Scalars['ID'];
@@ -2551,7 +2576,7 @@ export type GetResourceListQueryVariables = Exact<{
 }>;
 
 
-export type GetResourceListQuery = { resources: Array<{ name: string, folder: boolean, length: number }> };
+export type GetResourceListQuery = { resources: Array<{ name: string, folder: boolean, length: number, properties?: any }> };
 
 export type GetResourceProjectListQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2594,6 +2619,16 @@ export type SetProjectPermissionsMutationVariables = Exact<{
 
 
 export type SetProjectPermissionsMutation = { rmSetProjectPermissions: boolean };
+
+export type SetResourcePropertyMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  resourcePath: Scalars['String'];
+  name: Scalars['ID'];
+  value?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type SetResourcePropertyMutation = { properties: boolean };
 
 export type SetSubjectProjectsPermissionsMutationVariables = Exact<{
   subjectId: Scalars['String'];
@@ -2638,6 +2673,13 @@ export type ChangeSessionLanguageMutationVariables = Exact<{
 
 
 export type ChangeSessionLanguageMutation = { changeSessionLanguage?: boolean };
+
+export type GetSessionEventsQueryVariables = Exact<{
+  maxEntries: Scalars['Int'];
+}>;
+
+
+export type GetSessionEventsQuery = { events: Array<{ eventType: CbEventType, eventData: any }> };
 
 export type OpenSessionMutationVariables = Exact<{
   defaultLocale?: InputMaybe<Scalars['String']>;
@@ -3052,6 +3094,7 @@ export const NavNodeInfoFragmentDoc = `
   inline
   navigable
   features
+  projectId
   object {
     features
   }
@@ -4124,6 +4167,7 @@ export const GetResourceListDocument = `
     name
     folder
     length
+    properties
   }
 }
     `;
@@ -4174,6 +4218,16 @@ export const SetProjectPermissionsDocument = `
   rmSetProjectPermissions(projectId: $projectId, permissions: $permissions)
 }
     `;
+export const SetResourcePropertyDocument = `
+    mutation setResourceProperty($projectId: String!, $resourcePath: String!, $name: ID!, $value: String) {
+  properties: rmSetResourceProperty(
+    projectId: $projectId
+    resourcePath: $resourcePath
+    name: $name
+    value: $value
+  )
+}
+    `;
 export const SetSubjectProjectsPermissionsDocument = `
     mutation setSubjectProjectsPermissions($subjectId: String!, $permissions: [RMProjectPermissions!]!) {
   rmSetSubjectProjectPermissions(subjectId: $subjectId, permissions: $permissions)
@@ -4213,6 +4267,14 @@ export const SetDefaultNavigatorSettingsDocument = `
 export const ChangeSessionLanguageDocument = `
     mutation changeSessionLanguage($locale: String!) {
   changeSessionLanguage(locale: $locale)
+}
+    `;
+export const GetSessionEventsDocument = `
+    query getSessionEvents($maxEntries: Int!) {
+  events: readSessionEvents(maxEntries: $maxEntries) {
+    eventType
+    eventData
+  }
 }
     `;
 export const OpenSessionDocument = `
@@ -4717,6 +4779,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     setProjectPermissions(variables: SetProjectPermissionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetProjectPermissionsMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<SetProjectPermissionsMutation>(SetProjectPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setProjectPermissions', 'mutation');
     },
+    setResourceProperty(variables: SetResourcePropertyMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetResourcePropertyMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<SetResourcePropertyMutation>(SetResourcePropertyDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setResourceProperty', 'mutation');
+    },
     setSubjectProjectsPermissions(variables: SetSubjectProjectsPermissionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetSubjectProjectsPermissionsMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<SetSubjectProjectsPermissionsMutation>(SetSubjectProjectsPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setSubjectProjectsPermissions', 'mutation');
     },
@@ -4734,6 +4799,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ChangeSessionLanguageMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'changeSessionLanguage', 'mutation');
+    },
+    getSessionEvents(variables: GetSessionEventsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSessionEventsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSessionEventsQuery>(GetSessionEventsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSessionEvents', 'query');
     },
     openSession(variables?: OpenSessionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<OpenSessionMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<OpenSessionMutation>(OpenSessionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'openSession', 'mutation');

@@ -14,39 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package io.cloudbeaver.service.security.internal;
+package io.cloudbeaver.events;
 
 import org.jkiss.code.NotNull;
 
-public class RefreshTokenInfo {
-    @NotNull
-    private final String refreshToken;
+import java.util.Map;
 
+/**
+ * CloudBeaver event
+ */
+public class CBEvent {
     @NotNull
-    private final String sessionId;
-
+    private final String eventType;
     @NotNull
-    private final String userId;
+    private final Map<String, Object> eventData;
 
-    public RefreshTokenInfo(@NotNull String refreshToken, @NotNull String sessionId, @NotNull String userId) {
-        this.refreshToken = refreshToken;
-        this.sessionId = sessionId;
-        this.userId = userId;
+    public CBEvent(@NotNull String eventType) {
+        this(eventType, Map.of());
+    }
+
+    public CBEvent(@NotNull String eventType, @NotNull Map<String, Object> eventData) {
+        this.eventType = eventType;
+        this.eventData = eventData;
     }
 
     @NotNull
-    public String getRefreshToken() {
-        return refreshToken;
+    public String getEventType() {
+        return eventType;
     }
 
     @NotNull
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    @NotNull
-    public String getUserId() {
-        return userId;
+    public Map<String, Object> getEventData() {
+        return eventData;
     }
 }

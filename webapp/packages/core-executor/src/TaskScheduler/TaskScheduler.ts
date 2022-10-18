@@ -27,7 +27,7 @@ export interface IScheduleOptions {
 
 const queueLimit = 100;
 
-export class TaskScheduler<TIdentifier> {
+export class TaskScheduler<TIdentifier = void> {
   get activeList(): TIdentifier[] {
     return this.queue.map(task => task.id);
   }

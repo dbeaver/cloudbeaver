@@ -121,7 +121,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @NotNull
     @Override
-    public AdminUserInfo createUser(@NotNull WebSession webSession, String userName, @NotNull Boolean enabled) throws DBWebException {
+    public AdminUserInfo createUser(
+        @NotNull WebSession webSession,
+        String userName,
+        @NotNull Boolean enabled,
+        @Nullable String authRole
+    ) throws DBWebException {
         if (userName.isEmpty()) {
             throw new DBWebException("Empty user name");
         }
@@ -129,7 +134,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
         try {
             var securityController = webSession.getAdminSecurityController();
-            securityController.createUser(userName, Map.of(), enabled);
+            securityController.createUser(userName, Map.of(), enabled, authRole);
             var smUser = securityController.getUserById(userName);
             return new AdminUserInfo(webSession, new WebUser(smUser));
         } catch (Exception e) {
