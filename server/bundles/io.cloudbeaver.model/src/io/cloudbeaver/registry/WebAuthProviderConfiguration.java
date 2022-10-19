@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.registry;
 
-import io.cloudbeaver.auth.SMWAuthProviderFederated;
+import io.cloudbeaver.auth.SMAuthProviderFederated;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
@@ -71,25 +71,25 @@ public class WebAuthProviderConfiguration {
     @Property
     public String getSignInLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof SMWAuthProviderFederated ? ((SMWAuthProviderFederated) instance).getSignInLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getSignInLink(getId(), config.getParameters()) : null;
     }
 
     @Property
     public String getSignOutLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof SMWAuthProviderFederated ? ((SMWAuthProviderFederated) instance).getSignOutLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getSignOutLink(getId(), config.getParameters()) : null;
     }
 
     @Property
     public String getRedirectLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof SMWAuthProviderFederated ? ((SMWAuthProviderFederated) instance).getRedirectLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getRedirectLink(getId(), config.getParameters()) : null;
     }
 
     @Property
     public String getMetadataLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof SMWAuthProviderFederated ? ((SMWAuthProviderFederated) instance).getMetadataLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getMetadataLink(getId(), config.getParameters()) : null;
     }
 
     @Override

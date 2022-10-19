@@ -17,33 +17,23 @@
 package io.cloudbeaver.auth;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.security.user.SMTeam;
 
 import java.util.Map;
 
 /**
- * Federated auth provider.
- * Provides links to external auth resource
+ * Auth
+ * Authenticates user using external user identity
  */
-public interface SMWAuthProviderFederated {
-
-    /**
-     * Returns new identifying credentials which can be used to find/create user in database
-     */
-    @NotNull
-    String getSignInLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
-
+public interface SMAuthProviderAssigner {
 
     @NotNull
-    String getSignOutLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
-
-    @Nullable
-    String getMetadataLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
-
-    @Nullable
-    default String getRedirectLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException {
-        return null;
-    }
+    SMAutoAssign detectAutoAssignments(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull Map<String, Object> providerConfig,
+        @NotNull Map<String, Object> authParameters,
+        @NotNull SMTeam[] allTeams) throws DBException;
 
 }

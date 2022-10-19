@@ -20,8 +20,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.auth.SMAuthProviderAssigner;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
-import io.cloudbeaver.auth.SMWAuthProviderFederated;
+import io.cloudbeaver.auth.SMAuthProviderFederated;
+import io.cloudbeaver.auth.SMAutoAssign;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -42,7 +44,6 @@ import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
-import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.security.exception.SMException;
@@ -931,7 +932,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     smTokens.getSmAccessToken(),
                     smTokens.getSmRefreshToken(),
                     new SMAuthPermissions(null, smSessionId, permissions),
-                    Map.of()
+                    Map.of(),
+                    null
                 );
             }
         } catch (SQLException e) {
@@ -954,7 +956,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @Nullable String authProviderConfigurationId,
         @NotNull Map<String, Object> userCredentials
     ) throws DBException {
-        var authProgressMonitor = new VoidProgressMonitor();
+        var authProgressMonitor = new LoggingProgressMonitor(log);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 Map<String, Object> securedUserIdentifyingCredentials = userCredentials;
@@ -981,9 +983,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     sessionParameters
                 );
 
-                if (SMWAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
+                if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
                     //async auth
-                    var authProviderFederated = (SMWAuthProviderFederated) authProviderInstance;
+                    var authProviderFederated = (SMAuthProviderFederated) authProviderInstance;
                     var redirectUrl = buildRedirectLink(
                         authProviderFederated.getSignInLink(authProviderConfigurationId, Map.of()),
                         authAttemptId);
@@ -991,7 +993,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
                 txn.commit();
                 return finishAuthentication(
-                    SMAuthInfo.inProgress(authAttemptId, null, Map.of(authProviderId, securedUserIdentifyingCredentials)),
+                    SMAuthInfo.inProgress(
+                        authAttemptId,
+                        null,
+                        Map.of(authProviderId, securedUserIdentifyingCredentials)
+                    ),
                     true,
                     false
                 );
@@ -1144,8 +1150,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
             Map<String, Object> authData = new LinkedHashMap<>();
             String redirectUrl = null;
+            String currentAuthRole = null;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE FROM CB_AUTH_ATTEMPT_INFO "
+                "SELECT AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE " +
+                    "FROM CB_AUTH_ATTEMPT_INFO "
                     + "WHERE AUTH_ID=? ORDER BY CREATE_TIME"
             )) {
                 dbStat.setString(1, authId);
@@ -1156,12 +1164,32 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                         Map<String, Object> authProviderData = gson.fromJson(dbResult.getString(3), MAP_STRING_OBJECT_TYPE);
                         if (authProviderConfiguration != null) {
                             var authProviderInstance = getAuthProvider(authProviderId).getInstance();
-                            if (SMWAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
+                            if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
                                 redirectUrl = buildRedirectLink(
-                                    ((SMWAuthProviderFederated) authProviderInstance).getRedirectLink(authProviderConfiguration, Map.of()),
+                                    ((SMAuthProviderFederated) authProviderInstance).getRedirectLink(authProviderConfiguration, Map.of()),
                                     authId
                                 );
                             }
+                            if (smAuthStatus == SMAuthStatus.SUCCESS) {
+                                // On success try to get user identity and enrich auth info with auth role (if present)
+                                if (authProviderInstance instanceof SMAuthProviderAssigner) {
+                                    var authProviderExternal = (SMAuthProviderAssigner) authProviderInstance;
+                                    Map<String, Object> providerConfig = Map.of();
+                                    try {
+                                        DBRProgressMonitor authProgressMonitor = new LoggingProgressMonitor(log);
+                                        SMTeam[] allTeams = readAllTeams();
+                                        SMAutoAssign smAutoAssign = authProviderExternal.detectAutoAssignments(
+                                            authProgressMonitor,
+                                            providerConfig,
+                                            authProviderData,
+                                            allTeams);
+                                        currentAuthRole = smAutoAssign.getAuthRole();
+                                    } catch (DBException e) {
+                                        log.error("Error getting user identity during authentication", e);
+                                    }
+                                }
+                            }
+
                         }
                         authData.put(authProviderId, authProviderData);
                     }
@@ -1188,7 +1216,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 smTokens.getSmAccessToken(),
                 smTokens.getSmRefreshToken(),
                 authPermissions,
-                authData
+                authData,
+                currentAuthRole
             );
             updateAuthStatus(authId, SMAuthStatus.EXPIRED, authData, null, authPermissions.getSessionId());
             return successAuthStatus;
@@ -1379,7 +1408,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             //refresh token must be sent only once
             isMainAuthSession ? smTokens.getSmRefreshToken() : null,
             permissions,
-            authInfo.getAuthData()
+            authInfo.getAuthData(),
+            authInfo.getAuthRole()
         );
     }
 

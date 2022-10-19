@@ -2,7 +2,7 @@ package io.cloudbeaver.server.servlets;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.auth.SMWAuthProviderFederated;
+import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
@@ -105,7 +105,7 @@ public class CBStaticServlet extends DefaultServlet {
                     // We have the only provider
                     // Forward to signon URL
                     SMAuthProvider<?> authProviderInstance = authProvider.getInstance();
-                    if (authProviderInstance instanceof SMWAuthProviderFederated) {
+                    if (authProviderInstance instanceof SMAuthProviderFederated) {
                         if (webSession.getUser() == null) {
                             var securityController = webSession.getSecurityController();
                             SMAuthInfo authInfo = securityController.authenticate(
