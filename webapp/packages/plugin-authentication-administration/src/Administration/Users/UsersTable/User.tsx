@@ -32,10 +32,11 @@ const styles = css`
 
 interface Props {
   user: AdminUser;
+  displayAuthRole: boolean;
   selectable?: boolean;
 }
 
-export const User = observer<Props>(function User({ user, selectable }) {
+export const User = observer<Props>(function User({ user, displayAuthRole, selectable }) {
   const usersAdministrationService = useService(UsersAdministrationService);
   const teams = user.grantedTeams.join(', ');
   const usersService = useService(UsersResource);
@@ -64,6 +65,9 @@ export const User = observer<Props>(function User({ user, selectable }) {
         <TableItemExpand />
       </TableColumnValue>
       <TableColumnValue title={user.userId} expand ellipsis>{user.userId}</TableColumnValue>
+      {displayAuthRole && (
+        <TableColumnValue title={user.authRole} expand ellipsis>{user.authRole}</TableColumnValue>
+      )}
       <TableColumnValue title={teams} ellipsis>{teams}</TableColumnValue>
       <TableColumnValue>
         <Checkbox
