@@ -424,7 +424,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             try (PreparedStatement dbStat = dbCon.prepareStatement("UPDATE CB_USER SET DEFAULT_AUTH_ROLE=? WHERE USER_ID=?")) {
                 dbStat.setString(1, authRole);
                 dbStat.setString(2, userId);
-                dbStat.executeUpdate();
+                if (dbStat.executeUpdate() <= 0) {
+                    throw new SMException("User not found");
+                }
             }
         } catch (SQLException e) {
             throw new DBCException("Error while updating user authentication role", e);
