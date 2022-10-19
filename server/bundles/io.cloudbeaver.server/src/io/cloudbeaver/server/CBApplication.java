@@ -1031,9 +1031,14 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     protected WebSessionManager createSessionManager() {
         return new WebSessionManager(this);
     }
+
     @NotNull
     public WebDriverRegistry getDriverRegistry() {
         return WebDriverRegistry.getInstance();
+    }
+
+    public Set<String> getAvailableAuthRoles() {
+        return Set.of();
     }
 
     // gets info about patterns from original configuration file and saves it to runtime config

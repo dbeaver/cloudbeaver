@@ -40,6 +40,7 @@ public interface DBWServiceAuth extends DBWService {
         @Nullable Map<String, Object> credentials,
         boolean linkWithActiveUser) throws DBWebException;
 
+
     @WebAction(requirePermissions = {})
     WebAuthStatus authUpdateStatus(@NotNull WebSession webSession, @NotNull String authId, boolean linkWithActiveUser) throws DBWebException;
 
