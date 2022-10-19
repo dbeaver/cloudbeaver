@@ -123,7 +123,7 @@ extend type Query {
     createUser(userId: ID!, enabled: Boolean!, authRole: String): AdminUserInfo!
     deleteUser(userId: ID!): Boolean
 
-    createTeam(teamId: ID!, teamName: String!, description: String): AdminTeamInfo!
+    createTeam(teamId: ID!, teamName: String, description: String): AdminTeamInfo!
     updateTeam(teamId: ID!, teamName: String, description: String): AdminTeamInfo!
     deleteTeam(teamId: ID!): Boolean
 
