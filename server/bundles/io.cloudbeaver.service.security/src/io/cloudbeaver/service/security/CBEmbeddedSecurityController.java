@@ -1153,6 +1153,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             Map<String, Object> authData = new LinkedHashMap<>();
             String redirectUrl = null;
             String currentAuthRole = null;
+            Map<SMAuthProvider<?>, Map<String, Object>> usedAuthProviders = new IdentityHashMap<>();
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE " +
                     "FROM CB_AUTH_ATTEMPT_INFO "
@@ -1166,30 +1167,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                         Map<String, Object> authProviderData = gson.fromJson(dbResult.getString(3), MAP_STRING_OBJECT_TYPE);
                         if (authProviderConfiguration != null) {
                             var authProviderInstance = getAuthProvider(authProviderId).getInstance();
+                            usedAuthProviders.put(authProviderInstance, authProviderData);
                             if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
                                 redirectUrl = buildRedirectLink(
                                     ((SMAuthProviderFederated) authProviderInstance).getRedirectLink(authProviderConfiguration, Map.of()),
                                     authId
                                 );
-                            }
-                            if (smAuthStatus == SMAuthStatus.SUCCESS) {
-                                // On success try to get user identity and enrich auth info with auth role (if present)
-                                if (authProviderInstance instanceof SMAuthProviderAssigner) {
-                                    var authProviderExternal = (SMAuthProviderAssigner) authProviderInstance;
-                                    Map<String, Object> providerConfig = Map.of();
-                                    try {
-                                        DBRProgressMonitor authProgressMonitor = new LoggingProgressMonitor(log);
-                                        SMTeam[] allTeams = readAllTeams();
-                                        SMAutoAssign smAutoAssign = authProviderExternal.detectAutoAssignments(
-                                            authProgressMonitor,
-                                            providerConfig,
-                                            authProviderData,
-                                            allTeams);
-                                        currentAuthRole = smAutoAssign.getAuthRole();
-                                    } catch (DBException e) {
-                                        log.error("Error getting user identity during authentication", e);
-                                    }
-                                }
                             }
 
                         }
@@ -1213,6 +1196,38 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
             SMTokens smTokens = findTokenBySmSession(smSessionId);
             SMAuthPermissions authPermissions = getTokenPermissions(smTokens.getSmAccessToken());
+
+            for (SMAuthProvider<?> authProviderInstance : usedAuthProviders.keySet()) {
+                // On success try to get user identity and enrich auth info with auth role (if present)
+                if (authProviderInstance instanceof SMAuthProviderAssigner) {
+                    var authProviderExternal = (SMAuthProviderAssigner) authProviderInstance;
+                    Map<String, Object> providerConfig = Map.of();
+                    try {
+                        DBRProgressMonitor authProgressMonitor = new LoggingProgressMonitor(log);
+                        SMTeam[] allTeams = readAllTeams();
+                        Map<String, Object> authProviderData = usedAuthProviders.get(authProviderInstance);
+
+                        SMAutoAssign smAutoAssign = authProviderExternal.detectAutoAssignments(
+                            authProgressMonitor,
+                            providerConfig,
+                            authProviderData,
+                            allTeams);
+                        if (!ArrayUtils.isEmpty(smAutoAssign.getTeams())) {
+                            setUserTeams(
+                                authPermissions.getUserId(),
+                                Arrays.stream(smAutoAssign.getTeams()).map(SMTeam::getTeamId).toArray(String[]::new),
+                                authPermissions.getUserId());
+                        }
+                        currentAuthRole = smAutoAssign.getAuthRole();
+                        if (currentAuthRole == null) {
+                            // Try to get auto-assigned role from teams meta data
+                        }
+                    } catch (DBException e) {
+                        log.error("Error getting user identity during authentication", e);
+                    }
+                }
+            }
+
             var successAuthStatus = SMAuthInfo.success(
                 authId,
                 smTokens.getSmAccessToken(),
