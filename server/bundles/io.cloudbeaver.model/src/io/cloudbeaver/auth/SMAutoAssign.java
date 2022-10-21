@@ -1,17 +1,18 @@
 package io.cloudbeaver.auth;
 
-import org.jkiss.dbeaver.model.security.user.SMTeam;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SMAutoAssign {
     private String authRole;
-    private SMTeam[] teams;
+    private List<String> externalTeamIds = new ArrayList<>();
 
     public SMAutoAssign() {
     }
 
-    public SMAutoAssign(String authRole, SMTeam[] teams) {
+    public SMAutoAssign(String authRole, List<String> externalRolesIds) {
         this.authRole = authRole;
-        this.teams = teams;
+        this.externalTeamIds = externalRolesIds;
     }
 
     public String getAuthRole() {
@@ -22,11 +23,11 @@ public class SMAutoAssign {
         this.authRole = authRole;
     }
 
-    public SMTeam[] getTeams() {
-        return teams;
+    public List<String> getExternalTeamIds() {
+        return externalTeamIds;
     }
 
-    public void setTeams(SMTeam[] teams) {
-        this.teams = teams;
+    public void addExternalTeamId(String externalRoleId) {
+        this.externalTeamIds.add(externalRoleId);
     }
 }

@@ -19,7 +19,6 @@ package io.cloudbeaver.auth;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.security.user.SMTeam;
 
 import java.util.Map;
 
@@ -33,7 +32,9 @@ public interface SMAuthProviderAssigner {
     SMAutoAssign detectAutoAssignments(
         @NotNull DBRProgressMonitor monitor,
         @NotNull Map<String, Object> providerConfig,
-        @NotNull Map<String, Object> authParameters,
-        @NotNull SMTeam[] allTeams) throws DBException;
+        @NotNull Map<String, Object> authParameters
+    ) throws DBException;
+
+    String getExternalTeamIdMetadataFieldName();
 
 }

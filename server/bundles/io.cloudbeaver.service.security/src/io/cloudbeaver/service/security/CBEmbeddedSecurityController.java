@@ -459,7 +459,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public void setUserCredentials(@NotNull String userId, @NotNull String authProviderId, @NotNull Map<String, Object> credentials) throws DBException {
-        var existUserByCredentials = findUserByCredentials(authProviderId, credentials);
+        var existUserByCredentials = findUserByCredentials(getAuthProvider(authProviderId), credentials);
         if (existUserByCredentials != null && !existUserByCredentials.equals(userId)) {
             throw new DBException("Another user is already linked to the specified credentials");
         }
@@ -505,8 +505,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Nullable
-    private String findUserByCredentials(String authProviderId, Map<String, Object> authParameters) throws DBCException {
-        WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+    private String findUserByCredentials(WebAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
         Map<String, Object> identCredentials = new LinkedHashMap<>();
         String[] propNames = authParameters.keySet().toArray(new String[0]);
         for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(propNames)) {
@@ -934,8 +933,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     smTokens.getSmAccessToken(),
                     smTokens.getSmRefreshToken(),
                     new SMAuthPermissions(null, smSessionId, permissions),
-                    Map.of(),
-                    null
+                    Map.of()
                 );
             }
         } catch (SQLException e) {
@@ -1152,9 +1150,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
             Map<String, Object> authData = new LinkedHashMap<>();
             String redirectUrl = null;
-            String currentAuthRole = null;
-            Map<WebAuthProviderDescriptor, Map<String, Object>> usedAuthProviders = new IdentityHashMap<>();
-            Map<WebAuthProviderDescriptor, SMAuthProviderCustomConfiguration> usedConfigurations = new IdentityHashMap<>();
 
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE " +
@@ -1170,14 +1165,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                         if (authProviderConfiguration != null) {
                             WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
                             var authProviderInstance = authProviderDescriptor.getInstance();
-                            usedAuthProviders.put(authProviderDescriptor, authProviderData);
-                            WebApplication webApplication = WebAppUtils.getWebApplication();
-                            if (webApplication instanceof WebAuthApplication) {
-                                SMAuthProviderCustomConfiguration apConfig = ((WebAuthApplication) webApplication).getAuthConfiguration().getAuthProviderConfiguration(authProviderConfiguration);
-                                if (apConfig != null) {
-                                    usedConfigurations.put(authProviderDescriptor, apConfig);
-                                }
-                            }
                             if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
                                 redirectUrl = buildRedirectLink(
                                     ((SMAuthProviderFederated) authProviderInstance).getRedirectLink(authProviderConfiguration, Map.of()),
@@ -1208,56 +1195,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             SMAuthPermissions authPermissions = getTokenPermissions(smTokens.getSmAccessToken());
             String userId = authPermissions.getUserId();
 
-            for (WebAuthProviderDescriptor authProviderDescriptor : usedAuthProviders.keySet()) {
-                // On success try to auto assignments and enrich auth info with auth role (if present)
-                SMAuthProvider<?> authProviderInstance = authProviderDescriptor.getInstance();
-                if (userId != null && authProviderInstance instanceof SMAuthProviderAssigner) {
-                    var authProviderExternal = (SMAuthProviderAssigner) authProviderInstance;
-                    SMAuthProviderCustomConfiguration apConfig = usedConfigurations.get(authProviderDescriptor);
-
-                    Map<String, Object> providerConfig = apConfig == null ? null : apConfig.getParameters();
-                    if (providerConfig == null) {
-                        providerConfig = Map.of();
-                    }
-                    try {
-                        DBRProgressMonitor authProgressMonitor = new LoggingProgressMonitor(log);
-                        SMTeam[] allTeams = readAllTeams();
-                        Map<String, Object> authProviderData = usedAuthProviders.get(authProviderDescriptor);
-
-                        SMAutoAssign smAutoAssign = authProviderExternal.detectAutoAssignments(
-                            authProgressMonitor,
-                            providerConfig,
-                            authProviderData,
-                            allTeams);
-                        if (!ArrayUtils.isEmpty(smAutoAssign.getTeams())) {
-                            setUserTeams(
-                                userId,
-                                Arrays.stream(smAutoAssign.getTeams()).map(SMTeam::getTeamId).toArray(String[]::new),
-                                userId);
-                        }
-                        currentAuthRole = smAutoAssign.getAuthRole();
-                        if (currentAuthRole != null) {
-                            // Update user role in database
-                            setUserAuthRole(userId, currentAuthRole);
-                            // Refresh permissions
-                            authPermissions = new SMAuthPermissions(
-                                userId,
-                                authPermissions.getSessionId(),
-                                getUserPermissions(userId, currentAuthRole));
-                        }
-                    } catch (DBException e) {
-                        log.error("Error getting user identity during authentication", e);
-                    }
-                }
-            }
-
             var successAuthStatus = SMAuthInfo.success(
                 authId,
                 smTokens.getSmAccessToken(),
                 smTokens.getSmRefreshToken(),
                 authPermissions,
-                authData,
-                currentAuthRole
+                authData
             );
             updateAuthStatus(authId, SMAuthStatus.EXPIRED, authData, null, authPermissions.getSessionId());
             return successAuthStatus;
@@ -1385,16 +1328,21 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         String activeUserId = permissions == null ? null : permissions.getUserId();
 
         Map<String, Object> storedUserData = new LinkedHashMap<>();
+        SMTeam[] allTeams = null;
+        String detectedAuthRole = null;
         for (String authProviderId : authProviderIds) {
+            WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
             var userAuthData = (Map<String, Object>) authInfo.getAuthData().get(authProviderId);
+            SMAutoAssign autoAssign = getAutoAssignUserData(authId, authProvider, userAuthData, finishAuthMonitor);
+
             var userIdFromCreds = findOrCreateExternalUserByCredentials(
-                authProviderId,
+                authProvider,
                 authAttemptSessionInfo.getSessionParams(),
                 userAuthData,
                 finishAuthMonitor,
                 activeUserId,
                 activeUserId == null,
-                authInfo.getAuthRole()
+                autoAssign == null ? null : autoAssign.getAuthRole()
             );
 
             if (userIdFromCreds == null) {
@@ -1402,6 +1350,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
                 return SMAuthInfo.error(authId, error);
             }
+
+            if (autoAssign != null && !CommonUtils.isEmpty(autoAssign.getExternalTeamIds())) {
+                if (allTeams == null) {
+                    allTeams = readAllTeams();
+                }
+                autoUpdateUserTeams(authProvider, autoAssign, userIdFromCreds, allTeams);
+            }
+
             if (activeUserId == null) {
                 activeUserId = userIdFromCreds;
             }
@@ -1411,7 +1367,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             );
         }
 
-        String tokenAuthRole = updateUserAuthRoleIfNeeded(activeUserId, authInfo.getAuthRole());
+        String tokenAuthRole = updateUserAuthRoleIfNeeded(activeUserId, detectedAuthRole);
         if (smTokens == null && permissions == null) {
             try (Connection dbCon = database.openConnection()) {
                 try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
@@ -1448,10 +1404,99 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             //refresh token must be sent only once
             isMainAuthSession ? smTokens.getSmRefreshToken() : null,
             permissions,
-            authInfo.getAuthData(),
-            authInfo.getAuthRole()
+            authInfo.getAuthData()
         );
     }
+
+    private void autoUpdateUserTeams(
+        WebAuthProviderDescriptor authProvider,
+        SMAutoAssign autoAssign,
+        String userId,
+        SMTeam[] allTeams
+    ) throws DBCException {
+        if (!(authProvider.getInstance() instanceof SMAuthProviderAssigner)) {
+            return;
+        }
+        SMAuthProviderAssigner authProviderAssigner = (SMAuthProviderAssigner) authProvider.getInstance();
+
+        String[] newTeamIds = autoAssign.getExternalTeamIds()
+            .stream()
+            .map(externalTeamId -> findTeamByExternalTeamId(
+                allTeams,
+                authProviderAssigner.getExternalTeamIdMetadataFieldName(),
+                externalTeamId
+            ))
+            .filter(Objects::nonNull)
+            .map(SMTeam::getTeamId)
+            .toArray(String[]::new);
+        if (!ArrayUtils.isEmpty(newTeamIds)) {
+            setUserTeams(
+                userId,
+                newTeamIds,
+                userId
+            );
+        }
+    }
+
+    @Nullable
+    private SMAutoAssign getAutoAssignUserData(
+        String authAttemptId,
+        WebAuthProviderDescriptor authProvider,
+        Map<String, Object> userData,
+        DBRProgressMonitor monitor
+    ) throws DBException {
+        var authProviderInstance = authProvider.getInstance();
+        if (!(authProviderInstance instanceof SMAuthProviderAssigner)) {
+            return null;
+        }
+        var authProviderAssigner = (SMAuthProviderAssigner) authProviderInstance;
+        String providerConfigId = readProviderConfigId(authAttemptId, authProvider.getId());
+        if (providerConfigId == null) {
+            return null;
+        }
+        var providerConfig =
+            application.getAuthConfiguration().getAuthProviderConfiguration(providerConfigId);
+        return authProviderAssigner.detectAutoAssignments(
+            monitor,
+            providerConfig == null ? Map.of() : providerConfig.getParameters(),
+            userData
+        );
+    }
+
+    @Nullable
+    private SMTeam findTeamByExternalTeamId(SMTeam[] allTeams, String externalGroupParameterName, String groupId) {
+        for (SMTeam team : allTeams) {
+            String teamGroupId = team.getMetaParameters().get(externalGroupParameterName);
+            if (CommonUtils.equalObjects(teamGroupId, groupId)) {
+                return team;
+            }
+        }
+        return null;
+    }
+
+
+    private String readProviderConfigId(String authAttemptId, String authProviderId) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT AUTH_PROVIDER_CONFIGURATION_ID " +
+                    "FROM CB_AUTH_ATTEMPT_INFO "
+                    + "WHERE AUTH_ID=? AND AUTH_PROVIDER_ID=?"
+            )) {
+                dbStat.setString(1, authAttemptId);
+                dbStat.setString(2, authProviderId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    if (!dbResult.next()) {
+                        return null;
+                    }
+                    return dbResult.getString(1);
+
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBException("Failed to read auth provider configuration", e);
+        }
+    }
+
 
     @Nullable
     protected String readUserAuthRole(String userId) throws DBException {
@@ -1511,7 +1556,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     private String findOrCreateExternalUserByCredentials(
-        @NotNull String authProviderId,
+        @NotNull WebAuthProviderDescriptor authProvider,
         @NotNull Map<String, Object> sessionParameters,
         @NotNull Map<String, Object> userCredentials,
         @NotNull DBRProgressMonitor progressMonitor,
@@ -1519,9 +1564,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         boolean createNewUserIfNotExist,
         String authRole
     ) throws DBException {
-        WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
-        String userId = findUserByCredentials(authProviderId, userCredentials);
+        String userId = findUserByCredentials(authProvider, userCredentials);
         String userIdFromCredentials;
         try {
             userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, Map.of(), userCredentials, null);
@@ -1531,7 +1575,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
         if (activeUserId != null && userId != null && !activeUserId.equals(userId)) {
             log.debug("User '" + activeUserId + "' is authenticated in '"
-                + authProviderId + "' auth provider with credentials of user '"
+                + authProvider.getId() + "' auth provider with credentials of user '"
                 + userIdFromCredentials + "'");
         }
         if (userId == null && createNewUserIfNotExist) {
@@ -1551,7 +1595,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     setUserTeams(userId, new String[]{defaultTeamName}, userId);
                 }
             }
-            setUserCredentials(userId, authProviderId, userCredentials);
+            setUserCredentials(userId, authProvider.getId(), userCredentials);
         } else if (userId == null) {
             userId = userIdFromCredentials;
         }
