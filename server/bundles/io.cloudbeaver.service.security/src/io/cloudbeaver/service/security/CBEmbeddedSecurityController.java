@@ -1153,7 +1153,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             Map<String, Object> authData = new LinkedHashMap<>();
             String redirectUrl = null;
             String currentAuthRole = null;
-            Map<SMAuthProvider<?>, Map<String, Object>> usedAuthProviders = new IdentityHashMap<>();
+            Map<WebAuthProviderDescriptor, Map<String, Object>> usedAuthProviders = new IdentityHashMap<>();
+            Map<WebAuthProviderDescriptor, SMAuthProviderCustomConfiguration> usedConfigurations = new IdentityHashMap<>();
+
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE " +
                     "FROM CB_AUTH_ATTEMPT_INFO "
@@ -1166,8 +1168,16 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                         String authProviderConfiguration = dbResult.getString(2);
                         Map<String, Object> authProviderData = gson.fromJson(dbResult.getString(3), MAP_STRING_OBJECT_TYPE);
                         if (authProviderConfiguration != null) {
-                            var authProviderInstance = getAuthProvider(authProviderId).getInstance();
-                            usedAuthProviders.put(authProviderInstance, authProviderData);
+                            WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
+                            var authProviderInstance = authProviderDescriptor.getInstance();
+                            usedAuthProviders.put(authProviderDescriptor, authProviderData);
+                            WebApplication webApplication = WebAppUtils.getWebApplication();
+                            if (webApplication instanceof WebAuthApplication) {
+                                SMAuthProviderCustomConfiguration apConfig = ((WebAuthApplication) webApplication).getAuthConfiguration().getAuthProviderConfiguration(authProviderConfiguration);
+                                if (apConfig != null) {
+                                    usedConfigurations.put(authProviderDescriptor, apConfig);
+                                }
+                            }
                             if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
                                 redirectUrl = buildRedirectLink(
                                     ((SMAuthProviderFederated) authProviderInstance).getRedirectLink(authProviderConfiguration, Map.of()),
@@ -1196,16 +1206,23 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
             SMTokens smTokens = findTokenBySmSession(smSessionId);
             SMAuthPermissions authPermissions = getTokenPermissions(smTokens.getSmAccessToken());
+            String userId = authPermissions.getUserId();
 
-            for (SMAuthProvider<?> authProviderInstance : usedAuthProviders.keySet()) {
-                // On success try to get user identity and enrich auth info with auth role (if present)
-                if (authProviderInstance instanceof SMAuthProviderAssigner) {
+            for (WebAuthProviderDescriptor authProviderDescriptor : usedAuthProviders.keySet()) {
+                // On success try to auto assignments and enrich auth info with auth role (if present)
+                SMAuthProvider<?> authProviderInstance = authProviderDescriptor.getInstance();
+                if (userId != null && authProviderInstance instanceof SMAuthProviderAssigner) {
                     var authProviderExternal = (SMAuthProviderAssigner) authProviderInstance;
-                    Map<String, Object> providerConfig = Map.of();
+                    SMAuthProviderCustomConfiguration apConfig = usedConfigurations.get(authProviderDescriptor);
+
+                    Map<String, Object> providerConfig = apConfig == null ? null : apConfig.getParameters();
+                    if (providerConfig == null) {
+                        providerConfig = Map.of();
+                    }
                     try {
                         DBRProgressMonitor authProgressMonitor = new LoggingProgressMonitor(log);
                         SMTeam[] allTeams = readAllTeams();
-                        Map<String, Object> authProviderData = usedAuthProviders.get(authProviderInstance);
+                        Map<String, Object> authProviderData = usedAuthProviders.get(authProviderDescriptor);
 
                         SMAutoAssign smAutoAssign = authProviderExternal.detectAutoAssignments(
                             authProgressMonitor,
@@ -1214,13 +1231,19 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                             allTeams);
                         if (!ArrayUtils.isEmpty(smAutoAssign.getTeams())) {
                             setUserTeams(
-                                authPermissions.getUserId(),
+                                userId,
                                 Arrays.stream(smAutoAssign.getTeams()).map(SMTeam::getTeamId).toArray(String[]::new),
-                                authPermissions.getUserId());
+                                userId);
                         }
                         currentAuthRole = smAutoAssign.getAuthRole();
-                        if (currentAuthRole == null) {
-                            // Try to get auto-assigned role from teams meta data
+                        if (currentAuthRole != null) {
+                            // Update user role in database
+                            setUserAuthRole(userId, currentAuthRole);
+                            // Refresh permissions
+                            authPermissions = new SMAuthPermissions(
+                                userId,
+                                authPermissions.getSessionId(),
+                                getUserPermissions(userId, currentAuthRole));
                         }
                     } catch (DBException e) {
                         log.error("Error getting user identity during authentication", e);
