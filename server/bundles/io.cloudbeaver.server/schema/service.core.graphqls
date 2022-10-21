@@ -387,7 +387,9 @@ type LogEntry {
 }
 
 enum CBEventType {
-    cb_config_changed
+    cb_config_changed,
+    cb_datasource_updated,
+    cb_resource_updated
 }
 
 type CBEvent {

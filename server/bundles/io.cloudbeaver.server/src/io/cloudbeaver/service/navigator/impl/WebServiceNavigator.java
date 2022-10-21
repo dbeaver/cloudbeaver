@@ -19,6 +19,7 @@ package io.cloudbeaver.service.navigator.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
@@ -30,6 +31,7 @@ import io.cloudbeaver.service.navigator.WebCatalog;
 import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import io.cloudbeaver.service.navigator.WebStructContainers;
 import io.cloudbeaver.service.security.SMUtils;
+import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -469,6 +471,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     ((DBNDataSource) node).moveToFolder(folderNode.getOwnerProject(), folder);
                     node.getOwnerProject().getDataSourceRegistry().updateDataSource(
                         ((DBNDataSource) node).getDataSourceContainer());
+                    WebAppUtils.addDatasourceUpdatedEvent(node.getOwnerProject().getId());
                 } else if (node instanceof DBNLocalFolder) {
                     DBPDataSourceFolder folder = WebConnectionFolderUtils.getParentFolder(folderNode);
                     if (folder != null) {
@@ -481,6 +484,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     }
                     ((DBNLocalFolder) node).getFolder().setParent(folder);
                     WebServiceUtils.updateConfigAndRefreshDatabases(session, node.getOwnerProject().getId());
+                    WebAppUtils.addDatasourceUpdatedEvent(node.getOwnerProject().getId());
                 } else if (node instanceof DBNResourceManagerResource) {
                     boolean rmNewNode = folderNode instanceof DBNAbstractResourceManagerNode;
                     DBNResourceManagerResource rmOldNode = (DBNResourceManagerResource) node;
@@ -496,6 +500,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     }
                     String resourcePath = rmOldNode.getResourceFolder();
                     session.getRmController().moveResource(projectId, resourcePath, newPath);
+                    WebAppUtils.addRmResourceUpdatedEvent(CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED, projectId, resourcePath);
                 } else {
                     throw new DBWebException("Navigator node '"  + path + "' is not a data source node");
                 }

@@ -418,7 +418,6 @@ public class LocalResourceController implements RMController {
         } catch (IOException e) {
             throw new DBException("Error moving resource '" + oldResourcePath + "'", e);
         }
-        WebAppUtils.addRmResourceUpdatedEvent(CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED, projectId, oldResourcePath);
         return DEFAULT_CHANGE_ID;
     }
 
@@ -449,7 +448,6 @@ public class LocalResourceController implements RMController {
                 rmResourcePath
             )
         );
-        WebAppUtils.addRmResourceUpdatedEvent(CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED, projectId, resourcePath);
     }
 
     @Override
