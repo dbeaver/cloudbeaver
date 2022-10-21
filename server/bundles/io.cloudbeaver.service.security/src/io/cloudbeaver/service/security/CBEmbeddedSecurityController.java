@@ -933,7 +933,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     smTokens.getSmAccessToken(),
                     smTokens.getSmRefreshToken(),
                     new SMAuthPermissions(null, smSessionId, permissions),
-                    Map.of()
+                    Map.of(),
+                    smConfig.getDefaultAuthRole()
                 );
             }
         } catch (SQLException e) {
@@ -1194,13 +1195,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             SMTokens smTokens = findTokenBySmSession(smSessionId);
             SMAuthPermissions authPermissions = getTokenPermissions(smTokens.getSmAccessToken());
             String userId = authPermissions.getUserId();
-
+            String authRole = readTokenAuthRole(smTokens.getSmAccessToken());
             var successAuthStatus = SMAuthInfo.success(
                 authId,
                 smTokens.getSmAccessToken(),
                 smTokens.getSmRefreshToken(),
                 authPermissions,
-                authData
+                authData,
+                authRole
             );
             updateAuthStatus(authId, SMAuthStatus.EXPIRED, authData, null, authPermissions.getSessionId());
             return successAuthStatus;
@@ -1334,6 +1336,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
             var userAuthData = (Map<String, Object>) authInfo.getAuthData().get(authProviderId);
             SMAutoAssign autoAssign = getAutoAssignUserData(authId, authProvider, userAuthData, finishAuthMonitor);
+            if (autoAssign != null) {
+                detectedAuthRole = autoAssign.getAuthRole();
+            }
 
             var userIdFromCreds = findOrCreateExternalUserByCredentials(
                 authProvider,
@@ -1342,7 +1347,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 finishAuthMonitor,
                 activeUserId,
                 activeUserId == null,
-                autoAssign == null ? null : autoAssign.getAuthRole()
+                detectedAuthRole
             );
 
             if (userIdFromCreds == null) {
@@ -1404,7 +1409,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             //refresh token must be sent only once
             isMainAuthSession ? smTokens.getSmRefreshToken() : null,
             permissions,
-            authInfo.getAuthData()
+            authInfo.getAuthData(),
+            tokenAuthRole
         );
     }
 
