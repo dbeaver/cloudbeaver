@@ -1008,6 +1008,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return WebDriverRegistry.getInstance();
     }
 
+    @Override
     public CBEventController getEventController() {
         return eventController;
     }

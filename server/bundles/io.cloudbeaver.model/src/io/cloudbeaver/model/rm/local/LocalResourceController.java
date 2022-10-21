@@ -18,6 +18,7 @@ package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -392,6 +393,7 @@ public class LocalResourceController implements RMController {
         } catch (IOException e) {
             throw new DBException("Error creating resource '" + resourcePath + "'", e);
         }
+        WebAppUtils.addRmResourceUpdatedEvent(CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED, projectId, resourcePath);
         return DEFAULT_CHANGE_ID;
     }
 
@@ -412,6 +414,7 @@ public class LocalResourceController implements RMController {
         } catch (IOException e) {
             throw new DBException("Error moving resource '" + oldResourcePath + "'", e);
         }
+        WebAppUtils.addRmResourceUpdatedEvent(CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED, projectId, oldResourcePath);
         return DEFAULT_CHANGE_ID;
     }
 
@@ -442,6 +445,7 @@ public class LocalResourceController implements RMController {
                 rmResourcePath
             )
         );
+        WebAppUtils.addRmResourceUpdatedEvent(CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED, projectId, resourcePath);
     }
 
     @Override

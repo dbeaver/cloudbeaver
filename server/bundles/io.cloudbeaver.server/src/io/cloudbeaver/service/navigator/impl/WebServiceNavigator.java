@@ -341,8 +341,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             if (node == null) {
                 throw new DBWebException("Navigator node '"  + nodePath + "' not found");
             }
-            List<String> projectIds = new ArrayList<>();
-            addProjectIdForEvent(projectIds, node);
             checkProjectEditAccess(node, session);
             if (node.supportsRename()) {
                 if (node instanceof DBNLocalFolder) {
@@ -356,7 +354,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     }
                 }
                 node.rename(session.getProgressMonitor(), newName);
-                WebServiceUtils.addProjectUpdatedEvent(projectIds);
                 return node.getName();
             }
             if (node instanceof DBNDatabaseNode) {
@@ -381,14 +378,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             String projectId = null;
             boolean containsFolderNodes = false;
             Map<DBNNode, DBEObjectMaker> nodes = new LinkedHashMap<>();
-            List<String> projectIds = new ArrayList<>();
             for (String path : nodePaths) {
                 DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, path);
                 if (node == null) {
                     throw new DBWebException("Navigator node '"  + path + "' not found");
                 }
                 checkProjectEditAccess(node, session);
-                addProjectIdForEvent(projectIds, node);
                 if (node instanceof DBNDatabaseNode) {
                     DBSObject object = ((DBNDatabaseNode) node).getObject();
                     DBEObjectMaker objectDeleter = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
@@ -429,7 +424,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             if (containsFolderNodes) {
                 WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
             }
-            WebServiceUtils.addProjectUpdatedEvent(projectIds);
             return nodes.size();
 
         } catch (DBException e) {
@@ -464,14 +458,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             DBRProgressMonitor monitor = session.getProgressMonitor();
             DBNNode folderNode;
             folderNode = session.getNavigatorModel().getNodeByPath(monitor, folderNodePath);
-            List<String> projectIds = new ArrayList<>();
             for (String path : nodePaths) {
                 DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, path);
                 if (node == null) {
                     throw new DBWebException("Navigator node '"  + path + "' not found");
                 }
                 checkProjectEditAccess(node, session);
-                addProjectIdForEvent(projectIds, node);
                 if (node instanceof DBNDataSource) {
                     DBPDataSourceFolder folder = WebConnectionFolderUtils.getParentFolder(folderNode);
                     ((DBNDataSource) node).moveToFolder(folderNode.getOwnerProject(), folder);
@@ -508,17 +500,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     throw new DBWebException("Navigator node '"  + path + "' is not a data source node");
                 }
             }
-            WebServiceUtils.addProjectUpdatedEvent(projectIds);
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error moving navigator nodes "  + nodePaths, e);
-        }
-    }
-
-    private void addProjectIdForEvent(List<String> projectIds, DBNNode node) {
-        String ownerProject = node.getOwnerProject().getId();
-        if (!projectIds.contains(ownerProject)) {
-            projectIds.add(ownerProject); // for updating project in all sessions
         }
     }
 

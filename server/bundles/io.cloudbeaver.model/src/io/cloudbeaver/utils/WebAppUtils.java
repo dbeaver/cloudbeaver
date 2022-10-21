@@ -17,6 +17,8 @@
 package io.cloudbeaver.utils;
 
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
+import io.cloudbeaver.events.CBEvent;
+import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import org.jkiss.code.NotNull;
@@ -33,10 +35,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class WebAppUtils {
     private static final Log log = Log.getLog(WebAppUtils.class);
@@ -162,5 +161,22 @@ public class WebAppUtils {
     public static String getGlobalProjectId() {
         String globalConfigurationName = getWebApplication().getDefaultProjectName();
         return RMProjectType.GLOBAL.getPrefix() + "_" + globalConfigurationName;
+    }
+
+    public static void addDatasourceUpdatedEvent(String projectId) {
+        getWebApplication().getEventController().addEvent(
+            new CBEvent(CBEventConstants.CLOUDBEAVER_DATASOURCE_UPDATED, Map.of("projectId", projectId))
+        );
+    }
+
+    public static void addRmResourceUpdatedEvent(String eventId, String projectId, String resourcePath) {
+        getWebApplication().getEventController().addEvent(
+            new CBEvent(eventId,
+                Map.of(
+                    "projectId", projectId,
+                    "resourcePath", resourcePath
+                )
+            )
+        );
     }
 }

@@ -50,7 +50,8 @@
 
     <extension point="io.cloudbeaver.event.handler">
         <eventHandler class="io.cloudbeaver.server.events.CBConfigurationChangedEventHandler"/>
-        <eventHandler class="io.cloudbeaver.server.events.CBProjectUpdatedEventHandler"/>
+        <eventHandler class="io.cloudbeaver.server.events.CBDatasourceUpdatedEventHandlerImpl"/>\
+        <eventHandler class="io.cloudbeaver.server.events.CBRmResourceUpdatedEventHandlerImpl"/>
     </extension>
 
 </plugin>

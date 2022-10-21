@@ -17,32 +17,29 @@
 package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventHandler;
+import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.Log;
-
-import java.util.Collection;
+import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
 /**
- * Notify all active user session that project has been updated
+ * Notify all active user session that rm resource has been updated
  */
-public abstract class CBProjectUpdatedEventHandler implements CBEventHandler {
-    private static final Log log = Log.getLog(CBProjectUpdatedEventHandler.class);
-
+public class CBRmResourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHandler {
     @NotNull
     @Override
-    public abstract String getSupportedEventType();
-
-    @Override
-    public void handleEvent(@NotNull CBEvent event) {
-        log.debug(getSupportedEventType() + " event handled");
-        Collection<WebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
-        for (WebSession activeUserSession : allSessions) {
-            updateSessionData(activeUserSession, event);
-        }
+    public String getSupportedEventType() {
+        return CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED;
     }
 
-    protected abstract void updateSessionData(WebSession activeUserSession, CBEvent event);
+    @Override
+    protected void updateSessionData(WebSession activeUserSession, CBEvent event) {
+        String projectId = JSONUtils.getString(event.getEventData(), "project");
+        DBPProject project = activeUserSession.getProjectById(projectId);
+        if (project == null) {
+            return;
+        }
+        activeUserSession.addSessionEvent(event);
+    }
 }
