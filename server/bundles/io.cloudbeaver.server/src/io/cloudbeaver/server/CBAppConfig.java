@@ -218,12 +218,16 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
     }
 
     public <T> T getResourceQuota(String quotaId) {
-        return (T) resourceQuotas.get(quotaId);
+        Object quota = resourceQuotas.get(quotaId);
+        if (quota instanceof String) {
+            quota = CommonUtils.toDouble(quota);
+        }
+        return (T) quota;
     }
 
     public <T> T getResourceQuota(String quotaId, T defaultValue) {
         if (resourceQuotas.containsKey(quotaId)) {
-            return (T) resourceQuotas.get(quotaId);
+            return (T) getResourceQuota(quotaId);
         } else {
             return defaultValue;
         }
