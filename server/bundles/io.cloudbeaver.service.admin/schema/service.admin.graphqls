@@ -42,6 +42,7 @@ type AdminUserInfo {
 
     linkedAuthProviders: [String!]!
     enabled: Boolean!
+    authRole: String
 }
 
 type AdminTeamInfo {
@@ -118,8 +119,9 @@ extend type Query {
     listUsers(userId: ID): [AdminUserInfo!]!
     listTeams(teamId: ID): [AdminTeamInfo!]!
     listPermissions: [AdminPermissionInfo!]!
+    listAuthRoles: [String!]!
 
-    createUser(userId: ID!, enabled: Boolean!): AdminUserInfo!
+    createUser(userId: ID!, enabled: Boolean!, authRole: String): AdminUserInfo!
     deleteUser(userId: ID!): Boolean
 
     createTeam(teamId: ID!, teamName: String, description: String): AdminTeamInfo!
@@ -134,6 +136,8 @@ extend type Query {
     setUserCredentials(userId: ID!, providerId: ID!, credentials: Object!): Boolean
 
     enableUser(userId: ID!, enabled: Boolean!): Boolean
+
+    setUserAuthRole(userId: ID!, authRole: String): Boolean
 
     #### Connection management
 

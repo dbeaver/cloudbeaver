@@ -6,14 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable, runInAction, toJS } from 'mobx';
 
-import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import { IConnectionExecutionContextInfo, NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
+import { TaskScheduler } from '@cloudbeaver/core-executor';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { debounce, isArraysEqual } from '@cloudbeaver/core-utils';
+import { debounce, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IResourceNodeInfo, IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
+
+interface IResourceProperties {
+  'default-datasource'?: string;
+  'default-catalog'?: string;
+  'default-schema'?: string;
+}
 
 interface IResourceInfo {
   isReadonly?: (dataSource: ResourceSqlDataSource) => boolean;
@@ -23,6 +30,15 @@ interface IResourceActions {
   rename(dataSource: ResourceSqlDataSource, nodeId: string, name: string): Promise<string>;
   read(dataSource: ResourceSqlDataSource, nodeId: string): Promise<string>;
   write(dataSource: ResourceSqlDataSource, nodeId: string, value: string): Promise<void>;
+  getProperties(
+    dataSource: ResourceSqlDataSource,
+    nodeId: string
+  ): Promise<Record<string, any>>;
+  setProperties(
+    dataSource: ResourceSqlDataSource,
+    nodeId: string,
+    diff: Record<string, any>
+  ): Promise<Record<string, any>>;
 }
 
 const VALUE_SYNC_DELAY = 1 * 1000;
@@ -40,6 +56,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   get script(): string {
     return this._script;
+  }
+
+  get projectId(): string | null {
+    return this.nodeInfo?.projectId ?? null;
   }
 
   get executionContext(): IConnectionExecutionContextInfo | undefined {
@@ -68,9 +88,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   private info?: IResourceInfo;
   private lastAction?: () => Promise<void>;
   private readonly state: IResourceSqlDataSourceState;
+  private resourceProperties: IResourceProperties;
 
-  private loading: boolean;
   private loaded: boolean;
+  private readonly scheduler: TaskScheduler;
 
   constructor(
     private readonly navNodeInfoResource: NavNodeInfoResource,
@@ -80,11 +101,12 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.state = state;
     this._script = '';
     this.saved = true;
-    this.loading = false;
     this.loaded = false;
+    this.resourceProperties = {};
+    this.scheduler = new TaskScheduler(() => true);
     this.debouncedWrite = debounce(this.debouncedWrite.bind(this), VALUE_SYNC_DELAY);
 
-    makeObservable<this, '_script' | 'lastAction' | 'loading' | 'loaded'>(this, {
+    makeObservable<this, '_script' | 'lastAction' | 'loaded' | 'resourceProperties'>(this, {
       script: computed,
       executionContext: computed,
       nodeInfo: computed,
@@ -92,9 +114,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
         equals: isArraysEqual,
       }),
       _script: observable,
-      lastAction: observable,
-      loading: observable,
+      lastAction: observable.ref,
       loaded: observable,
+      resourceProperties: observable,
+      setExecutionContext: action,
       setScript: action,
       setNodeInfo: action,
     });
@@ -113,7 +136,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   isLoading(): boolean {
-    return this.loading;
+    return this.scheduler.executing;
   }
 
   setNodeInfo(nodeInfo?: IResourceNodeInfo): void {
@@ -133,6 +156,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   setName(name: string | null): void {
     this.rename(name);
+  }
+
+  setProject(projectId: string | null): void {
+
   }
 
   canRename(name: string | null): boolean {
@@ -168,96 +195,205 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   async load(): Promise<void> {
     await this.read();
+    await this.updateProperties();
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
-    this.state.executionContext = executionContext;
+    if (
+      this.nodeInfo?.projectId
+      && executionContext?.projectId
+      && this.nodeInfo.projectId !== executionContext.projectId
+    ) {
+      console.warn('Cant change execution context because of different projects');
+      return;
+    }
+
+    if (
+      !isObjectsEqual(toJS(this.state.executionContext), toJS(executionContext))
+    ) {
+      this.state.executionContext = toJS(executionContext);
+    }
+
+    if (
+      this.isReadonly()
+      || (
+        this.resourceProperties['default-datasource'] === executionContext?.connectionId
+        && this.resourceProperties['default-catalog'] === executionContext?.defaultCatalog
+        && this.resourceProperties['default-schema'] === executionContext?.defaultSchema
+      )
+    ) {
+      return;
+    }
+
+    this.resourceProperties['default-datasource'] = executionContext?.connectionId;
+    this.resourceProperties['default-catalog'] = executionContext?.defaultCatalog;
+    this.resourceProperties['default-schema'] = executionContext?.defaultSchema;
+
+    this.setProperties(toJS(this.resourceProperties));
   }
 
   async rename(name: string | null) {
     await this.write();
 
-    if (
-      !this.actions
+    await this.scheduler.schedule(undefined, async () => {
+      if (
+        !this.actions
       || !this.nodeInfo
       || !this.saved
       || !name?.trim()
-    ) {
-      return;
-    }
-
-    if (!name.toLowerCase().endsWith('.sql')) {
-      name += '.sql';
-    }
-
-    this.lastAction = this.rename.bind(this, name);
-    this.loading = true;
-    this.message = 'Renaming script...';
-
-    try {
-      this.exception = null;
-      this.nodeInfo.nodeId = await this.actions.rename(this, this.nodeInfo.nodeId, name);
-
-      if (this.nodeInfo.parents.length > 0) {
-        this.nodeInfo.parents.splice(this.nodeInfo.parents.length - 1, 1, this.nodeInfo.nodeId);
+      ) {
+        return;
       }
 
-      this.markOutdated();
-      this.saved = true;
-      this.loaded = false;
-    } catch (exception: any) {
-      this.exception = exception;
-    } finally {
-      this.loading = false;
-      this.message = undefined;
-    }
+      if (!name.toLowerCase().endsWith('.sql')) {
+        name += '.sql';
+      }
+
+      this.lastAction = this.rename.bind(this, name);
+      this.message = 'Renaming script...';
+
+      try {
+        this.exception = null;
+        this.nodeInfo.nodeId = await this.actions.rename(this, this.nodeInfo.nodeId, name);
+
+        if (this.nodeInfo.parents.length > 0) {
+          this.nodeInfo.parents.splice(this.nodeInfo.parents.length - 1, 1, this.nodeInfo.nodeId);
+        }
+
+        this.markOutdated();
+        this.saved = true;
+        this.loaded = false;
+      } catch (exception: any) {
+        this.exception = exception;
+      } finally {
+        this.message = undefined;
+      }
+    });
   }
 
   async read() {
-    if (!this.actions || !this.nodeInfo || !this.isOutdated() || !this.saved) {
-      return;
-    }
+    await this.scheduler.schedule(undefined, async () => {
+      if (!this.actions || !this.nodeInfo || !this.isOutdated() || !this.saved) {
+        return;
+      }
 
-    this.lastAction = this.read.bind(this);
-    this.loading = true;
-    this.message = 'Reading script...';
+      this.lastAction = this.read.bind(this);
+      this.message = 'Reading script...';
 
-    try {
-      this.exception = null;
-      this._script = await this.actions.read(this, this.nodeInfo.nodeId);
-      this.state.name = this.name ?? undefined;
-      this.markUpdated();
-      this.loaded = true;
-      super.setScript(this.script);
-    } catch (exception: any) {
-      this.exception = exception;
-    } finally {
-      this.loading = false;
-      this.message = undefined;
-    }
+      try {
+        this.exception = null;
+        this._script = await this.actions.read(this, this.nodeInfo.nodeId);
+        this.state.name = this.name ?? undefined;
+        this.markUpdated();
+        this.loaded = true;
+        super.setScript(this.script);
+      } catch (exception: any) {
+        this.exception = exception;
+      } finally {
+        this.message = undefined;
+      }
+    });
   }
 
   async write() {
-    if (!this.actions || !this.nodeInfo || this.saved) {
+    await this.scheduler.schedule(undefined, async () => {
+      if (!this.actions || !this.nodeInfo || this.saved) {
+        return;
+      }
+
+      this.lastAction = this.write.bind(this);
+      this.message = 'Saving script...';
+
+      try {
+        this.exception = null;
+        await this.actions.write(this, this.nodeInfo.nodeId, this.script);
+        this.state.name = this.name ?? undefined;
+        this.saved = true;
+        this.markUpdated();
+      } catch (exception: any) {
+        this.exception = exception;
+      } finally {
+        this.message = undefined;
+      }
+    });
+  }
+
+  async setProperties(properties: IResourceProperties) {
+    if (Object.keys(properties).length === 0) {
       return;
     }
 
-    this.lastAction = this.write.bind(this);
-    this.loading = true;
-    this.message = 'Saving script...';
+    await this.scheduler.schedule(undefined, async () => {
+      if (!this.actions || !this.nodeInfo) {
+        return;
+      }
 
-    try {
-      this.exception = null;
-      await this.actions.write(this, this.nodeInfo.nodeId, this.script);
-      this.state.name = this.name ?? undefined;
-      this.saved = true;
-      this.markUpdated();
-    } catch (exception: any) {
-      this.exception = exception;
-    } finally {
-      this.loading = false;
-      this.message = undefined;
+      this.lastAction = this.setProperties.bind(this, properties);
+      this.message = 'Update info...';
+
+      try {
+        this.exception = null;
+
+        if (!this.isReadonly()) {
+          await this.actions.setProperties(
+            this,
+            this.nodeInfo.nodeId,
+            properties
+          );
+        }
+
+        await this.updateProperties();
+      } catch (exception: any) {
+        this.exception = exception;
+      } finally {
+        this.message = undefined;
+      }
+    });
+  }
+
+  private async updateProperties() {
+    if (!this.actions || !this.nodeInfo) {
+      return;
     }
+
+    const previousProperties = this.resourceProperties;
+
+    const resourceProperties = await this.actions.getProperties(this, this.nodeInfo.nodeId);
+
+    runInAction(() => {
+      this.resourceProperties = toJS(resourceProperties);
+
+      if (isObjectsEqual(toJS(previousProperties), toJS(this.resourceProperties)) && this.isReadonly()) {
+        return;
+      }
+
+      const connectionId =  this.resourceProperties['default-datasource'];
+      const defaultCatalog = this.resourceProperties['default-catalog'];
+      const defaultSchema = this.resourceProperties['default-schema'];
+
+      if (!this.nodeInfo!.projectId) {
+        return;
+      }
+
+      if (connectionId) {
+        if (
+          !isValuesEqual(this.state.executionContext?.connectionId, connectionId, null)
+        || !isValuesEqual(this.state.executionContext?.defaultCatalog, defaultCatalog, null)
+        || !isValuesEqual(this.state.executionContext?.defaultSchema, defaultSchema, null)
+        || !isValuesEqual(this.state.executionContext?.projectId, this.nodeInfo!.projectId, null)
+        ) {
+          this.state.executionContext = {
+            id: NOT_INITIALIZED_CONTEXT_ID,
+            projectId: this.nodeInfo!.projectId,
+            connectionId,
+            defaultCatalog,
+            defaultSchema,
+          };
+        }
+      } else {
+        this.state.executionContext = undefined;
+      }
+    });
   }
 
   private debouncedWrite() {

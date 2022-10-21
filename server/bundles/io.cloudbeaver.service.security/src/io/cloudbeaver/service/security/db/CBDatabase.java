@@ -196,14 +196,20 @@ public class CBDatabase {
     }
 
     //TODO move out
-    public void finishConfiguration(@NotNull String adminName, @Nullable String adminPassword, @NotNull List<WebAuthInfo> authInfoList) throws DBException {
+    public void finishConfiguration(
+        @NotNull String adminName,
+        @Nullable String adminPassword,
+        @NotNull List<WebAuthInfo> authInfoList
+    ) throws DBException {
         if (!application.isConfigurationMode()) {
             throw new DBException("Database is already configured");
         }
 
         log.info("Configure CB database security");
         CBDatabaseInitialData initialData = getInitialData();
-        if (initialData != null && !CommonUtils.isEmpty(initialData.getAdminName()) && !CommonUtils.equalObjects(initialData.getAdminName(), adminName)) {
+        if (initialData != null && !CommonUtils.isEmpty(initialData.getAdminName())
+            && !CommonUtils.equalObjects(initialData.getAdminName(), adminName)
+        ) {
             // Delete old admin user
             adminSecurityController.deleteUser(initialData.getAdminName());
         }
@@ -241,12 +247,15 @@ public class CBDatabase {
     }
 
     @NotNull
-    private SMUser createAdminUser(@NotNull String adminName, @Nullable String adminPassword) throws DBException {
+    private SMUser createAdminUser(
+        @NotNull String adminName,
+        @Nullable String adminPassword
+    ) throws DBException {
         SMUser adminUser = adminSecurityController.getUserById(adminName);
 
         if (adminUser == null) {
-            adminUser = new SMUser(adminName, true);
-            adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters(), true);
+            adminUser = new SMUser(adminName, true, "administrator");
+            adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters(), true, adminUser.getAuthRole());
         }
 
         if (!CommonUtils.isEmpty(adminPassword)) {

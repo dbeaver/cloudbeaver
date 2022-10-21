@@ -18,8 +18,12 @@
 package io.cloudbeaver.service.security.internal;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 
-public class RefreshTokenInfo {
+public class SMTokenInfo {
+    @NotNull
+    private final String accessToken;
+
     @NotNull
     private final String refreshToken;
 
@@ -29,10 +33,21 @@ public class RefreshTokenInfo {
     @NotNull
     private final String userId;
 
-    public RefreshTokenInfo(@NotNull String refreshToken, @NotNull String sessionId, @NotNull String userId) {
+    @Nullable
+    private final String authRole;
+
+    public SMTokenInfo(
+        @NotNull String accessToken,
+        @NotNull String refreshToken,
+        @NotNull String sessionId,
+        @NotNull String userId,
+        @Nullable String authRole
+    ) {
+        this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.sessionId = sessionId;
         this.userId = userId;
+        this.authRole = authRole;
     }
 
     @NotNull
@@ -48,5 +63,15 @@ public class RefreshTokenInfo {
     @NotNull
     public String getUserId() {
         return userId;
+    }
+
+    @NotNull
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    @Nullable
+    public String getAuthRole() {
+        return authRole;
     }
 }

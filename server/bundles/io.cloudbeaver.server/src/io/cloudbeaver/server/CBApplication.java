@@ -112,6 +112,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     protected final Map<String, Object> databaseConfiguration = new HashMap<>();
     private final CBAppConfig appConfiguration = new CBAppConfig();
     private Map<String, String> externalProperties = new LinkedHashMap<>();
+    private Map<String, Object> originalConfigurationProperties = new LinkedHashMap<>();
 
     // Persistence
     private SMAdminController securityController;
@@ -650,13 +651,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         Map<String, Object> configProps = new LinkedHashMap<>();
         if (configFile.exists()) {
             log.debug("Read configuration [" + configFile.getAbsolutePath() + "]");
-            try (Reader reader = new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)) {
-                configProps.putAll(JSONUtils.parseMap(getGson(), reader));
-                patchConfigurationWithProperties(configProps); // patch original properties
+            // saves original configuration file
+            this.originalConfigurationProperties.putAll(readConfigurationFile(configFile));
 
-            } catch (IOException e) {
-                throw new DBException("Error parsing server configuration", e);
-            }
+            configProps.putAll(readConfigurationFile(configFile));
+            patchConfigurationWithProperties(configProps); // patch original properties
         }
 
         readAdditionalConfiguration(configProps);
@@ -680,6 +679,14 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
         patchConfigurationWithProperties(configProps); // patch again because properties can be changed
         return configProps;
+    }
+
+    public Map<String, Object> readConfigurationFile(File configFile) throws DBException {
+        try (Reader reader = new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)) {
+            return JSONUtils.parseMap(getGson(), reader);
+        } catch (IOException e) {
+            throw new DBException("Error parsing server configuration", e);
+        }
     }
 
     private Gson getGson() {
@@ -875,36 +882,57 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         Map<String, Object> rootConfig = new LinkedHashMap<>();
         {
             var serverConfigProperties = new LinkedHashMap<String, Object>();
+            var originServerConfig = getServerConfigProps(this.originalConfigurationProperties); // get server properties from original configuration file
             rootConfig.put("server", serverConfigProperties);
             if (!CommonUtils.isEmpty(newServerName)) {
-                serverConfigProperties.put(CBConstants.PARAM_SERVER_NAME, newServerName);
+                copyConfigValue(originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_NAME, newServerName);
             }
             if (!CommonUtils.isEmpty(newServerURL)) {
-                serverConfigProperties.put(CBConstants.PARAM_SERVER_URL, newServerURL);
+                copyConfigValue(
+                        originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, newServerURL);
             }
             if (sessionExpireTime > 0) {
-                serverConfigProperties.put(CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
+                copyConfigValue(
+                        originServerConfig, serverConfigProperties, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
             }
-
+            var databaseConfigProperties = new LinkedHashMap<String, Object>();
+            Map<String, Object> oldRuntimeDBConfig = JSONUtils.getObject(originServerConfig, CBConstants.PARAM_DB_CONFIGURATION);
             if (!CommonUtils.isEmpty(databaseConfiguration)) {
-                serverConfigProperties.put(CBConstants.PARAM_DB_CONFIGURATION, databaseConfiguration);
+                for (Map.Entry<String, Object> mp : databaseConfiguration.entrySet()) {
+                    copyConfigValue(oldRuntimeDBConfig, databaseConfigProperties, mp.getKey(), mp.getValue());
+                }
+                serverConfigProperties.put(CBConstants.PARAM_DB_CONFIGURATION, databaseConfigProperties);
             }
         }
         {
             var appConfigProperties = new LinkedHashMap<String, Object>();
+            Map<String, Object> oldAppConfig = JSONUtils.getObject(this.originalConfigurationProperties, "app");
             rootConfig.put("app", appConfigProperties);
 
-            appConfigProperties.put("anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
-            appConfigProperties.put("supportsCustomConnections", appConfig.isSupportsCustomConnections());
-            appConfigProperties.put("publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
-            appConfigProperties.put("adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
-            appConfigProperties.put("enableReverseProxyAuth", appConfig.isEnabledReverseProxyAuth());
-            appConfigProperties.put("forwardProxy", appConfig.isEnabledForwardProxy());
-            appConfigProperties.put("linkExternalCredentialsWithUser", appConfig.isLinkExternalCredentialsWithUser());
-            appConfigProperties.put("redirectOnFederatedAuth", appConfig.isRedirectOnFederatedAuth());
-            appConfigProperties.put(CBConstants.PARAM_RESOURCE_MANAGER_ENABLED, appConfig.isResourceManagerEnabled());
+            copyConfigValue(
+                    oldAppConfig, appConfigProperties, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
+            copyConfigValue(
+                    oldAppConfig, appConfigProperties, "supportsCustomConnections", appConfig.isSupportsCustomConnections());
+            copyConfigValue(
+                    oldAppConfig, appConfigProperties, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
+            copyConfigValue(
+                    oldAppConfig, appConfigProperties, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
+            copyConfigValue(
+                    oldAppConfig, appConfigProperties, "enableReverseProxyAuth", appConfig.isEnabledReverseProxyAuth());
+            copyConfigValue(
+                    oldAppConfig, appConfigProperties, "forwardProxy", appConfig.isEnabledForwardProxy());
+            copyConfigValue(
+                    oldAppConfig, appConfigProperties, "linkExternalCredentialsWithUser", appConfig.isLinkExternalCredentialsWithUser());
+            copyConfigValue(
+                    oldAppConfig, appConfigProperties, "redirectOnFederatedAuth", appConfig.isRedirectOnFederatedAuth());
+            copyConfigValue(
+                    oldAppConfig, appConfigProperties, CBConstants.PARAM_RESOURCE_MANAGER_ENABLED, appConfig.isResourceManagerEnabled());
 
-            Map<String, Object> resourceQuotas = appConfig.getResourceQuotas();
+            Map<String, Object> resourceQuotas = new LinkedHashMap<>();
+            Map<String, Object> originResourceQuotas = JSONUtils.getObject(oldAppConfig, CBConstants.PARAM_RESOURCE_QUOTAS);
+            for (Map.Entry<String, Object> mp : appConfig.getResourceQuotas().entrySet()) {
+                copyConfigValue(originResourceQuotas, resourceQuotas, mp.getKey(), mp.getValue());
+            }
             appConfigProperties.put(CBConstants.PARAM_RESOURCE_QUOTAS, resourceQuotas);
 
             {
@@ -1003,9 +1031,30 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     protected WebSessionManager createSessionManager() {
         return new WebSessionManager(this);
     }
+
     @NotNull
     public WebDriverRegistry getDriverRegistry() {
         return WebDriverRegistry.getInstance();
+    }
+
+    public Set<String> getAvailableAuthRoles() {
+        return Set.of();
+    }
+
+    // gets info about patterns from original configuration file and saves it to runtime config
+    private void copyConfigValue(Map<String, Object> oldConfig, Map<String, Object> newConfig, String key, Object defaultValue) {
+        Object value = oldConfig.get(key);
+        if (value instanceof Map && defaultValue instanceof Map) {
+            Map<String, Object> subValue = new LinkedHashMap<>();
+            Map<String, Object> oldConfigValue = JSONUtils.getObject(oldConfig, key);
+            for (Map.Entry<String, Object> entry : oldConfigValue.entrySet()) {
+                copyConfigValue(oldConfigValue, subValue, entry.getKey(), ((Map) defaultValue).get(entry.getKey()));
+            }
+            newConfig.put(key, subValue);
+        } else {
+            Object newConfigValue = WebAppUtils.getExtractedValue(oldConfig.get(key), defaultValue);
+            newConfig.put(key, newConfigValue);
+        }
     }
 
     @Override
