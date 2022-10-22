@@ -147,6 +147,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public void deleteUser(String userId) throws DBCException {
+        invalidateAllUserTokens(userId);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 deleteAuthSubject(dbCon, userId);
@@ -1241,6 +1242,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private void invalidateUserTokens(String smToken) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?", smToken);
+        } catch (SQLException e) {
+            throw new DBCException("Session invalidation failed", e);
+        }
+    }
+
+    private void invalidateAllUserTokens(String userId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE USER_ID=?", userId);
         } catch (SQLException e) {
             throw new DBCException("Session invalidation failed", e);
         }
