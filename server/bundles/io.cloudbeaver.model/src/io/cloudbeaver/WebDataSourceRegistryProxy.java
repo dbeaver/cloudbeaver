@@ -41,7 +41,7 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     @Override
     public DBPDataSourceContainer getDataSource(String id) {
         DBPDataSourceContainer dataSource = dataSourceRegistry.getDataSource(id);
-        if (dataSourceFilter != null && !dataSourceFilter.filter(dataSource)) {
+        if (dataSource == null || dataSourceFilter != null && !dataSourceFilter.filter(dataSource)) {
             return null;
         }
         return dataSource;

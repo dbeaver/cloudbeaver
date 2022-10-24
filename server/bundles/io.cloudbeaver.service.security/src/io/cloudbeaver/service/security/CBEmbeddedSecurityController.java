@@ -20,12 +20,16 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.auth.SMAuthProviderAssigner;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
-import io.cloudbeaver.auth.SMWAuthProviderFederated;
+import io.cloudbeaver.auth.SMAuthProviderFederated;
+import io.cloudbeaver.auth.SMAutoAssign;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.model.session.WebAuthInfo;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
 import io.cloudbeaver.service.security.internal.SMTokenInfo;
@@ -40,17 +44,11 @@ import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
-import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
-import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
-import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
-import org.jkiss.dbeaver.model.security.user.SMTeam;
-import org.jkiss.dbeaver.model.security.user.SMUser;
-import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
-import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
+import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -139,16 +137,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                     dbStat.execute();
                 }
-                if (!CommonUtils.isEmpty(metaParameters)) {
-                    try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_META(USER_ID,META_ID,META_VALUE) VALUES(?,?,?)")) {
-                        dbStat.setString(1, userId);
-                        for (Map.Entry<String, String> mp : metaParameters.entrySet()) {
-                            dbStat.setString(2, mp.getKey());
-                            dbStat.setString(3, mp.getValue());
-                            dbStat.execute();
-                        }
-                    }
-                }
+                saveSubjectMetas(dbCon, userId, metaParameters);
                 txn.commit();
             }
         } catch (SQLException e) {
@@ -233,18 +222,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                 }
             }
-            // Metas
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT META_ID,META_VALUE FROM CB_USER_META WHERE USER_ID=?")) {
-                dbStat.setString(1, userId);
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    while (dbResult.next()) {
-                        user.setMetaParameter(
-                            dbResult.getString(1),
-                            dbResult.getString(2)
-                        );
-                    }
-                }
-            }
+            readSubjectMetas(dbCon, user);
             // Teams
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT TEAM_ID FROM CB_USER_TEAM WHERE USER_ID=?")) {
                 dbStat.setString(1, userId);
@@ -283,25 +261,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                 }
             }
-            // Read metas
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT USER_ID,META_ID,META_VALUE FROM CB_USER_META" +
-                (CommonUtils.isEmpty(userNameMask) ? "" : " WHERE USER_ID=?"))) {
-                if (!CommonUtils.isEmpty(userNameMask)) {
-                    dbStat.setString(1, userNameMask);
-                }
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    while (dbResult.next()) {
-                        String userId = dbResult.getString(1);
-                        SMUser user = result.get(userId);
-                        if (user != null) {
-                            user.setMetaParameter(
-                                dbResult.getString(2),
-                                dbResult.getString(3)
-                            );
-                        }
-                    }
-                }
-            }
+            readSubjectsMetas(dbCon, SMSubjectType.user, userNameMask, result);
             // Read teams
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT USER_ID,TEAM_ID FROM CB_USER_TEAM" +
                 (CommonUtils.isEmpty(userNameMask) ? "" : " WHERE USER_ID=?"))) {
@@ -326,30 +286,67 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    @Override
-    public void setUserMeta(String userId, Map<String, Object> metaParameters) throws DBCException {
-        try (Connection dbCon = database.openConnection()) {
-            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                // Delete old metas
-                try (PreparedStatement dbStat = dbCon.prepareStatement("DELETE FROM CB_USER_META WHERE USER_ID=?")) {
-                    dbStat.setString(1, userId);
-                    dbStat.execute();
+    private void cleanupSubjectMeta(Connection dbCon, String subjectId) throws SQLException {
+        // Delete old metas
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "DELETE FROM CB_SUBJECT_META WHERE SUBJECT_ID=?")) {
+            dbStat.setString(1, subjectId);
+            dbStat.execute();
+        }
+    }
+
+    private void readSubjectMetas(Connection dbCon, SMSubject subject) throws SQLException {
+        // Metas
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "SELECT META_ID,META_VALUE FROM CB_SUBJECT_META WHERE SUBJECT_ID=?")) {
+            dbStat.setString(1, subject.getSubjectId());
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    subject.setMetaParameter(
+                        dbResult.getString(1),
+                        dbResult.getString(2)
+                    );
                 }
-                if (!metaParameters.isEmpty()) {
-                    // Insert new metas
-                    try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_META(USER_ID,META_ID,META_VALUE) VALUES(?,?,?)")) {
-                        dbStat.setString(1, userId);
-                        for (Map.Entry<String, Object> mpe : metaParameters.entrySet()) {
-                            dbStat.setString(2, mpe.getKey());
-                            dbStat.setString(3, CommonUtils.toString(mpe.getValue()));
-                            dbStat.execute();
-                        }
+            }
+        }
+    }
+
+    private void readSubjectsMetas(Connection dbCon, SMSubjectType subjectType, String nameMask, Map<String, ? extends SMSubject> result) throws SQLException {
+        // Read metas
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "SELECT m.SUBJECT_ID,m.META_ID,m.META_VALUE FROM CB_AUTH_SUBJECT s, CB_SUBJECT_META m\n" +
+                "WHERE s.SUBJECT_TYPE=? AND s.SUBJECT_ID=m.SUBJECT_ID" +
+            (CommonUtils.isEmpty(nameMask) ? "" : " AND s.SUBJECT_ID=?"))) {
+            dbStat.setString(1, subjectType.getCode());
+            if (!CommonUtils.isEmpty(nameMask)) {
+                dbStat.setString(2, nameMask);
+            }
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    String subjectId = dbResult.getString(1);
+                    SMSubject subject = result.get(subjectId);
+                    if (subject != null) {
+                        subject.setMetaParameter(
+                            dbResult.getString(2),
+                            dbResult.getString(3)
+                        );
                     }
                 }
-                txn.commit();
             }
-        } catch (SQLException e) {
-            throw new DBCException("Error while loading users", e);
+        }
+    }
+
+    private void saveSubjectMetas(Connection dbCon, String subjectId, Map<String, String> metaParameters) throws SQLException {
+        if (!CommonUtils.isEmpty(metaParameters)) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "INSERT INTO CB_SUBJECT_META(SUBJECT_ID,META_ID,META_VALUE) VALUES(?,?,?)")) {
+                dbStat.setString(1, subjectId);
+                for (Map.Entry<String, String> mp : metaParameters.entrySet()) {
+                    dbStat.setString(2, mp.getKey());
+                    dbStat.setString(3, mp.getValue());
+                    dbStat.execute();
+                }
+            }
         }
     }
 
@@ -440,7 +437,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     ///////////////////////////////////////////
     // Credentials
 
-    private static SMAuthCredentialsProfile getCredentialProfileByParameters(AuthProviderDescriptor authProvider, Set<String> keySet) {
+    private static SMAuthCredentialsProfile getCredentialProfileByParameters(WebAuthProviderDescriptor authProvider, Set<String> keySet) {
         List<SMAuthCredentialsProfile> credentialProfiles = authProvider.getCredentialProfiles();
         if (credentialProfiles.size() > 1) {
             for (SMAuthCredentialsProfile profile : credentialProfiles) {
@@ -463,12 +460,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public void setUserCredentials(@NotNull String userId, @NotNull String authProviderId, @NotNull Map<String, Object> credentials) throws DBException {
-        var existUserByCredentials = findUserByCredentials(authProviderId, credentials);
+        var existUserByCredentials = findUserByCredentials(getAuthProvider(authProviderId), credentials);
         if (existUserByCredentials != null && !existUserByCredentials.equals(userId)) {
             throw new DBException("Another user is already linked to the specified credentials");
         }
         List<String[]> transformedCredentials;
-        AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+        WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         try {
             SMAuthCredentialsProfile credProfile = getCredentialProfileByParameters(authProvider, credentials.keySet());
             transformedCredentials = credentials.entrySet().stream().map(cred -> {
@@ -509,10 +506,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Nullable
-    private String findUserByCredentials(String authProviderId, Map<String, Object> authParameters) throws DBCException {
-        AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+    private String findUserByCredentials(WebAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
         Map<String, Object> identCredentials = new LinkedHashMap<>();
-        for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(authParameters.keySet())) {
+        String[] propNames = authParameters.keySet().toArray(new String[0]);
+        for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(propNames)) {
             if (prop.isIdentifying()) {
                 String propId = CommonUtils.toString(prop.getId());
                 Object paramValue = authParameters.get(propId);
@@ -578,7 +575,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public Map<String, Object> getUserCredentials(String userId, String authProviderId) throws DBCException {
-        AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+        WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT CRED_ID,CRED_VALUE FROM CB_USER_CREDENTIALS\n" +
@@ -651,6 +648,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                 }
             }
+            readSubjectsMetas(dbCon, SMSubjectType.team,null, teams);
             return teams.values().toArray(new SMTeam[0]);
         } catch (SQLException e) {
             throw new DBCException("Error reading teams from database", e);
@@ -774,7 +772,22 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     ///////////////////////////////////////////
-    // Permissions
+    // Subject functions
+
+    @Override
+    public void setSubjectMetas(String userId, Map<String, String> metaParameters) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                cleanupSubjectMeta(dbCon, userId);
+                if (!metaParameters.isEmpty()) {
+                    saveSubjectMetas(dbCon, userId, metaParameters);
+                }
+                txn.commit();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while loading users", e);
+        }
+    }
 
     @Override
     public void setSubjectPermissions(String subjectId, List<String> permissionIds, String grantorId) throws DBException {
@@ -921,7 +934,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     smTokens.getSmAccessToken(),
                     smTokens.getSmRefreshToken(),
                     new SMAuthPermissions(null, smSessionId, permissions),
-                    Map.of()
+                    Map.of(),
+                    smConfig.getDefaultAuthRole()
                 );
             }
         } catch (SQLException e) {
@@ -944,11 +958,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @Nullable String authProviderConfigurationId,
         @NotNull Map<String, Object> userCredentials
     ) throws DBException {
-        var authProgressMonitor = new VoidProgressMonitor();
+        var authProgressMonitor = new LoggingProgressMonitor(log);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 Map<String, Object> securedUserIdentifyingCredentials = userCredentials;
-                AuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
+                WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
                 var authProviderInstance = authProviderDescriptor.getInstance();
                 if (SMAuthProviderExternal.class.isAssignableFrom(authProviderInstance.getClass())) {
                     var authProviderExternal = (SMAuthProviderExternal<?>) authProviderInstance;
@@ -971,9 +985,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     sessionParameters
                 );
 
-                if (SMWAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
+                if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
                     //async auth
-                    var authProviderFederated = (SMWAuthProviderFederated) authProviderInstance;
+                    var authProviderFederated = (SMAuthProviderFederated) authProviderInstance;
                     var redirectUrl = buildRedirectLink(
                         authProviderFederated.getSignInLink(authProviderConfigurationId, Map.of()),
                         authAttemptId);
@@ -981,7 +995,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
                 txn.commit();
                 return finishAuthentication(
-                    SMAuthInfo.inProgress(authAttemptId, null, Map.of(authProviderId, securedUserIdentifyingCredentials)),
+                    SMAuthInfo.inProgress(
+                        authAttemptId,
+                        null,
+                        Map.of(authProviderId, securedUserIdentifyingCredentials)
+                    ),
                     true,
                     false
                 );
@@ -993,7 +1011,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private Map<String, Object> filterSecuredUserData(
         Map<String, Object> userIdentifyingCredentials,
-        AuthProviderDescriptor authProviderDescriptor
+        WebAuthProviderDescriptor authProviderDescriptor
     ) {
         SMAuthCredentialsProfile credProfile = getCredentialProfileByParameters(authProviderDescriptor, userIdentifyingCredentials.keySet());
         return userIdentifyingCredentials.entrySet()
@@ -1134,8 +1152,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
             Map<String, Object> authData = new LinkedHashMap<>();
             String redirectUrl = null;
+
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE FROM CB_AUTH_ATTEMPT_INFO "
+                "SELECT AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE " +
+                    "FROM CB_AUTH_ATTEMPT_INFO "
                     + "WHERE AUTH_ID=? ORDER BY CREATE_TIME"
             )) {
                 dbStat.setString(1, authId);
@@ -1145,13 +1165,15 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                         String authProviderConfiguration = dbResult.getString(2);
                         Map<String, Object> authProviderData = gson.fromJson(dbResult.getString(3), MAP_STRING_OBJECT_TYPE);
                         if (authProviderConfiguration != null) {
-                            var authProviderInstance = getAuthProvider(authProviderId).getInstance();
-                            if (SMWAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
+                            WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
+                            var authProviderInstance = authProviderDescriptor.getInstance();
+                            if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
                                 redirectUrl = buildRedirectLink(
-                                    ((SMWAuthProviderFederated) authProviderInstance).getRedirectLink(authProviderConfiguration, Map.of()),
+                                    ((SMAuthProviderFederated) authProviderInstance).getRedirectLink(authProviderConfiguration, Map.of()),
                                     authId
                                 );
                             }
+
                         }
                         authData.put(authProviderId, authProviderData);
                     }
@@ -1173,12 +1195,15 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
             SMTokens smTokens = findTokenBySmSession(smSessionId);
             SMAuthPermissions authPermissions = getTokenPermissions(smTokens.getSmAccessToken());
+            String userId = authPermissions.getUserId();
+            String authRole = readTokenAuthRole(smTokens.getSmAccessToken());
             var successAuthStatus = SMAuthInfo.success(
                 authId,
                 smTokens.getSmAccessToken(),
                 smTokens.getSmRefreshToken(),
                 authPermissions,
-                authData
+                authData,
+                authRole
             );
             updateAuthStatus(authId, SMAuthStatus.EXPIRED, authData, null, authPermissions.getSessionId());
             return successAuthStatus;
@@ -1314,16 +1339,24 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         String activeUserId = permissions == null ? null : permissions.getUserId();
 
         Map<String, Object> storedUserData = new LinkedHashMap<>();
+        SMTeam[] allTeams = null;
+        String detectedAuthRole = null;
         for (String authProviderId : authProviderIds) {
+            WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
             var userAuthData = (Map<String, Object>) authInfo.getAuthData().get(authProviderId);
+            SMAutoAssign autoAssign = getAutoAssignUserData(authId, authProvider, userAuthData, finishAuthMonitor);
+            if (autoAssign != null) {
+                detectedAuthRole = autoAssign.getAuthRole();
+            }
+
             var userIdFromCreds = findOrCreateExternalUserByCredentials(
-                authProviderId,
+                authProvider,
                 authAttemptSessionInfo.getSessionParams(),
                 userAuthData,
                 finishAuthMonitor,
                 activeUserId,
                 activeUserId == null,
-                authInfo.getAuthRole()
+                detectedAuthRole
             );
 
             if (userIdFromCreds == null) {
@@ -1331,6 +1364,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
                 return SMAuthInfo.error(authId, error);
             }
+
+            if (autoAssign != null && !CommonUtils.isEmpty(autoAssign.getExternalTeamIds())) {
+                if (allTeams == null) {
+                    allTeams = readAllTeams();
+                }
+                autoUpdateUserTeams(authProvider, autoAssign, userIdFromCreds, allTeams);
+            }
+
             if (activeUserId == null) {
                 activeUserId = userIdFromCreds;
             }
@@ -1340,7 +1381,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             );
         }
 
-        String tokenAuthRole = updateUserAuthRoleIfNeeded(activeUserId, authInfo.getAuthRole());
+        String tokenAuthRole = updateUserAuthRoleIfNeeded(activeUserId, detectedAuthRole);
         if (smTokens == null && permissions == null) {
             try (Connection dbCon = database.openConnection()) {
                 try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
@@ -1377,9 +1418,100 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             //refresh token must be sent only once
             isMainAuthSession ? smTokens.getSmRefreshToken() : null,
             permissions,
-            authInfo.getAuthData()
+            authInfo.getAuthData(),
+            tokenAuthRole
         );
     }
+
+    private void autoUpdateUserTeams(
+        WebAuthProviderDescriptor authProvider,
+        SMAutoAssign autoAssign,
+        String userId,
+        SMTeam[] allTeams
+    ) throws DBCException {
+        if (!(authProvider.getInstance() instanceof SMAuthProviderAssigner)) {
+            return;
+        }
+        SMAuthProviderAssigner authProviderAssigner = (SMAuthProviderAssigner) authProvider.getInstance();
+
+        String[] newTeamIds = autoAssign.getExternalTeamIds()
+            .stream()
+            .map(externalTeamId -> findTeamByExternalTeamId(
+                allTeams,
+                authProviderAssigner.getExternalTeamIdMetadataFieldName(),
+                externalTeamId
+            ))
+            .filter(Objects::nonNull)
+            .map(SMTeam::getTeamId)
+            .toArray(String[]::new);
+        if (!ArrayUtils.isEmpty(newTeamIds)) {
+            setUserTeams(
+                userId,
+                newTeamIds,
+                userId
+            );
+        }
+    }
+
+    @Nullable
+    private SMAutoAssign getAutoAssignUserData(
+        String authAttemptId,
+        WebAuthProviderDescriptor authProvider,
+        Map<String, Object> userData,
+        DBRProgressMonitor monitor
+    ) throws DBException {
+        var authProviderInstance = authProvider.getInstance();
+        if (!(authProviderInstance instanceof SMAuthProviderAssigner)) {
+            return null;
+        }
+        var authProviderAssigner = (SMAuthProviderAssigner) authProviderInstance;
+        String providerConfigId = readProviderConfigId(authAttemptId, authProvider.getId());
+        if (providerConfigId == null) {
+            return null;
+        }
+        var providerConfig =
+            application.getAuthConfiguration().getAuthProviderConfiguration(providerConfigId);
+        return authProviderAssigner.detectAutoAssignments(
+            monitor,
+            providerConfig == null ? Map.of() : providerConfig.getParameters(),
+            userData
+        );
+    }
+
+    @Nullable
+    private SMTeam findTeamByExternalTeamId(SMTeam[] allTeams, String externalGroupParameterName, String groupId) {
+        for (SMTeam team : allTeams) {
+            String teamGroupId = team.getMetaParameters().get(externalGroupParameterName);
+            if (CommonUtils.equalObjects(teamGroupId, groupId)) {
+                return team;
+            }
+        }
+        return null;
+    }
+
+
+    private String readProviderConfigId(String authAttemptId, String authProviderId) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT AUTH_PROVIDER_CONFIGURATION_ID " +
+                    "FROM CB_AUTH_ATTEMPT_INFO "
+                    + "WHERE AUTH_ID=? AND AUTH_PROVIDER_ID=?"
+            )) {
+                dbStat.setString(1, authAttemptId);
+                dbStat.setString(2, authProviderId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    if (!dbResult.next()) {
+                        return null;
+                    }
+                    return dbResult.getString(1);
+
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBException("Failed to read auth provider configuration", e);
+        }
+    }
+
 
     @Nullable
     protected String readUserAuthRole(String userId) throws DBException {
@@ -1439,7 +1571,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     private String findOrCreateExternalUserByCredentials(
-        @NotNull String authProviderId,
+        @NotNull WebAuthProviderDescriptor authProvider,
         @NotNull Map<String, Object> sessionParameters,
         @NotNull Map<String, Object> userCredentials,
         @NotNull DBRProgressMonitor progressMonitor,
@@ -1447,9 +1579,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         boolean createNewUserIfNotExist,
         String authRole
     ) throws DBException {
-        AuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
-        String userId = findUserByCredentials(authProviderId, userCredentials);
+        String userId = findUserByCredentials(authProvider, userCredentials);
         String userIdFromCredentials;
         try {
             userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, Map.of(), userCredentials, null);
@@ -1459,7 +1590,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
         if (activeUserId != null && userId != null && !activeUserId.equals(userId)) {
             log.debug("User '" + activeUserId + "' is authenticated in '"
-                + authProviderId + "' auth provider with credentials of user '"
+                + authProvider.getId() + "' auth provider with credentials of user '"
                 + userIdFromCredentials + "'");
         }
         if (userId == null && createNewUserIfNotExist) {
@@ -1479,7 +1610,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     setUserTeams(userId, new String[]{defaultTeamName}, userId);
                 }
             }
-            setUserCredentials(userId, authProviderId, userCredentials);
+            setUserCredentials(userId, authProvider.getId(), userCredentials);
         } else if (userId == null) {
             userId = userIdFromCredentials;
         }
@@ -1573,12 +1704,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
         WebAuthConfiguration appConfiguration = (WebAuthConfiguration) application.getAppConfiguration();
         Set<SMAuthProviderCustomConfiguration> customConfigurations = appConfiguration.getAuthCustomConfigurations();
-        List<SMAuthProviderDescriptor> providers = AuthProviderRegistry.getInstance().getAuthProviders().stream()
+        List<SMAuthProviderDescriptor> providers = WebAuthProviderRegistry.getInstance().getAuthProviders().stream()
             .filter(ap ->
                 !ap.isTrusted() &&
                     appConfiguration.isAuthProviderEnabled(ap.getId()) &&
                     (!ap.isConfigurable() || hasProviderConfiguration(ap, customConfigurations)))
-            .map(AuthProviderDescriptor::createDescriptorBean).collect(Collectors.toList());
+            .map(WebAuthProviderDescriptor::createDescriptorBean).collect(Collectors.toList());
 
         if (!CommonUtils.isEmpty(customConfigurations)) {
             // Attach custom configs to providers
@@ -1596,7 +1727,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         return providers.toArray(new SMAuthProviderDescriptor[0]);
     }
 
-    private static boolean hasProviderConfiguration(AuthProviderDescriptor ap, Set<SMAuthProviderCustomConfiguration> customConfigurations) {
+    private static boolean hasProviderConfiguration(WebAuthProviderDescriptor ap, Set<SMAuthProviderCustomConfiguration> customConfigurations) {
         for (SMAuthProviderCustomConfiguration cc : customConfigurations) {
             if (!cc.isDisabled() && cc.getProvider().equals(ap.getId())) {
                 return true;
@@ -1904,7 +2035,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     "INSERT INTO CB_AUTH_PROVIDER(PROVIDER_ID,IS_ENABLED) VALUES(?,'Y')")) {
-                    for (AuthProviderDescriptor authProvider : AuthProviderRegistry.getInstance().getAuthProviders()) {
+                    for (WebAuthProviderDescriptor authProvider : WebAuthProviderRegistry.getInstance().getAuthProviders()) {
                         if (!registeredProviders.contains(authProvider.getId())) {
                             dbStat.setString(1, authProvider.getId());
                             dbStat.executeUpdate();
@@ -1934,8 +2065,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private AuthProviderDescriptor getAuthProvider(String authProviderId) throws DBCException {
-        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
+    private WebAuthProviderDescriptor getAuthProvider(String authProviderId) throws DBCException {
+        WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
         if (authProvider == null) {
             throw new DBCException("Auth provider not found: " + authProviderId);
         }

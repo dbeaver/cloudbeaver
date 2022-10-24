@@ -17,6 +17,8 @@
 package io.cloudbeaver.auth.provider.local;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -25,8 +27,6 @@ import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
-import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Map;
@@ -51,7 +51,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
 
         String userName = CommonUtils.toString(userCredentials.get(CRED_USER), null);
 
-        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(PROVIDER_ID);
+        WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(PROVIDER_ID);
         Map<String, Object> storedCredentials = securityController.getUserCredentials(userName, authProvider.getId());
         if (storedCredentials == null) {
             throw new DBException("Invalid user name or password");
@@ -95,7 +95,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
     public static boolean changeUserPassword(@NotNull WebSession webSession, @NotNull String oldPassword, @NotNull String newPassword) throws DBException {
         String userName = webSession.getUser().getUserId();
 
-        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(PROVIDER_ID);
+        WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(PROVIDER_ID);
         Map<String, Object> storedCredentials = webSession.getSecurityController().getUserCredentials(userName, authProvider.getId());
         if (storedCredentials == null) {
             throw new DBException("Invalid user name or password");

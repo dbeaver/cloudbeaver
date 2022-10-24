@@ -26,7 +26,7 @@ import java.util.Map;
  * Federated auth provider.
  * Provides links to external auth resource
  */
-public interface SMWAuthProviderFederated {
+public interface SMAuthProviderFederated {
 
     /**
      * Returns new identifying credentials which can be used to find/create user in database
