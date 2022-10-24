@@ -9,9 +9,14 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-
 import { useStyles } from '@cloudbeaver/core-blocks';
-import { BASE_TAB_STYLES, TabList, TabPanelList, TabsContainer, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+
+import { BASE_TAB_STYLES } from '../Tabs/Tab/BASE_TAB_STYLES';
+import { UNDERLINE_TAB_STYLES } from '../Tabs/Tab/UnderlineTabStyles';
+import { TabList } from '../Tabs/TabList';
+import { TabPanelList } from '../Tabs/TabPanelList';
+import type { TabsContainer } from '../Tabs/TabsContainer/TabsContainer';
+import { TabsState } from '../Tabs/TabsState';
 
 const tabsStyles = css`
   TabList {

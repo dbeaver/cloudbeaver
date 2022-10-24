@@ -16,11 +16,12 @@
   },
   "dependencies": {
     "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-extensions": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
+    "@cloudbeaver/core-extensions": "~0.1.0",
     "@cloudbeaver/core-theming": "~0.1.0"
+
   },
   "peerDependencies": {
     "mobx": "~6.x.x"

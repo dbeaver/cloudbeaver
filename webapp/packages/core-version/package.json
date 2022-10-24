@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-localization": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-sdk": "~0.1.0"

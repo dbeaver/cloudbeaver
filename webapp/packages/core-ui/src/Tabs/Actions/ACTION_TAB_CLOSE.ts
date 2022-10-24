@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createAction } from "@cloudbeaver/core-view";
+import { createAction } from '@cloudbeaver/core-view';
 
 export const ACTION_TAB_CLOSE = createAction('tab-close', {
   label: 'ui_close',
