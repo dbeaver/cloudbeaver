@@ -353,6 +353,7 @@ export class UserFormController implements IInitializableController, IDestructib
       this.credentials.metaParameters = this.user.metaParameters;
       this.credentials.login = this.user.userId;
       this.credentials.teams = new Map(this.user.grantedTeams.map(teamId => ([teamId, true])));
+      this.credentials.authRole = this.user.authRole;
       this.enabled = this.user.enabled;
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load user');
