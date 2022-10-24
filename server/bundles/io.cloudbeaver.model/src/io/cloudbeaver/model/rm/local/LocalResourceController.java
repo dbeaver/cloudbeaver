@@ -18,7 +18,6 @@ package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.VirtualProjectImpl;
-import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -397,7 +396,7 @@ public class LocalResourceController implements RMController {
         } catch (IOException e) {
             throw new DBException("Error creating resource '" + resourcePath + "'", e);
         }
-        WebAppUtils.addRmResourceUpdatedEvent(CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED, projectId, resourcePath);
+        fireRmResourceAddEvent(projectId, resourcePath);
         return DEFAULT_CHANGE_ID;
     }
 
@@ -408,6 +407,7 @@ public class LocalResourceController implements RMController {
         @NotNull String newResourcePath
     ) throws DBException {
         Path oldTargetPath = getTargetPath(projectId, oldResourcePath);
+        List<RMResource> rmOldResourcePath = makeResourcePath(projectId, oldTargetPath, false);
         if (!Files.exists(oldTargetPath)) {
             throw new DBException("Resource '" + oldTargetPath + "' doesn't exists");
         }
@@ -418,6 +418,8 @@ public class LocalResourceController implements RMController {
         } catch (IOException e) {
             throw new DBException("Error moving resource '" + oldResourcePath + "'", e);
         }
+        fireRmResourceDeleteEvent(projectId, rmOldResourcePath);
+        fireRmResourceAddEvent(projectId, newResourcePath);
         return DEFAULT_CHANGE_ID;
     }
 
@@ -442,12 +444,7 @@ public class LocalResourceController implements RMController {
         VirtualProjectImpl project = getProjectMetadata(projectId);
         project.resetResourceProperties(resourcePath);
 
-        RMEventManager.fireEvent(
-            new RMEvent(RMEvent.Action.RESOURCE_DELETE,
-                makeProjectFromId(projectId, false),
-                rmResourcePath
-            )
-        );
+        fireRmResourceDeleteEvent(projectId, rmResourcePath);
     }
 
     @Override
@@ -501,7 +498,9 @@ public class LocalResourceController implements RMController {
         } catch (IOException e) {
             throw new DBException("Error reading resource '" + resourcePath + "'", e);
         }
-
+        if (!forceOverwrite) {
+            fireRmResourceAddEvent(projectId, resourcePath);
+        }
         return DEFAULT_CHANGE_ID;
     }
 
@@ -708,10 +707,26 @@ public class LocalResourceController implements RMController {
         return getProjectPath(projectId).toAbsolutePath().relativize(path).toString().replace('\\', IPath.SEPARATOR);
     }
 
+    private void fireRmResourceAddEvent(@NotNull String projectId, @NotNull String resourcePath) throws DBException {
+        RMEventManager.fireEvent(
+            new RMEvent(RMEvent.Action.RESOURCE_ADD,
+                getProject(projectId, false, false),
+                Arrays.asList(getResourcePath(projectId, resourcePath)))
+        );
+    }
+
+    private void fireRmResourceDeleteEvent(@NotNull String projectId, @NotNull List<RMResource> resourcePath) throws DBException {
+        RMEventManager.fireEvent(
+            new RMEvent(RMEvent.Action.RESOURCE_DELETE,
+                makeProjectFromId(projectId, false),
+                resourcePath
+            )
+        );
+    }
+
     public static Builder builder(SMCredentialsProvider credentialsProvider, SMController smController) {
         return new Builder(credentialsProvider, smController);
     }
-
     public static final class Builder {
         private final SMCredentialsProvider credentialsProvider;
         private final SMController smController;

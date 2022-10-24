@@ -16,12 +16,18 @@
  */
 package io.cloudbeaver.server.events;
 
+import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.events.CBEvent;
 import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.rm.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Notify all active user session that rm resource has been updated
@@ -36,9 +42,34 @@ public class CBRmResourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHa
     @Override
     protected void updateSessionData(WebSession activeUserSession, CBEvent event) {
         String projectId = JSONUtils.getString(event.getEventData(), "project");
-        DBPProject project = activeUserSession.getProjectById(projectId);
+        String eventType = JSONUtils.getString(event.getEventData(), "eventType");
+        String resourcePath = JSONUtils.getString(event.getEventData(), "resourcePath");
+        if (projectId == null || eventType == null || resourcePath == null) {
+            return;
+        }
+        VirtualProjectImpl project = activeUserSession.getProjectById(projectId);
         if (project == null) {
             return;
+        }
+        RMController rmController = activeUserSession.getRmController();
+        List<RMResource> rmResourcePath;
+        try {
+            rmResourcePath = Arrays.asList(rmController.getResourcePath(projectId, resourcePath));
+        } catch (DBException e) {
+            return;
+        }
+        if (eventType.equals("create")) {
+            RMEventManager.fireEvent(
+                new RMEvent(RMEvent.Action.RESOURCE_ADD,
+                    project.getRmProject(),
+                    rmResourcePath)
+            );
+        } else if (eventType.equals("delete")) {
+            RMEventManager.fireEvent(
+                new RMEvent(RMEvent.Action.RESOURCE_DELETE,
+                    project.getRmProject(),
+                    rmResourcePath)
+            );
         }
         activeUserSession.addSessionEvent(event);
     }

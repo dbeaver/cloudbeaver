@@ -31,4 +31,21 @@ public abstract class DBNAbstractResourceManagerNode extends DBNNode implements 
             node.removeChildResourceNode(resourcePath);
         }
     }
+
+    public void addChildResourceNode(@NotNull Queue<RMResource> resourcePath) {
+        if (children == null || resourcePath.isEmpty()) {
+            return;
+        }
+        var expectedResource = resourcePath.poll();
+        var node = RMNavigatorUtils.findResourceNode(children, expectedResource);
+        if (node == null) { // we are in expected parent node
+            DBNResourceManagerResource newResourceNode = new DBNResourceManagerResource(this, expectedResource);
+            ArrayUtils.add(DBNResourceManagerResource.class, children, newResourceNode);
+            return;
+        }
+
+        if (resourcePath.size() > 1) {
+            node.addChildResourceNode(resourcePath);
+        }
+    }
 }
