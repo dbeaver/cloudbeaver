@@ -26,7 +26,6 @@ import org.jkiss.dbeaver.registry.language.PlatformLanguageDescriptor;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
-import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
@@ -198,4 +197,8 @@ public class WebServerConfig {
         return application.getAppConfiguration().getDisabledDrivers();
     }
 
+    @Property
+    public Boolean isDistributed() {
+        return application.isDistributed();
+    }
 }
