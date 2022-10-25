@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.server.events;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.cloudbeaver.VirtualProjectImpl;
 import io.cloudbeaver.events.CBEvent;
 import io.cloudbeaver.events.CBEventConstants;
@@ -33,6 +35,9 @@ import java.util.List;
  * Notify all active user session that rm resource has been updated
  */
 public class CBRmResourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHandler {
+
+    private static final Gson gson = new GsonBuilder().create();
+
     @NotNull
     @Override
     public String getSupportedEventType() {
@@ -41,9 +46,11 @@ public class CBRmResourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHa
 
     @Override
     protected void updateSessionData(WebSession activeUserSession, CBEvent event) {
-        String projectId = JSONUtils.getString(event.getEventData(), "project");
+        String projectId = JSONUtils.getString(event.getEventData(), "projectId");
         String eventType = JSONUtils.getString(event.getEventData(), "eventType");
         String resourcePath = JSONUtils.getString(event.getEventData(), "resourcePath");
+        RMResource[] resourceParsedPath = gson.fromJson(
+            gson.toJson(JSONUtils.getObjectList(event.getEventData(), "resourceParsedPath")), RMResource[].class);
         if (projectId == null || eventType == null || resourcePath == null) {
             return;
         }
@@ -51,20 +58,14 @@ public class CBRmResourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHa
         if (project == null) {
             return;
         }
-        RMController rmController = activeUserSession.getRmController();
-        List<RMResource> rmResourcePath;
-        try {
-            rmResourcePath = Arrays.asList(rmController.getResourcePath(projectId, resourcePath));
-        } catch (DBException e) {
-            return;
-        }
-        if (eventType.equals("create")) {
+        List<RMResource> rmResourcePath = Arrays.asList(resourceParsedPath);
+        if (eventType.equals("TYPE_CREATE")) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_ADD,
                     project.getRmProject(),
                     rmResourcePath)
             );
-        } else if (eventType.equals("delete")) {
+        } else if (eventType.equals("TYPE_DELETE")) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_DELETE,
                     project.getRmProject(),

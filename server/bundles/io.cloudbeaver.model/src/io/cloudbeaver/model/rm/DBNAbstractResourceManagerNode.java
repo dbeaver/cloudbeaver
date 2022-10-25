@@ -40,7 +40,7 @@ public abstract class DBNAbstractResourceManagerNode extends DBNNode implements 
         var node = RMNavigatorUtils.findResourceNode(children, expectedResource);
         if (node == null) { // we are in expected parent node
             DBNResourceManagerResource newResourceNode = new DBNResourceManagerResource(this, expectedResource);
-            ArrayUtils.add(DBNResourceManagerResource.class, children, newResourceNode);
+            children = ArrayUtils.add(DBNResourceManagerResource.class, children, newResourceNode);
             return;
         }
 
