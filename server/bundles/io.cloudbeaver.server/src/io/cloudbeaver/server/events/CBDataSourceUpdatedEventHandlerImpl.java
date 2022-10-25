@@ -35,7 +35,7 @@ public class CBDataSourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHa
 
     @Override
     protected void updateSessionData(WebSession activeUserSession, CBEvent event) {
-        String projectId = JSONUtils.getString(event.getEventData(), "project");
+        String projectId = JSONUtils.getString(event.getEventData(), "projectId");
         VirtualProjectImpl project = activeUserSession.getProjectById(projectId);
         if (project == null || !project.getRmProject().isShared()) {
             return;
