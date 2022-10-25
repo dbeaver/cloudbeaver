@@ -1244,7 +1244,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
             SMTokens smTokens = findTokenBySmSession(smSessionId);
             SMAuthPermissions authPermissions = getTokenPermissions(smTokens.getSmAccessToken());
-            String userId = authPermissions.getUserId();
             String authRole = readTokenAuthRole(smTokens.getSmAccessToken());
             var successAuthStatus = SMAuthInfo.success(
                 authId,
@@ -1751,7 +1750,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error reading token info in database", e);
         }
-        var permissions = userId == null ? getAnonymousUserPermissions() : getUserPermissions(userId);
+        var permissions = userId == null ? getAnonymousUserPermissions() : getUserPermissions(userId, authRole);
         return new SMAuthPermissions(userId, sessionId, permissions);
     }
 
