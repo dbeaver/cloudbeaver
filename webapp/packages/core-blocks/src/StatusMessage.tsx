@@ -60,6 +60,8 @@ export const StatusMessage = observer<Props>(function StatusMessage({
 
   if (Array.isArray(message)) {
     message = message.map(m => translate(m)).join(', ');
+  } else if (message !== null) {
+    message = translate(message);
   }
 
   message = message ?? errorDetails.details?.message;
