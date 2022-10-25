@@ -14,11 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.user;
+package io.cloudbeaver.auth;
+
+import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+
+import java.util.Map;
 
 /**
- * Web user.
+ * Auth
+ * Authenticates user using external user identity
  */
-public class WebUserCredentials {
+public interface SMAuthProviderAssigner {
+
+    @NotNull
+    SMAutoAssign detectAutoAssignments(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull Map<String, Object> providerConfig,
+        @NotNull Map<String, Object> authParameters
+    ) throws DBException;
+
+    String getExternalTeamIdMetadataFieldName();
 
 }

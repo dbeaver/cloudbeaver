@@ -20,13 +20,13 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.security.SMObjects;
-import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
-import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +96,7 @@ public class AdminUserInfo {
     public WebUserOriginInfo[] getOrigins() throws DBWebException {
         List<WebUserOriginInfo> result = new ArrayList<>();
         for (String provider : getUserLinkedProviders()) {
-            AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(provider);
+            WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(provider);
             if (authProvider == null) {
                 log.error("Auth provider '" + provider + "' not found");
             } else {

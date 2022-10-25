@@ -25,11 +25,8 @@ import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
 import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.registry.WebFeatureRegistry;
-import io.cloudbeaver.registry.WebPermissionDescriptor;
-import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.registry.*;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
@@ -56,8 +53,6 @@ import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
-import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
-import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.CommonUtils;
 
 import java.text.MessageFormat;
@@ -293,7 +288,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public boolean setUserCredentials(@NotNull WebSession webSession, @NotNull String userID, @NotNull String providerId, @NotNull Map<String, Object> credentials) throws DBWebException {
-        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(providerId);
+        WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
             throw new DBWebException("Invalid auth provider '" + providerId + "'");
         }
@@ -492,11 +487,16 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public List<WebPropertyInfo> listAuthProviderConfigurationParameters(@NotNull WebSession webSession, @NotNull String providerId) throws DBWebException {
-        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(providerId);
+        WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
             throw new DBWebException("Invalid provider ID " + providerId);
         }
-        return authProvider.getConfigurationParameters().stream().map(p -> new WebPropertyInfo(webSession, p)).collect(Collectors.toList());
+        return authProvider.getConfigurationParameters().stream().filter(p -> {
+            if (p.hasFeature("distributed")) {
+                return CBApplication.getInstance().isDistributed();
+            }
+            return true;
+        }).map(p -> new WebPropertyInfo(webSession, p)).collect(Collectors.toList());
     }
 
     @Override
@@ -506,7 +506,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             if (providerId != null && !providerId.equals(cfg.getProvider())) {
                 continue;
             }
-            AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(cfg.getProvider());
+            WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(cfg.getProvider());
             if (authProvider != null) {
                 result.add(new WebAuthProviderConfiguration(authProvider, cfg));
             }
@@ -524,7 +524,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         @Nullable String iconURL,
         @Nullable String description,
         @Nullable Map<String, Object> parameters) throws DBWebException {
-        AuthProviderDescriptor authProvider = AuthProviderRegistry.getInstance().getAuthProvider(providerId);
+        WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
             throw new DBWebException("Auth provider '" + providerId + "' not found");
         }
@@ -779,9 +779,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public Boolean setUserMetaParameterValues(WebSession webSession, String userId, Map<String, Object> parameters) throws DBWebException {
+    public Boolean setUserMetaParameterValues(WebSession webSession, String userId, Map<String, String> parameters) throws DBWebException {
         try {
-            webSession.getAdminSecurityController().setUserMeta(userId, parameters);
+            webSession.getAdminSecurityController().setSubjectMetas(userId, parameters);
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error changing user '" + userId + "' meta parameters", e);

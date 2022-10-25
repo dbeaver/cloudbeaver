@@ -24,7 +24,7 @@ import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebAuthProviderConfiguration;
+import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -189,8 +189,7 @@ public interface DBWServiceAdmin extends DBWService {
     Boolean deleteUserMetaParameter(WebSession webSession, String id) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    Boolean setUserMetaParameterValues(WebSession webSession, String userId, Map<String, Object> parameters) throws DBWebException;
-
+    Boolean setUserMetaParameterValues(WebSession webSession, String userId, Map<String, String> parameters) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     Boolean enableUser(WebSession webSession, String userId, Boolean enabled) throws DBWebException;
 

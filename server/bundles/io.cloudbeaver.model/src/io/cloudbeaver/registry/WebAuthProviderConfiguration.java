@@ -14,29 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.user;
+package io.cloudbeaver.registry;
 
-import io.cloudbeaver.auth.SMWAuthProviderFederated;
+import io.cloudbeaver.auth.SMAuthProviderFederated;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
-import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
 import java.util.Map;
 
 /**
- * WebAuthProviderInfo.
+ * WebAuthProviderConfiguration.
  */
 public class WebAuthProviderConfiguration {
 
     private static final Log log = Log.getLog(WebAuthProviderConfiguration.class);
 
-    private final AuthProviderDescriptor providerDescriptor;
+    private final WebAuthProviderDescriptor providerDescriptor;
     private final SMAuthProviderCustomConfiguration config;
 
-    public WebAuthProviderConfiguration(AuthProviderDescriptor providerDescriptor, SMAuthProviderCustomConfiguration config) {
+    public WebAuthProviderConfiguration(WebAuthProviderDescriptor providerDescriptor, SMAuthProviderCustomConfiguration config) {
         this.providerDescriptor = providerDescriptor;
         this.config = config;
     }
@@ -72,25 +71,25 @@ public class WebAuthProviderConfiguration {
     @Property
     public String getSignInLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof SMWAuthProviderFederated ? ((SMWAuthProviderFederated) instance).getSignInLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getSignInLink(getId(), config.getParameters()) : null;
     }
 
     @Property
     public String getSignOutLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof SMWAuthProviderFederated ? ((SMWAuthProviderFederated) instance).getSignOutLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getSignOutLink(getId(), config.getParameters()) : null;
     }
 
     @Property
     public String getRedirectLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof SMWAuthProviderFederated ? ((SMWAuthProviderFederated) instance).getRedirectLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getRedirectLink(getId(), config.getParameters()) : null;
     }
 
     @Property
     public String getMetadataLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof SMWAuthProviderFederated ? ((SMWAuthProviderFederated) instance).getMetadataLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getMetadataLink(getId(), config.getParameters()) : null;
     }
 
     @Override

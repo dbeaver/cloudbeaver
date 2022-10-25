@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
 import java.util.*;
 
@@ -46,7 +45,7 @@ public class WebServiceRegistry {
     private final List<WebServiceDescriptor> webServices = new ArrayList<>();
     private DBWServiceBinding[] webServiceInstances;
 
-    private final Map<String, AuthProviderDescriptor> authProviders = new LinkedHashMap<>();
+    private final Map<String, WebAuthProviderDescriptor> authProviders = new LinkedHashMap<>();
     private final Map<String, WebValueSerializerDescriptor> valueSerializers = new HashMap<>();
 
     private WebServiceRegistry() {
