@@ -13,6 +13,7 @@ export default [
   ['authentication_identity_provider_dialog_subtitle', '选择您要用于登录的配置'],
 
   ['authentication_user_name', '用户名称'],
+  ['authentication_user_role', 'Role'],
   ['authentication_user_credentials', '凭据'],
   ['authentication_user_meta_parameters', '参数'],
   ['authentication_user_password', '用户密码'],
@@ -20,6 +21,7 @@ export default [
   ['authentication_user_status', 'User status'],
   ['authentication_user_enabled', 'Enabled'],
   ['authentication_user_login_not_set', '用户名不能为空'],
+  ['authentication_user_role_not_set', '{alias:authentication_user_role} is required'],
   ['authentication_user_password_not_set', '密码是必须的'],
   ['authentication_user_passwords_not_match', '密码不匹配'],
   ['authentication_user_login_already_exists', '同名用户已存在'],

@@ -72,10 +72,10 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
       {error.htmlBody && <Iframe srcDoc={error.htmlBody} />}
       {error.errors.map(
         (error, id) => (
-          <>
+          <div key={id}>
             {id > 0 && <hr />}
-            <DisplayErrorInfo key={id} error={error} />
-          </>
+            <DisplayErrorInfo error={error} />
+          </div>
         )
       )}
     </CommonDialogWrapper>

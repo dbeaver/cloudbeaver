@@ -115,8 +115,10 @@ public class AdminUserInfo {
         if (userLinkedProviders != null) {
             return userLinkedProviders;
         }
+
         try {
-            userLinkedProviders = session.getSecurityController().getUserLinkedProviders(user.getUserId());
+            String userId = user.getUserId();
+            userLinkedProviders = session.getAdminSecurityController().getUserLinkedProviders(userId);
         } catch (DBException e) {
             throw new DBWebException("Error reading user linked providers", e);
         }

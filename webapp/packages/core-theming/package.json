@@ -22,7 +22,7 @@
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-plugin": "~0.1.0",
     "@cloudbeaver/core-settings": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
+
     "@material/button": "~4.0.0",
     "@material/elevation": "~4.0.0",
     "@material/layout-grid": "~4.0.0",

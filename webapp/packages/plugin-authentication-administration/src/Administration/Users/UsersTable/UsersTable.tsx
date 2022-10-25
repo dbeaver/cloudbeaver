@@ -11,7 +11,8 @@ import styled, { css, use } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useMapResource, ToolsAction, ToolsPanel, Loader, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { AuthRolesResource } from '@cloudbeaver/core-authentication/src/AuthRolesResource';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useMapResource, ToolsAction, ToolsPanel, Loader, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles, useDataResource } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { filterUndefined } from '@cloudbeaver/core-utils';
@@ -69,6 +70,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
   const createUserService = useService(CreateUserService);
   const controller = useController(UsersTableController);
   const usersResource = useMapResource(UsersTable, UsersResource, CachedMapAllKey);
+  const authRoles = useDataResource(UsersTable, AuthRolesResource, undefined);
   const isLocalProviderAvailable = controller.isLocalProviderAvailable;
   const users = usersResource.resource.values
     .filter<AdminUser>(filterUndefined)
@@ -84,6 +86,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
 
   const create = param === 'create';
   const keys = users.map(user => user.userId);
+  const displayAuthRole = authRoles.data.length > 0;
 
   return styled(style)(
     <layout-grid>
@@ -129,7 +132,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
           </layout-grid-cell>
         )}
         <layout-grid-cell data-span='12' {...use({ table: true })}>
-          <Loader style={loaderStyle} state={usersResource} overlay>
+          <Loader style={loaderStyle} state={[usersResource, authRoles]} overlay>
             <Table
               keys={keys}
               selectedItems={controller.selectedItems}
@@ -144,12 +147,22 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
                 )}
                 <TableColumnHeader min />
                 <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
+                {displayAuthRole && (
+                  <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>
+                )}
                 <TableColumnHeader>{translate('authentication_user_team')}</TableColumnHeader>
                 <TableColumnHeader>{translate('authentication_user_enabled')}</TableColumnHeader>
                 <TableColumnHeader />
               </TableHeader>
               <TableBody>
-                {users.map(user => <User key={user.userId} user={user} selectable={isLocalProviderAvailable} />)}
+                {users.map(user => (
+                  <User
+                    key={user.userId}
+                    user={user}
+                    displayAuthRole={displayAuthRole}
+                    selectable={isLocalProviderAvailable}
+                  />
+                ))}
               </TableBody>
             </Table>
           </Loader>
