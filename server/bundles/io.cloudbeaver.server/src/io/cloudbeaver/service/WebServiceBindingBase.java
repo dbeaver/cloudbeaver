@@ -26,6 +26,7 @@ import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
+import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -170,6 +171,17 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                     throw e.getTargetException();
                 }
             } catch (Throwable ex) {
+                if (SMUtils.isTokenExpiredExceptionWasHandled(ex)) {
+                    WebSession webSession = findWebSession(env);
+                    if (webSession != null) {
+                        webSession.resetUserState();
+                    }
+                    throw new DBWebException(
+                        "Authentication has expired",
+                        DBWebException.ERROR_CODE_SESSION_EXPIRED,
+                        ex
+                    );
+                }
                 for (Class<?> exType : method.getExceptionTypes()) {
                     if (exType.isInstance(ex)) {
                         throw ex;
