@@ -402,7 +402,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
         webSession.addConnection(connectionInfo);
         webSession.addInfoMessage("New connection was created - " + WebServiceUtils.getConnectionContainerInfo(newDataSource));
-        WebAppUtils.addDatasourceUpdatedEvent(webSession.getProjectById(projectId));
+        WebAppUtils.addDataSourceUpdatedEvent(webSession.getProjectById(projectId), connectionInfo.getId());
         return connectionInfo;
     }
 
@@ -440,7 +440,7 @@ public class WebServiceCore implements DBWServiceCore {
         } catch (DBException e) {
             throw new DBWebException("Failed to update connection", e);
         }
-        WebAppUtils.addDatasourceUpdatedEvent(webSession.getProjectById(projectId));
+        WebAppUtils.addDataSourceUpdatedEvent(webSession.getProjectById(projectId), connectionInfo.getId());
         return connectionInfo;
     }
 
@@ -454,7 +454,7 @@ public class WebServiceCore implements DBWServiceCore {
         webSession.addInfoMessage("Delete connection - " +
             WebServiceUtils.getConnectionContainerInfo(connectionInfo.getDataSourceContainer()));
         closeAndDeleteConnection(webSession, projectId, connectionId, true);
-        WebAppUtils.addDatasourceUpdatedEvent(webSession.getProjectById(projectId));
+        WebAppUtils.addDataSourceUpdatedEvent(webSession.getProjectById(projectId), connectionId);
         return true;
     }
 
@@ -491,7 +491,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
         webSession.addConnection(connectionInfo);
 
-        WebAppUtils.addDatasourceUpdatedEvent(webSession.getProjectById(projectId));
+        WebAppUtils.addDataSourceUpdatedEvent(webSession.getProjectById(projectId), connectionInfo.getId());
 
         return connectionInfo;
     }
@@ -533,7 +533,7 @@ public class WebServiceCore implements DBWServiceCore {
             WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
             dataSourceRegistry.checkForErrors();
             webSession.addConnection(connectionInfo);
-            WebAppUtils.addDatasourceUpdatedEvent(webSession.getProjectById(projectId));
+            WebAppUtils.addDataSourceUpdatedEvent(webSession.getProjectById(projectId), connectionInfo.getId());
             return connectionInfo;
         } catch (DBException e) {
             throw new DBWebException("Error copying connection", e);
@@ -712,7 +712,7 @@ public class WebServiceCore implements DBWServiceCore {
             DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
             WebConnectionFolderInfo folderInfo = new WebConnectionFolderInfo(session, newFolder);
             WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
-            WebAppUtils.addDatasourceUpdatedEvent(session.getProjectById(projectId));
+            WebAppUtils.addDataSourceUpdatedEvent(session.getProjectById(projectId), folderInfo.getId());
             return folderInfo;
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
@@ -730,7 +730,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(session, projectId, folderPath);
         folderInfo.getDataSourceFolder().setName(newName);
         WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
-        WebAppUtils.addDatasourceUpdatedEvent(session.getProjectById(projectId));
+        WebAppUtils.addDataSourceUpdatedEvent(session.getProjectById(projectId), folderInfo.getId());
         return folderInfo;
     }
 
@@ -748,7 +748,7 @@ public class WebServiceCore implements DBWServiceCore {
             DBPDataSourceRegistry sessionRegistry = session.getProjectById(projectId).getDataSourceRegistry();
             sessionRegistry.removeFolder(folderInfo.getDataSourceFolder(), false);
             WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
-            WebAppUtils.addDatasourceUpdatedEvent(session.getProjectById(projectId));
+            WebAppUtils.addDataSourceUpdatedEvent(session.getProjectById(projectId), folderInfo.getId());
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
         }
@@ -763,7 +763,7 @@ public class WebServiceCore implements DBWServiceCore {
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor)connectionInfo.getDataSourceContainer());
         dataSourceDescriptor.setNavigatorSettings(settings);
         dataSourceDescriptor.persistConfiguration();
-        WebAppUtils.addDatasourceUpdatedEvent(webSession.getProjectById(projectId));
+        WebAppUtils.addDataSourceUpdatedEvent(webSession.getProjectById(projectId), id);
         return connectionInfo;
     }
 

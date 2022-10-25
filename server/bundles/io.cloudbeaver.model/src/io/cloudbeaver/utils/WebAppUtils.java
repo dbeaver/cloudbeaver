@@ -205,12 +205,15 @@ public class WebAppUtils {
         return RMProjectType.GLOBAL.getPrefix() + "_" + globalConfigurationName;
     }
 
-    public static void addDatasourceUpdatedEvent(DBPProject project) {
+    public static void addDataSourceUpdatedEvent(DBPProject project, String datasourceId) {
         if (project == null) {
             return;
         }
         getWebApplication().getEventController().addEvent(
-            new CBEvent(CBEventConstants.CLOUDBEAVER_DATASOURCE_UPDATED, Map.of("projectId", project.getId()))
+            new CBEvent(
+                CBEventConstants.CLOUDBEAVER_DATASOURCE_UPDATED,
+                Map.of("projectId", project.getId(), "dataSourceIds", new String[] {datasourceId})
+            )
         );
     }
 

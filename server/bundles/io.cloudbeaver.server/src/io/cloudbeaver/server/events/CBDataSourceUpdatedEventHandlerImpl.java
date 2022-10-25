@@ -26,7 +26,7 @@ import org.jkiss.dbeaver.model.data.json.JSONUtils;
 /**
  * Notify all active user session that datasource has been updated
  */
-public class CBDatasourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHandler {
+public class CBDataSourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHandler {
     @NotNull
     @Override
     public String getSupportedEventType() {

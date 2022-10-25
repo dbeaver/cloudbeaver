@@ -296,7 +296,11 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public void saveProjectDataSources(@NotNull String projectId, @NotNull String configuration) throws DBException {
+    public void saveProjectDataSources(
+        @NotNull String projectId,
+        @NotNull String configuration,
+        @NotNull String[] dataSourceIds
+    ) throws DBException {
         final DBPProject project = getProjectMetadata(projectId);
         final DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         final DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(StandardCharsets.UTF_8));
