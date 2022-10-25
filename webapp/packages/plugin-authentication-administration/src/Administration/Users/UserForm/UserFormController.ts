@@ -317,13 +317,13 @@ export class UserFormController implements IInitializableController, IDestructib
 
   private async saveUserRole() {
     if (this.credentials.authRole !== this.user.authRole) {
-      await this.usersResource.setAuthRole(this.user.userId, this.credentials.authRole);
+      await this.usersResource.setAuthRole(this.user.userId, this.credentials.authRole, true);
     }
   }
 
   private async saveUserStatus() {
     if (this.enabled !== this.user.enabled) {
-      await this.usersResource.enableUser(this.user.userId, this.enabled);
+      await this.usersResource.enableUser(this.user.userId, this.enabled, true);
     }
   }
 
