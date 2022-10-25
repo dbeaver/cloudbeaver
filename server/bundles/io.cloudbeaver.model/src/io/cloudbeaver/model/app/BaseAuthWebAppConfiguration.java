@@ -19,11 +19,11 @@ package io.cloudbeaver.model.app;
 
 import com.google.gson.annotations.Expose;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
-import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
-import org.jkiss.dbeaver.registry.auth.AuthProviderRegistry;
 import org.jkiss.utils.ArrayUtils;
 
 import java.util.*;
@@ -65,8 +65,8 @@ public abstract class BaseAuthWebAppConfiguration extends BaseWebAppConfiguratio
     public String[] getEnabledAuthProviders() {
         if (enabledAuthProviders == null) {
             // No config - enable all providers (+backward compatibility)
-            return AuthProviderRegistry.getInstance().getAuthProviders()
-                .stream().map(AuthProviderDescriptor::getId).toArray(String[]::new);
+            return WebAuthProviderRegistry.getInstance().getAuthProviders()
+                .stream().map(WebAuthProviderDescriptor::getId).toArray(String[]::new);
         }
         return enabledAuthProviders;
     }
@@ -78,7 +78,7 @@ public abstract class BaseAuthWebAppConfiguration extends BaseWebAppConfiguratio
 
     @Override
     public boolean isAuthProviderEnabled(String id) {
-        var authProviderDescriptor = AuthProviderRegistry.getInstance().getAuthProvider(id);
+        var authProviderDescriptor = WebAuthProviderRegistry.getInstance().getAuthProvider(id);
         if (authProviderDescriptor == null) {
             return false;
         }

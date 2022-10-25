@@ -65,8 +65,8 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession> {
 
     @NotNull
     @Override
-    public DBWUserIdentity getUserIdentity(@NotNull DBRProgressMonitor monitor, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> credentials) throws DBException {
-        String userName = String.valueOf(credentials.get("user"));
+    public DBWUserIdentity getUserIdentity(@NotNull DBRProgressMonitor monitor, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> authParameters) throws DBException {
+        String userName = String.valueOf(authParameters.get("user"));
         return new DBWUserIdentity(userName, userName);
     }
 

@@ -329,6 +329,10 @@ public class WebSession extends AbstractSessionPersistent
 
     private void loadProjects() {
         WebUser user = userContext.getUser();
+        if (user == null && DBWorkbench.isDistributed()) {
+            // No anonymous mode in distributed apps
+            return;
+        }
         refreshAccessibleConnectionIds();
         try {
             RMController controller = application.getResourceController(this, getSecurityController());

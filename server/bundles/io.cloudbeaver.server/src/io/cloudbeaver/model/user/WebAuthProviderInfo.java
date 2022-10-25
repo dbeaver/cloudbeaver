@@ -17,12 +17,13 @@
 package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.registry.WebAuthProviderConfiguration;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.SMAuthCredentialsProfile;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
-import org.jkiss.dbeaver.registry.auth.AuthProviderDescriptor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +35,13 @@ public class WebAuthProviderInfo {
 
     private static final Log log = Log.getLog(WebAuthProviderInfo.class);
 
-    private final AuthProviderDescriptor descriptor;
+    private final WebAuthProviderDescriptor descriptor;
 
-    public WebAuthProviderInfo(AuthProviderDescriptor descriptor) {
+    public WebAuthProviderInfo(WebAuthProviderDescriptor descriptor) {
         this.descriptor = descriptor;
     }
 
-    AuthProviderDescriptor getDescriptor() {
+    WebAuthProviderDescriptor getDescriptor() {
         return descriptor;
     }
 

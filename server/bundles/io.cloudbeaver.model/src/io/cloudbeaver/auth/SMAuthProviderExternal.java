@@ -50,7 +50,7 @@ public interface SMAuthProviderExternal<AUTH_SESSION extends SMSession> extends 
     DBWUserIdentity getUserIdentity(
         @NotNull DBRProgressMonitor monitor,
         @NotNull Map<String, Object> providerConfig,
-        @NotNull Map<String, Object> credentials) throws DBException;
+        @NotNull Map<String, Object> authParameters) throws DBException;
 
     /**
      * Get specified user details.
