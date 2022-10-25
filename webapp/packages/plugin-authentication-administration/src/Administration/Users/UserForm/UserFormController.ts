@@ -8,8 +8,7 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { AdminUser, compareTeams, isLocalUser, TeamInfo, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { AuthRolesResource } from '@cloudbeaver/core-authentication/src/AuthRolesResource';
+import { AdminUser, AuthRolesResource, compareTeams, isLocalUser, TeamInfo, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';

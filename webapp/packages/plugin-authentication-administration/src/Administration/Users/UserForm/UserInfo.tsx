@@ -10,8 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { AuthRolesResource } from '@cloudbeaver/core-authentication/src/AuthRolesResource';
+import { AuthRolesResource, UserMetaParametersResource } from '@cloudbeaver/core-authentication';
 import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, FieldCheckbox, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useDataResource, useTranslate, useStyles, Combobox } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
