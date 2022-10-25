@@ -435,6 +435,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public void setUserAuthRole(@NotNull String userId, @Nullable String authRole) throws DBException {
+        if (credentialsProvider.getActiveUserCredentials() != null
+            && userId.equals(credentialsProvider.getActiveUserCredentials().getUserId()
+        )) {
+            throw new SMException("User cannot change his own role");
+        }
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement("UPDATE CB_USER SET DEFAULT_AUTH_ROLE=? WHERE USER_ID=?")) {
                 dbStat.setString(1, authRole);

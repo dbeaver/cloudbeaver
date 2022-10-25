@@ -81,6 +81,7 @@ export interface AdminTeamInfo {
 }
 
 export interface AdminUserInfo {
+  authRole?: Maybe<Scalars['String']>;
   configurationParameters: Scalars['Object'];
   enabled: Scalars['Boolean'];
   grantedConnections: Array<AdminConnectionGrantInfo>;
@@ -914,6 +915,7 @@ export interface Query {
   grantUserTeam?: Maybe<Scalars['Boolean']>;
   listAuthProviderConfigurationParameters: Array<ObjectPropertyInfo>;
   listAuthProviderConfigurations: Array<AdminAuthProviderConfiguration>;
+  listAuthRoles: Array<Scalars['String']>;
   listFeatureSets: Array<WebFeatureSet>;
   listPermissions: Array<AdminPermissionInfo>;
   listProjects: Array<ProjectInfo>;
@@ -948,6 +950,7 @@ export interface Query {
   setDefaultNavigatorSettings: Scalars['Boolean'];
   setSubjectConnectionAccess?: Maybe<Scalars['Boolean']>;
   setSubjectPermissions: Array<AdminPermissionInfo>;
+  setUserAuthRole?: Maybe<Scalars['Boolean']>;
   setUserCredentials?: Maybe<Scalars['Boolean']>;
   setUserMetaParameterValues: Scalars['Boolean'];
   sqlCompletionProposals?: Maybe<Array<Maybe<SqlCompletionProposal>>>;
@@ -1033,6 +1036,7 @@ export interface QueryCreateTeamArgs {
 
 
 export interface QueryCreateUserArgs {
+  authRole?: InputMaybe<Scalars['String']>;
   enabled: Scalars['Boolean'];
   userId: Scalars['ID'];
 }
@@ -1262,6 +1266,12 @@ export interface QuerySetSubjectConnectionAccessArgs {
 export interface QuerySetSubjectPermissionsArgs {
   permissions: Array<Scalars['ID']>;
   subjectId: Scalars['ID'];
+}
+
+
+export interface QuerySetUserAuthRoleArgs {
+  authRole?: InputMaybe<Scalars['String']>;
+  userId: Scalars['ID'];
 }
 
 
@@ -1727,6 +1737,11 @@ export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetAuthProvidersQuery = { providers: Array<{ id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, trusted: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> }> };
 
+export type GetAuthRolesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAuthRolesQuery = { roles: Array<string> };
+
 export type GetAuthStatusQueryVariables = Exact<{
   authId: Scalars['ID'];
   linkUser?: InputMaybe<Scalars['Boolean']>;
@@ -1804,12 +1819,13 @@ export type UpdateTeamQuery = { team: { teamId: string, teamName?: string, descr
 export type CreateUserQueryVariables = Exact<{
   userId: Scalars['ID'];
   enabled: Scalars['Boolean'];
+  authRole?: InputMaybe<Scalars['String']>;
   includeMetaParameters: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
 
-export type CreateUserQuery = { user: { userId: string, grantedTeams: Array<string>, linkedAuthProviders: Array<string>, metaParameters?: any, enabled: boolean, origins: Array<{ type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> } };
+export type CreateUserQuery = { user: { userId: string, grantedTeams: Array<string>, linkedAuthProviders: Array<string>, metaParameters?: any, enabled: boolean, authRole?: string, origins: Array<{ type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> } };
 
 export type DeleteUserQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -1847,7 +1863,7 @@ export type GetUsersListQueryVariables = Exact<{
 }>;
 
 
-export type GetUsersListQuery = { users: Array<{ userId: string, grantedTeams: Array<string>, linkedAuthProviders: Array<string>, metaParameters?: any, enabled: boolean, origins: Array<{ type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> }> };
+export type GetUsersListQuery = { users: Array<{ userId: string, grantedTeams: Array<string>, linkedAuthProviders: Array<string>, metaParameters?: any, enabled: boolean, authRole?: string, origins: Array<{ type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> }> };
 
 export type GrantUserTeamQueryVariables = Exact<{
   userId: Scalars['ID'];
@@ -1872,6 +1888,14 @@ export type SetConnectionsQueryVariables = Exact<{
 
 
 export type SetConnectionsQuery = { grantedConnections?: boolean };
+
+export type SetUserAuthRoleQueryVariables = Exact<{
+  userId: Scalars['ID'];
+  authRole?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type SetUserAuthRoleQuery = { setUserAuthRole?: boolean };
 
 export type SetUserConfigurationParameterMutationVariables = Exact<{
   name: Scalars['String'];
@@ -2274,7 +2298,7 @@ export type AdminPermissionInfoFragment = { id: string, label?: string, descript
 
 export type AdminTeamInfoFragment = { teamId: string, teamName?: string, description?: string, teamPermissions: Array<string> };
 
-export type AdminUserInfoFragment = { userId: string, grantedTeams: Array<string>, linkedAuthProviders: Array<string>, metaParameters?: any, enabled: boolean, origins: Array<{ type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> };
+export type AdminUserInfoFragment = { userId: string, grantedTeams: Array<string>, linkedAuthProviders: Array<string>, metaParameters?: any, enabled: boolean, authRole?: string, origins: Array<{ type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> };
 
 export type AllNavigatorSettingsFragment = { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean };
 
@@ -2834,6 +2858,7 @@ export const AdminUserInfoFragmentDoc = `
     ...ObjectOriginInfo
   }
   enabled
+  authRole
 }
     ${ObjectOriginInfoFragmentDoc}`;
 export const AsyncTaskInfoFragmentDoc = `
@@ -3245,6 +3270,11 @@ export const GetAuthProvidersDocument = `
   }
 }
     ${AuthProviderInfoFragmentDoc}`;
+export const GetAuthRolesDocument = `
+    query getAuthRoles {
+  roles: listAuthRoles
+}
+    `;
 export const GetAuthStatusDocument = `
     query getAuthStatus($authId: ID!, $linkUser: Boolean, $customIncludeOriginDetails: Boolean!) {
   authInfo: authUpdateStatus(authId: $authId, linkUser: $linkUser) {
@@ -3336,8 +3366,8 @@ export const UpdateTeamDocument = `
 }
     ${AdminTeamInfoFragmentDoc}`;
 export const CreateUserDocument = `
-    query createUser($userId: ID!, $enabled: Boolean!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
-  user: createUser(userId: $userId, enabled: $enabled) {
+    query createUser($userId: ID!, $enabled: Boolean!, $authRole: String, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  user: createUser(userId: $userId, enabled: $enabled, authRole: $authRole) {
     ...AdminUserInfo
   }
 }
@@ -3390,6 +3420,11 @@ export const SetConnectionsDocument = `
     subjectId: $userId
     connections: $connections
   )
+}
+    `;
+export const SetUserAuthRoleDocument = `
+    query setUserAuthRole($userId: ID!, $authRole: String) {
+  setUserAuthRole(userId: $userId, authRole: $authRole)
 }
     `;
 export const SetUserConfigurationParameterDocument = `
@@ -4488,6 +4523,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getAuthProviders(variables?: GetAuthProvidersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthProvidersQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetAuthProvidersQuery>(GetAuthProvidersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthProviders', 'query');
     },
+    getAuthRoles(variables?: GetAuthRolesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthRolesQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAuthRolesQuery>(GetAuthRolesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthRoles', 'query');
+    },
     getAuthStatus(variables: GetAuthStatusQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthStatusQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetAuthStatusQuery>(GetAuthStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthStatus', 'query');
     },
@@ -4541,6 +4579,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     setConnections(variables: SetConnectionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetConnectionsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<SetConnectionsQuery>(SetConnectionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setConnections', 'query');
+    },
+    setUserAuthRole(variables: SetUserAuthRoleQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetUserAuthRoleQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<SetUserAuthRoleQuery>(SetUserAuthRoleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setUserAuthRole', 'query');
     },
     setUserConfigurationParameter(variables: SetUserConfigurationParameterMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetUserConfigurationParameterMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<SetUserConfigurationParameterMutation>(SetUserConfigurationParameterDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setUserConfigurationParameter', 'mutation');

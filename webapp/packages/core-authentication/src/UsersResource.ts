@@ -42,6 +42,7 @@ interface UserCreateOptions {
   metaParameters: Record<string, any>;
   grantedConnections: string[];
   enabled: boolean;
+  authRole?: string;
 }
 
 @injectable()
@@ -94,11 +95,18 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   }
 
   async create({
-    userId, teams, credentials, metaParameters, grantedConnections, enabled,
+    userId,
+    teams,
+    credentials,
+    metaParameters,
+    grantedConnections,
+    enabled,
+    authRole,
   }: UserCreateOptions): Promise<AdminUser> {
     const { user } = await this.graphQLService.sdk.createUser({
       userId,
       enabled,
+      authRole,
       ...this.getDefaultIncludes(),
       ...this.getIncludesMap(userId),
     });
@@ -142,7 +150,15 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     await this.graphQLService.sdk.enableUser({ userId, enabled });
 
     if (!skipUpdate) {
-      await this.refresh(userId);
+      this.markOutdated(userId);
+    }
+  }
+
+  async setAuthRole(userId: string, authRole?: string, skipUpdate?: boolean): Promise<void> {
+    await this.graphQLService.sdk.setUserAuthRole({ userId, authRole });
+
+    if (!skipUpdate) {
+      this.markOutdated(userId);
     }
   }
 

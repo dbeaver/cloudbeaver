@@ -55,7 +55,7 @@ export function useGrantedConnections(team: TeamInfo, mode: TeamFormMode): Reado
 
         if (this.mode === 'edit') {
           const grantInfo = await this.resource.getSubjectConnectionAccess(this.team.teamId);
-          this.state.grantedSubjects = grantInfo.map(subject => subject.connectionId);
+          this.state.grantedSubjects = grantInfo.map(subject => subject.dataSourceId);
           this.state.initialGrantedSubjects = this.state.grantedSubjects.slice();
         }
 
