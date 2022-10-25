@@ -49,6 +49,9 @@ public class WebProjectInfo {
     }
 
     @Property
+    public boolean isGlobal() { return project.getRmProject().isGlobal(); }
+
+    @Property
     public boolean isShared() {
         return project.getRmProject().isShared();
     }

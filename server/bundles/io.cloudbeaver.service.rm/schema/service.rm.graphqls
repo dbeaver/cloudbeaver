@@ -5,6 +5,7 @@ type RMProject {
     name: String!
     description: String
     shared: Boolean!
+    global: Boolean!
 
     createTime: DateTime!
     creator: String!

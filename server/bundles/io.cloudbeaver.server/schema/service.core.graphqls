@@ -371,6 +371,7 @@ type NavigatorSettings {
 
 type ProjectInfo {
     id: String!
+    global: Boolean!
     shared: Boolean!
     name: String!
     description: String
