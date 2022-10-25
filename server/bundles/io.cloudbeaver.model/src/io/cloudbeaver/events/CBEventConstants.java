@@ -22,5 +22,5 @@ package io.cloudbeaver.events;
 public interface CBEventConstants {
     String CLOUDBEAVER_CONFIG_CHANGED = "cb_config_changed";
     String CLOUDBEAVER_DATASOURCE_UPDATED = "cb_datasource_updated";
-    String CLOUDBEAVER_RM_RESOURCE_UPDATED = "cb_rm_resource_deleted";
+    String CLOUDBEAVER_RM_RESOURCE_UPDATED = "cb_rm_resource_updated";
 }
