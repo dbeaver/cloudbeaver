@@ -299,7 +299,7 @@ public class LocalResourceController implements RMController {
     public void saveProjectDataSources(
         @NotNull String projectId,
         @NotNull String configuration,
-        @NotNull String[] dataSourceIds
+        @Nullable List<String> dataSourceIds
     ) throws DBException {
         final DBPProject project = getProjectMetadata(projectId);
         final DBPDataSourceRegistry registry = project.getDataSourceRegistry();
