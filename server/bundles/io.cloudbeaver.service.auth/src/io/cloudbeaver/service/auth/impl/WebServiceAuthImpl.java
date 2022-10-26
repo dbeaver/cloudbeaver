@@ -147,7 +147,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         }
         try {
             // Read user from security controller. It will also read meta parameters
-            SMUser userWithDetails = webSession.getSecurityController().getUserById(webSession.getUser().getUserId());
+            SMUser userWithDetails = webSession.getSecurityController().getCurrentUser();
             if (userWithDetails != null) {
                 // USer not saved yet. This may happen in easy config mode
                 var webUser = new WebUser(userWithDetails);
@@ -201,13 +201,14 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
-    public boolean setUserConfigurationParameter(@NotNull WebSession webSession, @NotNull String name, @Nullable String value) throws DBWebException {
+    public boolean setUserConfigurationParameter(
+        @NotNull WebSession webSession,
+        @NotNull String name,
+        @Nullable String value
+    ) throws DBWebException {
         webSession.addInfoMessage("Set user parameter - " + name);
         try {
-            webSession.getSecurityController().setUserParameter(
-                webSession.getUser().getUserId(),
-                name,
-                value);
+            webSession.getSecurityController().setUserParameter(name, value);
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error setting user parameter", e);

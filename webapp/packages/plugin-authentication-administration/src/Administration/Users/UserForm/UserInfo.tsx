@@ -11,7 +11,8 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, FieldCheckbox, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useDataResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { AuthRolesResource } from '@cloudbeaver/core-authentication/src/AuthRolesResource';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, FieldCheckbox, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useDataResource, useTranslate, useStyles, Combobox } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IUserFormProps } from './UserFormService';
@@ -29,6 +30,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
   const translate = useTranslate();
   const userMetaParameters = useDataResource(UserInfo, UserMetaParametersResource, undefined);
+  const authRoles = useDataResource(UserInfo, AuthRolesResource, undefined);
 
   const handleTeamChange = useCallback(
     (teamId: string, value: boolean) => { controller.credentials.teams.set(teamId, value); },
@@ -87,6 +89,18 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
         </Container>
       </Group>
       <Group small gap overflow>
+        {authRoles.data.length > 0 && (
+          <Combobox
+            name='authRole'
+            state={controller.credentials}
+            items={authRoles.data}
+            keySelector={value => value}
+            valueSelector={value => value}
+            disabled={controller.isSaving}
+          >
+            {translate('authentication_user_role')}
+          </Combobox>
+        )}
         <GroupTitle>{translate('authentication_user_status')}</GroupTitle>
         <FieldCheckbox
           id={`${controller.user.userId}_user_enabled`}

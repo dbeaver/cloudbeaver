@@ -18,13 +18,12 @@
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-authentication": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-ui": "~0.1.0",
+    "@cloudbeaver/core-extensions": "~0.1.0",
+    "@cloudbeaver/core-resource-manager": "~0.1.0",
     "@cloudbeaver/core-sdk": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0",
-    "@cloudbeaver/core-resource-manager": "~0.1.0",
-    "@cloudbeaver/core-settings": "~0.1.0",
+    "@cloudbeaver/core-ui": "~0.1.0",
     "@cloudbeaver/core-executor": "~0.1.0",
-    "@cloudbeaver/core-navigation-tree": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0"
   },
   "peerDependencies": {

@@ -13,6 +13,7 @@ export default [
   ['authentication_identity_provider_dialog_subtitle', 'Выберите конфигурацию с помощью которой вы хотите войти'],
 
   ['authentication_user_name', 'Имя'],
+  ['authentication_user_role', 'Роль'],
   ['authentication_user_credentials', 'Учетные данные'],
   ['authentication_user_meta_parameters', 'Параметры'],
   ['authentication_user_password', 'Пароль'],
@@ -22,6 +23,7 @@ export default [
   ['authentication_user_enabled', 'Включен'],
   ['authentication_user_login_not_set', 'Логин не может быть пустым'],
   ['authentication_user_team_not_set', 'Должна быть выбрана минимум одна команда'],
+  ['authentication_user_role_not_set', '{alias:authentication_user_role} не задана'],
   ['authentication_user_password_not_set', 'Пароль не задан'],
   ['authentication_user_passwords_not_match', 'Пароли не совпадают'],
   ['authentication_user_login_already_exists', 'Пользователь с таким именем уже существует'],

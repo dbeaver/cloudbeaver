@@ -65,7 +65,7 @@ public class WebUserInfo {
     public List<String> getLinkedAuthProviders() throws DBWebException {
         if (linkedProviders == null) {
             try {
-                linkedProviders = session.getSecurityController().getUserLinkedProviders(session.getUser().getUserId());
+                linkedProviders = session.getSecurityController().getUserLinkedProviders();
             } catch (DBException e) {
                 throw new DBWebException("Error reading user linked providers", e);
             }
@@ -81,7 +81,7 @@ public class WebUserInfo {
     @Property
     public Map<String, Object> getConfigurationParameters() throws DBWebException {
         try {
-            return session.getSecurityController().getUserParameters(user.getUserId());
+            return session.getSecurityController().getUserParameters();
         } catch (DBException e) {
             throw new DBWebException("Error reading user parameters", e);
         }

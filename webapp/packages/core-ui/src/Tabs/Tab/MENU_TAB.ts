@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createMenu } from "@cloudbeaver/core-view";
+import { createMenu } from '@cloudbeaver/core-view';
 
 export const MENU_TAB = createMenu('tab', 'Tab menu');

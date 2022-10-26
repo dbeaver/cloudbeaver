@@ -7,7 +7,8 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { TabsContainer } from '@cloudbeaver/core-ui';
+
+import { TabsContainer } from '../Tabs/TabsContainer/TabsContainer';
 
 @injectable()
 export class SideBarPanelService {

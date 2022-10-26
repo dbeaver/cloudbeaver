@@ -90,7 +90,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.rmController = application.getResourceController(this, this.securityController);
         if (isSessionChanged) {
             this.smSessionId = smAuthInfo.getAuthPermissions().getSessionId();
-            setUser(authPermissions.getUserId() == null ? null : new WebUser(securityController.getUserById(authPermissions.getUserId())));
+            setUser(authPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));
         }
         return isSessionChanged;
     }
@@ -168,7 +168,7 @@ public class WebUserContext implements SMCredentialsProvider {
      */
     public synchronized void refreshPermissions() throws DBException {
         if (isAuthorizedInSecurityManager()) {
-            this.userPermissions = securityController.getTokenPermissions(smCredentials.getSmToken()).getPermissions();
+            this.userPermissions = securityController.getTokenPermissions().getPermissions();
         } else {
             this.userPermissions = getDefaultPermissions();
         }

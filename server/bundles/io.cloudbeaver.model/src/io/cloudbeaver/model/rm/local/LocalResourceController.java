@@ -154,10 +154,7 @@ public class LocalResourceController implements RMController {
         if (credentialsProvider.hasPermission(DBWConstants.PERMISSION_ADMIN) || credentialsProvider.hasPermission(RMConstants.PERMISSION_RM_ADMIN)) {
             return new ArrayList<>(Arrays.asList(listAllSharedProjects()));
         }
-        var accessibleSharedProjects = smController.getAllAvailableObjectsPermissions(
-            userId,
-            SMObjects.PROJECT
-        );
+        var accessibleSharedProjects = smController.getAllAvailableObjectsPermissions(SMObjects.PROJECT);
 
         return accessibleSharedProjects
             .stream()

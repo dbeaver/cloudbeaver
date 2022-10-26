@@ -13,6 +13,7 @@ export default [
   ['authentication_identity_provider_dialog_subtitle', 'Choose configuration you want to sign in with'],
 
   ['authentication_user_name', 'User name'],
+  ['authentication_user_role', 'Role'],
   ['authentication_user_credentials', 'Credentials'],
   ['authentication_user_meta_parameters', 'Parameters'],
   ['authentication_user_password', 'User password'],
@@ -22,7 +23,8 @@ export default [
   ['authentication_user_enabled', 'Enabled'],
   ['authentication_user_login_not_set', 'Login can\'t be empty'],
   ['authentication_user_team_not_set', 'At least one team must be selected'],
-  ['authentication_user_password_not_set', 'Password is required'],
+  ['authentication_user_role_not_set', '{alias:authentication_user_role} is required'],
+  ['authentication_user_password_not_set', '{alias:authentication_user_password} is required'],
   ['authentication_user_passwords_not_match', "Passwords don't match"],
   ['authentication_user_login_already_exists', 'The user with this name already exists'],
   ['authentication_user_login_cant_be_used', 'Sorry, that name cannot be used'],
