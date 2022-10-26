@@ -127,7 +127,7 @@ public class WebSessionAuthProcessor {
                 if (authProviderExternal != null && !configMode && !alreadyLoggedIn) {
                     // We may need to associate new credentials with active user
                     if (linkWithActiveUser) {
-                        securityController.setUserCredentials(userId, authProviderDescriptor.getId(), authAttrs);
+                        securityController.setUserCredentials(authProviderDescriptor.getId(), authAttrs);
                     }
                 }
 
@@ -164,7 +164,7 @@ public class WebSessionAuthProcessor {
                 if (!configMode && securityController.getUserPermissions(userId).isEmpty()) {
                     throw new DBWebException("Access denied (no permissions)");
                 }
-                if (!configMode && !securityController.getUserById(userId).isEnabled()) {
+                if (!configMode && !securityController.getCurrentUser().isEnabled()) {
                     throw new DBWebException("User account is locked");
                 }
 

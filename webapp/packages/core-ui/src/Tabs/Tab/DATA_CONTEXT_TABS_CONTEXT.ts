@@ -7,6 +7,7 @@
  */
 
 import { createDataContext } from '@cloudbeaver/core-view';
+
 import type { ITabsContext } from '../TabsContext';
 
 export const DATA_CONTEXT_TABS_CONTEXT = createDataContext<ITabsContext<any>>('tabs-context');

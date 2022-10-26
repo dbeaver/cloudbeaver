@@ -1,0 +1,9 @@
+query setUserAuthRole(
+  $userId: ID!
+  $authRole: String
+) {
+  setUserAuthRole(
+    userId: $userId
+    authRole: $authRole
+  )
+}

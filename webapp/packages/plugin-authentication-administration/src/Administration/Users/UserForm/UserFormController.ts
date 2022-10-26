@@ -9,6 +9,7 @@
 import { observable, computed, makeObservable } from 'mobx';
 
 import { AdminUser, compareTeams, isLocalUser, TeamInfo, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { AuthRolesResource } from '@cloudbeaver/core-authentication/src/AuthRolesResource';
 import { ConnectionInfoProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -33,6 +34,7 @@ interface IUserCredentials {
   passwordRepeat: string;
   metaParameters: Record<string, any>;
   teams: Map<string, boolean>;
+  authRole?: string;
 }
 
 @injectable()
@@ -76,6 +78,7 @@ export class UserFormController implements IInitializableController, IDestructib
     private readonly teamsResource: TeamsResource,
     private readonly usersResource: UsersResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly authRolesResource: AuthRolesResource,
     private readonly dbDriverResource: DBDriverResource
   ) {
     this.partsState = new MetadataMap();
@@ -149,6 +152,7 @@ export class UserFormController implements IInitializableController, IDestructib
           teams: this.getGrantedTeams(),
           metaParameters: this.credentials.metaParameters,
           grantedConnections: this.getGrantedConnections(),
+          authRole: this.credentials.authRole,
         });
 
         this.collapse();
@@ -164,6 +168,7 @@ export class UserFormController implements IInitializableController, IDestructib
           );
         }
         await this.updateTeams();
+        await this.saveUserRole();
         await this.saveUserStatus();
         await this.saveConnectionPermissions();
         await this.saveMetaParameters();
@@ -261,6 +266,11 @@ export class UserFormController implements IInitializableController, IDestructib
       }
     }
 
+    if (!this.credentials.authRole && this.authRolesResource.data.length > 0) {
+      this.setStatusMessage('authentication_user_role_not_set', ENotificationType.Error);
+      return;
+    }
+
     if (!this.credentials.password && !this.editing) {
       this.setStatusMessage('authentication_user_password_not_set', ENotificationType.Error);
       return;
@@ -305,9 +315,15 @@ export class UserFormController implements IInitializableController, IDestructib
     await this.usersResource.setMetaParameters(this.user.userId, this.credentials.metaParameters);
   }
 
+  private async saveUserRole() {
+    if (this.credentials.authRole !== this.user.authRole) {
+      await this.usersResource.setAuthRole(this.user.userId, this.credentials.authRole, true);
+    }
+  }
+
   private async saveUserStatus() {
     if (this.enabled !== this.user.enabled) {
-      await this.usersResource.enableUser(this.user.userId, this.enabled);
+      await this.usersResource.enableUser(this.user.userId, this.enabled, true);
     }
   }
 
@@ -337,6 +353,7 @@ export class UserFormController implements IInitializableController, IDestructib
       this.credentials.metaParameters = this.user.metaParameters;
       this.credentials.login = this.user.userId;
       this.credentials.teams = new Map(this.user.grantedTeams.map(teamId => ([teamId, true])));
+      this.credentials.authRole = this.user.authRole;
       this.enabled = this.user.enabled;
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load user');

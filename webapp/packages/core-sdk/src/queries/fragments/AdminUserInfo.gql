@@ -8,4 +8,5 @@ fragment AdminUserInfo on AdminUserInfo {
     ...ObjectOriginInfo
   }
   enabled
+  authRole
 }

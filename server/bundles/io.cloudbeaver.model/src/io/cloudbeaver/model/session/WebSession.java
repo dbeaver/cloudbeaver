@@ -413,12 +413,10 @@ public class WebSession extends AbstractSessionPersistent
     @NotNull
     private Set<String> readAccessibleConnectionIds() {
         WebUser user = getUser();
-        String subjectId = user == null ?
-            application.getAppConfiguration().getAnonymousUserTeam() : user.getUserId();
 
         try {
             return getSecurityController()
-                .getAllAvailableObjectsPermissions(subjectId, SMObjects.DATASOURCE)
+                .getAllAvailableObjectsPermissions(SMObjects.DATASOURCE)
                 .stream()
                 .map(SMObjectPermissions::getObjectId)
                 .collect(Collectors.toSet());
@@ -536,7 +534,7 @@ public class WebSession extends AbstractSessionPersistent
                     if (!application.isConfigurationMode()) {
                         // Update record
                         //TODO use generate id from SMController
-                        getSecurityController().updateSession(this.userContext.getSmSessionId(), getUserId(), getSessionParameters());
+                        getSecurityController().updateSession(this.userContext.getSmSessionId(), getSessionParameters());
                     }
                 }
             } catch (Exception e) {
