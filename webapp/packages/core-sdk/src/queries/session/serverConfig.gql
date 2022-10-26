@@ -25,6 +25,7 @@ query serverConfig {
     configurationMode
     developmentMode
     redirectOnFederatedAuth
+    distributed
 
     enabledFeatures
     enabledAuthProviders
