@@ -17,12 +17,14 @@
 package io.cloudbeaver.service.rm.impl;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.admin.AdminPermissionInfo;
 import io.cloudbeaver.service.rm.DBWServiceRM;
 import io.cloudbeaver.service.rm.model.RMProjectPermissions;
 import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
 import io.cloudbeaver.service.security.SMUtils;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -137,7 +139,9 @@ public class WebServiceRM implements DBWServiceRM {
     ) throws DBException {
         checkIsRmEnabled(webSession);
         try {
-            return getResourceController(webSession).createResource(projectId, resourcePath, isFolder);
+            String result = getResourceController(webSession).createResource(projectId, resourcePath, isFolder);
+            WebAppUtils.addRmResourceUpdatedEvent(CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED, projectId, resourcePath);
+            return result;
         } catch (Exception e) {
             throw new DBWebException("Error creating resource " + resourcePath, e);
         }
@@ -151,6 +155,7 @@ public class WebServiceRM implements DBWServiceRM {
         checkIsRmEnabled(webSession);
         try {
             getResourceController(webSession).deleteResource(projectId, resourcePath, false);
+            WebAppUtils.addRmResourceUpdatedEvent(CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED, projectId, resourcePath);
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error deleting resource " + resourcePath, e);

@@ -18,6 +18,7 @@ package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.events.CBEventController;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.app.DBPApplication;
@@ -75,6 +76,8 @@ public interface WebApplication extends DBPApplication {
     }
 
     String getApplicationInstanceId() throws DBException;
+
+    CBEventController getEventController();
 
     /**
      * Port this server listens on

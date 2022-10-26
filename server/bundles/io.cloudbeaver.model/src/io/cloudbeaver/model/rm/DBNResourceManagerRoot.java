@@ -18,6 +18,7 @@
 package io.cloudbeaver.model.rm;
 
 import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPHiddenObject;
 import org.jkiss.dbeaver.model.DBPImage;
@@ -28,10 +29,7 @@ import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, RMEventListener {
 
@@ -126,13 +124,26 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
             case RESOURCE_DELETE:
                 deleteResourceNode(event.getProject(), event.getResourceTree());
                 break;
+            case RESOURCE_ADD:
+                addResourceNode(event.getProject(), event.getResourceTree());
+                break;
         }
     }
 
     private void deleteResourceNode(RMProject project, List<RMResource> resourcePath) {
-        var projectNode = Arrays.stream(projects)
+        var projectNode = getProjectNode(project);
+        projectNode.ifPresent(dbnResourceManagerProject -> dbnResourceManagerProject.removeChildResourceNode(new ArrayDeque<>(resourcePath)));
+    }
+
+    @NotNull
+    private Optional<DBNResourceManagerProject> getProjectNode(RMProject project) {
+        return Arrays.stream(projects)
             .filter(rmProjectNode -> rmProjectNode.getProject().getId().equals(project.getId()))
             .findFirst();
-        projectNode.ifPresent(dbnResourceManagerProject -> dbnResourceManagerProject.removeChildResourceNode(new ArrayDeque<>(resourcePath)));
+    }
+
+    private void addResourceNode(RMProject project, List<RMResource> resourcePath) {
+        var projectNode = getProjectNode(project);
+        projectNode.ifPresent(dbnResourceManagerProject -> dbnResourceManagerProject.addChildResourceNode(new ArrayDeque<>(resourcePath)));
     }
 }
