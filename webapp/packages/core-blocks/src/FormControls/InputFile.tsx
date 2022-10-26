@@ -97,7 +97,8 @@ export const InputFile: InputFileType = observer(function InputFile({
     error ? baseInvalidFormControlStyles : baseValidFormControlStyles
   );
 
-  const description = error?.message ?? selected?.name ?? translate('ui_no_file_chosen');
+  const fileSaved = !!state[name];
+  const description = error?.message ?? selected?.name ?? translate(fileSaved ? 'ui_processing_saved' : 'ui_no_file_chosen');
 
   const removeFile = useCallback(() => {
     setSelected(null);
@@ -162,7 +163,7 @@ export const InputFile: InputFileType = observer(function InputFile({
       </UploadArea>
       <field-description>
         {description}
-        {selected && <IconButton disabled={disabled} name='cross' onClick={removeFile} />}
+        {(selected || fileSaved) && <IconButton disabled={disabled} name='cross' onClick={removeFile} />}
       </field-description>
     </field>
   );
