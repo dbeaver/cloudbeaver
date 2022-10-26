@@ -20,7 +20,6 @@ mkdir cloudbeaver\web
 echo Pull cloudbeaver platform
 
 cd ..\..
-rem IF NOT EXIST react-data-grid git clone https://github.com/dbeaver/react-data-grid.git
 
 echo Pull dbeaver platform
 
@@ -54,16 +53,9 @@ echo Build static content
 
 cd ..\
 
-rem cd ..\react-data-grid
-rem call npm i
-rem call npm run build
-rem call npm run build:types
-rem call yarn link
-
 cd ..\cloudbeaver\webapp
 
 call yarn
-rem call yarn link "react-data-grid"
 call lerna bootstrap
 call lerna run build --no-bail --stream --scope=@cloudbeaver/product-default &::-- -- --env source-map
 
