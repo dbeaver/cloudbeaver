@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { PropsWithChildren, useCallback, useContext, useState } from 'react';
+import { ReactNode, useCallback, useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
@@ -49,10 +49,9 @@ const INPUT_FILE_FIELD_STYLES = css`
   }
 `;
 
-interface Props extends ILayoutSizeProps {
-  // we need to make sure that name exists in state (via types)
-  name: string;
-  state: Record<string, any>;
+interface Props<TState> extends ILayoutSizeProps {
+  name: keyof TState;
+  state: TState;
   labelTooltip?: string;
   tooltip?: string;
   required?: boolean;
@@ -61,10 +60,13 @@ interface Props extends ILayoutSizeProps {
   maxFileSize?: number;
   disabled?: boolean;
   className?: string;
-  onChange?: (value: string, name: string) => void;
+  children?: ReactNode;
+  onChange?: (value: string, name: keyof TState) => void;
 }
 
-export const InputFile = observer<PropsWithChildren<Props>>(function InputFile({
+type InputFileType = <TState extends Record<string, any>>(props: Props<TState>) => React.ReactElement<any, any>;
+
+export const InputFile: InputFileType = observer(function InputFile({
   name,
   state,
   labelTooltip,
@@ -80,7 +82,7 @@ export const InputFile = observer<PropsWithChildren<Props>>(function InputFile({
   className,
   children,
   onChange,
-}) {
+}: Props<Record<any, any>>) {
   const translate = useTranslate();
   const context = useContext(FormContext);
 
