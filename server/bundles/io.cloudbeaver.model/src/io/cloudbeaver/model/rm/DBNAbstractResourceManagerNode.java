@@ -1,9 +1,11 @@
 package io.cloudbeaver.model.rm;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPObjectWithDetails;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.rm.RMResource;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.utils.ArrayUtils;
 
 import java.util.Queue;
@@ -33,7 +35,15 @@ public abstract class DBNAbstractResourceManagerNode extends DBNNode implements 
     }
 
     public void addChildResourceNode(@NotNull Queue<RMResource> resourcePath) {
-        if (children == null || resourcePath.isEmpty()) {
+        if (children == null) {
+            // initialize children
+            try {
+                getChildren(new VoidProgressMonitor());
+            } catch (DBException e) {
+                return;
+            }
+        }
+        if (resourcePath.isEmpty()) {
             return;
         }
         var expectedResource = resourcePath.poll();
@@ -43,9 +53,9 @@ public abstract class DBNAbstractResourceManagerNode extends DBNNode implements 
             children = ArrayUtils.add(DBNResourceManagerResource.class, children, newResourceNode);
             return;
         }
-
-        if (resourcePath.size() > 1) {
+        if (resourcePath.size() > 0) {
             node.addChildResourceNode(resourcePath);
         }
+
     }
 }
