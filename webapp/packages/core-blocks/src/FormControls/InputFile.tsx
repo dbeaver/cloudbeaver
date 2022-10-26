@@ -89,7 +89,6 @@ export const InputFile: InputFileType = observer(function InputFile({
   const [selected, setSelected] = useState<File | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
-
   const styles = useStyles(
     INPUT_FILE_FIELD_STYLES,
     baseFormControlStyles,
