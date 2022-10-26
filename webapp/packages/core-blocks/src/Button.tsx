@@ -12,7 +12,7 @@ import styled, { css, use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
-import { Icon } from './Icon';
+import { IconOrImage } from './IconOrImage';
 import { Loader } from './Loader/Loader';
 import { useObservableRef } from './useObservableRef';
 import { useStyles } from './useStyles';
@@ -30,6 +30,14 @@ const buttonStyles = css`
     Button {
       composes: theme-button from global;
       display: flex;
+
+      & IconOrImage {
+        width: 100%;
+      }
+
+      &[disabled] IconOrImage {
+        opacity: 0.5;
+      }
 
       & Loader, & button-label {
         transition: opacity cubic-bezier(0.4, 0.0, 0.2, 1) 0.3s;
@@ -154,7 +162,7 @@ export const Button = observer<ButtonProps>(function Button({
       onClick={state.click}
     >
       <ripple />
-      {icon && <button-icon><Icon name={icon} viewBox={viewBox} /></button-icon>}
+      {icon && <button-icon><IconOrImage icon={icon} viewBox={viewBox} /></button-icon>}
       <button-label as='span'>{children}</button-label>
       <Loader small />
     </Button>

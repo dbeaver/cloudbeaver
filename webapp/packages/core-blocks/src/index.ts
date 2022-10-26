@@ -136,6 +136,7 @@ export * from './FormControls/FormContext';
 export * from './FormControls/FormFieldDescription';
 export * from './FormControls/FormGroup';
 export * from './FormControls/InputField';
+export * from './FormControls/InputFile';
 export * from './FormControls/Radio';
 export * from './FormControls/RadioGroup';
 export * from './FormControls/RadioGroupContext';
