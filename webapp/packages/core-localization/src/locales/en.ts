@@ -86,6 +86,9 @@ export const defaultENLocale = [
   ['ui_limit', 'Limit'],
   ['ui_file_size', 'File size'],
   ['ui_processing_synchronization', 'Synchronization...'],
+  ['ui_no_file_chosen', 'No file chosen'],
+  ['ui_file_size_exceeds', 'Max file size exceeds. File size: {arg:size}. Max file size: {arg:maxSize}'],
+  ['ui_upload_file', 'Upload file'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],

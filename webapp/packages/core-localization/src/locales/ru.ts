@@ -84,6 +84,9 @@ export const defaultRULocale = [
   ['ui_limit', 'Лимит'],
   ['ui_file_size', 'Размер файла'],
   ['ui_processing_synchronization', 'Синхронизация...'],
+  ['ui_no_file_chosen', 'Файл не выбран'],
+  ['ui_file_size_exceeds', 'Максимальный размер файла превышен. Размер файла: {arg:size}. Максимальный размер: {arg:maxSize}'],
+  ['ui_upload_file', 'Загрузить файл'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],
