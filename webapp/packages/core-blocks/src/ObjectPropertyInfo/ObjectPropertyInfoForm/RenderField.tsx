@@ -14,6 +14,7 @@ import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox';
 import { Combobox } from '../../FormControls/Combobox';
 import { FormFieldDescription } from '../../FormControls/FormFieldDescription';
 import { InputField } from '../../FormControls/InputField';
+import { InputFile } from '../../FormControls/InputFile';
 import { isControlPresented } from '../../FormControls/isControlPresented';
 import { Textarea } from '../../FormControls/Textarea';
 import { Link } from '../../Link';
@@ -33,7 +34,7 @@ interface RenderFieldProps {
   className?: string;
 }
 
-type ControlType = 'checkbox' | 'combobox' | 'link' | 'input' | 'textarea';
+type ControlType = 'checkbox' | 'combobox' | 'link' | 'input' | 'textarea' | 'file';
 
 function getControlTypeFor(property: ObjectPropertyInfo): ControlType {
   const dataType = property.dataType?.toLowerCase();
@@ -46,6 +47,8 @@ function getControlTypeFor(property: ObjectPropertyInfo): ControlType {
     return 'link';
   } else if (dataType === 'string' && property.length === 'MULTILINE') {
     return 'textarea';
+  } else if (property.features.includes('file')) {
+    return 'file';
   }
 
   return 'input';
@@ -83,6 +86,21 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   const value = getValue(property.value, controltype);
   const defaultValue = getValue(property.defaultValue, controltype);
   let description: string | undefined;
+
+  if (controltype === 'file' && state) {
+    return (
+      <InputFile
+        tooltip={property.description}
+        labelTooltip={property.displayName || property.description}
+        name={property.id!}
+        state={state}
+        disabled={disabled}
+        className={className}
+      >
+        {property.displayName}
+      </InputFile>
+    );
+  }
 
   if (controltype === 'link') {
     return (
