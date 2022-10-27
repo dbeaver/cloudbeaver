@@ -24,7 +24,6 @@ import io.cloudbeaver.utils.CBModelConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.*;
-import org.jkiss.dbeaver.model.data.storage.ExternalContentStorage;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCSession;
 import org.jkiss.dbeaver.model.gis.DBGeometry;
@@ -32,7 +31,6 @@ import org.jkiss.dbeaver.model.gis.GisConstants;
 import org.jkiss.dbeaver.model.gis.GisTransformUtils;
 import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.Base64;
@@ -41,7 +39,6 @@ import org.jkiss.utils.CommonUtils;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -90,7 +87,7 @@ public class WebSQLUtils {
                 return serializeContentValue(session, (DBDContent)dbValue);
             }
         }
-        return cellValue == null ? null : cellValue.toString();
+        return cellValue == null ? null : serializeStringValue(cellValue);
     }
 
     private static Object serializeComplexValue(WebSession session, DBSTypedObject type, DBDComplexValue value, WebDataFormat dataFormat) throws DBCException {
@@ -199,6 +196,27 @@ public class WebSQLUtils {
         if (xValue != null && xValue != value) {
             map.put("mapText", xValue.toString());
         }
+        return map;
+    }
+
+    /**
+     * Serializes original value from db to web form
+     *
+     * @param value original value
+     * @return web form value
+     */
+    public static Object serializeStringValue(Object value) {
+        int textPreviewMaxLength = CommonUtils.toInt(
+            CBApplication.getInstance().getAppConfiguration().getResourceQuota(
+                WebSQLConstants.QUOTA_PROP_BINARY_PREVIEW_MAX_LENGTH,
+                WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH));
+        String stringValue = value.toString();
+        if (stringValue.length() < textPreviewMaxLength) {
+            return value.toString();
+        }
+        Map<String, Object> map = createMapOfType(WebSQLConstants.VALUE_TYPE_CONTENT);
+        map.put(WebSQLConstants.ATTR_TEXT, stringValue.substring(0, textPreviewMaxLength));
+        map.put("contentLength", GeneralUtils.convertToBytes(stringValue).length);
         return map;
     }
 
