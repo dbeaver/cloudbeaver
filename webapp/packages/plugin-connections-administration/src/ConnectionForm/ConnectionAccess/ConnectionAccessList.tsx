@@ -112,8 +112,8 @@ export const ConnectionAccessList = observer<Props>(function ConnectionAccessLis
                 <ConnectionAccessTableItem
                   key={team.teamId}
                   id={team.teamId}
-                  name={team.teamName || ''}
-                  tooltip={team.teamName}
+                  name={team.teamName || team.teamId}
+                  tooltip={team.teamId}
                   description={team.description}
                   icon='/icons/team.svg'
                   iconTooltip={translate('authentication_team_icon_tooltip')}
