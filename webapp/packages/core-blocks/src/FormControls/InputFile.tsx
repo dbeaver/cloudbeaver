@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { ReactNode, useCallback, useContext, useState } from 'react';
+import { ReactNode, useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
@@ -99,18 +99,21 @@ export const InputFile: InputFileType = observer(function InputFile({
   const fileSaved = !!state[name];
   const description = error?.message ?? selected?.name ?? translate(fileSaved ? 'ui_processing_saved' : 'ui_no_file_chosen');
 
-  const removeFile = useCallback(() => {
+  function updateValue(value: string) {
+    state[name] = value;
+    onChange?.(value, name);
+    context?.change(value, name);
+  }
+
+  function removeFile() {
     setSelected(null);
 
     if (state[name]) {
-      const value = '';
-      state[name] = value;
-      onChange?.(value, name);
-      context?.change(value, name);
+      updateValue('');
     }
-  }, [name, state, context, onChange]);
+  }
 
-  const validateFileSize = useCallback((size: number) => {
+  function validateFileSize(size: number) {
     const maxFileSizeBytes = maxFileSize * 1000;
 
     if (size > maxFileSizeBytes) {
@@ -119,12 +122,10 @@ export const InputFile: InputFileType = observer(function InputFile({
         maxSize: bytesToSize(maxFileSizeBytes),
       }));
     }
-  }, [maxFileSize]);
+  }
 
-  const handleChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+  async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
-
-    setError(null);
 
     if (!file) {
       removeFile();
@@ -136,16 +137,15 @@ export const InputFile: InputFileType = observer(function InputFile({
 
         if (value) {
           setSelected(file);
-          state[name] = value;
-          onChange?.(value, name);
-          context?.change(value, name);
+          updateValue(value);
+          setError(null);
         }
       } catch (exception: any) {
         removeFile();
         setError(exception);
       }
     }
-  }, [name, state, context, validateFileSize, removeFile, onChange]);
+  }
 
   return styled(styles)(
     <field className={className} {...use({ small, medium, large, tiny })}>
