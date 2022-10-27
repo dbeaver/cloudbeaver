@@ -15,7 +15,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { PermissionsService } from '@cloudbeaver/core-root';
+import { PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
 import { CachedMapAllKey, DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { getUniqueName, isValuesEqual } from '@cloudbeaver/core-utils';
 
@@ -30,6 +30,7 @@ import { Options } from './Options';
 @injectable()
 export class ConnectionOptionsTabService extends Bootstrap {
   constructor(
+    private readonly serverConfigResource: ServerConfigResource,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionFormService: ConnectionFormService,
     private readonly dbDriverResource: DBDriverResource,
@@ -95,7 +96,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const adminPermission = this.permissionsService.has(EAdminPermission.admin);
     const originLocal = !state.info || isLocalConnection(state.info);
 
-    return adminPermission && originLocal && isProjectShared;
+    return adminPermission && originLocal && isProjectShared && !this.serverConfigResource.data?.distributed;
   }
 
   private async save(

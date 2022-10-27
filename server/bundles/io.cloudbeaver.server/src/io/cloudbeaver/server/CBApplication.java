@@ -1056,4 +1056,9 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             newConfig.put(key, newConfigValue);
         }
     }
+
+    @Override
+    public CBEventController getEventController() {
+        return eventController;
+    }
 }

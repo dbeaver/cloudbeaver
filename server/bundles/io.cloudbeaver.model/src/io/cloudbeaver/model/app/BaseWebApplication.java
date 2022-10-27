@@ -18,6 +18,7 @@ package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.events.CBEventController;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
 import io.cloudbeaver.server.WebWorkspace;
@@ -197,5 +198,10 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         } catch (Exception e) {
             throw new DBException("Error during generation instance id generation", e);
         }
+    }
+
+    @Override
+    public CBEventController getEventController() {
+        return null;
     }
 }
