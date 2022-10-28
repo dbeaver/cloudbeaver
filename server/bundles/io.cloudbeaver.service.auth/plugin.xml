@@ -3,6 +3,11 @@
 
 <plugin>
 
+    <extension point="io.cloudbeaver.service">
+        <service id="auth" label="User authentication" description="User authentication services" class="io.cloudbeaver.service.auth.WebServiceBindingAuth">
+
+        </service>
+    </extension>
     <extension point="io.cloudbeaver.metaParameters">
         <metaParameters type="user">
             <propertyGroup label="Main">
