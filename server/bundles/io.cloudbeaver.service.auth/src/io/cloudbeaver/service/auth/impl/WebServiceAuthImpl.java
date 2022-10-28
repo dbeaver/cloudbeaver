@@ -32,6 +32,7 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
 import io.cloudbeaver.service.auth.WebAuthStatus;
 import io.cloudbeaver.service.auth.WebUserInfo;
+import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -157,6 +158,14 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 return new WebUserInfo(webSession, webSession.getUser());
             }
         } catch (DBException e) {
+            if (SMUtils.isTokenExpiredExceptionWasHandled(e)) {
+                try {
+                    webSession.resetUserState();
+                    return null;
+                } catch (DBException ex) {
+                    throw new DBWebException("Error reading user details", e);
+                }
+            }
             throw new DBWebException("Error reading user details", e);
         }
     }

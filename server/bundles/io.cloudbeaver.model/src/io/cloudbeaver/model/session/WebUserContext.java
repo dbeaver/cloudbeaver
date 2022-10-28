@@ -112,8 +112,11 @@ public class WebUserContext implements SMCredentialsProvider {
      * reset the state as if the user is not logged in
      */
     public synchronized void reset() throws DBException {
-        if (this.smCredentials != null) {
-            this.securityController.logout();
+        try {
+            if (this.smCredentials != null) {
+                this.securityController.logout();
+            }
+        } catch (Exception e) {
         }
         this.userPermissions = getDefaultPermissions();
         this.smCredentials = null;
