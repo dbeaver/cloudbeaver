@@ -10,20 +10,17 @@ import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { PermissionsResource } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, FieldCheckbox, Group, GroupTitle, InputField, SubmittingForm, Textarea, useMapResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, InputField, SubmittingForm, Textarea, useTranslate, useStyles, useDataResource } from '@cloudbeaver/core-blocks';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormProps } from '../ITeamFormProps';
+import { Permissions } from './Permissions';
 
 const styles = css`
   SubmittingForm {
     flex: 1;
     overflow: auto;
-  }
-  caption {
-    composes: theme-text-text-hint-on-light theme-typography--caption from global;
   }
 `;
 
@@ -33,7 +30,8 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
   const formRef = useRef<HTMLFormElement>(null);
 
   const translate = useTranslate();
-  const permissionsResource = useMapResource(TeamOptions, PermissionsResource, CachedMapAllKey);
+  const serverConfigResource = useDataResource(TeamOptions, ServerConfigResource, undefined);
+
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
   const edit = state.mode === 'edit';
 
@@ -73,42 +71,7 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
             {translate('administration_teams_team_description')}
           </Textarea>
         </Group>
-        <Group small gap>
-          <GroupTitle>{translate('administration_teams_team_permissions')}</GroupTitle>
-          {permissionsResource.resource.values.map(permission => {
-            const label = permission.label ?? permission.id;
-
-            let caption = '';
-
-            if (permission.description) {
-              caption = permission.description;
-            } else if (permission.label) {
-              caption = `(${permission.id})`;
-            }
-
-            let tooltip = `${permission.id}`;
-
-            if (permission.label) {
-              tooltip = permission.label + ` (${permission.id})`;
-            }
-
-            return (
-              <FieldCheckbox
-                key={permission.id}
-                id={permission.id}
-                value={permission.id}
-                title={tooltip}
-                name='teamPermissions'
-                state={state.config}
-                readOnly={state.readonly}
-                disabled={state.disabled}
-              >
-                {label}
-                {caption ? <caption>{caption}</caption> : null}
-              </FieldCheckbox>
-            );
-          })}
-        </Group>
+        {!serverConfigResource.data?.distributed && <Permissions state={state} />}
       </ColoredContainer>
     </SubmittingForm>
   );
