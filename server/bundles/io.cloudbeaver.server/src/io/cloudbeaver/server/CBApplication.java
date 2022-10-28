@@ -115,7 +115,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     private Map<String, Object> originalConfigurationProperties = new LinkedHashMap<>();
 
     // Persistence
-    private SMAdminController securityController;
+    protected SMAdminController securityController;
 
     private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
 
