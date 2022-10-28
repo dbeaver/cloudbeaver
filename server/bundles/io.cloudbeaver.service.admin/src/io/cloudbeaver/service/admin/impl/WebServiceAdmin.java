@@ -45,11 +45,9 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
-import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
-import org.jkiss.dbeaver.model.security.SMConstants;
-import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
-import org.jkiss.dbeaver.model.security.SMObjects;
+import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -117,6 +115,25 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         } catch (Exception e) {
             throw new DBWebException("Error reading permissions", e);
         }
+    }
+
+    @Override
+    public WebPropertyInfo[] listTeamMetaParameters(@NotNull WebSession webSession) {
+        // First add user profile properties
+        List<DBPPropertyDescriptor> props = new ArrayList<>(
+            WebMetaParametersRegistry.getInstance().getTeamParameters());
+
+        // Add metas from enabled auth providers
+        for (WebAuthProviderDescriptor ap : WebServiceUtils.getEnabledAuthProviders()) {
+            List<DBPPropertyDescriptor> metaProps = ap.getMetaParameters(SMSubjectType.team);
+            if (!CommonUtils.isEmpty(metaProps)) {
+                props.addAll(metaProps);
+            }
+        }
+
+        return props.stream()
+            .map(p -> new WebPropertyInfo(webSession, p, null))
+            .toArray(WebPropertyInfo[]::new);
     }
 
     @NotNull

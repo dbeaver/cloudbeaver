@@ -50,6 +50,8 @@ type AdminTeamInfo {
     teamName: String
     description: String
 
+    metaParameters: Object!
+
     grantedUsers: [ID!]!
     grantedConnections: [AdminConnectionGrantInfo!]!
 
@@ -120,6 +122,7 @@ extend type Query {
     listTeams(teamId: ID): [AdminTeamInfo!]!
     listPermissions: [AdminPermissionInfo!]!
     listAuthRoles: [String!]!
+    listTeamMetaParameters: [ObjectPropertyInfo!]!
 
     createUser(userId: ID!, enabled: Boolean!, authRole: String): AdminUserInfo!
     deleteUser(userId: ID!): Boolean

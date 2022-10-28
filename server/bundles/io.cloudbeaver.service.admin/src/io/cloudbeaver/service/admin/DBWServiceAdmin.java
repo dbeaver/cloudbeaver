@@ -52,6 +52,9 @@ public interface DBWServiceAdmin extends DBWService {
     @NotNull
     List<AdminPermissionInfo> listPermissions(@NotNull WebSession webSession) throws DBWebException;
 
+    @WebAction()
+    WebPropertyInfo[] listTeamMetaParameters(@NotNull WebSession webSession);
+
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     @NotNull
     AdminUserInfo createUser(

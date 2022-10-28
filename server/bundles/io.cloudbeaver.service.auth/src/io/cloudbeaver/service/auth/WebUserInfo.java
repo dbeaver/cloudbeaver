@@ -55,6 +55,11 @@ public class WebUserInfo {
     }
 
     @Property
+    public String getAuthRole() {
+        return user == null ? null : user.getAuthRole();
+    }
+
+    @Property
     public List<WebUserAuthToken> getAuthTokens() {
         return session.getAllAuthInfo().stream()
             .map(ai -> new WebUserAuthToken(session, user, ai))
