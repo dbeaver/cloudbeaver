@@ -18,6 +18,7 @@ package io.cloudbeaver.service.admin.impl;
 
 import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebConnectionConfig;
@@ -45,7 +46,6 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
-import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
@@ -339,10 +339,15 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     // Connection management
 
     @Override
-    public List<WebConnectionInfo> getAllConnections(@NotNull WebSession webSession, @Nullable String id) throws DBWebException {
+    public List<WebConnectionInfo> getAllConnections(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @Nullable String id
+    ) throws DBWebException {
         // Get all connections from global configuration
         List<WebConnectionInfo> result = new ArrayList<>();
-        for (DBPDataSourceContainer ds : getGlobalRegistry(webSession).getDataSources()) {
+        DBPDataSourceRegistry registry = getDataSourceRegistry(webSession, projectId);
+        for (DBPDataSourceContainer ds : registry.getDataSources()) {
             if (id != null && !id.equals(ds.getId())) {
                 continue;
             }
@@ -369,7 +374,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     ) throws DBWebException {
 
         webSession.addInfoMessage("Create new connection");
-        DBPDataSourceRegistry registry = getGlobalRegistry(webSession);
+        DBPDataSourceRegistry registry = getDataSourceRegistry(webSession, projectId);
         DBPDataSourceContainer dataSource = WebServiceUtils.createConnectionFromConfig(config, registry);
         try {
             registry.addDataSource(dataSource);
@@ -393,7 +398,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     ) throws DBWebException {
         try {
             DBNModel globalNavigatorModel = webSession.getNavigatorModel();
-            DBPDataSourceRegistry globalDataSourceRegistry = getGlobalRegistry(webSession);
+            DBPDataSourceRegistry globalDataSourceRegistry = getDataSourceRegistry(webSession, projectId);
 
             DBNNode srcNode = globalNavigatorModel.getNodeByPath(webSession.getProgressMonitor(), nodePath);
             if (srcNode == null) {
@@ -430,7 +435,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         @NotNull String id,
         @NotNull WebConnectionConfig config
     ) throws DBWebException {
-        DBPDataSourceContainer dataSource = getGlobalRegistry(webSession).getDataSource(id);
+        DBPDataSourceContainer dataSource = getDataSourceRegistry(webSession, projectId).getDataSource(id);
         if (dataSource == null) {
             throw new DBWebException("Connection '" + id + "' not found");
         }
@@ -455,7 +460,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         @Nullable String projectId,
         @NotNull String id
     ) throws DBWebException {
-        DBPDataSourceContainer dataSource = getGlobalRegistry(webSession).getDataSource(id);
+        DBPDataSourceContainer dataSource = getDataSourceRegistry(webSession, projectId).getDataSource(id);
         if (dataSource == null) {
             throw new DBWebException("Connection '" + id + "' not found");
         }
@@ -463,7 +468,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         webSession.addInfoMessage(
             "Delete connection - " + WebServiceUtils.getConnectionContainerInfo(dataSource)
         );
-        getGlobalRegistry(webSession).removeDataSource(dataSource);
+        getDataSourceRegistry(webSession, projectId).removeDataSource(dataSource);
 
         try {
             webSession.getAdminSecurityController()
@@ -704,7 +709,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (!WebServiceUtils.isGlobalProject(globalProject)) {
             throw new DBWebException("Project '" + projectId + "'is not global");
         }
-        DBPDataSourceContainer dataSource = getGlobalRegistry(webSession).getDataSource(connectionId);
+        DBPDataSourceContainer dataSource = getDataSourceRegistry(webSession, projectId).getDataSource(connectionId);
         if (dataSource == null) {
             throw new DBWebException("Connection '" + connectionId + "' not found");
         }
@@ -744,11 +749,13 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public boolean setSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId, @NotNull List<String> connections) throws DBWebException {
+/*
         for (String connectionId : connections) {
             if (getGlobalRegistry(webSession).getDataSource(connectionId) == null) {
                 throw new DBWebException("Connection '" + connectionId + "' not found");
             }
         }
+*/
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
             throw new DBWebException("Cannot grant access in anonymous mode");
@@ -788,10 +795,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
     }
 
-    @Deprecated
-    private DBPDataSourceRegistry getGlobalRegistry(WebSession session) {
-        String globalConfigurationName = CBApplication.getInstance().getDefaultProjectName();
-        return session.getProjectById(RMProjectType.GLOBAL.getPrefix() + "_" + globalConfigurationName).getDataSourceRegistry();
+    private DBPDataSourceRegistry getDataSourceRegistry(WebSession session, String projectId) throws DBWebException {
+        WebProjectImpl project = session.getProjectById(projectId);
+        if (project == null) {
+            throw new DBWebException("Project '" + projectId + "' not found");
+        }
+        return project.getDataSourceRegistry();
     }
 
     private void validatePermissions(@NotNull String expectedScope, @NotNull Collection<String> permissions) throws DBWebException {
