@@ -51,11 +51,10 @@ public class WebUserContext implements SMCredentialsProvider {
 
     private SMController securityController;
     private SMAdminController adminSecurityController;
-    private RMController rmController;
 
     public WebUserContext(WebApplication application) throws DBException {
         this.application = application;
-        this.securityController = application.getSecurityController(this);
+        this.securityController = application.createSecurityController(this);
         this.userPermissions = getDefaultPermissions();
     }
 
@@ -85,9 +84,8 @@ public class WebUserContext implements SMCredentialsProvider {
         );
         this.refreshToken = smAuthInfo.getSmRefreshToken();
         this.userPermissions = authPermissions.getPermissions();
-        this.securityController = application.getSecurityController(this);
+        this.securityController = application.createSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
-        this.rmController = application.getResourceController(this, this.securityController);
         if (isSessionChanged) {
             this.smSessionId = smAuthInfo.getAuthPermissions().getSessionId();
             setUser(authPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));
@@ -121,9 +119,8 @@ public class WebUserContext implements SMCredentialsProvider {
         this.userPermissions = getDefaultPermissions();
         this.smCredentials = null;
         this.user = null;
-        this.securityController = application.getSecurityController(this);
+        this.securityController = application.createSecurityController(this);
         this.adminSecurityController = null;
-        this.rmController = application.getResourceController(this, this.securityController);
     }
 
     @NotNull
@@ -159,7 +156,7 @@ public class WebUserContext implements SMCredentialsProvider {
     }
 
     public synchronized RMController getRmController() {
-        return rmController;
+        return application.getResourceController();
     }
 
     public synchronized Set<String> getUserPermissions() {
@@ -175,10 +172,7 @@ public class WebUserContext implements SMCredentialsProvider {
         } else {
             this.userPermissions = getDefaultPermissions();
         }
-        if (userPermissions != null &&
-            !userPermissions.isEmpty() &&
-            !userPermissions.contains(DBWConstants.PERMISSION_PUBLIC)
-        ) {
+        if (userPermissions != null && !userPermissions.isEmpty()) {
             userPermissions.add(DBWConstants.PERMISSION_PUBLIC);
         }
     }

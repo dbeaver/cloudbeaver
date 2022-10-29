@@ -27,7 +27,9 @@ import io.cloudbeaver.events.CBEventController;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
+import io.cloudbeaver.model.rm.local.LocalResourceController;
 import io.cloudbeaver.model.session.WebAuthInfo;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
@@ -48,6 +50,7 @@ import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
@@ -128,8 +131,13 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     protected final CBEventController eventController = new CBEventController();
 
     private WebSessionManager sessionManager;
+    protected final SMCredentialsProvider webSessionCredentialsProvider;
 
     public CBApplication() {
+        webSessionCredentialsProvider = () -> {
+            WebSession activeWebSession = getSessionManager().getActiveWebSession();
+            return activeWebSession == null ? null : activeWebSession.getActiveUserCredentials();
+        };
     }
 
     public String getServerURL() {
@@ -206,7 +214,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     @Override
-    public SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
+    public SMController createSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
         return new EmbeddedSecurityControllerFactory().createSecurityService(
             this,
             databaseConfiguration,
@@ -237,7 +245,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     protected void startServer() {
         CBPlatform.setApplication(this);
 
-        Path configPath = null;
+        Path configPath;
         try {
             configPath = loadServerConfiguration();
             if (configPath == null) {
@@ -506,6 +514,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         }
         // Set default preferences
         PrefUtils.setDefaultPreferenceValue(ModelPreferences.getPreferences(), ModelPreferences.UI_DRIVERS_HOME, getDriversLocation());
+    }
+
+    @Override
+    protected RMController createResourceController() {
+        return LocalResourceController.builder(webSessionCredentialsProvider, this::getSecurityController).build();
     }
 
     private void parseConfiguration(File configFile) throws DBException {

@@ -788,6 +788,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
     }
 
+    @Deprecated
     private DBPDataSourceRegistry getGlobalRegistry(WebSession session) {
         String globalConfigurationName = CBApplication.getInstance().getDefaultProjectName();
         return session.getProjectById(RMProjectType.GLOBAL.getPrefix() + "_" + globalConfigurationName).getDataSourceRegistry();

@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.model;
 
-import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebDataFormat;
@@ -366,9 +366,9 @@ public class WebConnectionInfo {
 
     private boolean hasProjectPermission(RMProjectPermission projectPermission) {
         DBPProject project = dataSourceContainer.getProject();
-        if (!(project instanceof VirtualProjectImpl)) {
+        if (!(project instanceof WebProjectImpl)) {
             return false;
         }
-        return SMUtils.hasProjectPermission(session, ((VirtualProjectImpl) project).getRmProject(), projectPermission);
+        return SMUtils.hasProjectPermission(session, ((WebProjectImpl) project).getRmProject(), projectPermission);
     }
 }

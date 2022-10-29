@@ -17,13 +17,13 @@
 package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.DataSourceFilter;
-import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.events.CBEventController;
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
-import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
@@ -48,22 +48,18 @@ public interface WebApplication extends DBPApplication {
 
     boolean isMultiNode();
 
-    VirtualProjectImpl createProjectImpl(
+    WebProjectImpl createProjectImpl(
+        @NotNull WebSession webSession,
         @NotNull RMProject project,
-        @NotNull SMSessionContext sessionContext,
-        @NotNull SMCredentialsProvider credentialsProvider,
         @NotNull DataSourceFilter dataSourceFilter);
 
-    SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
+    SMController createSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
     SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
     DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
-    RMController getResourceController(
-        @NotNull SMCredentialsProvider credentialsProvider,
-        @NotNull SMController smController
-    );
+    RMController getResourceController();
 
     String getServerURL();
 

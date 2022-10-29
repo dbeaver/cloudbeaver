@@ -45,6 +45,7 @@ public class WebSessionManager {
 
     private final CBApplication application;
     private final Map<String, WebSession> sessionMap = new HashMap<>();
+    private final ThreadLocal<String> activeWebSession = new ThreadLocal<>();
 
     public WebSessionManager(CBApplication application) {
         this.application = application;
@@ -122,6 +123,9 @@ public class WebSessionManager {
                 }
             }
         }
+        // Set active session ID
+        activeWebSession.set(webSession.getSessionId());
+
         return webSession;
     }
 
@@ -148,7 +152,11 @@ public class WebSessionManager {
     public WebSession findWebSession(HttpServletRequest request) {
         String sessionId = request.getSession().getId();
         synchronized (sessionMap) {
-            return sessionMap.get(sessionId);
+            WebSession webSession = sessionMap.get(sessionId);
+            if (webSession != null) {
+                activeWebSession.set(sessionId);
+            }
+            return webSession;
         }
     }
 
@@ -192,5 +200,10 @@ public class WebSessionManager {
         synchronized (sessionMap) {
             return sessionMap.values();
         }
+    }
+
+    public WebSession getActiveWebSession() {
+        String sessionId = activeWebSession.get();
+        return sessionId == null ? null : getWebSession(sessionId);
     }
 }
