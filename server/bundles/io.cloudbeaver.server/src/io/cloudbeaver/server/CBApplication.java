@@ -325,13 +325,6 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
         }
 
-        try {
-            initializeServer();
-        } catch (DBException e) {
-            log.error("Error initializing server", e);
-            return;
-        }
-
         {
             try {
                 initializeSecurityController();
@@ -339,6 +332,12 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
                 log.error("Error initializing database", e);
                 return;
             }
+        }
+        try {
+            initializeServer();
+        } catch (DBException e) {
+            log.error("Error initializing server", e);
+            return;
         }
 
         if (configurationMode) {
