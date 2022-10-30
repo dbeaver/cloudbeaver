@@ -805,6 +805,16 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
     }
 
+    @Override
+    public Boolean setTeamMetaParameterValues(WebSession webSession, String teamId, Map<String, String> parameters) throws DBWebException {
+        try {
+            webSession.getAdminSecurityController().setSubjectMetas(teamId, parameters);
+            return true;
+        } catch (DBException e) {
+            throw new DBWebException("Error changing team '" + teamId + "' meta parameters", e);
+        }
+    }
+
     private DBPDataSourceRegistry getGlobalRegistry(WebSession session) {
         String globalConfigurationName = CBApplication.getInstance().getDefaultProjectName();
         return session.getProjectById(RMProjectType.GLOBAL.getPrefix() + "_" + globalConfigurationName).getDataSourceRegistry();

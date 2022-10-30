@@ -189,6 +189,8 @@ extend type Query {
 
     setUserMetaParameterValues(userId: ID!, parameters: Object!): Boolean!
 
+    setTeamMetaParameterValues(teamId: ID!, parameters: Object!): Boolean!
+
     #### Global configuration
 
     configureServer(configuration: ServerConfigInput!): Boolean!

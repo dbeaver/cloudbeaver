@@ -168,6 +168,11 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
                     getWebSession(env),
                     env.getArgument("userId"),
                     env.getArgument("parameters")))
+            .dataFetcher("setTeamMetaParameterValues",
+                env -> getService(env).setTeamMetaParameterValues(
+                    getWebSession(env),
+                    env.getArgument("teamId"),
+                    env.getArgument("parameters")))
 
             .dataFetcher("configureServer",
                 env -> getService(env).configureServer(getWebSession(env), env.getArgument("configuration")))
