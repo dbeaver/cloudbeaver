@@ -127,6 +127,8 @@ public class WebSession extends AbstractSessionPersistent
     private final WebUserContext userContext;
     private final List<CBEvent> sessionEvents = new ArrayList<>();
 
+    private RMController rmController;
+
     public WebSession(
         @NotNull HttpSession httpSession,
         @NotNull WebApplication application,
@@ -143,6 +145,7 @@ public class WebSession extends AbstractSessionPersistent
         this.sessionHandlers = sessionHandlers;
         this.userContext = new WebUserContext(application);
         this.maxSessionIdleTime = maxSessionIdleTime;
+        this.rmController = application.createResourceController(this);
     }
 
     @NotNull
@@ -273,7 +276,7 @@ public class WebSession extends AbstractSessionPersistent
     }
 
     public synchronized RMController getRmController() {
-        return userContext.getRmController();
+        return rmController;
     }
 
     public synchronized void refreshUserData() {
@@ -472,6 +475,9 @@ public class WebSession extends AbstractSessionPersistent
             addSessionError(e);
             log.error("Error reading session permissions", e);
         }
+
+        // Initialize new resource controller
+        this.rmController = application.createResourceController(this);
     }
 
     private synchronized void refreshAccessibleConnectionIds() {

@@ -60,12 +60,15 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     private static final Log log = Log.getLog(BaseWebApplication.class);
 
-    private RMController rmController;
-
     @NotNull
     @Override
     public DBPWorkspace createWorkspace(@NotNull DBPPlatform platform, @NotNull IWorkspace eclipseWorkspace) {
         return new WebWorkspace(platform, eclipseWorkspace);
+    }
+
+    @Override
+    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
+        throw new IllegalStateException("Resource controller is not supported by " + getClass().getSimpleName());
     }
 
     @Nullable
@@ -141,16 +144,6 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     public DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider)  throws DBException {
         return new LocalSecretController("user/" + credentialsProvider.getActiveUserCredentials().getUserId());
     }
-
-    @Override
-    public synchronized RMController getResourceController() {
-        if (rmController == null) {
-            rmController = createResourceController();
-        }
-        return rmController;
-    }
-
-    protected abstract RMController createResourceController();
 
     protected Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
         return JSONUtils.getObject(configProps, "server");

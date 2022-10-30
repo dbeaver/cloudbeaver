@@ -28,7 +28,6 @@ import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.utils.CommonUtils;
@@ -153,10 +152,6 @@ public class WebUserContext implements SMCredentialsProvider {
 
     public synchronized SMAdminController getAdminSecurityController() {
         return adminSecurityController;
-    }
-
-    public synchronized RMController getRmController() {
-        return application.getResourceController();
     }
 
     public synchronized Set<String> getUserPermissions() {

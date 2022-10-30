@@ -59,7 +59,7 @@ public interface WebApplication extends DBPApplication {
 
     DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
-    RMController getResourceController();
+    RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider);
 
     String getServerURL();
 
