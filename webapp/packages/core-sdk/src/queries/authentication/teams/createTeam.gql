@@ -1,4 +1,4 @@
-query createTeam($teamId: ID!, $teamName: String, $description: String ) {
+query createTeam($teamId: ID!, $teamName: String, $description: String, $includeMetaParameters: Boolean!) {
   team: createTeam(teamId: $teamId, teamName: $teamName, description: $description) {
     ...AdminTeamInfo
   }

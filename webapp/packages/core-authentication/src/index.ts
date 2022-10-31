@@ -15,3 +15,4 @@ export * from './UserDataService';
 export * from './UserInfoResource';
 export * from './UserMetaParametersResource';
 export * from './UsersResource';
+export * from './TeamMetaParametersResource';
