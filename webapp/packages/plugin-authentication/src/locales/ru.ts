@@ -16,6 +16,7 @@ export default [
   ['authentication_user_role', 'Роль'],
   ['authentication_user_credentials', 'Учетные данные'],
   ['authentication_user_meta_parameters', 'Параметры'],
+  ['authentication_team_meta_parameters', 'Параметры'],
   ['authentication_user_password', 'Пароль'],
   ['authentication_user_password_repeat', 'Повторите пароль'],
   ['authentication_user_team', 'Команда'],

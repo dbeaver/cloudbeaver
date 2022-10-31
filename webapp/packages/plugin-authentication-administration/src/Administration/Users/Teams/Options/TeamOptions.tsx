@@ -77,7 +77,7 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
         <Loader state={teamMetaParameters} inline>
           {() => teamMetaParameters.data.length > 0 && styled(style)(
             <Group small gap vertical overflow>
-              <GroupTitle keepSize>{translate('authentication_user_meta_parameters')}</GroupTitle>
+              <GroupTitle keepSize>{translate('authentication_team_meta_parameters')}</GroupTitle>
               <ObjectPropertyInfoForm
                 state={state.config.metaParameters}
                 properties={teamMetaParameters.data}
