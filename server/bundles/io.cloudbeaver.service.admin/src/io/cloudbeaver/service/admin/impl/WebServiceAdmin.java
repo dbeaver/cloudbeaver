@@ -21,8 +21,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
-import io.cloudbeaver.model.WebConnectionConfig;
-import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
@@ -43,16 +41,12 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
-import org.jkiss.dbeaver.model.navigator.DBNDataSource;
-import org.jkiss.dbeaver.model.navigator.DBNModel;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
-import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.utils.CommonUtils;
 
 import java.text.MessageFormat;
@@ -339,144 +333,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     // Connection management
 
     @Override
-    public List<WebConnectionInfo> getAllConnections(
-        @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @Nullable String id
-    ) throws DBWebException {
-        // Get all connections from global configuration
-        List<WebConnectionInfo> result = new ArrayList<>();
-        DBPDataSourceRegistry registry = getDataSourceRegistry(webSession, projectId);
-        for (DBPDataSourceContainer ds : registry.getDataSources()) {
-            if (id != null && !id.equals(ds.getId())) {
-                continue;
-            }
-            if (CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver())) {
-                result.add(new WebConnectionInfo(webSession, ds));
-            }
-        }
-
-        return result;
-    }
-
-    @Override
     public List<AdminConnectionSearchInfo> searchConnections(@NotNull WebSession webSession, @NotNull List<String> hostNames) throws DBWebException {
         ConnectionSearcher searcher = new ConnectionSearcher(webSession, hostNames.toArray(new String[0]));
         searcher.run(webSession.getProgressMonitor());
         return searcher.getFoundConnections();
-    }
-
-    @Override
-    public WebConnectionInfo createConnectionConfiguration(
-        @NotNull WebSession webSession,
-        @Nullable String projectId,
-        @NotNull WebConnectionConfig config
-    ) throws DBWebException {
-
-        webSession.addInfoMessage("Create new connection");
-        DBPDataSourceRegistry registry = getDataSourceRegistry(webSession, projectId);
-        DBPDataSourceContainer dataSource = WebServiceUtils.createConnectionFromConfig(config, registry);
-        try {
-            registry.addDataSource(dataSource);
-        } catch (DBException e) {
-            throw new DBWebException("Error adding datasource", e);
-        }
-
-        webSession.addInfoMessage(
-            "New connection was created - " + WebServiceUtils.getConnectionContainerInfo(dataSource)
-        );
-
-        return new WebConnectionInfo(webSession, dataSource);
-    }
-
-    @Override
-    public WebConnectionInfo copyConnectionConfiguration(
-        @NotNull WebSession webSession,
-        @Nullable String projectId,
-        @NotNull String nodePath,
-        @NotNull WebConnectionConfig config
-    ) throws DBWebException {
-        try {
-            DBNModel globalNavigatorModel = webSession.getNavigatorModel();
-            DBPDataSourceRegistry globalDataSourceRegistry = getDataSourceRegistry(webSession, projectId);
-
-            DBNNode srcNode = globalNavigatorModel.getNodeByPath(webSession.getProgressMonitor(), nodePath);
-            if (srcNode == null) {
-                throw new DBException("Node '" + nodePath + "' not found");
-            }
-            if (!(srcNode instanceof DBNDataSource)) {
-                throw new DBException("Node '" + nodePath + "' is not a datasource node");
-            }
-            DBPDataSourceContainer dataSourceTemplate = ((DBNDataSource)srcNode).getDataSourceContainer();
-
-            DBPDataSourceContainer newDataSource = globalDataSourceRegistry.createDataSource(dataSourceTemplate);
-            // Copy props from config
-            if (!CommonUtils.isEmpty(config.getName())) {
-                newDataSource.setName(config.getName());
-            }
-            if (!CommonUtils.isEmpty(config.getDescription())) {
-                newDataSource.setDescription(config.getDescription());
-            }
-
-            ((DataSourceDescriptor) newDataSource).setNavigatorSettings(CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
-            globalDataSourceRegistry.addDataSource(newDataSource);
-            WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
-            webSession.addConnection(connectionInfo);
-            return connectionInfo;
-        } catch (DBException e) {
-            throw new DBWebException("Error copying connection", e);
-        }
-    }
-
-    @Override
-    public WebConnectionInfo updateConnectionConfiguration(
-        @NotNull WebSession webSession,
-        @Nullable String projectId,
-        @NotNull String id,
-        @NotNull WebConnectionConfig config
-    ) throws DBWebException {
-        DBPDataSourceContainer dataSource = getDataSourceRegistry(webSession, projectId).getDataSource(id);
-        if (dataSource == null) {
-            throw new DBWebException("Connection '" + id + "' not found");
-        }
-        webSession.addInfoMessage(
-            "Update connection - " + WebServiceUtils.getConnectionContainerInfo(dataSource)
-        );
-        WebServiceUtils.updateConnectionFromConfig(dataSource, config);
-        dataSource.persistConfiguration();
-        // Update local datasource as well. We use it for connection tests
-        // It may be null if this connection was just created
-        DBPDataSourceContainer localDS = webSession.getSingletonProject().getDataSourceRegistry().getDataSource(id);
-        if (localDS != null) {
-            WebServiceUtils.updateConnectionFromConfig(localDS, config);
-            // We don't need to save it in local registry (because in fact it is stored in the global registry)
-        }
-        return new WebConnectionInfo(webSession, dataSource);
-    }
-
-    @Override
-    public boolean deleteConnectionConfiguration(
-        @NotNull WebSession webSession,
-        @Nullable String projectId,
-        @NotNull String id
-    ) throws DBWebException {
-        DBPDataSourceContainer dataSource = getDataSourceRegistry(webSession, projectId).getDataSource(id);
-        if (dataSource == null) {
-            throw new DBWebException("Connection '" + id + "' not found");
-        }
-
-        webSession.addInfoMessage(
-            "Delete connection - " + WebServiceUtils.getConnectionContainerInfo(dataSource)
-        );
-        getDataSourceRegistry(webSession, projectId).removeDataSource(dataSource);
-
-        try {
-            webSession.getAdminSecurityController()
-                .deleteAllObjectPermissions(id, SMObjects.DATASOURCE);
-        } catch (DBException e) {
-            log.error(e);
-        }
-        return true;
     }
 
     ////////////////////////////////////////////////////////////////////

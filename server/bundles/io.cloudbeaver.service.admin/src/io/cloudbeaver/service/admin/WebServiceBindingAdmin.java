@@ -18,7 +18,6 @@ package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
@@ -87,34 +86,7 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
             env -> getService(env).enableUser(getWebSession(env), env.getArgument("userId"), env.getArgument("enabled")))
         .dataFetcher("setUserAuthRole",
             env -> getService(env).setUserAuthRole(getWebSession(env), env.getArgument("userId"), env.getArgument("authRole")))
-        .dataFetcher("allConnections", env -> getService(env).getAllConnections(
-            getWebSession(env),
-            getProjectReference(env),
-            env.getArgument("id")))
         .dataFetcher("searchConnections", env -> getService(env).searchConnections(getWebSession(env), env.getArgument("hostNames")))
-
-        .dataFetcher("createConnectionConfiguration",
-            env -> getService(env).createConnectionConfiguration(
-                getWebSession(env),
-                getProjectReference(env),
-                new WebConnectionConfig(env.getArgument("config"))))
-        .dataFetcher("copyConnectionConfiguration",
-            env -> getService(env).copyConnectionConfiguration(
-                getWebSession(env),
-                getProjectReference(env),
-                env.getArgument("nodePath"),
-                new WebConnectionConfig(env.getArgument("config"))))
-        .dataFetcher("updateConnectionConfiguration",
-            env -> getService(env).updateConnectionConfiguration(
-                getWebSession(env),
-                getProjectReference(env),
-                env.getArgument("id"),
-                new WebConnectionConfig(env.getArgument("config"))))
-        .dataFetcher("deleteConnectionConfiguration",
-            env -> getService(env).deleteConnectionConfiguration(
-                getWebSession(env),
-                getProjectReference(env),
-                env.getArgument("id")))
 
         .dataFetcher("getConnectionSubjectAccess",
             env -> getService(env).getConnectionSubjectAccess(

@@ -20,8 +20,6 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
-import io.cloudbeaver.model.WebConnectionConfig;
-import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderConfiguration;
@@ -94,32 +92,7 @@ public interface DBWServiceAdmin extends DBWService {
     // Connection management
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    List<WebConnectionInfo> getAllConnections(@NotNull WebSession webSession, @NotNull String projectId, @Nullable String id) throws DBWebException;
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     List<AdminConnectionSearchInfo> searchConnections(WebSession webSession, List<String> hostNames) throws DBWebException;
-
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    WebConnectionInfo createConnectionConfiguration(
-        @NotNull WebSession webSession,
-        @Nullable String projectId,
-        @NotNull WebConnectionConfig config) throws DBWebException;
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    WebConnectionInfo copyConnectionConfiguration(
-        @NotNull WebSession webSession,
-        @Nullable String projectId,
-        @NotNull String nodePath,
-        @NotNull WebConnectionConfig config) throws DBWebException;
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    WebConnectionInfo updateConnectionConfiguration(
-        @NotNull WebSession webSession,
-        @Nullable String projectId,
-        @NotNull String id,
-        @NotNull WebConnectionConfig config) throws DBWebException;
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean deleteConnectionConfiguration(
-        @NotNull WebSession webSession,
-        @Nullable String projectId,
-        @NotNull String id) throws DBWebException;
 
     ////////////////////////////////////////////////////////////////////
     // Features
