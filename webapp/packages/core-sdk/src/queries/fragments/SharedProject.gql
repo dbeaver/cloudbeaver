@@ -2,6 +2,7 @@ fragment SharedProject on RMProject {
   id
   name
   shared
+  global
   description
   projectPermissions
 }
