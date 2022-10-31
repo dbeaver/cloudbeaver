@@ -205,14 +205,16 @@ public class WebAppUtils {
         return RMProjectType.GLOBAL.getPrefix() + "_" + globalConfigurationName;
     }
 
-    public static void addDataSourceUpdatedEvent(DBPProject project, String datasourceId) {
+    public static void addDataSourceUpdatedEvent(DBPProject project, String datasourceId, CBEventConstants.EventType eventType) {
         if (project == null) {
             return;
         }
         getWebApplication().getEventController().addEvent(
             new CBEvent(
                 CBEventConstants.CLOUDBEAVER_DATASOURCE_UPDATED,
-                Map.of("projectId", project.getId(), "dataSourceIds", new String[] {datasourceId})
+                Map.of("projectId", project.getId(),
+                    "dataSourceIds", List.of(datasourceId),
+                    "eventType", eventType)
             )
         );
     }

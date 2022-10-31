@@ -23,6 +23,8 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
+import java.util.List;
+
 /**
  * Notify all active user session that datasource has been updated
  */
@@ -36,11 +38,14 @@ public class CBDataSourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHa
     @Override
     protected void updateSessionData(WebSession activeUserSession, CBEvent event) {
         String projectId = JSONUtils.getString(event.getEventData(), "projectId");
+        List<String> dataSourceIds = JSONUtils.getStringList(event.getEventData(), "dataSourceIds");
+        CBEventConstants.EventType eventType =
+            CBEventConstants.EventType.valueOf(JSONUtils.getString(event.getEventData(), "eventType"));
         VirtualProjectImpl project = activeUserSession.getProjectById(projectId);
         if (project == null || !project.getRmProject().isShared()) {
             return;
         }
-        activeUserSession.refreshUserData();
+        activeUserSession.updateProjectConnection(project, dataSourceIds, eventType);
         activeUserSession.addSessionEvent(event);
     }
 }
