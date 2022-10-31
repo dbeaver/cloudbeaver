@@ -11,6 +11,7 @@ fragment DatabaseConnection on ConnectionInfo {
   useUrl
   readOnly
   saveCredentials
+  sharedCredentials
 
   folder
   nodePath

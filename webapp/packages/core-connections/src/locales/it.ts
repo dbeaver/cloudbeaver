@@ -21,6 +21,8 @@ export default [
   ['connections_connection_create_custom', 'Custom'],
   ['connections_connection_create_search_database', 'Cerca'],
   ['connections_connection_edit_save_credentials', 'Salva le credenziali'],
+  ['connections_connection_share_credentials', 'Share credentials'],
+  ['connections_connection_share_credentials_tooltip', 'Share credentials across all users'],
   ['connections_connection_credentials_provisioning', 'Credenziali di autenticazione'],
   ['connections_connection_credentials_provisioning_description', 'Devi compilare o confermare le credenziali per provare questa connessione'],
   ['connections_connection_edit_authentication', 'Autenticazione'],

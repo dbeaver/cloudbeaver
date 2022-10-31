@@ -217,6 +217,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     state.config.authModelId = state.info.authModel;
     state.config.saveCredentials = state.info.saveCredentials;
+    state.config.sharedCredentials = state.info.sharedCredentials;
 
     if (state.info.authProperties) {
       for (const property of state.info.authProperties) {
@@ -293,6 +294,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     if ((state.config.authModelId || driver.defaultAuthModel) && !driver.anonymousAccess) {
       tempConfig.authModelId = state.config.authModelId || driver.defaultAuthModel;
       tempConfig.saveCredentials = state.config.saveCredentials;
+      tempConfig.sharedCredentials = state.config.sharedCredentials;
 
       const properties = await this.getConnectionAuthModelProperties(tempConfig.authModelId, state.info);
 
@@ -378,6 +380,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       || config.credentials !== undefined
       || (config.authModelId !== undefined && !isValuesEqual(config.authModelId, data.info.authModel, ''))
       || (config.saveCredentials !== undefined && config.saveCredentials !== data.info.saveCredentials)
+      || (config.sharedCredentials !== undefined && config.sharedCredentials !== data.info.sharedCredentials)
       || (
         config.providerProperties !== undefined
         && !isObjectPropertyInfoStateEqual(

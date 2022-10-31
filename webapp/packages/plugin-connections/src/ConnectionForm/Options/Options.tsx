@@ -32,10 +32,12 @@ import {
   FormFieldDescription,
   useTranslate,
   usePermission,
+  useDataResource,
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { CachedMapEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
@@ -75,6 +77,7 @@ const driverConfiguration: IDriverConfiguration[] = [
 export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({
   state,
 }) {
+  const serverConfigResource = useDataResource(Options, ServerConfigResource, undefined);
   const connectionOptionsTabService = useService(ConnectionOptionsTabService);
   const service = useService(ConnectionFormService);
   const formRef = useRef<HTMLFormElement>(null);
@@ -140,6 +143,16 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
 
     if (config.template) {
       config.folder = undefined;
+    }
+
+    if (name === 'sharedCredentials' && value) {
+      config.saveCredentials = true;
+
+      for (const handler of config.networkHandlersConfig ?? []) {
+        if (!handler.savePassword) {
+          handler.savePassword = true;
+        }
+      }
     }
   }
 
@@ -379,14 +392,29 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                     />
                   </Container>
                   {credentialsSavingEnabled && (
-                    <FieldCheckbox
-                      id={config.connectionId + 'authNeeded'}
-                      name="saveCredentials"
-                      state={config}
-                      disabled={disabled || readonly}
-                    >
-                      {translate('connections_connection_edit_save_credentials')}
-                    </FieldCheckbox>
+                    <Container wrap gap>
+                      <FieldCheckbox
+                        id={config.connectionId + 'authNeeded'}
+                        name="saveCredentials"
+                        state={config}
+                        disabled={disabled || readonly || config.sharedCredentials}
+                        keepSize
+                      >
+                        {translate('connections_connection_edit_save_credentials')}
+                      </FieldCheckbox>
+                      {serverConfigResource.data?.distributed && (
+                        <FieldCheckbox
+                          id={config.connectionId + 'isShared'}
+                          name="sharedCredentials"
+                          title={translate('connections_connection_share_credentials_tooltip')}
+                          state={config}
+                          disabled={disabled || readonly}
+                          keepSize
+                        >
+                          {translate('connections_connection_share_credentials')}
+                        </FieldCheckbox>
+                      )}
+                    </Container>
                   )}
                 </>
               )}
