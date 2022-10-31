@@ -329,7 +329,9 @@ export class UserFormController implements IInitializableController, IDestructib
   }
 
   private async saveConnectionPermissions() {
-    if (!this.connectionAccessChanged) {
+    await this.projectInfoResource.load(CachedMapAllKey);
+
+    if (!this.connectionAccessChanged || !this.projectInfoResource.values.some(project => project.global)) {
       return;
     }
     await this.usersResource.setConnections(this.user.userId, this.getGrantedConnections());

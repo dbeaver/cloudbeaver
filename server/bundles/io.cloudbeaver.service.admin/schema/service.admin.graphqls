@@ -146,10 +146,10 @@ extend type Query {
 
     searchConnections( hostNames: [String!]! ): [AdminConnectionSearchInfo!]!
 
-    createConnectionConfiguration(projectId: ID!, config: ConnectionConfig! ): ConnectionInfo!
-    copyConnectionConfiguration(projectId: ID!, nodePath: String!, config: ConnectionConfig ): ConnectionInfo!
-    updateConnectionConfiguration(projectId: ID!, id: ID!, config: ConnectionConfig! ): ConnectionInfo!
-    deleteConnectionConfiguration(projectId: ID!, id: ID! ): Boolean
+    createConnectionConfiguration(projectId: ID!, config: ConnectionConfig! ): ConnectionInfo! @deprecated
+    copyConnectionConfiguration(projectId: ID!, nodePath: String!, config: ConnectionConfig ): ConnectionInfo! @deprecated
+    updateConnectionConfiguration(projectId: ID!, id: ID!, config: ConnectionConfig! ): ConnectionInfo! @deprecated
+    deleteConnectionConfiguration(projectId: ID!, id: ID! ): Boolean @deprecated
 
     # Permissions
 

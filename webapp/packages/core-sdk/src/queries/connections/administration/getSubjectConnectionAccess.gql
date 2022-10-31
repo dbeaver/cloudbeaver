@@ -1,4 +1,4 @@
-query getSubjectConnectionAccess($subjectId: ID) {
+query getSubjectConnectionAccess($subjectId: ID!) {
   grantInfo: getSubjectConnectionAccess(subjectId: $subjectId) {
     connectionId,
     dataSourceId
