@@ -22,7 +22,15 @@ export const topMenuStyles = css`
   menu-box menu-panel-item {
     border-color: #ffffff !important;
   }
-  MenuTrigger, Button {
+  MenuButton, MenuBarElement {
+    composes: theme-ripple from global;
+    background: none;
+    border: none;
+    outline: none !important;
+    color: inherit;
+    cursor: pointer;
+  }
+  MenuButton, MenuTrigger, Button, MenuBarElement {
     height: 100%;
     padding: 0 16px !important;
 
@@ -41,7 +49,7 @@ export const topMenuStyles = css`
     & menu-trigger-icon {
       margin-right: 8px;
     }
-    & menu-trigger-text {
+    & menu-trigger-text, & menu-bar-item-label {
       max-width: 240px;
       overflow-x: hidden;
       text-overflow: ellipsis;
@@ -51,6 +59,8 @@ export const topMenuStyles = css`
       background: #236ea0;
     }*/
   }
+  MenuButton,
+  MenuBarElement,
   MenuItem,
   MenuItemCheckbox,
   MenuItemRadio {
@@ -62,7 +72,7 @@ export const topMenuStyles = css`
     }
   }
   @media only screen and (max-width: 1200px) {
-    MenuTrigger, Button {
+    MenuButton, MenuBarElement, MenuTrigger, Button {
       padding: 0 8px !important;
     }
   }

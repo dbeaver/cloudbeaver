@@ -36,8 +36,12 @@ export class DataContext implements IDataContext {
     this.fallback = fallback;
   }
 
-  has(context: DataContextGetter<any>): boolean {
-    return this.map.has(context) || this.fallback?.has(context) || false;
+  has(context: DataContextGetter<any>, nested = true): boolean {
+    if (nested) {
+      return this.map.has(context) || this.fallback?.has(context) || false;
+    }
+
+    return this.map.has(context);
   }
 
   hasValue<T>(context: DataContextGetter<T>, value: T): boolean {

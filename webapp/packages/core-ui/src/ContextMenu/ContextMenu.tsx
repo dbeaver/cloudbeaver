@@ -11,9 +11,8 @@ import { ButtonHTMLAttributes, forwardRef, useRef } from 'react';
 import type { MenuInitialState } from 'reakit/Menu';
 import styled from 'reshadow';
 
-import { getComputed, IMenuState, Menu, menuPanelStyles, useObjectRef, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { getComputed, IMenuState, Menu, menuPanelStyles, useObjectRef, useTranslate, useStyles, useAutoLoad } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { IMenuData, MenuActionItem, MenuService } from '@cloudbeaver/core-view';
 
@@ -61,6 +60,8 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(forwar
 
   const menu = useRef<IMenuState>();
   const styles = useStyles(menuPanelStyles, style);
+
+  useAutoLoad(menuData.loaders, !lazy);
 
   const handlers = useObjectRef(() => ({
     handleItemClose() {

@@ -10,9 +10,8 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, Loader, ILoadableState, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
-
-
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, Loader, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import { Team } from './Team';
 

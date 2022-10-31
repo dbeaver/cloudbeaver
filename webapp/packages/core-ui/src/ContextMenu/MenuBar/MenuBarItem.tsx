@@ -37,7 +37,7 @@ export const MenuBarItem = observer<Props, HTMLButtonElement>(forwardRef(functio
     <menu-bar-item ref={ref} as='button' {...rest} title={title} aria-label={title}>
       {loading && <Loader small fullSize />}
       {!loading && icon && <IconOrImage icon={icon} viewBox={viewBox} />}
-      {label && <item-label>{translate(label)}</item-label>}
+      {label && <menu-bar-item-label>{translate(label)}</menu-bar-item-label>}
     </menu-bar-item>
   );
 }));

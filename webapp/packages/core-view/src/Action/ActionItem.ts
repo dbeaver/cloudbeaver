@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { flat } from '@cloudbeaver/core-utils';
+
 import type { IDataContextProvider } from '../DataContext/IDataContextProvider';
 import type { IAction } from './IAction';
 import type { IActionHandler } from './IActionHandler';
@@ -17,7 +19,7 @@ export class ActionItem implements IActionItem {
   readonly action: IAction;
   readonly handler: IActionHandler;
   readonly binding: IKeyBindingHandler | null;
-  private context: IDataContextProvider;
+  private readonly context: IDataContextProvider;
 
   get actionInfo(): IActionInfo {
     if (this.handler.getActionInfo) {
@@ -44,7 +46,10 @@ export class ActionItem implements IActionItem {
   }
 
   isLoading(): boolean {
-    return this.handler.isLoading?.(this.context, this.action) ?? false;
+    return (
+      this.handler.isLoading?.(this.context, this.action)
+      || flat([this.handler.getLoader?.(this.context, this.action)]).some(loader => loader?.isLoading())
+    );
   }
 
   isDisabled(): boolean {

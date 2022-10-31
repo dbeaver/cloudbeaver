@@ -1,4 +1,4 @@
-export * from './TopNavBar/MainMenu/MainMenuService';
+export * from './TopNavBar/MainMenu/TOP_APP_BAR_MENU';
 export * from './TopNavBar/shared/TopNavButton';
 export * from './TopNavBar/TopNavService';
 export * from './TopNavBar/AdministrationTopAppBarBootstrapService';

@@ -38,13 +38,13 @@ export const MENU_BAR_DEFAULT_STYLES = css`
         width: 24px;
       }
 
-      & item-label {
+      & menu-bar-item-label {
           display: block;
           text-transform: uppercase;
           font-weight: 700;
       }
 
-      & IconOrImage + item-label, & Loader + item-label {
+      & IconOrImage + menu-bar-item-label, & Loader + menu-bar-item-label {
           padding-left: 8px
       }
     }

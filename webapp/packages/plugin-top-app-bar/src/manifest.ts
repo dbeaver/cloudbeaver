@@ -10,7 +10,6 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { PluginBootstrap } from './PluginBootstrap';
 import { AdministrationTopAppBarBootstrapService } from './TopNavBar/AdministrationTopAppBarBootstrapService';
-import { MainMenuService } from './TopNavBar/MainMenu/MainMenuService';
 import { TopNavService } from './TopNavBar/TopNavService';
 
 export const topAppBarPlugin: PluginManifest = {
@@ -19,7 +18,6 @@ export const topAppBarPlugin: PluginManifest = {
   },
   providers: [
     PluginBootstrap,
-    MainMenuService,
     TopNavService,
     AdministrationTopAppBarBootstrapService,
   ],

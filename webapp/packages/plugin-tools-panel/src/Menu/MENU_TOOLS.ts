@@ -6,12 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface ILoadableState {
-  isLoading: () => boolean;
-  isLoaded: () => boolean;
-  readonly exception?: Error[] | Error | null;
-  reload?: () => void;
+import { createMenu } from '@cloudbeaver/core-view';
 
-  isCancelled?: () => boolean;
-  cancel?: () => void;
-}
+export const MENU_TOOLS = createMenu(
+  'tools',
+  'plugin_tools_panel_menu_title'
+);

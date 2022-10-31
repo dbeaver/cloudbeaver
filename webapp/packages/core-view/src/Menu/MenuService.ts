@@ -7,6 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { flat, ILoadableState } from '@cloudbeaver/core-utils';
 
 import { ActionService } from '../Action/ActionService';
 import { isAction } from '../Action/createAction';
@@ -44,11 +45,6 @@ export class MenuService {
     return null;
   }
 
-  isMenuAvailable(context: IDataContextProvider): boolean {
-    return this.creators
-      .some(filterApplicable(context));
-  }
-
   addCreator(creator: IMenuItemsCreator): void {
     this.creators.push(creator);
   }
@@ -70,18 +66,32 @@ export class MenuService {
     return null;
   }
 
-  getMenu(context: IDataContextProvider): IMenuItem[] {
-    const applicableCreators = this.creators.filter(filterApplicable(context));
+  getMenuItemLoaders(context: IDataContextProvider, itemCreators: MenuCreatorItem[]): ILoadableState[] {
+    return flat(itemCreators
+      .map(item => {
+        if (isAction(item)) {
+          const handler = this.actionService.getHandler(context, item);
 
-    return applicableCreators
-      .reduce<MenuCreatorItem[]>(
+          return handler?.getLoader?.(context, item) ?? null;
+        }
+
+        return null;
+      }))
+      .filter<ILoadableState>((item => item !== null) as ((obj: any) => obj is ILoadableState))
+    ;
+  }
+
+  getMenuItemCreators(context: IDataContextProvider): MenuCreatorItem[] {
+    const creators = this.creators.filter(filterApplicable(context));
+
+    return creators.reduce<MenuCreatorItem[]>(
       (items, creator) => {
         if (creator.orderItems) {
           return creator.orderItems(context, items);
         }
         return items;
       },
-      applicableCreators
+      creators
         .reduce<MenuCreatorItem[]>((items, creator) => creator.getItems(context, items), [])
         .filter(item => {
           if (isAction(item)) {
@@ -90,7 +100,11 @@ export class MenuService {
 
           return true;
         })
-    )
+    );
+  }
+
+  getMenu(context: IDataContextProvider, itemCreators: MenuCreatorItem[]): IMenuItem[] {
+    return itemCreators
       .map(item => {
         if (isAction(item)) {
           return this.createActionItem(context, item) as IMenuItem;
@@ -132,6 +146,10 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
       return false;
     }
 
-    return creator.isApplicable?.(contexts) ?? true;
+    if (creator.isApplicable?.(contexts) === false) {
+      return false;
+    }
+
+    return true;
   };
 }

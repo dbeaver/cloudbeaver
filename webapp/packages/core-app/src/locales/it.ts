@@ -1,11 +1,4 @@
 export default [
-  ['app_shared_connectionMenu_newConnection', 'Nuova connessione'],
-  ['app_shared_connectionMenu_connection', 'Connessione'],
-  ['app_shared_connectionMenu_custom', 'Manuale'],
-  ['app_shared_connectionMenu_disconnect', 'Scollegati da tutto'],
-  ['app_shared_toolsMenu_tools', 'Strumenti'],
-  ['app_shared_toolsMenu_logViewer', 'Visualizzatore del Log'],
-  ['app_shared_toolsMenu_logViewer_placeholder', 'Il visualizzatore del log non è attivo'],
   ['app_shared_settingsMenu_config', 'Configurazione'],
   ['app_shared_settingsMenu_theme', 'Tema'],
   ['app_shared_settingsMenu_lang', 'Lingua'],

@@ -9,10 +9,66 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useService } from '@cloudbeaver/core-di';
+import { MenuBar } from '@cloudbeaver/core-ui';
+import { useMenu } from '@cloudbeaver/core-view';
 
-import { TopMenuItem } from '../shared/TopMenuItem';
-import { MainMenuService } from './MainMenuService';
+import { topMenuStyles } from '../shared/topMenuStyles';
+import { TOP_APP_BAR_MENU } from './TOP_APP_BAR_MENU';
+
+const menuStyles = css`
+  Menu {
+    & menu-box {
+      max-height: 80vh;
+      overflow: auto;
+    }
+    & menu-panel-item {
+      overflow-x: hidden;
+    }
+    & menu-item-text {
+      max-width: 400px;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+    }
+    & menu-trigger-text {
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+  }
+`;
+
+const menuBarItemStyles = css`
+  MenuBarElement {
+    background: none;
+    
+    & menu-bar-item-label {
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+  }
+`;
+
+const removeDisableEffect = css`
+  Button:disabled, Button[aria-disabled="true"] {
+    opacity: 1;
+  }
+`;
+
+const projectsMenu = css`
+  MenuItem IconOrImage {
+    background-color: #fff;
+    padding: 2px;
+    border-radius: var(--theme-form-element-radius);
+  }
+  menu-trigger-icon:not([|loading]) {
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 1px;
+    
+    & IconOrImage {
+      width: 22px;
+    }
+  }
+`;
 
 const styles = css`
   menu-wrapper {
@@ -27,13 +83,15 @@ const styles = css`
 `;
 
 export const MainMenu = observer(function MainMenu() {
-  const mainMenuService = useService(MainMenuService);
+  const menu = useMenu({ menu: TOP_APP_BAR_MENU });
 
   return styled(styles)(
     <menu-wrapper>
-      {mainMenuService.getMainMenu().map((topItem, i) => (
-        <TopMenuItem key={i} menuItem={topItem} />
-      ))}
+      <MenuBar
+        menu={menu}
+        style={[topMenuStyles, menuBarItemStyles, topMenuStyles]}
+        nestedMenuSettings={{ modal: true }}
+      />
     </menu-wrapper>
   );
 });

@@ -18,7 +18,6 @@ export * from './layout/TopAppBar';
 
 export * from './Loader/Loader';
 export * from './Loader/useAutoLoad';
-export * from './Loader/ILoadableState';
 
 export * from './localization/Translate';
 export * from './localization/useTranslate';

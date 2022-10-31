@@ -8,5 +8,5 @@ export default [
   ['basicConnection_connectionDialog_passwordPlaceholder', 'password'],
   ['basicConnection_connectionDialog_connecting', 'Connecting...'],
   ['basicConnection_connectionDialog_connecting_message', 'Connecting to database...'],
-  ['basicConnection_main_menu_item', 'From Template'],
+  ['plugin_connection_template_action_connection_template_label', 'From Template'],
 ];

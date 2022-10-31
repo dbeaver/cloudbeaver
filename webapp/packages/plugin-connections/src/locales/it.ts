@@ -11,4 +11,6 @@ export default [
   ['plugin_connections_connection_form_host_configuration_invalid', 'Host configuration is not supported'],
   ['plugin_connections_connection_form_name_invalid', 'Field \'name\' can\'t be empty'],
   ['connections_public_connection_folder_delete_confirmation', 'You\'re going to delete "{arg:name}". Connections won\'t be deleted. Are you sure?'],
+  ['plugin_connections_menu_connections_label', 'Connessione'],
+  ['plugin_connections_action_disconnect_all_label', 'Scollegati da tutto'],
 ];

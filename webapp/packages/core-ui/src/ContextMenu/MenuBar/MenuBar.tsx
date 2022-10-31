@@ -11,7 +11,7 @@ import { forwardRef, useCallback } from 'react';
 import { MenuInitialState, MenuSeparator } from 'reakit';
 import styled, { use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-blocks';
+import { useAutoLoad, useStyles } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { DATA_CONTEXT_MENU_NESTED, IMenuActionItem, IMenuData, IMenuItem, MenuActionItem, MenuBaseItem, MenuSeparatorItem, MenuSubMenuItem, useMenu } from '@cloudbeaver/core-view';
 
@@ -36,6 +36,7 @@ export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(forwardRef(functi
 }, ref) {
   const styles = useStyles(style);
   const items = menu.items;
+  useAutoLoad(menu.loaders);
 
   if (!items.length) {
     return null;
@@ -60,6 +61,7 @@ interface IMenuBarElementProps {
   item: IMenuItem;
   menuData: IMenuData;
   nestedMenuSettings?: INestedMenuSettings;
+  className?: string;
   style?: ComponentStyle;
 }
 
@@ -67,6 +69,7 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
   item,
   menuData,
   nestedMenuSettings,
+  className,
   style,
 }) {
   const styles = useStyles(style);
@@ -81,6 +84,7 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
         item={item}
         menuData={menuData}
         style={style}
+        className={className}
         nestedMenuSettings={nestedMenuSettings}
       />
     );
@@ -88,7 +92,7 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
 
   if (item instanceof MenuSeparatorItem) {
     return styled(styles)(
-      <MenuSeparator />
+      <MenuSeparator className={className} />
     );
   }
 
@@ -97,6 +101,7 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
       <MenuBarAction
         item={item}
         style={style}
+        className={className}
         onClick={onClick}
       />
     );
@@ -112,6 +117,7 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
         title={item.tooltip}
         disabled={item.disabled}
         style={style}
+        className={className}
         onClick={onClick}
         {...use({ hidden: item.hidden })}
       />
@@ -124,10 +130,11 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
 interface IMenuBarActionProps {
   item: IMenuActionItem;
   style?: ComponentStyle;
+  className?: string;
   onClick: () => void;
 }
 
-const MenuBarAction = observer<IMenuBarActionProps>(function MenuBarAction({ item, style, onClick }) {
+const MenuBarAction = observer<IMenuBarActionProps>(function MenuBarAction({ item, style, className, onClick }) {
   const styles = useStyles(style);
 
   const actionInfo = item.action.actionInfo;
@@ -148,6 +155,7 @@ const MenuBarAction = observer<IMenuBarActionProps>(function MenuBarAction({ ite
       disabled={item.disabled}
       loading={loading}
       style={style}
+      className={className}
       onClick={handleClick}
       {...use({ hidden: item.hidden })}
     />
@@ -158,6 +166,7 @@ interface ISubMenuItemProps {
   item: MenuSubMenuItem;
   menuData: IMenuData;
   nestedMenuSettings?: INestedMenuSettings;
+  className?: string;
   style?: ComponentStyle;
 }
 
@@ -165,6 +174,7 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
   item,
   menuData,
   nestedMenuSettings,
+  className,
   style,
 }) {
   const styles = useStyles(style);
@@ -176,6 +186,7 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
     <ContextMenu
       menu={subMenuData}
       style={style}
+      className={className}
       disclosure
       {...nestedMenuSettings}
     >
