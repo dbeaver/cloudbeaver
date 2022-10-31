@@ -307,8 +307,9 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull String connectionId,
         @NotNull Map<String, Object> authProperties,
         @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
-        @Nullable Boolean saveCredentials) throws DBWebException
-    {
+        @Nullable Boolean saveCredentials,
+        @Nullable Boolean sharedCredentials
+    ) throws DBWebException {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, connectionId);
         connectionInfo.setSavedCredentials(authProperties, networkCredentials);
 
@@ -348,7 +349,9 @@ public class WebServiceCore implements DBWServiceCore {
                 dataSourceContainer,
                 dataSourceContainer.getConnectionConfiguration(),
                 authProperties,
-                true);
+                true,
+                sharedCredentials == null ? false : sharedCredentials
+            );
 
             WebDataSourceUtils.saveCredentialsInDataSource(connectionInfo, dataSourceContainer, dataSourceContainer.getConnectionConfiguration());
             saveConfig[0] = true;
@@ -432,7 +435,13 @@ public class WebServiceCore implements DBWServiceCore {
         dataSource.setFolder(config.getFolder() != null ? sessionRegistry.getFolder(config.getFolder()) : null);
 
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
-        WebServiceUtils.saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
+        WebServiceUtils.saveAuthProperties(
+            dataSource,
+            dataSource.getConnectionConfiguration(),
+            config.getCredentials(),
+            config.isSaveCredentials(),
+            config.isSharedCredentials()
+        );
 
         try {
             sessionRegistry.updateDataSource(dataSource);
@@ -555,8 +564,18 @@ public class WebServiceCore implements DBWServiceCore {
         DBPDataSourceContainer testDataSource;
         if (dataSource != null) {
             testDataSource = dataSource.createCopy(dataSource.getRegistry());
-            WebServiceUtils.setConnectionConfiguration(testDataSource.getDriver(), testDataSource.getConnectionConfiguration(), connectionConfig);
-            WebServiceUtils.saveAuthProperties(testDataSource, testDataSource.getConnectionConfiguration(), connectionConfig.getCredentials(), true);
+            WebServiceUtils.setConnectionConfiguration(
+                testDataSource.getDriver(),
+                testDataSource.getConnectionConfiguration(),
+                connectionConfig
+            );
+            WebServiceUtils.saveAuthProperties(
+                testDataSource,
+                testDataSource.getConnectionConfiguration(),
+                connectionConfig.getCredentials(),
+                true,
+                false
+            );
         } else {
             testDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
         }

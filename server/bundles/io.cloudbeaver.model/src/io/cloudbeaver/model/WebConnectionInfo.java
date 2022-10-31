@@ -158,6 +158,11 @@ public class WebConnectionInfo {
     }
 
     @Property
+    public boolean isSharedCredentials() {
+        return dataSourceContainer.isSharedCredentials();
+    }
+
+    @Property
     public String getFolder() {
         DBPDataSourceFolder folder = dataSourceContainer.getFolder();
         return folder == null ? null : folder.getFolderPath();

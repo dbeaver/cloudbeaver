@@ -113,7 +113,9 @@ public interface DBWServiceCore extends DBWService {
         @NotNull String connectionId,
         @NotNull Map<String, Object> authProperties,
         @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
-        @Nullable Boolean saveCredentials) throws DBWebException;
+        @Nullable Boolean saveCredentials,
+        @Nullable Boolean sharedCredentials
+    ) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionInfo createConnection(

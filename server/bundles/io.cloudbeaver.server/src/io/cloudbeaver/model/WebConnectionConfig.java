@@ -53,6 +53,7 @@ public class WebConnectionConfig {
     private String authModelId;
     private Map<String, Object> credentials;
     private boolean saveCredentials;
+    private boolean sharedCredentials;
     private Map<String, Object> providerProperties;
     private List<WebNetworkHandlerConfigInput> networkHandlersConfig;
     private DBPDriverConfigurationType configurationType;
@@ -90,6 +91,7 @@ public class WebConnectionConfig {
             authModelId = JSONUtils.getString(params, "authModelId");
             credentials = JSONUtils.getObjectOrNull(params, "credentials");
             saveCredentials = JSONUtils.getBoolean(params, "saveCredentials");
+            sharedCredentials = JSONUtils.getBoolean(params, "sharedCredentials");
 
             providerProperties = JSONUtils.getObjectOrNull(params, "providerProperties");
 
@@ -205,6 +207,11 @@ public class WebConnectionConfig {
     @Property
     public boolean isSaveCredentials() {
         return saveCredentials;
+    }
+
+    @Property
+    public boolean isSharedCredentials() {
+        return sharedCredentials;
     }
 
     public void setSaveCredentials(boolean saveCredentials) {

@@ -305,6 +305,7 @@ type ConnectionInfo {
     readOnly: Boolean!
     useUrl: Boolean!
     saveCredentials: Boolean!
+    sharedCredentials: Boolean!
 
     folder: ID
     nodePath: String
@@ -454,6 +455,7 @@ input ConnectionConfig {
     # User credentials
 
     saveCredentials: Boolean
+    sharedCredentials: Boolean
     authModelId: ID
     credentials: Object
 
@@ -559,7 +561,8 @@ extend type Mutation {
     testNetworkHandler( config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
 
     # Initiate existing connection
-    initConnection( id: ID!, projectId: ID, credentials: Object, networkCredentials: [NetworkHandlerConfigInput!], saveCredentials: Boolean ): ConnectionInfo!
+    initConnection( id: ID!, projectId: ID, credentials: Object, networkCredentials: [NetworkHandlerConfigInput!],
+        saveCredentials:Boolean, sharedCredentials: Boolean ): ConnectionInfo!
 
     # Disconnect from database
     closeConnection( id: ID!, projectId: ID ): ConnectionInfo!
