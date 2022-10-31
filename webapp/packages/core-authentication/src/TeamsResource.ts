@@ -35,13 +35,11 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
   }
 
   async loadAll(): Promise<Map<string, TeamInfo>> {
-    this.resetIncludes();
     await this.load(CachedMapAllKey);
     return this.data;
   }
 
   async refreshAll(): Promise<Map<string, TeamInfo>> {
-    this.resetIncludes();
     await this.refresh(CachedMapAllKey);
     return this.data;
   }
@@ -155,6 +153,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
       });
 
       if (all) {
+        this.resetIncludes();
         this.data.clear();
       }
 
