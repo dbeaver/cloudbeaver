@@ -1,3 +1,0 @@
-query deleteConnectionConfiguration($id: ID!) {
-  deleteConnectionConfiguration(id: $id)
-}

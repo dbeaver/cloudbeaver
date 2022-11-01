@@ -27,6 +27,7 @@ import io.cloudbeaver.events.CBEventController;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
+import io.cloudbeaver.model.rm.local.LocalResourceController;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
@@ -48,6 +49,7 @@ import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
@@ -206,7 +208,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     @Override
-    public SMController getSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
+    public SMController createSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
         return new EmbeddedSecurityControllerFactory().createSecurityService(
             this,
             databaseConfiguration,
@@ -237,7 +239,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     protected void startServer() {
         CBPlatform.setApplication(this);
 
-        Path configPath = null;
+        Path configPath;
         try {
             configPath = loadServerConfiguration();
             if (configPath == null) {
@@ -317,13 +319,6 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
         }
 
-        try {
-            initializeServer();
-        } catch (DBException e) {
-            log.error("Error initializing server", e);
-            return;
-        }
-
         {
             try {
                 initializeSecurityController();
@@ -331,6 +326,12 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
                 log.error("Error initializing database", e);
                 return;
             }
+        }
+        try {
+            initializeServer();
+        } catch (DBException e) {
+            log.error("Error initializing server", e);
+            return;
         }
 
         if (configurationMode) {
@@ -506,6 +507,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         }
         // Set default preferences
         PrefUtils.setDefaultPreferenceValue(ModelPreferences.getPreferences(), ModelPreferences.UI_DRIVERS_HOME, getDriversLocation());
+    }
+
+    @Override
+    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
+        return LocalResourceController.builder(credentialsProvider, this::getSecurityController).build();
     }
 
     private void parseConfiguration(File configFile) throws DBException {

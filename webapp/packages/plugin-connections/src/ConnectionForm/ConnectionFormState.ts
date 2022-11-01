@@ -9,7 +9,7 @@
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import type { IFormStateInfo } from '@cloudbeaver/core-blocks';
-import { createConnectionParam, DatabaseConnection, IConnectionInfoParams, IConnectionsResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
 import type { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ConnectionConfig, ResourceKey } from '@cloudbeaver/core-sdk';
@@ -81,7 +81,7 @@ export class ConnectionFormState implements IConnectionFormState {
     return this.config.connectionId || this._id;
   }
 
-  readonly resource: IConnectionsResource;
+  readonly resource: ConnectionInfoResource;
   readonly service: ConnectionFormService;
   readonly submittingTask: IExecutor<IConnectionFormSubmitData>;
   readonly closeTask: IExecutor;
@@ -96,7 +96,7 @@ export class ConnectionFormState implements IConnectionFormState {
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
     service: ConnectionFormService,
-    resource: IConnectionsResource
+    resource: ConnectionInfoResource
   ) {
     this._id = uuid();
     this.initError = null;

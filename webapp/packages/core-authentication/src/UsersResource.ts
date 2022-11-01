@@ -235,6 +235,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     runInAction(() => {
       if (all) {
         this.data.clear();
+        this.resetIncludes();
       }
 
       this.set(resourceKeyList(usersList.map(user => user.userId)), usersList);

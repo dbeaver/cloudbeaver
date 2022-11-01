@@ -18,15 +18,15 @@ package io.cloudbeaver.server.events;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.events.CBEvent;
 import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
-import org.jkiss.dbeaver.model.rm.*;
+import org.jkiss.dbeaver.model.rm.RMEvent;
+import org.jkiss.dbeaver.model.rm.RMEventManager;
+import org.jkiss.dbeaver.model.rm.RMResource;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +54,7 @@ public class CBRmResourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHa
         if (projectId == null || eventType == null || resourcePath == null) {
             return;
         }
-        VirtualProjectImpl project = activeUserSession.getProjectById(projectId);
+        WebProjectImpl project = activeUserSession.getProjectById(projectId);
         if (project == null) {
             return;
         }

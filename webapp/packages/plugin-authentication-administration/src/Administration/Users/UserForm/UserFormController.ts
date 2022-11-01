@@ -8,17 +8,16 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { AdminUser, compareTeams, isLocalUser, TeamInfo, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { AuthRolesResource } from '@cloudbeaver/core-authentication/src/AuthRolesResource';
-import { ConnectionInfoProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
+import { AdminUser, AuthRolesResource, compareTeams, isLocalUser, TeamInfo, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
-import { GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo } from '@cloudbeaver/core-sdk';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { IUserFormState } from './UserFormService';
@@ -50,7 +49,8 @@ export class UserFormController implements IInitializableController, IDestructib
   partsState: MetadataMap<string, any>;
 
   get connections(): DatabaseConnection[] {
-    return this.connectionInfoResource.get(ConnectionInfoProjectKey(PROJECT_GLOBAL_ID)) as DatabaseConnection[];
+    return this.connectionInfoResource.values
+      .filter(({ projectId }) => this.projectInfoResource.get(projectId)?.global) as DatabaseConnection[];
   }
 
   get teams(): TeamInfo[] {
@@ -73,6 +73,7 @@ export class UserFormController implements IInitializableController, IDestructib
   private editing!: boolean;
 
   constructor(
+    private readonly projectInfoResource: ProjectInfoResource,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly teamsResource: TeamsResource,
@@ -172,7 +173,7 @@ export class UserFormController implements IInitializableController, IDestructib
         await this.saveUserStatus();
         await this.saveConnectionPermissions();
         await this.saveMetaParameters();
-        user = await this.usersResource.refresh(this.user.userId);
+        user = await this.usersResource.refresh(this.user.userId, ['includeMetaParameters']);
 
         this.notificationService.logSuccess({ title: 'authentication_administration_user_updated' });
       }
@@ -328,7 +329,9 @@ export class UserFormController implements IInitializableController, IDestructib
   }
 
   private async saveConnectionPermissions() {
-    if (!this.connectionAccessChanged) {
+    await this.projectInfoResource.load(CachedMapAllKey);
+
+    if (!this.connectionAccessChanged || !this.projectInfoResource.values.some(project => project.global)) {
       return;
     }
     await this.usersResource.setConnections(this.user.userId, this.getGrantedConnections());
@@ -363,7 +366,8 @@ export class UserFormController implements IInitializableController, IDestructib
   private async loadConnections() {
     try {
       await this.dbDriverResource.loadAll();
-      await this.connectionInfoResource.load(ConnectionInfoProjectKey(PROJECT_GLOBAL_ID));
+      await this.projectInfoResource.load(CachedMapAllKey);
+      await this.connectionInfoResource.load(CachedMapAllKey);
     } catch (exception: any) {
       this.setStatusMessage('authentication_administration_user_connections_access_connections_load_fail', ENotificationType.Error);
     }

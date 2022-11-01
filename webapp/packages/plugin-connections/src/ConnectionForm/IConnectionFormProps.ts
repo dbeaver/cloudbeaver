@@ -7,7 +7,7 @@
  */
 
 import type { IFormStateInfo } from '@cloudbeaver/core-blocks';
-import type { DatabaseConnection, IConnectionsResource } from '@cloudbeaver/core-connections';
+import type { ConnectionInfoResource, DatabaseConnection } from '@cloudbeaver/core-connections';
 import type { IExecutor, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
@@ -32,7 +32,7 @@ export interface IConnectionFormState {
   readonly configured: boolean;
 
   readonly availableDrivers: string[];
-  readonly resource: IConnectionsResource;
+  readonly resource: ConnectionInfoResource;
   readonly info: DatabaseConnection | undefined;
   readonly readonly: boolean;
   readonly submittingTask: IExecutorHandlersCollection<IConnectionFormSubmitData>;
