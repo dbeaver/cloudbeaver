@@ -9,6 +9,7 @@
 import { observer } from 'mobx-react-lite';
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { removeMetadataFromBase64 } from '@cloudbeaver/core-utils';
 
 import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox';
 import { Combobox } from '../../FormControls/Combobox';
@@ -96,6 +97,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         state={state}
         disabled={disabled}
         className={className}
+        mapValue={removeMetadataFromBase64}
       >
         {property.displayName}
       </InputFile>
