@@ -55,6 +55,7 @@ interface Props<TState> extends ILayoutSizeProps {
   labelTooltip?: string;
   tooltip?: string;
   required?: boolean;
+  fileName?: string;
   style?: ComponentStyle;
   /** Max file size in KB */
   maxFileSize?: number;
@@ -73,6 +74,7 @@ export const InputFile: InputFileType = observer(function InputFile({
   labelTooltip,
   tooltip,
   required,
+  fileName,
   small,
   medium,
   large,
@@ -98,8 +100,22 @@ export const InputFile: InputFileType = observer(function InputFile({
     error ? baseInvalidFormControlStyles : baseValidFormControlStyles
   );
 
-  const fileSaved = !!state[name];
-  const description = error?.message ?? selected?.name ?? translate(fileSaved ? 'ui_processing_saved' : 'ui_no_file_chosen');
+  const savedExternally = !!fileName && state[name] !== '';
+  const saved = savedExternally || !!state[name];
+
+  let description;
+
+  if (selected?.name || savedExternally) {
+    description = selected?.name ?? fileName;
+  }
+
+  if (error?.message) {
+    description = error.message;
+  }
+
+  if (!description) {
+    description = translate(saved ? 'ui_processing_saved' : 'ui_no_file_chosen');
+  }
 
   function updateValue(value: string) {
     const val = mapValue?.(value) ?? value;
@@ -111,10 +127,7 @@ export const InputFile: InputFileType = observer(function InputFile({
 
   function removeFile() {
     setSelected(null);
-
-    if (state[name]) {
-      updateValue('');
-    }
+    updateValue('');
   }
 
   function validateFileSize(size: number) {
@@ -166,7 +179,7 @@ export const InputFile: InputFileType = observer(function InputFile({
       </UploadArea>
       <field-description>
         {description}
-        {(selected || fileSaved) && <IconButton disabled={disabled} name='cross' onClick={removeFile} />}
+        {(selected || saved) && <IconButton disabled={disabled} name='cross' onClick={removeFile} />}
       </field-description>
     </field>
   );
