@@ -62,6 +62,7 @@ interface Props<TState> extends ILayoutSizeProps {
   className?: string;
   children?: ReactNode;
   onChange?: (value: string, name: keyof TState) => void;
+  mapValue?: (value: string) => string;
 }
 
 type InputFileType = <TState extends Record<string, any>>(props: Props<TState>) => React.ReactElement<any, any>;
@@ -82,6 +83,7 @@ export const InputFile: InputFileType = observer(function InputFile({
   className,
   children,
   onChange,
+  mapValue,
 }: Props<Record<any, any>>) {
   const translate = useTranslate();
   const context = useContext(FormContext);
@@ -100,9 +102,11 @@ export const InputFile: InputFileType = observer(function InputFile({
   const description = error?.message ?? selected?.name ?? translate(fileSaved ? 'ui_processing_saved' : 'ui_no_file_chosen');
 
   function updateValue(value: string) {
-    state[name] = value;
-    onChange?.(value, name);
-    context?.change(value, name);
+    const val = mapValue?.(value) ?? value;
+
+    state[name] = val;
+    onChange?.(val, name);
+    context?.change(val, name);
   }
 
   function removeFile() {
