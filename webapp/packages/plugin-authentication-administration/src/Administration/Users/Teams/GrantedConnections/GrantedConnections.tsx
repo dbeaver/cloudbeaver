@@ -6,18 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group,
+  BASE_CONTAINERS_STYLES, ColoredContainer, Container, getComputed, Group,
   InfoItem, Loader, TextPlaceholder, useMapResource, useStyles, useTranslate
 } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoProjectKey, ConnectionInfoResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
-import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
@@ -53,22 +52,28 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
   const { selected } = useTab(tabId);
   const loaded = state.state.loaded;
 
+  const projects = useMapResource(GrantedConnections, ProjectInfoResource, CachedMapAllKey);
+
   const dbDriverResource = useMapResource(
     GrantedConnections,
     DBDriverResource,
     CachedMapAllKey,
     { active: selected }
   );
+
   const connections = useMapResource(
     GrantedConnections,
     ConnectionInfoResource,
-    ConnectionInfoProjectKey(PROJECT_GLOBAL_ID),
+    CachedMapAllKey,
     { active: selected }
   );
 
-  const grantedConnections = useMemo(() => computed(() => connections.resource.values
+  const globalConnections = connections.resource.values
+    .filter(({ projectId }) => projects.resource.get(projectId)?.global);
+
+  const grantedConnections = getComputed(() => globalConnections
     .filter(connection => state.state.grantedSubjects.includes(connection.id))
-  ), [state.state.grantedSubjects, connections.resource]);
+  );
 
   useEffect(() => {
     if (selected && !loaded) {
@@ -82,7 +87,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
 
   let info: TLocalizationToken | null = null;
 
-  const cloudExists = connections.resource.values.some(isCloudConnection);
+  const cloudExists = globalConnections.some(isCloudConnection);
 
   if (cloudExists) {
     info = 'cloud_connections_access_placeholder';
@@ -93,10 +98,10 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
   }
 
   return styled(style)(
-    <Loader state={[connections, dbDriverResource, state.state]}>
+    <Loader state={[connections, dbDriverResource, projects, state.state]}>
       {() => styled(style)(
         <ColoredContainer parent gap vertical>
-          {!connections.resource.values.length ? (
+          {!globalConnections.length ? (
             <Group large>
               <TextPlaceholder>{translate('administration_teams_team_granted_connections_empty')}</TextPlaceholder>
             </Group>
@@ -105,14 +110,14 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
               {info && <InfoItem info={info} />}
               <Container gap overflow>
                 <GrantedConnectionList
-                  grantedConnections={grantedConnections.get()}
+                  grantedConnections={grantedConnections}
                   disabled={formState.disabled}
                   onEdit={state.edit}
                   onRevoke={state.revoke}
                 />
                 {state.state.editing && (
                   <ConnectionList
-                    connectionList={connections.resource.values}
+                    connectionList={globalConnections}
                     grantedSubjects={state.state.grantedSubjects}
                     disabled={formState.disabled}
                     onGrant={state.grant}

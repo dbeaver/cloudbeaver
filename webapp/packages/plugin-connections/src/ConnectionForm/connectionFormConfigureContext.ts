@@ -8,11 +8,14 @@
 
 import type { DatabaseConnection } from '@cloudbeaver/core-connections';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { CachedResourceIncludeArgs, GetConnectionsQueryVariables } from '@cloudbeaver/core-sdk';
+import type { CachedResourceIncludeArgs, GetUserConnectionsQueryVariables } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionFormState } from './IConnectionFormProps';
 
-export type ConnectionFormInfoIncludes = CachedResourceIncludeArgs<DatabaseConnection, GetConnectionsQueryVariables>;
+export type ConnectionFormInfoIncludes = CachedResourceIncludeArgs<
+DatabaseConnection,
+GetUserConnectionsQueryVariables
+>;
 
 export interface IConnectionFormConfigureContext {
   readonly driverId: string | undefined;

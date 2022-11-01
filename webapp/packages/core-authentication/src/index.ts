@@ -4,6 +4,7 @@ export * from './AUTH_PROVIDER_LOCAL_ID';
 export * from './AuthInfoService';
 export * from './AuthProviderService';
 export * from './AuthProvidersResource';
+export * from './AuthRolesResource';
 export * from './AuthSettingsService';
 export * from './DATA_CONTEXT_USER';
 export * from './IAuthCredentials';

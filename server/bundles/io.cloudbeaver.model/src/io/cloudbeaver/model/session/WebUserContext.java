@@ -28,7 +28,6 @@ import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.utils.CommonUtils;
@@ -51,11 +50,10 @@ public class WebUserContext implements SMCredentialsProvider {
 
     private SMController securityController;
     private SMAdminController adminSecurityController;
-    private RMController rmController;
 
     public WebUserContext(WebApplication application) throws DBException {
         this.application = application;
-        this.securityController = application.getSecurityController(this);
+        this.securityController = application.createSecurityController(this);
         this.userPermissions = getDefaultPermissions();
     }
 
@@ -85,9 +83,8 @@ public class WebUserContext implements SMCredentialsProvider {
         );
         this.refreshToken = smAuthInfo.getSmRefreshToken();
         this.userPermissions = authPermissions.getPermissions();
-        this.securityController = application.getSecurityController(this);
+        this.securityController = application.createSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
-        this.rmController = application.getResourceController(this, this.securityController);
         if (isSessionChanged) {
             this.smSessionId = smAuthInfo.getAuthPermissions().getSessionId();
             setUser(authPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));
@@ -121,9 +118,8 @@ public class WebUserContext implements SMCredentialsProvider {
         this.userPermissions = getDefaultPermissions();
         this.smCredentials = null;
         this.user = null;
-        this.securityController = application.getSecurityController(this);
+        this.securityController = application.createSecurityController(this);
         this.adminSecurityController = null;
-        this.rmController = application.getResourceController(this, this.securityController);
     }
 
     @NotNull
@@ -158,10 +154,6 @@ public class WebUserContext implements SMCredentialsProvider {
         return adminSecurityController;
     }
 
-    public synchronized RMController getRmController() {
-        return rmController;
-    }
-
     public synchronized Set<String> getUserPermissions() {
         return userPermissions;
     }
@@ -175,10 +167,7 @@ public class WebUserContext implements SMCredentialsProvider {
         } else {
             this.userPermissions = getDefaultPermissions();
         }
-        if (userPermissions != null &&
-            !userPermissions.isEmpty() &&
-            !userPermissions.contains(DBWConstants.PERMISSION_PUBLIC)
-        ) {
+        if (userPermissions != null && !userPermissions.isEmpty()) {
             userPermissions.add(DBWConstants.PERMISSION_PUBLIC);
         }
     }
