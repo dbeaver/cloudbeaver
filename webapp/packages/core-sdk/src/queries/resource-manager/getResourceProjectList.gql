@@ -3,6 +3,7 @@ query getResourceProjectList {
     id
     name
     shared
+    global
     description
     projectPermissions
   }

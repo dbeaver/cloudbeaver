@@ -36,7 +36,10 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class WebAppUtils {
     private static final Log log = Log.getLog(WebAppUtils.class);
@@ -57,7 +60,7 @@ public class WebAppUtils {
     }
 
     public static SMAuthenticationManager getAuthManager(WebApplication application) throws DBException {
-        var smController = application.getSecurityController(new NoAuthCredentialsProvider());
+        var smController = application.createSecurityController(new NoAuthCredentialsProvider());
         if (!SMAuthenticationManager.class.isAssignableFrom(smController.getClass())) {
             throw new DBException("The current application cannot be used for authorization");
         }
