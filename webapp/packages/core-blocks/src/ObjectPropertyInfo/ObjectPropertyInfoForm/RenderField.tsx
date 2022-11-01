@@ -19,6 +19,7 @@ import { InputFile } from '../../FormControls/InputFile';
 import { isControlPresented } from '../../FormControls/isControlPresented';
 import { Textarea } from '../../FormControls/Textarea';
 import { Link } from '../../Link';
+import { useTranslate } from '../../localization/useTranslate';
 
 const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 
@@ -81,12 +82,15 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   onFocus,
   className,
 }) {
+  const translate = useTranslate();
+
   const controltype = getControlTypeFor(property);
   const password = property.features.includes('password');
 
   const value = getValue(property.value, controltype);
   const defaultValue = getValue(property.defaultValue, controltype);
-  let description: string | undefined;
+  const passwordSaved = showRememberTip && password && !!property.value;
+  const description = passwordSaved ? translate('ui_processing_saved') : undefined;
 
   if (controltype === 'file' && state) {
     return (
@@ -96,6 +100,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         name={property.id!}
         state={state}
         disabled={disabled}
+        fileName={description}
         className={className}
         mapValue={removeMetadataFromBase64}
       >
@@ -121,10 +126,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         {state?.[property.id!]}
       </FormFieldDescription>
     );
-  }
-
-  if (showRememberTip && password && property.value) {
-    description = 'Password saved';
   }
 
   if (controltype === 'checkbox') {
