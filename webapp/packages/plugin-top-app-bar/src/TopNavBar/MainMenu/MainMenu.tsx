@@ -48,7 +48,10 @@ const menuBarItemStyles = css`
 `;
 
 const removeDisableEffect = css`
-  Button:disabled, Button[aria-disabled="true"] {
+  Button:disabled,
+  Button[aria-disabled="true"],
+  MenuButton:disabled,
+  MenuButton[aria-disabled="true"] {
     opacity: 1;
   }
 `;
@@ -71,7 +74,7 @@ const projectsMenu = css`
 `;
 
 const styles = css`
-  menu-wrapper {
+  menu-wrapper, MenuBar {
     display: flex;
     height: 100%;
   }
@@ -89,7 +92,7 @@ export const MainMenu = observer(function MainMenu() {
     <menu-wrapper>
       <MenuBar
         menu={menu}
-        style={[topMenuStyles, menuBarItemStyles, topMenuStyles]}
+        style={[topMenuStyles, menuBarItemStyles, topMenuStyles, removeDisableEffect]}
         nestedMenuSettings={{ modal: true }}
       />
     </menu-wrapper>

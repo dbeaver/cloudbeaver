@@ -35,9 +35,14 @@ export const MenuBarItem = observer<Props, HTMLButtonElement>(forwardRef(functio
   const title = translate(rest.title);
   return styled(useStyles(style))(
     <menu-bar-item ref={ref} as='button' {...rest} title={title} aria-label={title}>
-      {loading && <Loader small fullSize />}
-      {!loading && icon && <IconOrImage icon={icon} viewBox={viewBox} />}
-      {label && <menu-bar-item-label>{translate(label)}</menu-bar-item-label>}
+      <menu-bar-item-box>
+        {loading ? (
+          <menu-bar-item-icon><Loader small /></menu-bar-item-icon>
+        ) : icon && (
+          <menu-bar-item-icon><IconOrImage icon={icon} viewBox={viewBox} /></menu-bar-item-icon>
+        )}
+        {label && <menu-bar-item-label>{translate(label)}</menu-bar-item-label>}
+      </menu-bar-item-box>
     </menu-bar-item>
   );
 }));

@@ -22,6 +22,9 @@ export const topMenuStyles = css`
   menu-box menu-panel-item {
     border-color: #ffffff !important;
   }
+  Loader {
+    composes: secondary from global;
+  }
   MenuButton, MenuBarElement {
     composes: theme-ripple from global;
     background: none;
@@ -46,7 +49,26 @@ export const topMenuStyles = css`
       display: block;
       width: 24px;
     }
-    & menu-trigger-icon {
+    & menu-bar-item-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      box-sizing: border-box;
+      align-items: center;
+      justify-content: center;
+    }
+    & menu-bar-item-box {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      height: inherit;
+      position: relative;
+    }
+    & menu-bar-item-icon IconOrImage {
+      display: block;
+      object-fit: contain;
+    }
+    & menu-trigger-icon, & menu-bar-item-icon {
       margin-right: 8px;
     }
     & menu-trigger-text, & menu-bar-item-label {

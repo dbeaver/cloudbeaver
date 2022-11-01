@@ -49,7 +49,7 @@ export class DataContext implements IDataContext {
     let provider: IDataContextProvider = this;
 
     while (true) {
-      if (this.map.get(context) === value) {
+      if (provider.map.get(context) === value) {
         return true;
       }
 

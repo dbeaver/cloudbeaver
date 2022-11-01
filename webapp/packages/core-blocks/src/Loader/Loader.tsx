@@ -254,7 +254,7 @@ export const Loader = observer<Props>(function Loader({
     <LoaderContext.Provider value={contextState}>
       <>
         {overlay && children}
-        <loader ref={loaderRef} className={className} {...use({ small, fullSize, inline })}>
+        <loader ref={loaderRef} className={className} {...use({ small, fullSize, inline, secondary, overlay })}>
           <icon><StaticImage icon={spinnerURL} /></icon>
           {!hideMessage && <message><Translate token={message || 'ui_processing_loading'} /></message>}
           {onCancel && (

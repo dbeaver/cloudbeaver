@@ -74,6 +74,10 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
 
   const loading = getComputed(() => handler?.isLoading?.(subMenuData.context));
   const disabled = getComputed(() => handler?.isDisabled?.(subMenuData.context));
+  const info = handler?.getInfo?.(subMenuData.context, subMenuData.menu);
+  const label = info?.label ?? subMenu.label ?? subMenu.menu.label;
+  const icon = info?.icon ?? subMenu.icon ?? subMenu.menu.icon;
+  const tooltip = info?.tooltip ?? subMenu.tooltip ?? subMenu.menu.tooltip;
   const MenuItemRenderer = itemRenderer;
   const panelAvailable = subMenuData.available && !loading;
 
@@ -106,9 +110,9 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
       {...rest}
     >
       <MenuItemElement
-        label={subMenu.label ?? subMenu.menu.label}
-        icon={subMenu.icon ?? subMenu.menu.icon}
-        tooltip={subMenu.tooltip ?? subMenu.menu.tooltip}
+        label={label}
+        icon={icon}
+        tooltip={tooltip}
         panelAvailable={panelAvailable}
         loading={loading}
         style={style}

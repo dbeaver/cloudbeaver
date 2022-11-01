@@ -7,10 +7,12 @@
  */
 
 import type { IDataContextProvider } from '../DataContext/IDataContextProvider';
+import type { IMenu } from './IMenu';
 
 export interface IMenuHandler {
   id: string;
 
+  getInfo?: (context: IDataContextProvider, menu: IMenu) => IMenu;
   isApplicable: (context: IDataContextProvider) => boolean;
   isLoading?: (context: IDataContextProvider) => boolean;
   isDisabled?: (context: IDataContextProvider) => boolean;

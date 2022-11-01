@@ -142,12 +142,20 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
           return false;
         }
       }
-    } else if (creator.menus || creator.contexts) {
+    } else if (creator.contexts) {
       return false;
     }
 
     if (creator.isApplicable?.(contexts) === false) {
       return false;
+    }
+
+    if (creator.menus) {
+      const applicable = creator.menus.some(menu => contexts.hasValue(DATA_CONTEXT_MENU, menu));
+
+      if (!applicable) {
+        return false;
+      }
     }
 
     return true;

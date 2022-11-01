@@ -36,7 +36,6 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
   }
 
   register(): void {
-
     this.connectionInfoResource.onDataUpdate
       .addHandler(this.connectionSchemaManagerService.onConnectionUpdate.bind(this.connectionSchemaManagerService));
 
