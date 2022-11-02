@@ -20,4 +20,8 @@ describe('Remove metadata from base64', () => {
   test('should return base64 when base64 with no metadata is passed', () => {
     expect(removeMetadataFromBase64(BASE64_NO_METADATA)).toMatch(BASE64_NO_METADATA);
   });
+
+  test('should return empty string when empty string is passed', () => {
+    expect(removeMetadataFromBase64('')).toMatch('');
+  });
 });
