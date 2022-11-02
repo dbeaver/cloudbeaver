@@ -58,7 +58,7 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
       </menu-item-binding>
       <menu-item-content>
         {loading && <Loader small fullSize />}
-        {panelAvailable !== false && menu && !loading && <Icon name="arrow" viewBox="0 0 16 16" />}
+        {panelAvailable !== false && menu && !loading && <Icon name="context-menu-submenu" viewBox="0 0 6 7" />}
       </menu-item-content>
     </menu-panel-item>
 
