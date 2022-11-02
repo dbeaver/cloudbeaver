@@ -52,6 +52,7 @@ const INPUT_FILE_FIELD_STYLES = css`
 interface Props<TState> extends ILayoutSizeProps {
   name: keyof TState;
   state: TState;
+  accept?: string;
   labelTooltip?: string;
   tooltip?: string;
   required?: boolean;
@@ -71,6 +72,7 @@ type InputFileType = <TState extends Record<string, any>>(props: Props<TState>) 
 export const InputFile: InputFileType = observer(function InputFile({
   name,
   state,
+  accept,
   labelTooltip,
   tooltip,
   required,
@@ -167,7 +169,7 @@ export const InputFile: InputFileType = observer(function InputFile({
   return styled(styles)(
     <field className={className} {...use({ small, medium, large, tiny })}>
       <field-label title={labelTooltip}>{children}{required && ' *'}</field-label>
-      <UploadArea title={tooltip} disabled={disabled} accept='.zip,.rar,.7zip' reset onChange={handleChange}>
+      <UploadArea title={tooltip} disabled={disabled} accept={accept} reset onChange={handleChange}>
         <Button
           icon='/icons/import.svg'
           tag='div'
