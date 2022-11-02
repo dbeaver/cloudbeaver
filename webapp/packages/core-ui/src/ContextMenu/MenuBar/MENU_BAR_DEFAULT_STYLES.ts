@@ -47,6 +47,10 @@ export const MENU_BAR_DEFAULT_STYLES = css`
       & IconOrImage + menu-bar-item-label, & Loader + menu-bar-item-label {
           padding-left: 8px
       }
+      
+      & menu-bar-item-mark {
+        display: none;
+      }
     }
 
     MenuSeparator {

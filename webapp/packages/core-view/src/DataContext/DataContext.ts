@@ -44,7 +44,7 @@ export class DataContext implements IDataContext {
     return this.map.has(context);
   }
 
-  hasValue<T>(context: DataContextGetter<T>, value: T): boolean {
+  hasValue<T>(context: DataContextGetter<T>, value: T, nested = true): boolean {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     let provider: IDataContextProvider = this;
 
@@ -53,7 +53,7 @@ export class DataContext implements IDataContext {
         return true;
       }
 
-      if (provider.fallback) {
+      if (provider.fallback && nested) {
         provider = provider.fallback;
       } else {
         return false;

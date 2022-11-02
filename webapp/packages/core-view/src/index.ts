@@ -49,7 +49,7 @@ export * from './Menu/DATA_CONTEXT_MENU_NESTED';
 export * from './Menu/DATA_CONTEXT_MENU';
 export * from './Menu/DATA_CONTEXT_SUBMENU_ITEM';
 export * from './Menu/IMenu';
-export * from './Menu/menuExtractActions';
+export * from './Menu/menuExtractItems';
 export * from './Menu/MenuService';
 export * from './Menu/useMenu';
 export * from './Menu/useMenuContext';

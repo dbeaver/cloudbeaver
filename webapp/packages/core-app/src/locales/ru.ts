@@ -2,7 +2,6 @@ export default [
   ['app_shared_settingsMenu_config', 'Настройки'],
   ['app_shared_settingsMenu_theme', 'Тема'],
   ['app_shared_settingsMenu_lang', 'Язык'],
-  ['app_topnavbar_connection_schema_manager_not_selected', '-- не выбрано --'],
   [
     'app_shared_navigationTabsBar_placeholder',
     'Нет открытых объектов для отображения. Дважды нажмите на элемент в дереве навигации, чтобы открыть его.',

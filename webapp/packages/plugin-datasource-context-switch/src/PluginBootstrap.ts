@@ -7,22 +7,15 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { TopNavService } from '@cloudbeaver/plugin-top-app-bar';
-
-import { ConnectionSelector } from './ConnectionSchemaManager/ConnectionSelector/ConnectionSelector';
 
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
-  constructor(
-    private readonly topNavService: TopNavService,
-  ) {
+  constructor() {
     super();
   }
 
-  register(): void | Promise<void> {
-    this.topNavService.placeholder.add(ConnectionSelector, 2);
-  }
+  register(): void | Promise<void> { }
 
   load(): void | Promise<void> { }
 }

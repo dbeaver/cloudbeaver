@@ -6,13 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { compareConnectionsInfo, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, serializeConnectionParam } from '@cloudbeaver/core-connections';
+import { compareConnectionsInfo, ConnectionInfoResource, ConnectionsManagerService, ContainerResource, createConnectionParam, serializeConnectionParam } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
-import { DATA_CONTEXT_MENU, MenuBaseItem, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { EPermission, PermissionsService } from '@cloudbeaver/core-root';
+import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
+import { OptionsPanelService } from '@cloudbeaver/core-ui';
+import { DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { TOP_APP_BAR_MENU } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionSchemaManagerService } from './ConnectionSchemaManagerService';
 import { ConnectionIcon } from './ConnectionSelector/ConnectionIcon';
+import type { IConnectionSelectorExtraProps } from './ConnectionSelector/IConnectionSelectorExtraProps';
 import { MENU_CONNECTION_DATA_CONTAINER_SELECTOR } from './MENU_CONNECTION_DATA_CONTAINER_SELECTOR';
 import { MENU_CONNECTION_SELECTOR } from './MENU_CONNECTION_SELECTOR';
 
@@ -30,25 +35,57 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
     private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly optionsPanelService: OptionsPanelService,
+    private readonly permissionsService: PermissionsService,
+    private readonly containerResource: ContainerResource,
     private readonly menuService: MenuService
   ) {
     super();
   }
 
   register(): void {
+    this.addTopAppMenuItems();
+
     this.connectionInfoResource.onDataUpdate
       .addHandler(this.connectionSchemaManagerService.onConnectionUpdate.bind(this.connectionSchemaManagerService));
 
-    this.menuService.setHandler({
+    this.menuService.setHandler<IConnectionSelectorExtraProps>({
       id: 'connection-selector-base',
       isApplicable: context => context.hasValue(DATA_CONTEXT_MENU, MENU_CONNECTION_SELECTOR),
       isLoading: () => this.connectionSelectorLoading,
+      isHidden: () => this.isHidden(),
       isDisabled: () => (
         !this.connectionSchemaManagerService.isConnectionChangeable
         || this.connectionSelectorLoading
         || !this.connectionsManagerService.hasAnyConnection()
         || this.connectionSchemaManagerService.isChangingConnectionContainer
       ),
+      getInfo: (context, menu) => {
+        const connection = this.connectionSchemaManagerService.currentConnection;
+        const label = connection?.name || 'plugin_datasource_context_switch_select_connection';
+
+        return {
+          ...menu,
+          label,
+        };
+      },
+      iconComponent: () => ConnectionIcon,
+      getExtraProps: () => ({ connectionKey: this.connectionSchemaManagerService.currentConnectionKey, small: true }),
+      getLoader: (context, menu) => {
+        if (this.isHidden()) {
+          return [];
+        }
+
+        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
+
+        return state.getState(
+          menu.id,
+          () => getCachedDataResourceLoaderState(this.containerResource, {
+            ...this.connectionSchemaManagerService.activeConnectionKey!,
+            catalogId: this.connectionSchemaManagerService.activeObjectCatalogId,
+          }, undefined)
+        );
+      },
     });
 
     this.menuService.addCreator({
@@ -81,7 +118,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         for (const connection of connections) {
           const connectionKey = createConnectionParam(connection);
 
-          items.push(new MenuBaseItem(
+          items.push(new MenuBaseItem<IConnectionSelectorExtraProps>(
             {
               id: serializeConnectionParam(connectionKey),
               label: connection.name,
@@ -128,7 +165,8 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         && this.connectionSchemaManagerService.isChangingConnectionContainer
       ),
       isHidden: () => (
-        !this.connectionSchemaManagerService.objectContainerList
+        this.isHidden()
+        || !this.connectionSchemaManagerService.objectContainerList
         || (
           this.connectionSchemaManagerService.currentObjectSchemaId === undefined
           && this.connectionSchemaManagerService.currentObjectCatalogId === undefined
@@ -140,6 +178,43 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
           && this.connectionSchemaManagerService.objectContainerList.catalogList.length === 0
         )
       ),
+      getInfo: (context, menu) => {
+        const connectionSchemaManagerService = this.connectionSchemaManagerService;
+
+        let icon: string | undefined = 'database';
+
+        let label = NodeManagerUtils.concatSchemaAndCatalog(
+          connectionSchemaManagerService.currentObjectCatalogId,
+          connectionSchemaManagerService.currentObjectSchemaId
+        );
+
+        if (!label) {
+          label = 'plugin_datasource_context_switch_select_container';
+        }
+
+        if (
+          !connectionSchemaManagerService.currentObjectSchema
+          && !connectionSchemaManagerService.currentObjectCatalog
+        ) {
+          icon = undefined;
+        } else if (
+          connectionSchemaManagerService.currentObjectSchema?.object?.features?.includes(EObjectFeature.schema)
+        ) {
+          // TODO move such kind of icon paths to a set of constants
+          icon = 'schema_system';
+        } else if (
+          connectionSchemaManagerService.currentObjectCatalog?.object?.features?.includes(EObjectFeature.catalog)
+        ) {
+          icon = 'database';
+        }
+
+
+        return {
+          ...menu,
+          icon,
+          label,
+        };
+      },
     });
 
     this.menuService.addCreator({
@@ -292,4 +367,31 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
   }
 
   load(): void {}
+
+  private isHidden(): boolean {
+    return (
+      this.optionsPanelService.active
+      || (
+        !this.connectionSchemaManagerService.isConnectionChangeable
+        && !this.connectionSchemaManagerService.currentConnectionKey
+      )
+      || !this.permissionsService.has(EPermission.public)
+    );
+  }
+
+  private addTopAppMenuItems() {
+    this.menuService.addCreator({
+      menus: [TOP_APP_BAR_MENU],
+      getItems: (context, items) => [
+        ...items,
+        MENU_CONNECTION_SELECTOR,
+        MENU_CONNECTION_DATA_CONTAINER_SELECTOR,
+      ],
+      orderItems: (context, items) => {
+        const extracted = menuExtractItems(items, [MENU_CONNECTION_SELECTOR, MENU_CONNECTION_DATA_CONTAINER_SELECTOR]);
+
+        return [...items, ...extracted];
+      },
+    });
+  }
 }

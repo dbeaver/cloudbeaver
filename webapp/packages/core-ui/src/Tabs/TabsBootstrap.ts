@@ -7,7 +7,7 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ActionService, DATA_CONTEXT_MENU, menuExtractActions, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
 import { ACTION_TAB_CLOSE } from './Actions/ACTION_TAB_CLOSE';
 import { ACTION_TAB_CLOSE_ALL } from './Actions/ACTION_TAB_CLOSE_ALL';
@@ -99,7 +99,7 @@ export class TabsBootstrap extends Bootstrap {
         ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT,
       ],
       orderItems: (context, items) => {
-        const actions = menuExtractActions(items, [
+        const actions = menuExtractItems(items, [
           ACTION_TAB_CLOSE,
           ACTION_TAB_CLOSE_ALL,
           ACTION_TAB_CLOSE_OTHERS,

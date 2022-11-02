@@ -9,6 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { usePermission } from '@cloudbeaver/core-blocks';
+import { EPermission } from '@cloudbeaver/core-root';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
@@ -43,6 +45,15 @@ const menuBarItemStyles = css`
     & menu-bar-item-label {
       text-transform: uppercase;
       font-weight: 500;
+    }
+      
+    & menu-bar-item-mark {
+      display: flex;
+      padding-left: 6px;
+
+      & Icon {
+        width: 12px;
+      }
     }
   }
 `;
@@ -87,6 +98,11 @@ const styles = css`
 
 export const MainMenu = observer(function MainMenu() {
   const menu = useMenu({ menu: TOP_APP_BAR_MENU });
+  const isEnabled = usePermission(EPermission.public);
+
+  if (!isEnabled) {
+    return null;
+  }
 
   return styled(styles)(
     <menu-wrapper>

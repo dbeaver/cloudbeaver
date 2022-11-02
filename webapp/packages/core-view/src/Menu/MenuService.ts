@@ -25,7 +25,7 @@ import { MenuSubMenuItem } from './MenuItem/MenuSubMenuItem';
 
 @injectable()
 export class MenuService {
-  private readonly handlers: Map<string, IMenuHandler>;
+  private readonly handlers: Map<string, IMenuHandler<any>>;
   private readonly creators: IMenuItemsCreator[];
 
   constructor(
@@ -49,7 +49,7 @@ export class MenuService {
     this.creators.push(creator);
   }
 
-  setHandler(handler: IMenuHandler): void {
+  setHandler<T = unknown>(handler: IMenuHandler<T>): void {
     if (this.handlers.has(handler.id)) {
       throw new Error(`Menu handler with same id (${handler.id}) already exists`);
     }
@@ -110,7 +110,7 @@ export class MenuService {
           return this.createActionItem(context, item) as IMenuItem;
         }
         if (isMenu(item)) {
-          return new MenuSubMenuItem(item) as IMenuItem;
+          return new MenuSubMenuItem({ menu: item }) as IMenuItem;
         }
         return item;
       })
@@ -128,7 +128,7 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
       }
 
       if (creator.menus) {
-        const applicable = creator.menus.some(menu => contexts.hasValue(DATA_CONTEXT_MENU, menu));
+        const applicable = creator.menus.some(menu => contexts.hasValue(DATA_CONTEXT_MENU, menu, false));
 
         if (!applicable) {
           return false;
@@ -151,7 +151,7 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
     }
 
     if (creator.menus) {
-      const applicable = creator.menus.some(menu => contexts.hasValue(DATA_CONTEXT_MENU, menu));
+      const applicable = creator.menus.some(menu => contexts.hasValue(DATA_CONTEXT_MENU, menu, false));
 
       if (!applicable) {
         return false;

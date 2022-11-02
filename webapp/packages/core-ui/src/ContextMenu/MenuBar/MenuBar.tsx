@@ -12,9 +12,8 @@ import { MenuInitialState, MenuSeparator } from 'reakit';
 import styled, { use } from 'reshadow';
 
 import { useAutoLoad, useStyles } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { DATA_CONTEXT_MENU_NESTED, DATA_CONTEXT_SUBMENU_ITEM, IMenuActionItem, IMenuData, IMenuItem, MenuActionItem, MenuBaseItem, MenuSeparatorItem, MenuService, MenuSubMenuItem, useMenu } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_MENU_NESTED, DATA_CONTEXT_SUBMENU_ITEM, IMenuActionItem, IMenuData, IMenuItem, MenuActionItem, MenuBaseItem, MenuSeparatorItem, MenuSubMenuItem, useMenu } from '@cloudbeaver/core-view';
 
 import { ContextMenu } from '../ContextMenu';
 import { MenuBarItem } from './MenuBarItem';
@@ -178,15 +177,16 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
   className,
   style,
 }) {
-  const menuService = useService(MenuService);
   const styles = useStyles(style);
   const subMenuData = useMenu({ menu: item.menu, context: menuData.context });
 
   subMenuData.context.set(DATA_CONTEXT_MENU_NESTED, true);
   subMenuData.context.set(DATA_CONTEXT_SUBMENU_ITEM, item);
 
-  const handler = menuService.getHandler(subMenuData.context);
+  const handler = subMenuData.handler;
 
+  const IconComponent = handler?.iconComponent?.() ?? item.iconComponent?.();
+  const extraProps = handler?.getExtraProps?.() ?? item.getExtraProps?.() as any;
   const info = handler?.getInfo?.(subMenuData.context, subMenuData.menu);
   const label = info?.label ?? item.label ?? item.menu.label;
   const icon = info?.icon ?? item.icon ?? item.menu.icon;
@@ -205,11 +205,18 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
           id={item.id}
           aria-label={item.menu.label}
           label={label}
-          icon={icon}
+          icon={IconComponent ? (
+            <IconComponent
+              item={item}
+              style={style}
+              {...extraProps}
+            />
+          ) : icon}
           title={tooltip}
           loading={loading}
           disabled={disabled}
           style={style}
+          displaySubmenuMark={!disabled}
           {...use({ hidden: item.hidden })}
         />
       )}

@@ -12,9 +12,8 @@ import type { MenuInitialState } from 'reakit/Menu';
 import styled from 'reshadow';
 
 import { getComputed, IMenuState, Menu, menuPanelStyles, useObjectRef, useTranslate, useStyles, useAutoLoad } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { IMenuData, MenuActionItem, MenuService } from '@cloudbeaver/core-view';
+import { IMenuData, MenuActionItem } from '@cloudbeaver/core-view';
 
 import { MenuItemRenderer } from './MenuItemRenderer';
 
@@ -50,9 +49,8 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(forwar
   ...props
 }, ref) {
   const translate = useTranslate();
-  const menuService = useService(MenuService);
 
-  const handler = getComputed(() => menuService.getHandler(menuData.context));
+  const handler = menuData.handler;
   const hidden = getComputed(() => handler?.isHidden?.(menuData.context) || false);
   const loading = getComputed(() => handler?.isLoading?.(menuData.context) || false);
   const disabled = getComputed(() => loading || handler?.isDisabled?.(menuData.context) || false);

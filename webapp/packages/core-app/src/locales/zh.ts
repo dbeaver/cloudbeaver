@@ -2,7 +2,6 @@ export default [
   ['app_shared_settingsMenu_config', '配置'],
   ['app_shared_settingsMenu_theme', '主题'],
   ['app_shared_settingsMenu_lang', '语言'],
-  ['app_topnavbar_connection_schema_manager_not_selected', '-- 为选择 --'],
   ['app_shared_inlineEditor_dialog_title', '编辑模式'],
   ['app_shared_inlineEditor_dialog_apply', '应用'],
   ['app_shared_inlineEditor_dialog_cancel', '取消'],

@@ -10,13 +10,14 @@ import { observer } from 'mobx-react-lite';
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 import styled from 'reshadow';
 
-import { IconOrImage, Loader, useStateDelay, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { IconOrImage, Loader, useStateDelay, useTranslate, useStyles, Icon } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 interface Props extends Omit<React.DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, 'style'> {
   label?: string;
   loading?: boolean;
-  icon?: string;
+  icon?: string | React.ReactNode;
+  displaySubmenuMark?: boolean;
   viewBox?: string;
   style?: ComponentStyle;
 }
@@ -25,6 +26,7 @@ export const MenuBarItem = observer<Props, HTMLButtonElement>(forwardRef(functio
   label,
   loading = false,
   icon,
+  displaySubmenuMark,
   viewBox = '0 0 24 24',
   style = [],
   ...rest
@@ -39,9 +41,12 @@ export const MenuBarItem = observer<Props, HTMLButtonElement>(forwardRef(functio
         {loading ? (
           <menu-bar-item-icon><Loader small /></menu-bar-item-icon>
         ) : icon && (
-          <menu-bar-item-icon><IconOrImage icon={icon} viewBox={viewBox} /></menu-bar-item-icon>
+          <menu-bar-item-icon>
+            {typeof icon === 'string' ? <IconOrImage icon={icon} viewBox={viewBox} /> : icon}
+          </menu-bar-item-icon>
         )}
         {label && <menu-bar-item-label>{translate(label)}</menu-bar-item-label>}
+        {displaySubmenuMark && <menu-bar-item-mark><Icon name="angle" viewBox="0 0 15 8" /></menu-bar-item-mark>}
       </menu-bar-item-box>
     </menu-bar-item>
   );

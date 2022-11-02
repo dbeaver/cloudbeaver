@@ -18,6 +18,7 @@ export const topMenuStyles = css`
   menu-box {
     composes: theme-text-on-primary from global;
     background-color: #338ecc!important;
+    clip-path: inset(0px -16px -16px -16px);
   }
   menu-box menu-panel-item {
     border-color: #ffffff !important;
@@ -35,7 +36,19 @@ export const topMenuStyles = css`
   }
   MenuButton, MenuTrigger, Button, MenuBarElement {
     height: 100%;
-    padding: 0 16px !important;
+    margin: 0 1px;
+    padding: 0 14px !important;
+
+    &:not(:last-child):after {
+      position: absolute;
+      background: #236ea0 !important;
+      height: 32px;
+      width: 2px;
+      top: 8px;
+      right: -2px;
+      opacity: 1 !important;
+      content: "";
+    }
 
     & box > div {
       display: block;
@@ -56,6 +69,10 @@ export const topMenuStyles = css`
       box-sizing: border-box;
       align-items: center;
       justify-content: center;
+
+      &:empty {
+        display: none;
+      }
     }
     & menu-bar-item-box {
       display: flex;
@@ -72,14 +89,18 @@ export const topMenuStyles = css`
       margin-right: 8px;
     }
     & menu-trigger-text, & menu-bar-item-label {
+      white-space: nowrap;
       max-width: 240px;
       overflow-x: hidden;
       text-overflow: ellipsis;
     }
     /*&:hover box > Icon,
     &:global([aria-expanded="true"]) box > Icon {
-      background: #236ea0;
+      background: #236EA0;
     }*/
+  }
+  MenuPanel menu-box MenuSeparator {
+    border-color: #236ea0 !important;
   }
   MenuButton,
   MenuBarElement,
@@ -87,10 +108,15 @@ export const topMenuStyles = css`
   MenuItemCheckbox,
   MenuItemRadio {
     &:hover, &:global([aria-expanded="true"]) {
-      background: #236ea0;
+      background: #236EA0;
     }
     &:before {
       display: none;
+    }
+  }
+  MenuButton, MenuBarElement {
+    &:hover, &:global([aria-expanded="true"]) {
+      background: #338ecc;
     }
   }
   @media only screen and (max-width: 1200px) {

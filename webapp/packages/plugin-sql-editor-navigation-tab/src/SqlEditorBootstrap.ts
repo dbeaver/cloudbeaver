@@ -13,7 +13,7 @@ import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
-import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuService, ViewService } from '@cloudbeaver/core-view';
+import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
@@ -57,7 +57,7 @@ export class SqlEditorBootstrap extends Bootstrap {
         ACTION_RENAME,
       ],
       orderItems: (context, items) => {
-        const actions = menuExtractActions(items, [
+        const actions = menuExtractItems(items, [
           ACTION_RENAME,
         ]);
 
@@ -182,7 +182,7 @@ export class SqlEditorBootstrap extends Bootstrap {
       orderItems: (context, items) => {
         let placeIndex = items.indexOf(ACTION_SQL_EDITOR_NEW);
 
-        const actionsOpen = menuExtractActions(items, [
+        const actionsOpen = menuExtractItems(items, [
           ACTION_SQL_EDITOR_NEW,
         ]);
 

@@ -2,7 +2,6 @@ export default [
   ['app_shared_settingsMenu_config', 'Configurazione'],
   ['app_shared_settingsMenu_theme', 'Tema'],
   ['app_shared_settingsMenu_lang', 'Lingua'],
-  ['app_topnavbar_connection_schema_manager_not_selected', '-- non selezionato --'],
   ['app_shared_inlineEditor_dialog_title', 'Modalità modifica'],
   ['app_shared_inlineEditor_dialog_apply', 'Applica'],
   ['app_shared_inlineEditor_dialog_cancel', 'Cancella'],
