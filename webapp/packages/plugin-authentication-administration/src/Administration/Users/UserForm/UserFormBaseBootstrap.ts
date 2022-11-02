@@ -8,6 +8,7 @@
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 
 import { ConnectionAccess } from './ConnectionAccess';
 import { getOriginTabId } from './getOriginTabId';
@@ -19,7 +20,8 @@ import { UserInfo } from './UserInfo';
 @injectable()
 export class UserFormBaseBootstrap extends Bootstrap {
   constructor(
-    private readonly userFormService: UserFormService
+    private readonly userFormService: UserFormService,
+    private readonly projectInfoResource: ProjectInfoResource
   ) {
     super();
   }
@@ -54,6 +56,7 @@ export class UserFormBaseBootstrap extends Bootstrap {
       title: 'authentication_administration_user_connections_access',
       order: 3,
       panel: () => ConnectionAccess,
+      isHidden: () => !this.projectInfoResource.values.some(project => project.global),
       onOpen: ({ props }) => props.controller.loadConnectionsAccess(),
     });
   }

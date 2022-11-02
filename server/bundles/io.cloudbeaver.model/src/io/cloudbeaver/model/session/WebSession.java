@@ -19,7 +19,7 @@ package io.cloudbeaver.model.session;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.DataSourceFilter;
-import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.events.CBEvent;
 import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
@@ -99,7 +99,7 @@ public class WebSession extends AbstractSessionPersistent
 
     private final String id;
     private final long createTime;
-    private long lastAccessTime;
+    private volatile long lastAccessTime;
     private long maxSessionIdleTime;
     private String lastRemoteAddr;
     private String lastRemoteUserAgent;
@@ -120,18 +120,22 @@ public class WebSession extends AbstractSessionPersistent
 
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
-    private VirtualProjectImpl defaultProject;
-    private final List<VirtualProjectImpl> accessibleProjects = new ArrayList<>();
+    private WebProjectImpl defaultProject;
+    private final List<WebProjectImpl> accessibleProjects = new ArrayList<>();
     private final SessionContextImpl sessionAuthContext;
     private final WebApplication application;
     private final Map<String, DBWSessionHandler> sessionHandlers;
     private final WebUserContext userContext;
     private final List<CBEvent> sessionEvents = new ArrayList<>();
 
-    public WebSession(HttpSession httpSession,
-                      WebApplication application,
-                      Map<String, DBWSessionHandler> sessionHandlers,
-                      long maxSessionIdleTime) throws DBException {
+    private RMController rmController;
+
+    public WebSession(
+        @NotNull HttpSession httpSession,
+        @NotNull WebApplication application,
+        @NotNull Map<String, DBWSessionHandler> sessionHandlers,
+        long maxSessionIdleTime
+    ) throws DBException {
         this.id = httpSession.getId();
         this.createTime = System.currentTimeMillis();
         this.lastAccessTime = this.createTime;
@@ -142,6 +146,7 @@ public class WebSession extends AbstractSessionPersistent
         this.sessionHandlers = sessionHandlers;
         this.userContext = new WebUserContext(application);
         this.maxSessionIdleTime = maxSessionIdleTime;
+        this.rmController = application.createResourceController(this);
     }
 
     @NotNull
@@ -183,7 +188,7 @@ public class WebSession extends AbstractSessionPersistent
 
     @NotNull
     public SMSessionContext getSessionContext() {
-        return defaultProject.getSessionContext();
+        return sessionAuthContext;
     }
 
     @Property
@@ -196,7 +201,7 @@ public class WebSession extends AbstractSessionPersistent
         return CBModelConstants.ISO_DATE_FORMAT.format(lastAccessTime);
     }
 
-    public synchronized long getLastAccessTimeMillis() {
+    public long getLastAccessTimeMillis() {
         return lastAccessTime;
     }
 
@@ -272,7 +277,7 @@ public class WebSession extends AbstractSessionPersistent
     }
 
     public synchronized RMController getRmController() {
-        return userContext.getRmController();
+        return rmController;
     }
 
     public synchronized void refreshUserData() {
@@ -322,7 +327,7 @@ public class WebSession extends AbstractSessionPersistent
         }
 
         if (!this.accessibleProjects.isEmpty()) {
-            for (VirtualProjectImpl project : accessibleProjects) {
+            for (WebProjectImpl project : accessibleProjects) {
                 if (project.equals(DBWorkbench.getPlatform().getWorkspace().getActiveProject())) {
                     continue;
                 }
@@ -356,17 +361,17 @@ public class WebSession extends AbstractSessionPersistent
         }
         refreshAccessibleConnectionIds();
         try {
-            RMController controller = application.getResourceController(this, getSecurityController());
+            RMController controller = getRmController();
             RMProject[] rmProjects = controller.listAccessibleProjects();
             for (RMProject project : rmProjects) {
-                VirtualProjectImpl virtualProject = createVirtualProject(project);
+                WebProjectImpl virtualProject = createWebProject(project);
                 if (!virtualProject.getRmProject().getProjectPermissions().contains(RMProjectPermission.DATA_SOURCES_EDIT.getPermissionId())) {
                     // Projects for which user don't have edit permission can't be saved. So mark the as in memory
                     virtualProject.setInMemory(true);
                 }
             }
             if (user == null) {
-                VirtualProjectImpl anonymousProject = createVirtualProject(RMUtils.createAnonymousProject());
+                WebProjectImpl anonymousProject = createWebProject(RMUtils.createAnonymousProject());
                 anonymousProject.setInMemory(true);
             }
         } catch (DBException e) {
@@ -375,16 +380,12 @@ public class WebSession extends AbstractSessionPersistent
         }
     }
 
-    public VirtualProjectImpl createVirtualProject(RMProject project) {
+    public WebProjectImpl createWebProject(RMProject project) {
         // Do not filter data sources from user project
         DataSourceFilter filter = project.getType() == RMProjectType.GLOBAL
             ? this::isDataSourceAccessible
             : x -> true;
-        VirtualProjectImpl sessionProject = application.createProjectImpl(
-            project,
-            sessionAuthContext,
-            this,
-            filter);
+        WebProjectImpl sessionProject = application.createProjectImpl(this, project, filter);
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
         dataSourceRegistry.setAuthCredentialsProvider(this);
         addSessionProject(sessionProject);
@@ -495,6 +496,9 @@ public class WebSession extends AbstractSessionPersistent
             addSessionError(e);
             log.error("Error reading session permissions", e);
         }
+
+        // Initialize new resource controller
+        this.rmController = application.createResourceController(this);
     }
 
     private synchronized void refreshAccessibleConnectionIds() {
@@ -1041,11 +1045,11 @@ public class WebSession extends AbstractSessionPersistent
     }
 
     @Nullable
-    public VirtualProjectImpl getProjectById(@Nullable String projectId) {
+    public WebProjectImpl getProjectById(@Nullable String projectId) {
         if (projectId == null) {
             return defaultProject;
         }
-        for (VirtualProjectImpl project : accessibleProjects) {
+        for (WebProjectImpl project : accessibleProjects) {
             if (project.getId().equals(projectId)) {
                 return project;
             }
@@ -1053,11 +1057,11 @@ public class WebSession extends AbstractSessionPersistent
         return null;
     }
 
-    public List<VirtualProjectImpl> getAccessibleProjects() {
+    public List<WebProjectImpl> getAccessibleProjects() {
         return accessibleProjects;
     }
 
-    public void addSessionProject(VirtualProjectImpl project) {
+    public void addSessionProject(WebProjectImpl project) {
         synchronized (accessibleProjects) {
             accessibleProjects.add(project);
         }

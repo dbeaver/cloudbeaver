@@ -122,6 +122,7 @@ public class WebSessionManager {
                 }
             }
         }
+
         return webSession;
     }
 
@@ -148,7 +149,8 @@ public class WebSessionManager {
     public WebSession findWebSession(HttpServletRequest request) {
         String sessionId = request.getSession().getId();
         synchronized (sessionMap) {
-            return sessionMap.get(sessionId);
+            WebSession webSession = sessionMap.get(sessionId);
+            return webSession;
         }
     }
 
@@ -193,4 +195,5 @@ public class WebSessionManager {
             return sessionMap.values();
         }
     }
+
 }

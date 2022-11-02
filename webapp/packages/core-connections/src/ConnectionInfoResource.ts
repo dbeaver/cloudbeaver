@@ -33,7 +33,7 @@ import {
 } from '@cloudbeaver/core-sdk';
 
 import type { DatabaseConnection } from './DatabaseConnection';
-import type { IConnectionInfoParams, IConnectionsResource } from './IConnectionsResource';
+import type { IConnectionInfoParams } from './IConnectionsResource';
 
 export type Connection = DatabaseConnection & {
   authProperties?: UserConnectionAuthPropertiesFragment[];
@@ -63,8 +63,8 @@ export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
 };
 
 @injectable()
-export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoParams, Connection, ConnectionInfoIncludes>
-  implements IConnectionsResource {
+export class ConnectionInfoResource
+  extends CachedMapResource<IConnectionInfoParams, Connection, ConnectionInfoIncludes> {
   readonly onConnectionCreate: ISyncExecutor<Connection>;
   readonly onConnectionClose: ISyncExecutor<Connection>;
 
@@ -208,17 +208,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     });
 
     return this.add(connection);
-  }
-
-  async createConnectionFromNode(nodeId: string, name: string): Promise<DatabaseConnection> {
-    const { connection } = await this.graphQLService.sdk.createConnectionConfigurationFromNode({
-      nodePath: nodeId,
-      config: { name },
-      ...this.getDefaultIncludes(),
-      ...this.getIncludesMap(),
-    });
-
-    return this.add(connection, true);
   }
 
   async createFromTemplate(projectId: string, templateId: string, connectionName: string): Promise<Connection> {

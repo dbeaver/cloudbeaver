@@ -17,7 +17,7 @@
 package io.cloudbeaver.service.navigator;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
@@ -204,7 +204,7 @@ public class WebNavigatorNodeInfo {
     }
 
     private boolean hasNodePermission(RMProjectPermission permission) {
-        VirtualProjectImpl project = session.getProjectById(getProjectId());
+        WebProjectImpl project = session.getProjectById(getProjectId());
         if (project == null) {
             return false;
         }

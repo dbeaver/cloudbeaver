@@ -10,6 +10,7 @@ import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
+import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -43,6 +44,20 @@ public class SMUtils {
         }
         permissionInfos.sort(Comparator.comparing(AdminPermissionInfo::getLabel));
         return permissionInfos;
+    }
+
+    public static boolean isTokenExpiredExceptionWasHandled(Throwable ex) {
+        if (ex instanceof SMRefreshTokenExpiredException) {
+            return true;
+        }
+
+        Throwable cause = ex;
+        while ((cause = cause.getCause()) != null) {
+            if (cause instanceof SMRefreshTokenExpiredException) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

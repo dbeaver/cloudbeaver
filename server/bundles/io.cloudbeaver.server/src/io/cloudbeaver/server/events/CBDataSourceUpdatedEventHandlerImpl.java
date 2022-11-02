@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.server.events;
 
-import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.events.CBEvent;
 import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.session.WebSession;
@@ -41,7 +41,7 @@ public class CBDataSourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHa
         List<String> dataSourceIds = JSONUtils.getStringList(event.getEventData(), "dataSourceIds");
         CBEventConstants.EventType eventType =
             CBEventConstants.EventType.valueOf(JSONUtils.getString(event.getEventData(), "eventType"));
-        VirtualProjectImpl project = activeUserSession.getProjectById(projectId);
+        WebProjectImpl project = activeUserSession.getProjectById(projectId);
         if (project == null || !project.getRmProject().isShared()) {
             return;
         }

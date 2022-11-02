@@ -17,10 +17,10 @@
 package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.DataSourceFilter;
-import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.events.CBEventController;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
-import io.cloudbeaver.model.rm.local.LocalResourceController;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebWorkspace;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
@@ -32,22 +32,18 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
-import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
-import org.jkiss.dbeaver.model.impl.app.LocalSecretController;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
+import org.jkiss.dbeaver.model.impl.app.LocalSecretController;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
-import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -64,11 +60,15 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     private static final Log log = Log.getLog(BaseWebApplication.class);
 
-
     @NotNull
     @Override
     public DBPWorkspace createWorkspace(@NotNull DBPPlatform platform, @NotNull IWorkspace eclipseWorkspace) {
         return new WebWorkspace(platform, eclipseWorkspace);
+    }
+
+    @Override
+    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
+        throw new IllegalStateException("Resource controller is not supported by " + getClass().getSimpleName());
     }
 
     @Nullable
@@ -127,28 +127,22 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     protected abstract void loadConfiguration(String configPath) throws DBException;
 
     @Override
-    public VirtualProjectImpl createProjectImpl(
+    public WebProjectImpl createProjectImpl(
+        @NotNull WebSession webSession,
         @NotNull RMProject project,
-        @NotNull SMSessionContext sessionContext,
-        @NotNull SMCredentialsProvider credentialsProvider,
         @NotNull DataSourceFilter dataSourceFilter
     ) {
-        return new VirtualProjectImpl(
+        return new WebProjectImpl(
+            webSession.getRmController(),
+            webSession.getSessionContext(),
             project,
-            sessionContext,
             dataSourceFilter
         );
     }
 
     @Override
-    public DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
+    public DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider)  throws DBException {
         return new LocalSecretController("user/" + credentialsProvider.getActiveUserCredentials().getUserId());
-    }
-
-    @Override
-    public RMController getResourceController(@NotNull SMCredentialsProvider credentialsProvider, @NotNull SMController smController) {
-        return LocalResourceController.builder(credentialsProvider, smController).build();
-
     }
 
     protected Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
