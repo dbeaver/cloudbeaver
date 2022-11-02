@@ -37,7 +37,7 @@ import java.util.List;
  */
 public interface DBWServiceRM extends DBWService {
 
-    @WebAction(requirePermissions = {DBWConstants.PERMISSION_ADMIN, DBWConstants.PERMISSION_PUBLIC})
+    @WebAction()
     RMProject[] listProjects(@NotNull WebSession webSession) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
