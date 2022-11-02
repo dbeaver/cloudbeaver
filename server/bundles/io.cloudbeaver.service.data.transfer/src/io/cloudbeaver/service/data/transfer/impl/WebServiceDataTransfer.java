@@ -230,6 +230,8 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             settings.setOutputTimestampPattern(outputSettings.getTimestampPattern());
         }
 
+        settings.setDataFileConflictBehavior(StreamConsumerSettings.DataFileConflictBehavior.APPEND);
+
         Map<String, Object> properties = new HashMap<>();
 
         Map<String, Object> processorProperties = parameters.getProcessorProperties();
