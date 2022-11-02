@@ -18,6 +18,11 @@ export const topAppBarStyles = css`
       background-color: #2A7CB4;
       z-index: 1;
     }
+    @media only screen and (max-width: 1200px) {
+      header {
+        padding: 0 8px;
+      }
+    }
   `;
 
 interface Props extends React.PropsWithChildren {

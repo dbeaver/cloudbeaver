@@ -24,6 +24,13 @@ const styles = css`
     width: 154px;
     margin-bottom: 2px;
   }
+
+  @media only screen and (max-width: 1200px) {
+    IconOrImage {
+      content: url(/icons/logo_sm.svg);
+      width: auto;
+    }
+  }
 `;
 
 interface Props {
@@ -33,7 +40,7 @@ interface Props {
 
 export const AppLogo: React.FC<Props> = function AppLogo({ title, onClick }) {
   return styled(styles)(
-    <logo as="div" title={title} onClick={onClick}>
+    <logo title={title} onClick={onClick}>
       <IconOrImage icon="/icons/logo.svg" />
     </logo>
   );
