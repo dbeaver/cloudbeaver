@@ -26,12 +26,14 @@ interface IMenuBarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'styl
   menu: IMenuData;
   nestedMenuSettings?: INestedMenuSettings;
   style?: ComponentStyle;
+  rtl?: boolean;
 }
 
 export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(forwardRef(function MenuBar({
   menu,
   nestedMenuSettings,
   style,
+  rtl,
   ...props
 }, ref) {
   const styles = useStyles(style);
@@ -50,6 +52,7 @@ export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(forwardRef(functi
           item={item}
           menuData={menu}
           nestedMenuSettings={nestedMenuSettings}
+          rtl={rtl}
           style={style}
         />
       ))}
@@ -62,6 +65,7 @@ interface IMenuBarElementProps {
   menuData: IMenuData;
   nestedMenuSettings?: INestedMenuSettings;
   className?: string;
+  rtl?: boolean;
   style?: ComponentStyle;
 }
 
@@ -70,6 +74,7 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
   menuData,
   nestedMenuSettings,
   className,
+  rtl,
   style,
 }) {
   const styles = useStyles(style);
@@ -85,6 +90,7 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
         menuData={menuData}
         style={style}
         className={className}
+        rtl={rtl}
         nestedMenuSettings={nestedMenuSettings}
       />
     );
@@ -167,6 +173,7 @@ interface ISubMenuItemProps {
   menuData: IMenuData;
   nestedMenuSettings?: INestedMenuSettings;
   className?: string;
+  rtl?: boolean;
   style?: ComponentStyle;
 }
 
@@ -175,6 +182,7 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
   menuData,
   nestedMenuSettings,
   className,
+  rtl,
   style,
 }) {
   const styles = useStyles(style);
@@ -197,6 +205,7 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
       menu={subMenuData}
       style={style}
       className={className}
+      rtl={rtl}
       disclosure
       {...nestedMenuSettings}
     >

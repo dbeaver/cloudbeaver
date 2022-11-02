@@ -16,10 +16,22 @@ import { useMenu } from '@cloudbeaver/core-view';
 
 import { topMenuStyles } from '../shared/topMenuStyles';
 import { MENU_BAR_ITEM_STYLES, MENU_BAR_DISABLE_EFFECT_STYLES, MENU_BAR_STYLES } from '../styles';
-import { MENU_APP_ACTIONS } from './MENU_APP_ACTIONS';
+import { MENU_APP_STATE } from './MENU_APP_STATE';
 
-export const MainMenu = observer(function MainMenu() {
-  const menu = useMenu({ menu: MENU_APP_ACTIONS });
+const styles = css`
+  MenuBarElement {
+    & menu-bar-item-icon {
+      margin-right: 0;
+    }
+    & menu-bar-item-label,
+    & menu-bar-item-mark {
+      display: none;
+    }
+  }
+`;
+
+export const AppStateMenu = observer(function AppStateMenu() {
+  const menu = useMenu({ menu: MENU_APP_STATE });
   const isEnabled = usePermission(EPermission.public);
 
   if (!isEnabled) {
@@ -30,8 +42,9 @@ export const MainMenu = observer(function MainMenu() {
     <menu-wrapper>
       <MenuBar
         menu={menu}
-        style={[topMenuStyles, MENU_BAR_ITEM_STYLES, topMenuStyles, MENU_BAR_DISABLE_EFFECT_STYLES]}
+        style={[styles, topMenuStyles, MENU_BAR_ITEM_STYLES, topMenuStyles, MENU_BAR_DISABLE_EFFECT_STYLES]}
         nestedMenuSettings={{ modal: true }}
+        rtl
       />
     </menu-wrapper>
   );

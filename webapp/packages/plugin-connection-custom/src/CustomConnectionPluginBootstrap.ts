@@ -11,7 +11,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
-import { ActionService, DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, DATA_CONTEXT_LOADABLE_STATE, MenuService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
 import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM';
@@ -31,7 +31,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
 
   register(): void | Promise<void> {
     this.menuService.addCreator({
-      isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === MENU_CONNECTIONS,
+      menus: [MENU_CONNECTIONS],
       getItems: (context, items) => [
         ...items,
         ACTION_CONNECTION_CUSTOM,

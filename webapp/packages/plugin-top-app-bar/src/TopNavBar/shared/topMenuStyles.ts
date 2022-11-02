@@ -34,7 +34,7 @@ export const topMenuStyles = css`
     color: inherit;
     cursor: pointer;
   }
-  MenuButton, MenuTrigger, Button, MenuBarElement {
+  MenuTrigger, Button, MenuBarElement {
     height: 100%;
     margin: 0 1px;
     padding: 0 14px !important;

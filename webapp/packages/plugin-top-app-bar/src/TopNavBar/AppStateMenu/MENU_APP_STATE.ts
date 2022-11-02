@@ -6,14 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import styled, { css } from 'reshadow';
+import { createMenu } from '@cloudbeaver/core-view';
 
-const styles = css`
-  fill {
-    flex: 1;
-  }
-`;
-
-export function Fill() {
-  return styled(styles)(<fill />);
-}
+export const MENU_APP_STATE = createMenu('app-state', 'Application State');

@@ -13,12 +13,12 @@ import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
-import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
+import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, LocalStorageSqlDataSource, SqlDataSourceService, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
-import { TOP_APP_BAR_MENU } from '@cloudbeaver/plugin-top-app-bar';
+import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ACTION_SQL_EDITOR_NEW } from './ACTION_SQL_EDITOR_NEW';
 import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
@@ -174,7 +174,7 @@ export class SqlEditorBootstrap extends Bootstrap {
 
   private registerTopAppBarItem() {
     this.menuService.addCreator({
-      isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === TOP_APP_BAR_MENU,
+      menus: [MENU_APP_ACTIONS],
       getItems: (context, items) => [
         ...items,
         ACTION_SQL_EDITOR_NEW,

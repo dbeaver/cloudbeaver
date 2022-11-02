@@ -15,6 +15,7 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "@cloudbeaver/plugin-top-app-bar": "~0.1.0",
     "@cloudbeaver/core-administration": "~0.1.0",
     "@cloudbeaver/core-app": "~0.1.0",
     "@cloudbeaver/core-authentication": "~0.1.0",

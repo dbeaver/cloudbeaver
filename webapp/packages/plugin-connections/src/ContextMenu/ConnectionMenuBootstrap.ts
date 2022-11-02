@@ -13,7 +13,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual, NavigatorViewSettings, PermissionsService } from '@cloudbeaver/core-root';
 import { ActionService, ACTION_DELETE, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
-import { TOP_APP_BAR_MENU } from '@cloudbeaver/plugin-top-app-bar';
+import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionsSettingsService } from '../ConnectionsSettingsService';
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService';
@@ -232,7 +232,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
   private addConnectionsMenuToTopAppBar() {
     this.menuService.addCreator({
-      isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === TOP_APP_BAR_MENU,
+      menus: [MENU_APP_ACTIONS],
       getItems: (context, items) => [
         ...items,
         MENU_CONNECTIONS,

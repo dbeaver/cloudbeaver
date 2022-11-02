@@ -13,7 +13,7 @@ import { EPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
-import { TOP_APP_BAR_MENU } from '@cloudbeaver/plugin-top-app-bar';
+import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionSchemaManagerService } from './ConnectionSchemaManagerService';
 import { ConnectionIcon } from './ConnectionSelector/ConnectionIcon';
@@ -381,7 +381,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
   private addTopAppMenuItems() {
     this.menuService.addCreator({
-      menus: [TOP_APP_BAR_MENU],
+      menus: [MENU_APP_ACTIONS],
       getItems: (context, items) => [
         ...items,
         MENU_CONNECTION_SELECTOR,

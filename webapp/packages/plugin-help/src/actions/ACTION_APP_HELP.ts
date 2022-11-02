@@ -6,6 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createMenu } from '@cloudbeaver/core-view';
+import { createAction } from '@cloudbeaver/core-view';
 
-export const TOP_APP_BAR_MENU = createMenu('top-app-bar', 'Top App Bar');
+export const ACTION_APP_HELP = createAction('app-help', {
+  label: 'shortcuts_title',
+  tooltip: 'shortcuts_title',
+  icon: 'info',
+});

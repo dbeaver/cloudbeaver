@@ -7,8 +7,8 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
-import { TOP_APP_BAR_MENU } from '@cloudbeaver/plugin-top-app-bar';
+import { MenuService } from '@cloudbeaver/core-view';
+import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { MENU_TOOLS } from './Menu/MENU_TOOLS';
 
@@ -22,7 +22,7 @@ export class PluginBootstrap extends Bootstrap {
 
   register(): void {
     this.menuService.addCreator({
-      isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === TOP_APP_BAR_MENU,
+      menus: [MENU_APP_ACTIONS],
       getItems: (context, items) => [
         ...items,
         MENU_TOOLS,
