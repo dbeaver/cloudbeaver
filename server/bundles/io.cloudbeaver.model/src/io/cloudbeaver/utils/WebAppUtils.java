@@ -36,6 +36,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.file.Path;
+
 import java.util.*;
 
 public class WebAppUtils {
@@ -205,6 +206,13 @@ public class WebAppUtils {
         return RMProjectType.GLOBAL.getPrefix() + "_" + globalConfigurationName;
     }
 
+    /**
+     * adds events of updated datasource to event controller
+     *
+     * @param project project of updated database
+     * @param datasourceId id of datasource
+     * @param eventType type of event
+     */
     public static void addDataSourceUpdatedEvent(DBPProject project, String datasourceId, CBEventConstants.EventType eventType) {
         if (project == null) {
             return;

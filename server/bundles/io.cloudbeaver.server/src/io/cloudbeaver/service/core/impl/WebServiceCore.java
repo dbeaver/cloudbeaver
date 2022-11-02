@@ -403,7 +403,11 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
         webSession.addConnection(connectionInfo);
         webSession.addInfoMessage("New connection was created - " + WebServiceUtils.getConnectionContainerInfo(newDataSource));
-        WebAppUtils.addDataSourceUpdatedEvent(webSession.getProjectById(projectId), connectionInfo.getId(), CBEventConstants.EventType.TYPE_CREATE);
+        WebAppUtils.addDataSourceUpdatedEvent(
+            webSession.getProjectById(projectId),
+            connectionInfo.getId(),
+            CBEventConstants.EventType.TYPE_CREATE
+        );
         return connectionInfo;
     }
 

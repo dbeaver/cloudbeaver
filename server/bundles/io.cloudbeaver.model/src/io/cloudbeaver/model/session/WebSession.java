@@ -286,6 +286,13 @@ public class WebSession extends AbstractSessionPersistent
         initNavigatorModel();
     }
 
+    /**
+     * updates connections based on event in web session
+     *
+     * @param project project of connection
+     * @param connectionIds list of updated connections
+     * @param type type of event
+     */
     public synchronized void updateProjectConnection(DBPProject project, List<String> connectionIds, CBEventConstants.EventType type) {
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         registry.refreshConfig();
@@ -293,7 +300,9 @@ public class WebSession extends AbstractSessionPersistent
             switch (type) {
                 case TYPE_CREATE:
                     DBPDataSourceContainer container = registry.getDataSource(connectionId);
-                    if (container == null) break;
+                    if (container == null) {
+                        break;
+                    }
                     WebConnectionInfo connectionInfo = new WebConnectionInfo(this, registry.getDataSource(connectionId));
                     this.connections.put(connectionInfo.getId(), connectionInfo);
                     break;
