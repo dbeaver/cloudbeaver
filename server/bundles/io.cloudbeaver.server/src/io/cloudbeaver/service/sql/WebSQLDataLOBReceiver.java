@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Timestamp;
@@ -44,7 +45,7 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
     private final DBSDataContainer dataContainer;
 
     private DBDAttributeBinding binding;
-    private DBDValue lobValue;
+    private Object lobValue;
     private int rowIndex;
 
     WebSQLDataLOBReceiver(String tableName, DBSDataContainer dataContainer, int rowIndex) {
@@ -75,8 +76,10 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
         Number fileSizeLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(CBConstants.QUOTA_PROP_FILE_LIMIT);
         if (lobValue instanceof DBDContent) {
             binaryValue = ContentUtils.getContentBinaryValue(session.getProgressMonitor(), (DBDContent) lobValue);
+        } else if (lobValue instanceof DBDValue) {
+            binaryValue = ((DBDValue) lobValue).getRawValue().toString().getBytes();
         } else {
-            binaryValue = lobValue.getRawValue().toString().getBytes();
+            binaryValue = lobValue.toString().getBytes(StandardCharsets.UTF_8);
         }
         if (binaryValue == null) {
             throw new DBCException("Lob value is null");
@@ -101,7 +104,7 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
     }
     @Override
     public void fetchRow(DBCSession session, DBCResultSet resultSet) throws DBCException {
-        lobValue = (DBDValue) binding.getValueHandler().fetchValueObject(
+        lobValue = binding.getValueHandler().fetchValueObject(
             resultSet.getSession(),
             resultSet,
             binding.getMetaAttribute(),

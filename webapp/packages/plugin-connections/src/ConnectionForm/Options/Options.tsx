@@ -36,7 +36,6 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { PROJECT_GLOBAL_ID } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { CachedMapEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
@@ -311,7 +310,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 {translate('connections_connection_name')}
               </InputField>
               <ProjectSelect
-                value={state.projectId ?? PROJECT_GLOBAL_ID}
+                value={state.projectId}
                 readOnly={readonly || edit}
                 disabled={disabled}
                 autoHide

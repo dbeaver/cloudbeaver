@@ -1,4 +1,4 @@
-query getUserGrantedConnections($userId: ID) {
+query getUserGrantedConnections($userId: ID!) {
   grantedConnections: getSubjectConnectionAccess(subjectId: $userId) {
     connectionId
     dataSourceId

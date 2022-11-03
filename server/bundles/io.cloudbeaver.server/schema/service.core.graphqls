@@ -111,29 +111,27 @@ type ServerConfig {
     workspaceId: ID!
 
     serverURL: String!
-
     rootURI: String!
-
     hostName: String!
 
-    anonymousAccessEnabled: Boolean
-    supportsCustomConnections: Boolean
-    supportsConnectionBrowser: Boolean
-    supportsWorkspaces: Boolean
-    resourceManagerEnabled: Boolean
+    anonymousAccessEnabled: Boolean!
+    supportsCustomConnections: Boolean!
+    supportsConnectionBrowser: Boolean!
+    supportsWorkspaces: Boolean!
+    resourceManagerEnabled: Boolean!
 
-    publicCredentialsSaveEnabled: Boolean
-    adminCredentialsSaveEnabled: Boolean
+    publicCredentialsSaveEnabled: Boolean!
+    adminCredentialsSaveEnabled: Boolean!
 
     licenseRequired: Boolean!
     licenseValid: Boolean!
 
-    sessionExpireTime: Int
+    sessionExpireTime: Int!
     localHostAddress: String
 
-    configurationMode: Boolean
-    developmentMode: Boolean
-    redirectOnFederatedAuth: Boolean
+    configurationMode: Boolean!
+    developmentMode: Boolean!
+    redirectOnFederatedAuth: Boolean!
     distributed: Boolean!
 
     enabledFeatures: [ID!]!
@@ -372,6 +370,7 @@ type NavigatorSettings {
 
 type ProjectInfo {
     id: String!
+    global: Boolean!
     shared: Boolean!
     name: String!
     description: String

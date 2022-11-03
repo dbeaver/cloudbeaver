@@ -36,6 +36,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.file.Path;
+
 import java.util.*;
 
 public class WebAppUtils {
@@ -57,7 +58,7 @@ public class WebAppUtils {
     }
 
     public static SMAuthenticationManager getAuthManager(WebApplication application) throws DBException {
-        var smController = application.getSecurityController(new NoAuthCredentialsProvider());
+        var smController = application.createSecurityController(new NoAuthCredentialsProvider());
         if (!SMAuthenticationManager.class.isAssignableFrom(smController.getClass())) {
             throw new DBException("The current application cannot be used for authorization");
         }
@@ -205,14 +206,23 @@ public class WebAppUtils {
         return RMProjectType.GLOBAL.getPrefix() + "_" + globalConfigurationName;
     }
 
-    public static void addDataSourceUpdatedEvent(DBPProject project, String datasourceId) {
+    /**
+     * adds events of updated datasource to event controller
+     *
+     * @param project project of updated database
+     * @param datasourceId id of datasource
+     * @param eventType type of event
+     */
+    public static void addDataSourceUpdatedEvent(DBPProject project, String datasourceId, CBEventConstants.EventType eventType) {
         if (project == null) {
             return;
         }
         getWebApplication().getEventController().addEvent(
             new CBEvent(
                 CBEventConstants.CLOUDBEAVER_DATASOURCE_UPDATED,
-                Map.of("projectId", project.getId(), "dataSourceIds", new String[] {datasourceId})
+                Map.of("projectId", project.getId(),
+                    "dataSourceIds", List.of(datasourceId),
+                    "eventType", eventType)
             )
         );
     }
