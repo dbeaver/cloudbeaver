@@ -41,16 +41,8 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
-import org.jkiss.dbeaver.model.navigator.DBNDataSource;
-import org.jkiss.dbeaver.model.navigator.DBNModel;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
-import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.security.*;
-import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
-import org.jkiss.dbeaver.model.security.SMConstants;
-import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
-import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.utils.CommonUtils;
@@ -690,9 +682,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
     }
 
-    private DBPDataSourceRegistry getGlobalRegistry(WebSession session) {
-        String globalConfigurationName = CBApplication.getInstance().getDefaultProjectName();
-        return session.getProjectById(RMProjectType.GLOBAL.getPrefix() + "_" + globalConfigurationName).getDataSourceRegistry();
+    private DBPDataSourceRegistry getDataSourceRegistry(WebSession session, String projectId) throws DBWebException {
+        WebProjectImpl project = session.getProjectById(projectId);
+        if (project == null) {
+            throw new DBWebException("Project '" + projectId + "' not found");
+        }
+        return project.getDataSourceRegistry();
     }
 
     private void validatePermissions(@NotNull String expectedScope, @NotNull Collection<String> permissions) throws DBWebException {
