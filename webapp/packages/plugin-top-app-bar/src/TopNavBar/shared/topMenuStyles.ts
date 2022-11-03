@@ -36,18 +36,21 @@ export const topMenuStyles = css`
   }
   MenuTrigger, Button, MenuBarElement {
     height: 100%;
-    margin: 0 1px;
     padding: 0 14px !important;
 
-    &:not(:last-child):after {
-      position: absolute;
-      background: #236ea0 !important;
-      height: 32px;
-      width: 2px;
-      top: 8px;
-      right: -2px;
-      opacity: 1 !important;
-      content: "";
+    &:not(:last-child) {
+      margin-right: 1px;
+
+      &:after {
+        position: absolute;
+        background: #236ea0 !important;
+        height: 32px;
+        width: 1px;
+        top: 8px;
+        right: -1px;
+        opacity: 1 !important;
+        content: "";
+      }
     }
 
     & box > div {

@@ -15,17 +15,16 @@ const styles = css`
     height: 100%;
     display: flex;
     align-items: center;
-    margin-right: 16px;
+    padding: 0 14px;
     cursor: pointer;
   }
 
   IconOrImage {
-    height: 34px;
+    height: 32px;
     width: 154px;
-    margin-bottom: 2px;
   }
 
-  @media only screen and (max-width: 1200px) {
+  @media only screen and (min-width: 480px) {
     IconOrImage {
       content: url(/icons/logo_sm.svg);
       width: auto;

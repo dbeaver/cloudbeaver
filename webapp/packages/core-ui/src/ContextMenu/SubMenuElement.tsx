@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef, useRef } from 'react';
 import styled from 'reshadow';
 
-import { getComputed, IMenuState, joinStyles, Menu, MenuItemElement, menuPanelStyles, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import { getComputed, IMenuState, joinStyles, Menu, MenuItemElement, menuPanelStyles, useAutoLoad, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { DATA_CONTEXT_MENU_NESTED, DATA_CONTEXT_SUBMENU_ITEM, IMenuData, IMenuSubMenuItem, MenuActionItem, useMenu } from '@cloudbeaver/core-view';
 
@@ -47,6 +47,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
 
   const handler = subMenuData.handler;
   const hidden = getComputed(() => handler?.isHidden?.(subMenuData.context));
+  useAutoLoad(subMenuData.loaders, !hidden);
 
   const handlers = useObjectRef(() => ({
     handleItemClose() {
@@ -72,15 +73,20 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
 
   const IconComponent = handler?.iconComponent?.() ?? subMenu.iconComponent?.();
   const extraProps = handler?.getExtraProps?.() ?? subMenu.getExtraProps?.() as any;
-  const loading = getComputed(() => handler?.isLoading?.(subMenuData.context));
+  const loading = getComputed(() => (
+    handler?.isLoading?.(subMenuData.context)
+    || subMenuData.loaders.some(loader => loader.isLoading())
+    || false
+  ));
   const disabled = getComputed(() => handler?.isDisabled?.(subMenuData.context));
+  const loaded = getComputed(() => !subMenuData.loaders.some(loader => !loader.isLoaded()));
   const info = handler?.getInfo?.(subMenuData.context, subMenuData.menu);
   const label = info?.label ?? subMenu.label ?? subMenu.menu.label;
   const icon = info?.icon ?? subMenu.icon ?? subMenu.menu.icon;
 
   const tooltip = info?.tooltip ?? subMenu.tooltip ?? subMenu.menu.tooltip;
   const MenuItemRenderer = itemRenderer;
-  const panelAvailable = subMenuData.available && !loading;
+  const panelAvailable = subMenuData.available || !loaded;
 
   return styled(styles)(
     <Menu

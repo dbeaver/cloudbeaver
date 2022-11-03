@@ -14,14 +14,9 @@ export const topAppBarStyles = css`
       display: flex;
       align-items: center;
       height: 48px;
-      padding: 0 16px;
+      padding: 0 8px;
       background-color: #2A7CB4;
       z-index: 1;
-    }
-    @media only screen and (max-width: 1200px) {
-      header {
-        padding: 0 8px;
-      }
     }
   `;
 

@@ -52,7 +52,11 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(forwar
 
   const handler = menuData.handler;
   const hidden = getComputed(() => handler?.isHidden?.(menuData.context) || false);
-  const loading = getComputed(() => handler?.isLoading?.(menuData.context) || false);
+  const loading = getComputed(() => (
+    handler?.isLoading?.(menuData.context)
+    || menuData.loaders.some(loader => loader.isLoading())
+    || false
+  ));
   const disabled = getComputed(() => loading || handler?.isDisabled?.(menuData.context) || false);
   const lazy = getComputed(() => !menuData.available || hidden);
 

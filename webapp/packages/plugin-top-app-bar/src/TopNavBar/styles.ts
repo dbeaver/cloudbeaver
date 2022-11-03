@@ -13,7 +13,6 @@ export const MENU_BAR_ITEM_STYLES = css`
     background: none;
     
     & menu-bar-item-label {
-      text-transform: uppercase;
       font-weight: 500;
     }
       

@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
 import { usePermission } from '@cloudbeaver/core-blocks';
 import { EPermission } from '@cloudbeaver/core-root';
