@@ -471,7 +471,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     ((DBNDataSource) node).moveToFolder(folderNode.getOwnerProject(), folder);
                     node.getOwnerProject().getDataSourceRegistry().updateDataSource(
                         ((DBNDataSource) node).getDataSourceContainer());
-                    WebAppUtils.addDataSourceUpdatedEvent(node.getOwnerProject(), ((DBNDataSource) node).getDataSourceContainer().getId());
+                    WebAppUtils.addDataSourceUpdatedEvent(
+                        node.getOwnerProject(),
+                        ((DBNDataSource) node).getDataSourceContainer().getId(),
+                        CBEventConstants.EventType.TYPE_UPDATE
+                    );
                 } else if (node instanceof DBNLocalFolder) {
                     DBPDataSourceFolder folder = WebConnectionFolderUtils.getParentFolder(folderNode);
                     if (folder != null) {
@@ -484,7 +488,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     }
                     ((DBNLocalFolder) node).getFolder().setParent(folder);
                     WebServiceUtils.updateConfigAndRefreshDatabases(session, node.getOwnerProject().getId());
-                    WebAppUtils.addDataSourceUpdatedEvent(node.getOwnerProject(), ((DBNLocalFolder) node).getFolder().getFolderPath());
+                    WebAppUtils.addDataSourceUpdatedEvent(
+                        node.getOwnerProject(),
+                        ((DBNLocalFolder) node).getFolder().getFolderPath(),
+                        CBEventConstants.EventType.TYPE_UPDATE
+                    );
                 } else if (node instanceof DBNResourceManagerResource) {
                     boolean rmNewNode = folderNode instanceof DBNAbstractResourceManagerNode;
                     DBNResourceManagerResource rmOldNode = (DBNResourceManagerResource) node;
