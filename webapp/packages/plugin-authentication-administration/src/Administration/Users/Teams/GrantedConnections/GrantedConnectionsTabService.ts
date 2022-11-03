@@ -9,7 +9,8 @@
 import { TeamsResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { isArraysEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
@@ -27,7 +28,8 @@ export class GrantedConnectionsTabService extends Bootstrap {
     private readonly teamFormService: TeamFormService,
     private readonly teamsResource: TeamsResource,
     private readonly graphQLService: GraphQLService,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
+    private readonly projectInfoResource: ProjectInfoResource
   ) {
     super();
     this.key = 'granted-connections';
@@ -40,13 +42,21 @@ export class GrantedConnectionsTabService extends Bootstrap {
       title: 'administration_teams_team_granted_connections_tab_title',
       order: 3,
       stateGetter: context => this.stateGetter(context),
+      isHidden: () => !this.isEnabled(),
       panel: () => GrantedConnections,
     });
 
-    this.teamFormService.afterFormSubmittingTask.addHandler(this.save.bind(this));
+    this.teamFormService.afterFormSubmittingTask.addHandler(executorHandlerFilter(
+      () => this.isEnabled(),
+      this.save.bind(this)
+    ));
   }
 
   load(): Promise<void> | void { }
+
+  private isEnabled(): boolean {
+    return this.projectInfoResource.values.some(project => project.global);
+  }
 
   private stateGetter(context: ITeamFormProps): MetadataValueGetter<string, IGrantedConnectionsTabState> {
     return () => ({

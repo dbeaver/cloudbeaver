@@ -10,8 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
-import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
-import { AuthRolesResource } from '@cloudbeaver/core-authentication/src/AuthRolesResource';
+import { AdminUser, AuthRolesResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useMapResource, ToolsAction, ToolsPanel, Loader, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles, useDataResource } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';

@@ -145,21 +145,14 @@ extend type Query {
     #### Connection management
 
     # All connection configurations
-    allConnections( id: ID ): [ ConnectionInfo! ]!
-
     searchConnections( hostNames: [String!]! ): [AdminConnectionSearchInfo!]!
-
-    createConnectionConfiguration( config: ConnectionConfig! ): ConnectionInfo!
-    copyConnectionConfiguration( nodePath: String!, config: ConnectionConfig ): ConnectionInfo!
-    updateConnectionConfiguration( id: ID!, config: ConnectionConfig! ): ConnectionInfo!
-    deleteConnectionConfiguration( id: ID! ): Boolean
 
     # Permissions
 
-    getConnectionSubjectAccess(projectId: ID, connectionId: ID): [AdminConnectionGrantInfo!]!
-    setConnectionSubjectAccess(projectId: ID, connectionId: ID!, subjects: [ID!]!): Boolean
+    getConnectionSubjectAccess(projectId: ID!, connectionId: ID): [AdminConnectionGrantInfo!]!
+    setConnectionSubjectAccess(projectId: ID!, connectionId: ID!, subjects: [ID!]!): Boolean
 
-    getSubjectConnectionAccess(subjectId: ID): [AdminConnectionGrantInfo!]!
+    getSubjectConnectionAccess(subjectId: ID!): [AdminConnectionGrantInfo!]!
     setSubjectConnectionAccess(subjectId: ID!, connections: [ID!]!): Boolean
 
     #### Feature sets

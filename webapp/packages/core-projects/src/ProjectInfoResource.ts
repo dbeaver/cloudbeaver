@@ -14,8 +14,6 @@ import { SharedProjectsResource } from '@cloudbeaver/core-resource-manager';
 import { EPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList } from '@cloudbeaver/core-sdk';
 
-import { PROJECT_GLOBAL_ID } from './PROJECT_GLOBAL_ID';
-
 export type ProjectInfo = SchemaProjectInfo;
 
 @injectable()
@@ -64,12 +62,8 @@ export function projectInfoSortByName(a: ProjectInfo, b: ProjectInfo) {
     return 0;
   }
 
-  if (a.id === PROJECT_GLOBAL_ID) {
-    return -1;
-  }
-
-  if (b.id === PROJECT_GLOBAL_ID) {
-    return 1;
+  if (a.global !== b.global) {
+    return +a.global - +b.global;
   }
 
   if (a.shared !== b.shared) {

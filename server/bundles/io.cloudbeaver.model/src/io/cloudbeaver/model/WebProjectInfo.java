@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.model;
 
-import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -26,10 +26,10 @@ import org.jkiss.dbeaver.model.rm.RMProjectType;
 
 public class WebProjectInfo {
     private final WebSession session;
-    private final VirtualProjectImpl project;
+    private final WebProjectImpl project;
     private final boolean customPrivateConnectionsEnabled;
 
-    public WebProjectInfo(WebSession session, VirtualProjectImpl project, boolean customPrivateConnectionsEnabled) {
+    public WebProjectInfo(WebSession session, WebProjectImpl project, boolean customPrivateConnectionsEnabled) {
         this.session = session;
         this.project = project;
         this.customPrivateConnectionsEnabled = customPrivateConnectionsEnabled;
@@ -47,6 +47,9 @@ public class WebProjectInfo {
     public String getId() {
         return project.getId();
     }
+
+    @Property
+    public boolean isGlobal() { return project.getRmProject().isGlobal(); }
 
     @Property
     public boolean isShared() {

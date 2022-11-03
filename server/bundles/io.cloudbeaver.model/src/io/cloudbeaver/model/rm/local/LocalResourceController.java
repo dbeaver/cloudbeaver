@@ -17,7 +17,7 @@
 package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.VirtualProjectImpl;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -53,6 +53,7 @@ import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -74,28 +75,32 @@ public class LocalResourceController implements RMController {
     private final Path userProjectsPath;
     private final Path sharedProjectsPath;
     private final String globalProjectName;
-    private final SMController smController;
+    private Supplier<SMController> smControllerSupplier;
 
-    private final Map<String, VirtualProjectImpl> projectRegistries = new LinkedHashMap<>();
+    private final Map<String, WebProjectImpl> projectRegistries = new LinkedHashMap<>();
 
     public LocalResourceController(
         SMCredentialsProvider credentialsProvider,
         Path rootPath,
         Path userProjectsPath,
         Path sharedProjectsPath,
-        SMController smController
+        Supplier<SMController> smControllerSupplier
     ) {
         this.credentialsProvider = credentialsProvider;
         this.rootPath = rootPath;
         this.userProjectsPath = userProjectsPath;
         this.sharedProjectsPath = sharedProjectsPath;
-        this.smController = smController;
+        this.smControllerSupplier = smControllerSupplier;
 
         this.globalProjectName = DBWorkbench.getPlatform().getApplication().getDefaultProjectName();
     }
 
+    protected SMController getSecurityController() {
+        return smControllerSupplier.get();
+    }
+
     private Path getGlobalProjectPath() {
-        return this.rootPath.resolve(this.globalProjectName);
+        return globalProjectName == null ? null : this.rootPath.resolve(this.globalProjectName);
     }
 
     private Path getPrivateProjectPath() {
@@ -104,15 +109,17 @@ public class LocalResourceController implements RMController {
         return userId == null ? null : this.userProjectsPath.resolve(userId);
     }
 
-    private VirtualProjectImpl getProjectMetadata(String projectId) throws DBException {
+    private WebProjectImpl getProjectMetadata(String projectId) throws DBException {
         synchronized (projectRegistries) {
-            VirtualProjectImpl project = projectRegistries.get(projectId);
+            WebProjectImpl project = projectRegistries.get(projectId);
             if (project == null) {
                 SessionContextImpl sessionContext = new SessionContextImpl(null);
                 RMProject rmProject = makeProjectFromId(projectId, false);
-                project = new VirtualProjectImpl(
+                project = new WebProjectImpl(
+                    this,
+                    sessionContext,
                     rmProject,
-                    sessionContext, (container) -> true);
+                    (container) -> true);
                 projectRegistries.put(projectId, project);
             }
             return project;
@@ -154,7 +161,7 @@ public class LocalResourceController implements RMController {
         if (credentialsProvider.hasPermission(DBWConstants.PERMISSION_ADMIN) || credentialsProvider.hasPermission(RMConstants.PERMISSION_RM_ADMIN)) {
             return new ArrayList<>(Arrays.asList(listAllSharedProjects()));
         }
-        var accessibleSharedProjects = smController.getAllAvailableObjectsPermissions(SMObjects.PROJECT);
+        var accessibleSharedProjects = getSecurityController().getAllAvailableObjectsPermissions(SMObjects.PROJECT);
 
         return accessibleSharedProjects
             .stream()
@@ -185,7 +192,7 @@ public class LocalResourceController implements RMController {
                     throw new DBException("Project id required");
                 }
 
-                return smController.getObjectPermissions(activeUserCreds.getUserId(), projectId, SMObjects.PROJECT)
+                return getSecurityController().getObjectPermissions(activeUserCreds.getUserId(), projectId, SMObjects.PROJECT)
                     .getPermissions()
                     .stream()
                     .map(RMProjectPermission::fromPermission)
@@ -258,7 +265,7 @@ public class LocalResourceController implements RMController {
         }
         try {
             IOUtils.deleteDirectory(targetPath);
-            smController.deleteAllObjectPermissions(projectId, SMObjects.PROJECT);
+            getSecurityController().deleteAllObjectPermissions(projectId, SMObjects.PROJECT);
         } catch (IOException e) {
             throw new DBException("Error deleting project '" + project.getName() + "'", e);
         }
@@ -442,7 +449,7 @@ public class LocalResourceController implements RMController {
             throw new DBException("Error deleting resource '" + resourcePath + "'", e);
         }
         // Nullify resource properties if any
-        VirtualProjectImpl project = getProjectMetadata(projectId);
+        WebProjectImpl project = getProjectMetadata(projectId);
         project.resetResourceProperties(resourcePath);
 
         fireRmResourceDeleteEvent(projectId, rmResourcePath);
@@ -725,20 +732,20 @@ public class LocalResourceController implements RMController {
         );
     }
 
-    public static Builder builder(SMCredentialsProvider credentialsProvider, SMController smController) {
-        return new Builder(credentialsProvider, smController);
+    public static Builder builder(SMCredentialsProvider credentialsProvider, Supplier<SMController> smControllerSupplier) {
+        return new Builder(credentialsProvider, smControllerSupplier);
     }
     public static final class Builder {
         private final SMCredentialsProvider credentialsProvider;
-        private final SMController smController;
+        private final Supplier<SMController> smController;
 
         private Path rootPath;
         private Path userProjectsPath;
         private Path sharedProjectsPath;
 
-        private Builder(SMCredentialsProvider credentialsProvider, SMController smController) {
+        private Builder(SMCredentialsProvider credentialsProvider, Supplier<SMController> smControllerSupplier) {
             this.credentialsProvider = credentialsProvider;
-            this.smController = smController;
+            this.smController = smControllerSupplier;
             this.rootPath = RMUtils.getRootPath();
             this.userProjectsPath = RMUtils.getUserProjectsPath();
             this.sharedProjectsPath = RMUtils.getSharedProjectsPath();
