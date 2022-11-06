@@ -15,6 +15,8 @@ import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 interface Props extends Omit<React.DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, 'style'> {
   label?: string;
+  /** @deprecated must be refactored (#1)*/
+  displayLabel?: boolean;
   loading?: boolean;
   icon?: string | React.ReactNode;
   displaySubmenuMark?: boolean;
@@ -24,6 +26,7 @@ interface Props extends Omit<React.DetailedHTMLProps<ButtonHTMLAttributes<HTMLBu
 
 export const MenuBarItem = observer<Props, HTMLButtonElement>(forwardRef(function MenuBarItem({
   label,
+  displayLabel = true,
   loading = false,
   icon,
   displaySubmenuMark,
@@ -45,7 +48,9 @@ export const MenuBarItem = observer<Props, HTMLButtonElement>(forwardRef(functio
             {typeof icon === 'string' ? <IconOrImage icon={icon} viewBox={viewBox} /> : icon}
           </menu-bar-item-icon>
         )}
-        {label && <menu-bar-item-label>{translate(label)}</menu-bar-item-label>}
+        {label && displayLabel ? (
+          <menu-bar-item-label>{translate(label)}</menu-bar-item-label>
+        ) : (<padding />)}
         {displaySubmenuMark && <menu-bar-item-mark><Icon name="angle" viewBox="0 0 15 8" /></menu-bar-item-mark>}
       </menu-bar-item-box>
     </menu-bar-item>

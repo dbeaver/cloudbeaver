@@ -21,6 +21,8 @@ import { menuPanelStyles } from './menuPanelStyles';
 
 interface IMenuItemElementProps {
   label: string;
+  /** @deprecated must be refactored (#1)*/
+  displayLabel?: boolean;
   tooltip?: string;
   binding?: string;
   icon?: string | React.ReactNode;
@@ -32,6 +34,7 @@ interface IMenuItemElementProps {
 
 export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItemElement({
   label,
+  displayLabel = true,
   tooltip,
   binding,
   icon,
@@ -50,9 +53,11 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
       <menu-item-icon>
         {typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}
       </menu-item-icon>
-      <menu-item-text title={title}>
-        {title}
-      </menu-item-text>
+      {displayLabel ? (
+        <menu-item-text title={title}>
+          {title}
+        </menu-item-text>
+      ) : (<padding />)}
       <menu-item-binding title={binding}>
         {binding}
       </menu-item-binding>

@@ -203,6 +203,7 @@ export class SqlEditorBootstrap extends Bootstrap {
       isActionApplicable: (context, action) => [
         ACTION_SQL_EDITOR_NEW,
       ].includes(action),
+      isLabelVisible: () => false,
       handler: (context, action) => {
         switch (action) {
           case ACTION_SQL_EDITOR_NEW: {

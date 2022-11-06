@@ -238,5 +238,10 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         MENU_CONNECTIONS,
       ],
     });
+    this.menuService.setHandler({
+      id: 'connections-menu-base',
+      isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === MENU_CONNECTIONS,
+      isLabelVisible: () => false,
+    });
   }
 }

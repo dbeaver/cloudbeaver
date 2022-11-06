@@ -25,4 +25,7 @@ export interface IActionHandler {
 
   isActionApplicable: (context: IDataContextProvider, action: IAction) => boolean;
   handler: (context: IDataContextProvider, action: IAction) => void;
+
+  /** @deprecated must be refactored (#1)*/
+  isLabelVisible?: (context: IDataContextProvider, action: IAction) => boolean;
 }

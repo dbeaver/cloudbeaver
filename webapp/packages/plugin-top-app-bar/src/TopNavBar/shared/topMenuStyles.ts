@@ -36,7 +36,7 @@ export const topMenuStyles = css`
   }
   MenuTrigger, Button, MenuBarElement {
     height: 100%;
-    padding: 0 14px !important;
+    padding: 0 8px !important;
 
     &:not(:last-child) {
       margin-right: 1px;
@@ -63,11 +63,11 @@ export const topMenuStyles = css`
     }
     & IconOrImage {
       display: block;
-      width: 24px;
+      width: 32px;
     }
     & menu-bar-item-icon {
-      width: 24px;
-      height: 24px;
+      width: 32px;
+      height: 32px;
       display: flex;
       box-sizing: border-box;
       align-items: center;
@@ -88,14 +88,26 @@ export const topMenuStyles = css`
       display: block;
       object-fit: contain;
     }
-    & menu-trigger-icon, & menu-bar-item-icon {
-      margin-right: 8px;
+    & menu-bar-item-mark {
+      padding-left: 0 !important;
     }
     & menu-trigger-text, & menu-bar-item-label {
       white-space: nowrap;
       max-width: 240px;
       overflow-x: hidden;
       text-overflow: ellipsis;
+      padding: 0 8px;
+
+      &:first-child {
+        padding-left: 0px;
+      }
+
+      &:last-child {
+        padding-right: 0px;
+      }
+    }
+    & padding:not(:last-child) {
+      padding-right: 8px;
     }
     /*&:hover box > Icon,
     &:global([aria-expanded="true"]) box > Icon {

@@ -24,4 +24,7 @@ export interface IMenuHandler<TExtraProps = unknown> {
   isDisabled?: (context: IDataContextProvider) => boolean;
   isHidden?: (context: IDataContextProvider) => boolean;
   handler?: (context: IDataContextProvider) => void;
+
+  /** @deprecated must be refactored (#1)*/
+  isLabelVisible?: (context: IDataContextProvider, menu: IMenu) => boolean;
 }

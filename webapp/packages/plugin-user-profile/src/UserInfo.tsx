@@ -17,16 +17,19 @@ import { UserProfileService } from './UserProfileService';
 
 const styles = css`
   user {
-    composes: theme-ripple from global;
     height: 100%;
     display: flex;
     align-items: center;
-    padding: 0 16px;
+    padding: 0 8px;
     cursor: pointer;
+
+    &:hover, &:global([aria-expanded="true"]) {
+      background: #338ecc;
+    }
   }
   IconOrImage {
     display: block;
-    width: 24px;
+    width: 32px;
   }
   user-name {
     display: block;

@@ -12,5 +12,6 @@ export const ACTION_SQL_EDITOR_NEW = createAction(
   'sql-editor-new',
   {
     label: 'plugin_sql_editor_navigation_tab_action_sql_editor_new',
+    icon: '/icons/plugin_sql_editor_navigation_tab_new.svg',
   }
 );

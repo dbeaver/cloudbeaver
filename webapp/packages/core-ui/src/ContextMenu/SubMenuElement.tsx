@@ -78,6 +78,8 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
     || subMenuData.loaders.some(loader => loader.isLoading())
     || false
   ));
+  /** @deprecated must be refactored (#1)*/
+  const displayLabel = getComputed(() => handler?.isLabelVisible?.(subMenuData.context, subMenuData.menu) ?? true);
   const disabled = getComputed(() => handler?.isDisabled?.(subMenuData.context));
   const loaded = getComputed(() => !subMenuData.loaders.some(loader => !loader.isLoaded()));
   const info = handler?.getInfo?.(subMenuData.context, subMenuData.menu);
@@ -118,6 +120,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
     >
       <MenuItemElement
         label={label}
+        displayLabel={displayLabel}
         icon={IconComponent ? (
           <IconComponent
             item={subMenu}

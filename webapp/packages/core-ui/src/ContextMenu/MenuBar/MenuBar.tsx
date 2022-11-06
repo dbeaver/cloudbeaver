@@ -11,7 +11,7 @@ import { forwardRef, useCallback } from 'react';
 import { MenuInitialState, MenuSeparator } from 'reakit';
 import styled, { use } from 'reshadow';
 
-import { useAutoLoad, useStyles } from '@cloudbeaver/core-blocks';
+import { getComputed, useAutoLoad, useStyles } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { DATA_CONTEXT_MENU_NESTED, DATA_CONTEXT_SUBMENU_ITEM, IMenuActionItem, IMenuData, IMenuItem, MenuActionItem, MenuBaseItem, MenuSeparatorItem, MenuSubMenuItem, useMenu } from '@cloudbeaver/core-view';
 
@@ -146,6 +146,9 @@ const MenuBarAction = observer<IMenuBarActionProps>(function MenuBarAction({ ite
   const actionInfo = item.action.actionInfo;
   const loading = item.action.isLoading();
 
+  /** @deprecated must be refactored (#1)*/
+  const displayLabel = item.action.isLabelVisible();
+
   function handleClick() {
     onClick();
     item.action.activate();
@@ -156,6 +159,7 @@ const MenuBarAction = observer<IMenuBarActionProps>(function MenuBarAction({ ite
       id={item.id}
       aria-label={actionInfo.label}
       label={actionInfo.label}
+      displayLabel={displayLabel}
       icon={actionInfo.icon}
       title={actionInfo.tooltip}
       disabled={item.disabled}
@@ -195,6 +199,8 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
 
   const IconComponent = handler?.iconComponent?.() ?? item.iconComponent?.();
   const extraProps = handler?.getExtraProps?.() ?? item.getExtraProps?.() as any;
+  /** @deprecated must be refactored (#1)*/
+  const displayLabel = getComputed(() => handler?.isLabelVisible?.(subMenuData.context, subMenuData.menu) ?? true);
   const info = handler?.getInfo?.(subMenuData.context, subMenuData.menu);
   const label = info?.label ?? item.label ?? item.menu.label;
   const icon = info?.icon ?? item.icon ?? item.menu.icon;
@@ -214,6 +220,7 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
           id={item.id}
           aria-label={item.menu.label}
           label={label}
+          displayLabel={displayLabel}
           icon={IconComponent ? (
             <IconComponent
               item={item}

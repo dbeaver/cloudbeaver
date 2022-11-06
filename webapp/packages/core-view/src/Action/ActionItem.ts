@@ -60,6 +60,10 @@ export class ActionItem implements IActionItem {
     return this.handler.isHidden?.(this.context, this.action) ?? false;
   }
 
+  isLabelVisible(): boolean {
+    return this.handler.isLabelVisible?.(this.context, this.action) ?? true;
+  }
+
   activate(binding?: boolean | undefined): void {
     if (binding) {
       this.binding?.handler(this.context, this.action);
