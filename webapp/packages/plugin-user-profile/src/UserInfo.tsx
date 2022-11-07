@@ -17,6 +17,7 @@ import { UserProfileService } from './UserProfileService';
 
 const styles = css`
   user {
+    position: relative;
     height: 100%;
     display: flex;
     align-items: center;
@@ -25,6 +26,17 @@ const styles = css`
 
     &:hover, &:global([aria-expanded="true"]) {
       background: #338ecc;
+    }
+
+    &:after {
+      position: absolute;
+      background: #236ea0 !important;
+      height: 32px;
+      width: 1px;
+      top: 8px;
+      right: -1px;
+      opacity: 1 !important;
+      content: "";
     }
   }
   IconOrImage {
