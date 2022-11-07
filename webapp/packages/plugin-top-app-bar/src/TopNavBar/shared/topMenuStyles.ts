@@ -63,11 +63,11 @@ export const topMenuStyles = css`
     }
     & IconOrImage {
       display: block;
-      width: 32px;
+      width: 24px;
     }
     & menu-bar-item-icon {
-      width: 32px;
-      height: 32px;
+      width: 24px;
+      height: 24px;
       display: flex;
       box-sizing: border-box;
       align-items: center;
@@ -83,6 +83,8 @@ export const topMenuStyles = css`
       flex: 1;
       height: inherit;
       position: relative;
+      min-width: 32px;
+      justify-content: center;
     }
     & menu-bar-item-icon IconOrImage {
       display: block;

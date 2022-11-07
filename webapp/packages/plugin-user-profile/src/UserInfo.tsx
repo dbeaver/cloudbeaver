@@ -29,7 +29,7 @@ const styles = css`
   }
   IconOrImage {
     display: block;
-    width: 32px;
+    width: 24px;
   }
   user-name {
     display: block;
@@ -54,7 +54,7 @@ export const UserInfo = observer<Props>(function UserInfo({ info }) {
   return styled(styles)(
     <user title={translate('plugin_user_profile_menu')} onClick={() => userProfileService.open()}>
       <user-icon>
-        <IconOrImage icon='user' viewBox='0 0 28 28' />
+        <IconOrImage icon='/icons/plugin_user_profile_m.svg' />
       </user-icon>
       <user-name>{info.displayName || info.userId}</user-name>
     </user>

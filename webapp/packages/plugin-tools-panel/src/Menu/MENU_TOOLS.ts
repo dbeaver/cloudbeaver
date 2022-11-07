@@ -11,5 +11,5 @@ import { createMenu } from '@cloudbeaver/core-view';
 export const MENU_TOOLS = createMenu(
   'tools',
   'plugin_tools_panel_menu_title',
-  '/icons/plugin_tools_panel.svg'
+  '/icons/plugin_tools_panel_m.svg'
 );

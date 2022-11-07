@@ -201,7 +201,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
           connectionSchemaManagerService.currentObjectSchema?.object?.features?.includes(EObjectFeature.schema)
         ) {
           // TODO move such kind of icon paths to a set of constants
-          icon = 'schema_system';
+          icon = '/icons/plugin_datasource_context_switch_schema_m.svg';
         } else if (
           connectionSchemaManagerService.currentObjectCatalog?.object?.features?.includes(EObjectFeature.catalog)
         ) {
@@ -283,7 +283,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
               id: title,
               label: title,
               tooltip: title,
-              icon: 'schema_system',
+              icon: '/icons/plugin_datasource_context_switch_schema_m.svg',
             },
             {
               onSelect: async () => {
@@ -344,7 +344,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
                 id: title,
                 label: title,
                 tooltip: title,
-                icon: 'schema_system',
+                icon: '/icons/plugin_datasource_context_switch_schema_m.svg',
               },
               {
                 onSelect: async () => {

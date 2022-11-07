@@ -11,5 +11,5 @@ import { createAction } from '@cloudbeaver/core-view';
 export const ACTION_APP_HELP = createAction('app-help', {
   label: 'shortcuts_title',
   tooltip: 'shortcuts_title',
-  icon: 'info',
+  icon: '/icons/plugin_help_m.svg',
 });
