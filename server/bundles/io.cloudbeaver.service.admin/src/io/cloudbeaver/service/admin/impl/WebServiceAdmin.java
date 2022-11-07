@@ -404,7 +404,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         providerConfig.setParameters(parameters);
         CBApplication.getInstance().getAppConfiguration().addAuthProviderConfiguration(providerConfig);
         try {
-            CBApplication.getInstance().flushConfiguration();
+            CBApplication.getInstance().flushConfiguration(webSession);
         } catch (DBException e) {
             throw new DBWebException("Error saving server configuration", e);
         }
@@ -417,7 +417,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
         if (CBApplication.getInstance().getAppConfiguration().deleteAuthProviderConfiguration(id)) {
             try {
-                CBApplication.getInstance().flushConfiguration();
+                CBApplication.getInstance().flushConfiguration(webSession);
             } catch (DBException e) {
                 throw new DBWebException("Error saving server configuration", e);
             }
@@ -503,7 +503,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 adminPassword,
                 authInfoList,
                 sessionExpireTime,
-                appConfig);
+                appConfig,
+                webSession
+            );
 
             // Refresh active session
             if (configurationMode) {
