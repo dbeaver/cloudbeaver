@@ -175,6 +175,7 @@ export * from './usePermission';
 export * from './usePromiseState';
 export * from './useStateDelay';
 export * from './useErrorDetails';
+export * from './useActivationDelay';
 export * from './useAppLoadingScreen';
 export * from './useInterval';
 export * from './useStyles';
