@@ -18,7 +18,7 @@ export const topMenuStyles = css`
   menu-box {
     composes: theme-text-on-primary from global;
     background-color: #338ecc!important;
-    clip-path: inset(0px -16px -16px -16px);
+    clip-path: inset(0px -16px -16px -16px); /* clip shadow from top edge of menu */
   }
   menu-box menu-panel-item {
     border-color: #ffffff !important;
