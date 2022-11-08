@@ -9,23 +9,36 @@
 import { useEffect, useRef, useState } from 'react';
 
 export function useStateDelay(state: boolean, delay: number, callback?: () => void): boolean {
-  const [delayedState, setState] = useState(false);
+  const [delayedState, setState] = useState(state);
   const callbackRef = useRef(callback);
+  const actualStateRef = useRef<NodeJS.Timeout | null>(null);
+
   callbackRef.current = callback;
 
   useEffect(() => {
     if (state === delayedState) {
+      if (actualStateRef.current !== null) {
+        clearTimeout(actualStateRef.current);
+        actualStateRef.current = null;
+      }
       return;
     }
-    const timerId = setTimeout(() => {
-      setState(state);
-      if (state) {
-        callbackRef.current?.();
-      }
-    }, delay);
 
-    return () => clearTimeout(timerId);
-  }, [state, delayedState, delay]);
+    if (actualStateRef.current !== null) {
+      return;
+    }
+
+    actualStateRef.current = setTimeout(() => {
+      setState(state);
+      actualStateRef.current = null;
+    }, delay);
+  });
+
+  useEffect(() => {
+    if (delayedState) {
+      callbackRef.current?.();
+    }
+  }, [delayedState]);
 
   return delayedState;
 }
