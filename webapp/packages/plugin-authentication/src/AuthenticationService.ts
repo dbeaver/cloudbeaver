@@ -9,7 +9,7 @@
 import { observable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { AppAuthService, AuthInfoService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, RequestedProvider, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AppAuthService, AuthInfoService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, IUserAuthConfiguration, RequestedProvider, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import type { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -71,25 +71,30 @@ export class AuthenticationService extends Bootstrap {
     await this.auth(false, { providerId, linkUser });
   }
 
-  async logout(): Promise<void> {
+  async logout(providerId?: string, configurationId?: string): Promise<void> {
     const contexts = await this.onLogout.execute('before');
 
     if (ExecutorInterrupter.isInterrupted(contexts)) {
       return;
     }
 
-    if (this.authInfoService.userAuthConfigurations.length > 0) {
-      const userAuthConfiguration = this.authInfoService.userAuthConfigurations[0];
+    let userAuthConfiguration: IUserAuthConfiguration | undefined = undefined;
 
-      if (userAuthConfiguration.signOutLink) {
-        this.logoutConfiguration(userAuthConfiguration.id, true);
-      }
+    if (providerId && configurationId) {
+      userAuthConfiguration = this.authInfoService.userAuthConfigurations
+        .find(c => c.providerId === providerId && c.configuration.id === configurationId);
+    } else if (this.authInfoService.userAuthConfigurations.length > 0) {
+      userAuthConfiguration = this.authInfoService.userAuthConfigurations[0];
+    }
+
+    if (userAuthConfiguration?.configuration.signOutLink) {
+      this.logoutConfiguration(userAuthConfiguration);
     }
 
     try {
-      await this.userInfoResource.logout();
+      await this.userInfoResource.logout(providerId, configurationId);
 
-      if (!this.administrationScreenService.isConfigurationMode) {
+      if (!this.administrationScreenService.isConfigurationMode && !providerId) {
         this.screenService.navigateToRoot();
       }
 
@@ -99,14 +104,11 @@ export class AuthenticationService extends Bootstrap {
     }
   }
 
-  logoutConfiguration(configurationId: string, full: boolean): void {
-    const userAuthConfiguration = this.authInfoService.userAuthConfigurations
-      .find(configuration => configuration.id === configurationId);
-
-    if (userAuthConfiguration?.signOutLink) {
-      const id = `${userAuthConfiguration.id}-sign-out`;
+  private async logoutConfiguration(configuration: IUserAuthConfiguration): Promise<void> {
+    if (configuration.configuration.signOutLink) {
+      const id = `${configuration.configuration.id}-sign-out`;
       const popup = this.windowsService.open(id, {
-        url: userAuthConfiguration.signOutLink,
+        url: configuration.configuration.signOutLink,
         target: id,
         width: 600,
         height: 700,
@@ -115,18 +117,6 @@ export class AuthenticationService extends Bootstrap {
       if (popup) {
         popup.blur();
         window.focus();
-      }
-
-      if (!full) {
-        let maxTime = 1000 / 100 * 10;
-
-        const interval = setInterval(() => {
-          if (popup?.location.href !== userAuthConfiguration.signOutLink || maxTime === 0) {
-            this.userInfoResource.markOutdated();
-            clearInterval(interval);
-          }
-          maxTime--;
-        }, 100);
       }
     }
   }
