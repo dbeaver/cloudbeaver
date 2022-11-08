@@ -64,6 +64,7 @@ import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
+import org.jkiss.dbeaver.registry.BaseProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -373,11 +374,7 @@ public class WebSession extends AbstractSessionPersistent
             RMController controller = getRmController();
             RMProject[] rmProjects = controller.listAccessibleProjects();
             for (RMProject project : rmProjects) {
-                WebProjectImpl virtualProject = createWebProject(project);
-                if (!virtualProject.getRmProject().getProjectPermissions().contains(RMProjectPermission.DATA_SOURCES_EDIT.getPermissionId())) {
-                    // Projects for which user don't have edit permission can't be saved. So mark the as in memory
-                    virtualProject.setInMemory(true);
-                }
+                createWebProject(project);
             }
             if (user == null) {
                 WebProjectImpl anonymousProject = createWebProject(RMUtils.createAnonymousProject());
