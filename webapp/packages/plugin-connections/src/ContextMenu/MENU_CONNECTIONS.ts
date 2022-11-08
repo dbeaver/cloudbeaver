@@ -11,5 +11,6 @@ import { createMenu } from '@cloudbeaver/core-view';
 export const MENU_CONNECTIONS = createMenu(
   'connections',
   'plugin_connections_menu_connections_label',
-  '/icons/plugin_connections_menu_m.svg'
+  '/icons/plugin_connections_menu_m.svg',
+  'plugin_connections_menu_connections_label'
 );

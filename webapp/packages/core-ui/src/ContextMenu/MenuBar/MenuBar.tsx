@@ -201,10 +201,12 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
   const extraProps = handler?.getExtraProps?.() ?? item.getExtraProps?.() as any;
   /** @deprecated must be refactored (#1)*/
   const displayLabel = getComputed(() => handler?.isLabelVisible?.(subMenuData.context, subMenuData.menu) ?? true);
+  const loaded = getComputed(() => !subMenuData.loaders.some(loader => !loader.isLoaded()));
   const info = handler?.getInfo?.(subMenuData.context, subMenuData.menu);
   const label = info?.label ?? item.label ?? item.menu.label;
   const icon = info?.icon ?? item.icon ?? item.menu.icon;
   const tooltip = info?.tooltip ?? item.tooltip ?? item.menu.tooltip;
+  const panelAvailable = subMenuData.available || !loaded;
 
   return styled(styles)(
     <ContextMenu
@@ -232,7 +234,7 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
           loading={loading}
           disabled={disabled}
           style={style}
-          displaySubmenuMark={!disabled}
+          displaySubmenuMark={panelAvailable}
           {...use({ hidden: item.hidden })}
         />
       )}
