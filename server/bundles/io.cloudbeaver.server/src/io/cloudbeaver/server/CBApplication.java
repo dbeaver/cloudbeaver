@@ -402,7 +402,9 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
                 autoAdminPassword,
                 Collections.emptyList(),
                 maxSessionIdleTime,
-                getAppConfiguration());
+                getAppConfiguration(),
+                null
+            );
         } catch (Exception e) {
             log.error("Error loading server auto configuration", e);
         }
@@ -779,7 +781,9 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         @Nullable String adminPassword,
         @NotNull List<WebAuthInfo> authInfoList,
         long sessionExpireTime,
-        @NotNull CBAppConfig appConfig) throws DBException {
+        @NotNull CBAppConfig appConfig,
+        @Nullable SMCredentialsProvider credentialsProvider
+    ) throws DBException {
         if (!RECONFIGURATION_ALLOWED && !isConfigurationMode()) {
             throw new DBException("Application must be in configuration mode");
         }
@@ -790,7 +794,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
         // Save runtime configuration
         log.debug("Saving runtime configuration");
-        saveRuntimeConfig(newServerName, newServerURL, sessionExpireTime, appConfig);
+        saveRuntimeConfig(newServerName, newServerURL, sessionExpireTime, appConfig, credentialsProvider);
 
         // Grant permissions to predefined connections
         if (isConfigurationMode() && appConfig.isAnonymousAccessEnabled()) {
@@ -817,17 +821,18 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return readConfiguration(runtimeConfigFile);
     }
 
-    protected void finishSecurityServiceConfiguration(@NotNull String adminName,
-                                                      @Nullable String adminPassword,
-                                                      @NotNull List<WebAuthInfo> authInfoList
+    protected void finishSecurityServiceConfiguration(
+        @NotNull String adminName,
+        @Nullable String adminPassword,
+        @NotNull List<WebAuthInfo> authInfoList
     ) throws DBException {
         if (securityController instanceof CBEmbeddedSecurityController) {
             ((CBEmbeddedSecurityController) securityController).finishConfiguration(adminName, adminPassword, authInfoList);
         }
     }
 
-    public synchronized void flushConfiguration() throws DBException {
-        saveRuntimeConfig(serverName, serverURL, maxSessionIdleTime, appConfiguration);
+    public synchronized void flushConfiguration(SMCredentialsProvider credentialsProvider) throws DBException {
+        saveRuntimeConfig(serverName, serverURL, maxSessionIdleTime, appConfiguration, credentialsProvider);
     }
 
 
@@ -852,11 +857,20 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         }
     }
 
-    protected void saveRuntimeConfig(String newServerName, String newServerURL, long sessionExpireTime, CBAppConfig appConfig) throws DBException {
+    protected void saveRuntimeConfig(
+        String newServerName,
+        String newServerURL,
+        long sessionExpireTime,
+        CBAppConfig appConfig,
+        SMCredentialsProvider credentialsProvider
+    ) throws DBException {
         if (newServerName == null) {
             throw new DBException("Invalid server configuration, server name cannot be empty");
         }
-        Map<String, Object> configurationProperties = collectConfigurationProperties(newServerName, newServerURL, sessionExpireTime, appConfig);
+        Map<String, Object> configurationProperties = collectConfigurationProperties(newServerName,
+            newServerURL,
+            sessionExpireTime,
+            appConfig);
         validateConfiguration(configurationProperties);
         writeRuntimeConfig(configurationProperties);
     }

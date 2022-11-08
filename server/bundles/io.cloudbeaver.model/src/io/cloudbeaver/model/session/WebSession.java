@@ -21,6 +21,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.events.CBEvent;
+import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -283,6 +284,35 @@ public class WebSession extends AbstractSessionPersistent
         refreshSessionAuth();
 
         initNavigatorModel();
+    }
+
+    /**
+     * updates connections based on event in web session
+     *
+     * @param project project of connection
+     * @param connectionIds list of updated connections
+     * @param type type of event
+     */
+    public synchronized void updateProjectConnection(DBPProject project, List<String> connectionIds, CBEventConstants.EventType type) {
+        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+        registry.refreshConfig();
+        for (String connectionId : connectionIds) {
+            switch (type) {
+                case TYPE_CREATE:
+                    DBPDataSourceContainer container = registry.getDataSource(connectionId);
+                    if (container == null) {
+                        break;
+                    }
+                    WebConnectionInfo connectionInfo = new WebConnectionInfo(this, registry.getDataSource(connectionId));
+                    this.connections.put(connectionInfo.getId(), connectionInfo);
+                    break;
+                case TYPE_DELETE:
+                    this.connections.remove(connectionId);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     // Note: for admin use only
