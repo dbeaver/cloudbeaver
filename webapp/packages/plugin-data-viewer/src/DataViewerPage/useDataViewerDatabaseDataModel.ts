@@ -9,10 +9,11 @@
 import { action, computed, observable } from 'mobx';
 import { useEffect } from 'react';
 
-import { ILoadableState, isContainsException, useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 import type { IObjectViewerTabState } from '@cloudbeaver/plugin-object-viewer';
 
@@ -60,7 +61,7 @@ export function useDataViewerDatabaseDataModel(tab: ITab<IObjectViewerTabState>)
     },
     async reload() {
       if (isContainsException(connection.exception)) {
-        connection.reload?.();
+        connection.reload();
       }
       this.init();
     },

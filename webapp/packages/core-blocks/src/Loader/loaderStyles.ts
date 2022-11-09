@@ -33,6 +33,7 @@ export const loaderStyles = css`
 
     & StaticImage {
       width: 100%;
+      content: url(/icons/spinner-primary.svg);
     }
   }
 
@@ -77,6 +78,25 @@ export const loaderStyles = css`
     }
     & actions {
       padding: 0;
+    }
+  }
+
+  loader[|small] StaticImage,
+  loader:global(.small) StaticImage {
+    content: url(/icons/spinner-primary-small.svg);
+  }
+
+  loader[|secondary],
+  loader[|overlay],
+  loader:global(.secondary),
+  loader:global(.overlay) {
+    & StaticImage {
+      content: url(/icons/spinner.svg);
+    }
+
+    &[|small] StaticImage,
+    &:global(.small) StaticImage {
+      content: url(/icons/spinner-small.svg);
     }
   }
 

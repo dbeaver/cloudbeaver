@@ -111,7 +111,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
             >
               {translate('ui_refresh')}
             </ToolsAction>
-            {isLocalProviderAvailable && (
+            {/* {isLocalProviderAvailable && (
               <ToolsAction
                 title={translate('authentication_administration_tools_delete_tooltip')}
                 icon="trash"
@@ -121,7 +121,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
               >
                 {translate('ui_delete')}
               </ToolsAction>
-            )}
+            )} */}
           </ToolsPanel>
         </layout-grid-cell>
 
@@ -139,11 +139,11 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
               size='big'
             >
               <TableHeader>
-                {isLocalProviderAvailable && (
+                {/* {isLocalProviderAvailable && (
                   <TableColumnHeader min flex centerContent>
                     <TableSelect />
                   </TableColumnHeader>
-                )}
+                )} */}
                 <TableColumnHeader min />
                 <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
                 {displayAuthRole && (
@@ -159,7 +159,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
                     key={user.userId}
                     user={user}
                     displayAuthRole={displayAuthRole}
-                    selectable={isLocalProviderAvailable}
+                  // selectable={isLocalProviderAvailable}
                   />
                 ))}
               </TableBody>

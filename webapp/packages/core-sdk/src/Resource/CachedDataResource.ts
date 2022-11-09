@@ -8,6 +8,8 @@
 
 import { makeObservable, observable } from 'mobx';
 
+import type { ILoadableState } from '@cloudbeaver/core-utils';
+
 import { CachedResource } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
 
@@ -86,4 +88,36 @@ export abstract class CachedDataResource<
     await this.loadData(param, false, context);
     return this.data;
   }
+}
+
+export function getCachedDataResourceLoaderState<
+  TData,
+  TParam = void,
+  TKey = TParam,
+  TContext extends Record<string, any> | void = void,
+>(
+  resource: CachedDataResource<TData, TParam, TKey, TContext>,
+  param: TParam,
+  context: ContextArg<TData, TContext>
+): ILoadableState {
+  return {
+    get exception() {
+      return resource.getException(param);
+    },
+    isLoading() {
+      return resource.isDataLoading(param);
+    },
+    isLoaded() {
+      return resource.isLoaded(param, context);
+    },
+    isOutdated() {
+      return resource.isOutdated(param);
+    },
+    load() {
+      return resource.load(param, context);
+    },
+    reload() {
+      return resource.refresh(param, context);
+    },
+  };
 }

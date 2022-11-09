@@ -7,35 +7,61 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { SideBarPanelService } from '@cloudbeaver/core-ui';
-import { EMainMenu, MainMenuService } from '@cloudbeaver/plugin-top-app-bar';
+import { ActionService, DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { MENU_TOOLS } from '@cloudbeaver/plugin-tools-panel';
 
+import { ACTION_RESOURCE_MANAGER } from './Actions/ACTION_RESOURCE_MANAGER';
 import { ResourceManager } from './ResourceManager';
 import { ResourceManagerService } from './ResourceManagerService';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
   constructor(
-    private readonly mainMenuService: MainMenuService,
     private readonly resourceManagerService: ResourceManagerService,
     private readonly sideBarPanelService: SideBarPanelService,
+    private readonly menuService: MenuService,
+    private readonly actionService: ActionService,
+    private readonly serverConfigResource: ServerConfigResource
   ) {
     super();
   }
 
   register(): void | Promise<void> {
-    this.mainMenuService.registerMenuItem(
-      EMainMenu.mainMenuToolsPanel,
-      {
-        id: 'resourceManagementTrigger',
-        order: 3,
-        type: 'checkbox',
-        title: 'plugin_resource_manager_title',
-        isHidden: () => !this.resourceManagerService.enabled,
-        isChecked: () => this.resourceManagerService.active,
-        onClick: this.resourceManagerService.togglePanel,
-      }
-    );
+    this.menuService.addCreator({
+      isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === MENU_TOOLS,
+      getItems: (context, items) => [
+        ...items,
+        ACTION_RESOURCE_MANAGER,
+      ],
+    });
+
+    this.actionService.addHandler({
+      id: 'resource-manager-base',
+      isActionApplicable: (context, action) => [
+        ACTION_RESOURCE_MANAGER,
+      ].includes(action),
+      isHidden: () => !this.resourceManagerService.enabled,
+      isChecked: () => this.resourceManagerService.active,
+      getLoader: (context, action) => {
+        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
+
+        return state.getState(
+          action.id,
+          () => getCachedDataResourceLoaderState(this.serverConfigResource, undefined, undefined)
+        );
+      },
+      handler: (context, action) => {
+        switch (action) {
+          case ACTION_RESOURCE_MANAGER: {
+            this.resourceManagerService.togglePanel();
+            break;
+          }
+        }
+      },
+    });
 
     this.sideBarPanelService.tabsContainer.add({
       key: 'resource-manager-tab',

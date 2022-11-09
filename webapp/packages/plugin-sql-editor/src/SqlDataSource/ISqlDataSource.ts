@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ILoadableState } from '@cloudbeaver/core-blocks';
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { ISyncExecutor } from '@cloudbeaver/core-executor';
+import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import type { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
 
