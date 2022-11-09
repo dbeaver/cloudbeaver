@@ -9,35 +9,57 @@
 import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { ProjectsService } from '@cloudbeaver/core-projects';
-import { MainMenuService, EMainMenu } from '@cloudbeaver/plugin-top-app-bar';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
+import { ActionService, DATA_CONTEXT_LOADABLE_STATE, MenuService } from '@cloudbeaver/core-view';
+import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
+import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM';
 import { CustomConnectionDialog } from './CustomConnection/CustomConnectionDialog';
 
 @injectable()
 export class CustomConnectionPluginBootstrap extends Bootstrap {
   constructor(
-    private readonly mainMenuService: MainMenuService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly projectsService: ProjectsService,
-    private readonly connectionsManagerService: ConnectionsManagerService
+    private readonly projectInfoResource: ProjectInfoResource,
+    private readonly menuService: MenuService,
+    private readonly actionService: ActionService,
+    private readonly connectionsManagerService: ConnectionsManagerService,
   ) {
     super();
   }
 
   register(): void | Promise<void> {
-    this.mainMenuService.onConnectionClick.addHandler(() => {
-      this.projectsService.load();
+    this.menuService.addCreator({
+      menus: [MENU_CONNECTIONS],
+      getItems: (context, items) => [
+        ...items,
+        ACTION_CONNECTION_CUSTOM,
+      ],
     });
 
-    this.mainMenuService.registerMenuItem(EMainMenu.mainMenuConnectionsPanel, {
-      id: 'customConnection',
-      order: 2,
-      title: 'app_shared_connectionMenu_custom',
-      isHidden: () => (
-        !this.projectsService.activeProjects.some(project => project.canEditDataSources)
-      ),
-      onClick: () => this.openConnectionsDialog(),
+    this.actionService.addHandler({
+      id: 'connection-custom',
+      isActionApplicable: (context, action) => [
+        ACTION_CONNECTION_CUSTOM,
+      ].includes(action),
+      isHidden: () => this.connectionsManagerService.createConnectionProjects.length === 0,
+      getLoader: (context, action) => {
+        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
+
+        return state.getState(
+          action.id,
+          () => getCachedMapResourceLoaderState(this.projectInfoResource, CachedMapAllKey)
+        );
+      },
+      handler: async (context, action) => {
+        switch (action) {
+          case ACTION_CONNECTION_CUSTOM: {
+            await this.openConnectionsDialog();
+            break;
+          }
+        }
+      },
     });
   }
 

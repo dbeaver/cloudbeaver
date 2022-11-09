@@ -140,11 +140,14 @@ export const menuPanelStyles = css`
         align-items: center;
         justify-content: center;
       }
+      & menu-item-content Icon {
+        width: 10px;
+        height: 10px;
+      }
       & Icon {
         width: 16px;
         height: 16px;
         opacity: 0.5;
-        transform: rotate(-90deg);
       }
       & IconOrImage {
         width: 16px;
@@ -161,7 +164,7 @@ export const menuPanelStyles = css`
         text-align: right;
       }
       & menu-panel-item menu-item-content Icon {
-        transform: rotate(90deg);
+        transform: rotate(180deg);
       }
     }
   `;

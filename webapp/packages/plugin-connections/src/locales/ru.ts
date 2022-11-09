@@ -11,4 +11,6 @@ export default [
   ['plugin_connections_connection_form_host_configuration_invalid', 'Конфигурация хоста не поддерживается'],
   ['plugin_connections_connection_form_name_invalid', 'Поле \'Название\' не может быть пустым'],
   ['connections_public_connection_folder_delete_confirmation', 'Вы удаляете "{arg:name}". Подключения не будут удалены. Вы уверены?'],
+  ['plugin_connections_menu_connections_label', 'Подключение'],
+  ['plugin_connections_action_disconnect_all_label', 'Отключить все'],
 ];

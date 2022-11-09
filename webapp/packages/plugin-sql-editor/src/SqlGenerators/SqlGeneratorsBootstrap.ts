@@ -9,7 +9,8 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
-import { MenuBaseItem, DATA_CONTEXT_MENU, MenuService, DATA_CONTEXT_MENU_NESTED } from '@cloudbeaver/core-view';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
+import { MenuBaseItem, DATA_CONTEXT_MENU, MenuService, DATA_CONTEXT_MENU_NESTED, DATA_CONTEXT_LOADABLE_STATE } from '@cloudbeaver/core-view';
 
 import { GeneratedSqlDialog } from './GeneratedSqlDialog';
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS';
@@ -29,19 +30,19 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
     this.menuService.setHandler({
       id: 'node-sql-generators',
       isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_SQL_GENERATORS,
-      isLoading: context => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
-
-        return this.sqlGeneratorsResource.isDataLoading(node.id);
-      },
       isDisabled: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
 
         return this.sqlGeneratorsResource.get(node.id)?.length === 0;
       },
-      handler: context => {
+      getLoader: (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
-        this.sqlGeneratorsResource.load(node.id);
+        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
+
+        return state.getState(
+          action.id,
+          () => getCachedMapResourceLoaderState(this.sqlGeneratorsResource, node.id)
+        );
       },
     });
     this.menuService.addCreator({
@@ -67,7 +68,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_SQL_GENERATORS,
+      menus: [MENU_SQL_GENERATORS],
       getItems: (context, items) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
 

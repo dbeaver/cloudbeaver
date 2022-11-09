@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface ILoadableState {
-  isLoading: () => boolean;
-  isLoaded: () => boolean;
-  readonly exception?: Error[] | Error | null;
-  reload?: () => void;
+import { createAction } from '@cloudbeaver/core-view';
 
-  isCancelled?: () => boolean;
-  cancel?: () => void;
-}
+export const ACTION_LOG_VIEWER_ENABLE = createAction(
+  'log-viewer-enable',
+  {
+    label: 'plugin_log_viewer_action_enable_label',
+    type: 'checkbox',
+  }
+);

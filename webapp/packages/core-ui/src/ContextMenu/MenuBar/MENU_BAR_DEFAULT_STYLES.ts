@@ -18,34 +18,41 @@ export const MENU_BAR_DEFAULT_STYLES = css`
     menu-bar-item {
       composes: theme-ripple from global;
       padding: 0 16px;
-      display: flex;
-      align-items: center;
       cursor: pointer;
       background: transparent;
       outline: none;
       color: inherit;
 
+      & menu-bar-item-box {
+        display: flex;
+        align-items: center;
+      }
+
       &[use|hidden] {
         display: none;
       }
 
-      & IconOrImage {
-        display: block;
+      & menu-bar-item-icon {
+        display: flex;
         width: 24px;
       }
 
-      & Loader {
+      & Loader, & IconOrImage {
         width: 24px;
       }
 
-      & item-label {
+      & menu-bar-item-label {
           display: block;
           text-transform: uppercase;
           font-weight: 700;
       }
 
-      & IconOrImage + item-label, & Loader + item-label {
+      & menu-bar-item-icon + menu-bar-item-label {
           padding-left: 8px
+      }
+      
+      & menu-bar-item-mark {
+        display: none;
       }
     }
 

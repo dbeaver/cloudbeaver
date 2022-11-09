@@ -7,33 +7,32 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
-import { useService } from '@cloudbeaver/core-di';
+import { usePermission } from '@cloudbeaver/core-blocks';
+import { EPermission } from '@cloudbeaver/core-root';
+import { MenuBar } from '@cloudbeaver/core-ui';
+import { useMenu } from '@cloudbeaver/core-view';
 
-import { TopMenuItem } from '../shared/TopMenuItem';
-import { MainMenuService } from './MainMenuService';
-
-const styles = css`
-  menu-wrapper {
-    display: flex;
-    height: 100%;
-  }
-  TopMenuItem {
-    text-transform: uppercase;
-    font-weight: 500;
-    height: 100%;
-  }
-`;
+import { topMenuStyles } from '../shared/topMenuStyles';
+import { MENU_BAR_ITEM_STYLES, MENU_BAR_DISABLE_EFFECT_STYLES, MENU_BAR_STYLES } from '../styles';
+import { MENU_APP_ACTIONS } from './MENU_APP_ACTIONS';
 
 export const MainMenu = observer(function MainMenu() {
-  const mainMenuService = useService(MainMenuService);
+  const menu = useMenu({ menu: MENU_APP_ACTIONS });
+  const isEnabled = usePermission(EPermission.public);
 
-  return styled(styles)(
+  if (!isEnabled) {
+    return null;
+  }
+
+  return styled(MENU_BAR_STYLES)(
     <menu-wrapper>
-      {mainMenuService.getMainMenu().map((topItem, i) => (
-        <TopMenuItem key={i} menuItem={topItem} />
-      ))}
+      <MenuBar
+        menu={menu}
+        style={[topMenuStyles, MENU_BAR_ITEM_STYLES, topMenuStyles, MENU_BAR_DISABLE_EFFECT_STYLES]}
+        nestedMenuSettings={{ modal: true }}
+      />
     </menu-wrapper>
   );
 });

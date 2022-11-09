@@ -10,8 +10,8 @@ import { computed, observable } from 'mobx';
 import { useEffect } from 'react';
 
 import { Task } from '@cloudbeaver/core-executor';
+import type { ILoadableState } from '@cloudbeaver/core-utils';
 
-import type { ILoadableState } from './Loader/ILoadableState';
 import { useObservableRef } from './useObservableRef';
 
 
@@ -40,6 +40,7 @@ export function usePromiseState<T>(promise: Promise<T> | null): ILoadableState {
     isLoaded(): boolean {
       return this.promise === null;
     },
+    load() {},
   }), {
     cancel: computed,
     promise: observable.ref,

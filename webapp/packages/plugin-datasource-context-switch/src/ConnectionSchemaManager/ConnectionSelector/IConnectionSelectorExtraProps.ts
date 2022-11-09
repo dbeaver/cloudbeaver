@@ -9,5 +9,6 @@
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 
 export interface IConnectionSelectorExtraProps {
-  connectionKey: IConnectionInfoParams;
+  connectionKey?: IConnectionInfoParams | null;
+  small?: boolean;
 }

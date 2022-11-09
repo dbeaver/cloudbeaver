@@ -11,9 +11,9 @@ import { useEffect, useState } from 'react';
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedDataResource, CachedDataResourceContext, CachedDataResourceGetter, CachedDataResourceParam, CachedResourceData, CachedResourceIncludeArgs, isResourceKeyList } from '@cloudbeaver/core-sdk';
+import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import { getComputed } from './getComputed';
-import type { ILoadableState } from './Loader/ILoadableState';
 import { useObjectRef } from './useObjectRef';
 
 interface KeyWithIncludes<TKey, TIncludes> {
@@ -44,6 +44,7 @@ interface IMapResourceResult<
   resource: TResource;
   exception: Error | null;
   reload: () => void;
+  load: () => void;
 }
 
 export function useDataResource<
@@ -182,6 +183,9 @@ export function useDataResource<
     reload: () => {
       setException(null);
       (refObj as any)[loadFunctionName](true);
+    },
+    load: () => {
+      (refObj as any)[loadFunctionName]();
     },
     isLoading: () => {
       if (refObj.key === null) {

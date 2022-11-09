@@ -7,9 +7,10 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
-import { MainMenuService, EMainMenu } from '@cloudbeaver/plugin-top-app-bar';
+import { MenuService, ActionService, DATA_CONTEXT_MENU } from '@cloudbeaver/core-view';
+import { MENU_TOOLS, ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
 
+import { ACTION_LOG_VIEWER_ENABLE } from '../Actions/ACTION_LOG_VIEWER_ENABLE';
 import { LogViewer } from './LogViewer';
 import { LogViewerService } from './LogViewerService';
 
@@ -17,30 +18,43 @@ import { LogViewerService } from './LogViewerService';
 @injectable()
 export class LogViewerBootstrap extends Bootstrap {
   constructor(
-    private readonly mainMenuService: MainMenuService,
     private readonly toolsPanelService: ToolsPanelService,
+    private readonly menuService: MenuService,
+    private readonly actionService: ActionService,
     private readonly logViewerService: LogViewerService
   ) {
     super();
   }
 
   register(): void {
-    this.mainMenuService.registerMenuItem(
-      EMainMenu.mainMenuToolsPanel,
-      {
-        id: 'openLogViewer',
-        order: 1,
-        type: 'checkbox',
-        isChecked: () => this.logViewerService.isActive,
-        title: 'app_shared_toolsMenu_logViewer',
-        onClick: () => this.logViewerService.toggle(),
-      }
-    );
+    this.menuService.addCreator({
+      isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === MENU_TOOLS,
+      getItems: (context, items) => [
+        ...items,
+        ACTION_LOG_VIEWER_ENABLE,
+      ],
+    });
+
+    this.actionService.addHandler({
+      id: 'log-viewer-base',
+      isActionApplicable: (context, action) => [
+        ACTION_LOG_VIEWER_ENABLE,
+      ].includes(action),
+      isChecked: () => this.logViewerService.isActive,
+      handler: (context, action) => {
+        switch (action) {
+          case ACTION_LOG_VIEWER_ENABLE: {
+            this.logViewerService.toggle();
+            break;
+          }
+        }
+      },
+    });
 
     this.toolsPanelService.tabsContainer.add({
       key: 'log-viewer-tab',
       order: 0,
-      name: 'app_shared_toolsMenu_logViewer',
+      name: 'plugin_log_viewer_action_enable_label',
       isHidden: () => !this.logViewerService.isActive,
       onClose: () => this.logViewerService.toggle(),
       panel: () => LogViewer,
