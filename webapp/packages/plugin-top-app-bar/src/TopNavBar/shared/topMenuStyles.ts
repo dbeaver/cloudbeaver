@@ -61,6 +61,7 @@ export const topMenuStyles = css`
     & IconOrImage {
       display: block;
       width: 24px;
+      height: 24px;
     }
     & menu-bar-item-icon {
       width: 24px;

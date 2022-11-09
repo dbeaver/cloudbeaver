@@ -42,6 +42,7 @@ const styles = css`
   IconOrImage {
     display: block;
     width: 24px;
+    height: 24px;
   }
   user-name {
     display: block;

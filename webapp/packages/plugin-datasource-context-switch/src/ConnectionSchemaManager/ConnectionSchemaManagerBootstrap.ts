@@ -181,7 +181,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
       getInfo: (context, menu) => {
         const connectionSchemaManagerService = this.connectionSchemaManagerService;
 
-        let icon: string | undefined = 'database';
+        let icon: string | undefined = '/icons/plugin_datasource_context_switch_database_m.svg';
 
         let label = NodeManagerUtils.concatSchemaAndCatalog(
           connectionSchemaManagerService.currentObjectCatalogId,
@@ -205,7 +205,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         } else if (
           connectionSchemaManagerService.currentObjectCatalog?.object?.features?.includes(EObjectFeature.catalog)
         ) {
-          icon = 'database';
+          icon = '/icons/plugin_datasource_context_switch_database_m.svg';
         }
 
 
@@ -283,7 +283,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
               id: title,
               label: title,
               tooltip: title,
-              icon: '/icons/plugin_datasource_context_switch_schema_m.svg',
+              icon: '/icons/plugin_datasource_context_switch_schema_sm.svg',
             },
             {
               onSelect: async () => {
@@ -316,7 +316,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
                 id: catalog.name,
                 label: catalog.name,
                 tooltip: catalog.name,
-                icon: 'database',
+                icon: '/icons/plugin_datasource_context_switch_database_sm.svg',
               },
               {
                 onSelect: async () => {
@@ -344,7 +344,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
                 id: title,
                 label: title,
                 tooltip: title,
-                icon: '/icons/plugin_datasource_context_switch_schema_m.svg',
+                icon: '/icons/plugin_datasource_context_switch_schema_sm.svg',
               },
               {
                 onSelect: async () => {
