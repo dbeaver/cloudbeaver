@@ -541,6 +541,8 @@ extend type Mutation {
 
     updateConnection( config: ConnectionConfig!, projectId: ID ): ConnectionInfo!
 
+    initConnectionProperties(projectId: ID!, connectionId: ID!): ConnectionInfo!
+
     deleteConnection( id: ID!, projectId: ID ): Boolean!
 
     createConnectionFromTemplate( templateId: ID!, projectId: ID!, connectionName: String ): ConnectionInfo!

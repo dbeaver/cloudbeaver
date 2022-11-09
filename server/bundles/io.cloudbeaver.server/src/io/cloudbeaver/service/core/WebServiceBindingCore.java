@@ -122,6 +122,12 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 getProjectReference(env),
                 env.getArgument("nodePath"),
                 new WebConnectionConfig(env.getArgument("config"))))
+            .dataFetcher("initConnectionProperties", env ->
+                getService(env).initConnectionProperties(
+                    getWebSession(env),
+                    env.getArgument("projectId"),
+                    env.getArgument("connectionId")
+                ))
             .dataFetcher("initConnection", env -> {
                     List<Map<String, Object>> networkCredentials = env.getArgument("networkCredentials");
                     List<WebNetworkHandlerConfigInput> nhc = null;

@@ -117,11 +117,19 @@ public interface DBWServiceCore extends DBWService {
         @Nullable Boolean sharedCredentials
     ) throws DBWebException;
 
+    @WebAction
+    WebConnectionInfo initConnectionProperties(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String connectionId
+    ) throws DBWebException;
+
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionInfo createConnection(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
-        @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
+        @NotNull WebConnectionConfig connectionConfig
+    ) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionInfo updateConnection(

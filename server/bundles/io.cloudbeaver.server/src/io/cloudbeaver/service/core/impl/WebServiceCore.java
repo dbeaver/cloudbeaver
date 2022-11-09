@@ -369,6 +369,26 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
+    public WebConnectionInfo initConnectionProperties(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String connectionId
+    ) throws DBWebException {
+        WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, connectionId);
+
+        DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
+        if (dataSourceContainer instanceof DataSourceDescriptor) {
+            var dataSourceDescriptor = (DataSourceDescriptor) dataSourceContainer;
+            try {
+                dataSourceDescriptor.resolveSecrets(webSession.getUserContext().getSecretController());
+            } catch (DBException e) {
+                throw new DBWebException("Failed to init connection properties", e);
+            }
+        }
+        return connectionInfo;
+    }
+
+    @Override
     public WebConnectionInfo createConnection(
         @NotNull WebSession webSession,
         @Nullable String projectId,
