@@ -421,6 +421,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     String resourceProjectId = rmResource.getResourceProject().getId();
                     String resourcePath = rmResource.getResourceFolder();
                     session.getRmController().deleteResource(resourceProjectId, resourcePath, true);
+                    WebAppUtils.addRmResourceUpdatedEvent(
+                        CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+                        projectId,
+                        resourcePath,
+                        CBEventConstants.EventType.TYPE_DELETE
+                    );
                 }
             }
             if (containsFolderNodes) {
@@ -508,7 +514,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     }
                     String resourcePath = rmOldNode.getResourceFolder();
                     session.getRmController().moveResource(projectId, resourcePath, newPath);
-                    WebAppUtils.addRmResourceUpdatedEvent(CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED, projectId, resourcePath);
+                    WebAppUtils.addRmResourceUpdatedEvent(
+                        CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+                        projectId,
+                        resourcePath,
+                        CBEventConstants.EventType.TYPE_UPDATE
+                    );
                 } else {
                     throw new DBWebException("Navigator node '"  + path + "' is not a data source node");
                 }
