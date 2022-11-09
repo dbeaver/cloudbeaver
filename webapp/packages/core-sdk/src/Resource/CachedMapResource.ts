@@ -9,7 +9,7 @@
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { isArraysEqual, MetadataMap } from '@cloudbeaver/core-utils';
+import { ILoadableState, isArraysEqual, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { CachedResource, CachedResourceKey, ICachedResourceMetadata } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
@@ -474,4 +474,35 @@ export abstract class CachedMapResource<
 
     this.onDataOutdated.execute(key);
   }
+}
+
+export function getCachedMapResourceLoaderState<
+  TKey,
+  TValue,
+  TArguments = Record<string, any>
+>(
+  resource: CachedMapResource<TKey, TValue, TArguments>,
+  key: ResourceKey<TKey>,
+  includes?: CachedResourceIncludeArgs<TValue, TArguments> | undefined
+): ILoadableState {
+  return {
+    get exception() {
+      return resource.getException(key);
+    },
+    isLoading() {
+      return resource.isDataLoading(key);
+    },
+    isLoaded() {
+      return resource.isLoaded(key, includes);
+    },
+    isOutdated() {
+      return resource.isOutdated(key);
+    },
+    load() {
+      return resource.load(key, includes);
+    },
+    reload() {
+      return resource.refresh(key, includes);
+    },
+  };
 }

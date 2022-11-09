@@ -50,7 +50,7 @@ const MENU_STYLES = css`
         width: 16px;
     }
 
-    & item-label {
+    & menu-bar-item-label {
         display: none;
     }
 

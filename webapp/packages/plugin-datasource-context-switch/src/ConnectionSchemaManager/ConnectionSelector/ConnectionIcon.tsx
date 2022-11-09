@@ -7,11 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { ConnectionMark, IconOrImage, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
-import type { MenuBaseItemIconComponent } from '@cloudbeaver/core-view';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { IConnectionSelectorExtraProps } from './IConnectionSelectorExtraProps';
 
@@ -19,12 +19,28 @@ const connectionIconStyle = css`
   icon {
     position: relative;
     display: flex;
+
+    & IconOrImage {
+      background-color: #fff;
+      padding: 2px;
+      border-radius: var(--theme-form-element-radius);
+
+      &[|small] {
+        box-sizing: border-box;
+      }
+    }
   }
 `;
 
-export const ConnectionIcon: MenuBaseItemIconComponent<IConnectionSelectorExtraProps> = observer(function ConnectionInfo({
-  style,
+interface Props extends IConnectionSelectorExtraProps {
+  style?: ComponentStyle;
+  className?: string;
+}
+
+export const ConnectionIcon: React.FC<Props> = observer(function ConnectionInfo({
   connectionKey,
+  small,
+  style,
   className,
 }) {
   const styles = useStyles(style, connectionIconStyle);
@@ -32,7 +48,7 @@ export const ConnectionIcon: MenuBaseItemIconComponent<IConnectionSelectorExtraP
   const connection = useMapResource(
     ConnectionInfo,
     ConnectionInfoResource,
-    connectionKey
+    connectionKey ?? null
   );
   const driverId = connection.data?.driverId;
 
@@ -46,7 +62,7 @@ export const ConnectionIcon: MenuBaseItemIconComponent<IConnectionSelectorExtraP
 
   return styled(styles)(
     <icon className={className}>
-      <IconOrImage icon={driver.data.icon} />
+      <IconOrImage icon={driver.data.icon} {...use({ small })} />
       <ConnectionMark connected={connection.data?.connected ?? false} />
     </icon>
   );

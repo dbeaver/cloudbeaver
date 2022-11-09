@@ -11,16 +11,14 @@ import { observer } from 'mobx-react-lite';
 import { useState, useEffect, useContext, useRef } from 'react';
 import styled, { use } from 'reshadow';
 
-
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { uuid } from '@cloudbeaver/core-utils';
+import { ILoadableState, uuid } from '@cloudbeaver/core-utils';
 
 import { Button } from '../Button';
 import { ExceptionMessage } from '../ExceptionMessage';
 import { Translate } from '../localization/Translate';
 import { StaticImage } from '../StaticImage';
 import { useStyles } from '../useStyles';
-import type { ILoadableState } from './ILoadableState';
 import { ILoaderContext, LoaderContext } from './LoaderContext';
 import { loaderStyles, overlayStyles } from './loaderStyles';
 
@@ -256,7 +254,7 @@ export const Loader = observer<Props>(function Loader({
     <LoaderContext.Provider value={contextState}>
       <>
         {overlay && children}
-        <loader ref={loaderRef} className={className} {...use({ small, fullSize, inline })}>
+        <loader ref={loaderRef} className={className} {...use({ small, fullSize, inline, secondary, overlay })}>
           <icon><StaticImage icon={spinnerURL} /></icon>
           {!hideMessage && <message><Translate token={message || 'ui_processing_loading'} /></message>}
           {onCancel && (
@@ -276,11 +274,3 @@ export const Loader = observer<Props>(function Loader({
     </LoaderContext.Provider>
   );
 });
-
-export function isContainsException(exception?: Error[] | Error | null): boolean {
-  if (Array.isArray(exception)) {
-    return exception.some(Boolean);
-  }
-
-  return !!exception;
-}

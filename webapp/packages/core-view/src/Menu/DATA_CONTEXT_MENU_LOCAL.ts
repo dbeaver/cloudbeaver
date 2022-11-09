@@ -8,4 +8,4 @@
 
 import { createDataContext } from '../DataContext/createDataContext';
 
-export const DATA_CONTEXT_MENU_LOCAL = createDataContext<boolean | undefined>('menu-local', false);
+export const DATA_CONTEXT_MENU_LOCAL = createDataContext<boolean | undefined>('menu-local', () => false);

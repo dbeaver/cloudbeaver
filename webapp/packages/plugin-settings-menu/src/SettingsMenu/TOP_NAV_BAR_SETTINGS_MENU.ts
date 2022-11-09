@@ -8,4 +8,9 @@
 
 import { createMenu } from '@cloudbeaver/core-view';
 
-export const TOP_NAV_BAR_SETTINGS_MENU = createMenu('top-nav-bar-settings', 'ui_settings', 'settings', 'ui_settings');
+export const TOP_NAV_BAR_SETTINGS_MENU = createMenu(
+  'top-nav-bar-settings',
+  'ui_settings',
+  '/icons/plugin_settings_menu_m.svg',
+  'ui_settings'
+);

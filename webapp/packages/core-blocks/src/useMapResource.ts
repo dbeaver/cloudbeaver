@@ -12,10 +12,9 @@ import { useEffect, useState } from 'react';
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, ResourceKey, CachedMapResourceValue, CachedMapResourceKey, CachedMapResourceArguments, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter, isResourceKeyList } from '@cloudbeaver/core-sdk';
-import { isArraysEqual } from '@cloudbeaver/core-utils';
+import { ILoadableState, isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { getComputed } from './getComputed';
-import type { ILoadableState } from './Loader/ILoadableState';
 import { useObservableRef } from './useObservableRef';
 
 interface IActions<
@@ -56,6 +55,7 @@ interface IMapResourceState<TResource extends CachedMapResource<any, any, any>> 
   loaded: boolean;
   resource: TResource;
   isOutdated: () => boolean;
+  load: () => void;
   reload: () => void;
 }
 
@@ -354,6 +354,9 @@ export function useMapResource<
     },
     reload: () => {
       (refObj as any)[loadFunctionName](true);
+    },
+    load: () => {
+      (refObj as any)[loadFunctionName]();
     },
     isLoading() {
       return this.loading;

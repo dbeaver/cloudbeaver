@@ -8,11 +8,13 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { NotificationService } from '@cloudbeaver/core-events';
-import { ProjectsService } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { PermissionsService, EPermission } from '@cloudbeaver/core-root';
-import { MainMenuService, EMainMenu } from '@cloudbeaver/plugin-top-app-bar';
+import { CachedMapAllKey, getCachedDataResourceLoaderState, getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
+import { MenuService, ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_LOADABLE_STATE } from '@cloudbeaver/core-view';
+import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
+import { ACTION_CONNECTION_TEMPLATE } from './Actions/ACTION_CONNECTION_TEMPLATE';
 import { ConnectionDialog } from './ConnectionDialog/ConnectionDialog';
 import { TemplateConnectionsResource } from './TemplateConnectionsResource';
 import { TemplateConnectionsService } from './TemplateConnectionsService';
@@ -20,10 +22,11 @@ import { TemplateConnectionsService } from './TemplateConnectionsService';
 @injectable()
 export class TemplateConnectionPluginBootstrap extends Bootstrap {
   constructor(
-    private readonly mainMenuService: MainMenuService,
+    private readonly menuService: MenuService,
+    private readonly actionService: ActionService,
+    private readonly projectInfoResource: ProjectInfoResource,
     private readonly templateConnectionsResource: TemplateConnectionsResource,
     private readonly commonDialogService: CommonDialogService,
-    private readonly notificationService: NotificationService,
     private readonly permissionsService: PermissionsService,
     private readonly templateConnectionsService: TemplateConnectionsService,
     private readonly projectsService: ProjectsService,
@@ -32,40 +35,49 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
   }
 
   register(): void | Promise<void> {
-    this.mainMenuService.onConnectionClick.addHandler(this.loadTemplateConnections.bind(this));
-    this.mainMenuService.registerMenuItem(EMainMenu.mainMenuConnectionsPanel, {
-      id: 'mainMenuConnect',
-      order: 1,
-      titleGetter: this.getMenuTitle.bind(this),
-      onClick: this.openConnectionsDialog.bind(this),
+    this.menuService.addCreator({
+      isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === MENU_CONNECTIONS,
+      getItems: (context, items) => [
+        ...items,
+        ACTION_CONNECTION_TEMPLATE,
+      ],
+    });
+
+    this.actionService.addHandler({
+      id: 'connection-template',
+      isActionApplicable: (context, action) => [
+        ACTION_CONNECTION_TEMPLATE,
+      ].includes(action),
       isHidden: () => (
         !this.permissionsService.has(EPermission.public)
         || !this.projectsService.userProject?.canEditDataSources
         || !this.templateConnectionsService.projectTemplates.length
       ),
+      getLoader: (context, action) => {
+        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
+
+        return state.getState(
+          action.id,
+          () => [
+            getCachedMapResourceLoaderState(this.projectInfoResource, CachedMapAllKey),
+            getCachedDataResourceLoaderState(this.templateConnectionsResource, undefined, undefined),
+          ]
+        );
+      },
+      handler: async (context, action) => {
+        switch (action) {
+          case ACTION_CONNECTION_TEMPLATE: {
+            await this.openConnectionsDialog();
+            break;
+          }
+        }
+      },
     });
   }
 
   load(): void | Promise<void> { }
 
-  private getMenuTitle(): string {
-    if (this.templateConnectionsResource.isLoading()) {
-      return 'ui_processing_loading';
-    }
-    return 'basicConnection_main_menu_item';
-  }
-
   private async openConnectionsDialog() {
-    this.loadTemplateConnections();
     await this.commonDialogService.open(ConnectionDialog, null);
-  }
-
-  private async loadTemplateConnections() {
-    try {
-      await this.projectsService.load();
-      await this.templateConnectionsResource.load();
-    } catch (error: any) {
-      this.notificationService.logException(error, 'Template Connections loading failed');
-    }
   }
 }

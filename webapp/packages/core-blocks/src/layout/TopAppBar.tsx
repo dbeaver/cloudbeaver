@@ -10,11 +10,12 @@ import styled, { css } from 'reshadow';
 
 export const topAppBarStyles = css`
     header {
-      composes: theme-background-primary theme-text-on-primary theme-typography--body2 from global;
+      composes: theme-text-on-primary theme-typography--body2 from global;
       display: flex;
       align-items: center;
       height: 48px;
-      padding: 0 16px;
+      padding: 0 8px;
+      background-color: #2A7CB4;
       z-index: 1;
     }
   `;

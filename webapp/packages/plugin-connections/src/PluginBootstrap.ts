@@ -8,28 +8,45 @@
 
 import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { EMainMenu, MainMenuService } from '@cloudbeaver/plugin-top-app-bar';
+import { MenuService, ActionService, DATA_CONTEXT_MENU } from '@cloudbeaver/core-view';
+
+import { ACTION_CONNECTION_DISCONNECT_ALL } from './ContextMenu/Actions/ACTION_CONNECTION_DISCONNECT_ALL';
+import { MENU_CONNECTIONS } from './ContextMenu/MENU_CONNECTIONS';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
   constructor(
-    private readonly mainMenuService: MainMenuService,
+    private readonly menuService: MenuService,
+    private readonly actionService: ActionService,
     private readonly connectionsManagerService: ConnectionsManagerService,
   ) {
     super();
   }
 
   register(): void {
-    this.mainMenuService.registerMenuItem(
-      EMainMenu.mainMenuConnectionsPanel,
-      {
-        id: 'mainMenuDisconnect',
-        order: 3,
-        title: 'app_shared_connectionMenu_disconnect',
-        onClick: () => this.connectionsManagerService.closeAllConnections(),
-        isDisabled: () => !this.connectionsManagerService.hasAnyConnection(true),
-      }
-    );
+    this.menuService.addCreator({
+      isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === MENU_CONNECTIONS,
+      getItems: (context, items) => [
+        ...items,
+        ACTION_CONNECTION_DISCONNECT_ALL,
+      ],
+    });
+
+    this.actionService.addHandler({
+      id: 'connection-base',
+      isActionApplicable: (context, action) => [
+        ACTION_CONNECTION_DISCONNECT_ALL,
+      ].includes(action),
+      isDisabled: () => !this.connectionsManagerService.hasAnyConnection(true),
+      handler: async (context, action) => {
+        switch (action) {
+          case ACTION_CONNECTION_DISCONNECT_ALL: {
+            await this.connectionsManagerService.closeAllConnections();
+            break;
+          }
+        }
+      },
+    });
   }
 
   load(): void { }
