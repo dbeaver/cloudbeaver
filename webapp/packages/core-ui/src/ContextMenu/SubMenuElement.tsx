@@ -10,10 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef, useRef } from 'react';
 import styled from 'reshadow';
 
-import { getComputed, IMenuState, Menu, MenuItemElement, menuPanelStyles, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
+import { getComputed, IMenuState, joinStyles, Menu, MenuItemElement, menuPanelStyles, useAutoLoad, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { DATA_CONTEXT_MENU_NESTED, DATA_CONTEXT_SUBMENU_ITEM, IMenuData, IMenuSubMenuItem, MenuActionItem, MenuService, useMenu } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_MENU_NESTED, DATA_CONTEXT_SUBMENU_ITEM, IMenuData, IMenuSubMenuItem, MenuActionItem, useMenu } from '@cloudbeaver/core-view';
 
 import type { IMenuItemRendererProps } from './MenuItemRenderer';
 
@@ -40,15 +39,15 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
   },
   ref
 ) {
-  const menuService = useService(MenuService);
   const menu = useRef<IMenuState>();
   const styles = useStyles(menuPanelStyles, style);
   const subMenuData = useMenu({ menu: subMenu.menu, context: menuData.context });
   subMenuData.context.set(DATA_CONTEXT_MENU_NESTED, true);
   subMenuData.context.set(DATA_CONTEXT_SUBMENU_ITEM, subMenu);
 
-  const handler = menuService.getHandler(subMenuData.context);
+  const handler = subMenuData.handler;
   const hidden = getComputed(() => handler?.isHidden?.(subMenuData.context));
+  useAutoLoad(subMenuData.loaders, !hidden);
 
   const handlers = useObjectRef(() => ({
     handleItemClose() {
@@ -72,10 +71,24 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
     return null;
   }
 
-  const loading = getComputed(() => handler?.isLoading?.(subMenuData.context));
+  const IconComponent = handler?.iconComponent?.() ?? subMenu.iconComponent?.();
+  const extraProps = handler?.getExtraProps?.() ?? subMenu.getExtraProps?.() as any;
+  const loading = getComputed(() => (
+    handler?.isLoading?.(subMenuData.context)
+    || subMenuData.loaders.some(loader => loader.isLoading())
+    || false
+  ));
+  /** @deprecated must be refactored (#1)*/
+  const displayLabel = getComputed(() => handler?.isLabelVisible?.(subMenuData.context, subMenuData.menu) ?? true);
   const disabled = getComputed(() => handler?.isDisabled?.(subMenuData.context));
+  const loaded = getComputed(() => !subMenuData.loaders.some(loader => !loader.isLoaded()));
+  const info = handler?.getInfo?.(subMenuData.context, subMenuData.menu);
+  const label = info?.label ?? subMenu.label ?? subMenu.menu.label;
+  const icon = info?.icon ?? subMenu.icon ?? subMenu.menu.icon;
+
+  const tooltip = info?.tooltip ?? subMenu.tooltip ?? subMenu.menu.tooltip;
   const MenuItemRenderer = itemRenderer;
-  const panelAvailable = subMenuData.available && !loading;
+  const panelAvailable = subMenuData.available || !loaded;
 
   return styled(styles)(
     <Menu
@@ -106,9 +119,16 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
       {...rest}
     >
       <MenuItemElement
-        label={subMenu.label ?? subMenu.menu.label}
-        icon={subMenu.icon ?? subMenu.menu.icon}
-        tooltip={subMenu.tooltip ?? subMenu.menu.tooltip}
+        label={label}
+        displayLabel={displayLabel}
+        icon={IconComponent ? (
+          <IconComponent
+            item={subMenu}
+            style={joinStyles(menuPanelStyles, style)}
+            {...extraProps}
+          />
+        ) : icon}
+        tooltip={tooltip}
         panelAvailable={panelAvailable}
         loading={loading}
         style={style}

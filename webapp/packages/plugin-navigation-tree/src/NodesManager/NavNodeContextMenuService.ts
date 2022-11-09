@@ -16,7 +16,7 @@ import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { type NavNode, type INodeActions, NavNodeManagerService, NavTreeResource, NavNodeInfoResource, NavTreeSettingsService, nodeDeleteContext, DATA_CONTEXT_NAV_NODE, ENodeFeature, getNodeDisplayName } from '@cloudbeaver/core-navigation-tree';
 import { ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { ActionService, ACTION_DELETE, ACTION_OPEN, ACTION_REFRESH, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, ACTION_DELETE, ACTION_OPEN, ACTION_REFRESH, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS';
 
@@ -182,16 +182,16 @@ export class NavNodeContextMenuService extends Bootstrap {
       ],
 
       orderItems: (context, items) => {
-        const actionsOpen = menuExtractActions(items, [
+        const actionsOpen = menuExtractItems(items, [
           ACTION_OPEN,
         ]);
 
-        const actionsManage = menuExtractActions(items, [
+        const actionsManage = menuExtractItems(items, [
           ACTION_RENAME,
           ACTION_DELETE,
         ]);
 
-        const actionsRefresh = menuExtractActions(items, [
+        const actionsRefresh = menuExtractItems(items, [
           ACTION_REFRESH,
         ]);
 

@@ -15,7 +15,7 @@ export class ResourceSubMenuItem extends MenuSubMenuItem {
   readonly resource: IServiceConstructor<any>;
 
   constructor(resource: IServiceConstructor<any>) {
-    super(MENU_RESOURCE, resource.name);
+    super({ menu: MENU_RESOURCE, label: resource.name });
 
     this.resource = resource;
 

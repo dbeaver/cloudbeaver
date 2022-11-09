@@ -1,4 +1,5 @@
 export default [
+  ['plugin_resource_manager_action_enable_label', 'Управление ресурсами'],
   ['plugin_resource_manager_title', 'Управление ресурсами'],
   ['plugin_resource_manager_no_resources_placeholder', 'Нет ресурсов'],
   ['plugin_resource_manager_script_name', 'Имя скрипта'],

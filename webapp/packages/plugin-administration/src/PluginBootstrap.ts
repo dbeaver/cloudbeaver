@@ -6,12 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EAdminPermission, AdministrationScreenService } from '@cloudbeaver/core-administration';
+import { EAdminPermission, AdministrationScreenService, AdministrationTopAppBarService } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { PermissionsService } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
+import { AppStateMenu } from '@cloudbeaver/plugin-top-app-bar';
+
+import { AdministrationMenu } from './AdministrationMenu/AdministrationMenu';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -19,12 +22,16 @@ export class PluginBootstrap extends Bootstrap {
     private readonly permissionsService: PermissionsService,
     private readonly screenService: ScreenService,
     private readonly administrationScreenService: AdministrationScreenService,
+    private readonly administrationTopAppBarService: AdministrationTopAppBarService,
     private readonly menuService: MenuService
   ) {
     super();
   }
 
   register(): void {
+    this.administrationTopAppBarService.placeholder.add(AdministrationMenu, 0);
+    this.administrationTopAppBarService.placeholder.add(AppStateMenu);
+
     this.menuService.addCreator({
       isApplicable: context => context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU,
       getItems: (context, items) => {

@@ -51,13 +51,13 @@ const TABLE_HEADER_MENU_BAR_STYLES = css`
           width: 16px;
       }
 
-      & item-label {
+      & menu-bar-item-label {
           display: block;
           text-transform: uppercase;
           font-weight: 700;
       }
 
-      & IconOrImage + item-label, & Loader + item-label {
+      & IconOrImage + menu-bar-item-label, & Loader + menu-bar-item-label {
           padding-left: 8px
       }
     }

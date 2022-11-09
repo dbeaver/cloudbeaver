@@ -13,13 +13,14 @@ import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
-import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractActions, MenuService, ViewService } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
+import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, LocalStorageSqlDataSource, SqlDataSourceService, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
-import { MainMenuService } from '@cloudbeaver/plugin-top-app-bar';
+import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
+import { ACTION_SQL_EDITOR_NEW } from './ACTION_SQL_EDITOR_NEW';
 import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
 import { isSessionActionOpenSQLEditor } from './sessionActionOpenSQLEditor';
@@ -30,7 +31,6 @@ import { SqlEditorTabService } from './SqlEditorTabService';
 @injectable()
 export class SqlEditorBootstrap extends Bootstrap {
   constructor(
-    private readonly mainMenuService: MainMenuService,
     private readonly sqlEditorNavigatorService: SqlEditorNavigatorService,
     private readonly navigationTabsService: NavigationTabsService,
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
@@ -48,14 +48,7 @@ export class SqlEditorBootstrap extends Bootstrap {
   }
 
   register(): void {
-    this.mainMenuService.registerRootItem(
-      {
-        id: 'sql-editor',
-        title: 'SQL',
-        order: 2,
-        onClick: this.openSQLEditor.bind(this),
-      }
-    );
+    this.registerTopAppBarItem();
 
     this.menuService.addCreator({
       isApplicable: context => context.has(DATA_CONTEXT_SQL_EDITOR_STATE) && context.has(DATA_CONTEXT_SQL_EDITOR_TAB),
@@ -64,7 +57,7 @@ export class SqlEditorBootstrap extends Bootstrap {
         ACTION_RENAME,
       ],
       orderItems: (context, items) => {
-        const actions = menuExtractActions(items, [
+        const actions = menuExtractItems(items, [
           ACTION_RENAME,
         ]);
 
@@ -178,6 +171,49 @@ export class SqlEditorBootstrap extends Bootstrap {
   }
 
   load(): void { }
+
+  private registerTopAppBarItem() {
+    this.menuService.addCreator({
+      menus: [MENU_APP_ACTIONS],
+      getItems: (context, items) => [
+        ...items,
+        ACTION_SQL_EDITOR_NEW,
+      ],
+      orderItems: (context, items) => {
+        let placeIndex = items.indexOf(ACTION_SQL_EDITOR_NEW);
+
+        const actionsOpen = menuExtractItems(items, [
+          ACTION_SQL_EDITOR_NEW,
+        ]);
+
+        const connectionsIndex = items.indexOf(MENU_CONNECTIONS);
+
+        if (connectionsIndex !== -1) {
+          placeIndex = connectionsIndex + 1;
+        }
+
+        items.splice(placeIndex, 0, ...actionsOpen);
+
+        return items;
+      },
+    });
+
+    this.actionService.addHandler({
+      id: 'sql-editor-new',
+      isActionApplicable: (context, action) => [
+        ACTION_SQL_EDITOR_NEW,
+      ].includes(action),
+      isLabelVisible: () => false,
+      handler: (context, action) => {
+        switch (action) {
+          case ACTION_SQL_EDITOR_NEW: {
+            this.openSQLEditor();
+            break;
+          }
+        }
+      },
+    });
+  }
 
   private openSQLEditor() {
     let connectionKey: IConnectionInfoParams | undefined;

@@ -16,6 +16,7 @@ export * from './flat';
 export * from './generateFileName';
 export * from './getMIME';
 export * from './GlobalConstants';
+export * from './ILoadableState';
 export * from './isArraysEqual';
 export * from './isPropertiesEqual';
 export * from './isValuesEqual';

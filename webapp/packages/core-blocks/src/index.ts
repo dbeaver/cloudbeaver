@@ -18,7 +18,6 @@ export * from './layout/TopAppBar';
 
 export * from './Loader/Loader';
 export * from './Loader/useAutoLoad';
-export * from './Loader/ILoadableState';
 
 export * from './localization/Translate';
 export * from './localization/useTranslate';
@@ -175,6 +174,7 @@ export * from './usePermission';
 export * from './usePromiseState';
 export * from './useStateDelay';
 export * from './useErrorDetails';
+export * from './useActivationDelay';
 export * from './useAppLoadingScreen';
 export * from './useInterval';
 export * from './useStyles';
