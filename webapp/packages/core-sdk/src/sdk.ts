@@ -169,6 +169,17 @@ export interface CbEvent {
   eventType: CbEventType;
 }
 
+export enum CbEventResourceType {
+  Datasource = 'DATASOURCE',
+  RmResource = 'RM_RESOURCE'
+}
+
+export enum CbEventStatus {
+  TypeCreate = 'TYPE_CREATE',
+  TypeDelete = 'TYPE_DELETE',
+  TypeUpdate = 'TYPE_UPDATE'
+}
+
 export enum CbEventType {
   CbConfigChanged = 'cb_config_changed',
   CbDatasourceUpdated = 'cb_datasource_updated',
@@ -887,7 +898,6 @@ export interface ProjectInfo {
 
 export interface Query {
   activeUser?: Maybe<UserInfo>;
-  allConnections: Array<ConnectionInfo>;
   authChangeLocalPassword: Scalars['Boolean'];
   authLogin: AuthInfo;
   authLogout?: Maybe<Scalars['Boolean']>;
@@ -897,10 +907,6 @@ export interface Query {
   configureServer: Scalars['Boolean'];
   connectionFolders: Array<ConnectionFolderInfo>;
   connectionInfo: ConnectionInfo;
-  /** @deprecated Field no longer supported */
-  copyConnectionConfiguration: ConnectionInfo;
-  /** @deprecated Field no longer supported */
-  createConnectionConfiguration: ConnectionInfo;
   createTeam: AdminTeamInfo;
   createUser: AdminUserInfo;
   dataTransferAvailableStreamProcessors: Array<DataTransferProcessorInfo>;
@@ -909,8 +915,6 @@ export interface Query {
   dataTransferExportDataFromResults: AsyncTaskInfo;
   dataTransferRemoveDataFile?: Maybe<Scalars['Boolean']>;
   deleteAuthProviderConfiguration: Scalars['Boolean'];
-  /** @deprecated Field no longer supported */
-  deleteConnectionConfiguration?: Maybe<Scalars['Boolean']>;
   deleteTeam?: Maybe<Scalars['Boolean']>;
   deleteUser?: Maybe<Scalars['Boolean']>;
   deleteUserMetaParameter: Scalars['Boolean'];
@@ -969,16 +973,8 @@ export interface Query {
   sqlParseScript: SqlScriptInfo;
   sqlSupportedOperations: Array<DataTypeLogicalOperation>;
   templateConnections: Array<ConnectionInfo>;
-  /** @deprecated Field no longer supported */
-  updateConnectionConfiguration: ConnectionInfo;
   updateTeam: AdminTeamInfo;
   userConnections: Array<ConnectionInfo>;
-}
-
-
-export interface QueryAllConnectionsArgs {
-  id?: InputMaybe<Scalars['ID']>;
-  projectId: Scalars['ID'];
 }
 
 
@@ -1025,19 +1021,6 @@ export interface QueryConnectionInfoArgs {
 }
 
 
-export interface QueryCopyConnectionConfigurationArgs {
-  config?: InputMaybe<ConnectionConfig>;
-  nodePath: Scalars['String'];
-  projectId: Scalars['ID'];
-}
-
-
-export interface QueryCreateConnectionConfigurationArgs {
-  config: ConnectionConfig;
-  projectId: Scalars['ID'];
-}
-
-
 export interface QueryCreateTeamArgs {
   description?: InputMaybe<Scalars['String']>;
   teamId: Scalars['ID'];
@@ -1076,12 +1059,6 @@ export interface QueryDataTransferRemoveDataFileArgs {
 
 export interface QueryDeleteAuthProviderConfigurationArgs {
   id: Scalars['ID'];
-}
-
-
-export interface QueryDeleteConnectionConfigurationArgs {
-  id: Scalars['ID'];
-  projectId: Scalars['ID'];
 }
 
 
@@ -1369,13 +1346,6 @@ export interface QuerySqlSupportedOperationsArgs {
 
 export interface QueryTemplateConnectionsArgs {
   projectId?: InputMaybe<Scalars['ID']>;
-}
-
-
-export interface QueryUpdateConnectionConfigurationArgs {
-  config: ConnectionConfig;
-  id: Scalars['ID'];
-  projectId: Scalars['ID'];
 }
 
 

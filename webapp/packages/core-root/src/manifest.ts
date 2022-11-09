@@ -8,6 +8,7 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { DataSynchronizationService } from './DataSynchronization/DataSynchronizationService';
 import { FeaturesResource } from './FeaturesResource';
 import { NetworkStateService } from './NetworkStateService';
 import { PermissionsService } from './PermissionsService';
@@ -50,5 +51,6 @@ export const manifest: PluginManifest = {
     QuotasService,
     ServerConfigEventHandler,
     SessionEventSource,
+    DataSynchronizationService,
   ],
 };

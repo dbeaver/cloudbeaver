@@ -174,6 +174,10 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   async canOpen(nodeId: string, parentId: string, folderId?: string): Promise<boolean> {
+    if (!this.navTree.has(nodeId)) {
+      return false;
+    }
+
     const contexts = await this.navigator.execute({
       type: NavigationType.canOpen,
       nodeId,
@@ -181,7 +185,7 @@ export class NavNodeManagerService extends Bootstrap {
       folderId,
     });
 
-    const data = await contexts.getContext(this.navigationNavNodeContext);
+    const data = contexts.getContext(this.navigationNavNodeContext);
 
     let cache = this.syncNodeInfoCache.get(nodeId);
 
