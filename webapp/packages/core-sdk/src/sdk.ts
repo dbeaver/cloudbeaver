@@ -1681,7 +1681,10 @@ export type AuthLoginQueryVariables = Exact<{
 
 export type AuthLoginQuery = { authInfo: { redirectLink?: string, authId?: string, authStatus: AuthStatus, userTokens?: Array<{ authProvider: string, authConfiguration?: string, loginTime: any, message?: string, origin: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> } }> } };
 
-export type AuthLogoutQueryVariables = Exact<{ [key: string]: never; }>;
+export type AuthLogoutQueryVariables = Exact<{
+  provider?: InputMaybe<Scalars['ID']>;
+  configuration?: InputMaybe<Scalars['ID']>;
+}>;
 
 
 export type AuthLogoutQuery = { authLogout?: boolean };
@@ -3148,8 +3151,8 @@ export const AuthLoginDocument = `
 }
     ${AuthTokenFragmentDoc}`;
 export const AuthLogoutDocument = `
-    query authLogout {
-  authLogout
+    query authLogout($provider: ID, $configuration: ID) {
+  authLogout(provider: $provider, configuration: $configuration)
 }
     `;
 export const DeleteAuthProviderConfigurationDocument = `

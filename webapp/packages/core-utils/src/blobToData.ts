@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function blobToData(blob: Blob): Promise<string | null> {
+export function blobToData(blob: Blob | File): Promise<string | null> {
   return new Promise((resolve, reject) => {
     const fileReader = new FileReader();
     fileReader.onload = () => {
