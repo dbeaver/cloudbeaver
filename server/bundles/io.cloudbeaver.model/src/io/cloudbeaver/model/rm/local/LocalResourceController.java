@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceConfigurationStorage;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
@@ -327,6 +328,25 @@ public class LocalResourceController implements RMController {
                 registry.removeDataSource(dataSource);
             } else {
                 log.warn("Could not find datasource " + dataSourceId + " for deletion");
+            }
+        }
+        registry.checkForErrors();
+    }
+
+    @Override
+    public void deleteProjectConnectionFolders(
+        @NotNull String projectId,
+        @NotNull String[] folderPaths,
+        boolean dropContents
+    ) throws DBException {
+        DBPProject project = getProjectMetadata(projectId);
+        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+        for (String folderPath : folderPaths) {
+            DBPDataSourceFolder folder = registry.getFolder(folderPath);
+            if (folder != null) {
+                registry.removeFolder(folder, dropContents);
+            } else {
+                log.warn("Can not find folder by path [" + folderPath + "] for deletion");
             }
         }
         registry.checkForErrors();
