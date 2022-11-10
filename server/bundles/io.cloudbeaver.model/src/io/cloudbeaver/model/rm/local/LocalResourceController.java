@@ -154,6 +154,7 @@ public class LocalResourceController implements RMController {
         if (userProject != null) {
             projects.add(0, userProject);
         }
+        projects.sort(Comparator.comparing(RMProject::getDisplayName));
         return projects.toArray(new RMProject[0]);
     }
 
@@ -171,7 +172,6 @@ public class LocalResourceController implements RMController {
                 RMProjectType.SHARED, true)
             )
             .filter(Objects::nonNull)
-            .sorted(Comparator.comparing(RMProject::getDisplayName))
             .collect(Collectors.toList());
     }
 
