@@ -7,14 +7,19 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { TopNavService } from '@cloudbeaver/plugin-top-app-bar';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import { MENU_APP_STATE } from '@cloudbeaver/plugin-top-app-bar';
 
-import { Help } from './Help';
+import { ACTION_APP_HELP } from './actions/ACTION_APP_HELP';
+import { ShortcutsDialog } from './Shortcuts/ShortcutsDialog';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
   constructor(
-    private readonly topNavService: TopNavService
+    private readonly menuService: MenuService,
+    private readonly actionService: ActionService,
+    private readonly commonDialogService: CommonDialogService
   ) {
     super();
   }
@@ -22,6 +27,37 @@ export class PluginBootstrap extends Bootstrap {
   async load(): Promise<void> { }
 
   register(): void {
-    this.topNavService.placeholder.add(Help, 5);
+    this.addTopAppMenuItems();
+  }
+  private addTopAppMenuItems() {
+    this.menuService.addCreator({
+      menus: [MENU_APP_STATE],
+      getItems: (context, items) => [
+        ...items,
+        ACTION_APP_HELP,
+      ],
+      orderItems: (context, items) => {
+        const extracted = menuExtractItems(items, [ACTION_APP_HELP]);
+
+        items.splice(items.length - 1, 0, ...extracted);
+
+        return items;
+      },
+    });
+
+    this.actionService.addHandler({
+      id: 'app-help',
+      isActionApplicable: (context, action) => [
+        ACTION_APP_HELP,
+      ].includes(action),
+      handler: async (context, action) => {
+        switch (action) {
+          case ACTION_APP_HELP: {
+            await this.commonDialogService.open(ShortcutsDialog, null);
+            break;
+          }
+        }
+      },
+    });
   }
 }

@@ -7,6 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { flat, ILoadableState } from '@cloudbeaver/core-utils';
 
 import { ActionService } from '../Action/ActionService';
 import { isAction } from '../Action/createAction';
@@ -24,7 +25,7 @@ import { MenuSubMenuItem } from './MenuItem/MenuSubMenuItem';
 
 @injectable()
 export class MenuService {
-  private readonly handlers: Map<string, IMenuHandler>;
+  private readonly handlers: Map<string, IMenuHandler<any>>;
   private readonly creators: IMenuItemsCreator[];
 
   constructor(
@@ -44,16 +45,11 @@ export class MenuService {
     return null;
   }
 
-  isMenuAvailable(context: IDataContextProvider): boolean {
-    return this.creators
-      .some(filterApplicable(context));
-  }
-
   addCreator(creator: IMenuItemsCreator): void {
     this.creators.push(creator);
   }
 
-  setHandler(handler: IMenuHandler): void {
+  setHandler<T = unknown>(handler: IMenuHandler<T>): void {
     if (this.handlers.has(handler.id)) {
       throw new Error(`Menu handler with same id (${handler.id}) already exists`);
     }
@@ -70,18 +66,32 @@ export class MenuService {
     return null;
   }
 
-  getMenu(context: IDataContextProvider): IMenuItem[] {
-    const applicableCreators = this.creators.filter(filterApplicable(context));
+  getMenuItemLoaders(context: IDataContextProvider, itemCreators: MenuCreatorItem[]): ILoadableState[] {
+    return flat(itemCreators
+      .map(item => {
+        if (isAction(item)) {
+          const handler = this.actionService.getHandler(context, item);
 
-    return applicableCreators
-      .reduce<MenuCreatorItem[]>(
+          return handler?.getLoader?.(context, item) ?? null;
+        }
+
+        return null;
+      }))
+      .filter<ILoadableState>((item => item !== null) as ((obj: any) => obj is ILoadableState))
+    ;
+  }
+
+  getMenuItemCreators(context: IDataContextProvider): MenuCreatorItem[] {
+    const creators = this.creators.filter(filterApplicable(context));
+
+    return creators.reduce<MenuCreatorItem[]>(
       (items, creator) => {
         if (creator.orderItems) {
           return creator.orderItems(context, items);
         }
         return items;
       },
-      applicableCreators
+      creators
         .reduce<MenuCreatorItem[]>((items, creator) => creator.getItems(context, items), [])
         .filter(item => {
           if (isAction(item)) {
@@ -90,13 +100,17 @@ export class MenuService {
 
           return true;
         })
-    )
+    );
+  }
+
+  getMenu(context: IDataContextProvider, itemCreators: MenuCreatorItem[]): IMenuItem[] {
+    return itemCreators
       .map(item => {
         if (isAction(item)) {
           return this.createActionItem(context, item) as IMenuItem;
         }
         if (isMenu(item)) {
-          return new MenuSubMenuItem(item) as IMenuItem;
+          return new MenuSubMenuItem({ menu: item }) as IMenuItem;
         }
         return item;
       })
@@ -114,7 +128,7 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
       }
 
       if (creator.menus) {
-        const applicable = creator.menus.some(menu => contexts.hasValue(DATA_CONTEXT_MENU, menu));
+        const applicable = creator.menus.some(menu => contexts.hasValue(DATA_CONTEXT_MENU, menu, false));
 
         if (!applicable) {
           return false;
@@ -128,10 +142,22 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
           return false;
         }
       }
-    } else if (creator.menus || creator.contexts) {
+    } else if (creator.contexts) {
       return false;
     }
 
-    return creator.isApplicable?.(contexts) ?? true;
+    if (creator.isApplicable?.(contexts) === false) {
+      return false;
+    }
+
+    if (creator.menus) {
+      const applicable = creator.menus.some(menu => contexts.hasValue(DATA_CONTEXT_MENU, menu, false));
+
+      if (!applicable) {
+        return false;
+      }
+    }
+
+    return true;
   };
 }

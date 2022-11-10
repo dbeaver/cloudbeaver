@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ILoadableState } from './ILoadableState';
+import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 export type LoaderState = ILoadableState | {
   loading: boolean;

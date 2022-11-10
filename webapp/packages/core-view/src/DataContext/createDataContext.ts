@@ -8,11 +8,14 @@
 
 import type { DataContextGetter } from './DataContextGetter';
 
-export function createDataContext<T>(name: string, defaultValue?: T): DataContextGetter<T> {
+export function createDataContext<T>(
+  name: string,
+  defaultValue?: () => T extends any ? T : undefined
+): DataContextGetter<T> {
   name = `@context/${name}`;
   const obj = {
     [name](): T {
-      return defaultValue as T;
+      return defaultValue?.() as T;
     },
   };
   return obj[name];

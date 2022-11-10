@@ -9,4 +9,4 @@
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { createDataContext } from '@cloudbeaver/core-view';
 
-export const DATA_CONTEXT_USER = createDataContext<UserInfo | null>('user-info', null);
+export const DATA_CONTEXT_USER = createDataContext<UserInfo | null>('user-info', () => null);

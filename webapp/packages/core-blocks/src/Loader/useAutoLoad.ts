@@ -8,18 +8,43 @@
 
 import { useEffect } from 'react';
 
-import type { ILoadableState } from './ILoadableState';
+import { ILoadableState, isLoadableStateHasException } from '@cloudbeaver/core-utils';
+
+import { getComputed } from '../getComputed';
 
 export interface IAutoLoadable extends ILoadableState {
   load: () => void;
 }
 
-export function useAutoLoad(state: IAutoLoadable, enabled = true) {
-  const canBeLoaded = enabled && !state.isLoaded();
+export function useAutoLoad(state: IAutoLoadable | IAutoLoadable[], enabled = true) {
+  if (!Array.isArray(state)) {
+    state = [state];
+  }
+
+  for (const loader of state as IAutoLoadable[]) {
+    getComputed( // activate mobx subscriptions
+      () => (
+        (
+          !loader.isLoaded()
+          || loader.isOutdated?.() === true
+        ) && !isLoadableStateHasException(loader)
+      )
+    );
+  }
 
   useEffect(() => {
-    if (canBeLoaded) {
-      state.load();
+    if (!enabled) {
+      return;
+    }
+
+    for (const loader of state as IAutoLoadable[]) {
+      if (isLoadableStateHasException(loader)) {
+        continue;
+      }
+
+      if (!loader.isLoaded() || loader.isOutdated?.() === true) {
+        loader.load();
+      }
     }
   });
 }

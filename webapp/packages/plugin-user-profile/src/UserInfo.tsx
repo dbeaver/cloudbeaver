@@ -17,16 +17,32 @@ import { UserProfileService } from './UserProfileService';
 
 const styles = css`
   user {
-    composes: theme-ripple from global;
+    position: relative;
     height: 100%;
     display: flex;
     align-items: center;
-    padding: 0 16px;
+    padding: 0 8px;
     cursor: pointer;
+
+    &:hover, &:global([aria-expanded="true"]) {
+      background: #338ecc;
+    }
+
+    &:after {
+      position: absolute;
+      background: #236ea0 !important;
+      height: 32px;
+      width: 1px;
+      top: 8px;
+      right: -1px;
+      opacity: 1 !important;
+      content: "";
+    }
   }
   IconOrImage {
     display: block;
     width: 24px;
+    height: 24px;
   }
   user-name {
     display: block;
@@ -51,7 +67,7 @@ export const UserInfo = observer<Props>(function UserInfo({ info }) {
   return styled(styles)(
     <user title={translate('plugin_user_profile_menu')} onClick={() => userProfileService.open()}>
       <user-icon>
-        <IconOrImage icon='user' viewBox='0 0 28 28' />
+        <IconOrImage icon='/icons/plugin_user_profile_m.svg' />
       </user-icon>
       <user-name>{info.displayName || info.userId}</user-name>
     </user>

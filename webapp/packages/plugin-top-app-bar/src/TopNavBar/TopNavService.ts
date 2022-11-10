@@ -9,6 +9,7 @@
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
+import { AppStateMenu } from './AppStateMenu/AppStateMenu';
 import { Fill } from './Fill';
 import { Logo } from './Logo';
 import { MainMenu } from './MainMenu/MainMenu';
@@ -21,5 +22,6 @@ export class TopNavService {
     this.placeholder.add(Logo, 0);
     this.placeholder.add(MainMenu, 1);
     this.placeholder.add(Fill, 3);
+    this.placeholder.add(AppStateMenu);
   }
 }

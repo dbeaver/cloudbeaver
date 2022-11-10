@@ -7,21 +7,37 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { TopNavService } from '@cloudbeaver/plugin-top-app-bar';
+import { menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import { MENU_APP_STATE } from '@cloudbeaver/plugin-top-app-bar';
 
-import { SettingsMenu } from './SettingsMenu/SettingsMenu';
+import { TOP_NAV_BAR_SETTINGS_MENU } from './SettingsMenu/TOP_NAV_BAR_SETTINGS_MENU';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
   constructor(
-    private readonly topNavService: TopNavService
+    private readonly menuService: MenuService
   ) {
     super();
   }
 
   register(): void | Promise<void> {
-    this.topNavService.placeholder.add(SettingsMenu, 6);
+    this.addTopAppMenuItems();
   }
 
   load(): void | Promise<void> { }
+
+  private addTopAppMenuItems() {
+    this.menuService.addCreator({
+      menus: [MENU_APP_STATE],
+      getItems: (context, items) => [
+        ...items,
+        TOP_NAV_BAR_SETTINGS_MENU,
+      ],
+      orderItems: (context, items) => {
+        const extracted = menuExtractItems(items, [TOP_NAV_BAR_SETTINGS_MENU]);
+
+        return [...items, ...extracted];
+      },
+    });
+  }
 }

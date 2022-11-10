@@ -8,4 +8,4 @@
 
 import { createDataContext } from '@cloudbeaver/core-view';
 
-export const DATA_CONTEXT_MENU_SEARCH = createDataContext<string>('menu-local', '');
+export const DATA_CONTEXT_MENU_SEARCH = createDataContext<string>('menu-local', () => '');

@@ -10,6 +10,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { ConnectionSchemaManagerBootstrap } from './ConnectionSchemaManager/ConnectionSchemaManagerBootstrap';
 import { ConnectionSchemaManagerService } from './ConnectionSchemaManager/ConnectionSchemaManagerService';
+import { LocaleService } from './LocaleService';
 import { PluginBootstrap } from './PluginBootstrap';
 
 
@@ -22,5 +23,6 @@ export const datasourceContextSwitchPluginManifest: PluginManifest = {
     PluginBootstrap,
     ConnectionSchemaManagerService,
     ConnectionSchemaManagerBootstrap,
+    LocaleService,
   ],
 };

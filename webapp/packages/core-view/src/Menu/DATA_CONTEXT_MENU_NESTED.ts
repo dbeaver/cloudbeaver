@@ -8,4 +8,4 @@
 
 import { createDataContext } from '../DataContext/createDataContext';
 
-export const DATA_CONTEXT_MENU_NESTED = createDataContext<boolean>('menu-nested', false);
+export const DATA_CONTEXT_MENU_NESTED = createDataContext<boolean>('menu-nested', () => false);

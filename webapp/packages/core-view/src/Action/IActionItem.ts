@@ -22,5 +22,8 @@ export interface IActionItem {
   isChecked: () => boolean;
   isLoading: () => boolean;
 
+  /** @deprecated must be refactored (#1)*/
+  isLabelVisible: () => boolean;
+
   activate: (binding?: boolean) => void;
 }

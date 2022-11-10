@@ -1,4 +1,5 @@
 export default [
+  ['plugin_resource_manager_action_enable_label', '资源管理器'],
   ['plugin_resource_manager_title', '资源管理器'],
   ['plugin_resource_manager_no_resources_placeholder', '无资源'],
   ['plugin_resource_manager_script_name', '脚本名称'],

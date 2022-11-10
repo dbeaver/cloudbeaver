@@ -36,20 +36,24 @@ export class DataContext implements IDataContext {
     this.fallback = fallback;
   }
 
-  has(context: DataContextGetter<any>): boolean {
-    return this.map.has(context) || this.fallback?.has(context) || false;
+  has(context: DataContextGetter<any>, nested = true): boolean {
+    if (nested) {
+      return this.map.has(context) || this.fallback?.has(context) || false;
+    }
+
+    return this.map.has(context);
   }
 
-  hasValue<T>(context: DataContextGetter<T>, value: T): boolean {
+  hasValue<T>(context: DataContextGetter<T>, value: T, nested = true): boolean {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     let provider: IDataContextProvider = this;
 
     while (true) {
-      if (this.map.get(context) === value) {
+      if (provider.map.get(context) === value) {
         return true;
       }
 
-      if (provider.fallback) {
+      if (provider.fallback && nested) {
         provider = provider.fallback;
       } else {
         return false;
