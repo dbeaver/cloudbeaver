@@ -227,12 +227,14 @@ public class WebAppUtils {
         );
     }
 
-    public static void addRmResourceUpdatedEvent(String eventId, String projectId, String resourcePath) {
+    public static void addRmResourceUpdatedEvent(
+        String eventId, String projectId, String resourcePath, CBEventConstants.EventType eventType) {
         getWebApplication().getEventController().addEvent(
             new CBEvent(eventId,
                 Map.of(
                     "projectId", projectId,
-                    "resourcePath", resourcePath
+                    "resourcePath", resourcePath,
+                    "eventType", eventType
                 )
             )
         );

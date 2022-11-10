@@ -140,7 +140,12 @@ public class WebServiceRM implements DBWServiceRM {
         checkIsRmEnabled(webSession);
         try {
             String result = getResourceController(webSession).createResource(projectId, resourcePath, isFolder);
-            WebAppUtils.addRmResourceUpdatedEvent(CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED, projectId, resourcePath);
+            WebAppUtils.addRmResourceUpdatedEvent(
+                CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+                projectId,
+                resourcePath,
+                CBEventConstants.EventType.TYPE_CREATE
+            );
             return result;
         } catch (Exception e) {
             throw new DBWebException("Error creating resource " + resourcePath, e);
@@ -155,7 +160,12 @@ public class WebServiceRM implements DBWServiceRM {
         checkIsRmEnabled(webSession);
         try {
             getResourceController(webSession).deleteResource(projectId, resourcePath, false);
-            WebAppUtils.addRmResourceUpdatedEvent(CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED, projectId, resourcePath);
+            WebAppUtils.addRmResourceUpdatedEvent(
+                CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+                projectId,
+                resourcePath,
+                CBEventConstants.EventType.TYPE_DELETE
+            );
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error deleting resource " + resourcePath, e);
@@ -174,7 +184,16 @@ public class WebServiceRM implements DBWServiceRM {
         checkIsRmEnabled(webSession);
         try {
             byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
-            return getResourceController(webSession).setResourceContents(projectId, resourcePath, bytes, forceOverwrite);
+            String content = getResourceController(webSession).setResourceContents(projectId, resourcePath, bytes, forceOverwrite);
+            if (!forceOverwrite) {
+                WebAppUtils.addRmResourceUpdatedEvent(
+                    CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+                    projectId,
+                    resourcePath,
+                    CBEventConstants.EventType.TYPE_CREATE
+                );
+            }
+            return content;
         } catch (Exception e) {
             throw new DBWebException("Error writing resource '" + resourcePath + "' data", e);
         }
