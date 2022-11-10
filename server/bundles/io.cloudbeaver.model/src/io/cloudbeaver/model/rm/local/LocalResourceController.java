@@ -426,6 +426,9 @@ public class LocalResourceController implements RMController {
         } catch (IOException e) {
             throw new DBException("Error moving resource '" + oldResourcePath + "'", e);
         }
+        // Move properties
+        getProjectMetadata(projectId).moveResourceProperties(oldResourcePath, newResourcePath);
+
         fireRmResourceDeleteEvent(projectId, rmOldResourcePath);
         fireRmResourceAddEvent(projectId, newResourcePath);
         return DEFAULT_CHANGE_ID;
