@@ -423,7 +423,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     session.getRmController().deleteResource(resourceProjectId, resourcePath, true);
                     WebAppUtils.addRmResourceUpdatedEvent(
                         CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
-                        projectId,
+                        resourceProjectId,
                         resourcePath,
                         CBEventConstants.EventType.TYPE_DELETE
                     );
