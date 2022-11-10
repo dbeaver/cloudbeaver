@@ -1037,17 +1037,17 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
                     //async auth
                     var authProviderFederated = (SMAuthProviderFederated) authProviderInstance;
-                    var redirectUrl = buildRedirectLink(
-                        authProviderFederated.getSignInLink(authProviderConfigurationId, Map.of()),
+                    var redirectUrl = buildRedirectLink(authProviderFederated.getSignInLink(authProviderConfigurationId, Map.of()),
                         authAttemptId);
-                    return SMAuthInfo.inProgress(authAttemptId, redirectUrl, filteredUserCreds);
+                    Map<SMAuthConfigurationReference, Object> authData = Map.of(new SMAuthConfigurationReference(authProviderId,
+                        authProviderConfigurationId), filteredUserCreds);
+                    return SMAuthInfo.inProgress(authAttemptId, redirectUrl, authData);
                 }
                 txn.commit();
                 return finishAuthentication(
                     SMAuthInfo.inProgress(
                         authAttemptId,
-                        null,
-                        Map.of(authProviderId, securedUserIdentifyingCredentials)
+                        null, Map.of(new SMAuthConfigurationReference(authProviderId, null), securedUserIdentifyingCredentials)
                     ),
                     true,
                     false
@@ -1125,10 +1125,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Override
-    public void updateAuthStatus(@NotNull String authId,
-                                 @NotNull SMAuthStatus authStatus,
-                                 @NotNull Map<String, Object> authInfo,
-                                 @Nullable String error) throws DBException {
+    public void updateAuthStatus(
+        @NotNull String authId,
+        @NotNull SMAuthStatus authStatus,
+        @NotNull Map<SMAuthConfigurationReference, Object> authInfo,
+        @Nullable String error
+    ) throws DBException {
         var existAuthInfo = getAuthStatus(authId);
         if (existAuthInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
             throw new SMException("Authorization already finished and cannot be updated");
@@ -1137,13 +1139,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         updateAuthStatus(authId, authStatus, authInfo, error, authSessionInfo.getSmSessionId());
     }
 
-    private void updateAuthStatus(@NotNull String authId,
-                                  @NotNull SMAuthStatus authStatus,
-                                  @NotNull Map<String, Object> authInfo,
-                                  @Nullable String error,
-                                  @Nullable String smSessionId) throws DBException {
-        try (Connection dbCon = database.openConnection();
-            JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+    private void updateAuthStatus(
+        @NotNull String authId,
+        @NotNull SMAuthStatus authStatus,
+        @NotNull Map<SMAuthConfigurationReference, Object> authInfo,
+        @Nullable String error,
+        @Nullable String smSessionId
+    ) throws DBException {
+        try (Connection dbCon = database.openConnection(); JDBCTransaction txn = new JDBCTransaction(dbCon)) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "UPDATE CB_AUTH_ATTEMPT SET AUTH_STATUS=?,AUTH_ERROR=?,SESSION_ID=? WHERE AUTH_ID=?")) {
                 dbStat.setString(1, authStatus.toString());
@@ -1155,20 +1158,29 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
             }
 
-            for (Map.Entry<String, Object> entry : authInfo.entrySet()) {
-                String providerId = entry.getKey();
+            for (Map.Entry<SMAuthConfigurationReference, Object> entry : authInfo.entrySet()) {
+                SMAuthConfigurationReference providerId = entry.getKey();
                 String authJson = gson.toJson(entry.getValue());
-                try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "UPDATE CB_AUTH_ATTEMPT_INFO SET AUTH_STATE=? WHERE AUTH_ID=? AND AUTH_PROVIDER_ID=?")) {
+                boolean configIdExist = providerId.getAuthProviderConfigurationId() != null;
+                var sqlBuilder = new StringBuilder();
+                sqlBuilder.append("UPDATE CB_AUTH_ATTEMPT_INFO SET AUTH_STATE=? ")
+                    .append("WHERE AUTH_ID=? AND AUTH_PROVIDER_ID=? AND ")
+                    .append(configIdExist ? "AUTH_PROVIDER_CONFIGURATION_ID=?" : "AUTH_PROVIDER_CONFIGURATION_ID IS NULL");
+                try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
                     dbStat.setString(1, authJson);
                     dbStat.setString(2, authId);
-                    dbStat.setString(3, providerId);
+                    dbStat.setString(3, providerId.getAuthProviderId());
+                    if (configIdExist) {
+                        dbStat.setString(4, providerId.getAuthProviderConfigurationId());
+                    }
                     if (dbStat.executeUpdate() <= 0) {
                         try (PreparedStatement dbStatIns = dbCon.prepareStatement(
-                            "INSERT INTO CB_AUTH_ATTEMPT_INFO (AUTH_ID,AUTH_PROVIDER_ID,AUTH_STATE) VALUES(?,?,?)")) {
+                            "INSERT INTO CB_AUTH_ATTEMPT_INFO (AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) "
+                                + "VALUES(?,?,?,?)")) {
                             dbStatIns.setString(1, authId);
-                            dbStatIns.setString(2, providerId);
-                            dbStatIns.setString(3, authJson);
+                            dbStatIns.setString(2, providerId.getAuthProviderId());
+                            dbStatIns.setString(3, providerId.getAuthProviderConfigurationId());
+                            dbStatIns.setString(4, authJson);
                             dbStatIns.execute();
                         }
                     }
@@ -1199,7 +1211,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     smSessionId = dbResult.getString(3);
                 }
             }
-            Map<String, Object> authData = new LinkedHashMap<>();
+            Map<SMAuthConfigurationReference, Object> authData = new LinkedHashMap<>();
             String redirectUrl = null;
 
             try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -1217,14 +1229,13 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                             WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
                             var authProviderInstance = authProviderDescriptor.getInstance();
                             if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
-                                redirectUrl = buildRedirectLink(
-                                    ((SMAuthProviderFederated) authProviderInstance).getRedirectLink(authProviderConfiguration, Map.of()),
-                                    authId
-                                );
+                                redirectUrl = buildRedirectLink(((SMAuthProviderFederated) authProviderInstance).getRedirectLink(
+                                    authProviderConfiguration,
+                                    Map.of()), authId);
                             }
 
                         }
-                        authData.put(authProviderId, authProviderData);
+                        authData.put(new SMAuthConfigurationReference(authProviderId, authProviderConfiguration), authProviderData);
                     }
                 }
             }
@@ -1368,7 +1379,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         if (authInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
             throw new SMException("Authorization has already been completed with status: " + authInfo.getAuthStatus());
         }
-        Set<String> authProviderIds = authInfo.getAuthData().keySet();
+        Set<SMAuthConfigurationReference> authProviderIds = authInfo.getAuthData().keySet();
         if (authProviderIds.isEmpty()) {
             throw new SMException("Authorization providers are not defined");
         }
@@ -1386,20 +1397,19 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
         String activeUserId = permissions == null ? null : permissions.getUserId();
 
-        Map<String, Object> storedUserData = new LinkedHashMap<>();
+        Map<SMAuthConfigurationReference, Object> storedUserData = new LinkedHashMap<>();
         SMTeam[] allTeams = null;
         String detectedAuthRole = null;
-        for (String authProviderId : authProviderIds) {
+        for (SMAuthConfigurationReference authConfiguration : authProviderIds) {
+            String authProviderId = authConfiguration.getAuthProviderId();
             WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
-            var userAuthData = (Map<String, Object>) authInfo.getAuthData().get(authProviderId);
+            var userAuthData = (Map<String, Object>) authInfo.getAuthData().get(authConfiguration);
             SMAutoAssign autoAssign = getAutoAssignUserData(authId, authProvider, userAuthData, finishAuthMonitor);
             if (autoAssign != null) {
                 detectedAuthRole = autoAssign.getAuthRole();
             }
 
-            var userIdFromCreds = findOrCreateExternalUserByCredentials(
-                authProvider,
-                authAttemptSessionInfo.getSessionParams(),
+            var userIdFromCreds = findOrCreateExternalUserByCredentials(authProvider, authAttemptSessionInfo.getSessionParams(),
                 userAuthData,
                 finishAuthMonitor,
                 activeUserId,
@@ -1423,10 +1433,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             if (activeUserId == null) {
                 activeUserId = userIdFromCreds;
             }
-            storedUserData.put(
-                authProviderId,
-                saveSecuredCreds ? userAuthData : filterSecuredUserData(userAuthData, getAuthProvider(authProviderId))
-            );
+            storedUserData.put(authConfiguration,
+                saveSecuredCreds ? userAuthData : filterSecuredUserData(userAuthData, getAuthProvider(authProviderId)));
         }
 
         String tokenAuthRole = updateUserAuthRoleIfNeeded(activeUserId, detectedAuthRole);
@@ -2156,4 +2164,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         return activeUserCredentials.getUserId();
     }
 
+    private boolean isProviderEnabled(@NotNull String providerId) {
+        WebAuthConfiguration appConfiguration = application.getAuthConfiguration();
+        return appConfiguration.isAuthProviderEnabled(providerId);
+    }
 }
