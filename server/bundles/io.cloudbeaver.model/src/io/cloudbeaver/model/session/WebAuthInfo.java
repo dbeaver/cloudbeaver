@@ -19,7 +19,6 @@ package io.cloudbeaver.model.session;
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
-import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
@@ -41,7 +40,7 @@ public class WebAuthInfo implements SMSessionPrincipal {
     private final WebSession session;
     private final WebUser user;
     private final WebAuthProviderDescriptor authProvider;
-    private WebAuthProviderConfiguration authProviderConfiguration;
+    private String authProviderConfigurationId;
     private SMSession authSession;
     private final OffsetDateTime loginTime;
     private final DBWUserIdentity userIdentity;
@@ -101,7 +100,11 @@ public class WebAuthInfo implements SMSessionPrincipal {
 
     @Property
     public String getAuthConfiguration() {
-        return authProviderConfiguration == null ? null : authProviderConfiguration.getId();
+        return authProviderConfigurationId;
+    }
+
+    public void setAuthProviderConfigurationId(String authProviderConfigurationId) {
+        this.authProviderConfigurationId = authProviderConfigurationId;
     }
 
     public WebUser getUser() {
@@ -114,14 +117,6 @@ public class WebAuthInfo implements SMSessionPrincipal {
 
     public WebAuthProviderDescriptor getAuthProviderDescriptor() {
         return authProvider;
-    }
-
-    public WebAuthProviderConfiguration getAuthProviderConfiguration() {
-        return authProviderConfiguration;
-    }
-
-    public void setAuthProviderConfiguration(WebAuthProviderConfiguration authProviderConfiguration) {
-        this.authProviderConfiguration = authProviderConfiguration;
     }
 
     public SMSession getAuthSession() {

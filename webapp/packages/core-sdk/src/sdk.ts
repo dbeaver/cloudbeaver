@@ -890,7 +890,6 @@ export interface ProjectInfo {
 
 export interface Query {
   activeUser?: Maybe<UserInfo>;
-  allConnections: Array<ConnectionInfo>;
   authChangeLocalPassword: Scalars['Boolean'];
   authLogin: AuthInfo;
   authLogout?: Maybe<Scalars['Boolean']>;
@@ -900,10 +899,6 @@ export interface Query {
   configureServer: Scalars['Boolean'];
   connectionFolders: Array<ConnectionFolderInfo>;
   connectionInfo: ConnectionInfo;
-  /** @deprecated Field no longer supported */
-  copyConnectionConfiguration: ConnectionInfo;
-  /** @deprecated Field no longer supported */
-  createConnectionConfiguration: ConnectionInfo;
   createTeam: AdminTeamInfo;
   createUser: AdminUserInfo;
   dataTransferAvailableStreamProcessors: Array<DataTransferProcessorInfo>;
@@ -912,8 +907,6 @@ export interface Query {
   dataTransferExportDataFromResults: AsyncTaskInfo;
   dataTransferRemoveDataFile?: Maybe<Scalars['Boolean']>;
   deleteAuthProviderConfiguration: Scalars['Boolean'];
-  /** @deprecated Field no longer supported */
-  deleteConnectionConfiguration?: Maybe<Scalars['Boolean']>;
   deleteTeam?: Maybe<Scalars['Boolean']>;
   deleteUser?: Maybe<Scalars['Boolean']>;
   deleteUserMetaParameter: Scalars['Boolean'];
@@ -972,16 +965,8 @@ export interface Query {
   sqlParseScript: SqlScriptInfo;
   sqlSupportedOperations: Array<DataTypeLogicalOperation>;
   templateConnections: Array<ConnectionInfo>;
-  /** @deprecated Field no longer supported */
-  updateConnectionConfiguration: ConnectionInfo;
   updateTeam: AdminTeamInfo;
   userConnections: Array<ConnectionInfo>;
-}
-
-
-export interface QueryAllConnectionsArgs {
-  id?: InputMaybe<Scalars['ID']>;
-  projectId: Scalars['ID'];
 }
 
 
@@ -1028,19 +1013,6 @@ export interface QueryConnectionInfoArgs {
 }
 
 
-export interface QueryCopyConnectionConfigurationArgs {
-  config?: InputMaybe<ConnectionConfig>;
-  nodePath: Scalars['String'];
-  projectId: Scalars['ID'];
-}
-
-
-export interface QueryCreateConnectionConfigurationArgs {
-  config: ConnectionConfig;
-  projectId: Scalars['ID'];
-}
-
-
 export interface QueryCreateTeamArgs {
   description?: InputMaybe<Scalars['String']>;
   teamId: Scalars['ID'];
@@ -1079,12 +1051,6 @@ export interface QueryDataTransferRemoveDataFileArgs {
 
 export interface QueryDeleteAuthProviderConfigurationArgs {
   id: Scalars['ID'];
-}
-
-
-export interface QueryDeleteConnectionConfigurationArgs {
-  id: Scalars['ID'];
-  projectId: Scalars['ID'];
 }
 
 
@@ -1372,13 +1338,6 @@ export interface QuerySqlSupportedOperationsArgs {
 
 export interface QueryTemplateConnectionsArgs {
   projectId?: InputMaybe<Scalars['ID']>;
-}
-
-
-export interface QueryUpdateConnectionConfigurationArgs {
-  config: ConnectionConfig;
-  id: Scalars['ID'];
-  projectId: Scalars['ID'];
 }
 
 
@@ -1714,7 +1673,10 @@ export type AuthLoginQueryVariables = Exact<{
 
 export type AuthLoginQuery = { authInfo: { redirectLink?: string, authId?: string, authStatus: AuthStatus, userTokens?: Array<{ authProvider: string, authConfiguration?: string, loginTime: any, message?: string, origin: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> } }> } };
 
-export type AuthLogoutQueryVariables = Exact<{ [key: string]: never; }>;
+export type AuthLogoutQueryVariables = Exact<{
+  provider?: InputMaybe<Scalars['ID']>;
+  configuration?: InputMaybe<Scalars['ID']>;
+}>;
 
 
 export type AuthLogoutQuery = { authLogout?: boolean };
@@ -3183,8 +3145,8 @@ export const AuthLoginDocument = `
 }
     ${AuthTokenFragmentDoc}`;
 export const AuthLogoutDocument = `
-    query authLogout {
-  authLogout
+    query authLogout($provider: ID, $configuration: ID) {
+  authLogout(provider: $provider, configuration: $configuration)
 }
     `;
 export const DeleteAuthProviderConfigurationDocument = `

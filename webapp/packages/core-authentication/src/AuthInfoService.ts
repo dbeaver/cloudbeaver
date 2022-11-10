@@ -15,15 +15,20 @@ import { uuid } from '@cloudbeaver/core-utils';
 import { AuthProvidersResource, AuthProviderConfiguration } from './AuthProvidersResource';
 import { type ILoginOptions, UserInfoResource } from './UserInfoResource';
 
+export interface IUserAuthConfiguration {
+  providerId: string;
+  configuration: AuthProviderConfiguration;
+}
+
 @injectable()
 export class AuthInfoService {
   get userInfo(): UserInfo | null {
     return this.userInfoResource.data;
   }
 
-  get userAuthConfigurations(): AuthProviderConfiguration[] {
+  get userAuthConfigurations(): IUserAuthConfiguration[] {
     const tokens = this.userInfo?.authTokens;
-    const result: AuthProviderConfiguration[] = [];
+    const result: IUserAuthConfiguration[] = [];
 
     if (!tokens) {
       return result;
@@ -41,7 +46,7 @@ export class AuthInfoService {
           );
 
           if (configuration) {
-            result.push(configuration);
+            result.push({ providerId: provider.id, configuration });
           }
         }
       }
