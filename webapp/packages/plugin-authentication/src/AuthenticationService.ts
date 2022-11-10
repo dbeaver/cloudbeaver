@@ -80,7 +80,7 @@ export class AuthenticationService extends Bootstrap {
 
     let userAuthConfiguration: IUserAuthConfiguration | undefined = undefined;
 
-    if (providerId && configurationId) {
+    if (providerId) {
       userAuthConfiguration = this.authInfoService.userAuthConfigurations
         .find(c => c.providerId === providerId && c.configuration.id === configurationId);
     } else if (this.authInfoService.userAuthConfigurations.length > 0) {
