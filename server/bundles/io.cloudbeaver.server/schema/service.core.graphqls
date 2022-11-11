@@ -311,6 +311,9 @@ type ConnectionInfo {
     # Determines that credentials were saved for current user.
     # This field read is slow, it should be read only when it really needed
     credentialsSaved: Boolean!
+    # Determines that additional credentials are needed to connect
+    # This field read is slow, it should be read only when it really needed
+    authNeeded: Boolean!
 
     folder: ID
     nodePath: String
@@ -322,7 +325,6 @@ type ConnectionInfo {
 
     origin: ObjectOrigin!
 
-    authNeeded: Boolean!
     authModel: ID
     authProperties: [ObjectPropertyInfo!]!
 

@@ -276,9 +276,9 @@ public class WebConnectionInfo {
     }
 
     @Property
-    public boolean isAuthNeeded() {
+    public boolean isAuthNeeded() throws DBException {
         return !dataSourceContainer.isConnected() &&
-            !dataSourceContainer.isSavePassword() &&
+            !dataSourceContainer.isCredentialsSaved() &&
             !dataSourceContainer.getDriver().isAnonymousAccess();
     }
 
