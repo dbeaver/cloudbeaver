@@ -59,7 +59,7 @@ export const TeamEdit = observer<Props>(function TeamEdit({
   data.config.teamId = item;
 
   return styled(useStyles(styles))(
-    <box ref={boxRef} as='div'>
+    <box ref={boxRef}>
       <TeamForm
         state={data}
         onCancel={collapse}

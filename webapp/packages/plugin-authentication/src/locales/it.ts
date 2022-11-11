@@ -10,6 +10,7 @@ export default [
   ['authentication_user_role', 'Role'],
   ['authentication_user_credentials', 'Credenziali'],
   ['authentication_user_meta_parameters', 'Parameters'],
+  ['authentication_team_meta_parameters', 'Parameters'],
   ['authentication_user_password', 'Password utente'],
   ['authentication_user_password_repeat', 'Ripeti password'],
   ['authentication_user_status', 'User status'],
