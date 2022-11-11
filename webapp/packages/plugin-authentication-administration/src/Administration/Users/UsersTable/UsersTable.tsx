@@ -63,10 +63,6 @@ const styles = css`
     overflow: auto;
     height: 100%;
   }
-
-  [|table] {
-    min-height: 140px; /* loader overlay size */
-  }
 `;
 
 interface Props {
