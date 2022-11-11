@@ -46,7 +46,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final IConfigurationElement cfg;
 
     private final ObjectType implType;
-    private final Map<SMSubjectType, List<DBPPropertyDescriptor>> metaProperties = new HashMap<>();
+    private final Map<SMSubjectType, List<DBPPropertyDescriptor>> metaParameters = new HashMap<>();
     private SMAuthProvider<?> instance;
     private final DBPImage icon;
     private final Map<String, PropertyDescriptor> configurationParameters = new LinkedHashMap<>();
@@ -76,13 +76,13 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         for (IConfigurationElement credElement : cfg.getChildren("credentials")) {
             credentialProfiles.add(new SMAuthCredentialsProfile(credElement));
         }
-        for (IConfigurationElement mpElement : cfg.getChildren("metaProperties")) {
+        for (IConfigurationElement mpElement : cfg.getChildren("metaParameters")) {
             SMSubjectType subjectType = CommonUtils.valueOf(SMSubjectType.class, mpElement.getAttribute("type"), SMSubjectType.user);
             List<DBPPropertyDescriptor> metaProps = new ArrayList<>();
             for (IConfigurationElement propGroup : ArrayUtils.safeArray(mpElement.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
                 metaProps.addAll(PropertyDescriptor.extractProperties(propGroup));
             }
-            metaProperties.put(subjectType, metaProps);
+            metaParameters.put(subjectType, metaProps);
         }
 
         String rfList = cfg.getAttribute("requiredFeatures");
@@ -182,8 +182,8 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     }
 
     @Nullable
-    public List<DBPPropertyDescriptor> getMetaProperties(SMSubjectType subjectType) {
-        return metaProperties.get(subjectType);
+    public List<DBPPropertyDescriptor> getMetaParameters(SMSubjectType subjectType) {
+        return metaParameters.get(subjectType);
     }
 
 }

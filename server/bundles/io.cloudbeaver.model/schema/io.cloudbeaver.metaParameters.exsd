@@ -2,7 +2,7 @@
 <schema targetNamespace="org.jkiss.dbeaver.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="io.cloudbeaver.auth" id="io.cloudbeaver.userProfile" name="User profile properties"/>
+         <meta.schema plugin="io.cloudbeaver.model" id="io.cloudbeaver.metaParameters" name="Subject meta parameters"/>
       </appInfo>
       <documentation>
       </documentation>
