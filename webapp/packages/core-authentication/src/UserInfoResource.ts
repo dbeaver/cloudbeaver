@@ -158,9 +158,13 @@ UserInfoIncludes
     });
   }
 
-  async logout(): Promise<void> {
-    if (this.data) {
-      await this.graphQLService.sdk.authLogout();
+  async logout(provider?: string, configuration?: string): Promise<void> {
+    await this.graphQLService.sdk.authLogout({
+      provider,
+      configuration,
+    });
+
+    if (!provider || (this.data?.authTokens.length || 0) <= 1) {
       this.setData(null);
       this.resetIncludes();
     }

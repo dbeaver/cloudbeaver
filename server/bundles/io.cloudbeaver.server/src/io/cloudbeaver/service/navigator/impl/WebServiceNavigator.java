@@ -418,7 +418,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     ne.getValue().deleteObject(commandContext, object, options);
                     commandContext.saveChanges(session.getProgressMonitor(), options);
                 } else if (node instanceof DBNLocalFolder) {
+
                     node.getOwnerProject().getDataSourceRegistry().removeFolder(((DBNLocalFolder) node).getFolder(), false);
+
                 } else if (node instanceof DBNResourceManagerResource) {
                     DBNResourceManagerResource rmResource = ((DBNResourceManagerResource) node);
                     String resourceProjectId = rmResource.getResourceProject().getId();
