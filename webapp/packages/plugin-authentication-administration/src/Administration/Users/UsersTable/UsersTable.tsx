@@ -32,15 +32,9 @@ const loaderStyle = css`
 `;
 
 const styles = css`
-  Table {
-    width: 100%;
-  }
-
-  TableHeader {
-    background: var(--theme-surface);
-    position: sticky;
-    top: 0;
-    z-index: 1;
+  ToolsPanel {
+    border-bottom: none;
+    border-radius: inherit;
   }
 
   content {
@@ -53,6 +47,17 @@ const styles = css`
   Group {
     padding: 0;
   }
+
+  Table {
+    width: 100%;
+  }
+
+  TableHeader {
+    background: var(--theme-surface);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
   
   table-container {
     overflow: auto;
@@ -61,11 +66,6 @@ const styles = css`
 
   [|table] {
     min-height: 140px; /* loader overlay size */
-  }
-
-  ToolsPanel {
-    border-bottom: none;
-    border-radius: inherit;
   }
 `;
 

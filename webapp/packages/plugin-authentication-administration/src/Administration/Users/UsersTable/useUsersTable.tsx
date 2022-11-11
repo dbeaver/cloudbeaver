@@ -18,7 +18,6 @@ import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { EUserStatus, IUserFilters, USER_ROLE_ALL, useUsersTableFilters } from './Filters/useUsersTableFilters';
 
 interface State {
-  usersResource: UsersResource;
   loading: boolean;
   state: TableState;
   filters: IUserFilters;
@@ -34,8 +33,7 @@ export function useUsersTable(usersResource: UsersResource) {
 
   const filters = useUsersTableFilters();
 
-  return useObservableRef<State>(() => ({
-    usersResource,
+  const state: State = useObservableRef(() => ({
     filters,
     loading: false,
     state: new TableState(),
@@ -112,4 +110,6 @@ export function useUsersTable(usersResource: UsersResource) {
     update: action.bound,
     delete: action.bound,
   }, { usersResource, filters });
+
+  return state;
 }
