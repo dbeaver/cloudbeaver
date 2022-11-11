@@ -23,6 +23,7 @@ import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
@@ -41,6 +42,8 @@ import java.util.Set;
  * Contains user state and services based on available permissions
  */
 public class WebUserContext implements SMCredentialsProvider {
+    private static final Log log = Log.getLog(WebUserContext.class);
+
     private final WebApplication application;
 
     private WebUser user;
@@ -66,7 +69,7 @@ public class WebUserContext implements SMCredentialsProvider {
      * @throws DBException - if user already authorized and new token come from another user
      */
     public synchronized boolean refresh(SMAuthInfo smAuthInfo) throws DBException {
-        if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS) {
+        if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS || smAuthInfo.getSmAuthToken() == null) {
             throw new DBCException("Authorization did not complete successfully");
         }
         var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
@@ -117,6 +120,7 @@ public class WebUserContext implements SMCredentialsProvider {
                 this.securityController.logout();
             }
         } catch (Exception e) {
+            log.error("Error logging out user", e);
         }
         this.userPermissions = getDefaultPermissions();
         this.smCredentials = null;
