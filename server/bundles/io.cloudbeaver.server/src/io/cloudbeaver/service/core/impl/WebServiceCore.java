@@ -19,6 +19,7 @@ package io.cloudbeaver.service.core.impl;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.events.CBEvent;
 import io.cloudbeaver.events.CBEventConstants;
@@ -154,7 +155,7 @@ public class WebServiceCore implements DBWServiceCore {
                 getTemplateConnectionsFromProject(webSession, project, result);
             }
         } else {
-            DBPProject project = webSession.getProjectById(projectId);
+            DBPProject project = getProjectById(webSession, projectId);
             getTemplateConnectionsFromProject(webSession, project, result);
         }
         webSession.filterAccessibleConnections(result);
@@ -189,7 +190,7 @@ public class WebServiceCore implements DBWServiceCore {
             WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(webSession, projectId, id);
             return Collections.singletonList(folderInfo);
         }
-        DBPProject project = webSession.getProjectById(projectId);
+        DBPProject project = getProjectById(webSession, projectId);
         return getConnectionFoldersFromProject(webSession, project);
     }
 
@@ -394,7 +395,7 @@ public class WebServiceCore implements DBWServiceCore {
         @Nullable String projectId,
         @NotNull WebConnectionConfig connectionConfig
     ) throws DBWebException {
-        var project = webSession.getProjectById(projectId);
+        var project = getProjectById(webSession, projectId);
         var rmProject = project.getRmProject();
         if (rmProject.getType() == RMProjectType.USER
             && !webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)
@@ -403,7 +404,7 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("New connection create is restricted by server configuration");
         }
         webSession.addInfoMessage("Create new connection");
-        DBPDataSourceRegistry sessionRegistry = webSession.getProjectById(projectId).getDataSourceRegistry();
+        DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
 
         // we don't need to save credentials for templates
         if (connectionConfig.isTemplate()) {
@@ -427,7 +428,7 @@ public class WebServiceCore implements DBWServiceCore {
         webSession.addConnection(connectionInfo);
         webSession.addInfoMessage("New connection was created - " + WebServiceUtils.getConnectionContainerInfo(newDataSource));
         WebAppUtils.addDataSourceUpdatedEvent(
-            webSession.getProjectById(projectId),
+            project,
             connectionInfo.getId(),
             CBEventConstants.EventType.TYPE_CREATE
         );
@@ -444,7 +445,7 @@ public class WebServiceCore implements DBWServiceCore {
 //        if (!CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()) {
 //            throw new DBWebException("Connection edit is restricted by server configuration");
 //        }
-        DBPDataSourceRegistry sessionRegistry = webSession.getProjectById(projectId).getDataSourceRegistry();
+        DBPDataSourceRegistry sessionRegistry = getProjectById(webSession, projectId).getDataSourceRegistry();
 
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, config.getConnectionId());
         DBPDataSourceContainer dataSource = connectionInfo.getDataSourceContainer();
@@ -475,21 +476,22 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Failed to update connection", e);
         }
         WebAppUtils.addDataSourceUpdatedEvent(
-            webSession.getProjectById(projectId), connectionInfo.getId(), CBEventConstants.EventType.TYPE_UPDATE);
+            getProjectById(webSession, projectId), connectionInfo.getId(), CBEventConstants.EventType.TYPE_UPDATE);
         return connectionInfo;
     }
 
     @Override
     public boolean deleteConnection(
-        @NotNull WebSession webSession, @Nullable String projectId, @NotNull String connectionId) throws DBWebException {
+        @NotNull WebSession webSession, @Nullable String projectId, @NotNull String connectionId
+    ) throws DBWebException {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, connectionId);
-        if (connectionInfo.getDataSourceContainer().getProject() != webSession.getProjectById(projectId)) {
+        if (connectionInfo.getDataSourceContainer().getProject() != getProjectById(webSession, projectId)) {
             throw new DBWebException("Global connection '" + connectionInfo.getName() + "' configuration cannot be deleted");
         }
         webSession.addInfoMessage("Delete connection - " +
             WebServiceUtils.getConnectionContainerInfo(connectionInfo.getDataSourceContainer()));
         closeAndDeleteConnection(webSession, projectId, connectionId, true);
-        WebAppUtils.addDataSourceUpdatedEvent(webSession.getProjectById(projectId), connectionId, CBEventConstants.EventType.TYPE_DELETE);
+        WebAppUtils.addDataSourceUpdatedEvent(getProjectById(webSession, projectId), connectionId, CBEventConstants.EventType.TYPE_DELETE);
         return true;
     }
 
@@ -500,7 +502,7 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull String templateId,
         @Nullable String connectionName) throws DBWebException
     {
-        DBPDataSourceRegistry templateRegistry = webSession.getProjectById(projectId).getDataSourceRegistry();
+        DBPDataSourceRegistry templateRegistry = getProjectById(webSession, projectId).getDataSourceRegistry();
         DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(templateId);
         if (dataSourceTemplate == null) {
             throw new DBWebException("Template data source '" + templateId + "' not found");
@@ -536,7 +538,7 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull WebConnectionConfig config) throws DBWebException {
         try {
             DBNModel navigatorModel = webSession.getNavigatorModel();
-            DBPDataSourceRegistry dataSourceRegistry = webSession.getProjectById(projectId).getDataSourceRegistry();
+            DBPDataSourceRegistry dataSourceRegistry = getProjectById(webSession, projectId).getDataSourceRegistry();
 
             DBNNode srcNode = navigatorModel.getNodeByPath(webSession.getProgressMonitor(), nodePath);
             if (srcNode == null) {
@@ -566,7 +568,7 @@ public class WebServiceCore implements DBWServiceCore {
             dataSourceRegistry.checkForErrors();
             webSession.addConnection(connectionInfo);
             WebAppUtils.addDataSourceUpdatedEvent(
-                webSession.getProjectById(projectId), connectionInfo.getId(), CBEventConstants.EventType.TYPE_CREATE);
+                getProjectById(webSession, projectId), connectionInfo.getId(), CBEventConstants.EventType.TYPE_CREATE);
             return connectionInfo;
         } catch (DBException e) {
             throw new DBWebException("Error copying connection", e);
@@ -584,9 +586,17 @@ public class WebServiceCore implements DBWServiceCore {
         DBPDataSourceContainer dataSource = WebDataSourceUtils.getLocalOrGlobalDataSource(
             CBApplication.getInstance(), webSession, projectId, connectionId);
 
-        DBPDataSourceRegistry sessionRegistry = webSession.getProjectById(projectId).getDataSourceRegistry();
+        WebProjectImpl project = getProjectById(webSession, projectId);
+        DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
         DBPDataSourceContainer testDataSource;
         if (dataSource != null) {
+            try {
+                // Check that creds are saved to trigger secrets resolve
+                dataSource.isCredentialsSaved();
+            } catch (DBException e) {
+                throw new DBWebException("Can't determine whether datasource credentials are saved", e);
+            }
+
             testDataSource = dataSource.createCopy(dataSource.getRegistry());
             WebServiceUtils.setConnectionConfiguration(
                 testDataSource.getDriver(),
@@ -703,7 +713,7 @@ public class WebServiceCore implements DBWServiceCore {
             //new DisconnectJob(connectionInfo.getDataSource()).schedule();
         }
         if (forceDelete) {
-            DBPDataSourceRegistry registry = webSession.getProjectById(projectId).getDataSourceRegistry();
+            DBPDataSourceRegistry registry = getProjectById(webSession, projectId).getDataSourceRegistry();
             registry.removeDataSource(dataSourceContainer);
             try {
                 registry.checkForErrors();
@@ -751,12 +761,13 @@ public class WebServiceCore implements DBWServiceCore {
             if (parentPath != null) {
                 parentNode = WebConnectionFolderUtils.getFolderInfo(session, projectId, parentPath);
             }
-            DBPDataSourceRegistry sessionRegistry = session.getProjectById(projectId).getDataSourceRegistry();
+            WebProjectImpl project = getProjectById(session, projectId);
+            DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
             DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
             WebConnectionFolderInfo folderInfo = new WebConnectionFolderInfo(session, newFolder);
             WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
             WebAppUtils.addDataSourceUpdatedEvent(
-                session.getProjectById(projectId), folderInfo.getId(), CBEventConstants.EventType.TYPE_CREATE);
+                project, folderInfo.getId(), CBEventConstants.EventType.TYPE_CREATE);
             return folderInfo;
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
@@ -775,7 +786,7 @@ public class WebServiceCore implements DBWServiceCore {
         folderInfo.getDataSourceFolder().setName(newName);
         WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
         WebAppUtils.addDataSourceUpdatedEvent(
-            session.getProjectById(projectId), folderInfo.getId(), CBEventConstants.EventType.TYPE_UPDATE);
+            getProjectById(session, projectId), folderInfo.getId(), CBEventConstants.EventType.TYPE_UPDATE);
         return folderInfo;
     }
 
@@ -786,15 +797,16 @@ public class WebServiceCore implements DBWServiceCore {
         try {
             WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(session, projectId, folderPath);
             DBPDataSourceFolder folder = folderInfo.getDataSourceFolder();
-            if (folder.getDataSourceRegistry().getProject() != session.getProjectById(projectId)) {
+            WebProjectImpl project = getProjectById(session, projectId);
+            if (folder.getDataSourceRegistry().getProject() != project) {
                 throw new DBWebException("Global folder '" + folderInfo.getId() + "' cannot be deleted");
             }
             session.addInfoMessage("Delete folder");
-            DBPDataSourceRegistry sessionRegistry = session.getProjectById(projectId).getDataSourceRegistry();
+            DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
             sessionRegistry.removeFolder(folderInfo.getDataSourceFolder(), false);
             WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
             WebAppUtils.addDataSourceUpdatedEvent(
-                session.getProjectById(projectId), folderInfo.getId(), CBEventConstants.EventType.TYPE_DELETE);
+                project, folderInfo.getId(), CBEventConstants.EventType.TYPE_DELETE);
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
         }
@@ -810,7 +822,7 @@ public class WebServiceCore implements DBWServiceCore {
         dataSourceDescriptor.setNavigatorSettings(settings);
         dataSourceDescriptor.persistConfiguration();
         WebAppUtils.addDataSourceUpdatedEvent(
-            webSession.getProjectById(projectId), id, CBEventConstants.EventType.TYPE_UPDATE);
+            getProjectById(webSession, projectId), id, CBEventConstants.EventType.TYPE_UPDATE);
         return connectionInfo;
     }
 
@@ -824,4 +836,11 @@ public class WebServiceCore implements DBWServiceCore {
         return webSession.asyncTaskCancel(taskId);
     }
 
+    private WebProjectImpl getProjectById(WebSession webSession, String projectId) throws DBWebException {
+        WebProjectImpl project = webSession.getProjectById(projectId);
+        if (project == null) {
+            throw new DBWebException("Project '" + projectId + "' not found");
+        }
+        return project;
+    }
 }
