@@ -22,6 +22,7 @@ import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebDataFormat;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebCommonUtils;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
@@ -155,6 +156,11 @@ public class WebConnectionInfo {
     @Property
     public boolean isSaveCredentials() {
         return dataSourceContainer.isSavePassword();
+    }
+
+    @Property
+    public boolean isCredentialsSaved() throws DBException {
+        return dataSourceContainer.isCredentialsSaved();
     }
 
     @Property

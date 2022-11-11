@@ -301,9 +301,16 @@ type ConnectionInfo {
     connected: Boolean!
     provided: Boolean!
     readOnly: Boolean!
+    # Forces connection URL use, host/port/database parameters will be ignored
     useUrl: Boolean!
+
+    # Forces credentials save. This flag doesn't work in shared projects.
     saveCredentials: Boolean!
+    # Shared credentials - the same for all users, stored in secure storage.
     sharedCredentials: Boolean!
+    # Determines that credentials were saved for current user.
+    # This field read is slow, it should be read only when it really needed
+    credentialsSaved: Boolean!
 
     folder: ID
     nodePath: String
