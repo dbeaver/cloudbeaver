@@ -92,7 +92,8 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
 
     await this.setMetaParameters(team.teamId, metaParameters);
     await this.setSubjectPermissions(team.teamId, teamPermissions);
-    await this.refresh(team.teamId);
+
+    this.markOutdated(team.teamId);
 
     return this.get(teamId)!;
   }
