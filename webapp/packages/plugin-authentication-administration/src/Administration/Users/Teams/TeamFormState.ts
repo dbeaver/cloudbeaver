@@ -8,9 +8,8 @@
 
 import { computed, makeObservable, observable } from 'mobx';
 
-import type { TeamInfo } from '@cloudbeaver/core-authentication';
+import type { TeamInfo, TeamsResource } from '@cloudbeaver/core-authentication';
 import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
-import type { CachedMapResource } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { teamFormConfigureContext } from './Contexts/teamFormConfigureContext';
@@ -44,7 +43,7 @@ export class TeamFormState implements ITeamFormState {
     return false;
   }
 
-  readonly resource: CachedMapResource<string, TeamInfo>;
+  readonly resource: TeamsResource;
 
   readonly service: TeamFormService;
   readonly submittingTask: IExecutor<ITeamFormSubmitData>;
@@ -55,12 +54,13 @@ export class TeamFormState implements ITeamFormState {
 
   constructor(
     service: TeamFormService,
-    resource: CachedMapResource<string, TeamInfo>
+    resource: TeamsResource
   ) {
     this.resource = resource;
     this.config = {
       teamId: '',
       teamPermissions: [],
+      metaParameters: {},
     };
 
     this.stateInfo = null;
@@ -156,6 +156,6 @@ export class TeamFormState implements ITeamFormState {
       return;
     }
 
-    await this.resource.load(data.config.teamId);
+    await this.resource.load(data.config.teamId, ['includeMetaParameters']);
   }
 }

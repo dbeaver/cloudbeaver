@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { TeamInfo } from '@cloudbeaver/core-authentication';
+import type { TeamInfo, TeamsResource } from '@cloudbeaver/core-authentication';
 import type { IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
-import type { CachedMapResource } from '@cloudbeaver/core-sdk';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 export type TeamFormMode = 'edit' | 'create';
@@ -25,7 +24,7 @@ export interface ITeamFormState {
   readonly loading: boolean;
 
   readonly submittingTask: IExecutorHandlersCollection<ITeamFormSubmitData>;
-  readonly resource: CachedMapResource<string, TeamInfo>;
+  readonly resource: TeamsResource;
 
   readonly load: () => Promise<void>;
   readonly loadTeamInfo: () => Promise<TeamInfo | undefined>;

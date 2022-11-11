@@ -10,7 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, InputField, SubmittingForm, Textarea, useTranslate, useStyles, useDataResource } from '@cloudbeaver/core-blocks';
+import { TeamMetaParametersResource } from '@cloudbeaver/core-authentication';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, InputField, SubmittingForm, Textarea, useTranslate, useStyles, useDataResource, Loader, GroupTitle, ObjectPropertyInfoForm } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
@@ -31,6 +32,7 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
 
   const translate = useTranslate();
   const serverConfigResource = useDataResource(TeamOptions, ServerConfigResource, undefined);
+  const teamMetaParameters = useDataResource(TeamOptions, TeamMetaParametersResource, undefined);
 
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
   const edit = state.mode === 'edit';
@@ -72,6 +74,20 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
           </Textarea>
         </Group>
         {!serverConfigResource.data?.distributed && <Permissions state={state} />}
+        <Loader state={teamMetaParameters} inline>
+          {() => teamMetaParameters.data.length > 0 && styled(style)(
+            <Group small gap vertical overflow>
+              <GroupTitle keepSize>{translate('authentication_team_meta_parameters')}</GroupTitle>
+              <ObjectPropertyInfoForm
+                state={state.config.metaParameters}
+                properties={teamMetaParameters.data}
+                disabled={state.disabled}
+                keepSize
+                tiny
+              />
+            </Group>
+          )}
+        </Loader>
       </ColoredContainer>
     </SubmittingForm>
   );

@@ -27,36 +27,47 @@ import org.jkiss.utils.ArrayUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WebUserProfileRegistry {
+public class WebMetaParametersRegistry {
 
-    private static final Log log = Log.getLog(WebUserProfileRegistry.class);
+    private static final Log log = Log.getLog(WebMetaParametersRegistry.class);
 
-    public static final String EXTENSION_ID = "io.cloudbeaver.userProfile"; //$NON-NLS-1$
+    public static final String EXTENSION_ID = "io.cloudbeaver.metaParameters"; //$NON-NLS-1$
 
-    private static WebUserProfileRegistry instance = null;
-    private final List<DBPPropertyDescriptor> properties = new ArrayList<>();
+    private static WebMetaParametersRegistry instance = null;
+    private final List<DBPPropertyDescriptor> userParameters = new ArrayList<>();
+    private final List<DBPPropertyDescriptor> teamParameters = new ArrayList<>();
 
-    public synchronized static WebUserProfileRegistry getInstance() {
+    public synchronized static WebMetaParametersRegistry getInstance() {
         if (instance == null) {
-            instance = new WebUserProfileRegistry();
+            instance = new WebMetaParametersRegistry();
             instance.loadExtensions(Platform.getExtensionRegistry());
         }
         return instance;
     }
 
-    private WebUserProfileRegistry() {
+    private WebMetaParametersRegistry() {
     }
 
-    public List<DBPPropertyDescriptor> getProperties() {
-        return properties;
+    public List<DBPPropertyDescriptor> getUserParameters() {
+        return userParameters;
+    }
+
+    public List<DBPPropertyDescriptor> getTeamParameters() {
+        return teamParameters;
     }
 
     private void loadExtensions(IExtensionRegistry registry) {
         IConfigurationElement[] extConfigs = registry.getConfigurationElementsFor(EXTENSION_ID);
         for (IConfigurationElement ext : extConfigs) {
-            if (ext.getName().equals("userProfileProperties")) {
+            if (ext.getName().equals("metaParameters")) {
+                boolean isUser = "user".equals(ext.getAttribute("type"));
                 for (IConfigurationElement propGroup : ArrayUtils.safeArray(ext.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
-                    properties.addAll(PropertyDescriptor.extractProperties(propGroup));
+                    List<DBPPropertyDescriptor> props = PropertyDescriptor.extractProperties(propGroup);
+                    if (isUser) {
+                        userParameters.addAll(props);
+                    } else {
+                        teamParameters.addAll(props);
+                    }
                 }
             }
         }

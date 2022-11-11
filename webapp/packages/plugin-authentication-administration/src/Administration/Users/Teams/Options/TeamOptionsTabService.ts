@@ -73,6 +73,10 @@ export class TeamOptionsTabService extends Bootstrap {
       config.description = state.config.description;
     }
 
+    if (state.config.metaParameters) {
+      config.metaParameters = state.config.metaParameters;
+    }
+
     config.teamPermissions = [...state.config.teamPermissions];
   }
 
@@ -115,6 +119,7 @@ export class TeamOptionsTabService extends Bootstrap {
         status.info(team.teamId);
       } else {
         const team = await this.teamResource.updateTeam(config);
+
         status.info('administration_teams_team_info_updated');
         status.info(team.teamId);
       }
@@ -142,12 +147,19 @@ export class TeamOptionsTabService extends Bootstrap {
     if (state.info.teamId) {
       state.config.teamId = state.info.teamId;
     }
+
     if (state.info.teamName) {
       state.config.teamName = state.info.teamName;
     }
+
     if (state.info.description) {
       state.config.description = state.info.description;
     }
+
+    if (state.info.metaParameters) {
+      state.config.metaParameters = state.info.metaParameters;
+    }
+
     state.config.teamPermissions = [...state.info.teamPermissions];
   }
 }
