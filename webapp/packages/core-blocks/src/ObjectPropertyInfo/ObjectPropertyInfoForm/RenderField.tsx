@@ -9,14 +9,17 @@
 import { observer } from 'mobx-react-lite';
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { removeMetadataFromBase64 } from '@cloudbeaver/core-utils';
 
 import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox';
 import { Combobox } from '../../FormControls/Combobox';
 import { FormFieldDescription } from '../../FormControls/FormFieldDescription';
 import { InputField } from '../../FormControls/InputField';
+import { InputFile } from '../../FormControls/InputFile';
 import { isControlPresented } from '../../FormControls/isControlPresented';
 import { Textarea } from '../../FormControls/Textarea';
 import { Link } from '../../Link';
+import { useTranslate } from '../../localization/useTranslate';
 
 const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 
@@ -33,7 +36,7 @@ interface RenderFieldProps {
   className?: string;
 }
 
-type ControlType = 'checkbox' | 'combobox' | 'link' | 'input' | 'textarea';
+type ControlType = 'checkbox' | 'combobox' | 'link' | 'input' | 'textarea' | 'file';
 
 function getControlTypeFor(property: ObjectPropertyInfo): ControlType {
   const dataType = property.dataType?.toLowerCase();
@@ -46,6 +49,8 @@ function getControlTypeFor(property: ObjectPropertyInfo): ControlType {
     return 'link';
   } else if (dataType === 'string' && property.length === 'MULTILINE') {
     return 'textarea';
+  } else if (property.features.includes('file')) {
+    return 'file';
   }
 
   return 'input';
@@ -77,12 +82,32 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   onFocus,
   className,
 }) {
+  const translate = useTranslate();
+
   const controltype = getControlTypeFor(property);
   const password = property.features.includes('password');
 
   const value = getValue(property.value, controltype);
   const defaultValue = getValue(property.defaultValue, controltype);
-  let description: string | undefined;
+  const passwordSaved = showRememberTip && password && !!property.value;
+  const description = passwordSaved ? translate('ui_processing_saved') : undefined;
+
+  if (controltype === 'file' && state) {
+    return (
+      <InputFile
+        tooltip={property.description}
+        labelTooltip={property.displayName || property.description}
+        name={property.id!}
+        state={state}
+        disabled={disabled}
+        fileName={description}
+        className={className}
+        mapValue={removeMetadataFromBase64}
+      >
+        {property.displayName}
+      </InputFile>
+    );
+  }
 
   if (controltype === 'link') {
     return (
@@ -101,10 +126,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         {state?.[property.id!]}
       </FormFieldDescription>
     );
-  }
-
-  if (showRememberTip && password && property.value) {
-    description = 'Password saved';
   }
 
   if (controltype === 'checkbox') {

@@ -29,6 +29,7 @@ import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.SMAuthConfigurationReference;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
@@ -87,8 +88,8 @@ public class WebSessionAuthProcessor {
 
         try {
             if (configMode && alreadyLoggedIn) {
-                for (String providerId : authInfo.getAuthData().keySet()) {
-                    webSession.removeAuthInfo(providerId);
+                for (SMAuthConfigurationReference authConfiguration : authInfo.getAuthData().keySet()) {
+                    webSession.removeAuthInfo(authConfiguration.getAuthProviderId());
                 }
             }
             webSession.updateSMAuthInfo(authInfo);
@@ -102,8 +103,9 @@ public class WebSessionAuthProcessor {
             var securityController = webSession.getSecurityController();
             Map<String, Object> providerConfig = Collections.emptyMap();
             var newAuthInfos = new ArrayList<WebAuthInfo>();
-            for (Map.Entry<String, Object> entry : authInfo.getAuthData().entrySet()) {
-                String providerId = entry.getKey();
+            for (Map.Entry<SMAuthConfigurationReference, Object> entry : authInfo.getAuthData().entrySet()) {
+                SMAuthConfigurationReference authConfiguration = entry.getKey();
+                String providerId = authConfiguration.getAuthProviderId();
                 Map<String, Object> authAttrs = (Map<String, Object>) entry.getValue();
 
                 var authProviderDescriptor = getAuthProvider(providerId);
@@ -111,15 +113,13 @@ public class WebSessionAuthProcessor {
                 SMAuthProviderExternal<?> authProviderExternal = authProviderInstance instanceof SMAuthProviderExternal<?> ?
                     (SMAuthProviderExternal<?>) authProviderInstance : null;
 
-                boolean providerEnabled = isProviderEnabled(providerId);
+                boolean providerDisabled = !isProviderEnabled(providerId);
                 if (configMode || webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
                     // 1. Admin can authorize in any providers
                     // 2. When it authorizes in non-local provider for the first time we force linkUser flag
-                    if (!providerEnabled && webSession.getUser() != null) {
+                    if (providerDisabled && webSession.getUser() != null) {
                         linkWithActiveUser = true;
                     }
-                } else if (!providerEnabled && !webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
-                    throw new DBWebException("Authentication provider '" + providerId + "' is disabled");
                 }
 
                 SMSession authSession;
@@ -174,7 +174,9 @@ public class WebSessionAuthProcessor {
                     authProviderDescriptor,
                     userIdentity,
                     authSession,
-                    OffsetDateTime.now());
+                    OffsetDateTime.now()
+                );
+                webAuthInfo.setAuthProviderConfigurationId(authConfiguration.getAuthProviderConfigurationId());
                 webAuthInfo.setMessage("Authenticated with " + authProviderDescriptor.getLabel() + " provider");
                 if (configMode) {
                     webAuthInfo.setUserCredentials(authAttrs);

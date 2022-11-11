@@ -1,5 +1,5 @@
-FROM eclipse-temurin:17.0.4.1_1-jre-focal
-#adoptopenjdk/openjdk11:jdk-11.0.12_7-ubuntu-slim
+ARG ARCH=amd64
+FROM ${ARCH}/eclipse-temurin:17.0.4.1_1-jre-focal
 
 COPY cloudbeaver /opt/cloudbeaver
 
