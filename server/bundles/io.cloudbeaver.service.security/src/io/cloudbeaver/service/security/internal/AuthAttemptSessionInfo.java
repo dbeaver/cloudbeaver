@@ -19,7 +19,7 @@ package io.cloudbeaver.service.security.internal;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.security.SMSessionType;
+import org.jkiss.dbeaver.model.auth.SMSessionType;
 
 import java.util.Map;
 
