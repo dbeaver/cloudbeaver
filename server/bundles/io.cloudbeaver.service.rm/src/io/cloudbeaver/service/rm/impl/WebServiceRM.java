@@ -175,6 +175,39 @@ public class WebServiceRM implements DBWServiceRM {
         }
     }
 
+    @Override
+    public boolean moveResource(@NotNull WebSession webSession,
+                                @NotNull String projectId,
+                                @NotNull String oldResourcePath,
+                                @NotNull String newResourcePath
+    ) throws DBException {
+        checkIsRmEnabled(webSession);
+        try {
+            var resourceController = getResourceController(webSession);
+            var oldRmResourcePath = resourceController.getResourcePath(projectId, oldResourcePath);
+            resourceController.moveResource(projectId, oldResourcePath, newResourcePath);;
+            var newRmResourcePath = resourceController.getResourcePath(projectId, newResourcePath);
+
+            WebAppUtils.addRmResourceUpdatedEvent(
+                CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+                projectId,
+                oldResourcePath,
+                oldRmResourcePath,
+                CBEventConstants.EventType.TYPE_DELETE
+            );
+            WebAppUtils.addRmResourceUpdatedEvent(
+                CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+                projectId,
+                newResourcePath,
+                newRmResourcePath,
+                CBEventConstants.EventType.TYPE_CREATE
+            );
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error moving resource " + oldResourcePath, e);
+        }
+    }
+
     @NotNull
     @Override
     public String writeResourceStringContent(
