@@ -49,8 +49,14 @@ public class CBRmResourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHa
         String projectId = JSONUtils.getString(event.getEventData(), "projectId");
         String eventType = JSONUtils.getString(event.getEventData(), "eventType");
         String resourcePath = JSONUtils.getString(event.getEventData(), "resourcePath");
-        RMResource[] resourceParsedPath = gson.fromJson(
-            gson.toJson(JSONUtils.getObjectList(event.getEventData(), "resourceParsedPath")), RMResource[].class);
+        Object parsedResourcePath = event.getEventData().get("resourceParsedPath");
+        RMResource[] resourceParsedPath;
+        if (parsedResourcePath instanceof RMResource[]) {
+            resourceParsedPath = (RMResource[]) parsedResourcePath;
+        } else {
+            resourceParsedPath = gson.fromJson(
+                gson.toJson(JSONUtils.getObjectList(event.getEventData(), "resourceParsedPath")), RMResource[].class);
+        }
         if (projectId == null || eventType == null || resourcePath == null) {
             return;
         }

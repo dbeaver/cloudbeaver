@@ -44,6 +44,7 @@ import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContextDefaults;
 import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -427,6 +428,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
                         resourceProjectId,
                         resourcePath,
+                        session.getRmController().getResourcePath(resourceProjectId, resourcePath),
                         CBEventConstants.EventType.TYPE_DELETE
                     );
                 }
@@ -515,12 +517,22 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         newPath = ((DBNResourceManagerResource) folderNode).getResourceFolder() + "/" + newPath;
                     }
                     String resourcePath = rmOldNode.getResourceFolder();
-                    session.getRmController().moveResource(projectId, resourcePath, newPath);
+                    RMController rmController = session.getRmController();
+                    var oldRmResourcePath = rmController.getResourcePath(projectId, resourcePath);
+                    rmController.moveResource(projectId, resourcePath, newPath);
                     WebAppUtils.addRmResourceUpdatedEvent(
                         CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
                         projectId,
                         resourcePath,
-                        CBEventConstants.EventType.TYPE_UPDATE
+                        oldRmResourcePath,
+                        CBEventConstants.EventType.TYPE_DELETE
+                    );
+                    WebAppUtils.addRmResourceUpdatedEvent(
+                        CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+                        projectId,
+                        resourcePath,
+                        rmController.getResourcePath(projectId, newPath),
+                        CBEventConstants.EventType.TYPE_CREATE
                     );
                 } else {
                     throw new DBWebException("Navigator node '"  + path + "' is not a data source node");

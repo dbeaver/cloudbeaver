@@ -144,6 +144,7 @@ public class WebServiceRM implements DBWServiceRM {
                 CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
                 projectId,
                 resourcePath,
+                getResourceController(webSession).getResourcePath(projectId, resourcePath),
                 CBEventConstants.EventType.TYPE_CREATE
             );
             return result;
@@ -159,11 +160,13 @@ public class WebServiceRM implements DBWServiceRM {
     ) throws DBException {
         checkIsRmEnabled(webSession);
         try {
+            var rmResourcePath = getResourceController(webSession).getResourcePath(projectId, resourcePath);
             getResourceController(webSession).deleteResource(projectId, resourcePath, false);
             WebAppUtils.addRmResourceUpdatedEvent(
                 CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
                 projectId,
                 resourcePath,
+                rmResourcePath,
                 CBEventConstants.EventType.TYPE_DELETE
             );
             return true;
@@ -190,6 +193,7 @@ public class WebServiceRM implements DBWServiceRM {
                     CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
                     projectId,
                     resourcePath,
+                    getResourceController(webSession).getResourcePath(projectId, resourcePath),
                     CBEventConstants.EventType.TYPE_CREATE
                 );
             }
