@@ -12,5 +12,6 @@ export function teamContext(): TeamInfo {
   return {
     teamId: '',
     teamPermissions: [],
+    metaParameters: {},
   };
 }
