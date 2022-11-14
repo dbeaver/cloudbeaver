@@ -3,10 +3,12 @@ package io.cloudbeaver.model.rm;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.CommonUtils;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -46,18 +48,25 @@ public class RMUtils {
      * @return path to the project based on the name of projects and prefixes that it contains
      */
     @NotNull
-    public static Path getProjectPathByName(@NotNull String projectId) {
-        if (!projectId.contains("_") || projectId.startsWith("_")) {
-            return getRootPath().resolve(BaseWebApplication.getInstance().getDefaultProjectName());
+    public static Path getProjectPathByName(@NotNull String projectId) throws DBException {
+        int divPos = projectId.indexOf("_");
+        if (divPos <= 0) {
+            throw new DBException("Bad project ID");
         }
-        String prefix = projectId.substring(0, projectId.indexOf("_"));
+
+        String prefix = projectId.substring(0, divPos);
+        String projectName = projectId.substring(divPos + 1);
         switch (RMProjectType.getByPrefix(prefix)) {
             case GLOBAL:
-                return getRootPath().resolve(BaseWebApplication.getInstance().getDefaultProjectName());
+                String defaultProjectName = BaseWebApplication.getInstance().getDefaultProjectName();
+                if (CommonUtils.isEmpty(defaultProjectName)) {
+                    throw new DBException("Global projects are not supported");
+                }
+                return getRootPath().resolve(defaultProjectName);
             case SHARED:
-                return getSharedProjectsPath().resolve(projectId);
+                return getSharedProjectsPath().resolve(projectName);
             default:
-                return getUserProjectsPath().resolve(projectId);
+                return getUserProjectsPath().resolve(projectName);
         }
     }
 

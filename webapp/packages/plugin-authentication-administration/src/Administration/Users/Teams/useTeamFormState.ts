@@ -8,16 +8,15 @@
 
 import { useState } from 'react';
 
-import type { TeamInfo } from '@cloudbeaver/core-authentication';
+import type { TeamsResource } from '@cloudbeaver/core-authentication';
 import { useService } from '@cloudbeaver/core-di';
-import type { CachedMapResource } from '@cloudbeaver/core-sdk';
 
 import type { ITeamFormState } from './ITeamFormProps';
 import { TeamFormService } from './TeamFormService';
 import { TeamFormState } from './TeamFormState';
 
 export function useTeamFormState(
-  resource: CachedMapResource<string, TeamInfo>,
+  resource: TeamsResource,
   configure?: (state: ITeamFormState) => any
 ): ITeamFormState {
   const service = useService(TeamFormService);
