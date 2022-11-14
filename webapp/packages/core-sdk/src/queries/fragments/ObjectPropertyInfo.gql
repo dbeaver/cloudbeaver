@@ -1,0 +1,13 @@
+fragment ObjectPropertyInfo on ObjectPropertyInfo {
+  id
+  displayName
+  description
+  category
+  dataType
+  value
+  validValues
+  defaultValue
+  length
+  features
+  order 
+}
