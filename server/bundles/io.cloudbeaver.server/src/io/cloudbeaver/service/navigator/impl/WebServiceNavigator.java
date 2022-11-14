@@ -31,8 +31,8 @@ import io.cloudbeaver.service.navigator.WebCatalog;
 import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import io.cloudbeaver.service.navigator.WebStructContainers;
 import io.cloudbeaver.service.security.SMUtils;
-import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -425,9 +425,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     String resourcePath = rmResource.getResourceFolder();
                     var rmResourcePath = session.getRmController().getResourcePath(resourceProjectId, resourcePath);
                     session.getRmController().deleteResource(resourceProjectId, resourcePath, true);
-                    WebAppUtils.addRmResourceUpdatedEvent(
-                        CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+                    WebEventUtils.addRmResourceUpdatedEvent(
                         resourceProjectId,
+                        session.getSessionId(),
                         resourcePath,
                         rmResourcePath,
                         CBEventConstants.EventType.TYPE_DELETE
@@ -482,8 +482,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     ((DBNDataSource) node).moveToFolder(folderNode.getOwnerProject(), folder);
                     node.getOwnerProject().getDataSourceRegistry().updateDataSource(
                         ((DBNDataSource) node).getDataSourceContainer());
-                    WebAppUtils.addDataSourceUpdatedEvent(
+                    WebEventUtils.addDataSourceUpdatedEvent(
                         node.getOwnerProject(),
+                        session.getSessionId(),
                         ((DBNDataSource) node).getDataSourceContainer().getId(),
                         CBEventConstants.EventType.TYPE_UPDATE
                     );
@@ -499,8 +500,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     }
                     ((DBNLocalFolder) node).getFolder().setParent(folder);
                     WebServiceUtils.updateConfigAndRefreshDatabases(session, node.getOwnerProject().getId());
-                    WebAppUtils.addDataSourceUpdatedEvent(
+                    WebEventUtils.addDataSourceUpdatedEvent(
                         node.getOwnerProject(),
+                        session.getSessionId(),
                         ((DBNLocalFolder) node).getFolder().getFolderPath(),
                         CBEventConstants.EventType.TYPE_UPDATE
                     );
@@ -521,16 +523,16 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     RMController rmController = session.getRmController();
                     var oldRmResourcePath = rmController.getResourcePath(projectId, resourcePath);
                     rmController.moveResource(projectId, resourcePath, newPath);
-                    WebAppUtils.addRmResourceUpdatedEvent(
-                        CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+                    WebEventUtils.addRmResourceUpdatedEvent(
                         projectId,
+                        session.getSessionId(),
                         resourcePath,
                         oldRmResourcePath,
                         CBEventConstants.EventType.TYPE_DELETE
                     );
-                    WebAppUtils.addRmResourceUpdatedEvent(
-                        CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+                    WebEventUtils.addRmResourceUpdatedEvent(
                         projectId,
+                        session.getSessionId(),
                         resourcePath,
                         rmController.getResourcePath(projectId, newPath),
                         CBEventConstants.EventType.TYPE_CREATE

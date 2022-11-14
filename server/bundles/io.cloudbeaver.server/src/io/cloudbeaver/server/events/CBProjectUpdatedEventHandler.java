@@ -22,6 +22,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.Collection;
 
@@ -40,6 +41,9 @@ public abstract class CBProjectUpdatedEventHandler implements CBEventHandler {
         log.debug(getSupportedEventType() + " event handled");
         Collection<WebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
         for (WebSession activeUserSession : allSessions) {
+            if (CommonUtils.equalObjects(activeUserSession.getSessionId(), event.getSessionId())) {
+                return;
+            }
             updateSessionData(activeUserSession, event);
         }
     }

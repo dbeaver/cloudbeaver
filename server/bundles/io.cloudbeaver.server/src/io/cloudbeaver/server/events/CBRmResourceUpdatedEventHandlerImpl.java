@@ -27,6 +27,7 @@ import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
 import org.jkiss.dbeaver.model.rm.RMResource;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
 import java.util.List;
