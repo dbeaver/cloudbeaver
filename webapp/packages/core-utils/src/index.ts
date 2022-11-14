@@ -48,3 +48,4 @@ export * from './svgToDataUri';
 export * from './uriToBlob';
 export * from './utf8ToBase64';
 export * from './createLastPromiseGetter';
+export * from './removeMetadataFromBase64';

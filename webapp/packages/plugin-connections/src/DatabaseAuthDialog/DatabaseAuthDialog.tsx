@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
   SubmittingForm,
-  Loader,
   useFocus,
   ErrorMessage,
   useStyles,
@@ -87,21 +86,21 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
       )}
       onReject={options?.persistent ? undefined : rejectDialog}
     >
-      {(!connection.isLoaded() || connection.isLoading() || !controller.configured)
-        ? <Loader />
-        : (
-          <SubmittingForm ref={focusedRef} onSubmit={controller.login}>
-            <ConnectionAuthenticationForm
-              config={controller.config}
-              authModelId={authModelId}
-              authProperties={connection.connectionInfo?.authProperties}
-              networkHandlers={payload.networkHandlers}
-              formId={`${payload.connection.projectId}:${payload.connection.connectionId}`}
-              allowSaveCredentials={credentialsSavingEnabled}
-              disabled={controller.isAuthenticating}
-            />
-          </SubmittingForm>
-        )}
+      <SubmittingForm
+        ref={focusedRef}
+        disabled={!connection.isLoaded() || connection.isLoading() || !controller.configured}
+        onSubmit={controller.login}
+      >
+        <ConnectionAuthenticationForm
+          config={controller.config}
+          authModelId={authModelId}
+          authProperties={connection.connectionInfo?.authProperties}
+          networkHandlers={payload.networkHandlers}
+          formId={`${payload.connection.projectId}:${payload.connection.connectionId}`}
+          allowSaveCredentials={credentialsSavingEnabled}
+          disabled={controller.isAuthenticating}
+        />
+      </SubmittingForm>
     </CommonDialogWrapper>
   );
 });

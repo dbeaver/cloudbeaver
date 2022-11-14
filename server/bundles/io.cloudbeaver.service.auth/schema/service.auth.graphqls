@@ -109,16 +109,19 @@ type UserInfo {
 
     # Human readable display name. It is taken from the first auth provider which was used for user login.
     displayName: String
+    # User auth role ID. Optional.
+    authRole: ID
 
+    # All authentication tokens used during current session
     authTokens: [UserAuthToken!]!
 
     linkedAuthProviders: [String!]!
 
     # User profile properties map
     metaParameters: Object!
-
-    # USer configuiraiton parameters
+    # User configuration parameters
     configurationParameters: Object!
+
 }
 
 extend type Query {

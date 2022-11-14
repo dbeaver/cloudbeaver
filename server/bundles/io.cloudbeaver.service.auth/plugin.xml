@@ -3,21 +3,18 @@
 
 <plugin>
 
-    <extension-point id="io.cloudbeaver.userProfile" name="User profiles" schema="schema/io.cloudbeaver.userProfile.exsd"/>
-
     <extension point="io.cloudbeaver.service">
         <service id="auth" label="User authentication" description="User authentication services" class="io.cloudbeaver.service.auth.WebServiceBindingAuth">
 
         </service>
     </extension>
-
-    <extension point="io.cloudbeaver.userProfile">
-        <userProfileProperties>
+    <extension point="io.cloudbeaver.metaParameters">
+        <metaParameters type="user">
             <propertyGroup label="Main">
                 <property id="firstName" label="First Name" type="string" description="User first name"/>
                 <property id="lastName" label="Last Name" type="string" description="User last name"/>
             </propertyGroup>
-        </userProfileProperties>
+        </metaParameters>
     </extension>
     <extension point="io.cloudbeaver.handler">
         <sessionHandler id="RPSessionHandler" class="io.cloudbeaver.service.auth.RPSessionHandler"/>

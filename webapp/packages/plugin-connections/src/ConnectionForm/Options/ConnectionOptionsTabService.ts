@@ -399,8 +399,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
       const value = credentials[property.id!];
 
       if (property.features.includes('password')) {
-        if (value) {
-          return true;
+        if (value !== undefined) {
+          return property.features.includes('file') ? true : !!value;
         }
       } else if (value !== property.value) {
         return true;
