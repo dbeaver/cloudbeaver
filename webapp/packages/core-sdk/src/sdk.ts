@@ -408,7 +408,6 @@ export interface Mutation {
   deleteConnection: Scalars['Boolean'];
   deleteConnectionFolder: Scalars['Boolean'];
   initConnection: ConnectionInfo;
-  initConnectionProperties: ConnectionInfo;
   navDeleteNodes?: Maybe<Scalars['Int']>;
   navMoveNodesToFolder?: Maybe<Scalars['Boolean']>;
   navRenameNode?: Maybe<Scalars['String']>;
@@ -548,12 +547,6 @@ export interface MutationInitConnectionArgs {
   projectId?: InputMaybe<Scalars['ID']>;
   saveCredentials?: InputMaybe<Scalars['Boolean']>;
   sharedCredentials?: InputMaybe<Scalars['Boolean']>;
-}
-
-
-export interface MutationInitConnectionPropertiesArgs {
-  connectionId: Scalars['ID'];
-  projectId: Scalars['ID'];
 }
 
 
