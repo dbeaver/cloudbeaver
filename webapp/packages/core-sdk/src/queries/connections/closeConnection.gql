@@ -6,6 +6,8 @@ mutation closeConnection(
   $customIncludeOriginDetails: Boolean!
   $includeAuthProperties: Boolean!
   $customIncludeNetworkHandlerCredentials: Boolean!
+  $includeCredentialsSaved: Boolean!
+  $includeAuthNeeded: Boolean!
 ) {
   connection: closeConnection(projectId: $projectId, id: $connectionId) {
     ...DatabaseConnection

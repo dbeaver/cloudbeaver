@@ -216,7 +216,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
 
     state.config.authModelId = state.info.authModel;
-    state.config.saveCredentials = state.info.saveCredentials;
+    state.config.saveCredentials = state.info.credentialsSaved;
     state.config.sharedCredentials = state.info.sharedCredentials;
 
     if (state.info.authProperties) {
@@ -235,7 +235,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
   private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const configuration = contexts.getContext(connectionFormConfigureContext);
 
-    configuration.include('includeAuthProperties');
+    configuration.include('includeAuthProperties', 'includeCredentialsSaved');
   }
 
   private async prepareConfig(
@@ -379,7 +379,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       || (config.databaseName !== undefined && !isValuesEqual(config.databaseName, data.info.databaseName, ''))
       || config.credentials !== undefined
       || (config.authModelId !== undefined && !isValuesEqual(config.authModelId, data.info.authModel, ''))
-      || (config.saveCredentials !== undefined && config.saveCredentials !== data.info.saveCredentials)
+      || (config.saveCredentials !== undefined && config.saveCredentials !== data.info.credentialsSaved)
       || (config.sharedCredentials !== undefined && config.sharedCredentials !== data.info.sharedCredentials)
       || (
         config.providerProperties !== undefined
