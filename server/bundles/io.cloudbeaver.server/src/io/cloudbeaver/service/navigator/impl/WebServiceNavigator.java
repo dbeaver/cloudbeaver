@@ -423,12 +423,13 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     DBNResourceManagerResource rmResource = ((DBNResourceManagerResource) node);
                     String resourceProjectId = rmResource.getResourceProject().getId();
                     String resourcePath = rmResource.getResourceFolder();
+                    var rmResourcePath = session.getRmController().getResourcePath(resourceProjectId, resourcePath);
                     session.getRmController().deleteResource(resourceProjectId, resourcePath, true);
                     WebAppUtils.addRmResourceUpdatedEvent(
                         CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
                         resourceProjectId,
                         resourcePath,
-                        session.getRmController().getResourcePath(resourceProjectId, resourcePath),
+                        rmResourcePath,
                         CBEventConstants.EventType.TYPE_DELETE
                     );
                 }
