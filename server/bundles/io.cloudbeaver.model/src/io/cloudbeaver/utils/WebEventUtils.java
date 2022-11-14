@@ -42,8 +42,8 @@ public class WebEventUtils {
         }
         WebAppUtils.getWebApplication().getEventController().addEvent(
             new CBEvent(
-                sessionId,
                 CBEventConstants.CLOUDBEAVER_DATASOURCE_UPDATED,
+                sessionId,
                 Map.of("projectId", project.getId(),
                     "dataSourceIds", List.of(datasourceId),
                     "eventType", eventType)
@@ -59,8 +59,8 @@ public class WebEventUtils {
         CBEventConstants.EventType eventType) {
         WebAppUtils.getWebApplication().getEventController().addEvent(
             new CBEvent(
-                sessionId,
                 CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+                sessionId,
                 Map.of(
                     "projectId", projectId,
                     "resourcePath", resourcePath,

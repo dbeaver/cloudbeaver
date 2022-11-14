@@ -32,6 +32,10 @@ public class CBEvent {
     @NotNull
     private final Map<String, Object> eventData;
 
+    public CBEvent(@NotNull String eventType) {
+        this(eventType, null, Map.of());
+    }
+
     public CBEvent(@NotNull String eventType, @Nullable String sessionId) {
         this(eventType, sessionId, Map.of());
     }

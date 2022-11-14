@@ -65,6 +65,11 @@ public class CBRmResourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHa
         if (project == null) {
             return;
         }
+        acceptChangesInNavigatorTree(eventType, resourceParsedPath, project);
+        activeUserSession.addSessionEvent(event);
+    }
+
+    private void acceptChangesInNavigatorTree(String eventType, RMResource[] resourceParsedPath, WebProjectImpl project) {
         List<RMResource> rmResourcePath = Arrays.asList(resourceParsedPath);
         if (eventType.equals("TYPE_CREATE")) {
             RMEventManager.fireEvent(
@@ -79,6 +84,5 @@ public class CBRmResourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHa
                     rmResourcePath)
             );
         }
-        activeUserSession.addSessionEvent(event);
     }
 }
