@@ -7,6 +7,8 @@ mutation setConnectionNavigatorSettings(
   $customIncludeOriginDetails: Boolean!
   $includeAuthProperties: Boolean!
   $customIncludeNetworkHandlerCredentials: Boolean!
+  $includeCredentialsSaved: Boolean!
+  $includeAuthNeeded: Boolean!
 ) {
   connection: setConnectionNavigatorSettings(projectId: $projectId, id: $connectionId, settings: $settings) {
     ...DatabaseConnection

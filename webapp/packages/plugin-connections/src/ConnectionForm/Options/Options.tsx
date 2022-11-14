@@ -401,7 +401,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                       >
                         {translate('connections_connection_edit_save_credentials')}
                       </FieldCheckbox>
-                      {serverConfigResource.data?.distributed && (
+                      {serverConfigResource.data?.distributed && connectionOptionsTabService.isProjectShared(state) && (
                         <FieldCheckbox
                           id={config.connectionId + 'isShared'}
                           name="sharedCredentials"
