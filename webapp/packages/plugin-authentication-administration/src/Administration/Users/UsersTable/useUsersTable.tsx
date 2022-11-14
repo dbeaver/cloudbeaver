@@ -14,13 +14,11 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
-
-import { EUserStatus, IUserFilters, USER_ROLE_ALL, useUsersTableFilters } from './Filters/useUsersTableFilters';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 interface State {
   loading: boolean;
   state: TableState;
-  filters: IUserFilters;
   users: AdminUser[];
   update: () => Promise<void>;
   delete: () => Promise<void>;
@@ -31,22 +29,12 @@ export function useUsersTable(usersResource: UsersResource) {
   const notificationService = useService(NotificationService);
   const commonDialogService = useService(CommonDialogService);
 
-  const filters = useUsersTableFilters();
-
   const state: State = useObservableRef(() => ({
-    filters,
     loading: false,
     state: new TableState(),
     get users() {
       return this.usersResource.values
-        .filter(user => {
-          const matchSearch = user.userId.toLowerCase().includes(this.filters.search.trim().toLowerCase());
-          const matchStatus = this.filters.status === EUserStatus.ALL
-            || (this.filters.status === EUserStatus.ENABLED ? user.enabled : !user.enabled);
-          const matchRole = this.filters.role === USER_ROLE_ALL || this.filters.role === user.authRole;
-
-          return matchSearch && matchStatus && matchRole;
-        })
+        .slice()
         .sort((a, b) => {
           if (this.usersResource.isNew(a.userId) === this.usersResource.isNew(b.userId)) {
             return a.userId.localeCompare(b.userId);
@@ -106,10 +94,10 @@ export function useUsersTable(usersResource: UsersResource) {
     },
   }), {
     loading: observable.ref,
-    users: computed,
+    users: computed<AdminUser[]>({ equals: (first, second) => isArraysEqual(first, second, undefined, true) }),
     update: action.bound,
     delete: action.bound,
-  }, { usersResource, filters });
+  }, { usersResource });
 
   return state;
 }

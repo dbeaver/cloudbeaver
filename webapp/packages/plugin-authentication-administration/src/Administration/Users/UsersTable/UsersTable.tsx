@@ -22,6 +22,7 @@ import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { CreateUser } from './CreateUser';
 import { CreateUserService } from './CreateUserService';
 import { UsersTableFilters } from './Filters/UsersTableFilters';
+import { useUsersTableFilters } from './Filters/useUsersTableFilters';
 import { User } from './User';
 import { useUsersTable } from './useUsersTable';
 
@@ -81,11 +82,12 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
   const authRolesResource = useDataResource(UsersTable, AuthRolesResource, undefined);
 
   const table = useUsersTable(usersResource.resource);
+  const filters = useUsersTableFilters(table.users);
 
   const isLocalProviderAvailable = authProvidersResource.resource.has(AUTH_PROVIDER_LOCAL_ID);
   const create = param === 'create';
-  const keys = table.users.map(user => user.userId);
   const displayAuthRole = authRolesResource.data.length > 0;
+  const keys = filters.filteredUsers.map(user => user.userId);
 
   return styled(style)(
     <ColoredContainer wrap gap parent overflow vertical>
@@ -125,7 +127,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
             )} */}
             </ToolsPanel>
           </Group>
-          <UsersTableFilters filters={table.filters} />
+          <UsersTableFilters filters={filters} />
         </Container>
 
         <content>
@@ -159,7 +161,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
                   <TableColumnHeader />
                 </TableHeader>
                 <TableBody>
-                  {table.users.map(user => (
+                  {filters.filteredUsers.map(user => (
                     <User
                       key={user.userId}
                       user={user}
