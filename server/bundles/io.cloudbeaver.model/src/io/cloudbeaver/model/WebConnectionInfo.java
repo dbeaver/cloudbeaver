@@ -22,6 +22,7 @@ import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebDataFormat;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebCommonUtils;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
@@ -158,6 +159,16 @@ public class WebConnectionInfo {
     }
 
     @Property
+    public boolean isCredentialsSaved() throws DBException {
+        return dataSourceContainer.isCredentialsSaved();
+    }
+
+    @Property
+    public boolean isSharedCredentials() {
+        return dataSourceContainer.isSharedCredentials();
+    }
+
+    @Property
     public String getFolder() {
         DBPDataSourceFolder folder = dataSourceContainer.getFolder();
         return folder == null ? null : folder.getFolderPath();
@@ -265,9 +276,9 @@ public class WebConnectionInfo {
     }
 
     @Property
-    public boolean isAuthNeeded() {
+    public boolean isAuthNeeded() throws DBException {
         return !dataSourceContainer.isConnected() &&
-            !dataSourceContainer.isSavePassword() &&
+            !dataSourceContainer.isCredentialsSaved() &&
             !dataSourceContainer.getDriver().isAnonymousAccess();
     }
 
