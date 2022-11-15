@@ -106,7 +106,7 @@ export const TableItem = observer<React.PropsWithChildren<Props>>(function Table
       </tr>
       {isExpanded && ExpandElement && (
         <tr {...use({ noHover: true, expanded: isExpanded })}>
-          <td colSpan={Children.count(children)} {...use({ expandArea: true })}>
+          <td colSpan={Children.toArray(children).length} {...use({ expandArea: true })}>
             <ExpandElement item={item} />
           </td>
         </tr>

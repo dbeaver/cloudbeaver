@@ -17,4 +17,5 @@ export default [
   ['customConnection_test', 'Test Connection'],
   ['customConnection_create', 'Create'],
   ['customConnection_create_error', 'Сreate connection error'],
+  ['plugin_connection_custom_action_custom_label', 'Manual'],
 ];

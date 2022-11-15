@@ -16,17 +16,20 @@ import {
   ResourceKeyUtils,
   AdminTeamInfoFragment,
   AdminConnectionGrantInfo,
-  CachedMapAllKey
+  CachedMapAllKey,
+  GetTeamsListQueryVariables
 } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 const NEW_TEAM_SYMBOL = Symbol('new-team');
 
 export type TeamInfo = AdminTeamInfoFragment;
+
+type TeamResourceIncludes = Omit<GetTeamsListQueryVariables, 'teamId'>;
 type NewTeam = TeamInfo & { [NEW_TEAM_SYMBOL]: boolean; timestamp: number };
 
 @injectable()
-export class TeamsResource extends CachedMapResource<string, TeamInfo> {
+export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResourceIncludes> {
   constructor(private readonly graphQLService: GraphQLService) {
     super();
   }
@@ -41,8 +44,20 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo> {
     return this.data;
   }
 
-  async createTeam(teamInfo: TeamInfo): Promise<TeamInfo> {
-    const response = await this.graphQLService.sdk.createTeam(teamInfo);
+  async createTeam({
+    teamId,
+    teamPermissions,
+    teamName,
+    description,
+    metaParameters,
+  }: TeamInfo): Promise<TeamInfo> {
+    const response = await this.graphQLService.sdk.createTeam({
+      teamId,
+      teamName,
+      description,
+      ...this.getDefaultIncludes(),
+      ...this.getIncludesMap(teamId),
+    });
 
     const newTeam: NewTeam = {
       ...response.team,
@@ -52,19 +67,35 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo> {
 
     this.updateTeams(newTeam);
 
-    await this.setSubjectPermissions(newTeam.teamId, teamInfo.teamPermissions);
+    await this.setMetaParameters(newTeam.teamId, metaParameters);
+    await this.setSubjectPermissions(newTeam.teamId, teamPermissions);
 
-    return this.get(teamInfo.teamId)!;
+    return this.get(teamId)!;
   }
 
-  async updateTeam(teamInfo: TeamInfo): Promise<TeamInfo> {
-    const { team } = await this.graphQLService.sdk.updateTeam(teamInfo);
+  async updateTeam({
+    teamId,
+    teamPermissions,
+    teamName,
+    description,
+    metaParameters,
+  }: TeamInfo): Promise<TeamInfo> {
+    const { team } = await this.graphQLService.sdk.updateTeam({
+      teamId,
+      teamName,
+      description,
+      ...this.getDefaultIncludes(),
+      ...this.getIncludesMap(teamId),
+    });
 
     this.updateTeams(team);
 
-    await this.setSubjectPermissions(team.teamId, teamInfo.teamPermissions);
+    await this.setMetaParameters(team.teamId, metaParameters);
+    await this.setSubjectPermissions(team.teamId, teamPermissions);
 
-    return this.get(teamInfo.teamId)!;
+    this.markOutdated(team.teamId);
+
+    return this.get(teamId)!;
   }
 
   async deleteTeam(key: ResourceKey<string>): Promise<Map<string, TeamInfo>> {
@@ -103,11 +134,15 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo> {
       team.teamPermissions = newPermissions.map(permission => permission.id);
     } else {
       // TODO: update permissions for team instead
-      await this.loader(subjectId);
+      await this.loader(subjectId, []);
     }
   }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, TeamInfo>> {
+  async setMetaParameters(teamId: string, parameters: Record<string, any>): Promise<void> {
+    await this.graphQLService.sdk.saveTeamMetaParameters({ teamId, parameters });
+  }
+
+  protected async loader(key: ResourceKey<string>, includes: string[] | undefined): Promise<Map<string, TeamInfo>> {
     const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
 
     await ResourceKeyUtils.forEachAsync(all ? CachedMapAllKey : key, async key => {
@@ -115,9 +150,12 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo> {
 
       const { teams } = await this.graphQLService.sdk.getTeamsList({
         teamId,
+        ...this.getDefaultIncludes(),
+        ...this.getIncludesMap(teamId, includes),
       });
 
       if (all) {
+        this.resetIncludes();
         this.data.clear();
       }
 
@@ -140,6 +178,12 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo> {
     this.set(key, oldTeams.map((team, i) => ({ ...team, ...teams[i] })));
 
     return key;
+  }
+
+  private getDefaultIncludes(): TeamResourceIncludes {
+    return {
+      includeMetaParameters: false,
+    };
   }
 }
 

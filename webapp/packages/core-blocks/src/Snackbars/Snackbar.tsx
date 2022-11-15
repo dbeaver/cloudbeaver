@@ -12,7 +12,7 @@ import type { ENotificationType } from '@cloudbeaver/core-events';
 
 import { Button } from '../Button';
 import { useTranslate } from '../localization/useTranslate';
-import { useStateDelay } from '../useStateDelay';
+import { useActivationDelay } from '../useActivationDelay';
 import { SnackbarBody } from './SnackbarMarkups/SnackbarBody';
 import { SnackbarContent } from './SnackbarMarkups/SnackbarContent';
 import { SnackbarFooter } from './SnackbarMarkups/SnackbarFooter';
@@ -45,7 +45,7 @@ export const Snackbar = observer<SnackbarProps>(function Snackbar({
   time,
 }) {
   const translate = useTranslate();
-  useStateDelay(closeDelay > 0, closeDelay, onClose);
+  useActivationDelay(closeDelay > 0, closeDelay, onClose);
 
   return (
     <SnackbarWrapper closing={!!state?.deleteDelay} persistent={persistent} onClose={() => onClose(false)}>

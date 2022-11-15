@@ -216,7 +216,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
 
     state.config.authModelId = state.info.authModel;
-    state.config.saveCredentials = state.info.saveCredentials;
+    state.config.saveCredentials = state.info.credentialsSaved;
+    state.config.sharedCredentials = state.info.sharedCredentials;
 
     if (state.info.authProperties) {
       for (const property of state.info.authProperties) {
@@ -234,7 +235,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
   private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const configuration = contexts.getContext(connectionFormConfigureContext);
 
-    configuration.include('includeAuthProperties');
+    configuration.include('includeAuthProperties', 'includeCredentialsSaved');
   }
 
   private async prepareConfig(
@@ -293,6 +294,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     if ((state.config.authModelId || driver.defaultAuthModel) && !driver.anonymousAccess) {
       tempConfig.authModelId = state.config.authModelId || driver.defaultAuthModel;
       tempConfig.saveCredentials = state.config.saveCredentials;
+      tempConfig.sharedCredentials = state.config.sharedCredentials;
 
       const properties = await this.getConnectionAuthModelProperties(tempConfig.authModelId, state.info);
 
@@ -377,7 +379,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
       || (config.databaseName !== undefined && !isValuesEqual(config.databaseName, data.info.databaseName, ''))
       || config.credentials !== undefined
       || (config.authModelId !== undefined && !isValuesEqual(config.authModelId, data.info.authModel, ''))
-      || (config.saveCredentials !== undefined && config.saveCredentials !== data.info.saveCredentials)
+      || (config.saveCredentials !== undefined && config.saveCredentials !== data.info.credentialsSaved)
+      || (config.sharedCredentials !== undefined && config.sharedCredentials !== data.info.sharedCredentials)
       || (
         config.providerProperties !== undefined
         && !isObjectPropertyInfoStateEqual(
@@ -399,8 +402,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
       const value = credentials[property.id!];
 
       if (property.features.includes('password')) {
-        if (value) {
-          return true;
+        if (value !== undefined) {
+          return property.features.includes('file') ? true : !!value;
         }
       } else if (value !== property.value) {
         return true;

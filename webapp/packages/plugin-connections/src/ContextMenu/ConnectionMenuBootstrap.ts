@@ -13,6 +13,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual, NavigatorViewSettings, PermissionsService } from '@cloudbeaver/core-root';
 import { ActionService, ACTION_DELETE, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionsSettingsService } from '../ConnectionsSettingsService';
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService';
@@ -23,6 +24,7 @@ import { ACTION_CONNECTION_VIEW_SIMPLE } from './Actions/ACTION_CONNECTION_VIEW_
 import { ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS } from './Actions/ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS';
 import { DATA_CONTEXT_CONNECTION } from './DATA_CONTEXT_CONNECTION';
 import { MENU_CONNECTION_VIEW } from './MENU_CONNECTION_VIEW';
+import { MENU_CONNECTIONS } from './MENU_CONNECTIONS';
 
 @injectable()
 export class ConnectionMenuBootstrap extends Bootstrap {
@@ -41,6 +43,8 @@ export class ConnectionMenuBootstrap extends Bootstrap {
   }
 
   register(): void | Promise<void> {
+    this.addConnectionsMenuToTopAppBar();
+
     this.menuService.addCreator({
       isApplicable: context => {
         if (
@@ -224,5 +228,20 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     } catch (exception: any) {
       this.notificationService.logException(exception);
     }
+  }
+
+  private addConnectionsMenuToTopAppBar() {
+    this.menuService.addCreator({
+      menus: [MENU_APP_ACTIONS],
+      getItems: (context, items) => [
+        ...items,
+        MENU_CONNECTIONS,
+      ],
+    });
+    this.menuService.setHandler({
+      id: 'connections-menu-base',
+      isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === MENU_CONNECTIONS,
+      isLabelVisible: () => false,
+    });
   }
 }

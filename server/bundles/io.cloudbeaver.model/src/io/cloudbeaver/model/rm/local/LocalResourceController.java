@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceConfigurationStorage;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
@@ -154,6 +155,7 @@ public class LocalResourceController implements RMController {
         if (userProject != null) {
             projects.add(0, userProject);
         }
+        projects.sort(Comparator.comparing(RMProject::getDisplayName));
         return projects.toArray(new RMProject[0]);
     }
 
@@ -171,7 +173,6 @@ public class LocalResourceController implements RMController {
                 RMProjectType.SHARED, true)
             )
             .filter(Objects::nonNull)
-            .sorted(Comparator.comparing(RMProject::getDisplayName))
             .collect(Collectors.toList());
     }
 
@@ -332,6 +333,25 @@ public class LocalResourceController implements RMController {
         registry.checkForErrors();
     }
 
+    @Override
+    public void deleteProjectConnectionFolders(
+        @NotNull String projectId,
+        @NotNull String[] folderPaths,
+        boolean dropContents
+    ) throws DBException {
+        DBPProject project = getProjectMetadata(projectId);
+        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+        for (String folderPath : folderPaths) {
+            DBPDataSourceFolder folder = registry.getFolder(folderPath);
+            if (folder != null) {
+                registry.removeFolder(folder, dropContents);
+            } else {
+                log.warn("Can not find folder by path [" + folderPath + "] for deletion");
+            }
+        }
+        registry.checkForErrors();
+    }
+
     @NotNull
     @Override
     public RMResource[] listResources(
@@ -426,6 +446,9 @@ public class LocalResourceController implements RMController {
         } catch (IOException e) {
             throw new DBException("Error moving resource '" + oldResourcePath + "'", e);
         }
+        // Move properties
+        getProjectMetadata(projectId).moveResourceProperties(oldResourcePath, newResourcePath);
+
         fireRmResourceDeleteEvent(projectId, rmOldResourcePath);
         fireRmResourceAddEvent(projectId, newResourcePath);
         return DEFAULT_CHANGE_ID;

@@ -8,6 +8,7 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { LocaleService } from './LocaleService';
 import { LogViewerBootstrap } from './LogViewer/LogViewerBootstrap';
 import { LogViewerService } from './LogViewer/LogViewerService';
 import { LogViewerSettingsService } from './LogViewer/LogViewerSettingsService';
@@ -17,6 +18,7 @@ export const logViewerPlugin: PluginManifest = {
   providers: [
     LogViewerBootstrap,
     LogViewerService,
+    LocaleService,
     LogViewerSettingsService,
   ],
 };

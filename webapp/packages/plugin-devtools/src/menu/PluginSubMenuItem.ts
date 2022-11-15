@@ -15,7 +15,7 @@ export class PluginSubMenuItem extends MenuSubMenuItem {
   readonly plugin: PluginManifest;
 
   constructor(plugin: PluginManifest) {
-    super(MENU_PLUGIN, plugin.info.name);
+    super({ menu: MENU_PLUGIN, label: plugin.info.name });
 
     this.plugin = plugin;
 

@@ -5,6 +5,8 @@ query getUserConnections(
   $customIncludeOriginDetails: Boolean!
   $includeAuthProperties: Boolean!
   $customIncludeNetworkHandlerCredentials: Boolean!
+  $includeCredentialsSaved: Boolean!
+  $includeAuthNeeded: Boolean!
 ) {
   connections: userConnections(projectId: $projectId, id: $connectionId) {
     ...DatabaseConnection

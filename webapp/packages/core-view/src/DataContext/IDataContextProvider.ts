@@ -11,9 +11,9 @@ import type { DataContextGetter } from './DataContextGetter';
 export interface IDataContextProvider {
   fallback?: IDataContextProvider;
   readonly map: Map<DataContextGetter<any>, any>;
-  has: (context: DataContextGetter<any>) => boolean;
+  has: (context: DataContextGetter<any>, nested?: boolean) => boolean;
   get: <T>(context: DataContextGetter<T>) => T;
   find: <T>(context: DataContextGetter<T>, predicate: (item: T) => boolean) => T | undefined;
-  hasValue: <T>(context: DataContextGetter<T>, value: T) => boolean;
+  hasValue: <T>(context: DataContextGetter<T>, value: T, nested?: boolean) => boolean;
   tryGet: <T>(context: DataContextGetter<T>) => T | undefined;
 }

@@ -7,29 +7,30 @@
  */
 
 import type { IMenu } from '../IMenu';
-import type { IMenuSubMenuEvents, IMenuSubMenuItem } from './IMenuSubMenuItem';
+import type { IMenuSubMenuItemOptions, IMenuSubMenuEvents, IMenuSubMenuItem, MenuSubMenuItemIconComponent } from './IMenuSubMenuItem';
 import { MenuItem } from './MenuItem';
 
-export class MenuSubMenuItem extends MenuItem implements IMenuSubMenuItem {
+export class MenuSubMenuItem<TExtraProps = unknown> extends MenuItem implements IMenuSubMenuItem<TExtraProps> {
   readonly menu: IMenu;
   readonly label?: string;
   readonly icon?: string;
   readonly tooltip?: string;
   readonly events?: IMenuSubMenuEvents;
   readonly hidden: boolean;
+  readonly getExtraProps?: () => TExtraProps;
+  readonly iconComponent?: () => MenuSubMenuItemIconComponent<TExtraProps>;
 
   constructor(
-    menu: IMenu,
-    label?: string,
-    icon?: string,
-    tooltip?: string,
+    options: IMenuSubMenuItemOptions<TExtraProps>,
     events?: IMenuSubMenuEvents
   ) {
-    super(menu.id);
-    this.menu = menu;
-    this.label = label;
-    this.icon = icon;
-    this.tooltip = tooltip;
+    super(options.menu.id);
+    this.menu = options.menu;
+    this.label = options.label;
+    this.icon = options.icon;
+    this.tooltip = options.tooltip;
+    this.getExtraProps = options.getExtraProps;
+    this.iconComponent = options.iconComponent;
     this.hidden = false;
     this.events = events;
   }

@@ -22,6 +22,8 @@
     "@cloudbeaver/core-bootstrap": "0.1.0",
     "@cloudbeaver/core-di": "0.1.0",
     "@cloudbeaver/core-product": "0.1.0",
+    "@cloudbeaver/plugin-user-profile": "0.1.0",
+    "@cloudbeaver/plugin-help": "0.1.0",
     "@cloudbeaver/plugin-administration": "0.1.0",
     "@cloudbeaver/plugin-authentication": "0.1.0",
     "@cloudbeaver/plugin-authentication-administration": "0.1.0",

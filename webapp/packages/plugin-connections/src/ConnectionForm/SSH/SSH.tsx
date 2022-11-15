@@ -216,7 +216,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
               id={SSH_TUNNEL_ID + ' savePassword'}
               name="savePassword"
               state={handlerState}
-              disabled={disabled || !enabled || readonly}
+              disabled={disabled || !enabled || readonly || formState.config.sharedCredentials}
             >
               {translate('connections_connection_edit_save_credentials')}
             </FieldCheckbox>

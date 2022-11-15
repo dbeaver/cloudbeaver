@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.security.user.SMTeam;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Web team info
@@ -45,14 +46,22 @@ public class AdminTeamInfo {
         return team.getTeamId();
     }
 
+    @Property
     public String getTeamName() {
         return team.getName();
     }
 
+    @Property
     public String getDescription() {
         return team.getDescription();
     }
 
+    @Property
+    public Map<String, String> getMetaParameters() {
+        return team.getMetaParameters();
+    }
+
+    @Property
     public List<String> getTeamPermissions() {
         return teamPermissions;
     }

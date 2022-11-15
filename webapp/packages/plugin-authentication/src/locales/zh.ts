@@ -16,6 +16,7 @@ export default [
   ['authentication_user_role', 'Role'],
   ['authentication_user_credentials', '凭据'],
   ['authentication_user_meta_parameters', '参数'],
+  ['authentication_team_meta_parameters', '参数'],
   ['authentication_user_password', '用户密码'],
   ['authentication_user_password_repeat', '重复密码'],
   ['authentication_user_status', 'User status'],

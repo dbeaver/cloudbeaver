@@ -7,14 +7,33 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
+
+import { MENU_TOOLS } from './Menu/MENU_TOOLS';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
-  constructor() {
+  constructor(
+    private readonly menuService: MenuService,
+  ) {
     super();
   }
 
-  register(): void | Promise<void> { }
+  register(): void {
+    this.menuService.addCreator({
+      menus: [MENU_APP_ACTIONS],
+      getItems: (context, items) => [
+        ...items,
+        MENU_TOOLS,
+      ],
+    });
+    this.menuService.setHandler({
+      id: 'tools-menu-base',
+      isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === MENU_TOOLS,
+      isLabelVisible: () => false,
+    });
+  }
 
   load(): void | Promise<void> { }
 }

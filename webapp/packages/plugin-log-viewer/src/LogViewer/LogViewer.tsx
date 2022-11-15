@@ -40,7 +40,7 @@ export const LogViewer = observer(function LogViewer() {
   }, [logViewerState]);
 
   if (!logViewerState.isActive) {
-    return <TextPlaceholder>{translate('app_shared_toolsMenu_logViewer_placeholder')}</TextPlaceholder>;
+    return <TextPlaceholder>{translate('plugin_log_viewer_placeholder')}</TextPlaceholder>;
   }
 
   return styled(style)(

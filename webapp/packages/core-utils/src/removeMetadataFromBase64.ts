@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface ILoadableState {
-  isLoading: () => boolean;
-  isLoaded: () => boolean;
-  readonly exception?: Error[] | Error | null;
-  reload?: () => void;
+export function removeMetadataFromBase64(base64: string) {
+  const parts = base64.split(',');
 
-  isCancelled?: () => boolean;
-  cancel?: () => void;
+  if (parts[1]) {
+    return parts[1];
+  }
+
+  return parts[0];
 }
