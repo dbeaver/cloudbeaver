@@ -265,7 +265,14 @@ export function useMapResource<
           setException(exception);
         }
 
-        actions?.onError?.(exception);
+
+        if (actions?.onError) {
+          actions.onError(exception);
+
+          if (actions.onError.length > 0) {
+            return;
+          }
+        }
 
         if (!this.exceptionObserved) {
           notifications.logException(exception, 'Can\'t load data');

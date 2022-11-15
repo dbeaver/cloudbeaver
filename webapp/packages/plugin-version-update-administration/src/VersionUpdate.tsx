@@ -13,6 +13,7 @@ import { gte } from 'semver';
 import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
 import { BASE_CONTAINERS_STYLES, ColoredContainer, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 
@@ -30,8 +31,13 @@ const styles = css`
 
 export const VersionUpdate: AdministrationItemContentComponent = observer(function VersionUpdate() {
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
+  const notificationService = useService(NotificationService);
   const versionService = useService(VersionService);
-  const versionResource = useMapResource(VersionUpdate, VersionResource, CachedMapAllKey);
+  const versionResource = useMapResource(VersionUpdate, VersionResource, CachedMapAllKey, {
+    onError(exception) {
+      notificationService.logException(exception, 'versions_load_fail');
+    },
+  });
 
   const versions = versionResource.resource.values.filter(v => gte(v.number, versionService.current));
 
