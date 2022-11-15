@@ -24,7 +24,7 @@ import io.cloudbeaver.service.rm.DBWServiceRM;
 import io.cloudbeaver.service.rm.model.RMProjectPermissions;
 import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
 import io.cloudbeaver.service.security.SMUtils;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -140,9 +140,9 @@ public class WebServiceRM implements DBWServiceRM {
         checkIsRmEnabled(webSession);
         try {
             String result = getResourceController(webSession).createResource(projectId, resourcePath, isFolder);
-            WebAppUtils.addRmResourceUpdatedEvent(
-                CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+            WebEventUtils.addRmResourceUpdatedEvent(
                 projectId,
+                webSession.getSessionId(),
                 resourcePath,
                 getResourceController(webSession).getResourcePath(projectId, resourcePath),
                 CBEventConstants.EventType.TYPE_CREATE
@@ -162,9 +162,9 @@ public class WebServiceRM implements DBWServiceRM {
         try {
             var rmResourcePath = getResourceController(webSession).getResourcePath(projectId, resourcePath);
             getResourceController(webSession).deleteResource(projectId, resourcePath, false);
-            WebAppUtils.addRmResourceUpdatedEvent(
-                CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+            WebEventUtils.addRmResourceUpdatedEvent(
                 projectId,
+                webSession.getSessionId(),
                 resourcePath,
                 rmResourcePath,
                 CBEventConstants.EventType.TYPE_DELETE
@@ -188,16 +188,16 @@ public class WebServiceRM implements DBWServiceRM {
             resourceController.moveResource(projectId, oldResourcePath, newResourcePath);;
             var newRmResourcePath = resourceController.getResourcePath(projectId, newResourcePath);
 
-            WebAppUtils.addRmResourceUpdatedEvent(
-                CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+            WebEventUtils.addRmResourceUpdatedEvent(
                 projectId,
+                webSession.getSessionId(),
                 oldResourcePath,
                 oldRmResourcePath,
                 CBEventConstants.EventType.TYPE_DELETE
             );
-            WebAppUtils.addRmResourceUpdatedEvent(
-                CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+            WebEventUtils.addRmResourceUpdatedEvent(
                 projectId,
+                webSession.getSessionId(),
                 newResourcePath,
                 newRmResourcePath,
                 CBEventConstants.EventType.TYPE_CREATE
@@ -222,9 +222,9 @@ public class WebServiceRM implements DBWServiceRM {
             byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
             String content = getResourceController(webSession).setResourceContents(projectId, resourcePath, bytes, forceOverwrite);
             if (!forceOverwrite) {
-                WebAppUtils.addRmResourceUpdatedEvent(
-                    CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+                WebEventUtils.addRmResourceUpdatedEvent(
                     projectId,
+                    webSession.getSessionId(),
                     resourcePath,
                     getResourceController(webSession).getResourcePath(projectId, resourcePath),
                     CBEventConstants.EventType.TYPE_CREATE

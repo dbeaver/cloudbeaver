@@ -31,8 +31,8 @@ import io.cloudbeaver.service.navigator.WebCatalog;
 import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import io.cloudbeaver.service.navigator.WebStructContainers;
 import io.cloudbeaver.service.security.SMUtils;
-import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -47,6 +47,7 @@ import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
+import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
@@ -356,6 +357,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         throw new DBWebException("Name " + newName + " is unavailable or invalid");
                     }
                 }
+                if (node instanceof DBNResourceManagerResource) {
+                    return renameRmResourceNode(session, node, newName);
+                }
                 node.rename(session.getProgressMonitor(), newName);
                 return node.getName();
             }
@@ -369,6 +373,45 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         } catch (DBException e) {
             throw new DBWebException("Error renaming navigator node '"  + nodePath + "'", e);
         }
+    }
+
+    @NotNull
+    private String renameRmResourceNode(@NotNull WebSession session, DBNNode node, @NotNull String newName) throws DBException {
+        DBNResourceManagerResource rmNode = (DBNResourceManagerResource) node;
+        // Get project id from node
+        String projectId = rmNode.getResourceProject().getId();
+        // Get paths from nodes
+        String resourcePath = rmNode.getResourceFolder();
+        RMController rmController = session.getRmController();
+        var oldRmResourcePath = rmController.getResourcePath(projectId, resourcePath);
+        node.rename(session.getProgressMonitor(), newName);
+        var newPath = rmNode.getResourceFolder();
+        var newRmResourcePath = rmController.getResourcePath(projectId, newPath);
+        addRmMoveEvent(session, projectId, resourcePath, oldRmResourcePath, newRmResourcePath);
+        return node.getName();
+    }
+
+    private void addRmMoveEvent(
+        @NotNull WebSession session,
+        String projectId,
+        String resourcePath,
+        RMResource[] oldRmResourcePath,
+        RMResource[] newRmResourcePath
+    ) {
+        WebEventUtils.addRmResourceUpdatedEvent(
+            projectId,
+            session.getSessionId(),
+            resourcePath,
+            oldRmResourcePath,
+            CBEventConstants.EventType.TYPE_DELETE
+        );
+        WebEventUtils.addRmResourceUpdatedEvent(
+            projectId,
+            session.getSessionId(),
+            resourcePath,
+            newRmResourcePath,
+            CBEventConstants.EventType.TYPE_CREATE
+        );
     }
 
     @Override
@@ -425,9 +468,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     String resourcePath = rmResource.getResourceFolder();
                     var rmResourcePath = session.getRmController().getResourcePath(resourceProjectId, resourcePath);
                     session.getRmController().deleteResource(resourceProjectId, resourcePath, true);
-                    WebAppUtils.addRmResourceUpdatedEvent(
-                        CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
+                    WebEventUtils.addRmResourceUpdatedEvent(
                         resourceProjectId,
+                        session.getSessionId(),
                         resourcePath,
                         rmResourcePath,
                         CBEventConstants.EventType.TYPE_DELETE
@@ -482,8 +525,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     ((DBNDataSource) node).moveToFolder(folderNode.getOwnerProject(), folder);
                     node.getOwnerProject().getDataSourceRegistry().updateDataSource(
                         ((DBNDataSource) node).getDataSourceContainer());
-                    WebAppUtils.addDataSourceUpdatedEvent(
+                    WebEventUtils.addDataSourceUpdatedEvent(
                         node.getOwnerProject(),
+                        session.getSessionId(),
                         ((DBNDataSource) node).getDataSourceContainer().getId(),
                         CBEventConstants.EventType.TYPE_UPDATE
                     );
@@ -499,8 +543,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     }
                     ((DBNLocalFolder) node).getFolder().setParent(folder);
                     WebServiceUtils.updateConfigAndRefreshDatabases(session, node.getOwnerProject().getId());
-                    WebAppUtils.addDataSourceUpdatedEvent(
+                    WebEventUtils.addDataSourceUpdatedEvent(
                         node.getOwnerProject(),
+                        session.getSessionId(),
                         ((DBNLocalFolder) node).getFolder().getFolderPath(),
                         CBEventConstants.EventType.TYPE_UPDATE
                     );
@@ -521,20 +566,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     RMController rmController = session.getRmController();
                     var oldRmResourcePath = rmController.getResourcePath(projectId, resourcePath);
                     rmController.moveResource(projectId, resourcePath, newPath);
-                    WebAppUtils.addRmResourceUpdatedEvent(
-                        CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
-                        projectId,
-                        resourcePath,
-                        oldRmResourcePath,
-                        CBEventConstants.EventType.TYPE_DELETE
-                    );
-                    WebAppUtils.addRmResourceUpdatedEvent(
-                        CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
-                        projectId,
-                        resourcePath,
-                        rmController.getResourcePath(projectId, newPath),
-                        CBEventConstants.EventType.TYPE_CREATE
-                    );
+                    var newRmResourcePath = rmController.getResourcePath(projectId, newPath);
+                    addRmMoveEvent(session, projectId, resourcePath, oldRmResourcePath, newRmResourcePath);
                 } else {
                     throw new DBWebException("Navigator node '"  + path + "' is not a data source node");
                 }
