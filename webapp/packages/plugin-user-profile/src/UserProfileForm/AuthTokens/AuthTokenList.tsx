@@ -95,10 +95,10 @@ export const AuthTokenList = observer<Props>(function AuthTokenList({ user, clas
               >
                 <Cell
                   before={icon ? <IconOrImage icon={icon} /> : undefined}
-                  after={configuration && (
+                  after={(
                     <Button
                       mod={['outlined']}
-                      onClick={() => authenticationService.logoutConfiguration(configuration!.id, false)}
+                      onClick={() => authenticationService.logout(provider.id, configuration?.id)}
                     >
                       {translate('authentication_logout')}
                     </Button>

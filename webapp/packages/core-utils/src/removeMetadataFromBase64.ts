@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { TeamInfo } from '@cloudbeaver/core-authentication';
+export function removeMetadataFromBase64(base64: string) {
+  const parts = base64.split(',');
 
-export function teamContext(): TeamInfo {
-  return {
-    teamId: '',
-    teamPermissions: [],
-    metaParameters: {},
-  };
+  if (parts[1]) {
+    return parts[1];
+  }
+
+  return parts[0];
 }

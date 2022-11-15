@@ -27,7 +27,7 @@ import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
-import io.cloudbeaver.registry.WebUserProfileRegistry;
+import io.cloudbeaver.registry.WebMetaParametersRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
 import io.cloudbeaver.service.auth.WebAuthStatus;
@@ -191,14 +191,13 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public WebPropertyInfo[] listUserProfileProperties(@NotNull WebSession webSession) {
-        List<DBPPropertyDescriptor> props = new ArrayList<>();
-
         // First add user profile properties
-        props.addAll(WebUserProfileRegistry.getInstance().getProperties());
+        List<DBPPropertyDescriptor> props = new ArrayList<>(
+            WebMetaParametersRegistry.getInstance().getUserParameters());
 
         // Add metas from enabled auth providers
         for (WebAuthProviderDescriptor ap : WebServiceUtils.getEnabledAuthProviders()) {
-            List<DBPPropertyDescriptor> metaProps = ap.getMetaProperties(SMSubjectType.user);
+            List<DBPPropertyDescriptor> metaProps = ap.getMetaParameters(SMSubjectType.user);
             if (!CommonUtils.isEmpty(metaProps)) {
                 props.addAll(metaProps);
             }
