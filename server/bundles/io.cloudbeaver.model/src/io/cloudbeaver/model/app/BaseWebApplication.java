@@ -194,6 +194,14 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         }
     }
 
+    public String getApplicationId() {
+        try {
+            return getApplicationInstanceId();
+        } catch (DBException e) {
+            return null;
+        }
+    }
+
     @Override
     public CBEventController getEventController() {
         return null;
