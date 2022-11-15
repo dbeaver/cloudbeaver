@@ -44,11 +44,11 @@ import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
+import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 import org.jkiss.dbeaver.model.security.user.*;
-import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -757,14 +757,21 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     dbStat.execute();
                 }
 
-                insertPermissions(dbCon, teamId,
-                    new String[] {DBWConstants.PERMISSION_PUBLIC} , grantor);
+                insertPermissions(dbCon,
+                    teamId,
+                    getDefaultTeamPermissions(),
+                    grantor
+                );
 
                 txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving tem in database", e);
         }
+    }
+
+    protected String[] getDefaultTeamPermissions() {
+        return new String[]{DBWConstants.PERMISSION_PUBLIC};
     }
 
     @Override
