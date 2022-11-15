@@ -6,6 +6,8 @@ mutation createConnection(
   $customIncludeOriginDetails: Boolean!
   $includeAuthProperties: Boolean!
   $customIncludeNetworkHandlerCredentials: Boolean!
+  $includeCredentialsSaved: Boolean!
+  $includeAuthNeeded: Boolean!
 ) {
   connection: createConnection(projectId: $projectId, config: $config) {
     ...DatabaseConnection

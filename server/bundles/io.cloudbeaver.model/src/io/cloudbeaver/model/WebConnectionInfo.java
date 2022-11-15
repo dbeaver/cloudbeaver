@@ -17,11 +17,14 @@
 package io.cloudbeaver.model;
 
 import io.cloudbeaver.WebProjectImpl;
+import io.cloudbeaver.model.app.BaseWebAppConfiguration;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebDataFormat;
 import io.cloudbeaver.utils.CBModelConstants;
+import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
@@ -38,10 +41,7 @@ import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
  */
 public class WebConnectionInfo {
 
+    private static final String SECURED_VALUE = "********";
     private final WebSession session;
     private final DBPDataSourceContainer dataSourceContainer;
     private WebServerError connectError;
@@ -99,12 +100,18 @@ public class WebConnectionInfo {
 
     @Property
     public String getHost() {
-        return dataSourceContainer.getConnectionConfiguration().getHostName();
+        if (canViewReadOnlyConnections()) {
+            return dataSourceContainer.getConnectionConfiguration().getHostName();
+        }
+        return SECURED_VALUE;
     }
 
     @Property
     public String getPort() {
-        return dataSourceContainer.getConnectionConfiguration().getHostPort();
+        if (canViewReadOnlyConnections()) {
+            return dataSourceContainer.getConnectionConfiguration().getHostPort();
+        }
+        return SECURED_VALUE;
     }
 
     @Property
@@ -114,17 +121,26 @@ public class WebConnectionInfo {
 
     @Property
     public String getDatabaseName() {
-        return dataSourceContainer.getConnectionConfiguration().getDatabaseName();
+        if (canViewReadOnlyConnections()) {
+            return dataSourceContainer.getConnectionConfiguration().getDatabaseName();
+        }
+        return SECURED_VALUE;
     }
 
     @Property
     public String getUrl() {
-        return dataSourceContainer.getConnectionConfiguration().getUrl();
+        if (canViewReadOnlyConnections()) {
+            return dataSourceContainer.getConnectionConfiguration().getUrl();
+        }
+        return SECURED_VALUE;
     }
 
     @Property
     public Map<String, String> getProperties() {
-        return dataSourceContainer.getConnectionConfiguration().getProperties();
+        if (canViewReadOnlyConnections()) {
+            return dataSourceContainer.getConnectionConfiguration().getProperties();
+        }
+        return Collections.emptyMap();
     }
 
     @Property
@@ -155,6 +171,16 @@ public class WebConnectionInfo {
     @Property
     public boolean isSaveCredentials() {
         return dataSourceContainer.isSavePassword();
+    }
+
+    @Property
+    public boolean isCredentialsSaved() throws DBException {
+        return dataSourceContainer.isCredentialsSaved();
+    }
+
+    @Property
+    public boolean isSharedCredentials() {
+        return dataSourceContainer.isSharedCredentials();
     }
 
     @Property
@@ -265,9 +291,9 @@ public class WebConnectionInfo {
     }
 
     @Property
-    public boolean isAuthNeeded() {
+    public boolean isAuthNeeded() throws DBException {
         return !dataSourceContainer.isConnected() &&
-            !dataSourceContainer.isSavePassword() &&
+            !dataSourceContainer.isCredentialsSaved() &&
             !dataSourceContainer.getDriver().isAnonymousAccess();
     }
 
@@ -301,8 +327,11 @@ public class WebConnectionInfo {
 
     @Property
     public List<WebNetworkHandlerConfig> getNetworkHandlersConfig() {
-        return dataSourceContainer.getConnectionConfiguration().getHandlers().stream()
-            .map(WebNetworkHandlerConfig::new).collect(Collectors.toList());
+        if (canViewReadOnlyConnections()) {
+            return dataSourceContainer.getConnectionConfiguration().getHandlers().stream()
+                .map(WebNetworkHandlerConfig::new).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
     @Property
@@ -341,7 +370,7 @@ public class WebConnectionInfo {
 
     @Property
     public boolean isCanViewSettings() {
-        return true;
+        return canViewReadOnlyConnections();
     }
 
     @Property
@@ -370,5 +399,14 @@ public class WebConnectionInfo {
             return false;
         }
         return SMUtils.hasProjectPermission(session, ((WebProjectImpl) project).getRmProject(), projectPermission);
+    }
+
+    private boolean canViewReadOnlyConnections() {
+        if (isCanEdit()) {
+            return true;
+        }
+        BaseWebAppConfiguration appConfig = (BaseWebAppConfiguration) WebAppUtils.getWebApplication().getAppConfiguration();
+        return appConfig.isShowReadOnlyConnectionInfo();
+
     }
 }

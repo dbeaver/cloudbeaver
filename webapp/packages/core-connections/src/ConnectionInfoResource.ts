@@ -39,7 +39,7 @@ import type { IConnectionInfoParams } from './IConnectionsResource';
 export type Connection = DatabaseConnection & {
   authProperties?: UserConnectionAuthPropertiesFragment[];
 };
-export type ConnectionInitConfig = Omit<InitConnectionMutationVariables, 'includeOrigin' | 'customIncludeOriginDetails' | 'includeAuthProperties' | 'customIncludeNetworkHandlerCredentials'>;
+export type ConnectionInitConfig = Omit<InitConnectionMutationVariables, 'includeOrigin' | 'customIncludeOriginDetails' | 'includeAuthProperties' | 'customIncludeNetworkHandlerCredentials' | 'includeAuthNeeded' | 'includeCredentialsSaved'>;
 export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
 
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
@@ -529,6 +529,8 @@ export class ConnectionInfoResource
       customIncludeOriginDetails: false,
       includeAuthProperties: false,
       includeOrigin: true,
+      includeAuthNeeded: false,
+      includeCredentialsSaved: false,
     };
   }
 }
