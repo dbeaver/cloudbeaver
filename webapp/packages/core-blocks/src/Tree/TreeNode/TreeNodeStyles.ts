@@ -17,7 +17,7 @@ export const TREE_NODE_STYLES = css`
     }
     node {
       box-sizing: border-box;
-      width: fit-content;
+      width: inherit;
       min-width: 100%;
 
       &[use|expanded] {
