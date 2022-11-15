@@ -33,7 +33,6 @@
         <setEntry value="io.cloudbeaver.ee.drivers.feature:default"/>
         <setEntry value="io.cloudbeaver.product.ce.feature:default"/>
         <setEntry value="io.cloudbeaver.product.ee.feature:default"/>
-        <setEntry value="io.cloudbeaver.sample.feature:default"/>
         <setEntry value="io.cloudbeaver.server.feature:default"/>
         <setEntry value="org.jkiss.dbeaver.db.feature:default"/>
         <setEntry value="org.jkiss.dbeaver.runtime.feature:default"/>
