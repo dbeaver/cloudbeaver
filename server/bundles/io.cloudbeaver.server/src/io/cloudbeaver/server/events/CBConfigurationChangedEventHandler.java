@@ -47,7 +47,7 @@ public class CBConfigurationChangedEventHandler implements CBEventHandler {
 
         for (WebSession activeUserSession : allSessions) {
             if (CommonUtils.equalObjects(activeUserSession.getSessionId(), event.getSessionId())) {
-                return;
+                continue;
             }
             activeUserSession.addSessionEvent(event);
         }

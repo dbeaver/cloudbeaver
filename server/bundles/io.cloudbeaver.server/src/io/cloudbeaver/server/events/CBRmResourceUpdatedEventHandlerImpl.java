@@ -62,7 +62,6 @@ public class CBRmResourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHa
             return;
         }
         Object parsedResourcePath = event.getEventData().get(RESOURCE_PARSED_PATH);
-        event.getEventData().remove(RESOURCE_PARSED_PATH);
         RMResource[] resourceParsedPath;
         if (parsedResourcePath instanceof RMResource[]) {
             resourceParsedPath = (RMResource[]) parsedResourcePath;

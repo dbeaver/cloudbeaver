@@ -42,7 +42,7 @@ public abstract class CBProjectUpdatedEventHandler implements CBEventHandler {
         Collection<WebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
         for (WebSession activeUserSession : allSessions) {
             if (CommonUtils.equalObjects(activeUserSession.getSessionId(), event.getSessionId())) {
-                return;
+                continue;
             }
             updateSessionData(activeUserSession, event);
         }
