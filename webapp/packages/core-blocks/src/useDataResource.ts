@@ -26,6 +26,7 @@ interface IActions<
   TKeyArg extends CachedDataResourceParam<TResource>,
 > {
   active?: boolean;
+  silent?: boolean;
   isActive?: (resource: TResource) => Promise<boolean> | boolean;
   onLoad?: (resource: TResource, key: TKeyArg | null) => Promise<any> | any;
   onData?: (
@@ -145,15 +146,9 @@ export function useDataResource<
           setException(exception);
         }
 
-        if (actions?.onError) {
-          actions.onError(exception);
+        actions?.onError?.(exception);
 
-          if (actions.onError.length > 0) {
-            return;
-          }
-        }
-
-        if (!this.exceptionObserved) {
+        if (!actions?.silent && !this.exceptionObserved) {
           notifications.logException(exception, 'Can\'t load data');
         }
       } finally {

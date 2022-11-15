@@ -11,9 +11,8 @@ import styled, { css } from 'reshadow';
 import { gte } from 'semver';
 
 import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Loader, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 
@@ -27,30 +26,38 @@ const styles = css`
     composes: theme-typography--body2 from global;
     list-style-position: inside;
   }
+
+  Loader {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 export const VersionUpdate: AdministrationItemContentComponent = observer(function VersionUpdate() {
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
-  const notificationService = useService(NotificationService);
   const versionService = useService(VersionService);
   const versionResource = useMapResource(VersionUpdate, VersionResource, CachedMapAllKey, {
-    onError(exception) {
-      notificationService.logException(exception, 'versions_load_fail');
-    },
+    silent: true,
   });
 
   const versions = versionResource.resource.values.filter(v => gte(v.number, versionService.current));
 
   return styled(style)(
     <ColoredContainer wrap gap overflow parent>
-      <VersionChecker />
-      {versions.length > 0 && (
-        <>
-          <Instructions />
-          <VersionSelector versions={versions} />
-        </>
-      )}
-      <Recommendations />
+      <Loader state={versionResource}>
+        {() => (
+          <>
+            <VersionChecker />
+            {versions.length > 0 && (
+              <>
+                <Instructions />
+                <VersionSelector versions={versions} />
+              </>
+            )}
+            <Recommendations />
+          </>
+        )}
+      </Loader>
     </ColoredContainer>
   );
 });

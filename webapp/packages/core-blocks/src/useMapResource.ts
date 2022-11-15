@@ -23,6 +23,7 @@ interface IActions<
   TIncludes
 > {
   active?: boolean;
+  silent?: boolean;
   isActive?: (resource: TResource) => Promise<boolean> | boolean;
   onLoad?: (resource: TResource, key: TKeyArg | null) => Promise<boolean | void> | boolean | void;
   onData?: (
@@ -265,16 +266,9 @@ export function useMapResource<
           setException(exception);
         }
 
+        actions?.onError?.(exception);
 
-        if (actions?.onError) {
-          actions.onError(exception);
-
-          if (actions.onError.length > 0) {
-            return;
-          }
-        }
-
-        if (!this.exceptionObserved) {
+        if (!actions?.silent && !this.exceptionObserved) {
           notifications.logException(exception, 'Can\'t load data');
         }
       } finally {

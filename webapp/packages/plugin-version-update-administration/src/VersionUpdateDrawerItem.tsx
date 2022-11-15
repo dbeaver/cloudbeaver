@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { Translate, useMapResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-ui';
 import { VersionResource } from '@cloudbeaver/core-version';
@@ -42,13 +41,10 @@ export const VersionUpdateDrawerItem = observer<AdministrationItemDrawerProps>(f
   item, onSelect, style, disabled,
 }) {
   const translate = useTranslate();
-  const notificationService = useService(NotificationService);
   const versionUpdateService = useService(VersionUpdateService);
 
   useMapResource(VersionUpdateDrawerItem, VersionResource, CachedMapAllKey, {
-    onError(exception) {
-      notificationService.logException(exception, 'versions_load_fail');
-    },
+    silent: true,
   });
 
   return styled(useStyles(style, styles))(
