@@ -301,8 +301,19 @@ type ConnectionInfo {
     connected: Boolean!
     provided: Boolean!
     readOnly: Boolean!
+    # Forces connection URL use, host/port/database parameters will be ignored
     useUrl: Boolean!
+
+    # Forces credentials save. This flag doesn't work in shared projects.
     saveCredentials: Boolean!
+    # Shared credentials - the same for all users, stored in secure storage.
+    sharedCredentials: Boolean!
+    # Determines that credentials were saved for current user.
+    # This field read is slow, it should be read only when it really needed
+    credentialsSaved: Boolean!
+    # Determines that additional credentials are needed to connect
+    # This field read is slow, it should be read only when it really needed
+    authNeeded: Boolean!
 
     folder: ID
     nodePath: String
@@ -314,7 +325,6 @@ type ConnectionInfo {
 
     origin: ObjectOrigin!
 
-    authNeeded: Boolean!
     authModel: ID
     authProperties: [ObjectPropertyInfo!]!
 
@@ -453,6 +463,7 @@ input ConnectionConfig {
     # User credentials
 
     saveCredentials: Boolean
+    sharedCredentials: Boolean
     authModelId: ID
     credentials: Object
 
@@ -558,7 +569,8 @@ extend type Mutation {
     testNetworkHandler( config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
 
     # Initiate existing connection
-    initConnection( id: ID!, projectId: ID, credentials: Object, networkCredentials: [NetworkHandlerConfigInput!], saveCredentials: Boolean ): ConnectionInfo!
+    initConnection( id: ID!, projectId: ID, credentials: Object, networkCredentials: [NetworkHandlerConfigInput!],
+        saveCredentials:Boolean, sharedCredentials: Boolean ): ConnectionInfo!
 
     # Disconnect from database
     closeConnection( id: ID!, projectId: ID ): ConnectionInfo!

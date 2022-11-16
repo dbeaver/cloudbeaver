@@ -34,7 +34,6 @@ import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
-import org.jkiss.dbeaver.model.impl.app.LocalSecretController;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
@@ -140,9 +139,14 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         );
     }
 
+    /**
+     * There is no secret controller in base web app.
+     * Method returns VoidSecretController instance.
+     * Advanced apps may implement it differently.
+     */
     @Override
     public DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider)  throws DBException {
-        return new LocalSecretController("user/" + credentialsProvider.getActiveUserCredentials().getUserId());
+        return VoidSecretController.INSTANCE;
     }
 
     protected Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {

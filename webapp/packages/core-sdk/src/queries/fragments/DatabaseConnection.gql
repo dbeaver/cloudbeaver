@@ -10,7 +10,10 @@ fragment DatabaseConnection on ConnectionInfo {
   provided
   useUrl
   readOnly
+  
   saveCredentials
+  credentialsSaved @include(if: $includeCredentialsSaved)
+  sharedCredentials
 
   folder
   nodePath
@@ -33,7 +36,7 @@ fragment DatabaseConnection on ConnectionInfo {
     ...ObjectOriginInfo
   }
 
-  authNeeded
+  authNeeded @include(if: $includeAuthNeeded)
   authModel
 
   authProperties @include(if: $includeAuthProperties) {

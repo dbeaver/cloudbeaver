@@ -23,11 +23,13 @@ import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.utils.CommonUtils;
@@ -40,6 +42,8 @@ import java.util.Set;
  * Contains user state and services based on available permissions
  */
 public class WebUserContext implements SMCredentialsProvider {
+    private static final Log log = Log.getLog(WebUserContext.class);
+
     private final WebApplication application;
 
     private WebUser user;
@@ -50,6 +54,7 @@ public class WebUserContext implements SMCredentialsProvider {
 
     private SMController securityController;
     private SMAdminController adminSecurityController;
+    private DBSSecretController secretController;
 
     public WebUserContext(WebApplication application) throws DBException {
         this.application = application;
@@ -64,7 +69,7 @@ public class WebUserContext implements SMCredentialsProvider {
      * @throws DBException - if user already authorized and new token come from another user
      */
     public synchronized boolean refresh(SMAuthInfo smAuthInfo) throws DBException {
-        if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS) {
+        if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS || smAuthInfo.getSmAuthToken() == null) {
             throw new DBCException("Authorization did not complete successfully");
         }
         var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
@@ -85,6 +90,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.userPermissions = authPermissions.getPermissions();
         this.securityController = application.createSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
+        this.secretController = application.getSecretController(this);
         if (isSessionChanged) {
             this.smSessionId = smAuthInfo.getAuthPermissions().getSessionId();
             setUser(authPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));
@@ -114,12 +120,14 @@ public class WebUserContext implements SMCredentialsProvider {
                 this.securityController.logout();
             }
         } catch (Exception e) {
+            log.error("Error logging out user", e);
         }
         this.userPermissions = getDefaultPermissions();
         this.smCredentials = null;
         this.user = null;
         this.securityController = application.createSecurityController(this);
         this.adminSecurityController = null;
+        this.secretController = application.getSecretController(this);
     }
 
     @NotNull
@@ -170,6 +178,10 @@ public class WebUserContext implements SMCredentialsProvider {
         if (userPermissions != null && !userPermissions.isEmpty()) {
             userPermissions.add(DBWConstants.PERMISSION_PUBLIC);
         }
+    }
+
+    public DBSSecretController getSecretController() {
+        return secretController;
     }
 
     public synchronized String getSmSessionId() {

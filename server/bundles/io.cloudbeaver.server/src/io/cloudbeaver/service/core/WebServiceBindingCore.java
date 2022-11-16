@@ -134,7 +134,9 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                         env.getArgument("id"),
                         env.getArgument("credentials"),
                         nhc,
-                        env.getArgument("saveCredentials"));
+                        env.getArgument("saveCredentials"),
+                        env.getArgument("sharedCredentials")
+                    );
                 }
             )
             .dataFetcher("testConnection", env -> getService(env).testConnection(
