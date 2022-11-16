@@ -1,4 +1,4 @@
-query updateTeam($teamId: ID!, $teamName: String, $description: String ) {
+query updateTeam($teamId: ID!, $teamName: String, $description: String, $includeMetaParameters: Boolean!) {
   team: updateTeam(teamId: $teamId, teamName: $teamName, description: $description) {
     ...AdminTeamInfo
   }

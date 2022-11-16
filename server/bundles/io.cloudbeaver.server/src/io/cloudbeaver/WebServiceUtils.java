@@ -140,7 +140,13 @@ public class WebServiceUtils extends WebCommonUtils {
         //navSettings.setShowSystemObjects(false);
         ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
 
-        saveAuthProperties(newDataSource, newDataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
+        saveAuthProperties(
+            newDataSource,
+            newDataSource.getConnectionConfiguration(),
+            config.getCredentials(),
+            config.isSaveCredentials(),
+            config.isSharedCredentials()
+        );
 
 
         return newDataSource;
@@ -245,9 +251,11 @@ public class WebServiceUtils extends WebCommonUtils {
         @NotNull DBPDataSourceContainer dataSourceContainer,
         @NotNull DBPConnectionConfiguration configuration,
         @Nullable Map<String, Object> authProperties,
-        boolean saveCredentials)
-    {
+        boolean saveCredentials,
+        boolean sharedCredentials
+    ) {
         dataSourceContainer.setSavePassword(saveCredentials);
+        dataSourceContainer.setSharedCredentials(sharedCredentials);
         if (!saveCredentials) {
             // Reset credentials
             if (authProperties == null) {
@@ -293,7 +301,13 @@ public class WebServiceUtils extends WebCommonUtils {
             dataSource.setFolder(null);
         }
         getGlobalDataSourceRegistry().getAllFolders().clear();
-        saveAuthProperties(dataSource, dataSource.getConnectionConfiguration(), config.getCredentials(), config.isSaveCredentials());
+        saveAuthProperties(
+            dataSource,
+            dataSource.getConnectionConfiguration(),
+            config.getCredentials(),
+            config.isSaveCredentials(),
+            config.isSharedCredentials()
+        );
     }
 
     public static DBNBrowseSettings parseNavigatorSettings(Map<String, Object> settingsMap) {

@@ -107,7 +107,9 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
   private async loadAuthModel() {
     try {
-      const connection = await this.connectionInfoResource.load(this.connectionKey, ['includeAuthProperties', 'customIncludeNetworkHandlerCredentials']);
+      const connection = await this.connectionInfoResource.load(this.connectionKey, [
+        'includeAuthProperties', 'customIncludeNetworkHandlerCredentials', 'includeAuthNeeded',
+      ]);
 
       if (connection.authNeeded) {
         const property = connection.authProperties.find(property => property.id === USER_NAME_PROPERTY_ID);
