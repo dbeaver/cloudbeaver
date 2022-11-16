@@ -387,28 +387,29 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         node.rename(session.getProgressMonitor(), newName);
         var newPath = rmNode.getResourceFolder();
         var newRmResourcePath = rmController.getResourcePath(projectId, newPath);
-        addRmMoveEvent(session, projectId, resourcePath, oldRmResourcePath, newRmResourcePath);
+        addRmMoveEvent(session, projectId, resourcePath, newPath, oldRmResourcePath, newRmResourcePath);
         return node.getName();
     }
 
     private void addRmMoveEvent(
         @NotNull WebSession session,
         String projectId,
-        String resourcePath,
+        String oldResourcePath,
+        String newResourcePath,
         RMResource[] oldRmResourcePath,
         RMResource[] newRmResourcePath
     ) {
         WebEventUtils.addRmResourceUpdatedEvent(
             projectId,
             session.getSessionId(),
-            resourcePath,
+            oldResourcePath,
             oldRmResourcePath,
             CBEventConstants.EventType.TYPE_DELETE
         );
         WebEventUtils.addRmResourceUpdatedEvent(
             projectId,
             session.getSessionId(),
-            resourcePath,
+            newResourcePath,
             newRmResourcePath,
             CBEventConstants.EventType.TYPE_CREATE
         );
@@ -567,7 +568,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     var oldRmResourcePath = rmController.getResourcePath(projectId, resourcePath);
                     rmController.moveResource(projectId, resourcePath, newPath);
                     var newRmResourcePath = rmController.getResourcePath(projectId, newPath);
-                    addRmMoveEvent(session, projectId, resourcePath, oldRmResourcePath, newRmResourcePath);
+                    addRmMoveEvent(session, projectId, resourcePath, newPath, oldRmResourcePath, newRmResourcePath);
                 } else {
                     throw new DBWebException("Navigator node '"  + path + "' is not a data source node");
                 }
