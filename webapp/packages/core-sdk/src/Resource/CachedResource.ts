@@ -389,11 +389,13 @@ export abstract class CachedResource<
   }
 
   async refresh(param: TParam, context: TContext): Promise<any> {
+    await this.preLoadData(param, false, context);
     await this.loadData(param, true, context);
     return this.data;
   }
 
   async load(param: TParam, context: TContext): Promise<any> {
+    await this.preLoadData(param, false, context);
     await this.loadData(param, false, context);
     return this.data;
   }
@@ -545,6 +547,8 @@ export abstract class CachedResource<
         error: exception => this.markDataError(exception, param, context),
       });
   }
+
+  protected async preLoadData(param: TParam, refresh: boolean, context: TContext): Promise<void> { }
 
   protected async loadData(param: TParam, refresh: boolean, context: TContext): Promise<void> {
     if (!refresh) {

@@ -10,11 +10,11 @@ import { action, computed, makeObservable, observable, runInAction, toJS } from 
 
 import { IConnectionExecutionContextInfo, NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
-import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import type { IResourceManagerParams, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { debounce, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
 
-import type { IResourceNodeInfo, IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
+import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
 
 interface IResourceProperties {
   'default-datasource'?: string;
@@ -27,16 +27,20 @@ interface IResourceInfo {
 }
 
 interface IResourceActions {
-  rename(dataSource: ResourceSqlDataSource, nodeId: string, name: string): Promise<string>;
-  read(dataSource: ResourceSqlDataSource, nodeId: string): Promise<string>;
-  write(dataSource: ResourceSqlDataSource, nodeId: string, value: string): Promise<void>;
+  rename(
+    dataSource: ResourceSqlDataSource,
+    key: IResourceManagerParams,
+    newKey: IResourceManagerParams
+  ): Promise<IResourceManagerParams>;
+  read(dataSource: ResourceSqlDataSource, key: IResourceManagerParams): Promise<string>;
+  write(dataSource: ResourceSqlDataSource, key: IResourceManagerParams, value: string): Promise<void>;
   getProperties(
     dataSource: ResourceSqlDataSource,
-    nodeId: string
+    key: IResourceManagerParams
   ): Promise<Record<string, any>>;
   setProperties(
     dataSource: ResourceSqlDataSource,
-    nodeId: string,
+    key: IResourceManagerParams,
     diff: Record<string, any>
   ): Promise<Record<string, any>>;
 }
@@ -47,11 +51,13 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   static key = 'resource';
 
   get name(): string | null {
-    if (!this.nodeInfo) {
-      return this.state.name ?? null;
+    if (!this.resourceKey) {
+      return null;
     }
 
-    return this.navNodeInfoResource.get(this.nodeInfo.nodeId)?.name ?? this.state.name ?? null;
+    const resource = this.resourceManagerResource.get(this.resourceKey)?.[0];
+
+    return resource?.name ?? this.resourceKey.name ?? null;
   }
 
   get script(): string {
@@ -59,15 +65,15 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   get projectId(): string | null {
-    return this.nodeInfo?.projectId ?? null;
+    return this.resourceKey?.projectId ?? null;
   }
 
   get executionContext(): IConnectionExecutionContextInfo | undefined {
     return this.state.executionContext;
   }
 
-  get nodeInfo(): IResourceNodeInfo | undefined {
-    return this.state.nodeInfo;
+  get resourceKey(): IResourceManagerParams | undefined {
+    return this.state.resourceKey;
   }
 
   get reload(): undefined | (() => Promise<void>) {
@@ -94,7 +100,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   private readonly scheduler: TaskScheduler;
 
   constructor(
-    private readonly navNodeInfoResource: NavNodeInfoResource,
+    private readonly resourceManagerResource: ResourceManagerResource,
     state: IResourceSqlDataSourceState
   ) {
     super();
@@ -109,7 +115,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     makeObservable<this, '_script' | 'lastAction' | 'loaded' | 'resourceProperties'>(this, {
       script: computed,
       executionContext: computed,
-      nodeInfo: computed,
+      resourceKey: computed,
       features: computed<ESqlDataSourceFeatures[]>({
         equals: isArraysEqual,
       }),
@@ -119,7 +125,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       resourceProperties: observable,
       setExecutionContext: action,
       setScript: action,
-      setNodeInfo: action,
+      setResourceKey: action,
     });
   }
 
@@ -128,19 +134,19 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   isOutdated(): boolean {
-    return this.nodeInfo !== undefined && super.isOutdated();
+    return this.resourceKey !== undefined && super.isOutdated();
   }
 
   isLoaded(): boolean {
-    return this.nodeInfo === undefined || super.isLoaded() || this.loaded;
+    return this.resourceKey === undefined || super.isLoaded() || this.loaded;
   }
 
   isLoading(): boolean {
     return this.scheduler.executing;
   }
 
-  setNodeInfo(nodeInfo?: IResourceNodeInfo): void {
-    this.state.nodeInfo = nodeInfo;
+  setResourceKey(resourceKey: IResourceManagerParams): void {
+    this.state.resourceKey = resourceKey;
     this.markOutdated();
     this.saved = true;
     this.loaded = false;
@@ -175,7 +181,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
     return (
       !!this.actions
-      && !!this.nodeInfo
+      && !!this.resourceKey
       && this.saved
       && name.length > 0
     );
@@ -200,9 +206,9 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
     if (
-      this.nodeInfo?.projectId
+      this.resourceKey?.projectId
       && executionContext?.projectId
-      && this.nodeInfo.projectId !== executionContext.projectId
+      && this.resourceKey.projectId !== executionContext.projectId
     ) {
       console.warn('Cant change execution context because of different projects');
       return;
@@ -238,7 +244,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     await this.scheduler.schedule(undefined, async () => {
       if (
         !this.actions
-      || !this.nodeInfo
+      || !this.resourceKey
       || !this.saved
       || !name?.trim()
       ) {
@@ -254,11 +260,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
       try {
         this.exception = null;
-        this.nodeInfo.nodeId = await this.actions.rename(this, this.nodeInfo.nodeId, name);
-
-        if (this.nodeInfo.parents.length > 0) {
-          this.nodeInfo.parents.splice(this.nodeInfo.parents.length - 1, 1, this.nodeInfo.nodeId);
-        }
+        this.state.resourceKey = await this.actions.rename(this, this.resourceKey, { ...this.resourceKey, name });
 
         this.markOutdated();
         this.saved = true;
@@ -273,7 +275,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   async read() {
     await this.scheduler.schedule(undefined, async () => {
-      if (!this.actions || !this.nodeInfo || !this.isOutdated() || !this.saved) {
+      if (!this.actions || !this.resourceKey || !this.isOutdated() || !this.saved) {
         return;
       }
 
@@ -282,8 +284,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
       try {
         this.exception = null;
-        this._script = await this.actions.read(this, this.nodeInfo.nodeId);
-        this.state.name = this.name ?? undefined;
+        this._script = await this.actions.read(this, this.resourceKey);
         this.markUpdated();
         this.loaded = true;
         super.setScript(this.script);
@@ -297,7 +298,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   async write() {
     await this.scheduler.schedule(undefined, async () => {
-      if (!this.actions || !this.nodeInfo || this.saved) {
+      if (!this.actions || !this.resourceKey || this.saved) {
         return;
       }
 
@@ -306,8 +307,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
       try {
         this.exception = null;
-        await this.actions.write(this, this.nodeInfo.nodeId, this.script);
-        this.state.name = this.name ?? undefined;
+        await this.actions.write(this, this.resourceKey, this.script);
         this.saved = true;
         this.markUpdated();
       } catch (exception: any) {
@@ -324,7 +324,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     }
 
     await this.scheduler.schedule(undefined, async () => {
-      if (!this.actions || !this.nodeInfo) {
+      if (!this.actions || !this.resourceKey) {
         return;
       }
 
@@ -337,7 +337,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
         if (!this.isReadonly()) {
           await this.actions.setProperties(
             this,
-            this.nodeInfo.nodeId,
+            this.resourceKey,
             properties
           );
         }
@@ -352,13 +352,13 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   private async updateProperties() {
-    if (!this.actions || !this.nodeInfo) {
+    if (!this.actions || !this.resourceKey) {
       return;
     }
 
     const previousProperties = this.resourceProperties;
 
-    const resourceProperties = await this.actions.getProperties(this, this.nodeInfo.nodeId);
+    const resourceProperties = await this.actions.getProperties(this, this.resourceKey);
 
     runInAction(() => {
       this.resourceProperties = toJS(resourceProperties);
@@ -371,7 +371,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       const defaultCatalog = this.resourceProperties['default-catalog'];
       const defaultSchema = this.resourceProperties['default-schema'];
 
-      if (!this.nodeInfo!.projectId) {
+      if (!this.resourceKey!.projectId) {
         return;
       }
 
@@ -380,11 +380,11 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
           !isValuesEqual(this.state.executionContext?.connectionId, connectionId, null)
         || !isValuesEqual(this.state.executionContext?.defaultCatalog, defaultCatalog, null)
         || !isValuesEqual(this.state.executionContext?.defaultSchema, defaultSchema, null)
-        || !isValuesEqual(this.state.executionContext?.projectId, this.nodeInfo!.projectId, null)
+        || !isValuesEqual(this.state.executionContext?.projectId, this.resourceKey!.projectId, null)
         ) {
           this.state.executionContext = {
             id: NOT_INITIALIZED_CONTEXT_ID,
-            projectId: this.nodeInfo!.projectId,
+            projectId: this.resourceKey!.projectId,
             connectionId,
             defaultCatalog,
             defaultSchema,

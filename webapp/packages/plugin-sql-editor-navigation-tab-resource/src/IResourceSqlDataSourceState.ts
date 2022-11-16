@@ -7,15 +7,9 @@
  */
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
-
-export interface IResourceNodeInfo {
-  nodeId: string;
-  projectId?: string;
-  parents: string[];
-}
+import type { IResourceManagerParams } from '@cloudbeaver/core-resource-manager';
 
 export interface IResourceSqlDataSourceState {
-  name?: string;
-  nodeInfo?: IResourceNodeInfo;
+  resourceKey?: IResourceManagerParams;
   executionContext?: IConnectionExecutionContextInfo;
 }

@@ -2578,9 +2578,9 @@ export type GetProjectPermissionsListQuery = { permissions: Array<{ id: string, 
 
 export type GetResourceListQueryVariables = Exact<{
   projectId: Scalars['String'];
-  folder?: InputMaybe<Scalars['String']>;
+  path?: InputMaybe<Scalars['String']>;
   nameMask?: InputMaybe<Scalars['String']>;
-  readProperties?: InputMaybe<Scalars['Boolean']>;
+  includeProperties: Scalars['Boolean'];
   readHistory?: InputMaybe<Scalars['Boolean']>;
 }>;
 
@@ -4176,18 +4176,18 @@ export const GetProjectPermissionsListDocument = `
 }
     ${AdminPermissionInfoFragmentDoc}`;
 export const GetResourceListDocument = `
-    query getResourceList($projectId: String!, $folder: String, $nameMask: String, $readProperties: Boolean, $readHistory: Boolean) {
+    query getResourceList($projectId: String!, $path: String, $nameMask: String, $includeProperties: Boolean!, $readHistory: Boolean) {
   resources: rmListResources(
     projectId: $projectId
-    folder: $folder
+    folder: $path
     nameMask: $nameMask
-    readProperties: $readProperties
+    readProperties: $includeProperties
     readHistory: $readHistory
   ) {
     name
     folder
     length
-    properties
+    properties @include(if: $includeProperties)
   }
 }
     `;

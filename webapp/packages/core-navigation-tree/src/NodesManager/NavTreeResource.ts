@@ -289,7 +289,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
           if (nodeInfo) {
             nodeInfo.hasChildren = children.length > 0;
           }
-          this.data.set(parentId, children);
+          this.dataSet(parentId, children);
         }
       }
 
@@ -319,7 +319,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         if (nodeInfo) {
           nodeInfo.hasChildren = children.length > 0;
         }
-        this.data.set(key, children);
+        this.dataSet(key, children);
       }
 
       deletedKeys.push(...values);
@@ -343,7 +343,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       if (nodeInfo) {
         nodeInfo.hasChildren = currentValue.length > 0;
       }
-      this.data.set(key, currentValue);
+      this.dataSet(key, currentValue);
     });
 
     this.markUpdated(keyObject);
@@ -363,7 +363,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       if (nodeInfo) {
         nodeInfo.hasChildren = currentValue.length > 0;
       }
-      this.data.set(key, currentValue);
+      this.dataSet(key, currentValue);
     });
 
     this.markUpdated(keyObject);
@@ -379,7 +379,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     if (nodeInfo) {
       nodeInfo.hasChildren = currentValue.length > 0;
     }
-    this.data.set(nodeId, currentValue);
+    this.dataSet(nodeId, currentValue);
 
     this.markUpdated(nodeId);
     this.onItemAdd.execute(nodeId);
@@ -393,7 +393,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       const value = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
       const children = this.data.get(key) || [];
       childrenToRemove.push(...children.filter(navNodeId => !value.includes(navNodeId)));
-      this.data.set(key, value);
+      this.dataSet(key, value);
     });
 
     this.delete(resourceKeyList(childrenToRemove));
@@ -418,7 +418,8 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       this.dataDelete(key);
       this.metadata.delete(key);
     });
-    this.markUpdated(allKeys);
+    // rewrites pending outdate
+    // this.markUpdated(allKeys);
 
     this.navNodeInfoResource.delete(allKeys);
   }
@@ -516,6 +517,20 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
       this.set(data.parentPath, data.navNodeChildren.map(node => node.id));
     }
+  }
+
+  protected dataSet(key: string, value: string[]): void {
+    key = this.getKeyRef(key);
+    const currentValue = this.dataGet(key) || [];
+
+    const deleted = currentValue.filter(r => !value.some(v => v === r));
+
+    if (deleted.length > 0) {
+      this.delete(resourceKeyList(deleted));
+    }
+
+    this.data.set(key, value);
+    this.navNodeInfoResource.markUpdated(resourceKeyList(value));
   }
 
   private async loadNodeChildren(
