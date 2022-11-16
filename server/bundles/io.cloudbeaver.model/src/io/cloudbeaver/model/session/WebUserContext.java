@@ -59,7 +59,7 @@ public class WebUserContext implements SMCredentialsProvider {
     public WebUserContext(WebApplication application) throws DBException {
         this.application = application;
         this.securityController = application.createSecurityController(this);
-        this.userPermissions = getDefaultPermissions();
+        setUserPermissions(getDefaultPermissions());
     }
 
     /**
@@ -87,7 +87,7 @@ public class WebUserContext implements SMCredentialsProvider {
             authPermissions.getPermissions()
         );
         this.refreshToken = smAuthInfo.getSmRefreshToken();
-        this.userPermissions = authPermissions.getPermissions();
+        setUserPermissions(authPermissions.getPermissions());
         this.securityController = application.createSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
         this.secretController = application.getSecretController(this);
@@ -122,7 +122,7 @@ public class WebUserContext implements SMCredentialsProvider {
         } catch (Exception e) {
             log.error("Error logging out user", e);
         }
-        this.userPermissions = getDefaultPermissions();
+        setUserPermissions(getDefaultPermissions());
         this.smCredentials = null;
         this.user = null;
         this.securityController = application.createSecurityController(this);
@@ -171,11 +171,16 @@ public class WebUserContext implements SMCredentialsProvider {
      */
     public synchronized void refreshPermissions() throws DBException {
         if (isAuthorizedInSecurityManager()) {
-            this.userPermissions = securityController.getTokenPermissions().getPermissions();
+            setUserPermissions(securityController.getTokenPermissions().getPermissions());
         } else {
-            this.userPermissions = getDefaultPermissions();
+            setUserPermissions(getDefaultPermissions());
         }
-        if (userPermissions != null && !userPermissions.isEmpty()) {
+    }
+
+    private void setUserPermissions(Set<String> permissions) {
+        this.userPermissions = permissions;
+        // FIXME: automatically assign public permission in sm controller˚
+        if (!CommonUtils.isEmpty(userPermissions)) {
             userPermissions.add(DBWConstants.PERMISSION_PUBLIC);
         }
     }
