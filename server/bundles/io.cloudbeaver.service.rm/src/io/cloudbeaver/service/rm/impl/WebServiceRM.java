@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.security.*;
 
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -110,12 +111,17 @@ public class WebServiceRM implements DBWServiceRM {
         checkIsRmEnabled(webSession);
         try {
             getResourceController(webSession).setResourceProperty(projectId, resourcePath, propertyName, propertyValue);
-            WebEventUtils.addRmResourceUpdatedEvent(
+            Map<String, Object> eventData = WebEventUtils.generateRmResourceEventData(
                 projectId,
-                webSession.getSessionId(),
                 resourcePath,
                 getResourceController(webSession).getResourcePath(projectId, resourcePath),
                 CBEventConstants.EventType.TYPE_UPDATE
+            );
+            eventData.put("propertyName", propertyName);
+            eventData.put("propertyValue", propertyValue);
+            WebEventUtils.addRmResourceUpdatedEvent(
+                webSession.getSessionId(),
+                eventData
             );
             return Boolean.TRUE.toString();
         } catch (DBException e) {

@@ -20,6 +20,7 @@ import io.cloudbeaver.events.CBEvent;
 import io.cloudbeaver.events.CBEventConstants;
 import org.jkiss.dbeaver.model.app.DBPProject;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,18 +57,44 @@ public class WebEventUtils {
         String sessionId,
         String resourcePath,
         Object resourceParsedPath,
-        CBEventConstants.EventType eventType) {
+        CBEventConstants.EventType eventType
+    ) {
+        addRmResourceUpdatedEvent(
+            sessionId,
+            generateRmResourceEventData(
+                projectId,
+                resourcePath,
+                resourceParsedPath,
+                eventType
+            )
+        );
+    }
+
+    public static void addRmResourceUpdatedEvent(String sessionId, Map<String, Object> eventData) {
         WebAppUtils.getWebApplication().getEventController().addEvent(
             new CBEvent(
                 CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
                 sessionId,
-                Map.of(
-                    "projectId", projectId,
-                    "resourcePath", resourcePath,
-                    "resourceParsedPath", resourceParsedPath,
-                    "eventType", eventType
-                )
+                eventData
             )
         );
     }
+
+    public static Map<String, Object> generateRmResourceEventData(
+        String projectId,
+        String resourcePath,
+        Object resourceParsedPath,
+        CBEventConstants.EventType eventType
+    ) {
+        return new LinkedHashMap<>(
+            Map.of(
+                "projectId", projectId,
+                "resourcePath", resourcePath,
+                "resourceParsedPath", resourceParsedPath,
+                "eventType", eventType
+            )
+        );
+    }
+
+
 }

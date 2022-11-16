@@ -23,6 +23,7 @@ import io.cloudbeaver.events.CBEvent;
 import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
@@ -31,6 +32,7 @@ import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Notify all active user session that rm resource has been updated
@@ -69,6 +71,7 @@ public class CBRmResourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHa
             resourceParsedPath = gson.fromJson(gson.toJson(parsedResourcePath), RMResource[].class);
         }
         acceptChangesInNavigatorTree(eventType, resourceParsedPath, project);
+        setResourcePropertyToResource(activeUserSession, eventType, projectId, resourcePath, event.getEventData());
         activeUserSession.addSessionEvent(event);
     }
 
@@ -86,6 +89,27 @@ public class CBRmResourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHa
                     project.getRmProject(),
                     rmResourcePath)
             );
+        }
+    }
+
+    private void setResourcePropertyToResource(
+        WebSession session,
+        String eventType,
+        String projectId,
+        String resourcePath,
+        Map<String, Object> eventData)
+    {
+        if (eventType.equals("TYPE_UPDATE")) {
+            var propertyName = JSONUtils.getString(eventData, "propertyName");
+            if (propertyName == null) {
+                return;
+            }
+            Object propertyValue = eventData.get("propertyValue");
+            try {
+                session.getRmController().setResourceProperty(projectId, resourcePath, propertyName, propertyValue);
+            } catch (DBException ignored) {
+
+            }
         }
     }
 }
