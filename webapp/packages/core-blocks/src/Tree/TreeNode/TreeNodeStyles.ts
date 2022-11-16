@@ -35,7 +35,7 @@ export const TREE_NODE_STYLES = css`
         height: 24px;
         display: flex;
         align-items: center;
-        padding: 2px 5px;
+        padding: 2px 0 2px 0;
         user-select: none;
         white-space: nowrap;
         position: initial;
@@ -57,7 +57,7 @@ export const TREE_NODE_STYLES = css`
         }
 
         & > * {
-          margin-right: 4px;
+          margin-right: 0px;
           margin-left: 4px;
         }
       }
@@ -93,7 +93,7 @@ export const TREE_NODE_STYLES = css`
 
     TreeNodeName {
       box-sizing: border-box;
-      padding-right: 16px;
+      padding-right: 0;
       display: flex;
       align-items: center;
     }
@@ -112,7 +112,7 @@ export const TREE_NODE_STYLES = css`
 
     TreeNodeNested {
       box-sizing: border-box;
-      padding-left: 24px;
+      padding-left: 8px;
       display: none;
 
       &[root] {
