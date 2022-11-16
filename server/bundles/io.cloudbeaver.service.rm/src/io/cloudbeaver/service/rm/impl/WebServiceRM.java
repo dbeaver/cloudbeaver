@@ -110,6 +110,13 @@ public class WebServiceRM implements DBWServiceRM {
         checkIsRmEnabled(webSession);
         try {
             getResourceController(webSession).setResourceProperty(projectId, resourcePath, propertyName, propertyValue);
+            WebEventUtils.addRmResourceUpdatedEvent(
+                projectId,
+                webSession.getSessionId(),
+                resourcePath,
+                getResourceController(webSession).getResourcePath(projectId, resourcePath),
+                CBEventConstants.EventType.TYPE_UPDATE
+            );
             return Boolean.TRUE.toString();
         } catch (DBException e) {
             String message = String.format("Error setting property [%s] for the the resource: [%s]", resourcePath, propertyName);
