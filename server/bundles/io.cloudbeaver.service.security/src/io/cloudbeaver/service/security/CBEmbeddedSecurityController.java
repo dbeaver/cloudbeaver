@@ -1810,7 +1810,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public void updateSession(@NotNull String sessionId, @NotNull Map<String, Object> parameters) throws DBCException {
-        String userId = getUserIdOrThrow();
+        String userId = getUserIdOrNull();
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "UPDATE CB_SESSION SET USER_ID=?,LAST_ACCESS_TIME=?,LAST_ACCESS_REMOTE_ADDRESS=?,LAST_ACCESS_USER_AGENT=?,LAST_ACCESS_INSTANCE_ID=? WHERE SESSION_ID=?")) {
@@ -2163,10 +2163,21 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         return originalLink + "?authId=" + authId;
     }
 
+
+    @NotNull
     private String getUserIdOrThrow() throws SMException {
+        String userId = getUserIdOrNull();
+        if (userId == null) {
+            throw new SMException("User not authenticated");
+        }
+        return userId;
+    }
+
+    @Nullable
+    private String getUserIdOrNull() {
         SMCredentials activeUserCredentials = credentialsProvider.getActiveUserCredentials();
         if (activeUserCredentials == null || activeUserCredentials.getUserId() == null) {
-            throw new SMException("User not authenticated");
+            return null;
         }
         return activeUserCredentials.getUserId();
     }
