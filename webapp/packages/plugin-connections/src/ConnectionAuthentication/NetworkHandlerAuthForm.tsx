@@ -26,6 +26,7 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
   const translate = useTranslate();
   const handler = useMapResource(NetworkHandlerAuthForm, NetworkHandlerResource, id);
 
+  //@TODO Do not mutate state in component body
   if (!networkHandlersConfig.some(state => state.id === id)) {
     networkHandlersConfig.push({
       id,
