@@ -42,7 +42,7 @@ public class CBDataSourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHa
         CBEventConstants.EventType eventType =
             CBEventConstants.EventType.valueOf(JSONUtils.getString(event.getEventData(), "eventType"));
         WebProjectImpl project = activeUserSession.getProjectById(projectId);
-        if (project == null || !project.getRmProject().isShared()) {
+        if (project == null) {
             return;
         }
         activeUserSession.updateProjectConnection(project, dataSourceIds, eventType);
