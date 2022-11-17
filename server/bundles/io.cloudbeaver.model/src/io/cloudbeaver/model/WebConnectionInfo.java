@@ -327,11 +327,8 @@ public class WebConnectionInfo {
 
     @Property
     public List<WebNetworkHandlerConfig> getNetworkHandlersConfig() {
-        if (canViewReadOnlyConnections()) {
-            return dataSourceContainer.getConnectionConfiguration().getHandlers().stream()
-                .map(WebNetworkHandlerConfig::new).collect(Collectors.toList());
-        }
-        return Collections.emptyList();
+        return dataSourceContainer.getConnectionConfiguration().getHandlers().stream()
+            .map(WebNetworkHandlerConfig::new).collect(Collectors.toList());
     }
 
     @Property
