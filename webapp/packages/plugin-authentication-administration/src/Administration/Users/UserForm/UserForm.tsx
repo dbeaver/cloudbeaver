@@ -62,6 +62,7 @@ const topBarStyles = css`
       position: relative;
       display: flex;
       padding-top: 16px;
+      margin-bottom: 24px;
 
       &:before {
         content: '';
