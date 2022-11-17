@@ -73,6 +73,7 @@ export class SqlEditorTabService extends Bootstrap {
       onRestore: this.handleTabRestore.bind(this),
       onUnload: this.handleTabUnload.bind(this),
       onClose: this.handleTabClose.bind(this),
+      onCloseSilent: this.handleTabCloseSilent.bind(this),
       canClose: this.handleCanTabClose.bind(this),
       extensions: [
         objectNavNodeProvider(this.getNavNode.bind(this)),
@@ -496,6 +497,17 @@ export class SqlEditorTabService extends Bootstrap {
 
     await this.sqlDataSourceService.unload(editorTab.handlerState.editorId);
 
+    this.sqlResultTabsService.removeResultTabs(editorTab.handlerState);
+  }
+
+  private async handleTabCloseSilent(editorTab: ITab<ISqlEditorTabState>) {
+    const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
+
+    if (dataSource?.executionContext) {
+      await this.sqlEditorService.destroyContext(dataSource.executionContext);
+    }
+
+    await this.sqlDataSourceService.destroySilent(editorTab.handlerState.editorId);
     this.sqlResultTabsService.removeResultTabs(editorTab.handlerState);
   }
 

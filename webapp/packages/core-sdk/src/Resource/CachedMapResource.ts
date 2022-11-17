@@ -149,6 +149,34 @@ export abstract class CachedMapResource<
     return ResourceKeyUtils.map(key, key => this.getMetadata(key).exception);
   }
 
+  isInUse(key: ResourceKey<TKey>): boolean {
+    return ResourceKeyUtils.every(key, key => super.isInUse(this.getKeyRef(key)));
+  }
+
+  use(key: TKey): string;
+  use(key: ResourceKeyList<TKey>): Array<string>;
+  use(key: ResourceKey<TKey>): Array<string> | string;
+  use(key: ResourceKey<TKey>): Array<string> | string {
+    key = this.transformParam(key);
+
+    return ResourceKeyUtils.map(key, key => {
+      key = this.getKeyRef(key);
+      return super.use(key);
+    });
+  }
+
+  free(key: TKey, id: string): void;
+  free(key: ResourceKeyList<TKey>, ids: string[]): void;
+  free(key: ResourceKey<TKey>, ids: string | string[]): void;
+  free(key: ResourceKey<TKey>, ids: string | string[]): void {
+    key = this.transformParam(key);
+    ResourceKeyUtils.forEach(key, (key, i) => {
+      key = this.getKeyRef(key);
+      const id = i === -1 ? ids as string : ids[i];
+      super.free(key, id);
+    });
+  }
+
   isOutdated(key: ResourceKey<TKey>): boolean {
     if (this.isAlias(key) && !this.isAliasLoaded(key)) {
       return true;
@@ -315,7 +343,6 @@ export abstract class CachedMapResource<
     this.onItemDelete.execute(key);
     ResourceKeyUtils.forEach(key, key => {
       this.dataDelete(key);
-      this.deleteMetadata(key);
     });
     // rewrites pending outdate
     // this.markUpdated(key);
@@ -493,6 +520,8 @@ export abstract class CachedMapResource<
   protected dataDelete(key: TKey): void {
     key = this.getKeyRef(key);
     this.data.delete(key);
+    this.metadata.delete(key);
+    this.paramsInUse.delete(key);
   }
 
   /**

@@ -10,7 +10,7 @@ import { observable, makeObservable, action } from 'mobx';
 
 import { Dependency } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, IExecutorHandler, ISyncExecutor, SyncExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
-import { MetadataMap } from '@cloudbeaver/core-utils';
+import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
 export interface ICachedResourceMetadata {
   outdated: boolean;
@@ -54,6 +54,7 @@ export abstract class CachedResource<
 
   protected metadata: MetadataMap<TKey, ICachedResourceMetadata>;
   protected loadedKeys: TParam[];
+  protected paramsInUse: MetadataMap<TParam, string[]>;
   protected defaultIncludes: string[];
 
   protected get loading(): boolean {
@@ -74,6 +75,7 @@ export abstract class CachedResource<
 
     this.logActivity = false;
     this.loadedKeys = [];
+    this.paramsInUse = new MetadataMap(() => []);
 
     this.defaultIncludes = defaultIncludes;
     this.paramAliases = [];
@@ -113,6 +115,8 @@ export abstract class CachedResource<
       commitIncludes: action,
       markOutdatedSync: action,
       resetIncludes: action,
+      use: action,
+      free: action,
     });
   }
 
@@ -221,6 +225,25 @@ export abstract class CachedResource<
     });
 
     return this;
+  }
+
+  isInUse(param: TParam): boolean {
+    return this.paramsInUse.get(param).length > 0;
+  }
+
+  use(param: TParam): string {
+    const list = this.paramsInUse.get(param);
+    const id = uuid();
+    list.push(id);
+    return id;
+  }
+
+  free(param: TParam, id: string): void {
+    const list = this.paramsInUse.get(param);
+
+    if (list.length > 0) {
+      this.paramsInUse.set(param, list.filter(v => v !== id));
+    }
   }
 
   abstract isLoaded(param: TParam, context: TContext): boolean;

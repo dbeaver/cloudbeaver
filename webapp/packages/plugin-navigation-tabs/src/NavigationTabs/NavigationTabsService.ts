@@ -20,7 +20,7 @@ import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { ACTION_OPEN_IN_TAB, IActiveView, View } from '@cloudbeaver/core-view';
 
 import type { ITab } from './ITab';
-import { TabHandler, TabHandlerOptions, TabHandlerEvent } from './TabHandler';
+import { TabHandler, TabHandlerOptions, TabHandlerEvent, TabSyncHandlerEvent } from './TabHandler';
 import { TabNavigationContext, ITabNavigationContext } from './TabNavigationContext';
 
 interface INavigatorHistory {
@@ -276,6 +276,7 @@ export class NavigationTabsService extends View<ITab> {
         this.history.history = this.history.history.filter(id => id !== tabId);
         this.tabsMap.delete(tabId);
         this.userTabsState.tabs = this.userTabsState.tabs.filter(id => id !== tabId);
+        this.callHandlerSyncCallback(tab, handler => handler.onCloseSilent);
       }
     });
 
@@ -414,6 +415,20 @@ export class NavigationTabsService extends View<ITab> {
 
       this.onInit.execute(true);
     });
+  }
+
+  private callHandlerSyncCallback(tab: ITab, selector: (handler: TabHandler) => TabSyncHandlerEvent | undefined) {
+    const handler = this.handlers.get(tab.handlerId);
+
+    if (!handler) {
+      return;
+    }
+
+    const callback = selector(handler);
+
+    if (callback) {
+      callback.call(handler, tab);
+    }
   }
 
   private async callHandlerCallback(tab: ITab, selector: (handler: TabHandler) => TabHandlerEvent | undefined) {

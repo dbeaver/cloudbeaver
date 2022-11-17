@@ -141,6 +141,14 @@ export class SqlDataSourceService {
     return (await activeProvider?.provider.canDestroy?.(activeProvider.dataSource, editorId)) ?? true;
   }
 
+  async destroySilent(editorId: string): Promise<void> {
+    const activeProvider = this.providers.get(editorId);
+
+    if (activeProvider) {
+      await this.destroyProvider(editorId, activeProvider);
+    }
+  }
+
   async destroy(editorId: string): Promise<void> {
     const activeProvider = this.providers.get(editorId);
 
@@ -174,5 +182,6 @@ export class SqlDataSourceService {
 
   private async destroyProvider(editorId: string, provider: ISqlDataSourceProvider): Promise<void> {
     await provider.provider.onDestroy?.(provider.dataSource, editorId);
+    await provider.dataSource.dispose();
   }
 }

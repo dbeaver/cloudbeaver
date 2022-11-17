@@ -43,13 +43,17 @@ export class ResourceManagerResource
     resourceManagerEventHandler
       .on<IResourceManagerParams>(
       async key => {
-        dataSynchronizationService
-          .requestSynchronization('resource-update', 'update')
-          .then(async state => {
-            if (state) {
-              await this.load(key);
-            }
-          });
+        if (this.isInUse(key)) {
+          dataSynchronizationService
+            .requestSynchronization('resource-update', 'update')
+            .then(async state => {
+              if (state) {
+                await this.load(key);
+              }
+            });
+        } else {
+          await this.load(key);
+        }
       },
       data => ({
         projectId: data.projectId,
@@ -59,14 +63,19 @@ export class ResourceManagerResource
       d => d.eventType === EResourceManagerEventType.TypeCreate)
       .on<IResourceManagerParams>(
       key => {
-        dataSynchronizationService
-          .requestSynchronization('resource-update', 'update')
-          .then(state => {
-            if (state) {
-              this.markUpdated(key);
-              this.markOutdated(key);
-            }
-          });
+        if (this.isInUse(key)) {
+          dataSynchronizationService
+            .requestSynchronization('resource-update', 'update')
+            .then(state => {
+              if (state) {
+                this.markUpdated(key);
+                this.markOutdated(key);
+              }
+            });
+        } else {
+          this.markUpdated(key);
+          this.markOutdated(key);
+        }
       },
       data => ({
         projectId: data.projectId,
@@ -76,14 +85,19 @@ export class ResourceManagerResource
       d => d.eventType === EResourceManagerEventType.TypeUpdate)
       .on<IResourceManagerParams>(
       key => {
-        dataSynchronizationService
-          .requestSynchronization('resource-delete', 'update')
-          .then(state => {
-            if (state) {
-              this.delete(key);
-              this.onDataUpdate.execute({ ...key, name: undefined });
-            }
-          });
+        if (this.isInUse(key)) {
+          dataSynchronizationService
+            .requestSynchronization('resource-delete', 'update')
+            .then(state => {
+              if (state) {
+                this.delete(key);
+                this.onDataUpdate.execute({ ...key, name: undefined });
+              }
+            });
+        } else {
+          this.delete(key);
+          this.onDataUpdate.execute({ ...key, name: undefined });
+        }
       },
       data => ({
         projectId: data.projectId,

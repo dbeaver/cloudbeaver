@@ -98,6 +98,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   private loaded: boolean;
   private readonly scheduler: TaskScheduler;
+  private resourceUseKeyId: string | null;
 
   constructor(
     private readonly resourceManagerResource: ResourceManagerResource,
@@ -108,6 +109,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this._script = '';
     this.saved = true;
     this.loaded = false;
+    this.resourceUseKeyId = null;
     this.resourceProperties = {};
     this.scheduler = new TaskScheduler(() => true);
     this.debouncedWrite = debounce(this.debouncedWrite.bind(this), VALUE_SYNC_DELAY);
@@ -146,6 +148,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   setResourceKey(resourceKey: IResourceManagerParams): void {
+    if (this.state.resourceKey && this.resourceUseKeyId) {
+      this.resourceManagerResource.free(this.state.resourceKey, this.resourceUseKeyId);
+    }
+
     this.state.resourceKey = resourceKey;
     this.markOutdated();
     this.saved = true;
@@ -199,7 +205,17 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     }
   }
 
+  dispose(): void {
+    super.dispose();
+    if (this.state.resourceKey && this.resourceUseKeyId) {
+      this.resourceManagerResource.free(this.state.resourceKey, this.resourceUseKeyId);
+    }
+  }
+
   async load(): Promise<void> {
+    if (this.state.resourceKey) {
+      this.resourceUseKeyId = this.resourceManagerResource.use(this.state.resourceKey);
+    }
     await this.read();
     await this.updateProperties();
   }

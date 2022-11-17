@@ -284,7 +284,8 @@ export class ResourceFoldersBootstrap extends Bootstrap {
         try {
           const resources = ResourceKeyUtils
             .mapArray(key, getResourceKeyFromNodeId)
-            .filter((obj: any): obj is IResourceManagerParams => !!obj);
+            .filter((obj: any): obj is IResourceManagerParams => !!obj)
+            .map(key => ({ projectId: key.projectId, path: key.path }));
 
           this.resourceManagerResource.markOutdated(resourceKeyList(resources));
         } finally {
