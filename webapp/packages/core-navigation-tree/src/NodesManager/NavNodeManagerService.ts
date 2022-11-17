@@ -174,7 +174,7 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   async canOpen(nodeId: string, parentId: string, folderId?: string): Promise<boolean> {
-    if (!this.navTree.has(nodeId)) {
+    if (!this.navNodeInfoResource.has(nodeId)) {
       return false;
     }
 
