@@ -7,8 +7,6 @@ fragment DatabaseConnection on ConnectionInfo {
 
   template
   connected
-  provided
-  useUrl
   readOnly
   
   saveCredentials
@@ -18,19 +16,21 @@ fragment DatabaseConnection on ConnectionInfo {
   folder
   nodePath
 
-  host
-  port
-  serverName
-  databaseName
-  url
-  properties
-  providerProperties
+  configurationType @include(if: $customIncludeOptions)
+  useUrl @include(if: $customIncludeOptions)
+  host @include(if: $customIncludeOptions)
+  port @include(if: $customIncludeOptions)
+  serverName @include(if: $customIncludeOptions)
+  databaseName @include(if: $customIncludeOptions)
+  url @include(if: $customIncludeOptions)
+
+  properties @include(if: $includeProperties)
+  providerProperties @include(if: $includeProviderProperties)
 
   requiredAuth
 
   features
   supportedDataFormats
-  configurationType
 
   origin @include(if: $includeOrigin) {
     ...ObjectOriginInfo
@@ -43,15 +43,15 @@ fragment DatabaseConnection on ConnectionInfo {
     ...UserConnectionAuthProperties
   }
 
-  networkHandlersConfig {
+  networkHandlersConfig @include(if: $includeNetworkHandlersConfig) {
     id
     enabled
     authType
-    userName @include(if: $customIncludeNetworkHandlerCredentials)
-    password @include(if: $customIncludeNetworkHandlerCredentials)
-    key @include(if: $customIncludeNetworkHandlerCredentials)
+    userName
+    password
+    key
     savePassword
-    properties @include(if: $customIncludeNetworkHandlerCredentials)
+    properties
   }
 
   navigatorSettings {

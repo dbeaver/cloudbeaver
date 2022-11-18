@@ -38,7 +38,7 @@ import type { IConnectionInfoParams } from './IConnectionsResource';
 export type Connection = DatabaseConnection & {
   authProperties?: UserConnectionAuthPropertiesFragment[];
 };
-export type ConnectionInitConfig = Omit<InitConnectionMutationVariables, 'includeOrigin' | 'customIncludeOriginDetails' | 'includeAuthProperties' | 'customIncludeNetworkHandlerCredentials' | 'includeAuthNeeded' | 'includeCredentialsSaved'>;
+export type ConnectionInitConfig = Omit<InitConnectionMutationVariables, 'includeOrigin' | 'customIncludeOriginDetails' | 'includeAuthProperties' | 'includeNetworkHandlersConfig' | 'includeAuthNeeded' | 'includeCredentialsSaved' | 'includeProperties' | 'includeProviderProperties' | 'customIncludeOptions'>;
 export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
 
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
@@ -76,7 +76,7 @@ export class ConnectionInfoResource
     sessionDataResource: SessionDataResource,
     permissionsResource: SessionPermissionsResource
   ) {
-    super(['includeOrigin', 'customIncludeNetworkHandlerCredentials', 'includeAuthProperties']);
+    super(['includeOrigin']);
 
     this.onConnectionCreate = new SyncExecutor();
     this.onConnectionClose = new SyncExecutor();
@@ -473,12 +473,15 @@ export class ConnectionInfoResource
 
   private getDefaultIncludes(): ConnectionInfoIncludes {
     return {
-      customIncludeNetworkHandlerCredentials: false,
+      includeNetworkHandlersConfig: false,
       customIncludeOriginDetails: false,
       includeAuthProperties: false,
       includeOrigin: true,
       includeAuthNeeded: false,
       includeCredentialsSaved: false,
+      includeProperties: false,
+      includeProviderProperties: false,
+      customIncludeOptions: false,
     };
   }
 }
