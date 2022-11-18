@@ -163,6 +163,11 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     }
 
     @Override
+    public void renameFolder(@NotNull DBPDataSourceFolder folder, @NotNull String newName) {
+        dataSourceRegistry.renameFolder(folder, newName);
+    }
+
+    @Override
     public void removeFolder(DBPDataSourceFolder folder, boolean dropContents) {
         dataSourceRegistry.removeFolder(folder, dropContents);
     }

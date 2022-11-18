@@ -352,6 +352,24 @@ public class LocalResourceController implements RMController {
         registry.checkForErrors();
     }
 
+    @Override
+    public void renameProjectConnectionFolders(
+        @NotNull String projectId,
+        @NotNull Map<String, String> folderData
+    ) throws DBException {
+        DBPProject project = getProjectMetadata(projectId);
+        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+        for (Map.Entry<String, String> entry : folderData.entrySet()) {
+            DBPDataSourceFolder folder = registry.getFolder(entry.getKey());
+            if (folder != null) {
+                registry.renameFolder(folder, entry.getValue());
+            } else {
+                log.warn("Can not find folder by path [" + entry.getKey() + "] for renaming");
+            }
+        }
+        registry.checkForErrors();
+    }
+
     @NotNull
     @Override
     public RMResource[] listResources(

@@ -346,14 +346,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             checkProjectEditAccess(node, session);
             if (node.supportsRename()) {
                 if (node instanceof DBNLocalFolder) {
-                    WebConnectionFolderUtils.validateConnectionFolder(newName);
-                    List<String> siblings = Arrays.stream(
-                        ((DBNLocalFolder) node).getLogicalParent().getChildren(session.getProgressMonitor()))
-                        .filter(n -> n instanceof DBNLocalFolder)
-                        .map(DBNNode::getName).collect(Collectors.toList());
-                    if (siblings.contains(newName)) {
-                        throw new DBWebException("Name " + newName + " is unavailable or invalid");
-                    }
+                    return renameLocalFolderNode(session, (DBNLocalFolder) node, newName);
                 }
                 node.rename(session.getProgressMonitor(), newName);
                 return node.getName();
@@ -368,6 +361,19 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         } catch (DBException e) {
             throw new DBWebException("Error renaming navigator node '"  + nodePath + "'", e);
         }
+    }
+
+    private String renameLocalFolderNode(@NotNull WebSession session, DBNLocalFolder node, @NotNull String newName) throws DBException {
+        WebConnectionFolderUtils.validateConnectionFolder(newName);
+        List<String> siblings = Arrays.stream(
+            node.getLogicalParent().getChildren(session.getProgressMonitor()))
+            .filter(n -> n instanceof DBNLocalFolder)
+            .map(DBNNode::getName).collect(Collectors.toList());
+        if (siblings.contains(newName)) {
+            throw new DBWebException("Name " + newName + " is unavailable or invalid");
+        }
+        node.getDataSourceRegistry().renameFolder(node.getFolder(), newName);
+        return node.getName();
     }
 
     @Override
