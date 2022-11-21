@@ -43,9 +43,7 @@ export const VersionUpdateDrawerItem = observer<AdministrationItemDrawerProps>(f
   const translate = useTranslate();
   const versionUpdateService = useService(VersionUpdateService);
 
-  useMapResource(VersionUpdateDrawerItem, VersionResource, CachedMapAllKey, {
-    silent: true,
-  });
+  useMapResource(VersionUpdateDrawerItem, VersionResource, CachedMapAllKey);
 
   return styled(useStyles(style, styles))(
     <Tab

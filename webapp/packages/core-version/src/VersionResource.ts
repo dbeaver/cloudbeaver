@@ -9,7 +9,6 @@
 import { computed, makeObservable, observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { CachedMapAllKey, CachedMapResource } from '@cloudbeaver/core-sdk';
 
@@ -34,7 +33,6 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
 
   constructor(
     private readonly serverConfigResource: ServerConfigResource,
-    private readonly notificationService: NotificationService,
   ) {
     super();
 
@@ -81,8 +79,8 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
         }
       });
 
-    } catch (exception: any) {
-      this.notificationService.logException(exception, 'versions_load_fail');
+    } catch {
+      throw new Error('versions_load_fail');
     }
 
     return this.data;
