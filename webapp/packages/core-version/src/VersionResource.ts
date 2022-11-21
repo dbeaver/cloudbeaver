@@ -9,6 +9,7 @@
 import { computed, makeObservable, observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { CachedMapAllKey, CachedMapResource } from '@cloudbeaver/core-sdk';
 
@@ -32,12 +33,13 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
   }
 
   constructor(
-    private readonly serverConfigResource: ServerConfigResource
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly notificationService: NotificationService,
   ) {
     super();
 
     this.latestVersionNumber = null;
-    this.preloadResource(this.serverConfigResource, () => {});
+    this.preloadResource(this.serverConfigResource, () => { });
 
     makeObservable<this, 'latestVersionNumber'>(this, {
       latestVersionNumber: observable.ref,
@@ -56,26 +58,32 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
       return this.data;
     }
 
-    const response = await fetch(versionLink, {
-      cache: 'no-cache',
-    });
+    try {
+      const response = await fetch(versionLink, {
+        cache: 'no-cache',
+      });
 
-    const json = await response.json() as IVersions;
+      const json = await response.json() as IVersions;
 
-    if (json.latestVersion) {
-      this.latestVersionNumber = json.latestVersion;
-    }
-
-    if (!json.versions) {
-      return this.data;
-    }
-
-    runInAction(() => {
-      this.data.clear();
-      for (const version of json.versions!) {
-        this.data.set(version.number, version);
+      if (json.latestVersion) {
+        this.latestVersionNumber = json.latestVersion;
       }
-    });
+
+
+      if (!json.versions) {
+        return this.data;
+      }
+
+      runInAction(() => {
+        this.data.clear();
+        for (const version of json.versions!) {
+          this.data.set(version.number, version);
+        }
+      });
+
+    } catch (exception: any) {
+      this.notificationService.logException(exception, 'versions_load_fail');
+    }
 
     return this.data;
   }

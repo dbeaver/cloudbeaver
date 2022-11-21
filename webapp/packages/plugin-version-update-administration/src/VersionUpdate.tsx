@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 import { gte } from 'semver';
 
 import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Loader, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
@@ -26,11 +26,6 @@ const styles = css`
     composes: theme-typography--body2 from global;
     list-style-position: inside;
   }
-
-  Loader {
-    width: 100%;
-    height: 100%;
-  }
 `;
 
 export const VersionUpdate: AdministrationItemContentComponent = observer(function VersionUpdate() {
@@ -44,20 +39,14 @@ export const VersionUpdate: AdministrationItemContentComponent = observer(functi
 
   return styled(style)(
     <ColoredContainer wrap gap overflow parent>
-      <Loader state={versionResource}>
-        {() => (
-          <>
-            <VersionChecker />
-            {versions.length > 0 && (
-              <>
-                <Instructions />
-                <VersionSelector versions={versions} />
-              </>
-            )}
-            <Recommendations />
-          </>
-        )}
-      </Loader>
+      <VersionChecker />
+      {versions.length > 0 && (
+        <>
+          <Instructions />
+          <VersionSelector versions={versions} />
+        </>
+      )}
+      <Recommendations />
     </ColoredContainer>
   );
 });
