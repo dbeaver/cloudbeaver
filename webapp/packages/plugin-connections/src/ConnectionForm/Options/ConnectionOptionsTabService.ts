@@ -235,7 +235,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
   private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const configuration = contexts.getContext(connectionFormConfigureContext);
 
-    configuration.include('includeAuthProperties', 'includeCredentialsSaved', 'customIncludeOptions');
+    configuration.include('includeOrigin', 'includeAuthProperties', 'includeCredentialsSaved', 'customIncludeOptions');
   }
 
   private async prepareConfig(

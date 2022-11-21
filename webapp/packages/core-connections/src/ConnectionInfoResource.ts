@@ -76,7 +76,7 @@ export class ConnectionInfoResource
     sessionDataResource: SessionDataResource,
     permissionsResource: SessionPermissionsResource
   ) {
-    super(['includeOrigin']);
+    super();
 
     this.onConnectionCreate = new SyncExecutor();
     this.onConnectionClose = new SyncExecutor();
@@ -476,7 +476,7 @@ export class ConnectionInfoResource
       includeNetworkHandlersConfig: false,
       customIncludeOriginDetails: false,
       includeAuthProperties: false,
-      includeOrigin: true,
+      includeOrigin: false,
       includeAuthNeeded: false,
       includeCredentialsSaved: false,
       includeProperties: false,
