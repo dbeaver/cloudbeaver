@@ -7,36 +7,24 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
-import { AdminUser, AuthRolesResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useMapResource, ToolsAction, ToolsPanel, Loader, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles, useDataResource } from '@cloudbeaver/core-blocks';
-import { useController, useService } from '@cloudbeaver/core-di';
+import { AuthProvidersResource, AuthRolesResource, AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
+import {
+  Table, TableHeader, TableColumnHeader, TableBody, useMapResource, ToolsAction,
+  ToolsPanel, Loader, useTranslate, useStyles, useDataResource,
+  BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group
+} from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { filterUndefined } from '@cloudbeaver/core-utils';
 
 import { CreateUser } from './CreateUser';
 import { CreateUserService } from './CreateUserService';
+import { UsersTableFilters } from './Filters/UsersTableFilters';
+import { useUsersTableFilters } from './Filters/useUsersTableFilters';
 import { User } from './User';
-import { UsersTableController } from './UsersTableController';
-
-const layoutStyles = css`
-    layout-grid {
-      width: 100%;
-      overflow: auto;
-    }
-
-    layout-grid-inner {
-      min-height: 100%;
-    }
-
-    layout-grid-cell {
-      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
-      position: relative;
-      border: solid 1px;
-    }
-  `;
+import { useUsersTable } from './useUsersTable';
 
 const loaderStyle = css`
   ExceptionMessage {
@@ -45,16 +33,36 @@ const loaderStyle = css`
 `;
 
 const styles = css`
+  ToolsPanel {
+    border-bottom: none;
+    border-radius: inherit;
+  }
+
+  content {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    gap: 24px;
+  }
+
+  Group {
+    padding: 0;
+  }
+
   Table {
     width: 100%;
   }
 
-  [|table] {
-    min-height: 140px; /* loader overlay size */
+  TableHeader {
+    background: var(--theme-surface);
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
-
-  ToolsPanel {
-    border-bottom: none;
+  
+  table-container {
+    overflow: auto;
+    height: 100%;
   }
 `;
 
@@ -65,53 +73,48 @@ interface Props {
 
 export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
   const translate = useTranslate();
-  const style = useStyles(BASE_LAYOUT_GRID_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES, layoutStyles);
-  const createUserService = useService(CreateUserService);
-  const controller = useController(UsersTableController);
-  const usersResource = useMapResource(UsersTable, UsersResource, CachedMapAllKey);
-  const authRoles = useDataResource(UsersTable, AuthRolesResource, undefined);
-  const isLocalProviderAvailable = controller.isLocalProviderAvailable;
-  const users = usersResource.resource.values
-    .filter<AdminUser>(filterUndefined)
-    .sort((a, b) => {
-      if (usersResource.resource.isNew(a.userId) === usersResource.resource.isNew(b.userId)) {
-        return a.userId.localeCompare(b.userId);
-      }
-      if (usersResource.resource.isNew(a.userId)) {
-        return -1;
-      }
-      return 1;
-    });
+  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES, BASE_CONTAINERS_STYLES);
 
+  const createUserService = useService(CreateUserService);
+
+  const usersResource = useMapResource(UsersTable, UsersResource, CachedMapAllKey);
+  const authProvidersResource = useMapResource(UsersTable, AuthProvidersResource, CachedMapAllKey);
+  const authRolesResource = useDataResource(UsersTable, AuthRolesResource, undefined);
+
+  const table = useUsersTable(usersResource.resource);
+  const filters = useUsersTableFilters(table.users);
+
+  const isLocalProviderAvailable = authProvidersResource.resource.has(AUTH_PROVIDER_LOCAL_ID);
   const create = param === 'create';
-  const keys = users.map(user => user.userId);
-  const displayAuthRole = authRoles.data.length > 0;
+  const displayAuthRole = authRolesResource.data.length > 0;
+  const keys = filters.filteredUsers.map(user => user.userId);
 
   return styled(style)(
-    <layout-grid>
-      <layout-grid-inner>
-        <layout-grid-cell data-span='12'>
-          <ToolsPanel>
-            {isLocalProviderAvailable && (
+    <ColoredContainer wrap gap parent overflow vertical>
+      <Container gap vertical>
+        <Container gap keepSize>
+          <Group>
+            <ToolsPanel>
+              {isLocalProviderAvailable && (
+                <ToolsAction
+                  title={translate('authentication_administration_tools_add_tooltip')}
+                  icon='add'
+                  viewBox="0 0 24 24"
+                  disabled={create && !!createUserService.user}
+                  onClick={createUserService.create}
+                >
+                  {translate('ui_add')}
+                </ToolsAction>
+              )}
               <ToolsAction
-                title={translate('authentication_administration_tools_add_tooltip')}
-                icon="add"
+                title={translate('authentication_administration_tools_refresh_tooltip')}
+                icon='refresh'
                 viewBox="0 0 24 24"
-                disabled={create && !!createUserService.user}
-                onClick={createUserService.create}
+                onClick={table.update}
               >
-                {translate('ui_add')}
+                {translate('ui_refresh')}
               </ToolsAction>
-            )}
-            <ToolsAction
-              title={translate('authentication_administration_tools_refresh_tooltip')}
-              icon="refresh"
-              viewBox="0 0 24 24"
-              onClick={controller.update}
-            >
-              {translate('ui_refresh')}
-            </ToolsAction>
-            {/* {isLocalProviderAvailable && (
+              {/* {isLocalProviderAvailable && (
               <ToolsAction
                 title={translate('authentication_administration_tools_delete_tooltip')}
                 icon="trash"
@@ -122,51 +125,56 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
                 {translate('ui_delete')}
               </ToolsAction>
             )} */}
-          </ToolsPanel>
-        </layout-grid-cell>
+            </ToolsPanel>
+          </Group>
+          <UsersTableFilters filters={filters} />
+        </Container>
 
-        {create && createUserService.user && (
-          <layout-grid-cell data-span='12'>
-            <CreateUser user={createUserService.user} onCancel={createUserService.cancelCreate} />
-          </layout-grid-cell>
-        )}
-        <layout-grid-cell data-span='12' {...use({ table: true })}>
-          <Loader style={loaderStyle} state={[usersResource, authRoles]} overlay>
-            <Table
-              keys={keys}
-              selectedItems={controller.selectedItems}
-              expandedItems={controller.expandedItems}
-              size='big'
-            >
-              <TableHeader>
-                {/* {isLocalProviderAvailable && (
+        <content>
+          {create && createUserService.user && (
+            <Group>
+              <CreateUser user={createUserService.user} onCancel={createUserService.cancelCreate} />
+            </Group>
+          )}
+
+          <Group>
+            <Loader style={loaderStyle} state={[usersResource, authRolesResource]} overlay>
+              <Table
+                keys={keys}
+                selectedItems={table.state.selected}
+                expandedItems={table.state.expanded}
+                size='big'
+              >
+                <TableHeader>
+                  {/* {isLocalProviderAvailable && (
                   <TableColumnHeader min flex centerContent>
                     <TableSelect />
                   </TableColumnHeader>
                 )} */}
-                <TableColumnHeader min />
-                <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
-                {displayAuthRole && (
-                  <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>
-                )}
-                <TableColumnHeader>{translate('authentication_user_team')}</TableColumnHeader>
-                <TableColumnHeader>{translate('authentication_user_enabled')}</TableColumnHeader>
-                <TableColumnHeader />
-              </TableHeader>
-              <TableBody>
-                {users.map(user => (
-                  <User
-                    key={user.userId}
-                    user={user}
-                    displayAuthRole={displayAuthRole}
-                  // selectable={isLocalProviderAvailable}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </Loader>
-        </layout-grid-cell>
-      </layout-grid-inner>
-    </layout-grid>
+                  <TableColumnHeader min />
+                  <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
+                  {displayAuthRole && (
+                    <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>
+                  )}
+                  <TableColumnHeader>{translate('authentication_user_team')}</TableColumnHeader>
+                  <TableColumnHeader>{translate('authentication_user_enabled')}</TableColumnHeader>
+                  <TableColumnHeader />
+                </TableHeader>
+                <TableBody>
+                  {filters.filteredUsers.map(user => (
+                    <User
+                      key={user.userId}
+                      user={user}
+                      displayAuthRole={displayAuthRole}
+                    // selectable={isLocalProviderAvailable}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </Loader>
+          </Group>
+        </content>
+      </Container>
+    </ColoredContainer>
   );
 });

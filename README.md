@@ -22,6 +22,15 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 22.2.5 - 2022-11-21
+- The main menu has become more compact thanks to the new design.
+- User administration:
+  - administrators can now filter enabled and disabled users in the Access Management tab;
+  - the application saves all user history. Users can be disabled, but not deleted.
+- Only administrators have access to the connection edit dialog of shared connections now. The dialog can be made visible to all users again by changing the setting in the configuration file.
+- Update to SSHJ library allows user to use more private key formats for SSH authentication.
+- Different bugs have been fixed.
+
 ### CloudBeaver 22.2.4 - 2022-11-07
 - The Value Panel:
   - the size of displayed JSON values is limited to improve CloudBeaver performance. Users can change the limit in the configuration file;

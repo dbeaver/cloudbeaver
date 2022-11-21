@@ -37,7 +37,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
   );
 
   return styled(style)(
-    <ColoredContainer parent gap overflow>
+    <ColoredContainer gap overflow>
       <Group small gap vertical overflow>
         <Container gap vertical>
           <GroupTitle keepSize>{translate('authentication_user_credentials')}</GroupTitle>

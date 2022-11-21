@@ -129,7 +129,7 @@ export const topMenuStyles = css`
       display: none;
     }
   }
-  MenuButton, MenuBarElement {
+  MenuBarElement {
     &:hover, &:global([aria-expanded="true"]) {
       background: #338ecc;
     }
