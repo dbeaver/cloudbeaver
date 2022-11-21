@@ -31,6 +31,7 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
     protected final Map<String, Object> plugins;
     protected String defaultUserTeam;
     protected boolean resourceManagerEnabled;
+    protected boolean showReadOnlyConnectionInfo;
     protected String[] enabledFeatures;
 
     public BaseWebAppConfiguration() {
@@ -38,6 +39,7 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
         this.defaultUserTeam = DEFAULT_APP_ANONYMOUS_TEAM_NAME;
         this.resourceManagerEnabled = true;
         this.enabledFeatures = null;
+        this.showReadOnlyConnectionInfo = false;
     }
 
     public BaseWebAppConfiguration(BaseWebAppConfiguration src) {
@@ -45,6 +47,7 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
         this.defaultUserTeam = src.defaultUserTeam;
         this.resourceManagerEnabled = src.resourceManagerEnabled;
         this.enabledFeatures = src.enabledFeatures;
+        this.showReadOnlyConnectionInfo = src.showReadOnlyConnectionInfo;
     }
 
     @Override
@@ -97,5 +100,9 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
 
     public void setEnabledFeatures(String[] enabledFeatures) {
         this.enabledFeatures = enabledFeatures;
+    }
+
+    public boolean isShowReadOnlyConnectionInfo() {
+        return showReadOnlyConnectionInfo;
     }
 }
