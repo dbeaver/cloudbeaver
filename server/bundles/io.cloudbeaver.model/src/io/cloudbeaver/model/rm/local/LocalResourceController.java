@@ -352,6 +352,19 @@ public class LocalResourceController implements RMController {
         registry.checkForErrors();
     }
 
+    @Override
+    public void updateProjectConnectionFolderParent(
+        @NotNull String projectId,
+        @NotNull String folderPath,
+        @Nullable String parentPath
+    ) throws DBException {
+        DBPProject project = getProjectMetadata(projectId);
+        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+        DBPDataSourceFolder parentFolder = parentPath == null ? null : registry.getFolder(parentPath);
+        registry.updateFolderParent(registry.getFolder(folderPath), parentFolder);
+        registry.checkForErrors();
+    }
+
     @NotNull
     @Override
     public RMResource[] listResources(

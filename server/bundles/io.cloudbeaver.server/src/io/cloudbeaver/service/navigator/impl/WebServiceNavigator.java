@@ -482,16 +482,16 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         CBEventConstants.EventType.TYPE_UPDATE
                     );
                 } else if (node instanceof DBNLocalFolder) {
-                    DBPDataSourceFolder folder = WebConnectionFolderUtils.getParentFolder(folderNode);
-                    if (folder != null) {
-                        List<String> siblings = Arrays.stream(folder.getChildren())
+                    DBPDataSourceFolder parentFolder = WebConnectionFolderUtils.getParentFolder(folderNode);
+                    if (parentFolder != null) {
+                        List<String> siblings = Arrays.stream(parentFolder.getChildren())
                             .map(DBPDataSourceFolder::getName)
                             .collect(Collectors.toList());
                         if (siblings.contains(node.getName())) {
                             throw new DBWebException("Node " + folderNodePath + " contains folder with name '" + node.getName() + "'");
                         }
                     }
-                    ((DBNLocalFolder) node).getFolder().setParent(folder);
+                    node.getOwnerProject().getDataSourceRegistry().updateFolderParent(((DBNLocalFolder) node).getFolder(), parentFolder);
                     WebServiceUtils.updateConfigAndRefreshDatabases(session, node.getOwnerProject().getId());
                     WebAppUtils.addDataSourceUpdatedEvent(
                         node.getOwnerProject(),

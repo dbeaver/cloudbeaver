@@ -167,6 +167,11 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
         dataSourceRegistry.removeFolder(folder, dropContents);
     }
 
+    @Override
+    public void updateFolderParent(@NotNull DBPDataSourceFolder folder, DBPDataSourceFolder parent) {
+        dataSourceRegistry.updateFolderParent(folder, parent);
+    }
+
     @Nullable
     @Override
     public DBSObjectFilter getSavedFilter(String name) {
