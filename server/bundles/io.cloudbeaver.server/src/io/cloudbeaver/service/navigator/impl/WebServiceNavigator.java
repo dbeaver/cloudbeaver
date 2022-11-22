@@ -491,10 +491,10 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                             throw new DBWebException("Node " + folderNodePath + " contains folder with name '" + node.getName() + "'");
                         }
                     }
+                    DBNLocalFolder dbnLocalFolder = ((DBNLocalFolder) node);
                     node.getOwnerProject().getDataSourceRegistry().moveFolder(
-                        ((DBNLocalFolder) node).getFolder(),
-                        parentFolder,
-                        null
+                        dbnLocalFolder.getFolder().getFolderPath(),
+                        dbnLocalFolder.generateNewFolderPath(parentFolder, dbnLocalFolder.getNodeName())
                     );
                     WebServiceUtils.updateConfigAndRefreshDatabases(session, node.getOwnerProject().getId());
                     WebAppUtils.addDataSourceUpdatedEvent(

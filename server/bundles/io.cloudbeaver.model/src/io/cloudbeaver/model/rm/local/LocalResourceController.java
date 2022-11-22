@@ -355,14 +355,12 @@ public class LocalResourceController implements RMController {
     @Override
     public void moveProjectDataSourceFolder(
         @NotNull String projectId,
-        @NotNull String folderPath,
-        @Nullable String parentPath,
-        @Nullable String newName) throws DBException {
+        @NotNull String oldPath,
+        @NotNull String newPath
+    ) throws DBException {
         DBPProject project = getProjectMetadata(projectId);
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-        DBPDataSourceFolder folder = registry.getFolder(folderPath);
-        DBPDataSourceFolder parentFolder = parentPath == null ? null : registry.getFolder(parentPath);
-        registry.moveFolder(folder, parentFolder, newName);
+        registry.moveFolder(oldPath, newPath);
         registry.checkForErrors();
     }
 
