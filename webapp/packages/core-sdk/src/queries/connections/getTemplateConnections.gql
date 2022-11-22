@@ -3,9 +3,12 @@ query getTemplateConnections(
   $includeOrigin: Boolean!
   $customIncludeOriginDetails: Boolean!
   $includeAuthProperties: Boolean!
-  $customIncludeNetworkHandlerCredentials: Boolean!
+  $includeNetworkHandlersConfig: Boolean!
   $includeCredentialsSaved: Boolean!
   $includeAuthNeeded: Boolean!
+  $includeProperties: Boolean!
+  $includeProviderProperties: Boolean!
+  $customIncludeOptions: Boolean!
 ) {
   connections: templateConnections(projectId: $projectId) {
     ...DatabaseConnection

@@ -11,11 +11,19 @@ const isObjectEqual = <T>(a: T, b: T) => a === b;
 export function isArraysEqual<T>(
   first: T[],
   second: T[],
-  isEqual: (a: T, b: T) => boolean = isObjectEqual
+  isEqual: (a: T, b: T) => boolean = isObjectEqual,
+  order?: boolean
 ): boolean {
   if (first.length !== second.length) {
     return false;
   }
 
-  return !first.some(b => !second.some(a => isEqual(a, b)));
+
+  return !first.some((b, index) => {
+    if (order) {
+      return !isEqual(second[index], b);
+    }
+
+    return !second.some(a => isEqual(a, b));
+  });
 }
