@@ -69,7 +69,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   }
 
   get networkHandlers(): string[] {
-    if (!this.template) {
+    if (!this.template?.networkHandlersConfig) {
       return [];
     }
 
@@ -170,7 +170,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     }
 
     for (const id of this.networkHandlers) {
-      const handler = this.template.networkHandlersConfig.find(handler => handler.id === id);
+      const handler = this.template.networkHandlersConfig?.find(handler => handler.id === id);
 
       if (handler && (handler.userName || handler.authType !== NetworkHandlerAuthType.Password)) {
         this.config.networkHandlersConfig.push({
