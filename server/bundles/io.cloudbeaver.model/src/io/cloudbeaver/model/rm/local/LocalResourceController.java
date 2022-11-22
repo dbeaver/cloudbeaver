@@ -334,7 +334,7 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public void deleteProjectConnectionFolders(
+    public void deleteProjectDataSourceFolders(
         @NotNull String projectId,
         @NotNull String[] folderPaths,
         boolean dropContents
@@ -353,7 +353,7 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public void updateProjectConnectionFolderParent(
+    public void moveProjectDataSourceFolder(
         @NotNull String projectId,
         @NotNull String folderPath,
         @Nullable String parentPath
@@ -361,7 +361,7 @@ public class LocalResourceController implements RMController {
         DBPProject project = getProjectMetadata(projectId);
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         DBPDataSourceFolder parentFolder = parentPath == null ? null : registry.getFolder(parentPath);
-        registry.updateFolderParent(registry.getFolder(folderPath), parentFolder);
+        registry.moveFolder(registry.getFolder(folderPath), parentFolder);
         registry.checkForErrors();
     }
 
