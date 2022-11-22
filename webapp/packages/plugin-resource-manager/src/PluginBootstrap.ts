@@ -10,7 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { SideBarPanelService } from '@cloudbeaver/core-ui';
-import { ActionService, DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_TOOLS } from '@cloudbeaver/plugin-tools-panel';
 
 import { ACTION_RESOURCE_MANAGER } from './Actions/ACTION_RESOURCE_MANAGER';
@@ -36,6 +36,10 @@ export class PluginBootstrap extends Bootstrap {
         ...items,
         ACTION_RESOURCE_MANAGER,
       ],
+      orderItems: (context, items) => {
+        const extracted = menuExtractItems(items, [ACTION_RESOURCE_MANAGER]);
+        return [...extracted, ...items];
+      },
     });
 
     this.actionService.addHandler({

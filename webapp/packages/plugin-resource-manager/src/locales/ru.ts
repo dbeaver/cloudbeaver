@@ -1,7 +1,7 @@
 export default [
-  ['plugin_resource_manager_action_enable_label', 'Управление ресурсами'],
-  ['plugin_resource_manager_title', 'Управление ресурсами'],
-  ['plugin_resource_manager_no_resources_placeholder', 'Нет ресурсов'],
+  ['plugin_resource_manager_action_enable_label', 'Управление SQL скриптами'],
+  ['plugin_resource_manager_title', 'Управление SQL скриптами'],
+  ['plugin_resource_manager_no_resources_placeholder', 'Скрипты отсутствуют'],
   ['plugin_resource_manager_script_name', 'Имя скрипта'],
   ['plugin_resource_manager_save_script', 'Сохранить скрипт'],
   ['plugin_resource_manager_open_script', 'Открыть скрипт'],
