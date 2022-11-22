@@ -353,7 +353,7 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public void renameProjectConnectionFolders(
+    public void renameProjectDataSourceFolders(
         @NotNull String projectId,
         @NotNull Map<String, String> folderData
     ) throws DBException {
