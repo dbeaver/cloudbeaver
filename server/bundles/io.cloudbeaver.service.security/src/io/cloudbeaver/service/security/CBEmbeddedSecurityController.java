@@ -2037,9 +2037,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         var allLinkedSubjects = getAllLinkedSubjects(subjectId);
         var grantedPermissionsByObjectId = new HashMap<String, SMObjectPermissionsGrant.Builder>();
         try (Connection dbCon = database.openConnection()) {
-            var sqlBuilder = new StringBuilder("SELECT OP.OBJECT_ID,S.SUBJECT_TYPE,OP.PERMISSION\n")
-                .append("FROM CB_OBJECT_PERMISSIONS OP,CB_AUTH_SUBJECT S\n")
-                .append("WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.SUBJECT_ID IN (");
+            var sqlBuilder =
+                new StringBuilder("SELECT OP.OBJECT_ID,S.SUBJECT_TYPE,S.SUBJECT_ID,OP.PERMISSION\n")
+                    .append("FROM CB_OBJECT_PERMISSIONS OP,CB_AUTH_SUBJECT S\n")
+                    .append("WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.SUBJECT_ID IN (");
             appendStringParameters(sqlBuilder, allLinkedSubjects.toArray(String[]::new));
             sqlBuilder.append(") AND OP.OBJECT_TYPE=?");
             try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
@@ -2048,10 +2049,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     while (dbResult.next()) {
                         String objectId = dbResult.getString(1);
                         SMSubjectType subjectType = SMSubjectType.fromCode(dbResult.getString(2));
-                        String permission = dbResult.getString(3);
+                        String permissionSubjectId = dbResult.getString(3);
+                        String permission = dbResult.getString(4);
                         grantedPermissionsByObjectId.computeIfAbsent(
                             objectId,
-                            key -> SMObjectPermissionsGrant.builder(subjectId, subjectType, objectId)
+                            key -> SMObjectPermissionsGrant.builder(permissionSubjectId, subjectType, objectId)
                         ).addPermission(permission);
                     }
                 }
