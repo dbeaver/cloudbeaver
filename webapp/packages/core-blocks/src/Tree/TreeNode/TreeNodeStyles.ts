@@ -57,7 +57,7 @@ export const TREE_NODE_STYLES = css`
         }
 
         & > * {
-          margin-right: 0px;
+          margin-right: 0;
           margin-left: 4px;
         }
       }
