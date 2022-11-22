@@ -78,7 +78,7 @@ export class ConnectionSSHTabService extends Bootstrap {
     if (!updated) {
       return;
     }
-    const initialConfig = state.info?.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
+    const initialConfig = state.info?.networkHandlersConfig?.find(handler => handler.id === SSH_TUNNEL_ID);
 
     if (!state.config.networkHandlersConfig) {
       state.config.networkHandlersConfig = [];
@@ -108,7 +108,7 @@ export class ConnectionSSHTabService extends Bootstrap {
   private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const configuration = contexts.getContext(connectionFormConfigureContext);
 
-    configuration.include('customIncludeNetworkHandlerCredentials');
+    configuration.include('includeNetworkHandlersConfig');
   }
 
   private validate(
@@ -128,7 +128,7 @@ export class ConnectionSSHTabService extends Bootstrap {
 
     for (const handler of config.networkHandlersConfig) {
       if (handler.enabled) {
-        const initial = info?.networkHandlersConfig.find(h => h.id === handler.id);
+        const initial = info?.networkHandlersConfig?.find(h => h.id === handler.id);
         if (this.isChanged(handler, initial)) {
           if (handler.savePassword && !handler.userName?.length) {
             validation.error("Field SSH 'User' can't be empty");
@@ -174,7 +174,7 @@ export class ConnectionSSHTabService extends Bootstrap {
     const configs: NetworkHandlerConfigInput[] = [];
 
     for (const handler of state.config.networkHandlersConfig) {
-      const initial = state.info?.networkHandlersConfig.find(h => h.id === handler.id);
+      const initial = state.info?.networkHandlersConfig?.find(h => h.id === handler.id);
       const passwordChanged = this.isPasswordChanged(handler, initial);
       const keyChanged = this.isKeyChanged(handler, initial);
 

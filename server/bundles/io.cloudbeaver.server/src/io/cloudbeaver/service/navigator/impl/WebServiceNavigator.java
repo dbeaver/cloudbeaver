@@ -163,6 +163,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
             List<WebNavigatorNodeInfo> nodeParents = new ArrayList<>();
             for (DBNNode parent = node.getParentNode(); parent != null && !(parent instanceof DBNRoot); parent = parent.getParentNode()) {
+                if (parent instanceof DBNProjectDatabases) {
+                    continue;
+                }
                 nodeParents.add(new WebNavigatorNodeInfo(session, parent));
             }
 

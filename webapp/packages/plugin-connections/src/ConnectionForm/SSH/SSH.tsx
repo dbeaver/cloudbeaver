@@ -49,7 +49,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
   const [loading, setLoading] = useState(false);
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
-  const initialConfig = info?.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
+  const initialConfig = info?.networkHandlersConfig?.find(handler => handler.id === SSH_TUNNEL_ID);
 
   const resource = useMapResource(SSH, NetworkHandlerResource, SSH_TUNNEL_ID, {
     onData: handler => {

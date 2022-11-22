@@ -13,6 +13,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isObjectPropertyInfoStateEqual } from '@cloudbeaver/core-sdk';
 
+import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
 import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
@@ -55,9 +56,18 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
 
     this.connectionFormService.fillConfigTask
       .addHandler(this.fillConfig.bind(this));
+
+    this.connectionFormService.configureTask
+      .addHandler(this.configure.bind(this));
   }
 
   load(): void { }
+
+  private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
+    const configuration = contexts.getContext(connectionFormConfigureContext);
+
+    configuration.include('includeProperties', 'includeProviderProperties');
+  }
 
   private fillConfig(
     { state, updated }: IConnectionFormFillConfigData,

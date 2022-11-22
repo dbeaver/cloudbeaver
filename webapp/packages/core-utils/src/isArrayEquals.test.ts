@@ -30,6 +30,30 @@ describe('Is array equals', () => {
   });
 
   test('should use isEqual argument if passed', () => {
-    expect(isArraysEqual([{ a:1 }], [{ a: 1 }], (a, b) => a.a === b.a)).toBe(true);
+    expect(isArraysEqual([{ a: 1 }], [{ a: 1 }], (a, b) => a.a === b.a)).toBe(true);
+  });
+
+  test('should return "true" when arrays are the same and "order" argument is "true"', () => {
+    expect(isArraysEqual([1, '1', true], [1, '1', true], undefined, true)).toBe(true);
+  });
+
+  test('should return "false" when arrays are not the same and "order" argument is "true"', () => {
+    expect(isArraysEqual([1, '2', true], [2, '1', true], undefined, true)).toBe(false);
+  });
+
+  test('should return "false" when arrays have the same elements but elements order is different and "order" argument is "true"', () => {
+    expect(isArraysEqual(['1', 1, true], [1, '1', true], undefined, true)).toBe(false);
+  });
+
+  test('should return "false" when arrays length is different and the first array is larger and "order" argument is "true"', () => {
+    expect(isArraysEqual([1, true, '1'], [1, true], undefined, true)).toBe(false);
+  });
+
+  test('should return "false" when arrays length is different and the second array is larger and "order" argument is "true"', () => {
+    expect(isArraysEqual([1, true], [1, true, '1'], undefined, true)).toBe(false);
+  });
+
+  test('should use isEqual argument if passed and "order" argument is "true"', () => {
+    expect(isArraysEqual([{ a: 1 }], [{ a: 1 }], (a, b) => a.a === b.a, true)).toBe(true);
   });
 });
