@@ -18,6 +18,10 @@ import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { activeProjectsContext } from './activeProjectsContext';
 import { ProjectInfo, ProjectInfoResource } from './ProjectInfoResource';
 
+interface IActiveProjectData {
+  type: 'before' | 'after';
+}
+
 interface IProjectsUserSettings {
   activeProjectIds: string[];
 }
@@ -81,7 +85,7 @@ export class ProjectsService {
     }), data => Array.isArray(data.activeProjectIds));
   }
 
-  readonly onActiveProjectChange: IExecutor;
+  readonly onActiveProjectChange: IExecutor<IActiveProjectData>;
   readonly getActiveProjectTask: ISyncExecutor;
 
   constructor(
@@ -105,12 +109,19 @@ export class ProjectsService {
   }
 
   async setActiveProjects(projects: ProjectInfo[]): Promise<boolean> {
-    const context = await this.onActiveProjectChange.execute();
+    const context = await this.onActiveProjectChange.execute({
+      type: 'before',
+    });
 
     if (ExecutorInterrupter.isInterrupted(context)) {
       return false;
     }
     this.userProjectsSettings.activeProjectIds = projects.map(project => project.id);
+
+    await this.onActiveProjectChange.execute({
+      type: 'after',
+    });
+
     return true;
   }
 

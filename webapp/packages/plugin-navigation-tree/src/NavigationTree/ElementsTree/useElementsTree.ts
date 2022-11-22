@@ -589,9 +589,15 @@ export function useElementsTree(options: IOptions): IElementsTree {
     postHandlers: [loadTreeThreshold],
   });
 
+  // TODO: trigger nav tree sync (navigationTreeProjectsExpandStateGetter is returning new state)
+  //       we want to have abstraction
   useExecutor({
     executor: projectsService.onActiveProjectChange,
-    handlers: [loadTreeThreshold],
+    handlers: [data => {
+      if (data.type === 'after') {
+        loadTreeThreshold();
+      }
+    }],
   });
 
   useExecutor({
