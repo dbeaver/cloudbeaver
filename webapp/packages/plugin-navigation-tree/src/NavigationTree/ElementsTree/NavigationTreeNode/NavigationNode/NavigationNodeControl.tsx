@@ -48,14 +48,14 @@ const styles = css`
   }
   TreeNodeName {
     height: 100%;
-    max-width: 250px;
+    max-width: 320px;
     overflow: hidden;
     text-overflow: ellipsis;
   } 
   portal {
     box-sizing: border-box;
     margin-left: auto !important;
-    margin-right: 16px !important;
+    margin-right: 8px !important;
     visibility: hidden;
   }
   name-box {
