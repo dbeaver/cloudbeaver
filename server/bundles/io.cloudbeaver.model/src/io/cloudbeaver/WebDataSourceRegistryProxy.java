@@ -168,8 +168,8 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     }
 
     @Override
-    public void moveFolder(@NotNull DBPDataSourceFolder folder, DBPDataSourceFolder parent) {
-        dataSourceRegistry.moveFolder(folder, parent);
+    public void moveFolder(@NotNull DBPDataSourceFolder folder, @Nullable DBPDataSourceFolder parent, @Nullable String newName) {
+        dataSourceRegistry.moveFolder(folder, parent, newName);
     }
 
     @Nullable
