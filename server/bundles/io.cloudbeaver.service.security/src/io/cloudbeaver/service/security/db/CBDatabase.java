@@ -358,8 +358,10 @@ public class CBDatabase {
                     // Create teams
                     for (SMTeam team : initialData.getTeams()) {
                         adminSecurityController.createTeam(team.getTeamId(), team.getName(), team.getDescription(), adminName);
-                        if (adminName != null) {
-                            adminSecurityController.setSubjectPermissions(team.getTeamId(), new ArrayList<>(team.getPermissions()), adminName);
+                        if (adminName != null && !application.isMultiNode()) {
+                            adminSecurityController.setSubjectPermissions(team.getTeamId(),
+                                new ArrayList<>(team.getPermissions()),
+                                adminName);
                         }
                     }
                 }
