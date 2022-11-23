@@ -13,9 +13,13 @@ import { IconOrImage } from './IconOrImage';
 interface Props extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   wrapper?: boolean;
   indicator?: boolean;
+  inline?: boolean;
 }
 
 const styles = css`
+  div[|inline] {
+    display: inline;
+  }
   a {
     position: relative;
     cursor: pointer;
@@ -35,6 +39,7 @@ const styles = css`
 `;
 
 export const Link: React.FC<Props> = function Link({
+  inline,
   wrapper,
   indicator,
   className,
@@ -42,7 +47,7 @@ export const Link: React.FC<Props> = function Link({
   ...rest
 }) {
   return styled(styles)(
-    <div className={className}>
+    <div className={className} {...use({ inline })}>
       <a
         {...use({ wrapper })}
         {...rest}
