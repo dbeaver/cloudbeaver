@@ -35,6 +35,7 @@ import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.security.EmbeddedSecurityControllerFactory;
+import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.eclipse.core.runtime.Platform;
@@ -112,6 +113,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     // Configurations
     protected final Map<String, Object> productConfiguration = new HashMap<>();
     protected final Map<String, Object> databaseConfiguration = new HashMap<>();
+    protected final SMControllerConfiguration securityManagerConfiguration = new SMControllerConfiguration();
     private final CBAppConfig appConfiguration = new CBAppConfig();
     private Map<String, String> externalProperties = new LinkedHashMap<>();
     private Map<String, Object> originalConfigurationProperties = new LinkedHashMap<>();
@@ -212,7 +214,8 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return new EmbeddedSecurityControllerFactory().createSecurityService(
             this,
             databaseConfiguration,
-            credentialsProvider
+            credentialsProvider,
+            securityManagerConfiguration
         );
     }
 
@@ -221,7 +224,8 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return new EmbeddedSecurityControllerFactory().createSecurityService(
             this,
             databaseConfiguration,
-            credentialsProvider
+            credentialsProvider,
+            securityManagerConfiguration
         );
     }
 
@@ -480,7 +484,12 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     protected SMAdminController createGlobalSecurityController() throws DBException {
-        return new EmbeddedSecurityControllerFactory().createSecurityService(this, databaseConfiguration, new NoAuthCredentialsProvider());
+        return new EmbeddedSecurityControllerFactory().createSecurityService(
+            this,
+            databaseConfiguration,
+            new NoAuthCredentialsProvider(),
+            securityManagerConfiguration
+        );
     }
 
     @Nullable
@@ -554,7 +563,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
             develMode = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_DEVEL_MODE, develMode);
             enableSecurityManager = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_SECURITY_MANAGER, enableSecurityManager);
-
+            //SM config
+            gson.fromJson(
+                gson.toJsonTree(JSONUtils.getObject(serverConfig, CBConstants.PARAM_SM_CONFIGURATION)),
+                SMControllerConfiguration.class
+            );
             // App config
             Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
             validateConfiguration(appConfig);
@@ -701,11 +714,13 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         // Stupid way to populate existing objects but ok google (https://github.com/google/gson/issues/431)
         InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
         InstanceCreator<DataSourceNavigatorSettings> navSettingsCreator = type -> (DataSourceNavigatorSettings) appConfiguration.getDefaultNavigatorSettings();
+        InstanceCreator<SMControllerConfiguration> smConfigCreator = type -> securityManagerConfiguration;
 
         return new GsonBuilder()
             .setLenient()
             .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
             .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
+            .registerTypeAdapter(SMControllerConfiguration.class, smConfigCreator)
             .create();
     }
 
@@ -1082,5 +1097,9 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     @Override
     public CBEventController getEventController() {
         return eventController;
+    }
+
+    public SMControllerConfiguration getSecurityManagerConfiguration() {
+        return securityManagerConfiguration;
     }
 }

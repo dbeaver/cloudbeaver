@@ -113,6 +113,7 @@ type ServerConfig {
     serverURL: String!
     rootURI: String!
     hostName: String!
+    defaultAuthRole: String
 
     anonymousAccessEnabled: Boolean!
     supportsCustomConnections: Boolean!
