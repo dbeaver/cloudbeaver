@@ -59,7 +59,7 @@ public class WebConnectionOriginInfo implements WebObjectOrigin {
     @NotNull
     @Override
     public String getDisplayName() {
-        return origin.getType();
+        return origin.getDisplayName();
     }
 
     @Nullable
