@@ -17,6 +17,7 @@ export interface ICachedResourceMetadata {
   loading: boolean;
   includes: string[];
   exception: Error | null;
+  dependencies: string[];
 }
 
 export interface IDataError<TParam> {
@@ -54,7 +55,6 @@ export abstract class CachedResource<
 
   protected metadata: MetadataMap<TKey, ICachedResourceMetadata>;
   protected loadedKeys: TParam[];
-  protected paramsInUse: MetadataMap<TParam, string[]>;
   protected defaultIncludes: string[];
 
   protected get loading(): boolean {
@@ -75,7 +75,6 @@ export abstract class CachedResource<
 
     this.logActivity = false;
     this.loadedKeys = [];
-    this.paramsInUse = new MetadataMap(() => []);
 
     this.defaultIncludes = defaultIncludes;
     this.paramAliases = [];
@@ -85,6 +84,7 @@ export abstract class CachedResource<
       loading: false,
       exception: null,
       includes: observable([...this.defaultIncludes]),
+      dependencies: observable([]),
     }, undefined, { deep: false })));
     this.scheduler = new TaskScheduler(this.includes);
     this.data = defaultValue;
@@ -228,22 +228,22 @@ export abstract class CachedResource<
   }
 
   isInUse(param: TParam): boolean {
-    return this.paramsInUse.get(param).length > 0;
+    return this.getMetadata(param).dependencies.length > 0;
   }
 
-  use(param: TParam): string {
-    const list = this.paramsInUse.get(param);
-    const id = uuid();
-    list.push(id);
+  use(param: TParam, id = uuid()): string {
+    this.updateMetadata(param, metadata => {
+      metadata.dependencies.push(id);
+    });
     return id;
   }
 
   free(param: TParam, id: string): void {
-    const list = this.paramsInUse.get(param);
-
-    if (list.length > 0) {
-      this.paramsInUse.set(param, list.filter(v => v !== id));
-    }
+    this.updateMetadata(param, metadata => {
+      if (metadata.dependencies.length > 0) {
+        metadata.dependencies = metadata.dependencies.filter(v => v !== id);
+      }
+    });
   }
 
   abstract isLoaded(param: TParam, context: TContext): boolean;
@@ -285,6 +285,11 @@ export abstract class CachedResource<
     return metadata;
   }
 
+  updateMetadata(param: TParam, callback: (data: ICachedResourceMetadata) => void): void {
+    const metadata = this.getMetadata(param);
+    callback(metadata);
+  }
+
   deleteMetadata(param: TParam): void {
     this.metadata.delete(param as any as TKey);
   }
@@ -311,8 +316,9 @@ export abstract class CachedResource<
 
   markDataLoading(param: TParam, context: TContext): void {
     param = this.transformParam(param);
-    const metadata = this.getMetadata(param);
-    metadata.loading = true;
+    this.updateMetadata(param, metadata => {
+      metadata.loading = true;
+    });
   }
 
   markDataLoaded(param: TParam, includes: TContext): void {
@@ -322,8 +328,9 @@ export abstract class CachedResource<
       this.commitIncludes(param, includes as string[]);
     }
 
-    const metadata = this.getMetadata(param);
-    metadata.loading = false;
+    this.updateMetadata(param, metadata => {
+      metadata.loading = false;
+    });
   }
 
   markDataError(exception: Error, param: TParam, context: TContext): void {
@@ -332,16 +339,18 @@ export abstract class CachedResource<
     }
 
     param = this.transformParam(param);
-    const metadata = this.getMetadata(param);
-    metadata.exception = exception;
-    metadata.outdated = false;
+    this.updateMetadata(param, metadata => {
+      metadata.exception = exception;
+      metadata.outdated = false;
+    });
     this.onDataError.execute({ param, exception });
   }
 
   cleanError(param: TParam): void {
     param = this.transformParam(param);
-    const metadata = this.getMetadata(param);
-    metadata.exception = null;
+    this.updateMetadata(param, metadata => {
+      metadata.exception = null;
+    });
   }
 
   markOutdated(param: TParam): void {
@@ -359,8 +368,14 @@ export abstract class CachedResource<
     }
 
     param = this.transformParam(param);
-    const metadata = this.getMetadata(param);
-    metadata.outdated = false;
+    this.updateMetadata(param, metadata => {
+      metadata.outdated = false;
+    });
+  }
+
+  dataUpdate(param: TParam): void {
+    this.cleanError(param);
+    this.onDataUpdate.execute(param);
   }
 
   addAlias(param: TParam, getAlias: (param: TParam) => TParam): void;
@@ -451,13 +466,14 @@ export abstract class CachedResource<
 
   protected commitIncludes(key: TParam, includes: string[]): void {
     key = this.transformParam(key);
-    const metadata = this.getMetadata(key);
-
-    for (const include of includes) {
-      if (!metadata.includes.includes(include)) {
-        metadata.includes.push(include);
+    this.updateMetadata(key, metadata => {
+      for (const include of includes) {
+        if (!metadata.includes.includes(include)) {
+          metadata.includes.push(include);
+        }
       }
-    }
+    });
+
   }
 
   protected setData(data: TData): void {
@@ -474,8 +490,9 @@ export abstract class CachedResource<
     }
 
     param = this.transformParam(param);
-    const metadata = this.getMetadata(param);
-    metadata.outdated = true;
+    this.updateMetadata(param, metadata => {
+      metadata.outdated = true;
+    });
     this.onDataOutdated.execute(param);
   }
 
@@ -563,8 +580,7 @@ export abstract class CachedResource<
         },
         success: () => {
           if (loaded) {
-            this.cleanError(param);
-            this.onDataUpdate.execute(param);
+            this.dataUpdate(param);
           }
         },
         error: exception => this.markDataError(exception, param, context),
@@ -614,8 +630,7 @@ export abstract class CachedResource<
         },
         success: async () => {
           if (loaded) {
-            this.cleanError(param);
-            this.onDataUpdate.execute(param);
+            this.dataUpdate(param);
           }
         },
         error: exception => this.markDataError(exception, param, context),

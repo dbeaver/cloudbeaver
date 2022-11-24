@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { makeObservable, observable } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ISyncExecutor } from '@cloudbeaver/core-executor';
 
@@ -20,6 +22,10 @@ export class DataSynchronizationService {
   constructor() {
     this.onSynchronizationRequest = new SyncExecutor();
     this.queue = new Map();
+
+    makeObservable(this, {
+      queue: observable.shallow,
+    });
   }
 
   requestSynchronization(

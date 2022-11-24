@@ -133,7 +133,7 @@ export function useMapResource<
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const resource = ctor instanceof CachedMapResource ? ctor : useService(ctor);
   const notifications = useService(NotificationService);
-  const [use, setUse] = useState<[TKeyArg | null, string | string[]]>([null, '']);
+  const [use, setUse] = useState<[TKeyArg | null, string]>([null, '']);
   const [exception, setException] = useState<Error | null>(null);
   let key: TKeyArg | null = keyObj as TKeyArg;
   let includes: TIncludes = [] as unknown as TIncludes;

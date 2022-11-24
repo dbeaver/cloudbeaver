@@ -122,8 +122,10 @@ export class ConnectionInfoResource
       .on<ResourceKeyList<IConnectionInfoParams>>(
       key => {
         if (this.isConnected(key)) {
+          const connection = this.get(key);
+
           this.dataSynchronizationService
-            .requestSynchronization('connection-update', 'update')
+            .requestSynchronization('connection', connection.map(connection => connection?.name).join('\n'))
             .then(state => {
               if (state) {
                 this.markOutdated(key);
@@ -144,8 +146,9 @@ export class ConnectionInfoResource
         })));
 
         if (this.isConnected(key)) {
+          const connection = this.get(key);
           this.dataSynchronizationService
-            .requestSynchronization('connection-delete', 'update')
+            .requestSynchronization('connection', connection.map(connection => connection?.name).join('\n'))
             .then(state => {
               if (state) {
                 this.delete(key);
