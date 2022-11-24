@@ -88,9 +88,9 @@ export class ConnectionAuthService extends Dependency {
       }
     }
 
-    connection = await this.connectionInfoResource.load(key, ['includeAuthNeeded']);
+    connection = await this.connectionInfoResource.load(key, ['includeAuthNeeded', 'includeNetworkHandlersConfig']);
 
-    const networkHandlers = connection.networkHandlersConfig
+    const networkHandlers = connection.networkHandlersConfig!
       .filter(handler => handler.enabled && !handler.savePassword)
       .map(handler => handler.id);
 

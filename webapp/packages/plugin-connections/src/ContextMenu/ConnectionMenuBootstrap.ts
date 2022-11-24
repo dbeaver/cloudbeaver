@@ -18,6 +18,7 @@ import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 import { ConnectionsSettingsService } from '../ConnectionsSettingsService';
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService';
 import { ACTION_CONNECTION_DISCONNECT } from './Actions/ACTION_CONNECTION_DISCONNECT';
+import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DISCONNECT_ALL';
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT';
 import { ACTION_CONNECTION_VIEW_ADVANCED } from './Actions/ACTION_CONNECTION_VIEW_ADVANCED';
 import { ACTION_CONNECTION_VIEW_SIMPLE } from './Actions/ACTION_CONNECTION_VIEW_SIMPLE';
@@ -153,6 +154,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         ...items,
         ACTION_CONNECTION_EDIT,
         ACTION_CONNECTION_DISCONNECT,
+        ACTION_CONNECTION_DISCONNECT_ALL,
       ],
     });
 
@@ -172,6 +174,10 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
         if (action === ACTION_CONNECTION_DISCONNECT) {
           return connection.connected;
+        }
+
+        if (action === ACTION_CONNECTION_DISCONNECT_ALL) {
+          return this.connectionsManagerService.hasAnyConnection(true);
         }
 
         if (action === ACTION_DELETE) {
@@ -194,6 +200,10 @@ export class ConnectionMenuBootstrap extends Bootstrap {
             );
             break;
           }
+          case ACTION_CONNECTION_DISCONNECT_ALL: {
+            await this.connectionsManagerService.closeAllConnections();
+            break;
+          }
           case ACTION_DELETE: {
             try {
               await this.connectionsManagerService.deleteConnection(
@@ -213,7 +223,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     });
   }
 
-  load(): void {}
+  load(): void { }
 
   private async changeConnectionView(connection: Connection, settings: NavigatorViewSettings) {
     try {

@@ -31,7 +31,9 @@ const styles = css`
 export const VersionUpdate: AdministrationItemContentComponent = observer(function VersionUpdate() {
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
   const versionService = useService(VersionService);
-  const versionResource = useMapResource(VersionUpdate, VersionResource, CachedMapAllKey);
+  const versionResource = useMapResource(VersionUpdate, VersionResource, CachedMapAllKey, {
+    silent: true,
+  });
 
   const versions = versionResource.resource.values.filter(v => gte(v.number, versionService.current));
 

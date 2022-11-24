@@ -7,8 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
-import { css } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { PlaceholderComponent, StaticImage } from '@cloudbeaver/core-blocks';

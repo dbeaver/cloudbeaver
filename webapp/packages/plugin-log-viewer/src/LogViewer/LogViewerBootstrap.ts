@@ -7,7 +7,7 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { MenuService, ActionService, DATA_CONTEXT_MENU } from '@cloudbeaver/core-view';
+import { MenuService, ActionService, DATA_CONTEXT_MENU, menuExtractItems } from '@cloudbeaver/core-view';
 import { MENU_TOOLS, ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
 
 import { ACTION_LOG_VIEWER_ENABLE } from '../Actions/ACTION_LOG_VIEWER_ENABLE';
@@ -33,6 +33,10 @@ export class LogViewerBootstrap extends Bootstrap {
         ...items,
         ACTION_LOG_VIEWER_ENABLE,
       ],
+      orderItems: (context, items) => {
+        const extracted = menuExtractItems(items, [ACTION_LOG_VIEWER_ENABLE]);
+        return [...items, ...extracted];
+      },
     });
 
     this.actionService.addHandler({

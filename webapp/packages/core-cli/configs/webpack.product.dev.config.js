@@ -49,13 +49,13 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
         target: env.server,
       },
     },
-    onListening: function (devServer) {
+    onListening: function (devServer, ...args) {
       if (!devServer) {
         throw new Error('webpack-dev-server is not defined');
       }
-
+      const logger = devServer.compiler.getInfrastructureLogger('webpack-dev-server');
       const port = devServer.server.address().port;
-      console.log(`Proxy from http://localhost:8080 to http://127.0.0.1:${port}`);
+      logger.info(`Proxy from http://localhost:8080 to http://127.0.0.1:${port}`);
       httpProxy.createProxyServer({ target:`http://127.0.0.1:${port}` }).listen(8080);
     },
   },

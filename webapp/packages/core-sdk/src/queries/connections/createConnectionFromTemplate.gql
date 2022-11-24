@@ -6,9 +6,12 @@ mutation createConnectionFromTemplate(
   $includeOrigin: Boolean!
   $customIncludeOriginDetails: Boolean!
   $includeAuthProperties: Boolean!
-  $customIncludeNetworkHandlerCredentials: Boolean!
+  $includeNetworkHandlersConfig: Boolean!
   $includeCredentialsSaved: Boolean!
   $includeAuthNeeded: Boolean!
+  $includeProperties: Boolean!
+  $includeProviderProperties: Boolean!
+  $customIncludeOptions: Boolean!
 ) {
   connection: createConnectionFromTemplate(projectId: $projectId, templateId: $templateId, connectionName: $connectionName) {
     ...DatabaseConnection
