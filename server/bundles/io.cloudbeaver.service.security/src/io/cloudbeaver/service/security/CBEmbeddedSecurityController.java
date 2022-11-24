@@ -1407,21 +1407,41 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         Map<SMAuthConfigurationReference, Object> storedUserData = new LinkedHashMap<>();
         SMTeam[] allTeams = null;
         String detectedAuthRole = null;
+        Map<String, Object> providerConfig = new LinkedHashMap<>();
+        Map<String, Object> userAuthData = new LinkedHashMap<>();
         for (SMAuthConfigurationReference authConfiguration : authProviderIds) {
             String authProviderId = authConfiguration.getAuthProviderId();
             WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
-            var userAuthData = (Map<String, Object>) authInfo.getAuthData().get(authConfiguration);
-            SMAutoAssign autoAssign = getAutoAssignUserData(authId, authProvider, userAuthData, finishAuthMonitor);
+
+            {
+                // Read auth provider configuration.
+                // Note: if there are several auth providers in a row then we'll reuse provider config from previous one.
+                // This is how federated auth + native auth providers work as a couple.
+                String providerConfigId = readProviderConfigId(authInfo.getAuthAttemptId(), authProvider.getId());
+                if (providerConfigId != null) {
+                    var providerCustomConfig =
+                        application.getAuthConfiguration().getAuthProviderConfiguration(providerConfigId);
+                    if (providerCustomConfig != null) {
+                        providerConfig.putAll(providerCustomConfig.getParameters());
+                    }
+                }
+            }
+
+            userAuthData.putAll((Map<String, Object>) authInfo.getAuthData().get(authConfiguration));
+            SMAutoAssign autoAssign = getAutoAssignUserData(authProvider, providerConfig, userAuthData, finishAuthMonitor);
             if (autoAssign != null) {
                 detectedAuthRole = autoAssign.getAuthRole();
             }
 
-            var userIdFromCreds = findOrCreateExternalUserByCredentials(authProvider, authAttemptSessionInfo.getSessionParams(),
+            var userIdFromCreds = findOrCreateExternalUserByCredentials(
+                authProvider,
+                authAttemptSessionInfo.getSessionParams(),
                 userAuthData,
                 finishAuthMonitor,
                 activeUserId,
                 activeUserId == null,
-                detectedAuthRole
+                detectedAuthRole,
+                providerConfig
             );
 
             if (userIdFromCreds == null) {
@@ -1497,29 +1517,32 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
         SMAuthProviderAssigner authProviderAssigner = (SMAuthProviderAssigner) authProvider.getInstance();
 
-        String[] newTeamIds = autoAssign.getExternalTeamIds()
-            .stream()
-            .map(externalTeamId -> findTeamByExternalTeamId(
-                allTeams,
-                authProviderAssigner.getExternalTeamIdMetadataFieldName(),
-                externalTeamId
-            ))
-            .filter(Objects::nonNull)
-            .map(SMTeam::getTeamId)
-            .toArray(String[]::new);
-        if (!ArrayUtils.isEmpty(newTeamIds)) {
-            setUserTeams(
-                userId,
-                newTeamIds,
-                userId
-            );
+        String externalTeamIdMetadataFieldName = authProviderAssigner.getExternalTeamIdMetadataFieldName();
+        if (!CommonUtils.isEmpty(externalTeamIdMetadataFieldName)) {
+            String[] newTeamIds = autoAssign.getExternalTeamIds()
+                .stream()
+                .map(externalTeamId -> findTeamByExternalTeamId(
+                    allTeams,
+                    externalTeamIdMetadataFieldName,
+                    externalTeamId
+                ))
+                .filter(Objects::nonNull)
+                .map(SMTeam::getTeamId)
+                .toArray(String[]::new);
+            if (!ArrayUtils.isEmpty(newTeamIds)) {
+                setUserTeams(
+                    userId,
+                    newTeamIds,
+                    userId
+                );
+            }
         }
     }
 
     @Nullable
     private SMAutoAssign getAutoAssignUserData(
-        String authAttemptId,
         WebAuthProviderDescriptor authProvider,
+        Map<String, Object> providerConfig,
         Map<String, Object> userData,
         DBRProgressMonitor monitor
     ) throws DBException {
@@ -1527,18 +1550,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         if (!(authProviderInstance instanceof SMAuthProviderAssigner)) {
             return null;
         }
-        var authProviderAssigner = (SMAuthProviderAssigner) authProviderInstance;
-        String providerConfigId = readProviderConfigId(authAttemptId, authProvider.getId());
-        if (providerConfigId == null) {
-            return null;
-        }
-        var providerConfig =
-            application.getAuthConfiguration().getAuthProviderConfiguration(providerConfigId);
-        return authProviderAssigner.detectAutoAssignments(
-            monitor,
-            providerConfig == null ? Map.of() : providerConfig.getParameters(),
-            userData
-        );
+        return ((SMAuthProviderAssigner) authProviderInstance).detectAutoAssignments(monitor, providerConfig, userData);
     }
 
     @Nullable
@@ -1640,13 +1652,15 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @NotNull DBRProgressMonitor progressMonitor,
         @Nullable String activeUserId,
         boolean createNewUserIfNotExist,
-        String authRole
+        String authRole,
+        Map<String, Object> providerConfig
     ) throws DBException {
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
+
         String userId = findUserByCredentials(authProvider, userCredentials);
         String userIdFromCredentials;
         try {
-            userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, Map.of(), userCredentials, null);
+            userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, providerConfig, userCredentials, null);
         } catch (DBException e) {
             log.debug("Local auth validation error", e);
             return null;
