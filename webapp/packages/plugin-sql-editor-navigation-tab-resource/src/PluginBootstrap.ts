@@ -198,21 +198,13 @@ export class PluginBootstrap extends Bootstrap {
         return;
       }
 
-      const resource = await this.navResourceNodeService.loadResourceInfo(resourceKey);
-
-      if (!resource) {
-        if (data.type === NavigationType.open) {
-          throw new Error('Resource not found');
-        } else {
-          return;
-        }
-      }
-
       nodeInfo.markOpen();
 
       if (data.type !== NavigationType.open) {
         return;
       }
+
+      const resource = await this.navResourceNodeService.loadResourceInfo(resourceKey);
 
       const maxSize = this.sqlEditorSettingsService.settings.isValueDefault('maxFileSize')
         ? this.sqlEditorSettingsService.deprecatedSettings.getValue('maxFileSize')

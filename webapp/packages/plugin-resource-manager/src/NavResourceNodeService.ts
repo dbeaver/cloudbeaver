@@ -21,7 +21,7 @@ export class NavResourceNodeService {
     private readonly resourceManagerResource: ResourceManagerResource,
   ) { }
 
-  async loadResourceInfo(key: IResourceManagerParams): Promise<RmResourceInfo | undefined> {
+  async loadResourceInfo(key: IResourceManagerParams): Promise<RmResourceInfo> {
     return (await this.resourceManagerResource.load(key))[0];
   }
 
