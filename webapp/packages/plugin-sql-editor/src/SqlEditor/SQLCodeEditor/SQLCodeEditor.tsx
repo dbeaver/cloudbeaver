@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef, useImperativeHandle, useMemo } from 'react';
 
 import { useController } from '@cloudbeaver/core-di';
-import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
+import { CodeEditorLoader, DEFAULT_CURSOR_BLINK_RATE } from '@cloudbeaver/plugin-codemirror';
 
 import type { ISQLCodeEditorProps } from './ISQLCodeEditorProps';
 import { SQLCodeEditorController } from './SQLCodeEditorController';
@@ -30,7 +30,8 @@ export const SQLCodeEditor = observer<ISQLCodeEditorProps, SQLCodeEditorControll
     <CodeEditorLoader
       {...controller.bindings}
       options={{
-        readOnly: props.readonly ? 'nocursor' : false,
+        readOnly: props.readonly,
+        cursorBlinkRate: props.readonly ? -1 : DEFAULT_CURSOR_BLINK_RATE,
         ...controller.bindings.options,
         mode: controller.mode,
       }}
