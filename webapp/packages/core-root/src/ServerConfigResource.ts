@@ -56,7 +56,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
 
     serverConfigEventHandler.on(() => {
       this.syncQueue.add(
-        this.dataSynchronizationService.requestSynchronization('server-config', 'update')
+        this.dataSynchronizationService.requestSynchronization('server-config', 'Server Configuration')
       );
     }, () => undefined);
   }

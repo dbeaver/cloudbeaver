@@ -69,9 +69,10 @@ string
       outdated: true,
       loading: false,
       exception: null,
-      outdatedData: [],
-      loadingData: [],
+      outdatedData: observable([]),
+      loadingData: observable([]),
       includes: observable([]),
+      dependencies: observable([]),
     }));
 
     permissionsResource.require(this, EPermission.public);

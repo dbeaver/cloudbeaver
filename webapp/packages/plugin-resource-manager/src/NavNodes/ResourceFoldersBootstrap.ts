@@ -285,9 +285,9 @@ export class ResourceFoldersBootstrap extends Bootstrap {
           const resources = ResourceKeyUtils
             .mapArray(key, getResourceKeyFromNodeId)
             .filter((obj: any): obj is IResourceManagerParams => !!obj)
-            .map(key => ({ projectId: key.projectId, path: key.path }));
+            .map<IResourceManagerParams>(key => ({ projectId: key.projectId, path: key.path }));
 
-          this.resourceManagerResource.markOutdated(resourceKeyList(resources));
+          this.resourceManagerResource.markOutdated(resourceKeyList(resources)); // because of this
         } finally {
           syncOutdate = true;
         }
@@ -297,16 +297,11 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     this.navNodeInfoResource.onItemDelete.addHandler(executorHandlerFilter(
       () => true,
       key => {
-        // syncOutdate = false;
-        try {
-          const resources = ResourceKeyUtils
-            .mapArray(key, getResourceKeyFromNodeId)
-            .filter((obj: any): obj is IResourceManagerParams => !!obj);
+        const resources = ResourceKeyUtils
+          .mapArray(key, getResourceKeyFromNodeId)
+          .filter((obj: any): obj is IResourceManagerParams => !!obj);
 
-          this.resourceManagerResource.delete(resourceKeyList(resources));
-        } finally {
-          // syncOutdate = true;
-        }
+        this.resourceManagerResource.delete(resourceKeyList(resources));
       }
     ));
 
@@ -314,7 +309,6 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       () => syncOutdate,
       key => {
         syncOutdate = false;
-
         try {
           const updated: string[] = [];
 

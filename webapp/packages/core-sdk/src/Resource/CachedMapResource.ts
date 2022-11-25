@@ -9,7 +9,7 @@
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { ILoadableState, isArraysEqual, MetadataMap } from '@cloudbeaver/core-utils';
+import { ILoadableState, isArraysEqual, MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
 import { CachedResource, CachedResourceKey, ICachedResourceMetadata } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
@@ -80,6 +80,7 @@ export abstract class CachedMapResource<
       loading: false,
       exception: null,
       includes: observable([...this.defaultIncludes]),
+      dependencies: observable([]),
       ...this.populateMetadata(key, metadata),
     }, undefined, { deep: false }));
 
@@ -150,29 +151,28 @@ export abstract class CachedMapResource<
   }
 
   isInUse(key: ResourceKey<TKey>): boolean {
-    return ResourceKeyUtils.every(key, key => super.isInUse(this.getKeyRef(key)));
+    return ResourceKeyUtils.every(key, key => super.isInUse(this.getMetadataKeyRef(key)));
   }
 
-  use(key: TKey): string;
-  use(key: ResourceKeyList<TKey>): Array<string>;
-  use(key: ResourceKey<TKey>): Array<string> | string;
-  use(key: ResourceKey<TKey>): Array<string> | string {
+  use(key: ResourceKey<TKey>): string {
     key = this.transformParam(key);
+    key = this.getLockedKeys(key);
+    const id = uuid();
 
-    return ResourceKeyUtils.map(key, key => {
-      key = this.getKeyRef(key);
-      return super.use(key);
+    ResourceKeyUtils.map(key, key => {
+      key = this.getMetadataKeyRef(key);
+      return super.use(key, id);
     });
+
+    return id;
   }
 
-  free(key: TKey, id: string): void;
-  free(key: ResourceKeyList<TKey>, ids: string[]): void;
-  free(key: ResourceKey<TKey>, ids: string | string[]): void;
-  free(key: ResourceKey<TKey>, ids: string | string[]): void {
+  free(key: ResourceKey<TKey>, id: string): void {
     key = this.transformParam(key);
+    key = this.getLockedKeys(key);
+
     ResourceKeyUtils.forEach(key, (key, i) => {
-      key = this.getKeyRef(key);
-      const id = i === -1 ? ids as string : ids[i];
+      key = this.getMetadataKeyRef(key);
       super.free(key, id);
     });
   }
@@ -198,8 +198,9 @@ export abstract class CachedMapResource<
   markDataLoading(key: ResourceKey<TKey>, includes?: string[]): void {
     key = this.transformParam(key);
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.getMetadata(key);
-      metadata.loading = true;
+      this.updateMetadata(key, metadata => {
+        metadata.loading = true;
+      });
     });
   }
 
@@ -211,8 +212,9 @@ export abstract class CachedMapResource<
     }
 
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.getMetadata(key);
-      metadata.loading = false;
+      this.updateMetadata(key, metadata => {
+        metadata.loading = false;
+      });
     });
   }
 
@@ -223,9 +225,10 @@ export abstract class CachedMapResource<
     key = this.transformParam(key);
 
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.getMetadata(key);
-      metadata.exception = exception;
-      metadata.outdated = false;
+      this.updateMetadata(key, metadata => {
+        metadata.exception = exception;
+        metadata.outdated = false;
+      });
     });
 
     this.onDataError.execute({ param: key, exception });
@@ -256,8 +259,9 @@ export abstract class CachedMapResource<
     key = this.transformParam(key);
 
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.getMetadata(key);
-      metadata.exception = null;
+      this.updateMetadata(key, metadata => {
+        metadata.exception = null;
+      });
     });
   }
 
@@ -275,8 +279,9 @@ export abstract class CachedMapResource<
     key = this.transformParam(key);
 
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.getMetadata(key);
-      metadata.outdated = false;
+      this.updateMetadata(key, metadata => {
+        metadata.outdated = false;
+      });
     });
   }
 
@@ -468,22 +473,43 @@ export abstract class CachedMapResource<
    * This method can be override
    */
   getMetadata(param: TKey): ICachedMapResourceMetadata {
-    const metadata = this.metadata.get(this.getKeyRef(param));
+    const metadata = this.metadata.get(this.getMetadataKeyRef(param));
     return metadata;
+  }
+
+  /**
+   * Use to update metadata
+   * This method can be override
+   */
+  updateMetadata(param: TKey, callback: (data: ICachedMapResourceMetadata) => void): void {
+    const metadata = this.getMetadata(param);
+    callback(metadata);
   }
 
   /**
    * Use it instead of this.metadata.delete
    * This method can be override
    */
-  deleteMetadata(param: TKey): void {
-    this.metadata.delete(this.getKeyRef(param));
+  deleteMetadata(key: TKey): void {
+    key = this.getMetadataKeyRef(key);
+    this.metadata.delete(key);
+  }
+
+  /**
+   * Can be override to provide static link to complicated keys
+   */
+  getMetadataKeyRef(key: TKey): TKey {
+    return this.getKeyRef(key);
   }
 
   /**
    * Can be override to provide static link to complicated keys
    */
   getKeyRef(key: TKey): TKey {
+    return key;
+  }
+
+  protected getLockedKeys(key: ResourceKey<TKey>): ResourceKey<TKey> {
     return key;
   }
 
@@ -518,10 +544,8 @@ export abstract class CachedMapResource<
    * This method can be override
    */
   protected dataDelete(key: TKey): void {
-    key = this.getKeyRef(key);
-    this.data.delete(key);
-    this.metadata.delete(key);
-    this.paramsInUse.delete(key);
+    this.data.delete(this.getKeyRef(key));
+    this.deleteMetadata(key);
   }
 
   /**
@@ -536,13 +560,13 @@ export abstract class CachedMapResource<
   protected commitIncludes(key: ResourceKey<TKey>, includes: string[]): void {
     key = this.transformParam(key);
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.getMetadata(key);
-
-      for (const include of includes) {
-        if (!metadata.includes.includes(include)) {
-          metadata.includes.push(include);
+      this.updateMetadata(key, metadata => {
+        for (const include of includes) {
+          if (!metadata.includes.includes(include)) {
+            metadata.includes.push(include);
+          }
         }
-      }
+      });
     });
   }
 
@@ -566,8 +590,9 @@ export abstract class CachedMapResource<
     }
 
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.getMetadata(key);
-      metadata.outdated = true;
+      this.updateMetadata(key, metadata => {
+        metadata.outdated = true;
+      });
     });
 
     this.onDataOutdated.execute(key);

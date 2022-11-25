@@ -10,7 +10,8 @@ import { action, computed, makeObservable, observable, runInAction, toJS } from 
 
 import { IConnectionExecutionContextInfo, NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
-import type { IResourceManagerParams, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
+import { IResourceManagerParams, isResourceManagerParamEqual, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
+import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { debounce, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
 
@@ -113,6 +114,9 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.resourceProperties = {};
     this.scheduler = new TaskScheduler(() => true);
     this.debouncedWrite = debounce(this.debouncedWrite.bind(this), VALUE_SYNC_DELAY);
+    this.syncResource = this.syncResource.bind(this);
+
+    resourceManagerResource.onDataUpdate.addHandler(this.syncResource);
 
     makeObservable<this, '_script' | 'lastAction' | 'loaded' | 'resourceProperties'>(this, {
       script: computed,
@@ -149,13 +153,11 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   setResourceKey(resourceKey: IResourceManagerParams): void {
     if (this.state.resourceKey && this.resourceUseKeyId) {
-      this.resourceManagerResource.free(this.state.resourceKey, this.resourceUseKeyId);
+      this.resourceManagerResource.free(toJS(this.state.resourceKey), this.resourceUseKeyId);
     }
 
-    this.state.resourceKey = resourceKey;
-    this.markOutdated();
-    this.saved = true;
-    this.loaded = false;
+    this.state.resourceKey = toJS(resourceKey);
+    this.reloadResource();
   }
 
   setActions(actions?: IResourceActions): void {
@@ -207,9 +209,23 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   dispose(): void {
     super.dispose();
+    this.resourceManagerResource.onDataUpdate.removeHandler(this.syncResource);
     if (this.state.resourceKey && this.resourceUseKeyId) {
-      this.resourceManagerResource.free(this.state.resourceKey, this.resourceUseKeyId);
+      this.resourceManagerResource.free(toJS(this.state.resourceKey), this.resourceUseKeyId);
     }
+  }
+
+  syncResource(key: ResourceKey<IResourceManagerParams>) {
+    const resourceKey = this.resourceKey;
+    if (resourceKey && ResourceKeyUtils.some(key, key => isResourceManagerParamEqual(key, resourceKey, true))) {
+      this.reloadResource();
+    }
+  }
+
+  reloadResource(): void {
+    this.markOutdated();
+    this.saved = true;
+    this.loaded = false;
   }
 
   async load(): Promise<void> {
@@ -276,11 +292,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
       try {
         this.exception = null;
-        this.state.resourceKey = await this.actions.rename(this, this.resourceKey, { ...this.resourceKey, name });
-
-        this.markOutdated();
-        this.saved = true;
-        this.loaded = false;
+        this.setResourceKey(await this.actions.rename(this, this.resourceKey, { ...this.resourceKey, name }));
       } catch (exception: any) {
         this.exception = exception;
       } finally {

@@ -6,15 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ActionSnackbar, ActionSnackbarProps } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, INotification, NotificationService } from '@cloudbeaver/core-events';
 import { DataSynchronizationService } from '@cloudbeaver/core-root';
 
+import { DataSynchronizationNotification } from './DataSynchronizationNotification';
 
 @injectable()
 export class DataSynchronizationResolverBootstrap extends Bootstrap {
-  private activeNotification: INotification<ActionSnackbarProps> | null;
+  private activeNotification: INotification | null;
 
   constructor(
     private readonly notificationService: NotificationService,
@@ -35,14 +35,7 @@ export class DataSynchronizationResolverBootstrap extends Bootstrap {
       return;
     }
 
-    this.activeNotification = this.notificationService.customNotification(() => ActionSnackbar, {
-      actionText: 'ui_apply',
-      onAction: () => {
-        this.dataSynchronizationService.resolveAll(true);
-        this.activeNotification?.close(false);
-        this.activeNotification = null;
-      },
-    }, {
+    this.activeNotification = this.notificationService.customNotification(() => DataSynchronizationNotification, {}, {
       title: 'plugin_root_data_sync_title',
       message: 'plugin_root_data_sync_message',
       type: ENotificationType.Info,

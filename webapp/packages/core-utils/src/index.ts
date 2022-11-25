@@ -6,6 +6,8 @@ export * from './Promises/PromiseExecutor';
 
 export * from './Quadtree/index';
 
+export * from './underscore';
+
 export * from './blobToData';
 export * from './bytesToSize';
 export * from './clsx';

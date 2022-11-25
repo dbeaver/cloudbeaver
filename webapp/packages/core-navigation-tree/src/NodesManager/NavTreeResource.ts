@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, makeObservable, runInAction } from 'mobx';
+import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 
 import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
@@ -101,7 +101,8 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       loading: false,
       withDetails: false,
       exception: null,
-      includes: [],
+      includes: observable([]),
+      dependencies: observable([]),
     }));
 
     permissionsResource.require(this, EPermission.public);
