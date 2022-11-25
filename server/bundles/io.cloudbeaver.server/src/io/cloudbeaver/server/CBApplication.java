@@ -99,7 +99,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     private String serverURL;
-    private int serverPort = CBConstants.DEFAULT_SERVER_PORT;
+    protected int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverHost = null;
     private String serverName = null;
     private String contentRoot = CBConstants.DEFAULT_CONTENT_ROOT;
