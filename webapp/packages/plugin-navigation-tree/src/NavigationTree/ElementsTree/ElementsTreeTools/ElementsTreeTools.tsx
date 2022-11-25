@@ -48,6 +48,7 @@ const toolsStyles = css`
       width: 24px;
       height: 24px;
       overflow: hidden;
+      flex-shrink: 0;
 
       & Icon, & StaticImage {
         transition: transform .3s ease-in-out;

@@ -27,6 +27,7 @@ export const buttonStyles = css`
       composes: theme-button theme-button_unelevated theme-button_background theme-elevation-z3 from global;
       opacity: 0;
       transition-property: opacity, box-shadow !important;
+      transition: opacity 0.3s ease-in-out;
     }
 
     ripple {
@@ -39,7 +40,7 @@ export const buttonStyles = css`
 
     container[|split='vertical'] {
       flex-direction: column;
-      cursor: col-resize;
+      cursor: ew-resize;
       height: 100%;
       width: 16px;
       left: -7px;
@@ -76,7 +77,7 @@ export const buttonStyles = css`
 
     container[|split='horizontal'] {
       flex-direction: row;
-      cursor: row-resize;
+      cursor: ns-resize;
       width: 100%;
       height: 16px;
       top: -7px;

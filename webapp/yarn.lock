@@ -8636,10 +8636,10 @@ globule@^1.0.0:
     lodash "^4.17.21"
     minimatch "~3.0.2"
 
-go-split@^3.0.6:
-  version "3.0.6"
-  resolved "https://registry.yarnpkg.com/go-split/-/go-split-3.0.6.tgz#15a4c16363ed55986bfec5957dd2ae49efebfe6e"
-  integrity sha512-4LchkAr3JduV1SRw9vlPXmpxyKjxgrVn5JE6yIAjYTt9IFX3s3FxGGN0/qZQ6TDX/XEkG57geXAUy7QF56/iYQ==
+go-split@^3.0.7:
+  version "3.0.7"
+  resolved "https://registry.yarnpkg.com/go-split/-/go-split-3.0.7.tgz#909f63e601e5d097f8540b3dd598f2d50eb0a5ca"
+  integrity sha512-SNy1OAwz7WFn2kt/7feKmf4v0IdNrm7Chsc1uIASC09G/yDA832HwOsBajkCx/cxMTPz+zZMWMAe9Ul6PNfGRg==
 
 graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.4, graceful-fs@^4.2.6, graceful-fs@^4.2.9:
   version "4.2.10"
