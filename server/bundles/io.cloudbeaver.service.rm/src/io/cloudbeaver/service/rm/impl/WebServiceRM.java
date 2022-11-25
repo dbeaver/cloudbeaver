@@ -234,15 +234,17 @@ public class WebServiceRM implements DBWServiceRM {
         try {
             byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
             String content = getResourceController(webSession).setResourceContents(projectId, resourcePath, bytes, forceOverwrite);
+            var eventType = CBEventConstants.EventType.TYPE_UPDATE;
             if (!forceOverwrite) {
-                WebEventUtils.addRmResourceUpdatedEvent(
-                    projectId,
-                    webSession.getSessionId(),
-                    resourcePath,
-                    getResourceController(webSession).getResourcePath(projectId, resourcePath),
-                    CBEventConstants.EventType.TYPE_CREATE
-                );
+                eventType = CBEventConstants.EventType.TYPE_CREATE;
             }
+            WebEventUtils.addRmResourceUpdatedEvent(
+                projectId,
+                webSession.getSessionId(),
+                resourcePath,
+                getResourceController(webSession).getResourcePath(projectId, resourcePath),
+                eventType
+            );
             return content;
         } catch (Exception e) {
             throw new DBWebException("Error writing resource '" + resourcePath + "' data", e);
