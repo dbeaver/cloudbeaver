@@ -1401,9 +1401,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private SMTokenInfo findTokenByAppSession(@NotNull String appSessionId) throws DBException {
         try (var dbCon = database.openConnection();
              var dbStat = dbCon.prepareStatement(
-                 "SELECT CAT.TOKEN_ID, CAT.EXPIRATION_TIME FROM CB_AUTH_TOKEN CAT " +
+                 "SELECT CAT.TOKEN_ID FROM CB_AUTH_TOKEN CAT " +
                      "  JOIN CB_SESSION CS ON CAT.SESSION_ID = CS.SESSION_ID " +
                      "  WHERE CS.APP_SESSION_ID = ? AND CAT.USER_ID IS NOT NULL " +
+                     "  AND CAT.EXPIRATION_TIME > CURRENT_TIMESTAMP" +
                      "  ORDER BY CAT.EXPIRATION_TIME DESC"
              )
         ) {
@@ -1413,10 +1414,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     return null;
                 }
                 String smAccessToken = dbResult.getString(1);
-                Timestamp tokenExpirationDate = dbResult.getTimestamp(2);
-                if (isTokenExpired(tokenExpirationDate)) {
-                    return null;
-                }
                 return readAccessTokenInfo(smAccessToken);
             }
         } catch (SQLException e) {
