@@ -10,8 +10,6 @@ import { ComplexLoader, createComplexLoader, Loader } from '@cloudbeaver/core-bl
 
 import type { ICodeEditorProps } from './ICodeEditorProps';
 
-export const DEFAULT_CURSOR_BLINK_RATE = 530;
-
 const loader = createComplexLoader(async function loader() {
   const { CodeEditor } = await import('./CodeEditor');
   return { CodeEditor };

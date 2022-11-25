@@ -16,7 +16,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { bytesToSize } from '@cloudbeaver/core-utils';
-import { CodeEditorLoader, DEFAULT_CURSOR_BLINK_RATE } from '@cloudbeaver/plugin-codemirror';
+import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
@@ -194,7 +194,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             mode: state.currentContentType,
             theme: 'material',
             readOnly: readonly,
-            cursorBlinkRate: readonly ? -1 : DEFAULT_CURSOR_BLINK_RATE,
+            cursorBlinkRate: readonly ? -1 : undefined,
             lineNumbers: true,
             indentWithTabs: true,
             smartIndent: true,
