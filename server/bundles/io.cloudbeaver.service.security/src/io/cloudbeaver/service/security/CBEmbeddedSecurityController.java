@@ -24,12 +24,14 @@ import io.cloudbeaver.auth.SMAuthProviderAssigner;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.SMAutoAssign;
+import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
+import io.cloudbeaver.registry.WebMetaParametersRegistry;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
 import io.cloudbeaver.service.security.internal.SMTokenInfo;
@@ -42,6 +44,7 @@ import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
+import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
@@ -671,6 +674,32 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
+    @NotNull
+    @Override
+    public SMPropertyDescriptor[] getMetaParametersBySubjectType(SMSubjectType subjectType) throws DBException {
+        // First add global metas
+        List<DBPPropertyDescriptor> props = new ArrayList<>(
+            WebMetaParametersRegistry.getInstance().getMetaParameters(subjectType));
+
+        // Add metas from enabled auth providers
+        WebAppConfiguration appConfiguration = WebAppUtils.getWebApplication().getAppConfiguration();
+        if (appConfiguration instanceof WebAuthConfiguration) {
+            for (String apId : ((WebAuthConfiguration)appConfiguration).getEnabledAuthProviders()) {
+                WebAuthProviderDescriptor ap = WebAuthProviderRegistry.getInstance().getAuthProvider(apId);
+                if (ap != null) {
+                    List<DBPPropertyDescriptor> metaProps = ap.getMetaParameters(SMSubjectType.team);
+                    if (!CommonUtils.isEmpty(metaProps)) {
+                        props.addAll(metaProps);
+                    }
+                }
+            }
+        }
+
+        return props.stream()
+            .map(SMPropertyDescriptor::new)
+            .toArray(SMPropertyDescriptor[]::new);
+    }
+
     ///////////////////////////////////////////
     // Teams
 
@@ -831,12 +860,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     // Subject functions
 
     @Override
-    public void setSubjectMetas(String userId, Map<String, String> metaParameters) throws DBCException {
+    public void setSubjectMetas(@NotNull String subjectId, @NotNull Map<String, String> metaParameters) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                cleanupSubjectMeta(dbCon, userId);
+                cleanupSubjectMeta(dbCon, subjectId);
                 if (!metaParameters.isEmpty()) {
-                    saveSubjectMetas(dbCon, userId, metaParameters);
+                    saveSubjectMetas(dbCon, subjectId, metaParameters);
                 }
                 txn.commit();
             }

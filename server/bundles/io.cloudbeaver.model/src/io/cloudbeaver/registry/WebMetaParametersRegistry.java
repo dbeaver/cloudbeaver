@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Platform;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
+import org.jkiss.dbeaver.model.security.SMSubjectType;
 import org.jkiss.utils.ArrayUtils;
 
 import java.util.ArrayList;
@@ -54,6 +55,10 @@ public class WebMetaParametersRegistry {
 
     public List<DBPPropertyDescriptor> getTeamParameters() {
         return teamParameters;
+    }
+
+    public List<DBPPropertyDescriptor> getMetaParameters(SMSubjectType subjectType) {
+        return subjectType == SMSubjectType.user ? userParameters : teamParameters;
     }
 
     private void loadExtensions(IExtensionRegistry registry) {
