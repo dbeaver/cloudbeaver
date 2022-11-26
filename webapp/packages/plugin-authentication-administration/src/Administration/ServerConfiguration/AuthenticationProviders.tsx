@@ -45,12 +45,13 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   const primaryProvider = providers.resource.get(providers.resource.getPrimary());
   const externalAuthentication = localProvider === undefined && providerList.length === 1;
   const authenticationDisabled = serverConfig.enabledAuthProviders?.length === 0;
+  const isAnonymousAccessDisabled = authSettingsService.settings.getValue('disableAnonymousAccess');
 
   useExecutor({
     executor: formContext.changeExecutor,
     handlers: [function switchControls() {
       if (serverConfig.enabledAuthProviders?.length === 0) {
-        if (localProvider) {
+        if (localProvider && !isAnonymousAccessDisabled) {
           serverConfig.anonymousAccessEnabled = true;
         } else if (primaryProvider) {
           serverConfig.enabledAuthProviders.push(primaryProvider.id);
@@ -75,7 +76,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
     <React.Fragment>
       <Group key='authentication' form gap>
         <GroupTitle>{translate('administration_configuration_wizard_configuration_authentication_group')}</GroupTitle>
-        {localProvider && !authSettingsService.settings.getValue('disableAnonymousAccess') ? (
+        {localProvider && !isAnonymousAccessDisabled ? (
           <Switch
             name="anonymousAccessEnabled"
             state={serverConfig}
