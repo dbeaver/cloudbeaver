@@ -193,7 +193,8 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           options={{
             mode: state.currentContentType,
             theme: 'material',
-            readOnly: readonly ? 'nocursor' : false,
+            readOnly: readonly,
+            cursorBlinkRate: readonly ? -1 : undefined,
             lineNumbers: true,
             indentWithTabs: true,
             smartIndent: true,

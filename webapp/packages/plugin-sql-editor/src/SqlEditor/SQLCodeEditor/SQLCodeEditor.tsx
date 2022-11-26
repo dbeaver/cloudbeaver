@@ -30,7 +30,8 @@ export const SQLCodeEditor = observer<ISQLCodeEditorProps, SQLCodeEditorControll
     <CodeEditorLoader
       {...controller.bindings}
       options={{
-        readOnly: props.readonly ? 'nocursor' : false,
+        readOnly: props.readonly,
+        cursorBlinkRate: props.readonly ? -1 : undefined,
         ...controller.bindings.options,
         mode: controller.mode,
       }}
