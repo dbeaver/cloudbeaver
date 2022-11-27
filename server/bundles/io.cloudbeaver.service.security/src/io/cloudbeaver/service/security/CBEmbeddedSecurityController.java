@@ -121,6 +121,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         boolean enabled,
         @Nullable String defaultAuthRole
     ) throws DBException {
+        if (CommonUtils.isEmpty(userId)) {
+            throw new DBCException("Empty user name is not allowed");
+        }
         if (isSubjectExists(userId)) {
             throw new DBCException("User or team '" + userId + "' already exists");
         }
@@ -785,6 +788,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public void createTeam(String teamId, String name, String description, String grantor) throws DBCException {
+        if (CommonUtils.isEmpty(teamId)) {
+            throw new DBCException("Empty team name is not allowed");
+        }
         if (isSubjectExists(teamId)) {
             throw new DBCException("User or team '" + teamId + "' already exists");
         }
