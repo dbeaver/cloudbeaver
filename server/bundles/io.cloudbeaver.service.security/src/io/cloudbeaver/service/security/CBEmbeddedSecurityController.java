@@ -222,7 +222,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @NotNull
     @Override
-    public SMTeam[] getUserTeams() throws DBException {
+    public SMTeam[] getCurrentUserTeams() throws DBException {
         return getUserTeams(getUserIdOrThrow());
     }
 
@@ -380,7 +380,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Override
-    public Map<String, Object> getUserParameters() throws DBCException {
+    public Map<String, Object> getCurrentUserParameters() throws DBCException {
         String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
             Map<String, Object> result = new LinkedHashMap<>();
@@ -402,7 +402,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Override
-    public void setUserParameter(String name, Object value) throws DBException {
+    public void setCurrentUserParameter(String name, Object value) throws DBException {
         String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
@@ -495,7 +495,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Override
-    public void setUserCredentials(
+    public void setCurrentUserCredentials(
         @NotNull String authProviderId,
         @NotNull Map<String, Object> credentials
     ) throws DBException {
@@ -656,12 +656,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @NotNull
     @Override
-    public Map<String, Object> getUserCredentials(@NotNull String authProviderId) throws DBException {
+    public Map<String, Object> getCurrentUserCredentials(@NotNull String authProviderId) throws DBException {
         return getUserCredentials(getUserIdOrThrow(), authProviderId);
     }
 
     @Override
-    public String[] getUserLinkedProviders() throws DBException {
+    public String[] getCurrentUserLinkedProviders() throws DBException {
         return getUserLinkedProviders(getUserIdOrThrow());
     }
 
