@@ -206,6 +206,20 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
+    private static Set<String> getAllLinkedSubjects(Connection dbCon, String subjectId) throws SQLException {
+        Set<String> allSubjects = new HashSet<>();
+        allSubjects.add(subjectId);
+        try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT TEAM_ID FROM CB_USER_TEAM UR WHERE USER_ID=?")) {
+            dbStat.setString(1, subjectId);
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    allSubjects.add(dbResult.getString(1));
+                }
+            }
+        }
+        return allSubjects;
+    }
+
     @NotNull
     @Override
     public SMTeam[] getUserTeams() throws DBException {
@@ -1968,8 +1982,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public List<SMObjectPermissions> getAllAvailableObjectsPermissions(@NotNull SMObjectType objectType) throws DBException {
 
         String subjectId = getSubjectId();
-        Set<String> allSubjects = getAllLinkedSubjects(subjectId);
         try (Connection dbCon = database.openConnection()) {
+            Set<String> allSubjects = getAllLinkedSubjects(dbCon, subjectId);
             {
                 var sqlBuilder = new StringBuilder("SELECT OBJECT_ID,PERMISSION FROM CB_OBJECT_PERMISSIONS ");
                 sqlBuilder.append("WHERE SUBJECT_ID IN (");
@@ -1996,16 +2010,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private Set<String> getAllLinkedSubjects(String subjectId) throws DBException {
-        Set<String> allSubjects = new HashSet<>();
-        allSubjects.add(subjectId);
-        var userTeamIds = Arrays.stream(getUserTeams(subjectId))
-            .map(SMTeam::getTeamId)
-            .collect(Collectors.toSet());
-        allSubjects.addAll(userTeamIds);
-        return allSubjects;
-    }
-
     @NotNull
     @Override
     public SMObjectPermissions getObjectPermissions(
@@ -2013,8 +2017,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @NotNull String objectId,
         @NotNull SMObjectType objectType
     ) throws DBException {
-        Set<String> allSubjects = getAllLinkedSubjects(subjectId);
         try (Connection dbCon = database.openConnection()) {
+            Set<String> allSubjects = getAllLinkedSubjects(dbCon, subjectId);
             {
                 var sqlBuilder = new StringBuilder("SELECT PERMISSION FROM CB_OBJECT_PERMISSIONS ");
                 sqlBuilder.append("WHERE SUBJECT_ID IN (");
@@ -2077,9 +2081,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public List<SMObjectPermissionsGrant> getSubjectObjectPermissionGrants(@NotNull String subjectId, @NotNull SMObjectType smObjectType) throws DBException {
-        var allLinkedSubjects = getAllLinkedSubjects(subjectId);
         var grantedPermissionsByObjectId = new HashMap<String, SMObjectPermissionsGrant.Builder>();
         try (Connection dbCon = database.openConnection()) {
+            var allLinkedSubjects = getAllLinkedSubjects(dbCon, subjectId);
             var sqlBuilder =
                 new StringBuilder("SELECT OP.OBJECT_ID,S.SUBJECT_TYPE,S.SUBJECT_ID,OP.PERMISSION\n")
                     .append("FROM CB_OBJECT_PERMISSIONS OP,CB_AUTH_SUBJECT S\n")
