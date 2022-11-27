@@ -1892,10 +1892,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 var sqlBuilder = new StringBuilder("DELETE FROM CB_OBJECT_PERMISSIONS WHERE SUBJECT_ID IN (");
-                appendStringParameters(sqlBuilder, subjectIds.toArray(String[]::new));
+                appendStringParameters(sqlBuilder, subjectIds);
                 sqlBuilder.append(") AND OBJECT_TYPE=? ")
                     .append("AND OBJECT_ID IN (");
-                appendStringParameters(sqlBuilder, objectIds.toArray(String[]::new));
+                appendStringParameters(sqlBuilder, objectIds);
                 sqlBuilder.append(")");
                 JDBCUtils.executeStatement(dbCon, sqlBuilder.toString(), objectType.getObjectType());
                 if (!CommonUtils.isEmpty(permissions)) {
@@ -1973,7 +1973,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             {
                 var sqlBuilder = new StringBuilder("SELECT OBJECT_ID,PERMISSION FROM CB_OBJECT_PERMISSIONS ");
                 sqlBuilder.append("WHERE SUBJECT_ID IN (");
-                appendStringParameters(sqlBuilder, allSubjects.toArray(String[]::new));
+                appendStringParameters(sqlBuilder, allSubjects);
                 sqlBuilder.append(") AND OBJECT_TYPE=?");
                 try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
                     dbStat.setString(1, objectType.getObjectType());
@@ -2018,7 +2018,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             {
                 var sqlBuilder = new StringBuilder("SELECT PERMISSION FROM CB_OBJECT_PERMISSIONS ");
                 sqlBuilder.append("WHERE SUBJECT_ID IN (");
-                appendStringParameters(sqlBuilder, allSubjects.toArray(String[]::new));
+                appendStringParameters(sqlBuilder, allSubjects);
                 sqlBuilder.append(") AND OBJECT_TYPE=? AND OBJECT_ID=?");
 
                 try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
@@ -2084,7 +2084,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 new StringBuilder("SELECT OP.OBJECT_ID,S.SUBJECT_TYPE,S.SUBJECT_ID,OP.PERMISSION\n")
                     .append("FROM CB_OBJECT_PERMISSIONS OP,CB_AUTH_SUBJECT S\n")
                     .append("WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.SUBJECT_ID IN (");
-            appendStringParameters(sqlBuilder, allLinkedSubjects.toArray(String[]::new));
+            appendStringParameters(sqlBuilder, allLinkedSubjects);
             sqlBuilder.append(") AND OP.OBJECT_TYPE=?");
             try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
                 dbStat.setString(1, smObjectType.getObjectType());
@@ -2110,10 +2110,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private void appendStringParameters(StringBuilder sql, @NotNull String[] subjectIds) {
-        for (int i = 0; i < subjectIds.length; i++) {
-            String id = subjectIds[i];
-            if (i > 0) sql.append(",");
+    private static void appendStringParameters(StringBuilder sql, @NotNull Collection<String> subjectIds) {
+        boolean first = true;
+        for (String id : subjectIds) {
+            if (!first) sql.append(",");
+            first = false;
             sql.append("'").append(id.replace("'", "''")).append("'");
         }
     }
