@@ -251,6 +251,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     this.menuService.setHandler({
       id: 'connections-menu-base',
       isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === MENU_CONNECTIONS,
+      isHidden: () => this.connectionsManagerService.createConnectionProjects.length === 0,
       isLabelVisible: () => false,
     });
   }

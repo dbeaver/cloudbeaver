@@ -58,6 +58,8 @@ const styles = css`
     flex: 1;
     overflow: auto;
     display: flex;
+    width: 250px;
+    max-width: 100%;
   }
 
   FolderExplorerPath {
