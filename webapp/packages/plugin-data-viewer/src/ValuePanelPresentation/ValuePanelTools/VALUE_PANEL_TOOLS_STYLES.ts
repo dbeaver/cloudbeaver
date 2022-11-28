@@ -27,7 +27,7 @@ export const VALUE_PANEL_TOOLS_STYLES = css`
     cursor: pointer;
     padding: 4px;
     width: 24px;
-    height: 100%;
+    height: auto;
   }
   IconOrImage {
     width: 100%;
