@@ -337,6 +337,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         if (configurationMode) {
             // Try to configure automatically
             performAutoConfiguration(configPath.toFile().getParentFile());
+        } else if (appConfiguration.isGrantConnectionsAccessToAnonymousTeam()) {
+            String autoAdminName = System.getenv(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
+            if (autoAdminName != null) {
+                grantAnonymousAccessToConnections(appConfiguration, autoAdminName);
+            }
         }
 
         if (enableSecurityManager) {
@@ -797,7 +802,9 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         saveRuntimeConfig(newServerName, newServerURL, sessionExpireTime, appConfig, credentialsProvider);
 
         // Grant permissions to predefined connections
-        if (isConfigurationMode() && appConfig.isAnonymousAccessEnabled()) {
+        boolean isGrantedAnonymousAccessToConnections = appConfig.isGrantConnectionsAccessToAnonymousTeam() ||
+            (isConfigurationMode() && appConfig.isAnonymousAccessEnabled());
+        if (isGrantedAnonymousAccessToConnections) {
             grantAnonymousAccessToConnections(appConfig, adminName);
         }
 
@@ -909,11 +916,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             }
             if (!CommonUtils.isEmpty(newServerURL)) {
                 copyConfigValue(
-                        originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, newServerURL);
+                    originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, newServerURL);
             }
             if (sessionExpireTime > 0) {
                 copyConfigValue(
-                        originServerConfig, serverConfigProperties, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
+                    originServerConfig, serverConfigProperties, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
             }
             var databaseConfigProperties = new LinkedHashMap<String, Object>();
             Map<String, Object> oldRuntimeDBConfig = JSONUtils.getObject(originServerConfig, CBConstants.PARAM_DB_CONFIGURATION);
@@ -949,6 +956,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
                 oldAppConfig, appConfigProperties, CBConstants.PARAM_RESOURCE_MANAGER_ENABLED, appConfig.isResourceManagerEnabled());
             copyConfigValue(
                 oldAppConfig, appConfigProperties, CBConstants.PARAM_SHOW_READ_ONLY_CONN_INFO, appConfig.isShowReadOnlyConnectionInfo());
+            copyConfigValue(
+                oldAppConfig,
+                appConfigProperties,
+                CBConstants.PARAM_CONN_GRANT_ANON_ACCESS,
+                appConfig.isGrantConnectionsAccessToAnonymousTeam());
 
             Map<String, Object> resourceQuotas = new LinkedHashMap<>();
             Map<String, Object> originResourceQuotas = JSONUtils.getObject(oldAppConfig, CBConstants.PARAM_RESOURCE_QUOTAS);
