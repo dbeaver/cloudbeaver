@@ -20,7 +20,7 @@ import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { IUserFormState } from './UserFormService';
+import { IUserFormState, UserFormService } from './UserFormService';
 
 interface IStatusMessage {
   status: ENotificationType;
@@ -80,7 +80,8 @@ export class UserFormController implements IInitializableController, IDestructib
     private readonly usersResource: UsersResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly authRolesResource: AuthRolesResource,
-    private readonly dbDriverResource: DBDriverResource
+    private readonly dbDriverResource: DBDriverResource,
+    private readonly userFormService: UserFormService,
   ) {
     this.partsState = new MetadataMap();
     this.afterSubmitTask = new Executor();
@@ -115,7 +116,9 @@ export class UserFormController implements IInitializableController, IDestructib
     });
   }
 
-  init(): void { }
+  init(): void {
+    this.userFormService.onFormInit.execute();
+  }
 
   update(user: AdminUserInfo, editing: boolean, collapse: () => void): void {
     const prevUser = this.user;

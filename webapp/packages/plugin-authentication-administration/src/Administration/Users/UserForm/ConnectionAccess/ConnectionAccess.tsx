@@ -21,7 +21,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { AdminSubjectType } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
-import type { IUserFormProps } from './UserFormService';
+import type { IUserFormProps } from '../UserFormService';
 
 const styles = css`
     Table {
