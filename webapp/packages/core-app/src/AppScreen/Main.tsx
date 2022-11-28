@@ -11,7 +11,6 @@ import styled, { css } from 'reshadow';
 
 import { splitStyles, Split, ResizerControls, Pane, ErrorBoundary, useSplitUserState, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-
 import { SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
 import { NavigationTree } from '@cloudbeaver/plugin-navigation-tree';
 
@@ -33,13 +32,14 @@ export const Main = observer(function Main() {
   const sideBarPanelService = useService(SideBarPanelService);
 
   const styles = useStyles(mainStyles, splitStyles);
-  const splitState = useSplitUserState('main');
+  const splitMainState = useSplitUserState('main');
+  const splitRightState = useSplitUserState('main-right');
 
   const activeBars = sideBarPanelService.tabsContainer.getDisplayed();
 
   return styled(styles)(
     <space as="main">
-      <Split {...splitState} sticky={30}>
+      <Split {...splitMainState} sticky={30}>
         <Pane main>
           <ErrorBoundary remount>
             <NavigationTree />
@@ -47,7 +47,7 @@ export const Main = observer(function Main() {
         </Pane>
         <ResizerControls />
         <Pane>
-          <Split disable={activeBars.length === 0}>
+          <Split {...splitRightState} disable={activeBars.length === 0} sticky={30}>
             <Pane>
               <RightArea />
             </Pane>

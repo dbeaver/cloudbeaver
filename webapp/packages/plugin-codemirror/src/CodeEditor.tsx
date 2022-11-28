@@ -21,13 +21,14 @@ import 'codemirror/addon/selection/mark-selection';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/addon/hint/show-hint.css';
 
-
-
 import { useStyles } from '@cloudbeaver/core-blocks';
 
 import type { ICodeEditorProps } from './ICodeEditorProps';
 import { SqlEditorStyles } from './theme';
 import { useAutoFormat } from './useAutoFormat';
+
+/** We use hardcoded value because codemirror treats undefined and lack of prop diffrently  */
+export const DEFAULT_CURSOR_BLINK_RATE = 530;
 
 export const CodeEditor = observer<ICodeEditorProps>(function CodeEditor(props) {
   const { autoFormat, className, editorDidMount } = props;
@@ -73,7 +74,11 @@ export const CodeEditor = observer<ICodeEditorProps>(function CodeEditor(props) 
         {...props}
         value={value}
         editorDidMount={handleMount}
-        options={{ styleSelectedText: true, ...props.options }}
+        options={{
+          styleSelectedText: true,
+          ...props.options,
+          cursorBlinkRate: props.options?.cursorBlinkRate ?? DEFAULT_CURSOR_BLINK_RATE,
+        }}
       />
     </code-editor>
   );

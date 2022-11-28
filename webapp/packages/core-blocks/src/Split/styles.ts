@@ -33,7 +33,7 @@ export const splitStyles = css`
       position: relative;
       flex: 0 1 auto;
       width: 2px;
-      cursor: col-resize;
+      cursor: ew-resize;
       user-select: none;
       z-index: 1;
       transition: box-shadow 0.3s ease-in-out;
@@ -50,7 +50,7 @@ export const splitStyles = css`
       height: 100%;
       top: 0;
       left: -5px;
-      cursor: col-resize;
+      cursor: ew-resize;
       box-sizing: border-box;
     }
   `;
@@ -66,7 +66,7 @@ export const splitHorizontalStyles = css`
 
   ResizerControls {
     position: relative;
-    cursor: row-resize;
+    cursor: ns-resize;
     height: 2px;
     width: initial;
   }
@@ -76,6 +76,6 @@ export const splitHorizontalStyles = css`
     width: 100%;
     top: -5px;
     left: 0;
-    cursor: row-resize;
+    cursor: ns-resize;
   }
 `;
