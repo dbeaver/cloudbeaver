@@ -334,7 +334,7 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public void deleteProjectConnectionFolders(
+    public void deleteProjectDataSourceFolders(
         @NotNull String projectId,
         @NotNull String[] folderPaths,
         boolean dropContents
@@ -349,6 +349,18 @@ public class LocalResourceController implements RMController {
                 log.warn("Can not find folder by path [" + folderPath + "] for deletion");
             }
         }
+        registry.checkForErrors();
+    }
+
+    @Override
+    public void moveProjectDataSourceFolder(
+        @NotNull String projectId,
+        @NotNull String oldPath,
+        @NotNull String newPath
+    ) throws DBException {
+        DBPProject project = getProjectMetadata(projectId);
+        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+        registry.moveFolder(oldPath, newPath);
         registry.checkForErrors();
     }
 
