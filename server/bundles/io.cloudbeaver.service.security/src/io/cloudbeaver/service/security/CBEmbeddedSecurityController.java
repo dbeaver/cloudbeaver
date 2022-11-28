@@ -1201,6 +1201,19 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public SMAuthInfo getAuthStatus(@NotNull String authId) throws DBException {
+        var smAuthInfo = getAuthStatus(authId, false);
+        if (smAuthInfo.getAuthStatus() == SMAuthStatus.SUCCESS) {
+            updateAuthStatus(authId,
+                SMAuthStatus.EXPIRED,
+                smAuthInfo.getAuthData(),
+                null,
+                smAuthInfo.getAuthPermissions().getSessionId()
+            );
+        }
+        return smAuthInfo;
+    }
+
+    private SMAuthInfo getAuthStatus(@NotNull String authId, boolean readExpiredData) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             SMAuthStatus smAuthStatus;
             String authError;
@@ -1254,7 +1267,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     case ERROR:
                         return SMAuthInfo.error(authId, authError);
                     case EXPIRED:
-                        return SMAuthInfo.expired(authId);
+                        return SMAuthInfo.expired(authId, readExpiredData ? authData : Map.of());
                     default:
                         throw new SMException("Unknown auth status:" + smAuthStatus);
                 }
@@ -1271,11 +1284,50 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 authData,
                 authRole
             );
-            updateAuthStatus(authId, SMAuthStatus.EXPIRED, authData, null, authPermissions.getSessionId());
             return successAuthStatus;
-
         } catch (SQLException e) {
             throw new DBException("Error while read auth info", e);
+        }
+    }
+
+    @Override
+    @Nullable
+    public SMAuthInfo restoreUserSession(@NotNull String appSessionId) throws DBException {
+        var latestActiveSmTokens = findTokenByAppSession(appSessionId);
+        if (latestActiveSmTokens == null) {
+            return null;
+        }
+        var latestSmSessionId = latestActiveSmTokens.getSessionId();
+
+        List<SMAuthInfo> allLatestAuthData = findAllSmSessionAuthData(latestSmSessionId);
+        Map<SMAuthConfigurationReference, Object> mergedData = new HashMap<>();
+        for (SMAuthInfo authData : allLatestAuthData) {
+            mergedData.putAll(authData.getAuthData());
+        }
+        return SMAuthInfo.success(
+            "restore_session_attempt_" + UUID.randomUUID(),
+            latestActiveSmTokens.getAccessToken(),
+            latestActiveSmTokens.getRefreshToken(),
+            getTokenPermissions(latestActiveSmTokens.getAccessToken()),
+            mergedData,
+            readTokenAuthRole(latestActiveSmTokens.getAccessToken())
+        );
+    }
+
+    private List<SMAuthInfo> findAllSmSessionAuthData(String smSessionId) throws DBException {
+
+        try (var dbCon = database.openConnection()) {
+            List<String> authAttemptIds = JDBCUtils.queryStrings(dbCon,
+                "SELECT AUTH_ID FROM CB_AUTH_ATTEMPT WHERE SESSION_ID=? AND AUTH_STATUS IN (?,?) ORDER BY CREATE_TIME",
+                smSessionId, SMAuthStatus.SUCCESS.name(), SMAuthStatus.EXPIRED.name()
+            );
+            List<SMAuthInfo> result = new ArrayList<>();
+            for (String authAttemptId : authAttemptIds) {
+                result.add(getAuthStatus(authAttemptId, true));
+            }
+            return result;
+        } catch (SQLException e) {
+            throw new DBException("Error reading sm session auth data", e);
         }
     }
 
@@ -1345,6 +1397,30 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
+    @Nullable
+    private SMTokenInfo findTokenByAppSession(@NotNull String appSessionId) throws DBException {
+        try (var dbCon = database.openConnection();
+             var dbStat = dbCon.prepareStatement(
+                 "SELECT CAT.TOKEN_ID FROM CB_AUTH_TOKEN CAT " +
+                     "  JOIN CB_SESSION CS ON CAT.SESSION_ID = CS.SESSION_ID " +
+                     "  WHERE CS.APP_SESSION_ID = ? AND CAT.USER_ID IS NOT NULL " +
+                     "  AND CAT.EXPIRATION_TIME > CURRENT_TIMESTAMP" +
+                     "  ORDER BY CAT.EXPIRATION_TIME DESC"
+             )
+        ) {
+            dbStat.setString(1, appSessionId);
+            try (var dbResult = dbStat.executeQuery()) {
+                if (!dbResult.next()) {
+                    return null;
+                }
+                String smAccessToken = dbResult.getString(1);
+                return readAccessTokenInfo(smAccessToken);
+            }
+        } catch (SQLException e) {
+            throw new DBException("Error finding active session creds", e);
+        }
+    }
+
     private SMTokenInfo readAccessTokenInfo(String smAccessToken) throws DBException {
         try (Connection dbCon = database.openConnection();
              PreparedStatement dbStat = dbCon.prepareStatement(
@@ -1361,7 +1437,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 var userId = dbResult.getString(3);
                 var expiredDate = dbResult.getTimestamp(4);
                 var authRole = dbResult.getString(5);
-                if (Timestamp.from(Instant.now()).after(expiredDate)) {
+                if (isTokenExpired(expiredDate)) {
                     throw new SMRefreshTokenExpiredException("Refresh token expired");
                 }
                 return new SMTokenInfo(smAccessToken, refreshToken, sessionId, userId, authRole);
@@ -1369,6 +1445,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error reading token info in database", e);
         }
+    }
+
+    private boolean isTokenExpired(Timestamp tokenExpiredDate) {
+        return Timestamp.from(Instant.now()).after(tokenExpiredDate);
     }
 
     @Override
@@ -1770,7 +1850,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
                 userId = dbResult.getString(1);
                 var expiredDate = dbResult.getTimestamp(2);
-                if (application.isMultiNode() && Timestamp.from(Instant.now()).after(expiredDate)) {
+                if (application.isMultiNode() && isTokenExpired(expiredDate)) {
                     throw new SMAccessTokenExpiredException("Token expired");
                 }
                 sessionId = dbResult.getString(3);
