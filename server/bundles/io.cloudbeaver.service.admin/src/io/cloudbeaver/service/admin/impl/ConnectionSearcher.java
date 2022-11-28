@@ -23,7 +23,6 @@ import io.cloudbeaver.service.admin.AdminConnectionSearchInfo;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRRunnableWithProgress;
-import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.utils.CommonUtils;
 
 import java.net.InetAddress;
@@ -42,16 +41,12 @@ public class ConnectionSearcher implements DBRRunnableWithProgress {
 
     private final WebSession webSession;
     private final String[] hostNames;
-    private final DataSourceRegistry tempRegistry;
     private final List<AdminConnectionSearchInfo> foundConnections = new ArrayList<>();
     private List<DBPDriver> availableDrivers = new ArrayList<>();
 
     public ConnectionSearcher(WebSession webSession, String[] hostNames) {
         this.webSession = webSession;
         this.hostNames = hostNames;
-        CBPlatform platform = CBPlatform.getInstance();
-        this.tempRegistry = new DataSourceRegistry(platform.getWorkspace().getActiveProject());
-
         this.availableDrivers.addAll(CBPlatform.getInstance().getApplicableDrivers());
     }
 

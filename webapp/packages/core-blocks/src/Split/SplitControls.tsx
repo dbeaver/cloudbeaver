@@ -10,8 +10,6 @@ import { SplitContext } from 'go-split';
 import { useContext } from 'react';
 import styled, { use } from 'reshadow';
 
-
-
 import { useObjectRef } from '../useObjectRef';
 import { buttonStyles } from './splitButtonStyles';
 

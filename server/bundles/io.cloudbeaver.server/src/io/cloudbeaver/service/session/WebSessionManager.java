@@ -18,6 +18,7 @@ package io.cloudbeaver.service.session;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.session.WebSessionAuthProcessor;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
@@ -27,6 +28,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -109,7 +111,7 @@ public class WebSessionManager {
                             throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
                         }
                     }
-
+                    tryToRestorePreviousUserSession(webSession);
                     log.debug("> New web session '" + webSession.getSessionId() + "'");
                 }
             } else {
@@ -124,6 +126,19 @@ public class WebSessionManager {
         }
 
         return webSession;
+    }
+
+    private void tryToRestorePreviousUserSession(WebSession webSession) {
+        try {
+            SMAuthInfo oldAuthInfo = webSession.getSecurityController().restoreUserSession(webSession.getSessionId());
+            if (oldAuthInfo == null) {
+                return;
+            }
+            boolean linkWithActiveUser = false; // because it's old credentials and should already be linked if needed
+            new WebSessionAuthProcessor(webSession, oldAuthInfo, linkWithActiveUser).authenticateSession();
+        } catch (DBException e) {
+            log.error("Failed to restore previous user session", e);
+        }
     }
 
     @NotNull
