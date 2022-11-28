@@ -127,7 +127,7 @@ public class WebSessionAuthProcessor {
                 if (authProviderExternal != null && !configMode && !alreadyLoggedIn) {
                     // We may need to associate new credentials with active user
                     if (linkWithActiveUser) {
-                        securityController.setUserCredentials(authProviderDescriptor.getId(), authAttrs);
+                        securityController.setCurrentUserCredentials(authProviderDescriptor.getId(), authAttrs);
                     }
                 }
 
