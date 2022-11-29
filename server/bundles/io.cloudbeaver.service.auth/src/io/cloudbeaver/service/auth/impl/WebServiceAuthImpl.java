@@ -216,7 +216,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     ) throws DBWebException {
         webSession.addInfoMessage("Set user parameter - " + name);
         try {
-            webSession.getSecurityController().setUserParameter(name, value);
+            webSession.getSecurityController().setCurrentUserParameter(name, value);
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error setting user parameter", e);

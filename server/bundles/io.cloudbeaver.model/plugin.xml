@@ -9,4 +9,13 @@
     <extension-point id="io.cloudbeaver.event.handler" name="Wev event handler" schema="schema/io.cloudbeaver.event.handler.exsd"/>
     <extension-point id="io.cloudbeaver.metaParameters" name="Meta parameters" schema="schema/io.cloudbeaver.metaParameters.exsd"/>
 
+    <extension point="io.cloudbeaver.metaParameters">
+        <metaParameters type="user">
+            <propertyGroup label="Main">
+                <property id="firstName" label="First Name" type="string" description="User first name"/>
+                <property id="lastName" label="Last Name" type="string" description="User last name"/>
+            </propertyGroup>
+        </metaParameters>
+    </extension>
+
 </plugin>
