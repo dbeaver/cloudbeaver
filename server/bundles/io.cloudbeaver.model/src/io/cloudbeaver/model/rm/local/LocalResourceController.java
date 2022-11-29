@@ -367,7 +367,7 @@ public class LocalResourceController implements RMController {
         @NotNull String oldPath,
         @NotNull String newPath
     ) throws DBException {
-        DBPProject project = getProjectMetadata(projectId);
+        DBPProject project = getProjectMetadata(projectId, false);
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         registry.moveFolder(oldPath, newPath);
         registry.checkForErrors();
