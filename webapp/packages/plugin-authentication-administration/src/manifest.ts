@@ -22,6 +22,7 @@ import { TeamOptionsTabService } from './Administration/Users/Teams/Options/Team
 import { TeamFormService } from './Administration/Users/Teams/TeamFormService';
 import { TeamsAdministrationNavService } from './Administration/Users/Teams/TeamsAdministrationNavService';
 import { TeamsAdministrationService } from './Administration/Users/Teams/TeamsAdministrationService';
+import { ConnectionAccessTabBootstrap } from './Administration/Users/UserForm/ConnectionAccess/ConnectionAccessTabBootstrap';
 import { UserFormBaseBootstrap } from './Administration/Users/UserForm/UserFormBaseBootstrap';
 import { UserFormService } from './Administration/Users/UserForm/UserFormService';
 import { UsersAdministrationNavigationService } from './Administration/Users/UsersAdministrationNavigationService';
@@ -57,5 +58,6 @@ export const manifest: PluginManifest = {
     TeamOptionsTabService,
     GrantedUsersTabService,
     GrantedConnectionsTabService,
+    ConnectionAccessTabBootstrap,
   ],
 };

@@ -8,6 +8,7 @@
 
 import type { AdminUser } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import { Executor } from '@cloudbeaver/core-executor';
 import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
@@ -28,9 +29,11 @@ export interface IUserFormState {
 
 @injectable()
 export class UserFormService {
+  readonly onFormInit: Executor;
   readonly tabsContainer: TabsContainer<IUserFormProps>;
 
   constructor() {
     this.tabsContainer = new TabsContainer();
+    this.onFormInit = new Executor();
   }
 }
