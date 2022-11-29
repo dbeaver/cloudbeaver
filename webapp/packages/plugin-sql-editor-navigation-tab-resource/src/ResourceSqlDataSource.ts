@@ -154,6 +154,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   setResourceKey(resourceKey: IResourceManagerParams): void {
     if (this.state.resourceKey && this.resourceUseKeyId) {
       this.resourceManagerResource.free(toJS(this.state.resourceKey), this.resourceUseKeyId);
+      this.resourceUseKeyId = null;
     }
 
     this.state.resourceKey = toJS(resourceKey);
@@ -212,6 +213,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.resourceManagerResource.onDataUpdate.removeHandler(this.syncResource);
     if (this.state.resourceKey && this.resourceUseKeyId) {
       this.resourceManagerResource.free(toJS(this.state.resourceKey), this.resourceUseKeyId);
+      this.resourceUseKeyId = null;
     }
   }
 
@@ -229,7 +231,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   async load(): Promise<void> {
-    if (this.state.resourceKey) {
+    if (this.state.resourceKey && !this.resourceUseKeyId) {
       this.resourceUseKeyId = this.resourceManagerResource.use(this.state.resourceKey);
     }
     await this.read();
