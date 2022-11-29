@@ -338,10 +338,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             // Try to configure automatically
             performAutoConfiguration(configPath.toFile().getParentFile());
         } else if (appConfiguration.isGrantConnectionsAccessToAnonymousTeam()) {
-            String autoAdminName = System.getenv(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
-            if (autoAdminName != null) {
-                grantAnonymousAccessToConnections(appConfiguration, autoAdminName);
-            }
+            grantAnonymousAccessToConnections(appConfiguration, CBConstants.DEFAULT_ADMIN_NAME);
         }
 
         if (enableSecurityManager) {
