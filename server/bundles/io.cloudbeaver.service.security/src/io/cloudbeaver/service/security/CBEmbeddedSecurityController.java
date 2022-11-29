@@ -701,7 +701,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             WebMetaParametersRegistry.getInstance().getMetaParameters(subjectType));
 
         // Add metas from enabled auth providers
-        WebAppConfiguration appConfiguration = WebAppUtils.getWebApplication().getAppConfiguration();
+        WebAppConfiguration appConfiguration = application.getAppConfiguration();
         if (appConfiguration instanceof WebAuthConfiguration) {
             for (String apId : ((WebAuthConfiguration)appConfiguration).getEnabledAuthProviders()) {
                 WebAuthProviderDescriptor ap = WebAuthProviderRegistry.getInstance().getAuthProvider(apId);
