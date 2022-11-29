@@ -17,9 +17,9 @@ import { NetworkStateService, WindowEventsService } from '@cloudbeaver/core-root
 import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { throttle } from '@cloudbeaver/core-utils';
-import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
+import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavResourceNodeService, ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
-import { getSqlEditorName, ISqlEditorTabState, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
+import { getSqlEditorName, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
