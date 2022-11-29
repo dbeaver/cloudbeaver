@@ -170,6 +170,17 @@ export interface CbEvent {
   eventType: CbEventType;
 }
 
+export enum CbEventResourceType {
+  Datasource = 'DATASOURCE',
+  RmResource = 'RM_RESOURCE'
+}
+
+export enum CbEventStatus {
+  TypeCreate = 'TYPE_CREATE',
+  TypeDelete = 'TYPE_DELETE',
+  TypeUpdate = 'TYPE_UPDATE'
+}
+
 export enum CbEventType {
   CbConfigChanged = 'cb_config_changed',
   CbDatasourceUpdated = 'cb_datasource_updated',
@@ -2595,9 +2606,9 @@ export type GetProjectPermissionsListQuery = { permissions: Array<{ id: string, 
 
 export type GetResourceListQueryVariables = Exact<{
   projectId: Scalars['String'];
-  folder?: InputMaybe<Scalars['String']>;
+  path?: InputMaybe<Scalars['String']>;
   nameMask?: InputMaybe<Scalars['String']>;
-  readProperties?: InputMaybe<Scalars['Boolean']>;
+  includeProperties: Scalars['Boolean'];
   readHistory?: InputMaybe<Scalars['Boolean']>;
 }>;
 
@@ -4192,18 +4203,18 @@ export const GetProjectPermissionsListDocument = `
 }
     ${AdminPermissionInfoFragmentDoc}`;
 export const GetResourceListDocument = `
-    query getResourceList($projectId: String!, $folder: String, $nameMask: String, $readProperties: Boolean, $readHistory: Boolean) {
+    query getResourceList($projectId: String!, $path: String, $nameMask: String, $includeProperties: Boolean!, $readHistory: Boolean) {
   resources: rmListResources(
     projectId: $projectId
-    folder: $folder
+    folder: $path
     nameMask: $nameMask
-    readProperties: $readProperties
+    readProperties: $includeProperties
     readHistory: $readHistory
   ) {
     name
     folder
     length
-    properties
+    properties @include(if: $includeProperties)
   }
 }
     `;

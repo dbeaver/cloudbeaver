@@ -10,14 +10,15 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, NavTreeResource, NavNodeInfoResource, NodeManagerUtils, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeManagerService, NavNodeInfoResource, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { createChildResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { DATA_CONTEXT_TAB_ID } from '@cloudbeaver/core-ui';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, RESOURCES_NODE_PATH, ResourcesProjectsNavNodeService } from '@cloudbeaver/plugin-resource-manager';
+import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, RESOURCES_NODE_PATH, getResourceKeyFromNodeId } from '@cloudbeaver/plugin-resource-manager';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
@@ -30,7 +31,6 @@ import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
-    private readonly navTreeResource: NavTreeResource,
     private readonly navResourceNodeService: NavResourceNodeService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navigationTabsService: NavigationTabsService,
@@ -43,10 +43,10 @@ export class PluginBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
+    private readonly resourceManagerResource: ResourceManagerResource,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
     private readonly sqlEditorTabService: SqlEditorTabService,
-    private readonly resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
   ) {
     super();
   }
@@ -113,17 +113,19 @@ export class PluginBootstrap extends Bootstrap {
 
               const scriptName = `${result.name.trim()}.${SCRIPT_EXTENSION}`;
               const folder = createPath(RESOURCES_NODE_PATH, projectId);
-              const resourceData = this.navResourceNodeService.getResourceData(folder);
+              const folderResourceKey = getResourceKeyFromNodeId(folder);
 
-              if (!resourceData) {
+              if (!folderResourceKey) {
                 this.notificationService.logError({ title: 'ui_error', message: 'plugin_resource_manager_save_script_error' });
                 return;
               }
 
-              const nodeId = await this.navResourceNodeService.saveScript(resourceData, scriptName, dataSource.script);
-
-              await this.navTreeResource.preloadNodeParents(NodeManagerUtils.parentsFromPath(nodeId), nodeId);
-              const node = await this.navNodeInfoResource.load(nodeId);
+              const resourceKey = createChildResourceKey(folderResourceKey, scriptName);
+              await this.resourceManagerResource.writeText(
+                resourceKey,
+                dataSource.script,
+                false
+              );
 
               if (tab && isSQLEditorTab(tab)) {
                 const previousDataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
@@ -132,21 +134,14 @@ export class PluginBootstrap extends Bootstrap {
                   ResourceSqlDataSource.key,
                 ) as ResourceSqlDataSource;
 
-                const nodeId = node.id;
-                const parents = NodeManagerUtils.parentsFromPath(nodeId);
-
-                dataSource.setNodeInfo({
-                  projectId,
-                  nodeId,
-                  parents,
-                });
+                dataSource.setResourceKey(resourceKey);
 
                 if (previousDataSource?.executionContext) {
                   dataSource.setExecutionContext(previousDataSource.executionContext);
                 }
               }
 
-              this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: node.name });
+              this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: resourceKey.name });
 
               if (!this.resourceManagerService.active) {
                 this.resourceManagerService.togglePanel();
@@ -197,20 +192,10 @@ export class PluginBootstrap extends Bootstrap {
         return;
       }
 
-      const resourceData = this.navResourceNodeService.getResourceData(node.id);
+      const resourceKey = getResourceKeyFromNodeId(node.id);
 
-      if (!resourceData) {
+      if (!resourceKey) {
         return;
-      }
-
-      const resource = await this.navResourceNodeService.loadResourceInfo(resourceData);
-
-      if (!resource) {
-        if (data.type === NavigationType.open) {
-          throw new Error('Resource not found');
-        } else {
-          return;
-        }
       }
 
       nodeInfo.markOpen();
@@ -218,6 +203,8 @@ export class PluginBootstrap extends Bootstrap {
       if (data.type !== NavigationType.open) {
         return;
       }
+
+      const resource = await this.navResourceNodeService.loadResourceInfo(resourceKey);
 
       const maxSize = this.sqlEditorSettingsService.settings.isValueDefault('maxFileSize')
         ? this.sqlEditorSettingsService.deprecatedSettings.getValue('maxFileSize')
@@ -234,13 +221,13 @@ export class PluginBootstrap extends Bootstrap {
         return;
       }
 
-      const tab = this.sqlEditorTabResourceService.getResourceTab(node.id);
+      const tab = this.sqlEditorTabResourceService.getResourceTab(resourceKey);
 
       if (tab) {
         this.navigationTabsService.selectTab(tab.id);
       } else {
         const contextProvider = await this.sqlEditorNavigatorService.openNewEditor({
-          name: node.name ?? 'Unknown script',
+          name: resourceKey.name ?? 'Unknown script',
           dataSourceKey: ResourceSqlDataSource.key,
         });
 
@@ -254,21 +241,14 @@ export class PluginBootstrap extends Bootstrap {
             ResourceSqlDataSource.key,
           ) as ResourceSqlDataSource;
 
-          const nodeId = node.id;
-          const parents = NodeManagerUtils.parentsFromPath(nodeId);
 
-          dataSource.setNodeInfo({
-            projectId: node.projectId,
-            nodeId,
-            parents,
-          });
+          dataSource.setResourceKey(resourceKey);
 
           if (previousDataSource?.executionContext) {
             dataSource.setExecutionContext(previousDataSource.executionContext);
           }
 
-          const project = this.resourcesProjectsNavNodeService.getProject(nodeId);
-          this.sqlEditorTabService.attachToProject(context.tab, project?.id ?? null);
+          this.sqlEditorTabService.attachToProject(context.tab, resourceKey.projectId);
         }
       }
     } catch (exception) {

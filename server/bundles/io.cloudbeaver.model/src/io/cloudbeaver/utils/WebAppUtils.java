@@ -17,8 +17,6 @@
 package io.cloudbeaver.utils;
 
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import org.jkiss.code.NotNull;
@@ -208,35 +206,4 @@ public class WebAppUtils {
         return RMProjectType.GLOBAL.getPrefix() + "_" + globalConfigurationName;
     }
 
-    /**
-     * adds events of updated datasource to event controller
-     *
-     * @param project project of updated database
-     * @param datasourceId id of datasource
-     * @param eventType type of event
-     */
-    public static void addDataSourceUpdatedEvent(DBPProject project, String datasourceId, CBEventConstants.EventType eventType) {
-        if (project == null) {
-            return;
-        }
-        getWebApplication().getEventController().addEvent(
-            new CBEvent(
-                CBEventConstants.CLOUDBEAVER_DATASOURCE_UPDATED,
-                Map.of("projectId", project.getId(),
-                    "dataSourceIds", List.of(datasourceId),
-                    "eventType", eventType)
-            )
-        );
-    }
-
-    public static void addRmResourceUpdatedEvent(String eventId, String projectId, String resourcePath) {
-        getWebApplication().getEventController().addEvent(
-            new CBEvent(eventId,
-                Map.of(
-                    "projectId", projectId,
-                    "resourcePath", resourcePath
-                )
-            )
-        );
-    }
 }

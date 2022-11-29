@@ -9,7 +9,7 @@
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { ILoadableState, isArraysEqual, MetadataMap } from '@cloudbeaver/core-utils';
+import { ILoadableState, isArraysEqual, MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
 import { CachedResource, CachedResourceKey, ICachedResourceMetadata } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
@@ -75,11 +75,13 @@ export abstract class CachedMapResource<
     this.onItemAdd = new SyncExecutor<ResourceKey<TKey>>(null);
     this.onItemDelete = new SyncExecutor<ResourceKey<TKey>>(null);
 
-    this.metadata = new MetadataMap(() => observable({
+    this.metadata = new MetadataMap((key, metadata) => observable({
       outdated: true,
       loading: false,
       exception: null,
       includes: observable([...this.defaultIncludes]),
+      dependencies: observable([]),
+      ...this.populateMetadata(key, metadata),
     }, undefined, { deep: false }));
 
     this.addAlias(CachedMapAllKey, key => {
@@ -148,6 +150,33 @@ export abstract class CachedMapResource<
     return ResourceKeyUtils.map(key, key => this.getMetadata(key).exception);
   }
 
+  isInUse(key: ResourceKey<TKey>): boolean {
+    return ResourceKeyUtils.every(key, key => super.isInUse(this.getMetadataKeyRef(key)));
+  }
+
+  use(key: ResourceKey<TKey>): string {
+    key = this.transformParam(key);
+    key = this.getLockedKeys(key);
+    const id = uuid();
+
+    ResourceKeyUtils.map(key, key => {
+      key = this.getMetadataKeyRef(key);
+      return super.use(key, id);
+    });
+
+    return id;
+  }
+
+  free(key: ResourceKey<TKey>, id: string): void {
+    key = this.transformParam(key);
+    key = this.getLockedKeys(key);
+
+    ResourceKeyUtils.forEach(key, (key, i) => {
+      key = this.getMetadataKeyRef(key);
+      super.free(key, id);
+    });
+  }
+
   isOutdated(key: ResourceKey<TKey>): boolean {
     if (this.isAlias(key) && !this.isAliasLoaded(key)) {
       return true;
@@ -169,8 +198,9 @@ export abstract class CachedMapResource<
   markDataLoading(key: ResourceKey<TKey>, includes?: string[]): void {
     key = this.transformParam(key);
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.getMetadata(key);
-      metadata.loading = true;
+      this.updateMetadata(key, metadata => {
+        metadata.loading = true;
+      });
     });
   }
 
@@ -182,8 +212,9 @@ export abstract class CachedMapResource<
     }
 
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.getMetadata(key);
-      metadata.loading = false;
+      this.updateMetadata(key, metadata => {
+        metadata.loading = false;
+      });
     });
   }
 
@@ -194,9 +225,10 @@ export abstract class CachedMapResource<
     key = this.transformParam(key);
 
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.getMetadata(key);
-      metadata.exception = exception;
-      metadata.outdated = false;
+      this.updateMetadata(key, metadata => {
+        metadata.exception = exception;
+        metadata.outdated = false;
+      });
     });
 
     this.onDataError.execute({ param: key, exception });
@@ -205,10 +237,11 @@ export abstract class CachedMapResource<
   markOutdated(): void;
   markOutdated(key: ResourceKey<TKey>): void;
   markOutdated(key?: ResourceKey<TKey>): void {
+    const isKeyExecuting = key === undefined ? this.scheduler.executing : this.scheduler.isExecuting(key);
     if (
-      (
-        (key === undefined ? this.scheduler.executing : this.scheduler.isExecuting(key))
-      ) && !this.outdateWaitList.some(param => this.includes(key!, param))) {
+      isKeyExecuting
+      && !this.outdateWaitList.some(param => this.includes(key!, param))
+    ) {
       this.outdateWaitList.push(key!);
       return;
     }
@@ -220,14 +253,15 @@ export abstract class CachedMapResource<
   cleanError(key: ResourceKey<TKey>): void;
   cleanError(key?: ResourceKey<TKey>): void {
     if (key === undefined) {
-      key = resourceKeyList(this.keys);
-    } else {
-      key = this.transformParam(key);
+      key = CachedMapAllKey;
     }
 
+    key = this.transformParam(key);
+
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.getMetadata(key);
-      metadata.exception = null;
+      this.updateMetadata(key, metadata => {
+        metadata.exception = null;
+      });
     });
   }
 
@@ -235,19 +269,19 @@ export abstract class CachedMapResource<
   markUpdated(key: ResourceKey<TKey>): void;
   markUpdated(key?: ResourceKey<TKey>): void {
     if (key === undefined) {
-      // TODO: maybe should add all aliases to loadedKeys
-      key = resourceKeyList(this.keys);
-    } else {
-      if (this.isAlias(key) && !this.isAliasLoaded(key)) {
-        this.loadedKeys.push(key);
-      }
-
-      key = this.transformParam(key);
+      key = CachedMapAllKey;
     }
 
+    if (this.isAlias(key) && !this.isAliasLoaded(key)) {
+      this.loadedKeys.push(key);
+    }
+
+    key = this.transformParam(key);
+
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.getMetadata(key);
-      metadata.outdated = false;
+      this.updateMetadata(key, metadata => {
+        metadata.outdated = false;
+      });
     });
   }
 
@@ -275,12 +309,21 @@ export abstract class CachedMapResource<
     });
   }
 
+  has(key: ResourceKey<TKey>): boolean {
+    if (this.isAlias(key) && !this.isAliasLoaded(key)) {
+      return false;
+    }
+
+    key = this.transformParam(key) as TKey;
+    return ResourceKeyUtils.every(key, key => this.dataHas(key));
+  }
+
   get(key: TKey): TValue | undefined;
   get(key: ResourceKeyList<TKey>): Array<TValue | undefined>;
   get(key: ResourceKey<TKey>): Array<TValue | undefined> | TValue | undefined;
   get(key: ResourceKey<TKey>): Array<TValue | undefined> | TValue | undefined {
     key = this.transformParam(key);
-    return ResourceKeyUtils.map(key, key => this.data.get(this.getKeyRef(key)));
+    return ResourceKeyUtils.map(key, key => this.dataGet(key));
   }
 
   set(key: TKey, value: TValue): void;
@@ -299,18 +342,15 @@ export abstract class CachedMapResource<
     this.onItemAdd.execute(key);
   }
 
-  delete(key: TKey): void;
-  delete(key: ResourceKeyList<TKey>): void;
-  delete(key: ResourceKey<TKey>): void;
   delete(key: ResourceKey<TKey>): void {
     key = this.transformParam(key);
 
     this.onItemDelete.execute(key);
     ResourceKeyUtils.forEach(key, key => {
       this.dataDelete(key);
-      this.deleteMetadata(key);
     });
-    this.markUpdated(key);
+    // rewrites pending outdate
+    // this.markUpdated(key);
   }
 
   clear(): void {
@@ -335,6 +375,8 @@ export abstract class CachedMapResource<
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
     //@ts-expect-error fix
+    await this.preLoadData(key, false, includes);
+    //@ts-expect-error fix
     await this.loadData(key, true, includes);
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
@@ -356,19 +398,18 @@ export abstract class CachedMapResource<
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
     //@ts-expect-error fix
+    await this.preLoadData(key, false, includes);
+    //@ts-expect-error fix
     await this.loadData(key, false, includes);
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
 
-  has(key: TKey): boolean {
-    if (this.isAlias(key) && !this.isAliasLoaded(key)) {
-      return false;
-    }
-
-    key = this.transformParam(key) as TKey;
-    return this.data.has(this.getKeyRef(key));
-  }
-
+  /**
+   * Check if key is a part of param
+   * @param param - param
+   * @param key - key
+   * @returns {boolean} Returns true if param can be represented by key
+   */
   includes(param: ResourceKey<TKey>, key: ResourceKey<TKey>): boolean {
     if
     (
@@ -399,6 +440,18 @@ export abstract class CachedMapResource<
     return metadata.includes;
   }
 
+  /**
+   * Converts array of includes to map
+   * ```
+   * {
+   *   customIncludeBase: true,
+   *   [key]: true
+   * }
+   * ```
+   * @param key - Resource to extract includes from metadata
+   * @param includes - Base includes
+   * @returns {Object} Object where key is include name and value is true
+   */
   getIncludesMap(key?: ResourceKey<TKey>, includes: string[] = this.defaultIncludes): Record<string, any> {
     const keyIncludes = this.getIncludes(key);
     return ['customIncludeBase', ...includes, ...keyIncludes].reduce<any>((map, key) => {
@@ -408,43 +461,112 @@ export abstract class CachedMapResource<
     }, {});
   }
 
+  /**
+   * Can be override to provide equality check for complicated keys
+   */
   isKeyEqual(param: TKey, second: TKey): boolean {
     return param === second;
   }
 
+  /**
+   * Use it instead of this.metadata.get
+   * This method can be override
+   */
   getMetadata(param: TKey): ICachedMapResourceMetadata {
-    const metadata = this.metadata.get(this.getKeyRef(param));
+    const metadata = this.metadata.get(this.getMetadataKeyRef(param));
     return metadata;
   }
 
-  deleteMetadata(param: TKey): void {
-    this.metadata.delete(this.getKeyRef(param));
+  /**
+   * Use to update metadata
+   * This method can be override
+   */
+  updateMetadata(param: TKey, callback: (data: ICachedMapResourceMetadata) => void): void {
+    const metadata = this.getMetadata(param);
+    callback(metadata);
   }
 
+  /**
+   * Use it instead of this.metadata.delete
+   * This method can be override
+   */
+  deleteMetadata(key: TKey): void {
+    key = this.getMetadataKeyRef(key);
+    this.metadata.delete(key);
+  }
+
+  /**
+   * Can be override to provide static link to complicated keys
+   */
+  getMetadataKeyRef(key: TKey): TKey {
+    return this.getKeyRef(key);
+  }
+
+  /**
+   * Can be override to provide static link to complicated keys
+   */
   getKeyRef(key: TKey): TKey {
     return key;
   }
 
+  protected getLockedKeys(key: ResourceKey<TKey>): ResourceKey<TKey> {
+    return key;
+  }
+
+  /**
+   * Use to extend metadata
+   * @returns {Record<string, any>} Object Map
+   */
+  protected populateMetadata(key: TKey, metadata: MetadataMap<TKey, ICachedMapResourceMetadata>): Record<string, any> {
+    return {};
+  }
+
+  /**
+   * Use it instead of this.data.get
+   * This method can be override
+   */
+  protected dataGet(key: TKey): TValue | undefined {
+    key = this.getKeyRef(key);
+    return this.data.get(key);
+  }
+
+  /**
+   * Use it instead of this.data.set
+   * This method can be override
+   */
   protected dataSet(key: TKey, value: TValue): void {
     key = this.getKeyRef(key);
     this.data.set(key, value);
   }
 
+  /**
+   * Use it instead of this.data.delete
+   * This method can be override
+   */
   protected dataDelete(key: TKey): void {
+    this.data.delete(this.getKeyRef(key));
+    this.deleteMetadata(key);
+  }
+
+  /**
+   * Use it instead of this.data.has
+   * This method can be override
+   */
+  protected dataHas(key: TKey): boolean {
     key = this.getKeyRef(key);
-    this.data.delete(key);
+    return this.data.has(key);
   }
 
   protected commitIncludes(key: ResourceKey<TKey>, includes: string[]): void {
     key = this.transformParam(key);
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.getMetadata(key);
-
-      for (const include of includes) {
-        if (!metadata.includes.includes(include)) {
-          metadata.includes.push(include);
+      this.updateMetadata(key, metadata => {
+        for (const include of includes) {
+          if (!metadata.includes.includes(include)) {
+            metadata.includes.push(include);
+          }
         }
-      }
+      });
     });
   }
 
@@ -468,8 +590,9 @@ export abstract class CachedMapResource<
     }
 
     ResourceKeyUtils.forEach(key, key => {
-      const metadata = this.getMetadata(key);
-      metadata.outdated = true;
+      this.updateMetadata(key, metadata => {
+        metadata.outdated = true;
+      });
     });
 
     this.onDataOutdated.execute(key);

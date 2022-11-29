@@ -110,10 +110,10 @@ public class LocalResourceController implements RMController {
         return userId == null ? null : this.userProjectsPath.resolve(userId);
     }
 
-    private WebProjectImpl getProjectMetadata(String projectId) throws DBException {
+    private WebProjectImpl getProjectMetadata(String projectId, boolean refresh) throws DBException {
         synchronized (projectRegistries) {
             WebProjectImpl project = projectRegistries.get(projectId);
-            if (project == null) {
+            if (project == null || refresh) {
                 SessionContextImpl sessionContext = new SessionContextImpl(null);
                 RMProject rmProject = makeProjectFromId(projectId, false);
                 project = new WebProjectImpl(
@@ -285,13 +285,13 @@ public class LocalResourceController implements RMController {
 
     @Override
     public Object getProjectProperty(@NotNull String projectId, @NotNull String propName) throws DBException {
-        DBPProject project = getProjectMetadata(projectId);
+        DBPProject project = getProjectMetadata(projectId, false);
         return project.getProjectProperty(propName);
     }
 
     @Override
     public String getProjectsDataSources(@NotNull String projectId) throws DBException {
-        DBPProject projectMetadata = getProjectMetadata(projectId);
+        DBPProject projectMetadata = getProjectMetadata(projectId, false);
         DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
         registry.checkForErrors();
         DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
@@ -301,12 +301,21 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public void saveProjectDataSources(
+    public void createProjectDataSources(
         @NotNull String projectId,
         @NotNull String configuration,
         @Nullable List<String> dataSourceIds
     ) throws DBException {
-        final DBPProject project = getProjectMetadata(projectId);
+        updateProjectDataSources(projectId, configuration, dataSourceIds);
+    }
+
+    @Override
+    public void updateProjectDataSources(
+        @NotNull String projectId,
+        @NotNull String configuration,
+        @Nullable List<String> dataSourceIds
+    ) throws DBException {
+        final DBPProject project = getProjectMetadata(projectId, false);
         final DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         final DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(StandardCharsets.UTF_8));
         final DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
@@ -318,7 +327,7 @@ public class LocalResourceController implements RMController {
 
     @Override
     public void deleteProjectDataSources(@NotNull String projectId, @NotNull String[] dataSourceIds) throws DBException {
-        final DBPProject project = getProjectMetadata(projectId);
+        final DBPProject project = getProjectMetadata(projectId, false);
         final DBPDataSourceRegistry registry = project.getDataSourceRegistry();
 
         for (String dataSourceId : dataSourceIds) {
@@ -339,7 +348,7 @@ public class LocalResourceController implements RMController {
         @NotNull String[] folderPaths,
         boolean dropContents
     ) throws DBException {
-        DBPProject project = getProjectMetadata(projectId);
+        DBPProject project = getProjectMetadata(projectId, false);
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         for (String folderPath : folderPaths) {
             DBPDataSourceFolder folder = registry.getFolder(folderPath);
@@ -358,7 +367,7 @@ public class LocalResourceController implements RMController {
         @NotNull String oldPath,
         @NotNull String newPath
     ) throws DBException {
-        DBPProject project = getProjectMetadata(projectId);
+        DBPProject project = getProjectMetadata(projectId, false);
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         registry.moveFolder(oldPath, newPath);
         registry.checkForErrors();
@@ -459,7 +468,7 @@ public class LocalResourceController implements RMController {
             throw new DBException("Error moving resource '" + oldResourcePath + "'", e);
         }
         // Move properties
-        getProjectMetadata(projectId).moveResourceProperties(oldResourcePath, newResourcePath);
+        getProjectMetadata(projectId, false).moveResourceProperties(oldResourcePath, newResourcePath);
 
         fireRmResourceDeleteEvent(projectId, rmOldResourcePath);
         fireRmResourceAddEvent(projectId, newResourcePath);
@@ -484,7 +493,7 @@ public class LocalResourceController implements RMController {
             throw new DBException("Error deleting resource '" + resourcePath + "'", e);
         }
         // Nullify resource properties if any
-        WebProjectImpl project = getProjectMetadata(projectId);
+        WebProjectImpl project = getProjectMetadata(projectId, false);
         project.resetResourceProperties(resourcePath);
 
         fireRmResourceDeleteEvent(projectId, rmResourcePath);
@@ -556,7 +565,7 @@ public class LocalResourceController implements RMController {
         @Nullable Object propertyValue
     ) throws DBException {
         validateResourcePath(resourcePath);
-        getProjectMetadata(projectId).setResourceProperty(resourcePath, propertyName, propertyValue);
+        getProjectMetadata(projectId, false).setResourceProperty(resourcePath, propertyName, propertyValue);
         return DEFAULT_CHANGE_ID;
     }
 
@@ -722,7 +731,7 @@ public class LocalResourceController implements RMController {
                 );
             }
             if (readProperties) {
-                final BaseProjectImpl project = (BaseProjectImpl) getProjectMetadata(projectId);
+                final BaseProjectImpl project = (BaseProjectImpl) getProjectMetadata(projectId, true);
                 final String resourcePath = getProjectRelativePath(projectId, path);
                 final Map<String, Object> properties = project.getResourceProperties(resourcePath);
 

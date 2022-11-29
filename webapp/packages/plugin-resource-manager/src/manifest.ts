@@ -13,7 +13,6 @@ import { ResourceFoldersBootstrap } from './NavNodes/ResourceFoldersBootstrap';
 import { ResourcesProjectsNavNodeService } from './NavNodes/ResourcesProjectsNavNodeService';
 import { NavResourceNodeService } from './NavResourceNodeService';
 import { PluginBootstrap } from './PluginBootstrap';
-import { ResourceManagerResource } from './ResourceManagerResource';
 import { ResourceManagerService } from './ResourceManagerService';
 import { ResourceManagerSettingsService } from './ResourceManagerSettingsService';
 import { ResourceProjectsResource } from './ResourceProjectsResource';
@@ -25,7 +24,6 @@ export const resourceManagerPlugin: PluginManifest = {
     PluginBootstrap,
     LocaleService,
     ResourceManagerService,
-    ResourceManagerResource,
     NavResourceNodeService,
     ResourceFoldersBootstrap,
     ResourceProjectsResource,

@@ -11,7 +11,7 @@ import { action, makeObservable, observable, runInAction } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ExecutorInterrupter, ISyncExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { EPermission, NavigatorViewSettings, SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
+import { EPermission, NavigatorViewSettings, SessionPermissionsResource, SessionDataResource, DataSynchronizationService } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -32,6 +32,7 @@ import {
   isResourceKeyList,
 } from '@cloudbeaver/core-sdk';
 
+import { ConnectionInfoEventHandler, EConnectionInfoEventType, IConnectionInfoEvent } from './ConnectionInfoEventHandler';
 import type { DatabaseConnection } from './DatabaseConnection';
 import type { IConnectionInfoParams } from './IConnectionsResource';
 
@@ -73,8 +74,10 @@ export class ConnectionInfoResource
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly projectInfoResource: ProjectInfoResource,
+    private readonly dataSynchronizationService: DataSynchronizationService,
     sessionDataResource: SessionDataResource,
-    permissionsResource: SessionPermissionsResource
+    permissionsResource: SessionPermissionsResource,
+    connectionInfoEventHandler: ConnectionInfoEventHandler,
   ) {
     super();
 
@@ -103,6 +106,58 @@ export class ConnectionInfoResource
       this.sessionUpdate = true;
       this.markOutdated();
     });
+
+    connectionInfoEventHandler
+      .on<ResourceKeyList<IConnectionInfoParams>>(
+      async key => {
+        const connections = await this.load(key);
+
+        for (const connection of connections) {
+          this.onConnectionCreate.execute(connection);
+        }
+      }, data => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
+        projectId: data.projectId,
+        connectionId,
+      }))), d => d.eventType === EConnectionInfoEventType.TypeCreate)
+      .on<ResourceKeyList<IConnectionInfoParams>>(
+      key => {
+        if (this.isConnected(key)) {
+          const connection = this.get(key);
+
+          this.dataSynchronizationService
+            .requestSynchronization('connection', connection.map(connection => connection?.name).join('\n'))
+            .then(state => {
+              if (state) {
+                this.markOutdated(key);
+              }
+            });
+        } else {
+          this.markOutdated(key);
+        }
+      }, data => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
+        projectId: data.projectId,
+        connectionId,
+      }))), d => d.eventType === EConnectionInfoEventType.TypeUpdate)
+      .on<IConnectionInfoEvent>(
+      data => {
+        const key = resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
+          projectId: data.projectId,
+          connectionId,
+        })));
+
+        if (this.isConnected(key)) {
+          const connection = this.get(key);
+          this.dataSynchronizationService
+            .requestSynchronization('connection', connection.map(connection => connection?.name).join('\n'))
+            .then(state => {
+              if (state) {
+                this.delete(key);
+              }
+            });
+        } else {
+          this.delete(key);
+        }
+      }, d => d, d => d.eventType === EConnectionInfoEventType.TypeDelete);
 
     makeObservable<this, 'nodeIdMap' | 'updateConnection'>(this, {
       nodeIdMap: observable,

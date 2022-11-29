@@ -24,7 +24,7 @@ import io.cloudbeaver.service.rm.DBWServiceRM;
 import io.cloudbeaver.service.rm.model.RMProjectPermissions;
 import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
 import io.cloudbeaver.service.security.SMUtils;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.security.*;
 
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -110,6 +111,18 @@ public class WebServiceRM implements DBWServiceRM {
         checkIsRmEnabled(webSession);
         try {
             getResourceController(webSession).setResourceProperty(projectId, resourcePath, propertyName, propertyValue);
+            Map<String, Object> eventData = WebEventUtils.generateRmResourceEventData(
+                projectId,
+                resourcePath,
+                getResourceController(webSession).getResourcePath(projectId, resourcePath),
+                CBEventConstants.EventType.TYPE_UPDATE
+            );
+            eventData.put("propertyName", propertyName);
+            eventData.put("propertyValue", propertyValue);
+            WebEventUtils.addRmResourceUpdatedEvent(
+                webSession.getSessionId(),
+                eventData
+            );
             return Boolean.TRUE.toString();
         } catch (DBException e) {
             String message = String.format("Error setting property [%s] for the the resource: [%s]", resourcePath, propertyName);
@@ -140,7 +153,13 @@ public class WebServiceRM implements DBWServiceRM {
         checkIsRmEnabled(webSession);
         try {
             String result = getResourceController(webSession).createResource(projectId, resourcePath, isFolder);
-            WebAppUtils.addRmResourceUpdatedEvent(CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED, projectId, resourcePath);
+            WebEventUtils.addRmResourceUpdatedEvent(
+                projectId,
+                webSession.getSessionId(),
+                resourcePath,
+                getResourceController(webSession).getResourcePath(projectId, resourcePath),
+                CBEventConstants.EventType.TYPE_CREATE
+            );
             return result;
         } catch (Exception e) {
             throw new DBWebException("Error creating resource " + resourcePath, e);
@@ -154,11 +173,51 @@ public class WebServiceRM implements DBWServiceRM {
     ) throws DBException {
         checkIsRmEnabled(webSession);
         try {
+            var rmResourcePath = getResourceController(webSession).getResourcePath(projectId, resourcePath);
             getResourceController(webSession).deleteResource(projectId, resourcePath, false);
-            WebAppUtils.addRmResourceUpdatedEvent(CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED, projectId, resourcePath);
+            WebEventUtils.addRmResourceUpdatedEvent(
+                projectId,
+                webSession.getSessionId(),
+                resourcePath,
+                rmResourcePath,
+                CBEventConstants.EventType.TYPE_DELETE
+            );
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error deleting resource " + resourcePath, e);
+        }
+    }
+
+    @Override
+    public boolean moveResource(@NotNull WebSession webSession,
+                                @NotNull String projectId,
+                                @NotNull String oldResourcePath,
+                                @NotNull String newResourcePath
+    ) throws DBException {
+        checkIsRmEnabled(webSession);
+        try {
+            var resourceController = getResourceController(webSession);
+            var oldRmResourcePath = resourceController.getResourcePath(projectId, oldResourcePath);
+            resourceController.moveResource(projectId, oldResourcePath, newResourcePath);;
+            var newRmResourcePath = resourceController.getResourcePath(projectId, newResourcePath);
+
+            WebEventUtils.addRmResourceUpdatedEvent(
+                projectId,
+                webSession.getSessionId(),
+                oldResourcePath,
+                oldRmResourcePath,
+                CBEventConstants.EventType.TYPE_DELETE
+            );
+            WebEventUtils.addRmResourceUpdatedEvent(
+                projectId,
+                webSession.getSessionId(),
+                newResourcePath,
+                newRmResourcePath,
+                CBEventConstants.EventType.TYPE_CREATE
+            );
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error moving resource " + oldResourcePath, e);
         }
     }
 
@@ -174,7 +233,19 @@ public class WebServiceRM implements DBWServiceRM {
         checkIsRmEnabled(webSession);
         try {
             byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
-            return getResourceController(webSession).setResourceContents(projectId, resourcePath, bytes, forceOverwrite);
+            String content = getResourceController(webSession).setResourceContents(projectId, resourcePath, bytes, forceOverwrite);
+            var eventType = CBEventConstants.EventType.TYPE_UPDATE;
+            if (!forceOverwrite) {
+                eventType = CBEventConstants.EventType.TYPE_CREATE;
+            }
+            WebEventUtils.addRmResourceUpdatedEvent(
+                projectId,
+                webSession.getSessionId(),
+                resourcePath,
+                getResourceController(webSession).getResourcePath(projectId, resourcePath),
+                eventType
+            );
+            return content;
         } catch (Exception e) {
             throw new DBWebException("Error writing resource '" + resourcePath + "' data", e);
         }

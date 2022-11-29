@@ -8,6 +8,8 @@ import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.utils.ArrayUtils;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Queue;
 
 public abstract class DBNAbstractResourceManagerNode extends DBNNode implements DBPObjectWithDetails {
@@ -51,6 +53,7 @@ public abstract class DBNAbstractResourceManagerNode extends DBNNode implements 
         if (node == null) { // we are in expected parent node
             DBNResourceManagerResource newResourceNode = new DBNResourceManagerResource(this, expectedResource);
             children = ArrayUtils.add(DBNResourceManagerResource.class, children, newResourceNode);
+            Arrays.sort(children, Comparator.comparing(DBNNode::getName));
             return;
         }
         if (resourcePath.size() > 0) {
