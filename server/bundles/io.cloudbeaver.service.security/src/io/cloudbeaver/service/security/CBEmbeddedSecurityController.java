@@ -24,11 +24,14 @@ import io.cloudbeaver.auth.SMAuthProviderAssigner;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.SMAutoAssign;
+import io.cloudbeaver.model.app.WebAppConfiguration;
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
+import io.cloudbeaver.registry.WebMetaParametersRegistry;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
 import io.cloudbeaver.service.security.internal.SMTokenInfo;
@@ -40,6 +43,7 @@ import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
+import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
@@ -115,6 +119,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         boolean enabled,
         @Nullable String defaultAuthRole
     ) throws DBException {
+        if (CommonUtils.isEmpty(userId)) {
+            throw new DBCException("Empty user name is not allowed");
+        }
         if (isSubjectExists(userId)) {
             throw new DBCException("User or team '" + userId + "' already exists");
         }
@@ -204,9 +211,23 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
+    private static Set<String> getAllLinkedSubjects(Connection dbCon, String subjectId) throws SQLException {
+        Set<String> allSubjects = new HashSet<>();
+        allSubjects.add(subjectId);
+        try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT TEAM_ID FROM CB_USER_TEAM UR WHERE USER_ID=?")) {
+            dbStat.setString(1, subjectId);
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    allSubjects.add(dbResult.getString(1));
+                }
+            }
+        }
+        return allSubjects;
+    }
+
     @NotNull
     @Override
-    public SMTeam[] getUserTeams() throws DBException {
+    public SMTeam[] getCurrentUserTeams() throws DBException {
         return getUserTeams(getUserIdOrThrow());
     }
 
@@ -364,7 +385,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Override
-    public Map<String, Object> getUserParameters() throws DBCException {
+    public Map<String, Object> getCurrentUserParameters() throws DBCException {
         String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
             Map<String, Object> result = new LinkedHashMap<>();
@@ -386,7 +407,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Override
-    public void setUserParameter(String name, Object value) throws DBException {
+    public void setCurrentUserParameter(String name, Object value) throws DBException {
         String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
@@ -479,7 +500,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Override
-    public void setUserCredentials(
+    public void setCurrentUserCredentials(
         @NotNull String authProviderId,
         @NotNull Map<String, Object> credentials
     ) throws DBException {
@@ -640,12 +661,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @NotNull
     @Override
-    public Map<String, Object> getUserCredentials(@NotNull String authProviderId) throws DBException {
+    public Map<String, Object> getCurrentUserCredentials(@NotNull String authProviderId) throws DBException {
         return getUserCredentials(getUserIdOrThrow(), authProviderId);
     }
 
     @Override
-    public String[] getUserLinkedProviders() throws DBException {
+    public String[] getCurrentUserLinkedProviders() throws DBException {
         return getUserLinkedProviders(getUserIdOrThrow());
     }
 
@@ -670,6 +691,32 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error reading user linked providers", e);
         }
+    }
+
+    @NotNull
+    @Override
+    public SMPropertyDescriptor[] getMetaParametersBySubjectType(SMSubjectType subjectType) throws DBException {
+        // First add global metas
+        List<DBPPropertyDescriptor> props = new ArrayList<>(
+            WebMetaParametersRegistry.getInstance().getMetaParameters(subjectType));
+
+        // Add metas from enabled auth providers
+        WebAppConfiguration appConfiguration = WebAppUtils.getWebApplication().getAppConfiguration();
+        if (appConfiguration instanceof WebAuthConfiguration) {
+            for (String apId : ((WebAuthConfiguration)appConfiguration).getEnabledAuthProviders()) {
+                WebAuthProviderDescriptor ap = WebAuthProviderRegistry.getInstance().getAuthProvider(apId);
+                if (ap != null) {
+                    List<DBPPropertyDescriptor> metaProps = ap.getMetaParameters(SMSubjectType.team);
+                    if (!CommonUtils.isEmpty(metaProps)) {
+                        props.addAll(metaProps);
+                    }
+                }
+            }
+        }
+
+        return props.stream()
+            .map(SMPropertyDescriptor::new)
+            .toArray(SMPropertyDescriptor[]::new);
     }
 
     ///////////////////////////////////////////
@@ -743,6 +790,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public void createTeam(String teamId, String name, String description, String grantor) throws DBCException {
+        if (CommonUtils.isEmpty(teamId)) {
+            throw new DBCException("Empty team name is not allowed");
+        }
         if (isSubjectExists(teamId)) {
             throw new DBCException("User or team '" + teamId + "' already exists");
         }
@@ -832,12 +882,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     // Subject functions
 
     @Override
-    public void setSubjectMetas(String userId, Map<String, String> metaParameters) throws DBCException {
+    public void setSubjectMetas(@NotNull String subjectId, @NotNull Map<String, String> metaParameters) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                cleanupSubjectMeta(dbCon, userId);
+                cleanupSubjectMeta(dbCon, subjectId);
                 if (!metaParameters.isEmpty()) {
-                    saveSubjectMetas(dbCon, userId, metaParameters);
+                    saveSubjectMetas(dbCon, subjectId, metaParameters);
                 }
                 txn.commit();
             }
@@ -1940,10 +1990,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 var sqlBuilder = new StringBuilder("DELETE FROM CB_OBJECT_PERMISSIONS WHERE SUBJECT_ID IN (");
-                appendStringParameters(sqlBuilder, subjectIds.toArray(String[]::new));
+                appendStringParameters(sqlBuilder, subjectIds);
                 sqlBuilder.append(") AND OBJECT_TYPE=? ")
                     .append("AND OBJECT_ID IN (");
-                appendStringParameters(sqlBuilder, objectIds.toArray(String[]::new));
+                appendStringParameters(sqlBuilder, objectIds);
                 sqlBuilder.append(")");
                 JDBCUtils.executeStatement(dbCon, sqlBuilder.toString(), objectType.getObjectType());
                 if (!CommonUtils.isEmpty(permissions)) {
@@ -2016,12 +2066,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public List<SMObjectPermissions> getAllAvailableObjectsPermissions(@NotNull SMObjectType objectType) throws DBException {
 
         String subjectId = getSubjectId();
-        Set<String> allSubjects = getAllLinkedSubjects(subjectId);
         try (Connection dbCon = database.openConnection()) {
+            Set<String> allSubjects = getAllLinkedSubjects(dbCon, subjectId);
             {
                 var sqlBuilder = new StringBuilder("SELECT OBJECT_ID,PERMISSION FROM CB_OBJECT_PERMISSIONS ");
                 sqlBuilder.append("WHERE SUBJECT_ID IN (");
-                appendStringParameters(sqlBuilder, allSubjects.toArray(String[]::new));
+                appendStringParameters(sqlBuilder, allSubjects);
                 sqlBuilder.append(") AND OBJECT_TYPE=?");
                 try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
                     dbStat.setString(1, objectType.getObjectType());
@@ -2044,16 +2094,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private Set<String> getAllLinkedSubjects(String subjectId) throws DBException {
-        Set<String> allSubjects = new HashSet<>();
-        allSubjects.add(subjectId);
-        var userTeamIds = Arrays.stream(getUserTeams(subjectId))
-            .map(SMTeam::getTeamId)
-            .collect(Collectors.toSet());
-        allSubjects.addAll(userTeamIds);
-        return allSubjects;
-    }
-
     @NotNull
     @Override
     public SMObjectPermissions getObjectPermissions(
@@ -2061,12 +2101,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @NotNull String objectId,
         @NotNull SMObjectType objectType
     ) throws DBException {
-        Set<String> allSubjects = getAllLinkedSubjects(subjectId);
         try (Connection dbCon = database.openConnection()) {
+            Set<String> allSubjects = getAllLinkedSubjects(dbCon, subjectId);
             {
                 var sqlBuilder = new StringBuilder("SELECT PERMISSION FROM CB_OBJECT_PERMISSIONS ");
                 sqlBuilder.append("WHERE SUBJECT_ID IN (");
-                appendStringParameters(sqlBuilder, allSubjects.toArray(String[]::new));
+                appendStringParameters(sqlBuilder, allSubjects);
                 sqlBuilder.append(") AND OBJECT_TYPE=? AND OBJECT_ID=?");
 
                 try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
@@ -2125,14 +2165,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public List<SMObjectPermissionsGrant> getSubjectObjectPermissionGrants(@NotNull String subjectId, @NotNull SMObjectType smObjectType) throws DBException {
-        var allLinkedSubjects = getAllLinkedSubjects(subjectId);
         var grantedPermissionsByObjectId = new HashMap<String, SMObjectPermissionsGrant.Builder>();
         try (Connection dbCon = database.openConnection()) {
+            var allLinkedSubjects = getAllLinkedSubjects(dbCon, subjectId);
             var sqlBuilder =
                 new StringBuilder("SELECT OP.OBJECT_ID,S.SUBJECT_TYPE,S.SUBJECT_ID,OP.PERMISSION\n")
                     .append("FROM CB_OBJECT_PERMISSIONS OP,CB_AUTH_SUBJECT S\n")
                     .append("WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.SUBJECT_ID IN (");
-            appendStringParameters(sqlBuilder, allLinkedSubjects.toArray(String[]::new));
+            appendStringParameters(sqlBuilder, allLinkedSubjects);
             sqlBuilder.append(") AND OP.OBJECT_TYPE=?");
             try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
                 dbStat.setString(1, smObjectType.getObjectType());
@@ -2158,10 +2198,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private void appendStringParameters(StringBuilder sql, @NotNull String[] subjectIds) {
-        for (int i = 0; i < subjectIds.length; i++) {
-            String id = subjectIds[i];
-            if (i > 0) sql.append(",");
+    private static void appendStringParameters(StringBuilder sql, @NotNull Collection<String> subjectIds) {
+        boolean first = true;
+        for (String id : subjectIds) {
+            if (!first) sql.append(",");
+            first = false;
             sql.append("'").append(id.replace("'", "''")).append("'");
         }
     }

@@ -115,7 +115,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
         //String newPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, newPassword);
 
         storedCredentials.put(CRED_PASSWORD, newPassword);
-        webSession.getSecurityController().setUserCredentials(authProvider.getId(), storedCredentials);
+        webSession.getSecurityController().setCurrentUserCredentials(authProvider.getId(), storedCredentials);
         return true;
     }
 
