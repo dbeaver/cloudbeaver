@@ -14,7 +14,7 @@ import { UserFormService } from '../UserFormService';
 import { ConnectionAccess } from './ConnectionAccess';
 
 @injectable()
-export class ConnectionAccessTabService extends Bootstrap {
+export class ConnectionAccessTabBootstrap extends Bootstrap {
   constructor(
     private readonly userFormService: UserFormService,
     private readonly projectInfoResource: ProjectInfoResource,
