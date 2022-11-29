@@ -337,8 +337,8 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         if (configurationMode) {
             // Try to configure automatically
             performAutoConfiguration(configPath.toFile().getParentFile());
-        } else if (appConfiguration.isGrantConnectionsAccessToAnonymousTeam()) {
-            grantAnonymousAccessToConnections(appConfiguration, CBConstants.DEFAULT_ADMIN_NAME);
+        } else if (appConfiguration.isGrantConnectionsAccessToAnonymousTeam() && !isMultiNode()) {
+            grantAnonymousAccessToConnections(appConfiguration, "auto-grant");
         }
 
         if (enableSecurityManager) {
@@ -799,9 +799,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         saveRuntimeConfig(newServerName, newServerURL, sessionExpireTime, appConfig, credentialsProvider);
 
         // Grant permissions to predefined connections
-        boolean isGrantedAnonymousAccessToConnections = appConfig.isGrantConnectionsAccessToAnonymousTeam() ||
-            (isConfigurationMode() && appConfig.isAnonymousAccessEnabled());
-        if (isGrantedAnonymousAccessToConnections) {
+        if (appConfig.isGrantConnectionsAccessToAnonymousTeam()) {
             grantAnonymousAccessToConnections(appConfig, adminName);
         }
 
