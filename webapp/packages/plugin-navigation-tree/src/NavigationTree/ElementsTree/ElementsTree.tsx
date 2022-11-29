@@ -59,6 +59,7 @@ const styles = css`
     overflow: auto;
     display: flex;
     width: 250px;
+    min-width: 100%;
     max-width: 100%;
   }
 
