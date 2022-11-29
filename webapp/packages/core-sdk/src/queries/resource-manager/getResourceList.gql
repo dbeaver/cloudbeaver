@@ -1,20 +1,20 @@
 query getResourceList(
   $projectId: String!
-  $folder: String
+  $path: String
   $nameMask: String
-  $readProperties: Boolean
+  $includeProperties: Boolean!
   $readHistory: Boolean
 ) {
   resources: rmListResources(
       projectId: $projectId
-      folder: $folder
+      folder: $path
       nameMask: $nameMask
-      readProperties: $readProperties
+      readProperties: $includeProperties
       readHistory: $readHistory
     ) {
     name
     folder
     length
-    properties
+    properties @include(if: $includeProperties)
   }
 }

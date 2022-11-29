@@ -80,11 +80,13 @@ export abstract class CachedDataResource<
   }
 
   async refresh(param: TParam, context: ContextArg<TData, TContext>): Promise<TData> {
+    await this.preLoadData(param, false, context);
     await this.loadData(param, true, context);
     return this.data;
   }
 
   async load(param: TParam, context: ContextArg<TData, TContext>): Promise<TData> {
+    await this.preLoadData(param, false, context);
     await this.loadData(param, false, context);
     return this.data;
   }

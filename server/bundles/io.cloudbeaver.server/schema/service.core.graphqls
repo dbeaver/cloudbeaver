@@ -402,6 +402,17 @@ enum CBEventType {
     cb_rm_resource_updated
 }
 
+enum CBEventResourceType {
+    RM_RESOURCE,
+    DATASOURCE
+}
+
+enum CBEventStatus {
+    TYPE_CREATE,
+    TYPE_DELETE,
+    TYPE_UPDATE
+}
+
 type CBEvent {
     eventType: CBEventType!
     eventData: Object!

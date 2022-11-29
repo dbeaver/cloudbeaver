@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, makeObservable, runInAction } from 'mobx';
+import { action, makeObservable, observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionPermissionsResource, EPermission } from '@cloudbeaver/core-root';
@@ -55,7 +55,8 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
       loading: false,
       withDetails: false,
       exception: null,
-      includes: [],
+      includes: observable([]),
+      dependencies: observable([]),
     }));
   }
 

@@ -1,0 +1,48 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2022 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { ENotificationType, INotification, NotificationService } from '@cloudbeaver/core-events';
+import { DataSynchronizationService } from '@cloudbeaver/core-root';
+
+import { DataSynchronizationNotification } from './DataSynchronizationNotification';
+
+@injectable()
+export class DataSynchronizationResolverBootstrap extends Bootstrap {
+  private activeNotification: INotification | null;
+
+  constructor(
+    private readonly notificationService: NotificationService,
+    private readonly dataSynchronizationService: DataSynchronizationService
+  ) {
+    super();
+    this.activeNotification = null;
+  }
+
+  register(): void {
+    this.dataSynchronizationService.onSynchronizationRequest.addHandler(this.handleNetworkStateChange.bind(this));
+  }
+
+  load(): void | Promise<void> { }
+
+  private handleNetworkStateChange(): void {
+    if (this.activeNotification) {
+      return;
+    }
+
+    this.activeNotification = this.notificationService.customNotification(() => DataSynchronizationNotification, {}, {
+      title: 'plugin_root_data_sync_title',
+      message: 'plugin_root_data_sync_message',
+      type: ENotificationType.Info,
+      onClose: () => {
+        this.dataSynchronizationService.resolveAll(false);
+        this.activeNotification = null;
+      },
+    });
+  }
+}

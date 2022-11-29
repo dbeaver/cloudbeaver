@@ -8,11 +8,11 @@
 
 
 import { injectable } from '@cloudbeaver/core-di';
+import { IResourceManagerParams, isResourceManagerParamEqual } from '@cloudbeaver/core-resource-manager';
 import { SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { ResourceSqlDataSource } from './ResourceSqlDataSource';
-
 
 @injectable()
 export class SqlEditorTabResourceService {
@@ -23,10 +23,11 @@ export class SqlEditorTabResourceService {
   ) {
   }
 
-  getResourceTab(nodeId: string) {
+  getResourceTab(key: IResourceManagerParams) {
     const dataSource = this.sqlDataSourceService.dataSources.find(([, dataSource]) => (
       dataSource instanceof ResourceSqlDataSource
-      && dataSource.nodeInfo?.nodeId === nodeId
+      && dataSource.resourceKey
+      && isResourceManagerParamEqual(dataSource.resourceKey, key, true)
     ));
 
     const tab = this.sqlEditorTabService.sqlEditorTabs

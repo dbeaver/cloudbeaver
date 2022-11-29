@@ -185,7 +185,7 @@ export class NavNodeManagerService extends Bootstrap {
       folderId,
     });
 
-    const data = await contexts.getContext(this.navigationNavNodeContext);
+    const data = contexts.getContext(this.navigationNavNodeContext);
 
     let cache = this.syncNodeInfoCache.get(nodeId);
 

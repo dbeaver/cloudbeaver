@@ -35,6 +35,7 @@ export class ConnectionNavNodeService extends Dependency {
       connectionCreateHandler: action.bound,
     });
 
+    this.connectionInfoResource.onDataOutdated.addHandler(this.connectionUpdateHandler); // duplicates onItemAdd in some cases
     this.connectionInfoResource.onItemAdd.addHandler(this.connectionUpdateHandler);
     this.connectionInfoResource.onItemDelete.addHandler(this.connectionRemoveHandler);
     this.connectionInfoResource.onConnectionCreate.addHandler(this.connectionCreateHandler);

@@ -13,6 +13,8 @@ import { GraphQLService, CachedDataResource, ServerConfig, ServerConfigInput, Na
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { isNavigatorViewSettingsEqual } from './ConnectionNavigatorViewSettings';
+import { DataSynchronizationQueue } from './DataSynchronization/DataSynchronizationQueue';
+import { DataSynchronizationService } from './DataSynchronization/DataSynchronizationService';
 import { ServerConfigEventHandler } from './ServerConfigEventHandler';
 
 @injectable()
@@ -20,12 +22,20 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
   update: ServerConfigInput;
   navigatorSettingsUpdate: NavigatorSettingsInput;
 
+  private readonly syncQueue: DataSynchronizationQueue;
+
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly dataSynchronizationService: DataSynchronizationService,
     serverConfigEventHandler: ServerConfigEventHandler,
   ) {
     super(null);
 
+    this.syncQueue = new DataSynchronizationQueue(state => {
+      if (state) {
+        this.markOutdated();
+      }
+    });
     this.update = {};
     this.navigatorSettingsUpdate = {
       hideFolders: false,
@@ -44,7 +54,11 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
       syncUpdateData: action,
     });
 
-    serverConfigEventHandler.on(this, () => undefined);
+    serverConfigEventHandler.on(() => {
+      this.syncQueue.add(
+        this.dataSynchronizationService.requestSynchronization('server-config', 'Server Configuration')
+      );
+    }, () => undefined);
   }
 
   get redirectOnFederatedAuth(): boolean {

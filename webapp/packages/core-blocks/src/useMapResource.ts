@@ -134,6 +134,7 @@ export function useMapResource<
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const resource = ctor instanceof CachedMapResource ? ctor : useService(ctor);
   const notifications = useService(NotificationService);
+  const [use, setUse] = useState<[TKeyArg | null, string]>([null, '']);
   const [exception, setException] = useState<Error | null>(null);
   let key: TKeyArg | null = keyObj as TKeyArg;
   let includes: TIncludes = [] as unknown as TIncludes;
@@ -246,6 +247,7 @@ export function useMapResource<
         }
 
         const newData = await resource.load(key, includes as any);
+        setUse([key, resource.use(key)]);
         this.prevData = newData;
 
         await actions?.onData?.(
@@ -384,6 +386,12 @@ export function useMapResource<
       || (Array.isArray(result.exception) && !result.exception.some(Boolean))
     )
   ));
+
+  useEffect(() => () => {
+    if (use[0] !== null) {
+      resource.free(use[0], use[1]);
+    }
+  }, [resource, use]);
 
   useEffect(() => {
     if (canLoad) {

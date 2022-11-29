@@ -97,6 +97,15 @@ public interface DBWServiceRM extends DBWService {
     @WebProjectAction(
         requireProjectPermissions = RMConstants.PERMISSION_PROJECT_RESOURCE_EDIT
     )
+    boolean moveResource(
+        @NotNull WebSession webSession,
+        @NotNull @WebObjectId String projectId,
+        @NotNull String oldResourcePath,
+        @NotNull String newResourcePath) throws DBException;
+
+    @WebProjectAction(
+        requireProjectPermissions = RMConstants.PERMISSION_PROJECT_RESOURCE_EDIT
+    )
     boolean deleteResource(
         @NotNull WebSession webSession,
         @NotNull @WebObjectId String projectId,

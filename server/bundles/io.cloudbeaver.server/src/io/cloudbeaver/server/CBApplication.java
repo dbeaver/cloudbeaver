@@ -29,6 +29,7 @@ import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
 import io.cloudbeaver.model.session.WebAuthInfo;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
@@ -98,7 +99,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     private String serverURL;
-    private int serverPort = CBConstants.DEFAULT_SERVER_PORT;
+    protected int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverHost = null;
     private String serverName = null;
     private String contentRoot = CBConstants.DEFAULT_CONTENT_ROOT;
@@ -813,7 +814,12 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         }
 
         configurationMode = CommonUtils.isEmpty(serverName);
-        eventController.addEvent(new CBEvent(CBEventConstants.CLOUDBEAVER_CONFIG_CHANGED));
+
+        String sessionId = null;
+        if (credentialsProvider instanceof WebSession) {
+            sessionId = ((WebSession) credentialsProvider).getSessionId();
+        }
+        eventController.addEvent(new CBEvent(CBEventConstants.CLOUDBEAVER_CONFIG_CHANGED, sessionId));
     }
 
     protected Map<String, Object> readRuntimeConfigurationProperties() throws DBException {

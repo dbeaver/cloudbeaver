@@ -28,6 +28,7 @@ export type TabHandlerPanelComponent<T = any> = React.FunctionComponent<TabHandl
 
 export type TabHandlerCloseEvent<T = any> = (tab: ITab<T>) => Promise<boolean> | boolean;
 export type TabHandlerEvent<T = any> = (tab: ITab<T>) => Promise<void> | void;
+export type TabSyncHandlerEvent<T = any> = (tab: ITab<T>) => void;
 export type TabRestoreEvent<T = any> = (tab: ITab<T>) => Promise<boolean> | boolean;
 
 export interface TabHandlerOptions<TState = any> {
@@ -37,6 +38,7 @@ export interface TabHandlerOptions<TState = any> {
   onSelect?: TabHandlerEvent<TState>;
   canClose?: TabHandlerCloseEvent<TState>;
   onClose?: TabHandlerEvent<TState>;
+  onCloseSilent?: TabSyncHandlerEvent<TState>;
   onRestore?: TabRestoreEvent<TState>;
   onUnload?: TabHandlerEvent<TState>;
   extensions?: Array<IExtension<ITab<TState>>>;
@@ -48,6 +50,7 @@ export class TabHandler<TState = any> {
   getPanelComponent: () => TabHandlerPanelComponent<TState>;
   onSelect?: TabHandlerEvent<TState>;
   onClose?: TabHandlerEvent<TState>;
+  onCloseSilent?: TabSyncHandlerEvent<TState>;
   canClose?: TabHandlerCloseEvent<TState>;
   onRestore?: TabRestoreEvent<TState>;
   onUnload?: TabHandlerEvent<TState>;
@@ -60,6 +63,7 @@ export class TabHandler<TState = any> {
     this.onSelect = options.onSelect;
     this.canClose = options.canClose;
     this.onClose = options.onClose;
+    this.onCloseSilent = options.onCloseSilent;
     this.onRestore = options.onRestore;
     this.onUnload = options.onUnload;
     this.extensions = options.extensions;
