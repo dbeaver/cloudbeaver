@@ -133,7 +133,7 @@ export class ConnectionAccessTabService extends Bootstrap {
       { state: data }
     );
 
-    if (!config.connectionId || !data.projectId) {
+    if (!config.connectionId || !data.projectId || !state.loaded) {
       return;
     }
 
