@@ -10,13 +10,15 @@ import { action, makeObservable } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { getProjectNodeId, INodeNavigationData, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { INodeNavigationData, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { getProjectNodeId } from '@cloudbeaver/core-projects';
 import { type ResourceKey, ResourceKeyUtils, resourceKeyList, CachedMapAllKey, CbEventStatus } from '@cloudbeaver/core-sdk';
 
 import { ConnectionFolderEventHandler, IConnectionFolderEvent } from '../ConnectionFolderEventHandler';
 import { Connection, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
 import { ConnectionsManagerService } from '../ConnectionsManagerService';
 import type { IConnectionInfoParams } from '../IConnectionsResource';
+import { getConnectionParentId } from './getConnectionParentId';
 import { getFolderNodeParents } from './getFolderParents';
 
 @injectable()
@@ -112,7 +114,6 @@ export class ConnectionNavNodeService extends Dependency {
   private connectionUpdateHandler(key: ResourceKey<IConnectionInfoParams>) {
     key = this.connectionInfoResource.transformParam(key);
     const outdatedTrees: string[] = [];
-    const outdatedFolders: string[] = [];
     const closedConnections: string[] = [];
 
     ResourceKeyUtils.forEach(key, key => {
@@ -124,19 +125,20 @@ export class ConnectionNavNodeService extends Dependency {
 
       const node = this.navNodeInfoResource.get(connectionInfo.nodePath);
 
-      if (!node) {
-        return;
-      }
+      const parentId = getConnectionParentId(connectionInfo.projectId, connectionInfo.folder);
 
       if (!connectionInfo.connected) {
         closedConnections.push(connectionInfo.nodePath);
-        const folder = node.parentId;
+      }
 
-        if (!outdatedFolders.includes(folder)) {
-          outdatedFolders.push(folder);
-        }
-      } else {
-        outdatedTrees.push(connectionInfo.nodePath);
+      const folderId = node?.parentId;
+
+      if (folderId && !outdatedTrees.includes(folderId)) {
+        outdatedTrees.push(folderId);
+      }
+
+      if (!outdatedTrees.includes(parentId)) {
+        outdatedTrees.push(parentId);
       }
     });
 
@@ -145,8 +147,8 @@ export class ConnectionNavNodeService extends Dependency {
       this.navTreeResource.set(key, closedConnections.map(() => []));
     }
 
-    if (outdatedTrees.length > 0 || outdatedFolders.length > 0) {
-      const key = resourceKeyList([...outdatedTrees, ...outdatedFolders]);
+    if (outdatedTrees.length > 0) {
+      const key = resourceKeyList(outdatedTrees);
       this.navTreeResource.markOutdated(key);
     }
   }

@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { getProjectNodeId, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { getProjectNodeId } from '@cloudbeaver/core-projects';
 
 import { isFolderNodeId } from './isFolderNodeId';
 

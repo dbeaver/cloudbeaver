@@ -94,10 +94,6 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
     return undefined;
   }
 
-  toNodeId(key: IConnectionFolderParam): string {
-    return `folder://${key.projectId}/${key.folderId}`;
-  }
-
   protected async loader(
     originalKey: ResourceKey<IConnectionFolderParam>
   ): Promise<Map<IConnectionFolderParam, ConnectionFolder>> {

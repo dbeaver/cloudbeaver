@@ -38,7 +38,3 @@ export class ProjectsNavNodeService {
     return this.projectsResource.get(nodeId.replace('resource://', ''));
   }
 }
-
-export function getProjectNodeId(projectId: string): string {
-  return `resource://${projectId}`;
-}
