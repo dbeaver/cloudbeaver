@@ -11,9 +11,9 @@ import styled from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, FieldCheckbox, GroupTitle, InputField, useMapResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource } from '@cloudbeaver/core-connections';
-
 import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
+import { SSHKeyUploader } from '../ConnectionForm/SSH/SSHKeyUploader';
 
 interface Props {
   id: string;
@@ -62,6 +62,7 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
       >
         {passwordLabel}
       </InputField>
+      {keyAuth && <SSHKeyUploader state={state} disabled={disabled} />}
       {allowSaveCredentials && (
         <FieldCheckbox
           id={id + ' savePassword'}
