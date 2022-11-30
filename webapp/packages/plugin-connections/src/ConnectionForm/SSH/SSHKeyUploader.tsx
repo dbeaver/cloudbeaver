@@ -15,13 +15,12 @@ import { getTextFileReadingProcess } from '@cloudbeaver/core-utils';
 interface Props {
   state: NetworkHandlerConfigInput;
   saved?: boolean;
-  required?: boolean;
   disabled?: boolean;
   readonly?: boolean;
 }
 
 // @TODO take it as a foundation for the core component TextUploader
-export const SSHKeyUploader = observer<Props>(function SSHKeyUploader({ state, saved, required, disabled, readonly }) {
+export const SSHKeyUploader = observer<Props>(function SSHKeyUploader({ state, saved, disabled, readonly }) {
   const translate = useTranslate();
 
   async function handleKeyUpload(event: React.ChangeEvent<HTMLInputElement>) {
@@ -47,7 +46,7 @@ export const SSHKeyUploader = observer<Props>(function SSHKeyUploader({ state, s
         disabled={disabled}
         readOnly={readonly}
         description={saved ? translate('ui_processing_saved') : undefined}
-        required={required}
+        required={state.savePassword}
         medium
       >
         {translate('connections_network_handler_ssh_tunnel_private_key')}

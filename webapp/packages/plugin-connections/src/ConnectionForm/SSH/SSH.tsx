@@ -168,7 +168,6 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
               <SSHKeyUploader
                 state={handlerState}
                 saved={keySaved}
-                required={handlerState.savePassword}
                 disabled={disabled || !enabled}
                 readonly={readonly}
               />
