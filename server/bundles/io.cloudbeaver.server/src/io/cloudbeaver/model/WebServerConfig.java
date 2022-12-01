@@ -201,4 +201,9 @@ public class WebServerConfig {
     public Boolean isDistributed() {
         return application.isDistributed();
     }
+
+    @Property
+    public String getDefaultAuthRole() {
+        return application.getSecurityManagerConfiguration().getDefaultAuthRole();
+    }
 }
