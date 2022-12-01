@@ -35,7 +35,6 @@ import io.cloudbeaver.registry.WebMetaParametersRegistry;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
 import io.cloudbeaver.service.security.internal.SMTokenInfo;
-import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -52,7 +51,6 @@ import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 import org.jkiss.dbeaver.model.security.user.*;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
@@ -145,6 +143,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
                 saveSubjectMetas(dbCon, userId, metaParameters);
                 txn.commit();
+            }
+            String defaultTeamName = application.getAppConfiguration().getDefaultUserTeam();
+            if (!CommonUtils.isEmpty(defaultTeamName)) {
+                setUserTeams(userId, new String[]{defaultTeamName}, userId);
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving user in database", e);
@@ -699,7 +701,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             WebMetaParametersRegistry.getInstance().getMetaParameters(subjectType));
 
         // Add metas from enabled auth providers
-        WebAppConfiguration appConfiguration = WebAppUtils.getWebApplication().getAppConfiguration();
+        WebAppConfiguration appConfiguration = application.getAppConfiguration();
         if (appConfiguration instanceof WebAuthConfiguration) {
             for (String apId : ((WebAuthConfiguration)appConfiguration).getEnabledAuthProviders()) {
                 WebAuthProviderDescriptor ap = WebAuthProviderRegistry.getInstance().getAuthProvider(apId);
@@ -1049,7 +1051,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     private Set<String> getAnonymousUserPermissions() throws DBException {
-        var anonymousUserTeam = ((WebApplication) DBWorkbench.getPlatform().getApplication()).getAppConfiguration().getAnonymousUserTeam();
+        var anonymousUserTeam = application.getAppConfiguration().getAnonymousUserTeam();
         return getSubjectPermissions(anonymousUserTeam);
     }
 
@@ -1811,10 +1813,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     true,
                     resolveUserAuthRole(null, authRole)
                 );
-                String defaultTeamName = WebAppUtils.getWebApplication().getAppConfiguration().getDefaultUserTeam();
-                if (!CommonUtils.isEmpty(defaultTeamName)) {
-                    setUserTeams(userId, new String[]{defaultTeamName}, userId);
-                }
             }
             setUserCredentials(userId, authProvider.getId(), userCredentials);
         } else if (userId == null) {
