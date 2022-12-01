@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
+import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -52,11 +53,38 @@ public class WebDataSourceUtils {
                 if (c != null) {
                     DBWHandlerConfiguration handlerCfg = configuration.getHandler(c.getId());
                     if (handlerCfg != null) {
-                        handlerCfg.setUserName(c.getUserName());
-                        handlerCfg.setPassword(c.getPassword());
+                        updateHandlerConfig(handlerCfg, c);
                     }
                 }
             });
+        }
+    }
+
+    public static void updateHandlerConfig(DBWHandlerConfiguration handlerConfig, WebNetworkHandlerConfigInput cfgInput) {
+        if (cfgInput.isEnabled() != null) {
+            handlerConfig.setEnabled(cfgInput.isEnabled());
+        }
+        if (cfgInput.getProperties() != null) {
+            handlerConfig.setProperties(cfgInput.getProperties());
+        }
+
+        if (cfgInput.getAuthType() != null) {
+            handlerConfig.setProperty(SSHConstants.PROP_AUTH_TYPE,
+                CommonUtils.valueOf(SSHConstants.AuthType.class, cfgInput.getAuthType(), SSHConstants.AuthType.PASSWORD));
+        }
+        if (cfgInput.isSavePassword() != null) {
+            handlerConfig.setSavePassword(cfgInput.isSavePassword());
+        } else {
+            handlerConfig.setSavePassword(false);
+        }
+        if (cfgInput.getUserName() != null) {
+            handlerConfig.setUserName(cfgInput.getUserName());
+        }
+        if (cfgInput.getPassword() != null) {
+            handlerConfig.setPassword(cfgInput.getPassword());
+        }
+        if (cfgInput.getKey() != null) {
+            handlerConfig.setSecureProperty(SSHConstants.PROP_KEY_VALUE, cfgInput.getKey());
         }
     }
 
