@@ -129,6 +129,7 @@ export class ConnectionNavNodeService extends Dependency {
 
       if (!connectionInfo.connected) {
         closedConnections.push(connectionInfo.nodePath);
+        outdatedTrees.push(connectionInfo.nodePath);
       }
 
       const folderId = node?.parentId;
@@ -144,7 +145,10 @@ export class ConnectionNavNodeService extends Dependency {
 
     if (closedConnections.length > 0) {
       const key = resourceKeyList(closedConnections);
-      this.navTreeResource.set(key, closedConnections.map(() => []));
+
+      if (this.navTreeResource.has(key)) {
+        this.navTreeResource.delete(key);
+      }
     }
 
     if (outdatedTrees.length > 0) {
