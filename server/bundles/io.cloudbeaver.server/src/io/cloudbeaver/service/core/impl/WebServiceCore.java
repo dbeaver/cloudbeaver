@@ -334,9 +334,8 @@ public class WebServiceCore implements DBWServiceCore {
                 if (CommonUtils.toBoolean(c.isSavePassword()) && !CommonUtils.isEmpty(c.getUserName())) {
                     DBWHandlerConfiguration handlerCfg = dataSourceContainer.getConnectionConfiguration().getHandler(c.getId());
                     if (handlerCfg != null) {
-                        WebDataSourceUtils.updateHandlerConfig(handlerCfg, c);
+                        WebDataSourceUtils.updateHandlerCredentials(handlerCfg, c);
                         handlerCfg.setSavePassword(true);
-                        handlerCfg.setEnabled(true);
                         saveConfig[0] = true;
                     }
                 }
