@@ -52,6 +52,25 @@ public class WebEventUtils {
         );
     }
 
+    public static void addNavigatorNodeUpdatedEvent(
+        DBPProject project,
+        String sessionId,
+        String nodePath,
+        CBEventConstants.EventType eventType) {
+        if (project == null) {
+            return;
+        }
+        WebAppUtils.getWebApplication().getEventController().addEvent(
+            new CBEvent(
+                CBEventConstants.CLOUDBEAVER_DATASOURCE_FOLDER_UPDATED,
+                sessionId,
+                Map.of("projectId", project.getId(),
+                    "nodePaths", List.of(nodePath),
+                    "eventType", eventType)
+            )
+        );
+    }
+
     public static void addRmResourceUpdatedEvent(
         String projectId,
         String sessionId,

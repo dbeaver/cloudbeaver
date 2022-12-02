@@ -524,7 +524,7 @@ export abstract class CachedResource<
     return this.isKeyEqual(param, second);
   }
 
-  protected abstract loader(param: TParam, context: TContext): Promise<TData>;
+  protected abstract loader(param: TParam, context: TContext, refresh: boolean): Promise<TData>;
 
   protected async performUpdate<T>(
     param: TParam,
@@ -567,7 +567,7 @@ export abstract class CachedResource<
 
         this.markDataLoading(param, context);
         try {
-          const result = await this.taskWrapper(param, context, update);
+          const result = await this.taskWrapper(param, context, true, update);
           loaded = true;
           return result;
         } finally {
@@ -615,7 +615,7 @@ export abstract class CachedResource<
 
         this.markDataLoading(param, context);
         try {
-          const result = await this.taskWrapper(param, context, this.loadingTask);
+          const result = await this.taskWrapper(param, context, refresh, this.loadingTask);
           loaded = true;
           return result;
         } finally {
@@ -637,20 +637,21 @@ export abstract class CachedResource<
       });
   }
 
-  private async loadingTask(param: TParam, context: TContext) {
-    this.setData(await this.loader(param, context));
+  private async loadingTask(param: TParam, context: TContext, refresh: boolean) {
+    this.setData(await this.loader(param, context, refresh));
   }
 
   private async taskWrapper<T>(
     param: TParam,
     context: TContext,
-    promise: (param: TParam, context: TContext) => Promise<T>
+    refresh: boolean,
+    promise: (param: TParam, context: TContext, refresh: boolean) => Promise<T>
   ) {
     if (this.logActivity) {
       console.log(this.getActionPrefixedName('loading'));
     }
 
-    const value = await promise(param, context);
+    const value = await promise(param, context, refresh);
     this.markUpdated(param);
 
     for (let i = 0; i < this.outdateWaitList.length; i++) {

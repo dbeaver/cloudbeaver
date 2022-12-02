@@ -351,14 +351,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             checkProjectEditAccess(node, session);
             if (node.supportsRename()) {
                 if (node instanceof DBNLocalFolder) {
-                    WebConnectionFolderUtils.validateConnectionFolder(newName);
-                    List<String> siblings = Arrays.stream(
-                        ((DBNLocalFolder) node).getLogicalParent().getChildren(session.getProgressMonitor()))
-                        .filter(n -> n instanceof DBNLocalFolder)
-                        .map(DBNNode::getName).collect(Collectors.toList());
-                    if (siblings.contains(newName)) {
-                        throw new DBWebException("Name " + newName + " is unavailable or invalid");
-                    }
+                    return renameConnectionFolder(session, node, newName);
                 }
                 if (node instanceof DBNResourceManagerResource) {
                     return renameRmResourceNode(session, node, newName);
@@ -376,6 +369,38 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         } catch (DBException e) {
             throw new DBWebException("Error renaming navigator node '"  + nodePath + "'", e);
         }
+    }
+
+    @NotNull
+    private String renameConnectionFolder(@NotNull WebSession session, DBNNode node, @NotNull String newName) throws DBException {
+        WebConnectionFolderUtils.validateConnectionFolder(newName);
+        List<String> siblings = Arrays.stream(
+            ((DBNLocalFolder) node).getLogicalParent().getChildren(session.getProgressMonitor()))
+            .filter(n -> n instanceof DBNLocalFolder)
+            .map(DBNNode::getName).collect(Collectors.toList());
+        if (siblings.contains(newName)) {
+            throw new DBWebException("Name " + newName + " is unavailable or invalid");
+        }
+        var oldNodePath = node.getNodeItemPath();
+        node.rename(session.getProgressMonitor(), newName);
+        var newNodePath = node.getNodeItemPath();
+        addNavigatorNodeMoveEvent(session, node, oldNodePath, newNodePath);
+        return node.getName();
+    }
+
+    private void addNavigatorNodeMoveEvent(@NotNull WebSession session, DBNNode node, String oldNodePath, String newNodePath) {
+        WebEventUtils.addNavigatorNodeUpdatedEvent(
+            node.getOwnerProject(),
+            session.getSessionId(),
+            oldNodePath,
+            CBEventConstants.EventType.TYPE_DELETE
+        );
+        WebEventUtils.addNavigatorNodeUpdatedEvent(
+            node.getOwnerProject(),
+            session.getSessionId(),
+            newNodePath,
+            CBEventConstants.EventType.TYPE_CREATE
+        );
     }
 
     @NotNull
@@ -463,9 +488,14 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     ne.getValue().deleteObject(commandContext, object, options);
                     commandContext.saveChanges(session.getProgressMonitor(), options);
                 } else if (node instanceof DBNLocalFolder) {
-
+                    var nodePath = node.getNodeItemPath();
                     node.getOwnerProject().getDataSourceRegistry().removeFolder(((DBNLocalFolder) node).getFolder(), false);
-
+                    WebEventUtils.addNavigatorNodeUpdatedEvent(
+                        session.getProjectById(projectId),
+                        session.getSessionId(),
+                        nodePath,
+                        CBEventConstants.EventType.TYPE_DELETE
+                    );
                 } else if (node instanceof DBNResourceManagerResource) {
                     DBNResourceManagerResource rmResource = ((DBNResourceManagerResource) node);
                     String resourceProjectId = rmResource.getResourceProject().getId();
@@ -546,17 +576,14 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         }
                     }
                     DBNLocalFolder dbnLocalFolder = ((DBNLocalFolder) node);
+                    var oldNodePath = node.getNodeItemPath();
                     node.getOwnerProject().getDataSourceRegistry().moveFolder(
                         dbnLocalFolder.getFolder().getFolderPath(),
                         dbnLocalFolder.generateNewFolderPath(parentFolder, dbnLocalFolder.getNodeName())
                     );
+                    var newNodePath = node.getNodeItemPath();
                     WebServiceUtils.updateConfigAndRefreshDatabases(session, node.getOwnerProject().getId());
-                    WebEventUtils.addDataSourceUpdatedEvent(
-                        node.getOwnerProject(),
-                        session.getSessionId(),
-                        ((DBNLocalFolder) node).getFolder().getFolderPath(),
-                        CBEventConstants.EventType.TYPE_UPDATE
-                    );
+                    addNavigatorNodeMoveEvent(session, node, oldNodePath, newNodePath);
                 } else if (node instanceof DBNResourceManagerResource) {
                     boolean rmNewNode = folderNode instanceof DBNAbstractResourceManagerNode;
                     DBNResourceManagerResource rmOldNode = (DBNResourceManagerResource) node;
