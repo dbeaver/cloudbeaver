@@ -422,7 +422,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     // rewrites pending outdate
     // this.markUpdated(allKeys);
 
-    this.navNodeInfoResource.delete(allKeys);
+    this.navNodeInfoResource.delete(ResourceKeyUtils.exclude(allKeys, key));
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, string[]>> {
