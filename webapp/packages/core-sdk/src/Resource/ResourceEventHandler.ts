@@ -21,7 +21,7 @@ export abstract class ResourceEventHandler<TEvent, SourceEvent = void> implement
   }
 
   on<T>(
-    resource: EventSourceCallback<T>,
+    callback: EventSourceCallback<T>,
     mapTo: (param: TEvent) => T,
     filter?: (param: TEvent) => boolean,
   ): this;

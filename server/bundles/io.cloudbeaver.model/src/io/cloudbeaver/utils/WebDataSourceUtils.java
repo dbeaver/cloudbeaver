@@ -53,7 +53,7 @@ public class WebDataSourceUtils {
                 if (c != null) {
                     DBWHandlerConfiguration handlerCfg = configuration.getHandler(c.getId());
                     if (handlerCfg != null) {
-                        updateHandlerConfig(handlerCfg, c);
+                        updateHandlerCredentials(handlerCfg, c);
                     }
                 }
             });
@@ -111,5 +111,11 @@ public class WebDataSourceUtils {
         }
 
         throw new DBWebException("No activate data source registry");
+    }
+
+    public static void updateHandlerCredentials(DBWHandlerConfiguration handlerCfg, WebNetworkHandlerConfigInput webConfig) {
+        handlerCfg.setUserName(webConfig.getUserName());
+        handlerCfg.setPassword(webConfig.getPassword());
+        handlerCfg.setSecureProperty(SSHConstants.PROP_KEY_VALUE, webConfig.getKey());
     }
 }

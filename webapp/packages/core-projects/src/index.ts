@@ -5,4 +5,5 @@ export * from './activeProjectsContext';
 export * from './ProjectInfoResource';
 export * from './ProjectsService';
 export * from './NAV_NODE_TYPE_PROJECT';
+export * from './NavTree/getProjectNodeId';
 export { manifest as coreProjectsManifest } from './manifest';

@@ -432,19 +432,31 @@ export class ConnectionInfoResource
 
   protected async loader(
     originalKey: ResourceKey<IConnectionInfoParams>,
-    includes: CachedResourceIncludeArgs<Connection, ConnectionInfoIncludes>
+    includes: CachedResourceIncludeArgs<Connection, ConnectionInfoIncludes>,
+    refresh: boolean
   ): Promise<Map<IConnectionInfoParams, Connection>> {
     let projectId: string | undefined;
-    const all = this.isAliasEqual(originalKey, CachedMapAllKey);
-    const isProjectKey = isConnectionInfoProjectKey(originalKey);
-    const key = this.transformParam(originalKey);
+    let all = this.isAliasEqual(originalKey, CachedMapAllKey);
+    let isProjectKey = isConnectionInfoProjectKey(originalKey);
+    let key = this.transformParam(originalKey);
 
     if (isProjectKey) {
       projectId = (originalKey as ResourceKeyList<IConnectionInfoParams>).mark;
     }
 
+    if (all || isProjectKey) {
+      const outdated = ResourceKeyUtils.filter(key, key => this.isOutdated(key));
+      if (refresh || outdated.length !== 1) {
+        key = originalKey;
+      } else {
+        key = outdated[0]; // load only single connection
+        all = false;
+        isProjectKey = false;
+      }
+    }
+
     await ResourceKeyUtils.forEachAsync(
-      (all || isProjectKey) ? CachedMapAllKey : key,
+      key,
       async (
         key: IConnectionInfoParams
       ) => {

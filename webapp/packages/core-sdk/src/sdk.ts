@@ -183,6 +183,7 @@ export enum CbEventStatus {
 
 export enum CbEventType {
   CbConfigChanged = 'cb_config_changed',
+  CbDatasourceFolderUpdated = 'cb_datasource_folder_updated',
   CbDatasourceUpdated = 'cb_datasource_updated',
   CbRmResourceUpdated = 'cb_rm_resource_updated'
 }

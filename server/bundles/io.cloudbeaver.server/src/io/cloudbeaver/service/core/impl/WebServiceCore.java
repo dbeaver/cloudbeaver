@@ -45,10 +45,7 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
-import org.jkiss.dbeaver.model.navigator.DBNDataSource;
-import org.jkiss.dbeaver.model.navigator.DBNModel;
-import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWNetworkHandler;
 import org.jkiss.dbeaver.model.net.DBWTunnel;
@@ -337,9 +334,8 @@ public class WebServiceCore implements DBWServiceCore {
                 if (CommonUtils.toBoolean(c.isSavePassword()) && !CommonUtils.isEmpty(c.getUserName())) {
                     DBWHandlerConfiguration handlerCfg = dataSourceContainer.getConnectionConfiguration().getHandler(c.getId());
                     if (handlerCfg != null) {
-                        WebDataSourceUtils.updateHandlerConfig(handlerCfg, c);
+                        WebDataSourceUtils.updateHandlerCredentials(handlerCfg, c);
                         handlerCfg.setSavePassword(true);
-                        handlerCfg.setEnabled(true);
                         saveConfig[0] = true;
                     }
                 }
@@ -760,10 +756,10 @@ public class WebServiceCore implements DBWServiceCore {
             DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
             WebConnectionFolderInfo folderInfo = new WebConnectionFolderInfo(session, newFolder);
             WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
-            WebEventUtils.addDataSourceUpdatedEvent(
+            WebEventUtils.addNavigatorNodeUpdatedEvent(
                 session.getProjectById(projectId),
                 session.getSessionId(),
-                folderInfo.getId(),
+                DBNLocalFolder.makeLocalFolderItemPath(newFolder),
                 CBEventConstants.EventType.TYPE_CREATE
             );
             return folderInfo;
@@ -781,13 +777,22 @@ public class WebServiceCore implements DBWServiceCore {
     ) throws DBWebException {
         WebConnectionFolderUtils.validateConnectionFolder(newName);
         WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(session, projectId, folderPath);
+        var oldFolderNode = DBNLocalFolder.makeLocalFolderItemPath(folderInfo.getDataSourceFolder());
         folderInfo.getDataSourceFolder().setName(newName);
+        var newFolderNode = DBNLocalFolder.makeLocalFolderItemPath(folderInfo.getDataSourceFolder());
         WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
-        WebEventUtils.addDataSourceUpdatedEvent(
+        WebEventUtils.addNavigatorNodeUpdatedEvent(
             session.getProjectById(projectId),
             session.getSessionId(),
-            folderInfo.getId(),
-            CBEventConstants.EventType.TYPE_UPDATE);
+            oldFolderNode,
+            CBEventConstants.EventType.TYPE_DELETE
+        );
+        WebEventUtils.addNavigatorNodeUpdatedEvent(
+            session.getProjectById(projectId),
+            session.getSessionId(),
+            newFolderNode,
+            CBEventConstants.EventType.TYPE_CREATE
+        );
         return folderInfo;
     }
 
@@ -802,14 +807,15 @@ public class WebServiceCore implements DBWServiceCore {
             if (folder.getDataSourceRegistry().getProject() != project) {
                 throw new DBWebException("Global folder '" + folderInfo.getId() + "' cannot be deleted");
             }
+            var folderNode = DBNLocalFolder.makeLocalFolderItemPath(folderInfo.getDataSourceFolder());
             session.addInfoMessage("Delete folder");
             DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
             sessionRegistry.removeFolder(folderInfo.getDataSourceFolder(), false);
             WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
-            WebEventUtils.addDataSourceUpdatedEvent(
+            WebEventUtils.addNavigatorNodeUpdatedEvent(
                 session.getProjectById(projectId),
                 session.getSessionId(),
-                folderInfo.getId(),
+                folderNode,
                 CBEventConstants.EventType.TYPE_DELETE
             );
         } catch (DBException e) {
