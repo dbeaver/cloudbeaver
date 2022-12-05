@@ -22,12 +22,6 @@ const styles = css`
     Pane {
       composes: theme-background-surface theme-text-on-surface from global;
     }
-    TableHeader {
-      composes: theme-background-surface from global;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
     Split {
       height: 100%;
       flex-direction: column;
@@ -66,7 +60,7 @@ export const ExecutionPlanTreeBlock = observer<Props>(function ExecutionPlanTree
       <Pane>
         {state.nodes.length && state.columns.length ? (
           <Table selectedItems={state.selectedNodes} onSelect={state.selectNode}>
-            <TableHeader>
+            <TableHeader fixed>
               {state.columns.map(property => {
                 const name = property.displayName;
                 const columnTooltip = `${name} ${property.description ? '(' + property.description + ')' : ''}`;

@@ -17,6 +17,24 @@ export const BASE_TABLE_STYLES = css`
     border-color: var(--theme-background);
     table-layout: fixed;
 
+    & thead {
+      &[|fixed] {
+        background: var(--theme-surface);
+        position: sticky;
+        top: 0;
+        z-index: 1;
+
+        &> tr {
+          border-top: none !important;
+          border-bottom: none !important;
+
+          &> th {
+            box-shadow: inset 0 -1px 0 var(--theme-background);
+          }
+        }
+      }
+    }
+
     &[|size="big"] {
       & > thead > tr > th {
         height: 54px;

@@ -112,13 +112,13 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
           <Table keys={keys} selectedItems={selectedSubjects} size='big'>
             <GrantedConnectionsTableInnerHeader disabled={disabled} />
             <TableBody>
-              <TableItem item='tableInfo' selectDisabled>
-                {tableInfoText && (
+              {tableInfoText && (
+                <TableItem item='tableInfo' selectDisabled>
                   <TableColumnValue colSpan={5}>
                     {translate(tableInfoText)}
                   </TableColumnValue>
-                )}
-              </TableItem>
+                </TableItem>
+              )}
               {connections.map(connection => {
                 const driver = driversResource.get(connection.driverId);
                 return (

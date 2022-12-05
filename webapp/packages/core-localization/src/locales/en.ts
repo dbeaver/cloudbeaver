@@ -28,6 +28,7 @@ export const defaultENLocale = [
   ['ui_error', 'Error'],
   ['ui_error_message', 'Error:'],
   ['ui_error_close', 'Close'],
+  ['ui_clear', 'Clear'],
   ['ui_close', 'Close'],
   ['ui_errors_details', 'Details'],
   ['ui_search', 'Search...'],
