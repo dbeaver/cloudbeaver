@@ -334,8 +334,7 @@ public class WebServiceCore implements DBWServiceCore {
                 if (CommonUtils.toBoolean(c.isSavePassword()) && !CommonUtils.isEmpty(c.getUserName())) {
                     DBWHandlerConfiguration handlerCfg = dataSourceContainer.getConnectionConfiguration().getHandler(c.getId());
                     if (handlerCfg != null) {
-                        handlerCfg.setUserName(c.getUserName());
-                        handlerCfg.setPassword(c.getPassword());
+                        WebDataSourceUtils.updateHandlerCredentials(handlerCfg, c);
                         handlerCfg.setSavePassword(true);
                         saveConfig[0] = true;
                     }
@@ -647,7 +646,7 @@ public class WebServiceCore implements DBWServiceCore {
                     monitor.subTask("Initialize tunnel");
 
                     DBWHandlerConfiguration configuration = new DBWHandlerConfiguration(handlerDescriptor, null);
-                    WebServiceUtils.updateHandlerConfig(configuration, nhConfig);
+                    WebDataSourceUtils.updateHandlerConfig(configuration, nhConfig);
                     configuration.setSavePassword(true);
                     configuration.setEnabled(true);
                     tunnel.initializeHandler(monitor, configuration, connectionConfig);

@@ -46,7 +46,6 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
-import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
@@ -209,41 +208,13 @@ public class WebServiceUtils extends WebCommonUtils {
                         continue;
                     } else {
                         handlerConfig = new DBWHandlerConfiguration(handlerDescriptor, null);
-                        updateHandlerConfig(handlerConfig, nhc);
+                        WebDataSourceUtils.updateHandlerConfig(handlerConfig, nhc);
                     }
                 } else {
-                    updateHandlerConfig(handlerConfig, nhc);
+                    WebDataSourceUtils.updateHandlerConfig(handlerConfig, nhc);
                 }
                 dsConfig.updateHandler(handlerConfig);
             }
-        }
-    }
-
-    public static void updateHandlerConfig(DBWHandlerConfiguration handlerConfig, WebNetworkHandlerConfigInput cfgInput) {
-        if (cfgInput.isEnabled() != null) {
-            handlerConfig.setEnabled(cfgInput.isEnabled());
-        }
-        if (cfgInput.getProperties() != null) {
-            handlerConfig.setProperties(cfgInput.getProperties());
-        }
-
-        if (cfgInput.getAuthType() != null) {
-            handlerConfig.setProperty(SSHConstants.PROP_AUTH_TYPE,
-                CommonUtils.valueOf(SSHConstants.AuthType.class, cfgInput.getAuthType(), SSHConstants.AuthType.PASSWORD));
-        }
-        if (cfgInput.isSavePassword() != null) {
-            handlerConfig.setSavePassword(cfgInput.isSavePassword());
-        } else {
-            handlerConfig.setSavePassword(false);
-        }
-        if (cfgInput.getUserName() != null) {
-            handlerConfig.setUserName(cfgInput.getUserName());
-        }
-        if (cfgInput.getPassword() != null) {
-            handlerConfig.setPassword(cfgInput.getPassword());
-        }
-        if (cfgInput.getKey() != null) {
-            handlerConfig.setSecureProperty(SSHConstants.PROP_KEY_VALUE, cfgInput.getKey());
         }
     }
 

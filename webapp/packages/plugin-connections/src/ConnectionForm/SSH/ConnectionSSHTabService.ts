@@ -146,7 +146,7 @@ export class ConnectionSSHTabService extends Bootstrap {
 
         const keyAuth = handler.authType === NetworkHandlerAuthType.PublicKey;
         const keySaved = initial?.key === '';
-        if (keyAuth && !keySaved && !handler.key?.length) {
+        if (keyAuth && handler.savePassword && !keySaved && !handler.key?.length) {
           validation.error("Field SSH 'Private key' can't be empty");
         }
 
