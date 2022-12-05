@@ -191,14 +191,22 @@ export class ConnectionNavNodeService extends Dependency {
       return;
     }
 
-    const children = this.navTreeResource.get(parentId);
+    let children = this.navTreeResource.get(parentId);
 
     if (!children || children.includes(connection.nodePath)) {
       return;
     }
 
     const connectionNode = await this.navNodeInfoResource.load(connection.nodePath);
+    await this.navTreeResource.waitLoad();
+
     this.navNodeInfoResource.setParent(connection.nodePath, parentId);
+
+    children = this.navTreeResource.get(parentId);
+
+    if (!children || children.includes(connection.nodePath)) {
+      return; // double check
+    }
 
     let insertIndex = 0;
 
