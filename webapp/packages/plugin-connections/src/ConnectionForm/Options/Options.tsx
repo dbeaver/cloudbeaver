@@ -183,9 +183,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     adminPermission
     || !model.requiresLocalConfiguration
   ));
-  const drivers = driverMap.resource.values
-    .filter(({ id }) => availableDrivers.includes(id))
-    .sort(driverMap.resource.compare);
+  const drivers = driverMap.resource.enabledDrivers
+    .filter(({ id }) => availableDrivers.includes(id));
 
   let properties = authModel?.properties;
 
