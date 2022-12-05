@@ -26,7 +26,9 @@ export type DBDriver = DatabaseDriverFragment;
 @injectable()
 export class DBDriverResource extends CachedMapResource<string, DBDriver, DriverListQueryVariables> {
   get enabledDrivers() {
-    return this.values.filter(driver => driver.enabled);
+    return this.values
+      .filter(driver => driver.enabled)
+      .sort(this.compare);
   }
 
   constructor(

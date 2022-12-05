@@ -124,15 +124,14 @@ export class ConnectionNavNodeService extends Dependency {
       }
 
       const node = this.navNodeInfoResource.get(connectionInfo.nodePath);
-
-      const parentId = getConnectionParentId(connectionInfo.projectId, connectionInfo.folder);
+      const parentId = getConnectionParentId(connectionInfo.projectId, connectionInfo.folder); // new parent
 
       if (!connectionInfo.connected) {
         closedConnections.push(connectionInfo.nodePath);
         outdatedTrees.push(connectionInfo.nodePath);
       }
 
-      const folderId = node?.parentId;
+      const folderId = node?.parentId; // current parent
 
       if (folderId && !outdatedTrees.includes(folderId)) {
         outdatedTrees.push(folderId);
@@ -166,11 +165,7 @@ export class ConnectionNavNodeService extends Dependency {
         return;
       }
 
-      let nodePath = connectionInfo.nodePath;
-
-      if (!nodePath) {
-        nodePath = NodeManagerUtils.connectionIdToConnectionNodeId(key.connectionId);
-      }
+      const nodePath = connectionInfo.nodePath ?? NodeManagerUtils.connectionIdToConnectionNodeId(key.connectionId);
 
       const node = this.navNodeInfoResource.get(nodePath);
       const folder = (
@@ -189,20 +184,29 @@ export class ConnectionNavNodeService extends Dependency {
       return;
     }
 
-    const node = this.navNodeInfoResource.get(connection.nodePath);
-    const folder = (
-      node?.parentId
-      ?? getProjectNodeId(connection.projectId)
-    );
+    const parentId = getConnectionParentId(connection.projectId, connection.folder);
 
-    const children = this.navTreeResource.get(folder);
+    await this.navTreeResource.waitLoad();
+    if (!this.navTreeResource.has(parentId)) {
+      return;
+    }
 
-    if (!children) {
+    let children = this.navTreeResource.get(parentId);
+
+    if (!children || children.includes(connection.nodePath)) {
       return;
     }
 
     const connectionNode = await this.navNodeInfoResource.load(connection.nodePath);
-    this.navNodeInfoResource.setParent(connection.nodePath, folder);
+    await this.navTreeResource.waitLoad();
+
+    this.navNodeInfoResource.setParent(connection.nodePath, parentId);
+
+    children = this.navTreeResource.get(parentId);
+
+    if (!children || children.includes(connection.nodePath)) {
+      return; // double check
+    }
 
     let insertIndex = 0;
 
@@ -215,7 +219,7 @@ export class ConnectionNavNodeService extends Dependency {
       insertIndex++;
     }
 
-    this.navTreeResource.insertToNode(folder, insertIndex, connection.nodePath);
+    this.navTreeResource.insertToNode(parentId, insertIndex, connection.nodePath);
   }
 
   private async navigateHandler(
