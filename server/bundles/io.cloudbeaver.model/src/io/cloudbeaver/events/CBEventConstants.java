@@ -32,5 +32,11 @@ public interface CBEventConstants {
     String CLOUDBEAVER_DATASOURCE_FOLDER_UPDATED = "cb_datasource_folder_updated";
     String CLOUDBEAVER_RM_RESOURCE_UPDATED = "cb_rm_resource_updated";
 
+    interface RMEvent {
+        String PROJECT_ID = "projectId";
+        String RESOURCE_PATH = "resourcePath";
+        String RESOURCE_PARSED_PATH = "resourceParsedPath";
+        String RM_EVENT_TYPE = "eventType";
+    }
 
 }

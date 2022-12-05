@@ -107,10 +107,10 @@ public class WebEventUtils {
     ) {
         return new LinkedHashMap<>(
             Map.of(
-                "projectId", projectId,
-                "resourcePath", resourcePath,
-                "resourceParsedPath", resourceParsedPath,
-                "eventType", eventType
+                CBEventConstants.RMEvent.PROJECT_ID, projectId,
+                CBEventConstants.RMEvent.RESOURCE_PATH, resourcePath,
+                CBEventConstants.RMEvent.RESOURCE_PARSED_PATH, resourceParsedPath,
+                CBEventConstants.RMEvent.RM_EVENT_TYPE, eventType
             )
         );
     }

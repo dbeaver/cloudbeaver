@@ -250,7 +250,13 @@ public class LocalResourceController implements RMController {
             throw new DBException("Project '" + name + "' not created");
         }
         try {
-            Files.createDirectories(getProjectPath(project.getId()));
+            var realProjectPath = getProjectPath(project.getId());
+            Files.createDirectories(realProjectPath);
+            //TODO move to field
+            var application = WebAppUtils.getWebApplication();
+            if (application.isMultiNode()) {
+                Files.createDirectories(realProjectPath.resolve(RMConstants.SCRIPTS_FOLDER));
+            }
             return project;
         } catch (IOException e) {
             throw new DBException("Error creating project path", e);
