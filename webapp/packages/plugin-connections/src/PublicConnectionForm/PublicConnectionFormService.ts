@@ -57,15 +57,6 @@ export class PublicConnectionFormService {
       }
     });
 
-    this.authenticationService.onLogout.addHandler(async (event, context) => {
-      if (event === 'before') {
-        const confirmed = await this.close(false);
-        if (!confirmed) {
-          ExecutorInterrupter.interrupt(context);
-        }
-      }
-    });
-
     makeObservable(this, {
       formState: observable.shallow,
       change: action,

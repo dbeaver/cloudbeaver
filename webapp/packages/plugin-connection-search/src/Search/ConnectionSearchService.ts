@@ -15,7 +15,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
-import { OptionsPanelService } from '@cloudbeaver/core-ui';
+import { NavigationService, OptionsPanelService } from '@cloudbeaver/core-ui';
 import { ConnectionFormService, ConnectionFormState, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 import { SearchDatabase } from './SearchDatabase';
@@ -39,9 +39,11 @@ export class ConnectionSearchService {
     private readonly commonDialogService: CommonDialogService,
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
-    private readonly connectionsManagerService: ConnectionsManagerService
+    private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly navigationService: NavigationService,
   ) {
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
+    this.navigationService.navigationTask.addHandler(this.closeHandler);
 
     this.databases = [];
     this.search = this.search.bind(this);
