@@ -17,6 +17,7 @@
 package io.cloudbeaver.events;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 
 import java.util.Map;
 
@@ -24,23 +25,35 @@ import java.util.Map;
  * CloudBeaver event
  */
 public class CBEvent {
+    @Nullable
+    private final String sessionId;
     @NotNull
     private final String eventType;
     @NotNull
     private final Map<String, Object> eventData;
 
     public CBEvent(@NotNull String eventType) {
-        this(eventType, Map.of());
+        this(eventType, null, Map.of());
     }
 
-    public CBEvent(@NotNull String eventType, @NotNull Map<String, Object> eventData) {
+    public CBEvent(@NotNull String eventType, @Nullable String sessionId) {
+        this(eventType, sessionId, Map.of());
+    }
+
+    public CBEvent(@NotNull String eventType, @Nullable String sessionId, @NotNull Map<String, Object> eventData) {
         this.eventType = eventType;
+        this.sessionId = sessionId;
         this.eventData = eventData;
     }
 
     @NotNull
     public String getEventType() {
         return eventType;
+    }
+
+    @Nullable
+    public String getSessionId() {
+        return sessionId;
     }
 
     @NotNull

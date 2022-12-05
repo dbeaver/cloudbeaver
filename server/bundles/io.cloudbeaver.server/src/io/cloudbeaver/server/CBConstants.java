@@ -48,6 +48,7 @@ public class CBConstants {
 
     public static final String PARAM_DEVEL_MODE = "develMode";
     public static final String PARAM_SECURITY_MANAGER = "enableSecurityManager";
+    public static final String PARAM_SM_CONFIGURATION = "sm";
 
     public static final int DEFAULT_SERVER_PORT = 8080;
     //public static final String DEFAULT_SERVER_NAME = "CloudBeaver Web Server";

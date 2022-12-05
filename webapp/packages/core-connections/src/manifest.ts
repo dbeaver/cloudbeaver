@@ -11,7 +11,9 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 import { ConnectionDialectResource } from './ConnectionDialectResource';
 import { ConnectionExecutionContextResource } from './ConnectionExecutionContext/ConnectionExecutionContextResource';
 import { ConnectionExecutionContextService } from './ConnectionExecutionContext/ConnectionExecutionContextService';
+import { ConnectionFolderEventHandler } from './ConnectionFolderEventHandler';
 import { ConnectionFolderResource } from './ConnectionFolderResource';
+import { ConnectionInfoEventHandler } from './ConnectionInfoEventHandler';
 import { ConnectionInfoResource } from './ConnectionInfoResource';
 import { ConnectionsLocaleService } from './ConnectionsLocaleService';
 import { ConnectionsManagerService } from './ConnectionsManagerService';
@@ -42,5 +44,7 @@ export const manifest: PluginManifest = {
     ConnectionDialectResource,
     ConnectionNavNodeService,
     NavNodeExtensionsService,
+    ConnectionInfoEventHandler,
+    ConnectionFolderEventHandler,
   ],
 };

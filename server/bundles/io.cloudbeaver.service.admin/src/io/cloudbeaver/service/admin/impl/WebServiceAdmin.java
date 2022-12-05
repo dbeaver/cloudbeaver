@@ -236,12 +236,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             var adminSecurityController = webSession.getAdminSecurityController();
             SMTeam[] userTeams = adminSecurityController.getUserTeams(user);
             List<String> teamIds = Arrays.stream(userTeams).map(SMTeam::getTeamId).collect(Collectors.toList());
-            if (!teamIds.contains(team)) {
-                teamIds.add(team);
-                adminSecurityController.setUserTeams(user, teamIds.toArray(new String[0]), grantor.getUserId());
-            } else {
-                throw new DBWebException("User '" + user + "' already has team '" + team + "'");
+            if (teamIds.contains(team)) {
+                return true;
             }
+            teamIds.add(team);
+            adminSecurityController.setUserTeams(user, teamIds.toArray(new String[0]), grantor.getUserId());
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error granting team", e);

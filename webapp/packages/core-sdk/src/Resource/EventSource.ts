@@ -16,7 +16,7 @@ export interface IEventSource<TEvent> {
     resource: EventSourceCallback<T>,
     mapTo: (param: TEvent) => T,
     filter?: (param: TEvent) => boolean,
-  ): void;
+  ): this;
 }
 
 const DEFAULT_INTERVAL = 1000;
@@ -36,17 +36,17 @@ export abstract class EventSource<TEvent> implements IEventSource<TEvent> {
     resource: EventSourceCallback<T>,
     mapTo: (param: TEvent) => T,
     filter?: (param: TEvent) => boolean,
-  ): void;
+  ): this;
   on<T>(
     resource: CachedResource<any, T, any, any>,
     mapTo: (param: TEvent) => T,
     filter?: (param: TEvent) => boolean,
-  ): void;
+  ): this;
   on<T>(
     resource: EventSourceCallback<T> | CachedResource<any, T, any, any>,
     mapTo: (param: TEvent) => T,
     filter?: (param: TEvent) => boolean,
-  ): void {
+  ): this {
     if (typeof resource === 'function') {
       this.onEvent.addHandler(event => {
         if (!filter || filter(event)) {
@@ -64,6 +64,8 @@ export abstract class EventSource<TEvent> implements IEventSource<TEvent> {
     if (!this.listening) {
       this.listen();
     }
+
+    return this;
   }
 
   listen() {

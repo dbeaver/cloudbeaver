@@ -13,16 +13,16 @@ import styled, { css } from 'reshadow';
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
   Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputField,
-  FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container, Textarea,
-  UploadArea, Combobox, Expandable, EXPANDABLE_FORM_STYLES, useTranslate, useStyles
+  FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container,
+  Combobox, Expandable, EXPANDABLE_FORM_STYLES, useTranslate, useStyles
 } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { getTextFileReadingProcess } from '@cloudbeaver/core-utils';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { authTypes } from './authTypes';
+import { SSHKeyUploader } from './SSHKeyUploader';
 
 const SSH_STYLES = css`
   SubmittingForm {
@@ -82,21 +82,6 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
 
   const aliveIntervalLabel = translate('connections_network_handler_ssh_tunnel_advanced_settings_alive_interval');
   const connectTimeoutLabel = translate('connections_network_handler_ssh_tunnel_advanced_settings_connect_timeout');
-
-  const handleKeyUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      throw new Error('File is not found');
-    }
-
-    const process = getTextFileReadingProcess(file);
-    const key = await process.promise;
-
-    if (key) {
-      handlerState.key = key;
-    }
-  };
 
   const authTypeChangeHandler = useCallback(() => {
     handlerState.password = '';
@@ -180,35 +165,12 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
               {passwordLabel}
             </InputField>
             {keyAuth && (
-              <>
-                <Textarea
-                  name='key'
-                  state={handlerState}
-                  disabled={disabled || !enabled}
-                  readOnly={readonly}
-                  description={keySaved ? translate('ui_processing_saved') : undefined}
-                  required
-                  medium
-                >
-                  {translate('connections_network_handler_ssh_tunnel_private_key')}
-                </Textarea>
-                <GroupItem>
-                  <UploadArea
-                    accept='.txt, .ssh'
-                    disabled={disabled || readonly || !enabled}
-                    reset
-                    onChange={handleKeyUpload}
-                  >
-                    <Button
-                      tag="div"
-                      disabled={disabled || readonly || !enabled}
-                      mod={['outlined']}
-                    >
-                      {translate('ui_file')}
-                    </Button>
-                  </UploadArea>
-                </GroupItem>
-              </>
+              <SSHKeyUploader
+                state={handlerState}
+                saved={keySaved}
+                disabled={disabled || !enabled}
+                readonly={readonly}
+              />
             )}
           </Container>
           {credentialsSavingEnabled && (

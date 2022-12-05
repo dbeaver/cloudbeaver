@@ -8,6 +8,7 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { DataSynchronizationResolverBootstrap } from './DataSynchronization/DataSynchronizationResolverBootstrap';
 import { LocaleService } from './LocaleService';
 import { NetworkStateNotificationService } from './NetworkStateNotification/NetworkStateNotificationService';
 import { PluginBootstrap } from './PluginBootstrap';
@@ -22,5 +23,6 @@ export const rootPlugin: PluginManifest = {
     SessionExpiredDialogService,
     SessionExpireWarningDialogService,
     NetworkStateNotificationService,
+    DataSynchronizationResolverBootstrap,
   ],
 };

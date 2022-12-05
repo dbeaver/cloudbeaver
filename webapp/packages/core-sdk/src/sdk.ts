@@ -170,8 +170,20 @@ export interface CbEvent {
   eventType: CbEventType;
 }
 
+export enum CbEventResourceType {
+  Datasource = 'DATASOURCE',
+  RmResource = 'RM_RESOURCE'
+}
+
+export enum CbEventStatus {
+  TypeCreate = 'TYPE_CREATE',
+  TypeDelete = 'TYPE_DELETE',
+  TypeUpdate = 'TYPE_UPDATE'
+}
+
 export enum CbEventType {
   CbConfigChanged = 'cb_config_changed',
+  CbDatasourceFolderUpdated = 'cb_datasource_folder_updated',
   CbDatasourceUpdated = 'cb_datasource_updated',
   CbRmResourceUpdated = 'cb_rm_resource_updated'
 }
@@ -1533,6 +1545,7 @@ export interface ServerConfig {
   adminCredentialsSaveEnabled: Scalars['Boolean'];
   anonymousAccessEnabled: Scalars['Boolean'];
   configurationMode: Scalars['Boolean'];
+  defaultAuthRole?: Maybe<Scalars['String']>;
   defaultNavigatorSettings: NavigatorSettings;
   developmentMode: Scalars['Boolean'];
   disabledDrivers: Array<Scalars['ID']>;
@@ -2594,9 +2607,9 @@ export type GetProjectPermissionsListQuery = { permissions: Array<{ id: string, 
 
 export type GetResourceListQueryVariables = Exact<{
   projectId: Scalars['String'];
-  folder?: InputMaybe<Scalars['String']>;
+  path?: InputMaybe<Scalars['String']>;
   nameMask?: InputMaybe<Scalars['String']>;
-  readProperties?: InputMaybe<Scalars['Boolean']>;
+  includeProperties: Scalars['Boolean'];
   readHistory?: InputMaybe<Scalars['Boolean']>;
 }>;
 
@@ -2724,7 +2737,7 @@ export type ReadSessionLogQuery = { log: Array<{ time?: any, type: string, messa
 export type ServerConfigQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ServerConfigQuery = { serverConfig: { name: string, version: string, workspaceId: string, serverURL: string, rootURI: string, hostName: string, productConfiguration: any, supportsCustomConnections: boolean, supportsConnectionBrowser: boolean, supportsWorkspaces: boolean, sessionExpireTime: number, anonymousAccessEnabled: boolean, adminCredentialsSaveEnabled: boolean, publicCredentialsSaveEnabled: boolean, resourceManagerEnabled: boolean, licenseRequired: boolean, licenseValid: boolean, configurationMode: boolean, developmentMode: boolean, redirectOnFederatedAuth: boolean, distributed: boolean, enabledFeatures: Array<string>, enabledAuthProviders: Array<string>, resourceQuotas: any, disabledDrivers: Array<string>, supportedLanguages: Array<{ isoCode: string, displayName?: string, nativeName?: string }>, defaultNavigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean }, productInfo: { id: string, version: string, latestVersionInfo?: string, name: string, description?: string, buildTime: string, releaseTime: string, licenseInfo?: string } } };
+export type ServerConfigQuery = { serverConfig: { name: string, version: string, workspaceId: string, serverURL: string, rootURI: string, hostName: string, defaultAuthRole?: string, productConfiguration: any, supportsCustomConnections: boolean, supportsConnectionBrowser: boolean, supportsWorkspaces: boolean, sessionExpireTime: number, anonymousAccessEnabled: boolean, adminCredentialsSaveEnabled: boolean, publicCredentialsSaveEnabled: boolean, resourceManagerEnabled: boolean, licenseRequired: boolean, licenseValid: boolean, configurationMode: boolean, developmentMode: boolean, redirectOnFederatedAuth: boolean, distributed: boolean, enabledFeatures: Array<string>, enabledAuthProviders: Array<string>, resourceQuotas: any, disabledDrivers: Array<string>, supportedLanguages: Array<{ isoCode: string, displayName?: string, nativeName?: string }>, defaultNavigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean }, productInfo: { id: string, version: string, latestVersionInfo?: string, name: string, description?: string, buildTime: string, releaseTime: string, licenseInfo?: string } } };
 
 export type SessionPermissionsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4191,18 +4204,18 @@ export const GetProjectPermissionsListDocument = `
 }
     ${AdminPermissionInfoFragmentDoc}`;
 export const GetResourceListDocument = `
-    query getResourceList($projectId: String!, $folder: String, $nameMask: String, $readProperties: Boolean, $readHistory: Boolean) {
+    query getResourceList($projectId: String!, $path: String, $nameMask: String, $includeProperties: Boolean!, $readHistory: Boolean) {
   resources: rmListResources(
     projectId: $projectId
-    folder: $folder
+    folder: $path
     nameMask: $nameMask
-    readProperties: $readProperties
+    readProperties: $includeProperties
     readHistory: $readHistory
   ) {
     name
     folder
     length
-    properties
+    properties @include(if: $includeProperties)
   }
 }
     `;
@@ -4339,6 +4352,7 @@ export const ServerConfigDocument = `
     serverURL
     rootURI
     hostName
+    defaultAuthRole
     productConfiguration
     supportsCustomConnections
     supportsConnectionBrowser

@@ -11,7 +11,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { GraphQLService } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, GraphQLService } from '@cloudbeaver/core-sdk';
 import { isArraysEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import { teamContext } from '../Contexts/teamContext';
@@ -50,6 +50,8 @@ export class GrantedConnectionsTabService extends Bootstrap {
       () => this.isEnabled(),
       this.save.bind(this)
     ));
+
+    this.teamFormService.configureTask.addHandler(() => this.projectInfoResource.load(CachedMapAllKey));
   }
 
   load(): Promise<void> | void { }

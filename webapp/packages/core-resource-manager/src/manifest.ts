@@ -9,6 +9,8 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { ProjectPermissionsResource } from './ProjectPermissionsResource';
+import { ResourceManagerEventHandler } from './ResourceManagerEventHandler';
+import { ResourceManagerResource } from './ResourceManagerResource';
 import { SharedProjectsResource } from './SharedProjectsResource';
 
 
@@ -20,5 +22,7 @@ export const resourceManagerManifest: PluginManifest = {
   providers: [
     SharedProjectsResource,
     ProjectPermissionsResource,
+    ResourceManagerEventHandler,
+    ResourceManagerResource,
   ],
 };

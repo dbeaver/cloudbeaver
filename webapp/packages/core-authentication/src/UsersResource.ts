@@ -77,6 +77,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       }],
       linkedAuthProviders: [AUTH_PROVIDER_LOCAL_ID],
       enabled: true,
+      authRole: this.serverConfigResource.data?.defaultAuthRole ?? undefined,
     };
   }
 

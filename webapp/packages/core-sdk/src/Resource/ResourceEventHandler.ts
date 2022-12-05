@@ -21,20 +21,20 @@ export abstract class ResourceEventHandler<TEvent, SourceEvent = void> implement
   }
 
   on<T>(
-    resource: EventSourceCallback<T>,
+    callback: EventSourceCallback<T>,
     mapTo: (param: TEvent) => T,
     filter?: (param: TEvent) => boolean,
-  ): void;
+  ): this;
   on<T>(
     resource: CachedResource<any, T, any, any>,
     mapTo: (param: TEvent) => T,
     filter?: (param: TEvent) => boolean,
-  ): void;
+  ): this;
   on<T>(
     resource: CachedResource<any, T, any, any> | EventSourceCallback<T>,
     mapTo: (param: TEvent) => T,
     filter?: (param: TEvent) => boolean,
-  ): void {
+  ): this {
     if (typeof resource === 'function') {
       this.onEvent.addHandler(event => {
         if (!filter || filter(event)) {
@@ -53,6 +53,8 @@ export abstract class ResourceEventHandler<TEvent, SourceEvent = void> implement
       this.subscribed = true;
       this.source?.on(this.event.bind(this), this.map.bind(this), this.filter.bind(this));
     }
+
+    return this;
   }
 
   event(event: TEvent) {

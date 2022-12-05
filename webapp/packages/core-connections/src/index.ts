@@ -16,6 +16,7 @@ export * from './extensions/IConnectionSetter';
 export * from './ConnectionsManagerService';
 export * from './ConnectionFolderResource';
 export * from './ConnectionDialectResource';
+export * from './ConnectionInfoEventHandler';
 export * from './ConnectionInfoResource';
 export * from './EConnectionFeature';
 export * from './ContainerResource';

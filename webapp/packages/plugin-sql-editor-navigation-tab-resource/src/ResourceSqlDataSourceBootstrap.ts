@@ -11,18 +11,18 @@ import { action, makeObservable, observable, untracked } from 'mobx';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { NavTreeResource, NavNodeInfoResource, INavNodeMoveData, INavNodeRenameData } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { IResourceManagerMoveData, IResourceManagerParams, isResourceManagerParamEqual, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { NetworkStateService, WindowEventsService } from '@cloudbeaver/core-root';
 import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { throttle } from '@cloudbeaver/core-utils';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { NavResourceNodeService, ResourceManagerService, ResourcesProjectsNavNodeService } from '@cloudbeaver/plugin-resource-manager';
+import { NavResourceNodeService, ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 import { getSqlEditorName, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
-import type { IResourceNodeInfo, IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
+import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
 import { ResourceSqlDataSource } from './ResourceSqlDataSource';
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
 
@@ -41,13 +41,11 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     private readonly notificationService: NotificationService,
     private readonly resourceManagerService: ResourceManagerService,
     private readonly sqlEditorTabService: SqlEditorTabService,
-    private readonly navTreeResource: NavTreeResource,
-    private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navigationTabsService: NavigationTabsService,
+    private readonly resourceManagerResource: ResourceManagerResource,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly windowEventsService: WindowEventsService,
     private readonly sqlEditorTabResourceService: SqlEditorTabResourceService,
-    private readonly resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
     localStorageSaveService: LocalStorageSaveService,
   ) {
     super();
@@ -65,11 +63,10 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       map => {
         for (const [key, value] of Array.from(map.entries())) {
           if (
-            !['undefined', 'object'].includes(typeof value.nodeInfo)
-            || !['string', 'undefined'].includes(typeof value.name)
-            || !['string', 'undefined'].includes(typeof value.nodeInfo?.nodeId)
-            || !['string', 'undefined'].includes(typeof value.nodeInfo?.projectId)
-            || !['undefined', 'object'].includes(typeof value.nodeInfo?.parents)
+            !['undefined', 'object'].includes(typeof value.resourceKey)
+            || !['string', 'undefined'].includes(typeof value.resourceKey?.name)
+            || !['string', 'undefined'].includes(typeof value.resourceKey?.projectId)
+            || !['string', 'undefined'].includes(typeof value.resourceKey?.path)
             || !['undefined', 'object'].includes(typeof value.executionContext)
             || !['string', 'undefined'].includes(typeof value.executionContext?.connectionId)
             || !['string', 'undefined'].includes(typeof value.executionContext?.id)
@@ -86,15 +83,14 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
   register(): void | Promise<void> {
     this.windowEventsService.onFocusChange.addHandler(this.focusChangeHandler.bind(this));
-    this.navTreeResource.onItemDelete.addHandler(this.nodeDeleteHandler.bind(this));
-    this.navTreeResource.onNodeRename.addHandler(this.nodeRenameHandler.bind(this));
-    this.navTreeResource.onNodeMove.addHandler(this.nodeMoveHandler.bind(this));
+    this.resourceManagerResource.onItemDelete.addHandler(this.resourceDeleteHandler.bind(this));
+    this.resourceManagerResource.onMove.addHandler(this.resourceMoveHandler.bind(this));
 
     this.sqlDataSourceService.register({
       key: ResourceSqlDataSource.key,
       getDataSource: (editorId, options) => {
         const dataSource = new ResourceSqlDataSource(
-          this.navNodeInfoResource,
+          this.resourceManagerResource,
           this.createState(
             editorId,
           )
@@ -122,12 +118,12 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
         dataSource.setInfo({
           isReadonly: (dataSource: ResourceSqlDataSource) => {
-            if (!dataSource.nodeInfo) {
+            if (!dataSource.resourceKey) {
               return true;
             }
 
             untracked(() => this.projectInfoResource.load(CachedMapAllKey));
-            const project = this.resourcesProjectsNavNodeService.getProject(dataSource.nodeInfo.nodeId);
+            const project = this.projectInfoResource.get(dataSource.resourceKey.projectId);
 
             return !this.networkStateService.state || !project?.canEditResources;
           },
@@ -174,13 +170,13 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
   private createState(
     editorId: string,
-    nodeInfo?: IResourceNodeInfo
+    resourceKey?: IResourceManagerParams
   ): IResourceSqlDataSourceState {
     let state = this.dataSourceStateState.get(editorId);
 
     if (!state) {
       state = observable<IResourceSqlDataSourceState>({
-        nodeInfo,
+        resourceKey,
       });
 
       this.dataSourceStateState.set(editorId, state);
@@ -211,25 +207,22 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     }
   }
 
-  private nodeMoveHandler(data: INavNodeMoveData) {
+  private resourceMoveHandler(data: IResourceManagerMoveData) {
     if (!this.resourceManagerService.enabled) {
       return;
     }
 
-    const tabs: string[] = [];
+    const dataSource = this.sqlDataSourceService.dataSources
+      .filter(([, dataSource]) => (
+        dataSource instanceof ResourceSqlDataSource
+      ))
+      .map(([,dataSource]) => dataSource as ResourceSqlDataSource)
+      .find(ds => ds.resourceKey && isResourceManagerParamEqual(ds.resourceKey, data.from, true));
 
-    ResourceKeyUtils.forEach(data.key, key => {
-      const tab = this.sqlEditorTabResourceService.getResourceTab(key);
-
-      if (tab) {
-        tabs.push(tab.id);
-      }
-    });
-
-    this.navigationTabsService.closeTabSilent(resourceKeyList(tabs), true);
+    dataSource?.setResourceKey(data.to);
   }
 
-  private nodeDeleteHandler(keyObj: ResourceKey<string>) {
+  private resourceDeleteHandler(keyObj: ResourceKey<IResourceManagerParams>) {
     if (!this.resourceManagerService.enabled) {
       return;
     }
@@ -247,65 +240,36 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     this.navigationTabsService.closeTabSilent(resourceKeyList(tabs), true);
   }
 
-  private nodeRenameHandler(data: INavNodeRenameData) {
-    if (!this.resourceManagerService.enabled) {
-      return;
-    }
-
-    const dataSource = this.sqlDataSourceService.dataSources
-      .filter(([, dataSource]) => (
-        dataSource instanceof ResourceSqlDataSource
-      ))
-      .map(([,dataSource]) => dataSource as ResourceSqlDataSource)
-      .find(ds => ds.nodeInfo?.nodeId === data.nodeId);
-
-    if (dataSource?.nodeInfo) {
-      dataSource.setNodeInfo({
-        ...dataSource.nodeInfo,
-        nodeId: data.newNodeId,
-      });
-    }
-  }
-
-  private async rename(dataSource: ResourceSqlDataSource, nodeId: string, name: string): Promise<string> {
+  private async rename(
+    dataSource: ResourceSqlDataSource,
+    resourceKey: IResourceManagerParams,
+    newResourceKey: IResourceManagerParams
+  ): Promise<IResourceManagerParams> {
     if (!this.resourceManagerService.enabled) {
       throw new Error('Resource Manager disabled');
     }
 
-    if (!dataSource.nodeInfo) {
-      throw new Error('Node info is not provided');
-    }
-
     try {
-      await this.navTreeResource.preloadNodeParents(dataSource.nodeInfo.parents, dataSource.nodeInfo.nodeId);
-      const node = this.navNodeInfoResource.get(nodeId);
-      const resourceData = this.navResourceNodeService.getResourceData(nodeId);
-
-      if (!resourceData || !node) {
-        throw new Error('Resource data not found');
-      }
-
-      return await this.navTreeResource.changeName(node, name);
+      await this.navResourceNodeService.move(resourceKey, newResourceKey);
+      return newResourceKey;
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
       throw exception;
     }
   }
 
-  private async write(dataSource: ResourceSqlDataSource, nodeId: string, value: string): Promise<void> {
-    if (!this.resourceManagerService.enabled || !dataSource.nodeInfo) {
+  private async write(
+    dataSource: ResourceSqlDataSource,
+    resourceKey: IResourceManagerParams,
+    value: string
+  ): Promise<void> {
+    if (!this.resourceManagerService.enabled) {
       return;
     }
 
     try {
-      await this.navTreeResource.preloadNodeParents(dataSource.nodeInfo.parents, dataSource.nodeInfo.nodeId);
-      const resourceData = this.navResourceNodeService.getResourceData(nodeId);
 
-      if (!resourceData) {
-        return;
-      }
-
-      await this.navResourceNodeService.write(resourceData, value);
+      await this.navResourceNodeService.write(resourceKey, value);
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
       throw exception;
@@ -314,21 +278,12 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
   private async getProperties(
     dataSource: ResourceSqlDataSource,
-    nodeId: string
+    resourceKey: IResourceManagerParams
   ): Promise<Record<string, any>> {
-    if (!dataSource.nodeInfo) {
-      throw new Error('Node info is not provided');
-    }
-
     try {
-      await this.navTreeResource.preloadNodeParents(dataSource.nodeInfo.parents, dataSource.nodeInfo.nodeId);
-      const resourceData = this.navResourceNodeService.getResourceData(nodeId);
+      const resource = await this.resourceManagerResource.load(resourceKey, ['includeProperties']);
 
-      if (!resourceData) {
-        throw new Error('Can\'t find resource');
-      }
-
-      return await this.navResourceNodeService.getProperties(resourceData);
+      return resource[0].properties ?? {};
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_resource_manager_sync_script_error');
       throw exception;
@@ -337,43 +292,24 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
   private async setProperties(
     dataSource: ResourceSqlDataSource,
-    nodeId: string,
+    resourceKey: IResourceManagerParams,
     diff: Record<string, any>
   ): Promise<Record<string, any>> {
-    if (!this.resourceManagerService.enabled || !dataSource.nodeInfo) {
+    if (!this.resourceManagerService.enabled) {
       return {};
     }
 
     try {
-      await this.navTreeResource.preloadNodeParents(dataSource.nodeInfo.parents, dataSource.nodeInfo.nodeId);
-      const resourceData = this.navResourceNodeService.getResourceData(nodeId);
-
-      if (!resourceData) {
-        return {};
-      }
-
-      return await this.navResourceNodeService.setProperties(resourceData, diff);
+      return await this.navResourceNodeService.setProperties(resourceKey, diff);
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
       throw exception;
     }
   }
 
-  private async read(dataSource: ResourceSqlDataSource, nodeId: string): Promise<string> {
-    if (!dataSource.nodeInfo) {
-      throw new Error('Node info is not provided');
-    }
-
+  private async read(dataSource: ResourceSqlDataSource, resourceKey: IResourceManagerParams): Promise<string> {
     try {
-      await this.navTreeResource.preloadNodeParents(dataSource.nodeInfo.parents, dataSource.nodeInfo.nodeId);
-      const resourceData = this.navResourceNodeService.getResourceData(nodeId);
-
-      if (!resourceData) {
-        throw new Error('Can\'t find resource');
-      }
-
-      const data = await this.navResourceNodeService.read(resourceData);
-
+      const data = await this.navResourceNodeService.read(resourceKey);
       return data;
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_resource_manager_sync_script_error');

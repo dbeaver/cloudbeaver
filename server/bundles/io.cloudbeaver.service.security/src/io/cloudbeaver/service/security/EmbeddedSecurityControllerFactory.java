@@ -38,17 +38,6 @@ public class EmbeddedSecurityControllerFactory {
     }
 
     /**
-     * Create new security controller instance with default configuration
-     */
-    public CBEmbeddedSecurityController createSecurityService(
-        WebAuthApplication application,
-        Map<String, Object> databaseConfig,
-        SMCredentialsProvider credentialsProvider
-    ) throws DBException {
-        return createSecurityService(application, databaseConfig, credentialsProvider, new SMControllerConfiguration());
-    }
-
-    /**
      * Create new security controller instance with custom configuration
      */
     public CBEmbeddedSecurityController createSecurityService(

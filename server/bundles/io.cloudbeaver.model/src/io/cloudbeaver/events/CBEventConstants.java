@@ -29,6 +29,7 @@ public interface CBEventConstants {
 
     String CLOUDBEAVER_CONFIG_CHANGED = "cb_config_changed";
     String CLOUDBEAVER_DATASOURCE_UPDATED = "cb_datasource_updated";
+    String CLOUDBEAVER_DATASOURCE_FOLDER_UPDATED = "cb_datasource_folder_updated";
     String CLOUDBEAVER_RM_RESOURCE_UPDATED = "cb_rm_resource_updated";
 
 

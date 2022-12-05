@@ -71,6 +71,11 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
                     env.getArgument("projectId"),
                     env.getArgument("resourcePath"),
                     CommonUtils.toBoolean(env.getArgument("isFolder"))))
+            .dataFetcher("rmMoveResource",
+                env -> getService(env).moveResource(getWebSession(env),
+                    env.getArgument("projectId"),
+                    env.getArgument("oldResourcePath"),
+                    env.getArgument("newResourcePath")))
             .dataFetcher("rmDeleteResource",
                 env -> getService(env).deleteResource(getWebSession(env),
                     env.getArgument("projectId"),
