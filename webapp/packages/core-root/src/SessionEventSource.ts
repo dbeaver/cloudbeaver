@@ -30,7 +30,7 @@ export class SessionEventSource extends EventSource<Record<string, any>> {
     private readonly graphQLService: GraphQLService
   ) {
     super(5000);
-    this.websocketMode = true;
+    this.websocketMode = false;
     this.socket = io({
       autoConnect: false,
     });
