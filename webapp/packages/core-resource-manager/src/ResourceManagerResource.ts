@@ -11,7 +11,7 @@ import { observable, toJS } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { DataSynchronizationService } from '@cloudbeaver/core-root';
-import { CachedMapResource, CachedResourceIncludeArgs, GetResourceListQueryVariables, GraphQLService, ICachedMapResourceMetadata, isResourceKeyList, ResourceKey, ResourceKeyList, resourceKeyList, ResourceKeyUtils, RmResource } from '@cloudbeaver/core-sdk';
+import { CachedMapResource, CachedResourceIncludeArgs, GetResourceListQueryVariables, GraphQLService, ICachedMapResourceMetadata, isResourceKeyList, ResourceKey, resourceKeyList, ResourceKeyUtils, RmResource } from '@cloudbeaver/core-sdk';
 import { createPath, isValuesEqual, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { EResourceManagerEventType, ResourceManagerEventHandler } from './ResourceManagerEventHandler';
@@ -42,9 +42,8 @@ export class ResourceManagerResource
 
     this.onMove = new Executor();
 
-    resourceManagerEventHandler
-      .on<IResourceManagerParams>(
-      async key => {
+    resourceManagerEventHandler.on<IResourceManagerParams>(
+      async (name, key) => {
         let parentFolderKey = createParentResourceKey(key);
         parentFolderKey = {
           projectId: parentFolderKey.projectId,
@@ -66,17 +65,18 @@ export class ResourceManagerResource
           }
         }
       },
-      data => ({
+      ({ data }) => ({
         projectId: data.projectId,
         path: this.getFolder(data.resourcePath),
         name: this.getResourceName(data.resourcePath),
       }),
-      d => d.eventType === EResourceManagerEventType.TypeCreate)
-      .on<IResourceManagerParams>(
-      key => {
+      d => d.name === EResourceManagerEventType.TypeCreate);
+
+    resourceManagerEventHandler.on<IResourceManagerParams>(
+      (name, key) => {
         if (this.isInUse(key)) {
           dataSynchronizationService
-            .requestSynchronization('resource', createPath(key.path, key?.name))
+            .requestSynchronization('resource', createPath(key.path, key.name))
             .then(state => {
               if (state) {
                 this.onDataUpdate.execute(key);
@@ -88,17 +88,18 @@ export class ResourceManagerResource
           this.markOutdated(key);
         }
       },
-      data => ({
+      ({ data }) => ({
         projectId: data.projectId,
         path: this.getFolder(data.resourcePath),
         name: this.getResourceName(data.resourcePath),
       }),
-      d => d.eventType === EResourceManagerEventType.TypeUpdate)
-      .on<IResourceManagerParams>(
-      key => {
+      d => d.name === EResourceManagerEventType.TypeUpdate);
+
+    resourceManagerEventHandler.on<IResourceManagerParams>(
+      (name, key) => {
         if (this.isInUse(key)) {
           dataSynchronizationService
-            .requestSynchronization('resource', createPath(key.path, key?.name))
+            .requestSynchronization('resource', createPath(key.path, key.name))
             .then(state => {
               if (state) {
                 this.delete(key);
@@ -110,12 +111,12 @@ export class ResourceManagerResource
           this.onDataUpdate.execute({ ...key, name: undefined });
         }
       },
-      data => ({
+      ({ data }) => ({
         projectId: data.projectId,
         path: this.getFolder(data.resourcePath),
         name: this.getResourceName(data.resourcePath),
       }),
-      d => d.eventType === EResourceManagerEventType.TypeDelete);
+      d => d.name === EResourceManagerEventType.TypeDelete);
 
   }
 

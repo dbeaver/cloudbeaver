@@ -9,6 +9,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import {
   CbEvent,
+  IEventData,
   ResourceEventHandler
 } from '@cloudbeaver/core-sdk';
 
@@ -19,14 +20,14 @@ export class ServerConfigEventHandler extends ResourceEventHandler<null, Session
   constructor(
     sessionEventSource: SessionEventSource
   ) {
-    super(sessionEventSource);
+    super([SessionEventType.CbConfigChanged], sessionEventSource);
   }
 
-  map(event: CbEvent): null {
-    return null;
+  map(event: IEventData<CbEvent>): IEventData<null> {
+    return { ...event, data: null };
   }
 
-  filter(event: CbEvent): boolean {
-    return event.eventType === SessionEventType.CbConfigChanged;
+  filter(event: IEventData<CbEvent>): boolean {
+    return event.name === SessionEventType.CbConfigChanged;
   }
 }

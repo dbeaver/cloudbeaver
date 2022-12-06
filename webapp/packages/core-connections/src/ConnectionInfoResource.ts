@@ -107,20 +107,20 @@ export class ConnectionInfoResource
       this.markOutdated();
     });
 
-    connectionInfoEventHandler
-      .on<ResourceKeyList<IConnectionInfoParams>>(
-      async key => {
+    connectionInfoEventHandler.on<ResourceKeyList<IConnectionInfoParams>>(
+      async (name, key) => {
         const connections = await this.load(key);
 
         for (const connection of connections) {
           this.onConnectionCreate.execute(connection);
         }
-      }, data => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
+      }, ({ data }) => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
         projectId: data.projectId,
         connectionId,
-      }))), d => d.eventType === EConnectionInfoEventType.TypeCreate)
-      .on<ResourceKeyList<IConnectionInfoParams>>(
-      key => {
+      }))), d => d.name === EConnectionInfoEventType.TypeCreate);
+
+    connectionInfoEventHandler.on<ResourceKeyList<IConnectionInfoParams>>(
+      (name, key) => {
         if (this.isConnected(key)) {
           const connection = this.get(key);
 
@@ -134,12 +134,13 @@ export class ConnectionInfoResource
         } else {
           this.markOutdated(key);
         }
-      }, data => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
+      }, ({ data }) => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
         projectId: data.projectId,
         connectionId,
-      }))), d => d.eventType === EConnectionInfoEventType.TypeUpdate)
-      .on<IConnectionInfoEvent>(
-      data => {
+      }))), d => d.name === EConnectionInfoEventType.TypeUpdate);
+
+    connectionInfoEventHandler.on<IConnectionInfoEvent>(
+      (name, data) => {
         const key = resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
           projectId: data.projectId,
           connectionId,
@@ -157,7 +158,7 @@ export class ConnectionInfoResource
         } else {
           this.delete(key);
         }
-      }, d => d, d => d.eventType === EConnectionInfoEventType.TypeDelete);
+      }, d => d.data, d => d.name === EConnectionInfoEventType.TypeDelete);
 
     makeObservable<this, 'nodeIdMap' | 'updateConnection'>(this, {
       nodeIdMap: observable,

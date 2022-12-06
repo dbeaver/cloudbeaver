@@ -8,7 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { type SessionEvent, SessionEventSource, SessionEventType } from '@cloudbeaver/core-root';
-import { CbEvent, CbEventStatus as EConnectionInfoEventType, ResourceEventHandler } from '@cloudbeaver/core-sdk';
+import { CbEvent, CbEventStatus as EConnectionInfoEventType, IEventData, ResourceEventHandler } from '@cloudbeaver/core-sdk';
 
 export { EConnectionInfoEventType };
 
@@ -23,14 +23,18 @@ export class ConnectionFolderEventHandler extends ResourceEventHandler<IConnecti
   constructor(
     sessionEventSource: SessionEventSource
   ) {
-    super(sessionEventSource);
+    super([SessionEventType.CbDatasourceFolderUpdated], sessionEventSource);
   }
 
-  map(event: CbEvent): IConnectionFolderEvent {
-    return event.eventData;
+  map(event: IEventData<CbEvent>): IEventData<IConnectionFolderEvent> {
+    const data: IConnectionFolderEvent = event.data.eventData;
+    return {
+      name: data.eventType,
+      data,
+    };
   }
 
-  filter(event: CbEvent): boolean {
-    return event.eventType === SessionEventType.CbDatasourceFolderUpdated;
+  filter(event: IEventData<CbEvent>): boolean {
+    return event.name === SessionEventType.CbDatasourceFolderUpdated;
   }
 }
