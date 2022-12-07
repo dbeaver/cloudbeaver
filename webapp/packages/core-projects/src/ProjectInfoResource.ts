@@ -62,8 +62,8 @@ export function projectInfoSortByName(a: ProjectInfo, b: ProjectInfo) {
     return 0;
   }
 
-  if (a.global !== b.global) {
-    return +a.global - +b.global;
+  if (isGlobalProject(a) !== isGlobalProject(b)) {
+    return +isGlobalProject(a) - +isGlobalProject(b);
   }
 
   if (a.shared !== b.shared) {
@@ -71,4 +71,8 @@ export function projectInfoSortByName(a: ProjectInfo, b: ProjectInfo) {
   }
 
   return a.name.localeCompare(b.name);
+}
+
+export function isGlobalProject(obj?: ProjectInfo): obj is ProjectInfo {
+  return obj?.global === true;
 }

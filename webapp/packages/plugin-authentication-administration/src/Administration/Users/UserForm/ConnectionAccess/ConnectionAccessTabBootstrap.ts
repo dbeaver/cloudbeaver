@@ -7,7 +7,7 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { UserFormService } from '../UserFormService';
@@ -29,7 +29,7 @@ export class ConnectionAccessTabBootstrap extends Bootstrap {
       title: 'authentication_administration_user_connections_access',
       order: 3,
       panel: () => ConnectionAccess,
-      isHidden: () => !this.projectInfoResource.values.some(project => project.global),
+      isHidden: () => !this.projectInfoResource.values.some(isGlobalProject),
       onOpen: ({ props }) => props.controller.loadConnectionsAccess(),
     });
 

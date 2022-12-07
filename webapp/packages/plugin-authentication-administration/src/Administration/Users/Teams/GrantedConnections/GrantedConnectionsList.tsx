@@ -25,10 +25,9 @@ import {
   useTranslate,
   useStyles
 } from '@cloudbeaver/core-blocks';
-import { DBDriverResource } from '@cloudbeaver/core-connections';
+import { Connection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
-import type { DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';
 
 
 import { getFilteredConnections } from './getFilteredConnections';
@@ -61,7 +60,7 @@ const styles = css`
   `;
 
 interface Props {
-  grantedConnections: DatabaseConnectionFragment[];
+  grantedConnections: Connection[];
   disabled: boolean;
   onRevoke: (subjectIds: string[]) => void;
   onEdit: () => void;
