@@ -8,7 +8,7 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, INotification, NotificationService } from '@cloudbeaver/core-events';
-import { DataSynchronizationService } from '@cloudbeaver/core-root';
+import { DataSynchronizationService, ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { DataSynchronizationNotification } from './DataSynchronizationNotification';
 
@@ -18,6 +18,7 @@ export class DataSynchronizationResolverBootstrap extends Bootstrap {
 
   constructor(
     private readonly notificationService: NotificationService,
+    private readonly serverConfigResource: ServerConfigResource,
     private readonly dataSynchronizationService: DataSynchronizationService
   ) {
     super();
@@ -31,7 +32,7 @@ export class DataSynchronizationResolverBootstrap extends Bootstrap {
   load(): void | Promise<void> { }
 
   private handleNetworkStateChange(): void {
-    if (this.activeNotification) {
+    if (this.activeNotification || this.serverConfigResource.configurationMode) {
       return;
     }
 
