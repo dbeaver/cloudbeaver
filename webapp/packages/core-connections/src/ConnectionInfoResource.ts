@@ -47,10 +47,16 @@ export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 
 export type NewConnection = Connection & { [NEW_CONNECTION_SYMBOL]: boolean; timestamp: number };
 
-const connectionInfoProjectKeySymbol = Symbol('@connection-info/project') as unknown as IConnectionInfoParams;
+const connectionInfoProjectKeySymbol = Symbol('@connection-info/projects') as unknown as IConnectionInfoParams;
 export const ConnectionInfoProjectKey = (...projectIds: string[]) => resourceKeyList<IConnectionInfoParams>(
   [connectionInfoProjectKeySymbol],
   projectIds
+);
+
+const connectionInfoActiveProjectKeySymbol = Symbol('@connection-info/projects-active') as unknown as IConnectionInfoParams;
+export const ConnectionInfoActiveProjectKey = resourceKeyList<IConnectionInfoParams>(
+  [connectionInfoActiveProjectKeySymbol],
+  'active-projects'
 );
 
 export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
@@ -93,6 +99,14 @@ export class ConnectionInfoResource
       (a, b) => isArraysEqual(a.mark, b.mark)
     );
 
+    this.addAlias(
+      isConnectionInfoActiveProjectKey,
+      () => resourceKeyList(
+        this.keys.filter(key => projectsService.activeProjects.some(({ id }) => id === key.projectId))
+      ),
+      (a, b) => a.mark === b.mark
+    );
+
     // in case when session was refreshed all data depended on connection info
     // should be refreshed by session update executor
     // it's prevents double nav tree refresh
@@ -104,7 +118,7 @@ export class ConnectionInfoResource
     this.sync(this.projectInfoResource, () => CachedMapAllKey, () => CachedMapAllKey);
     this.projectsService.onActiveProjectChange.addHandler(data => {
       if (data.type === 'after') {
-        this.markOutdated(CachedMapAllKey);
+        this.markOutdated(ConnectionInfoActiveProjectKey);
       }
     });
 
@@ -445,17 +459,18 @@ export class ConnectionInfoResource
     let projectIds: string[] | undefined;
     let all = this.isAliasEqual(originalKey, CachedMapAllKey);
     let isProjectKey = isConnectionInfoProjectKey(originalKey);
+    const isActiveProjectKey = isConnectionInfoActiveProjectKey(originalKey);
     let key = this.transformParam(originalKey);
 
     if (isProjectKey) {
       projectIds = (originalKey as ResourceKeyList<IConnectionInfoParams>).mark;
     }
 
-    if (all) {
+    if (isActiveProjectKey) {
       projectIds = this.projectsService.activeProjects.map(project => project.id);
     }
 
-    if (all || isProjectKey) {
+    if (all || isProjectKey || isActiveProjectKey) {
       const outdated = ResourceKeyUtils.filter(key, key => this.isOutdated(key));
       if (refresh || outdated.length !== 1) {
         key = originalKey;
@@ -473,7 +488,7 @@ export class ConnectionInfoResource
       ) => {
         let connectionId: string | undefined;
 
-        if (!all && !isProjectKey) {
+        if (!all && !isProjectKey && !isActiveProjectKey) {
           connectionId = key.connectionId;
           projectId = key.projectId;
         }
@@ -494,23 +509,23 @@ export class ConnectionInfoResource
           if (all) {
             this.resetIncludes();
             const unrestoredConnectionIdList = Array.from(this.keys)
-              .filter(key => (
-                !connections.some(connection => (
-                  connection.projectId === key.projectId
-                  && connection.id === key.connectionId
-                ))
-                && projectIds?.includes(key.projectId)
-              ));
+              .filter(key => !connections.some(connection => (
+                connection.projectId === key.projectId
+                && connection.id === key.connectionId
+              )));
 
             this.delete(resourceKeyList(unrestoredConnectionIdList));
           }
 
-          if (isProjectKey) {
+          if (isProjectKey || isActiveProjectKey) {
             const removedConnections = this.keys
-              .filter(key => !connections.some(f => (
+              .filter(key => (
                 projectIds?.includes(key.projectId)
-                && key.connectionId === f.id
-              )));
+                && !connections.some(f => (
+                  key.projectId === f.projectId
+                  && key.connectionId === f.id
+                ))
+              ));
 
             this.delete(resourceKeyList(removedConnections));
           }
@@ -572,6 +587,12 @@ function isConnectionInfoProjectKey(
   param: ResourceKey<IConnectionInfoParams>
 ): param is ResourceKeyList<IConnectionInfoParams> {
   return isResourceKeyList(param) && param.list.includes(connectionInfoProjectKeySymbol);
+}
+
+function isConnectionInfoActiveProjectKey(
+  param: ResourceKey<IConnectionInfoParams>
+): param is ResourceKeyList<IConnectionInfoParams> {
+  return isResourceKeyList(param) && param.list.includes(connectionInfoActiveProjectKeySymbol);
 }
 
 export function isConnectionInfoParamEqual(param: IConnectionInfoParams, second: IConnectionInfoParams): boolean {

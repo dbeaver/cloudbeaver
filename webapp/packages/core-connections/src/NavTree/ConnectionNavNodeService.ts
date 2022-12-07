@@ -12,10 +12,10 @@ import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { INodeNavigationData, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
-import { type ResourceKey, ResourceKeyUtils, resourceKeyList, CachedMapAllKey, CbEventStatus } from '@cloudbeaver/core-sdk';
+import { type ResourceKey, ResourceKeyUtils, resourceKeyList, CbEventStatus } from '@cloudbeaver/core-sdk';
 
 import { ConnectionFolderEventHandler, IConnectionFolderEvent } from '../ConnectionFolderEventHandler';
-import { Connection, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
+import { Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
 import { ConnectionsManagerService } from '../ConnectionsManagerService';
 import type { IConnectionInfoParams } from '../IConnectionsResource';
 import { getConnectionParentId } from './getConnectionParentId';
@@ -86,7 +86,7 @@ export class ConnectionNavNodeService extends Dependency {
       nodeId,
     }
   ) => {
-    await this.connectionInfoResource.load(CachedMapAllKey);
+    await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
     const connection = this.connectionInfoResource.getConnectionForNode(nodeId);
 
     return connection;
@@ -96,7 +96,7 @@ export class ConnectionNavNodeService extends Dependency {
     key: ResourceKey<string>,
     context: IExecutionContextProvider<ResourceKey<string>>
   ) {
-    await this.connectionInfoResource.load(CachedMapAllKey);
+    await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
     key = this.navTreeResource.transformParam(key);
 
     const notConnected = ResourceKeyUtils.some(key, key => {
