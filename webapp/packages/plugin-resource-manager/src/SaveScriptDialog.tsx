@@ -118,8 +118,9 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
           <ProjectSelect
             value={state.projectId}
             filter={p => (p.canEditResources && p.id === (payload.projectId ?? p.id))}
+            descriptionGetter={(_, options) => options.length <= 1 ? translate('plugin_resource_manager_save_script_project_restriction_descripion') : undefined}
             autoHide
-            onChange={projectId => {state.projectId = projectId;}}
+            onChange={projectId => { state.projectId = projectId; }}
           />
         </Container>
       </SubmittingForm>
