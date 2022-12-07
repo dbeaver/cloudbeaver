@@ -16,7 +16,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ISessionAction, ServerConfigResource, sessionActionContext, SessionActionService, SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
-import { WindowsService } from '@cloudbeaver/core-ui';
+import { NavigationService, WindowsService } from '@cloudbeaver/core-ui';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
 import type { IAuthOptions } from './IAuthOptions';
@@ -47,12 +47,15 @@ export class AuthenticationService extends Bootstrap {
     private readonly authInfoService: AuthInfoService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly windowsService: WindowsService,
-    private readonly sessionActionService: SessionActionService
+    private readonly sessionActionService: SessionActionService,
+    private readonly navigationService: NavigationService,
   ) {
     super();
 
     this.onLogout = new Executor();
     this.onLogin = new Executor();
+
+    this.onLogout.before(this.navigationService.navigationTask);
 
     this.authPromise = null;
     this.configureAuthProvider = null;
