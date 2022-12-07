@@ -10,7 +10,6 @@ import { SplitProps, Split as BaseSplit } from 'go-split';
 
 export type ISplitProps = SplitProps;
 
-
 export function Split(props: ISplitProps) {
 
   return <BaseSplit {...props} />;
