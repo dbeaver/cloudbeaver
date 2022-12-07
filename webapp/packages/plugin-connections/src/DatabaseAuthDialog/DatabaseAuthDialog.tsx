@@ -65,6 +65,10 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
     authModelId = connection.connectionInfo.authModel || driver?.defaultAuthModel || null;
   }
 
+  const authProperties = connection.connectionInfo?.authProperties?.filter(
+    property => property.features.includes('nonSecuredProperty') ? !property.value : true
+  );
+
   return styled(useStyles(styles))(
     <CommonDialogWrapper
       size='large'
@@ -94,7 +98,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
             <ConnectionAuthenticationForm
               config={controller.config}
               authModelId={authModelId}
-              authProperties={connection.connectionInfo?.authProperties}
+              authProperties={authProperties}
               networkHandlers={payload.networkHandlers}
               formId={`${payload.connection.projectId}:${payload.connection.connectionId}`}
               allowSaveCredentials={credentialsSavingEnabled}
