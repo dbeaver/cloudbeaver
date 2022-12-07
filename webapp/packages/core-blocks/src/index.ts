@@ -1,5 +1,3 @@
-export * from './ACTION_ICON_BUTTON_STYLES';
-
 export * from './AppRefreshButton';
 export * from './ComplexLoader';
 export * from './DisplayError';
@@ -26,7 +24,9 @@ export * from './localization/useTranslate';
 
 export * from './Marks/ConnectionMark';
 
+export * from './Menu/ACTION_ICON_BUTTON_STYLES';
 export * from './Menu/Menu';
+export * from './Menu/MenuBarSmallItem';
 export * from './Menu/MenuEmptyItem';
 export * from './Menu/MenuItem';
 export * from './Menu/MenuItemElement';

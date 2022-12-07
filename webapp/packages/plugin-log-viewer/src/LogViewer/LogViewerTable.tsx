@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { ACTION_ICON_BUTTON_STYLES, BASE_TABLE_STYLES, Button, IconButton, Table, TableBody, TableColumnHeader, TableHeader, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { BASE_TABLE_STYLES, MenuBarSmallItem, Table, TableBody, TableColumnHeader, TableHeader, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { ILogEntry } from './ILogEntry';
 import { LogEntry } from './LogEntry';
@@ -64,7 +64,7 @@ interface Props {
 }
 export const LogViewerTable = observer<Props>(function LogViewerTable({ items, selectedItem, onItemSelect, onClear, className }) {
   const translate = useTranslate();
-  const style = useStyles(BASE_TABLE_STYLES, ACTION_ICON_BUTTON_STYLES, styles);
+  const style = useStyles(BASE_TABLE_STYLES, styles);
 
   return styled(style)(
     <wrapper className={className}>
@@ -79,12 +79,14 @@ export const LogViewerTable = observer<Props>(function LogViewerTable({ items, s
                 {/* <Button title={translate('app_log_view_clear_log')} onClick={onClear}>
                   {translate('ui_clear')}
                 </Button> */}
-                <IconButton
+                <MenuBarSmallItem
                   name='trash'
                   viewBox='0 0 24 24'
                   title={translate('app_log_view_clear_log')}
                   onClick={onClear}
-                />
+                >
+                  {translate('ui_clear')}
+                </MenuBarSmallItem>
               </message-title-box>
             </TableColumnHeader>
           </TableHeader>
