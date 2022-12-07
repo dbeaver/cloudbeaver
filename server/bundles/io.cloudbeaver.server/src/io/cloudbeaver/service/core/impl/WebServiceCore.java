@@ -105,7 +105,10 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public List<WebConnectionInfo> getUserConnections(
-        @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @Nullable String id,
+        @Nullable List<String> projectIds
     ) throws DBWebException {
         if (id != null) {
             WebConnectionInfo connectionInfo = getConnectionState(webSession, projectId, id);
@@ -116,6 +119,9 @@ public class WebServiceCore implements DBWServiceCore {
         var stream = webSession.getConnections().stream();
         if (projectId != null) {
             stream = stream.filter(c -> c.getProjectId().equals(projectId));
+        }
+        if (projectIds != null) {
+            stream = stream.filter(c -> projectIds.contains(c.getProjectId()));
         }
         List<DBPDriver> applicableDrivers = CBPlatform.getInstance().getApplicableDrivers();
         return stream.filter(c -> applicableDrivers.contains(c.getDataSourceContainer().getDriver()))

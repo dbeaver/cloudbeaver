@@ -1025,7 +1025,7 @@ export interface QueryConnectionFoldersArgs {
 
 export interface QueryConnectionInfoArgs {
   id: Scalars['ID'];
-  projectId?: InputMaybe<Scalars['ID']>;
+  projectId: Scalars['ID'];
 }
 
 
@@ -1373,6 +1373,7 @@ export interface QueryUpdateTeamArgs {
 export interface QueryUserConnectionsArgs {
   id?: InputMaybe<Scalars['ID']>;
   projectId?: InputMaybe<Scalars['ID']>;
+  projectIds?: InputMaybe<Array<Scalars['ID']>>;
 }
 
 export interface RmProject {
@@ -2166,6 +2167,7 @@ export type GetTemplateConnectionsQuery = { connections: Array<{ id: string, pro
 export type GetUserConnectionsQueryVariables = Exact<{
   projectId?: InputMaybe<Scalars['ID']>;
   connectionId?: InputMaybe<Scalars['ID']>;
+  projectIds?: InputMaybe<Array<Scalars['ID']> | Scalars['ID']>;
   includeOrigin: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
   includeAuthProperties: Scalars['Boolean'];
@@ -3696,8 +3698,12 @@ export const GetTemplateConnectionsDocument = `
 }
     ${DatabaseConnectionFragmentDoc}`;
 export const GetUserConnectionsDocument = `
-    query getUserConnections($projectId: ID, $connectionId: ID, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $includeNetworkHandlersConfig: Boolean!, $includeCredentialsSaved: Boolean!, $includeAuthNeeded: Boolean!, $includeProperties: Boolean!, $includeProviderProperties: Boolean!, $customIncludeOptions: Boolean!) {
-  connections: userConnections(projectId: $projectId, id: $connectionId) {
+    query getUserConnections($projectId: ID, $connectionId: ID, $projectIds: [ID!], $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $includeNetworkHandlersConfig: Boolean!, $includeCredentialsSaved: Boolean!, $includeAuthNeeded: Boolean!, $includeProperties: Boolean!, $includeProviderProperties: Boolean!, $customIncludeOptions: Boolean!) {
+  connections: userConnections(
+    projectId: $projectId
+    id: $connectionId
+    projectIds: $projectIds
+  ) {
     ...DatabaseConnection
   }
 }

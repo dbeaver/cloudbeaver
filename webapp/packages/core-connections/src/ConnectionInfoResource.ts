@@ -10,7 +10,7 @@ import { action, makeObservable, observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ExecutorInterrupter, ISyncExecutor } from '@cloudbeaver/core-executor';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { EPermission, NavigatorViewSettings, SessionPermissionsResource, SessionDataResource, DataSynchronizationService } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
@@ -31,6 +31,7 @@ import {
   AdminConnectionGrantInfo,
   isResourceKeyList,
 } from '@cloudbeaver/core-sdk';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { ConnectionInfoEventHandler, EConnectionInfoEventType, IConnectionInfoEvent } from './ConnectionInfoEventHandler';
 import type { DatabaseConnection } from './DatabaseConnection';
@@ -46,11 +47,10 @@ export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
 
 export type NewConnection = Connection & { [NEW_CONNECTION_SYMBOL]: boolean; timestamp: number };
 
-
 const connectionInfoProjectKeySymbol = Symbol('@connection-info/project') as unknown as IConnectionInfoParams;
-export const ConnectionInfoProjectKey = (projectId: string) => resourceKeyList<IConnectionInfoParams>(
+export const ConnectionInfoProjectKey = (...projectIds: string[]) => resourceKeyList<IConnectionInfoParams>(
   [connectionInfoProjectKeySymbol],
-  projectId
+  projectIds
 );
 
 export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
@@ -73,6 +73,7 @@ export class ConnectionInfoResource
   private readonly nodeIdMap: Map<string, IConnectionInfoParams>;
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly dataSynchronizationService: DataSynchronizationService,
     sessionDataResource: SessionDataResource,
@@ -88,8 +89,8 @@ export class ConnectionInfoResource
 
     this.addAlias(
       isConnectionInfoProjectKey,
-      param => resourceKeyList(this.keys.filter(key => key.projectId === param.mark)),
-      (a, b) => a.mark === b.mark
+      param => resourceKeyList(this.keys.filter(key => param.mark.includes(key.projectId))),
+      (a, b) => isArraysEqual(a.mark, b.mark)
     );
 
     // in case when session was refreshed all data depended on connection info
@@ -101,6 +102,11 @@ export class ConnectionInfoResource
 
     permissionsResource.require(this, EPermission.public);
     this.sync(this.projectInfoResource, () => CachedMapAllKey, () => CachedMapAllKey);
+    this.projectsService.onActiveProjectChange.addHandler(data => {
+      if (data.type === 'after') {
+        this.markOutdated(CachedMapAllKey);
+      }
+    });
 
     sessionDataResource.onDataOutdated.addHandler(() => {
       this.sessionUpdate = true;
@@ -436,12 +442,17 @@ export class ConnectionInfoResource
     refresh: boolean
   ): Promise<Map<IConnectionInfoParams, Connection>> {
     let projectId: string | undefined;
+    let projectIds: string[] | undefined;
     let all = this.isAliasEqual(originalKey, CachedMapAllKey);
     let isProjectKey = isConnectionInfoProjectKey(originalKey);
     let key = this.transformParam(originalKey);
 
     if (isProjectKey) {
-      projectId = (originalKey as ResourceKeyList<IConnectionInfoParams>).mark;
+      projectIds = (originalKey as ResourceKeyList<IConnectionInfoParams>).mark;
+    }
+
+    if (all) {
+      projectIds = this.projectsService.activeProjects.map(project => project.id);
     }
 
     if (all || isProjectKey) {
@@ -470,6 +481,7 @@ export class ConnectionInfoResource
         const { connections } = await this.graphQLService.sdk.getUserConnections({
           projectId,
           connectionId,
+          projectIds,
           ...this.getDefaultIncludes(),
           ...this.getIncludesMap(key, includes),
         });
@@ -482,10 +494,13 @@ export class ConnectionInfoResource
           if (all) {
             this.resetIncludes();
             const unrestoredConnectionIdList = Array.from(this.keys)
-              .filter(key => !connections.some(connection => (
-                connection.projectId === key.projectId
-            && connection.id === key.connectionId
-              )));
+              .filter(key => (
+                !connections.some(connection => (
+                  connection.projectId === key.projectId
+                  && connection.id === key.connectionId
+                ))
+                && projectIds?.includes(key.projectId)
+              ));
 
             this.delete(resourceKeyList(unrestoredConnectionIdList));
           }
@@ -493,8 +508,8 @@ export class ConnectionInfoResource
           if (isProjectKey) {
             const removedConnections = this.keys
               .filter(key => !connections.some(f => (
-                key.projectId === projectId
-              && key.connectionId === f.id
+                projectIds?.includes(key.projectId)
+                && key.connectionId === f.id
               )));
 
             this.delete(resourceKeyList(removedConnections));

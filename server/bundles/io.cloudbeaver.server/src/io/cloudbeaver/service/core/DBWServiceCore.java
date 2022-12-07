@@ -53,7 +53,10 @@ public interface DBWServiceCore extends DBWService {
 
     @WebAction(requirePermissions = {})
     List<WebConnectionInfo> getUserConnections(
-        @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id) throws DBWebException;
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @Nullable String id,
+        @Nullable List<String> projectIds) throws DBWebException;
 
     @WebAction(requirePermissions = {})
     List<WebConnectionFolderInfo> getConnectionFolders(
