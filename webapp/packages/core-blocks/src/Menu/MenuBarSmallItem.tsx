@@ -16,7 +16,7 @@ import { useStyles } from '../useStyles';
 
 export const styles = css`
   icon-box {
-    composes: theme-form-element-radius theme-ripple from global;
+    composes: theme-form-element-radius theme-text-primary theme-ripple from global;
     box-sizing: border-box;
     overflow: hidden;
     padding: 4px !important;
@@ -45,7 +45,7 @@ export const styles = css`
 `;
 
 interface Props extends Omit<ButtonProps, 'style'> {
-  name: string;
+  name?: string;
   viewBox?: string;
   style?: ComponentStyle;
 }
@@ -63,11 +63,13 @@ export const MenuBarSmallItem: React.FC<React.PropsWithChildren<Props>> = functi
   // TODO: use button for icon-box (maybe)
   return styled(useStyles(styles, style))(
     <icon-box className={className} tabIndex={0}>
-      <IconButton
-        name={name}
-        viewBox={viewBox}
-        {...rest}
-      />
+      {name && (
+        <IconButton
+          name={name}
+          viewBox={viewBox}
+          {...rest}
+        />
+      )}
       {children && (
         <icon-label>{children}</icon-label>
       )}
