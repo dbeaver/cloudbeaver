@@ -9,22 +9,19 @@
 import { generateFileName } from './generateFileName';
 
 describe('generateFileName', () => {
-  it('should generate a file name with the current date and time', () => {
+  it('should generate a file name in the expected format', () => {
+    const mockDate = new Date('2020-09-09T14:13:20');
+    const spy = jest
+      .spyOn(global, 'Date')
+      .mockImplementation(() => mockDate as unknown as string);
+
     const fileName = 'my-file';
     const fileFormat = '.txt';
+    const expectedFileName = `${fileName} 2020-09-09 14-13-20${fileFormat}`;
 
-    const newFileName = generateFileName(fileName, fileFormat);
+    // Test the generateFileName function
+    expect(generateFileName(fileName, fileFormat)).toEqual(expectedFileName);
 
-    // assert that the file name contains the provided file name and file format
-    expect(newFileName).toContain(fileName);
-    expect(newFileName).toContain(fileFormat);
-
-    // assert that the file name contains the current date and time
-    // in the correct format
-    const now = new Date();
-    const dateString = now.toISOString().slice(0, 10);
-    const timeString = ('0' + now.getHours()).slice(-2) + '-' + ('0' + now.getMinutes()).slice(-2) + '-' + ('0' + now.getSeconds()).slice(-2);
-    expect(newFileName).toContain(dateString);
-    expect(newFileName).toContain(timeString);
+    spy.mockRestore();
   });
 });
