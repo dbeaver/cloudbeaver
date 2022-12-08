@@ -1,5 +1,5 @@
 <!--
- *  Copyright (c) Facebook, Inc.
+ *  Copyright (c) 2022 GraphQL Contributors
  *  All rights reserved.
  *
  *  This source code is licensed under the license found in the
@@ -27,21 +27,19 @@
       If you do not want to rely on a CDN, you can host these files locally or
       include them directly in your favored resource bunder.
     -->
-    <script src="//cdn.jsdelivr.net/es6-promise/4.0.5/es6-promise.auto.min.js"></script>
-    <script src="//cdn.jsdelivr.net/fetch/0.9.0/fetch.min.js"></script>
-    <script src="//cdn.jsdelivr.net/react/15.4.2/react.min.js"></script>
-    <script src="//cdn.jsdelivr.net/react/15.4.2/react-dom.min.js"></script>
+    <script src="https://unpkg.com/react@17/umd/react.development.js" integrity="sha512-Vf2xGDzpqUOEIKO+X2rgTLWPY+65++WPwCHkX2nFMu9IcstumPsf/uKKRd5prX3wOu8Q0GBylRpsDB26R6ExOg==" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" integrity="sha512-Wr9OKCTtq1anK0hq5bY3X/AvDI5EflDSAh0mE9gma+4hl+kXdTJPKZ3TwLMBcrgUeoY0s3dq9JjhCQc7vddtFg==" crossorigin="anonymous"></script>
 
     <!--
       These two files can be found in the npm module, however you may wish to
       copy them directly into your environment, or perhaps include them in your
       favored resource bundler.
-     -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/graphiql@0.11.2/graphiql.css" />
-    <script src="https://cdn.jsdelivr.net/npm/graphiql@0.11.2/graphiql.js"></script>
+    -->
+     <link rel="stylesheet" href="https://unpkg.com/graphiql@2.0.1/graphiql.min.css" />
 
   </head>
   <body>
+    <script src="https://unpkg.com/graphiql@2.0.1/graphiql.min.js" type="application/javascript"></script>
     <div id="graphiql">Loading...</div>
     <script>
       /**
