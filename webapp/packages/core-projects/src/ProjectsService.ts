@@ -16,6 +16,7 @@ import { NavigationService } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { activeProjectsContext } from './activeProjectsContext';
+import { ProjectInfoEventHandler } from './ProjectInfoEventHandler';
 import { ProjectInfo, ProjectInfoResource } from './ProjectInfoResource';
 
 interface IActiveProjectData {
@@ -92,12 +93,23 @@ export class ProjectsService {
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly userDataService: UserDataService,
+    private readonly projectInfoEventHandler: ProjectInfoEventHandler,
     navigationService: NavigationService
   ) {
     this.getActiveProjectTask = new SyncExecutor();
     this.onActiveProjectChange = new Executor();
 
     this.onActiveProjectChange.before(navigationService.navigationTask);
+
+    this.onActiveProjectChange.addHandler(data => {
+      if (data.type === 'after') {
+        this.projectInfoEventHandler.setActiveProjects(this.activeProjects.map(project => project.id));
+      }
+    });
+
+    this.projectInfoEventHandler.onInit.addHandler(() => {
+      this.projectInfoEventHandler.setActiveProjects(this.activeProjects.map(project => project.id));
+    });
 
     makeObservable(this, {
       userProject: computed,

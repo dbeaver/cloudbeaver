@@ -43,7 +43,7 @@ export class ResourceManagerResource
     this.onMove = new Executor();
 
     resourceManagerEventHandler.on<IResourceManagerParams>(
-      async (name, key) => {
+      async key => {
         let parentFolderKey = createParentResourceKey(key);
         parentFolderKey = {
           projectId: parentFolderKey.projectId,
@@ -65,15 +65,15 @@ export class ResourceManagerResource
           }
         }
       },
-      ({ data }) => ({
+      data => ({
         projectId: data.projectId,
         path: this.getFolder(data.resourcePath),
         name: this.getResourceName(data.resourcePath),
       }),
-      d => d.name === EResourceManagerEventType.TypeCreate);
+      d => d.eventType === EResourceManagerEventType.TypeCreate);
 
     resourceManagerEventHandler.on<IResourceManagerParams>(
-      (name, key) => {
+      key => {
         if (this.isInUse(key)) {
           dataSynchronizationService
             .requestSynchronization('resource', createPath(key.path, key.name))
@@ -88,15 +88,15 @@ export class ResourceManagerResource
           this.markOutdated(key);
         }
       },
-      ({ data }) => ({
+      data => ({
         projectId: data.projectId,
         path: this.getFolder(data.resourcePath),
         name: this.getResourceName(data.resourcePath),
       }),
-      d => d.name === EResourceManagerEventType.TypeUpdate);
+      d => d.eventType === EResourceManagerEventType.TypeUpdate);
 
     resourceManagerEventHandler.on<IResourceManagerParams>(
-      (name, key) => {
+      key => {
         if (this.isInUse(key)) {
           dataSynchronizationService
             .requestSynchronization('resource', createPath(key.path, key.name))
@@ -111,13 +111,12 @@ export class ResourceManagerResource
           this.onDataUpdate.execute({ ...key, name: undefined });
         }
       },
-      ({ data }) => ({
+      data => ({
         projectId: data.projectId,
         path: this.getFolder(data.resourcePath),
         name: this.getResourceName(data.resourcePath),
       }),
-      d => d.name === EResourceManagerEventType.TypeDelete);
-
+      d => d.eventType === EResourceManagerEventType.TypeDelete);
   }
 
   getResourceName(resourcePath: string): string {

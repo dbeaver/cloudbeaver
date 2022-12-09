@@ -21,6 +21,10 @@ export const GlobalConstants = {
     return _VERSION_;
   },
 
+  get host(): string {
+    return window.location.host;
+  },
+
   get rootURI(): string {
     const defaultURI = '/';
 
@@ -40,6 +44,10 @@ export const GlobalConstants = {
 
   absoluteServiceUrl(...parts: string[]): string {
     return pathJoin(this.serviceURI, ...parts);
+  },
+
+  hostServiceUrl(...parts: string[]): string {
+    return pathJoin(this.host, this.absoluteServiceUrl(...parts));
   },
 
   absoluteUrl(...parts: string[]): string {

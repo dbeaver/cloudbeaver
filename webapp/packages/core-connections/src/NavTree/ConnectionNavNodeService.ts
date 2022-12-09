@@ -49,7 +49,7 @@ export class ConnectionNavNodeService extends Dependency {
     this.navNodeManagerService.navigator.addHandler(this.navigateHandler.bind(this));
 
     this.connectionFolderEventHandler.on<IConnectionFolderEvent>(
-      (name, data) => {
+      data => {
         const parents = data.nodePaths.map(nodeId => {
           const parents = getFolderNodeParents(nodeId);
 
@@ -57,11 +57,11 @@ export class ConnectionNavNodeService extends Dependency {
         });
         this.navTreeResource.markTreeOutdated(resourceKeyList(parents));
       },
-      v => v.data,
-      event => event.name === CbEventStatus.TypeCreate
+      undefined,
+      event => event.eventType === CbEventStatus.TypeCreate
     );
     this.connectionFolderEventHandler.on<IConnectionFolderEvent>(
-      (name, data) => {
+      data => {
         const parents = data.nodePaths.map(nodeId => {
           const parents = getFolderNodeParents(nodeId);
 
@@ -70,15 +70,15 @@ export class ConnectionNavNodeService extends Dependency {
 
         this.navTreeResource.deleteInNode(resourceKeyList(parents), data.nodePaths);
       },
-      v => v.data,
-      event => event.name === CbEventStatus.TypeDelete
+      undefined,
+      event => event.eventType === CbEventStatus.TypeDelete
     );
     this.connectionFolderEventHandler.on<IConnectionFolderEvent>(
-      (name, data) => {
+      data => {
         this.navTreeResource.markOutdated(resourceKeyList(data.nodePaths));
       },
-      v => v.data,
-      event => event.name === CbEventStatus.TypeUpdate
+      undefined,
+      event => event.eventType === CbEventStatus.TypeUpdate
     );
   }
 

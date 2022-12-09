@@ -108,19 +108,19 @@ export class ConnectionInfoResource
     });
 
     connectionInfoEventHandler.on<ResourceKeyList<IConnectionInfoParams>>(
-      async (name, key) => {
+      async key => {
         const connections = await this.load(key);
 
         for (const connection of connections) {
           this.onConnectionCreate.execute(connection);
         }
-      }, ({ data }) => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
+      }, data => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
         projectId: data.projectId,
         connectionId,
-      }))), d => d.name === EConnectionInfoEventType.TypeCreate);
+      }))), d => d.eventType === EConnectionInfoEventType.TypeCreate);
 
     connectionInfoEventHandler.on<ResourceKeyList<IConnectionInfoParams>>(
-      (name, key) => {
+      key => {
         if (this.isConnected(key)) {
           const connection = this.get(key);
 
@@ -134,13 +134,13 @@ export class ConnectionInfoResource
         } else {
           this.markOutdated(key);
         }
-      }, ({ data }) => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
+      }, data => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
         projectId: data.projectId,
         connectionId,
-      }))), d => d.name === EConnectionInfoEventType.TypeUpdate);
+      }))), d => d.eventType === EConnectionInfoEventType.TypeUpdate);
 
     connectionInfoEventHandler.on<IConnectionInfoEvent>(
-      (name, data) => {
+      data => {
         const key = resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
           projectId: data.projectId,
           connectionId,
@@ -158,7 +158,7 @@ export class ConnectionInfoResource
         } else {
           this.delete(key);
         }
-      }, d => d.data, d => d.name === EConnectionInfoEventType.TypeDelete);
+      }, undefined, d => d.eventType === EConnectionInfoEventType.TypeDelete);
 
     makeObservable<this, 'nodeIdMap' | 'updateConnection'>(this, {
       nodeIdMap: observable,
