@@ -22,12 +22,8 @@ enum CBEventTopic {
     cb_config,
     cb_datasource,
     cb_datasource_folder,
-    cb_rm
-}
-
-enum CBEventResourceType {
-    RM_RESOURCE,
-    DATASOURCE
+    cb_rm,
+    cb_projects
 }
 
 enum CBEventStatus {
@@ -76,6 +72,7 @@ type CBDatasourceEvent implements CBServerEvent {
 type CBRMEvent implements CBServerEvent {
     type: CBServerEventType!
     topic: CBEventTopic
+    status: CBEventStatus!
     resourcePath: String!
     projectId: String!
 }

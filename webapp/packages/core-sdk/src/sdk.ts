@@ -217,6 +217,7 @@ export enum CbEventTopic {
   CbConfig = 'cb_config',
   CbDatasource = 'cb_datasource',
   CbDatasourceFolder = 'cb_datasource_folder',
+  CbProjects = 'cb_projects',
   CbRm = 'cb_rm'
 }
 
@@ -237,6 +238,7 @@ export interface CbProjectsActiveEvent extends CbClientEvent {
 export interface CbrmEvent extends CbServerEvent {
   projectId: Scalars['String'];
   resourcePath: Scalars['String'];
+  status: CbEventStatus;
   topic?: Maybe<CbEventTopic>;
   type: CbServerEventType;
 }

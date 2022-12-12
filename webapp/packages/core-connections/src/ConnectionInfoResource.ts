@@ -117,7 +117,7 @@ export class ConnectionInfoResource
       }, data => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
         projectId: data.projectId,
         connectionId,
-      }))), d => d.eventType === EConnectionInfoEventType.TypeCreate);
+      }))), d => d.status === EConnectionInfoEventType.TypeCreate);
 
     connectionInfoEventHandler.on<ResourceKeyList<IConnectionInfoParams>>(
       key => {
@@ -137,7 +137,7 @@ export class ConnectionInfoResource
       }, data => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
         projectId: data.projectId,
         connectionId,
-      }))), d => d.eventType === EConnectionInfoEventType.TypeUpdate);
+      }))), d => d.status === EConnectionInfoEventType.TypeUpdate);
 
     connectionInfoEventHandler.on<IConnectionInfoEvent>(
       data => {
@@ -158,7 +158,7 @@ export class ConnectionInfoResource
         } else {
           this.delete(key);
         }
-      }, undefined, d => d.eventType === EConnectionInfoEventType.TypeDelete);
+      }, undefined, d => d.status === EConnectionInfoEventType.TypeDelete);
 
     makeObservable<this, 'nodeIdMap' | 'updateConnection'>(this, {
       nodeIdMap: observable,

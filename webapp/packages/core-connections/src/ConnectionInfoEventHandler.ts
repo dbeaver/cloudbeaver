@@ -7,26 +7,20 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ISessionEvent, SessionEventSource, SessionEventType, TopicEventHandler } from '@cloudbeaver/core-root';
-import { CbEventStatus as EConnectionInfoEventType } from '@cloudbeaver/core-sdk';
+import { ISessionEvent, SessionEventSource, SessionEventTopic, TopicEventHandler } from '@cloudbeaver/core-root';
+import { CbEventStatus as EConnectionInfoEventType, CbDatasourceEvent as IConnectionInfoEvent } from '@cloudbeaver/core-sdk';
 
-export { EConnectionInfoEventType };
-
-export interface IConnectionInfoEvent {
-  eventType: EConnectionInfoEventType;
-  dataSourceIds: string[];
-  projectId: string;
-}
+export { EConnectionInfoEventType, type IConnectionInfoEvent };
 
 @injectable()
 export class ConnectionInfoEventHandler extends TopicEventHandler<IConnectionInfoEvent, ISessionEvent> {
   constructor(
     sessionEventSource: SessionEventSource
   ) {
-    super(SessionEventType.CbDatasourceUpdated, sessionEventSource);
+    super(SessionEventTopic.CbDatasource, sessionEventSource);
   }
 
   map(event: any): IConnectionInfoEvent {
-    return event.eventData;
+    return event;
   }
 }

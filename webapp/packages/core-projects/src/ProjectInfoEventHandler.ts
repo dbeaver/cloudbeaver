@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionEventSource, TopicEventHandler, ISessionEvent } from '@cloudbeaver/core-root';
+import { SessionEventSource, TopicEventHandler, ISessionEvent, ClientEventType, SessionEventTopic } from '@cloudbeaver/core-root';
 
 export type IProjectInfoEvent = void;
 
@@ -16,11 +16,11 @@ export class ProjectInfoEventHandler extends TopicEventHandler<IProjectInfoEvent
   constructor(
     sessionEventSource: SessionEventSource
   ) {
-    super('projects', sessionEventSource);
+    super(SessionEventTopic.CbProjects, sessionEventSource);
   }
 
   setActiveProjects(projects: string[]): void {
-    this.emit({ type: 'projects:active', projects });
+    this.emit({ type: ClientEventType.CbClientProjectsActive, projects });
   }
 
   map(): IProjectInfoEvent {

@@ -13,24 +13,25 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import {
   GraphQLService,
-  CbEvent,
-  CbEventType as SessionEventType,
   EnvironmentService,
+  CbEventTopic as SessionEventTopic,
+  CbServerEventType as ServerEventType,
+  CbClientEventType as ClientEventType,
 } from '@cloudbeaver/core-sdk';
 
 import type { IServerEventCallback, IServerEventEmitter, Subscription } from './ServerEventEmitter/IServerEventEmitter';
 
-export { SessionEventType };
+export { ServerEventType, SessionEventTopic, ClientEventType };
 
 export interface ISessionEvent {
-  type: string;
-  topic?: string;
+  type: ServerEventType | ClientEventType;
+  topic?: SessionEventTopic;
   [key: string]: any;
 }
 
 export interface ITopicSubEvent extends ISessionEvent {
-  type: 'topic:subscribe' | 'topic:unsubscribe';
-  topic: string;
+  type: ClientEventType.CbClientTopicSubscribe | ClientEventType.CbClientTopicUnsubscribe;
+  topic: SessionEventTopic;
 }
 
 const retryInterval = 5000;
@@ -97,8 +98,8 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent> {
   ): Observable<T> {
     return merge(
       this.subject.multiplex(
-        () => ({ type: 'topic:subscribe', topic } as ITopicSubEvent),
-        () => ({ type: 'topic:unsubscribe', topic } as ITopicSubEvent),
+        () => ({ type: ClientEventType.CbClientTopicSubscribe, topic } as ITopicSubEvent),
+        () => ({ type: ClientEventType.CbClientTopicUnsubscribe, topic } as ITopicSubEvent),
         event => event.topic === topic
       ),
       this.oldEventsSubject,
@@ -115,8 +116,8 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent> {
       maxEntries: 1000,
     });
 
-    for (const { eventType: type, ...rest } of events) {
-      this.oldEventsSubject.next({ type, ...rest });
+    for (const { eventType: type, eventData } of events) {
+      this.oldEventsSubject.next({ type: type as string, ...eventData });
     }
   }
 

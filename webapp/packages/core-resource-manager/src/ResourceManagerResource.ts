@@ -70,7 +70,7 @@ export class ResourceManagerResource
         path: this.getFolder(data.resourcePath),
         name: this.getResourceName(data.resourcePath),
       }),
-      d => d.eventType === EResourceManagerEventType.TypeCreate);
+      d => d.status === EResourceManagerEventType.TypeCreate);
 
     resourceManagerEventHandler.on<IResourceManagerParams>(
       key => {
@@ -93,7 +93,7 @@ export class ResourceManagerResource
         path: this.getFolder(data.resourcePath),
         name: this.getResourceName(data.resourcePath),
       }),
-      d => d.eventType === EResourceManagerEventType.TypeUpdate);
+      d => d.status === EResourceManagerEventType.TypeUpdate);
 
     resourceManagerEventHandler.on<IResourceManagerParams>(
       key => {
@@ -116,7 +116,7 @@ export class ResourceManagerResource
         path: this.getFolder(data.resourcePath),
         name: this.getResourceName(data.resourcePath),
       }),
-      d => d.eventType === EResourceManagerEventType.TypeDelete);
+      d => d.status === EResourceManagerEventType.TypeDelete);
   }
 
   getResourceName(resourcePath: string): string {

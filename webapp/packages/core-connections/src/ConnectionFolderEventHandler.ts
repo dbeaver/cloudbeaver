@@ -7,16 +7,10 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ISessionEvent, SessionEventSource, SessionEventType, TopicEventHandler } from '@cloudbeaver/core-root';
-import { CbEventStatus as EConnectionInfoEventType } from '@cloudbeaver/core-sdk';
+import { ISessionEvent, SessionEventSource, SessionEventTopic, TopicEventHandler } from '@cloudbeaver/core-root';
+import { CbEventStatus as EConnectionInfoEventType, CbDatasourceFolderEvent as IConnectionFolderEvent } from '@cloudbeaver/core-sdk';
 
-export { EConnectionInfoEventType };
-
-export interface IConnectionFolderEvent {
-  eventType: EConnectionInfoEventType;
-  nodePaths: string[];
-  projectId: string;
-}
+export { EConnectionInfoEventType, type IConnectionFolderEvent };
 
 @injectable()
 export class ConnectionFolderEventHandler
@@ -24,10 +18,10 @@ export class ConnectionFolderEventHandler
   constructor(
     sessionEventSource: SessionEventSource
   ) {
-    super(SessionEventType.CbDatasourceFolderUpdated, sessionEventSource);
+    super(SessionEventTopic.CbDatasourceFolder, sessionEventSource);
   }
 
   map(event: any): IConnectionFolderEvent {
-    return event.eventData;
+    return event;
   }
 }
