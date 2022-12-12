@@ -165,6 +165,38 @@ export enum AuthStatus {
   Success = 'SUCCESS'
 }
 
+export type CbClientEvent = {
+  topic?: Maybe<CbEventTopic>;
+  type: CbClientEventType;
+};
+
+export enum CbClientEventType {
+  CbClientProjectsActive = 'cb_client_projects_active',
+  CbClientTopicSubscribe = 'cb_client_topic_subscribe',
+  CbClientTopicUnsubscribe = 'cb_client_topic_unsubscribe'
+}
+
+export interface CbConfigEvent extends CbServerEvent {
+  topic?: Maybe<CbEventTopic>;
+  type: CbServerEventType;
+}
+
+export interface CbDatasourceEvent extends CbServerEvent {
+  dataSourceIds: Array<Scalars['String']>;
+  projectId: Scalars['String'];
+  status: CbEventStatus;
+  topic?: Maybe<CbEventTopic>;
+  type: CbServerEventType;
+}
+
+export interface CbDatasourceFolderEvent extends CbServerEvent {
+  nodePaths: Array<Scalars['String']>;
+  projectId: Scalars['String'];
+  status: CbEventStatus;
+  topic?: Maybe<CbEventTopic>;
+  type: CbServerEventType;
+}
+
 export interface CbEvent {
   eventData: Scalars['Object'];
   eventType: CbEventType;
@@ -181,11 +213,49 @@ export enum CbEventStatus {
   TypeUpdate = 'TYPE_UPDATE'
 }
 
+export enum CbEventTopic {
+  CbConfig = 'cb_config',
+  CbDatasource = 'cb_datasource',
+  CbDatasourceFolder = 'cb_datasource_folder',
+  CbRm = 'cb_rm'
+}
+
 export enum CbEventType {
   CbConfigChanged = 'cb_config_changed',
   CbDatasourceFolderUpdated = 'cb_datasource_folder_updated',
   CbDatasourceUpdated = 'cb_datasource_updated',
   CbRmResourceUpdated = 'cb_rm_resource_updated'
+}
+
+export interface CbProjectsActiveEvent extends CbClientEvent {
+  projects: Array<Scalars['String']>;
+  status: CbEventStatus;
+  topic?: Maybe<CbEventTopic>;
+  type: CbClientEventType;
+}
+
+export interface CbrmEvent extends CbServerEvent {
+  projectId: Scalars['String'];
+  resourcePath: Scalars['String'];
+  topic?: Maybe<CbEventTopic>;
+  type: CbServerEventType;
+}
+
+export type CbServerEvent = {
+  topic?: Maybe<CbEventTopic>;
+  type: CbServerEventType;
+};
+
+export enum CbServerEventType {
+  CbConfigChanged = 'cb_config_changed',
+  CbDatasourceFolderUpdated = 'cb_datasource_folder_updated',
+  CbDatasourceUpdated = 'cb_datasource_updated',
+  CbRmResourceUpdated = 'cb_rm_resource_updated'
+}
+
+export interface CbTopicEvent extends CbServerEvent {
+  topic: CbEventTopic;
+  type: CbServerEventType;
 }
 
 export interface ConnectionConfig {
@@ -419,6 +489,7 @@ export interface Mutation {
   createConnectionFromTemplate: ConnectionInfo;
   deleteConnection: Scalars['Boolean'];
   deleteConnectionFolder: Scalars['Boolean'];
+  emptyEventMutation?: Maybe<Scalars['Boolean']>;
   initConnection: ConnectionInfo;
   navDeleteNodes?: Maybe<Scalars['Int']>;
   navMoveNodesToFolder?: Maybe<Scalars['Boolean']>;
@@ -925,6 +996,7 @@ export interface Query {
   deleteUser?: Maybe<Scalars['Boolean']>;
   deleteUserMetaParameter: Scalars['Boolean'];
   driverList: Array<DriverInfo>;
+  emptyEvent?: Maybe<Scalars['Boolean']>;
   enableUser?: Maybe<Scalars['Boolean']>;
   getConnectionSubjectAccess: Array<AdminConnectionGrantInfo>;
   getSubjectConnectionAccess: Array<AdminConnectionGrantInfo>;

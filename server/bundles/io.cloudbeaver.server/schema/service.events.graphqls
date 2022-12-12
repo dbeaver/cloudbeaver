@@ -38,7 +38,7 @@ enum CBEventStatus {
 
 # Base server event interface
 interface CBServerEvent {
-    type: CBEventType!
+    type: CBServerEventType!
     topic: CBEventTopic
 }
 
@@ -50,11 +50,14 @@ interface CBClientEvent {
 
 # Topic subscription event
 type CBTopicEvent implements CBServerEvent {
+    type: CBServerEventType!
     topic: CBEventTopic! # topic to subscribe / unsubscribe
 }
 
 # Datasource folder event
 type CBDatasourceFolderEvent implements CBServerEvent {
+    type: CBServerEventType!
+    topic: CBEventTopic
     status: CBEventStatus!
     nodePaths: [String!]! # list of folders node ids
     projectId: String!
@@ -62,18 +65,31 @@ type CBDatasourceFolderEvent implements CBServerEvent {
 
 # Datasource event
 type CBDatasourceEvent implements CBServerEvent {
+    type: CBServerEventType!
+    topic: CBEventTopic
     status: CBEventStatus!
     dataSourceIds: [String!]! # list of datasources ids
     projectId: String!
 }
 
+# Resource manager event
 type CBRMEvent implements CBServerEvent {
+    type: CBServerEventType!
+    topic: CBEventTopic
     resourcePath: String!
     projectId: String!
 }
 
+# Server Config event
+type CBConfigEvent implements CBServerEvent {
+    type: CBServerEventType!
+    topic: CBEventTopic
+}
+
 # Active projects event
 type CBProjectsActiveEvent implements CBClientEvent {
+    type: CBClientEventType!
+    topic: CBEventTopic
     status: CBEventStatus!
     projects: [String!]! # list of active projects
 }
