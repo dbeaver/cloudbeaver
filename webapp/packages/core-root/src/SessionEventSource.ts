@@ -49,7 +49,6 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent> {
   private readonly openSubject: Subject<Event>;
   private readonly subject: WebSocketSubject<ISessionEvent>;
   private readonly oldEventsSubject: Subject<ISessionEvent>;
-  private listening: boolean;
 
   constructor(
     private readonly environmentService: EnvironmentService,
@@ -59,19 +58,13 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent> {
     this.oldEventsSubject = new Subject();
     this.closeSubject = new Subject();
     this.openSubject = new Subject();
-    this.listening = false;
     this.subject = webSocket({
       url: environmentService.wsEndpoint,
       closeObserver: this.closeSubject,
       openObserver: this.openSubject,
     });
 
-    this.closeSubject.subscribe(() => {
-      this.listen();
-    });
-
     this.openSubject.subscribe(() => {
-      this.listening = false;
       this.onInit.execute();
     });
 
@@ -109,44 +102,5 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent> {
   emit(event: ISessionEvent): this {
     this.subject.next(event);
     return this;
-  }
-
-  protected async listener(): Promise<void> {
-    const { events } = await this.graphQLService.sdk.getSessionEvents({
-      maxEntries: 1000,
-    });
-
-    for (const { eventType: type, eventData } of events) {
-      this.oldEventsSubject.next({ type: type as string, ...eventData });
-    }
-  }
-
-  private listen() {
-    if (this.listening) {
-      console.warn('Already listening events');
-      return;
-    }
-
-    this.listening = true;
-    let failedRequests = 0;
-    let interval = retryInterval;
-
-    const iteration = async () => {
-      try {
-        await this.listener();
-        failedRequests = 0;
-      } catch (exception: any) {
-        console.error(exception);
-        failedRequests++;
-      }
-
-      interval = retryInterval * Math.min((failedRequests || 1), 10);
-
-      if (this.listening) {
-        setTimeout(iteration, interval);
-      }
-    };
-
-    iteration();
   }
 }
