@@ -1,0 +1,88 @@
+####################################################
+# Events API
+####################################################
+
+# Events sent by server
+enum CBServerEventType {
+    cb_config_changed,
+    cb_datasource_updated,
+    cb_datasource_folder_updated,
+    cb_rm_resource_updated
+}
+
+# Events sent by client
+enum CBClientEventType {
+    cb_client_topic_subscribe,
+    cb_client_topic_unsubscribe,
+    cb_client_projects_active
+}
+
+# Client subscribes on topic to receive only related events
+enum CBEventTopic {
+    cb_config,
+    cb_datasource,
+    cb_datasource_folder,
+    cb_rm
+}
+
+enum CBEventResourceType {
+    RM_RESOURCE,
+    DATASOURCE
+}
+
+enum CBEventStatus {
+    TYPE_CREATE,
+    TYPE_DELETE,
+    TYPE_UPDATE
+}
+
+# Base server event interface
+interface CBServerEvent {
+    type: CBEventType!
+    topic: CBEventTopic
+}
+
+# Base client event interface
+interface CBClientEvent {
+    type: CBClientEventType!
+    topic: CBEventTopic
+}
+
+# Topic subscription event
+type CBTopicEvent implements CBServerEvent {
+    topic: CBEventTopic! # topic to subscribe / unsubscribe
+}
+
+# Datasource folder event
+type CBDatasourceFolderEvent implements CBServerEvent {
+    status: CBEventStatus!
+    nodePaths: [String!]! # list of folders node ids
+    projectId: String!
+}
+
+# Datasource event
+type CBDatasourceEvent implements CBServerEvent {
+    status: CBEventStatus!
+    dataSourceIds: [String!]! # list of datasources ids
+    projectId: String!
+}
+
+type CBRMEvent implements CBServerEvent {
+    resourcePath: String!
+    projectId: String!
+}
+
+# Active projects event
+type CBProjectsActiveEvent implements CBClientEvent {
+    status: CBEventStatus!
+    projects: [String!]! # list of active projects
+}
+
+extend type Query {
+    emptyEvent: Boolean
+}
+
+extend type Mutation {
+    emptyEventMutation: Boolean
+}
+

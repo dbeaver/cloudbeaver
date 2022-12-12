@@ -12,21 +12,21 @@ import { CbEventStatus as EResourceManagerEventType } from '@cloudbeaver/core-sd
 
 export { EResourceManagerEventType };
 
-export interface IConnectionInfoEvent {
+export interface IResourceManagerEvent {
   eventType: EResourceManagerEventType;
   resourcePath: string;
   projectId: string;
 }
 
 @injectable()
-export class ResourceManagerEventHandler extends TopicEventHandler<IConnectionInfoEvent, ISessionEvent> {
+export class ResourceManagerEventHandler extends TopicEventHandler<IResourceManagerEvent, ISessionEvent> {
   constructor(
     sessionEventSource: SessionEventSource
   ) {
     super(SessionEventType.CbRmResourceUpdated, sessionEventSource);
   }
 
-  map(event: any): IConnectionInfoEvent {
+  map(event: any): IResourceManagerEvent {
     return event.eventData;
   }
 }
