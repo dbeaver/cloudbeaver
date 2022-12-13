@@ -264,7 +264,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     if (tempConfig.name && state.mode === 'create') {
       const connections = await state.resource.load(CachedMapAllKey);
-      const connectionNames = connections.map(connection => connection.name);
+      const connectionNames = connections
+        .filter(connection => connection.projectId === state.projectId)
+        .map(connection => connection.name);
+
       tempConfig.name = getUniqueName(tempConfig.name, connectionNames);
     }
 
