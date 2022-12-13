@@ -38,8 +38,8 @@
     "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
     "@cloudbeaver/plugin-data-viewer": "~0.1.0",
-    "leaflet": "~1.9.1",
-    "react-leaflet": "~4.1.0",
+    "leaflet": "~1.9.3",
+    "react-leaflet": "~4.2.0",
     "wellknown": "~0.5.0"
   },
   "peerDependencies": {
@@ -50,6 +50,6 @@
   },
   "devDependencies": {
     "@types/react-leaflet": "~2.8.2",
-    "@types/wellknown": "~0.5.3"
+    "@types/wellknown": "~0.5.4"
   }
 }
