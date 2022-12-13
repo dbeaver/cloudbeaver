@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { filter, map, merge, Observable, Subject } from 'rxjs';
+import { Connectable, connectable, filter, map, merge, Observable, Subject } from 'rxjs';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import type { CachedResource } from '@cloudbeaver/core-sdk';
@@ -14,11 +14,19 @@ import { compose } from '@cloudbeaver/core-utils';
 
 import type { IServerEventCallback, IServerEventEmitter, Subscription } from './IServerEventEmitter';
 
+interface ISubscribedResourceInfo {
+  listeners: number;
+  subscription: Subscription;
+}
+
 export abstract class TopicEventHandler<TEvent, SourceEvent = void>
 implements IServerEventEmitter<TEvent, SourceEvent> {
   readonly onInit: ISyncExecutor;
-  readonly eventsSubject: Observable<TEvent>;
+  readonly eventsSubject: Connectable<TEvent>;
 
+  private subscription: Subscription | null;
+  private readonly activeResources: Array<CachedResource<any, any, any, any>>;
+  private readonly subscribedResources: Map<CachedResource<any, any, any, any>, ISubscribedResourceInfo>;
   private readonly serverSubject?: Observable<TEvent>;
   private readonly subject: Subject<TEvent>;
   constructor(
@@ -27,8 +35,11 @@ implements IServerEventEmitter<TEvent, SourceEvent> {
   ) {
     this.onInit = new SyncExecutor();
     this.subject = new Subject();
+    this.activeResources = [];
+    this.subscribedResources = new Map();
+    this.subscription = null;
     this.serverSubject = this.emitter.multiplex(topic, this.map);
-    this.eventsSubject = merge(this.subject, this.serverSubject);
+    this.eventsSubject = connectable(merge(this.subject, this.serverSubject));
 
     this.emitter.onInit.next(this.onInit);
   }
@@ -47,6 +58,7 @@ implements IServerEventEmitter<TEvent, SourceEvent> {
     callback: IServerEventCallback<T>,
     mapTo?: (param: TEvent) => T,
     filter?: (param: TEvent) => boolean,
+    resource?: CachedResource<any, any, any, any>,
   ): Subscription;
   on<T = TEvent>(
     resource: CachedResource<any, T, any, any>,
@@ -54,18 +66,24 @@ implements IServerEventEmitter<TEvent, SourceEvent> {
     filter?: (param: TEvent) => boolean,
   ): Subscription;
   on<T = TEvent>(
-    resource: CachedResource<any, T, any, any> | IServerEventCallback<T>,
+    resourceOrCallback: CachedResource<any, T, any, any> | IServerEventCallback<T>,
     mapTo: (param: TEvent) => T = event => event as unknown as T,
     filterFn: (param: TEvent) => boolean = () => true,
+    resource?: CachedResource<any, any, any, any>,
   ): Subscription {
     let handler: IServerEventCallback<T>;
 
-    if (typeof resource === 'function') {
-      handler = resource;
+    if (typeof resourceOrCallback === 'function') {
+      handler = resourceOrCallback;
     } else {
+      resource = resourceOrCallback;
       handler = event => {
-        resource.markOutdated(event);
+        resourceOrCallback.markOutdated(event);
       };
+    }
+
+    if (resource) {
+      this.registerResource(resource);
     }
 
     const sub = this.eventsSubject
@@ -74,12 +92,77 @@ implements IServerEventEmitter<TEvent, SourceEvent> {
 
     return () => {
       sub.unsubscribe();
+
+      if (resource) {
+        this.removeResource(resource);
+      }
     };
   }
 
   emit(event: SourceEvent): this {
     this.emitter.emit(event);
     return this;
+  }
+
+  private resourceUseHandler(resource: CachedResource<any, any, any, any>) {
+    const index = this.activeResources.indexOf(resource);
+
+    if (index !== -1) {
+      if (!resource.isResourceInUse) {
+        this.removeActiveResource(resource);
+      }
+    } else {
+      if (resource.isResourceInUse) {
+        this.activeResources.push(resource);
+
+        if (!this.subscription) {
+          // console.log('Subscribe: ', resource.getName());
+          const sub = this.eventsSubject.connect();
+          this.subscription = () => sub.unsubscribe();
+        }
+      }
+    }
+  }
+
+  private removeActiveResource(resource: CachedResource<any, any, any, any>) {
+    this.activeResources.splice(this.activeResources.indexOf(resource), 1);
+
+    if (this.activeResources.length === 0) {
+      // console.log('Unsubscribe: ', resource.getName());
+      this.subscription?.();
+      this.subscription = null;
+    }
+  }
+
+  private registerResource(resource: CachedResource<any, any, any, any>): void {
+    let info = this.subscribedResources.get(resource);
+
+    if (!info) {
+      info = {
+        listeners: 0,
+        subscription: this.resourceUseHandler.bind(this, resource),
+      };
+      this.subscribedResources.set(resource, info);
+      resource.onUse.addHandler(info.subscription);
+      // console.log('Register: ', resource.getName());
+    }
+
+    info.listeners++;
+  }
+
+  private removeResource(resource: CachedResource<any, any, any, any>): void {
+    const info = this.subscribedResources.get(resource);
+
+    if (info) {
+      info.listeners--;
+
+      if (info.listeners === 0) {
+        this.removeActiveResource(resource);
+        resource.onUse.removeHandler(info.subscription);
+        this.subscribedResources.delete(resource);
+        // console.log('Unregister: ', resource.getName());
+      }
+    }
   }
 
   protected abstract map(event: SourceEvent): TEvent;

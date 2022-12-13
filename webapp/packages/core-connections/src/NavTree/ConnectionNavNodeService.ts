@@ -58,7 +58,8 @@ export class ConnectionNavNodeService extends Dependency {
         this.navTreeResource.markTreeOutdated(resourceKeyList(parents));
       },
       undefined,
-      event => event.status === CbEventStatus.TypeCreate
+      event => event.status === CbEventStatus.TypeCreate,
+      this.navTreeResource
     );
     this.connectionFolderEventHandler.on<IConnectionFolderEvent>(
       data => {
@@ -71,14 +72,16 @@ export class ConnectionNavNodeService extends Dependency {
         this.navTreeResource.deleteInNode(resourceKeyList(parents), data.nodePaths);
       },
       undefined,
-      event => event.status === CbEventStatus.TypeDelete
+      event => event.status === CbEventStatus.TypeDelete,
+      this.navTreeResource
     );
     this.connectionFolderEventHandler.on<IConnectionFolderEvent>(
       data => {
         this.navTreeResource.markOutdated(resourceKeyList(data.nodePaths));
       },
       undefined,
-      event => event.status === CbEventStatus.TypeUpdate
+      event => event.status === CbEventStatus.TypeUpdate,
+      this.navTreeResource
     );
   }
 
@@ -113,7 +116,11 @@ export class ConnectionNavNodeService extends Dependency {
     }
   }
 
-  private connectionUpdateHandler(key: ResourceKey<IConnectionInfoParams>) {
+  private connectionUpdateHandler(key: ResourceKey<IConnectionInfoParams> | undefined) {
+    if (key === undefined) {
+      key = CachedMapAllKey;
+    }
+
     key = this.connectionInfoResource.transformParam(key);
     const outdatedTrees: string[] = [];
     const closedConnections: string[] = [];

@@ -102,6 +102,13 @@ export function useDataResource<
     loading: false,
     firstRender: true,
     prevData: (isResourceKeyList(key) ? [] : undefined) as CachedResourceData<TResource> | undefined,
+    useRef: [null, ''] as [TKeyArg | null, string],
+    use(key: TKeyArg | null) {
+      if (this.useRef[0] !== null) {
+        resource.free(this.useRef[0], this.useRef[1]);
+      }
+      this.useRef = [key, key === null ? '' : resource.use(key)];
+    },
     async [loadFunctionName](refresh?: boolean) {
       const { key, includes, loading, resource, actions, prevData } = this;
 
@@ -122,6 +129,7 @@ export function useDataResource<
         await actions?.onLoad?.(resource, key);
 
         if (key === null) {
+          setException(null);
           return;
         }
 
@@ -130,6 +138,7 @@ export function useDataResource<
         }
 
         const newData = await resource.load(key, includes as any);
+        this.use(key);
         setException(null);
 
         try {
@@ -207,6 +216,10 @@ export function useDataResource<
     && actions?.active !== false
     && !((!outdated && !refObj.firstRender) || refObj.key === null)
   ));
+
+  useEffect(() => () => {
+    refObj.use(null);
+  }, []);
 
   useEffect(() => {
     if (canLoad) {

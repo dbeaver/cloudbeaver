@@ -198,6 +198,7 @@ export function useMapResource<
     CachedMapResourceValue<TResource>,
     TIncludes
     > | undefined,
+    useRef: [null, ''] as [TKeyArg | null, string],
     get preloaded(): boolean {
       if (this.actions?.preload) {
         for (const preload of this.actions.preload) {
@@ -215,6 +216,12 @@ export function useMapResource<
         }
       }
       return true;
+    },
+    use(key: TKeyArg | null) {
+      if (this.useRef[0] !== null) {
+        resource.free(this.useRef[0], this.useRef[1]);
+      }
+      this.useRef = [key, key === null ? '' : resource.use(key)];
     },
     async [loadFunctionName](refresh?: boolean) {
       const { resource, actions, prevData } = this;
@@ -247,7 +254,7 @@ export function useMapResource<
         }
 
         const newData = await resource.load(key, includes as any);
-        setUse([key, resource.use(key)]);
+        this.use(key);
         this.prevData = newData;
 
         await actions?.onData?.(
@@ -388,12 +395,13 @@ export function useMapResource<
   ));
 
   useEffect(() => () => {
-    if (use[0] !== null) {
-      resource.free(use[0], use[1]);
-    }
-  }, [resource, use]);
+    refObj.use(null);
+  }, []);
 
   useEffect(() => {
+    if (keyRef.key === null) {
+      refObj.use(null);
+    }
     if (canLoad) {
       (refObj as any)[loadFunctionName]();
     }

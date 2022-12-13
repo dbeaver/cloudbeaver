@@ -58,7 +58,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
       this.syncQueue.add(
         this.dataSynchronizationService.requestSynchronization('server-config', 'Server Configuration')
       );
-    }, () => undefined);
+    }, () => undefined, undefined, this);
   }
 
   get redirectOnFederatedAuth(): boolean {

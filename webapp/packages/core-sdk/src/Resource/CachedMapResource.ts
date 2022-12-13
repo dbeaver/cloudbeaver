@@ -177,7 +177,14 @@ export abstract class CachedMapResource<
     });
   }
 
-  isOutdated(key: ResourceKey<TKey>): boolean {
+  isOutdated(key?: ResourceKey<TKey>): boolean {
+    if (key === undefined) {
+      return (
+        Array.from(this.metadata.values()).some(metadata => metadata.outdated)
+        && this.loadedKeys.length === 0
+      );
+    }
+
     if (this.isAlias(key) && !this.isAliasLoaded(key)) {
       return true;
     }

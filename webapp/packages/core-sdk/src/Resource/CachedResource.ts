@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, makeObservable, action } from 'mobx';
+import { observable, makeObservable, action, computed } from 'mobx';
 
 import { Dependency } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, IExecutorHandler, ISyncExecutor, SyncExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
@@ -48,7 +48,13 @@ export abstract class CachedResource<
 > extends Dependency {
   data: TData;
 
-  readonly onDataOutdated: ISyncExecutor<TParam>;
+  get isResourceInUse(): boolean {
+    return Array.from(this.metadata.values())
+      .some(metadata => metadata.dependencies.length > 0);
+  }
+
+  readonly onUse: ISyncExecutor;
+  readonly onDataOutdated: ISyncExecutor<TParam | undefined>;
   readonly onDataUpdate: ISyncExecutor<TParam>;
   readonly onDataError: ISyncExecutor<IDataError<TParam>>;
   readonly beforeLoad: IExecutor<TParam>;
@@ -89,9 +95,12 @@ export abstract class CachedResource<
     this.scheduler = new TaskScheduler(this.includes);
     this.data = defaultValue;
     this.beforeLoad = new Executor(null, this.includes);
-    this.onDataOutdated = new SyncExecutor<TParam>(null);
+    this.onUse = new SyncExecutor();
+    this.onDataOutdated = new SyncExecutor<TParam | undefined>(null);
     this.onDataUpdate = new SyncExecutor<TParam>(null);
     this.onDataError = new SyncExecutor<IDataError<TParam>>(null);
+
+    this.onUse.setInitialDataGetter(() => undefined);
 
     if (this.logActivity) {
       // this.spy(this.beforeLoad, 'beforeLoad');
@@ -106,6 +115,7 @@ export abstract class CachedResource<
     >(this, {
       loadedKeys: observable,
       data: observable,
+      isResourceInUse: computed,
       loader: action,
       markDataLoading: action,
       markDataLoaded: action,
@@ -118,12 +128,23 @@ export abstract class CachedResource<
       use: action,
       free: action,
     });
+
+    setInterval(() => {
+      // mark resource outdate when it's not used
+      if (!this.isResourceInUse && !this.isOutdated()) {
+        this.markOutdated();
+
+        if (this.logActivity) {
+          console.log('Resource outdated lazy: ', this.getName());
+        }
+      }
+    }, 5 * 60 * 1000);
   }
 
   sync<T = TParam>(
     resource: CachedResource<any, T, any, any>,
     mapTo?: (param: TParam) => T,
-    mapOut?: (param: T) => TParam
+    mapOut?: (param: T | undefined) => TParam
   ): void {
     resource.outdateResource(this, mapOut);
 
@@ -164,7 +185,7 @@ export abstract class CachedResource<
 
   outdateResource<T = TParam>(
     resource: CachedResource<any, T, any, any>,
-    map?: (param: TParam) => T
+    map?: (param: TParam | undefined) => T
   ): this {
     this.onDataOutdated.addHandler(param => {
       try {
@@ -235,6 +256,10 @@ export abstract class CachedResource<
     this.updateMetadata(param, metadata => {
       metadata.dependencies.push(id);
     });
+    this.onUse.execute();
+    if (this.logActivity) {
+      console.log('Use resource: ', this.getName(), param);
+    }
     return id;
   }
 
@@ -244,6 +269,11 @@ export abstract class CachedResource<
         metadata.dependencies = metadata.dependencies.filter(v => v !== id);
       }
     });
+    this.onUse.execute();
+
+    if (this.logActivity) {
+      console.log('Free resource: ', this.getName(), param);
+    }
   }
 
   abstract isLoaded(param: TParam, context: TContext): boolean;
@@ -299,7 +329,14 @@ export abstract class CachedResource<
     return this.getMetadata(param).exception;
   }
 
-  isOutdated(param: TParam): boolean {
+  isOutdated(param?: TParam): boolean {
+    if (param === undefined) {
+      return (
+        Array.from(this.metadata.values()).some(metadata => metadata.outdated)
+        && this.loadedKeys.length === 0
+      );
+    }
+
     if (this.isAlias(param) && !this.isAliasLoaded(param)) {
       return true;
     }
@@ -353,13 +390,15 @@ export abstract class CachedResource<
     });
   }
 
-  markOutdated(param: TParam): void {
-    if (this.scheduler.isExecuting(param) && !this.outdateWaitList.some(key => this.includes(param, key))) {
-      this.outdateWaitList.push(param);
+  markOutdated(param?: TParam): void {
+    const isKeyExecuting = param === undefined ? this.scheduler.executing : this.scheduler.isExecuting(param);
+
+    if (isKeyExecuting && !this.outdateWaitList.some(key => this.includes(param!, key))) {
+      this.outdateWaitList.push(param!);
       return;
     }
 
-    this.markOutdatedSync(param);
+    this.markOutdatedSync(param!);
   }
 
   markUpdated(param: TParam): void {
@@ -480,19 +519,31 @@ export abstract class CachedResource<
     this.data = data;
   }
 
-  protected markOutdatedSync(param: TParam): void {
-    if (this.isAlias(param)) {
-      const index = this.loadedKeys.findIndex(key => this.isAliasEqual(param, key));
-
-      if (index >= 0) {
-        this.loadedKeys.splice(index, 1);
+  protected markOutdatedSync(param?: TParam): void {
+    if (param === undefined) {
+      for (const param of this.metadata.keys()) {
+        this.updateMetadata(param as unknown as TParam, metadata => {
+          metadata.outdated = true;
+        });
       }
+      this.loadedKeys = [];
+      this.resetIncludes();
+    } else {
+
+      if (this.isAlias(param)) {
+        const index = this.loadedKeys.findIndex(key => this.isAliasEqual(param!, key));
+
+        if (index >= 0) {
+          this.loadedKeys.splice(index, 1);
+        }
+      }
+
+      param = this.transformParam(param);
+      this.updateMetadata(param, metadata => {
+        metadata.outdated = true;
+      });
     }
 
-    param = this.transformParam(param);
-    this.updateMetadata(param, metadata => {
-      metadata.outdated = true;
-    });
     this.onDataOutdated.execute(param);
   }
 
@@ -679,7 +730,7 @@ export abstract class CachedResource<
   };
 
   protected getActionPrefixedName(action: string): string {
-    return this.constructor.name + ': ' + action;
+    return this.getName() + ': ' + action;
   }
 
   private readonly logInterrupted = (action: string): IExecutorHandler<any> => (data, contexts) => {
