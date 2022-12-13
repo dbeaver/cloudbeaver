@@ -10,13 +10,13 @@ import { action, makeObservable, runInAction, toJS } from 'mobx';
 
 import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
+import { ConnectionInfoProjectKey, createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedMapAllKey, DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { getUniqueName, isValuesEqual } from '@cloudbeaver/core-utils';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
@@ -239,15 +239,13 @@ export class ConnectionOptionsTabService extends Bootstrap {
   }
 
   private async prepareConfig(
-    {
-      state,
-    }: IConnectionFormSubmitData,
+    { state }: IConnectionFormSubmitData,
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
     const config = contexts.getContext(connectionConfigContext);
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
 
-    if (!state.config.driverId) {
+    if (!state.config.driverId || !state.projectId) {
       return;
     }
 
@@ -263,10 +261,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
     tempConfig.name = state.config.name?.trim();
 
     if (tempConfig.name && state.mode === 'create') {
-      const connections = await state.resource.load(CachedMapAllKey);
-      const connectionNames = connections
-        .filter(connection => connection.projectId === state.projectId)
-        .map(connection => connection.name);
+      const connections = await state.resource.load(
+        ConnectionInfoProjectKey(state.projectId)
+      );
+      const connectionNames = connections.map(connection => connection.name);
 
       tempConfig.name = getUniqueName(tempConfig.name, connectionNames);
     }
