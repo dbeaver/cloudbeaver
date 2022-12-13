@@ -18,12 +18,12 @@
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-version": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",
-    "semver": "~7.3.7"
+    "semver": "~7.3.8"
   },
   "peerDependencies": {
     "mobx": "~6.x.x"
   },
   "devDependencies": {
-    "@types/semver": "~7.3.12"
+    "@types/semver": "~7.3.13"
   }
 }
