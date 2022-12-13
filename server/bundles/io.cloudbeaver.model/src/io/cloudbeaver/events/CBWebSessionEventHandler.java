@@ -16,26 +16,10 @@
  */
 package io.cloudbeaver.events;
 
-/**
- * CB event constants
- */
-public interface CBEventConstants {
+import org.jkiss.dbeaver.DBException;
 
-    enum EventType {
-        TYPE_CREATE,
-        TYPE_DELETE,
-        TYPE_UPDATE
-    }
+public interface CBWebSessionEventHandler {
+    void handeWebSessionEvent(CBEvent event) throws DBException;
 
-    interface ClientEvents {
-        String TOPIC_SUBSCRIBE = "cb_client_topic_subscribe";
-        String TOPIC_UNSUBSCRIBE = "cb_client_topic_unsubscribe";
-    }
-
-    String CLOUDBEAVER_CONFIG_CHANGED = "cb_config_changed";
-    String CLOUDBEAVER_DATASOURCE_UPDATED = "cb_datasource_updated";
-    String CLOUDBEAVER_DATASOURCE_FOLDER_UPDATED = "cb_datasource_folder_updated";
-    String CLOUDBEAVER_RM_RESOURCE_UPDATED = "cb_rm_resource_updated";
-
-
+    void close();
 }

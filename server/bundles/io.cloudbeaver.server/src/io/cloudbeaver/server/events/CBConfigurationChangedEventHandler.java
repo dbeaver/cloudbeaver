@@ -21,10 +21,8 @@ import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.events.CBEventHandler;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.service.session.WebSessionManager;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.utils.CommonUtils;
 
 import java.util.Collection;
 
@@ -46,9 +44,9 @@ public class CBConfigurationChangedEventHandler implements CBEventHandler {
         Collection<WebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
 
         for (WebSession activeUserSession : allSessions) {
-            if (CommonUtils.equalObjects(activeUserSession.getSessionId(), event.getSessionId())) {
-                continue;
-            }
+//            if (CommonUtils.equalObjects(activeUserSession.getSessionId(), event.getSessionId())) {
+//                continue;
+//            }
             activeUserSession.addSessionEvent(event);
         }
     }

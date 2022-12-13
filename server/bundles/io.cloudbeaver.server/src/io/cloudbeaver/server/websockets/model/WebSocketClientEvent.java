@@ -14,28 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.events;
+package io.cloudbeaver.server.websockets.model;
 
-/**
- * CB event constants
- */
-public interface CBEventConstants {
+public class WebSocketClientEvent {
+    private final String type;
+    private final String topic;
 
-    enum EventType {
-        TYPE_CREATE,
-        TYPE_DELETE,
-        TYPE_UPDATE
+    public WebSocketClientEvent(String type, String topic) {
+        this.type = type;
+        this.topic = topic;
     }
 
-    interface ClientEvents {
-        String TOPIC_SUBSCRIBE = "cb_client_topic_subscribe";
-        String TOPIC_UNSUBSCRIBE = "cb_client_topic_unsubscribe";
+    public String getType() {
+        return type;
     }
 
-    String CLOUDBEAVER_CONFIG_CHANGED = "cb_config_changed";
-    String CLOUDBEAVER_DATASOURCE_UPDATED = "cb_datasource_updated";
-    String CLOUDBEAVER_DATASOURCE_FOLDER_UPDATED = "cb_datasource_folder_updated";
-    String CLOUDBEAVER_RM_RESOURCE_UPDATED = "cb_rm_resource_updated";
-
-
+    public String getTopic() {
+        return topic;
+    }
 }

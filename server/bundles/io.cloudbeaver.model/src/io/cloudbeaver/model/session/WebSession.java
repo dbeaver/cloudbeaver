@@ -22,6 +22,7 @@ import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.events.CBEvent;
 import io.cloudbeaver.events.CBEventConstants;
+import io.cloudbeaver.events.CBWebSessionEventHandler;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -55,16 +56,17 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
-import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
-import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.SMConstants;
+import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
-import org.jkiss.dbeaver.registry.BaseProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -77,6 +79,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -127,7 +130,8 @@ public class WebSession extends AbstractSessionPersistent
     private final WebApplication application;
     private final Map<String, DBWSessionHandler> sessionHandlers;
     private final WebUserContext userContext;
-    private final List<CBEvent> sessionEvents = new ArrayList<>();
+    private final List<CBWebSessionEventHandler> sessionEventHandlers = new ArrayList<>();
+    private final Set<String> activeEventTopics = new CopyOnWriteArraySet<>();
 
     private RMController rmController;
 
@@ -641,6 +645,9 @@ public class WebSession extends AbstractSessionPersistent
             this.defaultProject.dispose();
             this.defaultProject = null;
         }
+        for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
+            sessionEventHandler.close();
+        }
         super.close();
     }
 
@@ -759,24 +766,36 @@ public class WebSession extends AbstractSessionPersistent
     }
 
     public void addSessionEvent(CBEvent event) {
-        synchronized (sessionEvents) {
-            sessionEvents.add(event);
+        synchronized (sessionEventHandlers) {
+            for (CBWebSessionEventHandler eventHandler : sessionEventHandlers) {
+                try {
+                    eventHandler.handeWebSessionEvent(event);
+                } catch (DBException e) {
+                    log.error(e.getMessage(), e);
+                    addSessionError(e);
+                }
+            }
         }
     }
 
-    public List<CBEvent> getSessionEvents(int eventsCount) {
-        synchronized (sessionEvents) {
-            List<CBEvent> result;
-            if (sessionEvents.size() <= eventsCount) {
-                result = List.copyOf(sessionEvents);
-                sessionEvents.clear();
-            } else {
-                var subList = sessionEvents.subList(0, eventsCount - 1);
-                result = List.copyOf(subList);
-                subList.clear();
-            }
-            return result;
+    public void addEventHandler(@NotNull CBWebSessionEventHandler handler) {
+        synchronized (sessionEventHandlers) {
+            sessionEventHandlers.add(handler);
         }
+    }
+
+    public void removeEventHandler(@NotNull CBWebSessionEventHandler handler) {
+        synchronized (sessionEventHandlers) {
+            sessionEventHandlers.remove(handler);
+        }
+    }
+
+    public void subscribeOnEventTopic(@NotNull String topic) {
+        activeEventTopics.add(topic);
+    }
+
+    public void unsubscribeFromEventTopic(@NotNull String topic) {
+        activeEventTopics.remove(topic);
     }
 
     public List<WebServerMessage> readLog(Integer maxEntries, Boolean clearLog) {

@@ -22,6 +22,7 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  com.google.gson;visibility:=reexport,
  org.jkiss.bundle.graphql.java;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp,
+ org.jkiss.bundle.jetty.websocket,
  org.jkiss.dbeaver.net.ssh,
  io.cloudbeaver.model;visibility:=reexport,
  io.cloudbeaver.service.security;visibility:=reexport
