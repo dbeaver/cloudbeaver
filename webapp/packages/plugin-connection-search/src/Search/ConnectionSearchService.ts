@@ -39,7 +39,7 @@ export class ConnectionSearchService {
     private readonly commonDialogService: CommonDialogService,
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
-    private readonly connectionsManagerService: ConnectionsManagerService
+    private readonly connectionsManagerService: ConnectionsManagerService,
   ) {
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
 

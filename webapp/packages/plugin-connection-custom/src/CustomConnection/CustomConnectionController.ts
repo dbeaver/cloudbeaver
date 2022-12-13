@@ -21,7 +21,7 @@ export class CustomConnectionController implements IInitializableController {
   onClose!: () => void;
 
   get drivers(): DBDriver[] {
-    return this.dbDriverResource.enabledDrivers.slice().sort(this.dbDriverResource.compare);
+    return this.dbDriverResource.enabledDrivers;
   }
 
   constructor(

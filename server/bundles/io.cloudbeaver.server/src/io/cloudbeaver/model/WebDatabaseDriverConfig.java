@@ -219,7 +219,7 @@ public class WebDatabaseDriverConfig {
     @Property
     public String getDefaultAuthModel() {
         for (DBPAuthModelDescriptor am : DataSourceProviderRegistry.getInstance().getApplicableAuthModels(driver)) {
-            if (am.isDefaultModel()) {
+            if (!am.isDesktopModel() && am.isDefaultModel()) {
                 return am.getId();
             }
         }

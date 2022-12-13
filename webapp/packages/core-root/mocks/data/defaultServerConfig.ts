@@ -114,7 +114,7 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
     'productInfo': {
       'id': 'io.cloudbeaver.product.ce.product',
       'version': '22.1.2.202207140640',
-      'latestVersionInfo': 'https://cloudbeaver.io/product/cloudbeaver-ce-version.json',
+      'latestVersionInfo': 'https://dbeaver.com/product/cloudbeaver-ce-version.json',
       'name': 'CloudBeaver CE Server',
       'description': 'Cloudbeaver Web UI Application',
       'buildTime': 'July 14, 2022',
