@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.events;
+package io.cloudbeaver.websocket;
 
-import io.cloudbeaver.events.registry.CBEventHandlersRegistry;
+import io.cloudbeaver.websocket.event.WSEvent;
+import io.cloudbeaver.websocket.registry.WSEventHandlersRegistry;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
@@ -29,21 +30,21 @@ import java.util.List;
 import java.util.Map;
 
 public class CBEventController {
-    private final Map<String, List<CBEventHandler>> eventHandlersByType = new HashMap<>();
+    private final Map<String, List<WSEventHandler>> eventHandlersByType = new HashMap<>();
 
     public CBEventController() {
-        var eventHandlers = CBEventHandlersRegistry.getInstance().getEventHandlers();
+        var eventHandlers = WSEventHandlersRegistry.getInstance().getEventHandlers();
 
         eventHandlers
             .forEach(handler -> eventHandlersByType.computeIfAbsent(handler.getSupportedEventType(), x -> new ArrayList<>()).add(handler));
     }
 
-    private final List<CBEvent> eventsPool = new ArrayList<>();
+    private final List<WSEvent> eventsPool = new ArrayList<>();
 
     /**
      * Add cb event to the event pool
      */
-    public void addEvent(@NotNull CBEvent event) {
+    public void addEvent(@NotNull WSEvent event) {
         synchronized (eventsPool) {
             eventsPool.add(event);
         }
@@ -65,7 +66,7 @@ public class CBEventController {
 
         @Override
         protected IStatus run(DBRProgressMonitor monitor) {
-            List<CBEvent> events;
+            List<WSEvent> events;
 
             synchronized (eventsPool) {
                 events = List.copyOf(eventsPool);
@@ -75,8 +76,8 @@ public class CBEventController {
                 schedule(CHECK_PERIOD);
                 return Status.OK_STATUS;
             }
-            for (CBEvent event : events) {
-                eventHandlersByType.getOrDefault(event.getEventType(), List.of())
+            for (WSEvent event : events) {
+                eventHandlersByType.getOrDefault(event.getId(), List.of())
                     .forEach(handler -> handler.handleEvent(event));
             }
             schedule(CHECK_PERIOD);

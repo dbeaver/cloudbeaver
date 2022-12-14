@@ -14,12 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.events;
+package io.cloudbeaver.websocket;
 
-import org.jkiss.dbeaver.DBException;
+public class WSUtils {
 
-public interface CBWebSessionEventHandler {
-    void handeWebSessionEvent(CBEvent event) throws DBException;
-
-    void close();
 }

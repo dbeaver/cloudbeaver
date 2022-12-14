@@ -16,38 +16,37 @@
  */
 package io.cloudbeaver.server.events;
 
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
-import io.cloudbeaver.events.CBEventHandler;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.websocket.WSEventHandler;
+import io.cloudbeaver.websocket.event.WSEvent;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.Collection;
 
 /**
- * Notify all active user session that configuration has been changed
+ * Notify all active user session that project has been updated
  */
-public class CBConfigurationChangedEventHandler implements CBEventHandler {
-    private static final Log log = Log.getLog(CBConfigurationChangedEventHandler.class);
+public abstract class WSProjectUpdatedEventHandler implements WSEventHandler {
+    private static final Log log = Log.getLog(WSProjectUpdatedEventHandler.class);
 
     @NotNull
     @Override
-    public String getSupportedEventType() {
-        return CBEventConstants.CLOUDBEAVER_CONFIG_CHANGED;
-    }
+    public abstract String getSupportedEventType();
 
     @Override
-    public void handleEvent(@NotNull CBEvent event) {
+    public void handleEvent(@NotNull WSEvent event) {
         log.debug(getSupportedEventType() + " event handled");
         Collection<WebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
-
         for (WebSession activeUserSession : allSessions) {
-//            if (CommonUtils.equalObjects(activeUserSession.getSessionId(), event.getSessionId())) {
-//                continue;
-//            }
-            activeUserSession.addSessionEvent(event);
+            if (CommonUtils.equalObjects(activeUserSession.getSessionId(), event.getSessionId())) {
+                continue;
+            }
+            updateSessionData(activeUserSession, event);
         }
     }
+
+    protected abstract void updateSessionData(WebSession activeUserSession, WSEvent event);
 }

@@ -21,9 +21,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
-import io.cloudbeaver.events.CBEventController;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -39,6 +36,8 @@ import io.cloudbeaver.service.security.EmbeddedSecurityControllerFactory;
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.websocket.CBEventController;
+import io.cloudbeaver.websocket.event.WSServerConfigurationChangedEvent;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.jkiss.code.NotNull;
@@ -834,7 +833,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         if (credentialsProvider instanceof WebSession) {
             sessionId = ((WebSession) credentialsProvider).getSessionId();
         }
-        eventController.addEvent(new CBEvent(CBEventConstants.CLOUDBEAVER_CONFIG_CHANGED, sessionId));
+        eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId));
     }
 
     protected Map<String, Object> readRuntimeConfigurationProperties() throws DBException {

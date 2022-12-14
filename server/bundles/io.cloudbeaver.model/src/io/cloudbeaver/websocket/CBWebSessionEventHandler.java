@@ -14,22 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.events;
+package io.cloudbeaver.websocket;
 
-import org.jkiss.code.NotNull;
+import io.cloudbeaver.websocket.event.WSEvent;
+import org.jkiss.dbeaver.DBException;
 
-/**
- * CB web event handlers
- */
-public interface CBEventHandler {
-    /**
-     * Expected cb event type
-     */
-    @NotNull
-    String getSupportedEventType();
+public interface CBWebSessionEventHandler {
+    void handeWebSessionEvent(WSEvent event) throws DBException;
 
-    /**
-     * Handle associated cb event
-     */
-    void handleEvent(@NotNull CBEvent event);
+    void close();
 }

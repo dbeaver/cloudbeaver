@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.events.registry;
+package io.cloudbeaver.websocket.registry;
 
-import io.cloudbeaver.events.CBEventHandler;
+import io.cloudbeaver.websocket.WSEventHandler;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.code.NotNull;
@@ -25,35 +25,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CBEventHandlersRegistry {
+public class WSEventHandlersRegistry {
     private static final String EXTENSION_ID = "io.cloudbeaver.event.handler";
     private static final String EVENT_HANDLER_TAG = "eventHandler";
-    private static CBEventHandlersRegistry instance = null;
+    private static WSEventHandlersRegistry instance = null;
 
-    public synchronized static CBEventHandlersRegistry getInstance() {
+    public synchronized static WSEventHandlersRegistry getInstance() {
         if (instance == null) {
-            instance = new CBEventHandlersRegistry();
+            instance = new WSEventHandlersRegistry();
         }
         return instance;
     }
 
     @NotNull
-    public List<CBEventHandler> getEventHandlers() {
-        List<CBEventHandlerDescriptor> eventHandlerDescriptors = readDescriptors();
+    public List<WSEventHandler> getEventHandlers() {
+        List<WSEventHandlerDescriptor> eventHandlerDescriptors = readDescriptors();
 
         return eventHandlerDescriptors.stream()
-            .map(CBEventHandlerDescriptor::getInstance)
+            .map(WSEventHandlerDescriptor::getInstance)
             .collect(Collectors.toList());
     }
 
     @NotNull
-    private List<CBEventHandlerDescriptor> readDescriptors() {
-        var result = new ArrayList<CBEventHandlerDescriptor>();
+    private List<WSEventHandlerDescriptor> readDescriptors() {
+        var result = new ArrayList<WSEventHandlerDescriptor>();
         var registry = Platform.getExtensionRegistry();
         for (IConfigurationElement ext : registry.getConfigurationElementsFor(EXTENSION_ID)) {
             // Load webServices
             if (EVENT_HANDLER_TAG.equals(ext.getName())) {
-                result.add(new CBEventHandlerDescriptor(ext));
+                result.add(new WSEventHandlerDescriptor(ext));
             }
         }
         return result;

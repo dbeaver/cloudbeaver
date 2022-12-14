@@ -21,7 +21,6 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
@@ -33,6 +32,7 @@ import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import io.cloudbeaver.utils.WebEventUtils;
+import io.cloudbeaver.websocket.WSConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -398,7 +398,7 @@ public class WebServiceCore implements DBWServiceCore {
             webSession.getProjectById(projectId),
             webSession.getSessionId(),
             connectionInfo.getId(),
-            CBEventConstants.EventType.TYPE_CREATE
+            WSConstants.EventAction.CREATE
         );
         return connectionInfo;
     }
@@ -452,7 +452,7 @@ public class WebServiceCore implements DBWServiceCore {
                 webSession.getProjectById(projectId),
                 webSession.getSessionId(),
                 connectionInfo.getId(),
-                CBEventConstants.EventType.TYPE_UPDATE
+                WSConstants.EventAction.UPDATE
             );
         }
         return connectionInfo;
@@ -490,7 +490,7 @@ public class WebServiceCore implements DBWServiceCore {
             webSession.getProjectById(projectId),
             webSession.getSessionId(),
             connectionId,
-            CBEventConstants.EventType.TYPE_DELETE
+            WSConstants.EventAction.DELETE
         );
         return true;
     }
@@ -571,7 +571,7 @@ public class WebServiceCore implements DBWServiceCore {
                 webSession.getProjectById(projectId),
                 webSession.getSessionId(),
                 connectionInfo.getId(),
-                CBEventConstants.EventType.TYPE_CREATE
+                WSConstants.EventAction.CREATE
             );
             return connectionInfo;
         } catch (DBException e) {
@@ -774,7 +774,7 @@ public class WebServiceCore implements DBWServiceCore {
                 session.getProjectById(projectId),
                 session.getSessionId(),
                 DBNLocalFolder.makeLocalFolderItemPath(newFolder),
-                CBEventConstants.EventType.TYPE_CREATE
+                WSConstants.EventAction.CREATE
             );
             return folderInfo;
         } catch (DBException e) {
@@ -799,13 +799,13 @@ public class WebServiceCore implements DBWServiceCore {
             session.getProjectById(projectId),
             session.getSessionId(),
             oldFolderNode,
-            CBEventConstants.EventType.TYPE_DELETE
+            WSConstants.EventAction.DELETE
         );
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             session.getProjectById(projectId),
             session.getSessionId(),
             newFolderNode,
-            CBEventConstants.EventType.TYPE_CREATE
+            WSConstants.EventAction.CREATE
         );
         return folderInfo;
     }
@@ -830,7 +830,7 @@ public class WebServiceCore implements DBWServiceCore {
                 session.getProjectById(projectId),
                 session.getSessionId(),
                 folderNode,
-                CBEventConstants.EventType.TYPE_DELETE
+                WSConstants.EventAction.DELETE
             );
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
@@ -850,7 +850,7 @@ public class WebServiceCore implements DBWServiceCore {
             webSession.getProjectById(projectId),
             webSession.getSessionId(),
             id,
-            CBEventConstants.EventType.TYPE_UPDATE);
+            WSConstants.EventAction.UPDATE);
         return connectionInfo;
     }
 

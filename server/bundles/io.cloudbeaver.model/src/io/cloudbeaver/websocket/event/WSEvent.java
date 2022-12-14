@@ -14,41 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.events;
+package io.cloudbeaver.websocket.event;
 
+import io.cloudbeaver.websocket.WSConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 
-import java.util.Map;
-
 /**
- * CloudBeaver event
+ * Base websocket event
  */
-public class CBEvent {
+public abstract class WSEvent {
     @Nullable
     private final String sessionId;
     @NotNull
-    private final String eventType;
+    private final String id;
     @NotNull
-    private final Map<String, Object> eventData;
+    private final String topic;
 
-    public CBEvent(@NotNull String eventType) {
-        this(eventType, null, Map.of());
+    protected WSEvent(@NotNull WSConstants.Event event) {
+        this(event, null);
     }
 
-    public CBEvent(@NotNull String eventType, @Nullable String sessionId) {
-        this(eventType, sessionId, Map.of());
+    protected WSEvent(@NotNull WSConstants.Event event, @Nullable String sessionId) {
+        this(event.getEventId(), event.getTopic().getTopicId(), sessionId);
     }
 
-    public CBEvent(@NotNull String eventType, @Nullable String sessionId, @NotNull Map<String, Object> eventData) {
-        this.eventType = eventType;
+    protected WSEvent(@NotNull String id, @NotNull String topic, @Nullable String sessionId) {
         this.sessionId = sessionId;
-        this.eventData = eventData;
+        this.id = id;
+        this.topic = topic;
     }
 
     @NotNull
-    public String getEventType() {
-        return eventType;
+    public String getId() {
+        return id;
     }
 
     @Nullable
@@ -57,7 +56,7 @@ public class CBEvent {
     }
 
     @NotNull
-    public Map<String, Object> getEventData() {
-        return eventData;
+    public String getTopic() {
+        return topic;
     }
 }

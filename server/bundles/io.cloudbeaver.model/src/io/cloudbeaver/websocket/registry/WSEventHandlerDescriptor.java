@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.events.registry;
+package io.cloudbeaver.websocket.registry;
 
-import io.cloudbeaver.events.CBEventHandler;
+import io.cloudbeaver.websocket.WSEventHandler;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -25,18 +25,18 @@ import org.jkiss.dbeaver.model.impl.AbstractDescriptor;
 /**
  * CB event handler descriptor
  */
-public class CBEventHandlerDescriptor extends AbstractDescriptor {
+public class WSEventHandlerDescriptor extends AbstractDescriptor {
     private final ObjectType implType;
 
-    protected CBEventHandlerDescriptor(IConfigurationElement contributorConfig) {
+    protected WSEventHandlerDescriptor(IConfigurationElement contributorConfig) {
         super(contributorConfig);
         this.implType = new ObjectType(contributorConfig, "class");
     }
 
     @NotNull
-    public CBEventHandler getInstance() {
+    public WSEventHandler getInstance() {
         try {
-            return implType.createInstance(CBEventHandler.class);
+            return implType.createInstance(WSEventHandler.class);
         } catch (DBException e) {
             throw new IllegalStateException("Can not instantiate event handler '" + implType.getImplName() + "'", e);
         }

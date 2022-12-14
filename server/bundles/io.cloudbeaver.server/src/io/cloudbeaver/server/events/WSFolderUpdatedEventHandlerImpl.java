@@ -17,30 +17,31 @@
 package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.websocket.WSConstants;
+import io.cloudbeaver.websocket.event.WSDataSourceFolderUpdateEvent;
+import io.cloudbeaver.websocket.event.WSEvent;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.data.json.JSONUtils;
-
-import java.util.List;
+import org.jkiss.utils.CommonUtils;
 
 /**
  * Notify all active user session that datasource has been updated
  */
-public class CBFolderUpdatedEventHandlerImpl extends CBProjectUpdatedEventHandler {
+public class WSFolderUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler {
     @NotNull
     @Override
     public String getSupportedEventType() {
-        return CBEventConstants.CLOUDBEAVER_DATASOURCE_FOLDER_UPDATED;
+        return WSConstants.CLOUDBEAVER_DATASOURCE_FOLDER_UPDATED;
     }
 
     @Override
-    protected void updateSessionData(WebSession activeUserSession, CBEvent event) {
-        String projectId = JSONUtils.getString(event.getEventData(), "projectId");
-        List<String> nodePaths = JSONUtils.getStringList(event.getEventData(), "nodePaths");
-        WebProjectImpl project = activeUserSession.getProjectById(projectId);
-        if (project == null || nodePaths.isEmpty()) {
+    protected void updateSessionData(WebSession activeUserSession, WSEvent event) {
+        if (!(event instanceof WSDataSourceFolderUpdateEvent)) {
+            return;
+        }
+        var dsFolderUpdateEvent = (WSDataSourceFolderUpdateEvent) event;
+        WebProjectImpl project = activeUserSession.getProjectById(dsFolderUpdateEvent.getProjectId());
+        if (project == null || CommonUtils.isEmpty(dsFolderUpdateEvent.getNodePaths())) {
             return;
         }
 

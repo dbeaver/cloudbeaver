@@ -20,9 +20,6 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
-import io.cloudbeaver.events.CBWebSessionEventHandler;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -33,6 +30,9 @@ import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebDataSourceUtils;
+import io.cloudbeaver.websocket.CBWebSessionEventHandler;
+import io.cloudbeaver.websocket.WSConstants;
+import io.cloudbeaver.websocket.event.WSEvent;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -294,16 +294,16 @@ public class WebSession extends AbstractSessionPersistent
     /**
      * updates connections based on event in web session
      *
-     * @param project project of connection
+     * @param project       project of connection
      * @param connectionIds list of updated connections
-     * @param type type of event
+     * @param type          type of event
      */
-    public synchronized void updateProjectConnection(DBPProject project, List<String> connectionIds, CBEventConstants.EventType type) {
+    public synchronized void updateProjectConnection(DBPProject project, List<String> connectionIds, WSConstants.EventAction type) {
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         registry.refreshConfig();
         for (String connectionId : connectionIds) {
             switch (type) {
-                case TYPE_CREATE:
+                case CREATE:
                     DBPDataSourceContainer container = registry.getDataSource(connectionId);
                     if (container == null) {
                         break;
@@ -311,7 +311,7 @@ public class WebSession extends AbstractSessionPersistent
                     WebConnectionInfo connectionInfo = new WebConnectionInfo(this, registry.getDataSource(connectionId));
                     this.connections.put(connectionInfo.getId(), connectionInfo);
                     break;
-                case TYPE_DELETE:
+                case DELETE:
                     this.connections.remove(connectionId);
                     break;
                 default:
@@ -765,7 +765,7 @@ public class WebSession extends AbstractSessionPersistent
         addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.INFO, message));
     }
 
-    public void addSessionEvent(CBEvent event) {
+    public void addSessionEvent(WSEvent event) {
         synchronized (sessionEventHandlers) {
             for (CBWebSessionEventHandler eventHandler : sessionEventHandlers) {
                 try {

@@ -18,10 +18,10 @@ package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.events.CBEventController;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebWorkspace;
+import io.cloudbeaver.websocket.CBEventController;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;

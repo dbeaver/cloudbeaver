@@ -17,35 +17,30 @@
 package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.websocket.WSConstants;
+import io.cloudbeaver.websocket.event.WSDataSourceUpdateEvent;
+import io.cloudbeaver.websocket.event.WSEvent;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.data.json.JSONUtils;
-
-import java.util.List;
 
 /**
  * Notify all active user session that datasource has been updated
  */
-public class CBDataSourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHandler {
+public class WSDataSourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler {
     @NotNull
     @Override
     public String getSupportedEventType() {
-        return CBEventConstants.CLOUDBEAVER_DATASOURCE_UPDATED;
+        return WSConstants.Event.DATASOURCE_UPDATED.getEventId();
     }
 
     @Override
-    protected void updateSessionData(WebSession activeUserSession, CBEvent event) {
-        String projectId = JSONUtils.getString(event.getEventData(), "projectId");
-        List<String> dataSourceIds = JSONUtils.getStringList(event.getEventData(), "dataSourceIds");
-        CBEventConstants.EventType eventType =
-            CBEventConstants.EventType.valueOf(JSONUtils.getString(event.getEventData(), "eventType"));
-        WebProjectImpl project = activeUserSession.getProjectById(projectId);
+    protected void updateSessionData(WebSession activeUserSession, WSEvent event) {
+        var dsUpdateEvent = (WSDataSourceUpdateEvent) event;
+        WebProjectImpl project = activeUserSession.getProjectById(dsUpdateEvent.getProjectId());
         if (project == null) {
             return;
         }
-        activeUserSession.updateProjectConnection(project, dataSourceIds, eventType);
+        activeUserSession.updateProjectConnection(project, dsUpdateEvent.getDatasourceIds(), dsUpdateEvent.getAction());
         activeUserSession.addSessionEvent(event);
     }
 }

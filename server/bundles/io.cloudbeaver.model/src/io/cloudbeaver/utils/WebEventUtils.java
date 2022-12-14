@@ -16,13 +16,13 @@
  */
 package io.cloudbeaver.utils;
 
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
+import io.cloudbeaver.websocket.WSConstants;
+import io.cloudbeaver.websocket.event.WSDataSourceFolderUpdateEvent;
+import io.cloudbeaver.websocket.event.WSDataSourceUpdateEvent;
+import io.cloudbeaver.websocket.event.WSResourceUpdatedEvent;
 import org.jkiss.dbeaver.model.app.DBPProject;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class WebEventUtils {
     /**
@@ -31,23 +31,23 @@ public class WebEventUtils {
      * @param project      project of updated database
      * @param sessionId    session id
      * @param datasourceId id of datasource
-     * @param eventType    type of event
+     * @param eventAction  type of event
      */
     public static void addDataSourceUpdatedEvent(
         DBPProject project,
         String sessionId,
         String datasourceId,
-        CBEventConstants.EventType eventType) {
+        WSConstants.EventAction eventAction
+    ) {
         if (project == null) {
             return;
         }
         WebAppUtils.getWebApplication().getEventController().addEvent(
-            new CBEvent(
-                CBEventConstants.CLOUDBEAVER_DATASOURCE_UPDATED,
+            new WSDataSourceUpdateEvent(
                 sessionId,
-                Map.of("projectId", project.getId(),
-                    "dataSourceIds", List.of(datasourceId),
-                    "eventType", eventType)
+                project.getId(),
+                List.of(datasourceId),
+                eventAction
             )
         );
     }
@@ -56,17 +56,17 @@ public class WebEventUtils {
         DBPProject project,
         String sessionId,
         String nodePath,
-        CBEventConstants.EventType eventType) {
+        WSConstants.EventAction eventAction
+    ) {
         if (project == null) {
             return;
         }
         WebAppUtils.getWebApplication().getEventController().addEvent(
-            new CBEvent(
-                CBEventConstants.CLOUDBEAVER_DATASOURCE_FOLDER_UPDATED,
+            new WSDataSourceFolderUpdateEvent(
                 sessionId,
-                Map.of("projectId", project.getId(),
-                    "nodePaths", List.of(nodePath),
-                    "eventType", eventType)
+                project.getId(),
+                List.of(nodePath),
+                eventAction
             )
         );
     }
@@ -76,44 +76,17 @@ public class WebEventUtils {
         String sessionId,
         String resourcePath,
         Object resourceParsedPath,
-        CBEventConstants.EventType eventType
+        WSConstants.EventAction eventAction
     ) {
-        addRmResourceUpdatedEvent(
-            sessionId,
-            generateRmResourceEventData(
+        WebAppUtils.getWebApplication().getEventController().addEvent(
+            new WSResourceUpdatedEvent(
+                sessionId,
                 projectId,
                 resourcePath,
                 resourceParsedPath,
-                eventType
+                eventAction
             )
         );
     }
-
-    public static void addRmResourceUpdatedEvent(String sessionId, Map<String, Object> eventData) {
-        WebAppUtils.getWebApplication().getEventController().addEvent(
-            new CBEvent(
-                CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
-                sessionId,
-                eventData
-            )
-        );
-    }
-
-    public static Map<String, Object> generateRmResourceEventData(
-        String projectId,
-        String resourcePath,
-        Object resourceParsedPath,
-        CBEventConstants.EventType eventType
-    ) {
-        return new LinkedHashMap<>(
-            Map.of(
-                "projectId", projectId,
-                "resourcePath", resourcePath,
-                "resourceParsedPath", resourceParsedPath,
-                "eventType", eventType
-            )
-        );
-    }
-
 
 }

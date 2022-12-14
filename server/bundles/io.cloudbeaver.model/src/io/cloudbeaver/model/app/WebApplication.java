@@ -18,8 +18,8 @@ package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.events.CBEventController;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.websocket.CBEventController;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.app.DBPApplication;

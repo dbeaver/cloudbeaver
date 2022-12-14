@@ -18,13 +18,13 @@ package io.cloudbeaver.server.websockets;
 
 import com.google.gson.Gson;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
-import io.cloudbeaver.events.CBWebSessionEventHandler;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.websockets.model.WebSocketClientEvent;
+import io.cloudbeaver.websocket.CBWebSessionEventHandler;
+import io.cloudbeaver.websocket.WSConstants;
+import io.cloudbeaver.websocket.event.WSEvent;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.jkiss.dbeaver.Log;
@@ -65,11 +65,11 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
             );
         }
         switch (clientEvent.getType()) {
-            case CBEventConstants.ClientEvents.TOPIC_SUBSCRIBE: {
+            case WSConstants.ClientEvents.TOPIC_SUBSCRIBE: {
                 this.webSession.subscribeOnEventTopic(clientEvent.getTopic());
                 break;
             }
-            case CBEventConstants.ClientEvents.TOPIC_UNSUBSCRIBE: {
+            case WSConstants.ClientEvents.TOPIC_UNSUBSCRIBE: {
                 this.webSession.unsubscribeFromEventTopic(clientEvent.getTopic());
                 break;
             }
@@ -101,7 +101,7 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
     }
 
     @Override
-    public void handeWebSessionEvent(CBEvent event) {
+    public void handeWebSessionEvent(WSEvent event) {
         if (isNotConnected()) {
             return;
         }

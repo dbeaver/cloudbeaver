@@ -19,7 +19,6 @@ package io.cloudbeaver.service.navigator.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
@@ -33,6 +32,7 @@ import io.cloudbeaver.service.navigator.WebStructContainers;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import io.cloudbeaver.utils.WebEventUtils;
+import io.cloudbeaver.websocket.WSConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -393,13 +393,13 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             node.getOwnerProject(),
             session.getSessionId(),
             oldNodePath,
-            CBEventConstants.EventType.TYPE_DELETE
+            WSConstants.EventAction.DELETE
         );
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             node.getOwnerProject(),
             session.getSessionId(),
             newNodePath,
-            CBEventConstants.EventType.TYPE_CREATE
+            WSConstants.EventAction.CREATE
         );
     }
 
@@ -432,14 +432,14 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             session.getSessionId(),
             oldResourcePath,
             oldRmResourcePath,
-            CBEventConstants.EventType.TYPE_DELETE
+            WSConstants.EventAction.DELETE
         );
         WebEventUtils.addRmResourceUpdatedEvent(
             projectId,
             session.getSessionId(),
             newResourcePath,
             newRmResourcePath,
-            CBEventConstants.EventType.TYPE_CREATE
+            WSConstants.EventAction.CREATE
         );
     }
 
@@ -494,7 +494,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         session.getProjectById(projectId),
                         session.getSessionId(),
                         nodePath,
-                        CBEventConstants.EventType.TYPE_DELETE
+                        WSConstants.EventAction.DELETE
                     );
                 } else if (node instanceof DBNResourceManagerResource) {
                     DBNResourceManagerResource rmResource = ((DBNResourceManagerResource) node);
@@ -507,7 +507,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         session.getSessionId(),
                         resourcePath,
                         rmResourcePath,
-                        CBEventConstants.EventType.TYPE_DELETE
+                        WSConstants.EventAction.DELETE
                     );
                 }
             }
@@ -563,7 +563,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         node.getOwnerProject(),
                         session.getSessionId(),
                         ((DBNDataSource) node).getDataSourceContainer().getId(),
-                        CBEventConstants.EventType.TYPE_UPDATE
+                        WSConstants.EventAction.UPDATE
                     );
                 } else if (node instanceof DBNLocalFolder) {
                     DBPDataSourceFolder parentFolder = WebConnectionFolderUtils.getParentFolder(folderNode);

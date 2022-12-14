@@ -14,28 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.events;
+package io.cloudbeaver.websocket.event;
 
-/**
- * CB event constants
- */
-public interface CBEventConstants {
+import io.cloudbeaver.websocket.WSConstants;
+import org.jkiss.code.Nullable;
 
-    enum EventType {
-        TYPE_CREATE,
-        TYPE_DELETE,
-        TYPE_UPDATE
+public class WSServerConfigurationChangedEvent extends WSEvent {
+    public WSServerConfigurationChangedEvent() {
+        super(WSConstants.Event.SERVER_CONFIG_CHANGED);
     }
 
-    interface ClientEvents {
-        String TOPIC_SUBSCRIBE = "cb_client_topic_subscribe";
-        String TOPIC_UNSUBSCRIBE = "cb_client_topic_unsubscribe";
+    public WSServerConfigurationChangedEvent(@Nullable String sessionId) {
+        super(WSConstants.Event.SERVER_CONFIG_CHANGED, sessionId);
     }
-
-    String CLOUDBEAVER_CONFIG_CHANGED = "cb_config_changed";
-    String CLOUDBEAVER_DATASOURCE_UPDATED = "cb_datasource_updated";
-    String CLOUDBEAVER_DATASOURCE_FOLDER_UPDATED = "cb_datasource_folder_updated";
-    String CLOUDBEAVER_RM_RESOURCE_UPDATED = "cb_rm_resource_updated";
-
-
 }

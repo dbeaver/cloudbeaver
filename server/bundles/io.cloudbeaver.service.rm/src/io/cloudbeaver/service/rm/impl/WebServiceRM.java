@@ -17,7 +17,6 @@
 package io.cloudbeaver.service.rm.impl;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.admin.AdminPermissionInfo;
 import io.cloudbeaver.service.rm.DBWServiceRM;
@@ -25,6 +24,7 @@ import io.cloudbeaver.service.rm.model.RMProjectPermissions;
 import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.WebEventUtils;
+import io.cloudbeaver.websocket.WSConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -35,7 +35,6 @@ import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.security.*;
 
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -111,17 +110,13 @@ public class WebServiceRM implements DBWServiceRM {
         checkIsRmEnabled(webSession);
         try {
             getResourceController(webSession).setResourceProperty(projectId, resourcePath, propertyName, propertyValue);
-            Map<String, Object> eventData = WebEventUtils.generateRmResourceEventData(
+
+            WebEventUtils.addRmResourceUpdatedEvent(
                 projectId,
+                webSession.getSessionId(),
                 resourcePath,
                 getResourceController(webSession).getResourcePath(projectId, resourcePath),
-                CBEventConstants.EventType.TYPE_UPDATE
-            );
-            eventData.put("propertyName", propertyName);
-            eventData.put("propertyValue", propertyValue);
-            WebEventUtils.addRmResourceUpdatedEvent(
-                webSession.getSessionId(),
-                eventData
+                WSConstants.EventAction.UPDATE
             );
             return Boolean.TRUE.toString();
         } catch (DBException e) {
@@ -158,7 +153,7 @@ public class WebServiceRM implements DBWServiceRM {
                 webSession.getSessionId(),
                 resourcePath,
                 getResourceController(webSession).getResourcePath(projectId, resourcePath),
-                CBEventConstants.EventType.TYPE_CREATE
+                WSConstants.EventAction.CREATE
             );
             return result;
         } catch (Exception e) {
@@ -180,7 +175,7 @@ public class WebServiceRM implements DBWServiceRM {
                 webSession.getSessionId(),
                 resourcePath,
                 rmResourcePath,
-                CBEventConstants.EventType.TYPE_DELETE
+                WSConstants.EventAction.DELETE
             );
             return true;
         } catch (Exception e) {
@@ -206,14 +201,14 @@ public class WebServiceRM implements DBWServiceRM {
                 webSession.getSessionId(),
                 oldResourcePath,
                 oldRmResourcePath,
-                CBEventConstants.EventType.TYPE_DELETE
+                WSConstants.EventAction.DELETE
             );
             WebEventUtils.addRmResourceUpdatedEvent(
                 projectId,
                 webSession.getSessionId(),
                 newResourcePath,
                 newRmResourcePath,
-                CBEventConstants.EventType.TYPE_CREATE
+                WSConstants.EventAction.CREATE
             );
             return true;
         } catch (Exception e) {
@@ -234,9 +229,9 @@ public class WebServiceRM implements DBWServiceRM {
         try {
             byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
             String content = getResourceController(webSession).setResourceContents(projectId, resourcePath, bytes, forceOverwrite);
-            var eventType = CBEventConstants.EventType.TYPE_UPDATE;
+            var eventType = WSConstants.EventAction.UPDATE;
             if (!forceOverwrite) {
-                eventType = CBEventConstants.EventType.TYPE_CREATE;
+                eventType = WSConstants.EventAction.CREATE;
             }
             WebEventUtils.addRmResourceUpdatedEvent(
                 projectId,

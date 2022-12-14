@@ -19,70 +19,62 @@ package io.cloudbeaver.server.events;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.websocket.WSConstants;
+import io.cloudbeaver.websocket.event.WSEvent;
+import io.cloudbeaver.websocket.event.WSResourceUpdatedEvent;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
 import org.jkiss.dbeaver.model.rm.RMResource;
-import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Notify all active user session that rm resource has been updated
  */
-public class CBRmResourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHandler {
+public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler {
 
     private static final Gson gson = new GsonBuilder().create();
-    private static final String RESOURCE_PARSED_PATH = "resourceParsedPath";
-    public static final String RESOURCE_PATH = "resourcePath";
-    public static final String EVENT_TYPE = "eventType";
-    public static final String PROJECT_ID = "projectId";
 
     @NotNull
     @Override
     public String getSupportedEventType() {
-        return CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED;
+        return WSConstants.Event.RM_RESOURCE_UPDATED.getEventId();
     }
 
     @Override
-    protected void updateSessionData(WebSession activeUserSession, CBEvent event) {
-        String projectId = JSONUtils.getString(event.getEventData(), PROJECT_ID);
+    protected void updateSessionData(WebSession activeUserSession, WSEvent event) {
+        var resourceUpdateEvent = (WSResourceUpdatedEvent) event;
+        String projectId = resourceUpdateEvent.getProjectId();
         WebProjectImpl project = activeUserSession.getProjectById(projectId);
         if (project == null) {
             return;
         }
-        String eventType = JSONUtils.getString(event.getEventData(), EVENT_TYPE);
-        String resourcePath = JSONUtils.getString(event.getEventData(), RESOURCE_PATH);
-        if (eventType == null || resourcePath == null) {
+        if (resourceUpdateEvent.getAction() == null || resourceUpdateEvent.getResourcePath() == null) {
             return;
         }
-        Object parsedResourcePath = event.getEventData().get(RESOURCE_PARSED_PATH);
+        Object parsedResourcePath = resourceUpdateEvent.getResourceParsedPath();
         RMResource[] resourceParsedPath;
         if (parsedResourcePath instanceof RMResource[]) {
             resourceParsedPath = (RMResource[]) parsedResourcePath;
         } else {
             resourceParsedPath = gson.fromJson(gson.toJson(parsedResourcePath), RMResource[].class);
         }
-        acceptChangesInNavigatorTree(eventType, resourceParsedPath, project);
+        acceptChangesInNavigatorTree(resourceUpdateEvent.getAction(), resourceParsedPath, project);
         activeUserSession.addSessionEvent(event);
     }
 
-    private void acceptChangesInNavigatorTree(String eventType, RMResource[] resourceParsedPath, WebProjectImpl project) {
+    private void acceptChangesInNavigatorTree(WSConstants.EventAction action, RMResource[] resourceParsedPath, WebProjectImpl project) {
         List<RMResource> rmResourcePath = Arrays.asList(resourceParsedPath);
-        if (eventType.equals("TYPE_CREATE")) {
+        if (action == WSConstants.EventAction.CREATE) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_ADD,
                     project.getRmProject(),
                     rmResourcePath)
             );
-        } else if (eventType.equals("TYPE_DELETE")) {
+        } else if (action == WSConstants.EventAction.DELETE) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_DELETE,
                     project.getRmProject(),
