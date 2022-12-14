@@ -69,7 +69,7 @@ public class WebUserContext implements SMCredentialsProvider {
      * @throws DBException - if user already authorized and new token come from another user
      */
     public synchronized boolean refresh(SMAuthInfo smAuthInfo) throws DBException {
-        if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS || smAuthInfo.getSmAuthToken() == null) {
+        if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS || smAuthInfo.getSmAccessToken() == null) {
             throw new DBCException("Authorization did not complete successfully");
         }
         var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
@@ -82,7 +82,7 @@ public class WebUserContext implements SMCredentialsProvider {
             throw new DBCException("Another user is already logged in");
         }
         this.smCredentials = new SMCredentials(
-            smAuthInfo.getSmAuthToken(),
+            smAuthInfo.getSmAccessToken(),
             authPermissions.getUserId(),
             authPermissions.getPermissions()
         );
