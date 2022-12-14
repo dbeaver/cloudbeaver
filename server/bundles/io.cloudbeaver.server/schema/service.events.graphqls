@@ -44,12 +44,6 @@ interface CBClientEvent {
     topic: CBEventTopic
 }
 
-# Topic subscription event
-type CBTopicEvent implements CBServerEvent {
-    id: CBServerEventId!
-    topic: CBEventTopic! # topic to subscribe / unsubscribe
-}
-
 # Datasource folder event
 type CBDatasourceFolderEvent implements CBServerEvent {
     id: CBServerEventId!
@@ -81,6 +75,12 @@ type CBRMEvent implements CBServerEvent {
 type CBConfigEvent implements CBServerEvent {
     id: CBServerEventId!
     topic: CBEventTopic
+}
+
+# Topic subscription event
+type CBTopicEvent implements CBClientEvent {
+    id: CBClientEventId!
+    topic: CBEventTopic! # topic to subscribe / unsubscribe
 }
 
 # Active projects event
