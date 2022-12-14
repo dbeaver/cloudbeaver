@@ -16,6 +16,12 @@
  */
 package io.cloudbeaver.websocket;
 
-public class WSUtils {
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.cloudbeaver.websocket.event.WSEvent;
 
+public class WSUtils {
+    public static final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(WSEvent.class, new WSEventDeserializer())
+            .create();
 }
