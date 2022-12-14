@@ -126,7 +126,11 @@ string
     return container.activeCatalog === (catalogId ?? defaultCatalog);
   }
 
-  isOutdated(param: ObjectContainerParams): boolean {
+  isOutdated(param?: ObjectContainerParams): boolean {
+    if (!param) {
+      return super.isOutdated();
+    }
+
     const metadata = this.metadata.get(serializeKey(param));
     const catalogId = param.catalogId ?? defaultCatalog;
     return metadata.outdatedData.includes(catalogId);
@@ -153,7 +157,12 @@ string
     metadata.loadingData = metadata.loadingData.filter(id => id !== catalogId);
   }
 
-  markOutdated(param: ObjectContainerParams): void {
+  markOutdated(param?: ObjectContainerParams): void {
+    if (!param) {
+      super.markOutdated();
+      return;
+    }
+
     const catalogId = param.catalogId ?? defaultCatalog;
 
     const metadata = this.metadata.get(serializeKey(param));
