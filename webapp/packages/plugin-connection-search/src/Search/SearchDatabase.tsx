@@ -8,11 +8,11 @@
 
 import { observer } from 'mobx-react-lite';
 
-
 import { useMapResource } from '@cloudbeaver/core-blocks';
+import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { AdminConnectionSearchInfo, CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { AdminConnectionSearchInfo, CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { ConnectionForm } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionSearchService } from './ConnectionSearchService';
@@ -20,7 +20,10 @@ import { DatabaseList } from './DatabaseList';
 
 export const SearchDatabase: React.FC = observer(function SearchDatabase() {
   const connectionSearchService = useService(ConnectionSearchService);
+  const possibleDriversList = connectionSearchService.databases.map(db => db.possibleDrivers).flat();
+
   useMapResource(SearchDatabase, ProjectInfoResource, CachedMapAllKey);
+  useMapResource(SearchDatabase, DBDriverResource, resourceKeyList(possibleDriversList));
 
   function select(database: AdminConnectionSearchInfo) {
     connectionSearchService.select(database);
