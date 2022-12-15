@@ -5,9 +5,18 @@
 # Events sent by server
 enum CBServerEventId {
     cb_config_changed,
+
+    cb_datasource_created,
     cb_datasource_updated,
+    cb_datasource_deleted,
+
+    cb_datasource_folder_created,
     cb_datasource_folder_updated,
+    cb_datasource_folder_deleted,
+
+    cb_rm_resource_created
     cb_rm_resource_updated
+    cb_rm_resource_deleted
 }
 
 # Events sent by client
@@ -26,12 +35,6 @@ enum CBEventTopic {
     cb_projects
 }
 
-enum CBEventAction {
-    CREATE,
-    DELETE,
-    UPDATE
-}
-
 # Base server event interface
 interface CBServerEvent {
     id: CBServerEventId!
@@ -48,7 +51,6 @@ interface CBClientEvent {
 type CBDatasourceFolderEvent implements CBServerEvent {
     id: CBServerEventId!
     topic: CBEventTopic
-    action: CBEventAction!
     nodePaths: [String!]! # list of folders node ids
     projectId: String!
 }
@@ -57,7 +59,6 @@ type CBDatasourceFolderEvent implements CBServerEvent {
 type CBDatasourceEvent implements CBServerEvent {
     id: CBServerEventId!
     topic: CBEventTopic
-    action: CBEventAction!
     dataSourceIds: [String!]! # list of datasources ids
     projectId: String!
 }
@@ -66,7 +67,6 @@ type CBDatasourceEvent implements CBServerEvent {
 type CBRMEvent implements CBServerEvent {
     id: CBServerEventId!
     topic: CBEventTopic
-    action: CBEventAction!
     resourcePath: String!
     projectId: String!
 }
@@ -87,7 +87,6 @@ type CBTopicEvent implements CBClientEvent {
 type CBProjectsActiveEvent implements CBClientEvent {
     id: CBClientEventId!
     topic: CBEventTopic
-    action: CBEventAction!
     projects: [String!]! # list of active projects
 }
 
