@@ -17,16 +17,16 @@
 package io.cloudbeaver.server.websockets.model;
 
 public class WebSocketClientEvent {
-    private final String type;
+    private final String id;
     private final String topic;
 
-    public WebSocketClientEvent(String type, String topic) {
-        this.type = type;
+    public WebSocketClientEvent(String id, String topic) {
+        this.id = id;
         this.topic = topic;
     }
 
-    public String getType() {
-        return type;
+    public String getId() {
+        return id;
     }
 
     public String getTopic() {

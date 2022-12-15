@@ -59,12 +59,12 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
     public void onWebSocketText(String message) {
         super.onWebSocketText(message);
         var clientEvent = gson.fromJson(message, WebSocketClientEvent.class);
-        if (clientEvent.getType() == null) {
+        if (clientEvent.getId() == null) {
             webSession.addSessionError(
                 new DBWebException("Invalid websocket event: " + message)
             );
         }
-        switch (clientEvent.getType()) {
+        switch (clientEvent.getId()) {
             case WSConstants.ClientEvents.TOPIC_SUBSCRIBE: {
                 this.webSession.subscribeOnEventTopic(clientEvent.getTopic());
                 break;
@@ -75,7 +75,7 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
             }
             default:
                 webSession.addSessionError(
-                    new DBWebException("Unknown websocket client event: " + clientEvent.getType())
+                    new DBWebException("Unknown websocket client event: " + clientEvent.getId())
                 );
         }
     }
