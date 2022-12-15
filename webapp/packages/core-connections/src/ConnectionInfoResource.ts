@@ -11,7 +11,7 @@ import { action, makeObservable, observable, runInAction } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ExecutorInterrupter, ISyncExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { EPermission, NavigatorViewSettings, SessionPermissionsResource, SessionDataResource, DataSynchronizationService } from '@cloudbeaver/core-root';
+import { EPermission, NavigatorViewSettings, SessionPermissionsResource, SessionDataResource, DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -32,7 +32,7 @@ import {
   isResourceKeyList,
 } from '@cloudbeaver/core-sdk';
 
-import { ConnectionInfoEventHandler, EConnectionInfoEventType, IConnectionInfoEvent } from './ConnectionInfoEventHandler';
+import { ConnectionInfoEventHandler, IConnectionInfoEvent } from './ConnectionInfoEventHandler';
 import type { DatabaseConnection } from './DatabaseConnection';
 import type { IConnectionInfoParams } from './IConnectionsResource';
 
@@ -107,19 +107,24 @@ export class ConnectionInfoResource
       this.markOutdated();
     });
 
-    connectionInfoEventHandler.on<ResourceKeyList<IConnectionInfoParams>>(
+    connectionInfoEventHandler.onEvent<ResourceKeyList<IConnectionInfoParams>>(
+      ServerEventId.CbDatasourceCreated,
       async key => {
         const connections = await this.load(key);
 
         for (const connection of connections) {
           this.onConnectionCreate.execute(connection);
         }
-      }, data => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
+      },
+      data => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
         projectId: data.projectId,
         connectionId,
-      }))), d => d.status === EConnectionInfoEventType.TypeCreate, this);
+      }))),
+      this
+    );
 
-    connectionInfoEventHandler.on<ResourceKeyList<IConnectionInfoParams>>(
+    connectionInfoEventHandler.onEvent<ResourceKeyList<IConnectionInfoParams>>(
+      ServerEventId.CbDatasourceUpdated,
       key => {
         if (this.isConnected(key)) {
           const connection = this.get(key);
@@ -134,12 +139,16 @@ export class ConnectionInfoResource
         } else {
           this.markOutdated(key);
         }
-      }, data => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
+      },
+      data => resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
         projectId: data.projectId,
         connectionId,
-      }))), d => d.status === EConnectionInfoEventType.TypeUpdate, this);
+      }))),
+      this
+    );
 
-    connectionInfoEventHandler.on<IConnectionInfoEvent>(
+    connectionInfoEventHandler.onEvent<IConnectionInfoEvent>(
+      ServerEventId.CbDatasourceDeleted,
       data => {
         const key = resourceKeyList(data.dataSourceIds.map<IConnectionInfoParams>(connectionId => ({
           projectId: data.projectId,
@@ -158,7 +167,10 @@ export class ConnectionInfoResource
         } else {
           this.delete(key);
         }
-      }, undefined, d => d.status === EConnectionInfoEventType.TypeDelete, this);
+      },
+      undefined,
+      this
+    );
 
     makeObservable<this, 'nodeIdMap' | 'updateConnection'>(this, {
       nodeIdMap: observable,

@@ -7,12 +7,13 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionEventSource, TopicEventHandler, ISessionEvent, ClientEventType, SessionEventTopic } from '@cloudbeaver/core-root';
+import { SessionEventSource, TopicEventHandler, ISessionEvent, ClientEventId, SessionEventTopic, IBaseServerEvent, SessionEventId } from '@cloudbeaver/core-root';
 
-export type IProjectInfoEvent = void;
+export type IProjectInfoEvent = IBaseServerEvent<SessionEventId, SessionEventTopic>;
 
 @injectable()
-export class ProjectInfoEventHandler extends TopicEventHandler<IProjectInfoEvent, ISessionEvent> {
+export class ProjectInfoEventHandler
+  extends TopicEventHandler<IProjectInfoEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(
     sessionEventSource: SessionEventSource
   ) {
@@ -20,9 +21,10 @@ export class ProjectInfoEventHandler extends TopicEventHandler<IProjectInfoEvent
   }
 
   setActiveProjects(projects: string[]): void {
-    this.emit({ type: ClientEventType.CbClientProjectsActive, projects });
+    this.emit({ id: ClientEventId.CbClientProjectsActive, projects });
   }
 
-  map(): IProjectInfoEvent {
+  map(event: ISessionEvent): IProjectInfoEvent {
+    return event;
   }
 }

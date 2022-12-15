@@ -166,51 +166,33 @@ export enum AuthStatus {
 }
 
 export type CbClientEvent = {
+  id: CbClientEventId;
   topic?: Maybe<CbEventTopic>;
-  type: CbClientEventType;
 };
 
-export enum CbClientEventType {
+export enum CbClientEventId {
   CbClientProjectsActive = 'cb_client_projects_active',
   CbClientTopicSubscribe = 'cb_client_topic_subscribe',
   CbClientTopicUnsubscribe = 'cb_client_topic_unsubscribe'
 }
 
 export interface CbConfigEvent extends CbServerEvent {
+  id: CbServerEventId;
   topic?: Maybe<CbEventTopic>;
-  type: CbServerEventType;
 }
 
 export interface CbDatasourceEvent extends CbServerEvent {
   dataSourceIds: Array<Scalars['String']>;
+  id: CbServerEventId;
   projectId: Scalars['String'];
-  status: CbEventStatus;
   topic?: Maybe<CbEventTopic>;
-  type: CbServerEventType;
 }
 
 export interface CbDatasourceFolderEvent extends CbServerEvent {
+  id: CbServerEventId;
   nodePaths: Array<Scalars['String']>;
   projectId: Scalars['String'];
-  status: CbEventStatus;
   topic?: Maybe<CbEventTopic>;
-  type: CbServerEventType;
-}
-
-export interface CbEvent {
-  eventData: Scalars['Object'];
-  eventType: CbEventType;
-}
-
-export enum CbEventResourceType {
-  Datasource = 'DATASOURCE',
-  RmResource = 'RM_RESOURCE'
-}
-
-export enum CbEventStatus {
-  TypeCreate = 'TYPE_CREATE',
-  TypeDelete = 'TYPE_DELETE',
-  TypeUpdate = 'TYPE_UPDATE'
 }
 
 export enum CbEventTopic {
@@ -218,46 +200,43 @@ export enum CbEventTopic {
   CbDatasource = 'cb_datasource',
   CbDatasourceFolder = 'cb_datasource_folder',
   CbProjects = 'cb_projects',
-  CbRm = 'cb_rm'
-}
-
-export enum CbEventType {
-  CbConfigChanged = 'cb_config_changed',
-  CbDatasourceFolderUpdated = 'cb_datasource_folder_updated',
-  CbDatasourceUpdated = 'cb_datasource_updated',
-  CbRmResourceUpdated = 'cb_rm_resource_updated'
+  CbScripts = 'cb_scripts'
 }
 
 export interface CbProjectsActiveEvent extends CbClientEvent {
+  id: CbClientEventId;
   projects: Array<Scalars['String']>;
-  status: CbEventStatus;
   topic?: Maybe<CbEventTopic>;
-  type: CbClientEventType;
 }
 
 export interface CbrmEvent extends CbServerEvent {
+  id: CbServerEventId;
   projectId: Scalars['String'];
   resourcePath: Scalars['String'];
-  status: CbEventStatus;
   topic?: Maybe<CbEventTopic>;
-  type: CbServerEventType;
 }
 
 export type CbServerEvent = {
+  id: CbServerEventId;
   topic?: Maybe<CbEventTopic>;
-  type: CbServerEventType;
 };
 
-export enum CbServerEventType {
+export enum CbServerEventId {
   CbConfigChanged = 'cb_config_changed',
+  CbDatasourceCreated = 'cb_datasource_created',
+  CbDatasourceDeleted = 'cb_datasource_deleted',
+  CbDatasourceFolderCreated = 'cb_datasource_folder_created',
+  CbDatasourceFolderDeleted = 'cb_datasource_folder_deleted',
   CbDatasourceFolderUpdated = 'cb_datasource_folder_updated',
   CbDatasourceUpdated = 'cb_datasource_updated',
+  CbRmResourceCreated = 'cb_rm_resource_created',
+  CbRmResourceDeleted = 'cb_rm_resource_deleted',
   CbRmResourceUpdated = 'cb_rm_resource_updated'
 }
 
-export interface CbTopicEvent extends CbServerEvent {
+export interface CbTopicEvent extends CbClientEvent {
+  id: CbClientEventId;
   topic: CbEventTopic;
-  type: CbServerEventType;
 }
 
 export interface ConnectionConfig {
@@ -1020,7 +999,6 @@ export interface Query {
   navNodeParents: Array<NavigatorNodeInfo>;
   navRefreshNode?: Maybe<Scalars['Boolean']>;
   networkHandlers: Array<NetworkHandlerDescriptor>;
-  readSessionEvents: Array<CbEvent>;
   readSessionLog: Array<LogEntry>;
   revokeUserTeam?: Maybe<Scalars['Boolean']>;
   rmListProjectGrantedPermissions: Array<AdminObjectGrantInfo>;
@@ -1241,11 +1219,6 @@ export interface QueryNavNodeParentsArgs {
 
 export interface QueryNavRefreshNodeArgs {
   nodePath: Scalars['ID'];
-}
-
-
-export interface QueryReadSessionEventsArgs {
-  maxEntries: Scalars['Int'];
 }
 
 
@@ -2785,13 +2758,6 @@ export type ChangeSessionLanguageMutationVariables = Exact<{
 
 
 export type ChangeSessionLanguageMutation = { changeSessionLanguage?: boolean };
-
-export type GetSessionEventsQueryVariables = Exact<{
-  maxEntries: Scalars['Int'];
-}>;
-
-
-export type GetSessionEventsQuery = { events: Array<{ eventType: CbEventType, eventData: any }> };
 
 export type OpenSessionMutationVariables = Exact<{
   defaultLocale?: InputMaybe<Scalars['String']>;
@@ -4392,14 +4358,6 @@ export const ChangeSessionLanguageDocument = `
   changeSessionLanguage(locale: $locale)
 }
     `;
-export const GetSessionEventsDocument = `
-    query getSessionEvents($maxEntries: Int!) {
-  events: readSessionEvents(maxEntries: $maxEntries) {
-    eventType
-    eventData
-  }
-}
-    `;
 export const OpenSessionDocument = `
     mutation openSession($defaultLocale: String) {
   session: openSession(defaultLocale: $defaultLocale) {
@@ -4921,9 +4879,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ChangeSessionLanguageMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'changeSessionLanguage', 'mutation');
-    },
-    getSessionEvents(variables: GetSessionEventsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSessionEventsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSessionEventsQuery>(GetSessionEventsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSessionEvents', 'query');
     },
     openSession(variables?: OpenSessionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<OpenSessionMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<OpenSessionMutation>(OpenSessionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'openSession', 'mutation');

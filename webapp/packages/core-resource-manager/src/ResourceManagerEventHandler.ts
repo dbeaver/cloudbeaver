@@ -7,17 +7,16 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ISessionEvent, SessionEventSource, TopicEventHandler, SessionEventTopic } from '@cloudbeaver/core-root';
-import { CbEventStatus as EResourceManagerEventType, CbrmEvent as IResourceManagerEvent } from '@cloudbeaver/core-sdk';
-
-export { EResourceManagerEventType, type IResourceManagerEvent };
+import { ISessionEvent, SessionEventSource, TopicEventHandler, SessionEventTopic, SessionEventId } from '@cloudbeaver/core-root';
+import type { CbrmEvent as IResourceManagerEvent } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class ResourceManagerEventHandler extends TopicEventHandler<IResourceManagerEvent, ISessionEvent> {
+export class ResourceManagerEventHandler
+  extends TopicEventHandler<IResourceManagerEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(
     sessionEventSource: SessionEventSource
   ) {
-    super(SessionEventTopic.CbRm, sessionEventSource);
+    super(SessionEventTopic.CbScripts, sessionEventSource);
   }
 
   map(event: any): IResourceManagerEvent {

@@ -13,16 +13,35 @@ import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 export type IServerEventCallback<T> = (data: T) => any;
 export type Subscription = () => void;
 
-export interface IServerEventEmitter<TEvent, TSourceEvent = TEvent> {
+export interface IBaseServerEvent<TID extends string = string, TTopic extends string = string> {
+  id: TID;
+  topic?: TTopic;
+}
+
+export interface IServerEventEmitter<
+  TEvent extends IBaseServerEvent<TEventID, TTopic>,
+  TSourceEvent extends IBaseServerEvent<TEventID, TTopic> = TEvent,
+  TEventID extends string = string,
+  TTopic extends string = string
+> {
   readonly onInit: ISyncExecutor;
+
+  onEvent<T = TEvent>(
+    id: TEventID,
+    callback: IServerEventCallback<T>,
+    mapTo?: (event: TEvent) => T,
+  ): Subscription;
+
   on<T = TEvent>(
     callback: IServerEventCallback<T>,
     mapTo?: (event: TEvent) => T,
     filter?: (event: TEvent) => boolean,
   ): Subscription;
+
   multiplex<T = TEvent>(
-    topic: string,
+    topic: TTopic,
     mapTo?: (event: TEvent) => T,
   ): Observable<T>;
+
   emit(event: TSourceEvent): this;
 }

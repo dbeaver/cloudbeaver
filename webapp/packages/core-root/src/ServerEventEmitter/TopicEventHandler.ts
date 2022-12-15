@@ -12,15 +12,20 @@ import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import type { CachedResource } from '@cloudbeaver/core-sdk';
 import { compose } from '@cloudbeaver/core-utils';
 
-import type { IServerEventCallback, IServerEventEmitter, Subscription } from './IServerEventEmitter';
+import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './IServerEventEmitter';
 
 interface ISubscribedResourceInfo {
   listeners: number;
   subscription: Subscription;
 }
 
-export abstract class TopicEventHandler<TEvent, SourceEvent = void>
-implements IServerEventEmitter<TEvent, SourceEvent> {
+export abstract class TopicEventHandler<
+  TEvent extends IBaseServerEvent<TEventID, TTopic>,
+  SourceEvent extends IBaseServerEvent<TEventID, TTopic>,
+  TEventID extends string = string,
+  TTopic extends string = string
+>
+implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
   readonly onInit: ISyncExecutor;
   readonly eventsSubject: Connectable<TEvent>;
 
@@ -45,13 +50,36 @@ implements IServerEventEmitter<TEvent, SourceEvent> {
   }
 
   multiplex<T = TEvent>(
-    topic: string,
+    topic: TTopic,
     mapTo: ((event: TEvent) => T) = event => event as unknown as T,
   ): Observable<T> {
     return this.emitter.multiplex(
       topic,
       compose(mapTo, this.map) as unknown as (event: SourceEvent) => T
     );
+  }
+
+  onEvent<T = TEvent>(
+    id: TEventID,
+    callback: IServerEventCallback<T>,
+    mapTo: (event: TEvent) => T = event => event as unknown as T,
+    resource?: CachedResource<any, any, any, any>,
+  ): Subscription {
+    if (resource) {
+      this.registerResource(resource);
+    }
+
+    const sub = this.eventsSubject
+      .pipe(filter(e => e.id === id), map(mapTo))
+      .subscribe(callback);
+
+    return () => {
+      sub.unsubscribe();
+
+      if (resource) {
+        this.removeResource(resource);
+      }
+    };
   }
 
   on<T = TEvent>(

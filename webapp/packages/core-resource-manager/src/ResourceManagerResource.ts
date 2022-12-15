@@ -10,11 +10,11 @@ import { observable, toJS } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { DataSynchronizationService } from '@cloudbeaver/core-root';
+import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
 import { CachedMapResource, CachedResourceIncludeArgs, GetResourceListQueryVariables, GraphQLService, ICachedMapResourceMetadata, isResourceKeyList, ResourceKey, resourceKeyList, ResourceKeyUtils, RmResource } from '@cloudbeaver/core-sdk';
 import { createPath, isValuesEqual, MetadataMap } from '@cloudbeaver/core-utils';
 
-import { EResourceManagerEventType, ResourceManagerEventHandler } from './ResourceManagerEventHandler';
+import { ResourceManagerEventHandler } from './ResourceManagerEventHandler';
 
 export type ResourceInfoIncludes = Omit<GetResourceListQueryVariables, 'projectId'>;
 export type RmResourceInfo = RmResource;
@@ -42,7 +42,8 @@ export class ResourceManagerResource
 
     this.onMove = new Executor();
 
-    resourceManagerEventHandler.on<IResourceManagerParams>(
+    resourceManagerEventHandler.onEvent<IResourceManagerParams>(
+      ServerEventId.CbDatasourceCreated,
       async key => {
         let parentFolderKey = createParentResourceKey(key);
         parentFolderKey = {
@@ -70,10 +71,11 @@ export class ResourceManagerResource
         path: this.getFolder(data.resourcePath),
         name: this.getResourceName(data.resourcePath),
       }),
-      d => d.status === EResourceManagerEventType.TypeCreate,
-      this);
+      this
+    );
 
-    resourceManagerEventHandler.on<IResourceManagerParams>(
+    resourceManagerEventHandler.onEvent<IResourceManagerParams>(
+      ServerEventId.CbRmResourceUpdated,
       key => {
         if (this.isInUse(key)) {
           dataSynchronizationService
@@ -94,10 +96,11 @@ export class ResourceManagerResource
         path: this.getFolder(data.resourcePath),
         name: this.getResourceName(data.resourcePath),
       }),
-      d => d.status === EResourceManagerEventType.TypeUpdate,
-      this);
+      this
+    );
 
-    resourceManagerEventHandler.on<IResourceManagerParams>(
+    resourceManagerEventHandler.onEvent<IResourceManagerParams>(
+      ServerEventId.CbRmResourceDeleted,
       key => {
         if (this.isInUse(key)) {
           dataSynchronizationService
@@ -118,8 +121,8 @@ export class ResourceManagerResource
         path: this.getFolder(data.resourcePath),
         name: this.getResourceName(data.resourcePath),
       }),
-      d => d.status === EResourceManagerEventType.TypeDelete,
-      this);
+      this
+    );
   }
 
   getResourceName(resourcePath: string): string {

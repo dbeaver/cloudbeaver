@@ -15,23 +15,25 @@ import {
   GraphQLService,
   EnvironmentService,
   CbEventTopic as SessionEventTopic,
-  CbServerEventType as ServerEventType,
-  CbClientEventType as ClientEventType,
+  CbServerEventId as ServerEventId,
+  CbClientEventId as ClientEventId,
   ServiceError,
 } from '@cloudbeaver/core-sdk';
 
-import type { IServerEventCallback, IServerEventEmitter, Subscription } from './ServerEventEmitter/IServerEventEmitter';
+import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './ServerEventEmitter/IServerEventEmitter';
 
-export { ServerEventType, SessionEventTopic, ClientEventType };
+export { ServerEventId, SessionEventTopic, ClientEventId };
 
-export interface ISessionEvent {
-  type: ServerEventType | ClientEventType;
+export type SessionEventId = ServerEventId | ClientEventId;
+
+export interface ISessionEvent extends IBaseServerEvent<SessionEventId, SessionEventTopic> {
+  id: SessionEventId;
   topic?: SessionEventTopic;
   [key: string]: any;
 }
 
 export interface ITopicSubEvent extends ISessionEvent {
-  type: ClientEventType.CbClientTopicSubscribe | ClientEventType.CbClientTopicUnsubscribe;
+  id: ClientEventId.CbClientTopicSubscribe | ClientEventId.CbClientTopicUnsubscribe;
   topic: SessionEventTopic;
 }
 
@@ -42,7 +44,8 @@ const retryConfig: RetryConfig = {
 };
 
 @injectable()
-export class SessionEventSource implements IServerEventEmitter<ISessionEvent> {
+export class SessionEventSource
+implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   readonly eventsSubject: Observable<ISessionEvent>;
   readonly onInit: ISyncExecutor;
 
@@ -83,6 +86,24 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent> {
     this.errorHandler = this.errorHandler.bind(this);
   }
 
+  onEvent<T = ISessionEvent>(
+    id: SessionEventId,
+    callback: IServerEventCallback<T>,
+    mapTo: (event: ISessionEvent) => T = e => e as T,
+  ): Subscription {
+    const sub = this.eventsSubject
+      .pipe(
+        catchError(this.errorHandler),
+        filter(event => event.id === id),
+        map(mapTo)
+      )
+      .subscribe(callback);
+
+    return () => {
+      sub.unsubscribe();
+    };
+  }
+
   on<T = ISessionEvent>(
     callback: IServerEventCallback<T>,
     mapTo: (event: ISessionEvent) => T = e => e as T,
@@ -102,13 +123,13 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent> {
   }
 
   multiplex<T = ISessionEvent>(
-    topic: string,
+    topic: SessionEventTopic,
     mapTo: ((event: ISessionEvent) => T)  = e => e as T
   ): Observable<T> {
     return merge(
       this.subject.multiplex(
-        () => ({ type: ClientEventType.CbClientTopicSubscribe, topic } as ITopicSubEvent),
-        () => ({ type: ClientEventType.CbClientTopicUnsubscribe, topic } as ITopicSubEvent),
+        () => ({ id: ClientEventId.CbClientTopicSubscribe, topic } as ITopicSubEvent),
+        () => ({ id: ClientEventId.CbClientTopicUnsubscribe, topic } as ITopicSubEvent),
         event => event.topic === topic
       ),
       this.oldEventsSubject,

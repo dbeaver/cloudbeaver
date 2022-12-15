@@ -12,7 +12,8 @@ import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { INodeNavigationData, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
-import { type ResourceKey, ResourceKeyUtils, resourceKeyList, CachedMapAllKey, CbEventStatus } from '@cloudbeaver/core-sdk';
+import { ServerEventId } from '@cloudbeaver/core-root';
+import { type ResourceKey, ResourceKeyUtils, resourceKeyList, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { ConnectionFolderEventHandler, IConnectionFolderEvent } from '../ConnectionFolderEventHandler';
 import { Connection, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
@@ -48,7 +49,8 @@ export class ConnectionNavNodeService extends Dependency {
 
     this.navNodeManagerService.navigator.addHandler(this.navigateHandler.bind(this));
 
-    this.connectionFolderEventHandler.on<IConnectionFolderEvent>(
+    this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
+      ServerEventId.CbDatasourceFolderCreated,
       data => {
         const parents = data.nodePaths.map(nodeId => {
           const parents = getFolderNodeParents(nodeId);
@@ -58,10 +60,10 @@ export class ConnectionNavNodeService extends Dependency {
         this.navTreeResource.markTreeOutdated(resourceKeyList(parents));
       },
       undefined,
-      event => event.status === CbEventStatus.TypeCreate,
       this.navTreeResource
     );
-    this.connectionFolderEventHandler.on<IConnectionFolderEvent>(
+    this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
+      ServerEventId.CbDatasourceFolderDeleted,
       data => {
         const parents = data.nodePaths.map(nodeId => {
           const parents = getFolderNodeParents(nodeId);
@@ -72,15 +74,14 @@ export class ConnectionNavNodeService extends Dependency {
         this.navTreeResource.deleteInNode(resourceKeyList(parents), data.nodePaths);
       },
       undefined,
-      event => event.status === CbEventStatus.TypeDelete,
       this.navTreeResource
     );
-    this.connectionFolderEventHandler.on<IConnectionFolderEvent>(
+    this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
+      ServerEventId.CbDatasourceFolderUpdated,
       data => {
         this.navTreeResource.markOutdated(resourceKeyList(data.nodePaths));
       },
       undefined,
-      event => event.status === CbEventStatus.TypeUpdate,
       this.navTreeResource
     );
   }
