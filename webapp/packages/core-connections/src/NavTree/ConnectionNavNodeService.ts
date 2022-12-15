@@ -49,6 +49,8 @@ export class ConnectionNavNodeService extends Dependency {
 
     this.navNodeManagerService.navigator.addHandler(this.navigateHandler.bind(this));
 
+    this.connectionInfoResource.connect(this.navTreeResource, CachedMapAllKey);
+
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderCreated,
       data => {

@@ -75,6 +75,10 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
       this.onInit.execute();
     });
 
+    this.closeSubject.subscribe(event => {
+      console.info(`Websocket closed: ${event.reason}`);
+    });
+
     this.eventsSubject = merge(this.oldEventsSubject, this.subject);
 
     this.errorSubject
@@ -133,10 +137,11 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
         event => event.topic === topic
       ),
       this.oldEventsSubject,
-    ).pipe(
-      catchError(this.errorHandler),
-      map(mapTo)
-    );
+    )
+      .pipe(
+        catchError(this.errorHandler),
+        map(mapTo)
+      );
   }
 
   emit(event: ISessionEvent): this {

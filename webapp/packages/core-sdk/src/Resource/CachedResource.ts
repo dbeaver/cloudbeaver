@@ -141,6 +141,26 @@ export abstract class CachedResource<
     }, 5 * 60 * 1000);
   }
 
+  connect(
+    resource: CachedResource<any, any, any, any>,
+    param: TParam
+  ): void {
+    let subscription: string | null = null;
+
+    resource.onUse.addHandler(() => {
+      if (resource.isResourceInUse) {
+        if (!subscription) {
+          subscription = this.use(param);
+        }
+      } else {
+        if (subscription) {
+          this.free(param, subscription);
+          subscription = null;
+        }
+      }
+    });
+  }
+
   sync<T = TParam>(
     resource: CachedResource<any, T, any, any>,
     mapTo?: (param: TParam) => T,
