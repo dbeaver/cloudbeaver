@@ -15,7 +15,7 @@ export type Subscription = () => void;
 
 export interface IBaseServerEvent<TID extends string = string, TTopic extends string = string> {
   id: TID;
-  topic?: TTopic;
+  topicId?: TTopic;
 }
 
 export interface IServerEventEmitter<
@@ -39,7 +39,7 @@ export interface IServerEventEmitter<
   ): Subscription;
 
   multiplex<T = TEvent>(
-    topic: TTopic,
+    topicId: TTopic,
     mapTo?: (event: TEvent) => T,
   ): Observable<T>;
 

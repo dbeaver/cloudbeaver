@@ -167,7 +167,7 @@ export enum AuthStatus {
 
 export type CbClientEvent = {
   id: CbClientEventId;
-  topic?: Maybe<CbEventTopic>;
+  topicId?: Maybe<CbEventTopic>;
 };
 
 export enum CbClientEventId {
@@ -178,21 +178,21 @@ export enum CbClientEventId {
 
 export interface CbConfigEvent extends CbServerEvent {
   id: CbServerEventId;
-  topic?: Maybe<CbEventTopic>;
+  topicId?: Maybe<CbEventTopic>;
 }
 
 export interface CbDatasourceEvent extends CbServerEvent {
   dataSourceIds: Array<Scalars['String']>;
   id: CbServerEventId;
   projectId: Scalars['String'];
-  topic?: Maybe<CbEventTopic>;
+  topicId?: Maybe<CbEventTopic>;
 }
 
 export interface CbDatasourceFolderEvent extends CbServerEvent {
   id: CbServerEventId;
   nodePaths: Array<Scalars['String']>;
   projectId: Scalars['String'];
-  topic?: Maybe<CbEventTopic>;
+  topicId?: Maybe<CbEventTopic>;
 }
 
 export enum CbEventTopic {
@@ -206,19 +206,19 @@ export enum CbEventTopic {
 export interface CbProjectsActiveEvent extends CbClientEvent {
   id: CbClientEventId;
   projects: Array<Scalars['String']>;
-  topic?: Maybe<CbEventTopic>;
+  topicId?: Maybe<CbEventTopic>;
 }
 
 export interface CbrmEvent extends CbServerEvent {
   id: CbServerEventId;
   projectId: Scalars['String'];
   resourcePath: Scalars['String'];
-  topic?: Maybe<CbEventTopic>;
+  topicId?: Maybe<CbEventTopic>;
 }
 
 export type CbServerEvent = {
   id: CbServerEventId;
-  topic?: Maybe<CbEventTopic>;
+  topicId?: Maybe<CbEventTopic>;
 };
 
 export enum CbServerEventId {
@@ -236,7 +236,7 @@ export enum CbServerEventId {
 
 export interface CbTopicEvent extends CbClientEvent {
   id: CbClientEventId;
-  topic: CbEventTopic;
+  topicId: CbEventTopic;
 }
 
 export interface ConnectionConfig {

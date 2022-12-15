@@ -28,13 +28,13 @@ export type SessionEventId = ServerEventId | ClientEventId;
 
 export interface ISessionEvent extends IBaseServerEvent<SessionEventId, SessionEventTopic> {
   id: SessionEventId;
-  topic?: SessionEventTopic;
+  topicId?: SessionEventTopic;
   [key: string]: any;
 }
 
 export interface ITopicSubEvent extends ISessionEvent {
   id: ClientEventId.CbClientTopicSubscribe | ClientEventId.CbClientTopicUnsubscribe;
-  topic: SessionEventTopic;
+  topicId: SessionEventTopic;
 }
 
 const retryInterval = 5000;
@@ -127,14 +127,14 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
   }
 
   multiplex<T = ISessionEvent>(
-    topic: SessionEventTopic,
+    topicId: SessionEventTopic,
     mapTo: ((event: ISessionEvent) => T)  = e => e as T
   ): Observable<T> {
     return merge(
       this.subject.multiplex(
-        () => ({ id: ClientEventId.CbClientTopicSubscribe, topic } as ITopicSubEvent),
-        () => ({ id: ClientEventId.CbClientTopicUnsubscribe, topic } as ITopicSubEvent),
-        event => event.topic === topic
+        () => ({ id: ClientEventId.CbClientTopicSubscribe, topicId } as ITopicSubEvent),
+        () => ({ id: ClientEventId.CbClientTopicUnsubscribe, topicId } as ITopicSubEvent),
+        event => event.topicId === topicId
       ),
       this.oldEventsSubject,
     )

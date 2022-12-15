@@ -50,11 +50,11 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
   }
 
   multiplex<T = TEvent>(
-    topic: TTopic,
+    topicId: TTopic,
     mapTo: ((event: TEvent) => T) = event => event as unknown as T,
   ): Observable<T> {
     return this.emitter.multiplex(
-      topic,
+      topicId,
       compose(mapTo, this.map) as unknown as (event: SourceEvent) => T
     );
   }
