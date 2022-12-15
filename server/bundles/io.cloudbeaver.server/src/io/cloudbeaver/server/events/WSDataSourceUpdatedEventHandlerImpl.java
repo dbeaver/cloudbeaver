@@ -50,7 +50,7 @@ public class WSDataSourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
         }
         activeUserSession.updateProjectConnection(
             project,
-            dsUpdateEvent.getDatasourceIds(),
+            dsUpdateEvent.getDataSourceIds(),
             eventType
         );
         activeUserSession.addSessionEvent(event);

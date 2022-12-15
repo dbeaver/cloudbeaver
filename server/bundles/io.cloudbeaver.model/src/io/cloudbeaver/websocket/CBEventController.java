@@ -77,7 +77,7 @@ public class CBEventController {
                 return Status.OK_STATUS;
             }
             for (WSEvent event : events) {
-                eventHandlersByType.getOrDefault(event.getTopic(), List.of())
+                eventHandlersByType.getOrDefault(event.getTopicId(), List.of())
                     .forEach(handler -> handler.handleEvent(event));
             }
             schedule(CHECK_PERIOD);

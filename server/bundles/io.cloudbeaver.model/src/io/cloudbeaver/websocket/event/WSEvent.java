@@ -52,7 +52,7 @@ public abstract class WSEvent {
     }
 
     @NotNull
-    public String getTopic() {
+    public String getTopicId() {
         return topicId;
     }
 }

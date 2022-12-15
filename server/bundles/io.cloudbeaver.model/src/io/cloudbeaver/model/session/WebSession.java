@@ -770,6 +770,10 @@ public class WebSession extends AbstractSessionPersistent
     }
 
     public void addSessionEvent(WSEvent event) {
+        boolean eventAllowedByFilter = activeEventTopics.isEmpty() || activeEventTopics.contains(event.getTopicId());
+        if (!eventAllowedByFilter) {
+            return;
+        }
         synchronized (sessionEventHandlers) {
             for (CBWebSessionEventHandler eventHandler : sessionEventHandlers) {
                 try {

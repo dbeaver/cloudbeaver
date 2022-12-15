@@ -19,40 +19,35 @@ package io.cloudbeaver.server.websockets;
 import com.google.gson.Gson;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.websockets.model.WebSocketClientEvent;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
 import io.cloudbeaver.websocket.WSConstants;
 import io.cloudbeaver.websocket.event.WSEvent;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 
 import java.io.IOException;
 
 public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionEventHandler {
+    private static final int NORMAL_STATUS = 1000;
     private static final Gson gson = new Gson();
     private static final Log log = Log.getLog(CBEventsWebSocket.class);
 
-    private WebSession webSession;
+    @NotNull
+    private final WebSession webSession;
+
+    public CBEventsWebSocket(@NotNull WebSession webSession) {
+        this.webSession = webSession;
+    }
+
 
     @Override
     public void onWebSocketConnect(Session session) {
-        var request = session.getUpgradeRequest();
-        var cbSessionIdCookie = request.getCookies().stream()
-                .filter(httpCookie -> httpCookie.getName().equals(CBConstants.CB_SESSION_COOKIE_NAME))
-                .findFirst();
-        if (cbSessionIdCookie.isEmpty()) {
-            log.error("CloudBeaver session id is not present in create websocket request cookies");
-            throw new RuntimeException("Failed associate websocket session with cb session");
-        }
-        var cbSessionId = cbSessionIdCookie.get().getValue();
-        this.webSession = CBPlatform.getInstance().getSessionManager()
-                .getWebSession(cbSessionId);
         super.onWebSocketConnect(session);
         this.webSession.addEventHandler(this);
-        log.debug("EventWebSocket connected to the " + cbSessionId + " session");
+        log.debug("EventWebSocket connected to the " + webSession.getSessionId() + " session");
     }
 
     @Override
@@ -116,5 +111,10 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
     @Override
     public void close() {
         getSession().close();
+        onWebSocketClose(NORMAL_STATUS, "Closed by web session");
+    }
+
+    public WebSession getWebSession() {
+        return webSession;
     }
 }

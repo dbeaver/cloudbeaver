@@ -22,7 +22,7 @@ import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.server.servlets.CBStatusServlet;
-import io.cloudbeaver.server.websockets.CBEventsWebSocket;
+import io.cloudbeaver.server.websockets.CBJettyWebSocketManager;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
@@ -114,7 +114,10 @@ public class CBJettyServer {
                     (context, wsContainer) -> {
                         wsContainer.setIdleTimeout(Duration.ofMinutes(5));
                         // Add websockets
-                        wsContainer.addMapping(application.getServicesURI() + "ws/*", CBEventsWebSocket.class);
+                        wsContainer.addMapping(
+                            application.getServicesURI() + "ws/*",
+                            new CBJettyWebSocketManager(application.getSessionManager())
+                        );
                     }
                 );
                 ErrorPageErrorHandler errorHandler = new ErrorPageErrorHandler();

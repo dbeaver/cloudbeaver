@@ -25,16 +25,16 @@ import java.util.List;
 
 public class WSDataSourceEvent extends WSAbstractProjectEvent {
     @Nullable
-    private final List<String> datasourceIds;
+    private final List<String> dataSourceIds;
 
     private WSDataSourceEvent(
         @NotNull WSEventType eventType,
         @Nullable String sessionId,
         @NotNull String projectId,
-        @Nullable List<String> datasourceIds
+        @Nullable List<String> dataSourceIds
     ) {
         super(eventType, sessionId, projectId);
-        this.datasourceIds = datasourceIds;
+        this.dataSourceIds = dataSourceIds;
     }
 
     public static WSDataSourceEvent create(
@@ -77,7 +77,7 @@ public class WSDataSourceEvent extends WSAbstractProjectEvent {
     }
 
     @Nullable
-    public List<String> getDatasourceIds() {
-        return datasourceIds;
+    public List<String> getDataSourceIds() {
+        return dataSourceIds;
     }
 }
