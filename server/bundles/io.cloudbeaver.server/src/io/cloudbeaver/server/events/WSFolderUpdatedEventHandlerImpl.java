@@ -18,7 +18,7 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.websocket.WSEventType;
+import io.cloudbeaver.websocket.WSEventTopic;
 import io.cloudbeaver.websocket.event.WSEvent;
 import io.cloudbeaver.websocket.event.datasource.WSDatasourceFolderEvent;
 import org.jkiss.code.NotNull;
@@ -30,8 +30,8 @@ import org.jkiss.utils.CommonUtils;
 public class WSFolderUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler {
     @NotNull
     @Override
-    public String getSupportedEventType() {
-        return WSEventType.DATASOURCE_FOLDER_UPDATED.getEventId();
+    public String getSupportedTopicId() {
+        return WSEventTopic.DATASOURCE_FOLDER.getTopicId();
     }
 
     @Override

@@ -36,7 +36,7 @@ public class CBEventController {
         var eventHandlers = WSEventHandlersRegistry.getInstance().getEventHandlers();
 
         eventHandlers
-            .forEach(handler -> eventHandlersByType.computeIfAbsent(handler.getSupportedEventType(), x -> new ArrayList<>()).add(handler));
+            .forEach(handler -> eventHandlersByType.computeIfAbsent(handler.getSupportedTopicId(), x -> new ArrayList<>()).add(handler));
     }
 
     private final List<WSEvent> eventsPool = new ArrayList<>();
@@ -77,7 +77,7 @@ public class CBEventController {
                 return Status.OK_STATUS;
             }
             for (WSEvent event : events) {
-                eventHandlersByType.getOrDefault(event.getId(), List.of())
+                eventHandlersByType.getOrDefault(event.getTopic(), List.of())
                     .forEach(handler -> handler.handleEvent(event));
             }
             schedule(CHECK_PERIOD);

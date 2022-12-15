@@ -27,20 +27,23 @@ public abstract class WSEvent {
     @Nullable
     private final String sessionId;
     @NotNull
-    private final WSEventType eventType;
+    private final String id;
+    @NotNull
+    private final String topicId;
 
     protected WSEvent(@NotNull WSEventType eventType) {
         this(eventType, null);
     }
 
     protected WSEvent(@NotNull WSEventType eventType, @Nullable String sessionId) {
-        this.eventType = eventType;
+        this.id = eventType.getEventId();
+        this.topicId = eventType.getTopic().getTopicId();
         this.sessionId = sessionId;
     }
 
     @NotNull
     public String getId() {
-        return eventType.getEventId();
+        return id;
     }
 
     @Nullable
@@ -50,11 +53,6 @@ public abstract class WSEvent {
 
     @NotNull
     public String getTopic() {
-        return eventType.getTopic().getTopicId();
-    }
-
-    @NotNull
-    public WSEventType getEventType() {
-        return eventType;
+        return topicId;
     }
 }

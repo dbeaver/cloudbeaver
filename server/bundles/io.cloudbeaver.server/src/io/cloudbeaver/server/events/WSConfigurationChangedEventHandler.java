@@ -19,7 +19,7 @@ package io.cloudbeaver.server.events;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.websocket.WSEventHandler;
-import io.cloudbeaver.websocket.WSEventType;
+import io.cloudbeaver.websocket.WSEventTopic;
 import io.cloudbeaver.websocket.event.WSEvent;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
@@ -35,13 +35,13 @@ public class WSConfigurationChangedEventHandler implements WSEventHandler {
 
     @NotNull
     @Override
-    public String getSupportedEventType() {
-        return WSEventType.SERVER_CONFIG_CHANGED.getEventId();
+    public String getSupportedTopicId() {
+        return WSEventTopic.SERVER_CONFIG.getTopicId();
     }
 
     @Override
     public void handleEvent(@NotNull WSEvent event) {
-        log.debug(getSupportedEventType() + " event handled");
+        log.debug(getSupportedTopicId() + " event handled");
         Collection<WebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
 
         for (WebSession activeUserSession : allSessions) {

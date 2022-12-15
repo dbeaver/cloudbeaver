@@ -27,7 +27,7 @@ public interface WSEventHandler {
      * Expected cb event type
      */
     @NotNull
-    String getSupportedEventType();
+    String getSupportedTopicId();
 
     /**
      * Handle associated cb event

@@ -18,6 +18,7 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.websocket.WSEventTopic;
 import io.cloudbeaver.websocket.WSEventType;
 import io.cloudbeaver.websocket.event.WSEvent;
 import io.cloudbeaver.websocket.event.datasource.WSDataSourceEvent;
@@ -29,8 +30,8 @@ import org.jkiss.code.NotNull;
 public class WSDataSourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler {
     @NotNull
     @Override
-    public String getSupportedEventType() {
-        return WSEventType.DATASOURCE_UPDATED.getEventId();
+    public String getSupportedTopicId() {
+        return WSEventTopic.DATASOURCE.getTopicId();
     }
 
     @Override
@@ -43,10 +44,14 @@ public class WSDataSourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
         if (project == null) {
             return;
         }
+        var eventType = WSEventType.valueById(event.getId());
+        if (eventType == null) {
+            return;
+        }
         activeUserSession.updateProjectConnection(
             project,
             dsUpdateEvent.getDatasourceIds(),
-            dsUpdateEvent.getEventType()
+            eventType
         );
         activeUserSession.addSessionEvent(event);
     }

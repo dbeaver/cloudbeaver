@@ -34,11 +34,11 @@ public abstract class WSProjectUpdatedEventHandler implements WSEventHandler {
 
     @NotNull
     @Override
-    public abstract String getSupportedEventType();
+    public abstract String getSupportedTopicId();
 
     @Override
     public void handleEvent(@NotNull WSEvent event) {
-        log.debug(getSupportedEventType() + " event handled");
+        log.debug(getSupportedTopicId() + " event handled");
         Collection<WebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
         for (WebSession activeUserSession : allSessions) {
             if (CommonUtils.equalObjects(activeUserSession.getSessionId(), event.getSessionId())) {

@@ -21,6 +21,7 @@ import io.cloudbeaver.websocket.event.WSServerConfigurationChangedEvent;
 import io.cloudbeaver.websocket.event.datasource.WSDataSourceEvent;
 import io.cloudbeaver.websocket.event.datasource.WSDatasourceFolderEvent;
 import io.cloudbeaver.websocket.event.resource.WSResourceUpdatedEvent;
+import org.jkiss.code.Nullable;
 
 public enum WSEventType {
     SERVER_CONFIG_CHANGED(
@@ -63,6 +64,16 @@ public enum WSEventType {
         this.eventId = eventId;
         this.topic = topic;
         this.eventClass = eventClass;
+    }
+
+    @Nullable
+    public static WSEventType valueById(String id) {
+        for (WSEventType value : values()) {
+            if (value.getEventId().equals(id)) {
+                return value;
+            }
+        }
+        return null;
     }
 
     public String getEventId() {

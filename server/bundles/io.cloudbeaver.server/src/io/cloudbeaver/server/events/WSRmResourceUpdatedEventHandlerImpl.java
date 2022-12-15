@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.websocket.WSEventTopic;
 import io.cloudbeaver.websocket.WSEventType;
 import io.cloudbeaver.websocket.event.WSEvent;
 import io.cloudbeaver.websocket.event.resource.WSResourceUpdatedEvent;
@@ -40,8 +41,8 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
 
     @NotNull
     @Override
-    public String getSupportedEventType() {
-        return WSEventType.RM_RESOURCE_UPDATED.getEventId();
+    public String getSupportedTopicId() {
+        return WSEventTopic.RM_SCRIPTS.getTopicId();
     }
 
     @Override
@@ -65,7 +66,11 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
         } else {
             resourceParsedPath = gson.fromJson(gson.toJson(parsedResourcePath), RMResource[].class);
         }
-        acceptChangesInNavigatorTree(resourceUpdateEvent.getEventType(), resourceParsedPath, project);
+        var eventType = WSEventType.valueById(resourceUpdateEvent.getId());
+        if (eventType == null) {
+            return;
+        }
+        acceptChangesInNavigatorTree(eventType, resourceParsedPath, project);
         activeUserSession.addSessionEvent(event);
     }
 
