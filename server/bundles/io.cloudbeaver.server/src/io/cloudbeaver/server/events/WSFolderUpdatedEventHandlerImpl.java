@@ -18,9 +18,9 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.websocket.WSConstants;
-import io.cloudbeaver.websocket.event.WSDataSourceFolderUpdateEvent;
+import io.cloudbeaver.websocket.WSEventType;
 import io.cloudbeaver.websocket.event.WSEvent;
+import io.cloudbeaver.websocket.event.datasource.WSDatasourceFolderEvent;
 import org.jkiss.code.NotNull;
 import org.jkiss.utils.CommonUtils;
 
@@ -31,15 +31,15 @@ public class WSFolderUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandle
     @NotNull
     @Override
     public String getSupportedEventType() {
-        return WSConstants.CLOUDBEAVER_DATASOURCE_FOLDER_UPDATED;
+        return WSEventType.DATASOURCE_FOLDER_UPDATED.getEventId();
     }
 
     @Override
     protected void updateSessionData(WebSession activeUserSession, WSEvent event) {
-        if (!(event instanceof WSDataSourceFolderUpdateEvent)) {
+        if (!(event instanceof WSDatasourceFolderEvent)) {
             return;
         }
-        var dsFolderUpdateEvent = (WSDataSourceFolderUpdateEvent) event;
+        var dsFolderUpdateEvent = (WSDatasourceFolderEvent) event;
         WebProjectImpl project = activeUserSession.getProjectById(dsFolderUpdateEvent.getProjectId());
         if (project == null || CommonUtils.isEmpty(dsFolderUpdateEvent.getNodePaths())) {
             return;

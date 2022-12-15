@@ -31,7 +31,7 @@ import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
-import io.cloudbeaver.websocket.WSConstants;
+import io.cloudbeaver.websocket.WSEventType;
 import io.cloudbeaver.websocket.event.WSEvent;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
@@ -298,12 +298,16 @@ public class WebSession extends AbstractSessionPersistent
      * @param connectionIds list of updated connections
      * @param type          type of event
      */
-    public synchronized void updateProjectConnection(DBPProject project, List<String> connectionIds, WSConstants.EventAction type) {
+    public synchronized void updateProjectConnection(
+        DBPProject project,
+        List<String> connectionIds,
+        WSEventType type
+    ) {
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         registry.refreshConfig();
         for (String connectionId : connectionIds) {
             switch (type) {
-                case CREATE:
+                case DATASOURCE_CREATED:
                     DBPDataSourceContainer container = registry.getDataSource(connectionId);
                     if (container == null) {
                         break;
@@ -311,7 +315,7 @@ public class WebSession extends AbstractSessionPersistent
                     WebConnectionInfo connectionInfo = new WebConnectionInfo(this, registry.getDataSource(connectionId));
                     this.connections.put(connectionInfo.getId(), connectionInfo);
                     break;
-                case DELETE:
+                case DATASOURCE_DELETED:
                     this.connections.remove(connectionId);
                     break;
                 default:

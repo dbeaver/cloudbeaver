@@ -18,8 +18,8 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.websocket.WSConstants;
 import io.cloudbeaver.websocket.WSEventHandler;
+import io.cloudbeaver.websocket.WSEventType;
 import io.cloudbeaver.websocket.event.WSEvent;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
@@ -36,7 +36,7 @@ public class WSConfigurationChangedEventHandler implements WSEventHandler {
     @NotNull
     @Override
     public String getSupportedEventType() {
-        return WSConstants.Event.SERVER_CONFIG_CHANGED.getEventId();
+        return WSEventType.SERVER_CONFIG_CHANGED.getEventId();
     }
 
     @Override

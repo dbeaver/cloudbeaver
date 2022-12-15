@@ -17,10 +17,12 @@
 package io.cloudbeaver.utils;
 
 import io.cloudbeaver.websocket.WSConstants;
-import io.cloudbeaver.websocket.event.WSDataSourceFolderUpdateEvent;
-import io.cloudbeaver.websocket.event.WSDataSourceUpdateEvent;
-import io.cloudbeaver.websocket.event.WSResourceUpdatedEvent;
+import io.cloudbeaver.websocket.event.WSEvent;
+import io.cloudbeaver.websocket.event.datasource.WSDataSourceEvent;
+import io.cloudbeaver.websocket.event.datasource.WSDatasourceFolderEvent;
+import io.cloudbeaver.websocket.event.resource.WSResourceUpdatedEvent;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.rm.RMResource;
 
 import java.util.List;
 
@@ -42,14 +44,34 @@ public class WebEventUtils {
         if (project == null) {
             return;
         }
-        WebAppUtils.getWebApplication().getEventController().addEvent(
-            new WSDataSourceUpdateEvent(
-                sessionId,
-                project.getId(),
-                List.of(datasourceId),
-                eventAction
-            )
-        );
+        WSEvent event = null;
+        switch (eventAction) {
+            case CREATE:
+                event = WSDataSourceEvent.create(
+                    sessionId,
+                    project.getId(),
+                    List.of(datasourceId)
+                );
+                break;
+            case DELETE:
+                event = WSDataSourceEvent.delete(
+                    sessionId,
+                    project.getId(),
+                    List.of(datasourceId)
+                );
+                break;
+            case UPDATE:
+                event = WSDataSourceEvent.update(
+                    sessionId,
+                    project.getId(),
+                    List.of(datasourceId)
+                );
+                break;
+        }
+        if (event == null) {
+            return;
+        }
+        WebAppUtils.getWebApplication().getEventController().addEvent(event);
     }
 
     public static void addNavigatorNodeUpdatedEvent(
@@ -61,32 +83,74 @@ public class WebEventUtils {
         if (project == null) {
             return;
         }
-        WebAppUtils.getWebApplication().getEventController().addEvent(
-            new WSDataSourceFolderUpdateEvent(
-                sessionId,
-                project.getId(),
-                List.of(nodePath),
-                eventAction
-            )
-        );
+        WSEvent event = null;
+        switch (eventAction) {
+            case CREATE:
+                event = WSDatasourceFolderEvent.create(
+                    sessionId,
+                    project.getId(),
+                    List.of(nodePath)
+                );
+                break;
+            case DELETE:
+                event = WSDatasourceFolderEvent.delete(
+                    sessionId,
+                    project.getId(),
+                    List.of(nodePath)
+                );
+                break;
+            case UPDATE:
+                event = WSDatasourceFolderEvent.update(
+                    sessionId,
+                    project.getId(),
+                    List.of(nodePath)
+                );
+                break;
+        }
+        if (event == null) {
+            return;
+        }
+        WebAppUtils.getWebApplication().getEventController().addEvent(event);
     }
 
     public static void addRmResourceUpdatedEvent(
         String projectId,
         String sessionId,
         String resourcePath,
-        Object resourceParsedPath,
+        RMResource[] resourceParsedPath,
         WSConstants.EventAction eventAction
     ) {
-        WebAppUtils.getWebApplication().getEventController().addEvent(
-            new WSResourceUpdatedEvent(
-                sessionId,
-                projectId,
-                resourcePath,
-                resourceParsedPath,
-                eventAction
-            )
-        );
+        WSEvent event = null;
+        switch (eventAction) {
+            case CREATE:
+                event = WSResourceUpdatedEvent.create(
+                    sessionId,
+                    projectId,
+                    resourcePath,
+                    resourceParsedPath
+                );
+                break;
+            case DELETE:
+                event = WSResourceUpdatedEvent.delete(
+                    sessionId,
+                    projectId,
+                    resourcePath,
+                    resourceParsedPath
+                );
+                break;
+            case UPDATE:
+                event = WSResourceUpdatedEvent.update(
+                    sessionId,
+                    projectId,
+                    resourcePath,
+                    resourceParsedPath
+                );
+                break;
+        }
+        if (event == null) {
+            return;
+        }
+        WebAppUtils.getWebApplication().getEventController().addEvent(event);
     }
 
 }

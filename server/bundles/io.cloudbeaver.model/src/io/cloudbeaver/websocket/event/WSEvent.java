@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.websocket.event;
 
-import io.cloudbeaver.websocket.WSConstants;
+import io.cloudbeaver.websocket.WSEventType;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 
@@ -27,27 +27,20 @@ public abstract class WSEvent {
     @Nullable
     private final String sessionId;
     @NotNull
-    private final String id;
-    @NotNull
-    private final String topic;
+    private final WSEventType eventType;
 
-    protected WSEvent(@NotNull WSConstants.Event event) {
-        this(event, null);
+    protected WSEvent(@NotNull WSEventType eventType) {
+        this(eventType, null);
     }
 
-    protected WSEvent(@NotNull WSConstants.Event event, @Nullable String sessionId) {
-        this(event.getEventId(), event.getTopic().getTopicId(), sessionId);
-    }
-
-    protected WSEvent(@NotNull String id, @NotNull String topic, @Nullable String sessionId) {
+    protected WSEvent(@NotNull WSEventType eventType, @Nullable String sessionId) {
+        this.eventType = eventType;
         this.sessionId = sessionId;
-        this.id = id;
-        this.topic = topic;
     }
 
     @NotNull
     public String getId() {
-        return id;
+        return eventType.getEventId();
     }
 
     @Nullable
@@ -57,6 +50,11 @@ public abstract class WSEvent {
 
     @NotNull
     public String getTopic() {
-        return topic;
+        return eventType.getTopic().getTopicId();
+    }
+
+    @NotNull
+    public WSEventType getEventType() {
+        return eventType;
     }
 }

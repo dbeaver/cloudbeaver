@@ -20,9 +20,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.websocket.WSConstants;
+import io.cloudbeaver.websocket.WSEventType;
 import io.cloudbeaver.websocket.event.WSEvent;
-import io.cloudbeaver.websocket.event.WSResourceUpdatedEvent;
+import io.cloudbeaver.websocket.event.resource.WSResourceUpdatedEvent;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
@@ -41,18 +41,21 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
     @NotNull
     @Override
     public String getSupportedEventType() {
-        return WSConstants.Event.RM_RESOURCE_UPDATED.getEventId();
+        return WSEventType.RM_RESOURCE_UPDATED.getEventId();
     }
 
     @Override
     protected void updateSessionData(WebSession activeUserSession, WSEvent event) {
+        if (!(event instanceof WSResourceUpdatedEvent)) {
+            return;
+        }
         var resourceUpdateEvent = (WSResourceUpdatedEvent) event;
         String projectId = resourceUpdateEvent.getProjectId();
         WebProjectImpl project = activeUserSession.getProjectById(projectId);
         if (project == null) {
             return;
         }
-        if (resourceUpdateEvent.getAction() == null || resourceUpdateEvent.getResourcePath() == null) {
+        if (resourceUpdateEvent.getResourcePath() == null) {
             return;
         }
         Object parsedResourcePath = resourceUpdateEvent.getResourceParsedPath();
@@ -62,19 +65,21 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
         } else {
             resourceParsedPath = gson.fromJson(gson.toJson(parsedResourcePath), RMResource[].class);
         }
-        acceptChangesInNavigatorTree(resourceUpdateEvent.getAction(), resourceParsedPath, project);
+        acceptChangesInNavigatorTree(resourceUpdateEvent.getEventType(), resourceParsedPath, project);
         activeUserSession.addSessionEvent(event);
     }
 
-    private void acceptChangesInNavigatorTree(WSConstants.EventAction action, RMResource[] resourceParsedPath, WebProjectImpl project) {
+    private void acceptChangesInNavigatorTree(WSEventType eventType,
+                                              RMResource[] resourceParsedPath,
+                                              WebProjectImpl project) {
         List<RMResource> rmResourcePath = Arrays.asList(resourceParsedPath);
-        if (action == WSConstants.EventAction.CREATE) {
+        if (eventType == WSEventType.RM_RESOURCE_CREATED) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_ADD,
                     project.getRmProject(),
                     rmResourcePath)
             );
-        } else if (action == WSConstants.EventAction.DELETE) {
+        } else if (eventType == WSEventType.RM_RESOURCE_DELETED) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_DELETE,
                     project.getRmProject(),

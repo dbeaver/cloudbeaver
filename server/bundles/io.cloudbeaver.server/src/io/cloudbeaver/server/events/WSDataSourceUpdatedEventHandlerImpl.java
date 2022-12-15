@@ -18,9 +18,9 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.websocket.WSConstants;
-import io.cloudbeaver.websocket.event.WSDataSourceUpdateEvent;
+import io.cloudbeaver.websocket.WSEventType;
 import io.cloudbeaver.websocket.event.WSEvent;
+import io.cloudbeaver.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.code.NotNull;
 
 /**
@@ -30,17 +30,24 @@ public class WSDataSourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
     @NotNull
     @Override
     public String getSupportedEventType() {
-        return WSConstants.Event.DATASOURCE_UPDATED.getEventId();
+        return WSEventType.DATASOURCE_UPDATED.getEventId();
     }
 
     @Override
     protected void updateSessionData(WebSession activeUserSession, WSEvent event) {
-        var dsUpdateEvent = (WSDataSourceUpdateEvent) event;
+        if (!(event instanceof WSDataSourceEvent)) {
+            return;
+        }
+        var dsUpdateEvent = (WSDataSourceEvent) event;
         WebProjectImpl project = activeUserSession.getProjectById(dsUpdateEvent.getProjectId());
         if (project == null) {
             return;
         }
-        activeUserSession.updateProjectConnection(project, dsUpdateEvent.getDatasourceIds(), dsUpdateEvent.getAction());
+        activeUserSession.updateProjectConnection(
+            project,
+            dsUpdateEvent.getDatasourceIds(),
+            dsUpdateEvent.getEventType()
+        );
         activeUserSession.addSessionEvent(event);
     }
 }

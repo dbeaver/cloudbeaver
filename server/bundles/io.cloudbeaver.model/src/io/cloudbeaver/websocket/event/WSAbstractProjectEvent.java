@@ -16,44 +16,25 @@
  */
 package io.cloudbeaver.websocket.event;
 
-import io.cloudbeaver.websocket.WSConstants;
+import io.cloudbeaver.websocket.WSEventType;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 
-import java.util.List;
+public class WSAbstractProjectEvent extends WSEvent {
+    @NotNull
+    protected final String projectId;
 
-public class WSDataSourceUpdateEvent extends WSEvent {
-    @NotNull
-    private final String projectId;
-    @NotNull
-    private final List<String> datasourceIds;
-    @NotNull
-    private final WSConstants.EventAction action;
-
-    public WSDataSourceUpdateEvent(
+    public WSAbstractProjectEvent(
+        @NotNull WSEventType eventType,
         @Nullable String sessionId,
-        @NotNull String projectId,
-        @NotNull List<String> datasourceIds,
-        @NotNull WSConstants.EventAction action
+        @NotNull String projectId
     ) {
-        super(WSConstants.Event.DATASOURCE_UPDATED, sessionId);
+        super(eventType, sessionId);
         this.projectId = projectId;
-        this.datasourceIds = datasourceIds;
-        this.action = action;
     }
 
     @NotNull
     public String getProjectId() {
         return projectId;
-    }
-
-    @NotNull
-    public List<String> getDatasourceIds() {
-        return datasourceIds;
-    }
-
-    @NotNull
-    public WSConstants.EventAction getAction() {
-        return action;
     }
 }

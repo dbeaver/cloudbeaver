@@ -28,10 +28,10 @@ public class WSEventDeserializer implements JsonDeserializer<WSEvent> {
     private static final String EVENT_ID_FIELD = "id";
     private final Gson gson = new Gson();
     private final Map<String, Class<? extends WSEvent>> eventClassById =
-            Arrays.stream(WSConstants.Event.values())
+            Arrays.stream(WSEventType.values())
                     .collect(Collectors.toMap(
-                            WSConstants.Event::getEventId,
-                            WSConstants.Event::getEventClass
+                        WSEventType::getEventId,
+                        WSEventType::getEventClass
                     ));
 
     @Override

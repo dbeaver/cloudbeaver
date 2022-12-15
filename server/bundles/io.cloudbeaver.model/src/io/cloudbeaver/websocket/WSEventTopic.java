@@ -14,17 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.websocket.event;
+package io.cloudbeaver.websocket;
 
-import io.cloudbeaver.websocket.WSEventType;
-import org.jkiss.code.Nullable;
+//TODO: implement event registry and describe possible events in plugin.xml
+public enum WSEventTopic {
+    SERVER_CONFIG("cb_config"),
+    DATASOURCE("cb_datasource"),
+    DATASOURCE_FOLDER("cb_datasource_folder"),
+    RM_SCRIPTS("cb_rm_scripts"),
+    PROJECTS("cb_projects");
 
-public class WSServerConfigurationChangedEvent extends WSEvent {
-    public WSServerConfigurationChangedEvent() {
-        super(WSEventType.SERVER_CONFIG_CHANGED);
+    private final String topicId;
+
+    WSEventTopic(String topicId) {
+        this.topicId = topicId;
     }
 
-    public WSServerConfigurationChangedEvent(@Nullable String sessionId) {
-        super(WSEventType.SERVER_CONFIG_CHANGED, sessionId);
+    public String getTopicId() {
+        return topicId;
     }
 }
