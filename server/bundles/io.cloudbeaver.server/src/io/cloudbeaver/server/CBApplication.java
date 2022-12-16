@@ -62,6 +62,7 @@ import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
@@ -863,7 +864,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             var securityController = getSecurityController();
             for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
                 var datasourcePermissions = securityController.getObjectPermissions(anonymousTeamId, ds.getId(), SMObjects.DATASOURCE);
-                if (CommonUtils.isEmpty(datasourcePermissions.getPermissions())) {
+                if (ArrayUtils.isEmpty(datasourcePermissions.getPermissions())) {
                     securityController.setObjectPermissions(
                         Set.of(ds.getId()),
                         SMObjects.DATASOURCE,
