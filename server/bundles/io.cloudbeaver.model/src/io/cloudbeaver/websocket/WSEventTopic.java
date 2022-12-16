@@ -21,7 +21,7 @@ public enum WSEventTopic {
     SERVER_CONFIG("cb_config"),
     DATASOURCE("cb_datasource"),
     DATASOURCE_FOLDER("cb_datasource_folder"),
-    RM_SCRIPTS("cb_rm_scripts"),
+    RM_SCRIPTS("cb_scripts"),
     PROJECTS("cb_projects");
 
     private final String topicId;

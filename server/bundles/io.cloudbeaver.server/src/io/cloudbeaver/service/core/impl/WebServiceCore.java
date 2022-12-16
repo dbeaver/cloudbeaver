@@ -61,10 +61,7 @@ import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -423,6 +420,7 @@ public class WebServiceCore implements DBWServiceCore {
         if (!CommonUtils.isEmpty(config.getName())) {
             dataSource.setName(config.getName());
         }
+        String oldDescription = dataSource.getDescription();
         if (config.getDescription() != null) {
             dataSource.setDescription(config.getDescription());
         }
@@ -430,8 +428,8 @@ public class WebServiceCore implements DBWServiceCore {
         dataSource.setFolder(config.getFolder() != null ? sessionRegistry.getFolder(config.getFolder()) : null);
 
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
-        
-        boolean sendEvent = sendUpdateConnectionEvent(config, dataSource, oldConnectionConfig);
+
+        boolean sendEvent = sendUpdateConnectionEvent(config, dataSource, oldConnectionConfig, oldDescription);
 
         WebServiceUtils.saveAuthProperties(
             dataSource,
@@ -464,9 +462,13 @@ public class WebServiceCore implements DBWServiceCore {
     private boolean sendUpdateConnectionEvent(
         @NotNull WebConnectionConfig config,
         @NotNull DBPDataSourceContainer dataSource,
-        @NotNull DBPConnectionConfiguration oldConnectionConfig
+        @NotNull DBPConnectionConfiguration oldConnectionConfig,
+        @Nullable String oldDescription
     ) {
         if (!oldConnectionConfig.equals(dataSource.getConnectionConfiguration())) {
+            return true;
+        }
+        if (!Objects.equals(oldDescription, dataSource.getDescription())) {
             return true;
         }
         if (dataSource.getProject().isUseSecretStorage()) {
