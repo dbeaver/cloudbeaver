@@ -61,11 +61,11 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
         }
         switch (clientEvent.getId()) {
             case WSConstants.ClientEvents.TOPIC_SUBSCRIBE: {
-                this.webSession.subscribeOnEventTopic(clientEvent.getTopic());
+                this.webSession.subscribeOnEventTopic(clientEvent.getTopicId());
                 break;
             }
             case WSConstants.ClientEvents.TOPIC_UNSUBSCRIBE: {
-                this.webSession.unsubscribeFromEventTopic(clientEvent.getTopic());
+                this.webSession.unsubscribeFromEventTopic(clientEvent.getTopicId());
                 break;
             }
             default:

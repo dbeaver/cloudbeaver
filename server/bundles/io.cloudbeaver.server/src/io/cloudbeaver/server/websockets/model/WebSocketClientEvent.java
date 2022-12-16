@@ -18,18 +18,18 @@ package io.cloudbeaver.server.websockets.model;
 
 public class WebSocketClientEvent {
     private final String id;
-    private final String topic;
+    private final String topicId;
 
-    public WebSocketClientEvent(String id, String topic) {
+    public WebSocketClientEvent(String id, String topicId) {
         this.id = id;
-        this.topic = topic;
+        this.topicId = topicId;
     }
 
     public String getId() {
         return id;
     }
 
-    public String getTopic() {
-        return topic;
+    public String getTopicId() {
+        return topicId;
     }
 }
