@@ -30,7 +30,7 @@ public class SMUtils {
         RMProject project,
         RMProjectPermission projectPermission
     ) {
-        return isRMAdmin(credentialsProvider) || project.getProjectPermissions().contains(projectPermission.getPermissionId());
+        return isRMAdmin(credentialsProvider) || project.hasProjectPermission(projectPermission.getPermissionId());
     }
 
     public static List<AdminPermissionInfo> findPermissions(@NotNull String permissionsScope) {
