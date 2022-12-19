@@ -18,7 +18,6 @@ package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
-import io.cloudbeaver.websocket.event.WSEvent;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -28,6 +27,7 @@ import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.time.Instant;

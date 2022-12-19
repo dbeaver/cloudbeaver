@@ -16,13 +16,13 @@
  */
 package io.cloudbeaver.utils;
 
-import io.cloudbeaver.websocket.WSConstants;
-import io.cloudbeaver.websocket.event.WSEvent;
-import io.cloudbeaver.websocket.event.datasource.WSDataSourceEvent;
-import io.cloudbeaver.websocket.event.datasource.WSDatasourceFolderEvent;
-import io.cloudbeaver.websocket.event.resource.WSResourceUpdatedEvent;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
+import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
+import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
 
 import java.util.List;
 

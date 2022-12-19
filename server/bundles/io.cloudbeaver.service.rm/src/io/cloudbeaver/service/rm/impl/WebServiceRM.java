@@ -24,7 +24,6 @@ import io.cloudbeaver.service.rm.model.RMProjectPermissions;
 import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.WebEventUtils;
-import io.cloudbeaver.websocket.WSConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -33,6 +32,7 @@ import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.websocket.WSConstants;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;

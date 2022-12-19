@@ -18,11 +18,11 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.websocket.WSEventTopic;
-import io.cloudbeaver.websocket.WSEventType;
-import io.cloudbeaver.websocket.event.WSEvent;
-import io.cloudbeaver.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
+import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 
 /**
  * Notify all active user session that datasource has been updated

@@ -18,10 +18,10 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.websocket.WSEventTopic;
-import io.cloudbeaver.websocket.event.WSEvent;
-import io.cloudbeaver.websocket.event.datasource.WSDatasourceFolderEvent;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
 import org.jkiss.utils.CommonUtils;
 
 /**

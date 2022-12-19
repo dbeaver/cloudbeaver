@@ -21,12 +21,12 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.websockets.model.WebSocketClientEvent;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
-import io.cloudbeaver.websocket.WSConstants;
-import io.cloudbeaver.websocket.event.WSEvent;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 
 import java.io.IOException;
 

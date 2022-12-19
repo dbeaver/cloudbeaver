@@ -20,14 +20,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.websocket.WSEventTopic;
-import io.cloudbeaver.websocket.WSEventType;
-import io.cloudbeaver.websocket.event.WSEvent;
-import io.cloudbeaver.websocket.event.resource.WSResourceUpdatedEvent;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
 import org.jkiss.dbeaver.model.rm.RMResource;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
+import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
 
 import java.util.Arrays;
 import java.util.List;

@@ -36,8 +36,6 @@ import io.cloudbeaver.service.security.EmbeddedSecurityControllerFactory;
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.utils.WebAppUtils;
-import io.cloudbeaver.websocket.CBEventController;
-import io.cloudbeaver.websocket.event.WSServerConfigurationChangedEvent;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.jkiss.code.NotNull;
@@ -53,6 +51,8 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.websocket.event.WSEventController;
+import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -130,7 +130,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     private String localHostAddress;
     private final List<InetAddress> localInetAddresses = new ArrayList<>();
 
-    protected final CBEventController eventController = new CBEventController();
+    protected final WSEventController eventController = new WSEventController();
 
     private WebSessionManager sessionManager;
 
@@ -1108,7 +1108,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     @Override
-    public CBEventController getEventController() {
+    public WSEventController getEventController() {
         return eventController;
     }
 
