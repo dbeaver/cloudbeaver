@@ -30,9 +30,7 @@ import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebDataSourceUtils;
-import io.cloudbeaver.websocket.CBWebSessionEventHandler;
 import io.cloudbeaver.websocket.WSEventType;
-import io.cloudbeaver.websocket.event.WSEvent;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -45,12 +43,10 @@ import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.*;
-import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
-import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -75,11 +71,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -88,7 +80,7 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
-public class WebSession extends AbstractSessionPersistent
+public class WebSession extends BaseWebSession
     implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
@@ -101,8 +93,6 @@ public class WebSession extends AbstractSessionPersistent
 
     private final AtomicInteger taskCount = new AtomicInteger();
 
-    private final String id;
-    private final long createTime;
     private volatile long lastAccessTime;
     private long maxSessionIdleTime;
     private String lastRemoteAddr;
@@ -126,12 +116,7 @@ public class WebSession extends AbstractSessionPersistent
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private WebProjectImpl defaultProject;
     private final List<WebProjectImpl> accessibleProjects = new ArrayList<>();
-    private final SessionContextImpl sessionAuthContext;
-    private final WebApplication application;
     private final Map<String, DBWSessionHandler> sessionHandlers;
-    private final WebUserContext userContext;
-    private final List<CBWebSessionEventHandler> sessionEventHandlers = new ArrayList<>();
-    private final Set<String> activeEventTopics = new CopyOnWriteArraySet<>();
 
     private RMController rmController;
 
@@ -141,23 +126,12 @@ public class WebSession extends AbstractSessionPersistent
         @NotNull Map<String, DBWSessionHandler> sessionHandlers,
         long maxSessionIdleTime
     ) throws DBException {
-        this.id = httpSession.getId();
-        this.createTime = System.currentTimeMillis();
+        super(httpSession.getId(), application);
         this.lastAccessTime = this.createTime;
         this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
-        this.sessionAuthContext = new SessionContextImpl(null);
-        this.sessionAuthContext.addSession(this);
-        this.application = application;
         this.sessionHandlers = sessionHandlers;
-        this.userContext = new WebUserContext(application);
         this.maxSessionIdleTime = maxSessionIdleTime;
         this.rmController = application.createResourceController(this);
-    }
-
-    @NotNull
-    @Override
-    public SMAuthSpace getSessionSpace() {
-        return DBWorkbench.getPlatform().getWorkspace();
     }
 
     @Override
@@ -170,18 +144,6 @@ public class WebSession extends AbstractSessionPersistent
         }
     }
 
-    @NotNull
-    @Property
-    public String getSessionId() {
-        return id;
-    }
-
-    @NotNull
-    @Override
-    public LocalDateTime getSessionStart() {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(createTime), ZoneId.systemDefault());
-    }
-
     public WebApplication getApplication() {
         return application;
     }
@@ -189,11 +151,6 @@ public class WebSession extends AbstractSessionPersistent
     @NotNull
     public DBPProject getSingletonProject() {
         return defaultProject;
-    }
-
-    @NotNull
-    public SMSessionContext getSessionContext() {
-        return sessionAuthContext;
     }
 
     @Property
@@ -242,10 +199,6 @@ public class WebSession extends AbstractSessionPersistent
         getAllAuthInfo().forEach(authInfo -> allMetaParams.putAll(authInfo.getUserIdentity().getMetaParameters()));
 
         return allMetaParams;
-    }
-
-    public synchronized WebUserContext getUserContext() {
-        return userContext;
     }
 
     public synchronized String getUserId() {
@@ -524,7 +477,7 @@ public class WebSession extends AbstractSessionPersistent
             return;
         }
         SMAuthInfo authInfo = getSecurityController().authenticateAnonymousUser(this.id, getSessionParameters(), CB_SESSION_TYPE);
-        updateSMAuthInfo(authInfo);
+        updateSMSession(authInfo);
     }
 
     @NotNull
@@ -649,9 +602,7 @@ public class WebSession extends AbstractSessionPersistent
             this.defaultProject.dispose();
             this.defaultProject = null;
         }
-        for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
-            sessionEventHandler.close();
-        }
+
         super.close();
     }
 
@@ -767,43 +718,6 @@ public class WebSession extends AbstractSessionPersistent
 
     public void addInfoMessage(String message) {
         addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.INFO, message));
-    }
-
-    public void addSessionEvent(WSEvent event) {
-        boolean eventAllowedByFilter = activeEventTopics.isEmpty() || activeEventTopics.contains(event.getTopicId());
-        if (!eventAllowedByFilter) {
-            return;
-        }
-        synchronized (sessionEventHandlers) {
-            for (CBWebSessionEventHandler eventHandler : sessionEventHandlers) {
-                try {
-                    eventHandler.handeWebSessionEvent(event);
-                } catch (DBException e) {
-                    log.error(e.getMessage(), e);
-                    addSessionError(e);
-                }
-            }
-        }
-    }
-
-    public void addEventHandler(@NotNull CBWebSessionEventHandler handler) {
-        synchronized (sessionEventHandlers) {
-            sessionEventHandlers.add(handler);
-        }
-    }
-
-    public void removeEventHandler(@NotNull CBWebSessionEventHandler handler) {
-        synchronized (sessionEventHandlers) {
-            sessionEventHandlers.remove(handler);
-        }
-    }
-
-    public void subscribeOnEventTopic(@NotNull String topic) {
-        activeEventTopics.add(topic);
-    }
-
-    public void unsubscribeFromEventTopic(@NotNull String topic) {
-        activeEventTopics.remove(topic);
     }
 
     public List<WebServerMessage> readLog(Integer maxEntries, Boolean clearLog) {
@@ -1060,11 +974,12 @@ public class WebSession extends AbstractSessionPersistent
         this.userContext.reset();
     }
 
-    public synchronized void updateSMAuthInfo(SMAuthInfo smAuthInfo) throws DBException {
-        boolean contextChanged = userContext.refresh(smAuthInfo);
+    public synchronized boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
+        boolean contextChanged = super.updateSMSession(smAuthInfo);
         if (contextChanged) {
             refreshUserData();
         }
+        return contextChanged;
     }
 
     @Override

@@ -42,7 +42,6 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
         this.webSession = webSession;
     }
 
-
     @Override
     public void onWebSocketConnect(Session session) {
         super.onWebSocketConnect(session);
@@ -86,9 +85,7 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
     public void onWebSocketError(Throwable cause) {
         super.onWebSocketError(cause);
         log.error(cause.getMessage(), cause);
-        if (webSession != null) {
-            webSession.addSessionError(cause);
-        }
+        webSession.addSessionError(cause);
     }
 
     public void awaitClosure() throws InterruptedException {
@@ -114,6 +111,7 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
         onWebSocketClose(NORMAL_STATUS, "Closed by web session");
     }
 
+    @NotNull
     public WebSession getWebSession() {
         return webSession;
     }

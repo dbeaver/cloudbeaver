@@ -32,6 +32,7 @@ import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Objects;
@@ -72,28 +73,35 @@ public class WebUserContext implements SMCredentialsProvider {
         if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS || smAuthInfo.getSmAuthToken() == null) {
             throw new DBCException("Authorization did not complete successfully");
         }
-        var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
-        var authPermissions = smAuthInfo.getAuthPermissions();
-        if (authPermissions == null) {
+        if (smAuthInfo.getAuthPermissions() == null) {
             throw new DBCException("Required information about session permissions is missing");
         }
-        var isSessionChanged = !CommonUtils.equalObjects(smSessionId, authPermissions.getSessionId());
-        if (isNonAnonymousUserAuthorized && isSessionChanged && !Objects.equals(getUserId(), authPermissions.getUserId())) {
+        return refresh(smAuthInfo.getSmAuthToken(), smAuthInfo.getSmRefreshToken(), smAuthInfo.getAuthPermissions());
+    }
+
+    public synchronized boolean refresh(
+        @NotNull String smAccessToken,
+        @Nullable String smRefreshToken,
+        @NotNull SMAuthPermissions smAuthPermissions
+    ) throws DBException {
+        var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
+        var isSessionChanged = !CommonUtils.equalObjects(smSessionId, smAuthPermissions.getSessionId());
+        if (isNonAnonymousUserAuthorized && isSessionChanged && !Objects.equals(getUserId(), smAuthPermissions.getUserId())) {
             throw new DBCException("Another user is already logged in");
         }
         this.smCredentials = new SMCredentials(
-            smAuthInfo.getSmAuthToken(),
-            authPermissions.getUserId(),
-            authPermissions.getPermissions()
+            smAccessToken,
+            smAuthPermissions.getUserId(),
+            smAuthPermissions.getPermissions()
         );
-        this.refreshToken = smAuthInfo.getSmRefreshToken();
-        setUserPermissions(authPermissions.getPermissions());
+        this.refreshToken = smRefreshToken;
+        setUserPermissions(smAuthPermissions.getPermissions());
         this.securityController = application.createSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
         this.secretController = application.getSecretController(this);
         if (isSessionChanged) {
-            this.smSessionId = smAuthInfo.getAuthPermissions().getSessionId();
-            setUser(authPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));
+            this.smSessionId = smAuthPermissions.getSessionId();
+            setUser(smAuthPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));
         }
         return isSessionChanged;
     }
