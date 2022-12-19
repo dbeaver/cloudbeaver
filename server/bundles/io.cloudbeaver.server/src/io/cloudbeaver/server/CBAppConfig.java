@@ -50,6 +50,7 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
 
     private boolean redirectOnFederatedAuth;
     private boolean anonymousAccessEnabled;
+    private boolean grantConnectionsAccessToAnonymousTeam;
     @Deprecated
     private String anonymousUserRole;
     private String anonymousUserTeam;
@@ -78,6 +79,7 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
         this.enableReverseProxyAuth = false;
         this.forwardProxy = false;
         this.linkExternalCredentialsWithUser = true;
+        this.grantConnectionsAccessToAnonymousTeam = false;
     }
 
     public CBAppConfig(CBAppConfig src) {
@@ -98,6 +100,7 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
         this.enableReverseProxyAuth = src.enableReverseProxyAuth;
         this.forwardProxy = src.forwardProxy;
         this.linkExternalCredentialsWithUser = src.linkExternalCredentialsWithUser;
+        this.grantConnectionsAccessToAnonymousTeam = src.grantConnectionsAccessToAnonymousTeam;
     }
 
     @Override
@@ -250,6 +253,11 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
 
     public boolean isEnabledForwardProxy() {
         return forwardProxy;
+    }
+
+
+    public boolean isGrantConnectionsAccessToAnonymousTeam() {
+        return grantConnectionsAccessToAnonymousTeam;
     }
 
 }

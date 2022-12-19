@@ -13,6 +13,7 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { DatabaseAuthModel, DetailsError, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 import type { IConnectionAuthenticationConfig } from '@cloudbeaver/plugin-connections';
@@ -85,7 +86,8 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     private readonly templateConnectionsService: TemplateConnectionsService,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly dbAuthModelsResource: DatabaseAuthModelsResource
+    private readonly dbAuthModelsResource: DatabaseAuthModelsResource,
+    private readonly projectsService: ProjectsService,
   ) {
     makeObservable(this, {
       step: observable,
@@ -126,7 +128,11 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     this.isConnecting = true;
     this.clearError();
     try {
-      const connectionNames = this.connectionInfoResource.values.map(connection => connection.name);
+      const connectionNames = this.connectionInfoResource.values
+        .filter(connection => !this.projectsService.userProject
+          || connection.projectId === this.projectsService.userProject.id)
+        .map(connection => connection.name);
+
       const uniqueConnectionName = getUniqueName(this.template.name || 'Template connection', connectionNames);
       const connection = await this.connectionInfoResource.createFromTemplate(
         this.template.projectId,
