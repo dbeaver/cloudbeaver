@@ -169,7 +169,7 @@ public class LocalResourceController implements RMController {
             .stream()
             .map(projectPermission -> makeProjectFromPath(
                 sharedProjectsPath.resolve(parseProjectName(projectPermission.getObjectId()).getName()),
-                projectPermission.getPermissions().stream().map(RMProjectPermission::fromPermission).collect(Collectors.toSet()),
+                Arrays.stream(projectPermission.getPermissions()).map(RMProjectPermission::fromPermission).collect(Collectors.toSet()),
                 RMProjectType.SHARED, true)
             )
             .filter(Objects::nonNull)
@@ -193,9 +193,9 @@ public class LocalResourceController implements RMController {
                     throw new DBException("Project id required");
                 }
 
-                return getSecurityController().getObjectPermissions(activeUserCreds.getUserId(), projectId, SMObjects.PROJECT)
-                    .getPermissions()
-                    .stream()
+                String[] permissions = getSecurityController().getObjectPermissions(activeUserCreds.getUserId(), projectId, SMObjects.PROJECT)
+                    .getPermissions();
+                return Arrays.stream(permissions)
                     .map(RMProjectPermission::fromPermission)
                     .collect(Collectors.toSet());
             case USER:
@@ -635,9 +635,9 @@ public class LocalResourceController implements RMController {
             return null;
         }
 
-        Set<String> allProjectPermissions = permissions.stream()
+        String[] allProjectPermissions = permissions.stream()
             .flatMap(rmProjectPermission -> rmProjectPermission.getAllPermissions().stream())
-            .collect(Collectors.toSet());
+            .toArray(String[]::new);
 
         RMProject project = new RMProject();
         String projectName = path.getFileName().toString();
@@ -653,10 +653,15 @@ public class LocalResourceController implements RMController {
                 log.error(e);
             }
         }
+        // Resource types
+        project.setResourceTypes(ResourceTypeRegistry.getInstance().getResourceTypes()
+            .stream()
+            .filter(ResourceTypeDescriptor::isManagable)
+            .map(RMResourceType::new)
+            .toArray(RMResourceType[]::new));
 
         return project;
     }
-
 
     private Path getProjectPath(String projectId) throws DBException {
         RMProjectName project = parseProjectName(projectId);

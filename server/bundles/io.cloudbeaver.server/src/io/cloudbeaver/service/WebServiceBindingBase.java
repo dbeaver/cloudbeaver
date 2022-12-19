@@ -223,7 +223,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 RMProject rmProject = project.getRmProject();
 
                 for (String reqProjectPermission : requireProjectPermissions) {
-                    if (!rmProject.getProjectPermissions().contains(reqProjectPermission)) {
+                    if (!rmProject.hasProjectPermission(reqProjectPermission)) {
                         throw new DBWebExceptionAccessDenied("Access denied");
                     }
                 }
