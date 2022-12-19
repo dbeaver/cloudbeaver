@@ -307,7 +307,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
         <ElementsTreeContext.Provider value={context}>
           <box className={className}>
             <FolderExplorer state={folderExplorer}>
-              <tree ref={dropOutside.mouse.reference} as="div" onClick={handleClick}>
+              <tree ref={dropOutside.mouse.reference} onClick={handleClick}>
                 {settings?.showFolderExplorerPath && <FolderExplorerPath getName={getName} canSkip={canSkip} />}
                 <drop-outside
                   ref={dndBox.setRef}

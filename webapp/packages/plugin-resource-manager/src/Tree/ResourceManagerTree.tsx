@@ -12,12 +12,14 @@ import styled, { css } from 'reshadow';
 
 import { Loader, useDataResource, useTranslate, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeInfoResource, NavNodeManagerService, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CaptureView } from '@cloudbeaver/core-view';
 import { NavigationTreeService, ElementsTree, IElementsTreeSettings, createElementsTreeSettings, validateElementsTreeSettings, getNavigationTreeUserSettingsId } from '@cloudbeaver/plugin-navigation-tree';
+import { ResourceManagerScriptsService } from '@cloudbeaver/plugin-resource-manager-scripts';
 
 import { ResourcesProjectsNavNodeService } from '../NavNodes/ResourcesProjectsNavNodeService';
+import { PROJECT_NODE_TYPE } from '../NavResourceNodeService';
 import { ResourceProjectsResource } from '../ResourceProjectsResource';
 import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';
@@ -69,6 +71,8 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
   const navTreeService = useService(NavigationTreeService);
+  const navNodeManagerService = useService(NavNodeManagerService);
+  const resourceManagerScriptsService = useService(ResourceManagerScriptsService);
 
   const settings = useUserData<IElementsTreeSettings>(
     getNavigationTreeUserSettingsId(root),
@@ -112,13 +116,48 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
 
   const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);
 
+  function getChildren(id: string) {
+    const node = navNodeManagerService.getNode(id);
+
+    if (node?.nodeType === PROJECT_NODE_TYPE) {
+      const project = resourcesProjectsNavNodeService.getProject(node.id);
+
+      if (project) {
+        const scriptsRoot = resourceManagerScriptsService.getRootPath(project.id);
+        id = scriptsRoot;
+      }
+    }
+
+    return navTreeService.getChildren(id);
+  }
+
+  async function loadNestedNodes(id = ROOT_NODE_PATH, tryConnect?: boolean, notify = true) {
+    const node = navNodeManagerService.getNode(id);
+
+    let isNodesLoaded = await navTreeService.loadNestedNodes(id, tryConnect, notify);
+
+    if (node?.nodeType === PROJECT_NODE_TYPE && isNodesLoaded) {
+      const project = resourcesProjectsNavNodeService.getProject(node.id);
+
+      if (project) {
+        const scriptsRoot = resourceManagerScriptsService.getRootPath(project.id);
+
+        if (scriptsRoot !== id) {
+          isNodesLoaded = await navTreeService.loadNestedNodes(scriptsRoot, tryConnect, notify);
+        }
+      }
+    }
+
+    return isNodesLoaded;
+  }
+
   return styled(styles)(
     <Loader state={resource}>
       <CaptureView view={navTreeService}>
         <ElementsTree
           root={root}
-          getChildren={navTreeService.getChildren}
-          loadChildren={navTreeService.loadNestedNodes}
+          getChildren={getChildren}
+          loadChildren={loadNestedNodes}
           settings={settings}
           filters={[projectFilter]}
           renderers={[projectsRendererRenderer]}

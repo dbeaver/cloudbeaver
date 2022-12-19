@@ -19,6 +19,7 @@ import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, RESOURCES_NODE_PATH, getResourceKeyFromNodeId } from '@cloudbeaver/plugin-resource-manager';
+import { ResourceManagerScriptsService } from '@cloudbeaver/plugin-resource-manager-scripts';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
@@ -47,6 +48,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
     private readonly sqlEditorTabService: SqlEditorTabService,
+    private readonly resourceManagerScriptsService: ResourceManagerScriptsService,
   ) {
     super();
   }
@@ -112,7 +114,7 @@ export class PluginBootstrap extends Bootstrap {
               }
 
               const scriptName = `${result.name.trim()}.${SCRIPT_EXTENSION}`;
-              const folder = createPath(RESOURCES_NODE_PATH, projectId);
+              const folder = this.resourceManagerScriptsService.getRootPath(projectId);
               const folderResourceKey = getResourceKeyFromNodeId(folder);
 
               if (!folderResourceKey) {
