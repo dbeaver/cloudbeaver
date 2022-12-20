@@ -93,7 +93,6 @@ public class WebSession extends BaseWebSession
 
     private final AtomicInteger taskCount = new AtomicInteger();
 
-    private volatile long lastAccessTime;
     private long maxSessionIdleTime;
     private String lastRemoteAddr;
     private String lastRemoteUserAgent;
@@ -118,8 +117,6 @@ public class WebSession extends BaseWebSession
     private final List<WebProjectImpl> accessibleProjects = new ArrayList<>();
     private final Map<String, DBWSessionHandler> sessionHandlers;
 
-    private RMController rmController;
-
     public WebSession(
         @NotNull HttpSession httpSession,
         @NotNull WebApplication application,
@@ -131,7 +128,6 @@ public class WebSession extends BaseWebSession
         this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
         this.sessionHandlers = sessionHandlers;
         this.maxSessionIdleTime = maxSessionIdleTime;
-        this.rmController = application.createResourceController(this);
     }
 
     @Override
@@ -161,10 +157,6 @@ public class WebSession extends BaseWebSession
     @Property
     public synchronized String getLastAccessTime() {
         return CBModelConstants.ISO_DATE_FORMAT.format(lastAccessTime);
-    }
-
-    public long getLastAccessTimeMillis() {
-        return lastAccessTime;
     }
 
     public String getLastRemoteAddr() {
@@ -235,7 +227,7 @@ public class WebSession extends BaseWebSession
     }
 
     public synchronized RMController getRmController() {
-        return rmController;
+        return userContext.getRmController();
     }
 
     public synchronized void refreshUserData() {
@@ -463,9 +455,6 @@ public class WebSession extends BaseWebSession
             addSessionError(e);
             log.error("Error reading session permissions", e);
         }
-
-        // Initialize new resource controller
-        this.rmController = application.createResourceController(this);
     }
 
     private synchronized void refreshAccessibleConnectionIds() {
@@ -510,8 +499,8 @@ public class WebSession extends BaseWebSession
         HttpServletResponse response,
         long maxSessionIdleTime
     ) throws DBWebException {
+        touchSession();
         HttpSession httpSession = request.getSession();
-        this.lastAccessTime = System.currentTimeMillis();
         this.lastRemoteAddr = request.getRemoteAddr();
         this.lastRemoteUserAgent = request.getHeader("User-Agent");
         this.maxSessionIdleTime = maxSessionIdleTime;

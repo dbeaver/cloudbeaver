@@ -19,6 +19,7 @@ package io.cloudbeaver.server.events;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.WebProjectImpl;
+import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.rm.RMEvent;
@@ -46,14 +47,13 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
     }
 
     @Override
-    protected void updateSessionData(WebSession activeUserSession, WSEvent event) {
+    protected void updateSessionData(BaseWebSession activeUserSession, WSEvent event) {
         if (!(event instanceof WSResourceUpdatedEvent)) {
             return;
         }
         var resourceUpdateEvent = (WSResourceUpdatedEvent) event;
         String projectId = resourceUpdateEvent.getProjectId();
-        WebProjectImpl project = activeUserSession.getProjectById(projectId);
-        if (project == null) {
+        if (!activeUserSession.isProjectAccessible(projectId)) {
             return;
         }
         if (resourceUpdateEvent.getResourcePath() == null) {
@@ -70,7 +70,10 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
         if (eventType == null) {
             return;
         }
-        acceptChangesInNavigatorTree(eventType, resourceParsedPath, project);
+        if (activeUserSession instanceof WebSession) {
+            var webSession = (WebSession) activeUserSession;
+            acceptChangesInNavigatorTree(eventType, resourceParsedPath, webSession.getProjectById(projectId));
+        }
         activeUserSession.addSessionEvent(event);
     }
 

@@ -14,7 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server.websockets.model;
+package io.cloudbeaver.service.session;
 
-public enum DBWebSocketEventType {
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.auth.SMCredentials;
+import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+
+import java.util.Set;
+
+public class SMTokenCredentialProvider implements SMCredentialsProvider {
+    private final String smAccessToken;
+
+    public SMTokenCredentialProvider(String smAccessToken) {
+        this.smAccessToken = smAccessToken;
+    }
+
+    @Nullable
+    @Override
+    public SMCredentials getActiveUserCredentials() {
+        return new SMCredentials(smAccessToken, null, Set.of());
+    }
 }
