@@ -16,8 +16,8 @@
  */
 package io.cloudbeaver.websocket;
 
-import io.cloudbeaver.websocket.event.WSEvent;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 
 public interface CBWebSessionEventHandler {
     void handeWebSessionEvent(WSEvent event) throws DBException;

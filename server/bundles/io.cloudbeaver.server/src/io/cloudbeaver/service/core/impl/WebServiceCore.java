@@ -32,7 +32,6 @@ import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import io.cloudbeaver.utils.WebEventUtils;
-import io.cloudbeaver.websocket.WSConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -51,6 +50,7 @@ import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHImplementation;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
@@ -238,14 +238,15 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public boolean closeSession(HttpServletRequest request) throws DBWebException {
         try {
-            WebSession webSession = CBPlatform.getInstance().getSessionManager().closeSession(request);
-            if (webSession != null) {
+            var baseWebSession = CBPlatform.getInstance().getSessionManager().closeSession(request);
+            if (baseWebSession instanceof WebSession) {
+                var webSession = (WebSession) baseWebSession;
                 for (WebSessionHandlerDescriptor hd : WebHandlerRegistry.getInstance().getSessionHandlers()) {
                     try {
                         hd.getInstance().handleSessionClose(webSession);
                     } catch (Exception e) {
                         log.error("Error calling session handler '" + hd.getId() + "'", e);
-                        webSession.addSessionError(e);
+                        baseWebSession.addSessionError(e);
                     }
                 }
                 return true;

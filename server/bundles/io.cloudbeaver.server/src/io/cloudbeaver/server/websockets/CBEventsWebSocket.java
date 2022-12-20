@@ -18,27 +18,26 @@ package io.cloudbeaver.server.websockets;
 
 import com.google.gson.Gson;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.websockets.model.WebSocketClientEvent;
+import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
-import io.cloudbeaver.websocket.WSConstants;
-import io.cloudbeaver.websocket.event.WSEvent;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 
 import java.io.IOException;
 
 public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionEventHandler {
-    private static final int NORMAL_STATUS = 1000;
     private static final Gson gson = new Gson();
     private static final Log log = Log.getLog(CBEventsWebSocket.class);
 
     @NotNull
-    private final WebSession webSession;
+    private final BaseWebSession webSession;
 
-    public CBEventsWebSocket(@NotNull WebSession webSession) {
+    public CBEventsWebSocket(@NotNull BaseWebSession webSession) {
         this.webSession = webSession;
     }
 
@@ -52,7 +51,7 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
     @Override
     public void onWebSocketText(String message) {
         super.onWebSocketText(message);
-        var clientEvent = gson.fromJson(message, WebSocketClientEvent.class);
+        var clientEvent = gson.fromJson(message, WSClientEvent.class);
         if (clientEvent.getId() == null) {
             webSession.addSessionError(
                 new DBWebException("Invalid websocket event: " + message)
@@ -108,11 +107,11 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
     @Override
     public void close() {
         getSession().close();
-        onWebSocketClose(NORMAL_STATUS, "Closed by web session");
+        onWebSocketClose(WSConstants.NORMAL_STATUS, "Closed by web session");
     }
 
     @NotNull
-    public WebSession getWebSession() {
+    public BaseWebSession getWebSession() {
         return webSession;
     }
 }

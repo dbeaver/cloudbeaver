@@ -21,7 +21,6 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebWorkspace;
-import io.cloudbeaver.websocket.CBEventController;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -37,6 +36,7 @@ import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
+import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -207,7 +207,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     @Override
-    public CBEventController getEventController() {
+    public WSEventController getEventController() {
         return null;
     }
 }

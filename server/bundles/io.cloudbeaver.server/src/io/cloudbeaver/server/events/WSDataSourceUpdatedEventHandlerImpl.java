@@ -17,12 +17,13 @@
 package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.WebProjectImpl;
+import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.websocket.WSEventTopic;
-import io.cloudbeaver.websocket.WSEventType;
-import io.cloudbeaver.websocket.event.WSEvent;
-import io.cloudbeaver.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
+import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 
 /**
  * Notify all active user session that datasource has been updated
@@ -35,24 +36,27 @@ public class WSDataSourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
     }
 
     @Override
-    protected void updateSessionData(WebSession activeUserSession, WSEvent event) {
+    protected void updateSessionData(BaseWebSession activeUserSession, WSEvent event) {
         if (!(event instanceof WSDataSourceEvent)) {
             return;
         }
         var dsUpdateEvent = (WSDataSourceEvent) event;
-        WebProjectImpl project = activeUserSession.getProjectById(dsUpdateEvent.getProjectId());
-        if (project == null) {
+        if (!activeUserSession.isProjectAccessible(dsUpdateEvent.getProjectId())) {
             return;
         }
         var eventType = WSEventType.valueById(event.getId());
         if (eventType == null) {
             return;
         }
-        activeUserSession.updateProjectConnection(
-            project,
-            dsUpdateEvent.getDataSourceIds(),
-            eventType
-        );
+        if (activeUserSession instanceof WebSession) {
+            var webSession = (WebSession) activeUserSession;
+            WebProjectImpl project = webSession.getProjectById(dsUpdateEvent.getProjectId());
+            webSession.updateProjectConnection(
+                project,
+                dsUpdateEvent.getDataSourceIds(),
+                eventType
+            );
+        }
         activeUserSession.addSessionEvent(event);
     }
 }

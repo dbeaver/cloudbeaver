@@ -18,7 +18,6 @@ package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
-import io.cloudbeaver.websocket.event.WSEvent;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -28,6 +27,7 @@ import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.time.Instant;
@@ -52,21 +52,23 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     protected final WebUserContext userContext;
     @NotNull
     protected final WebApplication application;
+    protected volatile long lastAccessTime;
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new ArrayList<>();
-    private final Set<String> activeEventTopics = new CopyOnWriteArraySet<>();
+    private final Set<String> subscribedEventTopics = new CopyOnWriteArraySet<>();
 
     public BaseWebSession(@NotNull String id, @NotNull WebApplication application) throws DBException {
         this.id = id;
         this.application = application;
         this.createTime = System.currentTimeMillis();
+        this.lastAccessTime = this.createTime;
         this.sessionAuthContext = new SessionContextImpl(null);
         this.sessionAuthContext.addSession(this);
         this.userContext = new WebUserContext(this.application);
     }
 
     public void addSessionEvent(WSEvent event) {
-        boolean eventAllowedByFilter = activeEventTopics.isEmpty() || activeEventTopics.contains(event.getTopicId());
+        boolean eventAllowedByFilter = subscribedEventTopics.isEmpty() || subscribedEventTopics.contains(event.getTopicId());
         if (!eventAllowedByFilter) {
             return;
         }
@@ -101,11 +103,11 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     }
 
     public void subscribeOnEventTopic(@NotNull String topic) {
-        activeEventTopics.add(topic);
+        subscribedEventTopics.add(topic);
     }
 
     public void unsubscribeFromEventTopic(@NotNull String topic) {
-        activeEventTopics.remove(topic);
+        subscribedEventTopics.remove(topic);
     }
 
     @NotNull
@@ -132,6 +134,14 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(createTime), ZoneId.systemDefault());
     }
 
+    public long getLastAccessTimeMillis() {
+        return lastAccessTime;
+    }
+
+    public synchronized void touchSession() {
+        this.lastAccessTime = System.currentTimeMillis();
+    }
+
     @NotNull
     public synchronized WebUserContext getUserContext() {
         return userContext;
@@ -143,5 +153,9 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
             sessionEventHandler.close();
         }
+    }
+
+    public boolean isProjectAccessible(String projectId) {
+        return userContext.getAccessibleProjectIds().contains(projectId);
     }
 }

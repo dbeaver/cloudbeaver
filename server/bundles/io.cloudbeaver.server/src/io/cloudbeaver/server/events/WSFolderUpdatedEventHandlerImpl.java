@@ -16,12 +16,12 @@
  */
 package io.cloudbeaver.server.events;
 
-import io.cloudbeaver.WebProjectImpl;
+import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.websocket.WSEventTopic;
-import io.cloudbeaver.websocket.event.WSEvent;
-import io.cloudbeaver.websocket.event.datasource.WSDatasourceFolderEvent;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
 import org.jkiss.utils.CommonUtils;
 
 /**
@@ -35,18 +35,22 @@ public class WSFolderUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandle
     }
 
     @Override
-    protected void updateSessionData(WebSession activeUserSession, WSEvent event) {
+    protected void updateSessionData(BaseWebSession activeUserSession, WSEvent event) {
         if (!(event instanceof WSDatasourceFolderEvent)) {
             return;
         }
         var dsFolderUpdateEvent = (WSDatasourceFolderEvent) event;
-        WebProjectImpl project = activeUserSession.getProjectById(dsFolderUpdateEvent.getProjectId());
-        if (project == null || CommonUtils.isEmpty(dsFolderUpdateEvent.getNodePaths())) {
+        boolean isProjectAccessible = activeUserSession.isProjectAccessible(dsFolderUpdateEvent.getProjectId());
+        if (!isProjectAccessible || CommonUtils.isEmpty(dsFolderUpdateEvent.getNodePaths())) {
             return;
         }
 
-        project.getDataSourceRegistry().refreshConfig();
-        activeUserSession.getNavigatorModel().getRoot().getProjectNode(project).getDatabases().refreshChildren();
+        if (activeUserSession instanceof WebSession) {
+            var webSession = (WebSession) activeUserSession;
+            var project = webSession.getProjectById(dsFolderUpdateEvent.getProjectId());
+            project.getDataSourceRegistry().refreshConfig();
+            webSession.getNavigatorModel().getRoot().getProjectNode(project).getDatabases().refreshChildren();
+        }
         activeUserSession.addSessionEvent(event);
     }
 }

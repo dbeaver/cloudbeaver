@@ -14,17 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.websocket.event;
+package io.cloudbeaver.service.session;
 
-import io.cloudbeaver.websocket.WSEventType;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.auth.SMCredentials;
+import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 
-public class WSServerConfigurationChangedEvent extends WSEvent {
-    public WSServerConfigurationChangedEvent() {
-        super(WSEventType.SERVER_CONFIG_CHANGED);
+import java.util.Set;
+
+public class SMTokenCredentialProvider implements SMCredentialsProvider {
+    private final String smAccessToken;
+
+    public SMTokenCredentialProvider(String smAccessToken) {
+        this.smAccessToken = smAccessToken;
     }
 
-    public WSServerConfigurationChangedEvent(@Nullable String sessionId) {
-        super(WSEventType.SERVER_CONFIG_CHANGED, sessionId);
+    @Nullable
+    @Override
+    public SMCredentials getActiveUserCredentials() {
+        return new SMCredentials(smAccessToken, null, Set.of());
     }
 }

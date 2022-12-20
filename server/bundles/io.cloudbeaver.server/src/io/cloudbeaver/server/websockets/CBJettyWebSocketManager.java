@@ -16,11 +16,14 @@
  */
 package io.cloudbeaver.server.websockets;
 
+import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.session.WebSessionManager;
 import org.eclipse.jetty.websocket.server.JettyServerUpgradeRequest;
 import org.eclipse.jetty.websocket.server.JettyServerUpgradeResponse;
 import org.eclipse.jetty.websocket.server.JettyWebSocketCreator;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 
 import java.nio.ByteBuffer;
@@ -40,12 +43,18 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
 
     @Override
     public Object createWebSocket(JettyServerUpgradeRequest request, JettyServerUpgradeResponse resp) {
-        var webSessionId = request.getHttpServletRequest().getSession().getId();
-        var webSession = webSessionManager.getWebSession(webSessionId);
-        if (webSession == null) {
-            log.error("CloudBeaver session not found, expected session id: " + webSessionId);
+        BaseWebSession webSession;
+        try {
+            webSession = resolveWebSession(request);
+        } catch (DBException e) {
+            log.error("Error resolve websocket session", e);
             return null;
         }
+        if (webSession == null) {
+            log.error("CloudBeaver session not found");
+            return null;
+        }
+        var webSessionId = webSession.getSessionId();
         var oldWebSocket = socketBySessionId.get(webSessionId);
         if (oldWebSocket != null) {
             oldWebSocket.close();
@@ -55,11 +64,23 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
         return newWebSocket;
     }
 
+    @Nullable
+    private BaseWebSession resolveWebSession(JettyServerUpgradeRequest request) throws DBException {
+        if (request.getHttpServletRequest().getSession() == null) {
+            return webSessionManager.getHeadlessSession(request.getHttpServletRequest(), true);
+        }
+        var webSessionId = request.getHttpServletRequest().getSession().getId();
+        var webSession = webSessionManager.getSession(webSessionId);
+        return webSession != null
+            ? webSession
+            : webSessionManager.getHeadlessSession(request.getHttpServletRequest(), true);
+    }
+
     public void sendPing() {
         //remove expired sessions
         socketBySessionId.entrySet()
             .removeIf(entry ->
-                entry.getValue().isNotConnected() || webSessionManager.getWebSession(entry.getKey()) == null
+                entry.getValue().isNotConnected() || webSessionManager.getSession(entry.getKey()) == null
             );
 
         socketBySessionId.entrySet()
