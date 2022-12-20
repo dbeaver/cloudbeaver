@@ -12,8 +12,8 @@ import styled, { css } from 'reshadow';
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { AuthProvidersResource, AuthRolesResource, AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
 import {
-  Table, TableHeader, TableColumnHeader, TableBody, useMapResource, ToolsAction,
-  ToolsPanel, Loader, useTranslate, useStyles, useDataResource,
+  Table, TableHeader, TableColumnHeader, TableBody, useResource, ToolsAction,
+  ToolsPanel, Loader, useTranslate, useStyles,
   BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -77,9 +77,9 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
 
   const createUserService = useService(CreateUserService);
 
-  const usersResource = useMapResource(UsersTable, UsersResource, CachedMapAllKey);
-  const authProvidersResource = useMapResource(UsersTable, AuthProvidersResource, CachedMapAllKey);
-  const authRolesResource = useDataResource(UsersTable, AuthRolesResource, undefined);
+  const usersResource = useResource(UsersTable, UsersResource, CachedMapAllKey);
+  const authProvidersResource = useResource(UsersTable, AuthProvidersResource, CachedMapAllKey);
+  const authRolesResource = useResource(UsersTable, AuthRolesResource, undefined);
 
   const table = useUsersTable(usersResource.resource);
   const filters = useUsersTableFilters(table.users);

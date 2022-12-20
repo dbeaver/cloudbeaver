@@ -9,7 +9,7 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { Loader, TextPlaceholder, useMapResource, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder, useResource, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextResource, ConnectionExecutionContextService, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { ScreenComponent } from '@cloudbeaver/core-routing';
@@ -23,7 +23,7 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
   contextId,
 }) {
   const translate = useTranslate();
-  const connectionExecutionContextResource = useMapResource(
+  const connectionExecutionContextResource = useResource(
     SqlEditorScreen,
     ConnectionExecutionContextResource,
     CachedMapAllKey

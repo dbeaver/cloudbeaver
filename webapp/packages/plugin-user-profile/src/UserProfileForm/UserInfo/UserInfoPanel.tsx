@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useDataResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { BASE_TAB_STYLES, TabPanel } from '@cloudbeaver/core-ui';
@@ -28,7 +28,7 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
   className,
   style,
 }) {
-  const userMetaParameters = useDataResource(UserInfoPanel, UserMetaParametersResource, undefined);
+  const userMetaParameters = useResource(UserInfoPanel, UserMetaParametersResource, undefined);
   const styles = useStyles(BASE_TAB_STYLES, style, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
 

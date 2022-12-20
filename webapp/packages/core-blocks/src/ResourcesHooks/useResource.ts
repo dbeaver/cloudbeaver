@@ -127,7 +127,7 @@ export function useResource<
   const [exception, setException] = useState<Error | null>(null);
   let key: TKeyArg | null = keyObj as TKeyArg;
   let includes: TIncludes = [] as unknown as TIncludes;
-  const [loadFunctionName] = useState(`${component.name}.useMapResource(${resource.getName()}).load`);
+  const [loadFunctionName] = useState(`${component.name}.useResource(${resource.getName()}).load`);
 
   if (isKeyWithIncludes<TKeyArg, TIncludes>(keyObj)) {
     key = keyObj.key;
@@ -401,6 +401,3 @@ export function useResource<
 function isKeyWithIncludes<TKey, TIncludes>(obj: any): obj is KeyWithIncludes<TKey, TIncludes> {
   return obj && typeof obj === 'object' && 'includes' in obj && 'key' in obj;
 }
-
-export { useResource as useMapResource };
-export { useResource as useDataResource };

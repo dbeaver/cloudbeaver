@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Loader, useDataResource } from '@cloudbeaver/core-blocks';
+import { Loader, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { UserProfileService } from '../UserProfileService';
@@ -25,7 +25,7 @@ const style = css`
 
 export const UserProfileForm = observer(function UserProfileForm() {
   const userProfileService = useService(UserProfileService);
-  const userInfo = useDataResource(UserProfileForm, UserInfoResource, {
+  const userInfo = useResource(UserProfileForm, UserInfoResource, {
     key: undefined,
     includes: ['includeMetaParameters'] as const,
   });

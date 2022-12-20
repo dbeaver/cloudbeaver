@@ -10,7 +10,7 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 
-import { Loader, useMapResource } from '@cloudbeaver/core-blocks';
+import { Loader, useResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -24,13 +24,13 @@ export const CustomConnection = observer(function CustomConnection() {
   const projectsService = useService(ProjectsService);
   const notificationService = useService(NotificationService);
   const connectionManualService = useService(ConnectionManualService);
-  const dbDriverResource = useMapResource(CustomConnection, DBDriverResource, CachedMapAllKey);
+  const dbDriverResource = useResource(CustomConnection, DBDriverResource, CachedMapAllKey);
 
   const drivers = useMemo(() => computed(() => (
     dbDriverResource.resource.enabledDrivers.slice().sort(dbDriverResource.resource.compare)
   )), [dbDriverResource]);
 
-  useMapResource(CustomConnection, ProjectInfoResource, CachedMapAllKey);
+  useResource(CustomConnection, ProjectInfoResource, CachedMapAllKey);
 
   function select(driverId: string) {
     if (projectsService.activeProjects.length > 0) {

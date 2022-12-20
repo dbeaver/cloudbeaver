@@ -15,7 +15,7 @@ import { TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   TextPlaceholder,
   Loader,
-  useMapResource,
+  useResource,
   BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Group,
@@ -62,8 +62,8 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
 
   useAutoLoad(state, selected);
 
-  const users = useMapResource(ConnectionAccess, UsersResource, CachedMapAllKey, { active: selected });
-  const teams = useMapResource(ConnectionAccess, TeamsResource, CachedMapAllKey, { active: selected });
+  const users = useResource(ConnectionAccess, UsersResource, CachedMapAllKey, { active: selected });
+  const teams = useResource(ConnectionAccess, TeamsResource, CachedMapAllKey, { active: selected });
 
   const grantedUsers = useMemo(() => computed(() => users.resource.values
     .filter(user => state.state.grantedSubjects.includes(user.userId))
