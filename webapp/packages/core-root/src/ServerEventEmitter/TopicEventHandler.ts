@@ -30,8 +30,8 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
   readonly eventsSubject: Connectable<TEvent>;
 
   private subscription: Subscription | null;
-  private readonly activeResources: Array<CachedResource<any, any, any, any>>;
-  private readonly subscribedResources: Map<CachedResource<any, any, any, any>, ISubscribedResourceInfo>;
+  private readonly activeResources: Array<CachedResource<any, any, any, any, any>>;
+  private readonly subscribedResources: Map<CachedResource<any, any, any, any, any>, ISubscribedResourceInfo>;
   private readonly serverSubject?: Observable<TEvent>;
   private readonly subject: Subject<TEvent>;
   constructor(
@@ -63,7 +63,7 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
     id: TEventID,
     callback: IServerEventCallback<T>,
     mapTo: (event: TEvent) => T = event => event as unknown as T,
-    resource?: CachedResource<any, any, any, any>,
+    resource?: CachedResource<any, any, any, any, any>,
   ): Subscription {
     if (resource) {
       this.registerResource(resource);
@@ -86,18 +86,18 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
     callback: IServerEventCallback<T>,
     mapTo?: (param: TEvent) => T,
     filter?: (param: TEvent) => boolean,
-    resource?: CachedResource<any, any, any, any>,
+    resource?: CachedResource<any, any, any, any, any>,
   ): Subscription;
   on<T = TEvent>(
-    resource: CachedResource<any, T, any, any>,
+    resource: CachedResource<any, any, T, any, any>,
     mapTo?: (param: TEvent) => T,
     filter?: (param: TEvent) => boolean,
   ): Subscription;
   on<T = TEvent>(
-    resourceOrCallback: CachedResource<any, T, any, any> | IServerEventCallback<T>,
+    resourceOrCallback: CachedResource<any, any, T, any, any> | IServerEventCallback<T>,
     mapTo: (param: TEvent) => T = event => event as unknown as T,
     filterFn: (param: TEvent) => boolean = () => true,
-    resource?: CachedResource<any, any, any, any>,
+    resource?: CachedResource<any, any, any, any, any>,
   ): Subscription {
     let handler: IServerEventCallback<T>;
 
@@ -132,7 +132,7 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
     return this;
   }
 
-  private resourceUseHandler(resource: CachedResource<any, any, any, any>) {
+  private resourceUseHandler(resource: CachedResource<any, any, any, any, any>) {
     const index = this.activeResources.indexOf(resource);
 
     if (index !== -1) {
@@ -152,7 +152,7 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
     }
   }
 
-  private removeActiveResource(resource: CachedResource<any, any, any, any>) {
+  private removeActiveResource(resource: CachedResource<any, any, any, any, any>) {
     this.activeResources.splice(this.activeResources.indexOf(resource), 1);
 
     if (this.activeResources.length === 0) {
@@ -162,7 +162,7 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
     }
   }
 
-  private registerResource(resource: CachedResource<any, any, any, any>): void {
+  private registerResource(resource: CachedResource<any, any, any, any, any>): void {
     let info = this.subscribedResources.get(resource);
 
     if (!info) {
@@ -178,7 +178,7 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
     info.listeners++;
   }
 
-  private removeResource(resource: CachedResource<any, any, any, any>): void {
+  private removeResource(resource: CachedResource<any, any, any, any, any>): void {
     const info = this.subscribedResources.get(resource);
 
     if (info) {

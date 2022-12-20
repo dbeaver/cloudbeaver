@@ -29,7 +29,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     private readonly dataSynchronizationService: DataSynchronizationService,
     serverConfigEventHandler: ServerConfigEventHandler,
   ) {
-    super(null);
+    super(null, []);
 
     this.syncQueue = new DataSynchronizationQueue(state => {
       if (state) {

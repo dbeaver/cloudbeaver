@@ -39,7 +39,7 @@ const loaderStyle = css`
 
 export const Body = observer(function Body() {
   useAppLoadingScreen();
-  const serverConfigLoader = useDataResource(Body, ServerConfigResource, undefined);
+  // const serverConfigLoader = useDataResource(Body, ServerConfigResource, undefined);
   const themeService = useService(ThemeService);
   const style = useStyles(bodyStyles);
   const ref = useRef<HTMLDivElement>(null);
@@ -59,7 +59,7 @@ export const Body = observer(function Body() {
   return styled(style)(
     <DNDProvider>
       <theme ref={ref} className={`theme-${themeService.currentTheme.id}`}>
-        <Loader state={[serverConfigLoader, permissionsService]} style={loaderStyle}>{() => styled(style)(
+        <Loader state={[permissionsService]} style={loaderStyle}>{() => styled(style)(
           <>
             {Screen && <Screen {...screenService.routerService.params} />}
           </>

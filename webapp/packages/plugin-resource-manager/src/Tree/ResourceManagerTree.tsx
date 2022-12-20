@@ -77,7 +77,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
     validateElementsTreeSettings
   );
 
-  const { resource } = useDataResource(ResourceManagerTree, ResourceProjectsResource, undefined);
+  const resourceProjectsLoader = useDataResource(ResourceManagerTree, ResourceProjectsResource, undefined);
 
   const projectsRendererRenderer = useMemo(
     () => navigationTreeProjectsRendererRenderer(navNodeInfoResource),
@@ -113,7 +113,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
   const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);
 
   return styled(styles)(
-    <Loader state={resource}>
+    <Loader state={resourceProjectsLoader}>
       <CaptureView view={navTreeService}>
         <ElementsTree
           root={root}

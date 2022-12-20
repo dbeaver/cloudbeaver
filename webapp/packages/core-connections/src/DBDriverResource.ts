@@ -59,7 +59,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
     return (driverB.promotedScore || 0) - (driverA.promotedScore || 0);
   }
 
-  protected async loader(key: ResourceKey<string>, includes: string[]): Promise<Map<string, DBDriver>> {
+  protected async loader(key: ResourceKey<string>, includes?: ReadonlyArray<string>): Promise<Map<string, DBDriver>> {
     const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
     key = this.transformParam(key);
 

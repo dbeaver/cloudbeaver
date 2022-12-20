@@ -6,51 +6,58 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable, untracked } from 'mobx';
+import { computed, observable, toJS, untracked } from 'mobx';
 import { useEffect, useState } from 'react';
 
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { CachedResourceIncludeArgs, CachedMapResource, CachedMapResourceGetter, ResourceKey, CachedMapResourceValue, CachedMapResourceKey, CachedMapResourceArguments, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter, isResourceKeyList } from '@cloudbeaver/core-sdk';
-import { ILoadableState, isArraysEqual } from '@cloudbeaver/core-utils';
+import { CachedMapResource, CachedMapResourceGetter, CachedMapResourceValue, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter, isResourceKeyList, CachedResourceData, CachedDataResourceGetter, CachedResource, CachedDataResource, CachedResourceParam, CachedResourceKey, CachedResourceContext } from '@cloudbeaver/core-sdk';
+import { ILoadableState, isArraysEqual, isContainsException } from '@cloudbeaver/core-utils';
 
-import { getComputed } from './getComputed';
-import { useObservableRef } from './useObservableRef';
+import { getComputed } from '../getComputed';
+import { useObservableRef } from '../useObservableRef';
+
+interface KeyWithIncludes<TKey, TIncludes> {
+  readonly key: TKey | null;
+  readonly includes: TIncludes;
+}
+
+type ResourceData<
+  TResource extends CachedResource<any, any, any, any, any>,
+  TKey,
+  TIncludes
+> = TResource extends CachedDataResource<any, any, any, any>
+  ? CachedResourceData<TResource>
+  : CachedMapResourceLoader<
+  TKey,
+  CachedResourceKey<TResource>,
+  CachedResourceData<TResource> extends Map<any, infer I> ? I : never,
+  TIncludes
+  >
+;
 
 interface IActions<
-  TKeyArg extends ResourceKey<CachedMapResourceKey<TResource>>,
-  TResource extends CachedMapResource<any, any, any>,
+  TResource extends CachedResource<any, any, any, any, any>,
+  TKey,
   TIncludes
 > {
   active?: boolean;
   silent?: boolean;
   isActive?: (resource: TResource) => Promise<boolean> | boolean;
-  onLoad?: (resource: TResource, key: TKeyArg | null) => Promise<boolean | void> | boolean | void;
-  onData?: (
-    data: CachedMapResourceLoader<
-    TKeyArg,
-    CachedMapResourceKey<TResource>,
-    CachedMapResourceValue<TResource>,
-    TIncludes
-    >,
+  onLoad?: (
     resource: TResource,
-    prevData: CachedMapResourceLoader<
-    TKeyArg,
-    CachedMapResourceKey<TResource>,
-    CachedMapResourceValue<TResource>,
-    TIncludes
-    > | undefined,
+    key: CachedResourceParam<TResource> | null
+  ) => Promise<boolean | void> | boolean | void;
+  onData?: (
+    data: ResourceData<TResource, TKey, TIncludes>,
+    resource: TResource,
+    prevData: ResourceData<TResource, TKey, TIncludes> | undefined,
   ) => Promise<any> | any;
   onError?: (exception: Error) => void;
-  preload?: Array<IMapResourceState<any>>;
+  preload?: ILoadableState[];
 }
 
-interface KeyWithIncludes<TKey, TIncludes> {
-  key: TKey | null;
-  includes: TIncludes;
-}
-
-interface IMapResourceState<TResource extends CachedMapResource<any, any, any>> extends ILoadableState {
+interface IMapResourceState<TResource> extends ILoadableState {
   outdated: boolean;
   loading: boolean;
   loaded: boolean;
@@ -60,10 +67,7 @@ interface IMapResourceState<TResource extends CachedMapResource<any, any, any>> 
   reload: () => void;
 }
 
-interface IMapResourceListResult<
-  TResource extends CachedMapResource<any, any, any>,
-  TIncludes
-> extends IMapResourceState<TResource> {
+interface IMapResourceListResult<TResource, TIncludes> extends IMapResourceState<TResource> {
   data: CachedMapResourceListGetter<
   CachedMapResourceValue<TResource>,
   TIncludes
@@ -71,10 +75,7 @@ interface IMapResourceListResult<
   exception: Error[] | null;
 }
 
-interface IMapResourceResult<
-  TResource extends CachedMapResource<any, any, any>,
-  TIncludes
-> extends IMapResourceState<TResource> {
+interface IMapResourceResult<TResource, TIncludes> extends IMapResourceState<TResource> {
   data: CachedMapResourceGetter<
   CachedMapResourceValue<TResource>,
   TIncludes
@@ -82,59 +83,47 @@ interface IMapResourceResult<
   exception: Error | null;
 }
 
-export function useMapResource<
-  TResource extends CachedMapResource<any, any, any>,
-  TIncludes extends CachedResourceIncludeArgs<
-  CachedMapResourceValue<TResource>,
-  CachedMapResourceArguments<TResource>
-  > = []
->(
-  component: { name: string },
-  ctor: IServiceConstructor<TResource> | TResource,
-  keyObj: TResource extends any
-    ? CachedMapResourceKey<TResource> | null | KeyWithIncludes<CachedMapResourceKey<TResource>, TIncludes>
-    : never,
-  actions?: TResource extends any ? IActions<CachedMapResourceKey<TResource>, TResource, TIncludes> : never
-): IMapResourceResult<TResource, TIncludes>;
+interface IDataResourceResult<TResource, TIncludes> extends IMapResourceState<TResource> {
+  data: CachedDataResourceGetter<CachedResourceData<TResource>, TIncludes>;
+  exception: Error | null;
+}
 
-export function useMapResource<
-  TResource extends CachedMapResource<any, any, any>,
-  TIncludes extends CachedResourceIncludeArgs<
-  CachedMapResourceValue<TResource>,
-  CachedMapResourceArguments<TResource>
-  > = []
->(
-  component: { name: string },
-  ctor: IServiceConstructor<TResource> | TResource,
-  keyObj: TResource extends any
-    ? (
-      ResourceKeyList<CachedMapResourceKey<TResource>>
-      | null
-      | KeyWithIncludes<ResourceKeyList<CachedMapResourceKey<TResource>>, TIncludes>
+type TResult<TResource, TKey, TIncludes> = (
+  TResource extends CachedDataResource<any, any, any, any>
+    ? IDataResourceResult<TResource, TIncludes>
+    : (
+      TKey extends ResourceKeyList<any>
+        ? IMapResourceListResult<TResource, TIncludes>
+        : IMapResourceResult<TResource, TIncludes>
     )
-    : never,
-  actions?: TResource extends any
-    ? IActions<ResourceKeyList<CachedMapResourceKey<TResource>>, TResource, TIncludes>
-    : never
-): IMapResourceListResult<TResource, TIncludes>;
+);
 
-export function useMapResource<
-  TResource extends CachedMapResource<any, any, any>,
-  TKeyArg extends ResourceKey<CachedMapResourceKey<TResource>>,
-  TIncludes extends CachedResourceIncludeArgs<
-  CachedMapResourceValue<TResource>,
-  CachedMapResourceArguments<TResource>
-  > = []
+export function useResource<
+  TResource extends CachedResource<any, any, any, any, any>,
+  TKeyArg extends CachedResourceParam<TResource>,
+  TIncludes extends Readonly<CachedResourceContext<TResource>>
 >(
   component: { name: string },
   ctor: IServiceConstructor<TResource> | TResource,
   keyObj: TResource extends any ? TKeyArg | null | KeyWithIncludes<TKeyArg, TIncludes> : never,
-  actions?: TResource extends any ? IActions<TKeyArg, TResource, TIncludes> : never
-): IMapResourceResult<TResource, TIncludes> | IMapResourceListResult<TResource, TIncludes> {
+  actions?: TResource extends any ? IActions<TResource, TKeyArg, TIncludes> : never
+): TResult<TResource, TKeyArg, TIncludes>;
+
+export function useResource<
+  TResource extends CachedResource<any, any, any, any, any>,
+  TKeyArg extends CachedResourceParam<TResource>,
+  TIncludes extends CachedResourceContext<TResource>
+>(
+  component: { name: string },
+  ctor: IServiceConstructor<TResource> | TResource,
+  keyObj: TResource extends any ? TKeyArg | null | KeyWithIncludes<TKeyArg, TIncludes> : never,
+  actions?: TResource extends any ? IActions<TResource, TKeyArg, TIncludes> : never
+): IMapResourceResult<TResource, TIncludes>
+  | IMapResourceListResult<TResource, TIncludes>
+  | IDataResourceResult<TResource, TIncludes> {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const resource = ctor instanceof CachedMapResource ? ctor : useService(ctor);
+  const resource = ctor instanceof CachedResource ? ctor : useService(ctor);
   const notifications = useService(NotificationService);
-  const [use, setUse] = useState<[TKeyArg | null, string]>([null, '']);
   const [exception, setException] = useState<Error | null>(null);
   let key: TKeyArg | null = keyObj as TKeyArg;
   let includes: TIncludes = [] as unknown as TIncludes;
@@ -192,24 +181,27 @@ export function useMapResource<
 
   const refObj = useObservableRef(() => ({
     loading: false,
-    prevData: undefined as CachedMapResourceLoader<
-    TKeyArg,
-    CachedMapResourceKey<TResource>,
-    CachedMapResourceValue<TResource>,
-    TIncludes
-    > | undefined,
+    prevData: (isResourceKeyList(key) ? [] : undefined) as unknown | undefined,
     useRef: [null, ''] as [TKeyArg | null, string],
+    use(key: TKeyArg | null) {
+      key = toJS(key);
+
+      if (this.useRef[0] !== null) {
+        if (key !== null && this.resource.includes(key, this.useRef[0])) {
+          return;
+        }
+
+        resource.free(this.useRef[0], this.useRef[1]);
+      }
+      this.useRef = [key, key === null ? '' : resource.use(key)];
+    },
     get preloaded(): boolean {
       if (this.actions?.preload) {
         for (const preload of this.actions.preload) {
           if (
             !preload.isLoaded()
-            || preload.isOutdated()
-            || (
-              Array.isArray(preload.exception)
-                ? preload.exception.some(Boolean)
-                : !!preload.exception
-            )
+            || preload.isOutdated?.()
+            || preload.isError()
           ) {
             return false;
           }
@@ -217,18 +209,12 @@ export function useMapResource<
       }
       return true;
     },
-    use(key: TKeyArg | null) {
-      if (this.useRef[0] !== null) {
-        resource.free(this.useRef[0], this.useRef[1]);
-      }
-      this.useRef = [key, key === null ? '' : resource.use(key)];
-    },
     async [loadFunctionName](refresh?: boolean) {
-      const { resource, actions, prevData } = this;
+      const { loading, resource, actions, prevData } = this;
       const key = keyRef.key;
       const includes = keyRef.includes;
 
-      if (this.loading) {
+      if (loading) {
         return;
       }
 
@@ -254,7 +240,6 @@ export function useMapResource<
         }
 
         const newData = await resource.load(key, includes as any);
-        this.use(key);
         this.prevData = newData;
 
         await actions?.onData?.(
@@ -322,10 +307,15 @@ export function useMapResource<
           return [];
         }
 
-        return undefined;
+        if (refObj.resource instanceof CachedMapResource) {
+          return undefined;
+        }
       }
 
-      return refObj.resource.get(keyRef.key);
+      if (refObj.resource instanceof CachedMapResource) {
+        return refObj.resource.get(keyRef.key);
+      }
+      return refObj.resource.data;
     },
     get outdated() {
       if (keyRef.key === null || !refObj.preloaded) {
@@ -339,11 +329,7 @@ export function useMapResource<
         return true;
       }
 
-      if (
-        Array.isArray(this.exception)
-          ? this.exception.some(Boolean)
-          : !!this.exception
-      ) {
+      if (this.isError()) {
         return false;
       }
 
@@ -355,6 +341,9 @@ export function useMapResource<
       }
 
       return refObj.loading || refObj.resource.isDataLoading(keyRef.key);
+    },
+    isError() {
+      return isContainsException(this.exception);
     },
     isOutdated() {
       return this.outdated;
@@ -388,10 +377,7 @@ export function useMapResource<
     && refObj.preloaded
     && keyRef.key !== null
     && actions?.active !== false
-    && (
-      result.exception === null
-      || (Array.isArray(result.exception) && !result.exception.some(Boolean))
-    )
+    && !result.isError()
   ));
 
   useEffect(() => () => {
@@ -399,9 +385,7 @@ export function useMapResource<
   }, []);
 
   useEffect(() => {
-    if (keyRef.key === null) {
-      refObj.use(null);
-    }
+    refObj.use(key);
     if (canLoad) {
       (refObj as any)[loadFunctionName]();
     }
@@ -417,3 +401,6 @@ export function useMapResource<
 function isKeyWithIncludes<TKey, TIncludes>(obj: any): obj is KeyWithIncludes<TKey, TIncludes> {
   return obj && typeof obj === 'object' && 'includes' in obj && 'key' in obj;
 }
+
+export { useResource as useMapResource };
+export { useResource as useDataResource };

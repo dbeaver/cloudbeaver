@@ -26,9 +26,10 @@ const style = css`
 export const UserProfileForm = observer(function UserProfileForm() {
   const userProfileService = useService(UserProfileService);
   const userInfo = useDataResource(UserProfileForm, UserInfoResource, {
-    key: undefined as any,
-    includes: ['includeMetaParameters'],
+    key: undefined,
+    includes: ['includeMetaParameters'] as const,
   });
+
   const close = useCallback(() => userProfileService.close(true), []);
 
   if (!userProfileService.formState) {

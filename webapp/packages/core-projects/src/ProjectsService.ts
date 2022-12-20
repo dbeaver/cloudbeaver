@@ -9,7 +9,7 @@
 import { computed, makeObservable } from 'mobx';
 
 import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
@@ -28,7 +28,7 @@ interface IProjectsUserSettings {
 }
 
 @injectable()
-export class ProjectsService {
+export class ProjectsService extends Dependency {
   get userProject(): ProjectInfo | undefined {
     let project: ProjectInfo | undefined;
 
@@ -96,10 +96,23 @@ export class ProjectsService {
     private readonly projectInfoEventHandler: ProjectInfoEventHandler,
     navigationService: NavigationService
   ) {
+    super();
     this.getActiveProjectTask = new SyncExecutor();
     this.onActiveProjectChange = new Executor();
 
     this.onActiveProjectChange.before(navigationService.navigationTask);
+
+    this.userInfoResource.onUserChange.addHandler(() => {
+      this.onActiveProjectChange.execute({
+        type: 'after',
+      });
+    });
+
+    this.projectInfoResource.onDataUpdate.addHandler(() => {
+      this.onActiveProjectChange.execute({
+        type: 'after',
+      });
+    });
 
     this.onActiveProjectChange.addHandler(data => {
       if (data.type === 'after') {
