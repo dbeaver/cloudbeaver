@@ -69,6 +69,7 @@ export const ConnectionAuthenticationDialog: DialogComponent<Payload> = observer
           authModelId={payload.authModelId}
           networkHandlers={payload.networkHandlers}
           formId={payload.config.connectionId || payload.driverId}
+          hideFeatures={['nonSecuredProperty']}
         />
       </SubmittingForm>
     </CommonDialogWrapper>

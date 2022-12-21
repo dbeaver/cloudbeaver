@@ -99,6 +99,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
               formId={`${payload.connection.projectId}:${payload.connection.connectionId}`}
               allowSaveCredentials={credentialsSavingEnabled}
               disabled={controller.isAuthenticating}
+              hideFeatures={['nonSecuredProperty']}
             />
           )}
       </SubmittingForm>
