@@ -295,7 +295,9 @@ export class UserFormController implements IInitializableController, IDestructib
           await this.usersResource.grantTeam(this.user.userId, teamId, true);
         }
       } else {
-        await this.usersResource.revokeTeam(this.user.userId, teamId, true);
+        if (this.user.grantedTeams.includes(teamId)) {
+          await this.usersResource.revokeTeam(this.user.userId, teamId, true);
+        }
       }
     }
   }
