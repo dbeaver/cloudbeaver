@@ -27,10 +27,19 @@ interface Props {
   allowSaveCredentials?: boolean;
   disabled?: boolean;
   className?: string;
+  hideFeatures?: string[];
 }
 
 export const ConnectionAuthenticationForm = observer<Props>(function ConnectionAuthenticationForm({
-  config, networkHandlers, authProperties, authModelId, formId, allowSaveCredentials, disabled, className,
+  config,
+  networkHandlers,
+  authProperties,
+  authModelId,
+  formId,
+  allowSaveCredentials,
+  disabled,
+  className,
+  hideFeatures,
 }) {
   const translate = useTranslate();
   const authModel = useMapResource(ConnectionAuthenticationForm, DatabaseAuthModelsResource, authModelId);
@@ -39,6 +48,10 @@ export const ConnectionAuthenticationForm = observer<Props>(function ConnectionA
 
   if (authProperties) {
     properties = authProperties;
+  }
+
+  if (properties && hideFeatures?.length) {
+    properties = properties.filter(property => !property.features.some(feature => hideFeatures.includes(feature)));
   }
 
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
