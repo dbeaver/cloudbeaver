@@ -21,6 +21,14 @@ export const GlobalConstants = {
     return _VERSION_;
   },
 
+  get protocol(): 'http:' | 'https:' {
+    return window.location.protocol as 'http:' | 'https:';
+  },
+
+  get wsProtocol(): 'ws:' | 'wss:' {
+    return this.protocol === 'https:' ? 'wss:' : 'ws:';
+  },
+
   get host(): string {
     return window.location.host;
   },
