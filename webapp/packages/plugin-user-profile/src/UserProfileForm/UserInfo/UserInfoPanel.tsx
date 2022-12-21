@@ -65,6 +65,18 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
               >
                 {translate('plugin_user_profile_info_displayName')}
               </InputField>
+              <InputField
+                type="text"
+                name="authRole"
+                mod='surface'
+                state={user}
+                autoHide
+                readOnly
+                tiny
+                fill
+              >
+                {translate('authentication_user_role')}
+              </InputField>
             </Container>
             <Loader state={userMetaParameters} inline>
               {() => userMetaParameters.data.length > 0 && styled(styles)(
