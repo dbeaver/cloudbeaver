@@ -67,9 +67,9 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
                 break;
             }
             default:
-                webSession.addSessionError(
-                    new DBWebException("Unknown websocket client event: " + clientEvent.getId())
-                );
+                var e = new DBWebException("Unknown websocket client event: " + clientEvent.getId());
+                log.error(e.getMessage(), e);
+                webSession.addSessionError(e);
         }
     }
 
