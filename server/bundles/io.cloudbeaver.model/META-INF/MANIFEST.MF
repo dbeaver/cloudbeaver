@@ -16,7 +16,7 @@ Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.bundle.graphql.java;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp,
  com.google.gson;visibility:=reexport,
- org.eclipse.jetty.servlet-api;visibility:=reexport
+ jakarta.servlet-api;visibility:=reexport
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.auth,
  io.cloudbeaver.auth.provider,
