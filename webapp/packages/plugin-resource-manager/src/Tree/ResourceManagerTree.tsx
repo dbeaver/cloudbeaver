@@ -14,6 +14,7 @@ import { Loader, useDataResource, useTranslate, useUserData } from '@cloudbeaver
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavNodeManagerService, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
+import { createPath } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
 import { NavigationTreeService, ElementsTree, IElementsTreeSettings, createElementsTreeSettings, validateElementsTreeSettings, getNavigationTreeUserSettingsId } from '@cloudbeaver/plugin-navigation-tree';
 import { ResourceManagerScriptsService } from '@cloudbeaver/plugin-resource-manager-scripts';
@@ -123,8 +124,8 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
       const project = resourcesProjectsNavNodeService.getProject(node.id);
 
       if (project) {
-        const scriptsRoot = resourceManagerScriptsService.getRootPath(project.id);
-        id = scriptsRoot;
+        const scriptsRootFolder = resourceManagerScriptsService.getRootFolder(project.id);
+        id = createPath(RESOURCES_NODE_PATH, project.id, scriptsRootFolder);
       }
     }
 
@@ -140,7 +141,8 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
       const project = resourcesProjectsNavNodeService.getProject(node.id);
 
       if (project) {
-        const scriptsRoot = resourceManagerScriptsService.getRootPath(project.id);
+        const scriptsRootFolder = resourceManagerScriptsService.getRootFolder(project.id);
+        const scriptsRoot = createPath(RESOURCES_NODE_PATH, project.id, scriptsRootFolder);
 
         if (scriptsRoot !== id) {
           isNodesLoaded = await navTreeService.loadNestedNodes(scriptsRoot, tryConnect, notify);

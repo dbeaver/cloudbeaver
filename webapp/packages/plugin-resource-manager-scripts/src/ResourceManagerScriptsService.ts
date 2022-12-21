@@ -8,8 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { createPath } from '@cloudbeaver/core-utils';
-import { ResourceProjectsResource, RESOURCES_NODE_PATH } from '@cloudbeaver/plugin-resource-manager';
+import { ResourceProjectsResource } from '@cloudbeaver/plugin-resource-manager';
 
 import { SCRIPTS_TYPE_ID } from './SCRIPTS_TYPE_ID';
 
@@ -28,14 +27,7 @@ export class ResourceManagerScriptsService {
     }
 
     const scriptType = project.resourceTypes.find(type => type.id === SCRIPTS_TYPE_ID);
-    return scriptType?.rootFolder;
-  }
 
-  getRootPath(projectId: string) {
-    return createPath(
-      RESOURCES_NODE_PATH,
-      projectId,
-      this.serverConfigResource.data?.distributed ? this.getRootFolder(projectId) : undefined
-    );
+    return this.serverConfigResource.data?.distributed ? scriptType?.rootFolder : undefined;
   }
 }

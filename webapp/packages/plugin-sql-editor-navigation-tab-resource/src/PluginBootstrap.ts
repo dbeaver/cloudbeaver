@@ -114,8 +114,10 @@ export class PluginBootstrap extends Bootstrap {
               }
 
               const scriptName = `${result.name.trim()}.${SCRIPT_EXTENSION}`;
-              const folder = this.resourceManagerScriptsService.getRootPath(projectId);
-              const folderResourceKey = getResourceKeyFromNodeId(folder);
+              const scriptsRootFolder = this.resourceManagerScriptsService.getRootFolder(projectId);
+              const folderResourceKey = getResourceKeyFromNodeId(
+                createPath(RESOURCES_NODE_PATH, projectId, scriptsRootFolder)
+              );
 
               if (!folderResourceKey) {
                 this.notificationService.logError({ title: 'ui_error', message: 'plugin_resource_manager_save_script_error' });

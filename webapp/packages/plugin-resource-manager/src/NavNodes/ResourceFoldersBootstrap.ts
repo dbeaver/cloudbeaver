@@ -23,6 +23,7 @@ import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, MenuService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, type IElementsTree } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
+import { ResourceManagerScriptsService } from '@cloudbeaver/plugin-resource-manager-scripts';
 
 import { NAV_NODE_TYPE_RM_PROJECT } from '../NAV_NODE_TYPE_RM_PROJECT';
 import { ResourceProjectsResource } from '../ResourceProjectsResource';
@@ -57,7 +58,8 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService
+    private readonly resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
+    private readonly resourceManagerScriptsService: ResourceManagerScriptsService,
   ) {
     super();
   }
@@ -175,7 +177,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
           return;
         }
 
-        let path: string | undefined;
+        let path = this.resourceManagerScriptsService.getRootFolder(targetNode.projectId);
 
         if (targetNode.folderId) {
           const resourceKey = getResourceKeyFromNodeId(targetNode.folderId);
