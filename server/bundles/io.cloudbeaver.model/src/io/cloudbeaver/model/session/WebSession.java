@@ -63,6 +63,7 @@ import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -694,15 +695,14 @@ public class WebSession extends BaseWebSession
     }
 
     public void addSessionError(Throwable exception) {
-        synchronized (sessionMessages) {
-            sessionMessages.add(new WebServerMessage(exception));
-        }
+        addSessionMessage(new WebServerMessage(exception));
     }
 
     public void addSessionMessage(WebServerMessage message) {
         synchronized (sessionMessages) {
             sessionMessages.add(message);
         }
+        addSessionEvent(new WSSessionLogUpdatedEvent());
     }
 
     public void addInfoMessage(String message) {

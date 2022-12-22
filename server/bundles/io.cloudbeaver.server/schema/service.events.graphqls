@@ -6,6 +6,8 @@
 enum CBServerEventId {
     cb_config_changed,
 
+    cb_session_log_updated,
+
     cb_datasource_created,
     cb_datasource_updated,
     cb_datasource_deleted,
@@ -29,6 +31,7 @@ enum CBClientEventId {
 # Client subscribes on topic to receive only related events
 enum CBEventTopic {
     cb_config,
+    cb_session_log,
     cb_datasource,
     cb_datasource_folder,
     cb_scripts,
