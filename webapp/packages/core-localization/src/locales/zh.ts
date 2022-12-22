@@ -28,6 +28,7 @@ export const defaultZHLocale = [
   ['ui_error', '错误'],
   ['ui_error_message', '错误：'],
   ['ui_error_close', '关闭'],
+  ['ui_clear', 'Clear'],
   ['ui_close', '关闭'],
   ['ui_errors_details', '详情'],
   ['ui_search', '搜索...'],

@@ -20,7 +20,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.WebObjectId;
 import io.cloudbeaver.WebProjectAction;
-import io.cloudbeaver.events.CBEvent;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
@@ -87,9 +86,6 @@ public interface DBWServiceCore extends DBWService {
 
     @WebAction
     List<WebServerMessage> readSessionLog(@NotNull WebSession webSession, Integer maxEntries, Boolean clearEntries) throws DBWebException;
-
-    @WebAction(requirePermissions = {})
-    List<CBEvent> readSessionEvents(@Nullable WebSession webSession, Integer maxEntries) throws DBWebException;
 
     @WebAction(requirePermissions = {})
     boolean closeSession(HttpServletRequest request) throws DBWebException;

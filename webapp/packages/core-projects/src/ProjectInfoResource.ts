@@ -24,7 +24,7 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
     private readonly userInfoResource: UserInfoResource,
     sessionPermissionsResource: SessionPermissionsResource
   ) {
-    super([]);
+    super(new Map(), []);
 
     this.sync(this.userInfoResource);
     sessionPermissionsResource.require(this, EPermission.public);

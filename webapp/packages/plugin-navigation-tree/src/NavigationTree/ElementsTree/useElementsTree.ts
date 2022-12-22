@@ -9,7 +9,7 @@
 import { action, computed, observable, runInAction } from 'mobx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { IFolderExplorerContext, useExecutor, useMapResource, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
+import { IFolderExplorerContext, useExecutor, useResource, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -578,7 +578,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     functionsRef.loadTree(options.root);
   }, 100), []);
 
-  useMapResource(useElementsTree, ProjectInfoResource, CachedMapAllKey, {
+  useResource(useElementsTree, ProjectInfoResource, CachedMapAllKey, {
     onData: () => {
       loadTreeThreshold();
     },

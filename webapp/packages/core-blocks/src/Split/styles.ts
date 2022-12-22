@@ -36,10 +36,10 @@ export const splitStyles = css`
       cursor: ew-resize;
       user-select: none;
       z-index: 1;
-      transition: box-shadow 0.3s ease-in-out;
+      transition: background-color 0.3s ease-in-out;
 
       &:hover {
-        box-shadow: 0px 3px 3px -2px rgb(0 0 0 / 20%), 0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%);
+        background-color: var(--theme-primary);
       }
     }
 

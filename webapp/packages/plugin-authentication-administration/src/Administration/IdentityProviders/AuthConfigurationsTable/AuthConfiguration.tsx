@@ -12,7 +12,7 @@ import styled, { css, use } from 'reshadow';
 import { AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import {
   TableItem, TableColumnValue, TableItemSelect, TableItemExpand,
-  Placeholder, StaticImage, useMapResource, FieldCheckbox
+  Placeholder, StaticImage, useResource, FieldCheckbox
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
@@ -43,7 +43,7 @@ interface Props {
 
 export const AuthConfiguration = observer<Props>(function AuthConfiguration({ configuration }) {
   const service = useService(AuthConfigurationsAdministrationService);
-  const resource = useMapResource(AuthConfiguration, AuthProvidersResource, configuration.providerId);
+  const resource = useResource(AuthConfiguration, AuthProvidersResource, configuration.providerId);
 
   const icon = configuration.iconURL || resource.data?.icon;
 

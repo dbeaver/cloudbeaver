@@ -11,7 +11,7 @@ import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { TeamMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, InputField, SubmittingForm, Textarea, useTranslate, useStyles, useDataResource, Loader, GroupTitle, ObjectPropertyInfoForm } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, InputField, SubmittingForm, Textarea, useTranslate, useStyles, useResource, Loader, GroupTitle, ObjectPropertyInfoForm } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
@@ -31,8 +31,8 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
   const formRef = useRef<HTMLFormElement>(null);
 
   const translate = useTranslate();
-  const serverConfigResource = useDataResource(TeamOptions, ServerConfigResource, undefined);
-  const teamMetaParameters = useDataResource(TeamOptions, TeamMetaParametersResource, undefined);
+  const serverConfigResource = useResource(TeamOptions, ServerConfigResource, undefined);
+  const teamMetaParameters = useResource(TeamOptions, TeamMetaParametersResource, undefined);
 
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
   const edit = state.mode === 'edit';

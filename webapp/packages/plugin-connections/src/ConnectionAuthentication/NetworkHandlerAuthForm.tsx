@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, FieldCheckbox, GroupTitle, InputField, useMapResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, FieldCheckbox, GroupTitle, InputField, useResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
@@ -24,7 +24,7 @@ interface Props {
 
 export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAuthForm({ id, networkHandlersConfig, allowSaveCredentials, disabled }) {
   const translate = useTranslate();
-  const handler = useMapResource(NetworkHandlerAuthForm, NetworkHandlerResource, id);
+  const handler = useResource(NetworkHandlerAuthForm, NetworkHandlerResource, id);
 
   //@TODO Do not mutate state in component body
   if (!networkHandlersConfig.some(state => state.id === id)) {

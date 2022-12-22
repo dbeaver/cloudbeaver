@@ -7,6 +7,7 @@
  */
 
 export type ResourceKey<TKey> = TKey | ResourceKeyList<TKey>;
+export type ResourceKeyType<TKey> = TKey extends ResourceKeyList<infer I> ? I : TKey;
 export type SingleResourceKey<T> = Exclude<T, Exclude<T, ResourceKeyList<any>>> extends ResourceKeyList<infer TKey>
   ? TKey
   : T;

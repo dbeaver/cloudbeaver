@@ -18,12 +18,17 @@ export type CachedResourceIncludeFlags<TValue, TArgs> = {
 };
 
 export type CachedResourceIncludeList<TValue> = Array<CachedResourceIncludeTemplate<TValue>>;
-export type CachedResourceIncludeToKey<TKey> = TKey extends Array<`include${infer T}` | `customInclude${Capitalize<string>}`> ? Uncapitalize<T> : unknown;
-export type CachedResourceIncludeArgs<TValue, TArguments> = Array<
-keyof CachedResourceIncludeFlags<
-Exclude<ExtractElementType<TValue>, undefined | null>,
-TArguments>
->;
+export type CachedResourceIncludeToKey<TKey> = TKey extends ReadonlyArray<`include${infer T}` | `customInclude${Capitalize<string>}`> ? Uncapitalize<T> : unknown;
+export type CachedResourceIncludeArgs<TValue, TArguments> = TArguments extends Record<string, never>
+  ? string[]
+  : (
+    Array<
+    Exclude<
+    keyof CachedResourceIncludeFlags<Exclude<ExtractElementType<TValue>, undefined | null>, TArguments>,
+    number | symbol
+    >
+    >
+  );
 
 export type ApplyIncludes<TValue, TKeys> = TValue
 & ({

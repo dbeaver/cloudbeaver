@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, useDataResource, useTranslate, useUserData } from '@cloudbeaver/core-blocks';
+import { Loader, useResource, useTranslate, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
@@ -77,7 +77,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
     validateElementsTreeSettings
   );
 
-  const { resource } = useDataResource(ResourceManagerTree, ResourceProjectsResource, undefined);
+  const resourceProjectsLoader = useResource(ResourceManagerTree, ResourceProjectsResource, undefined);
 
   const projectsRendererRenderer = useMemo(
     () => navigationTreeProjectsRendererRenderer(navNodeInfoResource),
@@ -113,7 +113,7 @@ export const ResourceManagerTree = observer(function ResourceManagerTree() {
   const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);
 
   return styled(styles)(
-    <Loader state={resource}>
+    <Loader state={resourceProjectsLoader}>
       <CaptureView view={navTreeService}>
         <ElementsTree
           root={root}

@@ -11,9 +11,8 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, IProperty, Loader, PropertiesTable, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, IProperty, Loader, PropertiesTable, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
-
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 
@@ -61,10 +60,10 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
     return { propertiesList, add, remove };
   });
 
-  const driver = useMapResource(
+  const driver = useResource(
     DriverProperties,
     DBDriverResource,
-    { key: (selected && formState.config.driverId) || null, includes: ['includeDriverProperties'] },
+    { key: (selected && formState.config.driverId) || null, includes: ['includeDriverProperties'] as const },
     {
       active: selected && !!formState.config.driverId,
       onData: driver => {

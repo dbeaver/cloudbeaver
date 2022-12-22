@@ -10,7 +10,7 @@ import { computed, observable } from 'mobx';
 import { useEffect } from 'react';
 
 import { Task } from '@cloudbeaver/core-executor';
-import type { ILoadableState } from '@cloudbeaver/core-utils';
+import { ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 
 import { useObservableRef } from './useObservableRef';
 
@@ -24,6 +24,9 @@ export function usePromiseState<T>(promise: Promise<T> | null): ILoadableState {
         return this.promise.cancel.bind(this.promise);
       }
       return undefined;
+    },
+    isError() {
+      return isContainsException(this.exception);
     },
     isCancelled(): boolean {
       if (this.promise instanceof Task) {

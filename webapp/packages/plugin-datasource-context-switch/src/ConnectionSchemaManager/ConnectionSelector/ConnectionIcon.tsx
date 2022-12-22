@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { ConnectionMark, IconOrImage, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
+import { ConnectionMark, IconOrImage, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
@@ -45,14 +45,14 @@ export const ConnectionIcon: React.FC<Props> = observer(function ConnectionInfo(
 }) {
   const styles = useStyles(style, connectionIconStyle);
 
-  const connection = useMapResource(
+  const connection = useResource(
     ConnectionInfo,
     ConnectionInfoResource,
     connectionKey ?? null
   );
   const driverId = connection.data?.driverId;
 
-  const driver = useMapResource(ConnectionInfo, DBDriverResource, driverId!, {
+  const driver = useResource(ConnectionInfo, DBDriverResource, driverId!, {
     active: driverId !== undefined,
   });
 

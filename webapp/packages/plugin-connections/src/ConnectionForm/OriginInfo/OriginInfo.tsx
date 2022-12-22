@@ -9,10 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TextPlaceholder, Loader, ExceptionMessage, useMapResource, ColoredContainer, Group, ObjectPropertyInfoForm, BASE_CONTAINERS_STYLES, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, Loader, ExceptionMessage, useResource, ColoredContainer, Group, ObjectPropertyInfoForm, BASE_CONTAINERS_STYLES, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { createConnectionParam } from '@cloudbeaver/core-connections';
-
-
 import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
@@ -43,9 +41,9 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   const state = useTabState<Record<string, any>>();
   const styles = useStyles(style, BASE_CONTAINERS_STYLES);
 
-  const connection = useMapResource(OriginInfo, resource, {
+  const connection = useResource(OriginInfo, resource, {
     key: (tab.selected && info) ? createConnectionParam(info.projectId, info.id) : null,
-    includes: ['includeOrigin', 'customIncludeOriginDetails'],
+    includes: ['includeOrigin', 'customIncludeOriginDetails'] as const,
   }, {
     // isActive: () => !info?.origin || userInfoService.hasOrigin(info.origin),
     onData: (connection, res, prev) => {

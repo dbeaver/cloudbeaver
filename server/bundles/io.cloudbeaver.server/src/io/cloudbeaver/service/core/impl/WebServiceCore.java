@@ -21,8 +21,6 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
@@ -52,6 +50,7 @@ import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHImplementation;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
@@ -62,10 +61,7 @@ import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -236,7 +232,12 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebSession getSessionState(@NotNull WebSession webSession) {
+    public WebSession getSessionState(@NotNull WebSession webSession) throws DBWebException {
+        try {
+            webSession.getUserContext().refreshPermissions();
+        } catch (DBException e) {
+            throw new DBWebException("Cannot refresh user permissions", e);
+        }
         return webSession;
     }
 
@@ -246,24 +247,17 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<CBEvent> readSessionEvents(@Nullable WebSession webSession, Integer maxEntries) throws DBWebException {
-        if (webSession == null) {
-            return Collections.emptyList();
-        }
-        return webSession.getSessionEvents(maxEntries);
-    }
-
-    @Override
     public boolean closeSession(HttpServletRequest request) throws DBWebException {
         try {
-            WebSession webSession = CBPlatform.getInstance().getSessionManager().closeSession(request);
-            if (webSession != null) {
+            var baseWebSession = CBPlatform.getInstance().getSessionManager().closeSession(request);
+            if (baseWebSession instanceof WebSession) {
+                var webSession = (WebSession) baseWebSession;
                 for (WebSessionHandlerDescriptor hd : WebHandlerRegistry.getInstance().getSessionHandlers()) {
                     try {
                         hd.getInstance().handleSessionClose(webSession);
                     } catch (Exception e) {
                         log.error("Error calling session handler '" + hd.getId() + "'", e);
-                        webSession.addSessionError(e);
+                        baseWebSession.addSessionError(e);
                     }
                 }
                 return true;
@@ -413,7 +407,7 @@ public class WebServiceCore implements DBWServiceCore {
             webSession.getProjectById(projectId),
             webSession.getSessionId(),
             connectionInfo.getId(),
-            CBEventConstants.EventType.TYPE_CREATE
+            WSConstants.EventAction.CREATE
         );
         return connectionInfo;
     }
@@ -438,6 +432,7 @@ public class WebServiceCore implements DBWServiceCore {
         if (!CommonUtils.isEmpty(config.getName())) {
             dataSource.setName(config.getName());
         }
+        String oldDescription = dataSource.getDescription();
         if (config.getDescription() != null) {
             dataSource.setDescription(config.getDescription());
         }
@@ -445,8 +440,8 @@ public class WebServiceCore implements DBWServiceCore {
         dataSource.setFolder(config.getFolder() != null ? sessionRegistry.getFolder(config.getFolder()) : null);
 
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
-        
-        boolean sendEvent = sendUpdateConnectionEvent(config, dataSource, oldConnectionConfig);
+
+        boolean sendEvent = sendUpdateConnectionEvent(config, dataSource, oldConnectionConfig, oldDescription);
 
         WebServiceUtils.saveAuthProperties(
             dataSource,
@@ -467,7 +462,7 @@ public class WebServiceCore implements DBWServiceCore {
                 webSession.getProjectById(projectId),
                 webSession.getSessionId(),
                 connectionInfo.getId(),
-                CBEventConstants.EventType.TYPE_UPDATE
+                WSConstants.EventAction.UPDATE
             );
         }
         return connectionInfo;
@@ -479,9 +474,13 @@ public class WebServiceCore implements DBWServiceCore {
     private boolean sendUpdateConnectionEvent(
         @NotNull WebConnectionConfig config,
         @NotNull DBPDataSourceContainer dataSource,
-        @NotNull DBPConnectionConfiguration oldConnectionConfig
+        @NotNull DBPConnectionConfiguration oldConnectionConfig,
+        @Nullable String oldDescription
     ) {
         if (!oldConnectionConfig.equals(dataSource.getConnectionConfiguration())) {
+            return true;
+        }
+        if (!Objects.equals(oldDescription, dataSource.getDescription())) {
             return true;
         }
         if (dataSource.getProject().isUseSecretStorage()) {
@@ -505,7 +504,7 @@ public class WebServiceCore implements DBWServiceCore {
             webSession.getProjectById(projectId),
             webSession.getSessionId(),
             connectionId,
-            CBEventConstants.EventType.TYPE_DELETE
+            WSConstants.EventAction.DELETE
         );
         return true;
     }
@@ -586,7 +585,7 @@ public class WebServiceCore implements DBWServiceCore {
                 webSession.getProjectById(projectId),
                 webSession.getSessionId(),
                 connectionInfo.getId(),
-                CBEventConstants.EventType.TYPE_CREATE
+                WSConstants.EventAction.CREATE
             );
             return connectionInfo;
         } catch (DBException e) {
@@ -789,7 +788,7 @@ public class WebServiceCore implements DBWServiceCore {
                 session.getProjectById(projectId),
                 session.getSessionId(),
                 DBNLocalFolder.makeLocalFolderItemPath(newFolder),
-                CBEventConstants.EventType.TYPE_CREATE
+                WSConstants.EventAction.CREATE
             );
             return folderInfo;
         } catch (DBException e) {
@@ -814,13 +813,13 @@ public class WebServiceCore implements DBWServiceCore {
             session.getProjectById(projectId),
             session.getSessionId(),
             oldFolderNode,
-            CBEventConstants.EventType.TYPE_DELETE
+            WSConstants.EventAction.DELETE
         );
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             session.getProjectById(projectId),
             session.getSessionId(),
             newFolderNode,
-            CBEventConstants.EventType.TYPE_CREATE
+            WSConstants.EventAction.CREATE
         );
         return folderInfo;
     }
@@ -845,7 +844,7 @@ public class WebServiceCore implements DBWServiceCore {
                 session.getProjectById(projectId),
                 session.getSessionId(),
                 folderNode,
-                CBEventConstants.EventType.TYPE_DELETE
+                WSConstants.EventAction.DELETE
             );
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
@@ -865,7 +864,7 @@ public class WebServiceCore implements DBWServiceCore {
             webSession.getProjectById(projectId),
             webSession.getSessionId(),
             id,
-            CBEventConstants.EventType.TYPE_UPDATE);
+            WSConstants.EventAction.UPDATE);
         return connectionInfo;
     }
 

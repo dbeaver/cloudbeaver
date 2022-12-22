@@ -7,26 +7,22 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  CbEvent,
-  ResourceEventHandler
-} from '@cloudbeaver/core-sdk';
+import type { CbConfigEvent as IServerConfigEvent } from '@cloudbeaver/core-sdk';
 
-import { SessionEvent, SessionEventSource, SessionEventType } from './SessionEventSource';
+import { TopicEventHandler } from './ServerEventEmitter/TopicEventHandler';
+import { ISessionEvent, SessionEventSource, SessionEventTopic } from './SessionEventSource';
+
+export { type IServerConfigEvent };
 
 @injectable()
-export class ServerConfigEventHandler extends ResourceEventHandler<null, SessionEvent> {
+export class ServerConfigEventHandler extends TopicEventHandler<IServerConfigEvent, ISessionEvent> {
   constructor(
     sessionEventSource: SessionEventSource
   ) {
-    super(sessionEventSource);
+    super(SessionEventTopic.CbConfig, sessionEventSource);
   }
 
-  map(event: CbEvent): null {
-    return null;
-  }
-
-  filter(event: CbEvent): boolean {
-    return event.eventType === SessionEventType.CbConfigChanged;
+  map(event: any) {
+    return event;
   }
 }

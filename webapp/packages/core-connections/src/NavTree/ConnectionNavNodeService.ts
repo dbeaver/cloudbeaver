@@ -12,7 +12,8 @@ import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { INodeNavigationData, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
-import { type ResourceKey, ResourceKeyUtils, resourceKeyList, CbEventStatus } from '@cloudbeaver/core-sdk';
+import { ServerEventId } from '@cloudbeaver/core-root';
+import { type ResourceKey, ResourceKeyUtils, resourceKeyList, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { ConnectionFolderEventHandler, IConnectionFolderEvent } from '../ConnectionFolderEventHandler';
 import { Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
@@ -48,7 +49,10 @@ export class ConnectionNavNodeService extends Dependency {
 
     this.navNodeManagerService.navigator.addHandler(this.navigateHandler.bind(this));
 
-    this.connectionFolderEventHandler.on<IConnectionFolderEvent>(
+    this.connectionInfoResource.connect(this.navTreeResource);
+
+    this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
+      ServerEventId.CbDatasourceFolderCreated,
       data => {
         const parents = data.nodePaths.map(nodeId => {
           const parents = getFolderNodeParents(nodeId);
@@ -57,9 +61,11 @@ export class ConnectionNavNodeService extends Dependency {
         });
         this.navTreeResource.markTreeOutdated(resourceKeyList(parents));
       },
-      v => v,
-      event => event.eventType === CbEventStatus.TypeCreate
-    ).on<IConnectionFolderEvent>(
+      undefined,
+      this.navTreeResource
+    );
+    this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
+      ServerEventId.CbDatasourceFolderDeleted,
       data => {
         const parents = data.nodePaths.map(nodeId => {
           const parents = getFolderNodeParents(nodeId);
@@ -69,14 +75,16 @@ export class ConnectionNavNodeService extends Dependency {
 
         this.navTreeResource.deleteInNode(resourceKeyList(parents), data.nodePaths);
       },
-      v => v,
-      event => event.eventType === CbEventStatus.TypeDelete
-    ).on<IConnectionFolderEvent>(
+      undefined,
+      this.navTreeResource
+    );
+    this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
+      ServerEventId.CbDatasourceFolderUpdated,
       data => {
         this.navTreeResource.markOutdated(resourceKeyList(data.nodePaths));
       },
-      v => v,
-      event => event.eventType === CbEventStatus.TypeUpdate
+      undefined,
+      this.navTreeResource
     );
   }
 
@@ -111,7 +119,11 @@ export class ConnectionNavNodeService extends Dependency {
     }
   }
 
-  private connectionUpdateHandler(key: ResourceKey<IConnectionInfoParams>) {
+  private connectionUpdateHandler(key: ResourceKey<IConnectionInfoParams> | undefined) {
+    if (key === undefined) {
+      key = CachedMapAllKey;
+    }
+
     key = this.connectionInfoResource.transformParam(key);
     const outdatedTrees: string[] = [];
     const closedConnections: string[] = [];
