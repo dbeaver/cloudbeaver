@@ -14,11 +14,11 @@ import { EPermission, SessionPermissionsResource } from '@cloudbeaver/core-root'
 import {
   GraphQLService,
   CachedDataResource,
-  NavNodeInfoFragment, ICachedResourceMetadata, ResourceKeyUtils, CachedMapAllKey
+  NavNodeInfoFragment, ICachedResourceMetadata, ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { ConnectionInfoResource } from './ConnectionInfoResource';
+import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from './ConnectionInfoResource';
 import type { IConnectionInfoParams } from './IConnectionsResource';
 
 export type ObjectContainer = NavNodeInfoFragment;
@@ -76,7 +76,7 @@ string
     }));
 
     permissionsResource.require(this, EPermission.public);
-    this.preloadResource(connectionInfoResource, () => CachedMapAllKey);
+    this.preloadResource(connectionInfoResource, () => ConnectionInfoActiveProjectKey);
     this.before(ExecutorInterrupter.interrupter(key => !connectionInfoResource.isConnected(key)));
 
     this.connectionInfoResource.onItemDelete.addHandler(

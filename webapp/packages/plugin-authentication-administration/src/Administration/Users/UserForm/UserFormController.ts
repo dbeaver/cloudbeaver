@@ -9,14 +9,14 @@
 import { observable, computed, makeObservable } from 'mobx';
 
 import { AdminUser, AuthRolesResource, compareTeams, isLocalUser, TeamInfo, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -50,7 +50,7 @@ export class UserFormController implements IInitializableController, IDestructib
 
   get connections(): DatabaseConnection[] {
     return this.connectionInfoResource.values
-      .filter(({ projectId }) => this.projectInfoResource.get(projectId)?.global) as DatabaseConnection[];
+      .filter(({ projectId }) => isGlobalProject(this.projectInfoResource.get(projectId))) as DatabaseConnection[];
   }
 
   get teams(): TeamInfo[] {
@@ -334,7 +334,7 @@ export class UserFormController implements IInitializableController, IDestructib
   private async saveConnectionPermissions() {
     await this.projectInfoResource.load(CachedMapAllKey);
 
-    if (!this.connectionAccessChanged || !this.projectInfoResource.values.some(project => project.global)) {
+    if (!this.connectionAccessChanged || !this.projectInfoResource.values.some(isGlobalProject)) {
       return;
     }
     await this.usersResource.setConnections(this.user.userId, this.getGrantedConnections());
@@ -369,8 +369,13 @@ export class UserFormController implements IInitializableController, IDestructib
   private async loadConnections() {
     try {
       await this.dbDriverResource.loadAll();
-      await this.projectInfoResource.load(CachedMapAllKey);
-      await this.connectionInfoResource.load(CachedMapAllKey);
+      const projects = await this.projectInfoResource.load(CachedMapAllKey);
+
+      await this.connectionInfoResource.load(ConnectionInfoProjectKey(
+        ...projects
+          .filter(isGlobalProject)
+          .map(project => project.id)
+      ));
     } catch (exception: any) {
       this.setStatusMessage('authentication_administration_user_connections_access_connections_load_fail', ENotificationType.Error);
     }
