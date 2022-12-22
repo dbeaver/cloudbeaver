@@ -48,6 +48,7 @@ interface Props extends Omit<ButtonProps, 'style'> {
   name?: string;
   viewBox?: string;
   style?: ComponentStyle;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
 }
 
 export const MenuBarSmallItem: React.FC<React.PropsWithChildren<Props>> = function MenuBarSmallItem({
@@ -56,13 +57,14 @@ export const MenuBarSmallItem: React.FC<React.PropsWithChildren<Props>> = functi
   children,
   className,
   style,
+  onClick,
   ...rest
 }) {
 
   // TODO: replace IconButton with StaticImage / Icon
   // TODO: use button for icon-box (maybe)
   return styled(useStyles(styles, style))(
-    <icon-box className={className} tabIndex={0}>
+    <icon-box className={className} tabIndex={0} onClick={onClick}>
       {name && (
         <IconButton
           name={name}
