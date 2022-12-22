@@ -127,7 +127,7 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
     };
   }
 
-  emit(event: SourceEvent): this {
+  emit<T extends SourceEvent>(event: T): this {
     this.emitter.emit(event);
     return this;
   }
