@@ -33,8 +33,10 @@ export const CustomConnection = observer(function CustomConnection() {
   useMapResource(CustomConnection, ProjectInfoResource, CachedMapAllKey);
 
   function select(driverId: string) {
-    if (projectsService.activeProjects.length > 0) {
-      connectionManualService.select(projectsService.activeProjects[0].id, driverId);
+    const shared = projectsService.activeProjects.filter(project => project.shared);
+
+    if (shared.length > 0) {
+      connectionManualService.select(shared[0].id, driverId);
     } else {
       notificationService.logError({
         title: 'core_projects_no_default_project',

@@ -230,7 +230,12 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebSession getSessionState(@NotNull WebSession webSession) {
+    public WebSession getSessionState(@NotNull WebSession webSession) throws DBWebException {
+        try {
+            webSession.getUserContext().refreshPermissions();
+        } catch (DBException e) {
+            throw new DBWebException("Cannot refresh user permissions", e);
+        }
         return webSession;
     }
 
