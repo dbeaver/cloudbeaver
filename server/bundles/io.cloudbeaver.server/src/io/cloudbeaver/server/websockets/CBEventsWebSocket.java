@@ -25,6 +25,7 @@ import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
@@ -33,7 +34,7 @@ import org.jkiss.dbeaver.model.websocket.event.client.WSUpdateActiveProjectsClie
 import java.io.IOException;
 
 public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionEventHandler {
-    private static final Gson gson = new Gson();
+    private static final Gson gson = WSUtils.gson;
     private static final Log log = Log.getLog(CBEventsWebSocket.class);
 
     @NotNull
