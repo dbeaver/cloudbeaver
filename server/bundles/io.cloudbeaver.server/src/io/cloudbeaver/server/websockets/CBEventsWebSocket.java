@@ -26,7 +26,9 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSClientEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.client.WSUpdateActiveProjectsClientEvent;
 
 import java.io.IOException;
 
@@ -52,18 +54,25 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
     public void onWebSocketText(String message) {
         super.onWebSocketText(message);
         var clientEvent = gson.fromJson(message, WSClientEvent.class);
-        if (clientEvent.getId() == null) {
+        var clientEventType = WSClientEventType.valueById(clientEvent.getId());
+        if (clientEventType == null) {
             webSession.addSessionError(
                 new DBWebException("Invalid websocket event: " + message)
             );
+            return;
         }
-        switch (clientEvent.getId()) {
-            case WSConstants.ClientEvents.TOPIC_SUBSCRIBE: {
-                this.webSession.subscribeOnEventTopic(clientEvent.getTopicId());
+        switch (clientEventType) {
+            case TOPIC_SUBSCRIBE: {
+                this.webSession.getEventsFilter().subscribeOnEventTopic(clientEvent.getTopicId());
                 break;
             }
-            case WSConstants.ClientEvents.TOPIC_UNSUBSCRIBE: {
-                this.webSession.unsubscribeFromEventTopic(clientEvent.getTopicId());
+            case TOPIC_UNSUBSCRIBE: {
+                this.webSession.getEventsFilter().unsubscribeFromEventTopic(clientEvent.getTopicId());
+                break;
+            }
+            case ACTIVE_PROJECTS: {
+                var projectEvent = (WSUpdateActiveProjectsClientEvent) clientEvent;
+                this.webSession.getEventsFilter().setSubscribedProjects(projectEvent.getProjectIds());
                 break;
             }
             default:
