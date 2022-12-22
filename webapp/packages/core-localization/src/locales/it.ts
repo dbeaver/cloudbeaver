@@ -28,6 +28,7 @@ export const defaultITLocale = [
   ['ui_error', 'Errore'],
   ['ui_error_message', 'Errore:'],
   ['ui_error_close', 'Chiudi'],
+  ['ui_clear', 'Clear'],
   ['ui_close', 'Chiudi'],
   ['ui_errors_details', 'Dettagli'],
   ['ui_search', 'Cerca...'],
