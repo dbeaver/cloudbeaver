@@ -8,13 +8,13 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { compareNewConnectionsInfo, ConnectionInfoResource, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { compareNewConnectionsInfo, Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { ProjectsService } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { isDefined } from '@cloudbeaver/core-utils';
 
 @injectable()
 export class ConnectionsAdministrationController {
@@ -23,21 +23,14 @@ export class ConnectionsAdministrationController {
   readonly expandedItems = observable<IConnectionInfoParams, boolean>(new Map());
 
   get keys(): IConnectionInfoParams[] {
-    return this.connectionsData.map(([key]) => key);
+    return this.connections.map(createConnectionParam);
   }
 
   get connections(): DatabaseConnection[] {
-    return this.connectionsData.map(([, connection]) => connection);
-  }
-
-  get connectionsData(): [IConnectionInfoParams, DatabaseConnection][] {
-    return Array.from(this.connectionInfoResource.data.entries())
-      .slice()
-      .filter(([key]) => this.projectsService.activeProjects.some(
-        project => project.id === key.projectId
-        && project.shared
-      ))
-      .sort(([, connectionA], [, connectionB]) => compareNewConnectionsInfo(
+    return this.connectionInfoResource
+      .get(ConnectionInfoActiveProjectKey)
+      .filter<Connection>(isDefined)
+      .sort((connectionA, connectionB) => compareNewConnectionsInfo(
         connectionA,
         connectionB
       ));
@@ -51,8 +44,7 @@ export class ConnectionsAdministrationController {
     private readonly notificationService: NotificationService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly commonDialogService: CommonDialogService,
-    private readonly localizationService: LocalizationService,
-    private readonly projectsService: ProjectsService
+    private readonly localizationService: LocalizationService
   ) {
     makeObservable(this, {
       isProcessing: observable,
@@ -67,7 +59,7 @@ export class ConnectionsAdministrationController {
     }
     this.isProcessing = true;
     try {
-      await this.connectionInfoResource.refresh(CachedMapAllKey);
+      await this.connectionInfoResource.refresh(ConnectionInfoActiveProjectKey);
       this.connectionInfoResource.cleanNewFlags();
       this.notificationService.logSuccess({ title: 'connections_administration_tools_refresh_success' });
     } catch (exception: any) {

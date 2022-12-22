@@ -11,9 +11,8 @@ import styled, { css } from 'reshadow';
 
 import { AdministrationItemContentProps, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
 import { Loader, useResource, ToolsAction, ToolsPanel, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles, Translate } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useController, useService } from '@cloudbeaver/core-di';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 
 import { ConnectionsAdministrationController } from './ConnectionsAdministrationController';
@@ -61,7 +60,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
   const controller = useController(ConnectionsAdministrationController);
   const translate = useTranslate();
 
-  useResource(ConnectionsAdministration, ConnectionInfoResource, CachedMapAllKey);
+  useResource(ConnectionsAdministration, ConnectionInfoResource, ConnectionInfoActiveProjectKey);
 
   return styled(useStyles(BASE_LAYOUT_GRID_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES))(
     <>

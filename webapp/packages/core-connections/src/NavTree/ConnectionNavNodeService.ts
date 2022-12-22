@@ -13,7 +13,7 @@ import { ExecutorInterrupter, IAsyncContextLoader, IExecutionContextProvider } f
 import { INodeNavigationData, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
 import { ServerEventId } from '@cloudbeaver/core-root';
-import { type ResourceKey, ResourceKeyUtils, resourceKeyList, CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { type ResourceKey, ResourceKeyUtils, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 import { ConnectionFolderEventHandler, IConnectionFolderEvent } from '../ConnectionFolderEventHandler';
 import { Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
@@ -121,7 +121,7 @@ export class ConnectionNavNodeService extends Dependency {
 
   private connectionUpdateHandler(key: ResourceKey<IConnectionInfoParams> | undefined) {
     if (key === undefined) {
-      key = CachedMapAllKey;
+      key = ConnectionInfoActiveProjectKey;
     }
 
     key = this.connectionInfoResource.transformParam(key);

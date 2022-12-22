@@ -134,6 +134,12 @@ export class ProjectsService extends Dependency {
   }
 
   async setActiveProjects(projects: ProjectInfo[]): Promise<boolean> {
+    const ids = projects.map(project => project.id);
+
+    if (isArraysEqual(ids, this.userProjectsSettings.activeProjectIds)) {
+      return true;
+    }
+
     const context = await this.onActiveProjectChange.execute({
       type: 'before',
     });
@@ -141,7 +147,7 @@ export class ProjectsService extends Dependency {
     if (ExecutorInterrupter.isInterrupted(context)) {
       return false;
     }
-    this.userProjectsSettings.activeProjectIds = projects.map(project => project.id);
+    this.userProjectsSettings.activeProjectIds = ids;
 
     await this.onActiveProjectChange.execute({
       type: 'after',

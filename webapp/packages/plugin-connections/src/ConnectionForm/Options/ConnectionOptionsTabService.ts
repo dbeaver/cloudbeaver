@@ -14,7 +14,7 @@ import { ConnectionInfoProjectKey, createConnectionParam, DatabaseAuthModelsReso
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { isSharedProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { getUniqueName, isValuesEqual } from '@cloudbeaver/core-utils';
@@ -88,7 +88,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       return false;
     }
 
-    return project.shared;
+    return isSharedProject(project);
   }
 
   isTemplateAvailable(state: IConnectionFormState): boolean {
