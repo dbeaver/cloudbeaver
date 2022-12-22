@@ -43,7 +43,10 @@ public class WebSessionEventsFilter {
     }
 
     public void setSubscribedProjects(@NotNull Set<String> subscribedProjectIds) {
-        this.subscribedProjectIds.addAll(subscribedProjectIds);
+        synchronized (this.subscribedProjectIds) {
+            this.subscribedProjectIds.clear();
+            this.subscribedProjectIds.addAll(subscribedProjectIds);
+        }
     }
 
     public boolean isEventAllowed(WSEvent event) {
