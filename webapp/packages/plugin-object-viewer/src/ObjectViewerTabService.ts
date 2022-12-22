@@ -8,12 +8,12 @@
 
 import { action, makeObservable, runInAction } from 'mobx';
 
-import { connectionProvider, ConnectionInfoResource, Connection, createConnectionParam, IConnectionInfoParams, ConnectionNavNodeService, objectCatalogProvider, objectSchemaProvider } from '@cloudbeaver/core-connections';
+import { connectionProvider, ConnectionInfoResource, Connection, createConnectionParam, IConnectionInfoParams, ConnectionNavNodeService, objectCatalogProvider, objectSchemaProvider, ConnectionInfoActiveProjectKey } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeManagerService, objectNavNodeProvider, type INodeNavigationData, NodeManagerUtils, NavigationType } from '@cloudbeaver/core-navigation-tree';
-import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationTabsService, ITab, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabContext } from './IObjectViewerTabContext';
@@ -244,7 +244,7 @@ export class ObjectViewerTabService {
   private async removeTabs(key: ResourceKey<string>) {
     const tabs: string[] = [];
 
-    await this.connectionInfoResource.load(CachedMapAllKey);
+    await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
 
     ResourceKeyUtils.forEach(key, key => {
       const tab = this.navigationTabsService.findTab(
@@ -342,7 +342,7 @@ export class ObjectViewerTabService {
       && (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
     ) {
       if (tab.handlerState.connectionKey) {
-        await this.connectionInfoResource.load(CachedMapAllKey);
+        await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
         if (!this.connectionInfoResource.has(tab.handlerState.connectionKey)) {
           return false;
         }

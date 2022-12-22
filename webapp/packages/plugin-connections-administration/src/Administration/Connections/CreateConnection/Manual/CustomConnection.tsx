@@ -14,7 +14,7 @@ import { Loader, useResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { isSharedProject, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { ConnectionManualService } from './ConnectionManualService';
@@ -33,7 +33,7 @@ export const CustomConnection = observer(function CustomConnection() {
   useResource(CustomConnection, ProjectInfoResource, CachedMapAllKey);
 
   function select(driverId: string) {
-    const shared = projectsService.activeProjects.filter(project => project.shared);
+    const shared = projectsService.activeProjects.filter(isSharedProject);
 
     if (shared.length > 0) {
       connectionManualService.select(shared[0].id, driverId);
