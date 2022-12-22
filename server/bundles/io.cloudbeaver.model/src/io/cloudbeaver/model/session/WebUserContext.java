@@ -29,13 +29,19 @@ import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.rm.RMController;
+import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Web user context.
@@ -55,10 +61,13 @@ public class WebUserContext implements SMCredentialsProvider {
     private SMController securityController;
     private SMAdminController adminSecurityController;
     private DBSSecretController secretController;
+    private RMController rmController;
+    private Set<String> accessibleProjectIds = new HashSet<>();
 
     public WebUserContext(WebApplication application) throws DBException {
         this.application = application;
         this.securityController = application.createSecurityController(this);
+        this.rmController = application.createResourceController(this);
         setUserPermissions(getDefaultPermissions());
     }
 
@@ -72,28 +81,40 @@ public class WebUserContext implements SMCredentialsProvider {
         if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS || smAuthInfo.getSmAuthToken() == null) {
             throw new DBCException("Authorization did not complete successfully");
         }
-        var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
-        var authPermissions = smAuthInfo.getAuthPermissions();
-        if (authPermissions == null) {
+        if (smAuthInfo.getAuthPermissions() == null) {
             throw new DBCException("Required information about session permissions is missing");
         }
-        var isSessionChanged = !CommonUtils.equalObjects(smSessionId, authPermissions.getSessionId());
-        if (isNonAnonymousUserAuthorized && isSessionChanged && !Objects.equals(getUserId(), authPermissions.getUserId())) {
+        return refresh(smAuthInfo.getSmAuthToken(), smAuthInfo.getSmRefreshToken(), smAuthInfo.getAuthPermissions());
+    }
+
+    public synchronized boolean refresh(
+        @NotNull String smAccessToken,
+        @Nullable String smRefreshToken,
+        @NotNull SMAuthPermissions smAuthPermissions
+    ) throws DBException {
+        var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
+        var isSessionChanged = !CommonUtils.equalObjects(smSessionId, smAuthPermissions.getSessionId());
+        if (isNonAnonymousUserAuthorized && isSessionChanged && !Objects.equals(getUserId(), smAuthPermissions.getUserId())) {
             throw new DBCException("Another user is already logged in");
         }
         this.smCredentials = new SMCredentials(
-            smAuthInfo.getSmAuthToken(),
-            authPermissions.getUserId(),
-            authPermissions.getPermissions()
+            smAccessToken,
+            smAuthPermissions.getUserId(),
+            smAuthPermissions.getPermissions()
         );
-        this.refreshToken = smAuthInfo.getSmRefreshToken();
-        setUserPermissions(authPermissions.getPermissions());
+        this.refreshToken = smRefreshToken;
+        setUserPermissions(smAuthPermissions.getPermissions());
         this.securityController = application.createSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
         this.secretController = application.getSecretController(this);
+        this.rmController = application.createResourceController(this);
         if (isSessionChanged) {
-            this.smSessionId = smAuthInfo.getAuthPermissions().getSessionId();
-            setUser(authPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));
+            this.smSessionId = smAuthPermissions.getSessionId();
+            setUser(smAuthPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));
+            this.accessibleProjectIds.clear();
+            this.accessibleProjectIds.addAll(
+                Arrays.stream(rmController.listAccessibleProjects()).map(RMProject::getId).collect(Collectors.toSet())
+            );
         }
         return isSessionChanged;
     }
@@ -195,5 +216,14 @@ public class WebUserContext implements SMCredentialsProvider {
 
     private Set<String> getDefaultPermissions() {
         return application.getAppConfiguration().isAnonymousAccessEnabled() ? null : Set.of();
+    }
+
+    public RMController getRmController() {
+        return rmController;
+    }
+
+    @NotNull
+    public Set<String> getAccessibleProjectIds() {
+        return accessibleProjectIds;
     }
 }

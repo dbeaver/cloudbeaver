@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, TextPlaceholder, useMapResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { BASE_TAB_STYLES, ITabData, TabList, TabPanel, TabsState, useTabLocalState, verticalTabStyles } from '@cloudbeaver/core-ui';
@@ -72,7 +72,7 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   const parents = tab.handlerState.parents;
   let folderId = tab.handlerState.folderId;
 
-  const children = useMapResource(ObjectFolders, NavTreeResource, nodeId, {
+  const children = useResource(ObjectFolders, NavTreeResource, nodeId, {
     onLoad: async resource => !(await resource.preloadNodeParents(parents, nodeId)),
   });
 

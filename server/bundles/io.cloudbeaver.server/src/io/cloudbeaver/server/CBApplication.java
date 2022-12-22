@@ -21,9 +21,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
-import io.cloudbeaver.events.CBEventController;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -54,6 +51,8 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.websocket.event.WSEventController;
+import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -131,7 +130,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     private String localHostAddress;
     private final List<InetAddress> localInetAddresses = new ArrayList<>();
 
-    protected final CBEventController eventController = new CBEventController();
+    protected final WSEventController eventController = new WSEventController();
 
     private WebSessionManager sessionManager;
 
@@ -837,7 +836,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         if (credentialsProvider instanceof WebSession) {
             sessionId = ((WebSession) credentialsProvider).getSessionId();
         }
-        eventController.addEvent(new CBEvent(CBEventConstants.CLOUDBEAVER_CONFIG_CHANGED, sessionId));
+        eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId));
     }
 
     protected Map<String, Object> readRuntimeConfigurationProperties() throws DBException {
@@ -1109,7 +1108,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     @Override
-    public CBEventController getEventController() {
+    public WSEventController getEventController() {
         return eventController;
     }
 

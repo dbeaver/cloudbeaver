@@ -1,6 +1,7 @@
 schema:
   - ../../../server/bundles/io.cloudbeaver.server/schema/schema.graphqls
   - ../../../server/bundles/io.cloudbeaver.server/schema/service.core.graphqls
+  - ../../../server/bundles/io.cloudbeaver.server/schema/service.events.graphqls
   - ../../../server/bundles/io.cloudbeaver.server/schema/service.navigator.graphqls
   - ../../../server/bundles/io.cloudbeaver.server/schema/service.sql.graphqls
   - ../../../server/bundles/io.cloudbeaver.service.metadata/schema/service.metadata.graphqls

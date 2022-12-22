@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AuthProvidersResource } from '@cloudbeaver/core-authentication';
-import { IconOrImage, Link, Cell, useMapResource, Loader, getComputed, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { IconOrImage, Link, Cell, useResource, Loader, getComputed, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { resourceKeyList, UserInfo } from '@cloudbeaver/core-sdk';
 
 
@@ -45,7 +45,7 @@ interface Props {
 }
 
 export const AuthProvidersList = observer<Props>(function AuthProvidersList({ user, providers, className }) {
-  const providersResource = useMapResource(AuthProvidersList, AuthProvidersResource, resourceKeyList(providers));
+  const providersResource = useResource(AuthProvidersList, AuthProvidersResource, resourceKeyList(providers));
   const translate = useTranslate();
   const style = useStyles(styles);
   const activeProviders = getComputed(() => user.authTokens.map(token => token.authProvider));

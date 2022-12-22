@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Container, getComputed, Group,
-  InfoItem, Loader, TextPlaceholder, useMapResource, useStyles, useTranslate
+  InfoItem, Loader, TextPlaceholder, useResource, useStyles, useTranslate
 } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
@@ -52,16 +52,16 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
   const { selected } = useTab(tabId);
   const loaded = state.state.loaded;
 
-  const projects = useMapResource(GrantedConnections, ProjectInfoResource, CachedMapAllKey);
+  const projects = useResource(GrantedConnections, ProjectInfoResource, CachedMapAllKey);
 
-  const dbDriverResource = useMapResource(
+  const dbDriverResource = useResource(
     GrantedConnections,
     DBDriverResource,
     CachedMapAllKey,
     { active: selected }
   );
 
-  const connections = useMapResource(
+  const connections = useResource(
     GrantedConnections,
     ConnectionInfoResource,
     CachedMapAllKey,

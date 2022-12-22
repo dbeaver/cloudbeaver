@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles, Overlay, OverlayMessage, OverlayActions, Button, useMapResource, getComputed, OverlayHeader, OverlayHeaderIcon, OverlayHeaderTitle, OverlayHeaderSubTitle, useSplitUserState, Loader, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles, Overlay, OverlayMessage, OverlayActions, Button, useResource, getComputed, OverlayHeader, OverlayHeaderIcon, OverlayHeaderTitle, OverlayHeaderSubTitle, useSplitUserState, Loader, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextResource, ConnectionInfoResource, createConnectionParam, DBDriverResource, getRealExecutionContextId } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
@@ -70,19 +70,19 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   const styles = useStyles(splitStyles, splitHorizontalStyles, viewerStyles);
   const dataSource = sqlDataSourceService.get(state.editorId);
   useDataSource(dataSource);
-  const connection = useMapResource(
+  const connection = useResource(
     SqlEditor,
     ConnectionInfoResource,
     dataSource?.executionContext
       ? createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId)
       : null
   );
-  const driver = useMapResource(SqlEditor, DBDriverResource, connection.data?.driverId ?? null);
+  const driver = useResource(SqlEditor, DBDriverResource, connection.data?.driverId ?? null);
   const splitState = useSplitUserState('sql-editor');
 
   const connected = getComputed(() => connection.data?.connected ?? false);
 
-  const context = useMapResource(
+  const context = useResource(
     SqlEditor,
     ConnectionExecutionContextResource,
     connected ? getRealExecutionContextId(dataSource?.executionContext?.id) : null

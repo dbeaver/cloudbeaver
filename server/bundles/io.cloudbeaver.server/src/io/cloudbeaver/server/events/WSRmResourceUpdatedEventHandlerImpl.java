@@ -19,70 +19,75 @@ package io.cloudbeaver.server.events;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
+import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
 import org.jkiss.dbeaver.model.rm.RMResource;
-import org.jkiss.utils.CommonUtils;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
+import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Notify all active user session that rm resource has been updated
  */
-public class CBRmResourceUpdatedEventHandlerImpl extends CBProjectUpdatedEventHandler {
+public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler {
 
     private static final Gson gson = new GsonBuilder().create();
-    private static final String RESOURCE_PARSED_PATH = "resourceParsedPath";
-    public static final String RESOURCE_PATH = "resourcePath";
-    public static final String EVENT_TYPE = "eventType";
-    public static final String PROJECT_ID = "projectId";
 
     @NotNull
     @Override
-    public String getSupportedEventType() {
-        return CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED;
+    public String getSupportedTopicId() {
+        return WSEventTopic.RM_SCRIPTS.getTopicId();
     }
 
     @Override
-    protected void updateSessionData(WebSession activeUserSession, CBEvent event) {
-        String projectId = JSONUtils.getString(event.getEventData(), PROJECT_ID);
-        WebProjectImpl project = activeUserSession.getProjectById(projectId);
-        if (project == null) {
+    protected void updateSessionData(BaseWebSession activeUserSession, WSEvent event) {
+        if (!(event instanceof WSResourceUpdatedEvent)) {
             return;
         }
-        String eventType = JSONUtils.getString(event.getEventData(), EVENT_TYPE);
-        String resourcePath = JSONUtils.getString(event.getEventData(), RESOURCE_PATH);
-        if (eventType == null || resourcePath == null) {
+        var resourceUpdateEvent = (WSResourceUpdatedEvent) event;
+        String projectId = resourceUpdateEvent.getProjectId();
+        if (!activeUserSession.isProjectAccessible(projectId)) {
             return;
         }
-        Object parsedResourcePath = event.getEventData().get(RESOURCE_PARSED_PATH);
+        if (resourceUpdateEvent.getResourcePath() == null) {
+            return;
+        }
+        Object parsedResourcePath = resourceUpdateEvent.getResourceParsedPath();
         RMResource[] resourceParsedPath;
         if (parsedResourcePath instanceof RMResource[]) {
             resourceParsedPath = (RMResource[]) parsedResourcePath;
         } else {
             resourceParsedPath = gson.fromJson(gson.toJson(parsedResourcePath), RMResource[].class);
         }
-        acceptChangesInNavigatorTree(eventType, resourceParsedPath, project);
+        var eventType = WSEventType.valueById(resourceUpdateEvent.getId());
+        if (eventType == null) {
+            return;
+        }
+        if (activeUserSession instanceof WebSession) {
+            var webSession = (WebSession) activeUserSession;
+            acceptChangesInNavigatorTree(eventType, resourceParsedPath, webSession.getProjectById(projectId));
+        }
         activeUserSession.addSessionEvent(event);
     }
 
-    private void acceptChangesInNavigatorTree(String eventType, RMResource[] resourceParsedPath, WebProjectImpl project) {
+    private void acceptChangesInNavigatorTree(WSEventType eventType,
+                                              RMResource[] resourceParsedPath,
+                                              WebProjectImpl project) {
         List<RMResource> rmResourcePath = Arrays.asList(resourceParsedPath);
-        if (eventType.equals("TYPE_CREATE")) {
+        if (eventType == WSEventType.RM_RESOURCE_CREATED) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_ADD,
                     project.getRmProject(),
                     rmResourcePath)
             );
-        } else if (eventType.equals("TYPE_DELETE")) {
+        } else if (eventType == WSEventType.RM_RESOURCE_DELETED) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_DELETE,
                     project.getRmProject(),

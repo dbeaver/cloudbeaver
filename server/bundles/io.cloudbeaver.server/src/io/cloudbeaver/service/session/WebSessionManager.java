@@ -17,6 +17,8 @@
 package io.cloudbeaver.service.session;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.model.session.WebHeadlessSession;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionAuthProcessor;
 import io.cloudbeaver.registry.WebHandlerRegistry;
@@ -29,6 +31,8 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
+import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
+import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -46,16 +50,16 @@ public class WebSessionManager {
     private static final Log log = Log.getLog(WebSessionManager.class);
 
     private final CBApplication application;
-    private final Map<String, WebSession> sessionMap = new HashMap<>();
+    private final Map<String, BaseWebSession> sessionMap = new HashMap<>();
 
     public WebSessionManager(CBApplication application) {
         this.application = application;
     }
 
-    public WebSession closeSession(@NotNull HttpServletRequest request) throws DBException {
+    public BaseWebSession closeSession(@NotNull HttpServletRequest request) throws DBException {
         HttpSession session = request.getSession();
         if (session != null) {
-            WebSession webSession;
+            BaseWebSession webSession;
             synchronized (sessionMap) {
                 webSession = sessionMap.remove(session.getId());
             }
@@ -72,7 +76,8 @@ public class WebSessionManager {
         return application;
     }
 
-    public boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException {
+    public boolean touchSession(@NotNull HttpServletRequest request,
+                                @NotNull HttpServletResponse response) throws DBWebException {
         WebSession webSession = getWebSession(request, response, false);
         long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
         webSession.updateInfo(request, response, maxSessionIdleTime);
@@ -80,7 +85,8 @@ public class WebSessionManager {
     }
 
     @NotNull
-    public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException {
+    public WebSession getWebSession(@NotNull HttpServletRequest request,
+                                    @NotNull HttpServletResponse response) throws DBWebException {
         return getWebSession(request, response, true);
     }
 
@@ -95,8 +101,8 @@ public class WebSessionManager {
         String sessionId = httpSession.getId();
         WebSession webSession;
         synchronized (sessionMap) {
-            webSession = sessionMap.get(sessionId);
-            if (webSession == null) {
+            var baseWebSession = sessionMap.get(sessionId);
+            if (baseWebSession == null) {
                 try {
                     webSession = createWebSessionImpl(httpSession);
                 } catch (DBException e) {
@@ -115,6 +121,10 @@ public class WebSessionManager {
                     log.debug("> New web session '" + webSession.getSessionId() + "'");
                 }
             } else {
+                if (!(baseWebSession instanceof WebSession)) {
+                    throw new DBWebException("Unexpected session type: " + baseWebSession.getClass().getName());
+                }
+                webSession = (WebSession) baseWebSession;
                 if (updateInfo) {
                     // Update only once per request
                     if (!CommonUtils.toBoolean(request.getAttribute("sessionUpdated"))) {
@@ -154,7 +164,7 @@ public class WebSessionManager {
     }
 
     @Nullable
-    public WebSession getWebSession(@NotNull String sessionId) {
+    public BaseWebSession getSession(@NotNull String sessionId) {
         synchronized (sessionMap) {
             return sessionMap.get(sessionId);
         }
@@ -164,8 +174,11 @@ public class WebSessionManager {
     public WebSession findWebSession(HttpServletRequest request) {
         String sessionId = request.getSession().getId();
         synchronized (sessionMap) {
-            WebSession webSession = sessionMap.get(sessionId);
-            return webSession;
+            var session = sessionMap.get(sessionId);
+            if (session instanceof WebSession) {
+                return (WebSession) session;
+            }
+            return null;
         }
     }
 
@@ -187,10 +200,10 @@ public class WebSessionManager {
             maxSessionIdleTime = 60 * 60 * 1000 * 24 * 7;
         }
 
-        List<WebSession> expiredList = new ArrayList<>();
+        List<BaseWebSession> expiredList = new ArrayList<>();
         synchronized (sessionMap) {
-            for (Iterator<WebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
-                WebSession session = iterator.next();
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
                 long idleMillis = System.currentTimeMillis() - session.getLastAccessTimeMillis();
                 if (idleMillis >= maxSessionIdleTime) {
                     iterator.remove();
@@ -199,16 +212,54 @@ public class WebSessionManager {
             }
         }
 
-        for (WebSession session : expiredList) {
+        for (var session : expiredList) {
             log.debug("> Expire session '" + session.getSessionId() + "'");
             session.close();
         }
     }
 
-    public Collection<WebSession> getAllActiveSessions() {
+    public Collection<BaseWebSession> getAllActiveSessions() {
         synchronized (sessionMap) {
             return sessionMap.values();
         }
     }
 
+    @Nullable
+    public WebHeadlessSession getHeadlessSession(HttpServletRequest request, boolean create) throws DBException {
+        String smAccessToken = request.getHeader(WSConstants.WS_AUTH_HEADER);
+        if (CommonUtils.isEmpty(smAccessToken)) {
+            return null;
+        }
+        synchronized (sessionMap) {
+            var httpSession = request.getSession();
+            var tempCredProvider = new SMTokenCredentialProvider(smAccessToken);
+            SMAuthPermissions authPermissions = application.createSecurityController(tempCredProvider).getTokenPermissions();
+            var sessionId = httpSession != null ? httpSession.getId()
+                : authPermissions.getSessionId();
+
+            var existSession = sessionMap.get(sessionId);
+
+            if (existSession instanceof WebHeadlessSession) {
+                return (WebHeadlessSession) existSession;
+            }
+            if (existSession != null) {
+                //session exist but it not headless session
+                return null;
+            }
+            if (!create) {
+                return null;
+            }
+            var headlessSession = new WebHeadlessSession(
+                sessionId,
+                application
+            );
+            headlessSession.getUserContext().refresh(
+                smAccessToken,
+                null,
+                authPermissions
+            );
+            sessionMap.put(sessionId, headlessSession);
+            return headlessSession;
+        }
+    }
 }
