@@ -14,7 +14,7 @@ import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } fr
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
-import { isDefined } from '@cloudbeaver/core-utils';
+import { isArraysEqual, isDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
 
 @injectable()
 export class ConnectionsAdministrationController {
@@ -48,7 +48,8 @@ export class ConnectionsAdministrationController {
   ) {
     makeObservable(this, {
       isProcessing: observable,
-      connections: computed,
+      connections: computed<DatabaseConnection[]>({ equals: (a, b) => isArraysEqual(a, b) }),
+      keys: computed<IConnectionInfoParams[]>({ equals: (a, b) => isArraysEqual(a, b, isObjectsEqual) }),
       itemsSelected: computed,
     });
   }
