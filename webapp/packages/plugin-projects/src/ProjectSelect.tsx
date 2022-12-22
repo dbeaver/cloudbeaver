@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Combobox, useMapResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Combobox, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfo, ProjectInfoResource, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -45,7 +45,7 @@ export const ProjectSelect = observer(function ProjectSelect({
     .filter(filter)
     .map(project => project.id);
 
-  const projectsLoader = useMapResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey, {
+  const projectsLoader = useResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey, {
     onData: () => {
       if (
         (!value && possibleOptions.length > 0)

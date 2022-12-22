@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AdministrationItemContentProps, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { Loader, useMapResource, ToolsAction, ToolsPanel, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles, Translate } from '@cloudbeaver/core-blocks';
+import { Loader, useResource, ToolsAction, ToolsPanel, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles, Translate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -61,7 +61,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
   const controller = useController(ConnectionsAdministrationController);
   const translate = useTranslate();
 
-  useMapResource(ConnectionsAdministration, ConnectionInfoResource, CachedMapAllKey);
+  useResource(ConnectionsAdministration, ConnectionInfoResource, CachedMapAllKey);
 
   return styled(useStyles(BASE_LAYOUT_GRID_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES))(
     <>

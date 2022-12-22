@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useCallback, useEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, Loader, PlaceholderElement, Translate, TreeNodeNested, TreeNodeNestedMessage, TREE_NODE_STYLES, useFolderExplorer, useMapResource, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, Loader, PlaceholderElement, Translate, TreeNodeNested, TreeNodeNestedMessage, TREE_NODE_STYLES, useFolderExplorer, useResource, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { type NavNode, ROOT_NODE_PATH, NavTreeResource, NavNodeInfoResource, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
@@ -177,7 +177,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
   }, [folderExplorer]);
 
-  useMapResource(ElementsTree, navTreeResource, root, {
+  useResource(ElementsTree, navTreeResource, root, {
     onLoad: async resource => {
       let fullPath = folderExplorer.state.fullPath;
       const preload = await resource.preloadNodeParents(fullPath);

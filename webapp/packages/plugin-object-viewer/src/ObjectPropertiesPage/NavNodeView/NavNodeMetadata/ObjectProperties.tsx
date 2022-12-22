@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { ColoredContainer, Loader, TextPlaceholder, useObjectPropertyCategories, GroupTitle, ObjectPropertyInfoForm, Group, useMapResource, BASE_CONTAINERS_STYLES, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Loader, TextPlaceholder, useObjectPropertyCategories, GroupTitle, ObjectPropertyInfoForm, Group, useResource, BASE_CONTAINERS_STYLES, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavTreeResource, DBObjectResource } from '@cloudbeaver/core-navigation-tree';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
@@ -28,7 +28,7 @@ export const ObjectProperties = observer<Props>(function ObjectProperties({
 }) {
   const translate = useTranslate();
   const navTreeResource = useService(NavTreeResource);
-  const dbObject = useMapResource(ObjectProperties, DBObjectResource, objectId, {
+  const dbObject = useResource(ObjectProperties, DBObjectResource, objectId, {
     onLoad: async () => !(await navTreeResource.preloadNodeParents(parents, objectId)),
   });
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(

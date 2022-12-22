@@ -15,7 +15,7 @@ import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import {
   InputField,
   SubmittingForm,
-  useMapResource,
+  useResource,
   ColoredContainer,
   BASE_CONTAINERS_STYLES,
   Group,
@@ -32,7 +32,6 @@ import {
   FormFieldDescription,
   useTranslate,
   usePermission,
-  useDataResource,
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -76,7 +75,7 @@ const driverConfiguration: IDriverConfiguration[] = [
 export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({
   state,
 }) {
-  const serverConfigResource = useDataResource(Options, ServerConfigResource, undefined);
+  const serverConfigResource = useResource(Options, ServerConfigResource, undefined as void);
   const connectionOptionsTabService = useService(ConnectionOptionsTabService);
   const service = useService(ConnectionFormService);
   const formRef = useRef<HTMLFormElement>(null);
@@ -117,11 +116,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     optionsHook.setAuthModel(model);
   }, []);
 
-
-  const driverMap = useMapResource(
+  const driverMap = useResource(
     Options,
     DBDriverResource,
-    { key: config.driverId || null, includes: ['includeProviderProperties'] },
+    { key: config.driverId || null, includes: ['includeProviderProperties'] as const },
     {
       onData: (data, resource, prevData) => {
         if (data.id !== prevData?.id) {
@@ -155,13 +153,13 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     }
   }
 
-  const { data: applicableAuthModels } = useMapResource(
+  const { data: applicableAuthModels } = useResource(
     Options,
     DatabaseAuthModelsResource,
     getComputed(() => driver?.applicableAuthModels ? resourceKeyList(driver.applicableAuthModels) : CachedMapEmptyKey)
   );
 
-  const { data: authModel } = useMapResource(
+  const { data: authModel } = useResource(
     Options,
     DatabaseAuthModelsResource,
     getComputed(() => config.authModelId || info?.authModel || driver?.defaultAuthModel || null),

@@ -9,6 +9,7 @@
 export interface ILoadableState {
   isLoading: () => boolean;
   isLoaded: () => boolean;
+  isError: () => boolean;
   readonly exception?: (Error | null)[] | Error | null;
   load: () => void;
   reload?: () => void;

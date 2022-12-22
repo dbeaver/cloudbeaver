@@ -6,7 +6,6 @@
     <extension-point id="io.cloudbeaver.feature" name="Web features" schema="schema/io.cloudbeaver.feature.exsd"/>
     <extension-point id="io.cloudbeaver.valueSerializer" name="Web value serializers" schema="schema/io.cloudbeaver.valueSerializer.exsd"/>
     <extension-point id="org.jkiss.dbeaver.auth.provider" name="%extension-point.org.jkiss.dbeaver.authProvider.name" schema="schema/org.jkiss.dbeaver.authProvider.exsd"/>
-    <extension-point id="io.cloudbeaver.event.handler" name="Wev event handler" schema="schema/io.cloudbeaver.event.handler.exsd"/>
     <extension-point id="io.cloudbeaver.metaParameters" name="Meta parameters" schema="schema/io.cloudbeaver.metaParameters.exsd"/>
 
     <extension point="io.cloudbeaver.metaParameters">

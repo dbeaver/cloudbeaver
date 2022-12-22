@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 import { gte } from 'semver';
 
 import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
@@ -31,7 +31,7 @@ const styles = css`
 export const VersionUpdate: AdministrationItemContentComponent = observer(function VersionUpdate() {
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
   const versionService = useService(VersionService);
-  const versionResource = useMapResource(VersionUpdate, VersionResource, CachedMapAllKey, {
+  const versionResource = useResource(VersionUpdate, VersionResource, CachedMapAllKey, {
     silent: true,
   });
 

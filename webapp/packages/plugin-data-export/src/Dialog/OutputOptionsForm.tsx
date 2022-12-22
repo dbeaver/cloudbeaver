@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Combobox, FieldCheckbox, Loader, useDataResource } from '@cloudbeaver/core-blocks';
+import { Combobox, FieldCheckbox, Loader, useResource } from '@cloudbeaver/core-blocks';
 import type { DataTransferOutputSettings } from '@cloudbeaver/core-sdk';
 
 import { DefaultExportOutputSettingsResource } from './DefaultExportOutputSettingsResource';
@@ -35,7 +35,7 @@ interface Props {
 }
 
 export const OutputOptionsForm = observer(function OutputOptionsForm(props: Props) {
-  const resource = useDataResource(OutputOptionsForm, DefaultExportOutputSettingsResource, undefined);
+  const resource = useResource(OutputOptionsForm, DefaultExportOutputSettingsResource, undefined);
 
   return (
     <Loader state={resource}>

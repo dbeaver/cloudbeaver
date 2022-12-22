@@ -11,7 +11,7 @@ import styled, { css, use } from 'reshadow';
 
 import type { IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useDataResource, ToolsPanel, ToolsAction, Loader, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useResource, ToolsPanel, ToolsAction, Loader, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 
 
@@ -53,7 +53,7 @@ export const MetaParameters = observer<Props>(function MetaParameters({ sub, par
   const translate = useTranslate();
   const controller = useController(MetaParametersController);
   const createMetaParameterService = useService(CreateMetaParameterService);
-  const userMetaParametersResource = useDataResource(MetaParameters, UserMetaParametersResource, undefined);
+  const userMetaParametersResource = useResource(MetaParameters, UserMetaParametersResource, undefined);
   const keys = userMetaParametersResource.data.map(metadata => metadata.id);
   const isLocalProviderAvailable = controller.isLocalProviderAvailable;
 

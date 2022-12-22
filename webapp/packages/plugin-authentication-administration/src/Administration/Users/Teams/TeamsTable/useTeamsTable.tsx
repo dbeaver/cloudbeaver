@@ -9,7 +9,7 @@
 import { computed, observable } from 'mobx';
 
 import { compareTeams, TeamInfo, TeamsResource } from '@cloudbeaver/core-authentication';
-import { TableState, useMapResource, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { TableState, useResource, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -28,7 +28,7 @@ interface State {
 export function useTeamsTable(): Readonly<State> {
   const notificationService = useService(NotificationService);
   const dialogService = useService(CommonDialogService);
-  const resource = useMapResource(useTeamsTable, TeamsResource, CachedMapAllKey);
+  const resource = useResource(useTeamsTable, TeamsResource, CachedMapAllKey);
 
   const translate = useTranslate();
 

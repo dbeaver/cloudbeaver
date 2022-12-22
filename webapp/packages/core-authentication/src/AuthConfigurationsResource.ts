@@ -33,7 +33,7 @@ export class AuthConfigurationsResource
     private readonly graphQLService: GraphQLService,
     permissionsResource: SessionPermissionsResource,
   ) {
-    super([]);
+    super(new Map(), []);
 
     permissionsResource
       .require(this, EAdminPermission.admin)
