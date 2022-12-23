@@ -84,31 +84,10 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
 
   on<T = TEvent>(
     callback: IServerEventCallback<T>,
-    mapTo?: (param: TEvent) => T,
-    filter?: (param: TEvent) => boolean,
-    resource?: CachedResource<any, any, any, any, any>,
-  ): Subscription;
-  on<T = TEvent>(
-    resource: CachedResource<any, any, T, any, any>,
-    mapTo?: (param: TEvent) => T,
-    filter?: (param: TEvent) => boolean,
-  ): Subscription;
-  on<T = TEvent>(
-    resourceOrCallback: CachedResource<any, any, T, any, any> | IServerEventCallback<T>,
     mapTo: (param: TEvent) => T = event => event as unknown as T,
     filterFn: (param: TEvent) => boolean = () => true,
     resource?: CachedResource<any, any, any, any, any>,
   ): Subscription {
-    let handler: IServerEventCallback<T>;
-
-    if (typeof resourceOrCallback === 'function') {
-      handler = resourceOrCallback;
-    } else {
-      resource = resourceOrCallback;
-      handler = event => {
-        resourceOrCallback.markOutdated(event);
-      };
-    }
 
     if (resource) {
       this.registerResource(resource);
@@ -116,7 +95,7 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
 
     const sub = this.eventsSubject
       .pipe(filter(filterFn), map(mapTo))
-      .subscribe(handler);
+      .subscribe(callback);
 
     return () => {
       sub.unsubscribe();
