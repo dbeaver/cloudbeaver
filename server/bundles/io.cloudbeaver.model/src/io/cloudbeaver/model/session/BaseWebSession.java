@@ -53,7 +53,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     protected volatile long lastAccessTime;
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new ArrayList<>();
-    private final WebSessionEventsFilter eventsFilter = new WebSessionEventsFilter();
+    private WebSessionEventsFilter eventsFilter = new WebSessionEventsFilter();
 
     public BaseWebSession(@NotNull String id, @NotNull WebApplication application) throws DBException {
         this.id = id;
@@ -148,6 +148,10 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @NotNull
     public WebSessionEventsFilter getEventsFilter() {
         return eventsFilter;
+    }
+
+    public void setEventsFilter(@NotNull WebSessionEventsFilter eventsFilter) {
+        this.eventsFilter = eventsFilter;
     }
 
     public boolean isProjectAccessible(String projectId) {
