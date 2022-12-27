@@ -9,7 +9,7 @@
 import { observable, computed, makeObservable } from 'mobx';
 
 import { AdminUser, AuthRolesResource, compareTeams, isLocalUser, TeamInfo, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { ConnectionInfoProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
+import { compareConnectionsInfo, ConnectionInfoProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
@@ -50,7 +50,8 @@ export class UserFormController implements IInitializableController, IDestructib
 
   get connections(): DatabaseConnection[] {
     return this.connectionInfoResource.values
-      .filter(({ projectId }) => isGlobalProject(this.projectInfoResource.get(projectId))) as DatabaseConnection[];
+      .filter(({ projectId }) => isGlobalProject(this.projectInfoResource.get(projectId)))
+      .sort(compareConnectionsInfo);
   }
 
   get teams(): TeamInfo[] {
