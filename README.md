@@ -22,6 +22,12 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 22.3.1 - 2022-12-26
+
+- administrators can grant access to all shared connections to the User team by changing one parameter in the configuration file;
+- the shared project is now selected by default in the Create connection dialog in the Administration;
+- different bugs have been fixed.
+
 ### CloudBeaver 22.3.0 - 2022-12-05
 
 Changes since 22.2.0
