@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Group, GroupTitle, BASE_CONTAINERS_STYLES, useMapResource, Combobox, Tags, ITag, Tag, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { Group, GroupTitle, BASE_CONTAINERS_STYLES, useResource, Combobox, Tags, ITag, Tag, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey, resourceKeyList, ServerConfigInput } from '@cloudbeaver/core-sdk';
 
@@ -32,7 +32,7 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
   serverConfig,
 }) {
   const translate = useTranslate();
-  const driversResource = useMapResource(ServerConfigurationDriversForm, DBDriverResource, CachedMapAllKey);
+  const driversResource = useResource(ServerConfigurationDriversForm, DBDriverResource, CachedMapAllKey);
 
   const drivers = driversResource.resource.values.slice().sort(driversResource.resource.compare);
 

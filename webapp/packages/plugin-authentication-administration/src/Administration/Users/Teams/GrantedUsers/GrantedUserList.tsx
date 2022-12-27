@@ -112,13 +112,13 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({
           >
             <GrantedUsersTableInnerHeader disabled={disabled} />
             <TableBody>
-              <TableItem item='tableInfo' selectDisabled>
-                {tableInfoText && (
+              {tableInfoText && (
+                <TableItem item='tableInfo' selectDisabled>
                   <TableColumnValue colSpan={5}>
                     {translate(tableInfoText)}
                   </TableColumnValue>
-                )}
-              </TableItem>
+                </TableItem>
+              )}
               {users.map(user => {
                 const activeUser = usersResource.isActiveUser(user.userId);
                 return (

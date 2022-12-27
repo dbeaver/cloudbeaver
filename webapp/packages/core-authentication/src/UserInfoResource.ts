@@ -219,7 +219,10 @@ UserInfoIncludes
     return this.data?.configurationParameters[key];
   }
 
-  protected async loader(key: void, includes?: string[]): Promise<UserInfo | null> {
+  protected async loader(
+    key: void,
+    includes?: ReadonlyArray<string>,
+  ): Promise<UserInfo | null> {
     const { user } = await this.graphQLService.sdk.getActiveUser({
       ...this.getDefaultIncludes(),
       ...this.getIncludesMap(key, includes),

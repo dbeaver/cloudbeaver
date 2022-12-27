@@ -9,9 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Container, FieldCheckbox, Group, GroupTitle, ObjectPropertyInfoForm, TextPlaceholder, useMapResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Container, FieldCheckbox, Group, GroupTitle, ObjectPropertyInfoForm, TextPlaceholder, useResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
-
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 
@@ -42,7 +41,7 @@ export const ConnectionAuthenticationForm = observer<Props>(function ConnectionA
   hideFeatures,
 }) {
   const translate = useTranslate();
-  const authModel = useMapResource(ConnectionAuthenticationForm, DatabaseAuthModelsResource, authModelId);
+  const authModel = useResource(ConnectionAuthenticationForm, DatabaseAuthModelsResource, authModelId);
 
   let properties = authModel.data?.properties;
 

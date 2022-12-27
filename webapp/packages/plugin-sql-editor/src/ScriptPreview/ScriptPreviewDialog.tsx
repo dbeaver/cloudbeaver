@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Button, useClipboard, useMapResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, useClipboard, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionDialectResource, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
@@ -54,7 +54,7 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
   const connectionExecutionContextService = useService(ConnectionExecutionContextService);
   const context = connectionExecutionContextService.get(payload.model.source.executionContext?.context?.id ?? '');
   const contextInfo = context?.context;
-  const dialect = useMapResource(ScriptPreviewDialog, ConnectionDialectResource, contextInfo
+  const dialect = useResource(ScriptPreviewDialog, ConnectionDialectResource, contextInfo
     ? createConnectionParam(contextInfo.projectId, contextInfo.connectionId)
     : null
   );

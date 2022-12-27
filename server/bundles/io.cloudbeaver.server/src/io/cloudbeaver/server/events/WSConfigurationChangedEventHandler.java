@@ -16,37 +16,39 @@
  */
 package io.cloudbeaver.server.events;
 
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventHandler;
-import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.websocket.WSEventHandler;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Collection;
 
 /**
- * Notify all active user session that project has been updated
+ * Notify all active user session that configuration has been changed
  */
-public abstract class CBProjectUpdatedEventHandler implements CBEventHandler {
-    private static final Log log = Log.getLog(CBProjectUpdatedEventHandler.class);
+public class WSConfigurationChangedEventHandler implements WSEventHandler {
+    private static final Log log = Log.getLog(WSConfigurationChangedEventHandler.class);
 
     @NotNull
     @Override
-    public abstract String getSupportedEventType();
+    public String getSupportedTopicId() {
+        return WSEventTopic.SERVER_CONFIG.getTopicId();
+    }
 
     @Override
-    public void handleEvent(@NotNull CBEvent event) {
-        log.debug(getSupportedEventType() + " event handled");
-        Collection<WebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
-        for (WebSession activeUserSession : allSessions) {
+    public void handleEvent(@NotNull WSEvent event) {
+        log.debug(getSupportedTopicId() + " event handled");
+        Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
+
+        for (var activeUserSession : allSessions) {
             if (CommonUtils.equalObjects(activeUserSession.getSessionId(), event.getSessionId())) {
                 continue;
             }
-            updateSessionData(activeUserSession, event);
+            activeUserSession.addSessionEvent(event);
         }
     }
-
-    protected abstract void updateSessionData(WebSession activeUserSession, CBEvent event);
 }

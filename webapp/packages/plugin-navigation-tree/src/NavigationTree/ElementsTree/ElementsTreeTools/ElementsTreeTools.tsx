@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { IconButton, PlaceholderElement, useMapResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { ACTION_ICON_BUTTON_STYLES, IconButton, PlaceholderElement, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
@@ -42,14 +42,6 @@ const toolsStyles = css`
       flex: 1;
     }
     IconButton {
-      composes: theme-form-element-radius theme-ripple from global;
-      padding: 4px;
-      margin: 2px;
-      width: 24px;
-      height: 24px;
-      overflow: hidden;
-      flex-shrink: 0;
-
       & Icon, & StaticImage {
         transition: transform .3s ease-in-out;
       }
@@ -87,8 +79,8 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
   const root = tree.root;
   const translate = useTranslate();
   const [opened, setOpen] = useState(false);
-  const styles = useStyles(toolsStyles, style);
-  const rootNode = useMapResource(ElementsTreeTools, NavTreeResource, root);
+  const styles = useStyles(ACTION_ICON_BUTTON_STYLES, toolsStyles, style);
+  const rootNode = useResource(ElementsTreeTools, NavTreeResource, root);
 
   useCaptureViewContext(context => {
     context?.set(DATA_CONTEXT_NAV_TREE_ROOT, tree.baseRoot);

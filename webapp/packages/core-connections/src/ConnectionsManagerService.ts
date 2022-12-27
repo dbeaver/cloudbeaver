@@ -14,7 +14,6 @@ import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } fr
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfo, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { ConnectionInfoResource, Connection, createConnectionParam } from './ConnectionInfoResource';
@@ -37,7 +36,7 @@ export class ConnectionsManagerService {
       .filter(project => project.canEditDataSources)
       .sort(projectInfoSortByName);
   }
-  readonly connectionExecutor: IExecutor<IConnectionInfoParams | null>;
+  readonly connectionExecutor: IExecutor<IConnectionInfoParams>;
   readonly onDisconnect: IExecutor<IConnectionExecutorData>;
   readonly onDelete: IExecutor<IConnectionExecutorData>;
 
@@ -52,18 +51,13 @@ export class ConnectionsManagerService {
   ) {
     this.disconnecting = false;
 
-    this.connectionExecutor = new Executor<IConnectionInfoParams | null>(null, (active, current) => (
-      active === current
-      || (
-        active !== null
-        && current !== null
-        && connectionInfo.includes(active, current)
-      )
+    this.connectionExecutor = new Executor<IConnectionInfoParams>(null, (active, current) => (
+      connectionInfo.includes(active, current)
     ));
     this.onDisconnect = new Executor();
     this.onDelete = new Executor();
 
-    this.connectionExecutor.addHandler(() => connectionInfo.load(CachedMapAllKey));
+    this.connectionExecutor.addHandler(key => connectionInfo.load(key));
     this.onDelete.before(this.onDisconnect);
 
     makeObservable(this, {
@@ -76,7 +70,7 @@ export class ConnectionsManagerService {
     });
   }
 
-  async requireConnection(key: IConnectionInfoParams | null = null): Promise<Connection | null> {
+  async requireConnection(key: IConnectionInfoParams): Promise<Connection | null> {
     try {
       const context = await this.connectionExecutor.execute(key);
       const connection = context.getContext(this.connectionContext);

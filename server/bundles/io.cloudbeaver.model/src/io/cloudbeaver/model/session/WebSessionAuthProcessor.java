@@ -92,7 +92,7 @@ public class WebSessionAuthProcessor {
                     webSession.removeAuthInfo(authConfiguration.getAuthProviderId());
                 }
             }
-            webSession.updateSMAuthInfo(authInfo);
+            webSession.updateSMSession(authInfo);
             WebUser curUser = webSession.getUser();
             if (curUser == null) {
                 //should never happen in theory since we should get the error much earlier

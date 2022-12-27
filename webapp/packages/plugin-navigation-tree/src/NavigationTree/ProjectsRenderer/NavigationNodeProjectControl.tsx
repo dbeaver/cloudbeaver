@@ -47,7 +47,7 @@ const styles = css`
   portal {
     box-sizing: border-box;
     margin-left: auto !important;
-    margin-right: 16px !important;
+    margin-right: 8px !important;
     visibility: hidden;
   }
   name-box {

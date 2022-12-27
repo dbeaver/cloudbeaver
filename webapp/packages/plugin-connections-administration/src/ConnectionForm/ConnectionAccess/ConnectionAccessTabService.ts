@@ -10,7 +10,7 @@ import { AdministrationScreenService, EAdminPermission } from '@cloudbeaver/core
 import { ConnectionInfoResource, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { PermissionsService } from '@cloudbeaver/core-root';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 import { connectionConfigContext, ConnectionFormService, connectionFormStateContext, IConnectionFormProps, IConnectionFormState, IConnectionFormSubmitData } from '@cloudbeaver/plugin-connections';
@@ -67,7 +67,7 @@ export class ConnectionAccessTabService extends Bootstrap {
   private isAccessTabActive(state: IConnectionFormState): boolean {
     return (
       state.projectId !== null
-      && this.projectInfoResource.get(state.projectId)?.global === true
+      && isGlobalProject(this.projectInfoResource.get(state.projectId))
       && this.permissionsResource.has(EAdminPermission.admin)
     );
   }
