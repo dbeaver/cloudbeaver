@@ -60,7 +60,7 @@ export const LogViewer = observer(function LogViewer() {
           />
         </Pane>
         <ResizerControls />
-        <Pane main>
+        <Pane basis='40%' main>
           {logViewerState.selectedItem && (
             <LogViewerInfoPanel
               selectedItem={logViewerState.selectedItem}

@@ -80,7 +80,12 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     return objectInfo;
   }
 
-  private outdateChildren(key: ResourceKey<string>): void {
+  private outdateChildren(key: ResourceKey<string> | undefined): void {
+    if (!key) {
+      this.markOutdated();
+      return;
+    }
+
     const childrenToOutdate: string[] = [];
 
     ResourceKeyUtils.forEach(key, key => {

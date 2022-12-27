@@ -10,6 +10,7 @@ import { makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { isContainsException } from '@cloudbeaver/core-utils';
 
 import type { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
 import type { ISqlDataSource } from './ISqlDataSource';
@@ -55,6 +56,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   abstract canRename(name: string | null): boolean;
   abstract setName(name: string | null): void;
   abstract setExecutionContext(executionContext?: IConnectionExecutionContextInfo | undefined): void;
+
+  isError(): boolean {
+    return isContainsException(this.exception);
+  }
 
   isEditing(): boolean {
     return this.editing;

@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AuthRolesResource, UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, FieldCheckbox, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useDataResource, useTranslate, useStyles, Combobox } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, FieldCheckbox, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useResource, useTranslate, useStyles, Combobox } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IUserFormProps } from './UserFormService';
@@ -28,8 +28,8 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
 }) {
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
   const translate = useTranslate();
-  const userMetaParameters = useDataResource(UserInfo, UserMetaParametersResource, undefined);
-  const authRoles = useDataResource(UserInfo, AuthRolesResource, undefined);
+  const userMetaParameters = useResource(UserInfo, UserMetaParametersResource, undefined);
+  const authRoles = useResource(UserInfo, AuthRolesResource, undefined);
 
   const handleTeamChange = useCallback(
     (teamId: string, value: boolean) => { controller.credentials.teams.set(teamId, value); },

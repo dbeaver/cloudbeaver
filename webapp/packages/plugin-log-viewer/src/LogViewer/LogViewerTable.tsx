@@ -9,51 +9,49 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { BASE_TABLE_STYLES, Button, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { BASE_TABLE_STYLES, MenuBarSmallItem, Table, TableBody, TableColumnHeader, TableHeader, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { ILogEntry } from './ILogEntry';
 import { LogEntry } from './LogEntry';
 
 const styles = css`
-    icon, timestamp, message {
-      composes: theme-border-color-background from global;
-    }
     wrapper {
       overflow: hidden;
       display: flex;
       flex-direction: column;
       height: 100%;
     }
+    Table {
+      flex: 1 1 auto;
+      width: 100%;
+    }
     table-wrapper {
       overflow: auto;
     }
-    buttons {
-      padding: 16px 
+    message-title-box {
+      display: flex;
+      align-items: center;
+
+      & message-title {
+        flex: 1;
+      }
+      & Button {
+        flex-shrink: 0;
+      }
     }
-    table {
-      flex: 1 1 auto;
-      width: 100%;
-      table-layout: fixed;
+    [|buttons] {
+      text-align: right;
     }
-    tr {
-      border-top: 1px solid;
-    }
-    icon, timestamp, message {
-      box-sizing: border-box;
+    TableColumnHeader {
       white-space: nowrap;
-      padding: 16px;
-      height: 36px;
-      padding-top: unset;
-      padding-bottom: unset;
-      text-transform: uppercase;
-      text-align: left;
-      text-decoration: none !important;
+      text-overflow: ellipsis;
     }
-    icon {
+    TableColumnHeader[min] {
       width: 32px;
     }
-    timestamp {
-      width: 180px;
+    [|timestamp] {
+      width: 200px;
+      min-width: 200px;
     }
   `;
 
@@ -70,21 +68,29 @@ export const LogViewerTable = observer<Props>(function LogViewerTable({ items, s
 
   return styled(style)(
     <wrapper className={className}>
-      <buttons>
-        <Button mod={['unelevated']} onClick={onClear}>
-          {translate('app_log_view_clear_log')}
-        </Button>
-      </buttons>
       <table-wrapper>
-        <table {...use({ expanded: !!selectedItem })}>
-          <thead>
-            <tr>
-              <icon as='th' />
-              <timestamp as='th'>{translate('app_log_view_entry_timestamp')}</timestamp>
-              <message as='th'>{translate('app_log_view_entry_message')}</message>
-            </tr>
-          </thead>
-          <tbody>
+        <Table {...use({ expanded: !!selectedItem })}>
+          <TableHeader fixed>
+            <TableColumnHeader min />
+            <TableColumnHeader {...use({ timestamp: true })}>{translate('app_log_view_entry_timestamp')}</TableColumnHeader>
+            <TableColumnHeader>
+              <message-title-box>
+                <message-title>{translate('app_log_view_entry_message')}</message-title>
+                {/* <Button title={translate('app_log_view_clear_log')} onClick={onClear}>
+                  {translate('ui_clear')}
+                </Button> */}
+                <MenuBarSmallItem
+                  name='trash'
+                  viewBox='0 0 24 24'
+                  title={translate('app_log_view_clear_log')}
+                  onClick={onClear}
+                >
+                  {translate('ui_clear')}
+                </MenuBarSmallItem>
+              </message-title-box>
+            </TableColumnHeader>
+          </TableHeader>
+          <TableBody>
             {items.map(item => (
               <LogEntry
                 key={item.id}
@@ -93,8 +99,8 @@ export const LogViewerTable = observer<Props>(function LogViewerTable({ items, s
                 onSelect={onItemSelect}
               />
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </table-wrapper>
     </wrapper>
   );

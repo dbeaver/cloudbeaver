@@ -9,11 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { IconButton, Loader, StaticImage, Icon, useMapResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { IconButton, Loader, StaticImage, Icon, useResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-
-
 import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { ConnectionForm } from '@cloudbeaver/plugin-connections';
 
@@ -122,7 +120,7 @@ export const CreateConnection = observer<Props>(function CreateConnection({
   const style = useStyles(componentStyle);
   const createConnectionService = useService(CreateConnectionService);
   const translate = useTranslate();
-  const driver = useMapResource(
+  const driver = useResource(
     CreateConnection,
     DBDriverResource,
     createConnectionService.data?.config.driverId || null

@@ -9,9 +9,8 @@
 import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { Button, getComputed, PlaceholderComponent, useMapResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, getComputed, PlaceholderComponent, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
-
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from './IConnectionFormProps';
@@ -21,14 +20,14 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
   onCancel,
 }) {
   const translate = useTranslate();
-  const driverMap = useMapResource(
+  const driverMap = useResource(
     ConnectionFormBaseActions,
     DBDriverResource,
     state.config.driverId || null
   );
 
   const driver = driverMap.data;
-  const { data: authModel } = useMapResource(
+  const { data: authModel } = useResource(
     ConnectionFormBaseActions,
     DatabaseAuthModelsResource,
     getComputed(() => state.config.authModelId || state.info?.authModel || driver?.defaultAuthModel || null)

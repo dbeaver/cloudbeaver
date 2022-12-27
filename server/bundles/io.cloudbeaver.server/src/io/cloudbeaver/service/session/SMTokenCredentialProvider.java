@@ -14,22 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.events;
+package io.cloudbeaver.service.session;
 
-import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.auth.SMCredentials;
+import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 
-/**
- * CB web event handlers
- */
-public interface CBEventHandler {
-    /**
-     * Expected cb event type
-     */
-    @NotNull
-    String getSupportedEventType();
+import java.util.Set;
 
-    /**
-     * Handle associated cb event
-     */
-    void handleEvent(@NotNull CBEvent event);
+public class SMTokenCredentialProvider implements SMCredentialsProvider {
+    private final String smAccessToken;
+
+    public SMTokenCredentialProvider(String smAccessToken) {
+        this.smAccessToken = smAccessToken;
+    }
+
+    @Nullable
+    @Override
+    public SMCredentials getActiveUserCredentials() {
+        return new SMCredentials(smAccessToken, null, Set.of());
+    }
 }

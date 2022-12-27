@@ -154,7 +154,7 @@ export class SqlEditorService {
 
   async setConnection(
     state: ISqlEditorTabState,
-    connectionKey?: IConnectionInfoParams,
+    connectionKey: IConnectionInfoParams,
     catalogId?: string,
     schemaId?: string
   ): Promise<boolean> {
@@ -231,13 +231,13 @@ export class SqlEditorService {
   }
 
   async initContext(
-    connectionKey?: IConnectionInfoParams,
+    connectionKey: IConnectionInfoParams,
     catalogId?: string,
     schemaId?: string
   ): Promise<IConnectionExecutionContext | null> {
     const connection = await this.connectionsManagerService.requireConnection(connectionKey);
 
-    if (!connection || !connectionKey) {
+    if (!connection) {
       return null;
     }
 

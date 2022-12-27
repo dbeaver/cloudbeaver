@@ -232,7 +232,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   async load(): Promise<void> {
     if (this.state.resourceKey && !this.resourceUseKeyId) {
-      this.resourceUseKeyId = this.resourceManagerResource.use(this.state.resourceKey);
+      this.resourceUseKeyId = this.resourceManagerResource.use(toJS(this.state.resourceKey));
     }
     await this.read();
     await this.updateProperties();

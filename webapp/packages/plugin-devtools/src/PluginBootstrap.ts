@@ -189,7 +189,8 @@ export class PluginBootstrap extends Bootstrap {
             },
             {
               onSelect: () => {
-                const instance = this.diService.serviceInjector.getServiceByClass<CachedResource<any, any>>(
+                const instance = this.diService.serviceInjector
+                  .getServiceByClass<CachedResource<any, any, any, any, any>>(
                   item.resource
                 );
                 instance.markOutdated(undefined);

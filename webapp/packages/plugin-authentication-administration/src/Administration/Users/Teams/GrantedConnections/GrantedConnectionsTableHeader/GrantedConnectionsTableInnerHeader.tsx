@@ -7,30 +7,19 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { TableColumnHeader, TableHeader, TableSelect, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
-
-
+import { TableColumnHeader, TableHeader, TableSelect, useTranslate } from '@cloudbeaver/core-blocks';
 
 interface Props {
   disabled?: boolean;
   className?: string;
 }
 
-const styles = css`
-    TableHeader {
-      composes: theme-background-surface from global;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-  `;
 
 export const GrantedConnectionsTableInnerHeader = observer<Props>(function GrantedConnectionsTableInnerHeader({ disabled, className }) {
   const translate = useTranslate();
-  return styled(useStyles(styles))(
-    <TableHeader className={className}>
+  return (
+    <TableHeader className={className} fixed>
       <TableColumnHeader min flex centerContent>
         <TableSelect id='selectConnections' disabled={disabled} />
       </TableColumnHeader>

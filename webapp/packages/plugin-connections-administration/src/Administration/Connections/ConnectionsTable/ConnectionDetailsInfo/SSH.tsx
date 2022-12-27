@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { PlaceholderComponent, StaticImage, useMapResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { PlaceholderComponent, StaticImage, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 
 
@@ -18,7 +18,7 @@ import { CONNECTION_DETAILS_STYLES } from './ConnectionDetailsStyles';
 
 export const SSH: PlaceholderComponent<IConnectionDetailsPlaceholderProps> = observer(function SSH({ connection }) {
   const translate = useTranslate();
-  const handler = useMapResource(SSH, NetworkHandlerResource, SSH_TUNNEL_ID);
+  const handler = useResource(SSH, NetworkHandlerResource, SSH_TUNNEL_ID);
   const sshConfig = connection.networkHandlersConfig?.find(state => state.id === SSH_TUNNEL_ID);
 
   if (!sshConfig || !sshConfig.enabled) {

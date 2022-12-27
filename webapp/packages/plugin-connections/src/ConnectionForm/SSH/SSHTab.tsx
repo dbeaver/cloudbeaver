@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { Translate, useMapResource, useStyles } from '@cloudbeaver/core-blocks';
+import { Translate, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { TabTitle, Tab, TabContainerTabComponent } from '@cloudbeaver/core-ui';
 
@@ -20,7 +20,7 @@ export const SSHTab: TabContainerTabComponent<IConnectionFormProps> = observer(f
   ...rest
 }) {
   const styles = useStyles(style);
-  const handler = useMapResource(SSHTab, NetworkHandlerResource, SSH_TUNNEL_ID);
+  const handler = useResource(SSHTab, NetworkHandlerResource, SSH_TUNNEL_ID);
 
   return styled(styles)(
     <Tab {...rest} title={handler.data?.description} style={style}>
