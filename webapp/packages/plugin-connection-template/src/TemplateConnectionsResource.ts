@@ -8,23 +8,39 @@
 
 import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { EPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
+import { EPermission, SessionDataResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { GraphQLService, CachedDataResource, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class TemplateConnectionsResource extends CachedDataResource<Connection[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
     connectionInfoResource: ConnectionInfoResource,
+    sessionDataResource:SessionDataResource,
     permissionsResource: SessionPermissionsResource,
   ) {
     super([]);
+
+    this.sync(sessionDataResource);
 
     permissionsResource
       .require(this, EPermission.public)
       .outdateResource(this);
 
-    connectionInfoResource.onDataUpdate.addHandler(() => this.markOutdated());
+    connectionInfoResource.onConnectionCreate.addHandler(connection => {
+      if (connection.template) {
+        this.markOutdated();
+      }
+    });
+    connectionInfoResource.onItemDelete.addHandler(list => {
+      const isAnyTemplate = connectionInfoResource
+        .get(ResourceKeyUtils.toList(list))
+        .some(connection => connection?.template);
+
+      if (isAnyTemplate) {
+        this.markOutdated();
+      }
+    });
   }
 
   isLoaded(): boolean {

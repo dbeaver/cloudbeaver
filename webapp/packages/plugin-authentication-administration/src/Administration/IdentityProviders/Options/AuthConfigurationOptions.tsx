@@ -14,7 +14,7 @@ import { AuthConfigurationParametersResource, AuthProvidersResource } from '@clo
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Combobox, FieldCheckbox, Group, GroupTitle,
   InputField, Link, ObjectPropertyInfoForm, SubmittingForm,
-  Textarea, useClipboard, useMapResource, useObjectPropertyCategories, useStyles, useTranslate
+  Textarea, useClipboard, useResource, useObjectPropertyCategories, useStyles, useTranslate
 } from '@cloudbeaver/core-blocks';
 import { AuthProviderConfigurationParametersFragment, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
@@ -39,8 +39,8 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
   const copy = useClipboard();
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
 
-  const providers = useMapResource(AuthConfigurationOptions, AuthProvidersResource, CachedMapAllKey);
-  const parameters = useMapResource(
+  const providers = useResource(AuthConfigurationOptions, AuthProvidersResource, CachedMapAllKey);
+  const parameters = useResource(
     AuthConfigurationOptions,
     AuthConfigurationParametersResource,
     state.config.providerId || null,

@@ -29,7 +29,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     private readonly dataSynchronizationService: DataSynchronizationService,
     serverConfigEventHandler: ServerConfigEventHandler,
   ) {
-    super(null);
+    super(null, []);
 
     this.syncQueue = new DataSynchronizationQueue(state => {
       if (state) {
@@ -58,7 +58,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
       this.syncQueue.add(
         this.dataSynchronizationService.requestSynchronization('server-config', 'Server Configuration')
       );
-    }, () => undefined);
+    }, () => undefined, undefined, this);
   }
 
   get redirectOnFederatedAuth(): boolean {

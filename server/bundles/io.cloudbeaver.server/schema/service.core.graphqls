@@ -397,29 +397,6 @@ type LogEntry {
     stackTrace: String
 }
 
-enum CBEventType {
-    cb_config_changed,
-    cb_datasource_updated,
-    cb_datasource_folder_updated,
-    cb_rm_resource_updated
-}
-
-enum CBEventResourceType {
-    RM_RESOURCE,
-    DATASOURCE
-}
-
-enum CBEventStatus {
-    TYPE_CREATE,
-    TYPE_DELETE,
-    TYPE_UPDATE
-}
-
-type CBEvent {
-    eventType: CBEventType!
-    eventData: Object!
-}
-
 ####################################################
 # Input types
 ####################################################
@@ -524,7 +501,7 @@ extend type Query {
     networkHandlers: [NetworkHandlerDescriptor!]!
 
     # List of user connections.
-    userConnections( projectId: ID, id: ID ): [ ConnectionInfo! ]!
+    userConnections( projectId: ID, id: ID, projectIds: [ID!] ): [ ConnectionInfo! ]!
     # List of template connections.
     templateConnections( projectId: ID ): [ ConnectionInfo! ]!
 
@@ -532,14 +509,12 @@ extend type Query {
     connectionFolders( projectId: ID, path: ID ): [ ConnectionFolderInfo! ]!
 
     # Return connection info
-    connectionInfo( projectId: ID, id: ID! ): ConnectionInfo!
+    connectionInfo( projectId: ID!, id: ID! ): ConnectionInfo!
 
     # Return list of accessible user projects
     listProjects: [ ProjectInfo! ]!
 
     readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]!
-
-    readSessionEvents(maxEntries: Int!): [ CBEvent! ]!
 }
 
 extend type Mutation {

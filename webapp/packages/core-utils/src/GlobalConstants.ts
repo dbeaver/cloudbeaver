@@ -21,6 +21,18 @@ export const GlobalConstants = {
     return _VERSION_;
   },
 
+  get protocol(): 'http:' | 'https:' {
+    return window.location.protocol as 'http:' | 'https:';
+  },
+
+  get wsProtocol(): 'ws:' | 'wss:' {
+    return this.protocol === 'https:' ? 'wss:' : 'ws:';
+  },
+
+  get host(): string {
+    return window.location.host;
+  },
+
   get rootURI(): string {
     const defaultURI = '/';
 
@@ -40,6 +52,10 @@ export const GlobalConstants = {
 
   absoluteServiceUrl(...parts: string[]): string {
     return pathJoin(this.serviceURI, ...parts);
+  },
+
+  hostServiceUrl(...parts: string[]): string {
+    return pathJoin(this.host, this.absoluteServiceUrl(...parts));
   },
 
   absoluteUrl(...parts: string[]): string {

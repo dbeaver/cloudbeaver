@@ -9,8 +9,8 @@
 import { action, computed, observable, runInAction } from 'mobx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { IFolderExplorerContext, useExecutor, useMapResource, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { IFolderExplorerContext, useExecutor, useResource, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
@@ -136,7 +136,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   const functionsRef = useObjectRef({
     async loadTree(nodeId: string) {
-      await connectionInfoResource.load(CachedMapAllKey);
+      await connectionInfoResource.load(ConnectionInfoActiveProjectKey);
       const preloaded = await navTreeResource.preloadNodeParents(options.folderExplorer.state.fullPath);
 
       if (!preloaded) {
@@ -578,7 +578,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     functionsRef.loadTree(options.root);
   }, 100), []);
 
-  useMapResource(useElementsTree, ProjectInfoResource, CachedMapAllKey, {
+  useResource(useElementsTree, ProjectInfoResource, CachedMapAllKey, {
     onData: () => {
       loadTreeThreshold();
     },

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
-import { Translate, useMapResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Translate, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-ui';
@@ -43,7 +43,7 @@ export const VersionUpdateDrawerItem = observer<AdministrationItemDrawerProps>(f
   const translate = useTranslate();
   const versionUpdateService = useService(VersionUpdateService);
 
-  useMapResource(VersionUpdateDrawerItem, VersionResource, CachedMapAllKey);
+  useResource(VersionUpdateDrawerItem, VersionResource, CachedMapAllKey);
 
   return styled(useStyles(style, styles))(
     <Tab

@@ -8,7 +8,7 @@
 
 import { observable, makeObservable, computed } from 'mobx';
 
-import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, USER_NAME_PROPERTY_ID, createConnectionParam } from '@cloudbeaver/core-connections';
+import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, USER_NAME_PROPERTY_ID, createConnectionParam, ConnectionInfoProjectKey } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -121,17 +121,17 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   };
 
   onConnect = async (): Promise<void> => {
-    if (!this.template) {
+    if (!this.template || !this.projectsService.userProject) {
       return;
     }
 
     this.isConnecting = true;
     this.clearError();
     try {
-      const connectionNames = this.connectionInfoResource.values
-        .filter(connection => !this.projectsService.userProject
-          || connection.projectId === this.projectsService.userProject.id)
-        .map(connection => connection.name);
+      const connections = await this.connectionInfoResource.load(
+        ConnectionInfoProjectKey(this.projectsService.userProject.id)
+      );
+      const connectionNames = connections.map(connection => connection.name);
 
       const uniqueConnectionName = getUniqueName(this.template.name || 'Template connection', connectionNames);
       const connection = await this.connectionInfoResource.createFromTemplate(

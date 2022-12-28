@@ -11,7 +11,7 @@ import styled from 'reshadow';
 
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
 import { TabPanel } from '@cloudbeaver/core-ui';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, InputField, Loader, ObjectPropertyInfoForm, useDataResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, InputField, Loader, ObjectPropertyInfoForm, useResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
@@ -29,7 +29,7 @@ export const MetaParameterInfoPanel = observer<Props>(function MetaParameterInfo
   className,
   style,
 }) {
-  const userMetaParameters = useDataResource(MetaParameterInfoPanel, UserMetaParametersResource, undefined);
+  const userMetaParameters = useResource(MetaParameterInfoPanel, UserMetaParametersResource, undefined);
   const styles = useStyles(style, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
 

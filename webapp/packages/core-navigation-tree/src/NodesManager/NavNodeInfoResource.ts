@@ -42,13 +42,6 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     permissionsResource: SessionPermissionsResource,
   ) {
     super();
-    permissionsResource.require(this, EPermission.public);
-
-    makeObservable(this, {
-      setDetails: action,
-      updateNode: action,
-      setParent: action,
-    });
 
     this.metadata = new MetadataMap<string, INodeMetadata>(() => ({
       outdated: true,
@@ -58,6 +51,14 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
       includes: observable([]),
       dependencies: observable([]),
     }));
+
+    makeObservable(this, {
+      setDetails: action,
+      updateNode: action,
+      setParent: action,
+    });
+
+    permissionsResource.require(this, EPermission.public);
   }
 
   updateNode(key: string, node: NavNode): void;

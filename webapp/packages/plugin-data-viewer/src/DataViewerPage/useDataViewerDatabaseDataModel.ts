@@ -9,7 +9,7 @@
 import { action, computed, observable } from 'mobx';
 import { useEffect } from 'react';
 
-import { useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useResource, useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
@@ -38,7 +38,7 @@ export function useDataViewerDatabaseDataModel(tab: ITab<IObjectViewerTabState>)
   const dataPresentationService = useService(DataPresentationService);
   const dataViewerDataChangeConfirmationService = useService(DataViewerDataChangeConfirmationService);
 
-  const connection = useMapResource(
+  const connection = useResource(
     useDataViewerDatabaseDataModel,
     ConnectionInfoResource,
     tab.handlerState.connectionKey ?? null

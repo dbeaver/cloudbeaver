@@ -23,7 +23,7 @@ export class SessionPermissionsResource extends CachedDataResource<Set<string>> 
     this.sync(sessionDataResource, () => {}, () => {});
   }
 
-  require(resource: CachedResource<any, any, any, any>, ...permissions: string[]): this {
+  require(resource: CachedResource<any, any, any, any, any>, ...permissions: string[]): this {
     resource
       .preloadResource(this, () => undefined)
       .before(ExecutorInterrupter.interrupter(() => !this.has(...permissions)));

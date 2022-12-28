@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useDataResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { BASE_TAB_STYLES, TabPanel } from '@cloudbeaver/core-ui';
@@ -28,7 +28,7 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
   className,
   style,
 }) {
-  const userMetaParameters = useDataResource(UserInfoPanel, UserMetaParametersResource, undefined);
+  const userMetaParameters = useResource(UserInfoPanel, UserMetaParametersResource, undefined);
   const styles = useStyles(BASE_TAB_STYLES, style, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
 
@@ -40,8 +40,8 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
             <GroupTitle>{translate('plugin_user_profile_info')}</GroupTitle>
             <Container wrap gap>
               <InputField
-                type="text"
-                name="userId"
+                type='text'
+                name='userId'
                 minLength={1}
                 state={user}
                 mod='surface'
@@ -53,8 +53,8 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
                 {translate('plugin_user_profile_info_id')}
               </InputField>
               <InputField
-                type="text"
-                name="displayName"
+                type='text'
+                name='displayName'
                 minLength={1}
                 state={user}
                 mod='surface'
@@ -64,6 +64,18 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
                 fill
               >
                 {translate('plugin_user_profile_info_displayName')}
+              </InputField>
+              <InputField
+                type='text'
+                name='authRole'
+                mod='surface'
+                state={user}
+                autoHide
+                readOnly
+                tiny
+                fill
+              >
+                {translate('authentication_user_role')}
               </InputField>
             </Container>
             <Loader state={userMetaParameters} inline>

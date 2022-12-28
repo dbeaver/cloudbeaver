@@ -10,11 +10,11 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 
-import { Loader, useMapResource } from '@cloudbeaver/core-blocks';
+import { Loader, useResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { isSharedProject, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { ConnectionManualService } from './ConnectionManualService';
@@ -24,17 +24,19 @@ export const CustomConnection = observer(function CustomConnection() {
   const projectsService = useService(ProjectsService);
   const notificationService = useService(NotificationService);
   const connectionManualService = useService(ConnectionManualService);
-  const dbDriverResource = useMapResource(CustomConnection, DBDriverResource, CachedMapAllKey);
+  const dbDriverResource = useResource(CustomConnection, DBDriverResource, CachedMapAllKey);
 
   const drivers = useMemo(() => computed(() => (
     dbDriverResource.resource.enabledDrivers.slice().sort(dbDriverResource.resource.compare)
   )), [dbDriverResource]);
 
-  useMapResource(CustomConnection, ProjectInfoResource, CachedMapAllKey);
+  useResource(CustomConnection, ProjectInfoResource, CachedMapAllKey);
 
   function select(driverId: string) {
-    if (projectsService.activeProjects.length > 0) {
-      connectionManualService.select(projectsService.activeProjects[0].id, driverId);
+    const shared = projectsService.activeProjects.filter(isSharedProject);
+
+    if (shared.length > 0) {
+      connectionManualService.select(shared[0].id, driverId);
     } else {
       notificationService.logError({
         title: 'core_projects_no_default_project',

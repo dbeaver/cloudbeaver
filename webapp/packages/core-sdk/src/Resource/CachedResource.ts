@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, makeObservable, action } from 'mobx';
+import { observable, makeObservable, action, computed } from 'mobx';
 
 import { Dependency } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, IExecutorHandler, ISyncExecutor, SyncExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
@@ -35,27 +35,37 @@ export type IParamAlias<TParam> = {
   getAlias: (param: TParam) => TParam;
 };
 
-export type CachedResourceData<TResource> = TResource extends CachedResource<infer T, any, any, any> ? T : never;
-export type CachedResourceParam<TResource> = TResource extends CachedResource<any, infer T, any, any> ? T : never;
-export type CachedResourceKey<TResource> = TResource extends CachedResource<any, any, infer T, any> ? T : never;
-export type CachedResourceContext<TResource> = TResource extends CachedResource<any, any, any, infer T> ? T : void;
+export type CachedResourceData<TResource> = TResource extends CachedResource<infer T, any, any, any, any> ? T : never;
+export type CachedResourceValue<TResource> = TResource extends CachedResource<any, infer T, any, any, any> ? T : never;
+export type CachedResourceParam<TResource> = TResource extends CachedResource<any, any, infer T, any, any> ? T : never;
+export type CachedResourceKey<TResource> = TResource extends CachedResource<any, any, any, infer T, any> ? T : never;
+export type CachedResourceContext<TResource> = TResource extends CachedResource<any, any, any, any, infer T> ? T : void;
+
+export const CachedResourceParamKey = Symbol('@cached-resource/param-default');
 
 export abstract class CachedResource<
   TData,
+  TValue,
   TParam,
-  TKey = TParam,
-  TContext extends string[] | void = void
+  TKey,
+  TContext extends ReadonlyArray<string>
 > extends Dependency {
   data: TData;
 
-  readonly onDataOutdated: ISyncExecutor<TParam>;
+  get isResourceInUse(): boolean {
+    return Array.from(this.metadata.values())
+      .some(metadata => metadata.dependencies.length > 0);
+  }
+
+  readonly onUse: ISyncExecutor;
+  readonly onDataOutdated: ISyncExecutor<TParam | undefined>;
   readonly onDataUpdate: ISyncExecutor<TParam>;
   readonly onDataError: ISyncExecutor<IDataError<TParam>>;
   readonly beforeLoad: IExecutor<TParam>;
 
   protected metadata: MetadataMap<TKey, ICachedResourceMetadata>;
   protected loadedKeys: TParam[];
-  protected defaultIncludes: string[];
+  protected defaultIncludes: TContext; // needed for CachedResourceContext
 
   protected get loading(): boolean {
     return this.scheduler.executing;
@@ -66,7 +76,12 @@ export abstract class CachedResource<
   protected logActivity: boolean;
   protected outdateWaitList: TParam[];
 
-  constructor(defaultValue: TData, defaultIncludes: string[] = []) {
+  private readonly typescriptHack: TValue;
+
+  constructor(
+    defaultValue: TData,
+    defaultIncludes: TContext = [] as any
+  ) {
     super();
 
     this.isKeyEqual = this.isKeyEqual.bind(this);
@@ -76,6 +91,7 @@ export abstract class CachedResource<
     this.logActivity = false;
     this.loadedKeys = [];
 
+    this.typescriptHack = null as any;
     this.defaultIncludes = defaultIncludes;
     this.paramAliases = [];
     this.outdateWaitList = [];
@@ -89,9 +105,12 @@ export abstract class CachedResource<
     this.scheduler = new TaskScheduler(this.includes);
     this.data = defaultValue;
     this.beforeLoad = new Executor(null, this.includes);
-    this.onDataOutdated = new SyncExecutor<TParam>(null);
+    this.onUse = new SyncExecutor();
+    this.onDataOutdated = new SyncExecutor<TParam | undefined>(null);
     this.onDataUpdate = new SyncExecutor<TParam>(null);
     this.onDataError = new SyncExecutor<IDataError<TParam>>(null);
+
+    this.onUse.setInitialDataGetter(() => undefined);
 
     if (this.logActivity) {
       // this.spy(this.beforeLoad, 'beforeLoad');
@@ -101,11 +120,12 @@ export abstract class CachedResource<
     }
 
     makeObservable<
-    CachedResource<TData, TParam, TKey, TContext>,
+    this,
     'loader' | 'loadedKeys' | 'commitIncludes' | 'resetIncludes' | 'markOutdatedSync'
     >(this, {
       loadedKeys: observable,
       data: observable,
+      isResourceInUse: computed,
       loader: action,
       markDataLoading: action,
       markDataLoaded: action,
@@ -118,12 +138,46 @@ export abstract class CachedResource<
       use: action,
       free: action,
     });
+
+    setInterval(() => {
+      // mark resource outdate when it's not used
+      if (!this.isResourceInUse && !this.isOutdated()) {
+        this.markOutdated();
+
+        if (this.logActivity) {
+          console.log('Resource outdated lazy: ', this.getName());
+        }
+      }
+    }, 5 * 60 * 1000);
+  }
+
+  /**
+   * Mark resource as in use when {@link resource} is in use
+   * @param resource resource to depend on
+   */
+  connect(
+    resource: CachedResource<any, any, any, any, any>
+  ): void {
+    let subscription: string | null = null;
+
+    resource.onUse.addHandler(() => {
+      if (resource.isResourceInUse) {
+        if (!subscription) {
+          subscription = this.use(CachedResourceParamKey);
+        }
+      } else {
+        if (subscription) {
+          this.free(CachedResourceParamKey, subscription);
+          subscription = null;
+        }
+      }
+    });
   }
 
   sync<T = TParam>(
-    resource: CachedResource<any, T, any, any>,
+    resource: CachedResource<any, any, T, any, any>,
     mapTo?: (param: TParam) => T,
-    mapOut?: (param: T) => TParam
+    mapOut?: (param: T | undefined) => TParam
   ): void {
     resource.outdateResource(this, mapOut);
 
@@ -140,7 +194,7 @@ export abstract class CachedResource<
     this.preloadResource(resource, mapTo);
   }
 
-  updateResource<T = TParam>(resource: CachedResource<any, T, any, any>, map?: (param: TParam) => T): this {
+  updateResource<T = TParam>(resource: CachedResource<any, any, T, any, any>, map?: (param: TParam) => T): this {
     this.onDataUpdate.addHandler(param => {
       try {
         if (this.logActivity) {
@@ -163,8 +217,8 @@ export abstract class CachedResource<
   }
 
   outdateResource<T = TParam>(
-    resource: CachedResource<any, T, any, any>,
-    map?: (param: TParam) => T
+    resource: CachedResource<any, any, T, any, any>,
+    map?: (param: TParam | undefined) => T
   ): this {
     this.onDataOutdated.addHandler(param => {
       try {
@@ -187,7 +241,9 @@ export abstract class CachedResource<
     return this;
   }
 
-  preloadResource<T = TParam>(resource: CachedResource<any, T, any, any>, map?: (param: TParam) => T): this {
+  preloadResource<T = TParam>(resource: CachedResource<any, any, T, any, any>, map?: (param: TParam) => T): this {
+    resource.connect(this);
+
     this.beforeLoad.addHandler(async param => {
       try {
         if (this.logActivity) {
@@ -198,7 +254,7 @@ export abstract class CachedResource<
           param = map(param) as any as TParam;
         }
 
-        await resource.load(param as any as T, undefined);
+        await resource.load(param as any as T, []);
       } finally {
         if (this.logActivity) {
           console.groupEnd();
@@ -231,22 +287,37 @@ export abstract class CachedResource<
     return this.getMetadata(param).dependencies.length > 0;
   }
 
-  use(param: TParam, id = uuid()): string {
-    this.updateMetadata(param, metadata => {
+  use(param: TParam | typeof CachedResourceParamKey, id = uuid()): string {
+    this.updateMetadata(param as TParam, metadata => {
+      if (param === CachedResourceParamKey) {
+        metadata.outdated = false;
+      }
       metadata.dependencies.push(id);
     });
+    this.onUse.execute();
+    if (this.logActivity) {
+      console.log('Use resource: ', this.getName(), param);
+    }
     return id;
   }
 
-  free(param: TParam, id: string): void {
-    this.updateMetadata(param, metadata => {
+  free(param: TParam | typeof CachedResourceParamKey, id: string): void {
+    this.updateMetadata(param as TParam, metadata => {
       if (metadata.dependencies.length > 0) {
+        if (param === CachedResourceParamKey) {
+          metadata.outdated = false;
+        }
         metadata.dependencies = metadata.dependencies.filter(v => v !== id);
       }
     });
+    this.onUse.execute();
+
+    if (this.logActivity) {
+      console.log('Free resource: ', this.getName(), param);
+    }
   }
 
-  abstract isLoaded(param: TParam, context: TContext): boolean;
+  abstract isLoaded(param: TParam, context?: TContext): boolean;
 
   isAlias(key: TParam): boolean {
     return this.paramAliases.some(alias => {
@@ -274,10 +345,7 @@ export abstract class CachedResource<
     key = this.transformParam(key);
     const metadata = this.getMetadata(key);
 
-    if (includes) {
-      return (includes as string[]).every(include => metadata.includes.includes(include));
-    }
-    return true;
+    return includes.every(include => metadata.includes.includes(include));
   }
 
   getMetadata(param: TParam): ICachedResourceMetadata {
@@ -299,7 +367,14 @@ export abstract class CachedResource<
     return this.getMetadata(param).exception;
   }
 
-  isOutdated(param: TParam): boolean {
+  isOutdated(param?: TParam): boolean {
+    if (param === undefined) {
+      return (
+        Array.from(this.metadata.values()).some(metadata => metadata.outdated)
+        && this.loadedKeys.length === 0
+      );
+    }
+
     if (this.isAlias(param) && !this.isAliasLoaded(param)) {
       return true;
     }
@@ -314,18 +389,18 @@ export abstract class CachedResource<
     return this.getMetadata(param).loading;
   }
 
-  markDataLoading(param: TParam, context: TContext): void {
+  markDataLoading(param: TParam, context?: TContext): void {
     param = this.transformParam(param);
     this.updateMetadata(param, metadata => {
       metadata.loading = true;
     });
   }
 
-  markDataLoaded(param: TParam, includes: TContext): void {
+  markDataLoaded(param: TParam, includes?: TContext): void {
     param = this.transformParam(param);
 
     if (includes) {
-      this.commitIncludes(param, includes as string[]);
+      this.commitIncludes(param, includes);
     }
 
     this.updateMetadata(param, metadata => {
@@ -333,7 +408,7 @@ export abstract class CachedResource<
     });
   }
 
-  markDataError(exception: Error, param: TParam, context: TContext): void {
+  markDataError(exception: Error, param: TParam, context?: TContext): void {
     if (this.isAlias(param) && !this.isAliasLoaded(param)) {
       this.loadedKeys.push(param);
     }
@@ -353,13 +428,15 @@ export abstract class CachedResource<
     });
   }
 
-  markOutdated(param: TParam): void {
-    if (this.scheduler.isExecuting(param) && !this.outdateWaitList.some(key => this.includes(param, key))) {
-      this.outdateWaitList.push(param);
+  markOutdated(param?: TParam): void {
+    const isKeyExecuting = param === undefined ? this.scheduler.executing : this.scheduler.isExecuting(param);
+
+    if (isKeyExecuting && !this.outdateWaitList.some(key => this.includes(param!, key))) {
+      this.outdateWaitList.push(param!);
       return;
     }
 
-    this.markOutdatedSync(param);
+    this.markOutdatedSync(param!);
   }
 
   markUpdated(param: TParam): void {
@@ -426,19 +503,19 @@ export abstract class CachedResource<
     return param;
   }
 
-  async refresh(param: TParam, context: TContext): Promise<any> {
+  async refresh(param: TParam, context?: TContext): Promise<any> {
     await this.preLoadData(param, false, context);
     await this.loadData(param, true, context);
     return this.data;
   }
 
-  async load(param: TParam, context: TContext): Promise<any> {
+  async load(param: TParam, context?: TContext): Promise<any> {
     await this.preLoadData(param, false, context);
     await this.loadData(param, false, context);
     return this.data;
   }
 
-  getIncludes(key?: TParam): string[] {
+  getIncludes(key?: TParam): ReadonlyArray<string> {
     if (key === undefined) {
       return this.defaultIncludes;
     }
@@ -449,7 +526,10 @@ export abstract class CachedResource<
     return metadata.includes;
   }
 
-  getIncludesMap(key?: TParam, includes: string[] = this.defaultIncludes): Record<string, any> {
+  getIncludesMap(
+    key?: TParam,
+    includes: ReadonlyArray<string> = this.defaultIncludes
+  ): Record<string, any> {
     const keyIncludes = this.getIncludes(key);
     return ['customIncludeBase', ...includes, ...keyIncludes].reduce<any>((map, key) => {
       map[key] = true;
@@ -464,7 +544,7 @@ export abstract class CachedResource<
     }
   }
 
-  protected commitIncludes(key: TParam, includes: string[]): void {
+  protected commitIncludes(key: TParam, includes: ReadonlyArray<string>): void {
     key = this.transformParam(key);
     this.updateMetadata(key, metadata => {
       for (const include of includes) {
@@ -480,19 +560,35 @@ export abstract class CachedResource<
     this.data = data;
   }
 
-  protected markOutdatedSync(param: TParam): void {
-    if (this.isAlias(param)) {
-      const index = this.loadedKeys.findIndex(key => this.isAliasEqual(param, key));
+  protected markOutdatedSync(param?: TParam): void {
+    if (param === undefined) {
+      for (const param of this.metadata.keys()) {
+        this.updateMetadata(param as unknown as TParam, metadata => {
+          if (param === CachedResourceParamKey) {
+            return;
+          }
 
-      if (index >= 0) {
-        this.loadedKeys.splice(index, 1);
+          metadata.outdated = true;
+        });
       }
+      this.loadedKeys = [];
+      this.resetIncludes();
+    } else {
+
+      if (this.isAlias(param)) {
+        const index = this.loadedKeys.findIndex(key => this.isAliasEqual(param!, key));
+
+        if (index >= 0) {
+          this.loadedKeys.splice(index, 1);
+        }
+      }
+
+      param = this.transformParam(param);
+      this.updateMetadata(param, metadata => {
+        metadata.outdated = true;
+      });
     }
 
-    param = this.transformParam(param);
-    this.updateMetadata(param, metadata => {
-      metadata.outdated = true;
-    });
     this.onDataOutdated.execute(param);
   }
 
@@ -514,7 +610,7 @@ export abstract class CachedResource<
     return param === second;
   }
 
-  protected includes(param: TParam, second: TParam): boolean {
+  includes(param: TParam, second: TParam): boolean {
     if (this.isAliasEqual(param, second)) {
       return true;
     }
@@ -524,25 +620,29 @@ export abstract class CachedResource<
     return this.isKeyEqual(param, second);
   }
 
-  protected abstract loader(param: TParam, context: TContext, refresh: boolean): Promise<TData>;
+  protected abstract loader(
+    param: TParam,
+    context: ReadonlyArray<string> | undefined,
+    refresh: boolean
+  ): Promise<TData>;
 
   protected async performUpdate<T>(
     param: TParam,
-    context: TContext,
-    update: (param: TParam, context: TContext) => Promise<T>,
+    context: TContext | undefined,
+    update: (param: TParam, context?: ReadonlyArray<string>) => Promise<T>,
   ): Promise<T>;
   protected async performUpdate<T>(
     param: TParam,
-    context: TContext,
-    update: (param: TParam, context: TContext) => Promise<T>,
-    exitCheck: (param: TParam, context: TContext) => boolean
+    context: TContext | undefined,
+    update: (param: TParam, context?: ReadonlyArray<string>) => Promise<T>,
+    exitCheck: (param: TParam, context?: ReadonlyArray<string>) => boolean
   ): Promise<T | undefined>;
 
   protected async performUpdate<T>(
     param: TParam,
-    context: TContext,
-    update: (param: TParam, context: TContext) => Promise<T>,
-    exitCheck?: (param: TParam, context: TContext) => boolean
+    context: TContext | undefined,
+    update: (param: TParam, context?: ReadonlyArray<string>) => Promise<T>,
+    exitCheck?: (param: TParam, context?: ReadonlyArray<string>) => boolean
   ): Promise<T | undefined> {
     const contexts = await this.beforeLoad.execute(param);
 
@@ -587,9 +687,17 @@ export abstract class CachedResource<
       });
   }
 
-  protected async preLoadData(param: TParam, refresh: boolean, context: TContext): Promise<void> { }
+  protected async preLoadData(
+    param: TParam,
+    refresh: boolean,
+    context?: TContext
+  ): Promise<void> { }
 
-  protected async loadData(param: TParam, refresh: boolean, context: TContext): Promise<void> {
+  protected async loadData(
+    param: TParam,
+    refresh: boolean,
+    context?: TContext
+  ): Promise<void> {
     if (!refresh) {
       await this.scheduler.waitRelease(param);
 
@@ -637,15 +745,23 @@ export abstract class CachedResource<
       });
   }
 
-  private async loadingTask(param: TParam, context: TContext, refresh: boolean) {
+  private async loadingTask(
+    param: TParam,
+    context: ReadonlyArray<string> | undefined,
+    refresh: boolean
+  ) {
     this.setData(await this.loader(param, context, refresh));
   }
 
   private async taskWrapper<T>(
     param: TParam,
-    context: TContext,
+    context: ReadonlyArray<string> | undefined,
     refresh: boolean,
-    promise: (param: TParam, context: TContext, refresh: boolean) => Promise<T>
+    promise: (
+      param: TParam,
+      context: ReadonlyArray<string> | undefined,
+      refresh: boolean
+    ) => Promise<T>
   ) {
     if (this.logActivity) {
       console.log(this.getActionPrefixedName('loading'));
@@ -679,7 +795,7 @@ export abstract class CachedResource<
   };
 
   protected getActionPrefixedName(action: string): string {
-    return this.constructor.name + ': ' + action;
+    return this.getName() + ': ' + action;
   }
 
   private readonly logInterrupted = (action: string): IExecutorHandler<any> => (data, contexts) => {

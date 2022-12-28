@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, TextPlaceholder, useMapResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource, DBObjectResource, type DBObject, DBObjectParentKey } from '@cloudbeaver/core-navigation-tree';
 import { type NavNodeTransformViewComponent, NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
@@ -38,7 +38,7 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
   const nodeType = VirtualFolderUtils.getNodeType(folderId);
   const navNodeViewService = useService(NavNodeViewService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const tree = useMapResource(VirtualFolderPanel, NavTreeResource, nodeId, {
+  const tree = useResource(VirtualFolderPanel, NavTreeResource, nodeId, {
     onLoad: async resource => !(await resource.preloadNodeParents(parents, nodeId)),
   });
 
@@ -46,7 +46,7 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
 
   const { nodes, duplicates } = navNodeViewService.filterDuplicates(limited.nodes);
 
-  const dbObject = useMapResource(VirtualFolderPanel, DBObjectResource, DBObjectParentKey(nodeId), {
+  const dbObject = useResource(VirtualFolderPanel, DBObjectResource, DBObjectParentKey(nodeId), {
     preload: [tree],
   });
 
