@@ -40,8 +40,8 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
             <GroupTitle>{translate('plugin_user_profile_info')}</GroupTitle>
             <Container wrap gap>
               <InputField
-                type="text"
-                name="userId"
+                type='text'
+                name='userId'
                 minLength={1}
                 state={user}
                 mod='surface'
@@ -53,8 +53,8 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
                 {translate('plugin_user_profile_info_id')}
               </InputField>
               <InputField
-                type="text"
-                name="displayName"
+                type='text'
+                name='displayName'
                 minLength={1}
                 state={user}
                 mod='surface'
@@ -64,6 +64,18 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
                 fill
               >
                 {translate('plugin_user_profile_info_displayName')}
+              </InputField>
+              <InputField
+                type='text'
+                name='authRole'
+                mod='surface'
+                state={user}
+                autoHide
+                readOnly
+                tiny
+                fill
+              >
+                {translate('authentication_user_role')}
               </InputField>
             </Container>
             <Loader state={userMetaParameters} inline>
