@@ -15,7 +15,7 @@ import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
  */
 export function getFilteredUsers(users: AdminUserInfoFragment[], filter: string): AdminUserInfoFragment[] {
   return users
-    .filter(user => user.userId.toLowerCase().includes(filter.toLowerCase()))
+    .filter(user => user.enabled && user.userId.toLowerCase().includes(filter.toLowerCase()))
     .sort((a, b) => (a.userId).localeCompare(b.userId));
 }
 
