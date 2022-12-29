@@ -1767,7 +1767,7 @@ export type GetActiveUserQueryVariables = Exact<{
 }>;
 
 
-export type GetActiveUserQuery = { user?: { userId: string, displayName?: string, linkedAuthProviders: Array<string>, metaParameters?: any, configurationParameters?: any, authTokens: Array<{ authProvider: string, authConfiguration?: string, loginTime: any, message?: string, origin: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> } }> } };
+export type GetActiveUserQuery = { user?: { userId: string, displayName?: string, authRole?: string, linkedAuthProviders: Array<string>, metaParameters?: any, configurationParameters?: any, authTokens: Array<{ authProvider: string, authConfiguration?: string, loginTime: any, message?: string, origin: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> } }> } };
 
 export type GetAuthProviderConfigurationParametersQueryVariables = Exact<{
   providerId: Scalars['ID'];
@@ -3304,6 +3304,7 @@ export const GetActiveUserDocument = `
   user: activeUser {
     userId
     displayName
+    authRole
     linkedAuthProviders
     metaParameters @include(if: $includeMetaParameters)
     configurationParameters @include(if: $includeConfigurationParameters)

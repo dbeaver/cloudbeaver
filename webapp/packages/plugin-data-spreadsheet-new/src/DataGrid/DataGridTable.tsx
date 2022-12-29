@@ -171,7 +171,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     gridSelectedCellCopy.onKeydownHandler(event);
 
-    if (EventContext.has(event, EventStopPropagationFlag)) {
+    if (EventContext.has(event, EventStopPropagationFlag) || tableData.isReadOnly() || model.isReadonly(resultIndex)) {
       return;
     }
 
