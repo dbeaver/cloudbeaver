@@ -43,7 +43,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
   const sortedProperties = useMemo(() => computed(() => propsRef.properties
     .slice()
     .sort((a, b) => (a.displayName ?? '').localeCompare(b.displayName ?? ''))
-    .filter(p => p.key.toLocaleLowerCase().includes(filterValue.toLocaleLowerCase()))
+    .filter(p => p.new || p.key.toLocaleLowerCase().includes(filterValue.toLocaleLowerCase()))
   ), [propsRef.properties, filterValue]);
 
   const changeName = useCallback((id: string, key: string) => {
