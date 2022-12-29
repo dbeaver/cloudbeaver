@@ -13,7 +13,7 @@ import styled, { css, use } from 'reshadow';
 import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, Loader, PlaceholderElement, Translate, TreeNodeNested, TreeNodeNestedMessage, TREE_NODE_STYLES, useFolderExplorer, useResource, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { type NavNode, ROOT_NODE_PATH, NavTreeResource, NavNodeInfoResource, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { type NavNode, ROOT_NODE_PATH, NAV_NODE_TYPE_FOLDER, NavTreeResource, NavNodeInfoResource, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { useNavTreeDropBox } from '../useNavTreeDropBox';
@@ -238,9 +238,9 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
         await onOpen?.(node, folder);
 
-        if (!leaf && tree.settings?.foldersTree) {
+        if ((!leaf || node.nodeType === NAV_NODE_TYPE_FOLDER) && tree.settings?.foldersTree) {
           const nodeId = node.id;
-          const loaded =  await ref.loadChildren(nodeId, true);
+          const loaded = await ref.loadChildren(nodeId, true);
 
           if (loaded) {
             await autoOpenFolders(nodeId, path);
