@@ -47,10 +47,7 @@ import org.jkiss.utils.IOUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -575,8 +572,11 @@ public class LocalResourceController implements RMController {
     }
 
     private void validateResourcePath(String resourcePath, String regex) throws DBException {
-        if (resourcePath.startsWith(".")) {
-            throw new DBException("Resource path '" + resourcePath + "' can't start with dot");
+        var fullPath = Paths.get(resourcePath);
+        for (Path path : fullPath) {
+            if (path.toString().startsWith(".")) {
+                throw new DBException("Resource path '" + resourcePath + "' can't start with dot");
+            }
         }
         if (!resourcePath.matches(regex)) {
             String illegalCharacters = resourcePath.replaceAll(regex, " ").strip();
