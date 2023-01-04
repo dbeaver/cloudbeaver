@@ -43,6 +43,7 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
 
     @Override
     public Object createWebSocket(JettyServerUpgradeRequest request, JettyServerUpgradeResponse resp) {
+        log.info("Try to create websocket");
         BaseWebSession webSession;
         try {
             webSession = resolveWebSession(request);
