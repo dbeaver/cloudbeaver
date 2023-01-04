@@ -47,6 +47,8 @@ import { ConnectionOptionsTabService } from './ConnectionOptionsTabService';
 import { ParametersForm } from './ParametersForm';
 import { useOptions } from './useOptions';
 
+const PROFILE_AUTH_MODEL_ID = 'profile';
+
 const styles = css`
   SubmittingForm {
     flex: 1;
@@ -85,9 +87,11 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     config,
     availableDrivers,
     submittingTask: submittingHandlers,
-    readonly,
     disabled,
   } = state;
+
+  //@TODO it's here until the profile implementation in the CloudBeaver
+  const readonly = state.readonly || info?.authModel === PROFILE_AUTH_MODEL_ID;
 
   const adminPermission = usePermission(EAdminPermission.admin);
 
