@@ -35,7 +35,6 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
-import org.jkiss.dbeaver.model.navigator.DBNLocalFolder;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMController;
@@ -345,11 +344,14 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public void createProjectDataSourceFolder(@NotNull String projectId, @Nullable String parentPath, @NotNull String folderName) throws DBException {
+    public void createProjectDataSourceFolder(@NotNull String projectId, @NotNull String folderPath) throws DBException {
         DBPProject project = getProjectMetadata(projectId, false);
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-        DBPDataSourceFolder parentFolder = parentPath == null ? null : registry.getFolder(parentPath);
-        DBPDataSourceFolder newFolder = registry.addFolder(parentFolder, folderName);
+        var result = Path.of(folderPath);
+        var newName = result.getFileName().toString();
+        var parent = result.getParent();
+        var parentFolder = parent == null ? null : registry.getFolder(parent.toString().replace("\\", "/"));
+        DBPDataSourceFolder newFolder = registry.addFolder(parentFolder, newName);
         registry.checkForErrors();
     }
 
