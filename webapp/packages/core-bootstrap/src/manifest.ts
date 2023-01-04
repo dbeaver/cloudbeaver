@@ -31,7 +31,6 @@ import { coreVersionManifest } from '@cloudbeaver/core-version';
 import { coreVersionUpdateManifest } from '@cloudbeaver/core-version-update';
 import { coreViewManifest } from '@cloudbeaver/core-view';
 
-
 export const coreManifests: PluginManifest[] = [
   {
     info: {
@@ -39,7 +38,7 @@ export const coreManifests: PluginManifest[] = [
     },
     depends: [],
 
-    providers: [ ],
+    providers: [],
   },
   coreDIManifest,
   coreRoutingManifest, // important, should be first because the router starts in load phase first after all plugins register phase

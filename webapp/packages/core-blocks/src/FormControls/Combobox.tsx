@@ -11,9 +11,6 @@ import { useLayoutEffect, useCallback, useState, useRef, useContext, useEffect }
 import { useMenuState, Menu, MenuItem, MenuButton } from 'reakit/Menu';
 import styled, { css, use } from 'reshadow';
 
-
-
-
 import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { getComputed } from '../getComputed';

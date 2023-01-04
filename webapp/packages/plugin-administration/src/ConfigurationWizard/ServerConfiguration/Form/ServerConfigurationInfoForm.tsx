@@ -12,8 +12,6 @@ import styled from 'reshadow';
 
 import { Group, GroupTitle, BASE_CONTAINERS_STYLES, InputField, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 
-
-
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState';
 
 interface Props {

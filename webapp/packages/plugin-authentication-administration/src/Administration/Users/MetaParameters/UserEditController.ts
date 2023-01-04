@@ -30,8 +30,8 @@ implements IInitializableController, IDestructibleController {
   readonly error = new GQLErrorCatcher();
 
   constructor(
-    private notificationService: NotificationService,
-    private usersResource: UsersResource
+    private readonly notificationService: NotificationService,
+    private readonly usersResource: UsersResource
   ) {
     makeObservable(this, {
       isLoading: observable,

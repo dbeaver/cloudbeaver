@@ -10,8 +10,6 @@ import styled, { css } from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, GroupItem, Translate } from '@cloudbeaver/core-blocks';
 
-
-
 const styles = css`
   p {
     line-height: 2;

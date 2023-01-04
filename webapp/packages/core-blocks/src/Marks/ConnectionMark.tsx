@@ -8,8 +8,6 @@
 
 import styled, { css, use } from 'reshadow';
 
-
-
 const styles = css`
     status {
       composes: theme-background-positive from global;
