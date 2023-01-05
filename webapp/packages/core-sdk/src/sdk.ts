@@ -205,7 +205,7 @@ export enum CbEventTopic {
 
 export interface CbProjectsActiveEvent extends CbClientEvent {
   id: CbClientEventId;
-  projects: Array<Scalars['String']>;
+  projectIds: Array<Scalars['String']>;
   topicId?: Maybe<CbEventTopic>;
 }
 
