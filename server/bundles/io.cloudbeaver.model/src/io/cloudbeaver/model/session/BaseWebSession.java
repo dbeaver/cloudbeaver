@@ -35,8 +35,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Base CB web session
@@ -55,7 +53,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     protected volatile long lastAccessTime;
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new ArrayList<>();
-    private final Set<String> subscribedEventTopics = new CopyOnWriteArraySet<>();
+    private WebSessionEventsFilter eventsFilter = new WebSessionEventsFilter();
 
     public BaseWebSession(@NotNull String id, @NotNull WebApplication application) throws DBException {
         this.id = id;
@@ -68,7 +66,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     }
 
     public void addSessionEvent(WSEvent event) {
-        boolean eventAllowedByFilter = subscribedEventTopics.isEmpty() || subscribedEventTopics.contains(event.getTopicId());
+        boolean eventAllowedByFilter = eventsFilter.isEventAllowed(event);
         if (!eventAllowedByFilter) {
             return;
         }
@@ -100,14 +98,6 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     public synchronized boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
         return userContext.refresh(smAuthInfo);
-    }
-
-    public void subscribeOnEventTopic(@NotNull String topic) {
-        subscribedEventTopics.add(topic);
-    }
-
-    public void unsubscribeFromEventTopic(@NotNull String topic) {
-        subscribedEventTopics.remove(topic);
     }
 
     @NotNull
@@ -153,6 +143,15 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
             sessionEventHandler.close();
         }
+    }
+
+    @NotNull
+    public WebSessionEventsFilter getEventsFilter() {
+        return eventsFilter;
+    }
+
+    public void setEventsFilter(@NotNull WebSessionEventsFilter eventsFilter) {
+        this.eventsFilter = eventsFilter;
     }
 
     public boolean isProjectAccessible(String projectId) {

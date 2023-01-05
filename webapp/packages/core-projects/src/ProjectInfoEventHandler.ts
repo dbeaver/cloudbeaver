@@ -8,6 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionEventSource, TopicEventHandler, ISessionEvent, ClientEventId, SessionEventTopic, IBaseServerEvent, SessionEventId } from '@cloudbeaver/core-root';
+import type { CbProjectsActiveEvent } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export type IProjectInfoEvent = IBaseServerEvent<SessionEventId, SessionEventTopic>;
@@ -28,14 +29,13 @@ export class ProjectInfoEventHandler
     });
   }
 
-  setActiveProjects(projects: string[]): void {
-    console.log(projects);
-    if (isArraysEqual(this.lastActiveProjects, projects)) {
+  setActiveProjects(projectIds: string[]): void {
+    if (isArraysEqual(this.lastActiveProjects, projectIds)) {
       return;
     }
 
-    this.emit({ id: ClientEventId.CbClientProjectsActive, projects });
-    this.lastActiveProjects = projects;
+    this.emit<CbProjectsActiveEvent>({ id: ClientEventId.CbClientProjectsActive, projectIds });
+    this.lastActiveProjects = projectIds;
   }
 
   map(event: ISessionEvent): IProjectInfoEvent {

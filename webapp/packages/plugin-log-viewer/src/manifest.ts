@@ -12,6 +12,7 @@ import { LocaleService } from './LocaleService';
 import { LogViewerBootstrap } from './LogViewer/LogViewerBootstrap';
 import { LogViewerService } from './LogViewer/LogViewerService';
 import { LogViewerSettingsService } from './LogViewer/LogViewerSettingsService';
+import { SessionLogsResource } from './SessionLogsResource';
 
 export const logViewerPlugin: PluginManifest = {
   info: { name: 'Log viewer plugin' },
@@ -20,5 +21,6 @@ export const logViewerPlugin: PluginManifest = {
     LogViewerService,
     LocaleService,
     LogViewerSettingsService,
+    SessionLogsResource,
   ],
 };
