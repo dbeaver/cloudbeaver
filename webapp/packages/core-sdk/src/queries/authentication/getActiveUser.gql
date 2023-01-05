@@ -2,6 +2,7 @@ query getActiveUser($includeMetaParameters: Boolean!, $includeConfigurationParam
   user: activeUser {
     userId
     displayName
+    authRole
     linkedAuthProviders
     metaParameters @include(if: $includeMetaParameters)
     configurationParameters @include(if: $includeConfigurationParameters)

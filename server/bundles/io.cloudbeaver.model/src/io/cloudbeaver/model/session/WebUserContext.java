@@ -78,13 +78,13 @@ public class WebUserContext implements SMCredentialsProvider {
      * @throws DBException - if user already authorized and new token come from another user
      */
     public synchronized boolean refresh(SMAuthInfo smAuthInfo) throws DBException {
-        if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS || smAuthInfo.getSmAuthToken() == null) {
+        if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS || smAuthInfo.getSmAccessToken() == null) {
             throw new DBCException("Authorization did not complete successfully");
         }
         if (smAuthInfo.getAuthPermissions() == null) {
             throw new DBCException("Required information about session permissions is missing");
         }
-        return refresh(smAuthInfo.getSmAuthToken(), smAuthInfo.getSmRefreshToken(), smAuthInfo.getAuthPermissions());
+        return refresh(smAuthInfo.getSmAccessToken(), smAuthInfo.getSmRefreshToken(), smAuthInfo.getAuthPermissions());
     }
 
     public synchronized boolean refresh(
