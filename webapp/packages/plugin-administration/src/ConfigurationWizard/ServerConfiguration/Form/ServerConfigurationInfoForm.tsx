@@ -55,8 +55,8 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         state={state.serverConfig}
         mod='surface'
         min={1}
-        mapState={v => (v ?? 1800000) / 1000 / 60}
-        mapValue={v => (v ?? 30) * 1000 * 60}
+        mapState={v => (v === 0 ? 60000 : v ?? 1800000) / 1000 / 60}
+        mapValue={v => (v === undefined ? 30 : Number(v) || 1) * 1000 * 60}
         required
         tiny
       >
