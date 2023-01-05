@@ -61,6 +61,7 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
         }
         var newWebSocket = new CBEventsWebSocket(webSession);
         socketBySessionId.put(webSessionId, newWebSocket);
+        log.info("Websocket created for session: " + webSessionId);
         return newWebSocket;
     }
 
