@@ -18,10 +18,11 @@ import { CONNECTION_DETAILS_STYLES } from './ConnectionDetailsStyles';
 
 export const SSH: PlaceholderComponent<IConnectionDetailsPlaceholderProps> = observer(function SSH({ connection }) {
   const translate = useTranslate();
-  const handler = useResource(SSH, NetworkHandlerResource, SSH_TUNNEL_ID);
   const sshConfig = connection.networkHandlersConfig?.find(state => state.id === SSH_TUNNEL_ID);
+  const applicable = sshConfig?.enabled === true;
+  const handler = useResource(SSH, NetworkHandlerResource, SSH_TUNNEL_ID, { active: applicable });
 
-  if (!sshConfig || !sshConfig.enabled) {
+  if (!applicable) {
     return null;
   }
 

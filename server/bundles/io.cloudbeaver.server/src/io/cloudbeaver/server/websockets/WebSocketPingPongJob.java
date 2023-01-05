@@ -26,7 +26,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
  * WebSessionMonitorJob
  */
 class WebSocketPingPongJob extends AbstractJob {
-    private static final int INTERVAL = 1000 * 60 * 2; // once per 2 min
+    private static final int INTERVAL = 1000 * 60 * 1; // once per 1 min
     private final CBPlatform platform;
     private final CBJettyWebSocketManager webSocketManager;
 
