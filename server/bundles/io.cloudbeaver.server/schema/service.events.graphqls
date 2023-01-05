@@ -80,6 +80,12 @@ type CBConfigEvent implements CBServerEvent {
     topicId: CBEventTopic
 }
 
+# Session log event
+type CBSessionLogEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+}
+
 # Topic subscription event
 type CBTopicEvent implements CBClientEvent {
     id: CBClientEventId!
