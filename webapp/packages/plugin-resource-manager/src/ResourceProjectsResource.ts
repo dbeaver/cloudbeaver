@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable } from 'mobx';
-
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { SharedProjectsResource } from '@cloudbeaver/core-resource-manager';
@@ -17,10 +15,6 @@ export type Project = Omit<RmProject, 'creator' | 'createTime' | 'canEditConnect
 
 @injectable()
 export class ResourceProjectsResource extends CachedDataResource<Project[]> {
-  get userProject(): Project | undefined {
-    return this.data.filter(project => !project.shared)[0];
-  }
-
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly userInfoResource: UserInfoResource,
@@ -36,10 +30,6 @@ export class ResourceProjectsResource extends CachedDataResource<Project[]> {
     this.sharedProjectsResource.onDataOutdated.addHandler(() => this.markOutdated());
     this.sharedProjectsResource.onItemAdd.addHandler(() => this.markOutdated());
     this.sharedProjectsResource.onItemDelete.addHandler(() => this.markOutdated());
-
-    makeObservable(this, {
-      userProject: computed,
-    });
   }
 
   protected async loader(): Promise<Project[]> {

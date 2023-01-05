@@ -8,7 +8,7 @@
 
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -34,7 +34,6 @@ export class ConnectionsAdministrationService extends Bootstrap {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly dbDriverResource: DBDriverResource,
     private readonly createConnectionService: CreateConnectionService,
-    private readonly networkHandlerResource: NetworkHandlerResource,
     private readonly commonDialogService: CommonDialogService
   ) {
     super();
@@ -116,7 +115,6 @@ export class ConnectionsAdministrationService extends Bootstrap {
     try {
       await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
       await this.dbDriverResource.loadAll();
-      await this.networkHandlerResource.loadAll();
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Error occurred while loading connections');
     }
