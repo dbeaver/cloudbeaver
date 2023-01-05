@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { runInAction, toJS } from 'mobx';
+import { runInAction } from 'mobx';
 
 import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
@@ -42,7 +42,6 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
 
     sessionLogsEventHandler.onEvent(ServerEventId.CbSessionLogUpdated, () => {
       this.markOutdated();
-      console.log('mark outdated', toJS(this.data));
     }, undefined, this);
   }
 
