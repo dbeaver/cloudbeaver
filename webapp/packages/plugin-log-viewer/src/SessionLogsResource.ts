@@ -10,11 +10,12 @@ import { runInAction } from 'mobx';
 
 import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
-import { EPermission, SessionDataResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { EPermission, ServerEventId, SessionDataResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedDataResource, LogEntry } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { LogViewerSettingsService } from './LogViewer/LogViewerSettingsService';
+import { SessionLogsEventHandler } from './SessionLogsEventHandler';
 
 export interface ILogEntry extends LogEntry {
   id: string;
@@ -30,9 +31,10 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
     private readonly logViewerSettingsService: LogViewerSettingsService,
     sessionDataResource: SessionDataResource,
     permissionsResource: SessionPermissionsResource,
+    sessionLogsEventHandler: SessionLogsEventHandler,
   ) {
     super([]);
-    this.sync(sessionDataResource, () => {}, () => {});
+    this.sync(sessionDataResource, () => { }, () => { });
     sessionDataResource.onDataUpdate.addHandler(() => {
       this.clear();
     });
@@ -40,15 +42,9 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
     permissionsResource.require(this, EPermission.public);
     this.timeoutTaskId = null;
 
-    this.onUse.addHandler(() => {
-      if (this.isResourceInUse) {
-        if (this.timeoutTaskId === null) {
-          this.outdateTimeout();
-        }
-      } else if (this.timeoutTaskId !== null) {
-        clearTimeout(this.timeoutTaskId);
-      }
-    });
+    sessionLogsEventHandler.onEvent(ServerEventId.CbSessionLogUpdated, () => {
+      this.markOutdated();
+    }, undefined, this);
   }
 
   clear() {
