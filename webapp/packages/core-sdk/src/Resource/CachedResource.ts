@@ -568,6 +568,7 @@ export abstract class CachedResource<
             return;
           }
 
+          console.log('marked outdated in resource');
           metadata.outdated = true;
         });
       }

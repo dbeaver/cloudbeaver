@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { runInAction } from 'mobx';
+import { runInAction, toJS } from 'mobx';
 
 import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { injectable } from '@cloudbeaver/core-di';
@@ -24,7 +24,6 @@ export interface ILogEntry extends LogEntry {
 @injectable()
 export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
 
-  private timeoutTaskId: NodeJS.Timeout | null = null;
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly coreSettingsService: CoreSettingsService,
@@ -40,10 +39,10 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
     });
 
     permissionsResource.require(this, EPermission.public);
-    this.timeoutTaskId = null;
 
     sessionLogsEventHandler.onEvent(ServerEventId.CbSessionLogUpdated, () => {
       this.markOutdated();
+      console.log('mark outdated', toJS(this.data));
     }, undefined, this);
   }
 
@@ -76,19 +75,5 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
     });
 
     return this.data;
-  }
-
-  private outdateTimeout() {
-    const refreshInterval = this.logViewerSettingsService.settings.isValueDefault('refreshTimeout')
-      ? this.coreSettingsService.settings.getValue('app.logViewer.refreshTimeout')
-      : this.logViewerSettingsService.settings.getValue('refreshTimeout');
-
-    this.timeoutTaskId = setTimeout(() => {
-      this.markOutdated();
-
-      if (this.isResourceInUse) {
-        this.outdateTimeout();
-      }
-    }, refreshInterval);
   }
 }
