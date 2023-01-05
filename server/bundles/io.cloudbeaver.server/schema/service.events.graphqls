@@ -90,7 +90,7 @@ type CBTopicEvent implements CBClientEvent {
 type CBProjectsActiveEvent implements CBClientEvent {
     id: CBClientEventId!
     topicId: CBEventTopic
-    projects: [String!]! # list of active projects
+    projectIds: [String!]! # list of active projects
 }
 
 extend type Query {

@@ -98,7 +98,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   const pages = dbObjectPagesService.orderedPages;
 
   const handleConnect = useCallback(async () => {
-    if (state.connecting || !connection.data) {
+    if (state.connecting || !connection.data || !connectionKey) {
       return;
     }
 

@@ -52,13 +52,6 @@ const styles = css`
   Table {
     width: 100%;
   }
-
-  TableHeader {
-    background: var(--theme-surface);
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
   
   table-container {
     overflow: auto;
@@ -145,7 +138,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
                 expandedItems={table.state.expanded}
                 size='big'
               >
-                <TableHeader>
+                <TableHeader fixed>
                   {/* {isLocalProviderAvailable && (
                   <TableColumnHeader min flex centerContent>
                     <TableSelect />

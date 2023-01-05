@@ -10,7 +10,7 @@ import { TeamsResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, GraphQLService } from '@cloudbeaver/core-sdk';
 import { isArraysEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
@@ -57,7 +57,7 @@ export class GrantedConnectionsTabService extends Bootstrap {
   load(): Promise<void> | void { }
 
   private isEnabled(): boolean {
-    return this.projectInfoResource.values.some(project => project.global);
+    return this.projectInfoResource.values.some(isGlobalProject);
   }
 
   private stateGetter(context: ITeamFormProps): MetadataValueGetter<string, IGrantedConnectionsTabState> {

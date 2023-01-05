@@ -18,8 +18,8 @@ export function isLocalConnection(connection: DatabaseConnection): boolean {
   return connection.origin.type === AUTH_PROVIDER_LOCAL_ID;
 }
 
-export function isCloudConnection(connection: DatabaseConnection): boolean {
-  if (!connection.origin) {
+export function isCloudConnection(connection?: DatabaseConnection): boolean {
+  if (!connection?.origin) {
     return false;
   }
   return connection.origin.type === 'cloud';

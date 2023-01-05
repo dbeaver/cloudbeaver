@@ -205,7 +205,7 @@ export enum CbEventTopic {
 
 export interface CbProjectsActiveEvent extends CbClientEvent {
   id: CbClientEventId;
-  projects: Array<Scalars['String']>;
+  projectIds: Array<Scalars['String']>;
   topicId?: Maybe<CbEventTopic>;
 }
 
@@ -1077,7 +1077,7 @@ export interface QueryConnectionFoldersArgs {
 
 export interface QueryConnectionInfoArgs {
   id: Scalars['ID'];
-  projectId?: InputMaybe<Scalars['ID']>;
+  projectId: Scalars['ID'];
 }
 
 
@@ -1420,6 +1420,7 @@ export interface QueryUpdateTeamArgs {
 export interface QueryUserConnectionsArgs {
   id?: InputMaybe<Scalars['ID']>;
   projectId?: InputMaybe<Scalars['ID']>;
+  projectIds?: InputMaybe<Array<Scalars['ID']>>;
 }
 
 export interface RmProject {
@@ -1766,7 +1767,7 @@ export type GetActiveUserQueryVariables = Exact<{
 }>;
 
 
-export type GetActiveUserQuery = { user?: { userId: string, displayName?: string, linkedAuthProviders: Array<string>, metaParameters?: any, configurationParameters?: any, authTokens: Array<{ authProvider: string, authConfiguration?: string, loginTime: any, message?: string, origin: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> } }> } };
+export type GetActiveUserQuery = { user?: { userId: string, displayName?: string, authRole?: string, linkedAuthProviders: Array<string>, metaParameters?: any, configurationParameters?: any, authTokens: Array<{ authProvider: string, authConfiguration?: string, loginTime: any, message?: string, origin: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> } }> } };
 
 export type GetAuthProviderConfigurationParametersQueryVariables = Exact<{
   providerId: Scalars['ID'];
@@ -2213,6 +2214,7 @@ export type GetTemplateConnectionsQuery = { connections: Array<{ id: string, pro
 export type GetUserConnectionsQueryVariables = Exact<{
   projectId?: InputMaybe<Scalars['ID']>;
   connectionId?: InputMaybe<Scalars['ID']>;
+  projectIds?: InputMaybe<Array<Scalars['ID']> | Scalars['ID']>;
   includeOrigin: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
   includeAuthProperties: Scalars['Boolean'];
@@ -3302,6 +3304,7 @@ export const GetActiveUserDocument = `
   user: activeUser {
     userId
     displayName
+    authRole
     linkedAuthProviders
     metaParameters @include(if: $includeMetaParameters)
     configurationParameters @include(if: $includeConfigurationParameters)
@@ -3736,8 +3739,12 @@ export const GetTemplateConnectionsDocument = `
 }
     ${DatabaseConnectionFragmentDoc}`;
 export const GetUserConnectionsDocument = `
-    query getUserConnections($projectId: ID, $connectionId: ID, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $includeNetworkHandlersConfig: Boolean!, $includeCredentialsSaved: Boolean!, $includeAuthNeeded: Boolean!, $includeProperties: Boolean!, $includeProviderProperties: Boolean!, $customIncludeOptions: Boolean!) {
-  connections: userConnections(projectId: $projectId, id: $connectionId) {
+    query getUserConnections($projectId: ID, $connectionId: ID, $projectIds: [ID!], $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $includeNetworkHandlersConfig: Boolean!, $includeCredentialsSaved: Boolean!, $includeAuthNeeded: Boolean!, $includeProperties: Boolean!, $includeProviderProperties: Boolean!, $customIncludeOptions: Boolean!) {
+  connections: userConnections(
+    projectId: $projectId
+    id: $connectionId
+    projectIds: $projectIds
+  ) {
     ...DatabaseConnection
   }
 }

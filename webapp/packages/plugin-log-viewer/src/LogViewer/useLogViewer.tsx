@@ -7,11 +7,11 @@
  */
 
 import { observable } from 'mobx';
-import { useEffect } from 'react';
 
-import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useObjectRef, useObservableRef, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
+import { SessionLogsResource } from '../SessionLogsResource';
 import type { ILogEntry } from './ILogEntry';
 import { LogViewerService } from './LogViewerService';
 
@@ -21,14 +21,8 @@ interface Props {
 }
 
 export function useLogViewer() {
+  const sessionLogsLoader = useResource(useLogViewer, SessionLogsResource, undefined);
   const logViewerService = useService(LogViewerService);
-
-  useEffect(() => {
-    logViewerService.startLog();
-    return () => {
-      logViewerService.stopLog();
-    };
-  }, []);
 
   const props: Props = useObservableRef(
     () => ({ selectedItem: null }),
@@ -51,10 +45,10 @@ export function useLogViewer() {
       return props.logViewerService.isActive;
     },
     get logItems() {
-      return props.logViewerService.getLog();
+      return sessionLogsLoader.data;
     },
     clearLog() {
-      props.logViewerService.clearLog();
+      sessionLogsLoader.resource.clear();
       this.selectItem(null);
     },
   }), false);
