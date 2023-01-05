@@ -53,7 +53,7 @@ export const ConnectionEdit = observer<Props>(function ConnectionEditNew({
   data.projectId = item.projectId;
 
   return styled(styles)(
-    <box ref={boxRef} as='div'>
+    <box ref={boxRef}>
       <ConnectionForm
         state={data}
         // onCancel={collapse}
