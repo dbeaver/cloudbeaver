@@ -13,8 +13,9 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
+import { isSharedProject, isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
-import { isDefined } from '@cloudbeaver/core-utils';
+import { isArraysEqual, isDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
 
 @injectable()
 export class ConnectionsAdministrationController {
@@ -30,6 +31,11 @@ export class ConnectionsAdministrationController {
     return this.connectionInfoResource
       .get(ConnectionInfoActiveProjectKey)
       .filter<Connection>(isDefined)
+      .filter(connection => {
+        const project = this.projectInfoResource.get(connection.projectId);
+
+        return project && (isSharedProject(project) || isGlobalProject(project));
+      })
       .sort((connectionA, connectionB) => compareNewConnectionsInfo(
         connectionA,
         connectionB
@@ -44,11 +50,13 @@ export class ConnectionsAdministrationController {
     private readonly notificationService: NotificationService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly commonDialogService: CommonDialogService,
-    private readonly localizationService: LocalizationService
+    private readonly localizationService: LocalizationService,
+    private readonly projectInfoResource: ProjectInfoResource
   ) {
     makeObservable(this, {
       isProcessing: observable,
-      connections: computed,
+      connections: computed<DatabaseConnection[]>({ equals: (a, b) => isArraysEqual(a, b) }),
+      keys: computed<IConnectionInfoParams[]>({ equals: (a, b) => isArraysEqual(a, b, isObjectsEqual) }),
       itemsSelected: computed,
     });
   }
