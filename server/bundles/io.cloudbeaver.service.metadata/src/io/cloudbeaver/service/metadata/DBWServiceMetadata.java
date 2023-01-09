@@ -32,4 +32,7 @@ public interface DBWServiceMetadata extends DBWService {
     @WebAction
     String getNodeDDL(WebSession webSession, DBNNode node, Map<String, Object> options) throws DBWebException;
 
+    @WebAction
+    String getNodeExtendedDDL(WebSession webSession, DBNNode node) throws DBWebException;
+
 }
