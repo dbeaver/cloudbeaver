@@ -111,13 +111,13 @@ public class SLF4JLogHandler implements LogHandler {
         if (message instanceof Throwable) {
             logger.error(message.toString(), (Throwable) message);
         } else {
-            logger.error(message.toString());
+            logger.error(message == null ? null : message.toString());
         }
     }
 
     @Override
     public void error(String name, Object message, Throwable t) {
-        getLogger(name).error(message.toString(), t);
+        getLogger(name).error(message == null ? null : message.toString(), t);
     }
 
     @Override
