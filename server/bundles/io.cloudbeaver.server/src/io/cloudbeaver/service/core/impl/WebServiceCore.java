@@ -61,7 +61,10 @@ import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -427,13 +430,12 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, config.getConnectionId());
         DBPDataSourceContainer dataSource = connectionInfo.getDataSourceContainer();
         webSession.addInfoMessage("Update connection - " + WebServiceUtils.getConnectionContainerInfo(dataSource));
-        DBPConnectionConfiguration oldConnectionConfig = new DBPConnectionConfiguration(dataSource.getConnectionConfiguration());
+        var oldDataSource = new DataSourceDescriptor((DataSourceDescriptor) dataSource, dataSource.getRegistry());
 
         if (!CommonUtils.isEmpty(config.getName())) {
             dataSource.setName(config.getName());
         }
-        String oldDescription = dataSource.getDescription();
-        String oldName = dataSource.getName();
+
         if (config.getDescription() != null) {
             dataSource.setDescription(config.getDescription());
         }
@@ -442,7 +444,7 @@ public class WebServiceCore implements DBWServiceCore {
 
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
 
-        boolean sendEvent = sendUpdateConnectionEvent(config, dataSource, oldConnectionConfig, oldDescription, oldName);
+        boolean sendEvent = sendUpdateConnectionEvent((DataSourceDescriptor) dataSource, oldDataSource);
 
         WebServiceUtils.saveAuthProperties(
             dataSource,
@@ -473,25 +475,10 @@ public class WebServiceCore implements DBWServiceCore {
      * Checks if only user credentials were changed
      */
     private boolean sendUpdateConnectionEvent(
-        @NotNull WebConnectionConfig config,
-        @NotNull DBPDataSourceContainer dataSource,
-        @NotNull DBPConnectionConfiguration oldConnectionConfig,
-        @Nullable String oldDescription,
-        @NotNull String oldName
+        @NotNull DataSourceDescriptor dataSource,
+        @NotNull DataSourceDescriptor oldDataSource
     ) {
-        if (!oldConnectionConfig.equals(dataSource.getConnectionConfiguration())) {
-            return true;
-        }
-        if (!Objects.equals(oldDescription, dataSource.getDescription())) {
-            return true;
-        }
-        if (!Objects.equals(oldName, dataSource.getName())) {
-            return true;
-        }
-        if (dataSource.getProject().isUseSecretStorage()) {
-            return dataSource.isSharedCredentials() != config.isSharedCredentials();
-        }
-        return dataSource.isSavePassword() != config.isSaveCredentials();
+        return dataSource.equalSettings(oldDataSource);
     }
 
     @Override
