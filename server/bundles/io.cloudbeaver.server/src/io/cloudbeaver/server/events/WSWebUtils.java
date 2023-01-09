@@ -14,24 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.session;
+package io.cloudbeaver.server.events;
 
+import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.auth.SMCredentials;
-import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 
-import java.util.Set;
+import java.util.Objects;
 
-public class SMTokenCredentialProvider implements SMCredentialsProvider {
-    private final String smAccessToken;
-
-    public SMTokenCredentialProvider(String smAccessToken) {
-        this.smAccessToken = smAccessToken;
-    }
-
-    @Nullable
-    @Override
-    public SMCredentials getActiveUserCredentials() {
-        return new SMCredentials(smAccessToken, null, Set.of());
+public class WSWebUtils {
+    public static boolean isSessionIdEquals(@NotNull BaseWebSession webSession, @Nullable String sessionId) {
+        if (sessionId == null) {
+            return false;
+        }
+        if (Objects.equals(webSession.getSessionId(), sessionId)) {
+            return true;
+        }
+        if (webSession instanceof WebSession) {
+            return Objects.equals(webSession.getUserContext().getSmSessionId(), sessionId);
+        }
+        return false;
     }
 }

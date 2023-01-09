@@ -21,6 +21,7 @@ import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
+import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.utils.CommonUtils;
 
@@ -41,7 +42,7 @@ public abstract class WSProjectUpdatedEventHandler implements WSEventHandler {
         log.debug(getSupportedTopicId() + " event handled");
         Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
         for (var activeUserSession : allSessions) {
-            if (CommonUtils.equalObjects(activeUserSession.getSessionId(), event.getSessionId())) {
+            if (WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId())) {
                 continue;
             }
             updateSessionData(activeUserSession, event);

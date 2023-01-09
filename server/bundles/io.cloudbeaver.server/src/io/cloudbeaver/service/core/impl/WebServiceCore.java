@@ -405,7 +405,7 @@ public class WebServiceCore implements DBWServiceCore {
         webSession.addInfoMessage("New connection was created - " + WebServiceUtils.getConnectionContainerInfo(newDataSource));
         WebEventUtils.addDataSourceUpdatedEvent(
             webSession.getProjectById(projectId),
-            webSession.getSessionId(),
+            webSession.getUserContext().getSmSessionId(),
             connectionInfo.getId(),
             WSConstants.EventAction.CREATE
         );
@@ -588,7 +588,7 @@ public class WebServiceCore implements DBWServiceCore {
             webSession.addConnection(connectionInfo);
             WebEventUtils.addDataSourceUpdatedEvent(
                 webSession.getProjectById(projectId),
-                webSession.getSessionId(),
+                webSession.getUserContext().getSmSessionId(),
                 connectionInfo.getId(),
                 WSConstants.EventAction.CREATE
             );
@@ -816,13 +816,13 @@ public class WebServiceCore implements DBWServiceCore {
         WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             session.getProjectById(projectId),
-            session.getSessionId(),
+            session.getUserContext().getSmSessionId(),
             oldFolderNode,
             WSConstants.EventAction.DELETE
         );
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             session.getProjectById(projectId),
-            session.getSessionId(),
+            session.getUserContext().getSmSessionId(),
             newFolderNode,
             WSConstants.EventAction.CREATE
         );
@@ -847,7 +847,7 @@ public class WebServiceCore implements DBWServiceCore {
             WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
             WebEventUtils.addNavigatorNodeUpdatedEvent(
                 session.getProjectById(projectId),
-                session.getSessionId(),
+                session.getUserContext().getSmSessionId(),
                 folderNode,
                 WSConstants.EventAction.DELETE
             );
@@ -867,7 +867,7 @@ public class WebServiceCore implements DBWServiceCore {
         dataSourceDescriptor.persistConfiguration();
         WebEventUtils.addDataSourceUpdatedEvent(
             webSession.getProjectById(projectId),
-            webSession.getSessionId(),
+            webSession.getUserContext().getSmSessionId(),
             id,
             WSConstants.EventAction.UPDATE);
         return connectionInfo;

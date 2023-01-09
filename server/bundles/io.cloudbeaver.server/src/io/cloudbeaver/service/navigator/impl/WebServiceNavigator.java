@@ -391,13 +391,13 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     private void addNavigatorNodeMoveEvent(@NotNull WebSession session, DBNNode node, String oldNodePath, String newNodePath) {
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             node.getOwnerProject(),
-            session.getSessionId(),
+            session.getUserContext().getSmSessionId(),
             oldNodePath,
             WSConstants.EventAction.DELETE
         );
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             node.getOwnerProject(),
-            session.getSessionId(),
+            session.getUserContext().getSmSessionId(),
             newNodePath,
             WSConstants.EventAction.CREATE
         );
@@ -492,7 +492,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     node.getOwnerProject().getDataSourceRegistry().removeFolder(((DBNLocalFolder) node).getFolder(), false);
                     WebEventUtils.addNavigatorNodeUpdatedEvent(
                         session.getProjectById(projectId),
-                        session.getSessionId(),
+                        session.getUserContext().getSmSessionId(),
                         nodePath,
                         WSConstants.EventAction.DELETE
                     );
@@ -561,7 +561,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         ((DBNDataSource) node).getDataSourceContainer());
                     WebEventUtils.addDataSourceUpdatedEvent(
                         node.getOwnerProject(),
-                        session.getSessionId(),
+                        session.getUserContext().getSmSessionId(),
                         ((DBNDataSource) node).getDataSourceContainer().getId(),
                         WSConstants.EventAction.UPDATE
                     );
