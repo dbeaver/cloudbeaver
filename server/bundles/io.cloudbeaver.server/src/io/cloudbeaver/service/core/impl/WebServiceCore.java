@@ -429,11 +429,12 @@ public class WebServiceCore implements DBWServiceCore {
         webSession.addInfoMessage("Update connection - " + WebServiceUtils.getConnectionContainerInfo(dataSource));
         DBPConnectionConfiguration oldConnectionConfig = new DBPConnectionConfiguration(dataSource.getConnectionConfiguration());
 
+        String oldName = dataSource.getName();
         if (!CommonUtils.isEmpty(config.getName())) {
             dataSource.setName(config.getName());
         }
         String oldDescription = dataSource.getDescription();
-        String oldName = dataSource.getName();
+
         if (config.getDescription() != null) {
             dataSource.setDescription(config.getDescription());
         }
