@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.registry.DataSourceConfigurationManager;
 import org.jkiss.dbeaver.registry.DataSourcePersistentRegistry;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -252,6 +253,11 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     @Override
     public void refreshConfig() {
         dataSourceRegistry.refreshConfig();
+    }
+
+    @Override
+    public void refreshConfig(Collection<String> dataSourceIds) {
+        dataSourceRegistry.refreshConfig(dataSourceIds);
     }
 
     @Override
