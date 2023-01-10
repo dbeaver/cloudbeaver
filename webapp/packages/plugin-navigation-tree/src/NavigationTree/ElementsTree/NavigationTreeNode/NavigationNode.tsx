@@ -39,7 +39,6 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   const navNodeManagerService = useService(NavNodeManagerService);
   const {
     ref,
-    empty,
     group,
     control,
     disabled,
@@ -77,7 +76,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
 
   const Control = control || externalControl || NavigationNodeControl;
 
-  if (leaf || empty) {
+  if (leaf) {
     externalExpanded = false;
   }
 

@@ -284,12 +284,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         const currentValue = this.data.get(parentId);
 
         if (currentValue) {
-          const nodeInfo = this.navNodeInfoResource.get(parentId);
           const children = currentValue.filter(value => value !== key);
-
-          if (nodeInfo) {
-            nodeInfo.hasChildren = children.length > 0;
-          }
           this.dataSet(parentId, children);
         }
       }
@@ -315,11 +310,6 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
       if (currentValue) {
         const children = currentValue.filter(value => !values.includes(value));
-        const nodeInfo = this.navNodeInfoResource.get(key);
-
-        if (nodeInfo) {
-          nodeInfo.hasChildren = children.length > 0;
-        }
         this.dataSet(key, children);
       }
 
@@ -337,13 +327,8 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     ResourceKeyUtils.forEach(keyObject, (key, i) => {
       const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
       const currentValue = this.data.get(key) || [];
-      const nodeInfo = this.navNodeInfoResource.get(key);
 
       currentValue.unshift(...values);
-
-      if (nodeInfo) {
-        nodeInfo.hasChildren = currentValue.length > 0;
-      }
       this.dataSet(key, currentValue);
     });
 
@@ -357,13 +342,8 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     ResourceKeyUtils.forEach(keyObject, (key, i) => {
       const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
       const currentValue = this.data.get(key) || [];
-      const nodeInfo = this.navNodeInfoResource.get(key);
 
       currentValue.push(...values);
-
-      if (nodeInfo) {
-        nodeInfo.hasChildren = currentValue.length > 0;
-      }
       this.dataSet(key, currentValue);
     });
 
@@ -373,13 +353,8 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
   insertToNode(nodeId: string, index: number, ...nodes: string[]): void {
     const currentValue = this.data.get(nodeId) || [];
-    const nodeInfo = this.navNodeInfoResource.get(nodeId);
 
     currentValue.splice(index, 0, ...nodes);
-
-    if (nodeInfo) {
-      nodeInfo.hasChildren = currentValue.length > 0;
-    }
     this.dataSet(nodeId, currentValue);
 
     this.markUpdated(nodeId);
@@ -546,8 +521,6 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       limit,
       withDetails: metadata.withDetails,
     });
-
-    navNodeInfo.hasChildren = navNodeInfo.hasChildren && navNodeChildren.length > 0;
 
     return { navNodeChildren, navNodeInfo, parentPath };
   }
