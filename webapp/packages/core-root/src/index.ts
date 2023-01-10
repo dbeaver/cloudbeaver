@@ -2,6 +2,8 @@ export * from './DataSynchronization/DataSynchronizationQueue';
 export * from './DataSynchronization/DataSynchronizationService';
 export * from './DataSynchronization/ISynchronizationMessage';
 export * from './DataSynchronization/SynchronizationMessage';
+export * from './ServerEventEmitter/IServerEventEmitter';
+export * from './ServerEventEmitter/TopicEventHandler';
 export * from './ConnectionNavigatorViewSettings';
 export * from './FeaturesResource';
 export * from './NetworkError';

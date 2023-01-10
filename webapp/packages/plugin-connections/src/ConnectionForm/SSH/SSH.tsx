@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 
 import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
-  Group, SubmittingForm, useMapResource, Button, ColoredContainer, InputField,
+  Group, SubmittingForm, useResource, Button, ColoredContainer, InputField,
   FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container,
   Combobox, Expandable, EXPANDABLE_FORM_STYLES, useTranslate, useStyles
 } from '@cloudbeaver/core-blocks';
@@ -51,7 +51,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
 
   const initialConfig = info?.networkHandlersConfig?.find(handler => handler.id === SSH_TUNNEL_ID);
 
-  const resource = useMapResource(SSH, NetworkHandlerResource, SSH_TUNNEL_ID, {
+  const resource = useResource(SSH, NetworkHandlerResource, SSH_TUNNEL_ID, {
     onData: handler => {
       if (Object.keys(handlerState).length === 0) {
         for (const property of handler.properties) {

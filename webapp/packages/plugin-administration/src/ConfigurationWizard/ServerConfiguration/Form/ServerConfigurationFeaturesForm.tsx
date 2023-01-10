@@ -11,7 +11,7 @@ import { useContext } from 'react';
 import styled from 'reshadow';
 
 import { AdministrationSettingsService } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, FormContext, GroupTitle, Loader, PlaceholderComponent, Switch, useDataResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, FormContext, GroupTitle, Loader, PlaceholderComponent, Switch, useResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { FeaturesResource } from '@cloudbeaver/core-root';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -22,7 +22,7 @@ export const ServerConfigurationFeaturesForm: PlaceholderComponent<IConfiguratio
   configurationWizard,
 }) {
   const administrationSettingsService = useService(AdministrationSettingsService);
-  const features = useDataResource(ServerConfigurationFeaturesForm, FeaturesResource, CachedMapAllKey);
+  const features = useResource(ServerConfigurationFeaturesForm, FeaturesResource, CachedMapAllKey);
   const translate = useTranslate();
   const styles = useStyles(BASE_CONTAINERS_STYLES);
   const formContext = useContext(FormContext);

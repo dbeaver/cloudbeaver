@@ -11,6 +11,7 @@ import { computed, makeObservable, untracked } from 'mobx';
 import {
   ConnectionExecutionContextResource,
   ConnectionExecutionContextService,
+  ConnectionInfoActiveProjectKey,
   ConnectionInfoResource,
   connectionProvider,
   connectionSetter,
@@ -30,7 +31,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { objectNavNodeProvider, NodeManagerUtils, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider, projectSetter, projectSetterState } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, NavNodeInfoFragment, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { NavNodeInfoFragment, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationTabsService, TabHandler, ITab, ITabOptions } from '@cloudbeaver/plugin-navigation-tabs';
 import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, SqlDataSourceService, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
 
@@ -303,7 +304,7 @@ export class SqlEditorTabService extends Bootstrap {
     );
 
     if (dataSource.executionContext) {
-      await this.connectionInfoResource.load(CachedMapAllKey);
+      await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
 
       const contextConnection = createConnectionParam(
         dataSource.executionContext.projectId,

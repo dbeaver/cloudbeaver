@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, TextPlaceholder, useMapResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavTreeResource, DBObjectResource, type DBObject, DBObjectParentKey } from '@cloudbeaver/core-navigation-tree';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
@@ -44,7 +44,7 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
   parents = [...parents, parentId];
   const translate = useTranslate();
   const navNodeViewService = useService(NavNodeViewService);
-  const tree = useMapResource(ObjectPropertyTable, NavTreeResource, objectId, {
+  const tree = useResource(ObjectPropertyTable, NavTreeResource, objectId, {
     onLoad: async resource => !(await resource.preloadNodeParents(parents, objectId)),
   });
 
@@ -52,7 +52,7 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
 
   const { nodes, duplicates } = navNodeViewService.filterDuplicates(limited.nodes);
 
-  const dbObject = useMapResource(ObjectPropertyTable, DBObjectResource, DBObjectParentKey(objectId), {
+  const dbObject = useResource(ObjectPropertyTable, DBObjectResource, DBObjectParentKey(objectId), {
     preload: [tree],
   });
 

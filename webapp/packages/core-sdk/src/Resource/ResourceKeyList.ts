@@ -7,6 +7,7 @@
  */
 
 export type ResourceKey<TKey> = TKey | ResourceKeyList<TKey>;
+export type ResourceKeyType<TKey> = TKey extends ResourceKeyList<infer I> ? I : TKey;
 export type SingleResourceKey<T> = Exclude<T, Exclude<T, ResourceKeyList<any>>> extends ResourceKeyList<infer TKey>
   ? TKey
   : T;
@@ -62,6 +63,7 @@ export interface ResourceKeyUtils {
   exclude: <TKey>(first: ResourceKeyList<TKey>, second: ResourceKey<TKey>) => ResourceKeyList<TKey>;
   join: <TKey>(...keys: Array<ResourceKey<TKey>>) => ResourceKeyList<TKey>;
   add: <TKey>(key: ResourceKey<TKey>, ...elements: TKey[]) => ResourceKeyList<TKey>;
+  toList: <TKey>(key: ResourceKey<TKey>) => ResourceKeyList<TKey>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -237,6 +239,14 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
     list.push(...elements);
 
     return resourceKeyList(list);
+  },
+
+  toList<TKey>(key: ResourceKey<TKey>): ResourceKeyList<TKey> {
+    if (isResourceKeyList(key)) {
+      return key;
+    }
+
+    return resourceKeyList([key]);
   },
 };
 

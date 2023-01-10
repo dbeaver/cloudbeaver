@@ -6,17 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
-import styled from 'reshadow';
+import styled, { use } from 'reshadow';
 
 import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 
 interface Props {
+  fixed?: boolean;
   className?: string;
 }
 
-export const TableHeader: React.FC<React.PropsWithChildren<Props>> = function TableHeader({ children, className }) {
+export const TableHeader: React.FC<React.PropsWithChildren<Props>> = function TableHeader({ fixed, children, className }) {
   return styled(BASE_TABLE_STYLES)(
-    <thead className={className}>
+    <thead className={className} {...use({ fixed })}>
       <tr>
         {children}
       </tr>

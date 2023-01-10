@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AuthInfoService, AuthProvider, AuthProviderConfiguration, AuthProvidersResource, IAuthCredentials } from '@cloudbeaver/core-authentication';
-import { useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useResource, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -45,7 +45,7 @@ interface IState {
 }
 
 export function useAuthDialogState(accessRequest: boolean, providerId: string | null, configurationId?: string): IData {
-  const authProvidersResource = useMapResource(useAuthDialogState, AuthProvidersResource, CachedMapAllKey);
+  const authProvidersResource = useResource(useAuthDialogState, AuthProvidersResource, CachedMapAllKey);
   const administrationScreenService = useService(AdministrationScreenService);
   const authInfoService = useService(AuthInfoService);
   const notificationService = useService(NotificationService);

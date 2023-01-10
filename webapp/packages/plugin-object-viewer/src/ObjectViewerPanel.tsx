@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, TextPlaceholder, Button, useMapResource, useObservableRef, getComputed, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder, Button, useResource, useObservableRef, getComputed, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
@@ -62,13 +62,13 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
     notFound: observable.ref,
   }, false);
 
-  const connection = useMapResource(ObjectViewerPanel, ConnectionInfoResource, connectionKey, {
+  const connection = useResource(ObjectViewerPanel, ConnectionInfoResource, connectionKey, {
     isActive: resource => !connectionKey || !resource.has(connectionKey),
   });
 
   const connected = getComputed(() => connection.data?.connected || false);
 
-  const children = useMapResource(ObjectViewerPanel, NavTreeResource, parentId, {
+  const children = useResource(ObjectViewerPanel, NavTreeResource, parentId, {
     onLoad: async resource => {
       if (!connected) {
         return true;
@@ -85,7 +85,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
     preload: [connection],
   });
 
-  const node = useMapResource(ObjectViewerPanel, navNodeInfoResource, objectId, {
+  const node = useResource(ObjectViewerPanel, navNodeInfoResource, objectId, {
     onLoad: async () => !(await children.resource.preloadNodeParents(parents, objectId)),
     onData(data) {
       tab.handlerState.tabIcon = data.icon;
@@ -98,7 +98,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   const pages = dbObjectPagesService.orderedPages;
 
   const handleConnect = useCallback(async () => {
-    if (state.connecting || !connection.data) {
+    if (state.connecting || !connection.data || !connectionKey) {
       return;
     }
 

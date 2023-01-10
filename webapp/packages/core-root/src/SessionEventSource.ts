@@ -6,31 +6,151 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { catchError, debounceTime, filter, map, merge, Observable, retry, RetryConfig, Subject } from 'rxjs';
+import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
+
 import { injectable } from '@cloudbeaver/core-di';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import {
   GraphQLService,
-  EventSource,
-  CbEvent,
-  CbEventType as SessionEventType
+  EnvironmentService,
+  CbEventTopic as SessionEventTopic,
+  CbServerEventId as ServerEventId,
+  CbClientEventId as ClientEventId,
+  ServiceError,
 } from '@cloudbeaver/core-sdk';
 
-export type SessionEvent = CbEvent;
-export { SessionEventType };
+import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './ServerEventEmitter/IServerEventEmitter';
+
+export { ServerEventId, SessionEventTopic, ClientEventId };
+
+export type SessionEventId = ServerEventId | ClientEventId;
+
+export interface ISessionEvent extends IBaseServerEvent<SessionEventId, SessionEventTopic> {
+  id: SessionEventId;
+  topicId?: SessionEventTopic;
+  [key: string]: any;
+}
+
+export interface ITopicSubEvent extends ISessionEvent {
+  id: ClientEventId.CbClientTopicSubscribe | ClientEventId.CbClientTopicUnsubscribe;
+  topicId: SessionEventTopic;
+}
+
+const retryInterval = 5000;
+
+const retryConfig: RetryConfig = {
+  delay: retryInterval,
+};
 
 @injectable()
-export class SessionEventSource extends EventSource<SessionEvent> {
+export class SessionEventSource
+implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
+  readonly eventsSubject: Observable<ISessionEvent>;
+  readonly onInit: ISyncExecutor;
+
+
+  private readonly closeSubject: Subject<CloseEvent>;
+  private readonly openSubject: Subject<Event>;
+  private readonly errorSubject: Subject<Error>;
+  private readonly subject: WebSocketSubject<ISessionEvent>;
+  private readonly oldEventsSubject: Subject<ISessionEvent>;
+
   constructor(
+    private readonly environmentService: EnvironmentService,
     private readonly graphQLService: GraphQLService
   ) {
-    super(5000);
-  }
-  protected async listener(): Promise<void> {
-    const { events } = await this.graphQLService.sdk.getSessionEvents({
-      maxEntries: 1000,
+    this.onInit = new SyncExecutor();
+    this.oldEventsSubject = new Subject();
+    this.closeSubject = new Subject();
+    this.openSubject = new Subject();
+    this.errorSubject = new Subject();
+    this.subject = webSocket({
+      url: environmentService.wsEndpoint,
+      closeObserver: this.closeSubject,
+      openObserver: this.openSubject,
     });
 
-    for (const event of events) {
-      this.event(event);
-    }
+    this.openSubject.subscribe(() => {
+      this.onInit.execute();
+    });
+
+    this.closeSubject.subscribe(event => {
+      console.info(`Websocket closed: ${event.reason}`);
+    });
+
+    this.eventsSubject = merge(this.oldEventsSubject, this.subject);
+
+    this.errorSubject
+      .pipe(debounceTime(1000))
+      .subscribe(error => {
+        console.error(error);
+      });
+
+    this.errorHandler = this.errorHandler.bind(this);
+  }
+
+  onEvent<T = ISessionEvent>(
+    id: SessionEventId,
+    callback: IServerEventCallback<T>,
+    mapTo: (event: ISessionEvent) => T = e => e as T,
+  ): Subscription {
+    const sub = this.eventsSubject
+      .pipe(
+        catchError(this.errorHandler),
+        filter(event => event.id === id),
+        map(mapTo)
+      )
+      .subscribe(callback);
+
+    return () => {
+      sub.unsubscribe();
+    };
+  }
+
+  on<T = ISessionEvent>(
+    callback: IServerEventCallback<T>,
+    mapTo: (event: ISessionEvent) => T = e => e as T,
+    filterFn: (event: ISessionEvent) => boolean = () => true,
+  ): Subscription {
+    const sub = this.eventsSubject
+      .pipe(
+        catchError(this.errorHandler),
+        filter(filterFn),
+        map(mapTo)
+      )
+      .subscribe(callback);
+
+    return () => {
+      sub.unsubscribe();
+    };
+  }
+
+  multiplex<T = ISessionEvent>(
+    topicId: SessionEventTopic,
+    mapTo: ((event: ISessionEvent) => T)  = e => e as T
+  ): Observable<T> {
+    return merge(
+      this.subject.multiplex(
+        () => ({ id: ClientEventId.CbClientTopicSubscribe, topicId } as ITopicSubEvent),
+        () => ({ id: ClientEventId.CbClientTopicUnsubscribe, topicId } as ITopicSubEvent),
+        event => event.topicId === topicId
+      ),
+      this.oldEventsSubject,
+    )
+      .pipe(
+        catchError(this.errorHandler),
+        map(mapTo)
+      );
+  }
+
+  emit(event: ISessionEvent): this {
+    this.subject.next(event);
+    return this;
+  }
+
+  private errorHandler(error: any, caught: Observable<ISessionEvent>): Observable<ISessionEvent> {
+    this.errorSubject.next(new ServiceError('WebSocket connection error'));
+    return caught;
   }
 }

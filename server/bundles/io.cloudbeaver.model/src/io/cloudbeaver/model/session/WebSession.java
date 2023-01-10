@@ -16,12 +16,13 @@
  */
 package io.cloudbeaver.model.session;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -40,31 +41,30 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.*;
-import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
-import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
-import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
-import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
-import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.SMConstants;
+import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
-import org.jkiss.dbeaver.registry.BaseProjectImpl;
+import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -73,9 +73,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -85,7 +82,7 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
-public class WebSession extends AbstractSessionPersistent
+public class WebSession extends BaseWebSession
     implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
@@ -98,9 +95,6 @@ public class WebSession extends AbstractSessionPersistent
 
     private final AtomicInteger taskCount = new AtomicInteger();
 
-    private final String id;
-    private final long createTime;
-    private volatile long lastAccessTime;
     private long maxSessionIdleTime;
     private String lastRemoteAddr;
     private String lastRemoteUserAgent;
@@ -123,13 +117,7 @@ public class WebSession extends AbstractSessionPersistent
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private WebProjectImpl defaultProject;
     private final List<WebProjectImpl> accessibleProjects = new ArrayList<>();
-    private final SessionContextImpl sessionAuthContext;
-    private final WebApplication application;
     private final Map<String, DBWSessionHandler> sessionHandlers;
-    private final WebUserContext userContext;
-    private final List<CBEvent> sessionEvents = new ArrayList<>();
-
-    private RMController rmController;
 
     public WebSession(
         @NotNull HttpSession httpSession,
@@ -137,23 +125,11 @@ public class WebSession extends AbstractSessionPersistent
         @NotNull Map<String, DBWSessionHandler> sessionHandlers,
         long maxSessionIdleTime
     ) throws DBException {
-        this.id = httpSession.getId();
-        this.createTime = System.currentTimeMillis();
+        super(httpSession.getId(), application);
         this.lastAccessTime = this.createTime;
         this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
-        this.sessionAuthContext = new SessionContextImpl(null);
-        this.sessionAuthContext.addSession(this);
-        this.application = application;
         this.sessionHandlers = sessionHandlers;
-        this.userContext = new WebUserContext(application);
         this.maxSessionIdleTime = maxSessionIdleTime;
-        this.rmController = application.createResourceController(this);
-    }
-
-    @NotNull
-    @Override
-    public SMAuthSpace getSessionSpace() {
-        return DBWorkbench.getPlatform().getWorkspace();
     }
 
     @Override
@@ -166,18 +142,6 @@ public class WebSession extends AbstractSessionPersistent
         }
     }
 
-    @NotNull
-    @Property
-    public String getSessionId() {
-        return id;
-    }
-
-    @NotNull
-    @Override
-    public LocalDateTime getSessionStart() {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(createTime), ZoneId.systemDefault());
-    }
-
     public WebApplication getApplication() {
         return application;
     }
@@ -185,11 +149,6 @@ public class WebSession extends AbstractSessionPersistent
     @NotNull
     public DBPProject getSingletonProject() {
         return defaultProject;
-    }
-
-    @NotNull
-    public SMSessionContext getSessionContext() {
-        return sessionAuthContext;
     }
 
     @Property
@@ -200,10 +159,6 @@ public class WebSession extends AbstractSessionPersistent
     @Property
     public synchronized String getLastAccessTime() {
         return CBModelConstants.ISO_DATE_FORMAT.format(lastAccessTime);
-    }
-
-    public long getLastAccessTimeMillis() {
-        return lastAccessTime;
     }
 
     public String getLastRemoteAddr() {
@@ -240,10 +195,6 @@ public class WebSession extends AbstractSessionPersistent
         return allMetaParams;
     }
 
-    public synchronized WebUserContext getUserContext() {
-        return userContext;
-    }
-
     public synchronized String getUserId() {
         return userContext.getUserId();
     }
@@ -278,7 +229,7 @@ public class WebSession extends AbstractSessionPersistent
     }
 
     public synchronized RMController getRmController() {
-        return rmController;
+        return userContext.getRmController();
     }
 
     public synchronized void refreshUserData() {
@@ -290,16 +241,20 @@ public class WebSession extends AbstractSessionPersistent
     /**
      * updates connections based on event in web session
      *
-     * @param project project of connection
+     * @param project       project of connection
      * @param connectionIds list of updated connections
-     * @param type type of event
+     * @param type          type of event
      */
-    public synchronized void updateProjectConnection(DBPProject project, List<String> connectionIds, CBEventConstants.EventType type) {
+    public synchronized void updateProjectConnection(
+        DBPProject project,
+        List<String> connectionIds,
+        WSEventType type
+    ) {
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         registry.refreshConfig();
         for (String connectionId : connectionIds) {
             switch (type) {
-                case TYPE_CREATE:
+                case DATASOURCE_CREATED:
                     DBPDataSourceContainer container = registry.getDataSource(connectionId);
                     if (container == null) {
                         break;
@@ -307,7 +262,7 @@ public class WebSession extends AbstractSessionPersistent
                     WebConnectionInfo connectionInfo = new WebConnectionInfo(this, registry.getDataSource(connectionId));
                     this.connections.put(connectionInfo.getId(), connectionInfo);
                     break;
-                case TYPE_DELETE:
+                case DATASOURCE_DELETED:
                     this.connections.remove(connectionId);
                     break;
                 default:
@@ -502,9 +457,6 @@ public class WebSession extends AbstractSessionPersistent
             addSessionError(e);
             log.error("Error reading session permissions", e);
         }
-
-        // Initialize new resource controller
-        this.rmController = application.createResourceController(this);
     }
 
     private synchronized void refreshAccessibleConnectionIds() {
@@ -516,7 +468,7 @@ public class WebSession extends AbstractSessionPersistent
             return;
         }
         SMAuthInfo authInfo = getSecurityController().authenticateAnonymousUser(this.id, getSessionParameters(), CB_SESSION_TYPE);
-        updateSMAuthInfo(authInfo);
+        updateSMSession(authInfo);
     }
 
     @NotNull
@@ -549,8 +501,8 @@ public class WebSession extends AbstractSessionPersistent
         HttpServletResponse response,
         long maxSessionIdleTime
     ) throws DBWebException {
+        touchSession();
         HttpSession httpSession = request.getSession();
-        this.lastAccessTime = System.currentTimeMillis();
         this.lastRemoteAddr = request.getRemoteAddr();
         this.lastRemoteUserAgent = request.getHeader("User-Agent");
         this.maxSessionIdleTime = maxSessionIdleTime;
@@ -641,6 +593,7 @@ public class WebSession extends AbstractSessionPersistent
             this.defaultProject.dispose();
             this.defaultProject = null;
         }
+
         super.close();
     }
 
@@ -756,27 +709,6 @@ public class WebSession extends AbstractSessionPersistent
 
     public void addInfoMessage(String message) {
         addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.INFO, message));
-    }
-
-    public void addSessionEvent(CBEvent event) {
-        synchronized (sessionEvents) {
-            sessionEvents.add(event);
-        }
-    }
-
-    public List<CBEvent> getSessionEvents(int eventsCount) {
-        synchronized (sessionEvents) {
-            List<CBEvent> result;
-            if (sessionEvents.size() <= eventsCount) {
-                result = List.copyOf(sessionEvents);
-                sessionEvents.clear();
-            } else {
-                var subList = sessionEvents.subList(0, eventsCount - 1);
-                result = List.copyOf(subList);
-                subList.clear();
-            }
-            return result;
-        }
     }
 
     public List<WebServerMessage> readLog(Integer maxEntries, Boolean clearLog) {
@@ -949,31 +881,18 @@ public class WebSession extends AbstractSessionPersistent
                 WebDataSourceUtils.saveCredentialsInDataSource(webConnectionInfo, dataSourceContainer, configuration);
             }
 
-            // Save auth credentials in connection config (e.g. sets user name and password in DBPConnectionConfiguration)
-            // FIXME: get rid of this. It is a hack because native auth model keeps settings in special props
-            //DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
-            if (configuration.getAuthModel() instanceof AuthModelDatabaseNative) {
-                String userName = configuration.getAuthProperty(AuthModelDatabaseNativeCredentials.PROP_USER_NAME);
-                if (userName != null) {
-                    configuration.setUserName(userName);
-                }
-                String userPassword = configuration.getAuthProperty(AuthModelDatabaseNativeCredentials.PROP_USER_PASSWORD);
-                if (userPassword != null) {
-                    configuration.setUserPassword(userPassword);
-                }
-            }
-            //WebServiceUtils.saveAuthProperties(dataSourceContainer, configuration, null);
+            // uncommented because we had the problem with non-native auth models
+            // (for example, can't connect to DynamoDB if credentials are not saved)
+            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
 
-//            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
-//
-//            InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
-//            Gson credGson = new GsonBuilder()
-//                .setLenient()
-//                .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
-//                .create();
-//
-//            credGson.fromJson(credGson.toJsonTree(authProperties), credentials.getClass());
-//            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
+            InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
+            Gson credGson = new GsonBuilder()
+                .setLenient()
+                .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
+                .create();
+
+            credGson.fromJson(credGson.toJsonTree(configuration.getAuthProperties()), credentials.getClass());
+            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
         } catch (DBException e) {
             addSessionError(e);
             log.error(e);
@@ -1033,11 +952,12 @@ public class WebSession extends AbstractSessionPersistent
         this.userContext.reset();
     }
 
-    public synchronized void updateSMAuthInfo(SMAuthInfo smAuthInfo) throws DBException {
-        boolean contextChanged = userContext.refresh(smAuthInfo);
+    public synchronized boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
+        boolean contextChanged = super.updateSMSession(smAuthInfo);
         if (contextChanged) {
             refreshUserData();
         }
+        return contextChanged;
     }
 
     @Override

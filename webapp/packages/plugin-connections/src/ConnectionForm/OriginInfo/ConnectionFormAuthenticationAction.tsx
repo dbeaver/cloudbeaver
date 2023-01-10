@@ -9,9 +9,8 @@
 import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { Button, getComputed, PlaceholderComponent, useMapResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, getComputed, PlaceholderComponent, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
-
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
@@ -20,14 +19,14 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
   state,
 }) {
   const translate = useTranslate();
-  const driverMap = useMapResource(
+  const driverMap = useResource(
     ConnectionFormAuthenticationAction,
     DBDriverResource,
     state.config.driverId || null
   );
 
   const driver = driverMap.data;
-  const { data: authModel } = useMapResource(
+  const { data: authModel } = useResource(
     ConnectionFormAuthenticationAction,
     DatabaseAuthModelsResource,
     getComputed(() => state.config.authModelId || state.info?.authModel || driver?.defaultAuthModel || null)
@@ -57,14 +56,14 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
 export const ConnectionFormAuthenticationAction: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormAuthenticationAction({
   state,
 }) {
-  const driverMap = useMapResource(
+  const driverMap = useResource(
     ConnectionFormAuthenticationAction,
     DBDriverResource,
     state.config.driverId || null
   );
 
   const driver = driverMap.data;
-  const { data: authModel } = useMapResource(
+  const { data: authModel } = useResource(
     ConnectionFormAuthenticationAction,
     DatabaseAuthModelsResource,
     getComputed(() => state.config.authModelId || state.info?.authModel || driver?.defaultAuthModel || null)

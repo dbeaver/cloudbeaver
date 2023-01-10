@@ -14,23 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.events;
+package io.cloudbeaver.model.session;
+
+import io.cloudbeaver.model.app.WebApplication;
+import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.auth.SMSessionPrincipal;
 
 /**
- * CB event constants
+ * Headless CB web session
  */
-public interface CBEventConstants {
-
-    enum EventType {
-        TYPE_CREATE,
-        TYPE_DELETE,
-        TYPE_UPDATE
+public class WebHeadlessSession extends BaseWebSession {
+    public WebHeadlessSession(
+        @NotNull String id,
+        @NotNull WebApplication application
+    ) throws DBException {
+        super(id, application);
     }
 
-    String CLOUDBEAVER_CONFIG_CHANGED = "cb_config_changed";
-    String CLOUDBEAVER_DATASOURCE_UPDATED = "cb_datasource_updated";
-    String CLOUDBEAVER_DATASOURCE_FOLDER_UPDATED = "cb_datasource_folder_updated";
-    String CLOUDBEAVER_RM_RESOURCE_UPDATED = "cb_rm_resource_updated";
+    @Override
+    public void addSessionError(Throwable exception) {
 
+    }
 
+    @Override
+    public SMSessionPrincipal getSessionPrincipal() {
+        return null;
+    }
 }

@@ -24,9 +24,10 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
     private readonly userInfoResource: UserInfoResource,
     sessionPermissionsResource: SessionPermissionsResource
   ) {
-    super([]);
+    super(new Map(), []);
 
     this.sync(this.userInfoResource);
+    this.sharedProjectsResource.connect(this);
     sessionPermissionsResource.require(this, EPermission.public);
     this.sharedProjectsResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
     this.sharedProjectsResource.onItemAdd.addHandler(() => this.markOutdated());
@@ -62,13 +63,21 @@ export function projectInfoSortByName(a: ProjectInfo, b: ProjectInfo) {
     return 0;
   }
 
-  if (a.global !== b.global) {
-    return +a.global - +b.global;
+  if (isGlobalProject(a) !== isGlobalProject(b)) {
+    return +isGlobalProject(a) - +isGlobalProject(b);
   }
 
-  if (a.shared !== b.shared) {
-    return +a.shared - +b.shared;
+  if (isSharedProject(a) !== isSharedProject(b)) {
+    return +isSharedProject(a) - +isSharedProject(b);
   }
 
   return a.name.localeCompare(b.name);
+}
+
+export function isGlobalProject(obj?: ProjectInfo): obj is ProjectInfo {
+  return obj?.global === true;
+}
+
+export function isSharedProject(obj?: ProjectInfo): obj is ProjectInfo {
+  return obj?.shared === true;
 }

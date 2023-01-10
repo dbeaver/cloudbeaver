@@ -1,0 +1,100 @@
+####################################################
+# Events API
+####################################################
+
+# Events sent by server
+enum CBServerEventId {
+    cb_config_changed,
+
+    cb_datasource_created,
+    cb_datasource_updated,
+    cb_datasource_deleted,
+
+    cb_datasource_folder_created,
+    cb_datasource_folder_updated,
+    cb_datasource_folder_deleted,
+
+    cb_rm_resource_created
+    cb_rm_resource_updated
+    cb_rm_resource_deleted
+}
+
+# Events sent by client
+enum CBClientEventId {
+    cb_client_topic_subscribe,
+    cb_client_topic_unsubscribe,
+    cb_client_projects_active
+}
+
+# Client subscribes on topic to receive only related events
+enum CBEventTopic {
+    cb_config,
+    cb_datasource,
+    cb_datasource_folder,
+    cb_scripts,
+    cb_projects
+}
+
+# Base server event interface
+interface CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+}
+
+# Base client event interface
+interface CBClientEvent {
+    id: CBClientEventId!
+    topicId: CBEventTopic
+}
+
+# Datasource folder event
+type CBDatasourceFolderEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    nodePaths: [String!]! # list of folders node ids
+    projectId: String!
+}
+
+# Datasource event
+type CBDatasourceEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    dataSourceIds: [String!]! # list of datasources ids
+    projectId: String!
+}
+
+# Resource manager event
+type CBRMEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    resourcePath: String!
+    projectId: String!
+}
+
+# Server Config event
+type CBConfigEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+}
+
+# Topic subscription event
+type CBTopicEvent implements CBClientEvent {
+    id: CBClientEventId!
+    topicId: CBEventTopic! # topic to subscribe / unsubscribe
+}
+
+# Active projects event
+type CBProjectsActiveEvent implements CBClientEvent {
+    id: CBClientEventId!
+    topicId: CBEventTopic
+    projectIds: [String!]! # list of active projects
+}
+
+extend type Query {
+    emptyEvent: Boolean
+}
+
+extend type Mutation {
+    emptyEventMutation: Boolean
+}
+

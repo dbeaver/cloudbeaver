@@ -9,9 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Container, FieldCheckbox, Group, GroupTitle, ObjectPropertyInfoForm, TextPlaceholder, useMapResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Container, FieldCheckbox, Group, GroupTitle, ObjectPropertyInfoForm, TextPlaceholder, useResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
-
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 
@@ -27,18 +26,31 @@ interface Props {
   allowSaveCredentials?: boolean;
   disabled?: boolean;
   className?: string;
+  hideFeatures?: string[];
 }
 
 export const ConnectionAuthenticationForm = observer<Props>(function ConnectionAuthenticationForm({
-  config, networkHandlers, authProperties, authModelId, formId, allowSaveCredentials, disabled, className,
+  config,
+  networkHandlers,
+  authProperties,
+  authModelId,
+  formId,
+  allowSaveCredentials,
+  disabled,
+  className,
+  hideFeatures,
 }) {
   const translate = useTranslate();
-  const authModel = useMapResource(ConnectionAuthenticationForm, DatabaseAuthModelsResource, authModelId);
+  const authModel = useResource(ConnectionAuthenticationForm, DatabaseAuthModelsResource, authModelId);
 
   let properties = authModel.data?.properties;
 
   if (authProperties) {
     properties = authProperties;
+  }
+
+  if (properties && hideFeatures?.length) {
+    properties = properties.filter(property => !property.features.some(feature => hideFeatures.includes(feature)));
   }
 
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
