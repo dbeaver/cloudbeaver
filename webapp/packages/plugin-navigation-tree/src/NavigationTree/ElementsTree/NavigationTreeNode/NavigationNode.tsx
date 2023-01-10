@@ -45,6 +45,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     selected,
     indeterminateSelected,
     loading,
+    loaded,
     showInFilter,
     expanded,
     leaf,
@@ -76,7 +77,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
 
   const Control = control || externalControl || NavigationNodeControl;
 
-  if (leaf) {
+  if (leaf || !loaded) {
     externalExpanded = false;
   }
 
