@@ -16,6 +16,9 @@
  */
 package io.cloudbeaver.model.session;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.DataSourceFilter;
@@ -38,14 +41,13 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
-import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -879,31 +881,18 @@ public class WebSession extends BaseWebSession
                 WebDataSourceUtils.saveCredentialsInDataSource(webConnectionInfo, dataSourceContainer, configuration);
             }
 
-            // Save auth credentials in connection config (e.g. sets user name and password in DBPConnectionConfiguration)
-            // FIXME: get rid of this. It is a hack because native auth model keeps settings in special props
-            //DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
-            if (configuration.getAuthModel() instanceof AuthModelDatabaseNative) {
-                String userName = configuration.getAuthProperty(AuthModelDatabaseNativeCredentials.PROP_USER_NAME);
-                if (userName != null) {
-                    configuration.setUserName(userName);
-                }
-                String userPassword = configuration.getAuthProperty(AuthModelDatabaseNativeCredentials.PROP_USER_PASSWORD);
-                if (userPassword != null) {
-                    configuration.setUserPassword(userPassword);
-                }
-            }
-            //WebServiceUtils.saveAuthProperties(dataSourceContainer, configuration, null);
+            // uncommented because we had the problem with non-native auth models
+            // (for example, can't connect to DynamoDB if credentials are not saved)
+            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
 
-//            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
-//
-//            InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
-//            Gson credGson = new GsonBuilder()
-//                .setLenient()
-//                .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
-//                .create();
-//
-//            credGson.fromJson(credGson.toJsonTree(authProperties), credentials.getClass());
-//            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
+            InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
+            Gson credGson = new GsonBuilder()
+                .setLenient()
+                .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
+                .create();
+
+            credGson.fromJson(credGson.toJsonTree(configuration.getAuthProperties()), credentials.getClass());
+            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
         } catch (DBException e) {
             addSessionError(e);
             log.error(e);
