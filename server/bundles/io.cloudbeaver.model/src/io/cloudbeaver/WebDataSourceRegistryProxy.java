@@ -256,7 +256,7 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     }
 
     @Override
-    public void refreshConfig(Collection<String> dataSourceIds) {
+    public void refreshConfig(@Nullable Collection<String> dataSourceIds) {
         dataSourceRegistry.refreshConfig(dataSourceIds);
     }
 
@@ -305,10 +305,10 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     public boolean loadDataSources(
         @NotNull List<DBPDataSourceConfigurationStorage> storages,
         @NotNull DataSourceConfigurationManager manager,
-        boolean refresh,
+        @Nullable Collection<String> dataSourceIds, boolean refresh,
         boolean purgeUntouched
     ) {
-        return dataSourceRegistry.loadDataSources(storages, manager, refresh, purgeUntouched);
+        return dataSourceRegistry.loadDataSources(storages, manager, dataSourceIds, refresh, purgeUntouched);
     }
 
     @Override

@@ -42,6 +42,7 @@ import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -51,6 +52,7 @@ import java.nio.file.*;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -287,12 +289,16 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public String getProjectsDataSources(@NotNull String projectId) throws DBException {
+    public String getProjectsDataSources(@NotNull String projectId, @Nullable String[] dataSourceIds) throws DBException {
         DBPProject projectMetadata = getProjectMetadata(projectId, false);
         DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
         registry.checkForErrors();
         DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
-        ((DataSourcePersistentRegistry) registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, null);
+        Predicate<DBPDataSourceContainer> filter = null;
+        if (!ArrayUtils.isEmpty(dataSourceIds)) {
+            filter = ds -> ArrayUtils.contains(dataSourceIds, ds.getId());
+        }
+        ((DataSourcePersistentRegistry) registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, filter);
         registry.checkForErrors();
         return new String(buffer.getData(), StandardCharsets.UTF_8);
     }
@@ -316,7 +322,7 @@ public class LocalResourceController implements RMController {
         final DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         final DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(StandardCharsets.UTF_8));
         final DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
-        var configChanged = ((DataSourcePersistentRegistry) registry).loadDataSources(List.of(storage), manager, true, false);
+        var configChanged = ((DataSourcePersistentRegistry) registry).loadDataSources(List.of(storage), manager, dataSourceIds, true, false);
         registry.checkForErrors();
         ((DataSourcePersistentRegistry) registry).saveDataSources();
         registry.checkForErrors();

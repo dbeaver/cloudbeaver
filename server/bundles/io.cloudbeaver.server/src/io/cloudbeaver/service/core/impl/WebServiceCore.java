@@ -478,7 +478,7 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull DataSourceDescriptor dataSource,
         @NotNull DataSourceDescriptor oldDataSource
     ) {
-        return dataSource.equalSettings(oldDataSource);
+        return !dataSource.equalSettings(oldDataSource);
     }
 
     @Override
