@@ -22,6 +22,15 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 22.3.2 - 2023-01-09
+
+- Administration menu:
+  - the User dialog displays available connections in alphabetical order.
+- Connection dialog:
+  - users can now add new driver properties with the applied filter in the Driver Properties tab.
+- Data Editor:
+  - edit shortcuts are no longer available for read-only tables.
+
 ### CloudBeaver 22.3.1 - 2022-12-26
 
 - Administrators can grant access to all shared connections to the User team by changing one parameter in the configuration file;
