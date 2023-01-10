@@ -1023,16 +1023,12 @@ public class WebSession extends BaseWebSession
     private class SessionProgressMonitor extends BaseProgressMonitor {
         @Override
         public void beginTask(String name, int totalWork) {
-            synchronized (sessionMessages) {
-                sessionMessages.add(new WebServerMessage(WebServerMessage.MessageType.INFO, name));
-            }
+            addInfoMessage(name);
         }
 
         @Override
         public void subTask(String name) {
-            synchronized (sessionMessages) {
-                sessionMessages.add(new WebServerMessage(WebServerMessage.MessageType.INFO, name));
-            }
+            addInfoMessage(name);
         }
     }
 
