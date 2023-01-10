@@ -31,6 +31,6 @@ public @interface WebActionSet {
 
     String[] requireFeatures() default { };
 
-    String[] requirePermissions() default { DBWConstants.PERMISSION_PUBLIC };
+    String[] requirePermissions() default { };
 
 }
