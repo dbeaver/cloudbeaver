@@ -200,7 +200,8 @@ export enum CbEventTopic {
   CbDatasource = 'cb_datasource',
   CbDatasourceFolder = 'cb_datasource_folder',
   CbProjects = 'cb_projects',
-  CbScripts = 'cb_scripts'
+  CbScripts = 'cb_scripts',
+  CbSessionLog = 'cb_session_log'
 }
 
 export interface CbProjectsActiveEvent extends CbClientEvent {
@@ -231,7 +232,13 @@ export enum CbServerEventId {
   CbDatasourceUpdated = 'cb_datasource_updated',
   CbRmResourceCreated = 'cb_rm_resource_created',
   CbRmResourceDeleted = 'cb_rm_resource_deleted',
-  CbRmResourceUpdated = 'cb_rm_resource_updated'
+  CbRmResourceUpdated = 'cb_rm_resource_updated',
+  CbSessionLogUpdated = 'cb_session_log_updated'
+}
+
+export interface CbSessionLogEvent extends CbServerEvent {
+  id: CbServerEventId;
+  topicId?: Maybe<CbEventTopic>;
 }
 
 export interface CbTopicEvent extends CbClientEvent {
