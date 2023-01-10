@@ -444,7 +444,7 @@ public class WebServiceCore implements DBWServiceCore {
 
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
 
-        boolean sendEvent = sendUpdateConnectionEvent((DataSourceDescriptor) dataSource, oldDataSource);
+        boolean sendEvent = !((DataSourceDescriptor) dataSource).equalSettings(oldDataSource);
 
         WebServiceUtils.saveAuthProperties(
             dataSource,
@@ -469,16 +469,6 @@ public class WebServiceCore implements DBWServiceCore {
             );
         }
         return connectionInfo;
-    }
-
-    /**
-     * Checks if only user credentials were changed
-     */
-    private boolean sendUpdateConnectionEvent(
-        @NotNull DataSourceDescriptor dataSource,
-        @NotNull DataSourceDescriptor oldDataSource
-    ) {
-        return !dataSource.equalSettings(oldDataSource);
     }
 
     @Override

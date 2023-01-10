@@ -92,7 +92,10 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
                     var sessionId = entry.getKey();
                     var webSocket = entry.getValue();
                     try {
-                        webSocket.getRemote().sendPing(ByteBuffer.wrap("cb-ping".getBytes(StandardCharsets.UTF_8)));
+                        webSocket.getRemote().sendPing(
+                            ByteBuffer.wrap("cb-ping".getBytes(StandardCharsets.UTF_8)),
+                            webSocket.getCallback()
+                        );
                     } catch (Exception e) {
                         log.error("Failed to send ping in web socket: " + sessionId);
                     }
