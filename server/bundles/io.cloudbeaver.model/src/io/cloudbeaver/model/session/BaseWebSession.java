@@ -140,8 +140,11 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @Override
     public void close() {
         super.close();
-        for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
-            sessionEventHandler.close();
+        synchronized (sessionEventHandlers) {
+            for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
+                sessionEventHandler.close();
+            }
+            sessionEventHandlers.clear();
         }
     }
 
