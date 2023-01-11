@@ -11,8 +11,6 @@ import styled, { css } from 'reshadow';
 
 import { Filter, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 
-
-
 export interface IFilterState {
   filterValue: string;
 }

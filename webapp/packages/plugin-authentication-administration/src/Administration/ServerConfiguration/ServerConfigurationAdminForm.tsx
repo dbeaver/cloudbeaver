@@ -11,7 +11,6 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, Group, GroupTitle, InputField, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
-
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 
 

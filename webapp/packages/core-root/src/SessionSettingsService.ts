@@ -11,7 +11,7 @@ import { SettingsSource } from '@cloudbeaver/core-settings';
 
 @injectable()
 export class SessionSettingsService extends SettingsSource {
-  constructor(private localStorageKey: string) {
+  constructor(private readonly localStorageKey: string) {
     super();
     const state = localStorage.getItem(this.localStorageKey);
     if (state) {
