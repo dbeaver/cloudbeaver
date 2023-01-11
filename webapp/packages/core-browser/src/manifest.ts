@@ -11,7 +11,6 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 import { BrowserSettingsService } from './BrowserSettingsService';
 import { CookiesService } from './CookiesService';
 
-
 export const coreBrowserManifest: PluginManifest = {
   info: {
     name: 'Core Browser',

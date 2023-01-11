@@ -14,7 +14,7 @@ import { ADMINISTRATION_SERVER_CONFIGURATION_ITEM } from './ServerConfiguration/
 @injectable()
 export class ServerConfigurationAdministrationNavService {
   constructor(
-    private administrationScreenService: AdministrationScreenService
+    private readonly administrationScreenService: AdministrationScreenService
   ) { }
 
   navToSettings(): void {

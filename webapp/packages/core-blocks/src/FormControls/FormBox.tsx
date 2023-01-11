@@ -22,7 +22,7 @@ interface Props {
 
 export const FormBox: React.FC<React.PropsWithChildren<Props>> = function FormBox({ children, className }) {
   return styled(styles)(
-    <box as='div' className={className}>
+    <box className={className}>
       {children}
     </box>
   );

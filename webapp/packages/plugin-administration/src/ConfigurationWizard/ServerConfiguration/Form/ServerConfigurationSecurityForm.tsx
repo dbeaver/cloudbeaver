@@ -12,7 +12,6 @@ import styled from 'reshadow';
 import { BASE_CONTAINERS_STYLES, Group, GroupTitle, Switch, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 
-
 interface Props {
   serverConfig: ServerConfigInput;
 }

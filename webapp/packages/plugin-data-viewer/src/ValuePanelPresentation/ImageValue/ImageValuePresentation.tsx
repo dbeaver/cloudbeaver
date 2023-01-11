@@ -67,16 +67,9 @@ const Tools = observer<IToolsProps>(function Tools({ loading, stretch, onToggleS
   return styled(VALUE_PANEL_TOOLS_STYLES)(
     <tools-container>
       {onSave && (
-        <tools>
-          <tools-action
-            as='button'
-            title={translate('ui_processing_save')}
-            disabled={loading}
-            onClick={onSave}
-          >
-            <IconOrImage icon='/icons/save.svg' />
-          </tools-action>
-        </tools>
+        <Button disabled={loading} onClick={onSave}>
+          {translate('ui_download')}
+        </Button>
       )}
       {onToggleStretch && (
         <tools>
@@ -204,7 +197,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
                 content.activeElement, state.selectedCell)}
               onClick={load}
             >
-              {translate('ui_download')}
+              {translate('ui_view')}
             </Button>
           )}
         </QuotaPlaceholder>

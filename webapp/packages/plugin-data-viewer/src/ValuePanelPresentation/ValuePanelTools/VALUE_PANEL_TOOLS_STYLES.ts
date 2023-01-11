@@ -11,7 +11,7 @@ import { css } from 'reshadow';
 export const VALUE_PANEL_TOOLS_STYLES = css`
   tools-container {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 8px;
   }
   tools {

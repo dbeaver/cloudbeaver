@@ -12,8 +12,6 @@ import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administra
 import { Translate, useStyles } from '@cloudbeaver/core-blocks';
 import { Tab, TabTitle, TabIcon } from '@cloudbeaver/core-ui';
 
-
-
 export const AuthConfigurationsDrawerItem: React.FC<AdministrationItemDrawerProps> = function AuthConfigurationsDrawerItem({
   item, onSelect, style, disabled,
 }) {

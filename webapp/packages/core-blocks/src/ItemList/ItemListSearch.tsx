@@ -11,9 +11,6 @@ import {
 } from 'react';
 import styled, { use } from 'reshadow';
 
-
-
-
 import { IconButton } from '../IconButton';
 import { useTranslate } from '../localization/useTranslate';
 import { useStyles } from '../useStyles';

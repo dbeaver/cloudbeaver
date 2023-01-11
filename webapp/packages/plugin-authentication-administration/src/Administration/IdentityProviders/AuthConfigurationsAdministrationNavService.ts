@@ -12,7 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 @injectable()
 export class AuthConfigurationsAdministrationNavService {
   constructor(
-    private administrationScreenService: AdministrationScreenService
+    private readonly administrationScreenService: AdministrationScreenService
   ) { }
 
   navToRoot(): void {

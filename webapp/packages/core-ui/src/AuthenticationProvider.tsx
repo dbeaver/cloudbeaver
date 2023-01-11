@@ -11,8 +11,6 @@ import styled, { css } from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, Button, Container, GroupItem, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 
-
-
 import { useAuthenticationAction } from './useAuthenticationAction';
 
 const styles = css`

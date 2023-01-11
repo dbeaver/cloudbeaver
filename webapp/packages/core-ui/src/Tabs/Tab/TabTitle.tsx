@@ -8,8 +8,6 @@
 
 import styled from 'reshadow';
 
-
-
 import { BASE_TAB_STYLES } from './BASE_TAB_STYLES';
 
 interface IProps {

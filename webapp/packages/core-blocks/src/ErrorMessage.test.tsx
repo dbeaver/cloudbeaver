@@ -16,7 +16,6 @@ import { mockAppInit } from '@cloudbeaver/core-root/mocks/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/mocks/mockGraphQL';
 import { screen } from '@testing-library/react';
 
-
 import { ErrorMessage } from './ErrorMessage';
 
 const endpoint = createGQLEndpoint();

@@ -763,7 +763,7 @@ public class WebServiceCore implements DBWServiceCore {
             }
             WebProjectImpl project = getProjectById(session, projectId);
             DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
-            DBPDataSourceFolder newFolder = WebServiceUtils.createFolder(parentNode, folderName, sessionRegistry);
+            DBPDataSourceFolder newFolder = WebConnectionFolderUtils.createFolder(parentNode, folderName, sessionRegistry);
             WebConnectionFolderInfo folderInfo = new WebConnectionFolderInfo(session, newFolder);
             WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
             WebEventUtils.addNavigatorNodeUpdatedEvent(

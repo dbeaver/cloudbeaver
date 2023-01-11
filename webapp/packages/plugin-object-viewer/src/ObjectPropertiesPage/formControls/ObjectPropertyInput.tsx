@@ -9,8 +9,6 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-
-
 import { additionalProps, getValue, matchType } from '../helpers';
 import type { ObjectPropertyProps } from './ObjectPropertyProps';
 
