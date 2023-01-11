@@ -563,9 +563,10 @@ export function useElementsTree(options: IOptions): IElementsTree {
       const pathIndex = folderExplorer.state.fullPath.indexOf(nodeId);
 
       if (pathIndex >= 0) {
-        folderExplorer.state.fullPath = folderExplorer.state.fullPath.slice(0, pathIndex);
-        folderExplorer.state.folder = folderExplorer.state.fullPath[pathIndex - 1];
-        folderExplorer.state.path = folderExplorer.state.fullPath.slice(0, pathIndex - 1);
+        folderExplorer.open(
+          folderExplorer.state.fullPath.slice(0, pathIndex - 1),
+          folderExplorer.state.fullPath[pathIndex - 1]
+        );
       }
     });
   }
@@ -606,7 +607,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       ResourceKeyUtils.forEach(key, key => {
         const children = navTreeResource.get(key);
 
-        if (!children || children.length === 0) {
+        if (!children) {
           exitNodeFolder(key);
         }
       });
