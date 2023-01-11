@@ -15,7 +15,7 @@ import { GraphQLService } from '@cloudbeaver/core-sdk';
 export class DdlViewerService {
   private ddlMetadata = new Map<string, Promise<string>>();
 
-  constructor(private graphQLService: GraphQLService) {
+  constructor(private readonly graphQLService: GraphQLService) {
     makeObservable<DdlViewerService, 'ddlMetadata'>(this, {
       ddlMetadata: observable,
     });

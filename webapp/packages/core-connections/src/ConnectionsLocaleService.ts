@@ -11,7 +11,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 
 @injectable()
 export class ConnectionsLocaleService extends Bootstrap {
-  constructor(private localizationService: LocalizationService) {
+  constructor(private readonly localizationService: LocalizationService) {
     super();
   }
 

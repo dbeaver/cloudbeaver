@@ -12,7 +12,7 @@ import { GraphQLService, CachedDataResource, DataTransferProcessorInfo } from '@
 @injectable()
 export class DataTransferProcessorsResource extends CachedDataResource<Map<string, DataTransferProcessorInfo>, void> {
   constructor(
-    private graphQLService: GraphQLService
+    private readonly graphQLService: GraphQLService
   ) {
     super(new Map());
   }

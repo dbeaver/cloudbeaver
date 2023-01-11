@@ -10,8 +10,6 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useRef, useState, useLayoutEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
-
-
 import { ShadowInput } from '../FormControls/ShadowInput';
 import { Icon } from '../Icon';
 import type { IProperty } from './IProperty';

@@ -9,7 +9,6 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-
 import { useStyles } from '@cloudbeaver/core-blocks';
 import type { IContextMenuItemProps } from '@cloudbeaver/core-ui';
 import type { ICustomMenuItemComponent } from '@cloudbeaver/core-view';

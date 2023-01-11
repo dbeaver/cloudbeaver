@@ -23,6 +23,7 @@
     "rxjs": "7.6.0"
   },
   "peerDependencies": {
-    "mobx": "~6.x.x"
+    "mobx": "~6.x.x",
+    "msw": "~0.x.x"
   }
 }

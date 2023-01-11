@@ -10,7 +10,6 @@ import styled from 'reshadow';
 
 import { IconOrImage, useStyles } from '@cloudbeaver/core-blocks';
 
-
 import { BASE_TAB_STYLES } from './BASE_TAB_STYLES';
 
 interface IProps {

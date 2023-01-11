@@ -10,7 +10,6 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef, useCallback, useContext, useState } from 'react';
 import styled, { use, css } from 'reshadow';
 
-
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';

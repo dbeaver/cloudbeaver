@@ -200,7 +200,8 @@ export enum CbEventTopic {
   CbDatasource = 'cb_datasource',
   CbDatasourceFolder = 'cb_datasource_folder',
   CbProjects = 'cb_projects',
-  CbScripts = 'cb_scripts'
+  CbScripts = 'cb_scripts',
+  CbSessionLog = 'cb_session_log'
 }
 
 export interface CbProjectsActiveEvent extends CbClientEvent {
@@ -231,7 +232,13 @@ export enum CbServerEventId {
   CbDatasourceUpdated = 'cb_datasource_updated',
   CbRmResourceCreated = 'cb_rm_resource_created',
   CbRmResourceDeleted = 'cb_rm_resource_deleted',
-  CbRmResourceUpdated = 'cb_rm_resource_updated'
+  CbRmResourceUpdated = 'cb_rm_resource_updated',
+  CbSessionLogUpdated = 'cb_session_log_updated'
+}
+
+export interface CbSessionLogEvent extends CbServerEvent {
+  id: CbServerEventId;
+  topicId?: Maybe<CbEventTopic>;
 }
 
 export interface CbTopicEvent extends CbClientEvent {
@@ -4564,7 +4571,7 @@ export const SqlGenerateEntityQueryDocument = `
 }
     `;
 
-export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
+export type SdkFunctionWrapper = <T>(action: (requestHeaders?: Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
 
 
 const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationType) => action();
@@ -4572,385 +4579,385 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
     getPermissionsList(variables?: GetPermissionsListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetPermissionsListQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetPermissionsListQuery>(GetPermissionsListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getPermissionsList', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetPermissionsListQuery>(GetPermissionsListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getPermissionsList', 'query');
     },
     setSubjectPermissions(variables: SetSubjectPermissionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetSubjectPermissionsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetSubjectPermissionsQuery>(SetSubjectPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setSubjectPermissions', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetSubjectPermissionsQuery>(SetSubjectPermissionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setSubjectPermissions', 'query');
     },
     asyncTaskCancel(variables: AsyncTaskCancelMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AsyncTaskCancelMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AsyncTaskCancelMutation>(AsyncTaskCancelDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'asyncTaskCancel', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<AsyncTaskCancelMutation>(AsyncTaskCancelDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'asyncTaskCancel', 'mutation');
     },
     authChangeLocalPassword(variables: AuthChangeLocalPasswordQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AuthChangeLocalPasswordQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AuthChangeLocalPasswordQuery>(AuthChangeLocalPasswordDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'authChangeLocalPassword', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<AuthChangeLocalPasswordQuery>(AuthChangeLocalPasswordDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'authChangeLocalPassword', 'query');
     },
     authLogin(variables: AuthLoginQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AuthLoginQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AuthLoginQuery>(AuthLoginDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'authLogin', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<AuthLoginQuery>(AuthLoginDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'authLogin', 'query');
     },
     authLogout(variables?: AuthLogoutQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AuthLogoutQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AuthLogoutQuery>(AuthLogoutDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'authLogout', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<AuthLogoutQuery>(AuthLogoutDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'authLogout', 'query');
     },
     deleteAuthProviderConfiguration(variables: DeleteAuthProviderConfigurationQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteAuthProviderConfigurationQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteAuthProviderConfigurationQuery>(DeleteAuthProviderConfigurationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteAuthProviderConfiguration', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteAuthProviderConfigurationQuery>(DeleteAuthProviderConfigurationDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteAuthProviderConfiguration', 'query');
     },
     getActiveUser(variables: GetActiveUserQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetActiveUserQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetActiveUserQuery>(GetActiveUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getActiveUser', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetActiveUserQuery>(GetActiveUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getActiveUser', 'query');
     },
     getAuthProviderConfigurationParameters(variables: GetAuthProviderConfigurationParametersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthProviderConfigurationParametersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetAuthProviderConfigurationParametersQuery>(GetAuthProviderConfigurationParametersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthProviderConfigurationParameters', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAuthProviderConfigurationParametersQuery>(GetAuthProviderConfigurationParametersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthProviderConfigurationParameters', 'query');
     },
     getAuthProviderConfigurations(variables?: GetAuthProviderConfigurationsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthProviderConfigurationsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetAuthProviderConfigurationsQuery>(GetAuthProviderConfigurationsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthProviderConfigurations', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAuthProviderConfigurationsQuery>(GetAuthProviderConfigurationsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthProviderConfigurations', 'query');
     },
     getAuthProviders(variables?: GetAuthProvidersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthProvidersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetAuthProvidersQuery>(GetAuthProvidersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthProviders', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAuthProvidersQuery>(GetAuthProvidersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthProviders', 'query');
     },
     getAuthRoles(variables?: GetAuthRolesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthRolesQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetAuthRolesQuery>(GetAuthRolesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthRoles', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAuthRolesQuery>(GetAuthRolesDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthRoles', 'query');
     },
     getAuthStatus(variables: GetAuthStatusQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthStatusQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetAuthStatusQuery>(GetAuthStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthStatus', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAuthStatusQuery>(GetAuthStatusDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthStatus', 'query');
     },
     getUserProfileProperties(variables?: GetUserProfilePropertiesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUserProfilePropertiesQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUserProfilePropertiesQuery>(GetUserProfilePropertiesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserProfileProperties', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUserProfilePropertiesQuery>(GetUserProfilePropertiesDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getUserProfileProperties', 'query');
     },
     saveAuthProviderConfiguration(variables: SaveAuthProviderConfigurationQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SaveAuthProviderConfigurationQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SaveAuthProviderConfigurationQuery>(SaveAuthProviderConfigurationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'saveAuthProviderConfiguration', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SaveAuthProviderConfigurationQuery>(SaveAuthProviderConfigurationDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'saveAuthProviderConfiguration', 'query');
     },
     saveUserMetaParameters(variables: SaveUserMetaParametersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SaveUserMetaParametersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SaveUserMetaParametersQuery>(SaveUserMetaParametersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'saveUserMetaParameters', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SaveUserMetaParametersQuery>(SaveUserMetaParametersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'saveUserMetaParameters', 'query');
     },
     createTeam(variables: CreateTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateTeamQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateTeamQuery>(CreateTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createTeam', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateTeamQuery>(CreateTeamDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createTeam', 'query');
     },
     deleteTeam(variables: DeleteTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteTeamQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteTeamQuery>(DeleteTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteTeam', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteTeamQuery>(DeleteTeamDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteTeam', 'query');
     },
     getTeamGrantedUsers(variables: GetTeamGrantedUsersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTeamGrantedUsersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetTeamGrantedUsersQuery>(GetTeamGrantedUsersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTeamGrantedUsers', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetTeamGrantedUsersQuery>(GetTeamGrantedUsersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getTeamGrantedUsers', 'query');
     },
     getTeamMetaParameters(variables?: GetTeamMetaParametersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTeamMetaParametersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetTeamMetaParametersQuery>(GetTeamMetaParametersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTeamMetaParameters', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetTeamMetaParametersQuery>(GetTeamMetaParametersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getTeamMetaParameters', 'query');
     },
     getTeamsList(variables: GetTeamsListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTeamsListQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetTeamsListQuery>(GetTeamsListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTeamsList', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetTeamsListQuery>(GetTeamsListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getTeamsList', 'query');
     },
     saveTeamMetaParameters(variables: SaveTeamMetaParametersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SaveTeamMetaParametersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SaveTeamMetaParametersQuery>(SaveTeamMetaParametersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'saveTeamMetaParameters', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SaveTeamMetaParametersQuery>(SaveTeamMetaParametersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'saveTeamMetaParameters', 'query');
     },
     updateTeam(variables: UpdateTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateTeamQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateTeamQuery>(UpdateTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateTeam', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateTeamQuery>(UpdateTeamDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'updateTeam', 'query');
     },
     createUser(variables: CreateUserQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateUserQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateUserQuery>(CreateUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createUser', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateUserQuery>(CreateUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createUser', 'query');
     },
     deleteUser(variables: DeleteUserQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteUserQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteUserQuery>(DeleteUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteUser', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteUserQuery>(DeleteUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteUser', 'query');
     },
     deleteUserMetaParameter(variables: DeleteUserMetaParameterQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteUserMetaParameterQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteUserMetaParameterQuery>(DeleteUserMetaParameterDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteUserMetaParameter', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteUserMetaParameterQuery>(DeleteUserMetaParameterDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteUserMetaParameter', 'query');
     },
     enableUser(variables: EnableUserQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<EnableUserQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<EnableUserQuery>(EnableUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'enableUser', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<EnableUserQuery>(EnableUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'enableUser', 'query');
     },
     getUserGrantedConnections(variables: GetUserGrantedConnectionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUserGrantedConnectionsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUserGrantedConnectionsQuery>(GetUserGrantedConnectionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserGrantedConnections', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUserGrantedConnectionsQuery>(GetUserGrantedConnectionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getUserGrantedConnections', 'query');
     },
     getUsersList(variables: GetUsersListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUsersListQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUsersListQuery>(GetUsersListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUsersList', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUsersListQuery>(GetUsersListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getUsersList', 'query');
     },
     grantUserTeam(variables: GrantUserTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GrantUserTeamQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GrantUserTeamQuery>(GrantUserTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'grantUserTeam', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GrantUserTeamQuery>(GrantUserTeamDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'grantUserTeam', 'query');
     },
     revokeUserTeam(variables: RevokeUserTeamQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RevokeUserTeamQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<RevokeUserTeamQuery>(RevokeUserTeamDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'revokeUserTeam', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<RevokeUserTeamQuery>(RevokeUserTeamDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'revokeUserTeam', 'query');
     },
     setConnections(variables: SetConnectionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetConnectionsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetConnectionsQuery>(SetConnectionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setConnections', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetConnectionsQuery>(SetConnectionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setConnections', 'query');
     },
     setUserAuthRole(variables: SetUserAuthRoleQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetUserAuthRoleQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetUserAuthRoleQuery>(SetUserAuthRoleDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setUserAuthRole', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetUserAuthRoleQuery>(SetUserAuthRoleDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setUserAuthRole', 'query');
     },
     setUserConfigurationParameter(variables: SetUserConfigurationParameterMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetUserConfigurationParameterMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetUserConfigurationParameterMutation>(SetUserConfigurationParameterDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setUserConfigurationParameter', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetUserConfigurationParameterMutation>(SetUserConfigurationParameterDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setUserConfigurationParameter', 'mutation');
     },
     setUserCredentials(variables: SetUserCredentialsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetUserCredentialsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetUserCredentialsQuery>(SetUserCredentialsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setUserCredentials', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetUserCredentialsQuery>(SetUserCredentialsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setUserCredentials', 'query');
     },
     setUserMetaParameter(variables: SetUserMetaParameterQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetUserMetaParameterQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetUserMetaParameterQuery>(SetUserMetaParameterDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setUserMetaParameter', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetUserMetaParameterQuery>(SetUserMetaParameterDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setUserMetaParameter', 'query');
     },
     updateUserProfileProperties(variables: UpdateUserProfilePropertiesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateUserProfilePropertiesQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateUserProfilePropertiesQuery>(UpdateUserProfilePropertiesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateUserProfileProperties', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateUserProfilePropertiesQuery>(UpdateUserProfilePropertiesDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'updateUserProfileProperties', 'query');
     },
     getConnectionAccess(variables: GetConnectionAccessQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetConnectionAccessQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetConnectionAccessQuery>(GetConnectionAccessDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getConnectionAccess', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetConnectionAccessQuery>(GetConnectionAccessDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getConnectionAccess', 'query');
     },
     getSubjectConnectionAccess(variables: GetSubjectConnectionAccessQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSubjectConnectionAccessQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSubjectConnectionAccessQuery>(GetSubjectConnectionAccessDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSubjectConnectionAccess', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSubjectConnectionAccessQuery>(GetSubjectConnectionAccessDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getSubjectConnectionAccess', 'query');
     },
     searchDatabases(variables: SearchDatabasesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SearchDatabasesQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SearchDatabasesQuery>(SearchDatabasesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'searchDatabases', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SearchDatabasesQuery>(SearchDatabasesDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'searchDatabases', 'query');
     },
     setConnectionAccess(variables: SetConnectionAccessQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetConnectionAccessQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetConnectionAccessQuery>(SetConnectionAccessDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setConnectionAccess', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetConnectionAccessQuery>(SetConnectionAccessDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setConnectionAccess', 'query');
     },
     setSubjectConnectionAccess(variables: SetSubjectConnectionAccessQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetSubjectConnectionAccessQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetSubjectConnectionAccessQuery>(SetSubjectConnectionAccessDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setSubjectConnectionAccess', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetSubjectConnectionAccessQuery>(SetSubjectConnectionAccessDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setSubjectConnectionAccess', 'query');
     },
     closeConnection(variables: CloseConnectionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CloseConnectionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CloseConnectionMutation>(CloseConnectionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'closeConnection', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<CloseConnectionMutation>(CloseConnectionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'closeConnection', 'mutation');
     },
     createConnection(variables: CreateConnectionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateConnectionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateConnectionMutation>(CreateConnectionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createConnection', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateConnectionMutation>(CreateConnectionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createConnection', 'mutation');
     },
     createConnectionFolder(variables: CreateConnectionFolderMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateConnectionFolderMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateConnectionFolderMutation>(CreateConnectionFolderDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createConnectionFolder', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateConnectionFolderMutation>(CreateConnectionFolderDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createConnectionFolder', 'mutation');
     },
     createConnectionFromNode(variables: CreateConnectionFromNodeMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateConnectionFromNodeMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateConnectionFromNodeMutation>(CreateConnectionFromNodeDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createConnectionFromNode', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateConnectionFromNodeMutation>(CreateConnectionFromNodeDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createConnectionFromNode', 'mutation');
     },
     createConnectionFromTemplate(variables: CreateConnectionFromTemplateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateConnectionFromTemplateMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateConnectionFromTemplateMutation>(CreateConnectionFromTemplateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createConnectionFromTemplate', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateConnectionFromTemplateMutation>(CreateConnectionFromTemplateDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createConnectionFromTemplate', 'mutation');
     },
     deleteConnection(variables: DeleteConnectionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteConnectionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteConnectionMutation>(DeleteConnectionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteConnection', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteConnectionMutation>(DeleteConnectionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteConnection', 'mutation');
     },
     deleteConnectionFolder(variables: DeleteConnectionFolderMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteConnectionFolderMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteConnectionFolderMutation>(DeleteConnectionFolderDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteConnectionFolder', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteConnectionFolderMutation>(DeleteConnectionFolderDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteConnectionFolder', 'mutation');
     },
     driverList(variables: DriverListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DriverListQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DriverListQuery>(DriverListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'driverList', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<DriverListQuery>(DriverListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'driverList', 'query');
     },
     executionContextCreate(variables: ExecutionContextCreateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExecutionContextCreateMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ExecutionContextCreateMutation>(ExecutionContextCreateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'executionContextCreate', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<ExecutionContextCreateMutation>(ExecutionContextCreateDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'executionContextCreate', 'mutation');
     },
     executionContextDestroy(variables: ExecutionContextDestroyMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExecutionContextDestroyMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ExecutionContextDestroyMutation>(ExecutionContextDestroyDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'executionContextDestroy', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<ExecutionContextDestroyMutation>(ExecutionContextDestroyDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'executionContextDestroy', 'mutation');
     },
     executionContextList(variables?: ExecutionContextListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExecutionContextListQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ExecutionContextListQuery>(ExecutionContextListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'executionContextList', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<ExecutionContextListQuery>(ExecutionContextListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'executionContextList', 'query');
     },
     executionContextUpdate(variables: ExecutionContextUpdateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExecutionContextUpdateMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ExecutionContextUpdateMutation>(ExecutionContextUpdateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'executionContextUpdate', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<ExecutionContextUpdateMutation>(ExecutionContextUpdateDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'executionContextUpdate', 'mutation');
     },
     getAuthModels(variables?: GetAuthModelsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthModelsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetAuthModelsQuery>(GetAuthModelsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthModels', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAuthModelsQuery>(GetAuthModelsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAuthModels', 'query');
     },
     getConnectionFolders(variables?: GetConnectionFoldersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetConnectionFoldersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetConnectionFoldersQuery>(GetConnectionFoldersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getConnectionFolders', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetConnectionFoldersQuery>(GetConnectionFoldersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getConnectionFolders', 'query');
     },
     getTemplateConnections(variables: GetTemplateConnectionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetTemplateConnectionsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetTemplateConnectionsQuery>(GetTemplateConnectionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTemplateConnections', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetTemplateConnectionsQuery>(GetTemplateConnectionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getTemplateConnections', 'query');
     },
     getUserConnections(variables: GetUserConnectionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetUserConnectionsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetUserConnectionsQuery>(GetUserConnectionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getUserConnections', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetUserConnectionsQuery>(GetUserConnectionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getUserConnections', 'query');
     },
     initConnection(variables: InitConnectionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<InitConnectionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<InitConnectionMutation>(InitConnectionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'initConnection', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<InitConnectionMutation>(InitConnectionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'initConnection', 'mutation');
     },
     refreshSessionConnections(variables?: RefreshSessionConnectionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RefreshSessionConnectionsMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<RefreshSessionConnectionsMutation>(RefreshSessionConnectionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'refreshSessionConnections', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<RefreshSessionConnectionsMutation>(RefreshSessionConnectionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'refreshSessionConnections', 'mutation');
     },
     setConnectionNavigatorSettings(variables: SetConnectionNavigatorSettingsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetConnectionNavigatorSettingsMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetConnectionNavigatorSettingsMutation>(SetConnectionNavigatorSettingsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setConnectionNavigatorSettings', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetConnectionNavigatorSettingsMutation>(SetConnectionNavigatorSettingsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setConnectionNavigatorSettings', 'mutation');
     },
     testConnection(variables: TestConnectionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<TestConnectionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<TestConnectionMutation>(TestConnectionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'testConnection', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<TestConnectionMutation>(TestConnectionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'testConnection', 'mutation');
     },
     testNetworkHandler(variables: TestNetworkHandlerMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<TestNetworkHandlerMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<TestNetworkHandlerMutation>(TestNetworkHandlerDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'testNetworkHandler', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<TestNetworkHandlerMutation>(TestNetworkHandlerDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'testNetworkHandler', 'mutation');
     },
     updateConnection(variables: UpdateConnectionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateConnectionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateConnectionMutation>(UpdateConnectionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateConnection', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateConnectionMutation>(UpdateConnectionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'updateConnection', 'mutation');
     },
     exportDataFromContainer(variables: ExportDataFromContainerQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExportDataFromContainerQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ExportDataFromContainerQuery>(ExportDataFromContainerDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'exportDataFromContainer', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<ExportDataFromContainerQuery>(ExportDataFromContainerDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'exportDataFromContainer', 'query');
     },
     exportDataFromResults(variables: ExportDataFromResultsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExportDataFromResultsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ExportDataFromResultsQuery>(ExportDataFromResultsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'exportDataFromResults', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<ExportDataFromResultsQuery>(ExportDataFromResultsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'exportDataFromResults', 'query');
     },
     getDataTransferDefaultParameters(variables?: GetDataTransferDefaultParametersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetDataTransferDefaultParametersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetDataTransferDefaultParametersQuery>(GetDataTransferDefaultParametersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getDataTransferDefaultParameters', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetDataTransferDefaultParametersQuery>(GetDataTransferDefaultParametersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getDataTransferDefaultParameters', 'query');
     },
     getDataTransferProcessors(variables?: GetDataTransferProcessorsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetDataTransferProcessorsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetDataTransferProcessorsQuery>(GetDataTransferProcessorsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getDataTransferProcessors', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetDataTransferProcessorsQuery>(GetDataTransferProcessorsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getDataTransferProcessors', 'query');
     },
     removeDataTransferFile(variables: RemoveDataTransferFileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RemoveDataTransferFileQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<RemoveDataTransferFileQuery>(RemoveDataTransferFileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'removeDataTransferFile', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<RemoveDataTransferFileQuery>(RemoveDataTransferFileDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'removeDataTransferFile', 'query');
     },
     navGetStructContainers(variables: NavGetStructContainersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<NavGetStructContainersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<NavGetStructContainersQuery>(NavGetStructContainersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'navGetStructContainers', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<NavGetStructContainersQuery>(NavGetStructContainersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navGetStructContainers', 'query');
     },
     getAsyncTaskInfo(variables: GetAsyncTaskInfoMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAsyncTaskInfoMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetAsyncTaskInfoMutation>(GetAsyncTaskInfoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAsyncTaskInfo', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAsyncTaskInfoMutation>(GetAsyncTaskInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getAsyncTaskInfo', 'mutation');
     },
     getNetworkHandlers(variables?: GetNetworkHandlersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetNetworkHandlersQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetNetworkHandlersQuery>(GetNetworkHandlersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getNetworkHandlers', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetNetworkHandlersQuery>(GetNetworkHandlersDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getNetworkHandlers', 'query');
     },
     asyncReadDataFromContainer(variables: AsyncReadDataFromContainerMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AsyncReadDataFromContainerMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AsyncReadDataFromContainerMutation>(AsyncReadDataFromContainerDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'asyncReadDataFromContainer', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<AsyncReadDataFromContainerMutation>(AsyncReadDataFromContainerDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'asyncReadDataFromContainer', 'mutation');
     },
     asyncSqlExecuteQuery(variables: AsyncSqlExecuteQueryMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AsyncSqlExecuteQueryMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AsyncSqlExecuteQueryMutation>(AsyncSqlExecuteQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'asyncSqlExecuteQuery', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<AsyncSqlExecuteQueryMutation>(AsyncSqlExecuteQueryDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'asyncSqlExecuteQuery', 'mutation');
     },
     asyncSqlExplainExecutionPlan(variables: AsyncSqlExplainExecutionPlanMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AsyncSqlExplainExecutionPlanMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AsyncSqlExplainExecutionPlanMutation>(AsyncSqlExplainExecutionPlanDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'asyncSqlExplainExecutionPlan', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<AsyncSqlExplainExecutionPlanMutation>(AsyncSqlExplainExecutionPlanDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'asyncSqlExplainExecutionPlan', 'mutation');
     },
     closeResult(variables: CloseResultMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CloseResultMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CloseResultMutation>(CloseResultDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'closeResult', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<CloseResultMutation>(CloseResultDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'closeResult', 'mutation');
     },
     getResultsetDataURL(variables: GetResultsetDataUrlMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetResultsetDataUrlMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetResultsetDataUrlMutation>(GetResultsetDataUrlDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getResultsetDataURL', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetResultsetDataUrlMutation>(GetResultsetDataUrlDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getResultsetDataURL', 'mutation');
     },
     getSqlExecuteTaskResults(variables: GetSqlExecuteTaskResultsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSqlExecuteTaskResultsMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSqlExecuteTaskResultsMutation>(GetSqlExecuteTaskResultsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSqlExecuteTaskResults', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSqlExecuteTaskResultsMutation>(GetSqlExecuteTaskResultsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getSqlExecuteTaskResults', 'mutation');
     },
     getSqlExecutionPlanResult(variables: GetSqlExecutionPlanResultMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSqlExecutionPlanResultMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSqlExecutionPlanResultMutation>(GetSqlExecutionPlanResultDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSqlExecutionPlanResult', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSqlExecutionPlanResultMutation>(GetSqlExecutionPlanResultDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getSqlExecutionPlanResult', 'mutation');
     },
     updateResultsDataBatch(variables: UpdateResultsDataBatchMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateResultsDataBatchMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateResultsDataBatchMutation>(UpdateResultsDataBatchDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateResultsDataBatch', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateResultsDataBatchMutation>(UpdateResultsDataBatchDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'updateResultsDataBatch', 'mutation');
     },
     updateResultsDataBatchScript(variables: UpdateResultsDataBatchScriptMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateResultsDataBatchScriptMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateResultsDataBatchScriptMutation>(UpdateResultsDataBatchScriptDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateResultsDataBatchScript', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateResultsDataBatchScriptMutation>(UpdateResultsDataBatchScriptDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'updateResultsDataBatchScript', 'mutation');
     },
     metadataGetNodeDDL(variables: MetadataGetNodeDdlQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<MetadataGetNodeDdlQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<MetadataGetNodeDdlQuery>(MetadataGetNodeDdlDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'metadataGetNodeDDL', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<MetadataGetNodeDdlQuery>(MetadataGetNodeDdlDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'metadataGetNodeDDL', 'query');
     },
     getChildrenDBObjectInfo(variables: GetChildrenDbObjectInfoQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetChildrenDbObjectInfoQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetChildrenDbObjectInfoQuery>(GetChildrenDbObjectInfoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getChildrenDBObjectInfo', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetChildrenDbObjectInfoQuery>(GetChildrenDbObjectInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getChildrenDBObjectInfo', 'query');
     },
     getDBObjectInfo(variables: GetDbObjectInfoQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetDbObjectInfoQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetDbObjectInfoQuery>(GetDbObjectInfoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getDBObjectInfo', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetDbObjectInfoQuery>(GetDbObjectInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getDBObjectInfo', 'query');
     },
     getNavNodeFullName(variables: GetNavNodeFullNameQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetNavNodeFullNameQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetNavNodeFullNameQuery>(GetNavNodeFullNameDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getNavNodeFullName', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetNavNodeFullNameQuery>(GetNavNodeFullNameDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getNavNodeFullName', 'query');
     },
     getNodeParents(variables: GetNodeParentsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetNodeParentsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetNodeParentsQuery>(GetNodeParentsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getNodeParents', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetNodeParentsQuery>(GetNodeParentsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getNodeParents', 'query');
     },
     navDeleteNodes(variables: NavDeleteNodesMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<NavDeleteNodesMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<NavDeleteNodesMutation>(NavDeleteNodesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'navDeleteNodes', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<NavDeleteNodesMutation>(NavDeleteNodesDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navDeleteNodes', 'mutation');
     },
     navMoveTo(variables: NavMoveToMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<NavMoveToMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<NavMoveToMutation>(NavMoveToDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'navMoveTo', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<NavMoveToMutation>(NavMoveToDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navMoveTo', 'mutation');
     },
     navNodeChildren(variables: NavNodeChildrenQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<NavNodeChildrenQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<NavNodeChildrenQuery>(NavNodeChildrenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'navNodeChildren', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<NavNodeChildrenQuery>(NavNodeChildrenDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navNodeChildren', 'query');
     },
     navNodeInfo(variables: NavNodeInfoQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<NavNodeInfoQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<NavNodeInfoQuery>(NavNodeInfoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'navNodeInfo', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<NavNodeInfoQuery>(NavNodeInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navNodeInfo', 'query');
     },
     navRefreshNode(variables: NavRefreshNodeQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<NavRefreshNodeQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<NavRefreshNodeQuery>(NavRefreshNodeDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'navRefreshNode', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<NavRefreshNodeQuery>(NavRefreshNodeDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navRefreshNode', 'query');
     },
     navRenameNode(variables: NavRenameNodeMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<NavRenameNodeMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<NavRenameNodeMutation>(NavRenameNodeDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'navRenameNode', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<NavRenameNodeMutation>(NavRenameNodeDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'navRenameNode', 'mutation');
     },
     getProjectList(variables?: GetProjectListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProjectListQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProjectListQuery>(GetProjectListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProjectList', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProjectListQuery>(GetProjectListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getProjectList', 'query');
     },
     createProject(variables: CreateProjectMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateProjectMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateProjectMutation>(CreateProjectDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createProject', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateProjectMutation>(CreateProjectDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createProject', 'mutation');
     },
     createResource(variables: CreateResourceMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateResourceMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateResourceMutation>(CreateResourceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createResource', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateResourceMutation>(CreateResourceDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'createResource', 'mutation');
     },
     deleteProject(variables: DeleteProjectMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteProjectMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteProjectMutation>(DeleteProjectDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteProject', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteProjectMutation>(DeleteProjectDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteProject', 'mutation');
     },
     deleteResource(variables: DeleteResourceMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteResourceMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteResourceMutation>(DeleteResourceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteResource', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<DeleteResourceMutation>(DeleteResourceDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'deleteResource', 'mutation');
     },
     getProject(variables: GetProjectQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProjectQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProjectQuery>(GetProjectDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProject', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProjectQuery>(GetProjectDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getProject', 'query');
     },
     getProjectGrantedPermissions(variables: GetProjectGrantedPermissionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProjectGrantedPermissionsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProjectGrantedPermissionsQuery>(GetProjectGrantedPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProjectGrantedPermissions', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProjectGrantedPermissionsQuery>(GetProjectGrantedPermissionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getProjectGrantedPermissions', 'query');
     },
     getProjectPermissionsList(variables?: GetProjectPermissionsListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProjectPermissionsListQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProjectPermissionsListQuery>(GetProjectPermissionsListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProjectPermissionsList', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProjectPermissionsListQuery>(GetProjectPermissionsListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getProjectPermissionsList', 'query');
     },
     getResourceList(variables: GetResourceListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetResourceListQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetResourceListQuery>(GetResourceListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getResourceList', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetResourceListQuery>(GetResourceListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getResourceList', 'query');
     },
     getResourceProjectList(variables?: GetResourceProjectListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetResourceProjectListQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetResourceProjectListQuery>(GetResourceProjectListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getResourceProjectList', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetResourceProjectListQuery>(GetResourceProjectListDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getResourceProjectList', 'query');
     },
     getSharedProjects(variables?: GetSharedProjectsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSharedProjectsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSharedProjectsQuery>(GetSharedProjectsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSharedProjects', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSharedProjectsQuery>(GetSharedProjectsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getSharedProjects', 'query');
     },
     getSubjectProjectsPermissions(variables: GetSubjectProjectsPermissionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSubjectProjectsPermissionsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSubjectProjectsPermissionsQuery>(GetSubjectProjectsPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSubjectProjectsPermissions', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<GetSubjectProjectsPermissionsQuery>(GetSubjectProjectsPermissionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'getSubjectProjectsPermissions', 'query');
     },
     moveResource(variables: MoveResourceMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<MoveResourceMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<MoveResourceMutation>(MoveResourceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'moveResource', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<MoveResourceMutation>(MoveResourceDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'moveResource', 'mutation');
     },
     readResource(variables: ReadResourceQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ReadResourceQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ReadResourceQuery>(ReadResourceDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'readResource', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<ReadResourceQuery>(ReadResourceDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'readResource', 'query');
     },
     setProjectPermissions(variables: SetProjectPermissionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetProjectPermissionsMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetProjectPermissionsMutation>(SetProjectPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setProjectPermissions', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetProjectPermissionsMutation>(SetProjectPermissionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setProjectPermissions', 'mutation');
     },
     setResourceProperty(variables: SetResourcePropertyMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetResourcePropertyMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetResourcePropertyMutation>(SetResourcePropertyDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setResourceProperty', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetResourcePropertyMutation>(SetResourcePropertyDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setResourceProperty', 'mutation');
     },
     setSubjectProjectsPermissions(variables: SetSubjectProjectsPermissionsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetSubjectProjectsPermissionsMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetSubjectProjectsPermissionsMutation>(SetSubjectProjectsPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setSubjectProjectsPermissions', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetSubjectProjectsPermissionsMutation>(SetSubjectProjectsPermissionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setSubjectProjectsPermissions', 'mutation');
     },
     writeResourceContent(variables: WriteResourceContentMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<WriteResourceContentMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<WriteResourceContentMutation>(WriteResourceContentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'writeResourceContent', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<WriteResourceContentMutation>(WriteResourceContentDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'writeResourceContent', 'mutation');
     },
     configureServer(variables: ConfigureServerQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ConfigureServerQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ConfigureServerQuery>(ConfigureServerDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'configureServer', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<ConfigureServerQuery>(ConfigureServerDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'configureServer', 'query');
     },
     listFeatureSets(variables?: ListFeatureSetsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ListFeatureSetsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ListFeatureSetsQuery>(ListFeatureSetsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'listFeatureSets', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<ListFeatureSetsQuery>(ListFeatureSetsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'listFeatureSets', 'query');
     },
     setDefaultNavigatorSettings(variables: SetDefaultNavigatorSettingsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetDefaultNavigatorSettingsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetDefaultNavigatorSettingsQuery>(SetDefaultNavigatorSettingsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setDefaultNavigatorSettings', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SetDefaultNavigatorSettingsQuery>(SetDefaultNavigatorSettingsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'setDefaultNavigatorSettings', 'query');
     },
     changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ChangeSessionLanguageMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'changeSessionLanguage', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'changeSessionLanguage', 'mutation');
     },
     openSession(variables?: OpenSessionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<OpenSessionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<OpenSessionMutation>(OpenSessionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'openSession', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<OpenSessionMutation>(OpenSessionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'openSession', 'mutation');
     },
     readSessionLog(variables: ReadSessionLogQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ReadSessionLogQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ReadSessionLogQuery>(ReadSessionLogDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'readSessionLog', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<ReadSessionLogQuery>(ReadSessionLogDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'readSessionLog', 'query');
     },
     serverConfig(variables?: ServerConfigQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ServerConfigQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ServerConfigQuery>(ServerConfigDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'serverConfig', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<ServerConfigQuery>(ServerConfigDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'serverConfig', 'query');
     },
     sessionPermissions(variables?: SessionPermissionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SessionPermissionsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SessionPermissionsQuery>(SessionPermissionsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'sessionPermissions', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SessionPermissionsQuery>(SessionPermissionsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'sessionPermissions', 'query');
     },
     sessionState(variables?: SessionStateQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SessionStateQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SessionStateQuery>(SessionStateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'sessionState', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SessionStateQuery>(SessionStateDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'sessionState', 'query');
     },
     touchSession(variables?: TouchSessionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<TouchSessionMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<TouchSessionMutation>(TouchSessionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'touchSession', 'mutation');
+      return withWrapper((wrappedRequestHeaders) => client.request<TouchSessionMutation>(TouchSessionDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'touchSession', 'mutation');
     },
     formatSqlQuery(variables: FormatSqlQueryQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<FormatSqlQueryQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<FormatSqlQueryQuery>(FormatSqlQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'formatSqlQuery', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<FormatSqlQueryQuery>(FormatSqlQueryDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'formatSqlQuery', 'query');
     },
     parseSQLQuery(variables: ParseSqlQueryQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ParseSqlQueryQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ParseSqlQueryQuery>(ParseSqlQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'parseSQLQuery', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<ParseSqlQueryQuery>(ParseSqlQueryDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'parseSQLQuery', 'query');
     },
     parseSQLScript(variables: ParseSqlScriptQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ParseSqlScriptQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ParseSqlScriptQuery>(ParseSqlScriptDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'parseSQLScript', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<ParseSqlScriptQuery>(ParseSqlScriptDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'parseSQLScript', 'query');
     },
     querySqlCompletionProposals(variables: QuerySqlCompletionProposalsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<QuerySqlCompletionProposalsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<QuerySqlCompletionProposalsQuery>(QuerySqlCompletionProposalsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'querySqlCompletionProposals', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<QuerySqlCompletionProposalsQuery>(QuerySqlCompletionProposalsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'querySqlCompletionProposals', 'query');
     },
     querySqlDialectInfo(variables: QuerySqlDialectInfoQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<QuerySqlDialectInfoQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<QuerySqlDialectInfoQuery>(QuerySqlDialectInfoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'querySqlDialectInfo', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<QuerySqlDialectInfoQuery>(QuerySqlDialectInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'querySqlDialectInfo', 'query');
     },
     sqlEntityQueryGenerators(variables: SqlEntityQueryGeneratorsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SqlEntityQueryGeneratorsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SqlEntityQueryGeneratorsQuery>(SqlEntityQueryGeneratorsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'sqlEntityQueryGenerators', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SqlEntityQueryGeneratorsQuery>(SqlEntityQueryGeneratorsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'sqlEntityQueryGenerators', 'query');
     },
     sqlGenerateEntityQuery(variables: SqlGenerateEntityQueryQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SqlGenerateEntityQueryQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SqlGenerateEntityQueryQuery>(SqlGenerateEntityQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'sqlGenerateEntityQuery', 'query');
+      return withWrapper((wrappedRequestHeaders) => client.request<SqlGenerateEntityQueryQuery>(SqlGenerateEntityQueryDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }), 'sqlGenerateEntityQuery', 'query');
     }
   };
 }

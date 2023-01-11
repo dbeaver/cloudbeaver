@@ -13,7 +13,7 @@ import { ClipboardService } from './ClipboardService';
 @injectable()
 export class ClipboardBootstrap extends Bootstrap {
   constructor(
-    private clipboardService: ClipboardService,
+    private readonly clipboardService: ClipboardService,
   ) {
     super();
   }

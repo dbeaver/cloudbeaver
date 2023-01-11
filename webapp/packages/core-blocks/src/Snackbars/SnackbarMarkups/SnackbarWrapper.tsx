@@ -9,8 +9,6 @@
 import { useEffect, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-
-
 import { IconButton } from '../../IconButton';
 
 const SNACKBAR_WRAPPER_STYLES = css` 

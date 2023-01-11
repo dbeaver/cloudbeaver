@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 
-
 import { AuthConfiguration } from './AuthConfiguration';
 
 const styles = css`

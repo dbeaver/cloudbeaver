@@ -188,7 +188,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
         return true;
       }
 
-      return await autoOpenFolders(root, folderExplorer.state.path);
+      return await autoOpenFolders(folderExplorer.state.folder, folderExplorer.state.path);
     },
   });
 
@@ -240,7 +240,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
         if (!leaf && tree.settings?.foldersTree) {
           const nodeId = node.id;
-          const loaded =  await ref.loadChildren(nodeId, true);
+          const loaded = await ref.loadChildren(nodeId, true);
 
           if (loaded) {
             await autoOpenFolders(nodeId, path);

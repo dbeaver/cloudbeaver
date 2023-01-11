@@ -8,7 +8,6 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 import { md5, uuid } from '@cloudbeaver/core-utils';
 
 import { AuthProvider, AuthProvidersResource } from './AuthProvidersResource';

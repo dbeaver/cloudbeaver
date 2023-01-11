@@ -21,7 +21,7 @@ interface Props {
 
 export const FormGroup: React.FC<React.PropsWithChildren<Props>> = function FormGroup({ children, className }) {
   return styled(styles)(
-    <group as='div' className={className}>
+    <group className={className}>
       {children}
     </group>
   );

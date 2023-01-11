@@ -342,6 +342,18 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
+    public void createProjectDataSourceFolder(@NotNull String projectId, @NotNull String folderPath) throws DBException {
+        DBPProject project = getProjectMetadata(projectId, false);
+        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+        var result = Path.of(folderPath);
+        var newName = result.getFileName().toString();
+        var parent = result.getParent();
+        var parentFolder = parent == null ? null : registry.getFolder(parent.toString().replace("\\", "/"));
+        DBPDataSourceFolder newFolder = registry.addFolder(parentFolder, newName);
+        registry.checkForErrors();
+    }
+
+    @Override
     public void deleteProjectDataSourceFolders(
         @NotNull String projectId,
         @NotNull String[] folderPaths,
