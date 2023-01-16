@@ -40,8 +40,8 @@ export type CachedMapResourceLoader<
   ? Array<CachedResourceValueIncludes<TValue, TIncludes>>
   : CachedResourceValueIncludes<TValue, TIncludes>;
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ICachedMapResourceMetadata extends ICachedResourceMetadata {
-  includes: string[];
 }
 
 export const CachedMapAllKey = resourceKeyList<any>([Symbol('@cached-map-resource/all')], 'all');
@@ -82,7 +82,7 @@ export abstract class CachedMapResource<
       outdated: true,
       loading: false,
       exception: null,
-      includes: observable([...this.defaultIncludes]),
+      includes: observable([...this.defaultIncludes as any]),
       dependencies: observable([]),
       ...this.populateMetadata(key, metadata),
     }, undefined, { deep: false }));
@@ -384,19 +384,19 @@ export abstract class CachedMapResource<
     }
   }
 
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext>>(
+  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: TKey,
     includes?: T
   ): Promise<CachedResourceValueIncludes<TValue, T>>;
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext>>(
+  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKeyList<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>>>;
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext>>(
+  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>>;
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext>>(
+  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
@@ -405,19 +405,19 @@ export abstract class CachedMapResource<
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
 
-  async load<T extends CachedResourceIncludeArgs<TValue, TContext>>(
+  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: TKey,
     includes?: T
   ): Promise<CachedResourceValueIncludes<TValue, T>>;
-  async load<T extends CachedResourceIncludeArgs<TValue, TContext>>(
+  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKeyList<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>>>;
-  async load<T extends CachedResourceIncludeArgs<TValue, TContext>>(
+  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>>;
-  async load<T extends CachedResourceIncludeArgs<TValue, TContext>>(
+  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {

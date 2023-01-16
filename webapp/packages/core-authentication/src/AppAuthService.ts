@@ -7,28 +7,36 @@
  */
 
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { ServerService } from '@cloudbeaver/core-root';
+import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { CachedDataResourceParam, CachedResource, getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
+import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import { UserInfoResource } from './UserInfoResource';
 
 @injectable()
 export class AppAuthService extends Bootstrap {
   get authenticated(): boolean {
-    const config = this.serverService.config.data;
     const user = this.userInfoResource.data;
 
     return (
-      !!config?.anonymousAccessEnabled
-      || this.serverService.config.configurationMode
+      this.serverConfigResource.anonymousAccessEnabled
+      || this.serverConfigResource.configurationMode
       || user !== null
     );
+  }
+
+  get loaders(): ILoadableState[] {
+    return [
+      getCachedDataResourceLoaderState(this.userInfoResource, undefined),
+      getCachedDataResourceLoaderState(this.serverConfigResource, undefined),
+    ];
   }
 
   readonly auth: IExecutor<boolean>;
 
   constructor(
-    private readonly serverService: ServerService,
+    private readonly serverConfigResource: ServerConfigResource,
     private readonly userInfoResource: UserInfoResource,
   ) {
     super();
@@ -36,21 +44,35 @@ export class AppAuthService extends Bootstrap {
     this.userInfoResource.onDataUpdate.addHandler(this.authUser.bind(this));
   }
 
+  requireAuthentication<T = CachedDataResourceParam<UserInfoResource>>(
+    resource: CachedResource<any, any, T, any, any>,
+    map?: (param: T | undefined) => T
+  ): this {
+    resource
+      .preloadResource(this.userInfoResource, () => undefined)
+      .preloadResource(this.serverConfigResource, () => undefined)
+      .before(ExecutorInterrupter.interrupter(() => !this.authenticated));
+
+    this.userInfoResource.outdateResource<T>(resource, map as any);
+
+    return this;
+  }
+
   async isAuthNeeded(): Promise<boolean> {
-    const config = await this.serverService.config.load();
+    const config = await this.serverConfigResource.load();
     if (!config) {
       throw new Error('Can\'t configure Authentication');
     }
 
-    const user = await this.userInfoResource.load(undefined, []);
+    const user = await this.userInfoResource.load();
 
-    return !this.serverService.config.configurationMode
-      && !config.anonymousAccessEnabled
+    return !this.serverConfigResource.configurationMode
+      && !this.serverConfigResource.anonymousAccessEnabled
       && user === null;
   }
 
   async authUser(): Promise<boolean> {
-    const userInfo = await this.userInfoResource.load(undefined, []);
+    const userInfo = await this.userInfoResource.load();
 
     const state = userInfo !== null;
     await this.auth.execute(state);

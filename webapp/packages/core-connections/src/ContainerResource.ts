@@ -8,9 +8,9 @@
 
 import { observable } from 'mobx';
 
+import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { EPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedDataResource,
@@ -61,7 +61,7 @@ string
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    permissionsResource: SessionPermissionsResource,
+    appAuthService: AppAuthService,
   ) {
     super(new Map());
 
@@ -75,7 +75,7 @@ string
       dependencies: observable([]),
     }));
 
-    permissionsResource.require(this, EPermission.public);
+    appAuthService.requireAuthentication(this);
     this.preloadResource(connectionInfoResource, () => ConnectionInfoActiveProjectKey);
     this.before(ExecutorInterrupter.interrupter(key => !connectionInfoResource.isConnected(key)));
 
