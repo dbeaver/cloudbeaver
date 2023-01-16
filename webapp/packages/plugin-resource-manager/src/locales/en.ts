@@ -1,7 +1,4 @@
 export default [
-  ['plugin_resource_manager_action_enable_label', 'SQL scripts manager'],
-  ['plugin_resource_manager_title', 'SQL scripts manager'],
-  ['plugin_resource_manager_no_resources_placeholder', 'There are no scripts yet'],
   ['plugin_resource_manager_script_name', 'Script name'],
   ['plugin_resource_manager_save_script', 'Save script'],
   ['plugin_resource_manager_open_script', 'Open script'],

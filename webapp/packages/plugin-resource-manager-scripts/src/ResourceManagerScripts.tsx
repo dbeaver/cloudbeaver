@@ -9,9 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { useTranslate } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
+import { ResourceManagerTree } from '@cloudbeaver/plugin-resource-manager';
 
-import { ResourceManagerTree } from './Tree/ResourceManagerTree';
+import { SCRIPTS_TYPE_ID } from './SCRIPTS_TYPE_ID';
 
 const styles = css`
   container {
@@ -22,10 +24,13 @@ const styles = css`
   }
 `;
 
-export const ResourceManager: TabContainerPanelComponent = observer(function ResourceManager() {
+export const ResourceManagerScripts: TabContainerPanelComponent = observer(function ResourceManagerScripts() {
+  const translate = useTranslate();
   return styled(styles)(
     <container>
-      <ResourceManagerTree />
+      <ResourceManagerTree resourceTypeId={SCRIPTS_TYPE_ID}>
+        {translate('plugin_resource_manager_scripts_no_resources_placeholder')}
+      </ResourceManagerTree>
     </container>
   );
 });

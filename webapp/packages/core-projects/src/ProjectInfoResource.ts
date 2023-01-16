@@ -12,9 +12,10 @@ import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { SharedProjectsResource } from '@cloudbeaver/core-resource-manager';
 import { EPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmResourceType } from '@cloudbeaver/core-sdk';
 
 export type ProjectInfo = SchemaProjectInfo;
+export type ProjectInfoResourceType = RmResourceType;
 
 @injectable()
 export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> {
@@ -39,6 +40,12 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
 
   getUserProject(userId: string): ProjectInfo | undefined {
     return this.get(`u_${userId}`);
+  }
+
+  getResourceType(project: ProjectInfo, resourceTypeId: string) {
+    const resourceType = project.resourceTypes.find(type => type.id === resourceTypeId);
+
+    return resourceType;
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, ProjectInfo>> {

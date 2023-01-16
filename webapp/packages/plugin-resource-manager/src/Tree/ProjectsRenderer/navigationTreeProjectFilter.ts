@@ -9,12 +9,11 @@
 
 import type { NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import type { ProjectsService } from '@cloudbeaver/core-projects';
+import { RESOURCES_NODE_PATH, NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { IElementsTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
-import { NAV_NODE_TYPE_RM_PROJECT } from '../../NAV_NODE_TYPE_RM_PROJECT';
 import type { ResourcesProjectsNavNodeService } from '../../NavNodes/ResourcesProjectsNavNodeService';
-import { RESOURCES_NODE_PATH } from '../../RESOURCES_NODE_PATH';
 
 export function navigationTreeProjectFilter(
   resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,

@@ -12,9 +12,9 @@ import styled, { css, use } from 'reshadow';
 
 import { Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { type IElementsTreeCustomRenderer, type NavigationNodeRendererComponent, useNode, NavigationNodeRenderer, ElementsTreeContext } from '@cloudbeaver/plugin-navigation-tree';
 
-import { NAV_NODE_TYPE_RM_PROJECT } from '../../NAV_NODE_TYPE_RM_PROJECT';
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
 
 const nestedStyles = css`

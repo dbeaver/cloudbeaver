@@ -73,6 +73,10 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     return this.data?.workspaceId || '';
   }
 
+  get distributed(): boolean {
+    return this.data?.distributed || false;
+  }
+
   get configurationMode(): boolean {
     return !!this.data?.configurationMode;
   }

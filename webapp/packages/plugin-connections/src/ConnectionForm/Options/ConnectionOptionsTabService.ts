@@ -96,7 +96,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const adminPermission = this.permissionsService.has(EAdminPermission.admin);
     const originLocal = !state.info || isLocalConnection(state.info);
 
-    return adminPermission && originLocal && isProjectShared && !this.serverConfigResource.data?.distributed;
+    return adminPermission && originLocal && isProjectShared && !this.serverConfigResource.distributed;
   }
 
   private async save(

@@ -6,28 +6,63 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { computed, makeObservable } from 'mobx';
+
+import { UserDataService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import type { ProjectInfo } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { ResourceProjectsResource } from '@cloudbeaver/plugin-resource-manager';
+import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import { SCRIPTS_TYPE_ID } from './SCRIPTS_TYPE_ID';
 
+const queryResourceManagerScriptsSettingsKey = 'resource-manager-scripts';
+
+interface ISettings {
+  active: boolean;
+}
+
 @injectable()
 export class ResourceManagerScriptsService {
+  get active() {
+    return this.enabled && this.settings.active;
+  }
+
+  get settings() {
+    return this.userDataService.getUserData(queryResourceManagerScriptsSettingsKey, getResourceManagerDefaultSettings);
+  }
+
+  get enabled() {
+    return this.resourceManagerService.enabled;
+  }
+
   constructor(
-    private readonly resourceProjectsResource: ResourceProjectsResource,
+    private readonly userDataService: UserDataService,
     private readonly serverConfigResource: ServerConfigResource,
-  ) { }
+    private readonly resourceManagerService: ResourceManagerService,
+  ) {
+    this.togglePanel = this.togglePanel.bind(this);
 
-  getRootFolder(projectId: string) {
-    const project = this.resourceProjectsResource.data.find(project => project.id === projectId);
+    makeObservable(this, {
+      settings: computed,
+      active: computed,
+      enabled: computed,
+    });
+  }
 
-    if (!project) {
-      return;
-    }
+  togglePanel() {
+    this.settings.active = !this.settings.active;
+  }
 
+  getRootFolder(project: ProjectInfo) {
     const scriptType = project.resourceTypes.find(type => type.id === SCRIPTS_TYPE_ID);
 
-    return this.serverConfigResource.data?.distributed ? scriptType?.rootFolder : undefined;
+    return this.serverConfigResource.distributed ? scriptType?.rootFolder : undefined;
   }
+}
+
+function getResourceManagerDefaultSettings(): ISettings {
+  return {
+    active: false,
+  };
 }
