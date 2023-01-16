@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.model.WebConnectionConfig;
-import io.cloudbeaver.model.WebConnectionFolderInfo;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
@@ -35,7 +34,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -308,11 +306,6 @@ public class WebServiceUtils extends WebCommonUtils {
             return null;
         }
         return container.getName() + " [" + container.getId() + "]";
-    }
-
-    public static DBPDataSourceFolder createFolder(WebConnectionFolderInfo parentFolder, String newName, DBPDataSourceRegistry registry) throws DBWebException {
-        DBPDataSourceFolder folder = registry.addFolder(parentFolder == null ? null : parentFolder.getDataSourceFolder(), newName);
-        return folder;
     }
 
     public static void updateConfigAndRefreshDatabases(WebSession session, String projectId) {

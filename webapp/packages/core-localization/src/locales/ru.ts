@@ -82,6 +82,7 @@ export const defaultRULocale = [
   ['ui_close_all_to_the_left', 'Закрыть все слева'],
   ['ui_or', 'Или'],
   ['ui_download', 'Загрузить'],
+  ['ui_view', 'Смотреть'],
   ['ui_limit', 'Лимит'],
   ['ui_file_size', 'Размер файла'],
   ['ui_processing_synchronization', 'Синхронизация...'],

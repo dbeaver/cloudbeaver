@@ -9,7 +9,6 @@
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
-
 @injectable()
 export class AppScreenService {
   readonly placeholder: PlaceholderContainer;

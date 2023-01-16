@@ -84,6 +84,7 @@ export const defaultENLocale = [
   ['ui_close_all_to_the_left', 'Close all to the Left'],
   ['ui_or', 'Or'],
   ['ui_download', 'Download'],
+  ['ui_view', 'View'],
   ['ui_limit', 'Limit'],
   ['ui_file_size', 'File size'],
   ['ui_processing_synchronization', 'Synchronization...'],

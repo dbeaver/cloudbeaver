@@ -10,7 +10,6 @@ import { observer } from 'mobx-react-lite';
 
 import { Button, PlaceholderComponent, useTranslate } from '@cloudbeaver/core-blocks';
 
-
 import type { IAuthConfigurationFormProps } from './IAuthConfigurationFormProps';
 
 export const AuthConfigurationFormBaseActions: PlaceholderComponent<IAuthConfigurationFormProps> = observer(function AuthConfigurationFormBaseActions({

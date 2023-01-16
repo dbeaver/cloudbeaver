@@ -19,6 +19,7 @@ import { useNode } from '../../../NodesManager/useNode';
 import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { IElementsTreeAction } from '../IElementsTreeAction';
 import type { NavTreeControlComponent } from '../NavigationNodeComponent';
+import type { IElementsTree } from '../useElementsTree';
 
 
 interface INavigationNode {
@@ -30,6 +31,8 @@ interface INavigationNode {
   selected: boolean;
   indeterminateSelected: boolean;
   loading: boolean;
+  loaded: boolean;
+  outdated: boolean;
   expanded: boolean;
   leaf: boolean;
   empty: boolean;
@@ -46,16 +49,18 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   const contextRef = useObjectRef({
     context: useContext(ElementsTreeContext),
   });
-  const { isLoading } = useNode(node.id);
+  const { isLoading, isLoaded, isOutdated } = useNode(node.id);
   const children = useChildren(node.id);
 
+  const outdated = getComputed(() => isOutdated() || children.isOutdated());
   const loading = getComputed(() => isLoading() || children.isLoading());
+  const loaded = getComputed(() => children.children !== undefined && children.isLoaded() && isLoaded());
   const showInFilter = getComputed(() => contextRef.context?.tree.getNodeState(node.id).showInFilter || false);
   const isExpanded = getComputed(() => contextRef.context?.tree.isNodeExpanded(node.id) || false);
-  const leaf = getComputed(() => isLeaf(node));
+  const leaf = getComputed(() => isLeaf(node, children.children, contextRef.context?.tree));
   const group = getComputed(() => contextRef.context?.tree.isGroup?.(node) || false);
   const empty = getComputed(() => children.children?.length === 0);
-  const expanded = getComputed(() => isExpanded && !leaf && !empty);
+  const expanded = getComputed(() => isExpanded);
   const control = getComputed(() => contextRef.context?.control);
   const disabled = getComputed(() => contextRef.context?.tree.disabled || false);
   const selected = getComputed(() => contextRef.context?.tree.isNodeSelected(node.id) || false);
@@ -107,6 +112,8 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     selected,
     indeterminateSelected,
     loading,
+    outdated,
+    loaded,
     expanded,
     leaf,
     expand: handleExpand,
@@ -117,6 +124,14 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   };
 }
 
-export function isLeaf(node: NavNode): boolean {
-  return !node.hasChildren || node.objectFeatures.includes(EObjectFeature.entity);
+export function isLeaf(node: NavNode, children: string[] | undefined, tree: IElementsTree | undefined): boolean {
+  if (node.folder && tree?.settings?.foldersTree) {
+    return false;
+  }
+
+  return (
+    node.objectFeatures.includes(EObjectFeature.entity)
+    || !node.hasChildren
+    || children?.length === 0
+  );
 }

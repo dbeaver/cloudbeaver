@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 
 import { ItemListSearch, ItemList, useFocus, useTranslate } from '@cloudbeaver/core-blocks';
 
-
 import { Driver, IDriver } from './Driver';
 
 interface Props {

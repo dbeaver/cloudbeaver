@@ -8,7 +8,6 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-
 import { ClipboardBootstrap } from './Clipboard/ClipboardBootstrap';
 import { ClipboardService } from './Clipboard/ClipboardService';
 import { LocaleService } from './LocaleService';

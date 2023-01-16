@@ -13,7 +13,7 @@ import productConfig from './config.json5';
 
 @injectable()
 export class ProductConfigService extends Bootstrap {
-  constructor(private productManager: ProductManagerService) {
+  constructor(private readonly productManager: ProductManagerService) {
     super();
   }
 

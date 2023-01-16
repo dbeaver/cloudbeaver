@@ -15,5 +15,5 @@ const styles = css`
 `;
 
 export function Fill() {
-  return styled(styles)(<fill as='div' />);
+  return styled(styles)(<fill />);
 }

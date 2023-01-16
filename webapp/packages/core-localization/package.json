@@ -22,9 +22,12 @@
     "@cloudbeaver/core-plugin": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/core-settings": "~0.1.0"
+    "@cloudbeaver/core-settings": "~0.1.0",
+    "@cloudbeaver/core-authentication": "~0.1.0",
+    "@cloudbeaver/core-cli": "~0.1.0"
   },
   "peerDependencies": {
-    "mobx": "~6.x.x"
+    "mobx": "~6.x.x",
+    "@testing-library/jest-dom": "~5.x.x"
   }
 }

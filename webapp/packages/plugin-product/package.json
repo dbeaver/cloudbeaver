@@ -15,29 +15,15 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
-    "@cloudbeaver/core-administration": "~0.1.0",
-    "@cloudbeaver/core-app": "~0.1.0",
-    "@cloudbeaver/core-authentication": "~0.1.0",
+    "@cloudbeaver/plugin-settings-menu": "~0.1.0",
+    "@cloudbeaver/plugin-version": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
-    "@cloudbeaver/core-connections": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-dialogs": "~0.1.0",
-    "@cloudbeaver/core-events": "~0.1.0",
-    "@cloudbeaver/core-executor": "~0.1.0",
-    "@cloudbeaver/core-extensions": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-notifications": "~0.1.0",
-    "@cloudbeaver/core-plugin": "~0.1.0",
-    "@cloudbeaver/core-product": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0",
-    "@cloudbeaver/core-routing": "~0.1.0",
-    "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/core-settings": "~0.1.0",
     "@cloudbeaver/core-theming": "~0.1.0",
-    "@cloudbeaver/core-ui": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
-    "@cloudbeaver/core-view": "~0.1.0",
-    "@cloudbeaver/plugin-version": "~0.1.0"
+    "@cloudbeaver/core-view": "~0.1.0"
   },
   "peerDependencies": {
     "react": "~18.x.x",

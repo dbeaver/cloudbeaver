@@ -11,7 +11,6 @@ import styled, { css } from 'reshadow';
 
 import { ENotificationType } from '@cloudbeaver/core-events';
 
-
 import { IconOrImage } from './IconOrImage';
 import { Link } from './Link';
 import { useTranslate } from './localization/useTranslate';

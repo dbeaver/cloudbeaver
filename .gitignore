@@ -45,3 +45,4 @@ server/test/io.cloudbeaver.test.platform/workspace/.data/
 
 deploy/cloudbeaver
 server/**/target
+apps/**/target
