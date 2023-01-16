@@ -61,7 +61,10 @@ import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -405,7 +408,7 @@ public class WebServiceCore implements DBWServiceCore {
         webSession.addInfoMessage("New connection was created - " + WebServiceUtils.getConnectionContainerInfo(newDataSource));
         WebEventUtils.addDataSourceUpdatedEvent(
             webSession.getProjectById(projectId),
-            webSession.getSessionId(),
+            webSession.getUserContext().getSmSessionId(),
             connectionInfo.getId(),
             WSConstants.EventAction.CREATE
         );
@@ -427,12 +430,12 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, config.getConnectionId());
         DBPDataSourceContainer dataSource = connectionInfo.getDataSourceContainer();
         webSession.addInfoMessage("Update connection - " + WebServiceUtils.getConnectionContainerInfo(dataSource));
-        DBPConnectionConfiguration oldConnectionConfig = new DBPConnectionConfiguration(dataSource.getConnectionConfiguration());
+        var oldDataSource = new DataSourceDescriptor((DataSourceDescriptor) dataSource, dataSource.getRegistry());
 
         if (!CommonUtils.isEmpty(config.getName())) {
             dataSource.setName(config.getName());
         }
-        String oldDescription = dataSource.getDescription();
+
         if (config.getDescription() != null) {
             dataSource.setDescription(config.getDescription());
         }
@@ -441,7 +444,7 @@ public class WebServiceCore implements DBWServiceCore {
 
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
 
-        boolean sendEvent = sendUpdateConnectionEvent(config, dataSource, oldConnectionConfig, oldDescription);
+        boolean sendEvent = !((DataSourceDescriptor) dataSource).equalSettings(oldDataSource);
 
         WebServiceUtils.saveAuthProperties(
             dataSource,
@@ -460,33 +463,12 @@ public class WebServiceCore implements DBWServiceCore {
         if (sendEvent) {
             WebEventUtils.addDataSourceUpdatedEvent(
                 webSession.getProjectById(projectId),
-                webSession.getSessionId(),
+                webSession.getUserContext().getSmSessionId(),
                 connectionInfo.getId(),
                 WSConstants.EventAction.UPDATE
             );
         }
         return connectionInfo;
-    }
-
-    /**
-     * Checks if only user credentials were changed
-     */
-    private boolean sendUpdateConnectionEvent(
-        @NotNull WebConnectionConfig config,
-        @NotNull DBPDataSourceContainer dataSource,
-        @NotNull DBPConnectionConfiguration oldConnectionConfig,
-        @Nullable String oldDescription
-    ) {
-        if (!oldConnectionConfig.equals(dataSource.getConnectionConfiguration())) {
-            return true;
-        }
-        if (!Objects.equals(oldDescription, dataSource.getDescription())) {
-            return true;
-        }
-        if (dataSource.getProject().isUseSecretStorage()) {
-            return dataSource.isSharedCredentials() != config.isSharedCredentials();
-        }
-        return dataSource.isSavePassword() != config.isSaveCredentials();
     }
 
     @Override
@@ -502,7 +484,7 @@ public class WebServiceCore implements DBWServiceCore {
         closeAndDeleteConnection(webSession, projectId, connectionId, true);
         WebEventUtils.addDataSourceUpdatedEvent(
             webSession.getProjectById(projectId),
-            webSession.getSessionId(),
+            webSession.getUserContext().getSmSessionId(),
             connectionId,
             WSConstants.EventAction.DELETE
         );
@@ -583,7 +565,7 @@ public class WebServiceCore implements DBWServiceCore {
             webSession.addConnection(connectionInfo);
             WebEventUtils.addDataSourceUpdatedEvent(
                 webSession.getProjectById(projectId),
-                webSession.getSessionId(),
+                webSession.getUserContext().getSmSessionId(),
                 connectionInfo.getId(),
                 WSConstants.EventAction.CREATE
             );
@@ -786,7 +768,7 @@ public class WebServiceCore implements DBWServiceCore {
             WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
             WebEventUtils.addNavigatorNodeUpdatedEvent(
                 session.getProjectById(projectId),
-                session.getSessionId(),
+                session.getUserContext().getSmSessionId(),
                 DBNLocalFolder.makeLocalFolderItemPath(newFolder),
                 WSConstants.EventAction.CREATE
             );
@@ -811,13 +793,13 @@ public class WebServiceCore implements DBWServiceCore {
         WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             session.getProjectById(projectId),
-            session.getSessionId(),
+            session.getUserContext().getSmSessionId(),
             oldFolderNode,
             WSConstants.EventAction.DELETE
         );
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             session.getProjectById(projectId),
-            session.getSessionId(),
+            session.getUserContext().getSmSessionId(),
             newFolderNode,
             WSConstants.EventAction.CREATE
         );
@@ -842,7 +824,7 @@ public class WebServiceCore implements DBWServiceCore {
             WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
             WebEventUtils.addNavigatorNodeUpdatedEvent(
                 session.getProjectById(projectId),
-                session.getSessionId(),
+                session.getUserContext().getSmSessionId(),
                 folderNode,
                 WSConstants.EventAction.DELETE
             );
@@ -862,7 +844,7 @@ public class WebServiceCore implements DBWServiceCore {
         dataSourceDescriptor.persistConfiguration();
         WebEventUtils.addDataSourceUpdatedEvent(
             webSession.getProjectById(projectId),
-            webSession.getSessionId(),
+            webSession.getUserContext().getSmSessionId(),
             id,
             WSConstants.EventAction.UPDATE);
         return connectionInfo;
