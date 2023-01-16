@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,7 @@ import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -696,15 +697,14 @@ public class WebSession extends BaseWebSession
     }
 
     public void addSessionError(Throwable exception) {
-        synchronized (sessionMessages) {
-            sessionMessages.add(new WebServerMessage(exception));
-        }
+        addSessionMessage(new WebServerMessage(exception));
     }
 
     public void addSessionMessage(WebServerMessage message) {
         synchronized (sessionMessages) {
             sessionMessages.add(message);
         }
+        addSessionEvent(new WSSessionLogUpdatedEvent());
     }
 
     public void addInfoMessage(String message) {
@@ -1023,16 +1023,12 @@ public class WebSession extends BaseWebSession
     private class SessionProgressMonitor extends BaseProgressMonitor {
         @Override
         public void beginTask(String name, int totalWork) {
-            synchronized (sessionMessages) {
-                sessionMessages.add(new WebServerMessage(WebServerMessage.MessageType.INFO, name));
-            }
+            addInfoMessage(name);
         }
 
         @Override
         public void subTask(String name) {
-            synchronized (sessionMessages) {
-                sessionMessages.add(new WebServerMessage(WebServerMessage.MessageType.INFO, name));
-            }
+            addInfoMessage(name);
         }
     }
 

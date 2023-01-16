@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -337,6 +337,18 @@ public class LocalResourceController implements RMController {
                 log.warn("Could not find datasource " + dataSourceId + " for deletion");
             }
         }
+        registry.checkForErrors();
+    }
+
+    @Override
+    public void createProjectDataSourceFolder(@NotNull String projectId, @NotNull String folderPath) throws DBException {
+        DBPProject project = getProjectMetadata(projectId, false);
+        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+        var result = Path.of(folderPath);
+        var newName = result.getFileName().toString();
+        var parent = result.getParent();
+        var parentFolder = parent == null ? null : registry.getFolder(parent.toString().replace("\\", "/"));
+        DBPDataSourceFolder newFolder = registry.addFolder(parentFolder, newName);
         registry.checkForErrors();
     }
 

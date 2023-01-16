@@ -10,9 +10,6 @@ import styled, { css } from 'reshadow';
 
 import { useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 
-
-
-
 import type { IShortcut } from './IShortcut';
 
 interface Props {

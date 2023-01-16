@@ -10,7 +10,7 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, IconOrImage, Textarea, useObservableRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, Textarea, useObservableRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
@@ -215,16 +215,9 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       {valueTruncated && <QuotaPlaceholder limit={limit} size={valueSize} />}
       {canSave && (
         <tools-container>
-          <tools>
-            <tools-action
-              as='button'
-              title={translate('ui_processing_save')}
-              disabled={model.isLoading()}
-              onClick={save}
-            >
-              <IconOrImage icon='/icons/save.svg' />
-            </tools-action>
-          </tools>
+          <Button disabled={model.isLoading()} onClick={save}>
+            {translate('ui_download')}
+          </Button>
         </tools-container>
       )}
     </container>

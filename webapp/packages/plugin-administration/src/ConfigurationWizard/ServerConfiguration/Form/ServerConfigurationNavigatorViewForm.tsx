@@ -13,7 +13,6 @@ import styled from 'reshadow';
 import { BASE_CONTAINERS_STYLES, Switch, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual } from '@cloudbeaver/core-root';
 
-
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState';
 
 interface Props {

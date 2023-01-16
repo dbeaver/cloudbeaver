@@ -21,7 +21,8 @@
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-executor": "~0.1.0",
-    "graphql-request": "~5.0.0"
+    "graphql-request": "~5.0.0",
+    "graphql": "~16.x.x"
   },
   "devDependencies": {
     "@graphql-codegen/add": "~3.2.1",
@@ -30,8 +31,7 @@
     "@graphql-codegen/typescript": "~2.8.3",
     "@graphql-codegen/typescript-graphql-files-modules": "~2.2.1",
     "@graphql-codegen/typescript-graphql-request": "~4.5.8",
-    "@graphql-codegen/typescript-operations": "~2.5.8",
-    "graphql": "~16.x.x"
+    "@graphql-codegen/typescript-operations": "~2.5.8"
   },
   "peerDependencies": {
     "mobx": "~6.x.x"

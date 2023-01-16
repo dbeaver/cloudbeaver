@@ -18,8 +18,8 @@ import type { IExportContext } from './IExportContext';
 @injectable()
 export class DataExportService {
   constructor(
-    private notificationService: NotificationService,
-    private dataExportProcessService: DataExportProcessService,
+    private readonly notificationService: NotificationService,
+    private readonly dataExportProcessService: DataExportProcessService,
     readonly processors: DataTransferProcessorsResource
   ) { }
 

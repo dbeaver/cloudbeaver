@@ -8,10 +8,8 @@
 
 import styled, { css } from 'reshadow';
 
-
 import { Translate } from '@cloudbeaver/core-blocks';
 import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
-
 
 import { UserForm } from '../UserForm/UserForm';
 

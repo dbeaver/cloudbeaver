@@ -9,7 +9,6 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-
 import { useStyles } from '@cloudbeaver/core-blocks';
 import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';

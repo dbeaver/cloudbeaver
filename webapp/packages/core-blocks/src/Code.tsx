@@ -8,8 +8,6 @@
 
 import styled, { css } from 'reshadow';
 
-
-
 interface Props {
   className?: string;
 }
@@ -19,7 +17,7 @@ const styles = css`
       composes: theme-background-secondary theme-text-on-secondary from global;
       padding: 16px;
     }
-  `;
+`;
 
 export const Code: React.FC<React.PropsWithChildren<Props>> = function Code({ children, className }) {
   return styled(styles)(
