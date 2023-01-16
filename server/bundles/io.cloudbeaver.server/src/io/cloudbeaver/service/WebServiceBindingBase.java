@@ -254,7 +254,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             CBApplication application = CBApplication.getInstance();
             if (!application.isConfigurationMode()) {
                 Set<String> sessionPermissions = session.getSessionPermissions();
-                if (CommonUtils.isEmpty(sessionPermissions)) {
+                if (CommonUtils.isEmpty(sessionPermissions) && webAction.authRequired()) {
                     log.debug("Anonymous access to " + method.getName() + " restricted");
                     throw new DBWebExceptionAccessDenied("Anonymous access restricted");
                 }

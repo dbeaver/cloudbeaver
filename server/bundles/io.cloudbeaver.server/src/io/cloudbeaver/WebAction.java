@@ -31,4 +31,6 @@ public @interface WebAction {
 
     String[] requirePermissions() default { };
 
+    boolean authRequired() default true;
+
 }
