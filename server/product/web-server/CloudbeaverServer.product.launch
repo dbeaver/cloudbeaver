@@ -109,6 +109,7 @@
         <setEntry value="io.cloudbeaver.service.auth@default:default"/>
         <setEntry value="io.cloudbeaver.service.data.transfer@default:default"/>
         <setEntry value="io.cloudbeaver.service.metadata@default:default"/>
+        <setEntry value="io.cloudbeaver.service.rm@default:default"/>
         <setEntry value="org.jkiss.dbeaver.data.gis@default:default"/>
         <setEntry value="org.jkiss.dbeaver.data.office@default:default"/>
         <setEntry value="org.jkiss.dbeaver.data.transfer@default:default"/>
