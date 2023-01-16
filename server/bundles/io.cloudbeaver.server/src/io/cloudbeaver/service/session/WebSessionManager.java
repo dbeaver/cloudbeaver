@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.session;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.auth.SMTokenCredentialProvider;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebHeadlessSession;
 import io.cloudbeaver.model.session.WebSession;

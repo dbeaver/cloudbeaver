@@ -22,6 +22,7 @@ import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
+import org.eclipse.jetty.websocket.api.WriteCallback;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
@@ -40,8 +41,12 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
     @NotNull
     private final BaseWebSession webSession;
 
+    @NotNull
+    private final WriteCallback callback;
+
     public CBEventsWebSocket(@NotNull BaseWebSession webSession) {
         this.webSession = webSession;
+        this.callback = new WebSocketPingPongCallback(webSession);
     }
 
     @Override
@@ -123,5 +128,10 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
     @NotNull
     public BaseWebSession getWebSession() {
         return webSession;
+    }
+
+    @NotNull
+    public WriteCallback getCallback() {
+        return callback;
     }
 }
