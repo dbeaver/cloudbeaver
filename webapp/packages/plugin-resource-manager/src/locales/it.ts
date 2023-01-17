@@ -20,4 +20,5 @@ export default [
   ['plugin_resource_manager_script_not_found_message', 'The script was probably removed or renamed. The last known value will be used'],
   ['plugin_resource_manager_script_name_invalid_characters_message', 'Script\'s name may contain the following symbols "_-$.()@" and can\'t start with a dot'],
   ['plugin_resource_manager_save_script_project_restriction_descripion', "The script's project can't be different from the connection's project"],
+  ['plugin_resource_manager_folder_delete_confirmation', 'You\'re going to delete "{arg:name}". All related scripts will be deleted. Are you sure?'],
 ];

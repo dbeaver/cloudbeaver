@@ -11,11 +11,11 @@ import { untracked } from 'mobx';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { CONNECTION_FOLDER_NAME_VALIDATION } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { DialogueStateResult, CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { DialogueStateResult, CommonDialogService, ConfirmationDialogDelete } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { executorHandlerFilter, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { NavTreeResource, NavNodeManagerService, NavNodeInfoResource, type INodeMoveData, navNodeMoveContext, getNodesFromContext, ENodeMoveType } from '@cloudbeaver/core-navigation-tree';
+import { NavTreeResource, NavNodeManagerService, NavNodeInfoResource, type INodeMoveData, navNodeMoveContext, getNodesFromContext, ENodeMoveType, nodeDeleteContext, NavNode } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { IResourceManagerParams, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
@@ -24,6 +24,7 @@ import { ActionService, MenuService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IActi
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, type IElementsTree } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
+import { isRMNavNode } from '../isRMNavNode';
 import { NAV_NODE_TYPE_RM_PROJECT } from '../NAV_NODE_TYPE_RM_PROJECT';
 import { ResourceProjectsResource } from '../ResourceProjectsResource';
 import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
@@ -35,7 +36,6 @@ import { ResourcesProjectsNavNodeService } from './ResourcesProjectsNavNodeServi
 interface ITargetNode {
   projectId: string;
   folderId?: string;
-
   projectNodeId: string;
   selectProject: boolean;
 }
@@ -108,7 +108,43 @@ export class ResourceFoldersBootstrap extends Bootstrap {
         return items;
       },
     });
+
+    this.navTreeResource.beforeNodeDelete.addHandler(async (data, contexts) => {
+      if (ExecutorInterrupter.isInterrupted(contexts)) {
+        return;
+      }
+
+      const deleteContext = contexts.getContext(nodeDeleteContext);
+
+      if (deleteContext.confirmed) {
+        return;
+      }
+
+      const nodes = ResourceKeyUtils
+        .filter(data, nodeId => isRMNavNode(nodeId) && !!this.navNodeInfoResource.get(nodeId)?.folder)
+        .map(nodeId => this.navNodeInfoResource.get(nodeId))
+        .filter<NavNode>(Boolean as any)
+        .map(node => node.name)
+        .join();
+
+      if (!nodes) {
+        return;
+      }
+
+      const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
+        title: 'ui_data_delete_confirmation',
+        message: this.localizationService.translate('plugin_resource_manager_folder_delete_confirmation', undefined, { name: nodes }),
+        confirmActionText: 'ui_delete',
+      });
+
+      if (result === DialogueStateResult.Rejected) {
+        ExecutorInterrupter.interrupt(contexts);
+      } else {
+        deleteContext.confirm();
+      }
+    });
   }
+
   load(): void | Promise<void> { }
 
   private async moveResourceToFolder(
