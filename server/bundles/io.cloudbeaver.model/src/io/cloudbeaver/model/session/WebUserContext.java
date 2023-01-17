@@ -100,6 +100,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.smCredentials = new SMCredentials(
             smAccessToken,
             smAuthPermissions.getUserId(),
+            smAuthPermissions.getSessionId(),
             smAuthPermissions.getPermissions()
         );
         this.refreshToken = smRefreshToken;
@@ -128,6 +129,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.smCredentials = new SMCredentials(
             newTokens.getSmAccessToken(),
             smCredentials.getUserId(),
+            smCredentials.getSmSessionId(),
             smCredentials.getPermissions()
         );
     }

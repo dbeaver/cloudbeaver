@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.session;
+package io.cloudbeaver.auth;
 
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
@@ -32,6 +32,6 @@ public class SMTokenCredentialProvider implements SMCredentialsProvider {
     @Nullable
     @Override
     public SMCredentials getActiveUserCredentials() {
-        return new SMCredentials(smAccessToken, null, Set.of());
+        return new SMCredentials(smAccessToken, null, null, Set.of());
     }
 }
