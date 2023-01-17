@@ -13,14 +13,18 @@ import { useStyles } from '@cloudbeaver/core-blocks';
 import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 
+import { NAV_NODE_DDL_ID } from '../NAV_NODE_DDL_ID';
+
 export const DDLViewerTab: NavNodeTransformViewComponent = observer(function DDLViewerTab({
   folderId,
   style,
 }) {
+  const title = folderId.startsWith(NAV_NODE_DDL_ID) ? 'DDL' : 'Body';
+
   return styled(useStyles(style))(
     <Tab tabId={folderId} title='DDL'>
       <TabIcon icon="/icons/DDL.svg" />
-      <TabTitle>DDL</TabTitle>
+      <TabTitle>{title}</TabTitle>
     </Tab>
   );
 });
