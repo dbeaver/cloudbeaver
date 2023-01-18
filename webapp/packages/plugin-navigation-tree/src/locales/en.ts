@@ -13,7 +13,7 @@ export default [
   ['app_navigationTree_settings_folders_title', 'Folders'],
   ['app_navigationTree_settings_folders_description', 'Open any node as tree root node'],
   ['app_navigationTree_node_delete_confirmation', 'You\'re going to delete "{arg:name}". Are you sure?'],
-  ['app_navigationTree_node_folder_delete_confirmation', 'All content in the selected folders will be deleted.'],
+  ['app_navigationTree_node_folder_delete_confirmation', 'All content in the selected folder will be deleted.'],
   ['app_navigationTree_node_delete_error', 'Failed to delete "{arg:name}'],
   ['app_navigationTree_node_rename_error', 'Error occurred while renaming'],
   ['app_navigationTree_node_empty', 'Empty'],
