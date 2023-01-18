@@ -49,16 +49,17 @@ export class DdlViewerBootstrap extends Bootstrap {
       },
       transformer: (nodeId, children) => {
         const node = this.navNodeInfoResource.get(nodeId);
+        const ids = [];
 
         if (node?.objectFeatures.includes(EObjectFeature.script)) {
-          return [...children || [], NAV_NODE_DDL_ID];
+          ids.push(NAV_NODE_DDL_ID);
         }
 
         if (node?.objectFeatures.includes(EObjectFeature.scriptExtended)) {
-          return [...children || [], NAV_NODE_EXTENDED_DDL_ID];
+          ids.push(NAV_NODE_EXTENDED_DDL_ID);
         }
 
-        return children;
+        return [...children || [], ...ids];
       },
     });
 
