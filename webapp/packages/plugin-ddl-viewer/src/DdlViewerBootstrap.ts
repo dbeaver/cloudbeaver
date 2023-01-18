@@ -30,7 +30,7 @@ export class DdlViewerBootstrap extends Bootstrap {
   register(): void {
     this.navNodeViewService.addTransform({
       tab: (nodeId, folderId) => {
-        if (folderId.startsWith(NAV_NODE_DDL_ID)) {
+        if (folderId.startsWith(NAV_NODE_DDL_ID) || folderId.startsWith(NAV_NODE_EXTENDED_DDL_ID)) {
           return DDLViewerTab;
         }
 
@@ -41,28 +41,6 @@ export class DdlViewerBootstrap extends Bootstrap {
           return DDLViewerTabPanel;
         }
 
-        return undefined;
-      },
-      transformer: (nodeId, children) => {
-        const node = this.navNodeInfoResource.get(nodeId);
-
-        if (node?.objectFeatures.includes(EObjectFeature.script)) {
-          return [...children || [], NAV_NODE_DDL_ID];
-        }
-
-        return children;
-      },
-    });
-
-    this.navNodeViewService.addTransform({
-      tab: (nodeId, folderId) => {
-        if (folderId.startsWith(NAV_NODE_EXTENDED_DDL_ID)) {
-          return DDLViewerTab;
-        }
-
-        return undefined;
-      },
-      panel: (nodeId, folderId) => {
         if (folderId.startsWith(NAV_NODE_EXTENDED_DDL_ID)) {
           return ExtendedDDLViewerTabPanel;
         }
@@ -71,6 +49,10 @@ export class DdlViewerBootstrap extends Bootstrap {
       },
       transformer: (nodeId, children) => {
         const node = this.navNodeInfoResource.get(nodeId);
+
+        if (node?.objectFeatures.includes(EObjectFeature.script)) {
+          return [...children || [], NAV_NODE_DDL_ID];
+        }
 
         if (node?.objectFeatures.includes(EObjectFeature.scriptExtended)) {
           return [...children || [], NAV_NODE_EXTENDED_DDL_ID];

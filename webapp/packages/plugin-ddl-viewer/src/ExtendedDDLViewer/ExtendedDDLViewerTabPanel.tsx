@@ -38,24 +38,22 @@ export const ExtendedDDLViewerTabPanel: NavNodeTransformViewComponent = observer
 
   const connectionDialectResource = useResource(ExtendedDDLViewerTabPanel, ConnectionDialectResource, connectionParam);
 
-  if (extendedDDLResource.isLoading()) {
-    return <Loader />;
-  }
-
   menu.context.set(DATA_CONTEXT_DDL_VIEWER_NODE, nodeId);
   menu.context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, extendedDDLResource.data);
 
   return styled(style)(
-    <wrapper>
-      <SQLCodeEditorLoader
-        bindings={{
-          autoCursor: false,
-        }}
-        value={extendedDDLResource.data}
-        dialect={connectionDialectResource.data}
-        readonly
-      />
-      <MenuBar menu={menu} style={MENU_BAR_DEFAULT_STYLES} />
-    </wrapper>
+    <Loader state={[extendedDDLResource, connectionDialectResource]}>
+      <wrapper>
+        <SQLCodeEditorLoader
+          bindings={{
+            autoCursor: false,
+          }}
+          value={extendedDDLResource.data}
+          dialect={connectionDialectResource.data}
+          readonly
+        />
+        <MenuBar menu={menu} style={MENU_BAR_DEFAULT_STYLES} />
+      </wrapper>
+    </Loader>
   );
 });

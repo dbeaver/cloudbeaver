@@ -22,7 +22,7 @@ export const DDLViewerTab: NavNodeTransformViewComponent = observer(function DDL
   const title = folderId.startsWith(NAV_NODE_DDL_ID) ? 'DDL' : 'Body';
 
   return styled(useStyles(style))(
-    <Tab tabId={folderId} title='DDL'>
+    <Tab tabId={folderId} title={title}>
       <TabIcon icon="/icons/DDL.svg" />
       <TabTitle>{title}</TabTitle>
     </Tab>

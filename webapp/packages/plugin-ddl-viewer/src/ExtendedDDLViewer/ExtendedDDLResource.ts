@@ -7,38 +7,33 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList } from '@cloudbeaver/core-sdk';
+import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { GraphQLService, CachedMapResource, ResourceKey, ResourceKeyUtils, isResourceKeyList } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class ExtendedDDLResource extends CachedMapResource<string, string> {
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly navNodeInfoResource: NavNodeInfoResource
   ) {
     super();
+
+    this.navNodeInfoResource.outdateResource(this);
+    this.navNodeInfoResource.deleteInResource(this);
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, string>> {
-    if (isResourceKeyList(key)) {
-      const values: string[] = [];
-      for (const nodeId of key.list) {
-        const metadata = await this.loadMetadata(nodeId);
-        if (metadata) {
-          values.push(metadata);
-        }
+    const values: string[] = [];
+
+    await ResourceKeyUtils.forEachAsync(key, async nodeId => {
+      const { metadataGetNodeExtendedDDL } = await this.graphQLService.sdk.metadataGetNodeExtendedDDL({ nodeId });
+      if (metadataGetNodeExtendedDDL) {
+        values.push(metadataGetNodeExtendedDDL);
       }
-      this.set(key, values);
-    } else {
-      const metadata = await this.loadMetadata(key);
-      if (metadata) {
-        this.set(key, metadata);
-      }
-    }
+    });
+
+    this.set(key, isResourceKeyList(key) ? values : values[0]);
 
     return this.data;
-  }
-
-  private async loadMetadata(nodeId: string) {
-    const { metadataGetNodeExtendedDDL } = await this.graphQLService.sdk.metadataGetNodeExtendedDDL({ nodeId });
-    return metadataGetNodeExtendedDDL;
   }
 }
