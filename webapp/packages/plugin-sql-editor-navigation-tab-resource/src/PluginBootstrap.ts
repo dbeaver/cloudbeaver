@@ -125,7 +125,7 @@ export class PluginBootstrap extends Bootstrap {
               );
 
               if (!folderResourceKey) {
-                this.notificationService.logError({ title: 'ui_error', message: 'plugin_resource_manager_save_script_error' });
+                this.notificationService.logError({ title: 'ui_error', message: 'plugin_sql_editor_navigation_tab_resource_save_script_error' });
                 return;
               }
 
@@ -150,14 +150,14 @@ export class PluginBootstrap extends Bootstrap {
                 }
               }
 
-              this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: resourceKey.name });
+              this.notificationService.logSuccess({ title: 'plugin_sql_editor_navigation_tab_resource_save_script_success', message: resourceKey.name });
 
               if (!this.resourceManagerScriptsService.active) {
                 this.resourceManagerScriptsService.togglePanel();
               }
 
             } catch (exception) {
-              this.notificationService.logException(exception as any, 'plugin_resource_manager_save_script_error');
+              this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_save_script_error');
             }
           }
         }
@@ -261,7 +261,7 @@ export class PluginBootstrap extends Bootstrap {
         }
       }
     } catch (exception) {
-      this.notificationService.logException(exception as any, 'plugin_resource_manager_open_script_error');
+      this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_open_script_error');
     }
   }
 }
