@@ -20,5 +20,4 @@ export default [
   ['plugin_resource_manager_script_not_found_message', '脚本可能被删除或重命名，将使用最后的有效值'],
   ['plugin_resource_manager_script_name_invalid_characters_message', '脚本名称中可以使用字符"_-$.()@" 但不能以"."开头'],
   ['plugin_resource_manager_save_script_project_restriction_descripion', "The script's project can't be different from the connection's project"],
-  ['plugin_resource_manager_folder_delete_confirmation', 'You\'re going to delete "{arg:name}" and all its contents. Are you sure?'],
 ];

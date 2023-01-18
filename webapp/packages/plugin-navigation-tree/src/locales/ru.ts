@@ -15,6 +15,7 @@ export default [
   ['app_navigationTree_settings_folders_title', 'Папки'],
   ['app_navigationTree_settings_folders_description', 'Позволяет открыть любой узел как начальный'],
   ['app_navigationTree_node_delete_confirmation', 'Вы собираетесь удалить "{arg:name}". Вы уверены?'],
+  ['app_navigationTree_node_folder_delete_confirmation', 'Все содержимое выбранных папок будет удалено.'],
   ['app_navigationTree_node_delete_error', 'Ошибка удаления "{arg:name}'],
   ['app_navigationTree_node_rename_error', 'Ошибка переименования ноды'],
 

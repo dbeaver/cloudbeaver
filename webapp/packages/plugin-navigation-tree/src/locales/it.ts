@@ -9,6 +9,7 @@ export default [
   ['app_navigationTree_settings_filter_all_title', 'Show collapsed'],
   ['app_navigationTree_settings_filter_all_description', 'Shows filtered elements in collapsed folders'],
   ['app_navigationTree_node_delete_confirmation', 'You\'re going to delete "{arg:name}". Are you sure?'],
+  ['app_navigationTree_node_folder_delete_confirmation', 'All content in the selected folders will be deleted.'],
   ['app_navigationTree_node_delete_error', 'Failed to delete "{arg:name}'],
   ['app_navigationTree_node_rename_error', 'Error occurred while renaming'],
   ['app_navigationTree_settings_state_title', 'Save tree state'],
