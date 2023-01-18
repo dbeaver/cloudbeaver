@@ -25,7 +25,7 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
   ) {
     super(new Map(), []);
 
-    this.sync(this.userInfoResource);
+    this.sync(this.userInfoResource, () => {}, () => CachedMapAllKey);
     this.sharedProjectsResource.connect(this);
     appAuthService.requireAuthentication(this);
     this.sharedProjectsResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
@@ -54,6 +54,13 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
     });
 
     return this.data;
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }
 

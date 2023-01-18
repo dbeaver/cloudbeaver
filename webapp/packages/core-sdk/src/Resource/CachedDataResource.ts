@@ -92,6 +92,14 @@ export abstract class CachedDataResource<
     await this.loadData(param, false, context);
     return this.data as CachedResourceValueIncludes<TData, T>;
   }
+
+
+  protected validateParam(param: TParam): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'undefined'
+    );
+  }
 }
 
 export function getCachedDataResourceLoaderState<

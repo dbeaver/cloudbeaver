@@ -49,8 +49,8 @@ export class AppAuthService extends Bootstrap {
     map?: (param: T | undefined) => T
   ): this {
     resource
-      .preloadResource(this.userInfoResource, () => undefined)
-      .preloadResource(this.serverConfigResource, () => undefined)
+      .preloadResource(this.userInfoResource, () => {})
+      .preloadResource(this.serverConfigResource, () => {})
       .before(ExecutorInterrupter.interrupter(() => !this.authenticated));
 
     this.userInfoResource.outdateResource<T>(resource, map as any);

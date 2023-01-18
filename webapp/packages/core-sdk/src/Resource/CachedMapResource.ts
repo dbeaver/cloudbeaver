@@ -13,7 +13,7 @@ import { ILoadableState, isArraysEqual, isContainsException, MetadataMap, uuid }
 
 import { CachedResource, CachedResourceKey, CachedResourceParamKey, ICachedResourceMetadata } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
-import { ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from './ResourceKeyList';
+import { isResourceKeyList, ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from './ResourceKeyList';
 
 export type CachedMapResourceKey<TResource> = CachedResourceKey<TResource>;
 export type CachedMapResourceValue<TResource> = TResource extends CachedResource<Map<any, infer T>, any, any, any, any>
@@ -621,6 +621,13 @@ export abstract class CachedMapResource<
     });
 
     this.onDataOutdated.execute(key);
+  }
+
+  protected validateParam(param: ResourceKey<TKey>): boolean {
+    return (
+      super.validateParam(param)
+      || isResourceKeyList(param)
+    );
   }
 }
 

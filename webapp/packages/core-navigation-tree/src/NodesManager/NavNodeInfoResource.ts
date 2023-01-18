@@ -218,6 +218,13 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
       return navNode;
     });
   }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
+  }
 }
 
 export function getNodeDisplayName(node: NavNode): string {

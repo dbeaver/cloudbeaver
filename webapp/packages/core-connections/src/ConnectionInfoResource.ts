@@ -595,6 +595,19 @@ export class ConnectionInfoResource
       customIncludeOptions: false,
     };
   }
+
+  protected validateParam(param: ResourceKey<IConnectionInfoParams>): boolean {
+    return (
+      super.validateParam(param)
+      || param === connectionInfoProjectKeySymbol
+      || param === connectionInfoActiveProjectKeySymbol
+      || (
+        typeof param === 'object' && !isResourceKeyList(param)
+        && typeof param.projectId === 'string'
+        && ['string'].includes(typeof param.connectionId)
+      )
+    );
+  }
 }
 
 function isConnectionInfoProjectKey(

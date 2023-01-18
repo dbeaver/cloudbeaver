@@ -151,4 +151,11 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
       }
     });
   }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
+  }
 }

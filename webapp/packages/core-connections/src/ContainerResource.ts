@@ -205,6 +205,18 @@ string
       && param.catalogId === second.catalogId
     );
   }
+
+  protected validateParam(param: ObjectContainerParams): boolean {
+    return (
+      super.validateParam(param)
+      || (
+        typeof param === 'object'
+        && typeof param.projectId === 'string'
+        && ['string'].includes(typeof param.connectionId)
+        && ['string', 'undefined'].includes(typeof param.catalogId)
+      )
+    );
+  }
 }
 
 function serializeKey(key: ObjectContainerParams): string {

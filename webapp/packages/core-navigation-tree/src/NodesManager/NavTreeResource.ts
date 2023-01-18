@@ -524,4 +524,11 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
     return { navNodeChildren, navNodeInfo, parentPath };
   }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
+  }
 }

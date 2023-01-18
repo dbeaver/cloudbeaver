@@ -98,4 +98,11 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
     const oldDriver = this.get(keys);
     this.set(keys, oldDriver.map((oldDriver, i) => (Object.assign(oldDriver ?? {}, drivers[i]))));
   }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
+  }
 }

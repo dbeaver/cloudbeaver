@@ -171,6 +171,17 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
 
     return key;
   }
+
+  protected validateParam(param: ResourceKey<IConnectionFolderParam>): boolean {
+    return (
+      super.validateParam(param)
+      || (
+        typeof param === 'object' && !isResourceKeyList(param)
+        && typeof param.projectId === 'string'
+        && ['string'].includes(typeof param.folderId)
+      )
+    );
+  }
 }
 
 function isConnectionFolderProjectKey(

@@ -240,6 +240,13 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 
     return key;
   }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
+  }
 }
 
 function getBaseContext(context: SqlContextInfo): IConnectionExecutionContextInfo {

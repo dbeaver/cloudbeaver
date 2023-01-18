@@ -132,6 +132,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
   })));
 
   options = useObjectRef(options);
+  options.renderers = useMemo(() => options.renderers || [], [...(options.renderers || [])]);
+  options.filters = useMemo(() => options.filters || [], [...(options.filters || [])]);
+  options.expandStateGetters = useMemo(() => options.expandStateGetters || [], [...(options.expandStateGetters || [])]);
   const state = options.localState || localTreeNodesState;
 
   const functionsRef = useObjectRef({
@@ -296,8 +299,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
       && Array.isArray(data.nodeState)
     )
   );
-
-  const renderers = useMemo(() => options.renderers || [], [options.renderers]);
 
   const elementsTree = useObservableRef<IElementsTree>(() => ({
     actions: new SyncExecutor(),
@@ -548,7 +549,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     root: options.root,
     settings: options.settings,
     baseRoot: options.baseRoot,
-    renderers,
+    renderers: options.renderers,
     userData,
   }, ['isLoading', 'isLoaded']);
 
