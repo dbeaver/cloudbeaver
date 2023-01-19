@@ -66,6 +66,7 @@ import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
+import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -246,30 +247,45 @@ public class WebSession extends BaseWebSession
      * @param connectionIds list of updated connections
      * @param type          type of event
      */
-    public synchronized void updateProjectConnection(
+    public synchronized boolean updateProjectConnection(
         DBPProject project,
         List<String> connectionIds,
         WSEventType type
     ) {
+        var sendDataSourceUpdatedEvent = false;
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-        registry.refreshConfig();
+        // save old connections
+        var oldDataSources = connectionIds.stream()
+            .map(registry::getDataSource)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toMap(
+                DBPDataSourceContainer::getId,
+                ds -> new DataSourceDescriptor((DataSourceDescriptor) ds, ds.getRegistry())
+            ));
+        registry.refreshConfig(connectionIds);
         for (String connectionId : connectionIds) {
-            switch (type) {
-                case DATASOURCE_CREATED:
-                    DBPDataSourceContainer container = registry.getDataSource(connectionId);
-                    if (container == null) {
-                        break;
-                    }
-                    WebConnectionInfo connectionInfo = new WebConnectionInfo(this, registry.getDataSource(connectionId));
-                    this.connections.put(connectionInfo.getId(), connectionInfo);
-                    break;
-                case DATASOURCE_DELETED:
-                    this.connections.remove(connectionId);
-                    break;
-                default:
-                    break;
+            DataSourceDescriptor container = (DataSourceDescriptor) registry.getDataSource(connectionId);
+            if (container == null) {
+                continue;
             }
+            sendDataSourceUpdatedEvent |= isSendDataSourceUpdatedEvent(type, oldDataSources.get(connectionId), container);
         }
+        return sendDataSourceUpdatedEvent;
+    }
+
+    private boolean isSendDataSourceUpdatedEvent(WSEventType type, DataSourceDescriptor oldDataSource, DataSourceDescriptor newDataSource) {
+        if (type == WSEventType.DATASOURCE_CREATED) {
+            WebConnectionInfo connectionInfo = new WebConnectionInfo(this, newDataSource);
+            this.connections.put(connectionInfo.getId(), connectionInfo);
+        } else if (type == WSEventType.DATASOURCE_DELETED) {
+            this.connections.remove(newDataSource.getId());
+        } else {
+            try {
+                newDataSource.resolveSecretsIfNeeded();
+            } catch (DBException ignore) { }
+            return !newDataSource.equalSettings(oldDataSource);
+        }
+        return true;
     }
 
     // Note: for admin use only
