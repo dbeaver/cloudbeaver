@@ -31,7 +31,6 @@ import { ResourcesProjectsNavNodeService } from './ResourcesProjectsNavNodeServi
 interface ITargetNode {
   projectId: string;
   folderId?: string;
-
   projectNodeId: string;
   selectProject: boolean;
 }
@@ -102,6 +101,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       },
     });
   }
+
   load(): void | Promise<void> { }
 
   private async moveResourceToFolder(

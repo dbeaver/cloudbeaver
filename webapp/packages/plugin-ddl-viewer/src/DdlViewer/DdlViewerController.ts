@@ -14,7 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import { SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
 
-import { DdlViewerService } from '../DdlViewerService';
+import { DdlViewerService } from './DdlViewerService';
 
 @injectable()
 export class DdlViewerController implements IInitializableController, IDestructibleController {

@@ -56,13 +56,20 @@ export class NavNodeContextMenuService extends Bootstrap {
 
       const nodes = ResourceKeyUtils
         .mapArray(data, nodeId => this.navNodeInfoResource.get(nodeId))
-        .filter<NavNode>(Boolean as any)
-        .map(node => node.name)
-        .join(', ');
+        .filter<NavNode>(Boolean as any);
+
+      const name = nodes.map(node => node.name).join(', ');
+      const folder = nodes.some(node => node.folder);
+
+      let message: string = this.localizationService.translate('app_navigationTree_node_delete_confirmation', undefined, { name });
+
+      if (folder) {
+        message = message + '\n' + this.localizationService.translate('app_navigationTree_node_folder_delete_confirmation');
+      }
 
       const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
         title: 'ui_data_delete_confirmation',
-        message: this.localizationService.translate('app_navigationTree_node_delete_confirmation', undefined, { name: nodes }),
+        message,
         confirmActionText: 'ui_delete',
       });
 

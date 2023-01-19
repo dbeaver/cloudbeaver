@@ -1001,6 +1001,7 @@ export interface Query {
   listUserProfileProperties: Array<ObjectPropertyInfo>;
   listUsers: Array<AdminUserInfo>;
   metadataGetNodeDDL?: Maybe<Scalars['String']>;
+  metadataGetNodeExtendedDDL?: Maybe<Scalars['String']>;
   navGetStructContainers: DatabaseStructContainers;
   navNodeChildren: Array<NavigatorNodeInfo>;
   navNodeInfo: NavigatorNodeInfo;
@@ -1196,6 +1197,11 @@ export interface QueryListUsersArgs {
 export interface QueryMetadataGetNodeDdlArgs {
   nodeId: Scalars['ID'];
   options?: InputMaybe<Scalars['Object']>;
+}
+
+
+export interface QueryMetadataGetNodeExtendedDdlArgs {
+  nodeId: Scalars['ID'];
 }
 
 
@@ -2533,6 +2539,13 @@ export type MetadataGetNodeDdlQueryVariables = Exact<{
 
 
 export type MetadataGetNodeDdlQuery = { metadataGetNodeDDL?: string };
+
+export type MetadataGetNodeExtendedDdlQueryVariables = Exact<{
+  nodeId: Scalars['ID'];
+}>;
+
+
+export type MetadataGetNodeExtendedDdlQuery = { metadataGetNodeExtendedDDL?: string };
 
 export type GetChildrenDbObjectInfoQueryVariables = Exact<{
   navNodeId: Scalars['ID'];
@@ -4139,6 +4152,11 @@ export const MetadataGetNodeDdlDocument = `
   metadataGetNodeDDL(nodeId: $nodeId)
 }
     `;
+export const MetadataGetNodeExtendedDdlDocument = `
+    query metadataGetNodeExtendedDDL($nodeId: ID!) {
+  metadataGetNodeExtendedDDL(nodeId: $nodeId)
+}
+    `;
 export const GetChildrenDbObjectInfoDocument = `
     query getChildrenDBObjectInfo($navNodeId: ID!, $offset: Int, $limit: Int, $filter: ObjectPropertyFilter) {
   dbObjects: navNodeChildren(
@@ -4827,6 +4845,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     metadataGetNodeDDL(variables: MetadataGetNodeDdlQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<MetadataGetNodeDdlQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<MetadataGetNodeDdlQuery>(MetadataGetNodeDdlDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'metadataGetNodeDDL', 'query');
+    },
+    metadataGetNodeExtendedDDL(variables: MetadataGetNodeExtendedDdlQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<MetadataGetNodeExtendedDdlQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<MetadataGetNodeExtendedDdlQuery>(MetadataGetNodeExtendedDdlDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'metadataGetNodeExtendedDDL', 'query');
     },
     getChildrenDBObjectInfo(variables: GetChildrenDbObjectInfoQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetChildrenDbObjectInfoQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetChildrenDbObjectInfoQuery>(GetChildrenDbObjectInfoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getChildrenDBObjectInfo', 'query');

@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
 import { Loader, useStyles } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
@@ -17,33 +17,14 @@ import { useMenu } from '@cloudbeaver/core-view';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 import { SQLCodeEditorLoader } from '@cloudbeaver/plugin-sql-editor';
 
+import { TAB_PANEL_STYLES } from '../TAB_PANEL_STYLES';
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from './DATA_CONTEXT_DDL_VIEWER_NODE';
 import { DATA_CONTEXT_DDL_VIEWER_VALUE } from './DATA_CONTEXT_DDL_VIEWER_VALUE';
 import { DdlViewerController } from './DdlViewerController';
 import { MENU_DDL_VIEWER_FOOTER } from './MENU_DDL_VIEWER_FOOTER';
 
-const styles = css`
-  wrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-    composes: theme-typography--body1 from global;
-  }
-
-  SQLCodeEditorLoader {
-    height: 100%;
-    flex: 1;
-    overflow: auto;
-  }
-
-  MenuBar {
-    border-top: 1px solid;
-  }
-`;
-
 export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(function DDLViewerTabPanel({ nodeId, folderId }) {
-  const style = useStyles(styles);
+  const style = useStyles(TAB_PANEL_STYLES);
   const controller = useController(DdlViewerController, nodeId);
   const menu = useMenu({ menu: MENU_DDL_VIEWER_FOOTER });
 
