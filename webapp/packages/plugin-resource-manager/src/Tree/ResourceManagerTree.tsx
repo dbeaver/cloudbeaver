@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 
 import { useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { CaptureView } from '@cloudbeaver/core-view';
@@ -75,6 +75,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeService = useService(NavigationTreeService);
   const resourceManagerService = useService(ResourceManagerService);
+  const navTreeResource = useService(NavTreeResource);
 
   const settings = useUserData<IElementsTreeSettings>(
     getNavigationTreeUserSettingsId(root),
@@ -130,6 +131,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
       resourcesProjectsNavNodeService,
       projectsService,
       navNodeInfoResource,
+      navTreeResource,
       resourceManagerService,
       resourceTypeId,
     ),
@@ -137,6 +139,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
       resourcesProjectsNavNodeService,
       projectsService,
       navNodeInfoResource,
+      navTreeResource,
       resourceManagerService,
       resourceTypeId,
     ]

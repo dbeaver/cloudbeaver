@@ -7,7 +7,7 @@
  */
 
 
-import type { NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import type { NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import type { ProjectsService } from '@cloudbeaver/core-projects';
 import { RESOURCES_NODE_PATH, NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
@@ -21,6 +21,7 @@ export function navigationTreeProjectFilter(
   resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
   projectsService: ProjectsService,
   navNodeInfoResource: NavNodeInfoResource,
+  navTreeResource: NavTreeResource,
   resourceManagerService: ResourceManagerService,
   resourceTypeId?: string,
 ): IElementsTreeFilter {
@@ -33,9 +34,26 @@ export function navigationTreeProjectFilter(
       }
 
       const resourceFolder = resourceManagerService.getRootFolder(project, resourceTypeId);
+
+      if (resourceFolder === undefined) {
+        return children;
+      }
+
       const folderNodeId = createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
 
-      return children.filter(nodeId => nodeId === folderNodeId);
+      const nodes = navNodeInfoResource
+        .get(resourceKeyList(children))
+        .filter<NavNode>((node => node !== undefined) as (node: NavNode | undefined) => node is NavNode)
+        .filter(node => {
+          if (node.id === folderNodeId) {
+            return navTreeResource.get(node.id)?.length;
+          }
+          return false;
+        })
+        .map(node => node.id);
+
+      return nodes;
+
     }
 
     if (node.id !== RESOURCES_NODE_PATH) {
@@ -49,7 +67,18 @@ export function navigationTreeProjectFilter(
         if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT) {
           const project = resourcesProjectsNavNodeService.getProject(node.id);
 
-          return project && projectsService.activeProjects.includes(project);
+          if (!project || !projectsService.activeProjects.includes(project)) {
+            return false;
+          }
+
+          if (resourceTypeId) {
+            const resourceFolder = resourceManagerService.getRootFolder(project, resourceTypeId);
+
+            const folderNodeId = createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
+            return (navTreeResource.get(folderNodeId)?.length || 0) > 0;
+          }
+
+          return (navTreeResource.get(node.id)?.length || 0) > 0;
         }
         return true;
       })
