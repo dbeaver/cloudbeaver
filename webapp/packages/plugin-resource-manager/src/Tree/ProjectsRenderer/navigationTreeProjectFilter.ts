@@ -7,21 +7,37 @@
  */
 
 
-import type { NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import type { NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import type { ProjectsService } from '@cloudbeaver/core-projects';
 import { RESOURCES_NODE_PATH, NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { createPath } from '@cloudbeaver/core-utils';
 import type { IElementsTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
 import type { ResourcesProjectsNavNodeService } from '../../NavNodes/ResourcesProjectsNavNodeService';
+import type { ResourceManagerService } from '../../ResourceManagerService';
 
 export function navigationTreeProjectFilter(
   resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
   projectsService: ProjectsService,
   navNodeInfoResource: NavNodeInfoResource,
-  navTreeResource: NavTreeResource,
+  resourceManagerService: ResourceManagerService,
+  resourceTypeId?: string,
 ): IElementsTreeFilter {
   return (filter: string, node: NavNode, children: string[]) => {
+    if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT && resourceTypeId !== undefined) {
+      const project = resourcesProjectsNavNodeService.getProject(node.id);
+
+      if (!project) {
+        return children;
+      }
+
+      const resourceFolder = resourceManagerService.getRootFolder(project, resourceTypeId);
+      const folderNodeId = createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
+
+      return children.filter(nodeId => nodeId === folderNodeId);
+    }
+
     if (node.id !== RESOURCES_NODE_PATH) {
       return children;
     }
@@ -33,11 +49,7 @@ export function navigationTreeProjectFilter(
         if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT) {
           const project = resourcesProjectsNavNodeService.getProject(node.id);
 
-          if (!project || !projectsService.activeProjects.includes(project)) {
-            return false;
-          }
-
-          return navTreeResource.get(node.id)?.length;
+          return project && projectsService.activeProjects.includes(project);
         }
         return true;
       })

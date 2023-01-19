@@ -12,10 +12,9 @@ import styled, { css } from 'reshadow';
 
 import { useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { ProjectInfo, ProjectsService } from '@cloudbeaver/core-projects';
-import { NAV_NODE_TYPE_RM_PROJECT, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
-import { createPath } from '@cloudbeaver/core-utils';
+import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { ProjectsService } from '@cloudbeaver/core-projects';
+import { RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { CaptureView } from '@cloudbeaver/core-view';
 import { NavigationTreeService, ElementsTree, IElementsTreeSettings, createElementsTreeSettings, validateElementsTreeSettings, getNavigationTreeUserSettingsId } from '@cloudbeaver/plugin-navigation-tree';
 
@@ -26,6 +25,7 @@ import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigatio
 import { navigationTreeProjectsExpandStateGetter } from './ProjectsRenderer/navigationTreeProjectsExpandStateGetter';
 import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navigationTreeProjectsRendererRenderer';
 import { ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm';
+import { navigationTreeResourceExpandStateGetter } from './ResourceFolderRenderer/navigationTreeResourceExpandStateGetter';
 import { ResourceManagerTreeCaptureViewContext } from './ResourceManagerTreeCaptureViewContext';
 
 const styles = css`
@@ -73,7 +73,6 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
   const resourcesProjectsNavNodeService = useService(ResourcesProjectsNavNodeService);
   const projectsService = useService(ProjectsService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const navTreeResource = useService(NavTreeResource);
   const navTreeService = useService(NavigationTreeService);
   const resourceManagerService = useService(ResourceManagerService);
 
@@ -85,9 +84,35 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
   );
 
   const projectsRendererRenderer = useMemo(
-    () => navigationTreeProjectsRendererRenderer(navNodeInfoResource),
-    [navNodeInfoResource]
+    () => navigationTreeProjectsRendererRenderer(
+      navNodeInfoResource,
+      resourceManagerService,
+      resourcesProjectsNavNodeService,
+      resourceTypeId,
+    ),
+    [
+      navNodeInfoResource,
+      resourceManagerService,
+      resourcesProjectsNavNodeService,
+      resourceTypeId,
+    ]
   );
+
+  const resourceExpandStateGetter = useMemo(
+    () => navigationTreeResourceExpandStateGetter(
+      navNodeInfoResource,
+      resourceManagerService,
+      resourcesProjectsNavNodeService,
+      resourceTypeId
+    ),
+    [
+      navNodeInfoResource,
+      resourceManagerService,
+      resourcesProjectsNavNodeService,
+      resourceTypeId,
+    ]
+  );
+
   const projectsExpandStateGetter = useMemo(
     () => navigationTreeProjectsExpandStateGetter(
       navNodeInfoResource,
@@ -105,74 +130,32 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
       resourcesProjectsNavNodeService,
       projectsService,
       navNodeInfoResource,
-      navTreeResource
+      resourceManagerService,
+      resourceTypeId,
     ),
     [
       resourcesProjectsNavNodeService,
       projectsService,
       navNodeInfoResource,
-      navTreeResource,
+      resourceManagerService,
+      resourceTypeId,
     ]
   );
 
   const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);
 
-  function getResourceTypeFolder(project: ProjectInfo): string {
-    if (!resourceTypeId) {
-      return createPath(RESOURCES_NODE_PATH, project.id);
-    }
-
-    const resourceFolder = resourceManagerService.getRootFolder(project, resourceTypeId);
-    return createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
-  }
-
-  function getChildren(id: string) {
-    const node = navNodeInfoResource.get(id);
-
-    if (node?.nodeType === NAV_NODE_TYPE_RM_PROJECT) {
-      const project = resourcesProjectsNavNodeService.getProject(node.id);
-
-      if (project) {
-        id = getResourceTypeFolder(project);
-      }
-    }
-
-    return navTreeService.getChildren(id);
-  }
-
-  async function loadNestedNodes(id = root, tryConnect?: boolean, notify = true) {
-    const node = navNodeInfoResource.get(id);
-
-    let isNodesLoaded = await navTreeService.loadNestedNodes(id, tryConnect, notify);
-
-    if (node?.nodeType === NAV_NODE_TYPE_RM_PROJECT && isNodesLoaded) {
-      const project = resourcesProjectsNavNodeService.getProject(node.id);
-
-      if (project) {
-        const scriptsRoot = getResourceTypeFolder(project);
-
-        if (scriptsRoot !== id && navNodeInfoResource.has(scriptsRoot)) {
-          isNodesLoaded = await navTreeService.loadNestedNodes(scriptsRoot, tryConnect, notify);
-        }
-      }
-    }
-
-    return isNodesLoaded;
-  }
 
   return styled(styles)(
     <CaptureView view={navTreeService}>
       <ResourceManagerTreeCaptureViewContext resourceTypeId={resourceTypeId} />
       <ElementsTree
         root={root}
-        getChildren={getChildren}
-        loadChildren={loadNestedNodes}
-        // getChildren={navTreeService.getChildren}
-        // loadChildren={navTreeService.loadNestedNodes}
+        getChildren={navTreeService.getChildren}
+        loadChildren={navTreeService.loadNestedNodes}
         settings={settings}
         filters={[projectFilter]}
         renderers={[projectsRendererRenderer]}
-        expandStateGetters={[projectsExpandStateGetter]}
+        expandStateGetters={[projectsExpandStateGetter, resourceExpandStateGetter]}
         navNodeFilterCompare={navigationTreeProjectSearchCompare}
         settingsElements={settingsElements}
         emptyPlaceholder={() => styled(styles)(

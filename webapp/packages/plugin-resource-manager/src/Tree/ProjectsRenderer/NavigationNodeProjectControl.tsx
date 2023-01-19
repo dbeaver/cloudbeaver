@@ -14,7 +14,12 @@ import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeName, TREE_NODE_
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource, type INodeActions } from '@cloudbeaver/core-navigation-tree';
+import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
+import { CaptureViewContext } from '@cloudbeaver/core-view';
 import { ElementsTreeContext, NavigationNodeEditor, NavTreeControlComponent, NavTreeControlProps, TreeNodeMenu } from '@cloudbeaver/plugin-navigation-tree';
+
+import { ResourcesProjectsNavNodeService } from '../../NavNodes/ResourcesProjectsNavNodeService';
+import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
 
 
 const styles = css`
@@ -31,9 +36,6 @@ const styles = css`
   portal:focus-within {
     visibility: visible;
   }
-  portal {
-    position: relative;
-  }
   TreeNodeName {
     composes: theme-text-text-hint-on-light theme-typography--caption from global;
     height: 100%;
@@ -42,9 +44,10 @@ const styles = css`
     text-overflow: ellipsis;
   } 
   portal {
+    position: relative;
     box-sizing: border-box;
     margin-left: auto !important;
-    margin-right: 16px !important;
+    margin-right: 8px !important;
     visibility: hidden;
   }
   name-box {
@@ -59,13 +62,17 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
   dndPlaceholder,
   className,
 }, ref) {
+  const viewContext = useContext(CaptureViewContext);
   const elementsTreeContext = useContext(ElementsTreeContext);
   const treeNodeContext = useContext(TreeNodeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
+  const resourcesProjectsNavNodeService = useService(ResourcesProjectsNavNodeService);
   const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
   const selected = treeNodeContext.selected;
+  const resourceType = viewContext?.tryGet(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
 
   const [editing, setEditing] = useState(false);
+  let name = node.name;
 
   const nodeActions = useObjectRef<INodeActions>({
     rename: () => {
@@ -82,6 +89,20 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     treeNodeContext.select(event.ctrlKey || event.metaKey);
   }
 
+  if (
+    node.nodeType === NAV_NODE_TYPE_RM_PROJECT
+    && resourceType !== undefined
+  ) {
+    return null;
+  } else if (resourceType !== undefined && node.projectId) {
+    const project = resourcesProjectsNavNodeService.getProjectNodeId(node.projectId);
+    const projectName = navNodeInfoResource.get(project)?.name;
+
+    if (projectName) {
+      name = `${projectName} / ${name}`;
+    }
+  }
+
   if (elementsTreeContext?.tree.settings?.projects === false) {
     return null;
   }
@@ -93,11 +114,11 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
       {...use({ outdated, editing, dragging: dndElement })}
       className={className}
     >
-      <TreeNodeName title={node.name}>
+      <TreeNodeName title={name}>
         {editing ? (
           <NavigationNodeEditor node={node} onClose={() => setEditing(false)} />
         ) : (
-          <name-box>{node.name}</name-box>
+          <name-box>{name}</name-box>
         )}
       </TreeNodeName>
       {!editing && !dndPlaceholder && (
