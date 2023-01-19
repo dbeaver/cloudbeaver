@@ -20,7 +20,9 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
+import io.cloudbeaver.model.rm.DBNResourceManagerProject;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.security.SMUtils;
@@ -38,6 +40,7 @@ import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
 import org.jkiss.dbeaver.registry.DataSourceFolder;
+import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.util.ArrayList;
@@ -194,7 +197,7 @@ public class WebNavigatorNodeInfo {
         if (node instanceof DBNRoot) {
             return features.toArray(new String[0]);
         }
-        if (node instanceof DBNAbstractResourceManagerNode) {
+        if (node instanceof DBNAbstractResourceManagerNode && !isDistributedSpecialFolderNode()) {
             if (hasNodePermission(RMProjectPermission.RESOURCE_EDIT)) {
                 features.add(NODE_FEATURE_CAN_RENAME);
                 features.add(NODE_FEATURE_CAN_DELETE);
@@ -210,6 +213,19 @@ public class WebNavigatorNodeInfo {
         }
         RMProject rmProject = project.getRmProject();
         return SMUtils.hasProjectPermission(session, rmProject, permission);
+    }
+
+    private boolean isDistributedSpecialFolderNode() {
+        // do not send rename/delete features for distributed resource manager special folder
+        if (!session.getApplication().isDistributed() || !(node instanceof DBNResourceManagerResource) || !isFolder()) {
+            return false;
+        }
+        // check only root folders
+        if (!(node.getParentNode() instanceof DBNResourceManagerProject)) {
+            return false;
+        }
+        var folderPath = ((DBNResourceManagerResource) node).getResourceFolder();
+        return ResourceTypeRegistry.getInstance().getResourceTypeByRootPath(node.getOwnerProject(), folderPath) != null;
     }
 
     ///////////////////////////////////
