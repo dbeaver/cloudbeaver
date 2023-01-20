@@ -491,13 +491,10 @@ public class LocalResourceController implements RMController {
         log.debug("Moving resource properties");
         // Move properties
         final var project = getProjectMetadata(projectId, false);
-        project.moveResourceProperties(oldResourcePath, newResourcePath);
-
-        log.debug("Moving children properties");
         try {
-            moveChildrenProperties(project, projectId, newTargetPath, oldTargetPath.getFileName());
+            movePropertiesRecursive(project, projectId, newTargetPath, oldTargetPath.getFileName());
         } catch (IOException | DBException e) {
-            throw new DBException("Unable to move child resource properties", e);
+            throw new DBException("Unable to move resource properties", e);
         }
 
         fireRmResourceDeleteEvent(projectId, rmOldResourcePath);
@@ -505,48 +502,43 @@ public class LocalResourceController implements RMController {
         return DEFAULT_CHANGE_ID;
     }
 
-    private void moveChildrenProperties(
+    private void movePropertiesRecursive(
             @NotNull final DBPProject project,
             @NotNull final String projectId,
-            @NotNull final Path actualParentPath,
-            @NotNull final Path oldParentName
+            @NotNull final Path actualRootNodePath,
+            @NotNull final Path oldRootNodeName
     ) throws IOException, DBException {
         final var projectPath = getProjectPath(projectId);
-        Files.walkFileTree(actualParentPath, new SimpleFileVisitor<>() {
+        Files.walkFileTree(actualRootNodePath, new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-                Objects.requireNonNull(dir);
-                Objects.requireNonNull(attrs);
-
-                if (actualParentPath.toAbsolutePath().equals(dir.toAbsolutePath())) { // skip parent folder
-                    return FileVisitResult.CONTINUE;
-                }
+            public FileVisitResult preVisitDirectory(@NotNull Path dir, BasicFileAttributes attrs) {
                 moveResourceProperties(dir);
-
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                Objects.requireNonNull(file);
-                Objects.requireNonNull(attrs);
-
+            public FileVisitResult visitFile(@NotNull Path file, BasicFileAttributes attrs) {
                 moveResourceProperties(file);
-
                 return FileVisitResult.CONTINUE;
             }
 
-            private void moveResourceProperties(Path resourcePath) {
+            private void moveResourceProperties(@NotNull Path resourcePath) {
                 final var newResourcePropertiesPath = projectPath.relativize(resourcePath.toAbsolutePath());
-                // restores the old path "%oldParentName%/resource" from the new "%newParentName%/resource"
-                final var oldResourcePropertiesPath = oldParentName
-                        .resolve(newResourcePropertiesPath.subpath(1, newResourcePropertiesPath.getNameCount()));
+                final var oldResourcePropertiesPath = replacePathFirstEntry(newResourcePropertiesPath, oldRootNodeName);
 
                 if (log.isDebugEnabled()) {
-                    log.debug("Moving child resource properties from '" + oldResourcePropertiesPath + "' to '" + newResourcePropertiesPath + "'");
+                    log.debug("Moving resource properties from '" + oldResourcePropertiesPath + "' to '" + newResourcePropertiesPath + "'");
                 }
 
                 project.moveResourceProperties(oldResourcePropertiesPath.toString(), newResourcePropertiesPath.toString());
+            }
+
+            @NotNull
+            private Path replacePathFirstEntry(@NotNull Path path, @NotNull Path replacement) {
+                if (path.getNameCount() == 1) {
+                    return replacement;
+                }
+                return replacement.resolve(path.subpath(1, path.getNameCount()));
             }
         });
     }
