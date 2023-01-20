@@ -835,7 +835,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         if (credentialsProvider != null && credentialsProvider.getActiveUserCredentials() != null) {
             sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();
         }
-        eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId));
+        eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId, null));
     }
 
     protected Map<String, Object> readRuntimeConfigurationProperties() throws DBException {
