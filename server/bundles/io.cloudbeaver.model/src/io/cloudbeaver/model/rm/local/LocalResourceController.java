@@ -514,7 +514,7 @@ public class LocalResourceController implements RMController {
         final var projectPath = getProjectPath(projectId);
         Files.walkFileTree(actualParentPath, new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
                 Objects.requireNonNull(dir);
                 Objects.requireNonNull(attrs);
 
@@ -527,7 +527,7 @@ public class LocalResourceController implements RMController {
             }
 
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 Objects.requireNonNull(file);
                 Objects.requireNonNull(attrs);
 
