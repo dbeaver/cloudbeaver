@@ -45,11 +45,14 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   executingScript: boolean;
   state: ISqlEditorTabState;
   reactionDisposer: IReactionDisposer | null;
+  hintsLimitIsMet: boolean;
   updateParserScripts(): Promise<void>;
   getExecutingQuery(script: boolean): ISQLScriptSegment | undefined;
   getResolvedSegment(): Promise<ISQLScriptSegment | undefined>;
   getSubQuery(): ISQLScriptSegment | undefined;
 }
+
+const MAX_HINTS_LIMIT = 200;
 
 export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const connectionExecutionContextService = useService(ConnectionExecutionContextService);
@@ -141,6 +144,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     readonlyState: false,
     executingScript: false,
     reactionDisposer: null,
+    hintsLimitIsMet: false,
 
     init(): void {
       if (this.reactionDisposer) {
@@ -197,25 +201,18 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         return [];
       }
 
-      const { connectionId, id, defaultSchema, defaultCatalog } = this.dataSource.executionContext;
+      const hintsGetter = () => this.sqlEditorService.getAutocomplete(
+        connectionId, id, this.value, position, MAX_HINTS_LIMIT, simple
+      );
 
-      return this.getLastAutocomplete([
-        connectionId,
-        id,
-        defaultSchema,
-        defaultCatalog,
-        position,
-        simple,
-        word.slice(0, 1),
-      ], () => this.sqlEditorService
-        .getAutocomplete(
-          connectionId,
-          id,
-          this.value,
-          position,
-          undefined,
-          simple
-        ));
+      const { connectionId, id, defaultSchema, defaultCatalog } = this.dataSource.executionContext;
+      const key = [connectionId, id, defaultSchema, defaultCatalog, position, simple, word.slice(0, 1)];
+
+      const hints = await (this.hintsLimitIsMet ? hintsGetter() : this.getLastAutocomplete(key, hintsGetter));
+
+      this.hintsLimitIsMet = hints.length >= MAX_HINTS_LIMIT;
+
+      return hints;
     }, 1000 / 3),
 
     async formatScript(): Promise<void> {

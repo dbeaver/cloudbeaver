@@ -18,7 +18,7 @@ import { action } from 'mobx';
 import { useCallback } from 'react';
 import type { IControlledCodeMirror } from 'react-codemirror2';
 
-import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useExecutor, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { throttle } from '@cloudbeaver/core-utils';
 
 import type { ISQLEditorData } from '../ISQLEditorData';
@@ -36,8 +36,8 @@ interface ISQLCodeEditorPanelDataPrivate extends ISQLCodeEditorPanelData {
   readonly options: EditorConfiguration;
   handleQueryChange(editor: Editor, data: EditorChange, query: string): void;
   handleEditorConfigure(editor: Editor): void;
-  showHint(activeSuggest: boolean): Promise<void>;
-  getHandleAutocomplete(editor: Editor, options: ShowHintOptions): Promise<Hints | undefined>;
+  showHint(activeSuggest: boolean, showPlaceholder?: boolean): Promise<void>;
+  getHandleAutocomplete(editor: Editor, options: ShowHintOptions, showPlaceholder: boolean): Promise<Hints | undefined>;
   highlightActiveQuery(): void;
 }
 
@@ -47,6 +47,7 @@ export function useSQLCodeEditorPanel(
   data: ISQLEditorData,
   controller: SQLCodeEditorController | null
 ): ISQLCodeEditorPanelData {
+  const translate = useTranslate();
   const editorPanelData = useObservableRef<ISQLCodeEditorPanelDataPrivate>(() => ({
     activeSuggest: true,
     options: {
@@ -68,12 +69,12 @@ export function useSQLCodeEditorPanel(
         // 'Alt-X': () => { editorPanelData.data.executeScript(); },
 
         // Autocomplete
-        'Ctrl-Space': () => { editorPanelData.showHint(false); }, // classic for windows, linux
-        'Shift-Ctrl-Space': () => { editorPanelData.showHint(false); },
-        'Alt-Space': () => { editorPanelData.showHint(false); }, // workaround for binded 'Ctrl-Space' by input switch in macOS
+        'Ctrl-Space': () => { editorPanelData.showHint(false, true); }, // classic for windows, linux
+        'Shift-Ctrl-Space': () => { editorPanelData.showHint(false, true); },
+        'Alt-Space': () => { editorPanelData.showHint(false, true); }, // workaround for binded 'Ctrl-Space' by input switch in macOS
       },
     },
-    bindings:  {
+    bindings: {
       get options(): EditorConfiguration {
         return editorPanelData.options;
       },
@@ -187,7 +188,7 @@ export function useSQLCodeEditorPanel(
       editor.closeHint();
     },
 
-    async showHint(activeSuggest: boolean) {
+    async showHint(activeSuggest: boolean, showPlaceholder = false) {
       const editor = this.controller?.getEditor();
 
       if (!editor) {
@@ -206,56 +207,62 @@ export function useSQLCodeEditorPanel(
         completeSingle: !activeSuggest,
         updateOnCursorActivity: false,
         closeCharacters,
-        hint: this.getHandleAutocomplete,
+        hint: (editor: Editor, options: ShowHintOptions) => this.getHandleAutocomplete(
+          editor, options, showPlaceholder
+        ),
       });
     },
 
-
     async getHandleAutocomplete(
       editor: Editor,
-      options: ShowHintOptions
+      options: ShowHintOptions,
+      showPlaceholder: boolean,
     ): Promise<Hints | undefined> {
       const cursor = editor.getCursor('from');
       const [from, to, word] = getWordRange(editor, cursor);
-      const cursorPosition = getAbsolutePosition(
-        editor, word.length > 0
-          ? { ...from, ch: from.ch + 1 }
-          : from
-      );
+      const position = word.length > 0 ? { ...from, ch: from.ch + 1 } : from;
+      const cursorPosition = getAbsolutePosition(editor, position);
 
-      let proposals = await editorPanelData.data.getHintProposals(
-        cursorPosition,
-        word,
-        !options.completeSingle
-      );
+      const proposals = await editorPanelData.data.getHintProposals(cursorPosition, word, !options.completeSingle);
 
-      proposals = proposals.filter(
-        ({ displayString }) => (
-          word === '*'
-          || (
-            displayString.toLocaleLowerCase() !== word.toLocaleLowerCase()
-            && displayString.toLocaleLowerCase().startsWith(word.toLocaleLowerCase())
-          )
-        )
-      );
+      const filteredProposals = proposals.filter(({ displayString }) => (word === '*' || (
+        displayString.toLocaleLowerCase() !== word.toLocaleLowerCase()
+        && displayString.toLocaleLowerCase().startsWith(word.toLocaleLowerCase())
+      )));
+
+      if (showPlaceholder && proposals.length > 0 && !filteredProposals.length) {
+        editor.showHint({
+          completeSingle: false,
+          updateOnCursorActivity: false,
+          closeCharacters,
+          hint: () => ({
+            from,
+            to,
+            list: [{ text: word, displayText: translate('sql_editor_no_hints') }],
+          }),
+        });
+
+        return;
+      }
 
       const hints: Hints = {
         from,
         to,
-        list: proposals.map(({ displayString, replacementString }) => ({
+        list: filteredProposals.map(({ displayString, replacementString }) => ({
           text: replacementString,
           displayText: displayString,
         })),
       };
 
       // fix single completion
-      if (proposals.length === 1 && options.completeSingle) {
+      if (filteredProposals.length === 1 && options.completeSingle) {
         editor.showHint({
           completeSingle: true,
           updateOnCursorActivity: false,
           closeCharacters,
           hint: () => hints,
         });
+
         return;
       }
 
@@ -284,7 +291,7 @@ export function useSQLCodeEditorPanel(
 
   useExecutor({
     executor: data.onUpdate,
-    handlers:[updateHighlight],
+    handlers: [updateHighlight],
   });
 
   useExecutor({
