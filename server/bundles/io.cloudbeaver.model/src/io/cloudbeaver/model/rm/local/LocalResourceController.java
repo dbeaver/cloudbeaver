@@ -503,10 +503,10 @@ public class LocalResourceController implements RMController {
     }
 
     private void movePropertiesRecursive(
-            @NotNull final DBPProject project,
-            @NotNull final String projectId,
-            @NotNull final Path actualRootNodePath,
-            @NotNull final Path oldRootNodeName
+            @NotNull DBPProject project,
+            @NotNull String projectId,
+            @NotNull Path actualRootNodePath,
+            @NotNull Path oldRootNodeName
     ) throws IOException, DBException {
         final var projectPath = getProjectPath(projectId);
         Files.walkFileTree(actualRootNodePath, new SimpleFileVisitor<>() {
