@@ -489,10 +489,8 @@ public class LocalResourceController implements RMController {
         }
 
         log.debug("Moving resource properties");
-        // Move properties
-        final var project = getProjectMetadata(projectId, false);
         try {
-            movePropertiesRecursive(project, projectId, newTargetPath, oldTargetPath.getFileName());
+            movePropertiesRecursive(projectId, newTargetPath, oldTargetPath.getFileName());
         } catch (IOException | DBException e) {
             throw new DBException("Unable to move resource properties", e);
         }
@@ -503,11 +501,11 @@ public class LocalResourceController implements RMController {
     }
 
     private void movePropertiesRecursive(
-            @NotNull DBPProject project,
             @NotNull String projectId,
             @NotNull Path actualRootNodePath,
             @NotNull Path oldRootNodeName
     ) throws IOException, DBException {
+        final var project = getProjectMetadata(projectId, false);
         final var projectPath = getProjectPath(projectId);
         Files.walkFileTree(actualRootNodePath, new SimpleFileVisitor<>() {
             @Override
