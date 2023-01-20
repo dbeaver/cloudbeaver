@@ -99,7 +99,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     const projectName = navNodeInfoResource.get(project)?.name;
 
     if (projectName) {
-      name = `${projectName} / ${name}`;
+      name = projectName;
     }
   }
 
