@@ -49,6 +49,7 @@ import org.jkiss.utils.IOUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -471,6 +472,9 @@ public class LocalResourceController implements RMController {
         @NotNull String oldResourcePath,
         @NotNull String newResourcePath
     ) throws DBException {
+        if (log.isDebugEnabled()) {
+            log.debug("Moving resource from '" + oldResourcePath + "' to '" + newResourcePath + "'");
+        }
         Path oldTargetPath = getTargetPath(projectId, oldResourcePath);
         List<RMResource> rmOldResourcePath = makeResourcePath(projectId, oldTargetPath, false);
         if (!Files.exists(oldTargetPath)) {
@@ -483,12 +487,68 @@ public class LocalResourceController implements RMController {
         } catch (IOException e) {
             throw new DBException("Error moving resource '" + oldResourcePath + "'", e);
         }
+
+        log.debug("Moving resource properties");
         // Move properties
-        getProjectMetadata(projectId, false).moveResourceProperties(oldResourcePath, newResourcePath);
+        final var project = getProjectMetadata(projectId, false);
+        project.moveResourceProperties(oldResourcePath, newResourcePath);
+
+        log.debug("Moving children properties");
+        try {
+            moveChildrenProperties(project, projectId, newTargetPath, oldTargetPath.getFileName());
+        } catch (IOException | DBException e) {
+            throw new DBException("Unable to move child resource properties", e);
+        }
 
         fireRmResourceDeleteEvent(projectId, rmOldResourcePath);
         fireRmResourceAddEvent(projectId, newResourcePath);
         return DEFAULT_CHANGE_ID;
+    }
+
+    private void moveChildrenProperties(
+            @NotNull final DBPProject project,
+            @NotNull final String projectId,
+            @NotNull final Path actualParentPath,
+            @NotNull final Path oldParentName
+    ) throws IOException, DBException {
+        final var projectPath = getProjectPath(projectId);
+        Files.walkFileTree(actualParentPath, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                Objects.requireNonNull(dir);
+                Objects.requireNonNull(attrs);
+
+                if (actualParentPath.toAbsolutePath().equals(dir.toAbsolutePath())) { // skip parent folder
+                    return FileVisitResult.CONTINUE;
+                }
+                moveResourceProperties(dir);
+
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Objects.requireNonNull(file);
+                Objects.requireNonNull(attrs);
+
+                moveResourceProperties(file);
+
+                return FileVisitResult.CONTINUE;
+            }
+
+            private void moveResourceProperties(Path resourcePath) {
+                final var newResourcePropertiesPath = projectPath.relativize(resourcePath.toAbsolutePath());
+                // restores the old path "%oldParentName%/resource" from the new "%newParentName%/resource"
+                final var oldResourcePropertiesPath = oldParentName
+                        .resolve(newResourcePropertiesPath.subpath(1, newResourcePropertiesPath.getNameCount()));
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Moving child resource properties from '" + oldResourcePropertiesPath + "' to '" + newResourcePropertiesPath + "'");
+                }
+
+                project.moveResourceProperties(oldResourcePropertiesPath.toString(), newResourcePropertiesPath.toString());
+            }
+        });
     }
 
     @Override
