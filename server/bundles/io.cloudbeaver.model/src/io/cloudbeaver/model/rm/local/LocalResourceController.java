@@ -22,6 +22,7 @@ import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.file.UniversalFileVisitor;
 import org.eclipse.core.runtime.IPath;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -42,14 +43,11 @@ import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.jkiss.utils.ArrayUtils;
-import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.IOUtils;
+import org.jkiss.utils.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -507,38 +505,17 @@ public class LocalResourceController implements RMController {
     ) throws IOException, DBException {
         final var project = getProjectMetadata(projectId, false);
         final var projectPath = getProjectPath(projectId);
-        Files.walkFileTree(actualRootNodePath, new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult preVisitDirectory(@NotNull Path dir, BasicFileAttributes attrs) {
-                moveResourceProperties(dir);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(@NotNull Path file, BasicFileAttributes attrs) {
-                moveResourceProperties(file);
-                return FileVisitResult.CONTINUE;
-            }
-
-            private void moveResourceProperties(@NotNull Path resourcePath) {
-                final var newResourcePropertiesPath = projectPath.relativize(resourcePath.toAbsolutePath());
-                final var oldResourcePropertiesPath = replacePathFirstEntry(newResourcePropertiesPath, oldRootNodeName);
-
-                if (log.isDebugEnabled()) {
-                    log.debug("Moving resource properties from '" + oldResourcePropertiesPath + "' to '" + newResourcePropertiesPath + "'");
-                }
-
-                project.moveResourceProperties(oldResourcePropertiesPath.toString(), newResourcePropertiesPath.toString());
-            }
-
-            @NotNull
-            private Path replacePathFirstEntry(@NotNull Path path, @NotNull Path replacement) {
-                if (path.getNameCount() == 1) {
-                    return replacement;
-                }
-                return replacement.resolve(path.subpath(1, path.getNameCount()));
-            }
+        final var propertiesPathsList = new ArrayList<Pair<String, String>>();
+        Files.walkFileTree(actualRootNodePath, (UniversalFileVisitor<Path>) (path, attrs) -> {
+            final var newResourcePropertiesPath = projectPath.relativize(path.toAbsolutePath());
+            final var oldResourcePropertiesPath = PathUtils.replacePathStart(newResourcePropertiesPath, oldRootNodeName);
+            propertiesPathsList.add(new Pair<>(oldResourcePropertiesPath.toString(), newResourcePropertiesPath.toString()));
+            return FileVisitResult.CONTINUE;
         });
+        if (log.isDebugEnabled()) {
+            log.debug("Move resources properties:\n" + propertiesPathsList);
+        }
+        project.moveResourcePropertiesBatch(propertiesPathsList);
     }
 
     @Override
