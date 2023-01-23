@@ -43,7 +43,10 @@ import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.jkiss.utils.*;
+import org.jkiss.utils.ArrayUtils;
+import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.IOUtils;
+import org.jkiss.utils.Pair;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -55,6 +58,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.jkiss.utils.StringUtils.normalizeResourcePath;
 
 /**
  * Resource manager API
@@ -470,46 +475,49 @@ public class LocalResourceController implements RMController {
         @NotNull String oldResourcePath,
         @NotNull String newResourcePath
     ) throws DBException {
+        var normalizedOldResourcePath = normalizeResourcePath(oldResourcePath);
+        var normalizedNewResourcePath = normalizeResourcePath(newResourcePath);
         if (log.isDebugEnabled()) {
-            log.debug("Moving resource from '" + oldResourcePath + "' to '" + newResourcePath + "'");
+            log.debug("Moving resource from '" + normalizedOldResourcePath + "' to '" + normalizedNewResourcePath + "'");
         }
-        Path oldTargetPath = getTargetPath(projectId, oldResourcePath);
+        Path oldTargetPath = getTargetPath(projectId, normalizedOldResourcePath);
         List<RMResource> rmOldResourcePath = makeResourcePath(projectId, oldTargetPath, false);
         if (!Files.exists(oldTargetPath)) {
             throw new DBException("Resource '" + oldTargetPath + "' doesn't exists");
         }
-        Path newTargetPath = getTargetPath(projectId, newResourcePath);
+        Path newTargetPath = getTargetPath(projectId, normalizedNewResourcePath);
         validateResourcePath(newTargetPath.toString());
         try {
             Files.move(oldTargetPath, newTargetPath);
         } catch (IOException e) {
-            throw new DBException("Error moving resource '" + oldResourcePath + "'", e);
+            throw new DBException("Error moving resource '" + normalizedOldResourcePath + "'", e);
         }
 
         log.debug("Moving resource properties");
         try {
-            movePropertiesRecursive(projectId, newTargetPath, oldTargetPath.getFileName());
+            movePropertiesRecursive(projectId, newTargetPath, normalizedOldResourcePath, normalizedNewResourcePath);
         } catch (IOException | DBException e) {
             throw new DBException("Unable to move resource properties", e);
         }
 
         fireRmResourceDeleteEvent(projectId, rmOldResourcePath);
-        fireRmResourceAddEvent(projectId, newResourcePath);
+        fireRmResourceAddEvent(projectId, normalizedNewResourcePath);
         return DEFAULT_CHANGE_ID;
     }
 
     private void movePropertiesRecursive(
             @NotNull String projectId,
-            @NotNull Path actualRootNodePath,
-            @NotNull Path oldRootNodeName
+            @NotNull Path rootResourcePath,
+            @NotNull String oldRootPropertiesPath,
+            @NotNull String newRootPropertiesPath
     ) throws IOException, DBException {
-        final var project = getProjectMetadata(projectId, false);
-        final var projectPath = getProjectPath(projectId);
-        final var propertiesPathsList = new ArrayList<Pair<String, String>>();
-        Files.walkFileTree(actualRootNodePath, (UniversalFileVisitor<Path>) (path, attrs) -> {
-            final var newResourcePropertiesPath = projectPath.relativize(path.toAbsolutePath());
-            final var oldResourcePropertiesPath = PathUtils.replacePathStart(newResourcePropertiesPath, oldRootNodeName);
-            propertiesPathsList.add(new Pair<>(oldResourcePropertiesPath.toString(), newResourcePropertiesPath.toString()));
+        var project = getProjectMetadata(projectId, false);
+        var projectPath = getProjectPath(projectId);
+        var propertiesPathsList = new ArrayList<Pair<String, String>>();
+        Files.walkFileTree(rootResourcePath, (UniversalFileVisitor<Path>) (path, attrs) -> {
+            var newResourcePropertiesPath = normalizeResourcePath(projectPath.relativize(path.toAbsolutePath()).toString());
+            var oldResourcePropertiesPath = newResourcePropertiesPath.replace(newRootPropertiesPath, oldRootPropertiesPath);
+            propertiesPathsList.add(new Pair<>(oldResourcePropertiesPath, newResourcePropertiesPath));
             return FileVisitResult.CONTINUE;
         });
         if (log.isDebugEnabled()) {
