@@ -208,7 +208,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       const { connectionId, id, defaultSchema, defaultCatalog } = this.dataSource.executionContext;
       const key = [connectionId, id, defaultSchema, defaultCatalog, position, simple, word.slice(0, 1)];
 
-      const hints = await (this.hintsLimitIsMet ? hintsGetter() : this.getLastAutocomplete(key, hintsGetter));
+      const hints = await this.getLastAutocomplete(key, hintsGetter);
 
       this.hintsLimitIsMet = hints.length >= MAX_HINTS_LIMIT;
 
@@ -462,10 +462,11 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     isLineScriptEmpty: computed,
     isDisabled: computed,
     value: computed,
+    readonly: computed,
+    hintsLimitIsMet: observable.ref,
     cursor: observable,
     readonlyState: observable,
     executingScript: observable,
-    readonly: computed,
   }, {
     state,
     connectionExecutionContextService,

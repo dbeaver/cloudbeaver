@@ -46,6 +46,7 @@ export interface ISQLEditorData {
   readonly isScriptEmpty: boolean;
   readonly isDisabled: boolean;
   readonly value: string;
+  readonly hintsLimitIsMet: boolean;
   readonly dataSource: ISqlDataSource | undefined;
   readonly onExecute: ISyncExecutor<boolean>;
   readonly onSegmentExecute: ISyncExecutor<ISegmentExecutionData>;
@@ -59,7 +60,7 @@ export interface ISQLEditorData {
   destruct(): void;
   setCursor(begin: number, end?: number): void;
   formatScript(): Promise<void>;
-  executeQuery (): Promise<void>;
+  executeQuery(): Promise<void>;
   executeQueryNewTab(): Promise<void>;
   showExecutionPlan(): Promise<void>;
   executeScript(): Promise<void>;

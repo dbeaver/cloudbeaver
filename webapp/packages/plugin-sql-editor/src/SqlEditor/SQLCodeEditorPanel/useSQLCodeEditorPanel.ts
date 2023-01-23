@@ -220,7 +220,9 @@ export function useSQLCodeEditorPanel(
     ): Promise<Hints | undefined> {
       const cursor = editor.getCursor('from');
       const [from, to, word] = getWordRange(editor, cursor);
-      const position = word.length > 0 ? { ...from, ch: from.ch + 1 } : from;
+
+      const ch = editorPanelData.data.hintsLimitIsMet ? to.ch : from.ch + 1;
+      const position = word.length > 0 ? { ...from, ch } : from;
       const cursorPosition = getAbsolutePosition(editor, position);
 
       const proposals = await editorPanelData.data.getHintProposals(cursorPosition, word, !options.completeSingle);
