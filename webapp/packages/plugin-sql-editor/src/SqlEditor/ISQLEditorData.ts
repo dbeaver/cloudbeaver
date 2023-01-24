@@ -46,7 +46,6 @@ export interface ISQLEditorData {
   readonly isScriptEmpty: boolean;
   readonly isDisabled: boolean;
   readonly value: string;
-  readonly hintsLimitIsMet: boolean;
   readonly dataSource: ISqlDataSource | undefined;
   readonly onExecute: ISyncExecutor<boolean>;
   readonly onSegmentExecute: ISyncExecutor<ISegmentExecutionData>;

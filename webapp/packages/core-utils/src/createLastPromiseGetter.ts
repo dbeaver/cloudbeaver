@@ -7,13 +7,18 @@
  */
 
 export type LastPromiseGetterKey = Array<string | number | boolean | undefined | null>;
-export type LastPromiseGetter<R> = (key: LastPromiseGetterKey, query: () => Promise<R>) => Promise<R>;
+export type LastPromiseGetter<R> = (key: LastPromiseGetterKey, query: () => Promise<R>, reset?: boolean) => Promise<R>;
 export function createLastPromiseGetter<R>(): LastPromiseGetter<R> {
   let lastKey: LastPromiseGetterKey | undefined = undefined;
   let lastPromise: Promise<R> | undefined = undefined;
 
-  return async (key: LastPromiseGetterKey, getter: () => Promise<R>) => {
+  return async (key: LastPromiseGetterKey, getter: () => Promise<R>, reset?: boolean) => {
     const currentKeyStr = JSON.stringify(key);
+
+    if (reset) {
+      lastKey = undefined;
+    }
+
     const lastKeyStr = lastKey ? JSON.stringify(lastKey) : undefined;
 
     if (currentKeyStr !== lastKeyStr) {

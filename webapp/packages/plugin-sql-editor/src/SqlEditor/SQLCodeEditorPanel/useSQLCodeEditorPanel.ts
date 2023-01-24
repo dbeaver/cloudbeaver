@@ -18,7 +18,7 @@ import { action } from 'mobx';
 import { useCallback } from 'react';
 import type { IControlledCodeMirror } from 'react-codemirror2';
 
-import { useExecutor, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
 import { throttle } from '@cloudbeaver/core-utils';
 
 import type { ISQLEditorData } from '../ISQLEditorData';
@@ -36,8 +36,8 @@ interface ISQLCodeEditorPanelDataPrivate extends ISQLCodeEditorPanelData {
   readonly options: EditorConfiguration;
   handleQueryChange(editor: Editor, data: EditorChange, query: string): void;
   handleEditorConfigure(editor: Editor): void;
-  showHint(activeSuggest: boolean, showPlaceholder?: boolean): Promise<void>;
-  getHandleAutocomplete(editor: Editor, options: ShowHintOptions, showPlaceholder: boolean): Promise<Hints | undefined>;
+  showHint(activeSuggest: boolean): Promise<void>;
+  getHandleAutocomplete(editor: Editor, options: ShowHintOptions): Promise<Hints | undefined>;
   highlightActiveQuery(): void;
 }
 
@@ -47,7 +47,6 @@ export function useSQLCodeEditorPanel(
   data: ISQLEditorData,
   controller: SQLCodeEditorController | null
 ): ISQLCodeEditorPanelData {
-  const translate = useTranslate();
   const editorPanelData = useObservableRef<ISQLCodeEditorPanelDataPrivate>(() => ({
     activeSuggest: true,
     options: {
@@ -69,9 +68,9 @@ export function useSQLCodeEditorPanel(
         // 'Alt-X': () => { editorPanelData.data.executeScript(); },
 
         // Autocomplete
-        'Ctrl-Space': () => { editorPanelData.showHint(false, true); }, // classic for windows, linux
-        'Shift-Ctrl-Space': () => { editorPanelData.showHint(false, true); },
-        'Alt-Space': () => { editorPanelData.showHint(false, true); }, // workaround for binded 'Ctrl-Space' by input switch in macOS
+        'Ctrl-Space': () => { editorPanelData.showHint(false); }, // classic for windows, linux
+        'Shift-Ctrl-Space': () => { editorPanelData.showHint(false); },
+        'Alt-Space': () => { editorPanelData.showHint(false); }, // workaround for binded 'Ctrl-Space' by input switch in macOS
       },
     },
     bindings: {
@@ -188,7 +187,7 @@ export function useSQLCodeEditorPanel(
       editor.closeHint();
     },
 
-    async showHint(activeSuggest: boolean, showPlaceholder = false) {
+    async showHint(activeSuggest: boolean) {
       const editor = this.controller?.getEditor();
 
       if (!editor) {
@@ -207,22 +206,18 @@ export function useSQLCodeEditorPanel(
         completeSingle: !activeSuggest,
         updateOnCursorActivity: false,
         closeCharacters,
-        hint: (editor: Editor, options: ShowHintOptions) => this.getHandleAutocomplete(
-          editor, options, showPlaceholder
-        ),
+        hint: (editor: Editor, options: ShowHintOptions) => this.getHandleAutocomplete(editor, options),
       });
     },
 
     async getHandleAutocomplete(
       editor: Editor,
       options: ShowHintOptions,
-      showPlaceholder: boolean,
     ): Promise<Hints | undefined> {
       const cursor = editor.getCursor('from');
       const [from, to, word] = getWordRange(editor, cursor);
 
-      const ch = editorPanelData.data.hintsLimitIsMet ? to.ch : from.ch + 1;
-      const position = word.length > 0 ? { ...from, ch } : from;
+      const position = word.length > 0 ? { ...from, ch: from.ch + 1 } : from;
       const cursorPosition = getAbsolutePosition(editor, position);
 
       const proposals = await editorPanelData.data.getHintProposals(cursorPosition, word, !options.completeSingle);
@@ -231,21 +226,6 @@ export function useSQLCodeEditorPanel(
         displayString.toLocaleLowerCase() !== word.toLocaleLowerCase()
         && displayString.toLocaleLowerCase().startsWith(word.toLocaleLowerCase())
       )));
-
-      if (showPlaceholder && proposals.length > 0 && !filteredProposals.length) {
-        editor.showHint({
-          completeSingle: false,
-          updateOnCursorActivity: false,
-          closeCharacters,
-          hint: () => ({
-            from,
-            to,
-            list: [{ text: word, displayText: translate('sql_editor_no_hints') }],
-          }),
-        });
-
-        return;
-      }
 
       const hints: Hints = {
         from,
@@ -317,7 +297,6 @@ export function useSQLCodeEditorPanel(
 
   return editorPanelData;
 }
-
 
 function getAbsolutePosition(editor: Editor, position: Position) {
   return editor.getRange({ line: 0, ch: 0 }, position).length;
