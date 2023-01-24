@@ -91,7 +91,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     ResourceKeyUtils.forEach(keyObject, key => {
       const metadata = this.metadata.get(key);
 
-      if (metadata.withDetails !== state) {
+      if (!metadata.withDetails && state) {
         metadata.outdated = true;
       }
       metadata.withDetails = state;
