@@ -21,5 +21,4 @@ export default [
   ['sql_execution_plan_properties_panel_general', 'Generale'],
   ['sql_execution_plan_properties_panel_details', 'Dettagli'],
   ['sql_editor_close_result_tabs_dialog_title', 'Confirm closing tabs'],
-  ['sql_editor_no_hints', 'No hints'],
 ];

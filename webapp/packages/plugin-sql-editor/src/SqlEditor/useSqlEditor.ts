@@ -202,18 +202,16 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       }
 
       const { connectionId, id, defaultSchema, defaultCatalog } = this.dataSource.executionContext;
-      const key = [connectionId, id, defaultSchema, defaultCatalog, position, simple, word.slice(0, 1)];
+      const key = [connectionId, id, defaultSchema, defaultCatalog, position, word.slice(0, 1)];
       const reset = this.hintsLimitIsMet || !simple;
 
       if (reset) {
         position = position + word.length - 1;
       }
 
-      const hintsGetter = () => this.sqlEditorService.getAutocomplete(
+      const hints = await this.getLastAutocomplete(key, () => this.sqlEditorService.getAutocomplete(
         connectionId, id, this.value, position, MAX_HINTS_LIMIT, simple
-      );
-
-      const hints = await this.getLastAutocomplete(key, hintsGetter, reset);
+      ), reset);
 
       this.hintsLimitIsMet = hints.length >= MAX_HINTS_LIMIT;
 

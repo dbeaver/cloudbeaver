@@ -25,5 +25,4 @@ export default [
   ['sql_editor_upload_script_unsaved_changes_dialog_message', '您当前的脚本将被上传的脚本覆盖。要先保存吗？'],
   ['sql_editor_upload_script_max_size_title', '文件大小超过最大大小'],
   ['sql_editor_close_result_tabs_dialog_title', 'Confirm closing tabs'],
-  ['sql_editor_no_hints', 'No hints'],
 ];
