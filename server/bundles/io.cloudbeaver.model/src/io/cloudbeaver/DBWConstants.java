@@ -27,6 +27,7 @@ public class DBWConstants {
     public static final String PERMISSION_ADMIN = DBAPermissionRealm.PERMISSION_ADMIN;
 
     public static final String PERMISSION_CONFIGURATION_MANAGER = "configuration-manager";
+    public static final String PERMISSION_PRIVATE_PROJECT_ACCESS = "private-project-access";
 
     public static final String PERMISSION_EDIT_STRUCTURE = "edit-meta";
     public static final String PERMISSION_EDIT_DATA = "edit-data";
