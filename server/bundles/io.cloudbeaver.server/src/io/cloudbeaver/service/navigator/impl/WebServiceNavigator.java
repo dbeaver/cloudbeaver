@@ -435,16 +435,14 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             oldResourcePath,
             oldRmResourcePath,
             WSConstants.EventAction.DELETE,
-            WSResourceProperty.NAME,
-            null);
+            WSResourceProperty.NAME);
         WebEventUtils.addRmResourceUpdatedEvent(
             projectId,
             session,
             newResourcePath,
             newRmResourcePath,
             WSConstants.EventAction.CREATE,
-            WSResourceProperty.NAME,
-            null);
+            WSResourceProperty.NAME);
     }
 
     @Override
@@ -512,8 +510,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         resourcePath,
                         rmResourcePath,
                         WSConstants.EventAction.DELETE,
-                        WSResourceProperty.NAME,
-                        null);
+                        WSResourceProperty.NAME);
                 }
             }
             if (containsFolderNodes) {

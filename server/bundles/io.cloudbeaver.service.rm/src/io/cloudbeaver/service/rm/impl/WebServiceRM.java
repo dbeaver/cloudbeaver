@@ -156,8 +156,7 @@ public class WebServiceRM implements DBWServiceRM {
                 resourcePath,
                 getResourceController(webSession).getResourcePath(projectId, resourcePath),
                 WSConstants.EventAction.CREATE,
-                WSResourceProperty.NAME,
-                null);
+                WSResourceProperty.NAME);
             return result;
         } catch (Exception e) {
             throw new DBWebException("Error creating resource " + resourcePath, e);
@@ -179,8 +178,7 @@ public class WebServiceRM implements DBWServiceRM {
                 resourcePath,
                 rmResourcePath,
                 WSConstants.EventAction.DELETE,
-                WSResourceProperty.NAME,
-                null);
+                WSResourceProperty.NAME);
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error deleting resource " + resourcePath, e);
@@ -206,16 +204,14 @@ public class WebServiceRM implements DBWServiceRM {
                 oldResourcePath,
                 oldRmResourcePath,
                 WSConstants.EventAction.DELETE,
-                WSResourceProperty.NAME,
-                null);
+                WSResourceProperty.NAME);
             WebEventUtils.addRmResourceUpdatedEvent(
                 projectId,
                 webSession,
                 newResourcePath,
                 newRmResourcePath,
                 WSConstants.EventAction.CREATE,
-                WSResourceProperty.NAME,
-                null);
+                WSResourceProperty.NAME);
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error moving resource " + oldResourcePath, e);
@@ -245,8 +241,7 @@ public class WebServiceRM implements DBWServiceRM {
                 resourcePath,
                 getResourceController(webSession).getResourcePath(projectId, resourcePath),
                 eventType,
-                WSResourceProperty.CONTENT,
-                null);
+                WSResourceProperty.CONTENT);
             return content;
         } catch (Exception e) {
             throw new DBWebException("Error writing resource '" + resourcePath + "' data", e);

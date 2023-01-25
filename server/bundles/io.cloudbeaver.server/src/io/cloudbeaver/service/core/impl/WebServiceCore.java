@@ -477,15 +477,17 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     private WSDataSourceProperty getDatasourceEventProperty(DataSourceDescriptor oldDataSource, DBPDataSourceContainer dataSource) {
-        if (oldDataSource.equalConfiguration((DataSourceDescriptor) dataSource)) {
-            var equalNames = CommonUtils.equalObjects(oldDataSource.getName(), dataSource.getName());
-            var equalDescriptions = CommonUtils.equalObjects(oldDataSource.getDescription(), dataSource.getDescription());
-            if (equalNames != equalDescriptions) {
-                return equalNames ? WSDataSourceProperty.NAME : WSDataSourceProperty.DESCRIPTION;
-            }
+        if (!oldDataSource.equalConfiguration((DataSourceDescriptor) dataSource)) {
+            return WSDataSourceProperty.CONFIGURATION;
         }
 
-        return WSDataSourceProperty.CONFIGURATION;
+        var nameChanged = !CommonUtils.equalObjects(oldDataSource.getName(), dataSource.getName());
+        var descriptionChanged = !CommonUtils.equalObjects(oldDataSource.getDescription(), dataSource.getDescription());
+        if (nameChanged && descriptionChanged) {
+            return WSDataSourceProperty.CONFIGURATION;
+        }
+
+        return nameChanged ? WSDataSourceProperty.NAME : WSDataSourceProperty.CONFIGURATION;
     }
 
     @Override

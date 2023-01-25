@@ -132,6 +132,17 @@ public class WebEventUtils {
         String resourcePath,
         RMResource[] resourceParsedPath,
         WSConstants.EventAction eventAction,
+        WSResourceProperty property
+    ) {
+        addRmResourceUpdatedEvent(projectId, session, resourcePath, resourceParsedPath, eventAction, property, null);
+    }
+
+    public static void addRmResourceUpdatedEvent(
+        String projectId,
+        WebSession session,
+        String resourcePath,
+        RMResource[] resourceParsedPath,
+        WSConstants.EventAction eventAction,
         WSResourceProperty property,
         String details
     ) {
