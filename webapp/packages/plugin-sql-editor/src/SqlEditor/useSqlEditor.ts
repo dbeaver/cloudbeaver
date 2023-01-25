@@ -209,13 +209,15 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         position = position + word.length - 1;
       }
 
-      const hints = await this.getLastAutocomplete(key, () => this.sqlEditorService.getAutocomplete(
-        connectionId, id, this.value, position, MAX_HINTS_LIMIT, simple
-      ), reset);
+      return await this.getLastAutocomplete(key, async () => {
+        const hints = await this.sqlEditorService.getAutocomplete(
+          connectionId, id, this.value, position, MAX_HINTS_LIMIT, simple
+        );
 
-      this.hintsLimitIsMet = hints.length >= MAX_HINTS_LIMIT;
+        this.hintsLimitIsMet = hints.length >= MAX_HINTS_LIMIT;
 
-      return hints;
+        return hints;
+      }, reset);
     }, 1000 / 3),
 
     async formatScript(): Promise<void> {
