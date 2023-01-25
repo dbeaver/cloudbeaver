@@ -9,8 +9,9 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { DDLViewerFooterService } from './DdlViewer/DDLViewerFooterService';
+import { DdlViewerService } from './DdlViewer/DdlViewerService';
 import { DdlViewerBootstrap } from './DdlViewerBootstrap';
-import { DdlViewerService } from './DdlViewerService';
+import { ExtendedDDLResource } from './ExtendedDDLViewer/ExtendedDDLResource';
 
 export const manifest: PluginManifest = {
   info: {
@@ -21,5 +22,6 @@ export const manifest: PluginManifest = {
     DdlViewerBootstrap,
     DdlViewerService,
     DDLViewerFooterService,
+    ExtendedDDLResource,
   ],
 };
