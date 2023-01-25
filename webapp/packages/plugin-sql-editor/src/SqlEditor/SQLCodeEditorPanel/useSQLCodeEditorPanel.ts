@@ -206,7 +206,7 @@ export function useSQLCodeEditorPanel(
         completeSingle: !activeSuggest,
         updateOnCursorActivity: false,
         closeCharacters,
-        hint: (editor: Editor, options: ShowHintOptions) => this.getHandleAutocomplete(editor, options),
+        hint: this.getHandleAutocomplete,
       });
     },
 
