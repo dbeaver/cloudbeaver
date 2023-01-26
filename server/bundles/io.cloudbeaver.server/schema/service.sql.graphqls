@@ -112,6 +112,8 @@ type SQLResultSet {
     hasMoreData: Boolean!
     # can't update data or load LOB file if hasRowIdentifier = false
     hasRowIdentifier: Boolean!
+    # original sql query without SQLDataFilter
+    originalQuery: String
 }
 
 type SQLQueryResults {
