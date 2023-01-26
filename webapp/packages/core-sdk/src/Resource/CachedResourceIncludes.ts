@@ -19,23 +19,26 @@ export type CachedResourceIncludeFlags<TValue, TArgs> = {
 
 export type CachedResourceIncludeList<TValue> = Array<CachedResourceIncludeTemplate<TValue>>;
 export type CachedResourceIncludeToKey<TKey> = TKey extends ReadonlyArray<`include${infer T}` | `customInclude${Capitalize<string>}`> ? Uncapitalize<T> : unknown;
-export type CachedResourceIncludeArgs<TValue, TArguments> = TArguments extends Record<string, never>
-  ? string[]
-  : (
-    Array<
-    Exclude<
-    keyof CachedResourceIncludeFlags<Exclude<ExtractElementType<TValue>, undefined | null>, TArguments>,
-    number | symbol
-    >
-    >
-  );
+export type CachedResourceIncludeArgs<TValue, TArguments> = (
+  TArguments extends Record<string, never>
+    ? string[]
+    : (
+      Array<
+      Exclude<
+      keyof CachedResourceIncludeFlags<Exclude<ExtractElementType<TValue>, undefined | null>, TArguments>,
+      number | symbol
+      >
+      >
+    )
+) | [];
 
-export type ApplyIncludes<TValue, TKeys> = TValue
-& ({
-  [P in Extract<CachedResourceIncludeToKey<TKeys>, keyof TValue>]-?: Required<TValue>[P] extends undefined
-    ? TValue[P]
-    : NonNullable<TValue[P]>;
-});
+export type ApplyIncludes<TValue, TKeys> = TValue extends null | undefined
+  ? TValue
+  : TValue & ({
+    [P in Extract<CachedResourceIncludeToKey<TKeys>, keyof TValue>]-?: Required<TValue>[P] extends undefined
+      ? TValue[P]
+      : NonNullable<TValue[P]>;
+  });
 
 export type CachedResourceValueElementIncludes<TValue, TKeys> = TValue extends any
   ? (
@@ -49,10 +52,14 @@ export type CachedResourceValueElementIncludes<TValue, TKeys> = TValue extends a
 
 export type CachedResourceValueIncludes<TValue, TKeys> = TValue extends any
   ? (
-    TValue extends Array<infer TElement>
-      ? TElement extends Record<any, any>
-        ? Array<ApplyIncludes<TElement, TKeys>>
-        : ApplyIncludes<TValue, TKeys>
-      : ApplyIncludes<TValue, TKeys>
+    TKeys extends []
+      ? TValue
+      : (
+        TValue extends Array<infer TElement>
+          ? TElement extends Record<any, any>
+            ? Array<ApplyIncludes<TElement, TKeys>>
+            : ApplyIncludes<TValue, TKeys>
+          : ApplyIncludes<TValue, TKeys>
+      )
   )
   : undefined;

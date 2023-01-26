@@ -8,7 +8,7 @@
 
 import { action, computed, makeObservable, observable, runInAction, toJS } from 'mobx';
 
-import { IConnectionExecutionContextInfo, NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam, IConnectionExecutionContextInfo, NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
 import { IResourceManagerParams, isResourceManagerParamEqual, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
@@ -70,6 +70,14 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   get executionContext(): IConnectionExecutionContextInfo | undefined {
+    if (
+      this.state.executionContext
+      && !this.connectionInfoResource.has(createConnectionParam(
+        this.state.executionContext.projectId,
+        this.state.executionContext.connectionId
+      ))) {
+      return undefined;
+    }
     return this.state.executionContext;
   }
 
@@ -102,6 +110,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   private resourceUseKeyId: string | null;
 
   constructor(
+    private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly resourceManagerResource: ResourceManagerResource,
     state: IResourceSqlDataSourceState
   ) {

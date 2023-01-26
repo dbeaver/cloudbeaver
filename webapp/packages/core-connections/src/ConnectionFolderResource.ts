@@ -8,8 +8,9 @@
 
 import { action, makeObservable, runInAction } from 'mobx';
 
+import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { EPermission, SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
+import { SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -42,11 +43,11 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
   constructor(
     private readonly graphQLService: GraphQLService,
     sessionDataResource: SessionDataResource,
-    permissionsResource: SessionPermissionsResource
+    appAuthService: AppAuthService
   ) {
     super();
 
-    permissionsResource.require(this, EPermission.public);
+    appAuthService.requireAuthentication(this);
     sessionDataResource.outdateResource(this);
 
     this.addAlias(
@@ -169,6 +170,17 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
     }
 
     return key;
+  }
+
+  protected validateParam(param: ResourceKey<IConnectionFolderParam>): boolean {
+    return (
+      super.validateParam(param)
+      || (
+        typeof param === 'object' && !isResourceKeyList(param)
+        && typeof param.projectId === 'string'
+        && ['string'].includes(typeof param.folderId)
+      )
+    );
   }
 }
 

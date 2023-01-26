@@ -9,8 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { usePermission } from '@cloudbeaver/core-blocks';
-import { EPermission } from '@cloudbeaver/core-root';
+import { AppAuthService } from '@cloudbeaver/core-authentication';
+import { useService } from '@cloudbeaver/core-di';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
@@ -32,9 +32,9 @@ const styles = css`
 
 export const AppStateMenu = observer(function AppStateMenu() {
   const menu = useMenu({ menu: MENU_APP_STATE });
-  const isEnabled = usePermission(EPermission.public);
+  const { authenticated } = useService(AppAuthService);
 
-  if (!isEnabled) {
+  if (!authenticated) {
     return null;
   }
 

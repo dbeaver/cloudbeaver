@@ -31,6 +31,10 @@ export class ResourceKeyList<TKey> {
 
     return this.list.some(current => isEqual(current, key));
   }
+
+  toString(): string {
+    return `ResourceKeyList(${this.list.join()})${this.mark !== undefined ? '@' + this.mark : ''}`;
+  }
 }
 
 interface MapFnc {

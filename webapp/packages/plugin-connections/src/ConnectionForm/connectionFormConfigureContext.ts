@@ -35,8 +35,8 @@ export function connectionFormConfigureContext(
     connectionIncludes: [],
     include(...includes) {
       for (const include of includes) {
-        if (!this.connectionIncludes.includes(include)) {
-          this.connectionIncludes.push(include);
+        if (!this.connectionIncludes.includes(include as never)) {
+          this.connectionIncludes.push(include as never);
         }
       }
     },

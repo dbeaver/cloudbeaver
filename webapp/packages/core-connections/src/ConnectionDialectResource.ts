@@ -17,7 +17,8 @@ import {
   ResourceKeyUtils,
   CachedMapAllKey,
   resourceKeyList,
-  SqlDialectInfo
+  SqlDialectInfo,
+  isResourceKeyList
 } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionExecutionContextInfo } from './ConnectionExecutionContext/IConnectionExecutionContextInfo';
@@ -105,5 +106,16 @@ export class ConnectionDialectResource extends CachedMapResource<IConnectionInfo
     }
 
     return key;
+  }
+
+  protected validateParam(param: ResourceKey<IConnectionInfoParams>): boolean {
+    return (
+      super.validateParam(param)
+      || (
+        typeof param === 'object' && !isResourceKeyList(param)
+        && typeof param.projectId === 'string'
+        && ['string'].includes(typeof param.connectionId)
+      )
+    );
   }
 }

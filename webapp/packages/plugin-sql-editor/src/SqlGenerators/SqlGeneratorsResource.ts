@@ -57,4 +57,11 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
     this.set(resourceKeyList(Array.from(values.keys())), Array.from(values.values()));
     return this.data;
   }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
+  }
 }
