@@ -503,6 +503,12 @@ public class LocalResourceController implements RMController {
         return DEFAULT_CHANGE_ID;
     }
 
+    /**
+     * Iterates the tree starting at {@code rootResourcePath}.
+     * Calculates for each file/folder {@code newResourcePropertiesPath} and restores {@code oldResourcePropertiesPath}
+     * by replacing the first {@code newRootPropertiesPath} with {@code oldRootPropertiesPath} in {@code newResourcePropertiesPath}.
+     * Gathers the old-new properties paths pairs and updates properties via BaseProjectImpl#moveResourcePropertiesBatch()
+     */
     private void movePropertiesRecursive(
             @NotNull String projectId,
             @NotNull Path rootResourcePath,
@@ -514,7 +520,7 @@ public class LocalResourceController implements RMController {
         var propertiesPathsList = new ArrayList<Pair<String, String>>();
         Files.walkFileTree(rootResourcePath, (UniversalFileVisitor<Path>) (path, attrs) -> {
             var newResourcePropertiesPath = CommonUtils.normalizeResourcePath(projectPath.relativize(path.toAbsolutePath()).toString());
-            var oldResourcePropertiesPath = newResourcePropertiesPath.replace(newRootPropertiesPath, oldRootPropertiesPath);
+            var oldResourcePropertiesPath = newResourcePropertiesPath.replaceFirst(newRootPropertiesPath, oldRootPropertiesPath);
             propertiesPathsList.add(new Pair<>(oldResourcePropertiesPath, newResourcePropertiesPath));
             return FileVisitResult.CONTINUE;
         });

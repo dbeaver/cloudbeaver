@@ -22,7 +22,8 @@ import java.nio.file.FileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
 /**
- * A simple file visitor with default behavior to visit all files and folders and perform the same operation on them and to re-throw I/O errors.
+ * A simple file visitor with default behavior to visit all files and folders
+ * and perform the same operation on them and to re-throw I/O errors.
  */
 @FunctionalInterface
 public interface UniversalFileVisitor<T> extends FileVisitor<T> {
