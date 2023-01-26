@@ -27,6 +27,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 @FunctionalInterface
 public interface UniversalFileVisitor<T> extends FileVisitor<T> {
 
+    /**
+     * Method that applies to both files and folders starting with {@code dirOrFile}
+     */
     FileVisitResult dirOrFileOperation(T dirOrFile, BasicFileAttributes attrs) throws IOException;
 
     @Override
@@ -48,8 +51,9 @@ public interface UniversalFileVisitor<T> extends FileVisitor<T> {
 
     @Override
     default FileVisitResult postVisitDirectory(T dir, IOException exc) throws IOException {
-        if (exc != null)
+        if (exc != null) {
             throw exc;
+        }
         return FileVisitResult.CONTINUE;
     }
 }
