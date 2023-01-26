@@ -12,7 +12,7 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedDataResource } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class ProjectPermissionsResource extends CachedDataResource<PermissionInfo[], void | any> {
+export class ProjectPermissionsResource extends CachedDataResource<PermissionInfo[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource

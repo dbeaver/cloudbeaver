@@ -14,6 +14,6 @@ export class ToolsPanelService {
   readonly tabsContainer: TabsContainer;
 
   constructor() {
-    this.tabsContainer = new TabsContainer();
+    this.tabsContainer = new TabsContainer('Tools');
   }
 }
