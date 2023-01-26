@@ -23,7 +23,6 @@ import org.jkiss.dbeaver.model.access.DBAPermissionRealm;
  */
 public class DBWConstants {
 
-    public static final String PERMISSION_PUBLIC = DBAPermissionRealm.PERMISSION_PUBLIC;
     public static final String PERMISSION_ADMIN = DBAPermissionRealm.PERMISSION_ADMIN;
 
     public static final String PERMISSION_CONFIGURATION_MANAGER = "configuration-manager";

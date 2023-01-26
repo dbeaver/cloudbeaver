@@ -59,7 +59,7 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
   return styled(style)(
     <TabsState selectedId={subName} lazy onChange={openSub}>
       <ToolsPanel>
-        <TabList style={style}>
+        <TabList aria-label='User Administration pages' style={style}>
           <Tab tabId={EUsersAdministrationSub.Users} style={style}>{translate('authentication_administration_item_users')}</Tab>
           <Tab tabId={EUsersAdministrationSub.Teams} style={style}>{translate('administration_teams_tab_title')}</Tab>
           {/* <Tab

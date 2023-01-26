@@ -98,6 +98,13 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     this.markOutdated(outdateKey);
     // }
   }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
+  }
 }
 
 function isDBObjectParentKey(

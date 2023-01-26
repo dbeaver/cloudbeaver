@@ -8,6 +8,7 @@
 
 import { action, makeObservable, observable, untracked } from 'mobx';
 
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -34,6 +35,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
   private readonly dataSourceStateState = new Map<string, IResourceSqlDataSourceState>();
 
   constructor(
+    private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly networkStateService: NetworkStateService,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly commonDialogService: CommonDialogService,
@@ -90,6 +92,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       key: ResourceSqlDataSource.key,
       getDataSource: (editorId, options) => {
         const dataSource = new ResourceSqlDataSource(
+          this.connectionInfoResource,
           this.resourceManagerResource,
           this.createState(
             editorId,

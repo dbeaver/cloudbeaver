@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, CachedDataResource, DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class DataTransferProcessorsResource extends CachedDataResource<Map<string, DataTransferProcessorInfo>, void> {
+export class DataTransferProcessorsResource extends CachedDataResource<Map<string, DataTransferProcessorInfo>> {
   constructor(
     private readonly graphQLService: GraphQLService
   ) {
