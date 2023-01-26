@@ -77,19 +77,39 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     return this.data?.distributed || false;
   }
 
+  get licenseRequired(): boolean {
+    return this.data?.licenseRequired ?? false;
+  }
+
+  get licenseValid(): boolean {
+    return this.data?.licenseValid ?? false;
+  }
+
   get configurationMode(): boolean {
     return !!this.data?.configurationMode;
   }
 
   get publicDisabled(): boolean {
     if (
-      this.data?.configurationMode
+      this.configurationMode
       || (this.data?.licenseRequired && !this.data.licenseValid)
     ) {
       return true;
     }
 
     return false;
+  }
+
+  get adminCredentialsSaveEnabled(): boolean {
+    return this.data?.adminCredentialsSaveEnabled ?? false;
+  }
+
+  get publicCredentialsSaveEnabled(): boolean {
+    return this.data?.publicCredentialsSaveEnabled ?? false;
+  }
+
+  get anonymousAccessEnabled(): boolean {
+    return this.data?.anonymousAccessEnabled ?? false;
   }
 
   get enabledFeatures(): string[] {

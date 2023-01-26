@@ -344,7 +344,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     const providerId = authModel.requiredAuth ?? data.info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
 
-    await this.userInfoResource.load(undefined, []);
+    await this.userInfoResource.load();
 
     if (!this.userInfoResource.hasToken(providerId)) {
       const provider = await this.authProvidersResource.load(providerId);

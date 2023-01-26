@@ -149,6 +149,13 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     const data = this.data.get(key);
     this.data.set(key, Object.assign(data ?? {}, value));
   }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
+  }
 }
 
 export function isEqualSharedProjectGrantInfo(a: AdminObjectGrantInfo, b: AdminObjectGrantInfo): boolean {

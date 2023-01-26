@@ -202,10 +202,6 @@ public class WebUserContext implements SMCredentialsProvider {
 
     private void setUserPermissions(Set<String> permissions) {
         this.userPermissions = permissions;
-        // FIXME: automatically assign public permission in sm controller˚
-        if (!CommonUtils.isEmpty(userPermissions)) {
-            userPermissions.add(DBWConstants.PERMISSION_PUBLIC);
-        }
     }
 
     public DBSSecretController getSecretController() {

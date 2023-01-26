@@ -8,10 +8,9 @@
 
 import { runInAction } from 'mobx';
 
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { SharedProjectsResource } from '@cloudbeaver/core-resource-manager';
-import { EPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmResourceType } from '@cloudbeaver/core-sdk';
 
 export type ProjectInfo = SchemaProjectInfo;
@@ -23,13 +22,13 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
     private readonly graphQLService: GraphQLService,
     private readonly sharedProjectsResource: SharedProjectsResource,
     private readonly userInfoResource: UserInfoResource,
-    sessionPermissionsResource: SessionPermissionsResource
+    appAuthService: AppAuthService,
   ) {
     super(new Map(), []);
 
-    this.sync(this.userInfoResource);
+    this.sync(this.userInfoResource, () => {}, () => CachedMapAllKey);
     this.sharedProjectsResource.connect(this);
-    sessionPermissionsResource.require(this, EPermission.public);
+    appAuthService.requireAuthentication(this);
     this.sharedProjectsResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
     this.sharedProjectsResource.onItemAdd.addHandler(() => this.markOutdated());
     this.sharedProjectsResource.onItemDelete.addHandler(() => this.markOutdated());
@@ -62,6 +61,13 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
     });
 
     return this.data;
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }
 

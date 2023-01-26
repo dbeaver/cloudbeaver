@@ -185,6 +185,13 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
       includeMetaParameters: false,
     };
   }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
+  }
 }
 
 function isNewTeam(team: TeamInfo | NewTeam): team is NewTeam {

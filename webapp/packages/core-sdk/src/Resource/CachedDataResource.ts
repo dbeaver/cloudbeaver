@@ -75,7 +75,7 @@ export abstract class CachedDataResource<
     return true;
   }
 
-  async refresh<T extends CachedResourceIncludeArgs<TData, TContext>>(
+  async refresh<T extends CachedResourceIncludeArgs<TData, TContext> = []>(
     param: TParam,
     context?: T
   ): Promise<CachedResourceValueIncludes<TData, T>> {
@@ -84,13 +84,21 @@ export abstract class CachedDataResource<
     return this.data as CachedResourceValueIncludes<TData, T>;
   }
 
-  async load<T extends CachedResourceIncludeArgs<TData, TContext>>(
+  async load<T extends CachedResourceIncludeArgs<TData, TContext> = []>(
     param: TParam,
     context?: T
   ): Promise<CachedResourceValueIncludes<TData, T>> {
     await this.preLoadData(param, false, context);
     await this.loadData(param, false, context);
     return this.data as CachedResourceValueIncludes<TData, T>;
+  }
+
+
+  protected validateParam(param: TParam): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'undefined'
+    );
   }
 }
 

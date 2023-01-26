@@ -37,7 +37,7 @@ interface Props extends IConnectionSelectorExtraProps {
   className?: string;
 }
 
-export const ConnectionIcon: React.FC<Props> = observer(function ConnectionInfo({
+export const ConnectionIcon: React.FC<Props> = observer(function ConnectionIcon({
   connectionKey,
   small,
   style,
@@ -46,13 +46,13 @@ export const ConnectionIcon: React.FC<Props> = observer(function ConnectionInfo(
   const styles = useStyles(style, connectionIconStyle);
 
   const connection = useResource(
-    ConnectionInfo,
+    ConnectionIcon,
     ConnectionInfoResource,
     connectionKey ?? null
   );
   const driverId = connection.data?.driverId;
 
-  const driver = useResource(ConnectionInfo, DBDriverResource, driverId!, {
+  const driver = useResource(ConnectionIcon, DBDriverResource, driverId!, {
     active: driverId !== undefined,
   });
 

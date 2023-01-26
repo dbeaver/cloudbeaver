@@ -9,8 +9,9 @@
 import { runInAction } from 'mobx';
 
 import { CoreSettingsService } from '@cloudbeaver/core-app';
+import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { EPermission, ServerEventId, SessionDataResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { ServerEventId, SessionDataResource } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedDataResource, LogEntry } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
@@ -29,7 +30,7 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
     private readonly coreSettingsService: CoreSettingsService,
     private readonly logViewerSettingsService: LogViewerSettingsService,
     sessionDataResource: SessionDataResource,
-    permissionsResource: SessionPermissionsResource,
+    appAuthService: AppAuthService,
     sessionLogsEventHandler: SessionLogsEventHandler,
   ) {
     super([]);
@@ -38,7 +39,7 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
       this.clear();
     });
 
-    permissionsResource.require(this, EPermission.public);
+    appAuthService.requireAuthentication(this);
 
     sessionLogsEventHandler.onEvent(ServerEventId.CbSessionLogUpdated, () => {
       this.markOutdated();

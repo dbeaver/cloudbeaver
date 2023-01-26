@@ -13,7 +13,8 @@ import {
   GraphQLService,
   CachedMapResource,
   resourceKeyList,
-  NetworkHandlerConfigInput
+  NetworkHandlerConfigInput,
+  ResourceKey
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -21,7 +22,7 @@ export const SSH_TUNNEL_ID = 'ssh_tunnel';
 
 @injectable()
 export class NetworkHandlerResource extends CachedMapResource<string, NetworkHandlerDescriptor> {
-  private loadedKeyMetadata: MetadataMap<string, boolean>;
+  private readonly loadedKeyMetadata: MetadataMap<string, boolean>;
 
   constructor(
     private readonly graphQLService: GraphQLService,
@@ -66,5 +67,12 @@ export class NetworkHandlerResource extends CachedMapResource<string, NetworkHan
     this.loadedKeyMetadata.set('all', true);
 
     return this.data;
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }

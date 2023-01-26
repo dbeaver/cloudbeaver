@@ -99,7 +99,7 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
         onChange={handleSelect}
         onClose={handleClose}
       >
-        <TabList style={styles}>
+        <TabList aria-label='SQL Results' style={styles}>
           {orderedTabs.map(result => (
             <SqlResultTab
               key={result.id}
