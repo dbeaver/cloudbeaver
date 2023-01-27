@@ -46,7 +46,8 @@ export * from './TableViewer/ValuePanel/DataValuePanelService';
 
 export * from './TableViewer/IDataTableActions';
 export * from './TableViewer/IDataPresentationActions';
-export * from './TableViewer/TableViewer';
+
+export * from './TableViewer/TableViewerLoader';
 export * from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
 
 export * from './ContainerDataSource';

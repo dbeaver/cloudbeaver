@@ -6,10 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
 import { CreateConnectionService } from '../CreateConnectionService';
-import { CustomConnection } from './Manual/CustomConnection';
+
+const CustomConnection = React.lazy(async () => {
+  const { CustomConnection } = await import('./Manual/CustomConnection');
+  return { default: CustomConnection };
+});
 
 @injectable()
 export class CreateConnectionBaseBootstrap extends Bootstrap {

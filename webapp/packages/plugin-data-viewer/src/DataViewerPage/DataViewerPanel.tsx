@@ -13,7 +13,7 @@ import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import type { ObjectPagePanelComponent } from '@cloudbeaver/plugin-object-viewer';
 
 import type { IDataViewerPageState } from '../IDataViewerPageState';
-import { TableViewer } from '../TableViewer/TableViewer';
+import { TableViewerLoader } from '../TableViewer/TableViewerLoader';
 import { useDataViewerDatabaseDataModel } from './useDataViewerDatabaseDataModel';
 
 export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = observer(function DataViewerPanel({
@@ -58,7 +58,7 @@ export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = o
   return (
     <Loader state={dataViewerDatabaseDataModel}>
       {tab.handlerState.tableId ? (
-        <TableViewer
+        <TableViewerLoader
           tableId={tab.handlerState.tableId}
           resultIndex={pageState?.resultIndex}
           presentationId={pageState?.presentationId}

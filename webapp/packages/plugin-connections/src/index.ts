@@ -1,14 +1,14 @@
 import { connectionPlugin } from './manifest';
 export * from './ConnectionAuthentication/IConnectionAuthenticationConfig';
-export * from './ConnectionAuthentication/ConnectionAuthenticationForm';
+export * from './ConnectionAuthentication/ConnectionAuthenticationFormLoader';
 export * from './ConnectionForm/Options/ConnectionOptionsTabService';
 export * from './ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService';
 export * from './ConnectionForm/SSH/ConnectionSSHTabService';
 export * from './ConnectionForm/OriginInfo/ConnectionOriginInfoTabService';
 export * from './ConnectionForm/Contexts/connectionConfigContext';
-export * from './ConnectionForm/ConnectionFormBaseActions';
+export * from './ConnectionForm/ConnectionFormBaseActionsLoader';
 export * from './ConnectionForm/connectionFormConfigureContext';
-export * from './ConnectionForm/ConnectionForm';
+export * from './ConnectionForm/ConnectionFormLoader';
 export * from './ConnectionForm/ConnectionFormService';
 export * from './ConnectionForm/ConnectionFormState';
 export * from './ConnectionForm/Contexts/connectionFormStateContext';

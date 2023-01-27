@@ -15,8 +15,8 @@ import { ENotificationType, NotificationService } from '@cloudbeaver/core-events
 import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 
-import { ConnectionAuthenticationDialog } from '../ConnectionAuthentication/ConnectionAuthenticationDialog';
-import { ConnectionFormBaseActions } from './ConnectionFormBaseActions';
+import { ConnectionAuthenticationDialogLoader } from '../ConnectionAuthentication/ConnectionAuthenticationDialogLoader';
+import { ConnectionFormBaseActionsLoader } from './ConnectionFormBaseActionsLoader';
 import { connectionConfigContext } from './Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from './Contexts/connectionCredentialsStateContext';
 import type { IConnectionFormProps, IConnectionFormState, IConnectionFormFillConfigData, IConnectionFormSubmitData } from './IConnectionFormProps';
@@ -72,7 +72,7 @@ export class ConnectionFormService {
     this.formSubmittingTask.addPostHandler(this.showSubmittingStatusMessage);
     this.formValidationTask.addPostHandler(this.ensureValidation);
 
-    this.actionsContainer.add(ConnectionFormBaseActions);
+    this.actionsContainer.add(ConnectionFormBaseActionsLoader);
   }
 
   connectionValidationContext = (): IConnectionFormValidation => ({
@@ -151,7 +151,7 @@ export class ConnectionFormService {
       }
     });
 
-    const result = await this.commonDialogService.open(ConnectionAuthenticationDialog, {
+    const result = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
       config,
       authModelId: credentialsState.authModelId,
       networkHandlers: credentialsState.networkHandlers,
