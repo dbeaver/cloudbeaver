@@ -10,7 +10,7 @@ import { computed, makeObservable, observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedMapAllKey, CachedMapResource } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, CachedMapResource, ResourceKey } from '@cloudbeaver/core-sdk';
 
 export interface IVersion {
   number: string;
@@ -84,5 +84,12 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
     }
 
     return this.data;
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }

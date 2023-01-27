@@ -29,6 +29,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface WebAction {
 
-    String[] requirePermissions() default { DBWConstants.PERMISSION_PUBLIC };
+    String[] requirePermissions() default { };
+
+    boolean authRequired() default true;
 
 }

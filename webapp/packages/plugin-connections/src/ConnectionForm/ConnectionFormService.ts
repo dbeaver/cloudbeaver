@@ -52,7 +52,7 @@ export class ConnectionFormService {
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
   ) {
-    this.tabsContainer = new TabsContainer();
+    this.tabsContainer = new TabsContainer('Connection settings');
     this.actionsContainer = new PlaceholderContainer();
     this.configureTask = new ExecutorHandlersCollection();
     this.fillConfigTask = new ExecutorHandlersCollection();

@@ -111,6 +111,13 @@ export class AuthConfigurationsResource
 
     return key;
   }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
+  }
 }
 
 function isNewConfiguration(

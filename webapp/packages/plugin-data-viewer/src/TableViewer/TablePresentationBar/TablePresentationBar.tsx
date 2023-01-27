@@ -89,7 +89,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
   return styled(style)(
     <table-left-bar className={className}>
       <TabsState currentTabId={presentationId} autoSelect={main}>
-        <TabList {...use({ flexible: main })}>
+        <TabList aria-label='Data Presentations' {...use({ flexible: main })}>
           {presentations.map(presentation => (
             <Tab
               key={presentation.id}
