@@ -225,7 +225,7 @@ public class WebNavigatorNodeInfo {
             return false;
         }
         var folderPath = ((DBNResourceManagerResource) node).getResourceFolder();
-        return ResourceTypeRegistry.getInstance().getResourceTypeByRootPath(node.getOwnerProject(), folderPath) != null;
+        return ResourceTypeRegistry.getInstance().getResourceTypeByRootPath(null, folderPath) != null;
     }
 
     ///////////////////////////////////
