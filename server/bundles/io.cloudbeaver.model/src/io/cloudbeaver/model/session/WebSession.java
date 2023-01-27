@@ -280,9 +280,6 @@ public class WebSession extends BaseWebSession
         } else if (type == WSEventType.DATASOURCE_DELETED) {
             this.connections.remove(newDataSource.getId());
         } else {
-            try {
-                newDataSource.resolveSecretsIfNeeded();
-            } catch (DBException ignore) { }
             return !newDataSource.equalSettings(oldDataSource);
         }
         return true;
