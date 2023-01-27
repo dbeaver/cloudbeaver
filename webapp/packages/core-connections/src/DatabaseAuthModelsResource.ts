@@ -11,7 +11,8 @@ import {
   DatabaseAuthModel,
   GraphQLService,
   CachedMapResource,
-  resourceKeyList
+  resourceKeyList,
+  ResourceKey
 } from '@cloudbeaver/core-sdk';
 
 @injectable()
@@ -26,5 +27,12 @@ export class DatabaseAuthModelsResource extends CachedMapResource<string, Databa
     this.set(resourceKeyList(models.map(model => model.id)), models);
 
     return this.data;
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }

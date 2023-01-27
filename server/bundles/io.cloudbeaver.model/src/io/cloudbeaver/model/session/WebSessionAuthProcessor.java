@@ -161,9 +161,6 @@ public class WebSessionAuthProcessor {
                     providerConfig,
                     authAttrs);
 
-                if (!configMode && securityController.getUserPermissions(userId).isEmpty()) {
-                    throw new DBWebException("Access denied (no permissions)");
-                }
                 if (!configMode && !securityController.getCurrentUser().isEnabled()) {
                     throw new DBWebException("User account is locked");
                 }

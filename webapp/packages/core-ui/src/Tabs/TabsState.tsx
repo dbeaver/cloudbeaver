@@ -8,11 +8,11 @@
 
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTabState } from 'reakit/Tab';
 
 import { useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
-import { Executor, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import type { ITabData, ITabsContainer } from './TabsContainer/ITabsContainer';
@@ -52,7 +52,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   onClose,
   ...rest
 }: Props<T>): React.ReactElement | null {
-  const props = rest as any as T;
+  const props = useMemo(() => rest as any as T, [...Object.values(rest)]);
   let displayed: string[] = [];
 
   if (container) {

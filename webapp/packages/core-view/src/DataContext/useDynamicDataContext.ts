@@ -31,7 +31,9 @@ export function useDynamicDataContext(
     state.dynamic.flush();
   });
 
-  capture(state.dynamic);
+  useEffect(() => {
+    capture(state.dynamic);
+  });
 
   useEffect(() => () => state.dynamic.flush(), []);
 }

@@ -22,7 +22,6 @@ import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
-import io.cloudbeaver.utils.file.UniversalFileVisitor;
 import org.eclipse.core.runtime.IPath;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -46,7 +45,6 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
-import org.jkiss.utils.Pair;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -58,8 +56,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.jkiss.utils.StringUtils.normalizeResourcePath;
 
 /**
  * Resource manager API
@@ -475,55 +471,24 @@ public class LocalResourceController implements RMController {
         @NotNull String oldResourcePath,
         @NotNull String newResourcePath
     ) throws DBException {
-        var normalizedOldResourcePath = normalizeResourcePath(oldResourcePath);
-        var normalizedNewResourcePath = normalizeResourcePath(newResourcePath);
-        if (log.isDebugEnabled()) {
-            log.debug("Moving resource from '" + normalizedOldResourcePath + "' to '" + normalizedNewResourcePath + "'");
-        }
-        Path oldTargetPath = getTargetPath(projectId, normalizedOldResourcePath);
+        Path oldTargetPath = getTargetPath(projectId, oldResourcePath);
         List<RMResource> rmOldResourcePath = makeResourcePath(projectId, oldTargetPath, false);
         if (!Files.exists(oldTargetPath)) {
             throw new DBException("Resource '" + oldTargetPath + "' doesn't exists");
         }
-        Path newTargetPath = getTargetPath(projectId, normalizedNewResourcePath);
+        Path newTargetPath = getTargetPath(projectId, newResourcePath);
         validateResourcePath(newTargetPath.toString());
         try {
             Files.move(oldTargetPath, newTargetPath);
         } catch (IOException e) {
-            throw new DBException("Error moving resource '" + normalizedOldResourcePath + "'", e);
+            throw new DBException("Error moving resource '" + oldResourcePath + "'", e);
         }
-
-        log.debug("Moving resource properties");
-        try {
-            movePropertiesRecursive(projectId, newTargetPath, normalizedOldResourcePath, normalizedNewResourcePath);
-        } catch (IOException | DBException e) {
-            throw new DBException("Unable to move resource properties", e);
-        }
+        // Move properties
+        getProjectMetadata(projectId, false).moveResourceProperties(oldResourcePath, newResourcePath);
 
         fireRmResourceDeleteEvent(projectId, rmOldResourcePath);
-        fireRmResourceAddEvent(projectId, normalizedNewResourcePath);
+        fireRmResourceAddEvent(projectId, newResourcePath);
         return DEFAULT_CHANGE_ID;
-    }
-
-    private void movePropertiesRecursive(
-            @NotNull String projectId,
-            @NotNull Path rootResourcePath,
-            @NotNull String oldRootPropertiesPath,
-            @NotNull String newRootPropertiesPath
-    ) throws IOException, DBException {
-        var project = getProjectMetadata(projectId, false);
-        var projectPath = getProjectPath(projectId);
-        var propertiesPathsList = new ArrayList<Pair<String, String>>();
-        Files.walkFileTree(rootResourcePath, (UniversalFileVisitor<Path>) (path, attrs) -> {
-            var newResourcePropertiesPath = normalizeResourcePath(projectPath.relativize(path.toAbsolutePath()).toString());
-            var oldResourcePropertiesPath = newResourcePropertiesPath.replace(newRootPropertiesPath, oldRootPropertiesPath);
-            propertiesPathsList.add(new Pair<>(oldResourcePropertiesPath, newResourcePropertiesPath));
-            return FileVisitResult.CONTINUE;
-        });
-        if (log.isDebugEnabled()) {
-            log.debug("Move resources properties:\n" + propertiesPathsList);
-        }
-        project.moveResourcePropertiesBatch(propertiesPathsList);
     }
 
     @Override
