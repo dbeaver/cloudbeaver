@@ -41,7 +41,7 @@ export class CreateConnectionService {
     private readonly projectInfoResource: ProjectInfoResource
   ) {
     this.data = null;
-    this.tabsContainer = new TabsContainer();
+    this.tabsContainer = new TabsContainer('Connection Creation mode');
 
     this.setConnectionTemplate = this.setConnectionTemplate.bind(this);
     this.clearConnectionTemplate = this.clearConnectionTemplate.bind(this);

@@ -46,4 +46,11 @@ export class AuthConfigurationParametersResource
 
     return this.data;
   }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
+  }
 }

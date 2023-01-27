@@ -8,7 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionDataResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedMapResource, CachedMapAllKey, AdminPermissionInfoFragment, AdminObjectGrantInfoFragment } from '@cloudbeaver/core-sdk';
+import { GraphQLService, CachedMapResource, CachedMapAllKey, AdminPermissionInfoFragment, AdminObjectGrantInfoFragment, ResourceKey } from '@cloudbeaver/core-sdk';
 
 export type PermissionInfo = AdminPermissionInfoFragment;
 export type AdminObjectGrantInfo = AdminObjectGrantInfoFragment;
@@ -33,5 +33,12 @@ export class PermissionsResource extends CachedMapResource<string, PermissionInf
     }
 
     return this.data;
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }

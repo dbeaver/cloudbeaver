@@ -8,8 +8,9 @@
 
 import { computed, makeObservable, runInAction } from 'mobx';
 
+import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { EPermission, SessionPermissionsResource, ServerConfigResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -34,10 +35,10 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
   constructor(
     private readonly serverConfigResource: ServerConfigResource,
     private readonly graphQLService: GraphQLService,
-    permissionsResource: SessionPermissionsResource,
+    appAuthService: AppAuthService,
   ) {
     super();
-    permissionsResource.require(this, EPermission.public);
+    appAuthService.requireAuthentication(this);
 
     this.serverConfigResource.onDataOutdated.addHandler(() => this.markOutdated());
 
@@ -96,5 +97,12 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
 
     const oldDriver = this.get(keys);
     this.set(keys, oldDriver.map((oldDriver, i) => (Object.assign(oldDriver ?? {}, drivers[i]))));
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }

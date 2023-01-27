@@ -46,7 +46,7 @@ export class TeamFormService {
   constructor(
     private readonly notificationService: NotificationService,
   ) {
-    this.tabsContainer = new TabsContainer();
+    this.tabsContainer = new TabsContainer('Team settings');
     this.actionsContainer = new PlaceholderContainer();
     this.configureTask = new ExecutorHandlersCollection();
     this.fillConfigTask = new ExecutorHandlersCollection();

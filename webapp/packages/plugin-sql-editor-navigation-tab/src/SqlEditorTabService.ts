@@ -175,13 +175,20 @@ export class SqlEditorTabService extends Bootstrap {
     }
 
     const { projectId, connectionId, defaultCatalog, defaultSchema } = dataSource.executionContext;
+    const connectionKey = createConnectionParam(projectId, connectionId);
+
+    const connection = this.connectionInfoResource.get(connectionKey);
+
+    if (!connection?.connected) {
+      return;
+    }
 
     let catalogData: ICatalogData | undefined;
     let schema: NavNodeInfoFragment | undefined;
 
     if (defaultCatalog) {
       catalogData = this.containerResource.getCatalogData(
-        createConnectionParam(projectId, connectionId),
+        connectionKey,
         defaultCatalog
       );
     }
@@ -194,12 +201,6 @@ export class SqlEditorTabService extends Bootstrap {
 
     if (!nodeId) {
       nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connectionId);
-    }
-
-    const connection = this.connectionInfoResource.getConnectionForNode(nodeId);
-
-    if (connection?.connected === false) {
-      return;
     }
 
     const parents = this.navNodeInfoResource.getParents(nodeId);
