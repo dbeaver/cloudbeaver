@@ -13,15 +13,16 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 interface IAuthenticationAction {
-  providerId: string;
+  providerId: string | undefined;
   authorized: boolean;
-  auth: () => Promise<void>;
+  isAuthorized(providerId?: string): boolean;
+  auth(providerId?: string): Promise<void>;
 }
 
 export type Options = {
-  onAuthenticate?: () => Promise<any> | void;
+  onAuthenticate?: (id: string) => Promise<any> | void;
   onClose?: () => Promise<void> | void;
-  providerId: string;
+  providerId?: string;
 };
 
 export function useAuthenticationAction(options: Options): IAuthenticationAction {
@@ -31,15 +32,28 @@ export function useAuthenticationAction(options: Options): IAuthenticationAction
   return useObservableRef(() => ({
     authenticating: false,
     get authorized() {
-      return !this.authenticating && userInfoService.hasToken(this.providerId);
+      return this.isAuthorized(this.providerId);
     },
-    async auth() {
+    isAuthorized(providerId?: string) {
+      const provider = providerId || this.providerId;
+      if (!provider) {
+        throw new Error('providerId must be provided');
+      }
+
+      return !this.authenticating && userInfoService.hasToken(provider);
+    },
+    async auth(providerId?: string) {
+      const provider = providerId || this.providerId;
+      if (!provider) {
+        throw new Error('providerId must be provided');
+      }
+
       this.authenticating = true;
       try {
-        const result = await authProviderService.requireProvider(this.providerId);
+        const result = await authProviderService.requireProvider(provider);
 
         if (result) {
-          await this.onAuthenticate?.();
+          await this.onAuthenticate?.(provider);
         } else {
           await this.onClose?.();
         }

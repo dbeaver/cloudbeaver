@@ -46,7 +46,7 @@ export const AuthenticationProvider = observer<Props>(function AuthenticationPro
         <Button
           type='button'
           mod={['unelevated']}
-          onClick={action.auth}
+          onClick={() => action.auth()}
         >
           {translate('authentication_authenticate')}
         </Button>
