@@ -16,7 +16,7 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 import { NavNodeInfoResource, type INodeActions } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
-import { ElementsTreeContext, NavigationNodeEditor, NavTreeControlComponent, NavTreeControlProps, TreeNodeMenu } from '@cloudbeaver/plugin-navigation-tree';
+import { ElementsTreeContext, NavigationNodeEditorLoader, NavTreeControlComponent, NavTreeControlProps, TreeNodeMenuLoader } from '@cloudbeaver/plugin-navigation-tree';
 
 import { ResourcesProjectsNavNodeService } from '../../NavNodes/ResourcesProjectsNavNodeService';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
@@ -116,14 +116,14 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     >
       <TreeNodeName title={name}>
         {editing ? (
-          <NavigationNodeEditor node={node} onClose={() => setEditing(false)} />
+          <NavigationNodeEditorLoader node={node} onClose={() => setEditing(false)} />
         ) : (
           <name-box>{name}</name-box>
         )}
       </TreeNodeName>
       {!editing && !dndPlaceholder && (
         <portal onClick={handlePortalClick}>
-          <TreeNodeMenu node={node} actions={nodeActions} selected={selected} />
+          <TreeNodeMenuLoader node={node} actions={nodeActions} selected={selected} />
         </portal>
       )}
     </TreeNodeControl>

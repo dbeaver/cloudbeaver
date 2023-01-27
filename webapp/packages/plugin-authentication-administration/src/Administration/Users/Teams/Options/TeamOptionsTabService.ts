@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { TeamsResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -15,7 +17,11 @@ import { getUniqueName } from '@cloudbeaver/core-utils';
 import { teamContext } from '../Contexts/teamContext';
 import type { ITeamFormFillConfigData, ITeamFormSubmitData } from '../ITeamFormProps';
 import { TeamFormService } from '../TeamFormService';
-import { TeamOptions } from './TeamOptions';
+
+const TeamOptions = React.lazy(async () => {
+  const { TeamOptions } = await import('./TeamOptions');
+  return { default: TeamOptions };
+});
 
 @injectable()
 export class TeamOptionsTabService extends Bootstrap {

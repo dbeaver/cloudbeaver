@@ -16,7 +16,7 @@ import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 
 import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { NavTreeNodeComponent } from '../NavigationNodeComponent';
-import { NavigationNodeRenderer } from './NavigationNodeRenderer';
+import { NavigationNodeRendererLoader } from './NavigationNodeRendererLoader';
 
 export const NavigationNodeElement: NavTreeNodeComponent = observer(function NavigationNodeElement({
   nodeId,
@@ -59,7 +59,7 @@ export const NavigationNodeElement: NavTreeNodeComponent = observer(function Nav
 
   // TODO: after node update reference can be lost and NavigationNode skip update
   return (
-    <NavigationNodeRenderer
+    <NavigationNodeRendererLoader
       node={node}
       path={path}
       expanded={expanded}

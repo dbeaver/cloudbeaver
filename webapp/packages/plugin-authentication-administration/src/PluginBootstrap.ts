@@ -6,12 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { ServerConfigurationAdministrationNavService, ServerConfigurationService } from '@cloudbeaver/plugin-administration';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 import { AuthConfigurationsAdministrationNavService } from './Administration/IdentityProviders/AuthConfigurationsAdministrationNavService';
-import { AuthenticationProviders } from './Administration/ServerConfiguration/AuthenticationProviders';
+
+const AuthenticationProviders = React.lazy(async () => {
+  const { AuthenticationProviders } = await import('./Administration/ServerConfiguration/AuthenticationProviders');
+  return { default: AuthenticationProviders };
+});
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {

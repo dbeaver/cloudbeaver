@@ -7,6 +7,7 @@
  */
 
 import { action, makeObservable, runInAction, toJS } from 'mobx';
+import React from 'react';
 
 import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
@@ -25,7 +26,11 @@ import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
 import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormSubmitData, IConnectionFormFillConfigData, IConnectionFormState } from '../IConnectionFormProps';
-import { Options } from './Options';
+
+export const Options = React.lazy(async () => {
+  const { Options } = await import('./Options');
+  return { default: Options };
+});
 
 @injectable()
 export class ConnectionOptionsTabService extends Bootstrap {

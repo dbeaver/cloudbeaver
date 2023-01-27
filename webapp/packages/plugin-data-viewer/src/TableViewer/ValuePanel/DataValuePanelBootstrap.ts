@@ -6,11 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
 import { DataValuePanelService } from './DataValuePanelService';
-import { ValuePanel } from './ValuePanel';
+
+export const ValuePanel = React.lazy(async () => {
+  const { ValuePanel } = await import('./ValuePanel');
+  return { default: ValuePanel };
+});
 
 @injectable()
 export class DataValuePanelBootstrap extends Bootstrap {

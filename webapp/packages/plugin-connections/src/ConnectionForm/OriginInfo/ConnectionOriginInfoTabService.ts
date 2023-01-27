@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { isLocalConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -13,9 +15,19 @@ import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
 import type { IConnectionFormState } from '../IConnectionFormProps';
-import { ConnectionFormAuthenticationAction } from './ConnectionFormAuthenticationAction';
-import { OriginInfo } from './OriginInfo';
-import { OriginInfoTab } from './OriginInfoTab';
+
+export const ConnectionFormAuthenticationAction = React.lazy(async () => {
+  const { ConnectionFormAuthenticationAction } = await import('./ConnectionFormAuthenticationAction');
+  return { default: ConnectionFormAuthenticationAction };
+});
+export const OriginInfo = React.lazy(async () => {
+  const { OriginInfo } = await import('./OriginInfo');
+  return { default: OriginInfo };
+});
+export const OriginInfoTab = React.lazy(async () => {
+  const { OriginInfoTab } = await import('./OriginInfoTab');
+  return { default: OriginInfoTab };
+});
 
 @injectable()
 export class ConnectionOriginInfoTabService extends Bootstrap {
