@@ -147,6 +147,9 @@ export const commonDialogBaseStyle = css`
       flex-direction: column;
       box-sizing: border-box;
     }
+    Loader {
+      height: 100%;
+    }
     dialog-body[|no-padding] + footer {
       padding-top: 24px;
     }
