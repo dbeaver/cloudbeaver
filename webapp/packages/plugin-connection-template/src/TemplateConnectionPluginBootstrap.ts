@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { PermissionsService, EPermission } from '@cloudbeaver/core-root';
+import { PermissionsService } from '@cloudbeaver/core-root';
 import { CachedMapAllKey, getCachedDataResourceLoaderState, getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { MenuService, ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_LOADABLE_STATE } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
@@ -22,6 +23,7 @@ import { TemplateConnectionsService } from './TemplateConnectionsService';
 @injectable()
 export class TemplateConnectionPluginBootstrap extends Bootstrap {
   constructor(
+    private readonly appAuthService: AppAuthService,
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
     private readonly projectInfoResource: ProjectInfoResource,
@@ -49,7 +51,7 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
         ACTION_CONNECTION_TEMPLATE,
       ].includes(action),
       isHidden: () => (
-        !this.permissionsService.has(EPermission.public)
+        !this.appAuthService.authenticated
         || !this.projectsService.userProject?.canEditDataSources
         || !this.templateConnectionsService.projectTemplates.length
       ),
@@ -59,6 +61,7 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
         return state.getState(
           action.id,
           () => [
+            ...this.appAuthService.loaders,
             getCachedMapResourceLoaderState(this.projectInfoResource, CachedMapAllKey),
             getCachedDataResourceLoaderState(this.templateConnectionsResource, undefined, undefined),
           ]

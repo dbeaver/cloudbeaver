@@ -116,7 +116,7 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
     >
       {!processor.isBinary ? (
         <TabsState currentTabId={currentTabId} onChange={handleTabChange}>
-          <TabList>
+          <TabList aria-label='Export Settings tabs'>
             <Tab tabId={SETTINGS_TABS.EXTRACTION} style={UNDERLINE_TAB_STYLES}>
               {translate('data_transfer_format_settings')}
             </Tab>

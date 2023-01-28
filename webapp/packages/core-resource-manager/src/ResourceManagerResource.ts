@@ -498,6 +498,18 @@ export class ResourceManagerResource
       includeProperties: false,
     };
   }
+
+  protected validateParam(param: ResourceKey<IResourceManagerParams>): boolean {
+    return (
+      super.validateParam(param)
+      || (
+        typeof param === 'object' && !isResourceKeyList(param)
+        && typeof param.projectId === 'string'
+        && ['string', 'undefined'].includes(typeof param.path)
+        && ['string', 'undefined'].includes(typeof param.name)
+      )
+    );
+  }
 }
 
 export function createParentResourceKey(key: IResourceManagerParams): IResourceManagerParams {
