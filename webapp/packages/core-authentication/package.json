@@ -28,8 +28,7 @@
     "@cloudbeaver/core-localization": "~0.1.0",
     "@cloudbeaver/core-theming": "~0.1.0",
     "@cloudbeaver/core-settings": "~0.1.0",
-    "@cloudbeaver/core-authentication": "~0.1.0",
-    "@cloudbeaver/core-cli": "~0.1.0"
+    "@cloudbeaver/core-authentication": "~0.1.0"
   },
   "peerDependencies": {
     "mobx": "~6.x.x",

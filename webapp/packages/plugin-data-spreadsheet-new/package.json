@@ -36,7 +36,6 @@
     "@cloudbeaver/core-theming": "~0.1.0",
     "@cloudbeaver/core-ui": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
-    "@cloudbeaver/core-cli": "~0.1.0",
     "@popperjs/core": "~2.11.6",
     "react-popper": "~2.3.0"
   },
