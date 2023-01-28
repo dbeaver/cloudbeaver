@@ -177,7 +177,7 @@ export class ServerConfigurationService {
       data.state.serverConfig.serverName = config.name || config.productInfo.name;
       data.state.serverConfig.serverURL = config.serverURL;
 
-      if (this.serverConfigResource.configurationMode) {
+      if (this.administrationScreenService.isConfigurationMode) {
         data.state.serverConfig.serverURL = window.location.origin;
       }
 

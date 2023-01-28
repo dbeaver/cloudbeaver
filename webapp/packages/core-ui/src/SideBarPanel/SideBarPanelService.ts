@@ -15,6 +15,6 @@ export class SideBarPanelService {
   readonly tabsContainer: TabsContainer;
 
   constructor() {
-    this.tabsContainer = new TabsContainer();
+    this.tabsContainer = new TabsContainer('Right Side Bar');
   }
 }

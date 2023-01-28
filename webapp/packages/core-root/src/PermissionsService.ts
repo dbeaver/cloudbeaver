@@ -11,7 +11,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { SessionPermissionsResource } from './SessionPermissionsResource';
 
 export enum EPermission {
-  public = 'public'
 }
 
 @injectable()

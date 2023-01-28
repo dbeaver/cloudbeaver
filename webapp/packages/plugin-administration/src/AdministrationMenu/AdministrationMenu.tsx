@@ -9,8 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { usePermission } from '@cloudbeaver/core-blocks';
-import { EPermission } from '@cloudbeaver/core-root';
+import { AppAuthService } from '@cloudbeaver/core-authentication';
+import { useService } from '@cloudbeaver/core-di';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { MENU_BAR_DISABLE_EFFECT_STYLES, MENU_BAR_ITEM_STYLES, MENU_BAR_STYLES, topMenuStyles } from '@cloudbeaver/plugin-top-app-bar';
@@ -19,9 +19,9 @@ import { MENU_APP_ADMINISTRATION_ACTIONS } from './MENU_APP_ADMINISTRATION_ACTIO
 
 export const AdministrationMenu = observer(function AdministrationMenu() {
   const menu = useMenu({ menu: MENU_APP_ADMINISTRATION_ACTIONS });
-  const isEnabled = usePermission(EPermission.public);
+  const { authenticated } = useService(AppAuthService);
 
-  if (!isEnabled) {
+  if (!authenticated) {
     return null;
   }
 

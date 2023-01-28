@@ -6,11 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, makeObservable, action, computed } from 'mobx';
+import { observable, makeObservable, action, computed, toJS } from 'mobx';
 
 import { Dependency } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, IExecutorHandler, ISyncExecutor, SyncExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
+
+import { isResourceKeyList } from './ResourceKeyList';
 
 export interface ICachedResourceMetadata {
   outdated: boolean;
@@ -254,7 +256,7 @@ export abstract class CachedResource<
           param = map(param) as any as TParam;
         }
 
-        await resource.load(param as any as T, []);
+        await resource.load(param as any as T);
       } finally {
         if (this.logActivity) {
           console.groupEnd();
@@ -475,6 +477,16 @@ export abstract class CachedResource<
   }
 
   transformParam(param: TParam): TParam {
+    if (!this.validateParam(param)) {
+      let paramString = JSON.stringify(toJS(param));
+
+      if (typeof param === 'symbol') {
+        paramString = param.toString();
+      } else if (isResourceKeyList(param))  {
+        paramString = param.toString();
+      }
+      console.warn(this.getActionPrefixedName(`wrong param "${paramString}"`));
+    }
     let deep = 0;
     // eslint-disable-next-line no-labels
     transform:
@@ -536,6 +548,10 @@ export abstract class CachedResource<
 
       return map;
     }, {});
+  }
+
+  protected validateParam(param: TParam): boolean {
+    return param === CachedResourceParamKey;
   }
 
   protected resetIncludes(): void {

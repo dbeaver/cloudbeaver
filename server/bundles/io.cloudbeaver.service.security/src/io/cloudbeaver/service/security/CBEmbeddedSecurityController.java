@@ -821,7 +821,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     protected String[] getDefaultTeamPermissions() {
-        return new String[]{DBWConstants.PERMISSION_PUBLIC};
+        return new String[0];
     }
 
     @Override
