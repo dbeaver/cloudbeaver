@@ -17,6 +17,7 @@ import { TabDefault } from './Tab/TabDefault';
 import { TabsContext } from './TabsContext';
 
 interface Props extends Omit<TabListOptions, keyof TabStateReturn> {
+  'aria-label'?: string;
   style?: ComponentStyle;
   childrenFirst?: boolean;
 }
@@ -36,7 +37,7 @@ export const TabList = observer<React.PropsWithChildren<Props>>(function TabList
   if (state.container) {
     const displayed = state.container.getDisplayed(state.props);
     return (
-      <BaseTabList {...props} {...state.state}>
+      <BaseTabList {...props} {...state.state} area-label={props['aria-label'] ?? state.container.areaLabel}>
         {childrenFirst && children}
         {displayed.map(generateTabElement(
           (tabInfo, key) => (
@@ -48,6 +49,7 @@ export const TabList = observer<React.PropsWithChildren<Props>>(function TabList
               component={tabInfo.tab?.()}
               {...state.props}
               style={style}
+              aria-label={tabInfo.name}
               disabled={props.disabled || tabInfo.isDisabled?.(tabInfo.key, state.props)}
               onOpen={tabInfo.onOpen}
               onClose={tabInfo.onClose}

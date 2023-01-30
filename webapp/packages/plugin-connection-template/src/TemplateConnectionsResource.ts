@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { EPermission, SessionDataResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
+import {  SessionDataResource } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedDataResource, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
 @injectable()
@@ -17,15 +18,13 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
     private readonly graphQLService: GraphQLService,
     connectionInfoResource: ConnectionInfoResource,
     sessionDataResource:SessionDataResource,
-    permissionsResource: SessionPermissionsResource,
+    appAuthService: AppAuthService,
   ) {
     super([]);
 
     this.sync(sessionDataResource);
 
-    permissionsResource
-      .require(this, EPermission.public)
-      .outdateResource(this);
+    appAuthService.requireAuthentication(this);
 
     connectionInfoResource.onConnectionCreate.addHandler(connection => {
       if (connection.template) {

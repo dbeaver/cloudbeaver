@@ -6,10 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { usePermission } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
-import { ServerService } from '@cloudbeaver/core-root';
-import type { ServerConfig } from '@cloudbeaver/core-sdk';
+import { usePermission, useResource } from '@cloudbeaver/core-blocks';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { EAdminPermission } from './EAdminPermission';
 
@@ -17,7 +15,7 @@ interface IAdministrationSettings {
   credentialsSavingEnabled: boolean;
 }
 
-function getCredentialsSavingSetting(config: ServerConfig, isAdmin: boolean) {
+function getCredentialsSavingSetting(config: ServerConfigResource, isAdmin: boolean) {
   if (config.configurationMode) {
     return true;
   }
@@ -35,14 +33,9 @@ function getCredentialsSavingSetting(config: ServerConfig, isAdmin: boolean) {
 
 export function useAdministrationSettings(): IAdministrationSettings {
   const isAdmin = usePermission(EAdminPermission.admin);
-  const serverService = useService(ServerService);
-  const config = serverService.config.data;
-
-  if (!config) {
-    throw new Error("Can't get credentials save permission");
-  }
+  const { resource: serverConfigResource } = useResource(useAdministrationSettings, ServerConfigResource, undefined);
 
   return {
-    credentialsSavingEnabled: getCredentialsSavingSetting(config, isAdmin),
+    credentialsSavingEnabled: getCredentialsSavingSetting(serverConfigResource, isAdmin),
   };
 }

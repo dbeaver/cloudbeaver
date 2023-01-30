@@ -188,7 +188,7 @@ export class AuthenticationService extends Bootstrap {
     this.screenService.routeChange.addHandler(() => this.requireAuthentication());
 
     this.administrationScreenService.ensurePermissions.addHandler(async () => {
-      const userInfo = await this.userInfoResource.load(undefined, []);
+      const userInfo = await this.userInfoResource.load();
       if (userInfo) {
         return;
       }
@@ -224,7 +224,7 @@ export class AuthenticationService extends Bootstrap {
     }
 
     await this.authProvidersResource.loadAll();
-    await this.userInfoResource.load(undefined, []);
+    await this.userInfoResource.load();
 
     if (!this.authProvidersResource.has(data.providerId)) {
       return;

@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -16,6 +17,7 @@ import { ILoadConfigData, IServerConfigSaveData, ServerConfigurationService, ser
 @injectable()
 export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
   constructor(
+    private readonly administrationScreenService: AdministrationScreenService,
     private readonly serverConfigurationService: ServerConfigurationService,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly serverConfigResource: ServerConfigResource,
@@ -43,7 +45,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
         return;
       }
 
-      if (config.configurationMode) {
+      if (this.administrationScreenService.isConfigurationMode) {
         await this.authProvidersResource.loadAll();
         if (this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID)) {
           data.state.serverConfig.adminName = 'cbadmin';

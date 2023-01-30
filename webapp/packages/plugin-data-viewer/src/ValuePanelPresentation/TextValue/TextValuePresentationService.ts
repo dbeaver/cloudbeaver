@@ -6,15 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ITabInfo, ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-ui';
 import { injectable } from '@cloudbeaver/core-di';
+import { ITabInfo, ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-ui';
 
 @injectable()
 export class TextValuePresentationService {
   readonly tabs: TabsContainer;
 
   constructor() {
-    this.tabs = new TabsContainer();
+    this.tabs = new TabsContainer('Value presentation');
   }
 
   get(tabId: string): ITabInfo | undefined {

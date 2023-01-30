@@ -9,11 +9,11 @@
 import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 
 import { CoreSettingsService } from '@cloudbeaver/core-app';
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { EPermission, SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
+import { SessionDataResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -78,7 +78,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     private readonly sessionDataResource: SessionDataResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly projectInfoResource: ProjectInfoResource,
-    permissionsResource: SessionPermissionsResource,
+    appAuthService: AppAuthService,
   ) {
     super();
 
@@ -105,7 +105,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       dependencies: observable([]),
     }));
 
-    permissionsResource.require(this, EPermission.public);
+    appAuthService.requireAuthentication(this);
     // this.preloadResource(connectionInfo, () => CachedMapAllKey);
 
     this.onNodeRefresh = new Executor<string>(null, (a, b) => a === b);
@@ -523,5 +523,12 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     });
 
     return { navNodeChildren, navNodeInfo, parentPath };
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }

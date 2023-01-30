@@ -8,8 +8,8 @@
 
 import { action, makeObservable, runInAction } from 'mobx';
 
+import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { EPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -40,7 +40,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    permissionsResource: SessionPermissionsResource
+    appAuthService: AppAuthService,
   ) {
     super();
 
@@ -54,9 +54,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
       (a, b) => a.mark === b.mark
     );
 
-    permissionsResource
-      .require(this, EPermission.public)
-      .outdateResource(this);
+    appAuthService.requireAuthentication(this);
 
     connectionInfoResource.onItemAdd.addHandler(this.updateConnectionContexts.bind(this));
     connectionInfoResource.onItemDelete.addHandler(this.deleteConnectionContexts.bind(this));
@@ -241,6 +239,13 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     this.set(key, oldContexts.map((context, i) => ({ ...context, ...contexts[i] })));
 
     return key;
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }
 

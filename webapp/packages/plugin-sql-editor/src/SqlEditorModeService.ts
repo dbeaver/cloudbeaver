@@ -22,6 +22,6 @@ export class SqlEditorModeService {
   readonly tabsContainer: TabsContainer<ISqlEditorModeProps>;
 
   constructor() {
-    this.tabsContainer = new TabsContainer();
+    this.tabsContainer = new TabsContainer('SQL Editor Mode');
   }
 }

@@ -130,7 +130,7 @@ export const UserForm = observer<Props>(function UserForm({
                 </>
               )}
             </status-message>
-            <TabList style={style} disabled={state.info.disabled}>
+            <TabList aria-label='User Settings' style={style} disabled={state.info.disabled}>
               <UserInfoTab style={style} />
               {localProvider && <AuthenticationTab style={style} />}
               {/* <UserAuthProvidersTab style={style} /> */}

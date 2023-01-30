@@ -32,7 +32,7 @@ export class UserMetaParametersResource extends CachedDataResource<UserMetaParam
 
     this.sync(sessionResource, () => {}, () => {});
     this
-      .preloadResource(userInfoResource)
+      .preloadResource(userInfoResource, () => {})
       .before(ExecutorInterrupter.interrupter(() => userInfoResource.data === null));
   }
 

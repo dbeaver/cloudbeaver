@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { TabsContainer } from '@cloudbeaver/core-ui';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
+import { TabsContainer } from '@cloudbeaver/core-ui';
 
 import { AuthConfigurationFormBaseActions } from './AuthConfigurationFormBaseActions';
 import type { IAuthConfigurationFormFillConfigData, IAuthConfigurationFormProps, IAuthConfigurationFormSubmitData, IAuthConfigurationFormState } from './IAuthConfigurationFormProps';
@@ -45,7 +45,7 @@ export class AuthConfigurationFormService {
   constructor(
     private readonly notificationService: NotificationService,
   ) {
-    this.tabsContainer = new TabsContainer();
+    this.tabsContainer = new TabsContainer('Identity Provider settings');
     this.actionsContainer = new PlaceholderContainer();
     this.configureTask = new ExecutorHandlersCollection();
     this.fillConfigTask = new ExecutorHandlersCollection();
@@ -93,7 +93,7 @@ export class AuthConfigurationFormService {
     },
   });
 
-  private showSubmittingStatusMessage: IExecutorHandler<IAuthConfigurationFormSubmitData> = (data, contexts) => {
+  private readonly showSubmittingStatusMessage: IExecutorHandler<IAuthConfigurationFormSubmitData> = (data, contexts) => {
     const status = contexts.getContext(this.configurationStatusContext);
 
     if (!status.saved) {
@@ -116,7 +116,7 @@ export class AuthConfigurationFormService {
     }
   };
 
-  private ensureValidation: IExecutorHandler<IAuthConfigurationFormSubmitData> = (data, contexts) => {
+  private readonly ensureValidation: IExecutorHandler<IAuthConfigurationFormSubmitData> = (data, contexts) => {
     const validation = contexts.getContext(this.configurationValidationContext);
 
     if (!validation.valid) {
