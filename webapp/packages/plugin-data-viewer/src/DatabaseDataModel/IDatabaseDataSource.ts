@@ -15,6 +15,7 @@ import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
 export interface IRequestInfo {
+  readonly originalQuery: string;
   readonly requestDuration: number;
   readonly requestMessage: string;
   readonly requestFilter: string;

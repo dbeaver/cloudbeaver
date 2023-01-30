@@ -1525,6 +1525,7 @@ export interface SqlDialectInfo {
 export interface SqlExecuteInfo {
   duration: Scalars['Int'];
   filterText?: Maybe<Scalars['String']>;
+  originalQuery?: Maybe<Scalars['String']>;
   results: Array<SqlQueryResults>;
   statusMessage?: Maybe<Scalars['String']>;
 }
@@ -2486,7 +2487,7 @@ export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
 }>;
 
 
-export type GetSqlExecuteTaskResultsMutation = { result: { duration: number, statusMessage?: string, filterText?: string, results: Array<{ title?: string, updateRowCount?: number, sourceQuery?: string, dataFormat?: ResultDataFormat, resultSet?: { id: string, rows?: Array<Array<any>>, singleEntity: boolean, hasMoreData: boolean, hasRowIdentifier: boolean, columns?: Array<{ dataKind?: string, entityName?: string, fullTypeName?: string, icon?: string, label?: string, maxLength?: number, name?: string, position: number, precision?: number, required: boolean, readOnly: boolean, readOnlyStatus?: string, scale?: number, typeName?: string, supportedOperations: Array<{ id: string, expression: string, argumentCount?: number }> }> } }> } };
+export type GetSqlExecuteTaskResultsMutation = { result: { duration: number, statusMessage?: string, filterText?: string, originalQuery?: string, results: Array<{ title?: string, updateRowCount?: number, sourceQuery?: string, dataFormat?: ResultDataFormat, resultSet?: { id: string, rows?: Array<Array<any>>, singleEntity: boolean, hasMoreData: boolean, hasRowIdentifier: boolean, columns?: Array<{ dataKind?: string, entityName?: string, fullTypeName?: string, icon?: string, label?: string, maxLength?: number, name?: string, position: number, precision?: number, required: boolean, readOnly: boolean, readOnlyStatus?: string, scale?: number, typeName?: string, supportedOperations: Array<{ id: string, expression: string, argumentCount?: number }> }> } }> } };
 
 export type GetSqlExecutionPlanResultMutationVariables = Exact<{
   taskId: Scalars['ID'];
@@ -4020,6 +4021,7 @@ export const GetSqlExecuteTaskResultsDocument = `
     duration
     statusMessage
     filterText
+    originalQuery
     results {
       title
       updateRowCount

@@ -61,6 +61,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     this.dataFormat = ResultDataFormat.Resultset;
     this.supportedDataFormats = [];
     this.requestInfo = {
+      originalQuery: '',
       requestDuration: 0,
       requestMessage: '',
       requestFilter: '',

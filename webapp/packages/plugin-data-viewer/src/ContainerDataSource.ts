@@ -118,6 +118,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       const response = await this.currentTask;
 
       this.requestInfo = {
+        originalQuery: response.originalQuery || '',
         requestDuration: response.duration || 0,
         requestMessage: response.statusMessage || '',
         requestFilter: response.filterText || '',
