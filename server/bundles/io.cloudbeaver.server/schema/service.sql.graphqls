@@ -112,8 +112,6 @@ type SQLResultSet {
     hasMoreData: Boolean!
     # can't update data or load LOB file if hasRowIdentifier = false
     hasRowIdentifier: Boolean!
-    # original sql query without SQLDataFilter
-    originalQuery: String
 }
 
 type SQLQueryResults {
@@ -135,6 +133,8 @@ type SQLExecuteInfo {
     duration: Int!
     # Actual conditions applied to query
     filterText: String
+    # original sql query without SQLDataFilter
+    originalQuery: String
     # Results
     results: [ SQLQueryResults! ]!
 }

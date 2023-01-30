@@ -29,6 +29,7 @@ public class WebSQLExecuteInfo {
     private String statusMessage;
     private long duration;
     private String filterText;
+    private String originalQuery;
     private WebSQLQueryResults[] results;
 
     @Property
@@ -56,6 +57,15 @@ public class WebSQLExecuteInfo {
 
     public void setFilterText(String filterText) {
         this.filterText = filterText;
+    }
+
+    @Property
+    public String getOriginalQuery() {
+        return originalQuery;
+    }
+
+    public void setOriginalQuery(String originalQuery) {
+        this.originalQuery = originalQuery;
     }
 
     @Property

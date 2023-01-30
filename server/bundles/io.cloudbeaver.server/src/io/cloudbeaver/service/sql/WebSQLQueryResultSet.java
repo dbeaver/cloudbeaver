@@ -60,14 +60,6 @@ public class WebSQLQueryResultSet {
     }
 
     @Property
-    public String getOriginalQuery() {
-        if (getResultsInfo() == null) {
-            return null;
-        }
-        return getResultsInfo().getDataContainer().getName();
-    }
-
-    @Property
     public Object[][] getRows() {
         return rows;
     }
