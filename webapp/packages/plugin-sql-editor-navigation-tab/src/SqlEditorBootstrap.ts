@@ -17,7 +17,7 @@ import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractItem
 import { DATA_CONTEXT_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, LocalStorageSqlDataSource, SqlDataSourceService, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, LocalStorageSqlDataSource, SqlDataSourceService, SqlEditorService, SqlEditorSettingsService } from '@cloudbeaver/plugin-sql-editor';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ACTION_SQL_EDITOR_NEW } from './ACTION_SQL_EDITOR_NEW';
@@ -43,6 +43,7 @@ export class SqlEditorBootstrap extends Bootstrap {
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly sqlEditorService: SqlEditorService,
+    private readonly sqlEditorSettingsService: SqlEditorSettingsService,
   ) {
     super();
   }
@@ -103,7 +104,7 @@ export class SqlEditorBootstrap extends Bootstrap {
 
           return dataSource?.features.includes(ESqlDataSourceFeatures.setName) ?? false;
         }
-        return  (
+        return (
           action === ACTION_SQL_EDITOR_OPEN
           && context.has(DATA_CONTEXT_CONNECTION)
         );
@@ -204,6 +205,13 @@ export class SqlEditorBootstrap extends Bootstrap {
         ACTION_SQL_EDITOR_NEW,
       ].includes(action),
       isLabelVisible: () => false,
+      isHidden: (context, action) => {
+        if (action === ACTION_SQL_EDITOR_NEW) {
+          return this.sqlEditorSettingsService.settings.getValue('disabled');
+        }
+
+        return false;
+      },
       handler: (context, action) => {
         switch (action) {
           case ACTION_SQL_EDITOR_NEW: {

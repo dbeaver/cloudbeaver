@@ -12,6 +12,7 @@ import styled, { css } from 'reshadow';
 import { splitStyles, Split, ResizerControls, Pane, ErrorBoundary, useSplitUserState, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
+import { ConnectionsSettingsService } from '@cloudbeaver/plugin-connections';
 import { NavigationTree } from '@cloudbeaver/plugin-navigation-tree';
 
 import { RightArea } from './RightArea';
@@ -30,6 +31,7 @@ const mainStyles = css`
 
 export const Main = observer(function Main() {
   const sideBarPanelService = useService(SideBarPanelService);
+  const connectionsSettingsService = useService(ConnectionsSettingsService);
 
   const styles = useStyles(mainStyles, splitStyles);
   const splitMainState = useSplitUserState('main');
@@ -39,7 +41,7 @@ export const Main = observer(function Main() {
 
   return styled(styles)(
     <space as="main">
-      <Split {...splitMainState} sticky={30}>
+      <Split {...splitMainState} sticky={30} disable={connectionsSettingsService.settings.getValue('disabled')}>
         <Pane main>
           <ErrorBoundary remount>
             <NavigationTree />

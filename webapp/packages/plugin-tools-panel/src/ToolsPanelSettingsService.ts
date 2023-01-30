@@ -9,21 +9,17 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
-export interface ConnectionsSettings {
-  hideConnectionViewForUsers: boolean;
-  disabled: boolean;
-}
-
-const defaultSettings: ConnectionsSettings = {
-  hideConnectionViewForUsers: false,
+const settings = {
   disabled: false,
 };
 
+type Settings = typeof settings;
+
 @injectable()
-export class ConnectionsSettingsService {
-  readonly settings: PluginSettings<ConnectionsSettings>;
+export class ToolsPanelSettingsService {
+  readonly settings: PluginSettings<Settings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('connections', defaultSettings);
+    this.settings = this.pluginManagerService.getPluginSettings('tools-panel', settings);
   }
 }

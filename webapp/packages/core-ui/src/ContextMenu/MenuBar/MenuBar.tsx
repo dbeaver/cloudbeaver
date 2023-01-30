@@ -83,6 +83,10 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
     item.events?.onSelect?.();
   }, [item]);
 
+  if (item.hidden) {
+    return null;
+  }
+
   if (item instanceof MenuSubMenuItem) {
     return styled(styles)(
       <SubMenuItem
