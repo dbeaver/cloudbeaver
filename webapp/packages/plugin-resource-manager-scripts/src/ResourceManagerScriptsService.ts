@@ -14,6 +14,7 @@ import type { ProjectInfo } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
+import { ResourceManagerScriptsSettingsService } from './ResourceManagerScriptsSettingsService';
 import { SCRIPTS_TYPE_ID } from './SCRIPTS_TYPE_ID';
 
 const queryResourceManagerScriptsSettingsKey = 'resource-manager-scripts';
@@ -33,13 +34,14 @@ export class ResourceManagerScriptsService {
   }
 
   get enabled() {
-    return this.resourceManagerService.enabled;
+    return this.resourceManagerService.enabled && !this.resourceManagerScriptsSettingsService.settings.getValue('disabled');
   }
 
   constructor(
     private readonly userDataService: UserDataService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly resourceManagerService: ResourceManagerService,
+    private readonly resourceManagerScriptsSettingsService: ResourceManagerScriptsSettingsService,
   ) {
     this.togglePanel = this.togglePanel.bind(this);
 
