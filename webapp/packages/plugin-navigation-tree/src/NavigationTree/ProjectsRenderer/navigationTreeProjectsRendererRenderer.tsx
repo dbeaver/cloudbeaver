@@ -11,8 +11,10 @@ import { useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { NAV_NODE_TYPE_PROJECT } from '@cloudbeaver/core-projects';
+import { NAV_NODE_TYPE_PROJECT, ProjectsService } from '@cloudbeaver/core-projects';
+import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 
 import { useNode } from '../../NodesManager/useNode';
 import { ElementsTreeContext } from '../ElementsTree/ElementsTreeContext';
@@ -25,7 +27,7 @@ const nestedStyles = css`
   TreeNode {
     margin-top: 8px;
 
-    &:only-child,
+    &[|project]:only-child,
     &[|hideProjects] {
       margin-top: 0px;
 
@@ -63,8 +65,10 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
   className,
   expanded,
 }) {
+  const projectsService = useService(ProjectsService);
   const elementsTreeContext = useContext(ElementsTreeContext);
   const { node } = useNode(nodeId);
+  const singleProject = projectsService.activeProjects.length === 1;
   const hideProjects = elementsTreeContext?.tree.settings?.projects === false;
 
   if (!node) {
@@ -74,6 +78,8 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
       </TreeNodeNestedMessage>
     );
   }
+
+  const project = node.nodeType === NAV_NODE_TYPE_RM_PROJECT && singleProject;
 
   return styled(nestedStyles)(
     <NavigationNodeRenderer
@@ -85,7 +91,7 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
       control={NavigationNodeProjectControl}
       style={nestedStyles}
       component={component}
-      {...use({ hideProjects })}
+      {...use({ hideProjects, project })}
     />
   );
 });

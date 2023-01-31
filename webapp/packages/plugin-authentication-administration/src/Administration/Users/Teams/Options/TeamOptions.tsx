@@ -73,7 +73,7 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
             {translate('administration_teams_team_description')}
           </Textarea>
         </Group>
-        {!serverConfigResource.data?.distributed && <Permissions state={state} />}
+        {!serverConfigResource.resource.distributed && <Permissions state={state} />}
         <Loader state={teamMetaParameters} inline>
           {() => teamMetaParameters.data.length > 0 && styled(style)(
             <Group small gap vertical overflow>
