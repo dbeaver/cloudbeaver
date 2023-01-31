@@ -21,7 +21,6 @@
     "@cloudbeaver/core-app": "~0.1.0",
     "@cloudbeaver/core-authentication": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
-    "@cloudbeaver/core-cli": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-events": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",

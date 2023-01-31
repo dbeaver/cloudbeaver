@@ -154,8 +154,8 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
           }
 
           const result = await this.commonDialogService.open(ConfirmationDialog, {
-            title: 'plugin_resource_manager_save_script_error_confirmation_title',
-            message: 'plugin_resource_manager_save_script_error_confirmation_message',
+            title: 'plugin_sql_editor_navigation_tab_resource_save_script_error_confirmation_title',
+            message: 'plugin_sql_editor_navigation_tab_resource_save_script_error_confirmation_message',
             subTitle: name,
             confirmActionText: 'ui_close',
           });
@@ -256,7 +256,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       await this.navResourceNodeService.move(resourceKey, newResourceKey);
       return newResourceKey;
     } catch (exception) {
-      this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
+      this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_update_script_error');
       throw exception;
     }
   }
@@ -274,7 +274,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
       await this.navResourceNodeService.write(resourceKey, value);
     } catch (exception) {
-      this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
+      this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_update_script_error');
       throw exception;
     }
   }
@@ -288,7 +288,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
       return resource[0].properties ?? {};
     } catch (exception) {
-      this.notificationService.logException(exception as any, 'plugin_resource_manager_sync_script_error');
+      this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_sync_script_error');
       throw exception;
     }
   }
@@ -305,7 +305,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     try {
       return await this.navResourceNodeService.setProperties(resourceKey, diff);
     } catch (exception) {
-      this.notificationService.logException(exception as any, 'plugin_resource_manager_update_script_error');
+      this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_update_script_error');
       throw exception;
     }
   }
@@ -315,7 +315,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       const data = await this.navResourceNodeService.read(resourceKey);
       return data;
     } catch (exception) {
-      this.notificationService.logException(exception as any, 'plugin_resource_manager_sync_script_error');
+      this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_sync_script_error');
       throw exception;
     }
   }

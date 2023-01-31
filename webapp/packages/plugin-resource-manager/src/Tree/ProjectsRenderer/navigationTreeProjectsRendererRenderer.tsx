@@ -11,17 +11,22 @@ import { useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { ProjectsService } from '@cloudbeaver/core-projects';
+import { NAV_NODE_TYPE_RM_PROJECT, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
+import { createPath } from '@cloudbeaver/core-utils';
 import { type IElementsTreeCustomRenderer, type NavigationNodeRendererComponent, useNode, NavigationNodeRenderer, ElementsTreeContext } from '@cloudbeaver/plugin-navigation-tree';
 
-import { NAV_NODE_TYPE_RM_PROJECT } from '../../NAV_NODE_TYPE_RM_PROJECT';
+import type { ResourcesProjectsNavNodeService } from '../../NavNodes/ResourcesProjectsNavNodeService';
+import type { ResourceManagerService } from '../../ResourceManagerService';
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
 
 const nestedStyles = css`
   TreeNode {
     margin-top: 8px;
 
-    &:only-child,
+    &[|project]:only-child,
     &[|hideProjects] {
       margin-top: 0px;
 
@@ -37,13 +42,33 @@ const nestedStyles = css`
 `;
 
 export function navigationTreeProjectsRendererRenderer(
-  navNodeInfoResource: NavNodeInfoResource
+  navNodeInfoResource: NavNodeInfoResource,
+  resourceManagerService: ResourceManagerService,
+  resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
+  resourceTypeId?: string,
 ): IElementsTreeCustomRenderer {
 
   return nodeId => {
     const node = navNodeInfoResource.get(nodeId);
 
     if (node?.nodeType === NAV_NODE_TYPE_RM_PROJECT) {
+      return ProjectRenderer;
+    }
+
+    if (!node?.folder || resourceTypeId === undefined) {
+      return undefined;
+    }
+
+    const project = resourcesProjectsNavNodeService.getProject(nodeId);
+
+    if (!project) {
+      return undefined;
+    }
+
+    const resourceFolder = resourceManagerService.getRootFolder(project, resourceTypeId);
+    const folderNodeId = createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
+
+    if (nodeId === folderNodeId) {
       return ProjectRenderer;
     }
 
@@ -59,9 +84,11 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
   className,
   expanded,
 }) {
+  const projectsService = useService(ProjectsService);
   const elementsTreeContext = useContext(ElementsTreeContext);
   const { node } = useNode(nodeId);
   const hideProjects = elementsTreeContext?.tree.settings?.projects === false;
+  const singleProject = projectsService.activeProjects.length === 1;
 
   if (!node) {
     return styled(TREE_NODE_STYLES)(
@@ -70,6 +97,8 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
       </TreeNodeNestedMessage>
     );
   }
+
+  const project = node.nodeType === NAV_NODE_TYPE_RM_PROJECT && singleProject;
 
   return styled(nestedStyles)(
     <NavigationNodeRenderer
@@ -81,7 +110,7 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
       control={NavigationNodeProjectControl}
       style={nestedStyles}
       component={component}
-      {...use({ hideProjects })}
+      {...use({ hideProjects, project })}
     />
   );
 });

@@ -6,5 +6,8 @@ query getResourceProjectList {
     global
     description
     projectPermissions
+    resourceTypes {
+      ...ResourceType
+    }
   }
 }

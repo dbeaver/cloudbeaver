@@ -1,4 +1,4 @@
 export default [
-  ['plugin_resource_manager_administration_settings_enable', 'Enable SQL scripts manager'],
-  ['plugin_resource_manager_administration_settings_enable_description', 'Enable SQL scripts manager functionality'],
+  ['plugin_resource_manager_administration_settings_enable', 'Enable {alias:plugin_resource_manager_title}'],
+  ['plugin_resource_manager_administration_settings_enable_description', 'Enable {alias:plugin_resource_manager_title} functionality'],
 ];

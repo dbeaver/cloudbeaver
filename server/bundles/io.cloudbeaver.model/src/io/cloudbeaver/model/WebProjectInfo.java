@@ -23,6 +23,11 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
+import org.jkiss.dbeaver.model.rm.RMResourceType;
+import org.jkiss.utils.ArrayUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class WebProjectInfo {
     private final WebSession session;
@@ -91,5 +96,16 @@ public class WebProjectInfo {
 
     private boolean hasDataSourcePermission(RMProjectPermission permission) {
         return SMUtils.hasProjectPermission(session, project.getRmProject(), permission);
+    }
+
+    @Property
+    public RMResourceType[] getResourceTypes() {
+        RMResourceType[] resourceTypes = project.getRmProject().getResourceTypes();
+
+        if(resourceTypes == null) {
+            return ArrayUtils.toArray(RMResourceType.class, new ArrayList<>());
+        }
+
+        return resourceTypes;
     }
 }
