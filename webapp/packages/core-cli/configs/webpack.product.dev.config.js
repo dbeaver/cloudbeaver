@@ -68,9 +68,9 @@ module.exports = (env, argv) => {
       },
     },
     devtool: 'eval-source-map',
-    optimization: {
-      moduleIds: 'named',
-    },
+    // optimization: {
+    //   moduleIds: 'named',
+    // },
     plugins: [
       new CopyWebpackPlugin({
         patterns: getAssets(package, ''),

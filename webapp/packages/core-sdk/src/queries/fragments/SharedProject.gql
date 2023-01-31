@@ -5,4 +5,7 @@ fragment SharedProject on RMProject {
   global
   description
   projectPermissions
+  resourceTypes {
+    ...ResourceType
+  }
 }

@@ -57,7 +57,7 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
       const valid = regex.test(this.name.trim());
 
       if (!valid) {
-        this.errorMessage = translate('plugin_resource_manager_script_name_invalid_characters_message');
+        this.errorMessage = translate('plugin_resource_manager_scripts_script_name_invalid_characters_message');
       }
     },
     async submit() {
@@ -78,7 +78,7 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
   return styled(style, BASE_CONTAINERS_STYLES)(
     <CommonDialogWrapper
       size='small'
-      title={translate('plugin_resource_manager_save_script')}
+      title={translate('plugin_resource_manager_scripts_save_script')}
       icon='/icons/sql_script_m.svg'
       className={className}
       style={style}
@@ -118,7 +118,7 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
           <ProjectSelect
             value={state.projectId}
             filter={p => (p.canEditResources && p.id === (payload.projectId ?? p.id))}
-            descriptionGetter={(_, options) => options.length <= 1 ? translate('plugin_resource_manager_save_script_project_restriction_descripion') : undefined}
+            descriptionGetter={(_, options) => options.length <= 1 ? translate('plugin_resource_manager_scripts_save_script_project_restriction_descripion') : undefined}
             autoHide
             onChange={projectId => { state.projectId = projectId; }}
           />

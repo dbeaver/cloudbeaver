@@ -9,20 +9,53 @@
 
 import type { NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import type { ProjectsService } from '@cloudbeaver/core-projects';
+import { RESOURCES_NODE_PATH, NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { createPath } from '@cloudbeaver/core-utils';
 import type { IElementsTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
-import { NAV_NODE_TYPE_RM_PROJECT } from '../../NAV_NODE_TYPE_RM_PROJECT';
 import type { ResourcesProjectsNavNodeService } from '../../NavNodes/ResourcesProjectsNavNodeService';
-import { RESOURCES_NODE_PATH } from '../../RESOURCES_NODE_PATH';
+import type { ResourceManagerService } from '../../ResourceManagerService';
 
 export function navigationTreeProjectFilter(
   resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
   projectsService: ProjectsService,
   navNodeInfoResource: NavNodeInfoResource,
   navTreeResource: NavTreeResource,
+  resourceManagerService: ResourceManagerService,
+  resourceTypeId?: string,
 ): IElementsTreeFilter {
   return (filter: string, node: NavNode, children: string[]) => {
+    if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT && resourceTypeId !== undefined) {
+      const project = resourcesProjectsNavNodeService.getProject(node.id);
+
+      if (!project) {
+        return children;
+      }
+
+      const resourceFolder = resourceManagerService.getRootFolder(project, resourceTypeId);
+
+      if (resourceFolder === undefined) {
+        return children;
+      }
+
+      const folderNodeId = createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
+
+      const nodes = navNodeInfoResource
+        .get(resourceKeyList(children))
+        .filter<NavNode>((node => node !== undefined) as (node: NavNode | undefined) => node is NavNode)
+        .filter(node => {
+          if (node.id === folderNodeId) {
+            return navTreeResource.get(node.id)?.length;
+          }
+          return false;
+        })
+        .map(node => node.id);
+
+      return nodes;
+
+    }
+
     if (node.id !== RESOURCES_NODE_PATH) {
       return children;
     }
@@ -38,7 +71,14 @@ export function navigationTreeProjectFilter(
             return false;
           }
 
-          return navTreeResource.get(node.id)?.length;
+          if (resourceTypeId) {
+            const resourceFolder = resourceManagerService.getRootFolder(project, resourceTypeId);
+
+            const folderNodeId = createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
+            return (navTreeResource.get(folderNodeId)?.length || 0) > 0;
+          }
+
+          return (navTreeResource.get(node.id)?.length || 0) > 0;
         }
         return true;
       })
