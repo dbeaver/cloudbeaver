@@ -59,7 +59,7 @@ export interface ISQLEditorData {
   destruct(): void;
   setCursor(begin: number, end?: number): void;
   formatScript(): Promise<void>;
-  executeQuery (): Promise<void>;
+  executeQuery(): Promise<void>;
   executeQueryNewTab(): Promise<void>;
   showExecutionPlan(): Promise<void>;
   executeScript(): Promise<void>;
