@@ -12,13 +12,14 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeManagerService, NavNodeInfoResource, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { createChildResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
+import { createChildResourceKey, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { DATA_CONTEXT_TAB_ID } from '@cloudbeaver/core-ui';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { NavResourceNodeService, RESOURCE_NODE_TYPE, SaveScriptDialog, ResourceManagerService, RESOURCES_NODE_PATH, getResourceKeyFromNodeId } from '@cloudbeaver/plugin-resource-manager';
+import { NavResourceNodeService, ResourceManagerService, getResourceKeyFromNodeId } from '@cloudbeaver/plugin-resource-manager';
+import { ResourceManagerScriptsService, SaveScriptDialog } from '@cloudbeaver/plugin-resource-manager-scripts';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
@@ -47,6 +48,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
     private readonly sqlEditorTabService: SqlEditorTabService,
+    private readonly resourceManagerScriptsService: ResourceManagerScriptsService,
   ) {
     super();
   }
@@ -111,12 +113,19 @@ export class PluginBootstrap extends Bootstrap {
                 throw new Error('Project not selected');
               }
 
+              const project = this.projectInfoResource.get(projectId);
+              if (!project) {
+                throw new Error('Project not found');
+              }
+
               const scriptName = `${result.name.trim()}.${SCRIPT_EXTENSION}`;
-              const folder = createPath(RESOURCES_NODE_PATH, projectId);
-              const folderResourceKey = getResourceKeyFromNodeId(folder);
+              const scriptsRootFolder = this.resourceManagerScriptsService.getRootFolder(project);
+              const folderResourceKey = getResourceKeyFromNodeId(
+                createPath(RESOURCES_NODE_PATH, projectId, scriptsRootFolder)
+              );
 
               if (!folderResourceKey) {
-                this.notificationService.logError({ title: 'ui_error', message: 'plugin_resource_manager_save_script_error' });
+                this.notificationService.logError({ title: 'ui_error', message: 'plugin_sql_editor_navigation_tab_resource_save_script_error' });
                 return;
               }
 
@@ -141,14 +150,14 @@ export class PluginBootstrap extends Bootstrap {
                 }
               }
 
-              this.notificationService.logSuccess({ title: 'plugin_resource_manager_save_script_success', message: resourceKey.name });
+              this.notificationService.logSuccess({ title: 'plugin_sql_editor_navigation_tab_resource_save_script_success', message: resourceKey.name });
 
-              if (!this.resourceManagerService.active) {
-                this.resourceManagerService.togglePanel();
+              if (!this.resourceManagerScriptsService.active) {
+                this.resourceManagerScriptsService.togglePanel();
               }
 
             } catch (exception) {
-              this.notificationService.logException(exception as any, 'plugin_resource_manager_save_script_error');
+              this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_save_script_error');
             }
           }
         }
@@ -188,7 +197,7 @@ export class PluginBootstrap extends Bootstrap {
       const nodeInfo = contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
       const node = this.navNodeInfoResource.get(data.nodeId);
 
-      if (!node || node.nodeType !== RESOURCE_NODE_TYPE || !isScript(node.id)) {
+      if (!node || node.nodeType !== NAV_NODE_TYPE_RM_RESOURCE || !isScript(node.id)) {
         return;
       }
 
@@ -252,7 +261,7 @@ export class PluginBootstrap extends Bootstrap {
         }
       }
     } catch (exception) {
-      this.notificationService.logException(exception as any, 'plugin_resource_manager_open_script_error');
+      this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_open_script_error');
     }
   }
 }

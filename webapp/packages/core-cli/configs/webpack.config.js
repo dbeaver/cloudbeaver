@@ -4,6 +4,8 @@ const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
+
+const excludedFromVendor = require('./excludedFromVendor.js');
 // const ESLintPlugin = require('eslint-webpack-plugin');
 
 class IgnoreNotFoundExportPlugin {
@@ -108,7 +110,40 @@ module.exports = (env, argv) => {
     optimization: {
       removeAvailableModules: false,
       removeEmptyChunks: false,
-      splitChunks: false,
+      runtimeChunk: 'single',
+      moduleIds: 'deterministic',
+      splitChunks: {
+        chunks: 'async',
+        cacheGroups: {
+          locale: {
+            test: /[\\/]locales[\\/].*?\.ts/,
+            filename: '[name].[contenthash].bundle.js',
+            name(module) {
+              return module.rawRequest.substr(2);
+            },
+            priority: -5,
+            reuseExistingChunk: true,
+          },
+          defaultVendors: {
+            name: 'vendors',
+            test: new RegExp(`[\\\\/]node_modules[\\\\/](?!${excludedFromVendor.join('|')}).*?[\\\\/]`, ''),
+            priority: -10,
+            reuseExistingChunk: false,
+            enforce: true,
+          },
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+          // styles: {
+          //   name: 'styles',
+          //   type: 'css/mini-extract',
+          //   chunks: 'all',
+          //   enforce: true,
+          // },
+        },
+      },
     },
     output: {
       pathinfo: false,
@@ -197,8 +232,8 @@ module.exports = (env, argv) => {
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
         // all options are optional
-        filename: devMode ? '[name].css' : '[name].[contenthash].css',
-        chunkFilename: devMode ? '[id].css' : '[id].[contenthash].css',
+        filename: devMode ? 'styles/[name].css' : 'styles/[name].[contenthash].css',
+        chunkFilename: devMode ? 'styles/[name].bundle.css' : 'styles/[name].[contenthash].css',
         ignoreOrder: false, // Enable to remove warnings about conflicting order
         insert: linkTag => {
           let reshadowObj = document.getElementById('__reshadow__');

@@ -15,7 +15,7 @@ import { NavResourceNodeService } from './NavResourceNodeService';
 import { PluginBootstrap } from './PluginBootstrap';
 import { ResourceManagerService } from './ResourceManagerService';
 import { ResourceManagerSettingsService } from './ResourceManagerSettingsService';
-import { ResourceProjectsResource } from './ResourceProjectsResource';
+// import { ResourceProjectsResource } from './ResourceProjectsResource';
 
 export const resourceManagerPlugin: PluginManifest = {
   info: { name: 'Resource manager plugin' },
@@ -26,7 +26,7 @@ export const resourceManagerPlugin: PluginManifest = {
     ResourceManagerService,
     NavResourceNodeService,
     ResourceFoldersBootstrap,
-    ResourceProjectsResource,
+    // ResourceProjectsResource,
     ResourcesProjectsNavNodeService,
   ],
 };
