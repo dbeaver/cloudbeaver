@@ -253,6 +253,7 @@ public class LocalResourceController implements RMController {
         }
         try {
             Files.createDirectories(getProjectPath(project.getId()));
+            fireRmProjectAddEvent(project);
             return project;
         } catch (IOException e) {
             throw new DBException("Error creating project path", e);
@@ -853,6 +854,14 @@ public class LocalResourceController implements RMController {
             new RMEvent(RMEvent.Action.RESOURCE_DELETE,
                 makeProjectFromId(projectId, false),
                 resourcePath
+            )
+        );
+    }
+
+    private void fireRmProjectAddEvent(@NotNull RMProject project) throws DBException {
+        RMEventManager.fireEvent(
+            new RMEvent(RMEvent.Action.RESOURCE_ADD,
+                project
             )
         );
     }

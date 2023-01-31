@@ -28,6 +28,7 @@ import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.utils.ArrayUtils;
 
 import java.util.*;
 
@@ -127,6 +128,9 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
             case RESOURCE_ADD:
                 addResourceNode(event.getProject(), event.getResourceTree());
                 break;
+            case PROJECT_ADD:
+                addProjectNode(event.getProject());
+                break;
         }
     }
 
@@ -145,5 +149,9 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
     private void addResourceNode(RMProject project, List<RMResource> resourcePath) {
         var projectNode = getProjectNode(project);
         projectNode.ifPresent(dbnResourceManagerProject -> dbnResourceManagerProject.addChildResourceNode(new ArrayDeque<>(resourcePath)));
+    }
+
+    private void addProjectNode(RMProject project) {
+        projects = ArrayUtils.add(DBNResourceManagerProject.class, projects, new DBNResourceManagerProject(this, project));
     }
 }
