@@ -2,6 +2,7 @@ package io.cloudbeaver.server.servlets;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
@@ -12,6 +13,7 @@ import io.cloudbeaver.registry.WebServletHandlerDescriptor;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.eclipse.jetty.http.HttpContent;
 import org.eclipse.jetty.http.HttpField;
 import org.eclipse.jetty.http.HttpHeader;
@@ -38,6 +40,7 @@ import java.util.Map;
 @WebServlet(urlPatterns = "/")
 public class CBStaticServlet extends DefaultServlet {
     private static final String AUTO_LOGIN_ACTION = "auto-login";
+    private static final String ACTION = "action";
     public static final int STATIC_CACHE_SECONDS = 60 * 60 * 24 * 3;
 
     private static final Log log = Log.getLog(CBStaticServlet.class);
@@ -61,6 +64,7 @@ public class CBStaticServlet extends DefaultServlet {
         try {
             WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(
                 request, response, false);
+            performAutoLoginIfNeeded(request, webSession);
             WebActionParameters webActionParameters = WebActionParameters.fromSession(webSession, false);
             if (CBApplication.getInstance().getAppConfiguration().isRedirectOnFederatedAuth()
                 && (CommonUtils.isEmpty(uri) || uri.equals("/") || uri.equals("/index.html"))
@@ -75,6 +79,29 @@ public class CBStaticServlet extends DefaultServlet {
             log.error("Error reading websession", e);
         }
         super.doGet(request, response);
+    }
+
+    private void performAutoLoginIfNeeded(HttpServletRequest request, WebSession webSession) {
+        boolean isAutoLogin = CommonUtils.toBoolean(request.getParameter(CBAuthConstants.CB_AUTO_LOGIN_REQUEST_PARAM));
+        if (!isAutoLogin) {
+            return;
+        }
+
+        if (webSession.isAuthorizedInSecurityManager()) {
+            log.warn("Auto login failed: user already authorized");
+            return;
+        }
+
+        String authId = request.getParameter(CBAuthConstants.CB_AUTH_ID_REQUEST_PARAM);
+        if (CommonUtils.isEmpty(authId)) {
+            log.warn("Auto login failed: authId not found in request");
+            return;
+        }
+        Map<String, Object> authActionParams = Map.of(
+            ACTION, AUTO_LOGIN_ACTION,
+            CBAuthConstants.CB_AUTH_ID_REQUEST_PARAM, authId
+        );
+        WebActionParameters.saveToSession(webSession, authActionParams);
     }
 
     private boolean processSessionStart(HttpServletRequest request, HttpServletResponse response, WebSession webSession) {
@@ -125,8 +152,8 @@ public class CBStaticServlet extends DefaultServlet {
                             if (!CommonUtils.isEmpty(signInLink)) {
                                 // Redirect to it
                                 Map<String, Object> authActionParams = Map.of(
-                                    "action", AUTO_LOGIN_ACTION,
-                                    "auth-id", authInfo.getAuthAttemptId()
+                                    ACTION, AUTO_LOGIN_ACTION,
+                                    CBAuthConstants.CB_AUTH_ID_REQUEST_PARAM, authInfo.getAuthAttemptId()
                                 );
                                 WebActionParameters.saveToSession(webSession, authActionParams);
                                 request.getSession().setAttribute(DBWConstants.STATE_ATTR_SIGN_IN_STATE, DBWConstants.SignInState.GLOBAL);
