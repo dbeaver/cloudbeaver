@@ -7,13 +7,8 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { IResourceManagerParams, ResourceManagerResource, RmResourceInfo } from '@cloudbeaver/core-resource-manager';
+import { IResourceManagerParams, ResourceManagerResource, RESOURCES_NODE_PATH, RmResourceInfo } from '@cloudbeaver/core-resource-manager';
 import { createPath } from '@cloudbeaver/core-utils';
-
-import { RESOURCES_NODE_PATH } from './RESOURCES_NODE_PATH';
-
-export const PROJECT_NODE_TYPE = 'rm.project';
-export const RESOURCE_NODE_TYPE = 'rm.resource';
 
 @injectable()
 export class NavResourceNodeService {

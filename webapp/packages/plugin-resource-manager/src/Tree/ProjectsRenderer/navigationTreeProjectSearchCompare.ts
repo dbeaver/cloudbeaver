@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { EEquality, elementsTreeNameFilterNode, NavNodeFilterCompareFn } from '@cloudbeaver/plugin-navigation-tree';
-
-import { NAV_NODE_TYPE_RM_PROJECT } from '../../NAV_NODE_TYPE_RM_PROJECT';
 
 export const navigationTreeProjectSearchCompare: NavNodeFilterCompareFn = function navigationTreeProjectSearchCompare(
   node,
