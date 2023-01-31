@@ -9,5 +9,8 @@ query getProjectList {
     canViewDataSources
     canEditResources
     canViewResources
+    resourceTypes {
+      ...ResourceType
+    }
   }
 }
