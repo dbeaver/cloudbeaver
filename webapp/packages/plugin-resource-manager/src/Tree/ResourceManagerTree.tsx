@@ -13,7 +13,7 @@ import styled, { css } from 'reshadow';
 import { useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { ProjectsService } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { CaptureView } from '@cloudbeaver/core-view';
 import { NavigationTreeService, ElementsTree, IElementsTreeSettings, createElementsTreeSettings, validateElementsTreeSettings, getNavigationTreeUserSettingsId } from '@cloudbeaver/plugin-navigation-tree';
@@ -24,6 +24,7 @@ import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreePr
 import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigationTreeProjectSearchCompare';
 import { navigationTreeProjectsExpandStateGetter } from './ProjectsRenderer/navigationTreeProjectsExpandStateGetter';
 import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navigationTreeProjectsRendererRenderer';
+import { navigationTreeResourceTypeFilter } from './ProjectsRenderer/navigationTreeResourceTypeFilter';
 import { ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm';
 import { navigationTreeResourceExpandStateGetter } from './ResourceFolderRenderer/navigationTreeResourceExpandStateGetter';
 import { ResourceManagerTreeCaptureViewContext } from './ResourceManagerTreeCaptureViewContext';
@@ -73,6 +74,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
   const resourcesProjectsNavNodeService = useService(ResourcesProjectsNavNodeService);
   const projectsService = useService(ProjectsService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
+  const projectInfoResource = useService(ProjectInfoResource);
   const navTreeService = useService(NavigationTreeService);
   const resourceManagerService = useService(ResourceManagerService);
   const navTreeResource = useService(NavTreeResource);
@@ -144,6 +146,20 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
       resourceTypeId,
     ]
   );
+  const resourceTypeFilter = useMemo(
+    () => navigationTreeResourceTypeFilter(
+      navNodeInfoResource,
+      resourcesProjectsNavNodeService,
+      projectInfoResource,
+      resourceTypeId
+    ),
+    [
+      navNodeInfoResource,
+      resourcesProjectsNavNodeService,
+      projectInfoResource,
+      resourceTypeId,
+    ]
+  );
 
   const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);
 
@@ -156,7 +172,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
         getChildren={navTreeService.getChildren}
         loadChildren={navTreeService.loadNestedNodes}
         settings={settings}
-        filters={[projectFilter]}
+        filters={[resourceTypeFilter, projectFilter]}
         renderers={[projectsRendererRenderer]}
         expandStateGetters={[projectsExpandStateGetter, resourceExpandStateGetter]}
         navNodeFilterCompare={navigationTreeProjectSearchCompare}

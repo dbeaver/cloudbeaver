@@ -6,4 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export const SCRIPT_EXTENSION = 'sql';
+export const NAV_NODE_TYPE_RM_FOLDER = 'rm.folder';

@@ -11,7 +11,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeManagerService, NavNodeInfoResource, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
-import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { createResourceOfType, isResourceOfType, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { createChildResourceKey, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { DATA_CONTEXT_TAB_ID } from '@cloudbeaver/core-ui';
@@ -20,12 +20,11 @@ import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@clo
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavResourceNodeService, ResourceManagerService, getResourceKeyFromNodeId } from '@cloudbeaver/plugin-resource-manager';
 import { ResourceManagerScriptsService, SaveScriptDialog } from '@cloudbeaver/plugin-resource-manager-scripts';
+import { SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts/src/SCRIPTS_TYPE_ID';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
-import { isScript } from './isScript';
 import { ResourceSqlDataSource } from './ResourceSqlDataSource';
-import { SCRIPT_EXTENSION } from './SCRIPT_EXTENSION';
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
 
 @injectable()
@@ -118,7 +117,12 @@ export class PluginBootstrap extends Bootstrap {
                 throw new Error('Project not found');
               }
 
-              const scriptName = `${result.name.trim()}.${SCRIPT_EXTENSION}`;
+              const resourceType = this.projectInfoResource.getResourceType(project, SCRIPTS_TYPE_ID);
+              if (!resourceType) {
+                throw new Error('Resource type not found');
+              }
+
+              const scriptName = createResourceOfType(resourceType, result.name.trim());
               const scriptsRootFolder = this.resourceManagerScriptsService.getRootFolder(project);
               const folderResourceKey = getResourceKeyFromNodeId(
                 createPath(RESOURCES_NODE_PATH, projectId, scriptsRootFolder)
@@ -195,9 +199,24 @@ export class PluginBootstrap extends Bootstrap {
 
     try {
       const nodeInfo = contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
+
+      if (!nodeInfo.projectId) {
+        return;
+      }
+
       const node = this.navNodeInfoResource.get(data.nodeId);
 
-      if (!node || node.nodeType !== NAV_NODE_TYPE_RM_RESOURCE || !isScript(node.id)) {
+      const project = this.projectInfoResource.get(nodeInfo.projectId);
+      if (!project) {
+        return;
+      }
+
+      const resourceType = this.projectInfoResource.getResourceType(project, SCRIPTS_TYPE_ID);
+      if (!resourceType) {
+        return;
+      }
+
+      if (!node || node.nodeType !== NAV_NODE_TYPE_RM_RESOURCE || !isResourceOfType(resourceType, node.id)) {
         return;
       }
 

@@ -49,7 +49,7 @@
     "@cloudbeaver/plugin-settings-menu-administration": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "~0.1.0",
-    "@cloudbeaver/plugin-sql-editor-navigation-tab-resource": "~0.1.0",
+    "@cloudbeaver/plugin-sql-editor-navigation-tab-script": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor-screen": "~0.1.0",
     "@cloudbeaver/plugin-theme": "~0.1.0",
     "@cloudbeaver/plugin-tools-panel": "~0.1.0",
