@@ -8,10 +8,10 @@
 
 import { createAction } from '@cloudbeaver/core-view';
 
-export const ACTION_RESOURCE_MANAGER = createAction(
-  'resource-manager-enable',
+export const ACTION_RESOURCE_MANAGER_SCRIPTS = createAction(
+  'resource-manager-scripts-enable',
   {
-    label: 'plugin_resource_manager_action_enable_label',
+    label: 'plugin_resource_manager_scripts_action_enable_label',
     type: 'checkbox',
   }
 );

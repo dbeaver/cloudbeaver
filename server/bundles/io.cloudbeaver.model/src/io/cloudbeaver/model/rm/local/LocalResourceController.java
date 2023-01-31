@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.app.DBPResourceTypeDescriptor;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
@@ -598,7 +599,24 @@ public class LocalResourceController implements RMController {
             throw new DBException("Resource '" + resourcePath + "' exists");
         }
         if (!Files.exists(targetPath.getParent())) {
-            throw new DBException("Parent folder '" + targetPath.getParent().getFileName() + "' doesn't exist");
+            boolean parentExists = false;
+            if (getProjectPath(projectId).equals(targetPath.toAbsolutePath().getParent().getParent())) {
+                // Create special folder on demand or throw error
+                for (DBPResourceTypeDescriptor rtd : ResourceTypeRegistry.getInstance().getResourceTypes()) {
+                    if (targetPath.getParent().getFileName().toString().equals(rtd.getDefaultRoot(null))) {
+                        try {
+                            Files.createDirectories(targetPath.getParent());
+                            parentExists = true;
+                            break;
+                        } catch (IOException e) {
+                            throw new DBException("Error creating special folder '" + targetPath.getParent() + "'");
+                        }
+                    }
+                }
+            }
+            if (!parentExists) {
+                throw new DBException("Parent folder '" + targetPath.getParent().getFileName() + "' doesn't exist");
+            }
         }
         try {
             Files.write(targetPath, data);

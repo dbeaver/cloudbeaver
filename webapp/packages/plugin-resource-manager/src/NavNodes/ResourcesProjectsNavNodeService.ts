@@ -9,11 +9,9 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { NAV_NODE_TYPE_RM_PROJECT, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { createPath } from '@cloudbeaver/core-utils';
-
-import { NAV_NODE_TYPE_RM_PROJECT } from '../NAV_NODE_TYPE_RM_PROJECT';
-import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
 
 @injectable()
 export class ResourcesProjectsNavNodeService {

@@ -27,6 +27,7 @@ import productPlugin from '@cloudbeaver/plugin-product';
 import projects from '@cloudbeaver/plugin-projects';
 import resourceManager from '@cloudbeaver/plugin-resource-manager';
 import resourceManagerAdministration from '@cloudbeaver/plugin-resource-manager-administration';
+import resourceManagerScripts from '@cloudbeaver/plugin-resource-manager-scripts';
 import root from '@cloudbeaver/plugin-root';
 import settingsMenu from '@cloudbeaver/plugin-settings-menu';
 import settingsMenuAdministration from '@cloudbeaver/plugin-settings-menu-administration';
@@ -41,7 +42,6 @@ import userProfile from '@cloudbeaver/plugin-user-profile';
 import userProfileAdministration from '@cloudbeaver/plugin-user-profile-administration';
 import version from '@cloudbeaver/plugin-version';
 import versionUpdate from '@cloudbeaver/plugin-version-update-administration';
-
 
 import { defaultProductManifest } from './manifest';
 
@@ -76,6 +76,7 @@ const PLUGINS: PluginManifest[] = [
   help,
   resourceManager,
   resourceManagerAdministration,
+  resourceManagerScripts,
   sqlEditorResource,
   logViewer,
   navigationTree,

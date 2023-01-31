@@ -6,10 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IResourceManagerParams } from '@cloudbeaver/core-resource-manager';
+import { IResourceManagerParams, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { createPath } from '@cloudbeaver/core-utils';
-
-import { RESOURCES_NODE_PATH } from '../RESOURCES_NODE_PATH';
 
 export function getResourceNodeId(key: IResourceManagerParams): string {
   return createPath(RESOURCES_NODE_PATH, key.projectId, key.path, key.name);

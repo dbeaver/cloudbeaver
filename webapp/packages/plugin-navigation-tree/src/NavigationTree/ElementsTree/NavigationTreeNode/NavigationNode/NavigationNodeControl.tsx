@@ -43,9 +43,6 @@ const styles = css`
   portal:focus-within {
     visibility: visible;
   }
-  portal {
-    position: relative;
-  }
   TreeNodeName {
     height: 100%;
     max-width: 320px;
@@ -53,6 +50,7 @@ const styles = css`
     text-overflow: ellipsis;
   } 
   portal {
+    position: relative;
     box-sizing: border-box;
     margin-left: auto !important;
     margin-right: 8px !important;
