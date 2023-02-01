@@ -10,6 +10,5 @@ import type { ProjectInfoResourceType } from './ProjectInfoResource';
 
 export function isResourceOfType(resourceType: ProjectInfoResourceType, name: string): boolean {
   return resourceType.fileExtensions
-    ?.some(type => name.endsWith(`.${type}`))
-    ?? false;
+    .some(type => name.endsWith(`.${type}`));
 }

@@ -9,6 +9,6 @@
 import type { ProjectInfoResourceType } from './ProjectInfoResource';
 
 export function createResourceOfType(resourceType: ProjectInfoResourceType, name: string): string {
-  const extension = resourceType.fileExtensions?.[0];
+  const extension = resourceType.fileExtensions[0];
   return `${name}${extension ? '.' + extension : ''}`;
 }

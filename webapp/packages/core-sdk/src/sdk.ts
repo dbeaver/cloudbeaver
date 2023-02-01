@@ -1463,7 +1463,7 @@ export interface RmResource {
 
 export interface RmResourceType {
   displayName: Scalars['String'];
-  fileExtensions?: Maybe<Array<Scalars['String']>>;
+  fileExtensions: Array<Scalars['String']>;
   icon?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   rootFolder?: Maybe<Scalars['String']>;
@@ -2415,13 +2415,13 @@ export type ObjectOriginInfoFragment = { type: string, subType?: string, display
 
 export type ObjectPropertyInfoFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number };
 
-export type ResourceTypeFragment = { id: string, displayName: string, icon?: string, fileExtensions?: Array<string>, rootFolder?: string };
+export type ResourceTypeFragment = { id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string };
 
 export type SqlScriptInfoFragment = { queries: Array<{ start: number, end: number }> };
 
 export type SessionStateFragment = { createTime: string, lastAccessTime: string, cacheExpired: boolean, locale: string, actionParameters?: any, valid: boolean, remainingTime: number };
 
-export type SharedProjectFragment = { id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions?: Array<string>, rootFolder?: string }> };
+export type SharedProjectFragment = { id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string }> };
 
 export type UserConnectionAuthPropertiesFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number };
 
@@ -2632,7 +2632,7 @@ export type NavRenameNodeMutation = { navRenameNode?: string };
 export type GetProjectListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProjectListQuery = { projects: Array<{ id: string, shared: boolean, global: boolean, name: string, description?: string, canEditDataSources: boolean, canViewDataSources: boolean, canEditResources: boolean, canViewResources: boolean, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions?: Array<string>, rootFolder?: string }> }> };
+export type GetProjectListQuery = { projects: Array<{ id: string, shared: boolean, global: boolean, name: string, description?: string, canEditDataSources: boolean, canViewDataSources: boolean, canEditResources: boolean, canViewResources: boolean, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string }> }> };
 
 export type CreateProjectMutationVariables = Exact<{
   projectId?: InputMaybe<Scalars['ID']>;
@@ -2641,7 +2641,7 @@ export type CreateProjectMutationVariables = Exact<{
 }>;
 
 
-export type CreateProjectMutation = { project: { id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions?: Array<string>, rootFolder?: string }> } };
+export type CreateProjectMutation = { project: { id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string }> } };
 
 export type CreateResourceMutationVariables = Exact<{
   projectId: Scalars['String'];
@@ -2673,7 +2673,7 @@ export type GetProjectQueryVariables = Exact<{
 }>;
 
 
-export type GetProjectQuery = { project: { id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions?: Array<string>, rootFolder?: string }> } };
+export type GetProjectQuery = { project: { id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string }> } };
 
 export type GetProjectGrantedPermissionsQueryVariables = Exact<{
   projectId: Scalars['String'];
@@ -2701,12 +2701,12 @@ export type GetResourceListQuery = { resources: Array<{ name: string, folder: bo
 export type GetResourceProjectListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetResourceProjectListQuery = { projects: Array<{ id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions?: Array<string>, rootFolder?: string }> }> };
+export type GetResourceProjectListQuery = { projects: Array<{ id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string }> }> };
 
 export type GetSharedProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetSharedProjectsQuery = { projects: Array<{ id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions?: Array<string>, rootFolder?: string }> }> };
+export type GetSharedProjectsQuery = { projects: Array<{ id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string }> }> };
 
 export type GetSubjectProjectsPermissionsQueryVariables = Exact<{
   subjectId: Scalars['String'];
