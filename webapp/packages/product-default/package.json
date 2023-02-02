@@ -1,7 +1,7 @@
 {
   "name": "@cloudbeaver/product-default",
   "sideEffects": false,
-  "version": "22.3.3",
+  "version": "22.3.4",
   "description": "",
   "license": "Apache-2.0",
   "main": "lib/index.js",
@@ -19,6 +19,11 @@
     "postinstall": "rimraf node_modules/.cache"
   },
   "dependencies": {
+    "@cloudbeaver/core-blocks": "~0.1.0",
+    "@cloudbeaver/core-bootstrap": "~0.1.0",
+    "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-product": "~0.1.0",
+    "@cloudbeaver/core-version-update": "~0.1.0",
     "@cloudbeaver/plugin-administration": "~0.1.0",
     "@cloudbeaver/plugin-authentication": "~0.1.0",
     "@cloudbeaver/plugin-authentication-administration": "~0.1.0",
@@ -57,12 +62,7 @@
     "@cloudbeaver/plugin-user-profile": "~0.1.0",
     "@cloudbeaver/plugin-user-profile-administration": "~0.1.0",
     "@cloudbeaver/plugin-version": "~0.1.0",
-    "@cloudbeaver/plugin-version-update-administration": "~0.1.0",
-    "@cloudbeaver/core-blocks": "~0.1.0",
-    "@cloudbeaver/core-bootstrap": "~0.1.0",
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-product": "~0.1.0",
-    "@cloudbeaver/core-version-update": "~0.1.0"
+    "@cloudbeaver/plugin-version-update-administration": "~0.1.0"
   },
   "peerDependencies": {
     "reflect-metadata": "~0.x.x"
