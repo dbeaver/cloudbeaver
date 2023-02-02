@@ -753,7 +753,8 @@ public class LocalResourceController implements RMController {
             default:
                 var activeUserCredentials = credentialsProvider.getActiveUserCredentials();
                 var userId = activeUserCredentials == null ? null : activeUserCredentials.getUserId();
-                if (!projectName.equals(userId)) {
+                var isAdmin = activeUserCredentials != null && activeUserCredentials.hasPermission(DBWConstants.PERMISSION_ADMIN);
+                if (!(projectName.equals(userId) || isAdmin)) {
                     throw new DBException("No access to the project: " + projectName);
                 }
                 return userProjectsPath.resolve(projectName);
