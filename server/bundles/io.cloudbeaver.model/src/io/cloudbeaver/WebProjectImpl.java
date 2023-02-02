@@ -137,6 +137,9 @@ public class WebProjectImpl extends BaseProjectImpl {
         flushMetadata();
     }
 
+    /**
+     * Method for Bulk Remove of resources properties
+     */
     public boolean resetResourcesPropertiesBatch(@NotNull Collection<String> resourcesPaths) {
         loadMetadata();
         boolean propertiesChanged = false;
