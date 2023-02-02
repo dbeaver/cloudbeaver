@@ -15,6 +15,7 @@ import { useService } from '@cloudbeaver/core-di';
 interface IAuthenticationAction {
   providerId: string | undefined;
   authorized: boolean;
+  authenticating: boolean;
   isAuthorized(providerId?: string): boolean;
   auth(providerId?: string): Promise<void>;
 }

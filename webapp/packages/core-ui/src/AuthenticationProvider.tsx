@@ -21,11 +21,11 @@ const styles = css`
 `;
 
 export type Props = {
-  onAuthenticate?: () => void;
-  onClose?: () => void;
-  children?: () => React.ReactNode;
+  providerId?: string;
   className?: string;
-  providerId: string;
+  children?: () => React.ReactNode;
+  onAuthenticate?: (id: string) => void;
+  onClose?: () => void;
 };
 
 export const AuthenticationProvider = observer<Props>(function AuthenticationProvider(props) {
@@ -33,7 +33,7 @@ export const AuthenticationProvider = observer<Props>(function AuthenticationPro
   const style = useStyles(styles, BASE_CONTAINERS_STYLES);
   const action = useAuthenticationAction(props);
 
-  if (action.authorized) {
+  if (!props.providerId || !action.authorized) {
     return props.children?.() as null || null;
   }
 
@@ -46,6 +46,7 @@ export const AuthenticationProvider = observer<Props>(function AuthenticationPro
         <Button
           type='button'
           mod={['unelevated']}
+          loading={action.authenticating}
           onClick={() => action.auth()}
         >
           {translate('authentication_authenticate')}
