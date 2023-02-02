@@ -572,7 +572,7 @@ public class LocalResourceController implements RMController {
     }
 
     private Collection<String> getPropertiesToRemove(@NotNull String projectId, @NotNull Path targetPath) throws DBException, IOException {
-        final var projectPath = getProjectPath(projectId);
+        var projectPath = getProjectPath(projectId);
         var propertiesToRemove = new ArrayList<String>();
         Files.walkFileTree(targetPath, (UniversalFileVisitor<Path>) (path, attrs) -> {
             var resourcePropertiesPath = projectPath.relativize(path.toAbsolutePath());
