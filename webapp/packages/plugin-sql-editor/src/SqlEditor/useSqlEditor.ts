@@ -205,8 +205,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       const key = [connectionId, id, defaultSchema, defaultCatalog, position, word.slice(0, 1)];
       const reset = this.hintsLimitIsMet || !simple;
 
-      if (reset) {
-        position = position + word.length - 1;
+      if (this.hintsLimitIsMet) {
+        position = position + Math.max(word.length - 1, 0);
       }
 
       return await this.getLastAutocomplete(key, async () => {
