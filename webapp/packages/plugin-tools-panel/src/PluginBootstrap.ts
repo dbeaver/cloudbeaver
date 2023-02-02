@@ -11,13 +11,13 @@ import { DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { MENU_TOOLS } from './Menu/MENU_TOOLS';
-import { ToolsPanelSettingsService } from './ToolsPanelSettingsService';
+import { ToolsPanelService } from './ToolsPanel/ToolsPanelService';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly menuService: MenuService,
-    private readonly toolsPanelSettingsService: ToolsPanelSettingsService,
+    private readonly toolsPanelService: ToolsPanelService,
   ) {
     super();
   }
@@ -34,7 +34,7 @@ export class PluginBootstrap extends Bootstrap {
       id: 'tools-menu-base',
       isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === MENU_TOOLS,
       isLabelVisible: () => false,
-      isHidden: () => this.toolsPanelSettingsService.settings.getValue('disabled'),
+      isHidden: () => this.toolsPanelService.disabled,
     });
   }
 

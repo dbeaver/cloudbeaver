@@ -24,7 +24,6 @@ import {
   useSplitUserState
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { NavigationTabsBar } from '@cloudbeaver/plugin-navigation-tabs';
 import { ToolsPanelService, ToolsPanel } from '@cloudbeaver/plugin-tools-panel';
@@ -63,7 +62,7 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
           sticky={30}
           split="horizontal"
           mode={activeTools.length ? splitState.mode : 'minimize'}
-          disable={activeTools.length === 0}
+          disable={activeTools.length === 0 || toolsPanelService.disabled}
           keepRatio
         >
           <Pane>
