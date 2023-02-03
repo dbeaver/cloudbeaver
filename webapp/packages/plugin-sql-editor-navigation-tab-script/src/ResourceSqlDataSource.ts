@@ -294,6 +294,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
         return;
       }
 
+      // TODO: use createResourceOfType instead
       if (!name.toLowerCase().endsWith('.sql')) {
         name += '.sql';
       }

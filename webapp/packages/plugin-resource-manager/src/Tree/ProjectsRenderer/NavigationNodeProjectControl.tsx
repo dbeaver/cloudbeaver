@@ -18,7 +18,7 @@ import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import { ElementsTreeContext, NavigationNodeEditor, NavTreeControlComponent, NavTreeControlProps, TreeNodeMenu } from '@cloudbeaver/plugin-navigation-tree';
 
-import { ResourcesProjectsNavNodeService } from '../../NavNodes/ResourcesProjectsNavNodeService';
+import { getRmProjectNodeId } from '../../NavNodes/getRmProjectNodeId';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
 
 
@@ -66,7 +66,6 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
   const elementsTreeContext = useContext(ElementsTreeContext);
   const treeNodeContext = useContext(TreeNodeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const resourcesProjectsNavNodeService = useService(ResourcesProjectsNavNodeService);
   const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
   const selected = treeNodeContext.selected;
   const resourceType = viewContext?.tryGet(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
@@ -95,7 +94,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
   ) {
     return null;
   } else if (resourceType !== undefined && node.projectId) {
-    const project = resourcesProjectsNavNodeService.getProjectNodeId(node.projectId);
+    const project = getRmProjectNodeId(node.projectId);
     const projectName = navNodeInfoResource.get(project)?.name;
 
     if (projectName) {

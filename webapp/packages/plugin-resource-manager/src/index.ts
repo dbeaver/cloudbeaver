@@ -7,5 +7,5 @@ export * from './NavResourceNodeService';
 export * from './ResourceManagerService';
 export * from './NavNodes/getResourceKeyFromNodeId';
 export * from './NavNodes/getResourceNodeId';
-export * from './NavNodes/ResourcesProjectsNavNodeService';
+export * from './NavNodes/getRmProjectNodeId';
 export * from './Tree/ResourceManagerTree';

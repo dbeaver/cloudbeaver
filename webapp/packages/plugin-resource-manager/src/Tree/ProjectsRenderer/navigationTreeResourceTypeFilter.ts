@@ -6,17 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import type { NavNode, NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, isResourceOfType } from '@cloudbeaver/core-projects';
 import { NAV_NODE_TYPE_RM_RESOURCE } from '@cloudbeaver/core-resource-manager';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { IElementsTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
-import type { ResourcesProjectsNavNodeService } from '../../NavNodes/ResourcesProjectsNavNodeService';
-
 export function navigationTreeResourceTypeFilter(
   navNodeInfoResource: NavNodeInfoResource,
-  resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
+  projectsNavNodeService: ProjectsNavNodeService,
   projectInfoResource: ProjectInfoResource,
   resourceTypeId?: string,
 ): IElementsTreeFilter {
@@ -34,7 +32,7 @@ export function navigationTreeResourceTypeFilter(
             return true;
           }
 
-          const project = resourcesProjectsNavNodeService.getProject(node.id);
+          const project = projectsNavNodeService.getProject(node.id);
 
           if (project) {
             const resourceType = projectInfoResource.getResourceType(project, resourceTypeId);

@@ -12,13 +12,12 @@ import styled, { css } from 'reshadow';
 
 import { useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { CaptureView } from '@cloudbeaver/core-view';
 import { NavigationTreeService, ElementsTree, IElementsTreeSettings, createElementsTreeSettings, validateElementsTreeSettings, getNavigationTreeUserSettingsId } from '@cloudbeaver/plugin-navigation-tree';
 
-import { ResourcesProjectsNavNodeService } from '../NavNodes/ResourcesProjectsNavNodeService';
 import { ResourceManagerService } from '../ResourceManagerService';
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';
 import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigationTreeProjectSearchCompare';
@@ -71,7 +70,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
 }) {
   const root = RESOURCES_NODE_PATH;
 
-  const resourcesProjectsNavNodeService = useService(ResourcesProjectsNavNodeService);
+  const projectsNavNodeService = useService(ProjectsNavNodeService);
   const projectsService = useService(ProjectsService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const projectInfoResource = useService(ProjectInfoResource);
@@ -90,13 +89,13 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
     () => navigationTreeProjectsRendererRenderer(
       navNodeInfoResource,
       resourceManagerService,
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
       resourceTypeId,
     ),
     [
       navNodeInfoResource,
       resourceManagerService,
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
       resourceTypeId,
     ]
   );
@@ -105,13 +104,13 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
     () => navigationTreeResourceExpandStateGetter(
       navNodeInfoResource,
       resourceManagerService,
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
       resourceTypeId
     ),
     [
       navNodeInfoResource,
       resourceManagerService,
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
       resourceTypeId,
     ]
   );
@@ -120,17 +119,17 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
     () => navigationTreeProjectsExpandStateGetter(
       navNodeInfoResource,
       projectsService,
-      resourcesProjectsNavNodeService
+      projectsNavNodeService
     ),
     [
       navNodeInfoResource,
       projectsService,
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
     ]
   );
   const projectFilter = useMemo(
     () => navigationTreeProjectFilter(
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
       projectsService,
       navNodeInfoResource,
       navTreeResource,
@@ -138,7 +137,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
       resourceTypeId,
     ),
     [
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
       projectsService,
       navNodeInfoResource,
       navTreeResource,
@@ -149,13 +148,13 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
   const resourceTypeFilter = useMemo(
     () => navigationTreeResourceTypeFilter(
       navNodeInfoResource,
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
       projectInfoResource,
       resourceTypeId
     ),
     [
       navNodeInfoResource,
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
       projectInfoResource,
       resourceTypeId,
     ]
