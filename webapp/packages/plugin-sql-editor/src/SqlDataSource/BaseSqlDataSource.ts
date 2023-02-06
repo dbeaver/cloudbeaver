@@ -27,8 +27,9 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   get features(): ESqlDataSourceFeatures[] {
-    return [];
+    return [ESqlDataSourceFeatures.script];
   }
+
   readonly onSetScript: ISyncExecutor<string>;
 
   protected outdated: boolean;
@@ -95,6 +96,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     }
 
     return true;
+  }
+
+  hasFeature(feature: ESqlDataSourceFeatures): boolean {
+    return this.features.includes(feature);
   }
 
   setEditing(state: boolean): void {

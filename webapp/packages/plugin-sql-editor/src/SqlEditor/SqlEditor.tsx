@@ -16,6 +16,7 @@ import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, VERTICAL_R
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
+import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
 import { ISqlEditorModeProps, SqlEditorModeService } from '../SqlEditorModeService';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA';
 import type { ISqlEditorProps } from './ISqlEditorProps';
@@ -50,6 +51,10 @@ const styles = css`
       flex-direction: column;
       align-items: center;
       user-select: none;
+
+      &:empty {
+        display: none;
+      }
     }
   
     button, upload {
@@ -76,8 +81,6 @@ const tabStyles = css`
   tabs {
     composes: theme-background-secondary theme-text-on-secondary from global;
     overflow-x: hidden;
-    padding-right: 8px;
-    padding-left: 4px;
   }
   Tab {
     composes: theme-ripple theme-background-background theme-text-text-primary-on-light theme-typography--body2 from global;
@@ -119,6 +122,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
 
   const disabled = getComputed(() => data.isLineScriptEmpty || data.isDisabled);
   const isActiveSegmentMode = getComputed(() => data.activeSegmentMode.activeSegmentMode);
+  const isScript = data.dataSource?.hasFeature(ESqlDataSourceFeatures.script);
 
   return styled(styles, BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, tabStyles)(
     <TabsState
@@ -133,6 +137,8 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
       <sql-editor className={className}>
         <container>
           <actions onMouseDown={preventFocusHandler}>
+            {isScript && (
+              <>
             <button
               disabled={disabled}
               title={translate('sql_editor_sql_execution_button_tooltip')}
@@ -163,6 +169,8 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
               >
                 <StaticImage icon="/icons/sql_execution_plan.svg" />
               </button>
+                )}
+              </>
             )}
           </actions>
           <SqlEditorTools data={data} state={state} style={styles} />

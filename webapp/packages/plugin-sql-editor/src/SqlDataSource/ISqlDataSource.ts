@@ -26,6 +26,7 @@ export interface ISqlDataSource extends ILoadableState {
   isOutdated(): boolean;
   markOutdated(): void;
   markUpdated(): void;
+  hasFeature(feature: ESqlDataSourceFeatures): boolean;
   canRename(name: string | null): boolean;
   setName(name: string | null): void;
   setProject(projectId: string | null): void;

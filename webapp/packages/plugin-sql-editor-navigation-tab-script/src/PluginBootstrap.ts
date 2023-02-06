@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -20,7 +21,7 @@ import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@clo
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavResourceNodeService, ResourceManagerService, getResourceKeyFromNodeId } from '@cloudbeaver/plugin-resource-manager';
 import { ResourceManagerScriptsService, SaveScriptDialog, SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, SqlDataSourceService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, SqlDataSourceService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { ResourceSqlDataSource } from './ResourceSqlDataSource';
@@ -177,8 +178,20 @@ export class PluginBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      isApplicable: context => this.resourceManagerService.enabled
-        && context.get(DATA_CONTEXT_MENU) === SQL_EDITOR_ACTIONS_MENU,
+      isApplicable: context => {
+        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+
+        if (!state) {
+          return false;
+        }
+        const dataSource = this.sqlDataSourceService.get(state.editorId);
+
+        return (
+          this.resourceManagerService.enabled
+          && context.get(DATA_CONTEXT_MENU) === SQL_EDITOR_ACTIONS_MENU
+          && !!dataSource?.hasFeature(ESqlDataSourceFeatures.script)
+        );
+      },
       getItems: (context, items) => [
         ...items,
         ACTION_SAVE,
@@ -272,7 +285,10 @@ export class PluginBootstrap extends Bootstrap {
           dataSource.setResourceKey(resourceKey);
 
           if (previousDataSource?.executionContext) {
-            dataSource.setExecutionContext(previousDataSource.executionContext);
+            dataSource.setExecutionContext({
+              ...previousDataSource.executionContext,
+              id: NOT_INITIALIZED_CONTEXT_ID,
+            });
           }
 
           this.sqlEditorTabService.attachToProject(context.tab, resourceKey.projectId);

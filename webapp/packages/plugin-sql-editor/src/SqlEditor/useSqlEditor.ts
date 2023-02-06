@@ -18,6 +18,7 @@ import type { SqlCompletionProposal, SqlDialectInfo } from '@cloudbeaver/core-sd
 import { createLastPromiseGetter, LastPromiseGetter, isObjectsEqual, throttleAsync } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
+import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
 import type { ISqlDataSource } from '../SqlDataSource/ISqlDataSource';
 import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
@@ -358,7 +359,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     }, 1000 / 2),
 
     async updateParserScripts() {
-      const connectionId = this.dataSource?.executionContext?.connectionId;
+      if (!this.dataSource?.hasFeature(ESqlDataSourceFeatures.script)) {
+        return;
+      }
+      const connectionId = this.dataSource.executionContext?.connectionId;
       const script = this.parser.actualScript;
 
       if (!connectionId || !script) {

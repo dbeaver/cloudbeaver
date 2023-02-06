@@ -91,10 +91,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   get features():ESqlDataSourceFeatures[] {
     if (this.isReadonly()) {
-      return [];
+      return [ESqlDataSourceFeatures.script];
     }
 
-    return [ESqlDataSourceFeatures.setName];
+    return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.setName];
   }
 
   private _script: string;
