@@ -155,9 +155,7 @@ export abstract class CachedMapResource<
     return ResourceKeyUtils.every(key, key => super.isInUse(this.getMetadataKeyRef(key)));
   }
 
-  use(key: ResourceKey<TKey> | typeof CachedResourceParamKey): string {
-    const id = uuid();
-
+  use(key: ResourceKey<TKey> | typeof CachedResourceParamKey, id = uuid()): string {
     if (key === CachedResourceParamKey) {
       super.use(CachedResourceParamKey, id);
       return id;
