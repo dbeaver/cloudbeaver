@@ -33,6 +33,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   requestInfo: IRequestInfo;
   error: Error | null;
   executionContext: IConnectionExecutionContext | null;
+  outdated: boolean;
 
   abstract get canCancel(): boolean;
 
@@ -53,6 +54,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
     this.prevOptions = null;
     this.options = null;
     this.disabled = false;
+    this.outdated = false;
     this.constraintsAvailable = true;
     this.activeRequest = null;
     this.activeSave = null;
@@ -87,6 +89,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       activeRequest: observable.ref,
       activeSave: observable.ref,
       activeTask: observable.ref,
+      outdated: observable.ref,
       setResults: action,
       setSupportedDataFormats: action,
     });
@@ -170,6 +173,11 @@ implements IDatabaseDataSource<TOptions, TResult> {
     }
 
     return null;
+  }
+
+  setOutdated(): this {
+    this.outdated = true;
+    return this;
   }
 
   setResults(results: TResult[]): this {
@@ -282,6 +290,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       this.activeRequest = this.requestDataAction();
 
       const data = await this.activeRequest;
+      this.outdated = false;
 
       if (data !== null) {
         this.setResults(data);

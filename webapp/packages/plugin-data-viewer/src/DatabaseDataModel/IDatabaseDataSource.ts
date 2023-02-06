@@ -43,6 +43,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly executionContext: IConnectionExecutionContext | null;
   readonly canCancel: boolean;
   readonly serviceInjector: IServiceInjector;
+  readonly outdated: boolean;
 
   isReadonly: (resultIndex: number) => boolean;
   isLoading: () => boolean;
@@ -74,6 +75,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
 
   getResult: (index: number) => TResult | null;
 
+  setOutdated: () => this;
   setResults: (results: TResult[]) => this;
   setAccess: (access: DatabaseDataAccessMode) => this;
   setSlice: (offset: number, count: number) => this;

@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useObjectRef, useObservableRef, useSplitUserState } from '@cloudbeaver/core-blocks';
+import { getComputed, Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useObjectRef, useObservableRef, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
@@ -191,6 +191,19 @@ export const TableViewer = observer<Props>(function TableViewer({
     onPresentationChange,
     onValuePresentationChange,
   }, ['setPresentation', 'setValuePresentation', 'switchValuePresentation', 'closeValuePresentation']);
+
+  const needRefresh = getComputed(() => (
+    dataModel
+    && dataModel.source.error === null
+    && dataModel.source.results.length === 0
+    && dataModel.source.outdated
+  ));
+
+  useEffect(() => {
+    if (needRefresh) {
+      dataModel?.request();
+    }
+  }, [needRefresh]);
 
   useEffect(() => {
     if (!presentationId || !dataModel) {
