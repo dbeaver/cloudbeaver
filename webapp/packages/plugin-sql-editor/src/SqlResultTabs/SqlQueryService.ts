@@ -65,6 +65,49 @@ export class SqlQueryService {
     return this.statisticsMap.get(tabId);
   }
 
+  executeEditorDatabaseDataModels(editorState: ISqlEditorTabState) {
+    const dataSource = this.sqlDataSourceService.get(editorState.editorId);
+    const databaseModels = dataSource?.databaseModels;
+
+    if (!databaseModels) {
+      console.error('databaseModels executionContext is not provided');
+      return;
+    }
+
+    const groups = this.sqlQueryResultService
+      .getGroups(editorState)
+      .filter(group => !databaseModels.some(model => model.id === group.modelId));
+
+    for (const group of groups) {
+      this.sqlQueryResultService.removeGroup(editorState, group.groupId);
+    }
+
+    let first = true;
+    for (const model of databaseModels) {
+      this.tableViewerStorageService.add(model);
+      this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
+
+      let tabGroup = this.sqlQueryResultService.getModelGroup(editorState, model.id);
+      if (!tabGroup) {
+        tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, model.source.options?.query ?? '');
+
+        this.switchTabToActiveRequest(editorState, tabGroup, model);
+        this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, first);
+
+        model.onRequest.addHandler(({ type, model }) => {
+          if (type === 'after') {
+            const tabGroup = this.sqlQueryResultService.getModelGroup(editorState, model.id);
+
+            if (tabGroup) {
+              this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
+            }
+          }
+        });
+        first = false;
+      }
+    }
+  }
+
   async executeEditorQuery(
     editorState: ISqlEditorTabState,
     query: string,
@@ -282,19 +325,23 @@ export class SqlQueryService {
   ) {
     model.onRequest.addPostHandler(({ type }) => {
       if (type === 'on') {
-        const edited = model
-          .getResults()
-          .some((r, index) => {
-            const editor = model.source.getActionImplementation(
-              index,
-              DatabaseEditAction
+        const activeGroupId = this.sqlQueryResultService.getSelectedGroup(editorState)?.groupId;
+        for (const result of model.getResults()) {
+          const editor = model.source.getActionImplementation(
+            result,
+            DatabaseEditAction
+          );
+
+          const edited =  editor?.isEdited() && model.source.executionContext?.context;
+
+          if (edited && activeGroupId !== tabGroup.groupId) {
+            this.sqlQueryResultService.selectResult(
+              editorState,
+              tabGroup.groupId,
+              model.getResults().indexOf(result)
             );
-
-            return editor?.isEdited() && model.source.executionContext?.context;
-          });
-
-        if (edited && this.sqlQueryResultService.getSelectedGroup(editorState)?.groupId !== tabGroup.groupId) {
-          this.sqlQueryResultService.selectFirstResult(editorState, tabGroup.groupId);
+            return;
+          }
         }
       }
     });

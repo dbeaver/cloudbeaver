@@ -48,6 +48,7 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   reactionDisposer: IReactionDisposer | null;
   hintsLimitIsMet: boolean;
   updateParserScripts(): Promise<void>;
+  loadDatabaseDataModels(): Promise<void>;
   getExecutingQuery(script: boolean): ISQLScriptSegment | undefined;
   getResolvedSegment(): Promise<ISQLScriptSegment | undefined>;
   getSubQuery(): ISQLScriptSegment | undefined;
@@ -259,6 +260,21 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           query.query,
           false
         )
+      );
+    },
+
+    async loadDatabaseDataModels(): Promise<void> {
+      const query = this.getExecutingQuery(true);
+
+      await this.executeQueryAction(
+        query,
+        async () => {
+          if ((this.dataSource?.databaseModels.length ?? 0) > 0) {
+            this.sqlQueryService.executeEditorDatabaseDataModels(this.state);
+          }
+        },
+        true,
+        true
       );
     },
 
@@ -494,6 +510,13 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     handlers: [function setScript(script) {
       data.parser.setScript(script);
       data.onUpdate.execute();
+    }],
+  });
+
+  useExecutor({
+    executor: data.dataSource?.onDatabaseModelUpdate,
+    handlers: [function updateDatabaseModels() {
+      data.loadDatabaseDataModels();
     }],
   });
 

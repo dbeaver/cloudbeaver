@@ -7,10 +7,10 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { getComputed, preventFocusHandler, StaticImage, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, preventFocusHandler, SplitContext, StaticImage, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
@@ -93,8 +93,10 @@ const tabStyles = css`
   }
   TabList {
     composes: theme-background-secondary theme-text-on-secondary from global;
+    margin-right: 8px;
+    margin-left: 4px;
 
-    & tab-outer:only-child {
+    &:empty, &:has( tab-outer:only-child) {
       display: none;
     }
   }
@@ -104,6 +106,7 @@ const tabListStyles = [BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, tabStyles];
 
 export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, className }) {
   const translate = useTranslate();
+  const splitContext = useContext(SplitContext);
   const sqlEditorModeService = useService(SqlEditorModeService);
   const data = useSqlEditor(state);
   const [modesState] = useState(() => new MetadataMap<string, any>());
@@ -122,6 +125,19 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
 
   const disabled = getComputed(() => data.isLineScriptEmpty || data.isDisabled);
   const isActiveSegmentMode = getComputed(() => data.activeSegmentMode.activeSegmentMode);
+  const displayedEditors = getComputed(() => sqlEditorModeService.tabsContainer.getDisplayed({ state, data }).length);
+
+  useEffect(() => {
+    if (displayedEditors === 0) {
+      if (splitContext.mode !== 'maximize' || !splitContext.disable) {
+        splitContext.setDisable(true);
+        splitContext.setMode('maximize');
+      }
+    } else if (splitContext.disable) {
+      splitContext.setDisable(false);
+    }
+  });
+
   const isScript = data.dataSource?.hasFeature(ESqlDataSourceFeatures.script);
 
   return styled(styles, BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, tabStyles)(
@@ -139,36 +155,36 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
           <actions onMouseDown={preventFocusHandler}>
             {isScript && (
               <>
-            <button
-              disabled={disabled}
-              title={translate('sql_editor_sql_execution_button_tooltip')}
-              onClick={data.executeQuery}
-            >
-              <StaticImage icon="/icons/sql_exec.svg" />
-            </button>
-            <button
-              disabled={disabled}
-              title={translate('sql_editor_sql_execution_new_tab_button_tooltip')}
-              onClick={data.executeQueryNewTab}
-            >
-              <StaticImage icon="/icons/sql_exec_new.svg" />
-            </button>
-            <button
-              disabled={disabled}
-              title={translate('sql_editor_sql_execution_script_button_tooltip')}
-              hidden={isActiveSegmentMode}
-              onClick={data.executeScript}
-            >
-              <StaticImage icon="/icons/sql_script_exec.svg" />
-            </button>
-            {data.dialect?.supportsExplainExecutionPlan && (
-              <button
-                disabled={disabled}
-                title={translate('sql_editor_execution_plan_button_tooltip')}
-                onClick={data.showExecutionPlan}
-              >
-                <StaticImage icon="/icons/sql_execution_plan.svg" />
-              </button>
+                <button
+                  disabled={disabled}
+                  title={translate('sql_editor_sql_execution_button_tooltip')}
+                  onClick={data.executeQuery}
+                >
+                  <StaticImage icon="/icons/sql_exec.svg" />
+                </button>
+                <button
+                  disabled={disabled}
+                  title={translate('sql_editor_sql_execution_new_tab_button_tooltip')}
+                  onClick={data.executeQueryNewTab}
+                >
+                  <StaticImage icon="/icons/sql_exec_new.svg" />
+                </button>
+                <button
+                  disabled={disabled}
+                  title={translate('sql_editor_sql_execution_script_button_tooltip')}
+                  hidden={isActiveSegmentMode}
+                  onClick={data.executeScript}
+                >
+                  <StaticImage icon="/icons/sql_script_exec.svg" />
+                </button>
+                {data.dialect?.supportsExplainExecutionPlan && (
+                  <button
+                    disabled={disabled}
+                    title={translate('sql_editor_execution_plan_button_tooltip')}
+                    onClick={data.showExecutionPlan}
+                  >
+                    <StaticImage icon="/icons/sql_execution_plan.svg" />
+                  </button>
                 )}
               </>
             )}
