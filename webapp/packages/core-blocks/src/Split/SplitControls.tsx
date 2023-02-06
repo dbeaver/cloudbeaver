@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SplitContext } from 'go-split';
 import { useContext } from 'react';
 import styled, { use } from 'reshadow';
 
 import { useObjectRef } from '../useObjectRef';
 import { buttonStyles } from './splitButtonStyles';
+import { SplitContext } from './SplitContext';
 
 export const SplitControls: React.FC = function SplitControls() {
   const {
