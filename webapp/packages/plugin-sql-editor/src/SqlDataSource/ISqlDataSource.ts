@@ -14,6 +14,8 @@ import type { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
 
 export interface ISqlDataSource extends ILoadableState {
   readonly name: string | null;
+  readonly icon?: string;
+  readonly emptyPlaceholder?: string;
   readonly script: string;
   readonly projectId: string | null;
   readonly executionContext?: IConnectionExecutionContextInfo;

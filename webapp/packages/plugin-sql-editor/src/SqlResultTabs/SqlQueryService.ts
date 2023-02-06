@@ -137,7 +137,7 @@ export class SqlQueryService {
       // remove group if execution was cancelled
       if (source.currentTask?.cancelled && isNewTabCreated) {
         this.sqlQueryResultService.removeGroup(editorState, tabGroup.groupId);
-        const message = `Query execution has been canceled${status ? `: ${status}` : ''}`;
+        const message = 'Query execution has been canceled';
         this.notificationService.logException(exception, 'Query execution Error', message);
         return;
       }

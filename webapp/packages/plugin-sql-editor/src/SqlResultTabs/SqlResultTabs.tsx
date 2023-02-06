@@ -92,7 +92,7 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
   }
 
   if (!state.tabs.length) {
-    return styled(style)(<TextPlaceholder>{translate('sql_editor_placeholder')}</TextPlaceholder>);
+    return styled(style)(<TextPlaceholder>{translate(dataSource?.emptyPlaceholder ?? 'sql_editor_placeholder')}</TextPlaceholder>);
   }
 
   const script = dataSource?.hasFeature(ESqlDataSourceFeatures.script);
