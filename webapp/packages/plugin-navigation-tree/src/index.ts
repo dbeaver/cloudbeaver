@@ -30,7 +30,6 @@ export * from './NodesManager/useDatabaseObjectInfo';
 export * from './NodesManager/useNode';
 export * from './NodesManager/useChildren';
 export * from './NodesManager/NodeLink';
-export * from './NavigationTree/useTreeRoot';
 import { navigationTreePlugin } from './manifest';
 
 export { navigationTreePlugin };

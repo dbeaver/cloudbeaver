@@ -46,7 +46,7 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
       type="button"
       disabled={state.disabled}
       mod={['outlined']}
-      onClick={() => authentication.auth()}
+      onClick={authentication.auth}
     >
       {translate('authentication_authenticate')}
     </Button>
