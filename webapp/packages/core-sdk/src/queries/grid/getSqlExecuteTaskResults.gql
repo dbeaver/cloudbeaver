@@ -7,7 +7,7 @@ mutation getSqlExecuteTaskResults(
         duration
         statusMessage
         filterText
-        originalQuery
+        fullQuery
         results {
             title
             updateRowCount
