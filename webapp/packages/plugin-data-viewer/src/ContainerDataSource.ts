@@ -236,12 +236,21 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   }
 
   private async ensureContextCreated(): Promise<IConnectionExecutionContext> {
-    if (!this.executionContext?.context) {
+    const currentContext = this.executionContext?.context;
+
+    if (!currentContext) {
       if (!this.options) {
         throw new Error('Options must be provided');
       }
-      this.executionContext = await this.connectionExecutionContextService.create(this.options.connectionKey);
+
+      const executionContext = await this.connectionExecutionContextService.create(
+        this.options.connectionKey,
+        this.options.catalog,
+        this.options.schema
+      );
+
+      this.setExecutionContext(executionContext);
     }
-    return this.executionContext;
+    return this.executionContext!;
   }
 }
