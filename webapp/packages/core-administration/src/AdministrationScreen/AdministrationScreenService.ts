@@ -230,6 +230,10 @@ export class AdministrationScreenService {
       return true;
     }
 
+    if (fromState.params.item === 'license' && toState.params.item === 'users') {
+      return true;
+    }
+
     const fromScreen = this.getScreen(toState);
     const screen = this.getScreen(fromState);
 

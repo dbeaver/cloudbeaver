@@ -9,6 +9,7 @@
 import { AdministrationItemService } from '@cloudbeaver/core-administration';
 import { AdminUser, TeamsResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
 import { CreateTeamService } from './Teams/CreateTeamService';
@@ -30,6 +31,7 @@ export class UsersAdministrationService extends Bootstrap {
     private readonly administrationItemService: AdministrationItemService,
     private readonly createUserService: CreateUserService,
     private readonly teamsResource: TeamsResource,
+    private readonly serverConfigResource: ServerConfigResource,
     private readonly createTeamService: CreateTeamService,
   ) {
     super();
@@ -39,6 +41,9 @@ export class UsersAdministrationService extends Bootstrap {
     this.administrationItemService.create({
       name: UsersAdministrationNavigationService.ItemName,
       order: 3,
+      isOnlyActive: configurationWizard => !configurationWizard
+      && !!this.serverConfigResource.licenseRequired
+      && !this.serverConfigResource.licenseValid,
       sub: [
         {
           name: EUsersAdministrationSub.MetaProperties,
