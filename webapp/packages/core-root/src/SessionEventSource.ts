@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { catchError, debounceTime, filter, map, merge, Observable, retry, RetryConfig, Subject } from 'rxjs';
+import { catchError, debounceTime, filter, map, merge, Observable, repeat, retry, share, Subject, throwError } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -37,11 +37,7 @@ export interface ITopicSubEvent extends ISessionEvent {
   topicId: SessionEventTopic;
 }
 
-const retryInterval = 5000;
-
-const retryConfig: RetryConfig = {
-  delay: retryInterval,
-};
+const retryInterval = 30 * 1000;
 
 @injectable()
 export class SessionEventSource
@@ -97,7 +93,7 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
   ): Subscription {
     const sub = this.eventsSubject
       .pipe(
-        catchError(this.errorHandler),
+        this.handleErrors(),
         filter(event => event.id === id),
         map(mapTo)
       )
@@ -115,7 +111,7 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
   ): Subscription {
     const sub = this.eventsSubject
       .pipe(
-        catchError(this.errorHandler),
+        this.handleErrors(),
         filter(filterFn),
         map(mapTo)
       )
@@ -139,7 +135,7 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
       this.oldEventsSubject,
     )
       .pipe(
-        catchError(this.errorHandler),
+        this.handleErrors(),
         map(mapTo)
       );
   }
@@ -149,8 +145,17 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
     return this;
   }
 
+  private handleErrors() {
+    return (source: Observable<ISessionEvent>):Observable<ISessionEvent> =>  source.pipe(
+      share(),
+      catchError(this.errorHandler),
+      retry({ delay: retryInterval }),
+      repeat({ delay: retryInterval }),
+    );
+  }
+
   private errorHandler(error: any, caught: Observable<ISessionEvent>): Observable<ISessionEvent> {
     this.errorSubject.next(new ServiceError('WebSocket connection error'));
-    return caught;
+    return throwError(() => error);
   }
 }
