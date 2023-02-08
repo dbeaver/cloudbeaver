@@ -12,13 +12,12 @@ import styled, { css, use } from 'reshadow';
 
 import { Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import type { NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { NAV_NODE_TYPE_RM_PROJECT, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { createPath } from '@cloudbeaver/core-utils';
 import { type IElementsTreeCustomRenderer, type NavigationNodeRendererComponent, useNode, NavigationNodeRendererLoader, ElementsTreeContext } from '@cloudbeaver/plugin-navigation-tree';
 
-import type { ResourcesProjectsNavNodeService } from '../../NavNodes/ResourcesProjectsNavNodeService';
 import type { ResourceManagerService } from '../../ResourceManagerService';
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
 
@@ -44,7 +43,7 @@ const nestedStyles = css`
 export function navigationTreeProjectsRendererRenderer(
   navNodeInfoResource: NavNodeInfoResource,
   resourceManagerService: ResourceManagerService,
-  resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
+  projectsNavNodeService: ProjectsNavNodeService,
   resourceTypeId?: string,
 ): IElementsTreeCustomRenderer {
 
@@ -59,7 +58,7 @@ export function navigationTreeProjectsRendererRenderer(
       return undefined;
     }
 
-    const project = resourcesProjectsNavNodeService.getProject(nodeId);
+    const project = projectsNavNodeService.getProject(nodeId);
 
     if (!project) {
       return undefined;

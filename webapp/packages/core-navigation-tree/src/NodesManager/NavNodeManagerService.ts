@@ -361,11 +361,11 @@ export class NavNodeManagerService extends Bootstrap {
         if (data.folderId) {
           folderId = data.folderId;
         }
-
-        if (!projectId) {
-          projectId = this.projectsNavNodeService.getProject(node.id)?.id;
-        }
       }
+    }
+
+    if (!projectId) {
+      projectId = this.projectsNavNodeService.getProject(nodeId)?.id;
     }
 
     const markOpen = () => {

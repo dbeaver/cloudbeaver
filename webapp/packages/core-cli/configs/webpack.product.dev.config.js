@@ -53,7 +53,7 @@ module.exports = (env, argv) => {
           target: env.server,
         },
         '/api/ws': {
-          target: `ws://${urlObject.hostname}:${urlObject.port}/api/ws`,
+          target: `${urlObject.protocol === 'https:' ? 'wss:' : 'ws:'}//${urlObject.hostname}:${urlObject.port}/api/ws`,
           ws: true,
         },
       },

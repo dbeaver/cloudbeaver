@@ -14,7 +14,6 @@ import { Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver
 import { useService } from '@cloudbeaver/core-di';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT, ProjectsService } from '@cloudbeaver/core-projects';
-import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 
 import { useNode } from '../../NodesManager/useNode';
 import { ElementsTreeContext } from '../ElementsTree/ElementsTreeContext';
@@ -79,7 +78,7 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
     );
   }
 
-  const project = node.nodeType === NAV_NODE_TYPE_RM_PROJECT && singleProject;
+  const project = node.nodeType === NAV_NODE_TYPE_PROJECT && singleProject;
 
   return styled(nestedStyles)(
     <NavigationNodeRendererLoader
