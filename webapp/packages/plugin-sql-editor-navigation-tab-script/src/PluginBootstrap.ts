@@ -119,7 +119,7 @@ export class PluginBootstrap extends Bootstrap {
 
               const resourceType = this.projectInfoResource.getResourceType(project, SCRIPTS_TYPE_ID);
               if (!resourceType) {
-                throw new Error('Resource type not found');
+                throw new Error('Script Resource type not found');
               }
 
               const scriptName = createResourceOfType(resourceType, result.name.trim());

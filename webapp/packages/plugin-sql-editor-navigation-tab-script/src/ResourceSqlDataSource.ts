@@ -253,8 +253,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       && executionContext?.projectId
       && this.resourceKey.projectId !== executionContext.projectId
     ) {
-      console.warn('Cant change execution context because of different projects');
-      return;
+      throw new Error('Resource SQL Data Source and Execution context projects don\t match');
     }
 
     if (

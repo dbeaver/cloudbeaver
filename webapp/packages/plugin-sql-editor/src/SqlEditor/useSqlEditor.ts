@@ -269,8 +269,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       await this.executeQueryAction(
         query,
         async () => {
-          if ((this.dataSource?.databaseModels.length ?? 0) > 0) {
-            this.sqlQueryService.executeEditorDatabaseDataModels(this.state);
+          if (this.dataSource?.databaseModels.length) {
+            this.sqlQueryService.initDatabaseDataModels(this.state);
           }
         },
         true,

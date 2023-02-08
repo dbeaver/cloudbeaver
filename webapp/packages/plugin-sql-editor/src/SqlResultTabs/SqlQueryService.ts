@@ -65,12 +65,11 @@ export class SqlQueryService {
     return this.statisticsMap.get(tabId);
   }
 
-  executeEditorDatabaseDataModels(editorState: ISqlEditorTabState) {
+  initDatabaseDataModels(editorState: ISqlEditorTabState) {
     const dataSource = this.sqlDataSourceService.get(editorState.editorId);
     const databaseModels = dataSource?.databaseModels;
 
     if (!databaseModels) {
-      console.error('databaseModels executionContext is not provided');
       return;
     }
 

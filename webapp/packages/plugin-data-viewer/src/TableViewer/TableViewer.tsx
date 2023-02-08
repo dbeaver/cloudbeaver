@@ -193,8 +193,7 @@ export const TableViewer = observer<Props>(function TableViewer({
   }, ['setPresentation', 'setValuePresentation', 'switchValuePresentation', 'closeValuePresentation']);
 
   const needRefresh = getComputed(() => (
-    dataModel
-    && dataModel.source.error === null
+    dataModel?.source.error === null
     && dataModel.source.results.length === 0
     && dataModel.source.outdated
   ));

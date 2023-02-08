@@ -7,10 +7,10 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { getComputed, preventFocusHandler, SplitContext, StaticImage, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, preventFocusHandler, StaticImage, useSplit, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
@@ -106,7 +106,7 @@ const tabListStyles = [BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, tabStyles];
 
 export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, className }) {
   const translate = useTranslate();
-  const splitContext = useContext(SplitContext);
+  const split = useSplit();
   const sqlEditorModeService = useService(SqlEditorModeService);
   const data = useSqlEditor(state);
   const [modesState] = useState(() => new MetadataMap<string, any>());
@@ -128,14 +128,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   const displayedEditors = getComputed(() => sqlEditorModeService.tabsContainer.getDisplayed({ state, data }).length);
 
   useEffect(() => {
-    if (displayedEditors === 0) {
-      if (splitContext.mode !== 'maximize' || !splitContext.disable) {
-        splitContext.setDisable(true);
-        splitContext.setMode('maximize');
-      }
-    } else if (splitContext.disable) {
-      splitContext.setDisable(false);
-    }
+    split.fixate('maximize', displayedEditors === 0);
   });
 
   const isScript = data.dataSource?.hasFeature(ESqlDataSourceFeatures.script);
