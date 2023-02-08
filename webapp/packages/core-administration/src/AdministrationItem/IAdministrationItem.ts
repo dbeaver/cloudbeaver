@@ -93,6 +93,7 @@ export interface IAdministrationItemOptions {
   sub?: IAdministrationItemSubItem[];
   isHidden?: ((configurationWizard: boolean) => boolean) | boolean;
   isOnlyActive?: ((configurationWizard: boolean) => boolean) | boolean;
+  filterOnlyActive?: (configurationWizard: boolean, item: IAdministrationItem) => boolean;
   replace?: IAdministrationItemReplaceOptions;
   defaultSub?: string;
   defaultParam?: string;

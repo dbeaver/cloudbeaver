@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 
 import { SlideBox, SlideElement, ErrorBoundary, SlideOverlay, slideBoxStyles, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-
 import { TabsState, TabList, verticalTabStyles, BASE_TAB_STYLES, OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { AdministrationItemService, filterOnlyActive } from '../AdministrationItem/AdministrationItemService';
@@ -78,7 +77,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
 
   const OptionsPanel = optionsPanelService.getPanelComponent();
   const items = administrationItemService.getActiveItems(configurationWizard);
-  const hasOnlyActive = items.some(filterOnlyActive(configurationWizard));
+  const onlyActiveItem = items.find(filterOnlyActive(configurationWizard));
 
   useLayoutEffect(() => {
     contentRef.current?.scrollTo({ top: 0, left: 0 });
@@ -94,7 +93,10 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
               item={item}
               configurationWizard={configurationWizard}
               style={[BASE_TAB_STYLES, verticalTabStyles, tabsStyles]}
-              disabled={hasOnlyActive}
+              disabled={(
+                onlyActiveItem
+                && onlyActiveItem.filterOnlyActive?.(configurationWizard, item) !== true
+              ) ? true : false}
               onSelect={onItemSelect}
             />
           ))}
