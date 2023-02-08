@@ -7,5 +7,5 @@
  */
 
 export function getProjectNodeId(projectId: string): string {
-  return `resource://${projectId}`;
+  return `ext://resources/${projectId}`;
 }

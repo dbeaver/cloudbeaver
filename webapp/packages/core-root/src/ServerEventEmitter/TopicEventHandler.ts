@@ -44,7 +44,13 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
     this.subscribedResources = new Map();
     this.subscription = null;
     this.serverSubject = this.emitter.multiplex(topic, this.map);
-    this.eventsSubject = connectable(merge(this.subject, this.serverSubject));
+    this.eventsSubject = connectable(
+      merge(this.subject, this.serverSubject),
+      {
+        connector: () => new Subject(),
+        resetOnDisconnect: false, // used because subscribers won't receive events after reconnect otherwise
+      }
+    );
 
     this.emitter.onInit.next(this.onInit);
   }

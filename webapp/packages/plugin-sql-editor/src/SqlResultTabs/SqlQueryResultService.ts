@@ -16,7 +16,7 @@ import type { IDataQueryOptions } from '../QueryDataSource';
 @injectable()
 export class SqlQueryResultService {
   constructor(
-    private tableViewerStorageService: TableViewerStorageService
+    private readonly tableViewerStorageService: TableViewerStorageService
   ) { }
 
   getSelectedGroup(editorState: ISqlEditorTabState): IResultGroup | null {
@@ -32,12 +32,26 @@ export class SqlQueryResultService {
     || null;
   }
 
+  getGroups(
+    editorState: ISqlEditorTabState
+  ): IResultGroup[] {
+    return editorState.resultGroups;
+  }
+
   getGroup(
     editorState: ISqlEditorTabState,
     groupId: string
   ): IResultGroup | undefined {
     return editorState.resultGroups
       .find(group => group.groupId === groupId);
+  }
+
+  getModelGroup(
+    editorState: ISqlEditorTabState,
+    modelId: string
+  ): IResultGroup | undefined {
+    return editorState.resultGroups
+      .find(group => group.modelId === modelId);
   }
 
   updateGroupTabs(
@@ -180,6 +194,20 @@ export class SqlQueryResultService {
         this.tableViewerStorageService.remove(group.modelId);
       }
     }
+  }
+
+  selectResult(editorState: ISqlEditorTabState, groupId: string, resultIndex: number) {
+    const resultTab = editorState.resultTabs.filter(
+      resultTab => resultTab.groupId === groupId
+    )
+      .sort((a, b) => {
+        if (a.indexInResultSet === resultIndex) {
+          return -1;
+        }
+        return a.indexInResultSet - b.indexInResultSet;
+      });
+
+    editorState.currentTabId = resultTab[0].tabId;
   }
 
   selectFirstResult(editorState: ISqlEditorTabState, groupId: string) {

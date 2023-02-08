@@ -13,7 +13,7 @@ import { DialogueStateResult, CommonDialogService } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { NavTreeResource, NavNodeManagerService, NavNodeInfoResource, type INodeMoveData, navNodeMoveContext, getNodesFromContext, ENodeMoveType } from '@cloudbeaver/core-navigation-tree';
+import { NavTreeResource, NavNodeManagerService, NavNodeInfoResource, type INodeMoveData, navNodeMoveContext, getNodesFromContext, ENodeMoveType, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfo, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { IResourceManagerParams, NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey, getCachedMapResourceLoaderState, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
@@ -26,7 +26,7 @@ import { ResourceManagerService } from '../ResourceManagerService';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../Tree/DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
 import { getResourceKeyFromNodeId } from './getResourceKeyFromNodeId';
 import { getResourceParentNodeId } from './getResourceNodeId';
-import { ResourcesProjectsNavNodeService } from './ResourcesProjectsNavNodeService';
+import { getRmProjectNodeId } from './getRmProjectNodeId';
 
 interface ITargetNode {
   projectId: string;
@@ -52,7 +52,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
+    private readonly projectsNavNodeService: ProjectsNavNodeService,
   ) {
     super();
   }
@@ -116,7 +116,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     const nodes = getNodesFromContext(moveContexts);
     const nodeIdList = nodes.map(node => node.id);
     const children = this.navTreeResource.get(targetNode.id) ?? [];
-    const targetProject = this.resourcesProjectsNavNodeService.getProject(targetNode.id);
+    const targetProject = this.projectsNavNodeService.getProject(targetNode.id);
 
     if (!targetProject?.canEditResources || (!targetNode.folder && targetNode.nodeType !== NAV_NODE_TYPE_RM_PROJECT)) {
       return;
@@ -125,7 +125,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     const supported = nodes.every(node => {
       if (
         ![NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE].includes(node.nodeType!)
-        || targetProject !== this.resourcesProjectsNavNodeService.getProject(node.id)
+        || targetProject !== this.projectsNavNodeService.getProject(node.id)
         || children.includes(node.id)
         || targetNode.id === node.id
       ) {
@@ -206,7 +206,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
               true
             );
 
-            this.navTreeResource.refreshTree(this.resourcesProjectsNavNodeService.getProjectNodeId(result.projectId));
+            this.navTreeResource.refreshTree(getRmProjectNodeId(result.projectId));
           } catch (exception: any) {
             this.notificationService.logException(exception, 'Error occurred while renaming');
           }
@@ -234,7 +234,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
 
         return {
           projectId: project.id,
-          projectNodeId: this.resourcesProjectsNavNodeService.getProjectNodeId(project.id),
+          projectNodeId: getRmProjectNodeId(project.id),
           selectProject: editableProjects.length > 1,
         };
       }
@@ -251,7 +251,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     }
 
 
-    const project = this.resourcesProjectsNavNodeService.getByNodeId(projectNode.id);
+    const project = this.projectsNavNodeService.getByNodeId(projectNode.id);
 
     if (!project?.canEditResources) {
       return;

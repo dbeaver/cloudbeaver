@@ -13,6 +13,7 @@ import styled, { css } from 'reshadow';
 import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, Translate, useFocus, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
+import { RESOURCE_NAME_REGEX } from '@cloudbeaver/plugin-resource-manager';
 
 const style = css`
   fill {
@@ -36,8 +37,6 @@ interface State extends ISaveScriptDialogResult {
   submit: () => Promise<void>;
 }
 
-const regex = /^(?!\.)[\p{L}\w\-$.\s()@]+$/u;
-
 export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult> = observer(function SaveScriptDialog({
   payload,
   resolveDialog,
@@ -54,7 +53,7 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
     validate() {
       this.errorMessage = null;
 
-      const valid = regex.test(this.name.trim());
+      const valid = RESOURCE_NAME_REGEX.test(this.name.trim());
 
       if (!valid) {
         this.errorMessage = translate('plugin_resource_manager_scripts_script_name_invalid_characters_message');
