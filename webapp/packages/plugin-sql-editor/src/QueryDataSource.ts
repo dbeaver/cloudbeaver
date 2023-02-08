@@ -39,6 +39,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
 
     this.currentTask = null;
     this.requestInfo = {
+      originalQuery: '',
       requestDuration: 0,
       requestMessage: '',
       requestFilter: '',
@@ -135,6 +136,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
     limit: number
   ): IDatabaseResultSet[] | null {
     this.requestInfo = {
+      originalQuery: response.fullQuery || this.options?.query || '',
       requestDuration: response.duration || 0,
       requestMessage: response.statusMessage || '',
       requestFilter: response.filterText || '',

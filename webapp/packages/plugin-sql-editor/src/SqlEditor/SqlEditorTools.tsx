@@ -13,6 +13,7 @@ import { getComputed, preventFocusHandler, StaticImage, UploadArea, useStyles, u
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
+import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
 import type { ISQLEditorData } from './ISQLEditorData';
 import { SqlEditorActionsMenu } from './SqlEditorActionsMenu';
 import { useTools } from './useTools';
@@ -23,6 +24,10 @@ const styles = css`
     display: flex;
     flex-direction: column;
     align-items: center;
+    
+    &:empty {
+      display: none;
+    }
   }
 `;
 
@@ -64,46 +69,52 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({
     tools.downloadScript(data.value.trim());
   }
 
+  const isScript = data.dataSource?.hasFeature(ESqlDataSourceFeatures.script);
+
   return styled(useStyles(style, styles))(
     <tools className={className} onMouseDown={preventFocusHandler}>
       <SqlEditorActionsMenu state={state} />
-      {!data.readonly && (
-        <button
-          disabled={disabled}
-          title={translate('sql_editor_sql_format_button_tooltip')}
-          hidden={isActiveSegmentMode}
-          onClick={data.formatScript}
-        >
-          <StaticImage icon="/icons/sql_format_sm.svg" />
-        </button>
+      {isScript && (
+        <>
+          {!data.readonly && (
+            <button
+              disabled={disabled}
+              title={translate('sql_editor_sql_format_button_tooltip')}
+              hidden={isActiveSegmentMode}
+              onClick={data.formatScript}
+            >
+              <StaticImage icon="/icons/sql_format_sm.svg" />
+            </button>
+          )}
+          <button
+            disabled={scriptEmpty}
+            title={translate('sql_editor_download_script_tooltip')}
+            hidden={isActiveSegmentMode}
+            onClick={downloadScriptHandler}
+          >
+            <StaticImage icon='/icons/export.svg' />
+          </button>
+          {!isActiveSegmentMode && !data.readonly && (
+            <UploadArea
+              accept='.sql'
+              title={translate('sql_editor_upload_script_tooltip')}
+              reset
+              onChange={handleScriptUpload}
+            >
+              <upload>
+                <StaticImage icon='/icons/import.svg' />
+              </upload>
+            </UploadArea>
+          )}
+          {/*<button
+              title={translate('sql_editor_sql_execution_script_lock_tooltip')}
+              hidden={data.dataSource?.isReadonly() ?? true}
+              onClick={data.switchEditing}
+            >
+              <StaticImage icon={data.editing ? '/icons/sql_unlock_sm.svg' : '/icons/sql_lock_sm.svg'} />
+            </button>*/}
+        </>
       )}
-      <button
-        disabled={scriptEmpty}
-        title={translate('sql_editor_download_script_tooltip')}
-        hidden={isActiveSegmentMode}
-        onClick={downloadScriptHandler}
-      >
-        <StaticImage icon='/icons/export.svg' />
-      </button>
-      {!isActiveSegmentMode && !data.readonly && (
-        <UploadArea
-          accept='.sql'
-          title={translate('sql_editor_upload_script_tooltip')}
-          reset
-          onChange={handleScriptUpload}
-        >
-          <upload>
-            <StaticImage icon='/icons/import.svg' />
-          </upload>
-        </UploadArea>
-      )}
-      {/*<button
-      title={translate('sql_editor_sql_execution_script_lock_tooltip')}
-      hidden={data.dataSource?.isReadonly() ?? true}
-      onClick={data.switchEditing}
-    >
-      <StaticImage icon={data.editing ? '/icons/sql_unlock_sm.svg' : '/icons/sql_lock_sm.svg'} />
-    </button>*/}
     </tools>
   );
 });

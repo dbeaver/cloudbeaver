@@ -101,7 +101,7 @@ export class SqlEditorBootstrap extends Bootstrap {
 
           const dataSource = this.sqlDataSourceService.get(editorState.editorId);
 
-          return dataSource?.features.includes(ESqlDataSourceFeatures.setName) ?? false;
+          return dataSource?.hasFeature(ESqlDataSourceFeatures.setName) ?? false;
         }
         return  (
           action === ACTION_SQL_EDITOR_OPEN

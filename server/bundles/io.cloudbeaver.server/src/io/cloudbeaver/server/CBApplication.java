@@ -235,11 +235,6 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     @Override
-    public boolean isMultiuser() {
-        return true;
-    }
-
-    @Override
     protected void startServer() {
         CBPlatform.setApplication(this);
 

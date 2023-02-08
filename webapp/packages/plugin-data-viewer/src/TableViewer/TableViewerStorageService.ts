@@ -22,7 +22,7 @@ export interface ITableViewerStorageChangeEventData {
 @injectable()
 export class TableViewerStorageService {
   readonly onChange: ISyncExecutor<ITableViewerStorageChangeEventData>;
-  private tableModelMap: Map<string, IDatabaseDataModel<any, any>> = new Map();
+  private readonly tableModelMap: Map<string, IDatabaseDataModel<any, any>> = new Map();
 
   get values(): Array<IDatabaseDataModel<any, any>> {
     return Array.from(this.tableModelMap.values());
@@ -48,6 +48,10 @@ export class TableViewerStorageService {
   add<TOptions, TResult extends IDatabaseDataResult>(
     model: IDatabaseDataModel<TOptions, TResult>
   ): IDatabaseDataModel<TOptions, TResult> {
+    if (this.tableModelMap.has(model.id)) {
+      return model;
+    }
+
     this.tableModelMap.set(model.id, model);
     this.onChange.execute({
       type: 'add',
