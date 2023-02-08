@@ -1,5 +1,5 @@
 export default [
-  ['table_header_sql_expression', 'Введите SQL выражение чтобы отфильтровать результаты'],
+  ['table_header_sql_expression', 'Введите SQL выражение чтобы отфильтровать результаты, например, column_name=10'],
   ['table_header_sql_expression_not_supported', 'Фильтрация данных недоступна'],
   ['data_viewer_tab_title', 'Данные'],
   ['data_viewer_value_edit', 'Изменить'],

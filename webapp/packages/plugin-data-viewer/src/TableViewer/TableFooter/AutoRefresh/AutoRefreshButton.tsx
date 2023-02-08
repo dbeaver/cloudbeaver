@@ -25,13 +25,13 @@ auto-reload {
 
   & icon-box {
     position: relative;
-    padding-left: 16px;
+    padding-left: 8px;
     display: flex;
     align-items: center;
 
     & Icon {
-      width: 24px;
-      height: 24px;
+      width: 16px;
+      height: 16px;
       flex-grow: 0;
       flex-shrink: 0;
     }
@@ -46,11 +46,11 @@ auto-reload {
     height: 100%;
     display: flex;
     align-items: center;
-    padding-right: 16px;
+    padding-right: 8px;
 
     & > Icon {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       flex-grow: 0;
       flex-shrink: 0;
     }

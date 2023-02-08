@@ -41,7 +41,7 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
     return this.get(`u_${userId}`);
   }
 
-  getResourceType(project: ProjectInfo, resourceTypeId: string) {
+  getResourceType(project: ProjectInfo, resourceTypeId: string): ProjectInfoResourceType | undefined {
     const resourceType = project.resourceTypes.find(type => type.id === resourceTypeId);
 
     return resourceType;

@@ -22,6 +22,12 @@ export interface ICachedResourceMetadata {
   dependencies: string[];
 }
 
+export interface IUseData<TParam> {
+  id: string | undefined;
+  param: TParam;
+  isInUse: boolean;
+}
+
 export interface IDataError<TParam> {
   param: TParam;
   exception: Error;
@@ -59,7 +65,7 @@ export abstract class CachedResource<
       .some(metadata => metadata.dependencies.length > 0);
   }
 
-  readonly onUse: ISyncExecutor;
+  readonly onUse: ISyncExecutor<IUseData<TParam | undefined>>;
   readonly onDataOutdated: ISyncExecutor<TParam | undefined>;
   readonly onDataUpdate: ISyncExecutor<TParam>;
   readonly onDataError: ISyncExecutor<IDataError<TParam>>;
@@ -112,7 +118,7 @@ export abstract class CachedResource<
     this.onDataUpdate = new SyncExecutor<TParam>(null);
     this.onDataError = new SyncExecutor<IDataError<TParam>>(null);
 
-    this.onUse.setInitialDataGetter(() => undefined);
+    this.onUse.setInitialDataGetter(() => ({ id: undefined, param: undefined, isInUse: false }));
 
     if (this.logActivity) {
       // this.spy(this.beforeLoad, 'beforeLoad');
@@ -296,7 +302,11 @@ export abstract class CachedResource<
       }
       metadata.dependencies.push(id);
     });
-    this.onUse.execute();
+    this.onUse.execute(
+      param === CachedResourceParamKey
+        ? { id, param: undefined, isInUse: true }
+        : { id, param, isInUse: true }
+    );
     if (this.logActivity) {
       console.log('Use resource: ', this.getName(), param);
     }
@@ -312,7 +322,11 @@ export abstract class CachedResource<
         metadata.dependencies = metadata.dependencies.filter(v => v !== id);
       }
     });
-    this.onUse.execute();
+    this.onUse.execute(
+      param === CachedResourceParamKey
+        ? { id, param: undefined, isInUse: false }
+        : { id, param, isInUse: false }
+    );
 
     if (this.logActivity) {
       console.log('Free resource: ', this.getName(), param);

@@ -18,9 +18,9 @@ import { SqlQueryService } from './SqlQueryService';
 @injectable()
 export class SqlResultTabsService {
   constructor(
-    private sqlQueryService: SqlQueryService,
-    private sqlQueryResultService: SqlQueryResultService,
-    private sqlExecutionPlanService: SqlExecutionPlanService,
+    private readonly sqlQueryService: SqlQueryService,
+    private readonly sqlQueryResultService: SqlQueryResultService,
+    private readonly sqlExecutionPlanService: SqlExecutionPlanService,
   ) {
     makeObservable(this, {
       removeResultTabs: action,
