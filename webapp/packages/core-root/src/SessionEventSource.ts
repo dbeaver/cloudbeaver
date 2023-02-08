@@ -37,7 +37,7 @@ export interface ITopicSubEvent extends ISessionEvent {
   topicId: SessionEventTopic;
 }
 
-const retryInterval = 30 * 1000;
+const RETRY_INTERVAL = 30 * 1000;
 
 @injectable()
 export class SessionEventSource
@@ -149,8 +149,8 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
     return (source: Observable<ISessionEvent>):Observable<ISessionEvent> =>  source.pipe(
       share(),
       catchError(this.errorHandler),
-      retry({ delay: retryInterval }),
-      repeat({ delay: retryInterval }),
+      retry({ delay: RETRY_INTERVAL }),
+      repeat({ delay: RETRY_INTERVAL }),
     );
   }
 
