@@ -7,6 +7,7 @@
  */
 
 export enum ESqlDataSourceFeatures {
+  script,
   setName,
   setProject
 }

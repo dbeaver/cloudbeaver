@@ -9,8 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { useTranslate } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { ResourceManagerTree } from '@cloudbeaver/plugin-resource-manager';
 
@@ -27,15 +26,10 @@ const styles = css`
 
 export const ResourceManagerScripts: TabContainerPanelComponent = observer(function ResourceManagerScripts() {
   const translate = useTranslate();
-  const serverConfigResource = useResource(ResourceManagerScripts, ServerConfigResource, undefined);
-  const resourceTypeId = (
-    serverConfigResource.resource.distributed
-      ? SCRIPTS_TYPE_ID
-      : undefined
-  );
+
   return styled(styles)(
     <container>
-      <ResourceManagerTree resourceTypeId={resourceTypeId}>
+      <ResourceManagerTree resourceTypeId={SCRIPTS_TYPE_ID}>
         {translate('plugin_resource_manager_scripts_no_resources_placeholder')}
       </ResourceManagerTree>
     </container>

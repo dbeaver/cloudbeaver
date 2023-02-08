@@ -6,4 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-export const SCRIPT_EXTENSION = 'sql';
+export function staticImplements<T>() {
+  return <U extends T>(constructor: U) => {constructor;};
+}

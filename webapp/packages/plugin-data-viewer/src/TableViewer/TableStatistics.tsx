@@ -38,7 +38,7 @@ export const TableStatistics = observer<Props>(function TableStatistics({
   const result = model.getResult(resultIndex);
 
   return styled(styles)(
-    <statistics as='div'>
+    <statistics>
       {translate('data_viewer_statistics_status')} {source.requestInfo.requestMessage}<br />
       {translate('data_viewer_statistics_duration')} {source.requestInfo.requestDuration} ms<br />
       {translate('data_viewer_statistics_updated_rows')} {result?.updateRowCount || 0}<br />

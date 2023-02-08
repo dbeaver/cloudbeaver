@@ -53,13 +53,13 @@ export class SqlEditorService {
       datasourceKey,
       source,
       order,
-      tabs: [],
-      resultGroups: [],
-      resultTabs: [],
-      executionPlanTabs: [],
-      statisticsTabs: [],
+      tabs: observable([]),
+      resultGroups: observable([]),
+      resultTabs: observable([]),
+      executionPlanTabs: observable([]),
+      statisticsTabs: observable([]),
       currentModeId: undefined,
-      modeState: [],
+      modeState: observable([]),
     });
   }
 
@@ -126,7 +126,7 @@ export class SqlEditorService {
   setName(name: string, state: ISqlEditorTabState) {
     const dataSource = this.sqlDataSourceService.get(state.editorId);
 
-    if (dataSource && dataSource.features.includes(ESqlDataSourceFeatures.setName)) {
+    if (dataSource && dataSource.hasFeature(ESqlDataSourceFeatures.setName)) {
       dataSource.setName(name);
     }
   }
