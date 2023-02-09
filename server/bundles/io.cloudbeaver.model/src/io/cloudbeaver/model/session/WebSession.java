@@ -128,7 +128,7 @@ public class WebSession extends BaseWebSession
     ) throws DBException {
         super(httpSession.getId(), application);
         this.lastAccessTime = this.createTime;
-        this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
+        setLocale(CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale));
         this.sessionHandlers = sessionHandlers;
         this.maxSessionIdleTime = maxSessionIdleTime;
     }
