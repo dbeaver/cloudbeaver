@@ -51,7 +51,12 @@ export type AdministrationItemEvent = (
 ) => Promise<void> | void;
 export type AdministrationItemCanActivateEvent = (
   configurationWizard: boolean,
-  administration: boolean
+  administration: boolean,
+) => Promise<boolean> | boolean;
+export type AdministrationItemCanDeActivateEvent = (
+  configurationWizard: boolean,
+  administration: boolean,
+  nextAdministrationItem: IAdministrationItem | null,
 ) => Promise<boolean> | boolean;
 export type AdministrationItemSubEvent = (
   param: string | null,
@@ -103,7 +108,7 @@ export interface IAdministrationItemOptions {
   onActivate?: AdministrationItemEvent;
   onDeActivate?: AdministrationItemEvent;
   canActivate?: AdministrationItemCanActivateEvent;
-  canDeActivate?: AdministrationItemCanActivateEvent;
+  canDeActivate?: AdministrationItemCanDeActivateEvent;
 }
 
 export interface IAdministrationItem extends IAdministrationItemOptions {

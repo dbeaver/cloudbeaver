@@ -41,9 +41,6 @@ export class UsersAdministrationService extends Bootstrap {
     this.administrationItemService.create({
       name: UsersAdministrationNavigationService.ItemName,
       order: 3,
-      isOnlyActive: configurationWizard => !configurationWizard
-      && !!this.serverConfigResource.licenseRequired
-      && !this.serverConfigResource.licenseValid,
       sub: [
         {
           name: EUsersAdministrationSub.MetaProperties,
