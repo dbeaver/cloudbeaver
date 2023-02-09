@@ -51,6 +51,8 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
   const OptionsPanel = optionsPanelService.getPanelComponent();
   const activeTools = toolsPanelService.tabsContainer.getDisplayed();
 
+  const toolsDisabled = activeTools.length === 0 || toolsPanelService.disabled;
+
   return styled(useStyles(styles, splitStyles, splitHorizontalStyles, slideBoxStyles))(
     <SlideBox open={optionsPanelService.active} className={className}>
       <SlideElement>
@@ -61,8 +63,8 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
           {...splitState}
           sticky={30}
           split="horizontal"
-          mode={activeTools.length ? splitState.mode : 'minimize'}
-          disable={activeTools.length === 0 || toolsPanelService.disabled}
+          mode={toolsDisabled ? 'minimize' : splitState.mode}
+          disable={toolsDisabled}
           keepRatio
         >
           <Pane>

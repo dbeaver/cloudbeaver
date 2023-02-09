@@ -39,9 +39,17 @@ export const Main = observer(function Main() {
 
   const activeBars = sideBarPanelService.tabsContainer.getDisplayed();
 
+  const connectionsDisabled = connectionsSettingsService.settings.getValue('disabled');
+  const sideBarDisabled = activeBars.length === 0;
+
   return styled(styles)(
     <space as="main">
-      <Split {...splitMainState} sticky={30} disable={connectionsSettingsService.settings.getValue('disabled')}>
+      <Split
+        {...splitMainState}
+        sticky={30}
+        mode={connectionsDisabled ? 'minimize' : splitMainState.mode}
+        disable={connectionsDisabled}
+      >
         <Pane main>
           <ErrorBoundary remount>
             <NavigationTree />
@@ -49,7 +57,12 @@ export const Main = observer(function Main() {
         </Pane>
         <ResizerControls />
         <Pane>
-          <Split {...splitRightState} disable={activeBars.length === 0} sticky={30}>
+          <Split
+            {...splitRightState}
+            mode={sideBarDisabled ? 'minimize' : splitRightState.mode}
+            disable={sideBarDisabled}
+            sticky={30}
+          >
             <Pane>
               <RightArea />
             </Pane>
