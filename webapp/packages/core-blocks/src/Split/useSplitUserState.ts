@@ -11,7 +11,7 @@ import type { SplitProps, SplitterMode } from 'go-split';
 import { useObjectRef } from '../useObjectRef';
 import { useUserData } from '../useUserData';
 
-type SplitState = Pick<SplitProps, 'mode' | 'size' | 'ratio' | 'onModeChange' | 'onResize'>;
+type SplitState = Pick<SplitProps, 'mode' | 'size' | 'ratio' | 'disable' | 'onModeChange' | 'onResize' | 'onDisable'>;
 
 export function useSplitUserState(id: string): SplitState {
   const state = useUserData<SplitState>(
@@ -30,6 +30,9 @@ export function useSplitUserState(id: string): SplitState {
     get ratio(): number | undefined {
       return this.state.ratio;
     },
+    get disable(): boolean | undefined {
+      return this.state.disable;
+    },
     onModeChange(mode) {
       this.state.mode = mode;
     },
@@ -37,5 +40,8 @@ export function useSplitUserState(id: string): SplitState {
       this.state.ratio = ratio;
       this.state.size = size;
     },
-  }), { state }, ['onModeChange', 'onResize']);
+    onDisable(disable) {
+      this.state.disable = disable ? true : undefined;
+    },
+  }), { state }, ['onModeChange', 'onResize', 'onDisable']);
 }

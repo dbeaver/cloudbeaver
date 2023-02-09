@@ -6,23 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SplitContext } from 'go-split';
-import { useContext } from 'react';
 import styled, { use } from 'reshadow';
 
 import { useObjectRef } from '../useObjectRef';
 import { buttonStyles } from './splitButtonStyles';
+import { useSplit } from './useSplit';
 
 export const SplitControls: React.FC = function SplitControls() {
-  const {
-    size, split, mode, setMode, isMainSecond, getContainerSize, ...splitContext
-  } = useContext(SplitContext);
+  const split = useSplit();
 
-  const inverse = isMainSecond();
+  const inverse = split.state.isMainSecond();
 
-  let inverseMode = mode;
+  let inverseMode = split.state.mode;
 
-  if (size > getContainerSize()) {
+  if (split.state.size > split.state.getContainerSize()) {
     inverseMode = 'maximize';
   }
 
@@ -49,18 +46,18 @@ export const SplitControls: React.FC = function SplitControls() {
         this.setMode('maximize');
       }
     },
-  }), { mode, setMode }, ['handleCollapse', 'handleExpand']);
+  }), { mode: split.state.mode, setMode: split.state.setMode }, ['handleCollapse', 'handleExpand']);
 
   return styled(buttonStyles)(
     <container
-      onMouseDown={splitContext.onMouseDown}
-      onTouchStart={splitContext.onTouchStart}
-      onTouchEnd={splitContext.onTouchEnd}
-      onClick={splitContext.onClick}
-      onDoubleClick={splitContext.onDoubleClick}
-      {...use({ split, inverse, mode: inverseMode })}
+      onMouseDown={split.state.onMouseDown}
+      onTouchStart={split.state.onTouchStart}
+      onTouchEnd={split.state.onTouchEnd}
+      onClick={split.state.onClick}
+      onDoubleClick={split.state.onDoubleClick}
+      {...use({ split: split.state.split, inverse, mode: inverseMode })}
     >
-      {mode !== 'minimize' && (
+      {split.state.mode !== 'minimize' && (
         <button
           type="button"
           {...use({ isPrimary: !inverse })}
@@ -69,7 +66,7 @@ export const SplitControls: React.FC = function SplitControls() {
           <ripple />
         </button>
       )}
-      {mode !== 'maximize' && (
+      {split.state.mode !== 'maximize' && (
         <button
           type="button"
           {...use({ isPrimary: inverse })}

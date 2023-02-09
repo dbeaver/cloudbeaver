@@ -153,6 +153,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
   ) {
     const validation = contexts.getContext(this.connectionFormService.connectionValidationContext);
 
+    if (!state.config.host?.length) {
+      validation.error('plugin_connections_connection_form_host_invalid');
+    }
+
     if (!state.config.name?.length) {
       validation.error('plugin_connections_connection_form_name_invalid');
     }
