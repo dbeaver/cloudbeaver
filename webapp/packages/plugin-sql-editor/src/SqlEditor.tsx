@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles, Overlay, OverlayMessage, OverlayActions, Button, useResource, getComputed, OverlayHeader, OverlayHeaderIcon, OverlayHeaderTitle, OverlayHeaderSubTitle, useSplitUserState, Loader, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles, Overlay, OverlayMessage, OverlayActions, Button, useResource, getComputed, OverlayHeader, OverlayHeaderIcon, OverlayHeaderTitle, OverlayHeaderSubTitle, useSplitUserState, Loader, useStyles, useTranslate, useExecutor } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextResource, ConnectionInfoResource, createConnectionParam, DBDriverResource, getRealExecutionContextId } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
@@ -29,6 +29,7 @@ const viewerStyles = css`
     flex: 1;
     display: flex;
     overflow: auto;
+    position: relative;
   }
   Pane {
     composes: theme-typography--body2 from global;
@@ -78,20 +79,27 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
       : null
   );
   const driver = useResource(SqlEditor, DBDriverResource, connection.data?.driverId ?? null);
-  const splitState = useSplitUserState('sql-editor');
+  const splitState = useSplitUserState(`sql-editor-${dataSource?.sourceKey ?? 'default'}`);
 
   const connected = getComputed(() => connection.data?.connected ?? false);
 
   const context = useResource(
     SqlEditor,
     ConnectionExecutionContextResource,
-    connected ? getRealExecutionContextId(dataSource?.executionContext?.id) : null
+    getRealExecutionContextId(dataSource?.executionContext?.id),
+    {
+      active: connected,
+    }
   );
 
-  const initializingContext = getComputed(() => connection.isLoading() || context.isLoading());
+  const initializingContext = getComputed(() => (
+    connection.isLoading()
+    || context.isLoading()
+  ));
   const initExecutionContext = getComputed(() => (
     context.data === undefined
     && connection.data !== undefined
+    && dataSource?.isLoading() === false
   ));
 
   async function cancelConnection() {
@@ -118,14 +126,13 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
       <Split {...splitState} split="horizontal" sticky={30}>
         <Pane>
           <SqlEditorLoader state={state} />
-          <Loader state={dataSource} message={dataSource?.message} small inline inlineException />
         </Pane>
         <ResizerControls />
         <Pane basis='50%' main>
           <SqlResultTabs state={state} />
         </Pane>
       </Split>
-      <Overlay active={initExecutionContext}>
+      <Overlay active={initExecutionContext && !connection.data?.connected}>
         <OverlayHeader>
           <OverlayHeaderIcon icon={driver.data?.icon} />
           <OverlayHeaderTitle>{connection.data?.name}</OverlayHeaderTitle>
@@ -152,6 +159,7 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
           </Button>
         </OverlayActions>
       </Overlay>
+      <Loader state={dataSource} message={dataSource?.message} small inline inlineException />
     </CaptureView>
   );
 });

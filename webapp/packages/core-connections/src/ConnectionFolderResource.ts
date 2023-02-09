@@ -158,20 +158,6 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
     );
   }
 
-  getKeyRef(key: IConnectionFolderParam): IConnectionFolderParam {
-    if (this.keys.includes(key)) {
-      return key;
-    }
-
-    const ref = this.keys.find(k => this.isKeyEqual(k, key));
-
-    if (ref) {
-      return ref;
-    }
-
-    return key;
-  }
-
   protected validateParam(param: ResourceKey<IConnectionFolderParam>): boolean {
     return (
       super.validateParam(param)

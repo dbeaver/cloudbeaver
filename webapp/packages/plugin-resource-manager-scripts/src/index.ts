@@ -3,4 +3,4 @@ export default resourceManagerScriptsPlugin;
 
 export * from './ResourceManagerScriptsService';
 export * from './SaveScriptDialog';
-export * from './ResourceManagerScriptsSettingsService';
+export * from './SCRIPTS_TYPE_ID';

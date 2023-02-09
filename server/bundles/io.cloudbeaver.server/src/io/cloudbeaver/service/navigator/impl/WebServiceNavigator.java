@@ -67,7 +67,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     private static final List<WebNavigatorNodeInfo> EMPTY_NODE_LIST = Collections.emptyList();
 
     public static final String ROOT_DATABASES = "databases";
-    private static final boolean SHOW_EXTRA_NODES = false;
 
     @Override
     public List<WebNavigatorNodeInfo> getNavigatorNodeChildren(
@@ -87,13 +86,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             if (isRootPath) {
                 DBNRoot rootNode = navigatorModel.getRoot();
                 nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, rootNode, true);
-                if (SHOW_EXTRA_NODES) {
-                    // Inject extra nodes. Disabled because we use different root path for extra nodes
-                    List<DBNNode> extraNodes = rootNode.getExtraNodes();
-                    if (!extraNodes.isEmpty()) {
-                        nodeChildren = ArrayUtils.concatArrays(extraNodes.toArray(new DBNNode[0]), nodeChildren);
-                    }
-                }
             } else {
                 DBNNode parentNode = navigatorModel.getNodeByPath(monitor, parentPath);
                 if (parentNode == null) {
@@ -111,12 +103,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 return EMPTY_NODE_LIST;
             }
             List<WebNavigatorNodeInfo> result = new ArrayList<>();
-            if (isRootPath) {
-                // Add navigator extensions
-                for (DBNNode extraNode : navigatorModel.getRoot().getExtraNodes()) {
-                    result.add(new WebNavigatorNodeInfo(session, extraNode));
-                }
-            }
 
             for (DBNNode node : nodeChildren) {
                 if (node instanceof DBNDatabaseFolder && CommonUtils.isEmpty(((DBNDatabaseFolder) node).getMeta().getChildren(null))) {

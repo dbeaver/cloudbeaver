@@ -30,7 +30,7 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
   }
 
   get features(): ESqlDataSourceFeatures[] {
-    return [ESqlDataSourceFeatures.setName];
+    return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.setName];
   }
 
   private readonly state: ILocalStorageSqlDataSourceState;

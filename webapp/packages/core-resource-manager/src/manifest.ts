@@ -8,6 +8,7 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { PluginBootstrap } from './PluginBootstrap';
 import { ProjectPermissionsResource } from './ProjectPermissionsResource';
 import { ResourceManagerEventHandler } from './ResourceManagerEventHandler';
 import { ResourceManagerResource } from './ResourceManagerResource';
@@ -20,6 +21,7 @@ export const resourceManagerManifest: PluginManifest = {
   },
 
   providers: [
+    PluginBootstrap,
     SharedProjectsResource,
     ProjectPermissionsResource,
     ResourceManagerEventHandler,
