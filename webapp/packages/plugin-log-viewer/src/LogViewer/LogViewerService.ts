@@ -42,6 +42,7 @@ export class LogViewerService {
 
     makeObservable<LogViewerService>(this, {
       settings: computed,
+      disabled: computed,
     });
 
   }
