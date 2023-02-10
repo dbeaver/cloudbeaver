@@ -10,6 +10,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { RouterService } from './RouterService';
 import { ScreenService } from './Screen/ScreenService';
+import { WindowsService } from './WindowsService';
 
 
 export const manifest: PluginManifest = {
@@ -20,5 +21,6 @@ export const manifest: PluginManifest = {
   providers: [
     ScreenService,
     RouterService,
+    WindowsService,
   ],
 };

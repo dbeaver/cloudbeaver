@@ -14,6 +14,7 @@ import { getService } from '@cloudbeaver/core-cli/tests/utils/getService';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/mocks/createGQLEndpoint';
 import { mockAppInit } from '@cloudbeaver/core-root/mocks/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/mocks/mockGraphQL';
+import administrationPlugin from '@cloudbeaver/plugin-administration';
 import datasourceContextSwitchPlugin from '@cloudbeaver/plugin-datasource-context-switch';
 import navigationTabsPlugin from '@cloudbeaver/plugin-navigation-tabs';
 import topAppBarPlugin from '@cloudbeaver/plugin-top-app-bar';
@@ -23,6 +24,7 @@ import { NavNodeViewService } from './NavNodeViewService';
 
 const endpoint = createGQLEndpoint();
 const app = createApp(
+  administrationPlugin,
   topAppBarPlugin,
   navigationTabsPlugin,
   datasourceContextSwitchPlugin,
