@@ -151,12 +151,16 @@ public class LocalResourceController implements RMController {
             projects.add(globalProject);
         }
 
-        //user has full access to his private project
-        var userProjectPermission = getProjectPermissions(null, RMProjectType.USER);
-        RMProject userProject = makeProjectFromPath(getPrivateProjectPath(), userProjectPermission, RMProjectType.USER, false);
-        if (userProject != null) {
-            projects.add(0, userProject);
+        var webApp = WebAppUtils.getWebApplication();
+        // we add private projects if it's not distributed app or if private projects access enabled in config
+        if (!webApp.isMultiNode() || webApp.getAppConfiguration().isPrivateProjectsAccessible()) {
+            var userProjectPermission = getProjectPermissions(null, RMProjectType.USER); // user has full access to his private project
+            RMProject userProject = makeProjectFromPath(getPrivateProjectPath(), userProjectPermission, RMProjectType.USER, false);
+            if (userProject != null) {
+                projects.add(0, userProject);
+            }
         }
+
         projects.sort(Comparator.comparing(RMProject::getDisplayName));
         return projects.toArray(new RMProject[0]);
     }

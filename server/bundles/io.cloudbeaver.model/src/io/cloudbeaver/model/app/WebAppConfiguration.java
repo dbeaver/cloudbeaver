@@ -41,4 +41,8 @@ public interface WebAppConfiguration {
     boolean isFeaturesEnabled(String[] requiredFeatures);
 
     boolean isFeatureEnabled(String id);
+
+    default boolean isPrivateProjectsAccessible() {
+        return true;
+    }
 }
