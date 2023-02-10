@@ -23,7 +23,7 @@ const tabsStyles = css`
     align-items: center;
   }
   Tab {
-    height: 46px!important;
+    height: 32px!important;
     text-transform: uppercase;
     font-weight: 500 !important;
   }
