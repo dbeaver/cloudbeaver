@@ -8,11 +8,12 @@
 
 import { observable, makeObservable, computed } from 'mobx';
 
-import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, USER_NAME_PROPERTY_ID, createConnectionParam } from '@cloudbeaver/core-connections';
+import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, USER_NAME_PROPERTY_ID, createConnectionParam, ConnectionInfoProjectKey } from '@cloudbeaver/core-connections';
 import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { DatabaseAuthModel, DetailsError, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 import type { IConnectionAuthenticationConfig } from '@cloudbeaver/plugin-connections';
@@ -85,7 +86,8 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     private readonly templateConnectionsService: TemplateConnectionsService,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly dbAuthModelsResource: DatabaseAuthModelsResource
+    private readonly dbAuthModelsResource: DatabaseAuthModelsResource,
+    private readonly projectsService: ProjectsService,
   ) {
     makeObservable(this, {
       step: observable,
@@ -119,14 +121,18 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   };
 
   onConnect = async (): Promise<void> => {
-    if (!this.template) {
+    if (!this.template || !this.projectsService.userProject) {
       return;
     }
 
     this.isConnecting = true;
     this.clearError();
     try {
-      const connectionNames = this.connectionInfoResource.values.map(connection => connection.name);
+      const connections = await this.connectionInfoResource.load(
+        ConnectionInfoProjectKey(this.projectsService.userProject.id)
+      );
+      const connectionNames = connections.map(connection => connection.name);
+
       const uniqueConnectionName = getUniqueName(this.template.name || 'Template connection', connectionNames);
       const connection = await this.connectionInfoResource.createFromTemplate(
         this.template.projectId,

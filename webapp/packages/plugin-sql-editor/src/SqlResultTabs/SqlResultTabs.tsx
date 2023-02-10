@@ -7,13 +7,15 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
-import { TextPlaceholder, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, TextPlaceholder, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ITabData, TabsState, TabList, TabPanel, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
+import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
+import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService';
 import { SqlResultPanel } from './SqlResultPanel';
 import { SqlResultTab } from './SqlResultTab';
 import { SqlResultTabsService } from './SqlResultTabsService';
@@ -41,6 +43,9 @@ const styles = css`
       display: flex;
       overflow: auto;
     }
+    TabList:not([|script]) tab-outer:only-child {
+      display: none;
+    }
     TextPlaceholder {
       padding: 24px;
     }
@@ -56,6 +61,8 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
   const style = useStyles(BASE_TAB_STYLES, styles);
   const translate = useTranslate();
   const sqlResultTabsService = useService(SqlResultTabsService);
+  const sqlDataSourceService = useService(SqlDataSourceService);
+  const dataSource = getComputed(() => sqlDataSourceService.get(state.editorId));
 
   const orderedTabs = state.tabs
     .slice()
@@ -85,9 +92,10 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
   }
 
   if (!state.tabs.length) {
-    return styled(style)(<TextPlaceholder>{translate('sql_editor_placeholder')}</TextPlaceholder>);
+    return styled(style)(<TextPlaceholder>{translate(dataSource?.emptyPlaceholder ?? 'sql_editor_placeholder')}</TextPlaceholder>);
   }
 
+  const script = dataSource?.hasFeature(ESqlDataSourceFeatures.script);
   const tabList = orderedTabs.map(tab => tab.id);
 
   return styled(style)(
@@ -99,7 +107,7 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
         onChange={handleSelect}
         onClose={handleClose}
       >
-        <TabList style={styles}>
+        <TabList aria-label='SQL Results' {...use({ script })} style={styles}>
           {orderedTabs.map(result => (
             <SqlResultTab
               key={result.id}

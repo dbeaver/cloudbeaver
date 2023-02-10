@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
-import io.cloudbeaver.events.CBEventController;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
 import io.cloudbeaver.model.session.WebAuthInfo;
-import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
@@ -54,6 +50,8 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.websocket.event.WSEventController;
+import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -62,6 +60,7 @@ import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
@@ -130,7 +129,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     private String localHostAddress;
     private final List<InetAddress> localInetAddresses = new ArrayList<>();
 
-    protected final CBEventController eventController = new CBEventController();
+    protected final WSEventController eventController = new WSEventController();
 
     private WebSessionManager sessionManager;
 
@@ -236,11 +235,6 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     @Override
-    public boolean isMultiuser() {
-        return true;
-    }
-
-    @Override
     protected void startServer() {
         CBPlatform.setApplication(this);
 
@@ -342,6 +336,8 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         if (configurationMode) {
             // Try to configure automatically
             performAutoConfiguration(configPath.toFile().getParentFile());
+        } else if (appConfiguration.isGrantConnectionsAccessToAnonymousTeam() && !isMultiNode()) {
+            grantAnonymousAccessToConnections(appConfiguration, "auto-grant");
         }
 
         if (enableSecurityManager) {
@@ -813,7 +809,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         saveRuntimeConfig(newServerName, newServerURL, sessionExpireTime, appConfig, credentialsProvider);
 
         // Grant permissions to predefined connections
-        if (isConfigurationMode() && appConfig.isAnonymousAccessEnabled()) {
+        if (appConfig.isGrantConnectionsAccessToAnonymousTeam()) {
             grantAnonymousAccessToConnections(appConfig, adminName);
         }
 
@@ -831,10 +827,10 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         configurationMode = CommonUtils.isEmpty(serverName);
 
         String sessionId = null;
-        if (credentialsProvider instanceof WebSession) {
-            sessionId = ((WebSession) credentialsProvider).getSessionId();
+        if (credentialsProvider != null && credentialsProvider.getActiveUserCredentials() != null) {
+            sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();
         }
-        eventController.addEvent(new CBEvent(CBEventConstants.CLOUDBEAVER_CONFIG_CHANGED, sessionId));
+        eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId));
     }
 
     protected Map<String, Object> readRuntimeConfigurationProperties() throws DBException {
@@ -863,7 +859,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             var securityController = getSecurityController();
             for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
                 var datasourcePermissions = securityController.getObjectPermissions(anonymousTeamId, ds.getId(), SMObjects.DATASOURCE);
-                if (CommonUtils.isEmpty(datasourcePermissions.getPermissions())) {
+                if (ArrayUtils.isEmpty(datasourcePermissions.getPermissions())) {
                     securityController.setObjectPermissions(
                         Set.of(ds.getId()),
                         SMObjects.DATASOURCE,
@@ -930,11 +926,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             }
             if (!CommonUtils.isEmpty(newServerURL)) {
                 copyConfigValue(
-                        originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, newServerURL);
+                    originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, newServerURL);
             }
             if (sessionExpireTime > 0) {
                 copyConfigValue(
-                        originServerConfig, serverConfigProperties, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
+                    originServerConfig, serverConfigProperties, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
             }
             var databaseConfigProperties = new LinkedHashMap<String, Object>();
             Map<String, Object> oldRuntimeDBConfig = JSONUtils.getObject(originServerConfig, CBConstants.PARAM_DB_CONFIGURATION);
@@ -970,6 +966,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
                 oldAppConfig, appConfigProperties, CBConstants.PARAM_RESOURCE_MANAGER_ENABLED, appConfig.isResourceManagerEnabled());
             copyConfigValue(
                 oldAppConfig, appConfigProperties, CBConstants.PARAM_SHOW_READ_ONLY_CONN_INFO, appConfig.isShowReadOnlyConnectionInfo());
+            copyConfigValue(
+                oldAppConfig,
+                appConfigProperties,
+                CBConstants.PARAM_CONN_GRANT_ANON_ACCESS,
+                appConfig.isGrantConnectionsAccessToAnonymousTeam());
 
             Map<String, Object> resourceQuotas = new LinkedHashMap<>();
             Map<String, Object> originResourceQuotas = JSONUtils.getObject(oldAppConfig, CBConstants.PARAM_RESOURCE_QUOTAS);
@@ -1101,7 +1102,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     @Override
-    public CBEventController getEventController() {
+    public WSEventController getEventController() {
         return eventController;
     }
 

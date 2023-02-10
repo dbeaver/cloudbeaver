@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useLayoutEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, useAppLoadingScreen, useDataResource, useStyles } from '@cloudbeaver/core-blocks';
+import { Loader, useAppLoadingScreen, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
@@ -39,10 +39,11 @@ const loaderStyle = css`
 
 export const Body = observer(function Body() {
   useAppLoadingScreen();
+  // const serverConfigLoader = useResource(Body, ServerConfigResource, undefined);
   const themeService = useService(ThemeService);
   const style = useStyles(bodyStyles);
   const ref = useRef<HTMLDivElement>(null);
-  const permissionsService = useDataResource(Body, SessionPermissionsResource, undefined);
+  const permissionsService = useResource(Body, SessionPermissionsResource, undefined);
   const screenService = useService(ScreenService);
   const Screen = screenService.screen?.component;
   const { backendVersion } = useAppVersion();
@@ -58,7 +59,7 @@ export const Body = observer(function Body() {
   return styled(style)(
     <DNDProvider>
       <theme ref={ref} className={`theme-${themeService.currentTheme.id}`}>
-        <Loader state={permissionsService} style={loaderStyle}>{() => styled(style)(
+        <Loader state={[permissionsService]} style={loaderStyle}>{() => styled(style)(
           <>
             {Screen && <Screen {...screenService.routerService.params} />}
           </>

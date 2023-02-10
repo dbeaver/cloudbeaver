@@ -18,6 +18,7 @@ import type { SqlCompletionProposal, SqlDialectInfo } from '@cloudbeaver/core-sd
 import { createLastPromiseGetter, LastPromiseGetter, isObjectsEqual, throttleAsync } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
+import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
 import type { ISqlDataSource } from '../SqlDataSource/ISqlDataSource';
 import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
@@ -45,11 +46,15 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   executingScript: boolean;
   state: ISqlEditorTabState;
   reactionDisposer: IReactionDisposer | null;
+  hintsLimitIsMet: boolean;
   updateParserScripts(): Promise<void>;
+  loadDatabaseDataModels(): Promise<void>;
   getExecutingQuery(script: boolean): ISQLScriptSegment | undefined;
   getResolvedSegment(): Promise<ISQLScriptSegment | undefined>;
   getSubQuery(): ISQLScriptSegment | undefined;
 }
+
+const MAX_HINTS_LIMIT = 200;
 
 export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const connectionExecutionContextService = useService(ConnectionExecutionContextService);
@@ -141,6 +146,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     readonlyState: false,
     executingScript: false,
     reactionDisposer: null,
+    hintsLimitIsMet: false,
 
     init(): void {
       if (this.reactionDisposer) {
@@ -198,24 +204,22 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       }
 
       const { connectionId, id, defaultSchema, defaultCatalog } = this.dataSource.executionContext;
+      const key = [connectionId, id, defaultSchema, defaultCatalog, position, word.slice(0, 1)];
+      const reset = this.hintsLimitIsMet || !simple;
 
-      return this.getLastAutocomplete([
-        connectionId,
-        id,
-        defaultSchema,
-        defaultCatalog,
-        position,
-        simple,
-        word.slice(0, 1),
-      ], () => this.sqlEditorService
-        .getAutocomplete(
-          connectionId,
-          id,
-          this.value,
-          position,
-          undefined,
-          simple
-        ));
+      if (this.hintsLimitIsMet) {
+        position = position + Math.max(word.length - 1, 0);
+      }
+
+      return await this.getLastAutocomplete(key, async () => {
+        const hints = await this.sqlEditorService.getAutocomplete(
+          connectionId, id, this.value, position, MAX_HINTS_LIMIT, simple
+        );
+
+        this.hintsLimitIsMet = hints.length >= MAX_HINTS_LIMIT;
+
+        return hints;
+      }, reset);
     }, 1000 / 3),
 
     async formatScript(): Promise<void> {
@@ -256,6 +260,21 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           query.query,
           false
         )
+      );
+    },
+
+    async loadDatabaseDataModels(): Promise<void> {
+      const query = this.getExecutingQuery(true);
+
+      await this.executeQueryAction(
+        query,
+        async () => {
+          if (this.dataSource?.databaseModels.length) {
+            this.sqlQueryService.initDatabaseDataModels(this.state);
+          }
+        },
+        true,
+        true
       );
     },
 
@@ -356,7 +375,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     }, 1000 / 2),
 
     async updateParserScripts() {
-      const connectionId = this.dataSource?.executionContext?.connectionId;
+      if (!this.dataSource?.hasFeature(ESqlDataSourceFeatures.script)) {
+        return;
+      }
+      const connectionId = this.dataSource.executionContext?.connectionId;
       const script = this.parser.actualScript;
 
       if (!connectionId || !script) {
@@ -465,10 +487,11 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     isLineScriptEmpty: computed,
     isDisabled: computed,
     value: computed,
+    readonly: computed,
+    hintsLimitIsMet: observable.ref,
     cursor: observable,
     readonlyState: observable,
     executingScript: observable,
-    readonly: computed,
   }, {
     state,
     connectionExecutionContextService,
@@ -487,6 +510,13 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     handlers: [function setScript(script) {
       data.parser.setScript(script);
       data.onUpdate.execute();
+    }],
+  });
+
+  useExecutor({
+    executor: data.dataSource?.onDatabaseModelUpdate,
+    handlers: [function updateDatabaseModels() {
+      data.loadDatabaseDataModels();
     }],
   });
 

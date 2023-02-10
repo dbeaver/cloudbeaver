@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,15 @@
  */
 package io.cloudbeaver.utils;
 
-import io.cloudbeaver.events.CBEvent;
-import io.cloudbeaver.events.CBEventConstants;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.rm.RMResource;
+import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
+import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class WebEventUtils {
     /**
@@ -31,89 +33,124 @@ public class WebEventUtils {
      * @param project      project of updated database
      * @param sessionId    session id
      * @param datasourceId id of datasource
-     * @param eventType    type of event
+     * @param eventAction  type of event
      */
     public static void addDataSourceUpdatedEvent(
         DBPProject project,
         String sessionId,
         String datasourceId,
-        CBEventConstants.EventType eventType) {
+        WSConstants.EventAction eventAction
+    ) {
         if (project == null) {
             return;
         }
-        WebAppUtils.getWebApplication().getEventController().addEvent(
-            new CBEvent(
-                CBEventConstants.CLOUDBEAVER_DATASOURCE_UPDATED,
-                sessionId,
-                Map.of("projectId", project.getId(),
-                    "dataSourceIds", List.of(datasourceId),
-                    "eventType", eventType)
-            )
-        );
+        WSEvent event = null;
+        switch (eventAction) {
+            case CREATE:
+                event = WSDataSourceEvent.create(
+                    sessionId,
+                    project.getId(),
+                    List.of(datasourceId)
+                );
+                break;
+            case DELETE:
+                event = WSDataSourceEvent.delete(
+                    sessionId,
+                    project.getId(),
+                    List.of(datasourceId)
+                );
+                break;
+            case UPDATE:
+                event = WSDataSourceEvent.update(
+                    sessionId,
+                    project.getId(),
+                    List.of(datasourceId)
+                );
+                break;
+        }
+        if (event == null) {
+            return;
+        }
+        WebAppUtils.getWebApplication().getEventController().addEvent(event);
     }
 
     public static void addNavigatorNodeUpdatedEvent(
         DBPProject project,
         String sessionId,
         String nodePath,
-        CBEventConstants.EventType eventType) {
+        WSConstants.EventAction eventAction
+    ) {
         if (project == null) {
             return;
         }
-        WebAppUtils.getWebApplication().getEventController().addEvent(
-            new CBEvent(
-                CBEventConstants.CLOUDBEAVER_DATASOURCE_FOLDER_UPDATED,
-                sessionId,
-                Map.of("projectId", project.getId(),
-                    "nodePaths", List.of(nodePath),
-                    "eventType", eventType)
-            )
-        );
+        WSEvent event = null;
+        switch (eventAction) {
+            case CREATE:
+                event = WSDatasourceFolderEvent.create(
+                    sessionId,
+                    project.getId(),
+                    List.of(nodePath)
+                );
+                break;
+            case DELETE:
+                event = WSDatasourceFolderEvent.delete(
+                    sessionId,
+                    project.getId(),
+                    List.of(nodePath)
+                );
+                break;
+            case UPDATE:
+                event = WSDatasourceFolderEvent.update(
+                    sessionId,
+                    project.getId(),
+                    List.of(nodePath)
+                );
+                break;
+        }
+        if (event == null) {
+            return;
+        }
+        WebAppUtils.getWebApplication().getEventController().addEvent(event);
     }
 
     public static void addRmResourceUpdatedEvent(
         String projectId,
         String sessionId,
         String resourcePath,
-        Object resourceParsedPath,
-        CBEventConstants.EventType eventType
+        RMResource[] resourceParsedPath,
+        WSConstants.EventAction eventAction
     ) {
-        addRmResourceUpdatedEvent(
-            sessionId,
-            generateRmResourceEventData(
-                projectId,
-                resourcePath,
-                resourceParsedPath,
-                eventType
-            )
-        );
+        WSEvent event = null;
+        switch (eventAction) {
+            case CREATE:
+                event = WSResourceUpdatedEvent.create(
+                    sessionId,
+                    projectId,
+                    resourcePath,
+                    resourceParsedPath
+                );
+                break;
+            case DELETE:
+                event = WSResourceUpdatedEvent.delete(
+                    sessionId,
+                    projectId,
+                    resourcePath,
+                    resourceParsedPath
+                );
+                break;
+            case UPDATE:
+                event = WSResourceUpdatedEvent.update(
+                    sessionId,
+                    projectId,
+                    resourcePath,
+                    resourceParsedPath
+                );
+                break;
+        }
+        if (event == null) {
+            return;
+        }
+        WebAppUtils.getWebApplication().getEventController().addEvent(event);
     }
-
-    public static void addRmResourceUpdatedEvent(String sessionId, Map<String, Object> eventData) {
-        WebAppUtils.getWebApplication().getEventController().addEvent(
-            new CBEvent(
-                CBEventConstants.CLOUDBEAVER_RM_RESOURCE_UPDATED,
-                sessionId,
-                eventData
-            )
-        );
-    }
-
-    public static Map<String, Object> generateRmResourceEventData(
-        String projectId,
-        String resourcePath,
-        Object resourceParsedPath,
-        CBEventConstants.EventType eventType
-    ) {
-        return new LinkedHashMap<>(
-            Map.of(
-                "projectId", projectId,
-                "resourcePath", resourcePath,
-                "resourceParsedPath", resourceParsedPath,
-                "eventType", eventType
-            )
-        );
-    }
-
 
 }

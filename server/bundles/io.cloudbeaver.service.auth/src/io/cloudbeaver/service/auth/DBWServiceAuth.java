@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public interface DBWServiceAuth extends DBWService {
 
-    @WebAction(requirePermissions = {})
+    @WebAction(authRequired = false)
     WebAuthStatus authLogin(
         @NotNull WebSession webSession,
         @NotNull String providerId,
@@ -41,16 +41,16 @@ public interface DBWServiceAuth extends DBWService {
         boolean linkWithActiveUser) throws DBWebException;
 
 
-    @WebAction(requirePermissions = {})
+    @WebAction(authRequired = false)
     WebAuthStatus authUpdateStatus(@NotNull WebSession webSession, @NotNull String authId, boolean linkWithActiveUser) throws DBWebException;
 
-    @WebAction(requirePermissions = {})
+    @WebAction(authRequired = false)
     void authLogout(@NotNull WebSession webSession, @Nullable String providerId,  @Nullable String configurationId) throws DBWebException;
 
-    @WebAction(requirePermissions = {})
+    @WebAction(authRequired = false)
     WebUserInfo activeUser(@NotNull WebSession webSession) throws DBWebException;
 
-    @WebAction(requirePermissions = {})
+    @WebAction(authRequired = false)
     WebAuthProviderInfo[] getAuthProviders();
 
     @WebAction()

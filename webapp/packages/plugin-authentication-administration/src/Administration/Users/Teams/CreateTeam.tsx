@@ -12,8 +12,6 @@ import styled, { css } from 'reshadow';
 import { IconButton, Translate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-
-
 import { CreateTeamService } from './CreateTeamService';
 import { TeamForm } from './TeamForm';
 

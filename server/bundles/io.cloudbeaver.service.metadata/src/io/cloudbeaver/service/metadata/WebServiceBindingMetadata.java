@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
  */
 package io.cloudbeaver.service.metadata;
 
+import graphql.schema.DataFetchingEnvironment;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.metadata.impl.WebServiceMetadata;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 
 import java.util.Map;
@@ -38,15 +40,20 @@ public class WebServiceBindingMetadata extends WebServiceBindingBase<DBWServiceM
 
     @Override
     public void bindWiring(DBWBindingContext model) throws DBWebException {
-        model.getQueryType().dataFetcher("metadataGetNodeDDL", env -> {
-            WebSession webSession = getWebSession(env);
+        model.getQueryType()
+            .dataFetcher("metadataGetNodeDDL", env -> getService(env).getNodeDDL(
+                getWebSession(env),
+                getNodeFromPath(env),
+                env.getArgument("options"))
+            ).dataFetcher("metadataGetNodeExtendedDDL", env -> getService(env).getNodeExtendedDDL(
+                getWebSession(env),
+                getNodeFromPath(env)
+            ));
+    }
 
-            String nodePath = env.getArgument("nodeId");
-            DBNNode node = webSession.getNavigatorModel().getNodeByPath(webSession.getProgressMonitor(), nodePath);
-            Map<String, Object> options = env.getArgument("options");
-
-            return getService(env).getNodeDDL(webSession, node, options);
-        });
-
+    private DBNNode getNodeFromPath(DataFetchingEnvironment env) throws DBException {
+        WebSession webSession = getWebSession(env);
+        String nodePath = env.getArgument("nodeId");
+        return webSession.getNavigatorModel().getNodeByPath(webSession.getProgressMonitor(), nodePath);
     }
 }

@@ -6,9 +6,29 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ISplitState, SplitContext } from 'go-split';
+import { ISplitState, SplitContext, SplitterMode } from 'go-split';
 import { useContext } from 'react';
 
-export function useSplit(): ISplitState {
-  return useContext(SplitContext);
+import { useObjectRef } from '../useObjectRef';
+
+interface ISplit {
+  state: ISplitState;
+  fixate(mode: SplitterMode, state: boolean): void;
+}
+
+export function useSplit(): ISplit {
+  return useObjectRef<ISplit>(() => ({
+    fixate(mode, state) {
+      if (state) {
+        if (this.state.mode !== mode || !this.state.disable) {
+          this.state.setDisable(true);
+          this.state.setMode(mode);
+        }
+      } else if (this.state.disable) {
+        this.state.setDisable(false);
+      }
+    },
+  }), {
+    state: useContext(SplitContext),
+  }, ['fixate']);
 }

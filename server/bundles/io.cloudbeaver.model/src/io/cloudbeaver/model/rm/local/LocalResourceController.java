@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.file.UniversalFileVisitor;
 import org.eclipse.core.runtime.IPath;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -32,6 +33,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.app.DBPResourceTypeDescriptor;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
@@ -42,18 +44,18 @@ import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
+import org.jkiss.utils.Pair;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -169,7 +171,7 @@ public class LocalResourceController implements RMController {
             .stream()
             .map(projectPermission -> makeProjectFromPath(
                 sharedProjectsPath.resolve(parseProjectName(projectPermission.getObjectId()).getName()),
-                projectPermission.getPermissions().stream().map(RMProjectPermission::fromPermission).collect(Collectors.toSet()),
+                Arrays.stream(projectPermission.getPermissions()).map(RMProjectPermission::fromPermission).collect(Collectors.toSet()),
                 RMProjectType.SHARED, true)
             )
             .filter(Objects::nonNull)
@@ -193,9 +195,9 @@ public class LocalResourceController implements RMController {
                     throw new DBException("Project id required");
                 }
 
-                return getSecurityController().getObjectPermissions(activeUserCreds.getUserId(), projectId, SMObjects.PROJECT)
-                    .getPermissions()
-                    .stream()
+                String[] permissions = getSecurityController().getObjectPermissions(activeUserCreds.getUserId(), projectId, SMObjects.PROJECT)
+                    .getPermissions();
+                return Arrays.stream(permissions)
                     .map(RMProjectPermission::fromPermission)
                     .collect(Collectors.toSet());
             case USER:
@@ -290,12 +292,16 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public String getProjectsDataSources(@NotNull String projectId) throws DBException {
+    public String getProjectsDataSources(@NotNull String projectId, @Nullable String[] dataSourceIds) throws DBException {
         DBPProject projectMetadata = getProjectMetadata(projectId, false);
         DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
         registry.checkForErrors();
         DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
-        ((DataSourcePersistentRegistry) registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, null);
+        Predicate<DBPDataSourceContainer> filter = null;
+        if (!ArrayUtils.isEmpty(dataSourceIds)) {
+            filter = ds -> ArrayUtils.contains(dataSourceIds, ds.getId());
+        }
+        ((DataSourcePersistentRegistry) registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, filter);
         registry.checkForErrors();
         return new String(buffer.getData(), StandardCharsets.UTF_8);
     }
@@ -319,7 +325,7 @@ public class LocalResourceController implements RMController {
         final DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         final DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(StandardCharsets.UTF_8));
         final DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
-        var configChanged = ((DataSourcePersistentRegistry) registry).loadDataSources(List.of(storage), manager, true, false);
+        var configChanged = ((DataSourcePersistentRegistry) registry).loadDataSources(List.of(storage), manager, dataSourceIds, true, false);
         registry.checkForErrors();
         ((DataSourcePersistentRegistry) registry).saveDataSources();
         registry.checkForErrors();
@@ -340,6 +346,18 @@ public class LocalResourceController implements RMController {
                 log.warn("Could not find datasource " + dataSourceId + " for deletion");
             }
         }
+        registry.checkForErrors();
+    }
+
+    @Override
+    public void createProjectDataSourceFolder(@NotNull String projectId, @NotNull String folderPath) throws DBException {
+        DBPProject project = getProjectMetadata(projectId, false);
+        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+        var result = Path.of(folderPath);
+        var newName = result.getFileName().toString();
+        var parent = result.getParent();
+        var parentFolder = parent == null ? null : registry.getFolder(parent.toString().replace("\\", "/"));
+        DBPDataSourceFolder newFolder = registry.addFolder(parentFolder, newName);
         registry.checkForErrors();
     }
 
@@ -456,24 +474,61 @@ public class LocalResourceController implements RMController {
         @NotNull String oldResourcePath,
         @NotNull String newResourcePath
     ) throws DBException {
-        Path oldTargetPath = getTargetPath(projectId, oldResourcePath);
+        var normalizedOldResourcePath = CommonUtils.normalizeResourcePath(oldResourcePath);
+        var normalizedNewResourcePath = CommonUtils.normalizeResourcePath(newResourcePath);
+        if (log.isDebugEnabled()) {
+            log.debug("Moving resource from '" + normalizedOldResourcePath + "' to '" + normalizedNewResourcePath + "'");
+        }
+        Path oldTargetPath = getTargetPath(projectId, normalizedOldResourcePath);
         List<RMResource> rmOldResourcePath = makeResourcePath(projectId, oldTargetPath, false);
         if (!Files.exists(oldTargetPath)) {
             throw new DBException("Resource '" + oldTargetPath + "' doesn't exists");
         }
-        Path newTargetPath = getTargetPath(projectId, newResourcePath);
+        Path newTargetPath = getTargetPath(projectId, normalizedNewResourcePath);
         validateResourcePath(newTargetPath.toString());
         try {
             Files.move(oldTargetPath, newTargetPath);
         } catch (IOException e) {
-            throw new DBException("Error moving resource '" + oldResourcePath + "'", e);
+            throw new DBException("Error moving resource '" + normalizedOldResourcePath + "'", e);
         }
-        // Move properties
-        getProjectMetadata(projectId, false).moveResourceProperties(oldResourcePath, newResourcePath);
+
+        log.debug("Moving resource properties");
+        try {
+            movePropertiesRecursive(projectId, newTargetPath, normalizedOldResourcePath, normalizedNewResourcePath);
+        } catch (IOException | DBException e) {
+            throw new DBException("Unable to move resource properties", e);
+        }
 
         fireRmResourceDeleteEvent(projectId, rmOldResourcePath);
-        fireRmResourceAddEvent(projectId, newResourcePath);
+        fireRmResourceAddEvent(projectId, normalizedNewResourcePath);
         return DEFAULT_CHANGE_ID;
+    }
+
+    /**
+     * Iterates the tree starting at {@code rootResourcePath}.
+     * Calculates for each file/folder {@code newResourcePropertiesPath} and restores {@code oldResourcePropertiesPath}
+     * by replacing the first {@code newRootPropertiesPath} with {@code oldRootPropertiesPath} in {@code newResourcePropertiesPath}.
+     * Gathers the old-new properties paths pairs and updates properties via BaseProjectImpl#moveResourcePropertiesBatch()
+     */
+    private void movePropertiesRecursive(
+            @NotNull String projectId,
+            @NotNull Path rootResourcePath,
+            @NotNull String oldRootPropertiesPath,
+            @NotNull String newRootPropertiesPath
+    ) throws IOException, DBException {
+        var project = getProjectMetadata(projectId, false);
+        var projectPath = getProjectPath(projectId);
+        var propertiesPathsList = new ArrayList<Pair<String, String>>();
+        Files.walkFileTree(rootResourcePath, (UniversalFileVisitor<Path>) (path, attrs) -> {
+            var newResourcePropertiesPath = CommonUtils.normalizeResourcePath(projectPath.relativize(path.toAbsolutePath()).toString());
+            var oldResourcePropertiesPath = newResourcePropertiesPath.replaceFirst(newRootPropertiesPath, oldRootPropertiesPath);
+            propertiesPathsList.add(new Pair<>(oldResourcePropertiesPath, newResourcePropertiesPath));
+            return FileVisitResult.CONTINUE;
+        });
+        if (log.isDebugEnabled()) {
+            log.debug("Move resources properties:\n" + propertiesPathsList);
+        }
+        project.moveResourcePropertiesBatch(propertiesPathsList);
     }
 
     @Override
@@ -544,7 +599,24 @@ public class LocalResourceController implements RMController {
             throw new DBException("Resource '" + resourcePath + "' exists");
         }
         if (!Files.exists(targetPath.getParent())) {
-            throw new DBException("Parent folder '" + targetPath.getParent().getFileName() + "' doesn't exist");
+            boolean parentExists = false;
+            if (getProjectPath(projectId).equals(targetPath.toAbsolutePath().getParent().getParent())) {
+                // Create special folder on demand or throw error
+                for (DBPResourceTypeDescriptor rtd : ResourceTypeRegistry.getInstance().getResourceTypes()) {
+                    if (targetPath.getParent().getFileName().toString().equals(rtd.getDefaultRoot(null))) {
+                        try {
+                            Files.createDirectories(targetPath.getParent());
+                            parentExists = true;
+                            break;
+                        } catch (IOException e) {
+                            throw new DBException("Error creating special folder '" + targetPath.getParent() + "'");
+                        }
+                    }
+                }
+            }
+            if (!parentExists) {
+                throw new DBException("Parent folder '" + targetPath.getParent().getFileName() + "' doesn't exist");
+            }
         }
         try {
             Files.write(targetPath, data);
@@ -575,8 +647,11 @@ public class LocalResourceController implements RMController {
     }
 
     private void validateResourcePath(String resourcePath, String regex) throws DBException {
-        if (resourcePath.startsWith(".")) {
-            throw new DBException("Resource path '" + resourcePath + "' can't start with dot");
+        var fullPath = Paths.get(resourcePath);
+        for (Path path : fullPath) {
+            if (path.toString().startsWith(".")) {
+                throw new DBException("Resource path '" + resourcePath + "' can't start with dot");
+            }
         }
         if (!resourcePath.matches(regex)) {
             String illegalCharacters = resourcePath.replaceAll(regex, " ").strip();
@@ -635,9 +710,9 @@ public class LocalResourceController implements RMController {
             return null;
         }
 
-        Set<String> allProjectPermissions = permissions.stream()
+        String[] allProjectPermissions = permissions.stream()
             .flatMap(rmProjectPermission -> rmProjectPermission.getAllPermissions().stream())
-            .collect(Collectors.toSet());
+            .toArray(String[]::new);
 
         RMProject project = new RMProject();
         String projectName = path.getFileName().toString();
@@ -653,10 +728,15 @@ public class LocalResourceController implements RMController {
                 log.error(e);
             }
         }
+        // Resource types
+        project.setResourceTypes(ResourceTypeRegistry.getInstance().getResourceTypes()
+            .stream()
+            .filter(ResourceTypeDescriptor::isManagable)
+            .map(RMResourceType::new)
+            .toArray(RMResourceType[]::new));
 
         return project;
     }
-
 
     private Path getProjectPath(String projectId) throws DBException {
         RMProjectName project = parseProjectName(projectId);

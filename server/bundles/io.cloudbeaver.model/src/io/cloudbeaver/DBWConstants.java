@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import org.jkiss.dbeaver.model.access.DBAPermissionRealm;
  */
 public class DBWConstants {
 
-    public static final String PERMISSION_PUBLIC = DBAPermissionRealm.PERMISSION_PUBLIC;
     public static final String PERMISSION_ADMIN = DBAPermissionRealm.PERMISSION_ADMIN;
 
     public static final String PERMISSION_CONFIGURATION_MANAGER = "configuration-manager";

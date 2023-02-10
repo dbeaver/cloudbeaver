@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.SMAutoAssign;
 import io.cloudbeaver.model.app.WebAppConfiguration;
-import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.model.session.WebAuthInfo;
@@ -822,7 +821,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     protected String[] getDefaultTeamPermissions() {
-        return new String[]{DBWConstants.PERMISSION_PUBLIC};
+        return new String[0];
     }
 
     @Override
@@ -1385,13 +1384,13 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     @Override
     public void logout() throws DBException {
         var currentUserCreds = getCurrentUserCreds();
-        invalidateUserTokens(currentUserCreds.getSmToken());
+        invalidateUserTokens(currentUserCreds.getSmAccessToken());
     }
 
     @Override
     public SMTokens refreshSession(@NotNull String refreshToken) throws DBException {
         var currentUserCreds = getCurrentUserCreds();
-        var currentUserAccessToken = currentUserCreds.getSmToken();
+        var currentUserAccessToken = currentUserCreds.getSmAccessToken();
         String currentUserAuthRole = readTokenAuthRole(currentUserAccessToken);
 
         var smTokenInfo = readAccessTokenInfo(currentUserAccessToken);
@@ -1876,10 +1875,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     @Override
     public SMAuthPermissions getTokenPermissions() throws DBException {
         SMCredentials activeUserCredentials = credentialsProvider.getActiveUserCredentials();
-        if (activeUserCredentials == null || activeUserCredentials.getSmToken() == null) {
+        if (activeUserCredentials == null || activeUserCredentials.getSmAccessToken() == null) {
             throw new SMException("User not authenticated");
         }
-        return getTokenPermissions(activeUserCredentials.getSmToken());
+        return getTokenPermissions(activeUserCredentials.getSmAccessToken());
     }
 
     private SMAuthPermissions getTokenPermissions(@NotNull String token) throws DBException {

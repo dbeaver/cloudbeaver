@@ -10,13 +10,13 @@ import { action, makeObservable, runInAction, toJS } from 'mobx';
 
 import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
+import { ConnectionInfoProjectKey, createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { isSharedProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedMapAllKey, DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { getUniqueName, isValuesEqual } from '@cloudbeaver/core-utils';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
@@ -88,7 +88,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       return false;
     }
 
-    return project.shared;
+    return isSharedProject(project);
   }
 
   isTemplateAvailable(state: IConnectionFormState): boolean {
@@ -96,7 +96,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const adminPermission = this.permissionsService.has(EAdminPermission.admin);
     const originLocal = !state.info || isLocalConnection(state.info);
 
-    return adminPermission && originLocal && isProjectShared && !this.serverConfigResource.data?.distributed;
+    return adminPermission && originLocal && isProjectShared && !this.serverConfigResource.distributed;
   }
 
   private async save(
@@ -152,6 +152,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
     const validation = contexts.getContext(this.connectionFormService.connectionValidationContext);
+
+    if (!state.config.host?.length) {
+      validation.error('plugin_connections_connection_form_host_invalid');
+    }
 
     if (!state.config.name?.length) {
       validation.error('plugin_connections_connection_form_name_invalid');
@@ -239,15 +243,13 @@ export class ConnectionOptionsTabService extends Bootstrap {
   }
 
   private async prepareConfig(
-    {
-      state,
-    }: IConnectionFormSubmitData,
+    { state }: IConnectionFormSubmitData,
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
     const config = contexts.getContext(connectionConfigContext);
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
 
-    if (!state.config.driverId) {
+    if (!state.config.driverId || !state.projectId) {
       return;
     }
 
@@ -263,8 +265,11 @@ export class ConnectionOptionsTabService extends Bootstrap {
     tempConfig.name = state.config.name?.trim();
 
     if (tempConfig.name && state.mode === 'create') {
-      const connections = await state.resource.load(CachedMapAllKey);
+      const connections = await state.resource.load(
+        ConnectionInfoProjectKey(state.projectId)
+      );
       const connectionNames = connections.map(connection => connection.name);
+
       tempConfig.name = getUniqueName(tempConfig.name, connectionNames);
     }
 
@@ -343,7 +348,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     const providerId = authModel.requiredAuth ?? data.info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
 
-    await this.userInfoResource.load(undefined, []);
+    await this.userInfoResource.load();
 
     if (!this.userInfoResource.hasToken(providerId)) {
       const provider = await this.authProvidersResource.load(providerId);

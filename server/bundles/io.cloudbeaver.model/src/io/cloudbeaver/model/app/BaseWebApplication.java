@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.events.CBEventController;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebWorkspace;
@@ -37,6 +36,7 @@ import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
+import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -78,6 +78,11 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     @Override
     public boolean isHeadlessMode() {
+        return true;
+    }
+
+    @Override
+    public boolean isMultiuser() {
         return true;
     }
 
@@ -207,7 +212,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     @Override
-    public CBEventController getEventController() {
+    public WSEventController getEventController() {
         return null;
     }
 }

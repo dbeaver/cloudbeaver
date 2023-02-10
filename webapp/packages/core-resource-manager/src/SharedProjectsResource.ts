@@ -33,7 +33,7 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     private readonly graphQLService: GraphQLService,
     sessionPermissionsResource: SessionPermissionsResource,
   ) {
-    super([]);
+    super(new Map(), []);
 
     sessionPermissionsResource
       .require(this, EAdminPermission.admin);
@@ -148,6 +148,13 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
 
     const data = this.data.get(key);
     this.data.set(key, Object.assign(data ?? {}, value));
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }
 

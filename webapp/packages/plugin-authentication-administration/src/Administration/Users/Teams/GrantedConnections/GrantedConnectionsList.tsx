@@ -25,10 +25,9 @@ import {
   useTranslate,
   useStyles
 } from '@cloudbeaver/core-blocks';
-import { DBDriverResource } from '@cloudbeaver/core-connections';
+import { Connection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
-import type { DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';
 
 
 import { getFilteredConnections } from './getFilteredConnections';
@@ -61,7 +60,7 @@ const styles = css`
   `;
 
 interface Props {
-  grantedConnections: DatabaseConnectionFragment[];
+  grantedConnections: Connection[];
   disabled: boolean;
   onRevoke: (subjectIds: string[]) => void;
   onEdit: () => void;
@@ -112,13 +111,13 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
           <Table keys={keys} selectedItems={selectedSubjects} size='big'>
             <GrantedConnectionsTableInnerHeader disabled={disabled} />
             <TableBody>
-              <TableItem item='tableInfo' selectDisabled>
-                {tableInfoText && (
+              {tableInfoText && (
+                <TableItem item='tableInfo' selectDisabled>
                   <TableColumnValue colSpan={5}>
                     {translate(tableInfoText)}
                   </TableColumnValue>
-                )}
-              </TableItem>
+                </TableItem>
+              )}
               {connections.map(connection => {
                 const driver = driversResource.get(connection.driverId);
                 return (

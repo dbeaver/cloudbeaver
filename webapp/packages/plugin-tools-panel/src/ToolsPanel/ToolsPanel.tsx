@@ -12,7 +12,7 @@ import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useStyles, useUserData } from '@cloudbeaver/core-blocks';
-import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsContainer, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, ITabData, ITabsContainer, TabList, TabPanelList, TabsContainer, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 const tabsStyles = css`
@@ -54,7 +54,7 @@ const formStyles = css`
 `;
 
 interface Props {
-  container: TabsContainer;
+  container: ITabsContainer;
 }
 
 interface IToolsState {

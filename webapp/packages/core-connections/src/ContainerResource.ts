@@ -8,17 +8,17 @@
 
 import { observable } from 'mobx';
 
+import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { EPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedDataResource,
-  NavNodeInfoFragment, ICachedResourceMetadata, ResourceKeyUtils, CachedMapAllKey
+  NavNodeInfoFragment, ICachedResourceMetadata, ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { ConnectionInfoResource } from './ConnectionInfoResource';
+import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from './ConnectionInfoResource';
 import type { IConnectionInfoParams } from './IConnectionsResource';
 
 export type ObjectContainer = NavNodeInfoFragment;
@@ -61,7 +61,7 @@ string
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    permissionsResource: SessionPermissionsResource,
+    appAuthService: AppAuthService,
   ) {
     super(new Map());
 
@@ -75,8 +75,8 @@ string
       dependencies: observable([]),
     }));
 
-    permissionsResource.require(this, EPermission.public);
-    this.preloadResource(connectionInfoResource, () => CachedMapAllKey);
+    appAuthService.requireAuthentication(this);
+    this.preloadResource(connectionInfoResource, () => ConnectionInfoActiveProjectKey);
     this.before(ExecutorInterrupter.interrupter(key => !connectionInfoResource.isConnected(key)));
 
     this.connectionInfoResource.onItemDelete.addHandler(
@@ -126,7 +126,11 @@ string
     return container.activeCatalog === (catalogId ?? defaultCatalog);
   }
 
-  isOutdated(param: ObjectContainerParams): boolean {
+  isOutdated(param?: ObjectContainerParams): boolean {
+    if (!param) {
+      return super.isOutdated();
+    }
+
     const metadata = this.metadata.get(serializeKey(param));
     const catalogId = param.catalogId ?? defaultCatalog;
     return metadata.outdatedData.includes(catalogId);
@@ -153,7 +157,12 @@ string
     metadata.loadingData = metadata.loadingData.filter(id => id !== catalogId);
   }
 
-  markOutdated(param: ObjectContainerParams): void {
+  markOutdated(param?: ObjectContainerParams): void {
+    if (!param) {
+      super.markOutdated();
+      return;
+    }
+
     const catalogId = param.catalogId ?? defaultCatalog;
 
     const metadata = this.metadata.get(serializeKey(param));
@@ -194,6 +203,18 @@ string
       param.projectId === second.projectId
       && param.connectionId === second.connectionId
       && param.catalogId === second.catalogId
+    );
+  }
+
+  protected validateParam(param: ObjectContainerParams): boolean {
+    return (
+      super.validateParam(param)
+      || (
+        typeof param === 'object'
+        && typeof param.projectId === 'string'
+        && ['string'].includes(typeof param.connectionId)
+        && ['string', 'undefined'].includes(typeof param.catalogId)
+      )
     );
   }
 }

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,7 +258,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     results.setResultSet(resultSet);
                     executeInfo.setResults(new WebSQLQueryResults[]{results});
                     setResultFilterText(dataContainer, session.getDataSource(), executeInfo, dataFilter);
-
+                    executeInfo.setFullQuery(statistics.getQueryText());
                     if (resultSet != null && resultSet.getRows() != null) {
                         executeInfo.setStatusMessage(resultSet.getRows().length + " row(s) fetched");
                     }
@@ -752,6 +752,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         executeInfo.setResults(resultList.toArray(new WebSQLQueryResults[0]));
 
         setResultFilterText(dataContainer, dbStat.getSession().getDataSource(), executeInfo, dataFilter);
+        executeInfo.setFullQuery(dbStat.getQueryString());
     }
 
     private void setResultFilterText(@NotNull DBSDataContainer dataContainer, @NotNull DBPDataSource dataSource, @NotNull WebSQLExecuteInfo executeInfo, @NotNull DBDDataFilter filter) throws DBException {

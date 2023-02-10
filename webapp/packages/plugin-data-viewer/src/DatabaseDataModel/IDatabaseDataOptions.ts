@@ -11,6 +11,8 @@ import type { SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 
 export interface IDatabaseDataOptions {
   connectionKey: IConnectionInfoParams;
+  schema?: string;
+  catalog?: string;
   whereFilter: string;
   constraints: SqlDataFilterConstraint[];
 }

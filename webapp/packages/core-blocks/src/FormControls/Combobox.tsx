@@ -11,9 +11,6 @@ import { useLayoutEffect, useCallback, useState, useRef, useContext, useEffect }
 import { useMenuState, Menu, MenuItem, MenuButton } from 'reakit/Menu';
 import styled, { css, use } from 'reshadow';
 
-
-
-
 import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { getComputed } from '../getComputed';
@@ -142,6 +139,7 @@ type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>,
   searchable?: boolean;
   defaultValue?: TKey;
   loading?: boolean;
+  description?: string;
   keySelector?: (item: TValue, index: number) => TKey;
   valueSelector?: (item: TValue) => string;
   titleSelector?: (item: TValue) => string | undefined;
@@ -187,6 +185,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   readOnly,
   disabled,
   inline,
+  description,
   keySelector = v => v,
   valueSelector = v => v,
   iconSelector,
@@ -421,6 +420,11 @@ export const Combobox: ComboboxType = observer(function Combobox({
             }))}
         </Menu>
       </input-box>
+      {description && (
+        <field-description>
+          {description}
+        </field-description>
+      )}
     </field>
   );
 });

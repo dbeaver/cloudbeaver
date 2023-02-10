@@ -8,7 +8,7 @@
 
 import { makeObservable, observable } from 'mobx';
 
-import type { ILoadableState } from '@cloudbeaver/core-utils';
+import { ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 
 import { CachedResource } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
@@ -22,9 +22,6 @@ export type CachedDataResourceParam<TResource> = TResource extends CachedDataRes
 export type CachedDataResourceKey<TResource> = TResource extends CachedDataResource<any, any, infer T, any>
   ? T
   : never;
-export type CachedDataResourceContext<TResource> = TResource extends CachedDataResource<any, any, any, infer T>
-  ? T
-  : never;
 
 export type CachedDataResourceGetter<
   TValue,
@@ -35,23 +32,22 @@ export type CachedDataResourceGetter<
     : CachedResourceValueIncludes<TValue, TIncludes>
 );
 
-type ContextArg<TData, TContext> = TContext extends void ? void : CachedResourceIncludeArgs<TData, TContext>;
-
 export abstract class CachedDataResource<
   TData,
   TParam = void,
   TKey = TParam,
-  TContext extends Record<string, any> | void = void,
+  TContext extends Record<string, any> = Record<string, never>
 > extends CachedResource<
+  TData,
   TData,
   TParam,
   TKey,
-  ContextArg<TData, TContext>
+  CachedResourceIncludeArgs<TData, TContext>
   > {
   protected loaded: boolean;
 
-  constructor(defaultValue: TData, defaultIncludes: ContextArg<TData, TContext>) {
-    super(defaultValue, defaultIncludes as any as string[]);
+  constructor(defaultValue: TData, defaultIncludes: CachedResourceIncludeArgs<TData, TContext> = [] as any) {
+    super(defaultValue, defaultIncludes);
 
     this.loaded = false;
 
@@ -62,7 +58,7 @@ export abstract class CachedDataResource<
     this.onDataUpdate.addHandler(() => { this.loaded = true; });
   }
 
-  isLoaded(param: TParam, includes: ContextArg<TData, TContext>): boolean {
+  isLoaded(param: TParam, includes?: CachedResourceIncludeArgs<TData, TContext>): boolean {
     if (!this.loaded) {
       return false;
     }
@@ -79,16 +75,30 @@ export abstract class CachedDataResource<
     return true;
   }
 
-  async refresh(param: TParam, context: ContextArg<TData, TContext>): Promise<TData> {
+  async refresh<T extends CachedResourceIncludeArgs<TData, TContext> = []>(
+    param: TParam,
+    context?: T
+  ): Promise<CachedResourceValueIncludes<TData, T>> {
     await this.preLoadData(param, false, context);
     await this.loadData(param, true, context);
-    return this.data;
+    return this.data as CachedResourceValueIncludes<TData, T>;
   }
 
-  async load(param: TParam, context: ContextArg<TData, TContext>): Promise<TData> {
+  async load<T extends CachedResourceIncludeArgs<TData, TContext> = []>(
+    param: TParam,
+    context?: T
+  ): Promise<CachedResourceValueIncludes<TData, T>> {
     await this.preLoadData(param, false, context);
     await this.loadData(param, false, context);
-    return this.data;
+    return this.data as CachedResourceValueIncludes<TData, T>;
+  }
+
+
+  protected validateParam(param: TParam): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'undefined'
+    );
   }
 }
 
@@ -96,11 +106,11 @@ export function getCachedDataResourceLoaderState<
   TData,
   TParam = void,
   TKey = TParam,
-  TContext extends Record<string, any> | void = void,
+  TContext extends Record<string, any> = Record<string, never>,
 >(
   resource: CachedDataResource<TData, TParam, TKey, TContext>,
   param: TParam,
-  context: ContextArg<TData, TContext>
+  context?: CachedResourceIncludeArgs<TData, TContext>
 ): ILoadableState {
   return {
     get exception() {
@@ -108,6 +118,9 @@ export function getCachedDataResourceLoaderState<
     },
     isLoading() {
       return resource.isDataLoading(param);
+    },
+    isError() {
+      return isContainsException(this.exception);
     },
     isLoaded() {
       return resource.isLoaded(param, context);

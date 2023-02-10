@@ -12,11 +12,11 @@ import styled, { css } from 'reshadow';
 
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Container, getComputed, Group,
-  InfoItem, Loader, TextPlaceholder, useMapResource, useStyles, useTranslate
+  InfoItem, Loader, TextPlaceholder, useResource, useStyles, useTranslate
 } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionInfoProjectKey, ConnectionInfoResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { isGlobalProject, ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
@@ -52,26 +52,31 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
   const { selected } = useTab(tabId);
   const loaded = state.state.loaded;
 
-  const projects = useMapResource(GrantedConnections, ProjectInfoResource, CachedMapAllKey);
+  const projects = useResource(GrantedConnections, ProjectInfoResource, CachedMapAllKey);
 
-  const dbDriverResource = useMapResource(
+  const globalConnectionsKey = ConnectionInfoProjectKey(
+    ...(projects.data as Array<ProjectInfo | undefined>)
+      .filter(isGlobalProject)
+      .map(project => project.id)
+  );
+
+  const dbDriverResource = useResource(
     GrantedConnections,
     DBDriverResource,
     CachedMapAllKey,
     { active: selected }
   );
 
-  const connections = useMapResource(
+  const connectionsLoader = useResource(
     GrantedConnections,
     ConnectionInfoResource,
-    CachedMapAllKey,
+    globalConnectionsKey,
     { active: selected }
   );
 
-  const globalConnections = connections.resource.values
-    .filter(({ projectId }) => projects.resource.get(projectId)?.global);
+  const connections = connectionsLoader.data as Connection[];
 
-  const grantedConnections = getComputed(() => globalConnections
+  const grantedConnections = getComputed(() => connections
     .filter(connection => state.state.grantedSubjects.includes(connection.id))
   );
 
@@ -87,7 +92,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
 
   let info: TLocalizationToken | null = null;
 
-  const cloudExists = globalConnections.some(isCloudConnection);
+  const cloudExists = connections.some(isCloudConnection);
 
   if (cloudExists) {
     info = 'cloud_connections_access_placeholder';
@@ -98,10 +103,10 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
   }
 
   return styled(style)(
-    <Loader state={[connections, dbDriverResource, projects, state.state]}>
+    <Loader state={[connectionsLoader, dbDriverResource, projects, state.state]}>
       {() => styled(style)(
         <ColoredContainer parent gap vertical>
-          {!globalConnections.length ? (
+          {!connections.length ? (
             <Group large>
               <TextPlaceholder>{translate('administration_teams_team_granted_connections_empty')}</TextPlaceholder>
             </Group>
@@ -117,7 +122,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
                 />
                 {state.state.editing && (
                   <ConnectionList
-                    connectionList={globalConnections}
+                    connectionList={connections}
                     grantedSubjects={state.state.grantedSubjects}
                     disabled={formState.disabled}
                     onGrant={state.grant}

@@ -7,19 +7,20 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Combobox, useMapResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Combobox, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfo, ProjectInfoResource, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 interface Props {
   value: string | null;
-  filter?: (project: ProjectInfo) => boolean;
-  onChange: (value: string) => void;
   autoHide?: boolean;
   readOnly?: boolean;
   disabled?: boolean;
   inline?: boolean;
+  onChange: (value: string) => void;
+  filter?: (project: ProjectInfo) => boolean;
+  descriptionGetter?: (projects: ProjectInfo[], possibleOptions: string[]) => string | undefined;
 }
 
 export const ProjectSelect = observer(function ProjectSelect({
@@ -30,6 +31,7 @@ export const ProjectSelect = observer(function ProjectSelect({
   disabled,
   inline,
   onChange,
+  descriptionGetter,
 }: Props) {
   const translate = useTranslate();
 
@@ -43,7 +45,7 @@ export const ProjectSelect = observer(function ProjectSelect({
     .filter(filter)
     .map(project => project.id);
 
-  const projectsLoader = useMapResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey, {
+  const projectsLoader = useResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey, {
     onData: () => {
       if (
         (!value && possibleOptions.length > 0)
@@ -64,6 +66,8 @@ export const ProjectSelect = observer(function ProjectSelect({
     return null;
   }
 
+  const description = descriptionGetter?.(projects, possibleOptions);
+
   return (
     <Combobox
       name='projectId'
@@ -78,6 +82,7 @@ export const ProjectSelect = observer(function ProjectSelect({
       disabled={disabled}
       loading={projectsLoader.isLoading()}
       inline={inline}
+      description={description}
       tiny
       fill
       onSelect={handleProjectSelect}

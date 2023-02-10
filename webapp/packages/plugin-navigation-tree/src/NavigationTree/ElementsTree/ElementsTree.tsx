@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useCallback, useEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, Loader, PlaceholderElement, Translate, TreeNodeNested, TreeNodeNestedMessage, TREE_NODE_STYLES, useFolderExplorer, useMapResource, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, Loader, PlaceholderElement, Translate, TreeNodeNested, TreeNodeNestedMessage, TREE_NODE_STYLES, useFolderExplorer, useResource, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { type NavNode, ROOT_NODE_PATH, NavTreeResource, NavNodeInfoResource, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
@@ -177,7 +177,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
   }, [folderExplorer]);
 
-  useMapResource(ElementsTree, navTreeResource, root, {
+  useResource(ElementsTree, navTreeResource, root, {
     onLoad: async resource => {
       let fullPath = folderExplorer.state.fullPath;
       const preload = await resource.preloadNodeParents(fullPath);
@@ -188,7 +188,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
         return true;
       }
 
-      return await autoOpenFolders(root, folderExplorer.state.path);
+      return await autoOpenFolders(folderExplorer.state.folder, folderExplorer.state.path);
     },
   });
 
@@ -240,7 +240,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
 
         if (!leaf && tree.settings?.foldersTree) {
           const nodeId = node.id;
-          const loaded =  await ref.loadChildren(nodeId, true);
+          const loaded = await ref.loadChildren(nodeId, true);
 
           if (loaded) {
             await autoOpenFolders(nodeId, path);
@@ -307,7 +307,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
         <ElementsTreeContext.Provider value={context}>
           <box className={className}>
             <FolderExplorer state={folderExplorer}>
-              <tree ref={dropOutside.mouse.reference} as="div" onClick={handleClick}>
+              <tree ref={dropOutside.mouse.reference} onClick={handleClick}>
                 {settings?.showFolderExplorerPath && <FolderExplorerPath getName={getName} canSkip={canSkip} />}
                 <drop-outside
                   ref={dndBox.setRef}

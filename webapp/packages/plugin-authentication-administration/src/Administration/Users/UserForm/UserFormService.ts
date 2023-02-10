@@ -33,7 +33,7 @@ export class UserFormService {
   readonly tabsContainer: TabsContainer<IUserFormProps>;
 
   constructor() {
-    this.tabsContainer = new TabsContainer();
+    this.tabsContainer = new TabsContainer('User settings');
     this.onFormInit = new Executor();
   }
 }

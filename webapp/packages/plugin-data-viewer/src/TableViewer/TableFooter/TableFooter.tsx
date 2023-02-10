@@ -24,6 +24,7 @@ const tableFooterStyles = css`
       align-items: center;
       flex: 0 0 auto;
       overflow: auto;
+      gap: 8px;
     }
     count input,
     count placeholder {
@@ -55,10 +56,6 @@ const tableFooterStyles = css`
       height: 24px;
       width: 24px;
       display: block;
-    }
-    count,
-    TableFooterMenu {
-      margin-left: 16px;
     }
     time {
       composes: theme-typography--caption from global;

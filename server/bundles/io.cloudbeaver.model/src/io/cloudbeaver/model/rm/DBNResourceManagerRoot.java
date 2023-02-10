@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp
+ * Copyright (C) 2010-2023 DBeaver Corp
  *
  * All Rights Reserved.
  *
@@ -25,7 +25,7 @@ import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
-import org.jkiss.dbeaver.model.navigator.DBNProject;
+import org.jkiss.dbeaver.model.navigator.DBNRoot;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
@@ -36,7 +36,7 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
     private DBNResourceManagerProject[] projects;
     private RMController resourceController;
 
-    public DBNResourceManagerRoot(DBNProject parentNode) {
+    public DBNResourceManagerRoot(DBNRoot parentNode) {
         super(parentNode);
     }
 

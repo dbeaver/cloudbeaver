@@ -165,27 +165,85 @@ export enum AuthStatus {
   Success = 'SUCCESS'
 }
 
-export interface CbEvent {
-  eventData: Scalars['Object'];
-  eventType: CbEventType;
+export type CbClientEvent = {
+  id: CbClientEventId;
+  topicId?: Maybe<CbEventTopic>;
+};
+
+export enum CbClientEventId {
+  CbClientProjectsActive = 'cb_client_projects_active',
+  CbClientTopicSubscribe = 'cb_client_topic_subscribe',
+  CbClientTopicUnsubscribe = 'cb_client_topic_unsubscribe'
 }
 
-export enum CbEventResourceType {
-  Datasource = 'DATASOURCE',
-  RmResource = 'RM_RESOURCE'
+export interface CbConfigEvent extends CbServerEvent {
+  id: CbServerEventId;
+  topicId?: Maybe<CbEventTopic>;
 }
 
-export enum CbEventStatus {
-  TypeCreate = 'TYPE_CREATE',
-  TypeDelete = 'TYPE_DELETE',
-  TypeUpdate = 'TYPE_UPDATE'
+export interface CbDatasourceEvent extends CbServerEvent {
+  dataSourceIds: Array<Scalars['String']>;
+  id: CbServerEventId;
+  projectId: Scalars['String'];
+  topicId?: Maybe<CbEventTopic>;
 }
 
-export enum CbEventType {
+export interface CbDatasourceFolderEvent extends CbServerEvent {
+  id: CbServerEventId;
+  nodePaths: Array<Scalars['String']>;
+  projectId: Scalars['String'];
+  topicId?: Maybe<CbEventTopic>;
+}
+
+export enum CbEventTopic {
+  CbConfig = 'cb_config',
+  CbDatasource = 'cb_datasource',
+  CbDatasourceFolder = 'cb_datasource_folder',
+  CbProjects = 'cb_projects',
+  CbScripts = 'cb_scripts',
+  CbSessionLog = 'cb_session_log'
+}
+
+export interface CbProjectsActiveEvent extends CbClientEvent {
+  id: CbClientEventId;
+  projectIds: Array<Scalars['String']>;
+  topicId?: Maybe<CbEventTopic>;
+}
+
+export interface CbrmEvent extends CbServerEvent {
+  id: CbServerEventId;
+  projectId: Scalars['String'];
+  resourcePath: Scalars['String'];
+  topicId?: Maybe<CbEventTopic>;
+}
+
+export type CbServerEvent = {
+  id: CbServerEventId;
+  topicId?: Maybe<CbEventTopic>;
+};
+
+export enum CbServerEventId {
   CbConfigChanged = 'cb_config_changed',
+  CbDatasourceCreated = 'cb_datasource_created',
+  CbDatasourceDeleted = 'cb_datasource_deleted',
+  CbDatasourceFolderCreated = 'cb_datasource_folder_created',
+  CbDatasourceFolderDeleted = 'cb_datasource_folder_deleted',
   CbDatasourceFolderUpdated = 'cb_datasource_folder_updated',
   CbDatasourceUpdated = 'cb_datasource_updated',
-  CbRmResourceUpdated = 'cb_rm_resource_updated'
+  CbRmResourceCreated = 'cb_rm_resource_created',
+  CbRmResourceDeleted = 'cb_rm_resource_deleted',
+  CbRmResourceUpdated = 'cb_rm_resource_updated',
+  CbSessionLogUpdated = 'cb_session_log_updated'
+}
+
+export interface CbSessionLogEvent extends CbServerEvent {
+  id: CbServerEventId;
+  topicId?: Maybe<CbEventTopic>;
+}
+
+export interface CbTopicEvent extends CbClientEvent {
+  id: CbClientEventId;
+  topicId: CbEventTopic;
 }
 
 export interface ConnectionConfig {
@@ -419,6 +477,7 @@ export interface Mutation {
   createConnectionFromTemplate: ConnectionInfo;
   deleteConnection: Scalars['Boolean'];
   deleteConnectionFolder: Scalars['Boolean'];
+  emptyEventMutation?: Maybe<Scalars['Boolean']>;
   initConnection: ConnectionInfo;
   navDeleteNodes?: Maybe<Scalars['Int']>;
   navMoveNodesToFolder?: Maybe<Scalars['Boolean']>;
@@ -899,6 +958,7 @@ export interface ProjectInfo {
   global: Scalars['Boolean'];
   id: Scalars['String'];
   name: Scalars['String'];
+  resourceTypes: Array<RmResourceType>;
   shared: Scalars['Boolean'];
 }
 
@@ -925,6 +985,7 @@ export interface Query {
   deleteUser?: Maybe<Scalars['Boolean']>;
   deleteUserMetaParameter: Scalars['Boolean'];
   driverList: Array<DriverInfo>;
+  emptyEvent?: Maybe<Scalars['Boolean']>;
   enableUser?: Maybe<Scalars['Boolean']>;
   getConnectionSubjectAccess: Array<AdminConnectionGrantInfo>;
   getSubjectConnectionAccess: Array<AdminConnectionGrantInfo>;
@@ -940,13 +1001,13 @@ export interface Query {
   listUserProfileProperties: Array<ObjectPropertyInfo>;
   listUsers: Array<AdminUserInfo>;
   metadataGetNodeDDL?: Maybe<Scalars['String']>;
+  metadataGetNodeExtendedDDL?: Maybe<Scalars['String']>;
   navGetStructContainers: DatabaseStructContainers;
   navNodeChildren: Array<NavigatorNodeInfo>;
   navNodeInfo: NavigatorNodeInfo;
   navNodeParents: Array<NavigatorNodeInfo>;
   navRefreshNode?: Maybe<Scalars['Boolean']>;
   networkHandlers: Array<NetworkHandlerDescriptor>;
-  readSessionEvents: Array<CbEvent>;
   readSessionLog: Array<LogEntry>;
   revokeUserTeam?: Maybe<Scalars['Boolean']>;
   rmListProjectGrantedPermissions: Array<AdminObjectGrantInfo>;
@@ -1025,7 +1086,7 @@ export interface QueryConnectionFoldersArgs {
 
 export interface QueryConnectionInfoArgs {
   id: Scalars['ID'];
-  projectId?: InputMaybe<Scalars['ID']>;
+  projectId: Scalars['ID'];
 }
 
 
@@ -1139,6 +1200,11 @@ export interface QueryMetadataGetNodeDdlArgs {
 }
 
 
+export interface QueryMetadataGetNodeExtendedDdlArgs {
+  nodeId: Scalars['ID'];
+}
+
+
 export interface QueryNavGetStructContainersArgs {
   catalog?: InputMaybe<Scalars['ID']>;
   connectionId: Scalars['ID'];
@@ -1167,11 +1233,6 @@ export interface QueryNavNodeParentsArgs {
 
 export interface QueryNavRefreshNodeArgs {
   nodePath: Scalars['ID'];
-}
-
-
-export interface QueryReadSessionEventsArgs {
-  maxEntries: Scalars['Int'];
 }
 
 
@@ -1373,6 +1434,7 @@ export interface QueryUpdateTeamArgs {
 export interface QueryUserConnectionsArgs {
   id?: InputMaybe<Scalars['ID']>;
   projectId?: InputMaybe<Scalars['ID']>;
+  projectIds?: InputMaybe<Array<Scalars['ID']>>;
 }
 
 export interface RmProject {
@@ -1383,6 +1445,7 @@ export interface RmProject {
   id: Scalars['ID'];
   name: Scalars['String'];
   projectPermissions: Array<Scalars['String']>;
+  resourceTypes: Array<RmResourceType>;
   shared: Scalars['Boolean'];
 }
 
@@ -1396,6 +1459,14 @@ export interface RmResource {
   length: Scalars['Int'];
   name: Scalars['String'];
   properties?: Maybe<Scalars['Object']>;
+}
+
+export interface RmResourceType {
+  displayName: Scalars['String'];
+  fileExtensions: Array<Scalars['String']>;
+  icon?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  rootFolder?: Maybe<Scalars['String']>;
 }
 
 export interface RmSubjectProjectPermissions {
@@ -1464,6 +1535,7 @@ export interface SqlDialectInfo {
 export interface SqlExecuteInfo {
   duration: Scalars['Int'];
   filterText?: Maybe<Scalars['String']>;
+  fullQuery?: Maybe<Scalars['String']>;
   results: Array<SqlQueryResults>;
   statusMessage?: Maybe<Scalars['String']>;
 }
@@ -1719,7 +1791,7 @@ export type GetActiveUserQueryVariables = Exact<{
 }>;
 
 
-export type GetActiveUserQuery = { user?: { userId: string, displayName?: string, linkedAuthProviders: Array<string>, metaParameters?: any, configurationParameters?: any, authTokens: Array<{ authProvider: string, authConfiguration?: string, loginTime: any, message?: string, origin: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> } }> } };
+export type GetActiveUserQuery = { user?: { userId: string, displayName?: string, authRole?: string, linkedAuthProviders: Array<string>, metaParameters?: any, configurationParameters?: any, authTokens: Array<{ authProvider: string, authConfiguration?: string, loginTime: any, message?: string, origin: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> } }> } };
 
 export type GetAuthProviderConfigurationParametersQueryVariables = Exact<{
   providerId: Scalars['ID'];
@@ -2166,6 +2238,7 @@ export type GetTemplateConnectionsQuery = { connections: Array<{ id: string, pro
 export type GetUserConnectionsQueryVariables = Exact<{
   projectId?: InputMaybe<Scalars['ID']>;
   connectionId?: InputMaybe<Scalars['ID']>;
+  projectIds?: InputMaybe<Array<Scalars['ID']> | Scalars['ID']>;
   includeOrigin: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
   includeAuthProperties: Scalars['Boolean'];
@@ -2342,11 +2415,13 @@ export type ObjectOriginInfoFragment = { type: string, subType?: string, display
 
 export type ObjectPropertyInfoFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number };
 
+export type ResourceTypeFragment = { id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string };
+
 export type SqlScriptInfoFragment = { queries: Array<{ start: number, end: number }> };
 
 export type SessionStateFragment = { createTime: string, lastAccessTime: string, cacheExpired: boolean, locale: string, actionParameters?: any, valid: boolean, remainingTime: number };
 
-export type SharedProjectFragment = { id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string> };
+export type SharedProjectFragment = { id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string }> };
 
 export type UserConnectionAuthPropertiesFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number };
 
@@ -2424,7 +2499,7 @@ export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
 }>;
 
 
-export type GetSqlExecuteTaskResultsMutation = { result: { duration: number, statusMessage?: string, filterText?: string, results: Array<{ title?: string, updateRowCount?: number, sourceQuery?: string, dataFormat?: ResultDataFormat, resultSet?: { id: string, rows?: Array<Array<any>>, singleEntity: boolean, hasMoreData: boolean, hasRowIdentifier: boolean, columns?: Array<{ dataKind?: string, entityName?: string, fullTypeName?: string, icon?: string, label?: string, maxLength?: number, name?: string, position: number, precision?: number, required: boolean, readOnly: boolean, readOnlyStatus?: string, scale?: number, typeName?: string, supportedOperations: Array<{ id: string, expression: string, argumentCount?: number }> }> } }> } };
+export type GetSqlExecuteTaskResultsMutation = { result: { duration: number, statusMessage?: string, filterText?: string, fullQuery?: string, results: Array<{ title?: string, updateRowCount?: number, sourceQuery?: string, dataFormat?: ResultDataFormat, resultSet?: { id: string, rows?: Array<Array<any>>, singleEntity: boolean, hasMoreData: boolean, hasRowIdentifier: boolean, columns?: Array<{ dataKind?: string, entityName?: string, fullTypeName?: string, icon?: string, label?: string, maxLength?: number, name?: string, position: number, precision?: number, required: boolean, readOnly: boolean, readOnlyStatus?: string, scale?: number, typeName?: string, supportedOperations: Array<{ id: string, expression: string, argumentCount?: number }> }> } }> } };
 
 export type GetSqlExecutionPlanResultMutationVariables = Exact<{
   taskId: Scalars['ID'];
@@ -2465,6 +2540,13 @@ export type MetadataGetNodeDdlQueryVariables = Exact<{
 
 
 export type MetadataGetNodeDdlQuery = { metadataGetNodeDDL?: string };
+
+export type MetadataGetNodeExtendedDdlQueryVariables = Exact<{
+  nodeId: Scalars['ID'];
+}>;
+
+
+export type MetadataGetNodeExtendedDdlQuery = { metadataGetNodeExtendedDDL?: string };
 
 export type GetChildrenDbObjectInfoQueryVariables = Exact<{
   navNodeId: Scalars['ID'];
@@ -2550,7 +2632,7 @@ export type NavRenameNodeMutation = { navRenameNode?: string };
 export type GetProjectListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProjectListQuery = { projects: Array<{ id: string, shared: boolean, global: boolean, name: string, description?: string, canEditDataSources: boolean, canViewDataSources: boolean, canEditResources: boolean, canViewResources: boolean }> };
+export type GetProjectListQuery = { projects: Array<{ id: string, shared: boolean, global: boolean, name: string, description?: string, canEditDataSources: boolean, canViewDataSources: boolean, canEditResources: boolean, canViewResources: boolean, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string }> }> };
 
 export type CreateProjectMutationVariables = Exact<{
   projectId?: InputMaybe<Scalars['ID']>;
@@ -2559,7 +2641,7 @@ export type CreateProjectMutationVariables = Exact<{
 }>;
 
 
-export type CreateProjectMutation = { project: { id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string> } };
+export type CreateProjectMutation = { project: { id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string }> } };
 
 export type CreateResourceMutationVariables = Exact<{
   projectId: Scalars['String'];
@@ -2591,7 +2673,7 @@ export type GetProjectQueryVariables = Exact<{
 }>;
 
 
-export type GetProjectQuery = { project: { id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string> } };
+export type GetProjectQuery = { project: { id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string }> } };
 
 export type GetProjectGrantedPermissionsQueryVariables = Exact<{
   projectId: Scalars['String'];
@@ -2619,12 +2701,12 @@ export type GetResourceListQuery = { resources: Array<{ name: string, folder: bo
 export type GetResourceProjectListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetResourceProjectListQuery = { projects: Array<{ id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string> }> };
+export type GetResourceProjectListQuery = { projects: Array<{ id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string }> }> };
 
 export type GetSharedProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetSharedProjectsQuery = { projects: Array<{ id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string> }> };
+export type GetSharedProjectsQuery = { projects: Array<{ id: string, name: string, shared: boolean, global: boolean, description?: string, projectPermissions: Array<string>, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string }> }> };
 
 export type GetSubjectProjectsPermissionsQueryVariables = Exact<{
   subjectId: Scalars['String'];
@@ -2711,13 +2793,6 @@ export type ChangeSessionLanguageMutationVariables = Exact<{
 
 
 export type ChangeSessionLanguageMutation = { changeSessionLanguage?: boolean };
-
-export type GetSessionEventsQueryVariables = Exact<{
-  maxEntries: Scalars['Int'];
-}>;
-
-
-export type GetSessionEventsQuery = { events: Array<{ eventType: CbEventType, eventData: any }> };
 
 export type OpenSessionMutationVariables = Exact<{
   defaultLocale?: InputMaybe<Scalars['String']>;
@@ -3178,6 +3253,15 @@ export const SessionStateFragmentDoc = `
   remainingTime
 }
     `;
+export const ResourceTypeFragmentDoc = `
+    fragment ResourceType on RMResourceType {
+  id
+  displayName
+  icon
+  fileExtensions
+  rootFolder
+}
+    `;
 export const SharedProjectFragmentDoc = `
     fragment SharedProject on RMProject {
   id
@@ -3186,8 +3270,11 @@ export const SharedProjectFragmentDoc = `
   global
   description
   projectPermissions
+  resourceTypes {
+    ...ResourceType
+  }
 }
-    `;
+    ${ResourceTypeFragmentDoc}`;
 export const UserConnectionNetworkHandlerPropertiesFragmentDoc = `
     fragment UserConnectionNetworkHandlerProperties on ObjectPropertyInfo {
   id
@@ -3262,6 +3349,7 @@ export const GetActiveUserDocument = `
   user: activeUser {
     userId
     displayName
+    authRole
     linkedAuthProviders
     metaParameters @include(if: $includeMetaParameters)
     configurationParameters @include(if: $includeConfigurationParameters)
@@ -3696,8 +3784,12 @@ export const GetTemplateConnectionsDocument = `
 }
     ${DatabaseConnectionFragmentDoc}`;
 export const GetUserConnectionsDocument = `
-    query getUserConnections($projectId: ID, $connectionId: ID, $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $includeNetworkHandlersConfig: Boolean!, $includeCredentialsSaved: Boolean!, $includeAuthNeeded: Boolean!, $includeProperties: Boolean!, $includeProviderProperties: Boolean!, $customIncludeOptions: Boolean!) {
-  connections: userConnections(projectId: $projectId, id: $connectionId) {
+    query getUserConnections($projectId: ID, $connectionId: ID, $projectIds: [ID!], $includeOrigin: Boolean!, $customIncludeOriginDetails: Boolean!, $includeAuthProperties: Boolean!, $includeNetworkHandlersConfig: Boolean!, $includeCredentialsSaved: Boolean!, $includeAuthNeeded: Boolean!, $includeProperties: Boolean!, $includeProviderProperties: Boolean!, $customIncludeOptions: Boolean!) {
+  connections: userConnections(
+    projectId: $projectId
+    id: $connectionId
+    projectIds: $projectIds
+  ) {
     ...DatabaseConnection
   }
 }
@@ -3953,6 +4045,7 @@ export const GetSqlExecuteTaskResultsDocument = `
     duration
     statusMessage
     filterText
+    fullQuery
     results {
       title
       updateRowCount
@@ -4061,6 +4154,11 @@ export const MetadataGetNodeDdlDocument = `
   metadataGetNodeDDL(nodeId: $nodeId)
 }
     `;
+export const MetadataGetNodeExtendedDdlDocument = `
+    query metadataGetNodeExtendedDDL($nodeId: ID!) {
+  metadataGetNodeExtendedDDL(nodeId: $nodeId)
+}
+    `;
 export const GetChildrenDbObjectInfoDocument = `
     query getChildrenDBObjectInfo($navNodeId: ID!, $offset: Int, $limit: Int, $filter: ObjectPropertyFilter) {
   dbObjects: navNodeChildren(
@@ -4145,9 +4243,12 @@ export const GetProjectListDocument = `
     canViewDataSources
     canEditResources
     canViewResources
+    resourceTypes {
+      ...ResourceType
+    }
   }
 }
-    `;
+    ${ResourceTypeFragmentDoc}`;
 export const CreateProjectDocument = `
     mutation createProject($projectId: ID, $projectName: String!, $description: String) {
   project: rmCreateProject(
@@ -4228,9 +4329,12 @@ export const GetResourceProjectListDocument = `
     global
     description
     projectPermissions
+    resourceTypes {
+      ...ResourceType
+    }
   }
 }
-    `;
+    ${ResourceTypeFragmentDoc}`;
 export const GetSharedProjectsDocument = `
     query getSharedProjects {
   projects: rmListSharedProjects {
@@ -4316,14 +4420,6 @@ export const SetDefaultNavigatorSettingsDocument = `
 export const ChangeSessionLanguageDocument = `
     mutation changeSessionLanguage($locale: String!) {
   changeSessionLanguage(locale: $locale)
-}
-    `;
-export const GetSessionEventsDocument = `
-    query getSessionEvents($maxEntries: Int!) {
-  events: readSessionEvents(maxEntries: $maxEntries) {
-    eventType
-    eventData
-  }
 }
     `;
 export const OpenSessionDocument = `
@@ -4752,6 +4848,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     metadataGetNodeDDL(variables: MetadataGetNodeDdlQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<MetadataGetNodeDdlQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<MetadataGetNodeDdlQuery>(MetadataGetNodeDdlDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'metadataGetNodeDDL', 'query');
     },
+    metadataGetNodeExtendedDDL(variables: MetadataGetNodeExtendedDdlQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<MetadataGetNodeExtendedDdlQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<MetadataGetNodeExtendedDdlQuery>(MetadataGetNodeExtendedDdlDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'metadataGetNodeExtendedDDL', 'query');
+    },
     getChildrenDBObjectInfo(variables: GetChildrenDbObjectInfoQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetChildrenDbObjectInfoQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetChildrenDbObjectInfoQuery>(GetChildrenDbObjectInfoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getChildrenDBObjectInfo', 'query');
     },
@@ -4847,9 +4946,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     changeSessionLanguage(variables: ChangeSessionLanguageMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ChangeSessionLanguageMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<ChangeSessionLanguageMutation>(ChangeSessionLanguageDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'changeSessionLanguage', 'mutation');
-    },
-    getSessionEvents(variables: GetSessionEventsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSessionEventsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetSessionEventsQuery>(GetSessionEventsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSessionEvents', 'query');
     },
     openSession(variables?: OpenSessionMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<OpenSessionMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<OpenSessionMutation>(OpenSessionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'openSession', 'mutation');

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button, Textarea, useClipboard, useTranslate } from '@cloudbeaver/core-blocks';
+import { MenuBarSmallItem, Textarea, useClipboard, useTranslate } from '@cloudbeaver/core-blocks';
 
 
 import type { ILogEntry } from './ILogEntry';
@@ -32,7 +32,7 @@ const styles = css`
     overflow-wrap: break-word;
   }
   buttons {
-    padding: 16px;
+    padding: 4px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -81,12 +81,18 @@ export const LogViewerInfoPanel = observer<Props>(function LogViewerInfoPanel({
   return styled(styles)(
     <panel-wrapper className={className}>
       <buttons>
-        <Button mod={['unelevated']} onClick={copyMessage}>
+        <MenuBarSmallItem
+          title={translate('ui_copy_to_clipboard')}
+          onClick={copyMessage}
+        >
           {translate('ui_copy_to_clipboard')}
-        </Button>
-        <Button mod={['outlined']} onClick={onClose}>
+        </MenuBarSmallItem>
+        <MenuBarSmallItem
+          title={translate('ui_close')}
+          onClick={onClose}
+        >
           {translate('ui_close')}
-        </Button>
+        </MenuBarSmallItem>
       </buttons>
       <content-wrapper>
         <type as='h2'>{typeInfo}</type>

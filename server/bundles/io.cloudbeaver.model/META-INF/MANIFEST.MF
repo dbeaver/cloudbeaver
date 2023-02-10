@@ -3,24 +3,26 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: io.cloudbeaver.model;singleton:=true
-Bundle-Version: 1.0.18.qualifier
-Bundle-Release-Date: 20221205
+Bundle-Version: 1.0.22.qualifier
+Bundle-Release-Date: 20230306
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
-Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
+Require-Bundle:  org.jkiss.dbeaver.data.gis;visibility:=reexport,
+ org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.model.sm;visibility:=reexport,
+ org.jkiss.dbeaver.model.event;visibility:=reexport,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  org.jkiss.dbeaver.net.ssh,
  org.jkiss.bundle.graphql.java;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp,
  com.google.gson;visibility:=reexport,
- jakarta.servlet-api;bundle-version="4.0.0";visibility:=reexport
+ jakarta.servlet-api;visibility:=reexport
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.auth,
  io.cloudbeaver.auth.provider,
  io.cloudbeaver.auth.provider.local,
- io.cloudbeaver.events,
+ io.cloudbeaver.websocket,
  io.cloudbeaver.model,
  io.cloudbeaver.model.app,
  io.cloudbeaver.model.rm,

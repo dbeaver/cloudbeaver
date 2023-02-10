@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
+import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
@@ -541,11 +542,14 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings) throws DBWebException {
         CBApplication.getInstance().getAppConfiguration().setDefaultNavigatorSettings(settings);
-//        try {
-//            CBApplication.getInstance().flushConfiguration();
-//        } catch (DBException e) {
-//            throw new DBWebException("Error saving server configuration", e);
-//        }
+        if (CBApplication.getInstance().isConfigurationMode()) {
+            return true;
+        }
+        try {
+            CBApplication.getInstance().flushConfiguration(webSession);
+        } catch (DBException e) {
+            throw new DBWebException("Error saving server configuration", e);
+        }
         return true;
     }
 

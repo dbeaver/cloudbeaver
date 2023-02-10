@@ -9,9 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { BASE_TABLE_STYLES, IconOrImage, Link, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
-
-
+import { BASE_TABLE_STYLES, IconOrImage, Link, TableColumnValue, TableItem, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { ILogEntry } from './ILogEntry';
 
@@ -41,8 +39,8 @@ const style = css`
   Link:hover {
     cursor: pointer;
   }
-  td:first-child {
-    padding: 0px;
+  [|icon] {
+    padding: 0;
   }
   icon-box {
     display: flex;
@@ -54,7 +52,7 @@ const style = css`
       height: 24px;
     }
   }
-  tr[|selected] {
+  TableItem[|selected] {
     font-weight: 500;
   }
 `;
@@ -81,10 +79,12 @@ export const LogEntry = observer<Props>(function LogEntry({
   }
 
   return styled(useStyles(BASE_TABLE_STYLES, style))(
-    <tr className={className} {...use({ selected })}>
-      <td title={item.type}><icon-box>{icon && <IconOrImage icon={icon} />}</icon-box></td>
-      <td>{item.time}</td>
-      <td>
+    <TableItem item={item.id} className={className} {...use({ selected })}>
+      <TableColumnValue title={item.type} centerContent flex {...use({ icon: true })}>
+        <icon-box>{icon && <IconOrImage icon={icon} />}</icon-box>
+      </TableColumnValue>
+      <TableColumnValue title={item.time} ellipsis>{item.time}</TableColumnValue>
+      <TableColumnValue>
         <message-cell>
           <message title={message}>
             {isError ? (
@@ -94,7 +94,7 @@ export const LogEntry = observer<Props>(function LogEntry({
             ) : message}
           </message>
         </message-cell>
-      </td>
-    </tr>
+      </TableColumnValue>
+    </TableItem>
   );
 });

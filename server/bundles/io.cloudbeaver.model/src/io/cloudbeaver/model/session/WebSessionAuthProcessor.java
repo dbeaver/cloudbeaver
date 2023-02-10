@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ public class WebSessionAuthProcessor {
                     webSession.removeAuthInfo(authConfiguration.getAuthProviderId());
                 }
             }
-            webSession.updateSMAuthInfo(authInfo);
+            webSession.updateSMSession(authInfo);
             WebUser curUser = webSession.getUser();
             if (curUser == null) {
                 //should never happen in theory since we should get the error much earlier
@@ -161,9 +161,6 @@ public class WebSessionAuthProcessor {
                     providerConfig,
                     authAttrs);
 
-                if (!configMode && securityController.getUserPermissions(userId).isEmpty()) {
-                    throw new DBWebException("Access denied (no permissions)");
-                }
                 if (!configMode && !securityController.getCurrentUser().isEnabled()) {
                     throw new DBWebException("User account is locked");
                 }

@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable, untracked } from 'mobx';
+import { computed, makeObservable, observable, untracked } from 'mobx';
 
 import {
   ConnectionExecutionContextResource,
   ConnectionExecutionContextService,
+  ConnectionInfoActiveProjectKey,
   ConnectionInfoResource,
   connectionProvider,
   connectionSetter,
@@ -30,7 +31,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { objectNavNodeProvider, NodeManagerUtils, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider, projectSetter, projectSetterState } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, NavNodeInfoFragment, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { NavNodeInfoFragment, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationTabsService, TabHandler, ITab, ITabOptions } from '@cloudbeaver/plugin-navigation-tabs';
 import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, SqlDataSourceService, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
 
@@ -174,13 +175,20 @@ export class SqlEditorTabService extends Bootstrap {
     }
 
     const { projectId, connectionId, defaultCatalog, defaultSchema } = dataSource.executionContext;
+    const connectionKey = createConnectionParam(projectId, connectionId);
+
+    const connection = this.connectionInfoResource.get(connectionKey);
+
+    if (!connection?.connected) {
+      return;
+    }
 
     let catalogData: ICatalogData | undefined;
     let schema: NavNodeInfoFragment | undefined;
 
     if (defaultCatalog) {
       catalogData = this.containerResource.getCatalogData(
-        createConnectionParam(projectId, connectionId),
+        connectionKey,
         defaultCatalog
       );
     }
@@ -193,12 +201,6 @@ export class SqlEditorTabService extends Bootstrap {
 
     if (!nodeId) {
       nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connectionId);
-    }
-
-    const connection = this.connectionInfoResource.getConnectionForNode(nodeId);
-
-    if (connection?.connected === false) {
-      return;
     }
 
     const parents = this.navNodeInfoResource.getParents(nodeId);
@@ -303,7 +305,7 @@ export class SqlEditorTabService extends Bootstrap {
     );
 
     if (dataSource.executionContext) {
-      await this.connectionInfoResource.load(CachedMapAllKey);
+      await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
 
       const contextConnection = createConnectionParam(
         dataSource.executionContext.projectId,
@@ -317,11 +319,11 @@ export class SqlEditorTabService extends Bootstrap {
 
     // clean old results
     tab.handlerState.currentTabId = '';
-    tab.handlerState.tabs = [];
-    tab.handlerState.resultGroups = [];
-    tab.handlerState.resultTabs = [];
-    tab.handlerState.executionPlanTabs = [];
-    tab.handlerState.statisticsTabs = [];
+    tab.handlerState.tabs = observable([]);
+    tab.handlerState.resultGroups = observable([]);
+    tab.handlerState.resultTabs = observable([]);
+    tab.handlerState.executionPlanTabs = observable([]);
+    tab.handlerState.statisticsTabs = observable([]);
 
     return true;
   }
@@ -335,7 +337,7 @@ export class SqlEditorTabService extends Bootstrap {
   private getProjectSetState(tab: ITab<ISqlEditorTabState>): boolean {
     const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
 
-    return !!dataSource?.features.includes(ESqlDataSourceFeatures.setProject);
+    return !!dataSource?.hasFeature(ESqlDataSourceFeatures.setProject);
   }
 
   private getConnectionId(tab: ITab<ISqlEditorTabState>): IConnectionInfoParams | undefined {

@@ -8,13 +8,13 @@
 
 import { runInAction } from 'mobx';
 
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { SharedProjectsResource } from '@cloudbeaver/core-resource-manager';
-import { EPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmResourceType } from '@cloudbeaver/core-sdk';
 
 export type ProjectInfo = SchemaProjectInfo;
+export type ProjectInfoResourceType = RmResourceType;
 
 @injectable()
 export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> {
@@ -22,12 +22,13 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
     private readonly graphQLService: GraphQLService,
     private readonly sharedProjectsResource: SharedProjectsResource,
     private readonly userInfoResource: UserInfoResource,
-    sessionPermissionsResource: SessionPermissionsResource
+    appAuthService: AppAuthService,
   ) {
-    super([]);
+    super(new Map(), []);
 
-    this.sync(this.userInfoResource);
-    sessionPermissionsResource.require(this, EPermission.public);
+    this.sync(this.userInfoResource, () => {}, () => CachedMapAllKey);
+    this.sharedProjectsResource.connect(this);
+    appAuthService.requireAuthentication(this);
     this.sharedProjectsResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
     this.sharedProjectsResource.onItemAdd.addHandler(() => this.markOutdated());
     this.sharedProjectsResource.onItemDelete.addHandler(() => this.markOutdated());
@@ -38,6 +39,12 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
 
   getUserProject(userId: string): ProjectInfo | undefined {
     return this.get(`u_${userId}`);
+  }
+
+  getResourceType(project: ProjectInfo, resourceTypeId: string): ProjectInfoResourceType | undefined {
+    const resourceType = project.resourceTypes.find(type => type.id === resourceTypeId);
+
+    return resourceType;
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, ProjectInfo>> {
@@ -55,6 +62,13 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
 
     return this.data;
   }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
+  }
 }
 
 export function projectInfoSortByName(a: ProjectInfo, b: ProjectInfo) {
@@ -62,13 +76,21 @@ export function projectInfoSortByName(a: ProjectInfo, b: ProjectInfo) {
     return 0;
   }
 
-  if (a.global !== b.global) {
-    return +a.global - +b.global;
+  if (isGlobalProject(a) !== isGlobalProject(b)) {
+    return +isGlobalProject(a) - +isGlobalProject(b);
   }
 
-  if (a.shared !== b.shared) {
-    return +a.shared - +b.shared;
+  if (isSharedProject(a) !== isSharedProject(b)) {
+    return +isSharedProject(a) - +isSharedProject(b);
   }
 
   return a.name.localeCompare(b.name);
+}
+
+export function isGlobalProject(obj?: ProjectInfo): obj is ProjectInfo {
+  return obj?.global === true;
+}
+
+export function isSharedProject(obj?: ProjectInfo): obj is ProjectInfo {
+  return obj?.shared === true;
 }

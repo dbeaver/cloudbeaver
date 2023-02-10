@@ -29,7 +29,7 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
   }
 
   get features(): ESqlDataSourceFeatures[] {
-    return [ESqlDataSourceFeatures.setName];
+    return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.setName];
   }
 
   private _name: string | null;

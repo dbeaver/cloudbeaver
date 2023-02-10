@@ -38,17 +38,10 @@ export class ConnectionAuthService extends Dependency {
   }
 
   private async connectionDialog(
-    connectionKey: IConnectionInfoParams | null,
+    connectionKey: IConnectionInfoParams,
     context: IExecutionContextProvider<IConnectionInfoParams | null>
   ) {
     const connection = context.getContext(this.connectionsManagerService.connectionContext);
-
-    if (!connectionKey) {
-      if (!this.connectionsManagerService.hasAnyConnection()) {
-        return;
-      }
-      connectionKey = createConnectionParam(this.connectionsManagerService.projectConnections[0]);
-    }
 
     try {
       const tempConnection = await this.auth(connectionKey);

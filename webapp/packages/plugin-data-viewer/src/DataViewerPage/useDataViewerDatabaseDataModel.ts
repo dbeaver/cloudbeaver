@@ -9,7 +9,7 @@
 import { action, computed, observable } from 'mobx';
 import { useEffect } from 'react';
 
-import { useMapResource, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useResource, useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
@@ -38,7 +38,7 @@ export function useDataViewerDatabaseDataModel(tab: ITab<IObjectViewerTabState>)
   const dataPresentationService = useService(DataPresentationService);
   const dataViewerDataChangeConfirmationService = useService(DataViewerDataChangeConfirmationService);
 
-  const connection = useMapResource(
+  const connection = useResource(
     useDataViewerDatabaseDataModel,
     ConnectionInfoResource,
     tab.handlerState.connectionKey ?? null
@@ -116,6 +116,7 @@ export function useDataViewerDatabaseDataModel(tab: ITab<IObjectViewerTabState>)
             node
           );
           this.tab.handlerState.tableId = model.id;
+          model.source.setOutdated();
           dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
 
           const pageState = dataViewerTabService.page.getState(this.tab);
@@ -130,12 +131,6 @@ export function useDataViewerDatabaseDataModel(tab: ITab<IObjectViewerTabState>)
         }
 
         model.setName(node?.name || null);
-
-        // TODO: used for initial data fetch, but can repeat request each time data tab is selected,
-        //       so probably should be refactored and managed by presentation
-        if (model.source.error === null && model.source.results.length === 0) {
-          model.request();
-        }
         this._exception = null;
       } catch (exception: any) {
         this._exception = exception;

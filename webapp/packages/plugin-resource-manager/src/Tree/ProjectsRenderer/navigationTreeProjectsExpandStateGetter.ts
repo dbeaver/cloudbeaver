@@ -6,19 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import type { NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import type { ProjectsService } from '@cloudbeaver/core-projects';
+import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import type { IElementsTreeNodeExpandInfoGetter } from '@cloudbeaver/plugin-navigation-tree';
-
-import { NAV_NODE_TYPE_RM_PROJECT } from '../../NAV_NODE_TYPE_RM_PROJECT';
-import type { ResourcesProjectsNavNodeService } from '../../NavNodes/ResourcesProjectsNavNodeService';
-
 
 
 export function navigationTreeProjectsExpandStateGetter(
   navNodeInfoResource: NavNodeInfoResource,
   projectsService: ProjectsService,
-  resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
+  projectsNavNodeService: ProjectsNavNodeService,
 ): IElementsTreeNodeExpandInfoGetter {
 
   return nodeId => {
@@ -29,7 +26,7 @@ export function navigationTreeProjectsExpandStateGetter(
     }
 
     let active = false;
-    const project = resourcesProjectsNavNodeService.getByNodeId(nodeId);
+    const project = projectsNavNodeService.getByNodeId(nodeId);
     if (project) {
       active = projectsService.activeProjects.includes(project);
     }

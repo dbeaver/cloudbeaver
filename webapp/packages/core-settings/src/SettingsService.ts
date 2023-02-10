@@ -12,7 +12,7 @@ import { LocalStorageSaveService } from './LocalStorageSaveService';
 
 @injectable()
 export class SettingsService {
-  constructor(private localStorageSaveService: LocalStorageSaveService) { }
+  constructor(private readonly localStorageSaveService: LocalStorageSaveService) { }
 
   /**
    * if autosaved value exits the settings object will be populated with this value

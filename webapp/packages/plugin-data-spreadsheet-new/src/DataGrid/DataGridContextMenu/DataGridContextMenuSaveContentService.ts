@@ -31,8 +31,8 @@ export class DataGridContextMenuSaveContentService {
       {
         id: this.getMenuContentSaveToken(),
         order: 4,
-        title: 'ui_processing_save',
-        icon: '/icons/save.svg',
+        title: 'ui_download',
+        icon: '/icons/export.svg',
         isPresent(context) {
           return context.contextType === DataGridContextMenuService.cellContext;
         },

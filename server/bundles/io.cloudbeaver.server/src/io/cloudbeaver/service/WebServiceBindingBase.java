@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -223,7 +223,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 RMProject rmProject = project.getRmProject();
 
                 for (String reqProjectPermission : requireProjectPermissions) {
-                    if (!rmProject.getProjectPermissions().contains(reqProjectPermission)) {
+                    if (!rmProject.hasProjectPermission(reqProjectPermission)) {
                         throw new DBWebExceptionAccessDenied("Access denied");
                     }
                 }
@@ -253,8 +253,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             }
             CBApplication application = CBApplication.getInstance();
             if (!application.isConfigurationMode()) {
-                Set<String> sessionPermissions = session.getSessionPermissions();
-                if (CommonUtils.isEmpty(sessionPermissions)) {
+                if (webAction.authRequired() && !session.isAuthorizedInSecurityManager()) {
                     log.debug("Anonymous access to " + method.getName() + " restricted");
                     throw new DBWebExceptionAccessDenied("Anonymous access restricted");
                 }

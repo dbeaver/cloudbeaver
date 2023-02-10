@@ -34,7 +34,7 @@ export class TableFooterMenuService {
     this.registerMenuItem({
       id: 'table_add',
       order: 0.5,
-      icon: '/icons/data_add.svg',
+      icon: '/icons/data_add_sm.svg',
       tooltip: 'data_viewer_action_edit_add',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
@@ -79,7 +79,7 @@ export class TableFooterMenuService {
     this.registerMenuItem({
       id: 'table_add_copy',
       order: 0.55,
-      icon: '/icons/data_add_copy.svg',
+      icon: '/icons/data_add_copy_sm.svg',
       tooltip: 'data_viewer_action_edit_add_copy',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
@@ -127,7 +127,7 @@ export class TableFooterMenuService {
     this.registerMenuItem({
       id: 'table_delete',
       order: 0.6,
-      icon: '/icons/data_delete.svg',
+      icon: '/icons/data_delete_sm.svg',
       tooltip: 'data_viewer_action_edit_delete',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
@@ -184,7 +184,7 @@ export class TableFooterMenuService {
     this.registerMenuItem({
       id: 'table_revert',
       order: 0.7,
-      icon: '/icons/data_revert.svg',
+      icon: '/icons/data_revert_sm.svg',
       tooltip: 'data_viewer_action_edit_revert',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
@@ -277,7 +277,7 @@ export class TableFooterMenuService {
       order: 2,
       title: 'data_viewer_value_revert',
       tooltip: 'data_viewer_value_revert_title',
-      icon: '/icons/data_revert_all.svg',
+      icon: '/icons/data_revert_all_sm.svg',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;
       },

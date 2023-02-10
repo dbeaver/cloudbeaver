@@ -12,7 +12,7 @@
     <extension point="org.eclipse.core.runtime.products" id="product">
         <product application="io.cloudbeaver.product.ce.application" description="Cloudbeaver Web UI Application" name="CloudBeaver CE Server">
             <property name="appName" value="CloudBeaver CE Server"/>
-            <property name="versionUpdateURL" value="https://cloudbeaver.io/product/cloudbeaver-ce-version.json"/>
+            <property name="versionUpdateURL" value="https://dbeaver.com/product/cloudbeaver-ce-version.json"/>
         </product>
     </extension>
 

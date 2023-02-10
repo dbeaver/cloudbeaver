@@ -14,7 +14,7 @@ import styled, { css } from 'reshadow';
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group,
-  InfoItem, Loader, TextPlaceholder, useMapResource, useStyles, useTranslate
+  InfoItem, Loader, TextPlaceholder, useResource, useStyles, useTranslate
 } from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
@@ -51,7 +51,7 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
   const state = useGrantedUsers(formState.config, formState.mode);
   const { selected } = useTab(tabId);
 
-  const users = useMapResource(GrantedUsers, UsersResource, selected ? CachedMapAllKey : null);
+  const users = useResource(GrantedUsers, UsersResource, selected ? CachedMapAllKey : null);
 
   const grantedUsers = useMemo(() => computed(() => users.resource.values
     .filter(user => state.state.grantedUsers.includes(user.userId))

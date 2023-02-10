@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,11 @@ import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.registry.BaseProjectImpl;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.Pair;
 
 import java.nio.file.Path;
+import java.util.Collection;
 
 public class WebProjectImpl extends BaseProjectImpl {
 
@@ -112,5 +115,25 @@ public class WebProjectImpl extends BaseProjectImpl {
     @Override
     protected DBPDataSourceRegistry createDataSourceRegistry() {
         return new WebDataSourceRegistryProxy(new DataSourceRegistry(this), dataSourceFilter);
+    }
+
+    /**
+     * Method for Bulk Update of resources properties paths
+     *
+     * @param oldToNewPaths collection of OldPath to NewPath pairs
+     */
+    public void moveResourcePropertiesBatch(@NotNull Collection<Pair<String, String>> oldToNewPaths) {
+        loadMetadata();
+        synchronized (metadataSync) {
+            for (var pathsPair : oldToNewPaths) {
+                final var oldResourcePath = CommonUtils.normalizeResourcePath(pathsPair.getFirst());
+                final var newResourcePath = CommonUtils.normalizeResourcePath(pathsPair.getSecond());
+                final var resProps = resourceProperties.remove(oldResourcePath);
+                if (resProps != null) {
+                    resourceProperties.put(newResourcePath, resProps);
+                }
+            }
+        }
+        flushMetadata();
     }
 }

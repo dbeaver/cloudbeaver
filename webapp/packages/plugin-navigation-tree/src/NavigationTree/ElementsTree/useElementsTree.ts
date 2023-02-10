@@ -9,8 +9,8 @@
 import { action, computed, observable, runInAction } from 'mobx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { IFolderExplorerContext, useExecutor, useMapResource, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { IFolderExplorerContext, useExecutor, useResource, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
@@ -132,11 +132,14 @@ export function useElementsTree(options: IOptions): IElementsTree {
   })));
 
   options = useObjectRef(options);
+  options.renderers = useMemo(() => options.renderers || [], [...(options.renderers || [])]);
+  options.filters = useMemo(() => options.filters || [], [...(options.filters || [])]);
+  options.expandStateGetters = useMemo(() => options.expandStateGetters || [], [...(options.expandStateGetters || [])]);
   const state = options.localState || localTreeNodesState;
 
   const functionsRef = useObjectRef({
     async loadTree(nodeId: string) {
-      await connectionInfoResource.load(CachedMapAllKey);
+      await connectionInfoResource.load(ConnectionInfoActiveProjectKey);
       const preloaded = await navTreeResource.preloadNodeParents(options.folderExplorer.state.fullPath);
 
       if (!preloaded) {
@@ -296,8 +299,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
       && Array.isArray(data.nodeState)
     )
   );
-
-  const renderers = useMemo(() => options.renderers || [], [options.renderers]);
 
   const elementsTree = useObservableRef<IElementsTree>(() => ({
     actions: new SyncExecutor(),
@@ -548,7 +549,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     root: options.root,
     settings: options.settings,
     baseRoot: options.baseRoot,
-    renderers,
+    renderers: options.renderers,
     userData,
   }, ['isLoading', 'isLoaded']);
 
@@ -563,9 +564,10 @@ export function useElementsTree(options: IOptions): IElementsTree {
       const pathIndex = folderExplorer.state.fullPath.indexOf(nodeId);
 
       if (pathIndex >= 0) {
-        folderExplorer.state.fullPath = folderExplorer.state.fullPath.slice(0, pathIndex);
-        folderExplorer.state.folder = folderExplorer.state.fullPath[pathIndex - 1];
-        folderExplorer.state.path = folderExplorer.state.fullPath.slice(0, pathIndex - 1);
+        folderExplorer.open(
+          folderExplorer.state.fullPath.slice(0, pathIndex - 1),
+          folderExplorer.state.fullPath[pathIndex - 1]
+        );
       }
     });
   }
@@ -578,7 +580,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     functionsRef.loadTree(options.root);
   }, 100), []);
 
-  useMapResource(useElementsTree, ProjectInfoResource, CachedMapAllKey, {
+  useResource(useElementsTree, ProjectInfoResource, CachedMapAllKey, {
     onData: () => {
       loadTreeThreshold();
     },
@@ -606,7 +608,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       ResourceKeyUtils.forEach(key, key => {
         const children = navTreeResource.get(key);
 
-        if (!children || children.length === 0) {
+        if (!children) {
           exitNodeFolder(key);
         }
       });

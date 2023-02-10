@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ public class CBConstants {
     public static final String PARAM_RESOURCE_QUOTAS = "resourceQuotas";
     public static final String PARAM_RESOURCE_MANAGER_ENABLED = "resourceManagerEnabled";
     public static final String PARAM_SHOW_READ_ONLY_CONN_INFO = "showReadOnlyConnectionInfo";
+    public static final String PARAM_CONN_GRANT_ANON_ACCESS = "grantConnectionsAccessToAnonymousTeam";
     public static final String PARAM_AUTH_PROVIDERS = "authConfiguration";
     public static final String PARAM_DB_CONFIGURATION = "database";
 

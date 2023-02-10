@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.WebObjectId;
 import io.cloudbeaver.WebProjectAction;
-import io.cloudbeaver.events.CBEvent;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
@@ -39,7 +38,7 @@ import java.util.Map;
  */
 public interface DBWServiceCore extends DBWService {
 
-    @WebAction(requirePermissions = {})
+    @WebAction(authRequired = false)
     WebServerConfig getServerConfig() throws DBWebException;
 
     @WebAction
@@ -51,11 +50,14 @@ public interface DBWServiceCore extends DBWService {
     @WebAction
     List<WebNetworkHandlerDescriptor> getNetworkHandlers(@NotNull WebSession webSession);
 
-    @WebAction(requirePermissions = {})
+    @WebAction(authRequired = false)
     List<WebConnectionInfo> getUserConnections(
-        @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id) throws DBWebException;
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @Nullable String id,
+        @Nullable List<String> projectIds) throws DBWebException;
 
-    @WebAction(requirePermissions = {})
+    @WebAction(authRequired = false)
     List<WebConnectionFolderInfo> getConnectionFolders(
         @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id) throws DBWebException;
 
@@ -66,35 +68,32 @@ public interface DBWServiceCore extends DBWService {
     @WebAction
     List<WebConnectionInfo> getTemplateConnections(@NotNull WebSession webSession, @Nullable String projectId) throws DBWebException;
 
-    @WebAction(requirePermissions = {})
+    @WebAction(authRequired = false)
     String[] getSessionPermissions(@NotNull WebSession webSession) throws DBWebException;
 
     ///////////////////////////////////////////
     // Session
 
-    @WebAction(requirePermissions = {})
+    @WebAction(authRequired = false)
     WebSession openSession(
         @NotNull WebSession webSession,
         @Nullable String defaultLocale,
         @NotNull HttpServletRequest servletRequest,
         @NotNull HttpServletResponse servletResponse) throws DBWebException;
 
-    @WebAction(requirePermissions = {})
+    @WebAction(authRequired = false)
     WebSession getSessionState(@NotNull WebSession webSession) throws DBWebException;
 
     @WebAction
     List<WebServerMessage> readSessionLog(@NotNull WebSession webSession, Integer maxEntries, Boolean clearEntries) throws DBWebException;
 
-    @WebAction(requirePermissions = {})
-    List<CBEvent> readSessionEvents(@Nullable WebSession webSession, Integer maxEntries) throws DBWebException;
-
-    @WebAction(requirePermissions = {})
+    @WebAction(authRequired = false)
     boolean closeSession(HttpServletRequest request) throws DBWebException;
 
-    @WebAction(requirePermissions = {})
+    @WebAction(authRequired = false)
     boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse servletResponse) throws DBWebException;
 
-    @WebAction(requirePermissions = {})
+    @WebAction(authRequired = false)
     boolean refreshSessionConnections(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException;
 
     @WebAction

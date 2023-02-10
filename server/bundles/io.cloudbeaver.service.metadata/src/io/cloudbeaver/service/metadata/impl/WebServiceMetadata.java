@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.metadata.DBWServiceMetadata;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPScriptObject;
+import org.jkiss.dbeaver.model.DBPScriptObjectExt;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.struct.DBSObject;
@@ -36,21 +37,37 @@ public class WebServiceMetadata implements DBWServiceMetadata {
 
     @Override
     public String getNodeDDL(WebSession webSession, DBNNode dbNode, Map<String, Object> options) throws DBWebException {
-        if (dbNode instanceof DBNDatabaseNode) {
-            DBSObject object = ((DBNDatabaseNode) dbNode).getObject();
-            if (object instanceof DBPScriptObject) {
-                if (options == null) {
-                    options = new LinkedHashMap<>();
-                }
-                try {
-                    return ((DBPScriptObject) object).getObjectDefinitionText(webSession.getProgressMonitor(), options);
-                } catch (DBException e) {
-                    throw new DBWebException("Error extracting DDL", e);
-                }
-            } else {
-                throw new DBWebException("Object '" + dbNode.getNodeItemPath() + "' doesn't support DDL");
-            }
-        } else {
+        validateDatabaseNode(dbNode);
+        DBSObject object = ((DBNDatabaseNode) dbNode).getObject();
+        if (!(object instanceof DBPScriptObject)) {
+            throw new DBWebException("Object '" + dbNode.getNodeItemPath() + "' doesn't support DDL");
+        }
+        if (options == null) {
+            options = new LinkedHashMap<>();
+        }
+        try {
+            return ((DBPScriptObject) object).getObjectDefinitionText(webSession.getProgressMonitor(), options);
+        } catch (DBException e) {
+            throw new DBWebException("Error extracting DDL", e);
+        }
+    }
+
+    @Override
+    public String getNodeExtendedDDL(WebSession webSession, DBNNode dbNode) throws DBWebException {
+        validateDatabaseNode(dbNode);
+        DBSObject object = ((DBNDatabaseNode) dbNode).getObject();
+        if (!(object instanceof DBPScriptObjectExt)) {
+            throw new DBWebException("Object '" + dbNode.getNodeItemPath() + "' doesn't support extended DDL");
+        }
+        try {
+            return ((DBPScriptObjectExt) object).getExtendedDefinitionText(webSession.getProgressMonitor());
+        } catch (DBException e) {
+            throw new DBWebException("Error extracting extended DDL", e);
+        }
+    }
+
+    private void validateDatabaseNode(DBNNode dbNode) throws DBWebException {
+        if (!(dbNode instanceof DBNDatabaseNode)) {
             throw new DBWebException("Node '" + dbNode.getNodeItemPath() + "' is not database node");
         }
     }

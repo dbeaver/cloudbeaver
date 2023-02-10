@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package io.cloudbeaver.service.navigator.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.events.CBEventConstants;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
@@ -53,6 +52,7 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
+import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -67,7 +67,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     private static final List<WebNavigatorNodeInfo> EMPTY_NODE_LIST = Collections.emptyList();
 
     public static final String ROOT_DATABASES = "databases";
-    private static final boolean SHOW_EXTRA_NODES = false;
 
     @Override
     public List<WebNavigatorNodeInfo> getNavigatorNodeChildren(
@@ -87,13 +86,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             if (isRootPath) {
                 DBNRoot rootNode = navigatorModel.getRoot();
                 nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, rootNode, true);
-                if (SHOW_EXTRA_NODES) {
-                    // Inject extra nodes. Disabled because we use different root path for extra nodes
-                    List<DBNNode> extraNodes = rootNode.getExtraNodes();
-                    if (!extraNodes.isEmpty()) {
-                        nodeChildren = ArrayUtils.concatArrays(extraNodes.toArray(new DBNNode[0]), nodeChildren);
-                    }
-                }
             } else {
                 DBNNode parentNode = navigatorModel.getNodeByPath(monitor, parentPath);
                 if (parentNode == null) {
@@ -111,12 +103,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 return EMPTY_NODE_LIST;
             }
             List<WebNavigatorNodeInfo> result = new ArrayList<>();
-            if (isRootPath) {
-                // Add navigator extensions
-                for (DBNNode extraNode : navigatorModel.getRoot().getExtraNodes()) {
-                    result.add(new WebNavigatorNodeInfo(session, extraNode));
-                }
-            }
 
             for (DBNNode node : nodeChildren) {
                 if (node instanceof DBNDatabaseFolder && CommonUtils.isEmpty(((DBNDatabaseFolder) node).getMeta().getChildren(null))) {
@@ -269,7 +255,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     if (
                         contextDefaults != null && contextDefaults.supportsSchemaChange()
                         && (
-                            contextDefaults.getDefaultCatalog().getName().equals(node.getName())
+                            (contextDefaults.getDefaultCatalog() != null && contextDefaults.getDefaultCatalog().getName().equals(node.getName()))
                             || node.getName().equals(catalog)
                         )
                     ) {
@@ -391,15 +377,15 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     private void addNavigatorNodeMoveEvent(@NotNull WebSession session, DBNNode node, String oldNodePath, String newNodePath) {
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             node.getOwnerProject(),
-            session.getSessionId(),
+            session.getUserContext().getSmSessionId(),
             oldNodePath,
-            CBEventConstants.EventType.TYPE_DELETE
+            WSConstants.EventAction.DELETE
         );
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             node.getOwnerProject(),
-            session.getSessionId(),
+            session.getUserContext().getSmSessionId(),
             newNodePath,
-            CBEventConstants.EventType.TYPE_CREATE
+            WSConstants.EventAction.CREATE
         );
     }
 
@@ -432,14 +418,14 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             session.getSessionId(),
             oldResourcePath,
             oldRmResourcePath,
-            CBEventConstants.EventType.TYPE_DELETE
+            WSConstants.EventAction.DELETE
         );
         WebEventUtils.addRmResourceUpdatedEvent(
             projectId,
             session.getSessionId(),
             newResourcePath,
             newRmResourcePath,
-            CBEventConstants.EventType.TYPE_CREATE
+            WSConstants.EventAction.CREATE
         );
     }
 
@@ -492,9 +478,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     node.getOwnerProject().getDataSourceRegistry().removeFolder(((DBNLocalFolder) node).getFolder(), false);
                     WebEventUtils.addNavigatorNodeUpdatedEvent(
                         session.getProjectById(projectId),
-                        session.getSessionId(),
+                        session.getUserContext().getSmSessionId(),
                         nodePath,
-                        CBEventConstants.EventType.TYPE_DELETE
+                        WSConstants.EventAction.DELETE
                     );
                 } else if (node instanceof DBNResourceManagerResource) {
                     DBNResourceManagerResource rmResource = ((DBNResourceManagerResource) node);
@@ -507,7 +493,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         session.getSessionId(),
                         resourcePath,
                         rmResourcePath,
-                        CBEventConstants.EventType.TYPE_DELETE
+                        WSConstants.EventAction.DELETE
                     );
                 }
             }
@@ -561,9 +547,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         ((DBNDataSource) node).getDataSourceContainer());
                     WebEventUtils.addDataSourceUpdatedEvent(
                         node.getOwnerProject(),
-                        session.getSessionId(),
+                        session.getUserContext().getSmSessionId(),
                         ((DBNDataSource) node).getDataSourceContainer().getId(),
-                        CBEventConstants.EventType.TYPE_UPDATE
+                        WSConstants.EventAction.UPDATE
                     );
                 } else if (node instanceof DBNLocalFolder) {
                     DBPDataSourceFolder parentFolder = WebConnectionFolderUtils.getParentFolder(folderNode);

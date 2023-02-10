@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
-import { Translate, useDataResource, usePermission } from '@cloudbeaver/core-blocks';
+import { Translate, useResource, usePermission } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 
@@ -21,7 +21,7 @@ import { WizardStepper } from './WizardStepper';
 import { WizardTopAppBar } from './WizardTopAppBar/WizardTopAppBar';
 
 export const ConfigurationWizardScreen = observer(function ConfigurationWizardScreen() {
-  useDataResource(ConfigurationWizardScreen, SessionPermissionsResource, undefined);
+  useResource(ConfigurationWizardScreen, SessionPermissionsResource, undefined);
   const administrationItemService = useService(AdministrationItemService);
   const administrationScreenService = useService(AdministrationScreenService);
 

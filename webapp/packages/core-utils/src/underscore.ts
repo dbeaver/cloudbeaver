@@ -6,4 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export { uniq, groupBy, iteratee, values as objectValues } from 'underscore';
+export { isNull, isUndefined, isObject, uniq, groupBy, iteratee, values as objectValues, compose } from 'underscore';

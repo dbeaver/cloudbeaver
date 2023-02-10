@@ -10,6 +10,7 @@ type RMProject {
     createTime: DateTime!
     creator: String!
     projectPermissions: [String!]!
+    resourceTypes: [RMResourceType!]!
 }
 
 type RMResource {
@@ -18,6 +19,14 @@ type RMResource {
     length: Int!
     # Properties map
     properties: Object
+}
+
+type RMResourceType {
+    id: String!
+    displayName: String!
+    icon: String
+    fileExtensions: [String!]!
+    rootFolder: String
 }
 
 input RMSubjectProjectPermissions {

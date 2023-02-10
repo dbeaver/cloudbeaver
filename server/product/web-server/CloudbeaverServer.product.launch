@@ -22,8 +22,8 @@
     <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -consoleLog -web-config conf/cloudbeaver.conf"/>
     <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
-    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dosgi.requiredJavaVersion=1.6 -Xms40m -Xmx512m"/>
-    <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc}/../opt/cloudbeaver"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="--add-opens=java.base/java.nio=ALL-UNNAMED -Dosgi.requiredJavaVersion=1.6 -Xms40m -Xmx512m"/>
+    <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc}/../../opt/cloudbeaver"/>
     <stringAttribute key="pde.version" value="3.3"/>
     <stringAttribute key="product" value="io.cloudbeaver.product.ce.product"/>
     <stringAttribute key="productFile" value="\web-server\DBeaverWebServer.product"/>
@@ -45,7 +45,6 @@
         <setEntry value="com.sun.jna*5.8.0.v20210503-0343@default:default"/>
         <setEntry value="com.sun.jna.platform*4.5.1.v20190425-1842@default:default"/>
         <setEntry value="com.sun.jna.platform*5.8.0.v20210406-1004@default:default"/>
-        <setEntry value="jakarta.servlet-api@default:default"/>
         <setEntry value="org.apache.commons.jexl@default:default"/>
         <setEntry value="org.apache.commons.logging@default:default"/>
         <setEntry value="org.apache.felix.scr@1:true"/>
@@ -81,6 +80,7 @@
         <setEntry value="org.eclipse.jetty.server@default:default"/>
         <setEntry value="org.eclipse.jetty.servlet@default:default"/>
         <setEntry value="org.eclipse.jetty.util@default:default"/>
+        <setEntry value="org.eclipse.jetty.servlet-api@default:default"/>
         <setEntry value="org.eclipse.osgi.compatibility.state@default:false"/>
         <setEntry value="org.eclipse.osgi.services@default:default"/>
         <setEntry value="org.eclipse.osgi.util@default:default"/>
@@ -95,6 +95,7 @@
         <setEntry value="org.jkiss.bundle.graphql.java@default:default"/>
         <setEntry value="org.jkiss.bundle.influxdb@default:default"/>
         <setEntry value="org.jkiss.bundle.jaxb@default:default"/>
+        <setEntry value="org.jkiss.bundle.jetty.websocket@default:default"/>
         <setEntry value="org.jkiss.bundle.sshj@default:default"/>
         <setEntry value="org.objectweb.asm@default:default"/>
         <setEntry value="org.slf4j.api@default:default"/>
@@ -108,6 +109,7 @@
         <setEntry value="io.cloudbeaver.service.auth@default:default"/>
         <setEntry value="io.cloudbeaver.service.data.transfer@default:default"/>
         <setEntry value="io.cloudbeaver.service.metadata@default:default"/>
+        <setEntry value="io.cloudbeaver.service.rm@default:default"/>
         <setEntry value="org.jkiss.dbeaver.data.gis@default:default"/>
         <setEntry value="org.jkiss.dbeaver.data.office@default:default"/>
         <setEntry value="org.jkiss.dbeaver.data.transfer@default:default"/>

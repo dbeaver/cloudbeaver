@@ -9,13 +9,14 @@
 import { computed, makeObservable } from 'mobx';
 
 import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { activeProjectsContext } from './activeProjectsContext';
+import { ProjectInfoEventHandler } from './ProjectInfoEventHandler';
 import { ProjectInfo, ProjectInfoResource } from './ProjectInfoResource';
 
 interface IActiveProjectData {
@@ -27,7 +28,7 @@ interface IProjectsUserSettings {
 }
 
 @injectable()
-export class ProjectsService {
+export class ProjectsService extends Dependency {
   get userProject(): ProjectInfo | undefined {
     let project: ProjectInfo | undefined;
 
@@ -92,12 +93,36 @@ export class ProjectsService {
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly userDataService: UserDataService,
+    private readonly projectInfoEventHandler: ProjectInfoEventHandler,
     navigationService: NavigationService
   ) {
+    super();
     this.getActiveProjectTask = new SyncExecutor();
     this.onActiveProjectChange = new Executor();
 
     this.onActiveProjectChange.before(navigationService.navigationTask);
+
+    this.userInfoResource.onUserChange.addHandler(() => {
+      this.onActiveProjectChange.execute({
+        type: 'after',
+      });
+    });
+
+    this.projectInfoResource.onDataUpdate.addHandler(() => {
+      this.onActiveProjectChange.execute({
+        type: 'after',
+      });
+    });
+
+    this.onActiveProjectChange.addHandler(data => {
+      if (data.type === 'after') {
+        this.projectInfoEventHandler.setActiveProjects(this.activeProjects.map(project => project.id));
+      }
+    });
+
+    this.projectInfoEventHandler.onInit.addHandler(() => {
+      this.projectInfoEventHandler.setActiveProjects(this.activeProjects.map(project => project.id));
+    });
 
     makeObservable(this, {
       userProject: computed,
@@ -109,6 +134,12 @@ export class ProjectsService {
   }
 
   async setActiveProjects(projects: ProjectInfo[]): Promise<boolean> {
+    const ids = projects.map(project => project.id);
+
+    if (isArraysEqual(ids, this.userProjectsSettings.activeProjectIds)) {
+      return true;
+    }
+
     const context = await this.onActiveProjectChange.execute({
       type: 'before',
     });
@@ -116,7 +147,7 @@ export class ProjectsService {
     if (ExecutorInterrupter.isInterrupted(context)) {
       return false;
     }
-    this.userProjectsSettings.activeProjectIds = projects.map(project => project.id);
+    this.userProjectsSettings.activeProjectIds = ids;
 
     await this.onActiveProjectChange.execute({
       type: 'after',

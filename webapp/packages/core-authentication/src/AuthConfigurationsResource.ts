@@ -33,7 +33,7 @@ export class AuthConfigurationsResource
     private readonly graphQLService: GraphQLService,
     permissionsResource: SessionPermissionsResource,
   ) {
-    super([]);
+    super(new Map(), []);
 
     permissionsResource
       .require(this, EAdminPermission.admin)
@@ -110,6 +110,13 @@ export class AuthConfigurationsResource
     this.set(key, oldConfiguration.map((configuration, i) => ({ ...configuration, ...configurations[i] })));
 
     return key;
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }
 

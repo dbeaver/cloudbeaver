@@ -6,17 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { ILoadableState, isArraysEqual, MetadataMap, uuid } from '@cloudbeaver/core-utils';
+import { ILoadableState, isArraysEqual, isContainsException, MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
-import { CachedResource, CachedResourceKey, ICachedResourceMetadata } from './CachedResource';
+import { CachedResource, CachedResourceKey, CachedResourceParamKey, ICachedResourceMetadata } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
-import { ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from './ResourceKeyList';
+import { isResourceKeyList, ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from './ResourceKeyList';
 
 export type CachedMapResourceKey<TResource> = CachedResourceKey<TResource>;
-export type CachedMapResourceValue<TResource> = TResource extends CachedResource<Map<any, infer T>, any, any, any>
+export type CachedMapResourceValue<TResource> = TResource extends CachedResource<Map<any, infer T>, any, any, any, any>
   ? T
   : never;
 export type CachedMapResourceArguments<TResource> = TResource extends CachedMapResource<any, any, infer T> ? T : never;
@@ -32,7 +32,7 @@ export type CachedMapResourceGetter<
 > = CachedResourceValueIncludes<TValue, TIncludes> | undefined;
 
 export type CachedMapResourceLoader<
-  TRealKey extends ResourceKey<TKey>,
+  TRealKey,
   TKey,
   TValue,
   TIncludes
@@ -40,8 +40,8 @@ export type CachedMapResourceLoader<
   ? Array<CachedResourceValueIncludes<TValue, TIncludes>>
   : CachedResourceValueIncludes<TValue, TIncludes>;
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ICachedMapResourceMetadata extends ICachedResourceMetadata {
-  includes: string[];
 }
 
 export const CachedMapAllKey = resourceKeyList<any>([Symbol('@cached-map-resource/all')], 'all');
@@ -50,12 +50,13 @@ export const CachedMapEmptyKey = resourceKeyList<any>([], 'empty');
 export abstract class CachedMapResource<
   TKey,
   TValue,
-  TArguments = Record<string, any>
+  TContext extends Record<string, any> = Record<string, never>
 > extends CachedResource<
   Map<TKey, TValue>,
+  TValue,
   ResourceKey<TKey>,
   TKey,
-  string[] | undefined
+  CachedResourceIncludeArgs<TValue, TContext>
   > {
   readonly onItemAdd: ISyncExecutor<ResourceKey<TKey>>;
   readonly onItemDelete: ISyncExecutor<ResourceKey<TKey>>;
@@ -69,8 +70,10 @@ export abstract class CachedMapResource<
     return Array.from(this.data.keys());
   }
 
-  constructor(defaultIncludes?: CachedResourceIncludeArgs<TValue, TArguments>, defaultValue?: Map<TKey, TValue>) {
-    //@ts-expect-error fix
+  constructor(
+    defaultValue?: Map<TKey, TValue>,
+    defaultIncludes?: CachedResourceIncludeArgs<TValue, TContext>
+  ) {
     super(defaultValue || new Map(), defaultIncludes);
     this.onItemAdd = new SyncExecutor<ResourceKey<TKey>>(null);
     this.onItemDelete = new SyncExecutor<ResourceKey<TKey>>(null);
@@ -79,7 +82,7 @@ export abstract class CachedMapResource<
       outdated: true,
       loading: false,
       exception: null,
-      includes: observable([...this.defaultIncludes]),
+      includes: observable([...this.defaultIncludes as any]),
       dependencies: observable([]),
       ...this.populateMetadata(key, metadata),
     }, undefined, { deep: false }));
@@ -131,13 +134,11 @@ export abstract class CachedMapResource<
     return this;
   }
 
-  //@ts-expect-error fix
-  isIncludes(key: ResourceKey<TKey>, includes: CachedResourceIncludeArgs<TValue, TArguments>): boolean {
+  isIncludes(key: ResourceKey<TKey>, includes: CachedResourceIncludeArgs<TValue, TContext>): boolean {
     key = this.transformParam(key);
     return ResourceKeyUtils.every(key, key => {
       const metadata = this.getMetadata(key);
 
-      //@ts-expect-error fix
       return includes.every(include => metadata.includes.includes(include));
     });
   }
@@ -154,10 +155,14 @@ export abstract class CachedMapResource<
     return ResourceKeyUtils.every(key, key => super.isInUse(this.getMetadataKeyRef(key)));
   }
 
-  use(key: ResourceKey<TKey>): string {
+  use(key: ResourceKey<TKey> | typeof CachedResourceParamKey, id = uuid()): string {
+    if (key === CachedResourceParamKey) {
+      super.use(CachedResourceParamKey, id);
+      return id;
+    }
+
     key = this.transformParam(key);
     key = this.getLockedKeys(key);
-    const id = uuid();
 
     ResourceKeyUtils.map(key, key => {
       key = this.getMetadataKeyRef(key);
@@ -167,7 +172,12 @@ export abstract class CachedMapResource<
     return id;
   }
 
-  free(key: ResourceKey<TKey>, id: string): void {
+  free(key: ResourceKey<TKey> | typeof CachedResourceParamKey, id: string): void {
+    if (key === CachedResourceParamKey) {
+      super.free(CachedResourceParamKey, id);
+      return;
+    }
+
     key = this.transformParam(key);
     key = this.getLockedKeys(key);
 
@@ -177,7 +187,14 @@ export abstract class CachedMapResource<
     });
   }
 
-  isOutdated(key: ResourceKey<TKey>): boolean {
+  isOutdated(key?: ResourceKey<TKey>): boolean {
+    if (key === undefined) {
+      return (
+        Array.from(this.metadata.values()).some(metadata => metadata.outdated)
+        && this.loadedKeys.length === 0
+      );
+    }
+
     if (this.isAlias(key) && !this.isAliasLoaded(key)) {
       return true;
     }
@@ -195,7 +212,7 @@ export abstract class CachedMapResource<
     return ResourceKeyUtils.some(key, key => this.getMetadata(key).loading);
   }
 
-  markDataLoading(key: ResourceKey<TKey>, includes?: string[]): void {
+  markDataLoading(key: ResourceKey<TKey>, includes?: CachedResourceIncludeArgs<TValue, TContext>): void {
     key = this.transformParam(key);
     ResourceKeyUtils.forEach(key, key => {
       this.updateMetadata(key, metadata => {
@@ -204,7 +221,7 @@ export abstract class CachedMapResource<
     });
   }
 
-  markDataLoaded(key: ResourceKey<TKey>, includes?: string[]): void {
+  markDataLoaded(key: ResourceKey<TKey>, includes?: CachedResourceIncludeArgs<TValue, TContext>): void {
     key = this.transformParam(key);
 
     if (includes) {
@@ -285,8 +302,10 @@ export abstract class CachedMapResource<
     });
   }
 
-  //@ts-expect-error fix
-  isLoaded(key: ResourceKey<TKey>, includes?: CachedResourceIncludeArgs<TValue, TArguments>): boolean {
+  isLoaded(
+    key: ResourceKey<TKey>,
+    includes?: CachedResourceIncludeArgs<TValue, TContext>
+  ): boolean {
     if (this.isAlias(key) && !this.isAliasLoaded(key)) {
       return false;
     }
@@ -300,7 +319,6 @@ export abstract class CachedMapResource<
       if (includes) {
         const metadata = this.getMetadata(key);
 
-        //@ts-expect-error fix
         if (includes.some(include => !metadata.includes.includes(include))) {
           return false;
         }
@@ -355,51 +373,53 @@ export abstract class CachedMapResource<
 
   clear(): void {
     this.data.clear();
-    this.metadata.clear();
+
+    const keys = Array.from(this.metadata.keys())
+      .filter(key => key !== CachedResourceParamKey);
+
+    for (const key of keys) {
+      this.metadata.delete(key);
+    }
   }
 
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
+  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: TKey,
     includes?: T
   ): Promise<CachedResourceValueIncludes<TValue, T>>;
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
+  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKeyList<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>>>;
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
+  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>>;
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
+  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
-    //@ts-expect-error fix
     await this.preLoadData(key, false, includes);
-    //@ts-expect-error fix
     await this.loadData(key, true, includes);
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
 
-  async load<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
+  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: TKey,
     includes?: T
   ): Promise<CachedResourceValueIncludes<TValue, T>>;
-  async load<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
+  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKeyList<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>>>;
-  async load<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
+  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>>;
-  async load<T extends CachedResourceIncludeArgs<TValue, TArguments> = []>(
+  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
-    //@ts-expect-error fix
     await this.preLoadData(key, false, includes);
-    //@ts-expect-error fix
     await this.loadData(key, false, includes);
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
@@ -429,7 +449,7 @@ export abstract class CachedMapResource<
     return ResourceKeyUtils.includes(param, key, this.isKeyEqual);
   }
 
-  getIncludes(key?: ResourceKey<TKey>): string[] {
+  getIncludes(key?: ResourceKey<TKey>): ReadonlyArray<string> {
     if (key === undefined) {
       return this.defaultIncludes;
     }
@@ -452,7 +472,10 @@ export abstract class CachedMapResource<
    * @param includes - Base includes
    * @returns {Object} Object where key is include name and value is true
    */
-  getIncludesMap(key?: ResourceKey<TKey>, includes: string[] = this.defaultIncludes): Record<string, any> {
+  getIncludesMap(
+    key?: ResourceKey<TKey>,
+    includes: ReadonlyArray<string> = this.defaultIncludes
+  ): Record<string, any> {
     const keyIncludes = this.getIncludes(key);
     return ['customIncludeBase', ...includes, ...keyIncludes].reduce<any>((map, key) => {
       map[key] = true;
@@ -506,7 +529,17 @@ export abstract class CachedMapResource<
    * Can be override to provide static link to complicated keys
    */
   getKeyRef(key: TKey): TKey {
-    return key;
+    if (this.keys.includes(key)) {
+      return key;
+    }
+
+    const ref = this.keys.find(k => this.isKeyEqual(k, key));
+
+    if (ref) {
+      return ref;
+    }
+
+    return Object.freeze(toJS(key));
   }
 
   protected getLockedKeys(key: ResourceKey<TKey>): ResourceKey<TKey> {
@@ -557,7 +590,7 @@ export abstract class CachedMapResource<
     return this.data.has(key);
   }
 
-  protected commitIncludes(key: ResourceKey<TKey>, includes: string[]): void {
+  protected commitIncludes(key: ResourceKey<TKey>, includes: CachedResourceIncludeArgs<TValue, TContext>): void {
     key = this.transformParam(key);
     ResourceKeyUtils.forEach(key, key => {
       this.updateMetadata(key, metadata => {
@@ -597,16 +630,23 @@ export abstract class CachedMapResource<
 
     this.onDataOutdated.execute(key);
   }
+
+  protected validateParam(param: ResourceKey<TKey>): boolean {
+    return (
+      super.validateParam(param)
+      || isResourceKeyList(param)
+    );
+  }
 }
 
 export function getCachedMapResourceLoaderState<
   TKey,
   TValue,
-  TArguments = Record<string, any>
+  TContext extends Record<string, any> = Record<string, never>
 >(
-  resource: CachedMapResource<TKey, TValue, TArguments>,
+  resource: CachedMapResource<TKey, TValue, TContext>,
   key: ResourceKey<TKey>,
-  includes?: CachedResourceIncludeArgs<TValue, TArguments> | undefined
+  includes?: CachedResourceIncludeArgs<TValue, TContext> | undefined
 ): ILoadableState {
   return {
     get exception() {
@@ -617,6 +657,9 @@ export function getCachedMapResourceLoaderState<
     },
     isLoaded() {
       return resource.isLoaded(key, includes);
+    },
+    isError() {
+      return isContainsException(this.exception);
     },
     isOutdated() {
       return resource.isOutdated(key);

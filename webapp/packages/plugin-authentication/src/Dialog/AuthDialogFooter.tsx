@@ -11,7 +11,6 @@ import styled, { css } from 'reshadow';
 
 import { Button, useTranslate } from '@cloudbeaver/core-blocks';
 
-
 const styles = css`
   footer-container {
     display: flex;
