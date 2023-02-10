@@ -8,8 +8,8 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { type ITask, AutoRunningTask } from '@cloudbeaver/core-executor';
+import { WindowsService } from '@cloudbeaver/core-routing';
 import { AuthInfo, AuthStatus, UserInfo } from '@cloudbeaver/core-sdk';
-import { WindowsService } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { AuthProvidersResource, AuthProviderConfiguration } from './AuthProvidersResource';
