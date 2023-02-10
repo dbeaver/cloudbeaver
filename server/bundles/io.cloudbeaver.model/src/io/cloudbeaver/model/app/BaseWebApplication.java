@@ -81,6 +81,11 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return true;
     }
 
+    @Override
+    public boolean isMultiuser() {
+        return true;
+    }
+
     @Nullable
     protected Path loadServerConfiguration() throws DBException {
         String configPath = DEFAULT_CONFIG_FILE_PATH;

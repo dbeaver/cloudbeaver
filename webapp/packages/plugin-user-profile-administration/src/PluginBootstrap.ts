@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AdministrationTopAppBarService } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { AdministrationTopAppBarService } from '@cloudbeaver/plugin-administration';
 import { UserMenu } from '@cloudbeaver/plugin-user-profile';
 
 @injectable()

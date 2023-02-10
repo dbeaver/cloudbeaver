@@ -24,10 +24,10 @@ const tabsStyles = css`
     position: relative;
     flex-shrink: 0;
     align-items: center;
-    height: 51px;
+    height: 33px;
   }
   Tab {
-    height: 46px!important;
+    height: 32px!important;
     text-transform: uppercase;
     font-weight: 500 !important;
   }

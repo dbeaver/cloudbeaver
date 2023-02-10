@@ -8,12 +8,8 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { IResourceManagerParams, ResourceManagerResource, RmResourceInfo } from '@cloudbeaver/core-resource-manager';
-import { createPath } from '@cloudbeaver/core-utils';
 
-import { RESOURCES_NODE_PATH } from './RESOURCES_NODE_PATH';
-
-export const PROJECT_NODE_TYPE = 'rm.project';
-export const RESOURCE_NODE_TYPE = 'rm.resource';
+import { getResourceNodeId } from './NavNodes/getResourceNodeId';
 
 @injectable()
 export class NavResourceNodeService {
@@ -28,7 +24,7 @@ export class NavResourceNodeService {
   async move(key: IResourceManagerParams, newKey: IResourceManagerParams): Promise<string> {
     await this.resourceManagerResource.move(key, newKey);
 
-    return createPath(RESOURCES_NODE_PATH, newKey.projectId, newKey.path, newKey.name);
+    return getResourceNodeId(newKey);
   }
 
   async delete(key: IResourceManagerParams) {

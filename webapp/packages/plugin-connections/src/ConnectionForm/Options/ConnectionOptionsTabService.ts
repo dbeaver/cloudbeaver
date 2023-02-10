@@ -8,8 +8,7 @@
 
 import { action, makeObservable, runInAction, toJS } from 'mobx';
 
-import { EAdminPermission } from '@cloudbeaver/core-administration';
-import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, EAdminPermission, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConnectionInfoProjectKey, createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -96,7 +95,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const adminPermission = this.permissionsService.has(EAdminPermission.admin);
     const originLocal = !state.info || isLocalConnection(state.info);
 
-    return adminPermission && originLocal && isProjectShared && !this.serverConfigResource.data?.distributed;
+    return adminPermission && originLocal && isProjectShared && !this.serverConfigResource.distributed;
   }
 
   private async save(
@@ -152,6 +151,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
     contexts: IExecutionContextProvider<IConnectionFormSubmitData>
   ) {
     const validation = contexts.getContext(this.connectionFormService.connectionValidationContext);
+
+    if (!state.config.host?.length) {
+      validation.error('plugin_connections_connection_form_host_invalid');
+    }
 
     if (!state.config.name?.length) {
       validation.error('plugin_connections_connection_form_name_invalid');

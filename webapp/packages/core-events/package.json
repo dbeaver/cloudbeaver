@@ -21,8 +21,6 @@
     "@cloudbeaver/core-plugin": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-executor": "~0.1.0",
-    "@cloudbeaver/core-authentication": "~0.1.0",
-    "@cloudbeaver/core-cli": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0"
   },
   "peerDependencies": {

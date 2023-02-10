@@ -21,7 +21,7 @@ export class ConnectionExecutionContextService {
   protected scheduler: TaskScheduler<string>;
 
   constructor(
-    private readonly connectionExecutionContextResource: ConnectionExecutionContextResource
+    readonly connectionExecutionContextResource: ConnectionExecutionContextResource
   ) {
     this.contexts = new MetadataMap(contextId => new ConnectionExecutionContext(
       this.scheduler,

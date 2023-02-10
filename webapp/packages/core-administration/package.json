@@ -17,8 +17,6 @@
   },
   "dependencies": {
     "@cloudbeaver/core-authentication": "~0.1.0",
-    "@cloudbeaver/core-blocks": "~0.1.0",
-    "@cloudbeaver/core-cli": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-events": "~0.1.0",
     "@cloudbeaver/core-executor": "~0.1.0",
@@ -28,9 +26,10 @@
     "@cloudbeaver/core-routing": "~0.1.0",
     "@cloudbeaver/core-sdk": "~0.1.0",
     "@cloudbeaver/core-settings": "~0.1.0",
-    "@cloudbeaver/core-theming": "~0.1.0",
-    "@cloudbeaver/core-ui": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0"
+  },
+  "devDependencies": {
+    "@cloudbeaver/core-theming": "~0.1.0"
   },
   "peerDependencies": {
     "react": "~18.x.x",

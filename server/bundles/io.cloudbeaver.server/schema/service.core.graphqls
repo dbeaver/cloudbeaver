@@ -388,6 +388,7 @@ type ProjectInfo {
     canViewDataSources: Boolean!
     canEditResources: Boolean!
     canViewResources: Boolean!
+    resourceTypes: [RMResourceType!]!
 }
 
 type LogEntry {

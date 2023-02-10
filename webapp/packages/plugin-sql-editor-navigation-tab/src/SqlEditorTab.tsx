@@ -43,6 +43,7 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   }
 
   const name = getSqlEditorName(tab.handlerState, dataSource, connection);
+  const icon = dataSource?.icon ?? '/icons/sql_script_m.svg';
 
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
@@ -56,7 +57,7 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
       onOpen={handleSelect}
       onClose={handleClose}
     >
-      <TabIcon icon='/icons/sql_script_m.svg' />
+      <TabIcon icon={icon} />
       <TabTitle>{name}</TabTitle>
     </Tab>
   );

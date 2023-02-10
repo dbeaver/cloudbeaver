@@ -15,6 +15,7 @@ import { createGQLEndpoint } from '@cloudbeaver/core-root/mocks/createGQLEndpoin
 import { mockAppInit } from '@cloudbeaver/core-root/mocks/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/mocks/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/mocks/resolvers/mockServerConfig';
+import administrationPlugin from '@cloudbeaver/plugin-administration';
 import topAppBar from '@cloudbeaver/plugin-top-app-bar';
 
 import { resourceManagerPlugin } from './manifest';
@@ -22,6 +23,7 @@ import { ResourceManagerSettings, ResourceManagerSettingsService } from './Resou
 
 const endpoint = createGQLEndpoint();
 const app = createApp(
+  administrationPlugin,
   topAppBar,
   resourceManagerPlugin
 );

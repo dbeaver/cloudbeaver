@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@cloudbeaver/plugin-version": "~0.1.0",
+    "@cloudbeaver/plugin-administration": "~0.1.0",
     "@cloudbeaver/core-administration": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
