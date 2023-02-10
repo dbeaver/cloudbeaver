@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EAdminPermission } from '@cloudbeaver/core-administration';
+import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';

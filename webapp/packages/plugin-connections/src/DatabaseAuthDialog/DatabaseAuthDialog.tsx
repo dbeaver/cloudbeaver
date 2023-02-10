@@ -9,13 +9,13 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
   SubmittingForm,
   useFocus,
   ErrorMessage,
   useStyles,
   Loader,
+  useAdministrationSettings,
 } from '@cloudbeaver/core-blocks';
 import { IConnectionInfoParams, useConnectionInfo, useDBDriver } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';

@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AdministrationTopAppBarService, WizardTopAppBarService } from '@cloudbeaver/core-administration';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { AdministrationTopAppBarService, WizardTopAppBarService } from '@cloudbeaver/plugin-administration';
 
 import { Logo } from './Logo';
 
