@@ -8,11 +8,8 @@
 
 import { observer } from 'mobx-react-lite';
 
+import { type AdministrationItemDrawerProps, ConfigurationWizardService, filterOnlyActive } from '@cloudbeaver/core-administration';
 import { useService } from '@cloudbeaver/core-di';
-
-import { filterOnlyActive } from '../AdministrationItem/AdministrationItemService';
-import type { AdministrationItemDrawerProps } from '../AdministrationItem/IAdministrationItem';
-import { ConfigurationWizardService } from '../AdministrationScreen/ConfigurationWizard/ConfigurationWizardService';
 
 export const DrawerItem = observer<AdministrationItemDrawerProps>(function DrawerItem({
   item, onSelect, style, configurationWizard, disabled,

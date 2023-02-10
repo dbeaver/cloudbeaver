@@ -6,8 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { SCRIPT_EXTENSION } from './SCRIPT_EXTENSION';
-
-export function isScript(nodeId: string) {
-  return nodeId.split('.').pop() === SCRIPT_EXTENSION;
-}
+export const NAV_NODE_TYPE_RM_FOLDER = 'rm.folder';

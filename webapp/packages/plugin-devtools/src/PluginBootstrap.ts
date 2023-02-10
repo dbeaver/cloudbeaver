@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EAdminPermission } from '@cloudbeaver/core-administration';
+import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { App, Bootstrap, DIService, injectable, IServiceConstructor } from '@cloudbeaver/core-di';
 import { PermissionsService } from '@cloudbeaver/core-root';
 import { CachedResource } from '@cloudbeaver/core-sdk';

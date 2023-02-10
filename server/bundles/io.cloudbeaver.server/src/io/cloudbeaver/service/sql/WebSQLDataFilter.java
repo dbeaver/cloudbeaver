@@ -92,8 +92,16 @@ public class WebSQLDataFilter {
         return where;
     }
 
-    public DBDDataFilter makeDataFilter(@Nullable WebSQLResultsInfo resultInfo) throws DBException
-    {
+    public static WebSQLDataFilter from(DBDDataFilter filter) {
+        var webFilter = new WebSQLDataFilter();
+        webFilter.where = filter.getWhere();
+        for (DBDAttributeConstraint constraint : filter.getConstraints()) {
+            webFilter.constraints.add(WebSQLDataFilterConstraint.from(constraint));
+        }
+        return webFilter;
+    }
+
+    public DBDDataFilter makeDataFilter(@Nullable WebSQLResultsInfo resultInfo) throws DBException {
         DBDDataFilter dataFilter = new DBDDataFilter();
         dataFilter.setWhere(where);
         if (CommonUtils.isEmpty(constraints)) {

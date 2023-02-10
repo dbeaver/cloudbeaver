@@ -28,7 +28,7 @@ export class DataViewerDataChangeConfirmationService {
   trackTableDataUpdate(modelId: string) {
     const model = this.dataViewerTableService.get(modelId);
 
-    if (model && !model.onRequest.addHandler(this.checkUnsavedData)) {
+    if (model && !model.onRequest.hasHandler(this.checkUnsavedData)) {
       model.onRequest.addHandler(this.checkUnsavedData);
     }
   }
