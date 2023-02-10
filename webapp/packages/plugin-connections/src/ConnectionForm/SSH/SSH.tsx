@@ -10,11 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
   Group, SubmittingForm, useResource, Button, ColoredContainer, InputField,
   FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container,
-  Combobox, Expandable, EXPANDABLE_FORM_STYLES, useTranslate, useStyles
+  Combobox, Expandable, EXPANDABLE_FORM_STYLES, useTranslate, useStyles, useAdministrationSettings
 } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';

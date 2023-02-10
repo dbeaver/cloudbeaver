@@ -15,8 +15,8 @@ import type { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ISessionAction, ServerConfigResource, sessionActionContext, SessionActionService, SessionDataResource } from '@cloudbeaver/core-root';
-import { ScreenService } from '@cloudbeaver/core-routing';
-import { NavigationService, WindowsService } from '@cloudbeaver/core-ui';
+import { ScreenService, WindowsService } from '@cloudbeaver/core-routing';
+import { NavigationService } from '@cloudbeaver/core-ui';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
 import type { IAuthOptions } from './IAuthOptions';
