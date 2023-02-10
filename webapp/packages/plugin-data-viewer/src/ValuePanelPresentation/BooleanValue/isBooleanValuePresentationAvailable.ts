@@ -7,14 +7,15 @@
  */
 
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
-import type { IResultSetValue } from '@cloudbeaver/plugin-data-viewer';
+
+import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 
 export function isStringifiedBoolean(value: string): boolean {
   return ['false', 'true'].includes(value.toLowerCase());
 }
 
 export function isBooleanValuePresentationAvailable(cellValue: IResultSetValue, column: SqlResultColumn): boolean {
-  return column?.dataKind?.toLowerCase() === 'boolean'
+  return column.dataKind?.toLowerCase() === 'boolean'
     && (
       typeof cellValue === 'boolean'
       || cellValue === null

@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
 import { AdministrationScreen } from './AdministrationScreen';
-import { AdministrationScreenService } from './AdministrationScreenService';
 import { ConfigurationWizardScreen } from './ConfigurationWizard/ConfigurationWizardScreen';
 
 @injectable()
