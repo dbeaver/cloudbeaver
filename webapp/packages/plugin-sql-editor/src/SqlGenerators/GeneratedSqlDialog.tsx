@@ -16,8 +16,9 @@ import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { GQLErrorCatcher, SqlDialectInfo } from '@cloudbeaver/core-sdk';
-import { SQLCodeEditorLoader, SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
 
+import { SqlDialectInfoService } from '../SqlDialectInfoService';
+import { SQLCodeEditorLoader } from '../SqlEditor/SQLCodeEditor/SQLCodeEditorLoader';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource';
 
 const styles = css`

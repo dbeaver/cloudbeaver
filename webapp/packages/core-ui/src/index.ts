@@ -58,6 +58,5 @@ export * from './SideBarPanel/SideBarPanelService';
 
 export * from './AuthenticationProvider';
 export * from './useAuthenticationAction';
-export * from './WindowsService';
 
 export { manifest as coreUIManifest } from './manifest';

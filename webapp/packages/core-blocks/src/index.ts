@@ -177,6 +177,7 @@ export * from './usePromiseState';
 export * from './useStateDelay';
 export * from './useErrorDetails';
 export * from './useActivationDelay';
+export * from './useAdministrationSettings';
 export * from './useAppLoadingScreen';
 export * from './useInterval';
 export * from './useStyles';

@@ -15,6 +15,7 @@ import { createGQLEndpoint } from '@cloudbeaver/core-root/mocks/createGQLEndpoin
 import { mockAppInit } from '@cloudbeaver/core-root/mocks/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/mocks/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/mocks/resolvers/mockServerConfig';
+import administrationPlugin from '@cloudbeaver/plugin-administration';
 import dataViewer from '@cloudbeaver/plugin-data-viewer';
 import datasourceContextSwitch from '@cloudbeaver/plugin-datasource-context-switch';
 import navigationTabs from '@cloudbeaver/plugin-navigation-tabs';
@@ -27,6 +28,7 @@ import { manifest } from './manifest';
 
 const endpoint = createGQLEndpoint();
 const app = createApp(
+  administrationPlugin,
   topAppBar,
   datasourceContextSwitch,
   navigationTree,
