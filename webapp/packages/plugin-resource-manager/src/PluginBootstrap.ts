@@ -10,14 +10,11 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
-  constructor(
-  ) {
+  constructor() {
     super();
   }
 
-  register(): void | Promise<void> {
-  }
+  register(): void | Promise<void> { }
 
-  async load(): Promise<void> {
-  }
+  async load(): Promise<void> { }
 }
