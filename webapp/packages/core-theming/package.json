@@ -35,7 +35,6 @@
   "peerDependencies": {
     "mobx": "~6.x.x",
     "react": "~18.x.x",
-    "reshadow": "~0.x.x",
-    "@testing-library/jest-dom": "~5.x.x"
+    "reshadow": "~0.x.x"
   }
 }

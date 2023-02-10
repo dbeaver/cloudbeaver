@@ -30,7 +30,6 @@
   },
   "peerDependencies": {
     "mobx": "~6.x.x",
-    "msw": "~0.x.x",
-    "@testing-library/jest-dom": "^5.x.x"
+    "msw": "~0.x.x"
   }
 }

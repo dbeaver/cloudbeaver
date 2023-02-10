@@ -25,7 +25,6 @@
     "react": "~18.x.x",
     "react-dom": "~18.x.x",
     "mobx": "~6.x.x",
-    "mobx-react-lite": "~3.x.x",
-    "@testing-library/jest-dom": "~5.x.x"
+    "mobx-react-lite": "~3.x.x"
   }
 }
