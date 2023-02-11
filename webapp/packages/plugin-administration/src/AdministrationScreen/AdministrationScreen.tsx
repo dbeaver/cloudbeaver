@@ -9,13 +9,13 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
+import { AdministrationScreenService } from '@cloudbeaver/core-administration';
+import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { usePermission } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { ScreenComponent } from '@cloudbeaver/core-routing';
 
 import { Administration } from '../Administration/Administration';
-import { EAdminPermission } from '../EAdminPermission';
-import { AdministrationScreenService } from './AdministrationScreenService';
 import { AdministrationTopAppBar } from './AdministrationTopAppBar/AdministrationTopAppBar';
 import type { IAdministrationScreenParams } from './IAdministrationScreenParams';
 

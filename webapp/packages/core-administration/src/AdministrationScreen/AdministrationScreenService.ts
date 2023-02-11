@@ -8,6 +8,7 @@
 
 import { computed, observable, makeObservable } from 'mobx';
 
+import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { IExecutor, Executor } from '@cloudbeaver/core-executor';
@@ -19,7 +20,6 @@ import { GlobalConstants } from '@cloudbeaver/core-utils';
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
 import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
 import type { IRouteParams } from '../AdministrationItem/IRouteParams';
-import { EAdminPermission } from '../EAdminPermission';
 
 const ADMINISTRATION_ITEMS_STATE = 'administration_items_state';
 const ADMINISTRATION_INFO = 'administration_info';
@@ -44,6 +44,7 @@ export class AdministrationScreenService {
   static setupItemSubParamRouteName = 'setup.item.sub.param';
 
   info: IAdministrationScreenInfo;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   itemState: Map<string, any>;
 
   get isAdministrationPageActive(): boolean {

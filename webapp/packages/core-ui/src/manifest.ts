@@ -15,7 +15,6 @@ import { NavigationService } from './Screens/AppScreen/NavigationService';
 import { OptionsPanelService } from './Screens/AppScreen/OptionsPanelService';
 import { SideBarPanelService } from './SideBarPanel/SideBarPanelService';
 import { TabsBootstrap } from './Tabs/TabsBootstrap';
-import { WindowsService } from './WindowsService';
 
 export const manifest: PluginManifest = {
   info: {
@@ -30,6 +29,5 @@ export const manifest: PluginManifest = {
     TabsBootstrap,
     SideBarPanelService,
     LocaleService,
-    WindowsService,
   ],
 };

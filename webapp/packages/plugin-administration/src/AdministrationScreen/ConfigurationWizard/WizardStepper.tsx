@@ -9,12 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import { Button, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-
-
-
-import { ConfigurationWizardService } from './ConfigurationWizardService';
 
 const styles = css`
     wizard-stepper {
@@ -55,8 +52,8 @@ export const WizardStepper = observer(function WizardStepper() {
   const translate = useTranslate();
 
   return styled(useStyles(styles))(
-    <wizard-stepper as='div'>
-      <actions as='div'>
+    <wizard-stepper>
+      <actions>
         <Button
           type="button"
           mod={['outlined']}
@@ -73,7 +70,7 @@ export const WizardStepper = observer(function WizardStepper() {
           {translate(service.currentStepIndex === service.steps.length - 1 ? 'ui_stepper_finish' : 'ui_stepper_next')}
         </Button>
       </actions>
-      <wizard-text as='div'>{translate(service.currentStep?.configurationWizardOptions?.description || '')}</wizard-text>
+      <wizard-text>{translate(service.currentStep?.configurationWizardOptions?.description || '')}</wizard-text>
     </wizard-stepper>
   );
 });

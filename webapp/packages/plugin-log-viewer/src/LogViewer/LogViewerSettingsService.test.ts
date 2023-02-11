@@ -16,15 +16,17 @@ import { createGQLEndpoint } from '@cloudbeaver/core-root/mocks/createGQLEndpoin
 import { mockAppInit } from '@cloudbeaver/core-root/mocks/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/mocks/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/mocks/resolvers/mockServerConfig';
+import administrationPlugin from '@cloudbeaver/plugin-administration';
 import toolsPanel from '@cloudbeaver/plugin-tools-panel';
-import topAppBar from '@cloudbeaver/plugin-top-app-bar';
+import topAppBarPlugin from '@cloudbeaver/plugin-top-app-bar';
 
 import { logViewerPlugin } from '../manifest';
 import { LogViewerSettings, LogViewerSettingsService } from './LogViewerSettingsService';
 
 const endpoint = createGQLEndpoint();
 const app = createApp(
-  topAppBar,
+  administrationPlugin,
+  topAppBarPlugin,
   toolsPanel,
   logViewerPlugin
 );
