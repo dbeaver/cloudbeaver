@@ -55,6 +55,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(urlPatterns = "/")
 public class CBStaticServlet extends DefaultServlet {
     private static final String AUTO_LOGIN_ACTION = "auto-login";
+    private static final String AUTO_LOGIN_AUTH_ID = "auth-id";
     private static final String ACTION = "action";
     public static final int STATIC_CACHE_SECONDS = 60 * 60 * 24 * 3;
 
@@ -114,7 +115,7 @@ public class CBStaticServlet extends DefaultServlet {
         }
         Map<String, Object> authActionParams = Map.of(
             ACTION, AUTO_LOGIN_ACTION,
-            CBAuthConstants.CB_AUTH_ID_REQUEST_PARAM, authId
+            AUTO_LOGIN_AUTH_ID, authId
         );
         WebActionParameters.saveToSession(webSession, authActionParams);
     }
@@ -168,7 +169,7 @@ public class CBStaticServlet extends DefaultServlet {
                                 // Redirect to it
                                 Map<String, Object> authActionParams = Map.of(
                                     ACTION, AUTO_LOGIN_ACTION,
-                                    CBAuthConstants.CB_AUTH_ID_REQUEST_PARAM, authInfo.getAuthAttemptId()
+                                    AUTO_LOGIN_AUTH_ID, authInfo.getAuthAttemptId()
                                 );
                                 WebActionParameters.saveToSession(webSession, authActionParams);
                                 request.getSession().setAttribute(DBWConstants.STATE_ATTR_SIGN_IN_STATE, DBWConstants.SignInState.GLOBAL);
