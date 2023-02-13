@@ -25,6 +25,7 @@ const styles = css`
     composes: theme-typography--body2 from global;
     flex-shrink: 0;
     padding: 16px 24px;
+    padding-top: 0;
     max-height: 50px;
     overflow: hidden;
 
@@ -32,7 +33,11 @@ const styles = css`
       margin: 0;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: initial;
     }
+  }
+  pre {
+    composes: theme-typography--caption from global;
   }
 `;
 
@@ -64,7 +69,7 @@ export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDia
       onReject={onClose}
     >
       <export-object>
-        {context.sourceName ? translate('data_transfer_exporting_sql') : `${translate('data_transfer_exporting_table')} ${node?.name}`}
+        {!context.sourceName && `${translate('data_transfer_exporting_table')} ${node?.name}`}
         <pre title={context.sourceName}>{context.sourceName}</pre>
       </export-object>
       {isLoading && <Loader />}

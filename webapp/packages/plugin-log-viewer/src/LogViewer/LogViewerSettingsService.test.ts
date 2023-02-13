@@ -16,15 +16,17 @@ import { createGQLEndpoint } from '@cloudbeaver/core-root/mocks/createGQLEndpoin
 import { mockAppInit } from '@cloudbeaver/core-root/mocks/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/mocks/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/mocks/resolvers/mockServerConfig';
+import administrationPlugin from '@cloudbeaver/plugin-administration';
 import toolsPanel from '@cloudbeaver/plugin-tools-panel';
-import topAppBar from '@cloudbeaver/plugin-top-app-bar';
+import topAppBarPlugin from '@cloudbeaver/plugin-top-app-bar';
 
 import { logViewerPlugin } from '../manifest';
 import { LogViewerSettings, LogViewerSettingsService } from './LogViewerSettingsService';
 
 const endpoint = createGQLEndpoint();
 const app = createApp(
-  topAppBar,
+  administrationPlugin,
+  topAppBarPlugin,
   toolsPanel,
   logViewerPlugin
 );
@@ -38,7 +40,7 @@ beforeAll(() => app.init());
 
 const equalConfig = {
   core: {
-    app:{
+    app: {
       logViewer: {
         refreshTimeout: 1,
         maxLogRecords: 2,
@@ -53,6 +55,7 @@ const equalConfig = {
       maxLogRecords: 2,
       logBatchSize: 3,
       maxFailedRequests: 4,
+      disabled: false,
     } as LogViewerSettings,
   },
 };
@@ -72,6 +75,7 @@ test('New settings equal deprecated settings', async () => {
   expect(settings.settings.getValue('maxLogRecords')).toBe(2);
   expect(settings.settings.getValue('logBatchSize')).toBe(3);
   expect(settings.settings.getValue('maxFailedRequests')).toBe(4);
+  expect(settings.settings.getValue('disabled')).toBe(false);
   expect(coreSettings.settings.getValue('app.logViewer.refreshTimeout')).toBe(1);
   expect(coreSettings.settings.getValue('app.logViewer.maxLogRecords')).toBe(2);
   expect(coreSettings.settings.getValue('app.logViewer.logBatchSize')).toBe(3);

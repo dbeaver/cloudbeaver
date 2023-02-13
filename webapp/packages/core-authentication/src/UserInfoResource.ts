@@ -15,6 +15,7 @@ import { AuthInfo, AuthStatus, CachedDataResource, GetActiveUserQueryVariables, 
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthProviderService } from './AuthProviderService';
+import type { ELMRole } from './ELMRole';
 import type { IAuthCredentials } from './IAuthCredentials';
 
 export type UserInfoIncludes = GetActiveUserQueryVariables;
@@ -33,6 +34,10 @@ void,
 UserInfoIncludes
 > {
   readonly onUserChange: ISyncExecutor<string>;
+
+  get authRole(): ELMRole | undefined {
+    return this.data?.authRole as ELMRole | undefined;
+  }
 
   get parametersAvailable() {
     return this.data !== null;
