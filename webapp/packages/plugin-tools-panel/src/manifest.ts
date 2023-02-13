@@ -11,6 +11,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService';
 import { PluginBootstrap } from './PluginBootstrap';
 import { ToolsPanelService } from './ToolsPanel/ToolsPanelService';
+import { ToolsPanelSettingsService } from './ToolsPanelSettingsService';
 
 
 export const toolsPanelPlugin: PluginManifest = {
@@ -19,5 +20,6 @@ export const toolsPanelPlugin: PluginManifest = {
     ToolsPanelService,
     PluginBootstrap,
     LocaleService,
+    ToolsPanelSettingsService,
   ],
 };

@@ -6,6 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function getProjectNodeId(projectId: string): string {
-  return `resource://${projectId}`;
+export enum ELMRole {
+  ADMINISTRATOR = 'ADMINISTRATOR',
+  DEVELOPER = 'DEVELOPER',
+  DATA_MANAGER = 'DATA_MANAGER',
+  EDITOR = 'EDITOR',
+  VIEWER = 'VIEWER',
 }

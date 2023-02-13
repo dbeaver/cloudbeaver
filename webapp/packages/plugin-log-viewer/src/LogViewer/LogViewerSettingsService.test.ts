@@ -40,7 +40,7 @@ beforeAll(() => app.init());
 
 const equalConfig = {
   core: {
-    app:{
+    app: {
       logViewer: {
         refreshTimeout: 1,
         maxLogRecords: 2,
@@ -55,6 +55,7 @@ const equalConfig = {
       maxLogRecords: 2,
       logBatchSize: 3,
       maxFailedRequests: 4,
+      disabled: false,
     } as LogViewerSettings,
   },
 };
@@ -74,6 +75,7 @@ test('New settings equal deprecated settings', async () => {
   expect(settings.settings.getValue('maxLogRecords')).toBe(2);
   expect(settings.settings.getValue('logBatchSize')).toBe(3);
   expect(settings.settings.getValue('maxFailedRequests')).toBe(4);
+  expect(settings.settings.getValue('disabled')).toBe(false);
   expect(coreSettings.settings.getValue('app.logViewer.refreshTimeout')).toBe(1);
   expect(coreSettings.settings.getValue('app.logViewer.maxLogRecords')).toBe(2);
   expect(coreSettings.settings.getValue('app.logViewer.logBatchSize')).toBe(3);
