@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.*;
@@ -151,11 +152,15 @@ public class LocalResourceController implements RMController {
             projects.add(globalProject);
         }
 
-        //user has full access to his private project
-        var userProjectPermission = getProjectPermissions(null, RMProjectType.USER);
-        RMProject userProject = makeProjectFromPath(getPrivateProjectPath(), userProjectPermission, RMProjectType.USER, false);
-        if (userProject != null) {
-            projects.add(0, userProject);
+        // check if user has permission for private project
+        var hasPrivateProjectPermission = activeUserCreds != null &&
+            activeUserCreds.hasPermission(DBWConstants.PERMISSION_PRIVATE_PROJECT_ACCESS);
+        if (!WebAppUtils.getWebApplication().isMultiNode() || hasPrivateProjectPermission) {
+            var userProjectPermission = getProjectPermissions(null, RMProjectType.USER);
+            RMProject userProject = makeProjectFromPath(getPrivateProjectPath(), userProjectPermission, RMProjectType.USER, false);
+            if (userProject != null) {
+                projects.add(0, userProject);
+            }
         }
         projects.sort(Comparator.comparing(RMProject::getDisplayName));
         return projects.toArray(new RMProject[0]);
@@ -194,17 +199,27 @@ public class LocalResourceController implements RMController {
                 if (projectId == null) {
                     throw new DBException("Project id required");
                 }
-
-                String[] permissions = getSecurityController().getObjectPermissions(activeUserCreds.getUserId(), projectId, SMObjects.PROJECT)
-                    .getPermissions();
-                return Arrays.stream(permissions)
-                    .map(RMProjectPermission::fromPermission)
-                    .collect(Collectors.toSet());
+                return getRmProjectPermissions(projectId, activeUserCreds);
             case USER:
-                return Set.of(RMProjectPermission.RESOURCE_EDIT, RMProjectPermission.DATA_SOURCES_EDIT);
+                if (!WebAppUtils.getWebApplication().isMultiNode() || activeUserCreds == null) {
+                    return Set.of(RMProjectPermission.RESOURCE_EDIT, RMProjectPermission.DATA_SOURCES_EDIT);
+                }
+                return activeUserCreds.getPermissions().stream()
+                    .map(RMProjectPermission::fromPermission)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
             default:
                 throw new DBException("Unknown project type:" + projectType);
         }
+    }
+
+    @NotNull
+    private Set<RMProjectPermission> getRmProjectPermissions(@NotNull String projectId, SMCredentials activeUserCreds) throws DBException {
+        String[] permissions = getSecurityController().getObjectPermissions(activeUserCreds.getUserId(), projectId, SMObjects.PROJECT)
+            .getPermissions();
+        return Arrays.stream(permissions)
+            .map(RMProjectPermission::fromPermission)
+            .collect(Collectors.toSet());
     }
 
     @NotNull

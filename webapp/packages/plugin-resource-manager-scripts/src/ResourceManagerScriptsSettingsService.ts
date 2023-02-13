@@ -9,21 +9,17 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
-const defaultSettings = {
-  refreshTimeout: 3000,
-  maxLogRecords: 1000,
-  logBatchSize: 2000,
-  maxFailedRequests: 3,
+const settings = {
   disabled: false,
 };
 
-export type LogViewerSettings = typeof defaultSettings;
+type Settings = typeof settings;
 
 @injectable()
-export class LogViewerSettingsService {
-  readonly settings: PluginSettings<LogViewerSettings>;
+export class ResourceManagerScriptsSettingsService {
+  readonly settings: PluginSettings<Settings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('log-viewer', defaultSettings);
+    this.settings = this.pluginManagerService.getPluginSettings('resource-manager-scripts', settings);
   }
 }

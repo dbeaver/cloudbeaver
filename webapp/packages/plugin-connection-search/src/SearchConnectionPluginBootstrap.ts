@@ -16,6 +16,7 @@ import { MenuService, ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_LOADABLE_ST
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
 import { ACTION_CONNECTION_SEARCH } from './Actions/ACTION_CONNECTION_SEARCH';
+import { ConnectionSearchSettingsService } from './ConnectionSearchSettingsService';
 import { ConnectionSearchService } from './Search/ConnectionSearchService';
 
 @injectable()
@@ -27,6 +28,7 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
+    private readonly connectionSearchSettingsService: ConnectionSearchSettingsService,
   ) {
     super();
   }
@@ -45,10 +47,18 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
       isActionApplicable: (context, action) => [
         ACTION_CONNECTION_SEARCH,
       ].includes(action),
-      isHidden: () => (
-        this.connectionsManagerService.createConnectionProjects.length === 0
-        || !this.permissionsService.has(EAdminPermission.admin)
-      ),
+      isHidden: (context, action) => {
+        if (this.connectionsManagerService.createConnectionProjects.length === 0
+          || !this.permissionsService.has(EAdminPermission.admin)) {
+          return true;
+        }
+
+        if (action === ACTION_CONNECTION_SEARCH) {
+          return this.connectionSearchSettingsService.settings.getValue('disabled');
+        }
+
+        return false;
+      },
       getLoader: (context, action) => {
         const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
 

@@ -16,6 +16,7 @@ import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
 import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM';
 import { CustomConnectionDialog } from './CustomConnection/CustomConnectionDialog';
+import { CustomConnectionSettingsService } from './CustomConnectionSettingsService';
 
 @injectable()
 export class CustomConnectionPluginBootstrap extends Bootstrap {
@@ -25,6 +26,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
     private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly customConnectionSettingsService: CustomConnectionSettingsService,
   ) {
     super();
   }
@@ -43,7 +45,17 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
       isActionApplicable: (context, action) => [
         ACTION_CONNECTION_CUSTOM,
       ].includes(action),
-      isHidden: () => this.connectionsManagerService.createConnectionProjects.length === 0,
+      isHidden: (context, action) => {
+        if (this.connectionsManagerService.createConnectionProjects.length === 0) {
+          return true;
+        }
+
+        if (action === ACTION_CONNECTION_CUSTOM) {
+          return this.customConnectionSettingsService.settings.getValue('disabled');
+        }
+
+        return false;
+      },
       getLoader: (context, action) => {
         const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
 

@@ -13,6 +13,7 @@ import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-t
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { ConnectionsSettingsService } from '@cloudbeaver/plugin-connections';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionSchemaManagerService } from './ConnectionSchemaManagerService';
@@ -38,7 +39,8 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
     private readonly optionsPanelService: OptionsPanelService,
     private readonly appAuthService: AppAuthService,
     private readonly containerResource: ContainerResource,
-    private readonly menuService: MenuService
+    private readonly menuService: MenuService,
+    private readonly connectionsSettingsService: ConnectionsSettingsService,
   ) {
     super();
   }
@@ -382,11 +384,12 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
     });
   }
 
-  load(): void {}
+  load(): void { }
 
   private isHidden(): boolean {
     return (
-      this.optionsPanelService.active
+      this.connectionsSettingsService.settings.getValue('disabled')
+      || this.optionsPanelService.active
       || (
         !this.connectionSchemaManagerService.isConnectionChangeable
         && !this.connectionSchemaManagerService.currentConnectionKey
