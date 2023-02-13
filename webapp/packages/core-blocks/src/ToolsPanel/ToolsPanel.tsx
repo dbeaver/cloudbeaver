@@ -10,7 +10,7 @@ import styled, { css } from 'reshadow';
 
 const styles = css`
   container {
-    height: 48px;
+    height: 32px;
     display: flex;
   }
 `;

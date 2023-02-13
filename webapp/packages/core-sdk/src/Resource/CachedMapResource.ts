@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ILoadableState, isArraysEqual, isContainsException, MetadataMap, uuid } from '@cloudbeaver/core-utils';
@@ -155,9 +155,7 @@ export abstract class CachedMapResource<
     return ResourceKeyUtils.every(key, key => super.isInUse(this.getMetadataKeyRef(key)));
   }
 
-  use(key: ResourceKey<TKey> | typeof CachedResourceParamKey): string {
-    const id = uuid();
-
+  use(key: ResourceKey<TKey> | typeof CachedResourceParamKey, id = uuid()): string {
     if (key === CachedResourceParamKey) {
       super.use(CachedResourceParamKey, id);
       return id;
@@ -531,7 +529,17 @@ export abstract class CachedMapResource<
    * Can be override to provide static link to complicated keys
    */
   getKeyRef(key: TKey): TKey {
-    return key;
+    if (this.keys.includes(key)) {
+      return key;
+    }
+
+    const ref = this.keys.find(k => this.isKeyEqual(k, key));
+
+    if (ref) {
+      return ref;
+    }
+
+    return Object.freeze(toJS(key));
   }
 
   protected getLockedKeys(key: ResourceKey<TKey>): ResourceKey<TKey> {

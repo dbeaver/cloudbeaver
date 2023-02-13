@@ -47,7 +47,7 @@ export const LogViewer = observer(function LogViewer() {
     <log-view-wrapper>
       <Split
         {...splitState}
-        mode={logViewerState.selectedItem ? splitState.mode : 'maximize'}
+        mode={logViewerState.selectedItem ? splitState.mode : 'minimize'}
         disable={!logViewerState.selectedItem}
         keepRatio
       >

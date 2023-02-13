@@ -8157,10 +8157,10 @@ globule@^1.0.0:
     lodash "^4.17.21"
     minimatch "~3.0.2"
 
-go-split@^3.0.7:
-  version "3.0.7"
-  resolved "https://registry.yarnpkg.com/go-split/-/go-split-3.0.7.tgz#909f63e601e5d097f8540b3dd598f2d50eb0a5ca"
-  integrity sha512-SNy1OAwz7WFn2kt/7feKmf4v0IdNrm7Chsc1uIASC09G/yDA832HwOsBajkCx/cxMTPz+zZMWMAe9Ul6PNfGRg==
+go-split@^3.4.1:
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/go-split/-/go-split-3.4.1.tgz#59b3b7b625f26abc2b5b91463604459d9116e16f"
+  integrity sha512-icg0vlpG6XN1VIecSlNd49WgGna14kxep+RLFpQ8P7ztbOAyFZcANzQja08Yc9MiDgIC1eTJa/Od2ST7xf3Q/Q==
 
 gopd@^1.0.1:
   version "1.0.1"

@@ -7,7 +7,9 @@
  */
 
 import { NAV_NODE_TYPE_PROJECT } from '@cloudbeaver/core-projects';
-import { EEquality, elementsTreeNameFilterNode, NavNodeFilterCompareFn } from '@cloudbeaver/plugin-navigation-tree';
+
+import { elementsTreeNameFilterNode } from '../ElementsTree/elementsTreeNameFilter';
+import { type NavNodeFilterCompareFn, EEquality } from '../ElementsTree/NavNodeFilterCompareFn';
 
 export const navigationTreeProjectSearchCompare: NavNodeFilterCompareFn = function navigationTreeProjectSearchCompare(
   node,

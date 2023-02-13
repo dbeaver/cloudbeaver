@@ -210,23 +210,6 @@ export class ConnectionInfoResource
     };
   }
 
-  getKeyRef(key: IConnectionInfoParams): IConnectionInfoParams {
-    if (this.keys.includes(key)) {
-      return key;
-    }
-
-    const ref = this.keys.find(k => (
-      k.projectId === key.projectId
-      && k.connectionId === key.connectionId
-    ));
-
-    if (ref) {
-      return ref;
-    }
-
-    return key;
-  }
-
   isConnected(key: IConnectionInfoParams): boolean;
   isConnected(key: ResourceKeyList<IConnectionInfoParams>): boolean;
   isConnected(key: ResourceKey<IConnectionInfoParams>): boolean;
