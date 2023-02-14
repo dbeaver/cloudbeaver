@@ -10,11 +10,12 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useTranslate
+  Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useTranslate, getComputed, useResource
 } from '@cloudbeaver/core-blocks';
 import { DatabaseConnection, IConnectionInfoParams, serializeConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { ProjectsService } from '@cloudbeaver/core-projects';
+import { isGlobalProject, isSharedProject, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { Connection } from './Connection';
 
@@ -43,14 +44,14 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
 }) {
   const translate = useTranslate();
   const projectService = useService(ProjectsService);
-  const sharedNonGlobalProjects = projectService.activeProjects.filter(project => project.shared && !project.global);
+  const projectsLoader = useResource(ConnectionsTable, ProjectInfoResource, CachedMapAllKey);
+  const displayProjects = getComputed(() => projectService
+    .activeProjects
+    .filter(project => isGlobalProject(project) || isSharedProject(project)).length > 1);
 
-  const getProjectName = (projectId: string) => {
-    if (sharedNonGlobalProjects.length > 1) {
-      return sharedNonGlobalProjects.find(project => project.id === projectId)?.name;
-    }
-    return null;
-  };
+  function getProjectName(projectId: string) {
+    return displayProjects ? projectsLoader.resource.get(projectId)?.name : null;
+  }
 
   return styled(styles)(
     <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
@@ -63,7 +64,7 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
         <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_address')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_folder')}</TableColumnHeader>
-        {sharedNonGlobalProjects.length > 1 && <TableColumnHeader>{translate('connections_connection_project')}</TableColumnHeader>}
+        {displayProjects && <TableColumnHeader>{translate('connections_connection_project')}</TableColumnHeader>}
         <TableColumnHeader />
       </TableHeader>
       <TableBody>
