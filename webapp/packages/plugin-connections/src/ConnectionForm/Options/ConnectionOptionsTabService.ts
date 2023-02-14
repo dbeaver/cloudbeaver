@@ -9,8 +9,7 @@
 import { action, makeObservable, runInAction, toJS } from 'mobx';
 import React from 'react';
 
-import { EAdminPermission } from '@cloudbeaver/core-administration';
-import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, EAdminPermission, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConnectionInfoProjectKey, createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';

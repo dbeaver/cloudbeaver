@@ -13,7 +13,7 @@ import { ConnectionInfoResource, createConnectionParam, IConnectionInfoParams } 
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { executorHandlerFilter, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ConnectionConfig, ResourceKey } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
@@ -48,14 +48,17 @@ export class PublicConnectionFormService {
     this.connectionInfoResource.onDataUpdate.addPostHandler(this.closeRemoved);
     this.connectionInfoResource.onItemDelete.addPostHandler(this.closeDeleted);
 
-    this.authenticationService.onLogin.addHandler(async (event, context) => {
-      if (event === 'before' && this.userInfoResource.data === null) {
-        const confirmed = await this.showUnsavedChangesDialog();
-        if (!confirmed) {
-          ExecutorInterrupter.interrupt(context);
+    this.authenticationService.onLogin.addHandler(executorHandlerFilter(
+      () => !!this.formState && this.optionsPanelService.isOpen(formGetter),
+      async (event, context) => {
+        if (event === 'before' && this.userInfoResource.data === null) {
+          const confirmed = await this.showUnsavedChangesDialog();
+          if (!confirmed) {
+            ExecutorInterrupter.interrupt(context);
+          }
         }
       }
-    });
+    ));
 
     makeObservable(this, {
       formState: observable.shallow,

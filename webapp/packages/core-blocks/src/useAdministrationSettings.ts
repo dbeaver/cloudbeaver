@@ -6,10 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { usePermission, useResource } from '@cloudbeaver/core-blocks';
+import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
-import { EAdminPermission } from './EAdminPermission';
+import { useResource } from './ResourcesHooks/useResource';
+import { usePermission } from './usePermission';
+
 
 interface IAdministrationSettings {
   credentialsSavingEnabled: boolean;

@@ -16,7 +16,9 @@
  */
 package io.cloudbeaver.registry;
 
+import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
@@ -71,13 +73,21 @@ public class WebAuthProviderConfiguration {
     @Property
     public String getSignInLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getSignInLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMAuthProviderFederated ?
+            buildRedirectUrl(((SMAuthProviderFederated) instance).getSignInLink(getId(), config.getParameters()))
+            : null;
+    }
+
+    private String buildRedirectUrl(String baseUrl) {
+        return baseUrl + "?" + CBAuthConstants.CB_REDIRECT_URL_REQUEST_PARAM + "=" + WebAppUtils.getWebApplication().getServerURL();
     }
 
     @Property
     public String getSignOutLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getSignOutLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMAuthProviderFederated
+            ? ((SMAuthProviderFederated) instance).getSignOutLink(getId(), config.getParameters())
+            : null;
     }
 
     @Property

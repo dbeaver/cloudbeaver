@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.server.CBApplication;

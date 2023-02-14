@@ -10,12 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { useLayoutEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
+import { AdministrationItemService, filterOnlyActive, IAdministrationItemRoute } from '@cloudbeaver/core-administration';
 import { SlideBox, SlideElement, ErrorBoundary, SlideOverlay, slideBoxStyles, useStyles, Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { TabsState, TabList, verticalTabStyles, BASE_TAB_STYLES, OptionsPanelService } from '@cloudbeaver/core-ui';
 
-import { AdministrationItemService, filterOnlyActive } from '../AdministrationItem/AdministrationItemService';
-import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
 import { DrawerItem } from './DrawerItem';
 import { ItemContent } from './ItemContent';
 

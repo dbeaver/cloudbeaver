@@ -11,13 +11,14 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
-import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NodeManagerUtils, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
 import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, LocalStorageSqlDataSource, SqlDataSourceService, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
+import { NavigationTreeService } from '@cloudbeaver/plugin-navigation-tree';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, LocalStorageSqlDataSource, SqlDataSourceService, SqlEditorService, SqlEditorSettingsService } from '@cloudbeaver/plugin-sql-editor';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ACTION_SQL_EDITOR_NEW } from './ACTION_SQL_EDITOR_NEW';
@@ -43,6 +44,9 @@ export class SqlEditorBootstrap extends Bootstrap {
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly sqlEditorService: SqlEditorService,
+    private readonly sqlEditorSettingsService: SqlEditorSettingsService,
+    private readonly navigationTreeService: NavigationTreeService,
+    private readonly navNodeManagerService: NavNodeManagerService
   ) {
     super();
   }
@@ -103,7 +107,7 @@ export class SqlEditorBootstrap extends Bootstrap {
 
           return dataSource?.hasFeature(ESqlDataSourceFeatures.setName) ?? false;
         }
-        return  (
+        return (
           action === ACTION_SQL_EDITOR_OPEN
           && context.has(DATA_CONTEXT_CONNECTION)
         );
@@ -204,6 +208,13 @@ export class SqlEditorBootstrap extends Bootstrap {
         ACTION_SQL_EDITOR_NEW,
       ].includes(action),
       isLabelVisible: () => false,
+      isHidden: (context, action) => {
+        if (action === ACTION_SQL_EDITOR_NEW) {
+          return this.sqlEditorSettingsService.settings.getValue('disabled');
+        }
+
+        return false;
+      },
       handler: (context, action) => {
         switch (action) {
           case ACTION_SQL_EDITOR_NEW: {
@@ -227,10 +238,34 @@ export class SqlEditorBootstrap extends Bootstrap {
         .on(isConnectionProvider, extension => { connectionKey = extension(activeView.context); })
         .on(isObjectCatalogProvider, extension => { catalogId = extension(activeView.context); })
         .on(isObjectSchemaProvider, extension => { schemaId = extension(activeView.context); });
-    } else {
-      connectionKey = this.connectionSchemaManagerService.currentConnectionKey || undefined;
+    } else if (this.connectionSchemaManagerService.currentConnectionKey) {
+      connectionKey = this.connectionSchemaManagerService.currentConnectionKey;
       catalogId = this.connectionSchemaManagerService.currentObjectCatalogId;
       schemaId = this.connectionSchemaManagerService.currentObjectSchemaId;
+    }
+
+    if (!connectionKey) {
+      const connections = Array.from(this.navigationTreeService.treeState.entries())
+        .filter(([nodeId, state]) => state.selected && NodeManagerUtils.isDatabaseObject(nodeId))
+        .map(([nodeId]) => nodeId);
+
+      if (connections.length > 0) {
+        const nodeInfo = this.navNodeManagerService
+          .getNodeContainerInfo(connections[0]);
+
+        if (nodeInfo.projectId && nodeInfo.connectionNodeId) {
+          const connectionId = this.connectionInfoResource.getConnectionForNode(nodeInfo.connectionNodeId);
+
+          if (connectionId) {
+            connectionKey = createConnectionParam(
+              nodeInfo.projectId,
+              connectionId.id
+            );
+            catalogId = nodeInfo.catalogId;
+            schemaId = nodeInfo.schemaId;
+          }
+        }
+      }
     }
 
     this.sqlEditorNavigatorService.openNewEditor({
