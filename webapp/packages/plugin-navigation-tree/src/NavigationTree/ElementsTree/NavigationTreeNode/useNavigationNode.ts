@@ -13,6 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import { type NavNode, NavNodeInfoResource, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import type { IDNDData } from '@cloudbeaver/core-ui';
 
 import { useChildren } from '../../../NodesManager/useChildren';
 import { useNode } from '../../../NodesManager/useNode';
@@ -41,6 +42,7 @@ interface INavigationNode {
   click: (leaf: boolean) => Promise<void>;
   select: (isMultiple?: boolean, nested?: boolean) => Promise<void>;
   getSelected: () => NavNode[];
+  setDnDState: (data: IDNDData, dragging: boolean) => void;
 }
 
 export function useNavigationNode(node: NavNode, path: string[]): INavigationNode {
@@ -79,6 +81,10 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     nested = false
   ) => await contextRef.context?.tree.select(node, multiple, nested);
 
+  function setDnDState(data: IDNDData, dragging: boolean): void {
+    contextRef.context?.tree.setDnDData(data, dragging);
+  }
+
   useEffect(() => () => {
     if (!contextRef.context?.selectionTree) {
       if (contextRef.context?.tree.isNodeSelected(node.id)) {
@@ -102,7 +108,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     }],
   });
 
-  return {
+  return useObjectRef({
     ref: elementRef,
     showInFilter,
     empty,
@@ -121,7 +127,8 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     open: handleOpen,
     select: handleSelect,
     getSelected,
-  };
+    setDnDState,
+  });
 }
 
 export function isLeaf(node: NavNode, children: string[] | undefined, tree: IElementsTree | undefined): boolean {

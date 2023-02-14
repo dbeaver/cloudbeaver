@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { NavNode, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import type { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
 import type { IElementsTreeFilter } from '../useElementsTree';
 
@@ -18,11 +18,7 @@ export function elementsTreeLimitFilter(
   navTreeResource: NavTreeResource,
   limit?: number
 ): IElementsTreeFilter {
-  return (
-    filter: string,
-    node: NavNode,
-    children: string[],
-  ) => {
+  return (tree, filter, node, children) => {
     limit = limit ?? navTreeResource.childrenLimit;
     const nextChildren = children.slice(0, limit);
 
