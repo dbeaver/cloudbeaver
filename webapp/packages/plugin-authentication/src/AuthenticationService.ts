@@ -142,6 +142,9 @@ export class AuthenticationService extends Bootstrap {
       .then(async state => {
         await this.onLogin.execute('after');
         return state;
+      })
+      .finally(() => {
+        this.authPromise = null;
       });
 
     if (this.serverConfigResource.redirectOnFederatedAuth) {
@@ -162,11 +165,7 @@ export class AuthenticationService extends Bootstrap {
       }
     }
 
-    try {
-      await this.authPromise;
-    } finally {
-      this.authPromise = null;
-    }
+    await this.authPromise;
   }
 
   private async requireAuthentication() {
