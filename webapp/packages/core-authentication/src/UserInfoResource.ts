@@ -233,7 +233,7 @@ UserInfoIncludes
       ...this.getIncludesMap(key, includes),
     });
 
-    return (user as UserInfo | null) ?? null;
+    return (user as UserInfo | null) || null;
   }
 
   protected setData(data: UserInfo | null): void {
