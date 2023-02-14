@@ -336,6 +336,9 @@ public class WebSession extends BaseWebSession
                 WebProjectImpl anonymousProject = createWebProject(RMUtils.createAnonymousProject());
                 anonymousProject.setInMemory(true);
             }
+            if (defaultProject == null && !accessibleProjects.isEmpty()) {
+                defaultProject = accessibleProjects.get(0);
+            }
         } catch (DBException e) {
             addSessionError(e);
             log.error("Error getting accessible projects list", e);

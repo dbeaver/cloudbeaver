@@ -39,7 +39,8 @@ export interface NavNodeValue {
 }
 
 export interface INodeContainerInfo {
-  connectionId?: string;
+  projectId?: string;
+  connectionNodeId?: string;
   catalogId?: string;
   schemaId?: string;
 }
@@ -313,8 +314,11 @@ export class NavNodeManagerService extends Bootstrap {
       if (!object) {
         return res;
       }
+      if (object.projectId) {
+        res.projectId = object.projectId;
+      }
       if (object.objectFeatures.includes(EObjectFeature.dataSource)) {
-        res.connectionId = object.id;
+        res.connectionNodeId = object.id;
       }
       if (object.objectFeatures.includes(EObjectFeature.catalog)) {
         res.catalogId = object.name; // note that catalogId is node name
