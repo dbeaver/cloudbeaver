@@ -6,4 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-export const SCRIPT_EXTENSION = 'sql';
+export enum ELMRole {
+  ADMINISTRATOR = 'ADMINISTRATOR',
+  DEVELOPER = 'DEVELOPER',
+  DATA_MANAGER = 'DATA_MANAGER',
+  EDITOR = 'EDITOR',
+  VIEWER = 'VIEWER',
+}

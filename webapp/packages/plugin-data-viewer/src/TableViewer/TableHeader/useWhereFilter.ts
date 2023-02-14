@@ -69,13 +69,13 @@ export function useWhereFilter(
       await this.model.request();
     },
   }),
-    {
-      filter: computed,
-      constraints: computed,
-      disabled: computed,
-      applicableFilter: computed,
-      set: action.bound,
-      apply: action.bound,
-    },
-    { model, resultIndex });
+  {
+    filter: computed,
+    constraints: computed,
+    disabled: computed,
+    applicableFilter: computed,
+    set: action.bound,
+    apply: action.bound,
+  },
+  { model, resultIndex });
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-sql-editor-navigation-tab-resource",
+  "name": "@cloudbeaver/plugin-sql-editor-navigation-tab-script",
   "sideEffects": false,
   "version": "0.1.0",
   "description": "",

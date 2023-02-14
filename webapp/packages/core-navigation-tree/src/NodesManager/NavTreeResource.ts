@@ -111,6 +111,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     this.onNodeRefresh = new Executor<string>(null, (a, b) => a === b);
 
     // navNodeInfoResource.preloadResource(this);
+    navNodeInfoResource.connect(this);
     this.outdateResource(navNodeInfoResource);
     this.updateResource(navNodeInfoResource);
     this.sync(this.projectInfoResource, () => CachedMapAllKey, () => CachedMapAllKey);

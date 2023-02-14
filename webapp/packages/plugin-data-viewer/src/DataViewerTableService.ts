@@ -8,7 +8,7 @@
 
 import { ConnectionExecutionContextService, Connection, createConnectionParam } from '@cloudbeaver/core-connections';
 import { App, injectable } from '@cloudbeaver/core-di';
-import { EObjectFeature, NavNode } from '@cloudbeaver/core-navigation-tree';
+import { EObjectFeature, NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { ContainerDataSource, IDataContainerOptions } from './ContainerDataSource';
@@ -24,6 +24,7 @@ import { TableViewerStorageService } from './TableViewer/TableViewerStorageServi
 export class DataViewerTableService {
   constructor(
     private readonly app: App,
+    private readonly navNodeManagerService: NavNodeManagerService,
     private readonly tableViewerStorageService: TableViewerStorageService,
     private readonly graphQLService: GraphQLService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
@@ -53,6 +54,9 @@ export class DataViewerTableService {
     connection: Connection,
     node: NavNode | undefined
   ): IDatabaseDataModel<IDataContainerOptions, IDatabaseResultSet> {
+    const nodeInfo = this.navNodeManagerService
+      .getNodeContainerInfo(node?.id ?? '');
+
     const source = new ContainerDataSource(
       this.app.getServiceInjector(),
       this.graphQLService,
@@ -64,6 +68,8 @@ export class DataViewerTableService {
       .setOptions({
         connectionKey: createConnectionParam(connection),
         containerNodePath: node?.id ?? '',
+        schema: nodeInfo.schemaId,
+        catalog: nodeInfo.catalogId,
         constraints: [],
         whereFilter: '',
       })

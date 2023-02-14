@@ -29,6 +29,7 @@ export * from './parseJSONFlat';
 export * from './pathJoin';
 export * from './PriorityQueue';
 export * from './replaceMiddle';
+export * from './staticImplements';
 export * from './TextTools';
 export * from './throttle';
 export * from './uuid_';

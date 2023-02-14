@@ -114,7 +114,7 @@ const styles = css`
 `;
 
 export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey, getAssociatedValues }) {
-  const splitContext = useSplit();
+  const split = useSplit();
   const translate = useTranslate();
 
   const [mapRef, setMapRef] = useState<leaflet.Map | null>(null);
@@ -180,7 +180,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
         mapRef.setView(center);
       }
     }
-  }, [splitContext.isResizing, splitContext.mode, crs, mapRef]);
+  }, [split.state.isResizing, split.state.mode, crs, mapRef]);
 
   return styled(styles, baseStyles)(
     <MapContainer ref={setMapRef} crs={crs} zoom={12}>

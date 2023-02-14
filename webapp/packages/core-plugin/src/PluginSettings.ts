@@ -6,14 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ISettingsSource } from '@cloudbeaver/core-settings';
+import { ISettingsSource, SettingsResolverSource } from '@cloudbeaver/core-settings';
 
-export class PluginSettings<T> implements ISettingsSource {
+export class PluginSettings<T> extends SettingsResolverSource implements ISettingsSource {
   constructor(
     private readonly source: ISettingsSource,
     private readonly scope: string,
     private readonly defaults: T
   ) {
+    super();
   }
 
   has<TKey extends keyof T>(key: TKey): boolean {
@@ -21,10 +22,14 @@ export class PluginSettings<T> implements ISettingsSource {
   }
 
   isValueDefault<TKey extends keyof T>(key: TKey): boolean {
-    return !this.source.has(this.scopedKey(key));
+    return !super.has(key) && !this.source.has(this.scopedKey(key));
   }
 
   getValue<TKey extends keyof T>(key: TKey): T[TKey] {
+    if (super.has(key)) {
+      return super.getValue(key);
+    }
+
     if (this.source.has(this.scopedKey(key))) {
       return this.source.getValue(this.scopedKey(key));
     }
@@ -33,6 +38,7 @@ export class PluginSettings<T> implements ISettingsSource {
   }
 
   setValue<TKey extends keyof T>(key: TKey, value: T[TKey]): void {
+    super.setValue(key, value);
     this.source.setValue(this.scopedKey(key), value);
   }
 
@@ -41,6 +47,7 @@ export class PluginSettings<T> implements ISettingsSource {
   }
 
   clear(): void {
+    super.clear();
     this.source.clear();
   }
 }

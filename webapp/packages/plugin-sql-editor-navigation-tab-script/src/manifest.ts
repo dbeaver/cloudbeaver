@@ -14,7 +14,7 @@ import { ResourceSqlDataSourceBootstrap } from './ResourceSqlDataSourceBootstrap
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
 
 export const manifest: PluginManifest = {
-  info: { name: 'Sql Editor Resource plugin' },
+  info: { name: 'Sql Editor Script plugin' },
   providers: [
     PluginBootstrap,
     LocaleService,

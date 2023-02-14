@@ -3,12 +3,13 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: io.cloudbeaver.model;singleton:=true
-Bundle-Version: 1.0.22.qualifier
-Bundle-Release-Date: 20230306
+Bundle-Version: 1.0.23.qualifier
+Bundle-Release-Date: 20230220
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
-Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
+Require-Bundle:  org.jkiss.dbeaver.data.gis;visibility:=reexport,
+ org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.model.sm;visibility:=reexport,
  org.jkiss.dbeaver.model.event;visibility:=reexport,
  org.jkiss.dbeaver.registry;visibility:=reexport,

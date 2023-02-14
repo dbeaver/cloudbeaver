@@ -91,10 +91,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   get features():ESqlDataSourceFeatures[] {
     if (this.isReadonly()) {
-      return [];
+      return [ESqlDataSourceFeatures.script];
     }
 
-    return [ESqlDataSourceFeatures.setName];
+    return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.setName];
   }
 
   private _script: string;
@@ -253,8 +253,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       && executionContext?.projectId
       && this.resourceKey.projectId !== executionContext.projectId
     ) {
-      console.warn('Cant change execution context because of different projects');
-      return;
+      throw new Error('Resource SQL Data Source and Execution context projects don\t match');
     }
 
     if (
@@ -294,6 +293,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
         return;
       }
 
+      // TODO: use createResourceOfType instead
       if (!name.toLowerCase().endsWith('.sql')) {
         name += '.sql';
       }

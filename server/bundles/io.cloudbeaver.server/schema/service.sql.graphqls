@@ -133,6 +133,10 @@ type SQLExecuteInfo {
     duration: Int!
     # Actual conditions applied to query
     filterText: String
+#    # original sql query without SQLDataFilter
+#    originalQuery: String
+    # Full query that was executed, contains all used filters
+    fullQuery: String
     # Results
     results: [ SQLQueryResults! ]!
 }
