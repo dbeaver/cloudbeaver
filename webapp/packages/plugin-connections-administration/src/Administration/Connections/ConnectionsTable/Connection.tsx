@@ -62,7 +62,8 @@ export const Connection = observer<Props>(function Connection({ connectionKey, c
       <TableColumnValue title={connection.name} expand ellipsis>{connection.name}</TableColumnValue>
       <TableColumnValue>{connection.host}{connection.host && connection.port && `:${connection.port}`}</TableColumnValue>
       <TableColumnValue>{connection.folder && connection.folder}</TableColumnValue>
-      {projectName && <TableColumnValue title={projectName} expand ellipsis>{projectName}</TableColumnValue>}
+      {projectName !== undefined && (
+        <TableColumnValue title={projectName ?? ''} expand ellipsis>{projectName}</TableColumnValue>)}
       <TableColumnValue flex>
         <Placeholder
           container={connectionsAdministrationService.connectionDetailsPlaceholder}

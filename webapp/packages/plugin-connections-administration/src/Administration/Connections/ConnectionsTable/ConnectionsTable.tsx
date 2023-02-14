@@ -50,7 +50,7 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
     .filter(project => isGlobalProject(project) || isSharedProject(project)).length > 1);
 
   function getProjectName(projectId: string) {
-    return displayProjects ? projectsLoader.resource.get(projectId)?.name : null;
+    return displayProjects ? (projectsLoader.resource.get(projectId)?.name ?? null) : undefined;
   }
 
   return styled(styles)(
