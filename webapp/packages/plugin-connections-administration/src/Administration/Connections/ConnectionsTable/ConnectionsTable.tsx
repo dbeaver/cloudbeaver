@@ -13,8 +13,8 @@ import {
   Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useTranslate
 } from '@cloudbeaver/core-blocks';
 import { DatabaseConnection, IConnectionInfoParams, serializeConnectionParam } from '@cloudbeaver/core-connections';
-
-
+import { useService } from '@cloudbeaver/core-di';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 
 import { Connection } from './Connection';
 
@@ -42,6 +42,15 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
   expandedItems,
 }) {
   const translate = useTranslate();
+  const projectService = useService(ProjectsService);
+  const sharedNonGlobalProjects = projectService.activeProjects.filter(project => project.shared && !project.global);
+
+  const getProjectName = (projectId: string) => {
+    if (sharedNonGlobalProjects.length > 1) {
+      return sharedNonGlobalProjects.find(project => project.id === projectId)?.name;
+    }
+    return null;
+  };
 
   return styled(styles)(
     <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
@@ -54,6 +63,7 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
         <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_address')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_folder')}</TableColumnHeader>
+        {sharedNonGlobalProjects.length > 1 && <TableColumnHeader>{translate('connections_connection_project')}</TableColumnHeader>}
         <TableColumnHeader />
       </TableHeader>
       <TableBody>
@@ -62,6 +72,7 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
             key={serializeConnectionParam(keys[i])}
             connectionKey={keys[i]}
             connection={connection}
+            projectName={getProjectName(connection.projectId)}
           />
         ))}
       </TableBody>
