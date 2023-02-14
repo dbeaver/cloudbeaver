@@ -8,6 +8,7 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
+import { ESqlDataSourceFeatures } from '../../SqlDataSource/ESqlDataSourceFeatures';
 import { SqlEditorModeService } from '../../SqlEditorModeService';
 import { SQLCodeEditorPanel } from './SQLCodeEditorPanel';
 
@@ -22,6 +23,7 @@ export class SQLCodeEditorPanelBootstrap extends Bootstrap {
       key: 'sql-editor',
       icon: '/icons/sql_script_sm.svg',
       name: 'sql_editor_script_editor',
+      isHidden: (tabId, props) => props?.data.dataSource?.hasFeature(ESqlDataSourceFeatures.script) !== true,
       panel: () => SQLCodeEditorPanel,
     });
   }

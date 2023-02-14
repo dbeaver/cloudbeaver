@@ -4,6 +4,7 @@ export * from './ResourceManagerEventHandler';
 export * from './ResourceManagerResource';
 export * from './EProjectPermission';
 export * from './isRMNavNode';
+export * from './NAV_NODE_TYPE_RM_FOLDER';
 export * from './NAV_NODE_TYPE_RM_PROJECT';
 export * from './NAV_NODE_TYPE_RM_RESOURCE';
 export * from './RESOURCES_NODE_PATH';

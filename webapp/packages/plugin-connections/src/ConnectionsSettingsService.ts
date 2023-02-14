@@ -11,10 +11,12 @@ import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 export interface ConnectionsSettings {
   hideConnectionViewForUsers: boolean;
+  disabled: boolean;
 }
 
 const defaultSettings: ConnectionsSettings = {
   hideConnectionViewForUsers: false,
+  disabled: false,
 };
 
 @injectable()

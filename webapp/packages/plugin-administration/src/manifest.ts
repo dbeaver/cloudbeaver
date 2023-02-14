@@ -8,6 +8,9 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { AdministrationScreenServiceBootstrap } from './AdministrationScreen/AdministrationScreenServiceBootstrap';
+import { AdministrationTopAppBarService } from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService';
+import { WizardTopAppBarService } from './AdministrationScreen/ConfigurationWizard/WizardTopAppBar/WizardTopAppBarService';
 import { ConfigurationWizardPagesBootstrapService } from './ConfigurationWizard/ConfigurationWizardPagesBootstrapService';
 import { ServerConfigurationService } from './ConfigurationWizard/ServerConfiguration/ServerConfigurationService';
 import { ServerConfigurationAdministrationNavService } from './ConfigurationWizard/ServerConfigurationAdministrationNavService';
@@ -20,10 +23,13 @@ export const manifest: PluginManifest = {
   },
 
   providers: [
+    LocaleService,
+    PluginBootstrap,
     ServerConfigurationService,
     ServerConfigurationAdministrationNavService,
     ConfigurationWizardPagesBootstrapService,
-    LocaleService,
-    PluginBootstrap,
+    AdministrationScreenServiceBootstrap,
+    AdministrationTopAppBarService,
+    WizardTopAppBarService,
   ],
 };

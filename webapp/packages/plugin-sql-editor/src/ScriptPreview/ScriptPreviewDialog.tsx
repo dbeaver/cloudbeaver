@@ -14,7 +14,8 @@ import { ConnectionDialectResource, ConnectionExecutionContextService, createCon
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
-import { SQLCodeEditorLoader } from '@cloudbeaver/plugin-sql-editor';
+
+import { SQLCodeEditorLoader } from '../SqlEditor/SQLCodeEditor/SQLCodeEditorLoader';
 
 export const dialogStyle = css`
   footer {
