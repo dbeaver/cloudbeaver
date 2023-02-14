@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Translate, usePermission, useUserData } from '@cloudbeaver/core-blocks';
+import { AppAuthService } from '@cloudbeaver/core-authentication';
+import { Translate, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { EPermission } from '@cloudbeaver/core-root';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavNodeViewService } from '../NodesManager/NavNodeView/NavNodeViewService';
@@ -84,7 +84,7 @@ export const NavigationTree = observer(function NavigationTree() {
   const navNodeViewService = useService(NavNodeViewService);
 
   const root = ROOT_NODE_PATH;
-  const isEnabled = usePermission(EPermission.public);
+  const { authenticated } = useService(AppAuthService);
   const { handleOpen, handleSelect, handleSelectReset } = useNavigationTree();
 
   const connectionGroupFilter = useMemo(() => navigationTreeConnectionGroupFilter(
@@ -114,7 +114,7 @@ export const NavigationTree = observer(function NavigationTree() {
 
   const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);
 
-  if (!isEnabled) {
+  if (!authenticated) {
     return null;
   }
 

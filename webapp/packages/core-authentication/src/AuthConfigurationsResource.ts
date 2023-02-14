@@ -8,7 +8,6 @@
 
 import { runInAction } from 'mobx';
 
-import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
@@ -19,6 +18,7 @@ import {
 } from '@cloudbeaver/core-sdk';
 
 import type { AuthProviderConfiguration } from './AuthProvidersResource';
+import { EAdminPermission } from './EAdminPermission';
 
 const NEW_CONFIGURATION_SYMBOL = Symbol('new-configuration');
 
@@ -110,6 +110,13 @@ export class AuthConfigurationsResource
     this.set(key, oldConfiguration.map((configuration, i) => ({ ...configuration, ...configurations[i] })));
 
     return key;
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }
 

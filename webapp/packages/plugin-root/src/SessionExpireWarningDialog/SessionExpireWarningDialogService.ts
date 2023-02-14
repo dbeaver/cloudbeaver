@@ -44,7 +44,7 @@ export class SessionExpireWarningDialogService extends Bootstrap {
   private startSessionPolling() {
     const checkSessionStatus = async () => {
       if (
-        !this.serverConfigResource.data?.anonymousAccessEnabled
+        !this.serverConfigResource.anonymousAccessEnabled
         && !this.userInfoResource.data
         && !this.serverConfigResource.configurationMode
       ) {

@@ -27,8 +27,7 @@
     "@cloudbeaver/core-executor": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-authentication": "~0.1.0",
-    "@cloudbeaver/core-cli": "~0.1.0",
-    "go-split": "^3.0.7"
+    "go-split": "^3.4.1"
   },
   "peerDependencies": {
     "reshadow": "~0.x.x",

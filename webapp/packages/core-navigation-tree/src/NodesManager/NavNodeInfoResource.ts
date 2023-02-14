@@ -8,8 +8,8 @@
 
 import { action, makeObservable, observable, runInAction } from 'mobx';
 
+import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionPermissionsResource, EPermission } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -39,7 +39,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
   protected metadata: MetadataMap<string, INodeMetadata>;
   constructor(
     private readonly graphQLService: GraphQLService,
-    permissionsResource: SessionPermissionsResource,
+    appAuthService: AppAuthService,
   ) {
     super();
 
@@ -58,7 +58,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
       setParent: action,
     });
 
-    permissionsResource.require(this, EPermission.public);
+    appAuthService.requireAuthentication(this);
   }
 
   updateNode(key: string, node: NavNode): void;
@@ -91,7 +91,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     ResourceKeyUtils.forEach(keyObject, key => {
       const metadata = this.metadata.get(key);
 
-      if (metadata.withDetails !== state) {
+      if (!metadata.withDetails && state) {
         metadata.outdated = true;
       }
       metadata.withDetails = state;
@@ -217,6 +217,13 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
       );
       return navNode;
     });
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }
 

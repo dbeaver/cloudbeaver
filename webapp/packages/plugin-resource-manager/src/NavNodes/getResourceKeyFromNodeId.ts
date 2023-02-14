@@ -6,9 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IResourceManagerParams } from '@cloudbeaver/core-resource-manager';
-
-import { isRMNavNode } from '../isRMNavNode';
+import { IResourceManagerParams, isRMNavNode } from '@cloudbeaver/core-resource-manager';
 
 export function getResourceKeyFromNodeId(nodeId: string): IResourceManagerParams | undefined {
   if (!isRMNavNode(nodeId)) {

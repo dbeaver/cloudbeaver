@@ -8,10 +8,11 @@
 
 import { action, makeObservable, observable, runInAction } from 'mobx';
 
+import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ExecutorInterrupter, ISyncExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { EPermission, NavigatorViewSettings, SessionPermissionsResource, SessionDataResource, DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
+import { NavigatorViewSettings, SessionDataResource, DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -83,7 +84,7 @@ export class ConnectionInfoResource
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly dataSynchronizationService: DataSynchronizationService,
     sessionDataResource: SessionDataResource,
-    permissionsResource: SessionPermissionsResource,
+    appAuthService: AppAuthService,
     connectionInfoEventHandler: ConnectionInfoEventHandler,
   ) {
     super();
@@ -114,7 +115,7 @@ export class ConnectionInfoResource
     this.onItemDelete.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
 
-    permissionsResource.require(this, EPermission.public);
+    appAuthService.requireAuthentication(this);
     this.sync(this.projectInfoResource, () => CachedMapAllKey, () => CachedMapAllKey);
     this.projectsService.onActiveProjectChange.addHandler(data => {
       if (data.type === 'after') {
@@ -207,23 +208,6 @@ export class ConnectionInfoResource
       template: false,
       saveCredentials: false,
     };
-  }
-
-  getKeyRef(key: IConnectionInfoParams): IConnectionInfoParams {
-    if (this.keys.includes(key)) {
-      return key;
-    }
-
-    const ref = this.keys.find(k => (
-      k.projectId === key.projectId
-      && k.connectionId === key.connectionId
-    ));
-
-    if (ref) {
-      return ref;
-    }
-
-    return key;
   }
 
   isConnected(key: IConnectionInfoParams): boolean;
@@ -593,6 +577,19 @@ export class ConnectionInfoResource
       includeProviderProperties: false,
       customIncludeOptions: false,
     };
+  }
+
+  protected validateParam(param: ResourceKey<IConnectionInfoParams>): boolean {
+    return (
+      super.validateParam(param)
+      || param === connectionInfoProjectKeySymbol
+      || param === connectionInfoActiveProjectKeySymbol
+      || (
+        typeof param === 'object' && !isResourceKeyList(param)
+        && typeof param.projectId === 'string'
+        && ['string'].includes(typeof param.connectionId)
+      )
+    );
   }
 }
 

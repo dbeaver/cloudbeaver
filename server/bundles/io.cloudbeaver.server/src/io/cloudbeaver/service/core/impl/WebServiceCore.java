@@ -209,7 +209,6 @@ public class WebServiceCore implements DBWServiceCore {
     public String[] getSessionPermissions(@NotNull WebSession webSession) throws DBWebException {
         if (CBApplication.getInstance().isConfigurationMode()) {
             return new String[] {
-                DBWConstants.PERMISSION_PUBLIC,
                 DBWConstants.PERMISSION_ADMIN
             };
         }

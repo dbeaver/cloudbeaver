@@ -24,10 +24,10 @@ const tabsStyles = css`
     position: relative;
     flex-shrink: 0;
     align-items: center;
-    height: 51px;
+    height: 33px;
   }
   Tab {
-    height: 46px!important;
+    height: 32px!important;
     text-transform: uppercase;
     font-weight: 500 !important;
   }
@@ -59,7 +59,7 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
   return styled(style)(
     <TabsState selectedId={subName} lazy onChange={openSub}>
       <ToolsPanel>
-        <TabList style={style}>
+        <TabList aria-label='User Administration pages' style={style}>
           <Tab tabId={EUsersAdministrationSub.Users} style={style}>{translate('authentication_administration_item_users')}</Tab>
           <Tab tabId={EUsersAdministrationSub.Teams} style={style}>{translate('administration_teams_tab_title')}</Tab>
           {/* <Tab

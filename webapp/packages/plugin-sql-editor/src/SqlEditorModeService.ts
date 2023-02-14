@@ -8,8 +8,8 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { TabsContainer } from '@cloudbeaver/core-ui';
-import type { ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
+import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import type { ISQLEditorData } from './SqlEditor/ISQLEditorData';
 
 export interface ISqlEditorModeProps {
@@ -22,6 +22,6 @@ export class SqlEditorModeService {
   readonly tabsContainer: TabsContainer<ISqlEditorModeProps>;
 
   constructor() {
-    this.tabsContainer = new TabsContainer();
+    this.tabsContainer = new TabsContainer('SQL Editor Mode');
   }
 }

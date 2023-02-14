@@ -8,8 +8,10 @@
 
 import { runInAction } from 'mobx';
 
-import { AdminObjectGrantInfo, EAdminPermission } from '@cloudbeaver/core-administration';
+import type { AdminObjectGrantInfo } from '@cloudbeaver/core-administration';
+import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmProject, ResourceKeyList, RmProjectPermissions, RmSubjectProjectPermissions } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
@@ -31,6 +33,7 @@ interface IProjectConfig {
 export class SharedProjectsResource extends CachedMapResource<string, SharedProject> {
   constructor(
     private readonly graphQLService: GraphQLService,
+    projectInfoResource: ProjectInfoResource,
     sessionPermissionsResource: SessionPermissionsResource,
   ) {
     super(new Map(), []);
@@ -38,6 +41,11 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     sessionPermissionsResource
       .require(this, EAdminPermission.admin);
     this.sync(sessionPermissionsResource, () => {});
+
+    this.connect(projectInfoResource);
+    this.onDataOutdated.addHandler(() => projectInfoResource.markOutdated());
+    this.onItemAdd.addHandler(() => projectInfoResource.markOutdated());
+    this.onItemDelete.addHandler(() => projectInfoResource.markOutdated());
   }
 
   isNew(id: string): boolean {
@@ -148,6 +156,13 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
 
     const data = this.data.get(key);
     this.data.set(key, Object.assign(data ?? {}, value));
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }
 

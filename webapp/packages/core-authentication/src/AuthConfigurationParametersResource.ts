@@ -6,13 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   AuthProviderConfigurationParametersFragment, CachedMapResource, GetAuthProviderConfigurationParametersQueryVariables,
   GraphQLService, isResourceKeyList, ResourceKey, ResourceKeyUtils
 } from '@cloudbeaver/core-sdk';
+
+import { EAdminPermission } from './EAdminPermission';
 
 @injectable()
 export class AuthConfigurationParametersResource
@@ -45,5 +46,12 @@ export class AuthConfigurationParametersResource
     this.set(key, isResourceKeyList(key) ? values : values[0]);
 
     return this.data;
+  }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
   }
 }

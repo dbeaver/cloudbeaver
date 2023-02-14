@@ -14,6 +14,7 @@ import type { ITabInfo, ITabInfoOptions, ITabsContainer } from './ITabsContainer
 
 export class TabsContainer<TProps = void, TOptions extends Record<string, any> = never>
 implements ITabsContainer<TProps, TOptions> {
+  readonly areaLabel: string;
   readonly tabInfoMap: Map<string, ITabInfo<TProps, TOptions>>;
 
   get tabInfoList(): Array<ITabInfo<TProps, TOptions>> {
@@ -27,9 +28,10 @@ implements ITabsContainer<TProps, TOptions> {
 
   private currentTabId: string | null;
 
-  constructor() {
+  constructor(areaLabel: string) {
     this.tabInfoMap = new Map();
     this.currentTabId = null;
+    this.areaLabel = areaLabel;
 
     makeObservable<TabsContainer<TProps, TOptions>, 'currentTabId'>(this, {
       tabInfoMap: observable.shallow,

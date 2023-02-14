@@ -86,7 +86,7 @@ export const UsersTable = observer<Props>(function UsersTable({ sub, param }) {
     <ColoredContainer wrap gap parent overflow vertical>
       <Container gap vertical>
         <Container gap keepSize>
-          <Group>
+          <Group box>
             <ToolsPanel>
               {isLocalProviderAvailable && (
                 <ToolsAction

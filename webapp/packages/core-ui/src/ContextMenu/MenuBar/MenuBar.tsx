@@ -83,6 +83,10 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
     item.events?.onSelect?.();
   }, [item]);
 
+  if (item.hidden) {
+    return null;
+  }
+
   if (item instanceof MenuSubMenuItem) {
     return styled(styles)(
       <SubMenuItem
@@ -196,6 +200,11 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
   subMenuData.context.set(DATA_CONTEXT_SUBMENU_ITEM, item);
 
   const handler = subMenuData.handler;
+  const hidden = getComputed(() => subMenuData.items.every(item => item.hidden));
+
+  if (hidden) {
+    return null;
+  }
 
   const IconComponent = handler?.iconComponent?.() ?? item.iconComponent?.();
   const extraProps = handler?.getExtraProps?.() ?? item.getExtraProps?.() as any;

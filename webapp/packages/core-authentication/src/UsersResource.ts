@@ -251,6 +251,13 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       includeMetaParameters: false,
     };
   }
+
+  protected validateParam(param: ResourceKey<string>): boolean {
+    return (
+      super.validateParam(param)
+      || typeof param === 'string'
+    );
+  }
 }
 
 export function isLocalUser(user: AdminUser): boolean {

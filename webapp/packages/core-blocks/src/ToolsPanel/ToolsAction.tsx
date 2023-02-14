@@ -14,7 +14,7 @@ import { IconOrImage } from '../IconOrImage';
 const styles = css`
     button {
       composes: theme-ripple from global;
-      padding: 0 16px;
+      padding: 0 8px;
       display: flex;
       align-items: center;
       cursor: pointer;
@@ -24,15 +24,16 @@ const styles = css`
     }
     IconOrImage {
       display: block;
-      width: 24px;
+      width: 16px;
     }
     button-label {
       display: block;
       text-transform: uppercase;
       font-weight: 700;
+      font-size: 12px;
     }
     IconOrImage + button-label {
-      padding-left: 8px
+      padding-left: 4px
     }
   `;
 

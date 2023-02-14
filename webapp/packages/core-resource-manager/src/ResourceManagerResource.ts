@@ -286,20 +286,6 @@ export class ResourceManagerResource
     return this.data;
   }
 
-  getKeyRef(key: IResourceManagerParams): IResourceManagerParams {
-    if (this.keys.includes(key)) {
-      return key;
-    }
-
-    const ref = this.keys.find(k => isResourceManagerParamEqual(k, key));
-
-    if (ref) {
-      return ref;
-    }
-
-    return { projectId: key.projectId, path: key.path };
-  }
-
   getMetadataKeyRef(key: IResourceManagerParams): IResourceManagerParams {
     const keys = Array.from(this.metadata.keys());
     if (keys.includes(key)) {
@@ -497,6 +483,18 @@ export class ResourceManagerResource
     return {
       includeProperties: false,
     };
+  }
+
+  protected validateParam(param: ResourceKey<IResourceManagerParams>): boolean {
+    return (
+      super.validateParam(param)
+      || (
+        typeof param === 'object' && !isResourceKeyList(param)
+        && typeof param.projectId === 'string'
+        && ['string', 'undefined'].includes(typeof param.path)
+        && ['string', 'undefined'].includes(typeof param.name)
+      )
+    );
   }
 }
 

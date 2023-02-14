@@ -48,6 +48,7 @@ export interface ITabInfo<
 }
 
 export interface ITabsContainer<TProps = void, TOptions extends Record<string, any> = never> {
+  readonly areaLabel: string;
   readonly tabInfoList: Array<ITabInfo<TProps, TOptions>>;
   readonly selectedId: string | null;
   has: (tabId: string) => boolean;

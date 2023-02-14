@@ -6,13 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { compareConnectionsInfo, ConnectionInfoResource, ConnectionsManagerService, ContainerResource, createConnectionParam, serializeConnectionParam } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
-import { EPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { ConnectionsSettingsService } from '@cloudbeaver/plugin-connections';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionSchemaManagerService } from './ConnectionSchemaManagerService';
@@ -36,9 +37,10 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly optionsPanelService: OptionsPanelService,
-    private readonly permissionsService: PermissionsService,
+    private readonly appAuthService: AppAuthService,
     private readonly containerResource: ContainerResource,
-    private readonly menuService: MenuService
+    private readonly menuService: MenuService,
+    private readonly connectionsSettingsService: ConnectionsSettingsService,
   ) {
     super();
   }
@@ -53,7 +55,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
       id: 'connection-selector-base',
       isApplicable: context => context.hasValue(DATA_CONTEXT_MENU, MENU_CONNECTION_SELECTOR),
       isLoading: () => this.connectionSelectorLoading,
-      isHidden: () => this.isHidden(),
+      isHidden: () => this.isHidden() || !this.appAuthService.authenticated,
       isDisabled: () => (
         !this.connectionSchemaManagerService.isConnectionChangeable
         || this.connectionSelectorLoading
@@ -80,10 +82,13 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
         return state.getState(
           menu.id,
-          () => getCachedDataResourceLoaderState(this.containerResource, {
-            ...this.connectionSchemaManagerService.activeConnectionKey!,
-            catalogId: this.connectionSchemaManagerService.activeObjectCatalogId,
-          }, undefined)
+          () => [
+            ...this.appAuthService.loaders,
+            getCachedDataResourceLoaderState(this.containerResource, {
+              ...this.connectionSchemaManagerService.activeConnectionKey!,
+              catalogId: this.connectionSchemaManagerService.activeObjectCatalogId,
+            }, undefined),
+          ]
         );
       },
     });
@@ -166,6 +171,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
       ),
       isHidden: () => (
         this.isHidden()
+        || !this.appAuthService.authenticated
         || !this.connectionSchemaManagerService.objectContainerList
         || (
           this.connectionSchemaManagerService.currentObjectSchemaId === undefined
@@ -178,6 +184,18 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
           && this.connectionSchemaManagerService.objectContainerList.catalogList.length === 0
         )
       ),
+      getLoader: (context, menu) => {
+        if (this.isHidden()) {
+          return [];
+        }
+
+        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
+
+        return state.getState(
+          menu.id,
+          () => this.appAuthService.loaders
+        );
+      },
       getInfo: (context, menu) => {
         const connectionSchemaManagerService = this.connectionSchemaManagerService;
 
@@ -366,16 +384,16 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
     });
   }
 
-  load(): void {}
+  load(): void { }
 
   private isHidden(): boolean {
     return (
-      this.optionsPanelService.active
+      this.connectionsSettingsService.settings.getValue('disabled')
+      || this.optionsPanelService.active
       || (
         !this.connectionSchemaManagerService.isConnectionChangeable
         && !this.connectionSchemaManagerService.currentConnectionKey
       )
-      || !this.permissionsService.has(EPermission.public)
     );
   }
 

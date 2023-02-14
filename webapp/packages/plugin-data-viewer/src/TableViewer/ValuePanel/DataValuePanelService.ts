@@ -28,7 +28,7 @@ export class DataValuePanelService {
   readonly tabs: TabsContainer<IDataValuePanelProps<any>, IDataValuePanelOptions>;
 
   constructor() {
-    this.tabs = new TabsContainer();
+    this.tabs = new TabsContainer('Value Panel');
   }
 
   get(tabId: string): ITabInfo<IDataValuePanelProps<any>, IDataValuePanelOptions> | undefined {

@@ -73,7 +73,7 @@ export function useSQLCodeEditorPanel(
         'Alt-Space': () => { editorPanelData.showHint(false); }, // workaround for binded 'Ctrl-Space' by input switch in macOS
       },
     },
-    bindings:  {
+    bindings: {
       get options(): EditorConfiguration {
         return editorPanelData.options;
       },
@@ -210,52 +210,41 @@ export function useSQLCodeEditorPanel(
       });
     },
 
-
     async getHandleAutocomplete(
       editor: Editor,
-      options: ShowHintOptions
+      options: ShowHintOptions,
     ): Promise<Hints | undefined> {
       const cursor = editor.getCursor('from');
       const [from, to, word] = getWordRange(editor, cursor);
-      const cursorPosition = getAbsolutePosition(
-        editor, word.length > 0
-          ? { ...from, ch: from.ch + 1 }
-          : from
-      );
 
-      let proposals = await editorPanelData.data.getHintProposals(
-        cursorPosition,
-        word,
-        !options.completeSingle
-      );
+      const position = word.length > 0 ? { ...from, ch: from.ch + 1 } : from;
+      const cursorPosition = getAbsolutePosition(editor, position);
 
-      proposals = proposals.filter(
-        ({ displayString }) => (
-          word === '*'
-          || (
-            displayString.toLocaleLowerCase() !== word.toLocaleLowerCase()
-            && displayString.toLocaleLowerCase().startsWith(word.toLocaleLowerCase())
-          )
-        )
-      );
+      const proposals = await editorPanelData.data.getHintProposals(cursorPosition, word, !options.completeSingle);
+
+      const filteredProposals = proposals.filter(({ displayString }) => (word === '*' || (
+        displayString.toLocaleLowerCase() !== word.toLocaleLowerCase()
+        && displayString.toLocaleLowerCase().startsWith(word.toLocaleLowerCase())
+      )));
 
       const hints: Hints = {
         from,
         to,
-        list: proposals.map(({ displayString, replacementString }) => ({
+        list: filteredProposals.map(({ displayString, replacementString }) => ({
           text: replacementString,
           displayText: displayString,
         })),
       };
 
       // fix single completion
-      if (proposals.length === 1 && options.completeSingle) {
+      if (filteredProposals.length === 1 && options.completeSingle) {
         editor.showHint({
           completeSingle: true,
           updateOnCursorActivity: false,
           closeCharacters,
           hint: () => hints,
         });
+
         return;
       }
 
@@ -284,7 +273,7 @@ export function useSQLCodeEditorPanel(
 
   useExecutor({
     executor: data.onUpdate,
-    handlers:[updateHighlight],
+    handlers: [updateHighlight],
   });
 
   useExecutor({
@@ -308,7 +297,6 @@ export function useSQLCodeEditorPanel(
 
   return editorPanelData;
 }
-
 
 function getAbsolutePosition(editor: Editor, position: Position) {
   return editor.getRange({ line: 0, ch: 0 }, position).length;

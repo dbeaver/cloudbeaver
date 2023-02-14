@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: io.cloudbeaver.service.data.transfer;singleton:=true
-Bundle-Version: 1.0.66.qualifier
-Bundle-Release-Date: 20230123
+Bundle-Version: 1.0.68.qualifier
+Bundle-Release-Date: 20230220
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
