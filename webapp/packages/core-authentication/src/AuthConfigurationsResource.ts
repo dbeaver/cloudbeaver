@@ -8,7 +8,6 @@
 
 import { runInAction } from 'mobx';
 
-import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
@@ -19,6 +18,7 @@ import {
 } from '@cloudbeaver/core-sdk';
 
 import type { AuthProviderConfiguration } from './AuthProvidersResource';
+import { EAdminPermission } from './EAdminPermission';
 
 const NEW_CONFIGURATION_SYMBOL = Symbol('new-configuration');
 

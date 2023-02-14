@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EAdminPermission } from '@cloudbeaver/core-administration';
+import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
@@ -16,6 +16,7 @@ import { MenuService, ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_LOADABLE_ST
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
 import { ACTION_CONNECTION_SEARCH } from './Actions/ACTION_CONNECTION_SEARCH';
+import { ConnectionSearchSettingsService } from './ConnectionSearchSettingsService';
 import { ConnectionSearchService } from './Search/ConnectionSearchService';
 
 @injectable()
@@ -27,6 +28,7 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
+    private readonly connectionSearchSettingsService: ConnectionSearchSettingsService,
   ) {
     super();
   }
@@ -45,10 +47,18 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
       isActionApplicable: (context, action) => [
         ACTION_CONNECTION_SEARCH,
       ].includes(action),
-      isHidden: () => (
-        this.connectionsManagerService.createConnectionProjects.length === 0
-        || !this.permissionsService.has(EAdminPermission.admin)
-      ),
+      isHidden: (context, action) => {
+        if (this.connectionsManagerService.createConnectionProjects.length === 0
+          || !this.permissionsService.has(EAdminPermission.admin)) {
+          return true;
+        }
+
+        if (action === ACTION_CONNECTION_SEARCH) {
+          return this.connectionSearchSettingsService.settings.getValue('disabled');
+        }
+
+        return false;
+      },
       getLoader: (context, action) => {
         const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
 
