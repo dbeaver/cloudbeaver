@@ -19,7 +19,7 @@ import type { IProperty } from './IProperty';
 import { PropertyItem } from './PropertyItem';
 import { PROPERTIES_TABLE_ADD_STYLES, PROPERTIES_TABLE_STYLES } from './styles';
 
-type PropertiesState = Record<string, string>;
+type PropertiesState = Record<string, string | null>;
 
 interface Props {
   properties: IProperty[];
@@ -70,7 +70,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
     property.key = key;
   }, []);
 
-  const changeValue = useCallback((id: string, value: string) => {
+  const changeValue = useCallback((id: string, value: string | null) => {
     const { properties, propertiesState, onChange } = propsRef;
     const property = properties.find(property => property.id === id);
 
@@ -79,7 +79,11 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
     }
 
     if (propertiesState) {
-      propertiesState[property.key] = value;
+      if (value === property.defaultValue) {
+        delete propertiesState[property.key];
+      } else {
+        propertiesState[property.key] = value;
+      }
 
       if (onChange) {
         onChange(propertiesState);
@@ -115,18 +119,18 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
       <properties-header>
         <properties-header-name>
           <div>
-            {translate('block_properties_table_name')}
+            {translate('core_block_properties_table_name')}
           </div>
           {props.filterable ? (
             <ShadowInput
               value={filterValue}
-              placeholder={translate('block_properties_table_filter_name')}
+              placeholder={translate('core_block_properties_table_filter_name')}
               onChange={setFilterValue}
             />
           ) : null}
         </properties-header-name>
         <properties-header-value>
-          {translate('block_properties_table_value')}
+          {translate('core_block_properties_table_value')}
         </properties-header-value>
       </properties-header>
       <properties-list>
@@ -139,7 +143,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
               styles={PROPERTIES_TABLE_ADD_STYLES}
               onClick={() => onAdd()}
             >
-              {translate('block_properties_table_add')}
+              {translate('core_block_properties_table_add')}
             </Button>
           </properties-header-add>
         )}
@@ -147,7 +151,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
           <PropertyItem
             key={property.id}
             property={property}
-            value={propertiesState?.[property.key]}
+            value={propertiesState?.[property.key] ?? undefined}
             error={!isKeyUnique(property.key)}
             readOnly={readOnly}
             onNameChange={changeName}
