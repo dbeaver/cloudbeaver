@@ -18,6 +18,7 @@ package io.cloudbeaver.server;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
@@ -25,6 +26,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
  * WebSessionMonitorJob
  */
 class WebSessionMonitorJob extends AbstractJob {
+    private static final Log log = Log.getLog(WebSessionMonitorJob.class);
     private static final int MONITOR_INTERVAL = 10000; // once per 10 seconds
 
     private final CBPlatform platform;
@@ -42,7 +44,11 @@ class WebSessionMonitorJob extends AbstractJob {
             return Status.OK_STATUS;
         }
 
-        platform.getSessionManager().expireIdleSessions();
+        try {
+            platform.getSessionManager().expireIdleSessions();
+        } catch (Exception e) {
+            log.error("Error on expire idle sessions", e);
+        }
 
         if (!platform.isShuttingDown()) {
             scheduleMonitor();

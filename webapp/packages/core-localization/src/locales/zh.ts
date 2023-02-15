@@ -53,6 +53,7 @@ export const defaultZHLocale = [
   ['ui_edit', '编辑'],
   ['ui_open_in_tab', '在选项卡中打开'],
   ['ui_create', 'Create'],
+  ['ui_create_processing', 'Creating...'],
   ['ui_folder', 'Folder'],
   ['ui_folder_new', 'New folder'],
   ['ui_rename', '重命名'],

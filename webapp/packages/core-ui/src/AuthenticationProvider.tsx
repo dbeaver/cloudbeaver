@@ -21,11 +21,11 @@ const styles = css`
 `;
 
 export type Props = {
+  providerId: string;
+  className?: string;
+  children?: () => React.ReactNode;
   onAuthenticate?: () => void;
   onClose?: () => void;
-  children?: () => React.ReactNode;
-  className?: string;
-  providerId: string;
 };
 
 export const AuthenticationProvider = observer<Props>(function AuthenticationProvider(props) {
@@ -46,6 +46,7 @@ export const AuthenticationProvider = observer<Props>(function AuthenticationPro
         <Button
           type='button'
           mod={['unelevated']}
+          loading={action.authenticating}
           onClick={action.auth}
         >
           {translate('authentication_authenticate')}
