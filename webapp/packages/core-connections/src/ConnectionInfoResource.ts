@@ -637,7 +637,7 @@ export function compareNewConnectionsInfo(a: DatabaseConnection, b: DatabaseConn
     return -1;
   }
 
-  return compareConnectionsInfo(a, b);
+  return 0;
 }
 
 export function createConnectionParam(

@@ -19,7 +19,7 @@ export function navigationTreeResourceTypeFilter(
   projectInfoResource: ProjectInfoResource,
   resourceTypeId?: string,
 ): IElementsTreeFilter {
-  return (filter: string, node: NavNode, children: string[]) => {
+  return (tree, filter, node, children) => {
     if (resourceTypeId === undefined) {
       return children;
     }

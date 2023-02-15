@@ -14,11 +14,13 @@ import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeName, TREE_NODE_
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource, type INodeActions } from '@cloudbeaver/core-navigation-tree';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import { ElementsTreeContext, NavigationNodeEditorLoader, NavTreeControlComponent, NavTreeControlProps, TreeNodeMenuLoader } from '@cloudbeaver/plugin-navigation-tree';
 
 import { getRmProjectNodeId } from '../../NavNodes/getRmProjectNodeId';
+import { ResourceManagerService } from '../../ResourceManagerService';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
 
 
@@ -65,7 +67,9 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
   const viewContext = useContext(CaptureViewContext);
   const elementsTreeContext = useContext(ElementsTreeContext);
   const treeNodeContext = useContext(TreeNodeContext);
+  const projectInfoResource = useService(ProjectInfoResource);
   const navNodeInfoResource = useService(NavNodeInfoResource);
+  const resourceManagerService = useService(ResourceManagerService);
   const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
   const selected = treeNodeContext.selected;
   const resourceType = viewContext?.tryGet(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
@@ -88,17 +92,23 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     treeNodeContext.select(event.ctrlKey || event.metaKey);
   }
 
-  if (
-    node.nodeType === NAV_NODE_TYPE_RM_PROJECT
-    && resourceType !== undefined
-  ) {
-    return null;
-  } else if (resourceType !== undefined && node.projectId) {
-    const project = getRmProjectNodeId(node.projectId);
-    const projectName = navNodeInfoResource.get(project)?.name;
+  if (node.projectId && resourceType !== undefined) {
+    if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT) {
+      const project = projectInfoResource.get(node.projectId);
+      if (project) {
+        const resourceFolder = resourceManagerService.getRootFolder(project, resourceType);
 
-    if (projectName) {
-      name = projectName;
+        if (resourceFolder !== undefined) {
+          return null;
+        }
+      }
+    } else {
+      const project = getRmProjectNodeId(node.projectId);
+      const projectName = navNodeInfoResource.get(project)?.name;
+
+      if (projectName) {
+        name = projectName;
+      }
     }
   }
 

@@ -52,6 +52,7 @@ export default [
   ['ui_open_in_tab', 'Открыть во вкладке'],
   ['ui_rename', 'Переименовать'],
   ['ui_create', 'Создать'],
+  ['ui_create_processing', 'Создание...'],
   ['ui_folder', 'Папка'],
   ['ui_folder_new', 'Новая папка'],
   ['ui_rename_processing', 'Переименование...'],

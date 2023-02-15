@@ -326,7 +326,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
             }
           });
 
-          this.navTreeResource.markOutdated(resourceKeyList(updated));
+          this.navTreeResource.markTreeOutdated(resourceKeyList(updated));
         } finally {
           syncOutdate = true;
         }

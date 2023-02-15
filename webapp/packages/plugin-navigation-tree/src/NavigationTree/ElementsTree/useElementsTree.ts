@@ -17,6 +17,7 @@ import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { type NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import type { IDNDData } from '@cloudbeaver/core-ui';
 import { ILoadableState, MetadataMap, throttle } from '@cloudbeaver/core-utils';
 
 import type { IElementsTreeAction } from './IElementsTreeAction';
@@ -30,11 +31,13 @@ export interface IElementsTreeNodeExpandedInfo {
 }
 
 export type IElementsTreeNodeExpandInfoGetter = (
+  tree: IElementsTree,
   nodeId: string,
   state: ITreeNodeState
 ) => IElementsTreeNodeExpandedInfo | null;
 
 export type IElementsTreeFilter = (
+  tree: IElementsTree,
   filter: string,
   node: NavNode,
   children: string[],
@@ -96,6 +99,7 @@ export interface IElementsTree extends ILoadableState {
   readonly filter: string;
   loading: boolean;
   disabled: boolean;
+  activeDnDData: IDNDData[];
   renderers: IElementsTreeCustomRenderer[];
   state: MetadataMap<string, ITreeNodeState>;
   userData: IElementsTreeUserState;
@@ -112,6 +116,7 @@ export interface IElementsTree extends ILoadableState {
   setFilter: (value: string) => Promise<void>;
   select: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void>;
   resetSelection(): Promise<void>;
+  setDnDData: (data: IDNDData, dragging: boolean) => void;
   expand: (node: NavNode, state: boolean) => Promise<void>;
   show: (nodeId: string, parents: string[]) => Promise<void>;
   refresh: (nodeId: string) => Promise<void>;
@@ -303,6 +308,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const elementsTree = useObservableRef<IElementsTree>(() => ({
     actions: new SyncExecutor(),
     state,
+    activeDnDData: [],
     loading: options.settings?.saveExpanded || false,
     get filter(): string {
       return this.userData.filter;
@@ -334,7 +340,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       if (!expanded && options.expandStateGetters?.length) {
         return options
           .expandStateGetters
-          .map(getExpandState => getExpandState(nodeId, nodeState))
+          .map(getExpandState => getExpandState(this, nodeId, nodeState))
           .filter(stateInfo => stateInfo !== null)
           .some(stateInfo => stateInfo?.expanded);
       }
@@ -351,7 +357,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
         return options
           .expandStateGetters
-          .map(getExpandState => getExpandState(nodeId, nodeState))
+          .map(getExpandState => getExpandState(this, nodeId, nodeState))
           .filter(stateInfo => stateInfo !== null)
           .every(stateInfo => stateInfo?.expandable !== false);
       }
@@ -407,7 +413,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       return (options.filters || [])
         .reduce(
-          (children, filter) => filter(elementsTree.filter, node, children, this.state),
+          (children, filter) => filter(elementsTree, elementsTree.filter, node, children, this.state),
           options.getChildren(node.id) || []
         );
     },
@@ -531,10 +537,20 @@ export function useElementsTree(options: IOptions): IElementsTree {
       }
       await functionsRef.resetSelection();
     },
+    setDnDData(data: IDNDData, dragging: boolean) {
+      if (dragging) {
+        if (!this.activeDnDData.includes(data)) {
+          this.activeDnDData.push(data);
+        }
+      } else {
+        this.activeDnDData = this.activeDnDData.filter(d => d !== data);
+      }
+    },
   }), {
     settings: observable.ref,
     isGroup: observable.ref,
     disabled: observable.ref,
+    activeDnDData: observable.shallow,
     root: observable.ref,
     filter: computed,
     filtering: computed,

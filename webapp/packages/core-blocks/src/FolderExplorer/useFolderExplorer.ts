@@ -55,6 +55,7 @@ export function useFolderExplorer(root: string, options: IFolderExplorerOptions 
     open: action.bound,
   }, {
     state: userState,
+    root,
   });
 
   return context || data;
