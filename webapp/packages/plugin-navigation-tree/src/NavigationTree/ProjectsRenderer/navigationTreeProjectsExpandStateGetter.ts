@@ -18,7 +18,7 @@ export function navigationTreeProjectsExpandStateGetter(
   projectsNavNodeService: ProjectsNavNodeService
 ): IElementsTreeNodeExpandInfoGetter {
 
-  return nodeId => {
+  return (tree, nodeId) => {
     const node = navNodeInfoResource.get(nodeId);
 
     if (node?.nodeType !== NAV_NODE_TYPE_PROJECT) {
