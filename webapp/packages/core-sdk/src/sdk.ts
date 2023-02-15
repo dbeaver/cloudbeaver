@@ -155,6 +155,7 @@ export interface AuthProviderInfo {
   icon?: Maybe<Scalars['ID']>;
   id: Scalars['ID'];
   label: Scalars['String'];
+  private: Scalars['Boolean'];
   requiredFeatures: Array<Scalars['String']>;
   trusted: Scalars['Boolean'];
 }
@@ -1810,7 +1811,7 @@ export type GetAuthProviderConfigurationsQuery = { configurations: Array<{ provi
 export type GetAuthProvidersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAuthProvidersQuery = { providers: Array<{ id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, trusted: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> }> };
+export type GetAuthProvidersQuery = { providers: Array<{ id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, trusted: boolean, private: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> }> };
 
 export type GetAuthRolesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2393,7 +2394,7 @@ export type AuthProviderConfigurationInfoFragment = { id: string, displayName: s
 
 export type AuthProviderConfigurationParametersFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number };
 
-export type AuthProviderInfoFragment = { id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, trusted: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> };
+export type AuthProviderInfoFragment = { id: string, label: string, icon?: string, description?: string, defaultProvider: boolean, trusted: boolean, private: boolean, configurable: boolean, requiredFeatures: Array<string>, configurations?: Array<{ id: string, displayName: string, iconURL?: string, description?: string, signInLink?: string, signOutLink?: string, metadataLink?: string }>, credentialProfiles: Array<{ id?: string, label?: string, description?: string, credentialParameters: Array<{ id: string, displayName: string, description?: string, admin: boolean, user: boolean, identifying: boolean, possibleValues?: Array<string>, encryption?: AuthCredentialEncryption }> }> };
 
 export type AuthTokenFragment = { authProvider: string, authConfiguration?: string, loginTime: any, message?: string, origin: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> } };
 
@@ -3000,6 +3001,7 @@ export const AuthProviderInfoFragmentDoc = `
   description
   defaultProvider
   trusted
+  private
   configurable
   configurations {
     ...AuthProviderConfigurationInfo
