@@ -320,12 +320,8 @@ public class CBDatabase {
         }
 
         @Override
-        public void updateCurrentSchemaVersion(
-            DBRProgressMonitor monitor,
-            @NotNull Connection connection,
-            @NotNull String schemaName
-        ) throws DBException, SQLException {
-            updateCurrentSchemaVersion(monitor, connection, schemaName, CURRENT_SCHEMA_VERSION);
+        public int getLatestSchemaVersion() {
+            return CURRENT_SCHEMA_VERSION;
         }
 
         @Override
