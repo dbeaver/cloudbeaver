@@ -30,7 +30,8 @@ interface IDNDDataPrivate extends IDNDData {
 }
 
 interface IOptions {
-  onDragStart: () => void;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
 }
 
 export function useDNDData(context: IDataContextProvider, options: IOptions): IDNDData {
@@ -47,8 +48,12 @@ export function useDNDData(context: IDataContextProvider, options: IOptions): ID
     collect: monitor => {
       const dragging = monitor.isDragging();
 
-      if (dragging !== state.isDragging && dragging) {
-        options.onDragStart();
+      if (dragging !== state.isDragging) {
+        if (dragging) {
+          options.onDragStart?.();
+        } else {
+          options.onDragEnd?.();
+        }
       }
 
       state.isDragging = monitor.isDragging();

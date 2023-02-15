@@ -57,7 +57,7 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
           {translate('data_viewer_presentation_value_content_truncated_placeholder') + ' '}
           <limit-word>
             {admin ? (
-              <Link href='https://cloudbeaver.io/docs/Server-configuration#resource-quotas' target='_blank' indicator>
+              <Link href='https://dbeaver.com/docs/cloudbeaver/Server-configuration/#resource-quotas' target='_blank' indicator>
                 {translate('ui_limit')}
               </Link>
             ) : translate('ui_limit')}

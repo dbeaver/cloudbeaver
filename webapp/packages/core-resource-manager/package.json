@@ -23,7 +23,8 @@
     "@cloudbeaver/core-sdk": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
-    "@cloudbeaver/core-executor": "~0.1.0"
+    "@cloudbeaver/core-executor": "~0.1.0",
+    "@cloudbeaver/core-projects": "~0.1.0"
   },
   "peerDependencies": {
     "mobx": "~6.x.x"
