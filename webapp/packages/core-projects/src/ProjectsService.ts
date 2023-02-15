@@ -20,6 +20,7 @@ import { ProjectInfoEventHandler } from './ProjectInfoEventHandler';
 import { ProjectInfo, ProjectInfoResource } from './ProjectInfoResource';
 
 interface IActiveProjectData {
+  projects: string[];
   type: 'before' | 'after';
 }
 
@@ -33,7 +34,7 @@ export class ProjectsService extends Dependency {
     let project: ProjectInfo | undefined;
 
     if (this.userInfoResource.data) {
-      project =  this.projectInfoResource.getUserProject(this.userInfoResource.data.userId);
+      project = this.projectInfoResource.getUserProject(this.userInfoResource.data.userId);
     } else {
       project = this.projectInfoResource.get('anonymous');
     }
@@ -45,7 +46,7 @@ export class ProjectsService extends Dependency {
     let activeProjects: ProjectInfo[] = [];
 
     if (activeProjects.length === 0 && this.activeProjectIds.length > 0) {
-      activeProjects =  this.projectInfoResource
+      activeProjects = this.projectInfoResource
         .get(resourceKeyList(this.activeProjectIds))
         .filter(Boolean) as ProjectInfo[];
     }
@@ -105,12 +106,14 @@ export class ProjectsService extends Dependency {
     this.userInfoResource.onUserChange.addHandler(() => {
       this.onActiveProjectChange.execute({
         type: 'after',
+        projects: this.activeProjectIds,
       });
     });
 
     this.projectInfoResource.onDataUpdate.addHandler(() => {
       this.onActiveProjectChange.execute({
         type: 'after',
+        projects: this.activeProjectIds,
       });
     });
 
@@ -142,6 +145,7 @@ export class ProjectsService extends Dependency {
 
     const context = await this.onActiveProjectChange.execute({
       type: 'before',
+      projects: ids,
     });
 
     if (ExecutorInterrupter.isInterrupted(context)) {
@@ -151,6 +155,7 @@ export class ProjectsService extends Dependency {
 
     await this.onActiveProjectChange.execute({
       type: 'after',
+      projects: ids,
     });
 
     return true;

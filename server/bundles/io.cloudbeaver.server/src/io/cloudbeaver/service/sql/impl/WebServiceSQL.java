@@ -167,6 +167,7 @@ public class WebServiceSQL implements DBWServiceSQL {
             );
 
             SQLCompletionAnalyzer analyzer = new SQLCompletionAnalyzer(request);
+            analyzer.setCheckNavigatorNodes(false);
             analyzer.runAnalyzer(sqlContext.getProcessor().getWebSession().getProgressMonitor());
             List<SQLCompletionProposalBase> proposals = analyzer.getProposals();
             if (maxResults == null) maxResults = 200;

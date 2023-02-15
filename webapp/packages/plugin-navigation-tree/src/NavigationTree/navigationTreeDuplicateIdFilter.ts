@@ -8,15 +8,13 @@
 
 import { untracked } from 'mobx';
 
-import type { NavNode } from '@cloudbeaver/core-navigation-tree';
-
 import type { NavNodeViewService } from '../NodesManager/NavNodeView/NavNodeViewService';
 import type { IElementsTreeFilter } from './ElementsTree/useElementsTree';
 
 export function navigationTreeDuplicateFilter(
   navNodeViewService: NavNodeViewService,
 ): IElementsTreeFilter {
-  return (filter: string, node: NavNode, children: string[]) => {
+  return (tree, filter, node, children) => {
     const { nodes, duplicates } = navNodeViewService.filterDuplicates(children);
 
     untracked(() => {

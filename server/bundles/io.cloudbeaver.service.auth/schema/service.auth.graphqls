@@ -57,6 +57,7 @@ type AuthProviderInfo {
 
     defaultProvider: Boolean!
     trusted: Boolean!
+    private: Boolean!
 
     # Configurable providers must be configured first. See configurations field.
     configurable: Boolean!
