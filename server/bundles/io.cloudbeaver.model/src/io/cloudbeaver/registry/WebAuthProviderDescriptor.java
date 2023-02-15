@@ -53,6 +53,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final List<SMAuthCredentialsProfile> credentialProfiles = new ArrayList<>();
     private final boolean configurable;
     private final boolean trusted;
+    private final boolean isPrivate;
     private final String[] requiredFeatures;
 
     public WebAuthProviderDescriptor(IConfigurationElement cfg) {
@@ -62,6 +63,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         this.icon = iconToImage(cfg.getAttribute("icon"));
         this.configurable = CommonUtils.toBoolean(cfg.getAttribute("configurable"));
         this.trusted = CommonUtils.toBoolean(cfg.getAttribute("trusted"));
+        this.isPrivate = CommonUtils.toBoolean(cfg.getAttribute("private"));
 
         for (IConfigurationElement cfgElement : cfg.getChildren("configuration")) {
             for (IConfigurationElement propGroup : ArrayUtils.safeArray(cfgElement.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
@@ -116,6 +118,10 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     public boolean isTrusted() {
         return trusted;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
     }
 
     public List<PropertyDescriptor> getConfigurationParameters() {

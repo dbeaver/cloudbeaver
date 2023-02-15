@@ -24,7 +24,7 @@ export function navigationTreeProjectFilter(
   resourceManagerService: ResourceManagerService,
   resourceTypeId?: string,
 ): IElementsTreeFilter {
-  return (filter: string, node: NavNode, children: string[]) => {
+  return (tree, filter, node, children) => {
     if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT && resourceTypeId !== undefined) {
       const project = projectsNavNodeService.getProject(node.id);
 
