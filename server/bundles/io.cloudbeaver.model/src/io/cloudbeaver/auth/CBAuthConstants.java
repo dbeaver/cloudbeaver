@@ -19,7 +19,10 @@ package io.cloudbeaver.auth;
 
 public interface CBAuthConstants {
     String CB_AUTH_ID_COOKIE_NAME = "cb-auth-id";
-    
-    String CB_AUTH_ID_REQUEST_PARAM = "authId";
 
+    String CB_REDIRECT_URL_COOKIE_NAME = "cb-redirect-url";
+
+    String CB_AUTH_ID_REQUEST_PARAM = "authId";
+    String CB_AUTO_LOGIN_REQUEST_PARAM = "autoLogin";
+    String CB_REDIRECT_URL_REQUEST_PARAM = "redirectUrl";
 }

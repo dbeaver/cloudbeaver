@@ -24,7 +24,6 @@ import {
   useSplitUserState
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { NavigationTabsBar } from '@cloudbeaver/plugin-navigation-tabs';
 import { ToolsPanelService, ToolsPanel } from '@cloudbeaver/plugin-tools-panel';
@@ -52,6 +51,8 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
   const OptionsPanel = optionsPanelService.getPanelComponent();
   const activeTools = toolsPanelService.tabsContainer.getDisplayed();
 
+  const toolsDisabled = activeTools.length === 0 || toolsPanelService.disabled;
+
   return styled(useStyles(styles, splitStyles, splitHorizontalStyles, slideBoxStyles))(
     <SlideBox open={optionsPanelService.active} className={className}>
       <SlideElement>
@@ -62,8 +63,8 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
           {...splitState}
           sticky={30}
           split="horizontal"
-          mode={activeTools.length ? splitState.mode : 'minimize'}
-          disable={activeTools.length === 0}
+          mode={toolsDisabled ? 'minimize' : splitState.mode}
+          disable={toolsDisabled}
           keepRatio
         >
           <Pane>

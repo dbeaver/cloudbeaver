@@ -7,6 +7,7 @@
  */
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import { removeLineBreak } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
@@ -130,14 +131,14 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
   toDisplayString(value: IResultSetValue): string {
     value = this.getText(value);
 
-    if (typeof value === 'string' && value.length > 1000) {
-      return value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join('');
-    }
-
     if (value === null) {
       return '[null]';
     }
 
-    return String(value);
+    if (typeof value === 'string' && value.length > 1000) {
+      return removeLineBreak(value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join(''));
+    }
+
+    return removeLineBreak(String(value));
   }
 }
