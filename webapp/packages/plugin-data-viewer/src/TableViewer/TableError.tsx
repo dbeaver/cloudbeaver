@@ -89,7 +89,7 @@ interface ErrorInfo {
   show: () => void;
 }
 
-export const TableError = observer<Props>(function TableViewer({
+export const TableError = observer<Props>(function TableError({
   model,
   loading,
   className,

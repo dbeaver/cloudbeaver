@@ -1,4 +1,4 @@
-export const defaultENLocale = [
+export default [
   ['name', 'en'],
   ['ui_rename_taken_or_invalid', 'This name is unavailable or invalid'],
   ['ui_tag_new', 'New'],

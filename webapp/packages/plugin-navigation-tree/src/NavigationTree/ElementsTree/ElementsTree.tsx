@@ -17,8 +17,8 @@ import { type NavNode, ROOT_NODE_PATH, NavTreeResource, NavNodeInfoResource, EOb
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { useNavTreeDropBox } from '../useNavTreeDropBox';
+import { ElementsTreeContentLoader } from './ElementsTreeContentLoader';
 import { IElementsTreeContext, ElementsTreeContext } from './ElementsTreeContext';
-import { ElementsTreeLoader } from './ElementsTreeLoader';
 import { elementsTreeNameFilter } from './elementsTreeNameFilter';
 import { ElementsTreeTools } from './ElementsTreeTools/ElementsTreeTools';
 import type { IElementsTreeSettingsProps } from './ElementsTreeTools/NavigationTreeSettings/ElementsTreeSettingsService';
@@ -88,7 +88,7 @@ const styles = css`
   }
 `;
 
-interface Props extends IElementsTreeOptions {
+export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWithChildren {
   root?: string;
   limit?: number;
   selectionTree?: boolean;
@@ -103,7 +103,7 @@ interface Props extends IElementsTreeOptions {
   onOpen?: (node: NavNode, folder: boolean) => Promise<void> | void;
 }
 
-export const ElementsTree = observer<Props>(function ElementsTree({
+export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   root: baseRoot = ROOT_NODE_PATH,
   limit,
   control,
@@ -321,7 +321,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
                     <TreeNodeNestedMessage><Translate token='app_navigationTree_drop_here' /></TreeNodeNestedMessage>
                   </TreeNodeNested>
                 </drop-outside>
-                <ElementsTreeLoader
+                <ElementsTreeContentLoader
                   root={root}
                   context={context}
                   emptyPlaceholder={emptyPlaceholder}
@@ -338,7 +338,7 @@ export const ElementsTree = observer<Props>(function ElementsTree({
                     />
                   </tree-elements>
                   {loaderAvailable && <Loader state={tree} overlay={hasChildren} />}
-                </ElementsTreeLoader>
+                </ElementsTreeContentLoader>
               </tree>
             </FolderExplorer>
           </box>

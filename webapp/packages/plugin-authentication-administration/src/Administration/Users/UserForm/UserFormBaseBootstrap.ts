@@ -6,14 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
 import { getOriginTabId } from './getOriginTabId';
-import { OriginInfoPanel } from './OriginInfoPanel';
-import { OriginInfoTab } from './OriginInfoTab';
 import { UserFormService } from './UserFormService';
-import { UserInfo } from './UserInfo';
+
+const OriginInfoPanel = React.lazy(async () => {
+  const { OriginInfoPanel } = await import('./OriginInfoPanel');
+  return { default: OriginInfoPanel };
+});
+const OriginInfoTab = React.lazy(async () => {
+  const { OriginInfoTab } = await import('./OriginInfoTab');
+  return { default: OriginInfoTab };
+});
+const UserInfo = React.lazy(async () => {
+  const { UserInfo } = await import('./UserInfo');
+  return { default: UserInfo };
+});
 
 @injectable()
 export class UserFormBaseBootstrap extends Bootstrap {

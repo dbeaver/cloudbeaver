@@ -17,9 +17,8 @@ import { NavNodeInfoResource, NavTreeResource, EObjectFeature, type INodeActions
 
 import { ElementsTreeContext } from '../../ElementsTreeContext';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../../NavigationNodeComponent';
-import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
-import { DATA_ATTRIBUTE_NODE_EDITING } from './DATA_ATTRIBUTE_NODE_EDITING';
-import { NavigationNodeEditor } from './NavigationNodeEditor';
+import { TreeNodeMenuLoader } from '../TreeNodeMenu/TreeNodeMenuLoader';
+import { NavigationNodeEditorLoader } from './NavigationNodeLoaders';
 
 const nodeIconStyle = css`
   TreeNodeIcon[|connected] StaticImage {
@@ -120,14 +119,14 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
       </TreeNodeIcon>
       <TreeNodeName title={node.name}>
         {editing ? (
-          <NavigationNodeEditor node={node} onClose={() => setEditing(false)} />
+          <NavigationNodeEditorLoader node={node} onClose={() => setEditing(false)} />
         ) : (
           <name-box>{node.name}</name-box>
         )}
       </TreeNodeName>
       {!editing && !dndPlaceholder && (
         <portal onClick={handlePortalClick}>
-          <TreeNodeMenu node={node} actions={nodeActions} selected={selected} />
+          <TreeNodeMenuLoader node={node} actions={nodeActions} selected={selected} />
         </portal>
       )}
     </TreeNodeControl>

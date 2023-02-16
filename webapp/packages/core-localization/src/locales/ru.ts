@@ -1,4 +1,4 @@
-export const defaultRULocale = [
+export default [
   ['name', 'ru'],
   ['ui_rename_taken_or_invalid', 'Имя занято или недопустимо'],
   ['ui_tag_new', 'Новый'],
