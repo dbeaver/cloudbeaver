@@ -6,14 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 
-import { AuthConfigurationFormBaseActions } from './AuthConfigurationFormBaseActions';
 import type { IAuthConfigurationFormFillConfigData, IAuthConfigurationFormProps, IAuthConfigurationFormSubmitData, IAuthConfigurationFormState } from './IAuthConfigurationFormProps';
+
+const AuthConfigurationFormBaseActions = React.lazy(async () => {
+  const { AuthConfigurationFormBaseActions } = await import('./AuthConfigurationFormBaseActions');
+  return { default: AuthConfigurationFormBaseActions };
+});
 
 export interface IConfigurationFormValidation {
   valid: boolean;
@@ -93,7 +99,10 @@ export class AuthConfigurationFormService {
     },
   });
 
-  private readonly showSubmittingStatusMessage: IExecutorHandler<IAuthConfigurationFormSubmitData> = (data, contexts) => {
+  private readonly showSubmittingStatusMessage: IExecutorHandler<IAuthConfigurationFormSubmitData> = (
+    data,
+    contexts
+  ) => {
     const status = contexts.getContext(this.configurationStatusContext);
 
     if (!status.saved) {

@@ -6,12 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { UserFormService } from '../UserFormService';
-import { ConnectionAccess } from './ConnectionAccess';
+
+const ConnectionAccess = React.lazy(async () => {
+  const { ConnectionAccess } = await import('./ConnectionAccess');
+  return { default: ConnectionAccess };
+});
 
 @injectable()
 export class ConnectionAccessTabBootstrap extends Bootstrap {

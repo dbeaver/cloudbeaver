@@ -17,7 +17,7 @@ import { NavNodeInfoResource, type INodeActions } from '@cloudbeaver/core-naviga
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
-import { ElementsTreeContext, NavigationNodeEditor, NavTreeControlComponent, NavTreeControlProps, TreeNodeMenu } from '@cloudbeaver/plugin-navigation-tree';
+import { ElementsTreeContext, NavigationNodeEditorLoader, NavTreeControlComponent, NavTreeControlProps, TreeNodeMenuLoader } from '@cloudbeaver/plugin-navigation-tree';
 
 import { getRmProjectNodeId } from '../../NavNodes/getRmProjectNodeId';
 import { ResourceManagerService } from '../../ResourceManagerService';
@@ -125,14 +125,14 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     >
       <TreeNodeName title={name}>
         {editing ? (
-          <NavigationNodeEditor node={node} onClose={() => setEditing(false)} />
+          <NavigationNodeEditorLoader node={node} onClose={() => setEditing(false)} />
         ) : (
           <name-box>{name}</name-box>
         )}
       </TreeNodeName>
       {!editing && !dndPlaceholder && (
         <portal onClick={handlePortalClick}>
-          <TreeNodeMenu node={node} actions={nodeActions} selected={selected} />
+          <TreeNodeMenuLoader node={node} actions={nodeActions} selected={selected} />
         </portal>
       )}
     </TreeNodeControl>

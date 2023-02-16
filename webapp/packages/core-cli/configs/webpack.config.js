@@ -114,26 +114,46 @@ module.exports = (env, argv) => {
       moduleIds: 'deterministic',
       splitChunks: {
         chunks: 'async',
+        minSize: 20000,
+        minRemainingSize: 0,
+        minChunks: 1,
+        maxAsyncRequests: 30,
+        maxInitialRequests: 30,
+        enforceSizeThreshold: 50000,
         cacheGroups: {
           locale: {
             test: /[\\/]locales[\\/].*?\.ts/,
-            filename: '[name].[contenthash].bundle.js',
+            filename: '[name].[contenthash].js',
             name(module) {
               return module.rawRequest.substr(2);
             },
             priority: -5,
             reuseExistingChunk: true,
           },
+          packages: {
+            test: /[\\/]packages[\\/]((plugin|core)-.*?)[\\/]src[\\/]/,
+            filename: '[name].[contenthash].js',
+            name(module) {
+              const path = module.context ?? module.resource;
+              const match = /[\\/]packages[\\/]((plugin|core)-.*?)([\\/]|$)/.exec(path);
+              if (!path || !match) {
+                return 'package';
+              }
+              return match[1];
+            },
+            priority: -10,
+            enforce: true,
+          },
           defaultVendors: {
+            chunks: 'all',
             name: 'vendors',
             test: new RegExp(`[\\\\/]node_modules[\\\\/](?!${excludedFromVendor.join('|')}).*?[\\\\/]`, ''),
-            priority: -10,
-            reuseExistingChunk: false,
-            enforce: true,
+            priority: -20,
+            reuseExistingChunk: true,
           },
           default: {
             minChunks: 2,
-            priority: -20,
+            priority: -40,
             reuseExistingChunk: true,
           },
           // styles: {

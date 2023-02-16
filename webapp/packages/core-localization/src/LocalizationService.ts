@@ -17,10 +17,6 @@ import type { ServerLanguage } from '@cloudbeaver/core-sdk';
 import { SettingsService } from '@cloudbeaver/core-settings';
 
 import type { ILocaleProvider } from './ILocaleProvider';
-import { defaultENLocale } from './locales/en';
-import { defaultITLocale } from './locales/it';
-import { defaultRULocale } from './locales/ru';
-import { defaultZHLocale } from './locales/zh';
 import type { TLocalizationToken } from './TLocalizationToken';
 
 export type ServerLanguageShort = Pick<ServerLanguage, 'isoCode' | 'nativeName'>;
@@ -160,16 +156,16 @@ export class LocalizationService extends Bootstrap {
     }
   }
 
-  private coreProvider(locale: string) {
+  private async coreProvider(locale: string) {
     switch (locale) {
       case 'ru':
-        return defaultRULocale;
+        return (await import('./locales/ru')).default;
       case 'it':
-        return defaultITLocale;
+        return (await import('./locales/it')).default;
       case 'zh':
-        return defaultZHLocale;
+        return (await import('./locales/zh')).default;
       default:
-        return defaultENLocale;
+        return (await import('./locales/en')).default;
     }
   }
 
