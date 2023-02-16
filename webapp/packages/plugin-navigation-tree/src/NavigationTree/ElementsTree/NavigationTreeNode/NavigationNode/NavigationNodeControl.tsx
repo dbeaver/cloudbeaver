@@ -18,8 +18,8 @@ import { GlobalConstants, isValidUrl } from '@cloudbeaver/core-utils';
 
 import { ElementsTreeContext } from '../../ElementsTreeContext';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../../NavigationNodeComponent';
-import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
-import { NavigationNodeEditor } from './NavigationNodeEditor';
+import { TreeNodeMenuLoader } from '../TreeNodeMenu/TreeNodeMenuLoader';
+import { NavigationNodeEditorLoader } from './NavigationNodeLoaders';
 
 
 const styles = css`
@@ -124,14 +124,14 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
       </TreeNodeIcon>
       <TreeNodeName title={node.name}>
         {editing ? (
-          <NavigationNodeEditor node={node} onClose={() => setEditing(false)} />
+          <NavigationNodeEditorLoader node={node} onClose={() => setEditing(false)} />
         ) : (
           <name-box>{node.name}</name-box>
         )}
       </TreeNodeName>
       {!editing && !dndPlaceholder && (
         <portal onClick={handlePortalClick}>
-          <TreeNodeMenu node={node} actions={nodeActions} selected={selected} />
+          <TreeNodeMenuLoader node={node} actions={nodeActions} selected={selected} />
         </portal>
       )}
     </TreeNodeControl>

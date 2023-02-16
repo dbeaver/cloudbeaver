@@ -11,8 +11,7 @@ import { useContext, useEffect } from 'react';
 import { Dialog, useDialogState } from 'reakit/Dialog';
 import styled, { use } from 'reshadow';
 
-import { Icon, IconOrImage, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
-
+import { Icon, IconOrImage, useTranslate, useStyles, Loader } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { DialogContext } from '../DialogContext';
@@ -86,7 +85,9 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps>(function C
         <dialog-body {...use({ 'no-padding': noBodyPadding, 'no-overflow': noOverflow })}>
           <dialog-body-overflow-box>
             <dialog-body-content>
-              {children}
+              <Loader loading={false} overlay>
+                {children}
+              </Loader>
             </dialog-body-content>
             {!noOverflow && <dialog-body-overflow />}
           </dialog-body-overflow-box>

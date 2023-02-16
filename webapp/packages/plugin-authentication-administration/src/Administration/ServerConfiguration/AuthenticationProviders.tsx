@@ -106,13 +106,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
                   disabled = true;
                 }
 
-                if (
-                  configurationWizard
-                  && (
-                    disabled
-                    || provider.id !== AUTH_PROVIDER_LOCAL_ID
-                  )
-                ) {
+                if (provider.private || (configurationWizard && (disabled || provider.id !== AUTH_PROVIDER_LOCAL_ID))) {
                   return null;
                 }
 

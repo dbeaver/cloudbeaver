@@ -8,7 +8,7 @@
 
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useState, useEffect, useContext, useRef } from 'react';
+import { useState, useEffect, useContext, useRef, Suspense } from 'react';
 import styled, { use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
@@ -216,11 +216,13 @@ export const Loader = observer<Props>(function Loader({
 
   if (children && (!loader || !loading) && !overlay) {
     if (loaded) {
-      if (typeof children === 'function') {
-        return <LoaderContext.Provider value={contextState}>{children()}</LoaderContext.Provider>;
-      } else {
-        return <LoaderContext.Provider value={contextState}>{children}</LoaderContext.Provider>;
-      }
+      return (
+        <LoaderContext.Provider value={contextState}>
+          <Suspense fallback={<Loader className={className} />}>
+            {typeof children === 'function' ? children() : children}
+          </Suspense>
+        </LoaderContext.Provider>
+      );
     }
 
     if (!loading) {
@@ -230,11 +232,13 @@ export const Loader = observer<Props>(function Loader({
 
   if ((!isVisible && overlay) || !loading) {
     if (overlay) {
-      if (typeof children === 'function') {
-        return <LoaderContext.Provider value={contextState}>{children()}</LoaderContext.Provider>;
-      } else {
-        return <LoaderContext.Provider value={contextState}>{children}</LoaderContext.Provider>;
-      }
+      return (
+        <LoaderContext.Provider value={contextState}>
+          <Suspense fallback={<Loader className={className} />}>
+            {typeof children === 'function' ? children() : children}
+          </Suspense>
+        </LoaderContext.Provider>
+      );
     }
 
     return null;
@@ -253,7 +257,11 @@ export const Loader = observer<Props>(function Loader({
   return styled(style)(
     <LoaderContext.Provider value={contextState}>
       <>
-        {overlay && children}
+        {overlay && (
+          <Suspense fallback={<Loader className={className} />}>
+            {typeof children === 'function' ? children() : children}
+          </Suspense>
+        )}
         <loader ref={loaderRef} className={className} {...use({ small, fullSize, inline, secondary, overlay })}>
           <icon>
             <StaticImage icon={spinnerType.primary} {...use({primaryIcon: true})} />

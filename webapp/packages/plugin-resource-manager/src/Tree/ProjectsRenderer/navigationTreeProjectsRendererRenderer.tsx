@@ -16,7 +16,7 @@ import type { NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/c
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { NAV_NODE_TYPE_RM_PROJECT, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { createPath } from '@cloudbeaver/core-utils';
-import { type IElementsTreeCustomRenderer, type NavigationNodeRendererComponent, useNode, NavigationNodeRenderer, ElementsTreeContext } from '@cloudbeaver/plugin-navigation-tree';
+import { type IElementsTreeCustomRenderer, type NavigationNodeRendererComponent, useNode, NavigationNodeRendererLoader, ElementsTreeContext } from '@cloudbeaver/plugin-navigation-tree';
 
 import type { ResourceManagerService } from '../../ResourceManagerService';
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
@@ -100,7 +100,7 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
   const project = node.nodeType === NAV_NODE_TYPE_RM_PROJECT && singleProject;
 
   return styled(nestedStyles)(
-    <NavigationNodeRenderer
+    <NavigationNodeRendererLoader
       node={node}
       path={path}
       expanded={expanded}

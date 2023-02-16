@@ -1,4 +1,4 @@
-export const defaultRULocale = [
+export default [
   ['name', 'ru'],
   ['ui_rename_taken_or_invalid', 'Имя занято или недопустимо'],
   ['ui_tag_new', 'Новый'],
@@ -52,6 +52,7 @@ export const defaultRULocale = [
   ['ui_open_in_tab', 'Открыть во вкладке'],
   ['ui_rename', 'Переименовать'],
   ['ui_create', 'Создать'],
+  ['ui_create_processing', 'Создание...'],
   ['ui_folder', 'Папка'],
   ['ui_folder_new', 'Новая папка'],
   ['ui_rename_processing', 'Переименование...'],
