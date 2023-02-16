@@ -14,20 +14,13 @@ import { ConnectionMark, getComputed, TreeNodeContext, TreeNodeControl, TreeNode
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource, NavTreeResource, EObjectFeature, type INodeActions } from '@cloudbeaver/core-navigation-tree';
+import { GlobalConstants, isValidUrl } from '@cloudbeaver/core-utils';
 
 import { ElementsTreeContext } from '../../ElementsTreeContext';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../../NavigationNodeComponent';
 import { TreeNodeMenu } from '../TreeNodeMenu/TreeNodeMenu';
 import { NavigationNodeEditor } from './NavigationNodeEditor';
 
-const nodeIconStyle = css`
-  TreeNodeIcon[|connected] StaticImage {
-    mask-image: url(/icons/connection-mark.svg);
-    mask-size: 100%;
-    mask-repeat: no-repeat;
-    mask-position: center;
-  }
-`;
 
 const styles = css`
   TreeNodeControl {
@@ -102,12 +95,31 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
     treeNodeContext.select(event.ctrlKey || event.metaKey);
   }
 
+  function renderIcon() {
+    if (!icon) {
+      return null;
+    }
+    const url = isValidUrl(icon) ? icon : GlobalConstants.absoluteUrl(icon);
+
+    return (
+      <svg width="16" height="16" viewBox="0 0 16 16">
+        <mask id="mask">
+          <rect fill="#fff" x="0" y="0" width="16" height="16" />
+          <circle fill="#000" cx="12" cy="12" r="6" />
+          <rect fill="#000" x="12" y="12" width="5" height="5" mask="url(#mask)" />
+        </mask>
+        <image xlinkHref={url} width="16" height="16" mask={connected ? 'url(#mask)' : undefined} />
+      </svg>
+    );
+  }
+
   const expandable = getComputed(() => treeContext?.tree.isNodeExpandable(node.id) ?? true);
 
-  return styled(TREE_NODE_STYLES, nodeIconStyle, styles)(
+  return styled(TREE_NODE_STYLES, styles)(
     <TreeNodeControl ref={ref} onClick={onClickHandler} {...use({ outdated, editing, dragging: dndElement })}>
       {expandable && <TreeNodeExpand filterActive={treeContext?.tree.filtering} />}
-      <TreeNodeIcon icon={icon} style={nodeIconStyle} {...use({ connected })}>
+      <TreeNodeIcon {...use({ connected })}>
+        {renderIcon()}
         <ConnectionMark connected={connected} />
       </TreeNodeIcon>
       <TreeNodeName title={node.name}>

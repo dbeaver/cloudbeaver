@@ -35,12 +35,12 @@ export const loaderStyles = css`
         & StaticImage[|secondaryIcon] {
           display: block;
         }
+      }
 
-        &[|small],
-        &:global(.small) {
-          & StaticImage[|secondarySmallIcon] {
-            display: block;
-          }
+      &[|small],
+      &:global(.small) {
+        & StaticImage[|secondarySmallIcon] {
+          display: block;
         }
       }
     }
