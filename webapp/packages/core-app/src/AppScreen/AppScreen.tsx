@@ -10,7 +10,6 @@ import { memo } from 'react';
 
 import { Placeholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { TopNavBar } from '@cloudbeaver/plugin-top-app-bar';
 
 import { AppScreenService } from './AppScreenService';
 import { Main } from './Main';
@@ -20,7 +19,6 @@ export const AppScreen = memo(function AppScreen() {
   return (
     <>
       <Placeholder container={appScreenService.placeholder} />
-      <TopNavBar />
       <Main />
     </>
   );

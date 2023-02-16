@@ -53,6 +53,7 @@ export * from './Tabs/TabsBootstrap';
 export * from './Tabs/TabsBox/TabsBox';
 export * from './Tabs/TabsBox/TabsBoxFromArray';
 
+export * from './SideBarPanel/LeftBarPanelService';
 export * from './SideBarPanel/SideBarPanel';
 export * from './SideBarPanel/SideBarPanelService';
 

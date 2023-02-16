@@ -37,6 +37,8 @@ export * from './NodesManager/useChildren';
 
 export * from './NodesManager/NodeLinkLoader';
 
+export * from './NavigationTreeSettingsService';
+
 import { navigationTreePlugin } from './manifest';
 
 export { navigationTreePlugin };
