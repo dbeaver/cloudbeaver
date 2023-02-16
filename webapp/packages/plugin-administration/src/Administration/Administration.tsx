@@ -11,7 +11,7 @@ import { useLayoutEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AdministrationItemService, filterOnlyActive, IAdministrationItemRoute } from '@cloudbeaver/core-administration';
-import { SlideBox, SlideElement, ErrorBoundary, SlideOverlay, slideBoxStyles, useStyles } from '@cloudbeaver/core-blocks';
+import { SlideBox, SlideElement, ErrorBoundary, SlideOverlay, slideBoxStyles, useStyles, Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { TabsState, TabList, verticalTabStyles, BASE_TAB_STYLES, OptionsPanelService } from '@cloudbeaver/core-ui';
 
@@ -59,6 +59,9 @@ const administrationStyles = css`
       flex-direction: column;
       overflow: auto;
     }
+    Loader {
+      height: 100%;
+    }
   `;
 
 interface Props {
@@ -102,16 +105,20 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
           <SlideBox open={optionsPanelService.active}>
             <SlideElement>
               <ErrorBoundary remount>
-                <content>
-                  <OptionsPanel />
-                </content>
+                <Loader loading={false} overlay>
+                  <content>
+                    <OptionsPanel />
+                  </content>
+                </Loader>
               </ErrorBoundary>
             </SlideElement>
             <SlideElement>
               <ErrorBoundary remount>
-                <content>
-                  <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
-                </content>
+                <Loader loading={false} overlay>
+                  <content>
+                    <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
+                  </content>
+                </Loader>
               </ErrorBoundary>
               <SlideOverlay onClick={() => optionsPanelService.close()} />
             </SlideElement>

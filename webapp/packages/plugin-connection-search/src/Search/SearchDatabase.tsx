@@ -7,16 +7,23 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import styled, { css } from 'reshadow';
 
-import { useResource } from '@cloudbeaver/core-blocks';
+import { Loader, useResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { AdminConnectionSearchInfo, CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { ConnectionForm } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionSearchService } from './ConnectionSearchService';
 import { DatabaseList } from './DatabaseList';
+
+const styles = css`
+  Loader {
+    height: 100%;
+  }
+`;
 
 export const SearchDatabase: React.FC = observer(function SearchDatabase() {
   const connectionSearchService = useService(ConnectionSearchService);
@@ -29,12 +36,14 @@ export const SearchDatabase: React.FC = observer(function SearchDatabase() {
   }
 
   if (connectionSearchService.formState) {
-    return (
-      <ConnectionForm
-        state={connectionSearchService.formState}
-        onSave={() => connectionSearchService.saveConnection()}
-        onCancel={() => connectionSearchService.goBack()}
-      />
+    return styled(styles)(
+      <Loader loading={false} overlay>
+        <ConnectionFormLoader
+          state={connectionSearchService.formState}
+          onSave={() => connectionSearchService.saveConnection()}
+          onCancel={() => connectionSearchService.goBack()}
+        />
+      </Loader>
     );
   }
 

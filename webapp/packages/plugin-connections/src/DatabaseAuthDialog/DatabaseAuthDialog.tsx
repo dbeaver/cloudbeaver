@@ -21,7 +21,7 @@ import { IConnectionInfoParams, useConnectionInfo, useDBDriver } from '@cloudbea
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 
-import { ConnectionAuthenticationForm } from '../ConnectionAuthentication/ConnectionAuthenticationForm';
+import { ConnectionAuthenticationFormLoader } from '../ConnectionAuthentication/ConnectionAuthenticationFormLoader';
 import { DBAuthDialogController } from './DBAuthDialogController';
 import { DBAuthDialogFooter } from './DBAuthDialogFooter';
 
@@ -33,7 +33,7 @@ const styles = css`
       display: flex;
       flex-direction: column;
     }
-    ConnectionAuthenticationForm {
+    ConnectionAuthenticationFormLoader {
       align-content: center;
     }
     ErrorMessage {
@@ -91,7 +91,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
         {!connection.isLoaded() || connection.isLoading() || !controller.configured
           ? <Loader />
           : (
-            <ConnectionAuthenticationForm
+            <ConnectionAuthenticationFormLoader
               config={controller.config}
               authModelId={authModelId}
               authProperties={connection.connectionInfo?.authProperties}

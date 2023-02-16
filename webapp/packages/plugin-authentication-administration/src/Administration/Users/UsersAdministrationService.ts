@@ -6,17 +6,31 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { AdministrationItemService } from '@cloudbeaver/core-administration';
 import { AdminUser, TeamsResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 
 import { CreateTeamService } from './Teams/CreateTeamService';
-import { UsersAdministration } from './UsersAdministration';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
-import { UsersDrawerItem } from './UsersDrawerItem';
 import { CreateUserService } from './UsersTable/CreateUserService';
-import { Origin } from './UsersTable/UserDetailsInfo/Origin';
+
+const Origin = React.lazy(async () => {
+  const { Origin } = await import('./UsersTable/UserDetailsInfo/Origin');
+  return { default: Origin };
+});
+
+const UsersDrawerItem = React.lazy(async () => {
+  const { UsersDrawerItem } = await import('./UsersDrawerItem');
+  return { default: UsersDrawerItem };
+});
+
+const UsersAdministration = React.lazy(async () => {
+  const { UsersAdministration } = await import('./UsersAdministration');
+  return { default: UsersAdministration };
+});
 
 export interface IUserDetailsInfoProps {
   user: AdminUser;

@@ -18,7 +18,7 @@ import { NAV_NODE_TYPE_PROJECT, ProjectsService } from '@cloudbeaver/core-projec
 import { useNode } from '../../NodesManager/useNode';
 import { ElementsTreeContext } from '../ElementsTree/ElementsTreeContext';
 import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent';
-import { NavigationNodeRenderer } from '../ElementsTree/NavigationTreeNode/NavigationNodeRenderer';
+import { NavigationNodeRendererLoader } from '../ElementsTree/NavigationTreeNode/NavigationNodeRendererLoader';
 import type { IElementsTreeCustomRenderer } from '../ElementsTree/useElementsTree';
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
 
@@ -81,7 +81,7 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
   const project = node.nodeType === NAV_NODE_TYPE_PROJECT && singleProject;
 
   return styled(nestedStyles)(
-    <NavigationNodeRenderer
+    <NavigationNodeRendererLoader
       node={node}
       path={path}
       expanded={expanded}
