@@ -18,6 +18,7 @@ import { NavNodeInfoResource, NavTreeResource, EObjectFeature, type INodeActions
 import { ElementsTreeContext } from '../../ElementsTreeContext';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../../NavigationNodeComponent';
 import { TreeNodeMenuLoader } from '../TreeNodeMenu/TreeNodeMenuLoader';
+import { DATA_ATTRIBUTE_NODE_EDITING } from './DATA_ATTRIBUTE_NODE_EDITING';
 import { NavigationNodeEditorLoader } from './NavigationNodeLoaders';
 
 const nodeIconStyle = css`

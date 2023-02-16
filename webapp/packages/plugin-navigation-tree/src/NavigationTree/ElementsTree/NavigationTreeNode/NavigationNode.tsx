@@ -18,6 +18,7 @@ import { useDataContext } from '@cloudbeaver/core-view';
 
 import { useNavTreeDropBox } from '../../useNavTreeDropBox';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
+import { DATA_ATTRIBUTE_NODE_EDITING } from './NavigationNode/DATA_ATTRIBUTE_NODE_EDITING';
 import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
 import { useNavigationNode } from './useNavigationNode';
