@@ -22,7 +22,7 @@ export * from './Loader/useAutoLoad';
 export * from './localization/Translate';
 export * from './localization/useTranslate';
 
-export * from './Marks/ConnectionMark';
+export * from './ConnectionImageWithMask/ConnectionImageWithMask';
 
 export * from './Menu/ACTION_ICON_BUTTON_STYLES';
 export * from './Menu/Menu';

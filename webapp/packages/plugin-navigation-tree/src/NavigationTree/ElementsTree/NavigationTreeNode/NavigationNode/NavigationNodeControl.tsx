@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { ConnectionMark, getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
+import { ConnectionImageWithMask, getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource, NavTreeResource, EObjectFeature, type INodeActions } from '@cloudbeaver/core-navigation-tree';
@@ -21,14 +21,6 @@ import { TreeNodeMenuLoader } from '../TreeNodeMenu/TreeNodeMenuLoader';
 import { DATA_ATTRIBUTE_NODE_EDITING } from './DATA_ATTRIBUTE_NODE_EDITING';
 import { NavigationNodeEditorLoader } from './NavigationNodeLoaders';
 
-const nodeIconStyle = css`
-  TreeNodeIcon[|connected] StaticImage {
-    mask-image: url(/icons/connection-mark.svg);
-    mask-size: 100%;
-    mask-repeat: no-repeat;
-    mask-position: center;
-  }
-`;
 
 const styles = css`
   TreeNodeControl {
@@ -107,7 +99,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
 
   const attributes = { [DATA_ATTRIBUTE_NODE_EDITING]: editing };
 
-  return styled(TREE_NODE_STYLES, nodeIconStyle, styles)(
+  return styled(TREE_NODE_STYLES, styles)(
     <TreeNodeControl
       ref={ref}
       {...attributes}
@@ -115,8 +107,8 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
       {...use({ outdated, editing, dragging: dndElement })}
     >
       {expandable && <TreeNodeExpand filterActive={treeContext?.tree.filtering} />}
-      <TreeNodeIcon icon={icon} style={nodeIconStyle} {...use({ connected })}>
-        <ConnectionMark connected={connected} />
+      <TreeNodeIcon {...use({ connected })}>
+        <ConnectionImageWithMask icon={icon} connected={connected} maskId="tree-node-icon" />
       </TreeNodeIcon>
       <TreeNodeName title={node.name}>
         {editing ? (
