@@ -51,6 +51,7 @@ import org.jkiss.dbeaver.model.net.ssh.SSHImplementation;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
@@ -407,9 +408,10 @@ public class WebServiceCore implements DBWServiceCore {
         webSession.addInfoMessage("New connection was created - " + WebServiceUtils.getConnectionContainerInfo(newDataSource));
         WebEventUtils.addDataSourceUpdatedEvent(
             webSession.getProjectById(projectId),
-            webSession.getUserContext().getSmSessionId(),
+            webSession,
             connectionInfo.getId(),
-            WSConstants.EventAction.CREATE
+            WSConstants.EventAction.CREATE,
+            WSDataSourceProperty.CONFIGURATION
         );
         return connectionInfo;
     }
@@ -444,6 +446,8 @@ public class WebServiceCore implements DBWServiceCore {
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
 
         boolean sendEvent = !((DataSourceDescriptor) dataSource).equalSettings(oldDataSource);
+        WSDataSourceProperty property = getDatasourceEventProperty(oldDataSource, dataSource);
+
 
         WebServiceUtils.saveAuthProperties(
             dataSource,
@@ -462,12 +466,27 @@ public class WebServiceCore implements DBWServiceCore {
         if (sendEvent) {
             WebEventUtils.addDataSourceUpdatedEvent(
                 webSession.getProjectById(projectId),
-                webSession.getUserContext().getSmSessionId(),
+                webSession,
                 connectionInfo.getId(),
-                WSConstants.EventAction.UPDATE
+                WSConstants.EventAction.UPDATE,
+                property
             );
         }
         return connectionInfo;
+    }
+
+    private WSDataSourceProperty getDatasourceEventProperty(DataSourceDescriptor oldDataSource, DBPDataSourceContainer dataSource) {
+        if (!oldDataSource.equalConfiguration((DataSourceDescriptor) dataSource)) {
+            return WSDataSourceProperty.CONFIGURATION;
+        }
+
+        var nameChanged = !CommonUtils.equalObjects(oldDataSource.getName(), dataSource.getName());
+        var descriptionChanged = !CommonUtils.equalObjects(oldDataSource.getDescription(), dataSource.getDescription());
+        if (nameChanged && descriptionChanged) {
+            return WSDataSourceProperty.CONFIGURATION;
+        }
+
+        return nameChanged ? WSDataSourceProperty.NAME : WSDataSourceProperty.CONFIGURATION;
     }
 
     @Override
@@ -483,9 +502,10 @@ public class WebServiceCore implements DBWServiceCore {
         closeAndDeleteConnection(webSession, projectId, connectionId, true);
         WebEventUtils.addDataSourceUpdatedEvent(
             webSession.getProjectById(projectId),
-            webSession.getUserContext().getSmSessionId(),
+            webSession,
             connectionId,
-            WSConstants.EventAction.DELETE
+            WSConstants.EventAction.DELETE,
+            WSDataSourceProperty.CONFIGURATION
         );
         return true;
     }
@@ -564,9 +584,10 @@ public class WebServiceCore implements DBWServiceCore {
             webSession.addConnection(connectionInfo);
             WebEventUtils.addDataSourceUpdatedEvent(
                 webSession.getProjectById(projectId),
-                webSession.getUserContext().getSmSessionId(),
+                webSession,
                 connectionInfo.getId(),
-                WSConstants.EventAction.CREATE
+                WSConstants.EventAction.CREATE,
+                WSDataSourceProperty.CONFIGURATION
             );
             return connectionInfo;
         } catch (DBException e) {
@@ -767,7 +788,7 @@ public class WebServiceCore implements DBWServiceCore {
             WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
             WebEventUtils.addNavigatorNodeUpdatedEvent(
                 session.getProjectById(projectId),
-                session.getUserContext().getSmSessionId(),
+                session,
                 DBNLocalFolder.makeLocalFolderItemPath(newFolder),
                 WSConstants.EventAction.CREATE
             );
@@ -792,13 +813,13 @@ public class WebServiceCore implements DBWServiceCore {
         WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             session.getProjectById(projectId),
-            session.getUserContext().getSmSessionId(),
+            session,
             oldFolderNode,
             WSConstants.EventAction.DELETE
         );
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             session.getProjectById(projectId),
-            session.getUserContext().getSmSessionId(),
+            session,
             newFolderNode,
             WSConstants.EventAction.CREATE
         );
@@ -823,7 +844,7 @@ public class WebServiceCore implements DBWServiceCore {
             WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
             WebEventUtils.addNavigatorNodeUpdatedEvent(
                 session.getProjectById(projectId),
-                session.getUserContext().getSmSessionId(),
+                session,
                 folderNode,
                 WSConstants.EventAction.DELETE
             );
@@ -843,9 +864,10 @@ public class WebServiceCore implements DBWServiceCore {
         dataSourceDescriptor.persistConfiguration();
         WebEventUtils.addDataSourceUpdatedEvent(
             webSession.getProjectById(projectId),
-            webSession.getUserContext().getSmSessionId(),
+            webSession,
             id,
-            WSConstants.EventAction.UPDATE);
+            WSConstants.EventAction.UPDATE,
+            WSDataSourceProperty.CONFIGURATION);
         return connectionInfo;
     }
 
