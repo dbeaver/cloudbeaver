@@ -45,7 +45,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   const dndData = useDNDData(context, {
     canDrag: () => {
       const el = navNode.ref.current;
-      const editing = !!el && el.getAttribute(DATA_ATTRIBUTE_NODE_EDITING) === 'true';
+      const editing = el?.getAttribute(DATA_ATTRIBUTE_NODE_EDITING) === 'true';
 
       return !editing;
     },
