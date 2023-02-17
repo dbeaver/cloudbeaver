@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { TableViewer } from '@cloudbeaver/plugin-data-viewer';
+import { TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IResultGroup, IResultTab } from '../ISqlEditorTabState';
 
@@ -26,7 +26,7 @@ export const SqlResultSetPanel = observer<Props>(function SqlResultSetPanel({
   const [valuePresentationId, setValuePresentation] = useState<string | null>(null);
 
   return (
-    <TableViewer
+    <TableViewerLoader
       tableId={group.modelId}
       resultIndex={resultTab.indexInResultSet}
       presentationId={presentationId}

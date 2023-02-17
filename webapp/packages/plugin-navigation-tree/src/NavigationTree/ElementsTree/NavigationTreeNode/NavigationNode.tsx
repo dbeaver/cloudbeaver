@@ -18,7 +18,7 @@ import {  useDataContext } from '@cloudbeaver/core-view';
 
 import { useNavTreeDropBox } from '../../useNavTreeDropBox';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
-import { NavigationNodeControl } from './NavigationNode/NavigationNodeControl';
+import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
 import { useNavigationNode } from './useNavigationNode';
 
@@ -64,7 +64,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   context.set(DATA_CONTEXT_NAV_NODE, node);
   context.set(DATA_CONTEXT_NAV_NODES, navNode.getSelected);
 
-  const Control = navNode.control || externalControl || NavigationNodeControl;
+  const Control = navNode.control || externalControl || NavigationNodeControlLoader;
 
   if (navNode.leaf || !navNode.loaded) {
     externalExpanded = false;

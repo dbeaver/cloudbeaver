@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import React from 'react';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { EAdminPermission } from '@cloudbeaver/core-authentication';
@@ -16,8 +17,12 @@ import { PermissionsService } from '@cloudbeaver/core-root';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 import { connectionConfigContext, ConnectionFormService, connectionFormStateContext, IConnectionFormProps, IConnectionFormState, IConnectionFormSubmitData } from '@cloudbeaver/plugin-connections';
 
-import { ConnectionAccess } from './ConnectionAccess';
 import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
+
+const ConnectionAccess = React.lazy(async () => {
+  const { ConnectionAccess } = await import('./ConnectionAccess');
+  return { default: ConnectionAccess };
+});
 
 @injectable()
 export class ConnectionAccessTabService extends Bootstrap {
