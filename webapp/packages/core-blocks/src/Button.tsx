@@ -45,7 +45,7 @@ const buttonStyles = css`
 
       & Loader {
         position: absolute;
-        opacity: 0;
+        opacity: 0 !important;
       }
 
       & button-label {
@@ -54,7 +54,7 @@ const buttonStyles = css`
 
       &[|loading] {
         & Loader {
-          opacity: 1;
+          opacity: 1 !important;
         }
 
         & button-label {

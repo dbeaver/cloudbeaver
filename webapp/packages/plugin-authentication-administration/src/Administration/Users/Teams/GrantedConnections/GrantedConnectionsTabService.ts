@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { TeamsResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -17,8 +19,12 @@ import { isArraysEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
 import { teamContext } from '../Contexts/teamContext';
 import type { ITeamFormProps, ITeamFormSubmitData } from '../ITeamFormProps';
 import { TeamFormService } from '../TeamFormService';
-import { GrantedConnections } from './GrantedConnections';
 import type { IGrantedConnectionsTabState } from './IGrantedConnectionsTabState';
+
+const GrantedConnections = React.lazy(async () => {
+  const { GrantedConnections } = await import('./GrantedConnections');
+  return { default: GrantedConnections };
+});
 
 @injectable()
 export class GrantedConnectionsTabService extends Bootstrap {

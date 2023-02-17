@@ -1,7 +1,7 @@
 {
   "name": "@cloudbeaver/product-default",
   "sideEffects": false,
-  "version": "22.3.4",
+  "version": "22.3.5",
   "description": "",
   "license": "Apache-2.0",
   "main": "lib/index.js",
@@ -11,7 +11,8 @@
     "prebuild": "rimraf lib/* && rimraf tsconfig.tsbuildinfo",
     "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.product.config.js",
     "dev": "core-cli-build serve --mode=development --progress --config=../core-cli/configs/webpack.product.dev.config.js --port=3100",
-    "analyse": "core-cli-build --config ../core-cli/configs/webpack.product.config.js --profile --json > ./lib/stats.json",
+    "preanalyse": "rimraf lib/* && if not exist lib mkdir lib",
+    "analyse": "core-cli-build --mode=production --config ../core-cli/configs/webpack.product.config.js --profile --json > ./lib/stats.json",
     "postanalyse": "core-cli-analyzer ./lib/stats.json",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",

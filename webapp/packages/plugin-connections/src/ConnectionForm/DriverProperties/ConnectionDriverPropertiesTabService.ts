@@ -18,7 +18,7 @@ import { ConnectionFormService } from '../ConnectionFormService';
 import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormFillConfigData, IConnectionFormSubmitData, IConnectionFormState } from '../IConnectionFormProps';
-import { DriverProperties } from './DriverProperties';
+import { DriverPropertiesLoader } from './DriverPropertiesLoader';
 
 @injectable()
 export class ConnectionDriverPropertiesTabService extends Bootstrap {
@@ -39,7 +39,7 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
       name: 'customConnection_properties',
       title: 'customConnection_properties',
       order: 2,
-      panel: () => DriverProperties,
+      panel: () => DriverPropertiesLoader,
       isDisabled: (tabId, props) => {
         if (props?.state.config.driverId) {
           return !props.state.config.driverId;

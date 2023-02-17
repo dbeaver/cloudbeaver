@@ -13,7 +13,7 @@ import styled, { css } from 'reshadow';
 import { Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { ConnectionForm } from '../ConnectionForm/ConnectionForm';
+import { ConnectionFormLoader } from '../ConnectionForm/ConnectionFormLoader';
 import { PublicConnectionFormService } from './PublicConnectionFormService';
 
 const styles = css`
@@ -31,7 +31,7 @@ export const PublicConnectionForm: React.FC = observer(function PublicConnection
   return styled(styles)(
     <Loader loading={service.formState === null}>
       {() => service.formState && (
-        <ConnectionForm
+        <ConnectionFormLoader
           // key={service.formState.id}
           state={service.formState}
           onSave={save}

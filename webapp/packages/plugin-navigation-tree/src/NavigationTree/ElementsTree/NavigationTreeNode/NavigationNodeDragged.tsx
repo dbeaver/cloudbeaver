@@ -15,7 +15,7 @@ import { getComputed, TreeNode, useObjectRef, useStyles } from '@cloudbeaver/cor
 
 import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
-import { NavigationNodeControl } from './NavigationNode/NavigationNodeControl';
+import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
 
 export const NavigationNodeDragged: NavigationNodeComponent = observer(function NavigationNode({
   node,
@@ -28,7 +28,7 @@ export const NavigationNodeDragged: NavigationNodeComponent = observer(function 
   });
   const control = getComputed(() => contextRef.context?.control);
 
-  const Control = control || externalControl || NavigationNodeControl;
+  const Control = control || externalControl || NavigationNodeControlLoader;
 
   return styled(useStyles(style))(
     <TreeNode externalExpanded={false} className={className} leaf>
