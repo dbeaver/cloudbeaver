@@ -30,7 +30,7 @@ interface Props extends ITreeNodeState {
   children?: React.ReactNode;
 }
 
-export const TreeNodeControl = observer<Props, HTMLDivElement>(forwardRef(function TreeNodeControl({
+export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>(forwardRef(function TreeNodeControl({
   title,
   group,
   disabled,
@@ -43,6 +43,7 @@ export const TreeNodeControl = observer<Props, HTMLDivElement>(forwardRef(functi
   onMouseDown,
   className,
   children,
+  ...rest
 }, ref) {
   const context = useContext(TreeNodeContext);
 
@@ -127,6 +128,7 @@ export const TreeNodeControl = observer<Props, HTMLDivElement>(forwardRef(functi
       onMouseDown={handleMouseDown}
       onKeyDown={handleEnter}
       onDoubleClick={handleDbClick}
+      {...rest}
     >
       {children}
     </div>

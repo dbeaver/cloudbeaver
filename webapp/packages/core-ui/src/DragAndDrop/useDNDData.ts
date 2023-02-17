@@ -30,6 +30,7 @@ interface IDNDDataPrivate extends IDNDData {
 }
 
 interface IOptions {
+  canDrag?: () => boolean;
   onDragStart?: () => void;
   onDragEnd?: () => void;
 }
@@ -43,8 +44,15 @@ export function useDNDData(context: IDataContextProvider, options: IOptions): ID
   options = useObjectRef(options);
 
   const [, setTarget, setPreview] = useDrag<IDataContextProvider, void, void>(() => ({
-    type:DND_ELEMENT_TYPE,
+    type: DND_ELEMENT_TYPE,
     item: context,
+    canDrag() {
+      if (options.canDrag) {
+        return options.canDrag();
+      }
+
+      return true;
+    },
     collect: monitor => {
       const dragging = monitor.isDragging();
 
