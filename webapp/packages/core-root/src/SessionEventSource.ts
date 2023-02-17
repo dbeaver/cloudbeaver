@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { catchError, debounceTime, filter, map, merge, Observable, repeat, retry, share, Subject, throwError } from 'rxjs';
+import { catchError, debounceTime, filter, interval, map, merge, Observable, repeat, retry, share, Subject, throwError } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -20,7 +20,9 @@ import {
   ServiceError,
 } from '@cloudbeaver/core-sdk';
 
+import { NetworkStateService } from './NetworkStateService';
 import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './ServerEventEmitter/IServerEventEmitter';
+import { SessionExpireService } from './SessionExpireService';
 
 export { ServerEventId, SessionEventTopic, ClientEventId };
 
@@ -51,8 +53,11 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
   private readonly errorSubject: Subject<Error>;
   private readonly subject: WebSocketSubject<ISessionEvent>;
   private readonly oldEventsSubject: Subject<ISessionEvent>;
+  private readonly retryTimer: Observable<number>;
 
   constructor(
+    private readonly networkStateService: NetworkStateService,
+    private readonly sessionExpireService: SessionExpireService,
     private readonly environmentService: EnvironmentService,
     private readonly graphQLService: GraphQLService
   ) {
@@ -61,6 +66,10 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
     this.closeSubject = new Subject();
     this.openSubject = new Subject();
     this.errorSubject = new Subject();
+    this.retryTimer = interval(RETRY_INTERVAL)
+      .pipe(
+        filter(() => !this.sessionExpireService.expired && networkStateService.state)
+      );
     this.subject = webSocket({
       url: environmentService.wsEndpoint,
       closeObserver: this.closeSubject,
@@ -149,8 +158,8 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
     return (source: Observable<ISessionEvent>):Observable<ISessionEvent> =>  source.pipe(
       share(),
       catchError(this.errorHandler),
-      retry({ delay: RETRY_INTERVAL }),
-      repeat({ delay: RETRY_INTERVAL }),
+      retry({ delay: () =>  this.retryTimer }),
+      repeat({ delay: () =>  this.retryTimer }),
     );
   }
 
