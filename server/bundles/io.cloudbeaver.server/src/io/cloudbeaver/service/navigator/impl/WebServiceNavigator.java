@@ -53,6 +53,8 @@ import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
+import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -377,13 +379,13 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     private void addNavigatorNodeMoveEvent(@NotNull WebSession session, DBNNode node, String oldNodePath, String newNodePath) {
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             node.getOwnerProject(),
-            session.getUserContext().getSmSessionId(),
+            session,
             oldNodePath,
             WSConstants.EventAction.DELETE
         );
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             node.getOwnerProject(),
-            session.getUserContext().getSmSessionId(),
+            session,
             newNodePath,
             WSConstants.EventAction.CREATE
         );
@@ -415,18 +417,18 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     ) {
         WebEventUtils.addRmResourceUpdatedEvent(
             projectId,
-            session.getSessionId(),
+            session,
             oldResourcePath,
             oldRmResourcePath,
-            WSConstants.EventAction.DELETE
-        );
+            WSConstants.EventAction.DELETE,
+            WSResourceProperty.NAME);
         WebEventUtils.addRmResourceUpdatedEvent(
             projectId,
-            session.getSessionId(),
+            session,
             newResourcePath,
             newRmResourcePath,
-            WSConstants.EventAction.CREATE
-        );
+            WSConstants.EventAction.CREATE,
+            WSResourceProperty.NAME);
     }
 
     @Override
@@ -478,7 +480,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     node.getOwnerProject().getDataSourceRegistry().removeFolder(((DBNLocalFolder) node).getFolder(), false);
                     WebEventUtils.addNavigatorNodeUpdatedEvent(
                         session.getProjectById(projectId),
-                        session.getUserContext().getSmSessionId(),
+                        session,
                         nodePath,
                         WSConstants.EventAction.DELETE
                     );
@@ -490,11 +492,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     session.getRmController().deleteResource(resourceProjectId, resourcePath, true);
                     WebEventUtils.addRmResourceUpdatedEvent(
                         resourceProjectId,
-                        session.getSessionId(),
+                        session,
                         resourcePath,
                         rmResourcePath,
-                        WSConstants.EventAction.DELETE
-                    );
+                        WSConstants.EventAction.DELETE,
+                        WSResourceProperty.NAME);
                 }
             }
             if (containsFolderNodes) {
@@ -547,9 +549,10 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         ((DBNDataSource) node).getDataSourceContainer());
                     WebEventUtils.addDataSourceUpdatedEvent(
                         node.getOwnerProject(),
-                        session.getUserContext().getSmSessionId(),
+                        session,
                         ((DBNDataSource) node).getDataSourceContainer().getId(),
-                        WSConstants.EventAction.UPDATE
+                        WSConstants.EventAction.UPDATE,
+                        WSDataSourceProperty.CONFIGURATION
                     );
                 } else if (node instanceof DBNLocalFolder) {
                     DBPDataSourceFolder parentFolder = WebConnectionFolderUtils.getParentFolder(folderNode);
