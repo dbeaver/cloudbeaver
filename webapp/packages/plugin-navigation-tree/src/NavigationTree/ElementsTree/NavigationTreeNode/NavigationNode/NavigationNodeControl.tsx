@@ -18,6 +18,7 @@ import { NavNodeInfoResource, NavTreeResource, EObjectFeature, type INodeActions
 import { ElementsTreeContext } from '../../ElementsTreeContext';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../../NavigationNodeComponent';
 import { TreeNodeMenuLoader } from '../TreeNodeMenu/TreeNodeMenuLoader';
+import { DATA_ATTRIBUTE_NODE_EDITING } from './DATA_ATTRIBUTE_NODE_EDITING';
 import { NavigationNodeEditorLoader } from './NavigationNodeLoaders';
 
 
@@ -96,8 +97,15 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
 
   const expandable = getComputed(() => treeContext?.tree.isNodeExpandable(node.id) ?? true);
 
+  const attributes = { [DATA_ATTRIBUTE_NODE_EDITING]: editing };
+
   return styled(TREE_NODE_STYLES, styles)(
-    <TreeNodeControl ref={ref} onClick={onClickHandler} {...use({ outdated, editing, dragging: dndElement })}>
+    <TreeNodeControl
+      ref={ref}
+      {...attributes}
+      onClick={onClickHandler}
+      {...use({ outdated, editing, dragging: dndElement })}
+    >
       {expandable && <TreeNodeExpand filterActive={treeContext?.tree.filtering} />}
       <TreeNodeIcon {...use({ connected })}>
         <ConnectionImageWithMask icon={icon} connected={connected} maskId="tree-node-icon" />
