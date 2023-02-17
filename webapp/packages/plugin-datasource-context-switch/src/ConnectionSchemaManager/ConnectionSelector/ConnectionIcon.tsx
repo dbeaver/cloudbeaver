@@ -39,7 +39,7 @@ interface Props extends IConnectionSelectorExtraProps {
 
 export const ConnectionIcon: React.FC<Props> = observer(function ConnectionIcon({
   connectionKey,
-  small,
+  small = true,
   style,
   className,
 }) {
