@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { ConnectionMark, IconOrImage, useResource, useStyles } from '@cloudbeaver/core-blocks';
+import { ConnectionImageWithMask, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
@@ -20,7 +20,7 @@ const connectionIconStyle = css`
     position: relative;
     display: flex;
 
-    & IconOrImage {
+    & ConnectionImageWithMask {
       background-color: #fff;
       padding: 2px;
       border-radius: var(--theme-form-element-radius);
@@ -62,8 +62,7 @@ export const ConnectionIcon: React.FC<Props> = observer(function ConnectionIcon(
 
   return styled(styles)(
     <icon className={className}>
-      <IconOrImage icon={driver.data.icon} {...use({ small })} />
-      <ConnectionMark connected={connection.data?.connected ?? false} />
+      <ConnectionImageWithMask icon={driver.data.icon} connected={connection.data?.connected ?? false} maskId="connection-icon" size={24} paddingSize={4} {...use({ small })} />
     </icon>
   );
 });
