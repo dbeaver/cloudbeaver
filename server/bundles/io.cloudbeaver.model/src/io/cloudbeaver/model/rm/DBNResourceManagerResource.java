@@ -32,12 +32,14 @@ import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.IOUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
     private static final Log log = Log.getLog(DBNResourceManagerResource.class);
+    private static final String FILE_EXTENSION_SQL = "sql";
 
     private final RMResource resource;
 
@@ -63,7 +65,15 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
 
     @Override
     public DBPImage getNodeIcon() {
-        return resource.isFolder() ? DBIcon.TREE_FOLDER : DBIcon.TREE_FILE;
+        return resource.isFolder() ? DBIcon.TREE_FOLDER : getNodeIconByType();
+    }
+
+    private DBPImage getNodeIconByType() {
+        var fileExtension = IOUtils.getFileExtension(getNodeName());
+        if (FILE_EXTENSION_SQL.equals(fileExtension)) {
+            return DBIcon.TREE_FILE;
+        }
+        return DBIcon.TREE_PAGE;
     }
 
     @Override
@@ -136,12 +146,9 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         String resourceName = resource.getName();
         try {
             if (newName.indexOf('.') == -1) {
-                int indexOfExt = resourceName.indexOf('.');
-                if (indexOfExt > 0) {
-                    String ext = resourceName.substring(indexOfExt + 1);
-                    if (!CommonUtils.isEmpty(ext)) {
-                        newName += "." + ext;
-                    }
+                String ext = IOUtils.getFileExtension(getNodeName());
+                if (!CommonUtils.isEmpty(ext)) {
+                    newName += "." + ext;
                 }
             }
             if (!newName.equals(resource.getName())) {
