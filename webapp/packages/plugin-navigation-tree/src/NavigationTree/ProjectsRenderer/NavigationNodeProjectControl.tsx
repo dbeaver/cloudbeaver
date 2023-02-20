@@ -83,7 +83,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     treeNodeContext.select(event.ctrlKey || event.metaKey);
   }
 
-  if (elementsTreeContext?.tree.settings?.projects === false) {
+  if (elementsTreeContext?.tree.settings?.projects === false && !elementsTreeContext.tree.activeDnDData.length) {
     return null;
   }
 

@@ -66,9 +66,12 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
 }) {
   const projectsService = useService(ProjectsService);
   const elementsTreeContext = useContext(ElementsTreeContext);
+
   const { node } = useNode(nodeId);
+
   const singleProject = projectsService.activeProjects.length === 1;
-  const hideProjects = elementsTreeContext?.tree.settings?.projects === false;
+  const isDragging = !!elementsTreeContext?.tree.activeDnDData.length;
+  const hideProjects = elementsTreeContext?.tree.settings?.projects === false && !isDragging;
 
   if (!node) {
     return styled(TREE_NODE_STYLES)(
@@ -78,7 +81,7 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
     );
   }
 
-  const project = node.nodeType === NAV_NODE_TYPE_PROJECT && singleProject;
+  const project = node.nodeType === NAV_NODE_TYPE_PROJECT && singleProject && !isDragging;
 
   return styled(nestedStyles)(
     <NavigationNodeRendererLoader

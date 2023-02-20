@@ -112,7 +112,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     }
   }
 
-  if (elementsTreeContext?.tree.settings?.projects === false) {
+  if (elementsTreeContext?.tree.settings?.projects === false && !elementsTreeContext.tree.activeDnDData.length) {
     return null;
   }
 
