@@ -14,11 +14,12 @@ import { getComputed, TreeNode, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService, DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES } from '@cloudbeaver/core-navigation-tree';
 import { useDNDData } from '@cloudbeaver/core-ui';
-import {  useDataContext } from '@cloudbeaver/core-view';
+import { useDataContext } from '@cloudbeaver/core-view';
 
 import { useNavTreeDropBox } from '../../useNavTreeDropBox';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
-import { NavigationNodeControl } from './NavigationNode/NavigationNodeControl';
+import { DATA_ATTRIBUTE_NODE_EDITING } from './NavigationNode/DATA_ATTRIBUTE_NODE_EDITING';
+import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
 import { useNavigationNode } from './useNavigationNode';
 
@@ -40,7 +41,14 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   const navNodeManagerService = useService(NavNodeManagerService);
   const navNode = useNavigationNode(node, path);
   const context = useDataContext();
+
   const dndData = useDNDData(context, {
+    canDrag: () => {
+      const el = navNode.ref.current;
+      const editing = el?.getAttribute(DATA_ATTRIBUTE_NODE_EDITING) === 'true';
+
+      return !editing;
+    },
     onDragStart: async () => {
       if (!navNode.selected) {
         navNode.select(false);
@@ -64,13 +72,13 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   context.set(DATA_CONTEXT_NAV_NODE, node);
   context.set(DATA_CONTEXT_NAV_NODES, navNode.getSelected);
 
-  const Control = navNode.control || externalControl || NavigationNodeControl;
+  const Control = navNode.control || externalControl || NavigationNodeControlLoader;
 
   if (navNode.leaf || !navNode.loaded) {
     externalExpanded = false;
   }
 
-  function setRef(refObj: HTMLDivElement  | null) {
+  function setRef(refObj: HTMLDivElement | null) {
     //@ts-expect-error ignore
     navNode.ref.current = refObj;
     dndData.setTargetRef(refObj);

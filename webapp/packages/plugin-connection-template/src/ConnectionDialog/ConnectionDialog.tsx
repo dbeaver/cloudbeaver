@@ -19,7 +19,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { ConnectionAuthenticationForm } from '@cloudbeaver/plugin-connections';
+import { ConnectionAuthenticationFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionController, ConnectionStep } from './ConnectionController';
 import { ConnectionDialogFooter } from './ConnectionDialogFooter';
@@ -36,6 +36,9 @@ const styles = css`
       flex-direction: column;
       align-items: center;
       justify-content: center;
+    }
+    ConnectionAuthenticationFormLoader {
+      align-content: center;
     }
     ErrorMessage {
       composes: theme-background-secondary theme-text-on-secondary from global;
@@ -88,7 +91,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
         </center>
       ) : (
         <SubmittingForm ref={focusedRef} onSubmit={controller.onConnect}>
-          <ConnectionAuthenticationForm
+          <ConnectionAuthenticationFormLoader
             config={controller.config}
             authModelId={controller.authModel.id}
             networkHandlers={controller.networkHandlers}

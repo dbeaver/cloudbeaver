@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { AuthConfigurationsResource, AuthProviderService, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
@@ -13,10 +15,20 @@ import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AdminAuthProviderConfiguration, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
-import { AuthConfigurationsAdministration } from './AuthConfigurationsAdministration';
-import { AuthConfigurationsDrawerItem } from './AuthConfigurationsDrawerItem';
 import { CreateAuthConfigurationService } from './CreateAuthConfigurationService';
-import { IdentityProvidersServiceLink } from './IdentityProvidersServiceLink';
+
+const AuthConfigurationsAdministration = React.lazy(async () => {
+  const { AuthConfigurationsAdministration } = await import('./AuthConfigurationsAdministration');
+  return { default: AuthConfigurationsAdministration };
+});
+const AuthConfigurationsDrawerItem = React.lazy(async () => {
+  const { AuthConfigurationsDrawerItem } = await import('./AuthConfigurationsDrawerItem');
+  return { default: AuthConfigurationsDrawerItem };
+});
+const IdentityProvidersServiceLink = React.lazy(async () => {
+  const { IdentityProvidersServiceLink } = await import('./IdentityProvidersServiceLink');
+  return { default: IdentityProvidersServiceLink };
+});
 
 export interface IAuthConfigurationDetailsPlaceholderProps {
   configuration: AdminAuthProviderConfiguration;

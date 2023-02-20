@@ -7,6 +7,7 @@
  */
 
 import { action, makeObservable } from 'mobx';
+import React from 'react';
 
 import { DBDriverResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -19,8 +20,15 @@ import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
 import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
-import { SSHPanel } from './SSHPanel';
-import { SSHTab } from './SSHTab';
+
+export const SSHTab = React.lazy(async () => {
+  const { SSHTab } = await import('./SSHTab');
+  return { default: SSHTab };
+});
+export const SSHPanel = React.lazy(async () => {
+  const { SSHPanel } = await import('./SSHPanel');
+  return { default: SSHPanel };
+});
 
 @injectable()
 export class ConnectionSSHTabService extends Bootstrap {

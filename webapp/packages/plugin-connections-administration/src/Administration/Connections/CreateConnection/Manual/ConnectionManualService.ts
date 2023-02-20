@@ -23,7 +23,7 @@ export class ConnectionManualService {
 
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private createConnectionService: CreateConnectionService
+    private readonly createConnectionService: CreateConnectionService
   ) {
     this.select = this.select.bind(this);
   }
