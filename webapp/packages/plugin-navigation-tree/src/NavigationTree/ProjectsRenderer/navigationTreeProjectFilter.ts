@@ -19,7 +19,7 @@ export function navigationTreeProjectFilter(
   navNodeInfoResource: NavNodeInfoResource,
   navTreeResource: NavTreeResource,
 ): IElementsTreeFilter {
-  return (filter: string, node: NavNode, children: string[]) => {
+  return (tree, filter, node, children) => {
     if (node.id !== ROOT_NODE_PATH) {
       return children;
     }

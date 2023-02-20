@@ -10,9 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
+import { Loader } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { ConnectionForm, useConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormLoader, useConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 const styles = css`
     box {
@@ -22,6 +23,9 @@ const styles = css`
       display: flex;
       flex-direction: column;
       height: 740px;
+    }
+    Loader {
+      height: 100%;
     }
   `;
 
@@ -54,11 +58,13 @@ export const ConnectionEdit = observer<Props>(function ConnectionEditNew({
 
   return styled(styles)(
     <box ref={boxRef}>
-      <ConnectionForm
-        state={data}
+      <Loader loading={false} overlay>
+        <ConnectionFormLoader
+          state={data}
         // onCancel={collapse}
         // onSave={collapse}
-      />
+        />
+      </Loader>
     </box>
   );
 });

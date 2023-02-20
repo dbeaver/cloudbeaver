@@ -17,8 +17,8 @@ import { NavNodeInfoResource, type INodeActions } from '@cloudbeaver/core-naviga
 
 import { ElementsTreeContext } from '../ElementsTree/ElementsTreeContext';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../ElementsTree/NavigationNodeComponent';
-import { NavigationNodeEditor } from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeEditor';
-import { TreeNodeMenu } from '../ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenu';
+import { NavigationNodeEditorLoader } from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeLoaders';
+import { TreeNodeMenuLoader } from '../ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenuLoader';
 
 const styles = css`
   TreeNodeControl {
@@ -54,7 +54,7 @@ const styles = css`
   }
 `;
 
-export const NavigationNodeProjectControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(forwardRef(function NavigationNodeControl({
+export const NavigationNodeProjectControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(forwardRef(function NavigationNodeProjectControl({
   node,
   dndElement,
   dndPlaceholder,
@@ -96,14 +96,14 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     >
       <TreeNodeName title={node.name}>
         {editing ? (
-          <NavigationNodeEditor node={node} onClose={() => setEditing(false)} />
+          <NavigationNodeEditorLoader node={node} onClose={() => setEditing(false)} />
         ) : (
           <name-box>{node.name}</name-box>
         )}
       </TreeNodeName>
       {!editing && !dndPlaceholder && (
         <portal onClick={handlePortalClick}>
-          <TreeNodeMenu node={node} actions={nodeActions} selected={selected} />
+          <TreeNodeMenuLoader node={node} actions={nodeActions} selected={selected} />
         </portal>
       )}
     </TreeNodeControl>

@@ -52,7 +52,7 @@ module.exports = {
         // "importSource": "preact-jsx-runtime"
       },
     ],
-    ['@babel/preset-typescript', { isTSX: true, allExtensions: true }],
+    ['@babel/preset-typescript', { isTSX: true, allExtensions: true, onlyRemoveTypeImports: true }],
   ],
   plugins: [
     'babel-plugin-transform-typescript-metadata',

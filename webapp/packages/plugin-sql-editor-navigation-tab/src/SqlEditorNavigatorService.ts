@@ -159,6 +159,7 @@ export class SqlEditorNavigatorService {
           this.sqlResultTabsService.removeResultTab(tab.handlerState, data.resultId);
         }
       }
+
       this.navigationTabsService.selectTab(tab.id);
     } catch (exception: any) {
       this.notificationService.logException(exception, 'SQL Editor Error', 'Error in SQL Editor while processing action with editor');

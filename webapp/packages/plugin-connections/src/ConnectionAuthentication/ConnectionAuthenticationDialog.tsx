@@ -12,11 +12,10 @@ import styled, { css } from 'reshadow';
 import { SubmittingForm, useFocus, Button, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useDBDriver } from '@cloudbeaver/core-connections';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 
-import { ConnectionAuthenticationForm } from './ConnectionAuthenticationForm';
+import { ConnectionAuthenticationFormLoader } from './ConnectionAuthenticationFormLoader';
 
 const styles = css`
   SubmittingForm {
@@ -26,7 +25,7 @@ const styles = css`
     display: flex;
     flex-direction: column;
   }
-  ConnectionAuthenticationForm {
+  ConnectionAuthenticationFormLoader {
     align-content: center;
   }
   Button {
@@ -64,7 +63,7 @@ export const ConnectionAuthenticationDialog: DialogComponent<Payload> = observer
       onReject={rejectDialog}
     >
       <SubmittingForm ref={focusedRef} onSubmit={() => resolveDialog()}>
-        <ConnectionAuthenticationForm
+        <ConnectionAuthenticationFormLoader
           config={payload.config}
           authModelId={payload.authModelId}
           networkHandlers={payload.networkHandlers}

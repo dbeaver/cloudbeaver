@@ -7,27 +7,26 @@
  */
 
 
-import type { NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import type { NavNode, NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import type { ProjectsService } from '@cloudbeaver/core-projects';
 import { RESOURCES_NODE_PATH, NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { createPath } from '@cloudbeaver/core-utils';
 import type { IElementsTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
-import type { ResourcesProjectsNavNodeService } from '../../NavNodes/ResourcesProjectsNavNodeService';
 import type { ResourceManagerService } from '../../ResourceManagerService';
 
 export function navigationTreeProjectFilter(
-  resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
+  projectsNavNodeService: ProjectsNavNodeService,
   projectsService: ProjectsService,
   navNodeInfoResource: NavNodeInfoResource,
   navTreeResource: NavTreeResource,
   resourceManagerService: ResourceManagerService,
   resourceTypeId?: string,
 ): IElementsTreeFilter {
-  return (filter: string, node: NavNode, children: string[]) => {
+  return (tree, filter, node, children) => {
     if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT && resourceTypeId !== undefined) {
-      const project = resourcesProjectsNavNodeService.getProject(node.id);
+      const project = projectsNavNodeService.getProject(node.id);
 
       if (!project) {
         return children;
@@ -65,7 +64,7 @@ export function navigationTreeProjectFilter(
       .filter<NavNode>((node => node !== undefined) as (node: NavNode | undefined) => node is NavNode)
       .filter(node => {
         if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT) {
-          const project = resourcesProjectsNavNodeService.getProject(node.id);
+          const project = projectsNavNodeService.getProject(node.id);
 
           if (!project || !projectsService.activeProjects.includes(project)) {
             return false;

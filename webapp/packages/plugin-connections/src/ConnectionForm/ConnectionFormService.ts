@@ -13,10 +13,11 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 
-import { ConnectionAuthenticationDialog } from '../ConnectionAuthentication/ConnectionAuthenticationDialog';
-import { ConnectionFormBaseActions } from './ConnectionFormBaseActions';
+import { ConnectionAuthenticationDialogLoader } from '../ConnectionAuthentication/ConnectionAuthenticationDialogLoader';
+import { ConnectionFormBaseActionsLoader } from './ConnectionFormBaseActionsLoader';
 import { connectionConfigContext } from './Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from './Contexts/connectionCredentialsStateContext';
 import type { IConnectionFormProps, IConnectionFormState, IConnectionFormFillConfigData, IConnectionFormSubmitData } from './IConnectionFormProps';
@@ -51,6 +52,7 @@ export class ConnectionFormService {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
+    private readonly localizationService: LocalizationService,
   ) {
     this.tabsContainer = new TabsContainer('Connection settings');
     this.actionsContainer = new PlaceholderContainer();
@@ -72,7 +74,7 @@ export class ConnectionFormService {
     this.formSubmittingTask.addPostHandler(this.showSubmittingStatusMessage);
     this.formValidationTask.addPostHandler(this.ensureValidation);
 
-    this.actionsContainer.add(ConnectionFormBaseActions);
+    this.actionsContainer.add(ConnectionFormBaseActionsLoader);
   }
 
   connectionValidationContext = (): IConnectionFormValidation => ({
@@ -151,7 +153,7 @@ export class ConnectionFormService {
       }
     });
 
-    const result = await this.commonDialogService.open(ConnectionAuthenticationDialog, {
+    const result = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
       config,
       authModelId: credentialsState.authModelId,
       networkHandlers: credentialsState.networkHandlers,
@@ -171,11 +173,12 @@ export class ConnectionFormService {
     }
 
     if (validation.messages.length > 0) {
+      const messages = validation.messages.map(message => this.localizationService.translate(message));
       this.notificationService.notify({
         title: data.state.mode === 'edit'
           ? 'connections_administration_connection_save_error'
           : 'connections_administration_connection_create_error',
-        message: validation.messages.join('\n'),
+        message: messages.join('\n'),
       }, validation.valid ? ENotificationType.Info : ENotificationType.Error);
     }
   };

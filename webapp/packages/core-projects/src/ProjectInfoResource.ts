@@ -10,7 +10,6 @@ import { runInAction } from 'mobx';
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { SharedProjectsResource } from '@cloudbeaver/core-resource-manager';
 import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmResourceType } from '@cloudbeaver/core-sdk';
 
 export type ProjectInfo = SchemaProjectInfo;
@@ -20,18 +19,13 @@ export type ProjectInfoResourceType = RmResourceType;
 export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
-    private readonly sharedProjectsResource: SharedProjectsResource,
     private readonly userInfoResource: UserInfoResource,
     appAuthService: AppAuthService,
   ) {
     super(new Map(), []);
 
     this.sync(this.userInfoResource, () => {}, () => CachedMapAllKey);
-    this.sharedProjectsResource.connect(this);
     appAuthService.requireAuthentication(this);
-    this.sharedProjectsResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
-    this.sharedProjectsResource.onItemAdd.addHandler(() => this.markOutdated());
-    this.sharedProjectsResource.onItemDelete.addHandler(() => this.markOutdated());
     this.userInfoResource.onUserChange.addPostHandler(() => {
       this.clear();
     });
@@ -41,7 +35,7 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
     return this.get(`u_${userId}`);
   }
 
-  getResourceType(project: ProjectInfo, resourceTypeId: string) {
+  getResourceType(project: ProjectInfo, resourceTypeId: string): ProjectInfoResourceType | undefined {
     const resourceType = project.resourceTypes.find(type => type.id === resourceTypeId);
 
     return resourceType;

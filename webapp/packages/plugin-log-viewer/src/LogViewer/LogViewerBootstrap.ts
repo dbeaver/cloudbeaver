@@ -45,6 +45,7 @@ export class LogViewerBootstrap extends Bootstrap {
         ACTION_LOG_VIEWER_ENABLE,
       ].includes(action),
       isChecked: () => this.logViewerService.isActive,
+      isHidden: () => this.logViewerService.disabled,
       handler: (context, action) => {
         switch (action) {
           case ACTION_LOG_VIEWER_ENABLE: {
@@ -59,7 +60,7 @@ export class LogViewerBootstrap extends Bootstrap {
       key: 'log-viewer-tab',
       order: 0,
       name: 'plugin_log_viewer_action_enable_label',
-      isHidden: () => !this.logViewerService.isActive,
+      isHidden: () => this.logViewerService.disabled || !this.logViewerService.isActive,
       onClose: () => this.logViewerService.toggle(),
       panel: () => LogViewer,
     });

@@ -8,12 +8,12 @@
 
 import { observable, computed, makeObservable } from 'mobx';
 
-import { compareNewConnectionsInfo, Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { compareConnectionsInfo, compareNewConnectionsInfo, Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { isSharedProject, isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { isSharedProject, isGlobalProject, ProjectInfoResource, projectInfoSortByName } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { isArraysEqual, isDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
 
@@ -36,10 +36,25 @@ export class ConnectionsAdministrationController {
 
         return project && (isSharedProject(project) || isGlobalProject(project));
       })
-      .sort((connectionA, connectionB) => compareNewConnectionsInfo(
-        connectionA,
-        connectionB
-      ));
+      .sort((connectionA, connectionB) => {
+        const compareNew = compareNewConnectionsInfo(connectionA, connectionB);
+        const projectA = this.projectInfoResource.get(connectionA.projectId);
+        const projectB = this.projectInfoResource.get(connectionB.projectId);
+
+        if (compareNew !== 0) {
+          return compareNew;
+        }
+
+        if (projectA && projectB) {
+          const projectSort = projectInfoSortByName(projectA, projectB);
+
+          if (projectSort !== 0) {
+            return projectSort;
+          }
+        }
+
+        return compareConnectionsInfo(connectionA, connectionB);
+      });
   }
 
   get itemsSelected(): boolean {

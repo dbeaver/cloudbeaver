@@ -7,17 +7,19 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import styled, { use, css } from 'reshadow';
 
 import { getComputed, TreeNode, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService, DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES } from '@cloudbeaver/core-navigation-tree';
 import { useDNDData } from '@cloudbeaver/core-ui';
-import {  useDataContext } from '@cloudbeaver/core-view';
+import { useDataContext } from '@cloudbeaver/core-view';
 
 import { useNavTreeDropBox } from '../../useNavTreeDropBox';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
-import { NavigationNodeControl } from './NavigationNode/NavigationNodeControl';
+import { DATA_ATTRIBUTE_NODE_EDITING } from './NavigationNode/DATA_ATTRIBUTE_NODE_EDITING';
+import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
 import { useNavigationNode } from './useNavigationNode';
 
@@ -37,75 +39,74 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   style,
 }) {
   const navNodeManagerService = useService(NavNodeManagerService);
-  const {
-    ref,
-    group,
-    control,
-    disabled,
-    selected,
-    indeterminateSelected,
-    loading,
-    loaded,
-    showInFilter,
-    expanded,
-    leaf,
-    click,
-    expand,
-    open,
-    select,
-    getSelected,
-  } = useNavigationNode(node, path);
+  const navNode = useNavigationNode(node, path);
   const context = useDataContext();
+
   const dndData = useDNDData(context, {
+    canDrag: () => {
+      const el = navNode.ref.current;
+      const editing = el?.getAttribute(DATA_ATTRIBUTE_NODE_EDITING) === 'true';
+
+      return !editing;
+    },
     onDragStart: async () => {
-      if (!selected) {
-        select(false);
+      if (!navNode.selected) {
+        navNode.select(false);
       }
+
+      navNode.setDnDState(dndData, true);
 
       // strange way to preload alias while dragging
       await navNodeManagerService.getNodeDatabaseAlias(node.id);
     },
-  });
-  const dndBox = useNavTreeDropBox(node, {
-    expanded,
-    expand,
+    onDragEnd: () => {
+      navNode.setDnDState(dndData, false);
+    },
   });
 
+  const dndBox = useNavTreeDropBox(node, {
+    expanded: navNode.expanded,
+    expand: navNode.expand,
+  });
 
   context.set(DATA_CONTEXT_NAV_NODE, node);
-  context.set(DATA_CONTEXT_NAV_NODES, getSelected);
+  context.set(DATA_CONTEXT_NAV_NODES, navNode.getSelected);
 
-  const Control = control || externalControl || NavigationNodeControl;
+  const Control = navNode.control || externalControl || NavigationNodeControlLoader;
 
-  if (leaf || !loaded) {
+  if (navNode.leaf || !navNode.loaded) {
     externalExpanded = false;
   }
 
-  function setRef(refObj: HTMLDivElement  | null) {
+  function setRef(refObj: HTMLDivElement | null) {
     //@ts-expect-error ignore
-    ref.current = refObj;
+    navNode.ref.current = refObj;
     dndData.setTargetRef(refObj);
   }
 
   const hasNodes = getComputed(() => !!dndBox.state.context && dndBox.state.canDrop && dndBox.state.isOverCurrent);
 
+  useEffect(() => () => {
+    navNode.setDnDState(dndData, false);
+  }, []);
+
   return styled(useStyles(style, styles))(
     <TreeNode
       ref={dndBox.setRef}
-      group={group}
-      loading={loading}
-      disabled={disabled}
-      selected={selected}
-      indeterminateSelected={indeterminateSelected}
-      expanded={expanded}
-      showInFilter={showInFilter}
+      group={navNode.group}
+      loading={navNode.loading}
+      disabled={navNode.disabled}
+      selected={navNode.selected}
+      indeterminateSelected={navNode.indeterminateSelected}
+      expanded={navNode.expanded}
+      showInFilter={navNode.showInFilter}
       externalExpanded={externalExpanded}
-      leaf={leaf}
+      leaf={navNode.leaf}
       className={className}
-      onExpand={expand}
-      onClick={click}
-      onOpen={open}
-      onSelect={select}
+      onExpand={navNode.expand}
+      onClick={navNode.click}
+      onOpen={navNode.open}
+      onSelect={navNode.select}
       {...use({ hovered: hasNodes })}
     >
       {/* <DNDPreview data={dndData} src="/icons/empty.svg" /> */}
@@ -115,7 +116,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
         style={style}
         node={node}
       />
-      {(expanded || externalExpanded) && (
+      {(navNode.expanded || externalExpanded) && (
         <NavigationNodeNested
           nodeId={node.id}
           path={path}

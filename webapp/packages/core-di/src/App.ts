@@ -67,7 +67,7 @@ export class App {
           await serviceInstance.register();
         }
       } else if (service.prototype instanceof Dependency) {
-        this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
+        this.diWrapper.injector.getServiceByClass<Dependency>(service);
       }
     }
   }

@@ -13,7 +13,7 @@ import { IconButton, Loader, StaticImage, Icon, useResource, useTranslate, useSt
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
-import { ConnectionForm } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { CreateConnectionService } from '../CreateConnectionService';
 
@@ -70,6 +70,7 @@ const styles = css`
 
     Loader {
       z-index: 1;
+      height: 100%;
     }
 
     title-bar {
@@ -137,11 +138,13 @@ export const CreateConnection = observer<Props>(function CreateConnection({
           <IconButton name="cross" viewBox="0 0 24 24" onClick={createConnectionService.cancelCreate} />
         </title-bar>
         <connection-create-content>
-          <ConnectionForm
-            state={createConnectionService.data}
-            onCancel={createConnectionService.clearConnectionTemplate}
-            onSave={createConnectionService.clearConnectionTemplate}
-          />
+          <Loader loading={false} overlay>
+            <ConnectionFormLoader
+              state={createConnectionService.data}
+              onCancel={createConnectionService.clearConnectionTemplate}
+              onSave={createConnectionService.clearConnectionTemplate}
+            />
+          </Loader>
         </connection-create-content>
       </connection-create>
     );

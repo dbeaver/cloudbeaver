@@ -10,20 +10,21 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useUserData } from '@cloudbeaver/core-blocks';
+import { useResource, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { ProjectsService } from '@cloudbeaver/core-projects';
-import { RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
+import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { IResourceManagerParams, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { CaptureView } from '@cloudbeaver/core-view';
-import { NavigationTreeService, ElementsTree, IElementsTreeSettings, createElementsTreeSettings, validateElementsTreeSettings, getNavigationTreeUserSettingsId } from '@cloudbeaver/plugin-navigation-tree';
+import { NavigationTreeService, ElementsTreeLoader, IElementsTreeSettings, createElementsTreeSettings, validateElementsTreeSettings, getNavigationTreeUserSettingsId } from '@cloudbeaver/plugin-navigation-tree';
 
-import { ResourcesProjectsNavNodeService } from '../NavNodes/ResourcesProjectsNavNodeService';
 import { ResourceManagerService } from '../ResourceManagerService';
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';
 import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigationTreeProjectSearchCompare';
 import { navigationTreeProjectsExpandStateGetter } from './ProjectsRenderer/navigationTreeProjectsExpandStateGetter';
 import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navigationTreeProjectsRendererRenderer';
+import { navigationTreeResourceTypeFilter } from './ProjectsRenderer/navigationTreeResourceTypeFilter';
 import { ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm';
 import { navigationTreeResourceExpandStateGetter } from './ResourceFolderRenderer/navigationTreeResourceExpandStateGetter';
 import { ResourceManagerTreeCaptureViewContext } from './ResourceManagerTreeCaptureViewContext';
@@ -36,7 +37,7 @@ const styles = css`
     flex-direction: column;
     overflow: auto;
   }
-  ElementsTree {
+  ElementsTreeLoader {
     min-width: 100%;
     width: max-content;
   }
@@ -70,12 +71,16 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
 }) {
   const root = RESOURCES_NODE_PATH;
 
-  const resourcesProjectsNavNodeService = useService(ResourcesProjectsNavNodeService);
+  const projectsNavNodeService = useService(ProjectsNavNodeService);
   const projectsService = useService(ProjectsService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
+  const projectInfoResource = useService(ProjectInfoResource);
   const navTreeService = useService(NavigationTreeService);
   const resourceManagerService = useService(ResourceManagerService);
   const navTreeResource = useService(NavTreeResource);
+
+  const key: IResourceManagerParams[] = projectsService.activeProjectIds.map(id => ({ projectId: id }));
+  useResource(ResourceManagerTree, ResourceManagerResource, resourceKeyList(key));
 
   const settings = useUserData<IElementsTreeSettings>(
     getNavigationTreeUserSettingsId(root),
@@ -88,13 +93,13 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
     () => navigationTreeProjectsRendererRenderer(
       navNodeInfoResource,
       resourceManagerService,
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
       resourceTypeId,
     ),
     [
       navNodeInfoResource,
       resourceManagerService,
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
       resourceTypeId,
     ]
   );
@@ -103,13 +108,13 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
     () => navigationTreeResourceExpandStateGetter(
       navNodeInfoResource,
       resourceManagerService,
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
       resourceTypeId
     ),
     [
       navNodeInfoResource,
       resourceManagerService,
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
       resourceTypeId,
     ]
   );
@@ -118,17 +123,17 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
     () => navigationTreeProjectsExpandStateGetter(
       navNodeInfoResource,
       projectsService,
-      resourcesProjectsNavNodeService
+      projectsNavNodeService
     ),
     [
       navNodeInfoResource,
       projectsService,
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
     ]
   );
   const projectFilter = useMemo(
     () => navigationTreeProjectFilter(
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
       projectsService,
       navNodeInfoResource,
       navTreeResource,
@@ -136,11 +141,25 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
       resourceTypeId,
     ),
     [
-      resourcesProjectsNavNodeService,
+      projectsNavNodeService,
       projectsService,
       navNodeInfoResource,
       navTreeResource,
       resourceManagerService,
+      resourceTypeId,
+    ]
+  );
+  const resourceTypeFilter = useMemo(
+    () => navigationTreeResourceTypeFilter(
+      navNodeInfoResource,
+      projectsNavNodeService,
+      projectInfoResource,
+      resourceTypeId
+    ),
+    [
+      navNodeInfoResource,
+      projectsNavNodeService,
+      projectInfoResource,
       resourceTypeId,
     ]
   );
@@ -151,12 +170,12 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
   return styled(styles)(
     <CaptureView view={navTreeService}>
       <ResourceManagerTreeCaptureViewContext resourceTypeId={resourceTypeId} />
-      <ElementsTree
+      <ElementsTreeLoader
         root={root}
         getChildren={navTreeService.getChildren}
         loadChildren={navTreeService.loadNestedNodes}
         settings={settings}
-        filters={[projectFilter]}
+        filters={[resourceTypeFilter, projectFilter]}
         renderers={[projectsRendererRenderer]}
         expandStateGetters={[projectsExpandStateGetter, resourceExpandStateGetter]}
         navNodeFilterCompare={navigationTreeProjectSearchCompare}

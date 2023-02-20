@@ -6,29 +6,28 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import type { NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { createPath } from '@cloudbeaver/core-utils';
 import type { IElementsTreeNodeExpandInfoGetter } from '@cloudbeaver/plugin-navigation-tree';
 
-import type { ResourcesProjectsNavNodeService } from '../../NavNodes/ResourcesProjectsNavNodeService';
 import type { ResourceManagerService } from '../../ResourceManagerService';
 
 export function navigationTreeResourceExpandStateGetter(
   navNodeInfoResource: NavNodeInfoResource,
   resourceManagerService: ResourceManagerService,
-  resourcesProjectsNavNodeService: ResourcesProjectsNavNodeService,
+  projectsNavNodeService: ProjectsNavNodeService,
   resourceTypeId?: string,
 ): IElementsTreeNodeExpandInfoGetter {
 
-  return nodeId => {
+  return (tree, nodeId) => {
     const node = navNodeInfoResource.get(nodeId);
 
     if (!node?.folder || resourceTypeId === undefined) {
       return null;
     }
 
-    const project = resourcesProjectsNavNodeService.getProject(nodeId);
+    const project = projectsNavNodeService.getProject(nodeId);
 
     if (!project) {
       return null;

@@ -22,7 +22,7 @@ export * from './Loader/useAutoLoad';
 export * from './localization/Translate';
 export * from './localization/useTranslate';
 
-export * from './Marks/ConnectionMark';
+export * from './ConnectionImageWithMask/ConnectionImageWithMask';
 
 export * from './Menu/ACTION_ICON_BUTTON_STYLES';
 export * from './Menu/Menu';
@@ -177,6 +177,7 @@ export * from './usePromiseState';
 export * from './useStateDelay';
 export * from './useErrorDetails';
 export * from './useActivationDelay';
+export * from './useAdministrationSettings';
 export * from './useAppLoadingScreen';
 export * from './useInterval';
 export * from './useStyles';

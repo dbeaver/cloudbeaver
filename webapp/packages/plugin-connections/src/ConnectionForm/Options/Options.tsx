@@ -10,8 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { EAdminPermission, useAdministrationSettings } from '@cloudbeaver/core-administration';
-import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
+import { AUTH_PROVIDER_LOCAL_ID, EAdminPermission } from '@cloudbeaver/core-authentication';
 import {
   InputField,
   SubmittingForm,
@@ -32,6 +31,7 @@ import {
   FormFieldDescription,
   useTranslate,
   usePermission,
+  useAdministrationSettings,
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';

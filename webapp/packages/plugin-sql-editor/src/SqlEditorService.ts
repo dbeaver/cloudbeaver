@@ -13,10 +13,11 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
-import { SqlDataSourceService, ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
 import { getSqlEditorName } from './getSqlEditorName';
+import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures';
+import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
 
 export type SQLProposal = SqlCompletionProposal;
 
@@ -53,13 +54,13 @@ export class SqlEditorService {
       datasourceKey,
       source,
       order,
-      tabs: [],
-      resultGroups: [],
-      resultTabs: [],
-      executionPlanTabs: [],
-      statisticsTabs: [],
+      tabs: observable([]),
+      resultGroups: observable([]),
+      resultTabs: observable([]),
+      executionPlanTabs: observable([]),
+      statisticsTabs: observable([]),
       currentModeId: undefined,
-      modeState: [],
+      modeState: observable([]),
     });
   }
 
@@ -126,7 +127,7 @@ export class SqlEditorService {
   setName(name: string, state: ISqlEditorTabState) {
     const dataSource = this.sqlDataSourceService.get(state.editorId);
 
-    if (dataSource && dataSource.features.includes(ESqlDataSourceFeatures.setName)) {
+    if (dataSource && dataSource.hasFeature(ESqlDataSourceFeatures.setName)) {
       dataSource.setName(name);
     }
   }

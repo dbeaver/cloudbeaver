@@ -17,7 +17,6 @@
 
 package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.code.NotNull;
@@ -92,7 +91,7 @@ public class WebUserContext implements SMCredentialsProvider {
         @Nullable String smRefreshToken,
         @NotNull SMAuthPermissions smAuthPermissions
     ) throws DBException {
-        var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
+        var isNonAnonymousUserAuthorized = isNonAnonymousUserAuthorizedInSM();
         var isSessionChanged = !CommonUtils.equalObjects(smSessionId, smAuthPermissions.getSessionId());
         if (isNonAnonymousUserAuthorized && isSessionChanged && !Objects.equals(getUserId(), smAuthPermissions.getUserId())) {
             throw new DBCException("Another user is already logged in");
@@ -166,6 +165,10 @@ public class WebUserContext implements SMCredentialsProvider {
 
     public synchronized boolean isAuthorizedInSecurityManager() {
         return smCredentials != null;
+    }
+
+    public synchronized boolean isNonAnonymousUserAuthorizedInSM() {
+        return isAuthorizedInSecurityManager() && getUser() != null;
     }
 
     @Nullable

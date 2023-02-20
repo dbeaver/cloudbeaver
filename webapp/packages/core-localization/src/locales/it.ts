@@ -1,4 +1,4 @@
-export const defaultITLocale = [
+export default [
   ['name', 'it'],
   ['ui_rename_taken_or_invalid', 'This name is unavailable or invalid'],
   ['ui_tag_new', 'Nuovo'],
@@ -54,6 +54,7 @@ export const defaultITLocale = [
   ['ui_open_in_tab', 'Open in tab'],
   ['ui_rename', 'Rename'],
   ['ui_create', 'Create'],
+  ['ui_create_processing', 'Creating...'],
   ['ui_folder', 'Folder'],
   ['ui_folder_new', 'New folder'],
   ['ui_rename_processing', 'Renaming...'],

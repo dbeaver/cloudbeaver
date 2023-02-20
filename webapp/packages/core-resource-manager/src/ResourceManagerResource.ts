@@ -10,6 +10,7 @@ import { observable, toJS } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
 import { CachedMapResource, CachedResourceIncludeArgs, GetResourceListQueryVariables, GraphQLService, ICachedMapResourceMetadata, isResourceKeyList, ResourceKey, resourceKeyList, ResourceKeyUtils, RmResource } from '@cloudbeaver/core-sdk';
 import { createPath, isValuesEqual, MetadataMap } from '@cloudbeaver/core-utils';
@@ -35,6 +36,7 @@ export class ResourceManagerResource
   readonly onMove: IExecutor<IResourceManagerMoveData>;
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly projectsService: ProjectsService,
     resourceManagerEventHandler: ResourceManagerEventHandler,
     dataSynchronizationService: DataSynchronizationService,
   ) {
@@ -42,8 +44,24 @@ export class ResourceManagerResource
 
     this.onMove = new Executor();
 
+    this.projectsService.onActiveProjectChange.addHandler(data => {
+      if (data.type === 'after') {
+        const updated: IResourceManagerParams[] = [];
+
+        for (const projectId of data.projects) {
+          const key = createParentResourceKey({
+            projectId,
+          });
+
+          updated.push(key);
+        }
+
+        this.markOutdated(resourceKeyList(updated));
+      }
+    });
+
     resourceManagerEventHandler.onEvent<IResourceManagerParams>(
-      ServerEventId.CbDatasourceCreated,
+      ServerEventId.CbRmResourceCreated,
       async key => {
         let parentFolderKey = createParentResourceKey(key);
         parentFolderKey = {
@@ -284,20 +302,6 @@ export class ResourceManagerResource
     });
 
     return this.data;
-  }
-
-  getKeyRef(key: IResourceManagerParams): IResourceManagerParams {
-    if (this.keys.includes(key)) {
-      return key;
-    }
-
-    const ref = this.keys.find(k => isResourceManagerParamEqual(k, key));
-
-    if (ref) {
-      return ref;
-    }
-
-    return { projectId: key.projectId, path: key.path };
   }
 
   getMetadataKeyRef(key: IResourceManagerParams): IResourceManagerParams {

@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { MenuService, ActionService, DATA_CONTEXT_MENU } from '@cloudbeaver/core-view';
@@ -16,8 +18,15 @@ import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataMo
 import { DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL } from './DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL';
 import { DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX } from './DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX';
 import { DATA_VIEWER_DATA_MODEL_TOOLS_MENU } from './DATA_VIEWER_DATA_MODEL_TOOLS_MENU';
-import { TableHeaderMenu } from './TableHeaderMenu';
-import { TableWhereFilter } from './TableWhereFilter';
+
+export const TableWhereFilter = React.lazy(async () => {
+  const { TableWhereFilter } = await import('./TableWhereFilter');
+  return { default: TableWhereFilter };
+});
+export const TableHeaderMenu = React.lazy(async () => {
+  const { TableHeaderMenu } = await import('./TableHeaderMenu');
+  return { default: TableHeaderMenu };
+});
 
 export interface ITableHeaderPlaceholderProps {
   model: IDatabaseDataModel<any, any>;
