@@ -10,13 +10,13 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+import { getComputed, Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { NAV_NODE_TYPE_RM_PROJECT, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { createPath } from '@cloudbeaver/core-utils';
-import { type IElementsTreeCustomRenderer, type NavigationNodeRendererComponent, useNode, NavigationNodeRendererLoader, ElementsTreeContext } from '@cloudbeaver/plugin-navigation-tree';
+import { type IElementsTreeCustomRenderer, type NavigationNodeRendererComponent, useNode, NavigationNodeRendererLoader, ElementsTreeContext, isDraggingInsideProject } from '@cloudbeaver/plugin-navigation-tree';
 
 import type { ResourceManagerService } from '../../ResourceManagerService';
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
@@ -88,7 +88,14 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
 
   const { node } = useNode(nodeId);
 
-  const isDragging = !!elementsTreeContext?.tree.activeDnDData.length;
+  const isDragging = getComputed(() => {
+    if (!node?.projectId || !elementsTreeContext?.tree.activeDnDData) {
+      return false;
+    }
+
+    return isDraggingInsideProject(node.projectId, elementsTreeContext.tree.activeDnDData);
+  });
+
   const hideProjects = elementsTreeContext?.tree.settings?.projects === false && !isDragging;
   const singleProject = projectsService.activeProjects.length === 1;
 

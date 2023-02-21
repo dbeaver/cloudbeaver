@@ -17,6 +17,7 @@ import { NavNodeInfoResource, type INodeActions } from '@cloudbeaver/core-naviga
 
 import { ElementsTreeContext } from '../ElementsTree/ElementsTreeContext';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../ElementsTree/NavigationNodeComponent';
+import { isDraggingInsideProject } from '../ElementsTree/NavigationTreeNode/isDraggingInsideProject';
 import { NavigationNodeEditorLoader } from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeLoaders';
 import { TreeNodeMenuLoader } from '../ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenuLoader';
 
@@ -74,6 +75,14 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     },
   });
 
+  const isDragging = getComputed(() => {
+    if (!node.projectId || !elementsTreeContext?.tree.activeDnDData) {
+      return false;
+    }
+
+    return isDraggingInsideProject(node.projectId, elementsTreeContext.tree.activeDnDData);
+  });
+
   function handlePortalClick(event: React.MouseEvent<HTMLDivElement>) {
     EventContext.set(event, EventStopPropagationFlag);
     treeNodeContext.select();
@@ -83,7 +92,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     treeNodeContext.select(event.ctrlKey || event.metaKey);
   }
 
-  if (elementsTreeContext?.tree.settings?.projects === false && !elementsTreeContext.tree.activeDnDData.length) {
+  if (elementsTreeContext?.tree.settings?.projects === false && !isDragging) {
     return null;
   }
 
