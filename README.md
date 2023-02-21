@@ -22,6 +22,11 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 22.3.5 - 2023-02-20
+
+- Added formatting for execution plan for easy reading.
+- Different bugs have been fixed.
+
 ### CloudBeaver 22.3.4 - 2023-02-06
 
 - "SQL script manager" in Tools menu is renamed to "Display Script".
