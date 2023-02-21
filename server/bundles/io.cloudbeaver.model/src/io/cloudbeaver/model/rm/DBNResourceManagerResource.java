@@ -40,6 +40,7 @@ import java.util.List;
 public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
     private static final Log log = Log.getLog(DBNResourceManagerResource.class);
     private static final String FILE_EXTENSION_SQL = "sql";
+    private static final String FILE_EXTENSION_DATASET = "ds";
 
     private final RMResource resource;
 
@@ -72,6 +73,8 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         var fileExtension = IOUtils.getFileExtension(getNodeName());
         if (FILE_EXTENSION_SQL.equals(fileExtension)) {
             return DBIcon.TREE_FILE;
+        } else if (FILE_EXTENSION_DATASET.equals(fileExtension)) {
+            return DBIcon.TREE_DATASET;
         }
         return DBIcon.TREE_PAGE;
     }
