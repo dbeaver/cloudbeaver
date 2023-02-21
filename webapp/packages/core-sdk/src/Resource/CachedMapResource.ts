@@ -44,7 +44,11 @@ export type CachedMapResourceLoader<
 export interface ICachedMapResourceMetadata extends ICachedResourceMetadata {
 }
 
-export const CachedMapAllKey = resourceKeyList<any>([Symbol('@cached-map-resource/all')], 'all');
+const CachedMapAllKeySymbol = Symbol('@cached-map-resource/all') as any;
+export const CachedMapAllKey = resourceKeyList<any>(
+  [CachedMapAllKeySymbol],
+  'all'
+);
 export const CachedMapEmptyKey = resourceKeyList<any>([], 'empty');
 
 export abstract class CachedMapResource<
@@ -191,11 +195,10 @@ export abstract class CachedMapResource<
     if (key === undefined) {
       return (
         Array.from(this.metadata.values()).some(metadata => metadata.outdated)
-        && this.loadedKeys.length === 0
       );
     }
 
-    if (this.isAlias(key) && !this.isAliasLoaded(key)) {
+    if (this.isAlias(key) && this.getMetadata(key as TKey).outdated) {
       return true;
     }
 
@@ -236,8 +239,11 @@ export abstract class CachedMapResource<
   }
 
   markDataError(exception: Error, key: ResourceKey<TKey>): void {
-    if (this.isAlias(key) && !this.isAliasLoaded(key)) {
-      this.loadedKeys.push(key);
+    if (this.isAlias(key)) {
+      this.updateMetadata(key as TKey, metadata => {
+        metadata.exception = exception;
+        metadata.outdated = false;
+      });
     }
     key = this.transformParam(key);
 
@@ -289,8 +295,10 @@ export abstract class CachedMapResource<
       key = CachedMapAllKey;
     }
 
-    if (this.isAlias(key) && !this.isAliasLoaded(key)) {
-      this.loadedKeys.push(key);
+    if (this.isAlias(key)) {
+      this.updateMetadata(key as TKey, metadata => {
+        metadata.outdated = false;
+      });
     }
 
     key = this.transformParam(key);
@@ -306,7 +314,7 @@ export abstract class CachedMapResource<
     key: ResourceKey<TKey>,
     includes?: CachedResourceIncludeArgs<TValue, TContext>
   ): boolean {
-    if (this.isAlias(key) && !this.isAliasLoaded(key)) {
+    if (this.isAlias(key) && !this.hasMetadata(key as TKey)) {
       return false;
     }
 
@@ -328,7 +336,7 @@ export abstract class CachedMapResource<
   }
 
   has(key: ResourceKey<TKey>): boolean {
-    if (this.isAlias(key) && !this.isAliasLoaded(key)) {
+    if (this.isAlias(key) && !this.hasMetadata(key)) {
       return false;
     }
 
@@ -607,16 +615,13 @@ export abstract class CachedMapResource<
   protected markOutdatedSync(key: ResourceKey<TKey>): void;
   protected markOutdatedSync(key?: ResourceKey<TKey>): void {
     if (key === undefined) {
-      key = ResourceKeyUtils.join(resourceKeyList(this.keys), ...this.loadedKeys.map(key => this.transformParam(key)));
-      this.loadedKeys = [];
+      key = ResourceKeyUtils.join(resourceKeyList(Array.from(this.metadata.keys())));
       this.resetIncludes();
     } else {
       if (this.isAlias(key)) {
-        const index = this.loadedKeys.findIndex(loadedKey => this.isAliasEqual(key!, loadedKey));
-
-        if (index >= 0) {
-          this.loadedKeys.splice(index, 1);
-        }
+        this.updateMetadata(key as TKey, metadata => {
+          metadata.outdated = true;
+        });
       }
 
       key = this.transformParam(key);

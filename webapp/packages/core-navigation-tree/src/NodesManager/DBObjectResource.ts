@@ -38,7 +38,6 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     // this.preloadResource(this.navNodeInfoResource);
     this.navNodeInfoResource.outdateResource(this);
     this.navNodeInfoResource.deleteInResource(this);
-    this.navNodeInfoResource.onDataOutdated.addHandler(this.outdateChildren.bind(this));
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, DBObject>> {

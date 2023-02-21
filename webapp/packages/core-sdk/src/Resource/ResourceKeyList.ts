@@ -33,7 +33,14 @@ export class ResourceKeyList<TKey> {
   }
 
   toString(): string {
-    return `ResourceKeyList(${this.list.join()})${this.mark !== undefined ? '@' + this.mark : ''}`;
+    const list = this.list.map(s => {
+      if (typeof s === 'symbol') {
+        return s.toString();
+      }
+
+      return s;
+    });
+    return `ResourceKeyList(${list.join()})${this.mark !== undefined ? '@' + this.mark : ''}`;
   }
 }
 

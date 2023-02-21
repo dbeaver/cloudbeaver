@@ -104,6 +104,10 @@ export class ConnectionNavNodeService extends Dependency {
     key: ResourceKey<string>,
     context: IExecutionContextProvider<ResourceKey<string>>
   ) {
+    if (!ResourceKeyUtils.some(key, key => NodeManagerUtils.isDatabaseObject(key))) {
+      return;
+    }
+
     await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
     key = this.navTreeResource.transformParam(key);
 

@@ -72,7 +72,6 @@ export abstract class CachedResource<
   readonly beforeLoad: IExecutor<TParam>;
 
   protected metadata: MetadataMap<TKey, ICachedResourceMetadata>;
-  protected loadedKeys: TParam[];
   protected defaultIncludes: TContext; // needed for CachedResourceContext
 
   protected get loading(): boolean {
@@ -97,7 +96,6 @@ export abstract class CachedResource<
     this.loadingTask = this.loadingTask.bind(this);
 
     this.logActivity = false;
-    this.loadedKeys = [];
 
     this.typescriptHack = null as any;
     this.defaultIncludes = defaultIncludes;
@@ -129,9 +127,8 @@ export abstract class CachedResource<
 
     makeObservable<
     this,
-    'loader' | 'loadedKeys' | 'commitIncludes' | 'resetIncludes' | 'markOutdatedSync'
+    'loader' | 'commitIncludes' | 'resetIncludes' | 'markOutdatedSync'
     >(this, {
-      loadedKeys: observable,
       data: observable,
       isResourceInUse: computed,
       loader: action,
@@ -353,15 +350,15 @@ export abstract class CachedResource<
     return this.loading;
   }
 
-  isAliasLoaded(key: TParam): boolean {
-    return this.loadedKeys.some(loadedKey => this.isAliasEqual(key, loadedKey));
-  }
-
   isIncludes(key: TParam, includes: TContext): boolean {
     key = this.transformParam(key);
     const metadata = this.getMetadata(key);
 
     return includes.every(include => metadata.includes.includes(include));
+  }
+
+  hasMetadata(param: TParam): boolean {
+    return this.metadata.has(param as any as TKey);
   }
 
   getMetadata(param: TParam): ICachedResourceMetadata {
@@ -387,11 +384,10 @@ export abstract class CachedResource<
     if (param === undefined) {
       return (
         Array.from(this.metadata.values()).some(metadata => metadata.outdated)
-        && this.loadedKeys.length === 0
       );
     }
 
-    if (this.isAlias(param) && !this.isAliasLoaded(param)) {
+    if (this.isAlias(param) && this.getMetadata(param).outdated) {
       return true;
     }
 
@@ -425,8 +421,11 @@ export abstract class CachedResource<
   }
 
   markDataError(exception: Error, param: TParam, context?: TContext): void {
-    if (this.isAlias(param) && !this.isAliasLoaded(param)) {
-      this.loadedKeys.push(param);
+    if (this.isAlias(param)) {
+      this.updateMetadata(param, metadata => {
+        metadata.exception = exception;
+        metadata.outdated = false;
+      });
     }
 
     param = this.transformParam(param);
@@ -456,8 +455,10 @@ export abstract class CachedResource<
   }
 
   markUpdated(param: TParam): void {
-    if (this.isAlias(param) && !this.isAliasLoaded(param)) {
-      this.loadedKeys.push(param);
+    if (this.isAlias(param) ) {
+      this.updateMetadata(param, metadata => {
+        metadata.outdated = false;
+      });
     }
 
     param = this.transformParam(param);
@@ -601,16 +602,12 @@ export abstract class CachedResource<
           metadata.outdated = true;
         });
       }
-      this.loadedKeys = [];
       this.resetIncludes();
     } else {
-
       if (this.isAlias(param)) {
-        const index = this.loadedKeys.findIndex(key => this.isAliasEqual(param!, key));
-
-        if (index >= 0) {
-          this.loadedKeys.splice(index, 1);
-        }
+        this.updateMetadata(param, metadata => {
+          metadata.outdated = true;
+        });
       }
 
       param = this.transformParam(param);
@@ -729,6 +726,10 @@ export abstract class CachedResource<
     context?: TContext
   ): Promise<void> {
     if (!refresh) {
+      if (this.isLoaded(param, context) && !this.isOutdated(param)) {
+        return;
+      }
+
       await this.scheduler.waitRelease(param);
 
       if (this.isLoaded(param, context) && !this.isOutdated(param)) {
