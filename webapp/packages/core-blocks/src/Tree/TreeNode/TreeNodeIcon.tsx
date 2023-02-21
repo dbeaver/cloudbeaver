@@ -33,7 +33,7 @@ export const TreeNodeIcon: React.FC<React.PropsWithChildren<Props>> = function T
 }) {
   return styled(useStyles(styles, style))(
     <icon className={className}>
-      <StaticImage icon={icon} />
+      {icon && <StaticImage icon={icon} />}
       {children}
     </icon>
   );

@@ -17,7 +17,7 @@ import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects
 import { IResourceManagerParams, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { CaptureView } from '@cloudbeaver/core-view';
-import { NavigationTreeService, ElementsTree, IElementsTreeSettings, createElementsTreeSettings, validateElementsTreeSettings, getNavigationTreeUserSettingsId } from '@cloudbeaver/plugin-navigation-tree';
+import { NavigationTreeService, ElementsTreeLoader, IElementsTreeSettings, createElementsTreeSettings, validateElementsTreeSettings, getNavigationTreeUserSettingsId } from '@cloudbeaver/plugin-navigation-tree';
 
 import { ResourceManagerService } from '../ResourceManagerService';
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';
@@ -37,7 +37,7 @@ const styles = css`
     flex-direction: column;
     overflow: auto;
   }
-  ElementsTree {
+  ElementsTreeLoader {
     min-width: 100%;
     width: max-content;
   }
@@ -170,7 +170,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
   return styled(styles)(
     <CaptureView view={navTreeService}>
       <ResourceManagerTreeCaptureViewContext resourceTypeId={resourceTypeId} />
-      <ElementsTree
+      <ElementsTreeLoader
         root={root}
         getChildren={navTreeService.getChildren}
         loadChildren={navTreeService.loadNestedNodes}

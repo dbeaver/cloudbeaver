@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
@@ -13,7 +15,11 @@ import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExe
 import { TabsContainer } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormFillConfigData, ITeamFormProps, ITeamFormState, ITeamFormSubmitData } from './ITeamFormProps';
-import { TeamFormBaseActions } from './TeamFormBaseActions';
+
+const TeamFormBaseActions = React.lazy(async () => {
+  const { TeamFormBaseActions } = await import('./TeamFormBaseActions');
+  return { default: TeamFormBaseActions };
+});
 
 export interface ITeamFormValidation {
   valid: boolean;

@@ -15,7 +15,6 @@ import { getComputed, Loader, Pane, ResizerControls, Split, splitStyles, TextPla
 import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-
 import { ResultSetConstraintAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import { DataPresentationService, DataPresentationType } from '../DataPresentationService';
 import type { IDataTableActionsPrivate } from './IDataTableActions';
