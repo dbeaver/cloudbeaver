@@ -157,8 +157,15 @@ export class ConnectionOptionsTabService extends Bootstrap {
   ) {
     const validation = contexts.getContext(this.connectionFormService.connectionValidationContext);
 
-    if (state.config.configurationType === DriverConfigurationType.Manual && state.config.host?.length === 0) {
-      validation.error('plugin_connections_connection_form_host_invalid');
+    if (
+      state.config.configurationType === DriverConfigurationType.Manual
+       && state.config.host?.length === 0
+       && state.config.driverId
+    ) {
+      const driver = await this.dbDriverResource.load(state.config.driverId);
+      if (!driver.embedded) {
+        validation.error('plugin_connections_connection_form_host_invalid');
+      }
     }
 
     if (!state.config.name?.length) {
