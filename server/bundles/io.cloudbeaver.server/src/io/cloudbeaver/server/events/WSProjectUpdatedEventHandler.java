@@ -17,13 +17,12 @@
 package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
-import org.jkiss.dbeaver.model.websocket.WSUtils;
-import org.jkiss.dbeaver.model.websocket.event.WSEvent;
-import org.jkiss.utils.CommonUtils;
+import org.jkiss.dbeaver.model.websocket.event.*;
 
 import java.util.Collection;
 
@@ -35,7 +34,9 @@ public abstract class WSProjectUpdatedEventHandler implements WSEventHandler {
 
     @NotNull
     @Override
-    public abstract String getSupportedTopicId();
+    public String getSupportedTopicId() {
+        return WSEventTopic.PROJECTS.getTopicId();
+    };
 
     @Override
     public void handleEvent(@NotNull WSEvent event) {
@@ -50,4 +51,11 @@ public abstract class WSProjectUpdatedEventHandler implements WSEventHandler {
     }
 
     protected abstract void updateSessionData(BaseWebSession activeUserSession, WSEvent event);
+
+    protected boolean validateEvent(BaseWebSession activeUserSession, WSAbstractProjectEvent event) {
+        if (!activeUserSession.isProjectAccessible(event.getProjectId())) {
+            return false;
+        }
+        return WSEventType.valueById(event.getId()) != null;
+    }
 }

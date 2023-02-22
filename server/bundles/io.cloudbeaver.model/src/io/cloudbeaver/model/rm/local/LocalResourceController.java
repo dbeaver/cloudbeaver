@@ -40,7 +40,6 @@ import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.*;
@@ -183,7 +182,7 @@ public class LocalResourceController implements RMController {
             .collect(Collectors.toList());
     }
 
-    private Set<RMProjectPermission> getProjectPermissions(@Nullable String projectId, RMProjectType projectType) throws DBException {
+    private Set<RMProjectPermission> getProjectPermissions(@Nullable String projectId, @NotNull RMProjectType projectType) throws DBException {
         var activeUserCreds = credentialsProvider.getActiveUserCredentials();
 
         switch (projectType) {

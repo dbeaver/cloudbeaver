@@ -16,9 +16,13 @@ enum CBServerEventId {
     cb_datasource_folder_updated,
     cb_datasource_folder_deleted,
 
-    cb_rm_resource_created
-    cb_rm_resource_updated
-    cb_rm_resource_deleted
+    cb_rm_resource_created,
+    cb_rm_resource_updated,
+    cb_rm_resource_deleted,
+
+    cb_rm_project_created,
+    cb_rm_project_updated,
+    cb_rm_project_deleted
 }
 
 # Events sent by client
