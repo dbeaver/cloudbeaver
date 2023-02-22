@@ -66,7 +66,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   get projectId(): string | null {
-    return this.resourceKey?.projectId ?? null;
+    return this.resourceKey?.projectId ?? super.projectId;
   }
 
   get executionContext(): IConnectionExecutionContextInfo | undefined {

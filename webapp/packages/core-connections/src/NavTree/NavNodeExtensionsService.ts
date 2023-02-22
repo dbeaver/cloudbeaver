@@ -8,7 +8,8 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import type { IExtension } from '@cloudbeaver/core-extensions';
-import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeInfoResource, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { projectProvider } from '@cloudbeaver/core-projects';
 
 import { ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
 import { connectionProvider } from '../extensions/IConnectionProvider';
@@ -22,14 +23,22 @@ export class NavNodeExtensionsService {
   readonly extensions: Array<IExtension<string>>;
 
   constructor(
+    private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly connectionInfoResource: ConnectionInfoResource
   ) {
     this.extensions = [
+      projectProvider(this.getProject.bind(this)),
       connectionProvider(this.getConnection.bind(this)),
       objectCatalogProvider(this.getDBObjectCatalog.bind(this)),
       objectSchemaProvider(this.getDBObjectSchema.bind(this)),
     ];
+  }
+
+  getProject(navNodeId: string): string | undefined {
+    const node = this.navNodeInfoResource.get(navNodeId);
+
+    return node?.projectId;
   }
 
   getConnection(navNodeId: string): IConnectionInfoParams | undefined {

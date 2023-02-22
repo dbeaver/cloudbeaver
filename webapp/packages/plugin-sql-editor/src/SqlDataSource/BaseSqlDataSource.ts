@@ -32,7 +32,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   get projectId(): string | null {
-    return null;
+    return this.executionContext?.projectId ?? null;
   }
 
   get features(): ESqlDataSourceFeatures[] {

@@ -132,6 +132,9 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   attachToProject(tab: ITab<ISqlEditorTabState>, projectId: string | null): void {
+    const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+
+    projectId = dataSource?.projectId ?? projectId;
     tab.projectId = projectId;
   }
 

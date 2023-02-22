@@ -145,13 +145,13 @@ export class PluginBootstrap extends Bootstrap {
                 const dataSource = this.sqlDataSourceService.create(
                   tab.handlerState,
                   ResourceSqlDataSource.key,
+                  {
+                    executionContext: previousDataSource?.executionContext,
+                  }
                 ) as ResourceSqlDataSource;
 
                 dataSource.setResourceKey(resourceKey);
-
-                if (previousDataSource?.executionContext) {
-                  dataSource.setExecutionContext(previousDataSource.executionContext);
-                }
+                this.sqlEditorTabService.attachToProject(tab, resourceKey.projectId);
               }
 
               this.notificationService.logSuccess({ title: 'plugin_sql_editor_navigation_tab_resource_save_script_success', message: resourceKey.name });
@@ -274,22 +274,12 @@ export class PluginBootstrap extends Bootstrap {
         const context = contextProvider.getContext(this.navigationTabsService.navigationTabContext);
 
         if (context.tab && isSQLEditorTab(context.tab)) {
-          const previousDataSource = this.sqlDataSourceService.get(context.tab.handlerState.editorId);
-
           const dataSource = this.sqlDataSourceService.create(
             context.tab.handlerState,
-            ResourceSqlDataSource.key,
+            ResourceSqlDataSource.key
           ) as ResourceSqlDataSource;
 
-
           dataSource.setResourceKey(resourceKey);
-
-          if (previousDataSource?.executionContext) {
-            dataSource.setExecutionContext({
-              ...previousDataSource.executionContext,
-              id: NOT_INITIALIZED_CONTEXT_ID,
-            });
-          }
 
           this.sqlEditorTabService.attachToProject(context.tab, resourceKey.projectId);
         }
