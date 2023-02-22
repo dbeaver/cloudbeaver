@@ -9,10 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { splitStyles, Split, ResizerControls, Pane, ErrorBoundary, useSplitUserState, useStyles } from '@cloudbeaver/core-blocks';
+import { splitStyles, Split, ResizerControls, Pane, ErrorBoundary, useSplitUserState, useStyles, Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
-import { NavigationTree } from '@cloudbeaver/plugin-navigation-tree';
+import { ConnectionsSettingsService } from '@cloudbeaver/plugin-connections';
+import { NavigationTreeLoader } from '@cloudbeaver/plugin-navigation-tree';
 
 import { RightArea } from './RightArea';
 
@@ -26,10 +27,14 @@ const mainStyles = css`
     position: relative;
     overflow: hidden;
   }
+  Loader {
+    height: 100%;
+  }
 `;
 
 export const Main = observer(function Main() {
   const sideBarPanelService = useService(SideBarPanelService);
+  const connectionsSettingsService = useService(ConnectionsSettingsService);
 
   const styles = useStyles(mainStyles, splitStyles);
   const splitMainState = useSplitUserState('main');
@@ -37,29 +42,48 @@ export const Main = observer(function Main() {
 
   const activeBars = sideBarPanelService.tabsContainer.getDisplayed();
 
+  const connectionsDisabled = connectionsSettingsService.settings.getValue('disabled');
+  const sideBarDisabled = activeBars.length === 0;
+
   return styled(styles)(
-    <space as="main">
-      <Split {...splitMainState} sticky={30}>
-        <Pane main>
-          <ErrorBoundary remount>
-            <NavigationTree />
-          </ErrorBoundary>
-        </Pane>
-        <ResizerControls />
-        <Pane>
-          <Split {...splitRightState} disable={activeBars.length === 0} sticky={30}>
-            <Pane>
-              <RightArea />
-            </Pane>
-            <ResizerControls />
-            <Pane main>
-              <ErrorBoundary remount>
-                <SideBarPanel container={sideBarPanelService.tabsContainer} />
-              </ErrorBoundary>
-            </Pane>
-          </Split>
-        </Pane>
-      </Split>
-    </space>
+    <Loader loading={false} overlay>
+      <space as="main">
+        <Split
+          {...splitMainState}
+          sticky={30}
+          mode={connectionsDisabled ? 'minimize' : splitMainState.mode}
+          disable={connectionsDisabled}
+        >
+          <Pane main>
+            <ErrorBoundary remount>
+              <Loader loading={false} overlay>
+                <NavigationTreeLoader />
+              </Loader>
+            </ErrorBoundary>
+          </Pane>
+          <ResizerControls />
+          <Pane>
+            <Split
+              {...splitRightState}
+              mode={sideBarDisabled ? 'minimize' : splitRightState.mode}
+              disable={sideBarDisabled}
+              sticky={30}
+            >
+              <Pane>
+                <RightArea />
+              </Pane>
+              <ResizerControls />
+              <Pane main>
+                <ErrorBoundary remount>
+                  <Loader loading={false} overlay>
+                    <SideBarPanel container={sideBarPanelService.tabsContainer} />
+                  </Loader>
+                </ErrorBoundary>
+              </Pane>
+            </Split>
+          </Pane>
+        </Split>
+      </space>
+    </Loader>
   );
 });

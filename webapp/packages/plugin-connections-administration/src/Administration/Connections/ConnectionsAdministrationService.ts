@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
@@ -13,16 +15,32 @@ import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-import { ConnectionsAdministration } from './ConnectionsAdministration';
-import { ConnectionsDrawerItem } from './ConnectionsDrawerItem';
-import { Origin } from './ConnectionsTable/ConnectionDetailsInfo/Origin';
-import { SSH } from './ConnectionsTable/ConnectionDetailsInfo/SSH';
-import { Template } from './ConnectionsTable/ConnectionDetailsInfo/Template';
 import { CreateConnectionService } from './CreateConnectionService';
 
 export interface IConnectionDetailsPlaceholderProps {
   connection: DatabaseConnection;
 }
+
+const ConnectionsAdministration = React.lazy(async () => {
+  const { ConnectionsAdministration } = await import('./ConnectionsAdministration');
+  return { default: ConnectionsAdministration };
+});
+const ConnectionsDrawerItem = React.lazy(async () => {
+  const { ConnectionsDrawerItem } = await import('./ConnectionsDrawerItem');
+  return { default: ConnectionsDrawerItem };
+});
+const Origin = React.lazy(async () => {
+  const { Origin } = await import('./ConnectionsTable/ConnectionDetailsInfo/Origin');
+  return { default: Origin };
+});
+const SSH = React.lazy(async () => {
+  const { SSH } = await import('./ConnectionsTable/ConnectionDetailsInfo/SSH');
+  return { default: SSH };
+});
+const Template = React.lazy(async () => {
+  const { Template } = await import('./ConnectionsTable/ConnectionDetailsInfo/Template');
+  return { default: Template };
+});
 
 @injectable()
 export class ConnectionsAdministrationService extends Bootstrap {

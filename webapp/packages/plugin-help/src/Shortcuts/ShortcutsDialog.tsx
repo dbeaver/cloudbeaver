@@ -54,7 +54,7 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
       <Container wrap overflow>
         <Group overflow>
           <GroupTitle>
-            <Link href='https://cloudbeaver.io/docs/Data-editor/' target='_blank' wrapper indicator>
+            <Link href='https://dbeaver.com/docs/cloudbeaver/Data-editor/' target='_blank' wrapper indicator>
               Data Viewer
             </Link>
           </GroupTitle>
@@ -62,7 +62,7 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
         </Group>
         <Group overflow>
           <GroupTitle>
-            <Link href='https://cloudbeaver.io/docs/SQL-Editor/' target='_blank' wrapper indicator>
+            <Link href='https://dbeaver.com/docs/cloudbeaver/SQL-Editor/' target='_blank' wrapper indicator>
               SQL Editor
             </Link>
           </GroupTitle>
@@ -70,7 +70,7 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
         </Group>
         <Group overflow>
           <GroupTitle>
-            <Link href='https://cloudbeaver.io/docs/Database-navigator/' target='_blank' wrapper indicator>
+            <Link href='https://dbeaver.com/docs/cloudbeaver/Database-Navigator/' target='_blank' wrapper indicator>
               Navigation Tree
             </Link>
           </GroupTitle>

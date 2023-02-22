@@ -14,6 +14,7 @@ const defaultSettings = {
   maxLogRecords: 1000,
   logBatchSize: 2000,
   maxFailedRequests: 3,
+  disabled: false,
 };
 
 export type LogViewerSettings = typeof defaultSettings;

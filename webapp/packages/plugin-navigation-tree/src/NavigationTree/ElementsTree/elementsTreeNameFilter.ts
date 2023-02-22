@@ -22,7 +22,7 @@ export function elementsTreeNameFilter(
   navNodeInfoResource: NavNodeInfoResource,
   compare: NavNodeFilterCompareFn = elementsTreeNameFilterNode
 ): IElementsTreeFilter {
-  return (filter: string, node: NavNode, children: string[], state: MetadataMap<string, ITreeNodeState>) => {
+  return (tree, filter, node, children, state) => {
     const nodeState = state.get(node.id);
 
     if (filter === '' || nodeState.showInFilter || compare(node, filter) === EEquality.full) {

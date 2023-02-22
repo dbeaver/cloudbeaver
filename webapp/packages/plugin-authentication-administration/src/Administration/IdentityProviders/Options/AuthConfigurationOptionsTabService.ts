@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React from 'react';
+
 import { AuthConfigurationsResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -14,7 +16,11 @@ import { getUniqueName } from '@cloudbeaver/core-utils';
 import { AuthConfigurationFormService } from '../AuthConfigurationFormService';
 import { authConfigurationContext } from '../Contexts/authConfigurationContext';
 import type { IAuthConfigurationFormFillConfigData, IAuthConfigurationFormState, IAuthConfigurationFormSubmitData } from '../IAuthConfigurationFormProps';
-import { AuthConfigurationOptions } from './AuthConfigurationOptions';
+
+const AuthConfigurationOptions = React.lazy(async () => {
+  const { AuthConfigurationOptions } = await import('./AuthConfigurationOptions');
+  return { default: AuthConfigurationOptions };
+});
 
 @injectable()
 export class AuthConfigurationOptionsTabService extends Bootstrap {

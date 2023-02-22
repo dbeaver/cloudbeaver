@@ -20,7 +20,7 @@ export function navigationTreeResourceExpandStateGetter(
   resourceTypeId?: string,
 ): IElementsTreeNodeExpandInfoGetter {
 
-  return nodeId => {
+  return (tree, nodeId) => {
     const node = navNodeInfoResource.get(nodeId);
 
     if (!node?.folder || resourceTypeId === undefined) {

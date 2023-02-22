@@ -16,12 +16,15 @@
  */
 package io.cloudbeaver.utils;
 
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
+import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
 
 import java.util.List;
@@ -31,15 +34,16 @@ public class WebEventUtils {
      * adds events of updated datasource to event controller
      *
      * @param project      project of updated database
-     * @param sessionId    session id
+     * @param session      web session
      * @param datasourceId id of datasource
      * @param eventAction  type of event
      */
     public static void addDataSourceUpdatedEvent(
         DBPProject project,
-        String sessionId,
+        WebSession session,
         String datasourceId,
-        WSConstants.EventAction eventAction
+        WSConstants.EventAction eventAction,
+        WSDataSourceProperty property
     ) {
         if (project == null) {
             return;
@@ -48,23 +52,29 @@ public class WebEventUtils {
         switch (eventAction) {
             case CREATE:
                 event = WSDataSourceEvent.create(
-                    sessionId,
+                    session.getUserContext().getSmSessionId(),
+                    session.getUserId(),
                     project.getId(),
-                    List.of(datasourceId)
+                    List.of(datasourceId),
+                    property
                 );
                 break;
             case DELETE:
                 event = WSDataSourceEvent.delete(
-                    sessionId,
+                    session.getUserContext().getSmSessionId(),
+                    session.getUserId(),
                     project.getId(),
-                    List.of(datasourceId)
+                    List.of(datasourceId),
+                    property
                 );
                 break;
             case UPDATE:
                 event = WSDataSourceEvent.update(
-                    sessionId,
+                    session.getUserContext().getSmSessionId(),
+                    session.getUserId(),
                     project.getId(),
-                    List.of(datasourceId)
+                    List.of(datasourceId),
+                    property
                 );
                 break;
         }
@@ -76,7 +86,7 @@ public class WebEventUtils {
 
     public static void addNavigatorNodeUpdatedEvent(
         DBPProject project,
-        String sessionId,
+        WebSession session,
         String nodePath,
         WSConstants.EventAction eventAction
     ) {
@@ -87,21 +97,24 @@ public class WebEventUtils {
         switch (eventAction) {
             case CREATE:
                 event = WSDatasourceFolderEvent.create(
-                    sessionId,
+                    session.getUserContext().getSmSessionId(),
+                    session.getUserId(),
                     project.getId(),
                     List.of(nodePath)
                 );
                 break;
             case DELETE:
                 event = WSDatasourceFolderEvent.delete(
-                    sessionId,
+                    session.getUserContext().getSmSessionId(),
+                    session.getUserId(),
                     project.getId(),
                     List.of(nodePath)
                 );
                 break;
             case UPDATE:
                 event = WSDatasourceFolderEvent.update(
-                    sessionId,
+                    session.getUserContext().getSmSessionId(),
+                    session.getUserId(),
                     project.getId(),
                     List.of(nodePath)
                 );
@@ -115,35 +128,57 @@ public class WebEventUtils {
 
     public static void addRmResourceUpdatedEvent(
         String projectId,
-        String sessionId,
+        WebSession session,
         String resourcePath,
         RMResource[] resourceParsedPath,
-        WSConstants.EventAction eventAction
+        WSConstants.EventAction eventAction,
+        WSResourceProperty property
+    ) {
+        addRmResourceUpdatedEvent(projectId, session, resourcePath, resourceParsedPath, eventAction, property, null);
+    }
+
+    public static void addRmResourceUpdatedEvent(
+        String projectId,
+        WebSession session,
+        String resourcePath,
+        RMResource[] resourceParsedPath,
+        WSConstants.EventAction eventAction,
+        WSResourceProperty property,
+        String details
     ) {
         WSEvent event = null;
         switch (eventAction) {
             case CREATE:
                 event = WSResourceUpdatedEvent.create(
-                    sessionId,
+                    session.getUserContext().getSmSessionId(),
+                    session.getUserId(),
                     projectId,
                     resourcePath,
-                    resourceParsedPath
+                    resourceParsedPath,
+                    property,
+                    details
                 );
                 break;
             case DELETE:
                 event = WSResourceUpdatedEvent.delete(
-                    sessionId,
+                    session.getUserContext().getSmSessionId(),
+                    session.getUserId(),
                     projectId,
                     resourcePath,
-                    resourceParsedPath
+                    resourceParsedPath,
+                    property,
+                    details
                 );
                 break;
             case UPDATE:
                 event = WSResourceUpdatedEvent.update(
-                    sessionId,
+                    session.getUserContext().getSmSessionId(),
+                    session.getUserId(),
                     projectId,
                     resourcePath,
-                    resourceParsedPath
+                    resourceParsedPath,
+                    property,
+                    details
                 );
                 break;
         }

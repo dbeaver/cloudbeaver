@@ -21,10 +21,10 @@ import {
   SlideOverlay,
   useStyles,
   ErrorBoundary,
-  useSplitUserState
+  useSplitUserState,
+  Loader
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { NavigationTabsBar } from '@cloudbeaver/plugin-navigation-tabs';
 import { ToolsPanelService, ToolsPanel } from '@cloudbeaver/plugin-tools-panel';
@@ -34,6 +34,9 @@ const styles = css`
       composes: theme-background-surface theme-text-on-surface from global;
       display: flex;
       overflow: auto;
+    }
+    Loader {
+      height: 100%;
     }
     SlideBox {
       flex: 1;
@@ -52,29 +55,39 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
   const OptionsPanel = optionsPanelService.getPanelComponent();
   const activeTools = toolsPanelService.tabsContainer.getDisplayed();
 
+  const toolsDisabled = activeTools.length === 0 || toolsPanelService.disabled;
+
   return styled(useStyles(styles, splitStyles, splitHorizontalStyles, slideBoxStyles))(
     <SlideBox open={optionsPanelService.active} className={className}>
       <SlideElement>
-        <ErrorBoundary remount><OptionsPanel /></ErrorBoundary>
+        <ErrorBoundary remount>
+          <Loader loading={false} overlay>
+            <OptionsPanel />
+          </Loader>
+        </ErrorBoundary>
       </SlideElement>
       <SlideElement>
         <Split
           {...splitState}
           sticky={30}
           split="horizontal"
-          mode={activeTools.length ? splitState.mode : 'minimize'}
-          disable={activeTools.length === 0}
+          mode={toolsDisabled ? 'minimize' : splitState.mode}
+          disable={toolsDisabled}
           keepRatio
         >
           <Pane>
             <ErrorBoundary remount>
-              <NavigationTabsBar />
+              <Loader loading={false} overlay>
+                <NavigationTabsBar />
+              </Loader>
             </ErrorBoundary>
           </Pane>
           <ResizerControls />
           <Pane basis='30%' main>
             <ErrorBoundary remount>
-              <ToolsPanel container={toolsPanelService.tabsContainer} />
+              <Loader loading={false} overlay>
+                <ToolsPanel container={toolsPanelService.tabsContainer} />
+              </Loader>
             </ErrorBoundary>
           </Pane>
         </Split>
