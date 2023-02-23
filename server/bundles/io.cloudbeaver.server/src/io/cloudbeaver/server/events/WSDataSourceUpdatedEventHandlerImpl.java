@@ -48,16 +48,19 @@ public class WSDataSourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
         if (eventType == null) {
             return;
         }
+        var sendEvent = true;
         if (activeUserSession instanceof WebSession) {
             var webSession = (WebSession) activeUserSession;
             WebProjectImpl project = webSession.getProjectById(dsUpdateEvent.getProjectId());
-            webSession.updateProjectConnection(
+            sendEvent = webSession.updateProjectConnection(
                 project,
                 dsUpdateEvent.getDataSourceIds(),
                 eventType
             );
         }
-        activeUserSession.addSessionEvent(event);
+        if (sendEvent) {
+            activeUserSession.addSessionEvent(event);
+        }
     }
 }
 

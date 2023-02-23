@@ -21,6 +21,44 @@ export const loaderStyles = css`
     &:global(.animate) {
       opacity: 1;
     }
+
+    & StaticImage {
+      width: 100%;
+      display: none;
+    }
+
+    &[|secondary],
+    &[|overlay],
+    &:global(.secondary),
+    &:global(.overlay) {
+      &:not([|small]):not(:global(.small)) {
+        & StaticImage[|secondaryIcon] {
+          display: block;
+        }
+      }
+
+      &[|small],
+      &:global(.small) {
+        & StaticImage[|secondarySmallIcon] {
+          display: block;
+        }
+      }
+    }
+
+    &:not([|secondary]):not([|overlay]):not(:global(.secondary)):not(:global(.overlay)) {
+      &:not([|small]):not(:global(.small)) {
+        & StaticImage[|primaryIcon] {
+          display: block;
+        }
+      }
+
+      &[|small],
+      &:global(.small) {
+        & StaticImage[|primarySmallIcon] {
+          display: block;
+        }
+      }
+    }
   }
 
   icon {
@@ -30,11 +68,6 @@ export const loaderStyles = css`
     width: 40px;
     height: 40px;
     animation: rotation 2s infinite linear;
-
-    & StaticImage {
-      width: 100%;
-      content: url(/icons/spinner-primary.svg);
-    }
   }
 
   message {
@@ -78,25 +111,6 @@ export const loaderStyles = css`
     }
     & actions {
       padding: 0;
-    }
-  }
-
-  loader[|small] StaticImage,
-  loader:global(.small) StaticImage {
-    content: url(/icons/spinner-primary-small.svg);
-  }
-
-  loader[|secondary],
-  loader[|overlay],
-  loader:global(.secondary),
-  loader:global(.overlay) {
-    & StaticImage {
-      content: url(/icons/spinner.svg);
-    }
-
-    &[|small] StaticImage,
-    &:global(.small) StaticImage {
-      content: url(/icons/spinner-small.svg);
     }
   }
 
