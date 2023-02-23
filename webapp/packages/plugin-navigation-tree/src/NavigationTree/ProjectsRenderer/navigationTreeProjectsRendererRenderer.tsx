@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+import { getComputed, Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT, ProjectsService } from '@cloudbeaver/core-projects';
@@ -18,6 +18,7 @@ import { NAV_NODE_TYPE_PROJECT, ProjectsService } from '@cloudbeaver/core-projec
 import { useNode } from '../../NodesManager/useNode';
 import { ElementsTreeContext } from '../ElementsTree/ElementsTreeContext';
 import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent';
+import { isDraggingInsideProject } from '../ElementsTree/NavigationTreeNode/isDraggingInsideProject';
 import { NavigationNodeRendererLoader } from '../ElementsTree/NavigationTreeNode/NavigationNodeRendererLoader';
 import type { IElementsTreeCustomRenderer } from '../ElementsTree/useElementsTree';
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
@@ -66,9 +67,19 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
 }) {
   const projectsService = useService(ProjectsService);
   const elementsTreeContext = useContext(ElementsTreeContext);
+
   const { node } = useNode(nodeId);
+
+  const isDragging = getComputed(() => {
+    if (!node?.projectId || !elementsTreeContext?.tree.activeDnDData) {
+      return false;
+    }
+
+    return isDraggingInsideProject(node.projectId, elementsTreeContext.tree.activeDnDData);
+  });
+
   const singleProject = projectsService.activeProjects.length === 1;
-  const hideProjects = elementsTreeContext?.tree.settings?.projects === false;
+  const hideProjects = elementsTreeContext?.tree.settings?.projects === false && !isDragging;
 
   if (!node) {
     return styled(TREE_NODE_STYLES)(
@@ -78,7 +89,7 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
     );
   }
 
-  const project = node.nodeType === NAV_NODE_TYPE_PROJECT && singleProject;
+  const project = node.nodeType === NAV_NODE_TYPE_PROJECT && singleProject && !isDragging;
 
   return styled(nestedStyles)(
     <NavigationNodeRendererLoader
