@@ -40,7 +40,6 @@ import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.*;
@@ -154,9 +153,9 @@ public class LocalResourceController implements RMController {
 
         // Checking if private projects are enabled in the configuration and if the user has permission to them
         var webApp = WebAppUtils.getWebApplication();
-        var hasPrivateProjectPermission = activeUserCreds != null &&
-            activeUserCreds.hasPermission(DBWConstants.PERMISSION_PRIVATE_PROJECT_ACCESS);
-        if (webApp.getAppConfiguration().isPrivateProjectsAccessible() && hasPrivateProjectPermission) {
+        var userHasPrivateProjectPermission = !webApp.isMultiNode() ||
+            activeUserCreds != null && activeUserCreds.hasPermission(DBWConstants.PERMISSION_PRIVATE_PROJECT_ACCESS);
+        if (webApp.getAppConfiguration().isPrivateProjectsAccessible() && userHasPrivateProjectPermission) {
             var userProjectPermission = getProjectPermissions(null, RMProjectType.USER);
             RMProject userProject = makeProjectFromPath(getPrivateProjectPath(), userProjectPermission, RMProjectType.USER, false);
             if (userProject != null) {
