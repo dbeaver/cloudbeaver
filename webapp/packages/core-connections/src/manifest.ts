@@ -17,6 +17,7 @@ import { ConnectionInfoEventHandler } from './ConnectionInfoEventHandler';
 import { ConnectionInfoResource } from './ConnectionInfoResource';
 import { ConnectionsLocaleService } from './ConnectionsLocaleService';
 import { ConnectionsManagerService } from './ConnectionsManagerService';
+import { ConnectionsSettingsService } from './ConnectionsSettingsService';
 import { ContainerResource } from './ContainerResource';
 import { DatabaseAuthModelsResource } from './DatabaseAuthModelsResource';
 import { DBDriverResource } from './DBDriverResource';
@@ -46,5 +47,6 @@ export const manifest: PluginManifest = {
     NavNodeExtensionsService,
     ConnectionInfoEventHandler,
     ConnectionFolderEventHandler,
+    ConnectionsSettingsService,
   ],
 };
