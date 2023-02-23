@@ -244,7 +244,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
 
         private void checkActionPermissions(@NotNull Method method, @NotNull WebAction webAction) throws DBWebException {
             String[] reqPermissions = webAction.requirePermissions();
-            if (reqPermissions.length == 0) {
+            if (reqPermissions.length == 0 && !webAction.authRequired()) {
                 return;
             }
             WebSession session = findWebSession(env);
