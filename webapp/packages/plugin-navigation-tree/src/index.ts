@@ -6,6 +6,7 @@ export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSet
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeLoaders';
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenuLoader';
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNodeRendererLoader';
+export * from './NavigationTree/ElementsTree/NavigationTreeNode/isDraggingInsideProject';
 
 export * from './NavigationTree/ElementsTree/ACTION_LINK_OBJECT';
 export * from './NavigationTree/ElementsTree/DATA_CONTEXT_ELEMENTS_TREE';
@@ -36,6 +37,8 @@ export * from './NodesManager/useNode';
 export * from './NodesManager/useChildren';
 
 export * from './NodesManager/NodeLinkLoader';
+
+export * from './NavigationTreeSettingsService';
 
 import { navigationTreePlugin } from './manifest';
 

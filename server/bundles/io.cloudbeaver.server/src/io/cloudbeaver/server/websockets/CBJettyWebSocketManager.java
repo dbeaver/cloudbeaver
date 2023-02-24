@@ -51,7 +51,6 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
             return null;
         }
         if (webSession == null) {
-            log.error("CloudBeaver session not found");
             return null;
         }
         var webSessionId = webSession.getSessionId();
@@ -68,13 +67,17 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
     @Nullable
     private BaseWebSession resolveWebSession(JettyServerUpgradeRequest request) throws DBException {
         if (request.getHttpServletRequest().getSession() == null) {
+            log.debug("CloudBeaver web session not exist, try to create headless session");
             return webSessionManager.getHeadlessSession(request.getHttpServletRequest(), true);
         }
         var webSessionId = request.getHttpServletRequest().getSession().getId();
         var webSession = webSessionManager.getSession(webSessionId);
-        return webSession != null
-            ? webSession
-            : webSessionManager.getHeadlessSession(request.getHttpServletRequest(), true);
+        if (webSession != null) {
+            return webSession;
+        }
+        log.error("CloudBeaver session not found with id " + webSessionId + ", try to create headless session");
+
+        return webSessionManager.getHeadlessSession(request.getHttpServletRequest(), true);
     }
 
     public void sendPing() {

@@ -7,13 +7,12 @@
  */
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
-import { compareConnectionsInfo, ConnectionInfoResource, ConnectionsManagerService, ContainerResource, createConnectionParam, serializeConnectionParam } from '@cloudbeaver/core-connections';
+import { compareConnectionsInfo, ConnectionInfoResource, ConnectionsManagerService, ConnectionsSettingsService, ContainerResource, createConnectionParam, serializeConnectionParam } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
-import { ConnectionsSettingsService } from '@cloudbeaver/plugin-connections';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionSchemaManagerService } from './ConnectionSchemaManagerService';

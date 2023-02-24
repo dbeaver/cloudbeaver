@@ -7,7 +7,7 @@
  */
 
 import { EAdminPermission } from '@cloudbeaver/core-authentication';
-import { Connection, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionInfoResource, ConnectionsManagerService, ConnectionsSettingsService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
@@ -15,7 +15,7 @@ import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual, Navig
 import { ActionService, ACTION_DELETE, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
-import { ConnectionsSettingsService } from '../ConnectionsSettingsService';
+import { PluginConnectionsSettingsService } from '../PluginConnectionsSettingsService';
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService';
 import { ACTION_CONNECTION_DISCONNECT } from './Actions/ACTION_CONNECTION_DISCONNECT';
 import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DISCONNECT_ALL';
@@ -38,6 +38,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     private readonly menuService: MenuService,
     private readonly publicConnectionFormService: PublicConnectionFormService,
     private readonly connectionsSettingsService: ConnectionsSettingsService,
+    private readonly pluginConnectionsSettingsService: PluginConnectionsSettingsService,
     private readonly permissionsService: PermissionsService,
   ) {
     super();
@@ -49,7 +50,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     this.menuService.addCreator({
       isApplicable: context => {
         if (
-          this.connectionsSettingsService.settings.getValue('hideConnectionViewForUsers')
+          this.pluginConnectionsSettingsService.settings.getValue('hideConnectionViewForUsers')
           && !this.permissionsService.has(EAdminPermission.admin)
         ) {
           return false;

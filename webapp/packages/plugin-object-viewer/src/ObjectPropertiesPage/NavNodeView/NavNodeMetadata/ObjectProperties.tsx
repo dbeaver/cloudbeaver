@@ -7,13 +7,18 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { ColoredContainer, Loader, TextPlaceholder, useObjectPropertyCategories, GroupTitle, ObjectPropertyInfoForm, Group, useResource, BASE_CONTAINERS_STYLES, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavTreeResource, DBObjectResource } from '@cloudbeaver/core-navigation-tree';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
+const loaderStyles = css`
+  ExceptionMessage {
+    padding: 24px;
+  }
+`;
 
 interface Props {
   objectId: string;
@@ -37,7 +42,7 @@ export const ObjectProperties = observer<Props>(function ObjectProperties({
   const properties = dbObject.data?.object?.properties;
 
   return styled(BASE_CONTAINERS_STYLES)(
-    <Loader state={dbObject}>{() => styled(BASE_CONTAINERS_STYLES)(
+    <Loader state={dbObject} style={loaderStyles}>{() => styled(BASE_CONTAINERS_STYLES)(
       <>
         {!properties || properties.length === 0 ? (
           <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
