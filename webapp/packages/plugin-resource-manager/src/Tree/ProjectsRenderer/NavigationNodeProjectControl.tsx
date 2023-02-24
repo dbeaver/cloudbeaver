@@ -17,7 +17,7 @@ import { NavNodeInfoResource, type INodeActions } from '@cloudbeaver/core-naviga
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
-import { ElementsTreeContext, NavigationNodeEditorLoader, NavTreeControlComponent, NavTreeControlProps, TreeNodeMenuLoader } from '@cloudbeaver/plugin-navigation-tree';
+import { ElementsTreeContext, isDraggingInsideProject, NavigationNodeEditorLoader, NavTreeControlComponent, NavTreeControlProps, TreeNodeMenuLoader } from '@cloudbeaver/plugin-navigation-tree';
 
 import { getRmProjectNodeId } from '../../NavNodes/getRmProjectNodeId';
 import { ResourceManagerService } from '../../ResourceManagerService';
@@ -67,12 +67,22 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
   const viewContext = useContext(CaptureViewContext);
   const elementsTreeContext = useContext(ElementsTreeContext);
   const treeNodeContext = useContext(TreeNodeContext);
+
   const projectInfoResource = useService(ProjectInfoResource);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const resourceManagerService = useService(ResourceManagerService);
+
   const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
   const selected = treeNodeContext.selected;
   const resourceType = viewContext?.tryGet(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
+
+  const isDragging = getComputed(() => {
+    if (!node.projectId || !elementsTreeContext?.tree.activeDnDData) {
+      return false;
+    }
+
+    return isDraggingInsideProject(node.projectId, elementsTreeContext.tree.activeDnDData);
+  });
 
   const [editing, setEditing] = useState(false);
   let name = node.name;
@@ -112,7 +122,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     }
   }
 
-  if (elementsTreeContext?.tree.settings?.projects === false) {
+  if (elementsTreeContext?.tree.settings?.projects === false && !isDragging) {
     return null;
   }
 

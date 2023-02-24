@@ -308,6 +308,15 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
+    public void setProjectProperty(
+        @NotNull String projectId,
+        @NotNull String propName,
+        @NotNull Object propValue
+    ) throws DBException {
+        getProjectMetadata(projectId, false).setProjectProperty(propName, propValue);
+    }
+
+    @Override
     public String getProjectsDataSources(@NotNull String projectId, @Nullable String[] dataSourceIds) throws DBException {
         DBPProject projectMetadata = getProjectMetadata(projectId, false);
         DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();

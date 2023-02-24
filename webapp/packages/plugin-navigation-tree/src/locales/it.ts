@@ -1,4 +1,5 @@
 export default [
+  ['plugin_navigation_tree_explorer_tab_title', 'Explorer'],
   ['app_navigationTree_openNodeTab', 'Apri'],
   ['app_navigationTree_search', 'Search elements...'],
   ['app_navigationTree_limited', 'Elements are limited to {arg:limit} items'],

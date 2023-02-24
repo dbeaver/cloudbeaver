@@ -6,15 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { AppScreenService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+
+import { TopNavBar } from './TopNavBar/TopNavBar';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
-  constructor() {
+  constructor(
+    private readonly appScreenService: AppScreenService,
+  ) {
     super();
   }
 
   register(): void | Promise<void> {
+    this.appScreenService.placeholder.add(TopNavBar);
   }
 
   load(): void | Promise<void> { }
