@@ -1,4 +1,5 @@
 export default [
+  ['plugin_navigation_tree_explorer_tab_title', 'Проводник'],
   ['app_navigationTree_openNodeTab', 'Открыть'],
   ['app_navigationTree_search', 'Искать элементы...'],
   ['app_navigationTree_limited', 'Отображено {arg:limit} элементов'],

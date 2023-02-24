@@ -129,21 +129,22 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     if (parents.length === 0) {
       return true;
     }
+    parents = [...parents];
 
-    const first = parents[0];
-    await this.load(first);
+    let parent: string | undefined;
+    let children: string[] = [];
 
-    for (const nodeId of parents) {
-      await this.waitLoad();
-
-      if (!this.navNodeInfoResource.has(nodeId)) {
+    while (parents.length > 0) {
+      const next = parents.shift()!;
+      if (parent !== undefined && !children.includes(next)) {
         return false;
       }
 
-      await this.load(nodeId);
+      children = await this.load(next);
+      parent = next;
     }
 
-    if (nextNode && !this.navNodeInfoResource.has(nextNode)) {
+    if (nextNode && !children.includes(nextNode)) {
       return false;
     }
 
@@ -259,13 +260,13 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         const parts = node.id.split('/');
         parts.splice(parts.length - 1, 1, name);
 
+        this.markTreeOutdated(node.parentId);
         return parts.join('/');
       } finally {
         this.markDataLoaded(node.id);
       }
     });
 
-    this.markOutdated(node.parentId);
     await this.onNodeRename.execute({
       projectId: node.projectId,
       nodeId: node.id,

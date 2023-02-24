@@ -191,10 +191,15 @@ export class SqlEditorTabService extends Bootstrap {
         connectionKey,
         defaultCatalog
       );
-    }
 
-    if (catalogData && defaultSchema) {
-      schema = catalogData.schemaList.find(schema => schema.name === defaultSchema);
+      if (catalogData && defaultSchema) {
+        schema = catalogData.schemaList.find(schema => schema.name === defaultSchema);
+      }
+    } else if (defaultSchema) {
+      schema = this.containerResource.getSchema(
+        connectionKey,
+        defaultSchema
+      );
     }
 
     let nodeId = schema?.id ?? catalogData?.catalog.id;

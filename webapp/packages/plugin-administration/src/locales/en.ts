@@ -11,7 +11,7 @@ export default [
   ['administration_configuration_wizard_configuration', 'Server configuration'],
   ['administration_configuration_wizard_configuration_step_description', 'Main server configuration'],
   ['administration_configuration_wizard_configuration_title', 'You can configure the main server parameters here.'],
-  ['administration_configuration_wizard_configuration_message', 'You will be able to add additional services after the server configuration.\n\r Administrator is a super user who can configure server, set databases connections, manage other users and much more. Please, remember the entered password. It is not possible to recover administrator password automatically.'],
+  ['administration_configuration_wizard_configuration_message', 'You will be able to add additional services after the server configuration.\n\rAdministrator is a super user who can configure server, set databases connections, manage other users and much more. Please, remember the entered password. It is not possible to recover administrator password automatically.'],
 
   ['administration_configuration_tools_save_tooltip', 'Save configuration'],
   ['administration_configuration_tools_cancel_tooltip', 'Reset changes'],

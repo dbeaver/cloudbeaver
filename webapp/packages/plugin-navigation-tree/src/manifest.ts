@@ -13,6 +13,7 @@ import { ElementsTreeToolsMenuService } from './NavigationTree/ElementsTree/Elem
 import { ElementsTreeSettingsService } from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/ElementsTreeSettingsService';
 import { NavigationTreeBootstrap } from './NavigationTree/NavigationTreeBootstrap';
 import { NavigationTreeService } from './NavigationTree/NavigationTreeService';
+import { NavigationTreeSettingsService } from './NavigationTreeSettingsService';
 import { NavNodeContextMenuService } from './NodesManager/NavNodeContextMenuService';
 import { NavNodeViewService } from './NodesManager/NavNodeView/NavNodeViewService';
 
@@ -27,5 +28,6 @@ export const navigationTreePlugin: PluginManifest = {
     NavNodeContextMenuService,
     NavNodeViewService,
     ElementsTreeSettingsService,
+    NavigationTreeSettingsService,
   ],
 };
