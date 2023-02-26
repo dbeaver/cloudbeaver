@@ -70,9 +70,7 @@ export class ThemeService extends Bootstrap {
   readonly onThemeChange: ISyncExecutor<ITheme>;
 
   private readonly themeMap: Map<string, ITheme> = new Map();
-  private readonly settings: ISettings = {
-    currentThemeId: defaultThemeSettings.defaultTheme,
-  };
+  private readonly settings: ISettings;
 
   constructor(
     private readonly serverConfigResource: ServerConfigResource,
@@ -82,6 +80,7 @@ export class ThemeService extends Bootstrap {
   ) {
     super();
 
+    this.settings = getDefaultThemeSettings();
     this.onThemeChange = new SyncExecutor();
 
     makeObservable<ThemeService, 'themeMap' | 'settings' | 'setCurrentThemeId'>(this, {
@@ -101,7 +100,12 @@ export class ThemeService extends Bootstrap {
   async load(): Promise<void> {
     await this.serverConfigResource.load();
     this.setCurrentThemeId(this.defaultThemeId); // set default app theme
-    this.settingsService.registerSettings(this.settings, THEME_SETTINGS_KEY); // load user state theme
+    this.settingsService.registerSettings(
+      THEME_SETTINGS_KEY,
+      this.settings,
+      getDefaultThemeSettings,
+      () => this.tryChangeTheme(this.currentThemeId)
+    ); // load user state theme
     await this.tryChangeTheme(this.currentThemeId);
   }
 
@@ -153,4 +157,10 @@ export class ThemeService extends Bootstrap {
       theme.styles = await theme.loader();
     }
   }
+}
+
+function getDefaultThemeSettings(): ISettings {
+  return {
+    currentThemeId: defaultThemeSettings.defaultTheme,
+  };
 }

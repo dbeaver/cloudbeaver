@@ -32,8 +32,9 @@ import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloud
 import { objectNavNodeProvider, NodeManagerUtils, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider, projectSetter, projectSetterState } from '@cloudbeaver/core-projects';
 import { NavNodeInfoFragment, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { NavigationTabsService, TabHandler, ITab, ITabOptions } from '@cloudbeaver/plugin-navigation-tabs';
-import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, SqlDataSourceService, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
+import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, SqlDataSourceService, ESqlDataSourceFeatures, ISQLDatasourceUpdateData } from '@cloudbeaver/plugin-sql-editor';
 
 import { isSQLEditorTab } from './isSQLEditorTab';
 import { SqlEditorPanel } from './SqlEditorPanel';
@@ -91,11 +92,14 @@ export class SqlEditorTabService extends Bootstrap {
     });
 
     makeObservable(this, {
-      sqlEditorTabs: computed,
+      sqlEditorTabs: computed<ITab<ISqlEditorTabState>[]>({
+        equals: (a, b) => isArraysEqual(a, b),
+      }),
     });
   }
 
   register(): void {
+    this.sqlDataSourceService.onUpdate.addHandler(this.syncDatasourceUpdate.bind(this));
     this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
     this.connectionInfoResource.onItemDelete.addHandler(this.handleConnectionDelete.bind(this));
     this.connectionExecutionContextResource.onItemAdd.addHandler(this.handleExecutionContextUpdate.bind(this));
@@ -448,6 +452,14 @@ export class SqlEditorTabService extends Bootstrap {
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor schema');
       return false;
+    }
+  }
+
+  private async syncDatasourceUpdate(data: ISQLDatasourceUpdateData) {
+    const tab = this.sqlEditorTabs.find(tab => tab.handlerState.editorId === data.editorId);
+
+    if (tab) {
+      this.attachToProject(tab, data.datasource.projectId);
     }
   }
 

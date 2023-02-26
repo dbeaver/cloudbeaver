@@ -69,6 +69,11 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
     postHandlers: [unloadTabs, restoreTabs],
   });
 
+  useExecutor({
+    executor: navigation.onStateUpdate,
+    postHandlers: [unloadTabs, restoreTabs],
+  });
+
   useEffect(() => {
     unloadTabs();
     restoreTabs();

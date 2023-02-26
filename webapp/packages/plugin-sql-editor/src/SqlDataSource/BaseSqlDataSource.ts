@@ -39,6 +39,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     return [ESqlDataSourceFeatures.script];
   }
 
+  readonly onUpdate: ISyncExecutor;
   readonly onSetScript: ISyncExecutor<string>;
   readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>[]>;
 
@@ -51,10 +52,12 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     this.message = undefined;
     this.outdated = true;
     this.editing = true;
+    this.onUpdate = new SyncExecutor();
     this.onSetScript = new SyncExecutor();
     this.onDatabaseModelUpdate = new SyncExecutor();
 
     this.onDatabaseModelUpdate.setInitialDataGetter(() => this.databaseModels);
+    this.onSetScript.next(this.onUpdate);
 
     makeObservable<this, 'outdated' | 'editing'>(this, {
       databaseModels: observable.ref,
@@ -70,8 +73,12 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   abstract canRename(name: string | null): boolean;
-  abstract setName(name: string | null): void;
-  abstract setExecutionContext(executionContext?: IConnectionExecutionContextInfo | undefined): void;
+  setName(name: string | null): void {
+    this.onUpdate.execute();
+  }
+  setExecutionContext(executionContext?: IConnectionExecutionContextInfo | undefined): void {
+    this.onUpdate.execute();
+  }
 
   isError(): boolean {
     return isContainsException(this.exception);
@@ -122,7 +129,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   setProject(projectId: string | null): void {
-
+    this.onUpdate.execute();
   }
 
   load(): Promise<void> | void { }

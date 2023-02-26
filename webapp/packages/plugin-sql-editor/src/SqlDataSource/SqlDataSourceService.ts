@@ -41,6 +41,11 @@ interface ISqlDataSourceProvider {
   isActionActive: boolean;
 }
 
+export interface ISQLDatasourceUpdateData {
+  editorId: string;
+  datasource: ISqlDataSource;
+}
+
 @injectable()
 export class SqlDataSourceService {
   get dataSources(): [string, ISqlDataSource][] {
@@ -49,6 +54,7 @@ export class SqlDataSourceService {
   }
 
   readonly onCreate: ISyncExecutor<[string, string]>;
+  readonly onUpdate: ISyncExecutor<ISQLDatasourceUpdateData>;
   private readonly dataSourceProviders: Map<string, ISqlDataSourceFabric>;
   private readonly providers: Map<string, ISqlDataSourceProvider>;
 
@@ -56,6 +62,11 @@ export class SqlDataSourceService {
     this.dataSourceProviders = new Map();
     this.providers = new Map();
     this.onCreate  = new SyncExecutor();
+    this.onUpdate  = new SyncExecutor();
+    this.onCreate.next<ISQLDatasourceUpdateData>(this.onUpdate, ([editorId]) => ({
+      editorId,
+      datasource: this.get(editorId)!,
+    }));
 
     this.register({
       key: MemorySqlDataSource.key,
@@ -103,6 +114,11 @@ export class SqlDataSourceService {
         isActionActive: false,
       };
 
+      activeProvider.dataSource.onUpdate
+        .next<ISQLDatasourceUpdateData>(this.onUpdate, () => ({
+        editorId,
+        datasource: activeProvider!.dataSource,
+      }));
       this.providers.set(editorId, activeProvider);
       state.datasourceKey = key;
       this.onCreate.execute([editorId, key]);

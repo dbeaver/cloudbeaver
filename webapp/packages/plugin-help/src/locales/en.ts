@@ -17,4 +17,9 @@ export default [
   ['sql_editor_shortcut_open_editor_in_new_tab', 'Open SQL Editor in the separate browser Tab'],
 
   ['navigation_tree_shortcut_enable_filter', 'Enable filtering'],
+
+  ['plugin_help_multi_tab_support_title', 'Multi-tab is not supported'],
+  ['plugin_help_multi_tab_support_description', `The data is not connected to other browser tabs.
+  Any opened application tabs will not be saved and will most likely be lost after the tab is closed.
+  Your local application settings will be lost after the browser tab is closed`],
 ];

@@ -8,6 +8,8 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_STATE } from '@cloudbeaver/plugin-top-app-bar';
 
@@ -19,7 +21,9 @@ export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
-    private readonly commonDialogService: CommonDialogService
+    private readonly commonDialogService: CommonDialogService,
+    private readonly notificationService: NotificationService,
+    private readonly localStorageSaveService: LocalStorageSaveService,
   ) {
     super();
   }
@@ -28,7 +32,20 @@ export class PluginBootstrap extends Bootstrap {
 
   register(): void {
     this.addTopAppMenuItems();
+    this.addMultiTabSupportNotification();
   }
+
+  private addMultiTabSupportNotification() {
+    this.localStorageSaveService.onStateChange.addHandler(mainStore => {
+      if (mainStore === 'session') {
+        this.notificationService.logError({
+          title: 'plugin_help_multi_tab_support_title',
+          message: 'plugin_help_multi_tab_support_description',
+        });
+      }
+    });
+  }
+
   private addTopAppMenuItems() {
     this.menuService.addCreator({
       menus: [MENU_APP_STATE],
