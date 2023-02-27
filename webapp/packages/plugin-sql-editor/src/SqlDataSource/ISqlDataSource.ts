@@ -28,6 +28,7 @@ export interface ISqlDataSource extends ILoadableState {
   readonly databaseModels: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>[];
   readonly executionContext?: IConnectionExecutionContextInfo;
   readonly message?: string;
+  readonly onUpdate: ISyncExecutor;
   readonly onSetScript: ISyncExecutor<string>;
   readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>[]>;
   readonly features: ESqlDataSourceFeatures[];

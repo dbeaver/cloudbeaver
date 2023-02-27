@@ -6,15 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
+import { TabsContainer } from '../Tabs/TabsContainer/TabsContainer';
+
 @injectable()
-export class AppScreenService {
-  static screenName = 'app';
-  readonly placeholder: PlaceholderContainer;
+export class LeftBarPanelService {
+  readonly tabsContainer: TabsContainer;
 
   constructor() {
-    this.placeholder = new PlaceholderContainer();
+    this.tabsContainer = new TabsContainer('Left Side Bar');
   }
 }

@@ -70,6 +70,8 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   const sqlDataSourceService = useService(SqlDataSourceService);
   const styles = useStyles(splitStyles, splitHorizontalStyles, viewerStyles);
   const dataSource = sqlDataSourceService.get(state.editorId);
+  const executionContextId = dataSource?.executionContext?.id;
+
   useDataSource(dataSource);
   const connection = useResource(
     SqlEditor,
@@ -86,7 +88,7 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   const context = useResource(
     SqlEditor,
     ConnectionExecutionContextResource,
-    getRealExecutionContextId(dataSource?.executionContext?.id),
+    getRealExecutionContextId(executionContextId),
     {
       active: connected,
     }
@@ -120,6 +122,15 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
       init();
     }
   }, [connected, initExecutionContext]);
+
+  useEffect(() => () => {
+    if (
+      executionContextId !== undefined
+      && dataSource?.executionContext?.id !== executionContextId
+    ) {
+      sqlEditorService.destroyContext({ id: executionContextId, connectionId: '', projectId: '' });
+    }
+  }, [executionContextId, dataSource]);
 
   return styled(styles)(
     <CaptureView view={sqlEditorView}>

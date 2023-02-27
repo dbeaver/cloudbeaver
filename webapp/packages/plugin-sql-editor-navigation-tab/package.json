@@ -16,10 +16,8 @@
   },
   "dependencies": {
     "@cloudbeaver/plugin-connections": "~0.1.0",
-    "@cloudbeaver/plugin-datasource-context-switch": "~0.1.0",
     "@cloudbeaver/plugin-navigation-tabs": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor": "~0.1.0",
-    "@cloudbeaver/plugin-navigation-tree": "~0.1.0",
     "@cloudbeaver/plugin-top-app-bar": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
     "@cloudbeaver/core-connections": "~0.1.0",

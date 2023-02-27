@@ -28,17 +28,21 @@ export class DevToolsService {
   constructor(
     private readonly autoSaveService: LocalStorageSaveService,
   ) {
-    this.settings = {
-      enabled: false,
-    };
+    this.settings = getDefaultDevToolsSettings();
 
     makeObservable<this, 'settings'>(this, {
       settings: observable,
     });
-    this.autoSaveService.withAutoSave(this.settings, DEVTOOLS);
+    this.autoSaveService.withAutoSave(DEVTOOLS, this.settings, getDefaultDevToolsSettings);
   }
 
   switch() {
     this.settings.enabled = !this.settings.enabled;
   }
+}
+
+function getDefaultDevToolsSettings(): IDevToolsSettings {
+  return {
+    enabled: false,
+  };
 }

@@ -13,6 +13,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeManagerService, objectNavNodeProvider, type INodeNavigationData, NodeManagerUtils, NavigationType } from '@cloudbeaver/core-navigation-tree';
+import { projectProvider } from '@cloudbeaver/core-projects';
 import { ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationTabsService, ITab, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
 
@@ -47,6 +48,7 @@ export class ObjectViewerTabService {
       canClose: this.canCloseObjectTab.bind(this),
 
       extensions: [
+        projectProvider(this.getProject.bind(this)),
         objectNavNodeProvider(this.getNavNode.bind(this)),
         connectionProvider(this.getConnection.bind(this)),
         objectCatalogProvider(this.getDBObjectCatalog.bind(this)),
@@ -265,6 +267,10 @@ export class ObjectViewerTabService {
     });
 
     this.navigationTabsService.closeTabSilent(resourceKeyList(tabs), true);
+  }
+
+  private getProject({ handlerState }: ITab<IObjectViewerTabState>) {
+    return handlerState.projectId;
   }
 
   private getNavNode({ handlerState }: ITab<IObjectViewerTabState>) {
