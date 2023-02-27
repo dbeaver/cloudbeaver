@@ -11,6 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 
 @injectable()
 export class AppScreenService {
+  static screenName = 'app';
   readonly placeholder: PlaceholderContainer;
 
   constructor() {

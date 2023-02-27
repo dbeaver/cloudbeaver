@@ -17,8 +17,11 @@
   -moz-animation:spin 2s linear infinite;
   animation:spin 2s linear infinite;
 }
-.app-loading-screen--fade-out {
+:not(:empty) + #app-loading-screen.app-loading-screen--fade-out {
   opacity: 0;
+}
+:not(:empty) + #app-loading-screen.app-loading-screen--hidden {
+  display: none;
 }
 
 @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }

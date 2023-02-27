@@ -42,6 +42,9 @@ export const inversifyWrapper: IDiWrapper = {
     ): void {
       mainContainer.addServiceByToken(token, value);
     },
+    unbindAll() {
+      mainContainer.unbindAll();
+    },
   },
 
   registerChildContainer(container: DIContainer): void {

@@ -28,6 +28,10 @@ export interface ILocalizationSettings {
   defaultLanguage: string;
 }
 
+interface ISettings {
+  language: string;
+}
+
 export const defaultThemeSettings: ILocalizationSettings = {
   defaultLanguage: DEFAULT_LOCALE_NAME,
 };
@@ -46,9 +50,7 @@ export class LocalizationService extends Bootstrap {
     return this.pluginSettings.getValue('defaultLanguage');
   }
 
-  settings = {
-    language: DEFAULT_LOCALE_NAME,
-  };
+  settings: ISettings;
   readonly pluginSettings: PluginSettings<ILocalizationSettings>;
   /** @deprecated Use settings instead, will be removed in 23.0.0 */
   readonly deprecatedPluginSettings: PluginSettings<ILocalizationSettings>;
@@ -68,6 +70,7 @@ export class LocalizationService extends Bootstrap {
   ) {
     super();
 
+    this.settings = getDefaultLocalizationSettings();
     this.onChange = new SyncExecutor();
     this.pluginSettings = this.pluginManagerService.getCoreSettings('localization', defaultThemeSettings);
     this.deprecatedPluginSettings = this.pluginManagerService.getCoreSettings('user', defaultThemeSettings);
@@ -129,7 +132,11 @@ export class LocalizationService extends Bootstrap {
   async load(): Promise<void> {
     await this.serverConfigResource.load();
     this.setCurrentLocale(this.defaultLanguage); // set default app locale
-    this.settingsService.registerSettings(this.settings, LANG_SETTINGS_KEY); // load user state locale
+    this.settingsService.registerSettings(
+      LANG_SETTINGS_KEY,
+      this.settings,
+      getDefaultLocalizationSettings
+    ); // load user state locale
     this.sessionResource.setDefaultLocale(this.settings.language);
     await this.loadLocaleAsync(DEFAULT_LOCALE_NAME);
     await this.loadLocaleAsync(this.settings.language);
@@ -209,4 +216,10 @@ export class LocalizationService extends Bootstrap {
       this.notificationService.logException(error, 'Locale is not found', '', true);
     }
   }
+}
+
+function getDefaultLocalizationSettings(): ISettings {
+  return {
+    language: DEFAULT_LOCALE_NAME,
+  };
 }

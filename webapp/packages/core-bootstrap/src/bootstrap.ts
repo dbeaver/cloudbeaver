@@ -9,8 +9,8 @@
 import { configure } from 'mobx';
 
 import { App, PluginManifest } from '@cloudbeaver/core-di';
+import { SyncExecutor } from '@cloudbeaver/core-executor';
 
-import { showErrorPage } from './ErrorPage';
 import { coreManifests } from './manifest';
 import { renderLayout } from './renderLayout';
 
@@ -18,16 +18,17 @@ export async function bootstrap(plugins: PluginManifest[]): Promise<void> {
   configure({ enforceActions: 'never' });
 
   const app = new App([...coreManifests, ...plugins]);
-  app.registerServices();
+  const render = renderLayout(app.getServiceInjector());
+  const unmountExecutor = new SyncExecutor();
+
+  unmountExecutor.addHandler(() => render.unmount());
+  app.onStart.before(unmountExecutor);
+  app.onStart.addHandler(() => render.renderApp());
 
   try {
-    await app.initializeServices();
-    await app.loadServices();
-
-    renderLayout(app.getServiceInjector());
-  } catch (e: any) {
-    console.error(e);
-    showErrorPage();
-    throw e;
+    await app.start();
+  } catch (exception) {
+    render.renderError();
+    throw exception;
   }
 }
