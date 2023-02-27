@@ -33,6 +33,10 @@ interface IMessage {
 
 @injectable()
 export class LocalStorageSaveService {
+  get storage(): LocalStorageType {
+    return this.storageType;
+  }
+
   readonly onStateChange: ISyncExecutor<LocalStorageType>;
 
   private readonly broadcastChannel: BroadcastChannel;
