@@ -155,7 +155,7 @@ public class LocalResourceController implements RMController {
         var webApp = WebAppUtils.getWebApplication();
         var userHasPrivateProjectPermission = !webApp.isMultiNode() ||
             activeUserCreds != null && activeUserCreds.hasPermission(DBWConstants.PERMISSION_PRIVATE_PROJECT_ACCESS);
-        if (webApp.getAppConfiguration().isPrivateProjectsAccessible() && userHasPrivateProjectPermission) {
+        if (webApp.getAppConfiguration().isSupportsCustomConnections() && userHasPrivateProjectPermission) {
             var userProjectPermission = getProjectPermissions(null, RMProjectType.USER);
             RMProject userProject = makeProjectFromPath(getPrivateProjectPath(), userProjectPermission, RMProjectType.USER, false);
             if (userProject != null) {

@@ -129,11 +129,6 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
         this.supportsCustomConnections = supportsCustomConnections;
     }
 
-    @Override
-    public boolean isPrivateProjectsAccessible() {
-        return supportsCustomConnections;
-    }
-
     public boolean isSupportsConnectionBrowser() {
         return supportsConnectionBrowser;
     }

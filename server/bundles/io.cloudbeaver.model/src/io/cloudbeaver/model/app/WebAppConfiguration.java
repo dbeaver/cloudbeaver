@@ -42,7 +42,7 @@ public interface WebAppConfiguration {
 
     boolean isFeatureEnabled(String id);
 
-    default boolean isPrivateProjectsAccessible() {
+    default boolean isSupportsCustomConnections() {
         return true;
     }
 }
