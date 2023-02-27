@@ -21,16 +21,14 @@ import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
-import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
-import org.jkiss.utils.CommonUtils;
 
 import java.util.Collection;
 
 /**
  * Notify all active user session that project has been updated
  */
-public abstract class WSProjectUpdatedEventHandler implements WSEventHandler {
+public abstract class WSProjectUpdatedEventHandler<Event extends WSEvent> implements WSEventHandler {
     private static final Log log = Log.getLog(WSProjectUpdatedEventHandler.class);
 
     @NotNull
@@ -39,15 +37,22 @@ public abstract class WSProjectUpdatedEventHandler implements WSEventHandler {
 
     @Override
     public void handleEvent(@NotNull WSEvent event) {
-        log.debug(getSupportedTopicId() + " event handled");
+        log.debug(getSupportedTopicId() + " event '" + event.getId() + "' processing");
+        if (!getEventClass().isInstance(event)) {
+            return;
+        }
         Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
         for (var activeUserSession : allSessions) {
             if (WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId())) {
-                continue;
+                continue; // skip events from current session
             }
-            updateSessionData(activeUserSession, event);
+            log.debug(getSupportedTopicId() + " event '" + event.getId() + "' handled");
+            updateSessionData(activeUserSession, getEventClass().cast(event));
         }
     }
 
-    protected abstract void updateSessionData(BaseWebSession activeUserSession, WSEvent event);
+    @NotNull
+    protected abstract Class<Event> getEventClass();
+
+    protected abstract void updateSessionData(BaseWebSession activeUserSession, Event event);
 }

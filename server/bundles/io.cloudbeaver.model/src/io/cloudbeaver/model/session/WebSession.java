@@ -1003,7 +1003,7 @@ public class WebSession extends BaseWebSession
         return accessibleProjects;
     }
 
-    public void addSessionProject(WebProjectImpl project) {
+    public void addSessionProject(@NotNull WebProjectImpl project) {
         synchronized (accessibleProjects) {
             accessibleProjects.add(project);
         }
@@ -1012,12 +1012,28 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public void deleteSessionProject(DBPProject project) {
+    public void deleteSessionProject(@Nullable WebProjectImpl project) {
         synchronized (accessibleProjects) {
             accessibleProjects.remove(project);
         }
         if (navigatorModel != null) {
             navigatorModel.getRoot().removeProject(project);
+        }
+    }
+
+    @Override
+    public void addSessionProject(@NotNull String projectId) throws DBException {
+        super.addSessionProject(projectId);
+        var rmProject = getRmController().getProject(projectId, false, false);
+        createWebProject(rmProject);
+    }
+
+    @Override
+    public void removeSessionProject(@Nullable String projectId) throws DBException {
+        super.removeSessionProject(projectId);
+        var project = getProjectById(projectId);
+        if (projectId != null) {
+            deleteSessionProject(project);
         }
     }
 
@@ -1048,7 +1064,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    private class TaskProgressMonitor extends ProxyProgressMonitor {
+    private static class TaskProgressMonitor extends ProxyProgressMonitor {
 
         private final WebAsyncTaskInfo asyncTask;
 
@@ -1070,7 +1086,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    private class PersistentAttribute {
+    private static class PersistentAttribute {
         private final Object value;
 
         public PersistentAttribute(Object value) {
