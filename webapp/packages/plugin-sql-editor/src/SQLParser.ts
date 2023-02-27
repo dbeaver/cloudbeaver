@@ -258,11 +258,6 @@ export class SQLParser {
 
       if (scriptDelimiter || position === script.length) {
         let query = currentSegment;
-
-        if (scriptDelimiter) {
-          query = query.substring(0, query.length - scriptDelimiter.length);
-        }
-
         query = query.trim();
 
         if (query) {
