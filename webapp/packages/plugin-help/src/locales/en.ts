@@ -21,5 +21,7 @@ export default [
   ['plugin_help_multi_tab_support_title', 'Multi-tab is not supported'],
   ['plugin_help_multi_tab_support_description', `The data is not connected to other browser tabs.
   Any opened application tabs will not be saved and will most likely be lost after the tab is closed.
-  Your local application settings will be lost after the browser tab is closed`],
+  Your local application settings will be lost after the browser tab is closed.
+  You can load tabs and settings for this tab`],
+  ['plugin_help_multi_tab_support_load_settings', 'Load tabs ans settings'],
 ];

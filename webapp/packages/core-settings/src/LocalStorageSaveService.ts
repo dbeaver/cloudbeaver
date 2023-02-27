@@ -37,7 +37,7 @@ export class LocalStorageSaveService {
     return this.storageType;
   }
 
-  readonly onStateChange: ISyncExecutor<LocalStorageType>;
+  readonly onStorageChange: ISyncExecutor<LocalStorageType>;
 
   private readonly broadcastChannel: BroadcastChannel;
   private readonly storages: Map<string, ILocalStorageElement<any>>;
@@ -47,44 +47,43 @@ export class LocalStorageSaveService {
     this.storageType = 'local';
     this.broadcastChannel = new BroadcastChannel('local-storage');
     this.storages = new Map();
-    this.onStateChange = new SyncExecutor();
+    this.onStorageChange = new SyncExecutor();
 
-    this.broadcastChannel.addEventListener('message', event => {
-      const message: IMessage = event.data;
+    // this.broadcastChannel.addEventListener('message', event => {
+    //   const message: IMessage = event.data;
 
-      switch (message.type) {
-        case 'init':
-          if (this.storageType === 'local') {
-            this.sendMessage({ type: 'respond' });
-          }
-          break;
-        case 'respond':
-          this.storageType = 'session';
-          this.updateStorage();
-          this.onStateChange.execute(this.storageType);
-          break;
-      }
-    });
-    this.sendMessage({ type: 'init' });
+    //   switch (message.type) {
+    //     case 'init':
+    //       if (this.storageType === 'local') {
+    //         this.sendMessage({ type: 'respond' });
+    //       }
+    //       break;
+    //     case 'respond':
+    //       this.updateStorage('session');
+    //       break;
+    //   }
+    // });
+    // this.sendMessage({ type: 'init' });
 
-    window.addEventListener('storage', action(event => {
-      if (this.storageType === 'session') {
-        return;
-      }
+    // window.addEventListener('storage', action(event => {
+    //   if (this.storageType === 'session') {
+    //     return;
+    //   }
 
-      if (event.key === null) {
-        for (const storage of this.storages.values()) {
-          storage.readState(true);
-          storage.saveState();
-        }
-      } else {
-        const storage = this.storages.get(event.key);
+    //   if (event.key === null) {
+    //     for (const storage of this.storages.values()) {
+    //       storage.readState(true);
+    //       storage.saveState();
+    //     }
+    //   } else {
+    //     const storage = this.storages.get(event.key);
 
-        if (storage) {
-          storage.readState(false);
-        }
-      }
-    }));
+    //     if (storage) {
+    //       storage.readState(false);
+    //     }
+    //   }
+    //   this.onStorageChange.execute(this.storageType);
+    // }));
   }
 
   withAutoSave<T extends Record<any, any> | Map<any, any>>(
@@ -108,10 +107,24 @@ export class LocalStorageSaveService {
     ));
   }
 
-  private updateStorage(): void {
-    for (const storage of this.storages.values()) {
-      storage.setStorage(this.getStorage());
+  updateStorage(storageType: LocalStorageType): void {
+    if (this.storageType === storageType) {
+      return;
     }
+
+    this.storageType = storageType;
+
+    if (this.storageType === 'local') {
+      this.sendMessage({ type: 'respond' });
+    }
+
+    runInAction(() => {
+      for (const storage of this.storages.values()) {
+        storage.setStorage(this.getStorage());
+      }
+    });
+
+    this.onStorageChange.execute(this.storageType);
   }
 
   private getStorage(): Storage {

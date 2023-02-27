@@ -172,8 +172,7 @@ export class NavigationTabsService extends View<ITab> {
           }
         }
         return map;
-      },
-      () => this.onStateUpdate.execute()
+      }
     );
 
     this.autoSaveService.withAutoSave(
@@ -210,6 +209,7 @@ export class NavigationTabsService extends View<ITab> {
     );
 
     this.userInfoResource.onDataUpdate.addHandler(this.unloadTabs.bind(this));
+    this.autoSaveService.onStorageChange.next(this.onStateUpdate, () => {});
   }
 
   getTabMetadata(tabId: string): ITabMetadata {

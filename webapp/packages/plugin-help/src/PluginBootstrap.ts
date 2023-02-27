@@ -7,9 +7,10 @@
  */
 
 import { AppScreenService } from '@cloudbeaver/core-app';
+import { ActionSnackbar } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { INotification, NotificationService } from '@cloudbeaver/core-events';
+import { ENotificationType, INotification, NotificationService } from '@cloudbeaver/core-events';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
@@ -20,7 +21,7 @@ import { ShortcutsDialog } from './Shortcuts/ShortcutsDialog';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
-  private errorNotification: INotification | null;
+  private errorNotification: INotification<any> | null;
   constructor(
     private readonly menuService: MenuService,
     private readonly screenService: ScreenService,
@@ -49,7 +50,14 @@ export class PluginBootstrap extends Bootstrap {
         this.screenService.isActive(AppScreenService.screenName)
         && this.localStorageSaveService.storage === 'session'
       ) {
-        this.errorNotification = this.notificationService.logError({
+        this.errorNotification = this.notificationService.customNotification(() => ActionSnackbar, {
+          actionText: 'plugin_help_multi_tab_support_load_settings',
+          onAction: () => {
+            this.localStorageSaveService.updateStorage('local');
+            this.errorNotification?.close(false);
+          },
+        }, {
+          type: ENotificationType.Error,
           title: 'plugin_help_multi_tab_support_title',
           message: 'plugin_help_multi_tab_support_description',
           onClose: () => {
@@ -58,7 +66,7 @@ export class PluginBootstrap extends Bootstrap {
         });
       }
     };
-    this.localStorageSaveService.onStateChange.addHandler(displayErrorMessage);
+    this.localStorageSaveService.onStorageChange.addHandler(displayErrorMessage);
 
     this.screenService.routeChange.addPostHandler(displayErrorMessage);
   }
