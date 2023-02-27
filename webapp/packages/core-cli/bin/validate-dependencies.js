@@ -35,8 +35,8 @@ function processDirectory(directory) {
         processDirectory(filePath);
       } else {
         // Otherwise, check if the file is a .ts/.tsx file
-        const extensions = ['.ts', '.tsx'];
-        if (extensions.some(ext => file.endsWith(ext)) && !file.split('.').includes('test')) {
+        const extensions = /(?<!\.test).tsx?$/i;
+        if (extensions.test(file)) {
           // Read the contents of the file
           const fileContent = fs.readFileSync(filePath, 'utf8');
           const regex = /import\s+(\{[^}]*\}|\w+)\s+from\s+['"]@cloudbeaver\/([^/'"]*)(\/[^'"]*)?['"]/g;
