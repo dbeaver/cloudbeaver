@@ -13,7 +13,8 @@
     "postbuild": "tsc",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "test": "core-cli-test"
+    "test": "core-cli-test",
+    "filter": "core-cli-filter-deps"
   },
   "dependencies": {
     "@timohausmann/quadtree-ts": "~2.0.0-beta.1",
