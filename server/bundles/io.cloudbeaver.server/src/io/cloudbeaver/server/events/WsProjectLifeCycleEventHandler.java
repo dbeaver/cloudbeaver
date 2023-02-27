@@ -7,9 +7,9 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
-import org.jkiss.dbeaver.model.websocket.event.WSProjectLifeCycleEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
 
-public class WsProjectLifeCycleEventHandler extends WSProjectUpdatedEventHandler<WSProjectLifeCycleEvent> {
+public class WsProjectLifeCycleEventHandler extends WSProjectUpdatedEventHandler<WSProjectUpdateEvent> {
 
     private static final Log log = Log.getLog(WsProjectLifeCycleEventHandler.class);
 
@@ -21,12 +21,12 @@ public class WsProjectLifeCycleEventHandler extends WSProjectUpdatedEventHandler
 
     @NotNull
     @Override
-    protected Class<WSProjectLifeCycleEvent> getEventClass() {
-        return WSProjectLifeCycleEvent.class;
+    protected Class<WSProjectUpdateEvent> getEventClass() {
+        return WSProjectUpdateEvent.class;
     }
 
     @Override
-    protected void updateSessionData(BaseWebSession activeUserSession, WSProjectLifeCycleEvent event) {
+    protected void updateSessionData(BaseWebSession activeUserSession, WSProjectUpdateEvent event) {
         if (!activeUserSession.getUserContext().hasPermission(DBWConstants.PERMISSION_ADMIN)) {
             log.debug("The current user is not an administrator. Event skipped");
             return;
@@ -41,6 +41,7 @@ public class WsProjectLifeCycleEventHandler extends WSProjectUpdatedEventHandler
                 activeUserSession.removeSessionProject(projectId);
                 log.info("Project '" + projectId + "' removed from '" + activeUserSession.getSessionId() + "' session");
             }
+            activeUserSession.addSessionEvent(event);
         } catch (DBException e) {
             log.warn("Failed to handle project lifecycle event", e);
         }
