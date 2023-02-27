@@ -56,7 +56,7 @@ export class ConnectionAuthService extends Dependency {
     }
   }
 
-  async auth(key: IConnectionInfoParams): Promise<Connection | null> {
+  async auth(key: IConnectionInfoParams, resetCredentials?: boolean): Promise<Connection | null> {
     if (!this.connectionInfoResource.has(key)) {
       return null;
     }
@@ -66,11 +66,11 @@ export class ConnectionAuthService extends Dependency {
     if (!connection?.connected) {
       connection = await this.connectionInfoResource.refresh(key);
     } else {
-      return connection;
-    }
-
-    if (connection.connected) {
-      return connection;
+      if (resetCredentials) {
+        this.connectionInfoResource.close(key);
+      } else {
+        return connection;
+      }
     }
 
     if (connection.requiredAuth) {
@@ -84,10 +84,10 @@ export class ConnectionAuthService extends Dependency {
     connection = await this.connectionInfoResource.load(key, ['includeAuthNeeded', 'includeNetworkHandlersConfig']);
 
     const networkHandlers = connection.networkHandlersConfig!
-      .filter(handler => handler.enabled && !handler.savePassword)
+      .filter(handler => handler.enabled && (!handler.savePassword || resetCredentials))
       .map(handler => handler.id);
 
-    if (connection.authNeeded || networkHandlers.length > 0) {
+    if (connection.authNeeded || resetCredentials || networkHandlers.length > 0) {
       await this.commonDialogService.open(DatabaseAuthDialog, {
         connection: key,
         networkHandlers,
