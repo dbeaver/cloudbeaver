@@ -96,7 +96,7 @@ const tabStyles = css`
     margin-right: 8px;
     margin-left: 4px;
 
-    &:empty, &:has( tab-outer:only-child) {
+    &:empty, & tab-outer:only-child {
       display: none;
     }
   }
