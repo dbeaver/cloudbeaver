@@ -11,6 +11,7 @@ const sso = require.resolve('@cloudbeaver/plugin-sso/src/index.ts');
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlReplaceWebpackPlugin = require('html-replace-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const HtmlInjectWebpackPlugin = require('./HtmlInjectWebpackPlugin');
@@ -97,6 +98,12 @@ module.exports = (env, argv) => {
       new HtmlInjectWebpackPlugin({
         body: [{ attributes: { hidden: true }, tagName: 'object', innerHTML: '{STATIC_CONTENT}', voidTag: false }],
       }),
+      new HtmlReplaceWebpackPlugin([
+        {
+          pattern: '{ROOT_URI}',
+          replacement: '/',
+        },
+      ]),
       new webpack.HotModuleReplacementPlugin(),
     ],
   });
