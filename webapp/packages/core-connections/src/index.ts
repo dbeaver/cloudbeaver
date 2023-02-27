@@ -19,6 +19,7 @@ export * from './ConnectionDialectResource';
 export * from './ConnectionInfoEventHandler';
 export * from './ConnectionInfoResource';
 export * from './EConnectionFeature';
+export * from './ConnectionsSettingsService';
 export * from './ContainerResource';
 export * from './ConnectionsLocaleService';
 export * from './DatabaseAuthModelsResource';
