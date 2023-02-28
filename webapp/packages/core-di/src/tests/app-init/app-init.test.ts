@@ -15,7 +15,7 @@ test('App Initialization', async () => {
   const app = new App([manifest]);
   const injector = app.getServiceInjector();
 
-  app.registerServices();
+  (app as any).registerServices();
 
   const service = injector.getServiceByClass(TestService);
   const bootstrap = injector.getServiceByClass(TestBootstrap);
@@ -27,11 +27,11 @@ test('App Initialization', async () => {
   expect(bootstrap.sum).toBe(0);
   expect(bootstrap.registered).toBe(false);
 
-  await app.initializeServices();
+  await (app as any).initializeServices();
   expect(bootstrap.loaded).toBe(false);
   expect(bootstrap.registered).toBe(true);
 
-  await app.loadServices();
+  await (app as any).loadServices();
   expect(bootstrap.loaded).toBe(true);
   expect(bootstrap.sum).toBe(3);
 

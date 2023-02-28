@@ -157,7 +157,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       this.parser.setScript(this.value);
 
       this.reactionDisposer = autorun(() => {
-        if (this.dataSource?.executionContext) {
+        if (this.dataSource?.executionContext?.id) {
           const context = this.connectionExecutionContextService.get(this.dataSource.executionContext.id);
 
           if (context) {

@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { Dialog, useDialogState } from 'reakit/Dialog';
 import styled, { use } from 'reshadow';
 
@@ -58,12 +58,23 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps>(function C
   const context = useContext(DialogContext);
   const translate = useTranslate();
   const dialogState = useDialogState({ visible: true });
+  const focusedElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!dialogState.visible && !context.dialog.options?.persistent) {
       context.reject();
     }
   });
+
+  useEffect(() => {
+    if (document.activeElement instanceof HTMLElement) {
+      focusedElementRef.current = document.activeElement;
+    }
+
+    return () => {
+      focusedElementRef.current?.focus();
+    };
+  }, []);
 
   return styled(useStyles(commonDialogThemeStyle, commonDialogBaseStyle, dialogStyles, style))(
     <Dialog {...dialogState} aria-label={ariaLabel} visible={context.visible} hideOnClickOutside={false} modal={false}>

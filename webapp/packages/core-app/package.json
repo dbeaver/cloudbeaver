@@ -12,15 +12,13 @@
     "build": "webpack --config ../../configs/webpack.plugin.config.js",
     "postbuild": "tsc",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
     "@cloudbeaver/plugin-navigation-tabs": "~0.1.0",
-    "@cloudbeaver/plugin-navigation-tree": "~0.1.0",
     "@cloudbeaver/plugin-tools-panel": "~0.1.0",
-    "@cloudbeaver/plugin-top-app-bar": "~0.1.0",
     "@cloudbeaver/plugin-version": "~0.1.0",
-    "@cloudbeaver/plugin-connections": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-dialogs": "~0.1.0",

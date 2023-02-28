@@ -11,9 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { splitStyles, Split, ResizerControls, Pane, ErrorBoundary, useSplitUserState, useStyles, Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
-import { ConnectionsSettingsService } from '@cloudbeaver/plugin-connections';
-import { NavigationTreeLoader } from '@cloudbeaver/plugin-navigation-tree';
+import { LeftBarPanelService, SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
 
 import { RightArea } from './RightArea';
 
@@ -34,16 +32,17 @@ const mainStyles = css`
 
 export const Main = observer(function Main() {
   const sideBarPanelService = useService(SideBarPanelService);
-  const connectionsSettingsService = useService(ConnectionsSettingsService);
+  const leftBarPanelService = useService(LeftBarPanelService);
 
   const styles = useStyles(mainStyles, splitStyles);
   const splitMainState = useSplitUserState('main');
   const splitRightState = useSplitUserState('main-right');
 
-  const activeBars = sideBarPanelService.tabsContainer.getDisplayed();
+  const activeSideBars = sideBarPanelService.tabsContainer.getDisplayed();
+  const activeLeftBars = leftBarPanelService.tabsContainer.getDisplayed();
 
-  const connectionsDisabled = connectionsSettingsService.settings.getValue('disabled');
-  const sideBarDisabled = activeBars.length === 0;
+  const sideBarDisabled = activeSideBars.length === 0;
+  const leftBarDisabled = activeLeftBars.length === 0;
 
   return styled(styles)(
     <Loader loading={false} overlay>
@@ -51,13 +50,13 @@ export const Main = observer(function Main() {
         <Split
           {...splitMainState}
           sticky={30}
-          mode={connectionsDisabled ? 'minimize' : splitMainState.mode}
-          disable={connectionsDisabled}
+          mode={leftBarDisabled ? 'minimize' : splitMainState.mode}
+          disable={leftBarDisabled}
         >
           <Pane main>
             <ErrorBoundary remount>
               <Loader loading={false} overlay>
-                <NavigationTreeLoader />
+                <SideBarPanel container={leftBarPanelService.tabsContainer} />
               </Loader>
             </ErrorBoundary>
           </Pane>
