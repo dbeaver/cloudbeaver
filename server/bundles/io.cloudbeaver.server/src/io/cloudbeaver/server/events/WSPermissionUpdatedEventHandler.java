@@ -38,7 +38,9 @@ public class WSPermissionUpdatedEventHandler implements WSEventHandler {
         try {
             var projectId = permissionEvent.getObjectId();
             var permissionGrants = smController.getObjectPermissionGrants(projectId, permissionEvent.getSmObjectType());
-            var newProjectSubjects = permissionGrants.stream().map(SMObjectPermissionsGrant::getSubjectId).collect(Collectors.toSet());
+            var subjectsWithProjectAccess = permissionGrants.stream()
+                .map(SMObjectPermissionsGrant::getSubjectId)
+                .collect(Collectors.toSet());
 
             log.debug(getSupportedTopicId() + " event handled");
 
@@ -58,7 +60,7 @@ public class WSPermissionUpdatedEventHandler implements WSEventHandler {
                 var accessibleProjectIds = activeUserSession.getUserContext().getAccessibleProjectIds();
                 var isAccessibleNow = accessibleProjectIds.contains(projectId);
 
-                var shouldBeAccessible = newProjectSubjects.stream().anyMatch(userSubjects::contains);
+                var shouldBeAccessible = subjectsWithProjectAccess.stream().anyMatch(userSubjects::contains);
 
                 if (shouldBeAccessible && !isAccessibleNow) {
                     // adding project to session cache

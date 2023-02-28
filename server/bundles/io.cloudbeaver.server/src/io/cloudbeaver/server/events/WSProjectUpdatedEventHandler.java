@@ -34,7 +34,7 @@ public class WSProjectUpdatedEventHandler extends WSAbstractProjectEventHandler<
         var eventId = event.getId();
         var projectId = event.getProjectId();
         try {
-            if (eventId.equals(WSEventType.RM_PROJECT_CREATED.getEventId())) {
+            if (eventId.equals(WSEventType.RM_PROJECT_ADDED.getEventId())) {
                 activeUserSession.addSessionProject(projectId);
                 log.info("Project '" + projectId + "' added to '" + activeUserSession.getSessionId() + "' session");
             } else if (eventId.equals(WSEventType.RM_PROJECT_REMOVED.getEventId())) {
