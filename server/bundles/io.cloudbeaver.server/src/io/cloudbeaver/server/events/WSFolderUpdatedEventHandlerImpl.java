@@ -40,11 +40,9 @@ public class WSFolderUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandle
             return;
         }
         var dsFolderUpdateEvent = (WSDatasourceFolderEvent) event;
-        boolean isProjectAccessible = activeUserSession.isProjectAccessible(dsFolderUpdateEvent.getProjectId());
-        if (!isProjectAccessible || CommonUtils.isEmpty(dsFolderUpdateEvent.getNodePaths())) {
+        if (!validateEvent(activeUserSession, dsFolderUpdateEvent)) {
             return;
         }
-
         if (activeUserSession instanceof WebSession) {
             var webSession = (WebSession) activeUserSession;
             var project = webSession.getProjectById(dsFolderUpdateEvent.getProjectId());
@@ -52,6 +50,13 @@ public class WSFolderUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandle
             webSession.getNavigatorModel().getRoot().getProjectNode(project).getDatabases().refreshChildren();
         }
         activeUserSession.addSessionEvent(event);
+    }
+
+    protected boolean validateEvent(BaseWebSession activeUserSession, WSDatasourceFolderEvent event) {
+        if (CommonUtils.isEmpty(event.getNodePaths())) {
+            return false;
+        }
+        return super.validateEvent(activeUserSession, event);
     }
 }
 

@@ -41,11 +41,7 @@ public class WSDataSourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
             return;
         }
         var dsUpdateEvent = (WSDataSourceEvent) event;
-        if (!activeUserSession.isProjectAccessible(dsUpdateEvent.getProjectId())) {
-            return;
-        }
-        var eventType = WSEventType.valueById(event.getId());
-        if (eventType == null) {
+        if (!validateEvent(activeUserSession, dsUpdateEvent)) {
             return;
         }
         var sendEvent = true;
@@ -55,7 +51,7 @@ public class WSDataSourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
             sendEvent = webSession.updateProjectConnection(
                 project,
                 dsUpdateEvent.getDataSourceIds(),
-                eventType
+                WSEventType.valueById(event.getId())
             );
         }
         if (sendEvent) {

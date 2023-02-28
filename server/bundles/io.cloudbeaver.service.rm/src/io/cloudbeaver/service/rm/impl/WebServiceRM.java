@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 
 import java.nio.charset.StandardCharsets;
@@ -301,10 +302,24 @@ public class WebServiceRM implements DBWServiceRM {
                     webSession.getUserId()
                 );
             }
+            addProjectPermissionsUpdatedEvent(webSession, projectId);
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error granting project permissions", e);
         }
+    }
+
+    private void addProjectPermissionsUpdatedEvent(
+        @NotNull WebSession webSession,
+        @NotNull String projectId
+    ) {
+        var event = WSObjectPermissionEvent.update(
+            webSession.getUserContext().getSmSessionId(),
+            webSession.getUserId(),
+            SMObjects.PROJECT,
+            projectId
+        );
+        webSession.getApplication().getEventController().addEvent(event);
     }
 
     @Override
@@ -325,6 +340,7 @@ public class WebServiceRM implements DBWServiceRM {
                     permissions,
                     webSession.getUserId()
                 );
+                addProjectPermissionsUpdatedEvent(webSession, projectId);
             }
             return true;
         } catch (Exception e) {

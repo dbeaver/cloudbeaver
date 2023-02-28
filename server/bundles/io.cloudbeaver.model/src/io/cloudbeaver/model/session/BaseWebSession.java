@@ -160,4 +160,12 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     public boolean isProjectAccessible(String projectId) {
         return userContext.getAccessibleProjectIds().contains(projectId);
     }
+
+    public void addSessionProject(String projectId) throws DBException {
+        userContext.getAccessibleProjectIds().add(projectId);
+    }
+
+    public void removeSessionProject(String projectId) throws DBException {
+        userContext.getAccessibleProjectIds().remove(projectId);
+    }
 }

@@ -52,13 +52,9 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
             return;
         }
         var resourceUpdateEvent = (WSResourceUpdatedEvent) event;
-        String projectId = resourceUpdateEvent.getProjectId();
-        if (!activeUserSession.isProjectAccessible(projectId)) {
+        if (!validateEvent(activeUserSession, resourceUpdateEvent)) {
             return;
-        }
-        if (resourceUpdateEvent.getResourcePath() == null) {
-            return;
-        }
+        };
         Object parsedResourcePath = resourceUpdateEvent.getResourceParsedPath();
         RMResource[] resourceParsedPath;
         if (parsedResourcePath instanceof RMResource[]) {
@@ -66,13 +62,13 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
         } else {
             resourceParsedPath = gson.fromJson(gson.toJson(parsedResourcePath), RMResource[].class);
         }
-        var eventType = WSEventType.valueById(resourceUpdateEvent.getId());
-        if (eventType == null) {
-            return;
-        }
         if (activeUserSession instanceof WebSession) {
             var webSession = (WebSession) activeUserSession;
-            acceptChangesInNavigatorTree(eventType, resourceParsedPath, webSession.getProjectById(projectId));
+            acceptChangesInNavigatorTree(
+                WSEventType.valueById(event.getId()),
+                resourceParsedPath,
+                webSession.getProjectById(resourceUpdateEvent.getProjectId())
+            );
         }
         activeUserSession.addSessionEvent(event);
     }
@@ -94,5 +90,12 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
                     rmResourcePath)
             );
         }
+    }
+
+    protected boolean validateEvent(BaseWebSession webSession, WSResourceUpdatedEvent event) {
+        if (event.getResourcePath() == null) {
+            return false;
+        }
+        return super.validateEvent(webSession, event);
     }
 }

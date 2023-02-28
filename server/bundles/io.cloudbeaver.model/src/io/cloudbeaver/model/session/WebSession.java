@@ -1021,6 +1021,22 @@ public class WebSession extends BaseWebSession
         }
     }
 
+    @Override
+    public void addSessionProject(String projectId) throws DBException {
+        super.addSessionProject(projectId);
+        var rmProject = getRmController().getProject(projectId, false, false);
+        createWebProject(rmProject);
+    }
+
+    @Override
+    public void removeSessionProject(String projectId) throws DBException {
+        super.removeSessionProject(projectId);
+        var project = getProjectById(projectId);
+        if (projectId != null) {
+            deleteSessionProject(project);
+        }
+    }
+
     @Property
     public boolean isValid() {
         return getSessionActiveTimeLeft() > 0;
