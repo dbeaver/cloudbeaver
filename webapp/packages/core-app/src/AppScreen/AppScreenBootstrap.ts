@@ -11,10 +11,10 @@ import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
 import { AppScreen } from './AppScreen';
+import { AppScreenService } from './AppScreenService';
 
 @injectable()
 export class AppScreenBootstrap extends Bootstrap {
-  static screenName = 'app';
   readonly activation: IExecutor;
 
   constructor(
@@ -26,8 +26,8 @@ export class AppScreenBootstrap extends Bootstrap {
 
   register(): void {
     this.screenService.create({
-      name: AppScreenBootstrap.screenName,
-      routes: [{ name: AppScreenBootstrap.screenName, path: '/' }],
+      name: AppScreenService.screenName,
+      routes: [{ name: AppScreenService.screenName, path: '/' }],
       component: AppScreen,
       root: true,
       onActivate: async () => { await this.activation.execute(); },

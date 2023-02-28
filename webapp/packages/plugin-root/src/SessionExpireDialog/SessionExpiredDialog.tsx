@@ -10,7 +10,9 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { Button, useTranslate } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import { RouterService } from '@cloudbeaver/core-routing';
 
 
 
@@ -31,9 +33,10 @@ const styles = css`
 export const SessionExpiredDialog: DialogComponent<null, null> = observer(function SessionExpiredDialog({
   rejectDialog,
 }) {
+  const routerService = useService(RouterService);
   const translate = useTranslate();
   function reload() {
-    window.location.reload();
+    routerService.reload();
   }
 
   return styled(styles)(

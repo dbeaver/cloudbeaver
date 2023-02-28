@@ -48,6 +48,7 @@ export * from './isDefined';
 export * from './createPath';
 export * from './debounce';
 export * from './svgToDataUri';
+export * from './TempMap';
 export * from './uriToBlob';
 export * from './utf8ToBase64';
 export * from './createLastPromiseGetter';

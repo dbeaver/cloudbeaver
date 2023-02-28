@@ -6,22 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeManagerService, NavNodeInfoResource, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
 import { createResourceOfType, isResourceOfType, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { createChildResourceKey, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
+import { createChildResourceKey, NAV_NODE_TYPE_RM_RESOURCE, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { DATA_CONTEXT_TAB_ID } from '@cloudbeaver/core-ui';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavResourceNodeService, ResourceManagerService, getResourceKeyFromNodeId } from '@cloudbeaver/plugin-resource-manager';
 import { ResourceManagerScriptsService, SaveScriptDialog, SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, SqlDataSourceService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, ISqlDataSource, SqlDataSourceService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { ResourceSqlDataSource } from './ResourceSqlDataSource';
@@ -43,7 +41,6 @@ export class PluginBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-    private readonly resourceManagerResource: ResourceManagerResource,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
     private readonly sqlEditorTabService: SqlEditorTabService,
@@ -59,10 +56,9 @@ export class PluginBootstrap extends Bootstrap {
       id: 'scripts-base-handler',
       isActionApplicable: (context, action): boolean => {
         if (action === ACTION_SAVE) {
-          const tabId = context.tryGet(DATA_CONTEXT_TAB_ID);
           const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
 
-          if (!state || !tabId) {
+          if (!state) {
             return false;
           }
 
@@ -76,11 +72,11 @@ export class PluginBootstrap extends Bootstrap {
         return false;
       },
       handler: async (context, action) => {
-        const tabId = context.get(DATA_CONTEXT_TAB_ID);
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
 
-        const dataSource = this.sqlDataSourceService.get(state.editorId);
-        const tab = this.navigationTabsService.getTab(tabId);
+        let dataSource: ISqlDataSource | ResourceSqlDataSource | undefined = this.sqlDataSourceService.get(
+          state.editorId
+        );
 
         if (!dataSource) {
           return;
@@ -134,25 +130,23 @@ export class PluginBootstrap extends Bootstrap {
               }
 
               const resourceKey = createChildResourceKey(folderResourceKey, scriptName);
-              await this.resourceManagerResource.writeText(
+
+              await this.resourceManagerScriptsService.createScript(
                 resourceKey,
+                dataSource.executionContext,
                 dataSource.script,
-                false
               );
 
-              if (tab && isSQLEditorTab(tab)) {
-                const previousDataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
-                const dataSource = this.sqlDataSourceService.create(
-                  tab.handlerState,
-                  ResourceSqlDataSource.key,
-                ) as ResourceSqlDataSource;
-
-                dataSource.setResourceKey(resourceKey);
-
-                if (previousDataSource?.executionContext) {
-                  dataSource.setExecutionContext(previousDataSource.executionContext);
+              dataSource = this.sqlDataSourceService.create(
+                state,
+                ResourceSqlDataSource.key,
+                {
+                  script: dataSource.script,
+                  executionContext: dataSource.executionContext,
                 }
-              }
+              );
+
+              (dataSource as ResourceSqlDataSource).setResourceKey(resourceKey);
 
               this.notificationService.logSuccess({ title: 'plugin_sql_editor_navigation_tab_resource_save_script_success', message: resourceKey.name });
 
@@ -274,24 +268,12 @@ export class PluginBootstrap extends Bootstrap {
         const context = contextProvider.getContext(this.navigationTabsService.navigationTabContext);
 
         if (context.tab && isSQLEditorTab(context.tab)) {
-          const previousDataSource = this.sqlDataSourceService.get(context.tab.handlerState.editorId);
-
           const dataSource = this.sqlDataSourceService.create(
             context.tab.handlerState,
-            ResourceSqlDataSource.key,
+            ResourceSqlDataSource.key
           ) as ResourceSqlDataSource;
 
-
           dataSource.setResourceKey(resourceKey);
-
-          if (previousDataSource?.executionContext) {
-            dataSource.setExecutionContext({
-              ...previousDataSource.executionContext,
-              id: NOT_INITIALIZED_CONTEXT_ID,
-            });
-          }
-
-          this.sqlEditorTabService.attachToProject(context.tab, resourceKey.projectId);
         }
       }
     } catch (exception) {
