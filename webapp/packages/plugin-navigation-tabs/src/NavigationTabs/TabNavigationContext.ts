@@ -48,7 +48,6 @@ export class TabNavigationContext implements ITabNavigationContext {
     this._tab = observable<ITab<T>>({
       id: uuid(),
       userId: this.userInfoResource.getId(),
-      restored: true,
       ...options,
     });
     this._isNewlyCreated = true;

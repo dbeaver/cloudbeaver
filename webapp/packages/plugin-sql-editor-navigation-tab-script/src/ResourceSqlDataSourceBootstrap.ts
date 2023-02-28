@@ -8,7 +8,7 @@
 
 import { action, makeObservable, observable, untracked } from 'mobx';
 
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -20,6 +20,7 @@ import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { throttle } from '@cloudbeaver/core-utils';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavResourceNodeService, ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
+import { ResourceManagerScriptsService } from '@cloudbeaver/plugin-resource-manager-scripts';
 import { getSqlEditorName, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
@@ -45,6 +46,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     private readonly sqlEditorTabService: SqlEditorTabService,
     private readonly navigationTabsService: NavigationTabsService,
     private readonly resourceManagerResource: ResourceManagerResource,
+    private readonly resourceManagerScriptsService: ResourceManagerScriptsService,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly windowEventsService: WindowEventsService,
     private readonly sqlEditorTabResourceService: SqlEditorTabResourceService,
@@ -60,8 +62,9 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     });
 
     localStorageSaveService.withAutoSave(
-      this.dataSourceStateState,
       RESOURCE_TAB_STATE,
+      this.dataSourceStateState,
+      () => new Map(),
       map => {
         for (const [key, value] of Array.from(map.entries())) {
           if (
@@ -72,8 +75,8 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
             || !['undefined', 'object'].includes(typeof value.executionContext)
             || !['string', 'undefined'].includes(typeof value.executionContext?.connectionId)
             || !['string', 'undefined'].includes(typeof value.executionContext?.id)
-            || !['string', 'undefined'].includes(typeof value.executionContext?.defaultCatalog)
-            || !['string', 'undefined'].includes(typeof value.executionContext?.defaultSchema)
+            || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultCatalog)
+            || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultSchema)
           ) {
             map.delete(key);
           }
@@ -282,11 +285,9 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
   private async getProperties(
     dataSource: ResourceSqlDataSource,
     resourceKey: IResourceManagerParams
-  ): Promise<Record<string, any>> {
+  ): Promise<IConnectionExecutionContextInfo | undefined> {
     try {
-      const resource = await this.resourceManagerResource.load(resourceKey, ['includeProperties']);
-
-      return resource[0].properties ?? {};
+      return await this.resourceManagerScriptsService.getExecutionContextInfo(resourceKey);
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_sync_script_error');
       throw exception;
@@ -296,14 +297,13 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
   private async setProperties(
     dataSource: ResourceSqlDataSource,
     resourceKey: IResourceManagerParams,
-    diff: Record<string, any>
-  ): Promise<Record<string, any>> {
-    if (!this.resourceManagerService.enabled) {
-      return {};
-    }
-
+    executionContext: IConnectionExecutionContextInfo | undefined
+  ): Promise<IConnectionExecutionContextInfo | undefined> {
     try {
-      return await this.navResourceNodeService.setProperties(resourceKey, diff);
+      return await this.resourceManagerScriptsService.setExecutionContextInfo(
+        resourceKey,
+        executionContext
+      );
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_update_script_error');
       throw exception;

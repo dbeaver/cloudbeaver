@@ -66,10 +66,12 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
     this._executionContext = executionContext;
+    super.setExecutionContext(executionContext);
   }
 
   setName(name: string | null): void {
     this._name = name;
+    super.setName(name);
   }
 
   canRename(name: string | null): boolean {

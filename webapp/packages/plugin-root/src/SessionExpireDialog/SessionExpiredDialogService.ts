@@ -11,12 +11,14 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { SessionExpireService } from '@cloudbeaver/core-root';
+import { RouterService } from '@cloudbeaver/core-routing';
 
 import { SessionExpiredDialog } from './SessionExpiredDialog';
 
 @injectable()
 export class SessionExpiredDialogService extends Bootstrap {
   constructor(
+    private readonly routerService: RouterService,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly sessionExpireService: SessionExpireService
@@ -36,7 +38,7 @@ export class SessionExpiredDialogService extends Bootstrap {
     if (state === DialogueStateResult.Rejected) {
       this.notificationService.customNotification(() => ActionSnackbar, {
         actionText: 'app_root_session_expired_reload',
-        onAction: () => location.reload(),
+        onAction: () => this.routerService.reload(),
       }, { title: 'app_root_session_expired_title', persistent: true, type: ENotificationType.Error });
     }
   }
