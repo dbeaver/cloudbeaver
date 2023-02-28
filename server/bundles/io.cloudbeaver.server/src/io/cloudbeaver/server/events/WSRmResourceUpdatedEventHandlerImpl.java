@@ -92,11 +92,4 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
             );
         }
     }
-
-    protected boolean validateEvent(BaseWebSession webSession, WSResourceUpdatedEvent event) {
-        if (event.getResourcePath() == null) {
-            return false;
-        }
-        return super.validateEvent(webSession, event);
-    }
 }
