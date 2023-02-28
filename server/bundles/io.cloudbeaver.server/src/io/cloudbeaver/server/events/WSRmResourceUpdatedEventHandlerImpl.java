@@ -25,7 +25,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
 import org.jkiss.dbeaver.model.rm.RMResource;
-import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
@@ -36,7 +35,7 @@ import java.util.List;
 /**
  * Notify all active user session that rm resource has been updated
  */
-public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler {
+public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler<WSResourceUpdatedEvent> {
 
     private static final Gson gson = new GsonBuilder().create();
 
@@ -46,16 +45,18 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
         return WSEventTopic.RM_SCRIPTS.getTopicId();
     }
 
+    @NotNull
     @Override
-    protected void updateSessionData(BaseWebSession activeUserSession, WSEvent event) {
-        if (!(event instanceof WSResourceUpdatedEvent)) {
+    protected Class<WSResourceUpdatedEvent> getEventClass() {
+        return WSResourceUpdatedEvent.class;
+    }
+
+    @Override
+    protected void updateSessionData(BaseWebSession activeUserSession, WSResourceUpdatedEvent event) {
+        if (!validateEvent(activeUserSession, event)) {
             return;
         }
-        var resourceUpdateEvent = (WSResourceUpdatedEvent) event;
-        if (!validateEvent(activeUserSession, resourceUpdateEvent)) {
-            return;
-        };
-        Object parsedResourcePath = resourceUpdateEvent.getResourceParsedPath();
+        Object parsedResourcePath = event.getResourceParsedPath();
         RMResource[] resourceParsedPath;
         if (parsedResourcePath instanceof RMResource[]) {
             resourceParsedPath = (RMResource[]) parsedResourcePath;
@@ -67,7 +68,7 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
             acceptChangesInNavigatorTree(
                 WSEventType.valueById(event.getId()),
                 resourceParsedPath,
-                webSession.getProjectById(resourceUpdateEvent.getProjectId())
+                webSession.getProjectById(event.getProjectId())
             );
         }
         activeUserSession.addSessionEvent(event);

@@ -27,7 +27,6 @@ import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
@@ -265,7 +264,7 @@ public class WebServiceRM implements DBWServiceRM {
     @Override
     public boolean deleteProject(@NotNull WebSession session, @NotNull String projectId) throws DBWebException {
         try {
-            DBPProject project = session.getProjectById(projectId);
+            var project = session.getProjectById(projectId);
             getResourceController(session).deleteProject(projectId);
             session.deleteSessionProject(project);
             return true;

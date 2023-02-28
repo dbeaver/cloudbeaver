@@ -19,7 +19,6 @@ package io.cloudbeaver.server.events;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
 import org.jkiss.utils.CommonUtils;
@@ -27,25 +26,27 @@ import org.jkiss.utils.CommonUtils;
 /**
  * Notify all active user session that datasource has been updated
  */
-public class WSFolderUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler {
+public class WSFolderUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler<WSDatasourceFolderEvent> {
     @NotNull
     @Override
     public String getSupportedTopicId() {
         return WSEventTopic.DATASOURCE_FOLDER.getTopicId();
     }
 
+    @NotNull
     @Override
-    protected void updateSessionData(BaseWebSession activeUserSession, WSEvent event) {
-        if (!(event instanceof WSDatasourceFolderEvent)) {
-            return;
-        }
-        var dsFolderUpdateEvent = (WSDatasourceFolderEvent) event;
-        if (!validateEvent(activeUserSession, dsFolderUpdateEvent)) {
+    protected Class<WSDatasourceFolderEvent> getEventClass() {
+        return WSDatasourceFolderEvent.class;
+    }
+
+    @Override
+    protected void updateSessionData(BaseWebSession activeUserSession, WSDatasourceFolderEvent event) {
+        if (!validateEvent(activeUserSession, event)) {
             return;
         }
         if (activeUserSession instanceof WebSession) {
             var webSession = (WebSession) activeUserSession;
-            var project = webSession.getProjectById(dsFolderUpdateEvent.getProjectId());
+            var project = webSession.getProjectById(event.getProjectId());
             project.getDataSourceRegistry().refreshConfig();
             webSession.getNavigatorModel().getRoot().getProjectNode(project).getDatabases().refreshChildren();
         }
