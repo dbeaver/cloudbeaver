@@ -320,15 +320,28 @@ public class CBDatabase {
         }
 
         @Override
-        public void updateCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName) throws DBException, SQLException {
-            if (JDBCUtils.executeUpdate(
+        public int getLatestSchemaVersion() {
+            return CURRENT_SCHEMA_VERSION;
+        }
+
+        @Override
+        public void updateCurrentSchemaVersion(
+            DBRProgressMonitor monitor,
+            @NotNull Connection connection,
+            @NotNull String schemaName,
+            int version
+        ) throws DBException, SQLException {
+            var updateCount = JDBCUtils.executeUpdate(
                 connection,
                 "UPDATE CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP",
-                CURRENT_SCHEMA_VERSION) <= 0) {
+                version
+            );
+            if (updateCount <= 0) {
                 JDBCUtils.executeSQL(
                     connection,
                     "INSERT INTO CB_SCHEMA_INFO (VERSION,UPDATE_TIME) VALUES(?,CURRENT_TIMESTAMP)",
-                    CURRENT_SCHEMA_VERSION);
+                    version
+                );
             }
         }
 

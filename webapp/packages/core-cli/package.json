@@ -14,7 +14,8 @@
   "bin": {
     "core-cli-build": "./bin/build.js",
     "core-cli-test": "./bin/test.js",
-    "core-cli-analyzer": "./bin/analyzer.js"
+    "core-cli-analyzer": "./bin/analyzer.js",
+    "core-cli-validate-dependencies": "./bin/validate-dependencies.js"
   },
   "engines": {
     "node": ">=10.13.0"
