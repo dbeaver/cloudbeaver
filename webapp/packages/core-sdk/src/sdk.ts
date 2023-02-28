@@ -234,7 +234,9 @@ export enum CbServerEventId {
   CbRmResourceCreated = 'cb_rm_resource_created',
   CbRmResourceDeleted = 'cb_rm_resource_deleted',
   CbRmResourceUpdated = 'cb_rm_resource_updated',
-  CbSessionLogUpdated = 'cb_session_log_updated'
+  CbSessionLogUpdated = 'cb_session_log_updated',
+  CbRmProjectCreated = 'cb_rm_project_created',
+  CbRmProjectDeleted = 'cb_rm_project_deleted'
 }
 
 export interface CbSessionLogEvent extends CbServerEvent {
