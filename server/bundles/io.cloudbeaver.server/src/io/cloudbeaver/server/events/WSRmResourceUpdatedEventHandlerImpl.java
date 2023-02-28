@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * Notify all active user session that rm resource has been updated
  */
-public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler<WSResourceUpdatedEvent> {
+public class WSRmResourceUpdatedEventHandlerImpl extends WSAbstractProjectEventHandler<WSResourceUpdatedEvent> {
 
     private static final Gson gson = new GsonBuilder().create();
 

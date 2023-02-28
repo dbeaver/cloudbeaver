@@ -26,7 +26,7 @@ import org.jkiss.utils.CommonUtils;
 /**
  * Notify all active user session that datasource has been updated
  */
-public class WSFolderUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler<WSDatasourceFolderEvent> {
+public class WSFolderUpdatedEventHandlerImpl extends WSAbstractProjectEventHandler<WSDatasourceFolderEvent> {
     @NotNull
     @Override
     public String getSupportedTopicId() {

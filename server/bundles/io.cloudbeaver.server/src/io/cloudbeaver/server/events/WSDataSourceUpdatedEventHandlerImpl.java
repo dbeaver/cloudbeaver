@@ -27,7 +27,7 @@ import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 /**
  * Notify all active user session that datasource has been updated
  */
-public class WSDataSourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler<WSDataSourceEvent> {
+public class WSDataSourceUpdatedEventHandlerImpl extends WSAbstractProjectEventHandler<WSDataSourceEvent> {
     @NotNull
     @Override
     public String getSupportedTopicId() {
