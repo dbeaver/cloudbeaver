@@ -33,14 +33,12 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.app.DBPResourceTypeDescriptor;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.*;
@@ -440,7 +438,7 @@ public class LocalResourceController implements RMController {
             if (!folderPath.startsWith(projectPath)) {
                 throw new DBException("Invalid folder path");
             }
-            createSpecialFolder(projectId, folderPath);
+            createFolder(folderPath);
             return readChildResources(projectId, folderPath, nameMask, readProperties, readHistory, recursive);
         } catch (NoSuchFileException e) {
             throw new DBException("Invalid resource folder " + folder);
@@ -481,7 +479,7 @@ public class LocalResourceController implements RMController {
         if (Files.exists(targetPath)) {
             throw new DBException("Resource '" + resourcePath + "' already exists");
         }
-        createSpecialFolder(projectId, targetPath.getParent());
+        createFolder(targetPath.getParent());
         try {
             if (isFolder) {
                 Files.createDirectories(targetPath);
@@ -652,7 +650,7 @@ public class LocalResourceController implements RMController {
         if (!forceOverwrite && Files.exists(targetPath)) {
             throw new DBException("Resource '" + resourcePath + "' exists");
         }
-        createSpecialFolder(projectId, targetPath.getParent());
+        createFolder(targetPath.getParent());
         try {
             Files.write(targetPath, data);
         } catch (IOException e) {
@@ -664,25 +662,12 @@ public class LocalResourceController implements RMController {
         return DEFAULT_CHANGE_ID;
     }
 
-    private void createSpecialFolder(@NotNull String projectId, Path targetPath) throws DBException {
+    private void createFolder(Path targetPath) throws DBException {
         if (!Files.exists(targetPath)) {
-            boolean parentExists = false;
-            if (getProjectPath(projectId).equals(targetPath.toAbsolutePath().getParent())) {
-                // Create special folder on demand or throw error
-                for (DBPResourceTypeDescriptor rtd : ResourceTypeRegistry.getInstance().getResourceTypes()) {
-                    if (targetPath.getFileName().toString().equals(rtd.getDefaultRoot(null))) {
-                        try {
-                            Files.createDirectories(targetPath);
-                            parentExists = true;
-                            break;
-                        } catch (IOException e) {
-                            throw new DBException("Error creating special folder '" + targetPath + "'");
-                        }
-                    }
-                }
-            }
-            if (!parentExists) {
-                throw new DBException("Parent folder '" + targetPath.getFileName() + "' doesn't exist");
+            try {
+                Files.createDirectories(targetPath);
+            } catch (IOException e) {
+                throw new DBException("Error creating folder '" + targetPath + "'");
             }
         }
     }
