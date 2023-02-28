@@ -83,6 +83,10 @@ export class DIContainer implements IServiceInjector, IServiceCollection {
     this.parent = parent;
   }
 
+  unbindAll() {
+    this.container.unbindAll();
+  }
+
   unbindParent(): void {
     this.container.parent = null;
     this.parent = null;

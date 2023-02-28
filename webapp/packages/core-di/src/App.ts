@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { flat } from '@cloudbeaver/core-utils';
 
 import { Bootstrap } from './Bootstrap';
@@ -16,14 +17,23 @@ import { IDiWrapper, inversifyWrapper } from './inversifyWrapper';
 import type { PluginManifest } from './PluginManifest';
 
 export class App {
+  readonly onStart: IExecutor;
   private readonly plugins: PluginManifest[];
-
   private readonly diWrapper: IDiWrapper = inversifyWrapper;
 
   constructor(plugins: PluginManifest[] = []) {
     this.plugins = plugins;
+    this.onStart = new Executor();
 
-    this.getServiceCollection().addServiceByClass(App, this);
+    this.onStart.addHandler(async () => {
+      this.registerServices();
+      await this.initializeServices();
+      await this.loadServices();
+    });
+  }
+
+  async start(): Promise<void> {
+    await this.onStart.execute();
   }
 
   getPlugins(): PluginManifest[] {
@@ -51,14 +61,19 @@ export class App {
   }
 
   // first phase register all dependencies
-  registerServices(): void {
+  private registerServices(): void {
+    this.diWrapper.collection.unbindAll();
+
+    this.getServiceCollection()
+      .addServiceByClass(App, this);
+
     for (const service of this.getServices()) {
       // console.log('provider', provider.name);
       this.diWrapper.collection.addServiceByClass(service);
     }
   }
 
-  async initializeServices(): Promise<void> {
+  private async initializeServices(): Promise<void> {
     for (const service of this.getServices()) {
       if (service.prototype instanceof Bootstrap) {
         const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
@@ -72,7 +87,7 @@ export class App {
     }
   }
 
-  async loadServices(): Promise<void> {
+  private async loadServices(): Promise<void> {
     for (const service of this.getServices()) {
       if (service.prototype instanceof Bootstrap) {
         const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);

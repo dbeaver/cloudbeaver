@@ -19,6 +19,7 @@ interface IState {
 }
 
 export interface IDNDData {
+  context: IDataContextProvider;
   state: IState;
   setTargetRef: (element: React.ReactElement | Element | null) => void;
   setPreviewRef: (element: React.ReactElement | Element | null) => void;
@@ -68,13 +69,14 @@ export function useDNDData(context: IDataContextProvider, options: IOptions): ID
     },
   }));
 
-  return useObjectRef<IDNDDataPrivate>(() => ({
+  return useObservableRef<IDNDDataPrivate>(() => ({
     state,
+    context,
     setTargetRef(element) {
       this.setTarget(element);
     },
     setPreviewRef(element) {
       this.setPreview(element);
     },
-  }), { setTarget, setPreview }, ['setTargetRef', 'setPreviewRef']);
+  }), { context: observable.ref }, { context, setTarget, setPreview }, ['setTargetRef', 'setPreviewRef']);
 }

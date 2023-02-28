@@ -15,7 +15,8 @@
     "gql:gen": "graphql-codegen",
     "gql:gen:dev": "graphql-codegen --watch",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
     "@cloudbeaver/core-di": "~0.1.0",

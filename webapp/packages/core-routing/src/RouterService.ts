@@ -13,7 +13,7 @@ import createRouter, {
 import browserPlugin from 'router5-plugin-browser';
 import type { DoneFn } from 'router5/dist/types/base';
 
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { injectable, Bootstrap, App } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
@@ -46,7 +46,9 @@ export class RouterService extends Bootstrap {
   private currentRoute = '';
   private currentParams: Record<string, any> = {};
 
-  constructor() {
+  constructor(
+    private readonly app: App
+  ) {
     super();
 
     this.transitionTask = new Executor();
@@ -73,6 +75,17 @@ export class RouterService extends Bootstrap {
   register(): void | Promise<void> { }
   load(): void | Promise<void> {
     this.start();
+  }
+
+  reload(): void {
+    this.app.start();
+    // this.router.navigate(
+    //   this.route,
+    //   this.params,
+    //   {
+    //     reload: true,
+    //   }
+    // );
   }
 
   private configure() {

@@ -17,5 +17,8 @@ export interface ITab<T = any> extends ITabOptions<T> {
   id: string;
   userId: string;
   projectId: string | null;
+}
+
+export interface ITabMetadata {
   restored: boolean;
 }

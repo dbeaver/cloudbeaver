@@ -52,6 +52,7 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
 
   setName(name: string | null): void {
     this.state.name = name ?? undefined;
+    super.setName(name);
   }
 
   canRename(name: string | null): boolean {
@@ -65,5 +66,6 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
     this.state.executionContext = executionContext;
+    super.setExecutionContext(executionContext);
   }
 }

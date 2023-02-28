@@ -5633,10 +5633,10 @@ coa@^2.0.2:
     chalk "^2.4.1"
     q "^1.1.2"
 
-codemirror@~5.65.9:
-  version "5.65.11"
-  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.65.11.tgz#c818edc3274788c008f636520c5490a1f7009b4f"
-  integrity sha512-Gp62g2eKSCHYt10axmGhKq3WoJSvVpvhXmowNq7pZdRVowwtvBR/hi2LSP5srtctKkRT33T6/n8Kv1UGp7JW4A==
+codemirror@5.65.7:
+  version "5.65.7"
+  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.65.7.tgz#29af41ce5f4c2b8f1c1e16f4e645ff392823716a"
+  integrity sha512-zb67cXzgugIQmb6tfD4G11ILjYoMfTjwcjn+cWsa4GewlI2adhR/h3kolkoCQTm1msD/1BuqVTKuO09ELsS++A==
 
 collect-v8-coverage@^1.0.0:
   version "1.0.1"
@@ -8494,6 +8494,11 @@ html-minifier-terser@^7.0.0:
     param-case "^3.0.4"
     relateurl "^0.2.7"
     terser "^5.15.1"
+
+html-replace-webpack-plugin@~2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/html-replace-webpack-plugin/-/html-replace-webpack-plugin-2.6.0.tgz#506d81e06cb5d6519281ce7c7dde7aeee04620e7"
+  integrity sha512-BL0DgtqIAef2C8+Dq8v3Ork7FWLPVVkuFkd3DpFB8XxI8hgXiWytvWhGTztSwdiIrPstUPahL5g7W8ts/vuERw==
 
 html-tags@^2.0.0:
   version "2.0.0"
