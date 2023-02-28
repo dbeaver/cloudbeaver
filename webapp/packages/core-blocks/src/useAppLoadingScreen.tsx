@@ -1,7 +1,7 @@
 import { useLayoutEffect } from 'react';
 
 function onTransitionEnd(this: HTMLElement) {
-  this.style.display = 'none';
+  this.classList.add('app-loading-screen--hidden');
 }
 
 export function useAppLoadingScreen() {
@@ -16,6 +16,11 @@ export function useAppLoadingScreen() {
     if (appLoadingScreen.classList.contains('app-loading-screen--fade-out')) {
       appLoadingScreen.classList.remove('app-loading-screen--fade-out');
       console.warn('#app-loading-screen already has "app-loading-screen--fade-out" class');
+    }
+
+    if (appLoadingScreen.classList.contains('app-loading-screen--hidden')) {
+      appLoadingScreen.classList.remove('app-loading-screen--hidden');
+      console.warn('#app-loading-screen already has "app-loading-screen--hidden" class');
     }
 
     appLoadingScreen.addEventListener('transitionend', onTransitionEnd);

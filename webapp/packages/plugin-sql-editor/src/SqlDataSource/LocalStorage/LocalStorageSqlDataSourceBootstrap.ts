@@ -34,8 +34,9 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
     });
 
     localStorageSaveService.withAutoSave(
-      this.dataSourceStateState,
       localStorageKey,
+      this.dataSourceStateState,
+      () => new Map(),
       map => {
         for (const [key, value] of Array.from(map.entries())) {
           if (

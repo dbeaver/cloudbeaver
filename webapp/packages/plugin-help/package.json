@@ -12,17 +12,22 @@
     "build": "webpack --config ../../configs/webpack.plugin.config.js",
     "postbuild": "tsc",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
     "@cloudbeaver/plugin-navigation-tree": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor": "~0.1.0",
     "@cloudbeaver/plugin-top-app-bar": "~0.1.0",
+    "@cloudbeaver/core-app": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
+    "@cloudbeaver/core-routing": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-dialogs": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-view": "~0.1.0"
+    "@cloudbeaver/core-events": "~0.1.0",
+    "@cloudbeaver/core-view": "~0.1.0",
+    "@cloudbeaver/core-settings": "~0.1.0"
   },
   "peerDependencies": {
     "mobx": "~6.x.x",

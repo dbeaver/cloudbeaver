@@ -17,12 +17,6 @@ import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-s
 
 import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
 
-interface IResourceProperties {
-  'default-datasource'?: string;
-  'default-catalog'?: string;
-  'default-schema'?: string;
-}
-
 interface IResourceInfo {
   isReadonly?: (dataSource: ResourceSqlDataSource) => boolean;
 }
@@ -38,12 +32,12 @@ interface IResourceActions {
   getProperties(
     dataSource: ResourceSqlDataSource,
     key: IResourceManagerParams
-  ): Promise<Record<string, any>>;
+  ): Promise<IConnectionExecutionContextInfo | undefined>;
   setProperties(
     dataSource: ResourceSqlDataSource,
     key: IResourceManagerParams,
-    diff: Record<string, any>
-  ): Promise<Record<string, any>>;
+    executionContext: IConnectionExecutionContextInfo | undefined
+  ): Promise<IConnectionExecutionContextInfo | undefined>;
 }
 
 const VALUE_SYNC_DELAY = 1 * 1000;
@@ -66,7 +60,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   get projectId(): string | null {
-    return this.resourceKey?.projectId ?? null;
+    return this.resourceKey?.projectId ?? super.projectId;
   }
 
   get executionContext(): IConnectionExecutionContextInfo | undefined {
@@ -103,7 +97,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   private info?: IResourceInfo;
   private lastAction?: () => Promise<void>;
   private readonly state: IResourceSqlDataSourceState;
-  private resourceProperties: IResourceProperties;
 
   private loaded: boolean;
   private readonly scheduler: TaskScheduler;
@@ -120,14 +113,13 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.saved = true;
     this.loaded = false;
     this.resourceUseKeyId = null;
-    this.resourceProperties = {};
     this.scheduler = new TaskScheduler(() => true);
     this.debouncedWrite = debounce(this.debouncedWrite.bind(this), VALUE_SYNC_DELAY);
     this.syncResource = this.syncResource.bind(this);
 
     resourceManagerResource.onDataUpdate.addHandler(this.syncResource);
 
-    makeObservable<this, '_script' | 'lastAction' | 'loaded' | 'resourceProperties'>(this, {
+    makeObservable<this, '_script' | 'lastAction' | 'loaded'>(this, {
       script: computed,
       executionContext: computed,
       resourceKey: computed,
@@ -137,7 +129,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       _script: observable,
       lastAction: observable.ref,
       loaded: observable,
-      resourceProperties: observable,
       setExecutionContext: action,
       setScript: action,
       setResourceKey: action,
@@ -168,6 +159,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
     this.state.resourceKey = toJS(resourceKey);
     this.reloadResource();
+    this.onUpdate.execute();
   }
 
   setActions(actions?: IResourceActions): void {
@@ -180,10 +172,11 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   setName(name: string | null): void {
     this.rename(name);
+    super.setName(name);
   }
 
   setProject(projectId: string | null): void {
-
+    super.setProject(projectId);
   }
 
   canRename(name: string | null): boolean {
@@ -244,7 +237,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       this.resourceUseKeyId = this.resourceManagerResource.use(toJS(this.state.resourceKey));
     }
     await this.read();
-    await this.updateProperties();
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
@@ -259,25 +251,30 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     if (
       !isObjectsEqual(toJS(this.state.executionContext), toJS(executionContext))
     ) {
+      const initNew = (
+        !isValuesEqual(executionContext?.connectionId, this.executionContext?.connectionId, undefined)
+        || !isValuesEqual(executionContext?.defaultCatalog, this.executionContext?.defaultCatalog, undefined)
+        || !isValuesEqual(executionContext?.defaultSchema, this.executionContext?.defaultSchema, undefined)
+      );
+
+      if (executionContext) {
+        if (initNew) {
+          executionContext.id = NOT_INITIALIZED_CONTEXT_ID;
+        } else if (executionContext.id === NOT_INITIALIZED_CONTEXT_ID) {
+          executionContext.id = this.executionContext?.id ?? NOT_INITIALIZED_CONTEXT_ID;
+
+          if (this.executionContext?.id !== NOT_INITIALIZED_CONTEXT_ID) {
+            return;
+          }
+        }
+      }
+
       this.state.executionContext = toJS(executionContext);
+      super.setExecutionContext(executionContext);
+
+      this.saveProperties();
     }
 
-    if (
-      this.isReadonly()
-      || (
-        this.resourceProperties['default-datasource'] === executionContext?.connectionId
-        && this.resourceProperties['default-catalog'] === executionContext?.defaultCatalog
-        && this.resourceProperties['default-schema'] === executionContext?.defaultSchema
-      )
-    ) {
-      return;
-    }
-
-    this.resourceProperties['default-datasource'] = executionContext?.connectionId;
-    this.resourceProperties['default-catalog'] = executionContext?.defaultCatalog;
-    this.resourceProperties['default-schema'] = executionContext?.defaultSchema;
-
-    this.setProperties(toJS(this.resourceProperties));
   }
 
   async rename(name: string | null) {
@@ -324,6 +321,17 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       try {
         this.exception = null;
         this._script = await this.actions.read(this, this.resourceKey);
+
+        const executionContext = await this.actions.getProperties(this, this.resourceKey);
+
+        runInAction(() => {
+          if (executionContext) {
+            this.setExecutionContext(executionContext);
+          } else {
+            this.setExecutionContext();
+          }
+        });
+
         this.markUpdated();
         this.loaded = true;
         super.setScript(this.script);
@@ -357,80 +365,35 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     });
   }
 
-  async setProperties(properties: IResourceProperties) {
-    if (Object.keys(properties).length === 0) {
-      return;
-    }
-
+  private async saveProperties() {
     await this.scheduler.schedule(undefined, async () => {
       if (!this.actions || !this.resourceKey) {
         return;
       }
 
-      this.lastAction = this.setProperties.bind(this, properties);
+      this.lastAction = this.saveProperties.bind(this);
       this.message = 'Update info...';
 
       try {
         this.exception = null;
 
         if (!this.isReadonly()) {
-          await this.actions.setProperties(
+          const executionContext = await this.actions.setProperties(
             this,
             this.resourceKey,
-            properties
+            this.executionContext
           );
-        }
 
-        await this.updateProperties();
+          if (executionContext) {
+            this.setExecutionContext(executionContext);
+          } else {
+            this.setExecutionContext();
+          }
+        }
       } catch (exception: any) {
         this.exception = exception;
       } finally {
         this.message = undefined;
-      }
-    });
-  }
-
-  private async updateProperties() {
-    if (!this.actions || !this.resourceKey) {
-      return;
-    }
-
-    const previousProperties = this.resourceProperties;
-
-    const resourceProperties = await this.actions.getProperties(this, this.resourceKey);
-
-    runInAction(() => {
-      this.resourceProperties = toJS(resourceProperties);
-
-      if (isObjectsEqual(toJS(previousProperties), toJS(this.resourceProperties)) && this.isReadonly()) {
-        return;
-      }
-
-      const connectionId =  this.resourceProperties['default-datasource'];
-      const defaultCatalog = this.resourceProperties['default-catalog'];
-      const defaultSchema = this.resourceProperties['default-schema'];
-
-      if (!this.resourceKey!.projectId) {
-        return;
-      }
-
-      if (connectionId) {
-        if (
-          !isValuesEqual(this.state.executionContext?.connectionId, connectionId, null)
-        || !isValuesEqual(this.state.executionContext?.defaultCatalog, defaultCatalog, null)
-        || !isValuesEqual(this.state.executionContext?.defaultSchema, defaultSchema, null)
-        || !isValuesEqual(this.state.executionContext?.projectId, this.resourceKey!.projectId, null)
-        ) {
-          this.state.executionContext = {
-            id: NOT_INITIALIZED_CONTEXT_ID,
-            projectId: this.resourceKey!.projectId,
-            connectionId,
-            defaultCatalog,
-            defaultSchema,
-          };
-        }
-      } else {
-        this.state.executionContext = undefined;
       }
     });
   }

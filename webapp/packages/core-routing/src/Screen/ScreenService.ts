@@ -23,13 +23,15 @@ export class ScreenService {
 
   readonly routeChange: IExecutor;
 
-  private screens = new Map<string, IScreen<any>>();
-  private routeScreenMap = new Map<string, string>();
+  private readonly screens: Map<string, IScreen<any>>;
+  private readonly routeScreenMap: Map<string, string>;
 
   constructor(
     readonly routerService: RouterService
   ) {
     this.routeChange = new Executor();
+    this.screens = new Map<string, IScreen<any>>();
+    this.routeScreenMap = new Map<string, string>();
     this.routerService.subscribe(this.onRouteChange.bind(this));
     this.routerService.transitionTask.addHandler(this.routeTransition.bind(this));
 

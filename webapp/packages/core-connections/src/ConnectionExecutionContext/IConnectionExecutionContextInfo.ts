@@ -8,4 +8,7 @@
 
 import type { SqlContextInfo } from '@cloudbeaver/core-sdk';
 
-export type IConnectionExecutionContextInfo = SqlContextInfo;
+export type IConnectionExecutionContextInfo = SqlContextInfo & {
+  defaultCatalog?: string | null;
+  defaultSchema?: string | null;
+};

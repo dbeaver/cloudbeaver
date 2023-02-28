@@ -549,7 +549,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
             serverName = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_NAME, serverName);
             contentRoot = WebAppUtils.getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_CONTENT_ROOT, contentRoot), homeFolder);
-            rootURI = JSONUtils.getString(serverConfig, CBConstants.PARAM_ROOT_URI, rootURI);
+            rootURI = readRootUri(serverConfig);
             servicesURI = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVICES_URI, servicesURI);
             driversLocation = WebAppUtils.getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_DRIVERS_LOCATION, driversLocation), homeFolder);
@@ -594,6 +594,18 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         mergeOldConfiguration(prevConfig);
 
         patchConfigurationWithProperties(productConfiguration);
+    }
+
+    private String readRootUri(Map<String, Object> serverConfig) {
+        String uri = JSONUtils.getString(serverConfig, CBConstants.PARAM_ROOT_URI, rootURI);
+        //slashes are needed to correctly display static resources on ui
+        if (!uri.endsWith("/")) {
+            uri = uri + '/';
+        }
+        if (!uri.startsWith("/")) {
+            uri = '/' + uri;
+        }
+        return uri;
     }
 
     protected void mergeOldConfiguration(CBAppConfig prevConfig) {
