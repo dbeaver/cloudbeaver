@@ -20,6 +20,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.websocket.event.WSAbstractProjectEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -53,6 +54,9 @@ public class WebSessionEventsFilter {
         if (!subscribedEventTopics.isEmpty() && !subscribedEventTopics.contains(event.getTopicId())
         ) {
             return false;
+        }
+        if (event instanceof WSProjectUpdateEvent) {
+            return true;
         }
 
         if (!subscribedProjectIds.isEmpty() && event instanceof WSAbstractProjectEvent) {

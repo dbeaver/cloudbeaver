@@ -89,6 +89,13 @@ type CBSessionLogEvent implements CBServerEvent {
     topicId: CBEventTopic
 }
 
+# RM project update event
+type CBProjectUpdateEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    projectId: String!
+}
+
 # Topic subscription event
 type CBTopicEvent implements CBClientEvent {
     id: CBClientEventId!
