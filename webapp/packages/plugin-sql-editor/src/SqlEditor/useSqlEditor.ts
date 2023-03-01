@@ -463,11 +463,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         return undefined;
       }
 
-      // TODO: should be moved to SQLParser
-      if (this.dialect?.scriptDelimiter && query.query.endsWith(this.dialect.scriptDelimiter)) {
-        query.query = query.query.slice(0, query.query.length - this.dialect.scriptDelimiter.length);
-      }
-
       query.query = query.query.trim();
 
       return query;
