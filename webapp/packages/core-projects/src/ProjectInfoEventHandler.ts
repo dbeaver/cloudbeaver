@@ -7,11 +7,11 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionEventSource, TopicEventHandler, ISessionEvent, ClientEventId, SessionEventTopic, IBaseServerEvent, SessionEventId } from '@cloudbeaver/core-root';
-import type { CbProjectsActiveEvent } from '@cloudbeaver/core-sdk';
+import { SessionEventSource, TopicEventHandler, ISessionEvent, ClientEventId, SessionEventTopic, SessionEventId } from '@cloudbeaver/core-root';
+import type { CbProjectsActiveEvent, CbProjectEvent as IProjectInfoEvent } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-export type IProjectInfoEvent = IBaseServerEvent<SessionEventId, SessionEventTopic>;
+export { IProjectInfoEvent };
 
 @injectable()
 export class ProjectInfoEventHandler
@@ -38,7 +38,7 @@ export class ProjectInfoEventHandler
     this.lastActiveProjects = projectIds;
   }
 
-  map(event: ISessionEvent): IProjectInfoEvent {
+  map(event: any): IProjectInfoEvent {
     return event;
   }
 }

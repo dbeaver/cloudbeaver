@@ -95,6 +95,13 @@ type CBTopicEvent implements CBClientEvent {
     topicId: CBEventTopic! # topic to subscribe / unsubscribe
 }
 
+# Project event
+type CBProjectEvent implements CBClientEvent {
+    id: CBClientEventId!
+    topicId: CBEventTopic
+    projectId: String!
+}
+
 # Active projects event
 type CBProjectsActiveEvent implements CBClientEvent {
     id: CBClientEventId!

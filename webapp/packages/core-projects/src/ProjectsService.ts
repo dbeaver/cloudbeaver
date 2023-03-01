@@ -11,12 +11,13 @@ import { computed, makeObservable } from 'mobx';
 import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { activeProjectsContext } from './activeProjectsContext';
-import { ProjectInfoEventHandler } from './ProjectInfoEventHandler';
+import { IProjectInfoEvent, ProjectInfoEventHandler } from './ProjectInfoEventHandler';
 import { ProjectInfo, ProjectInfoResource } from './ProjectInfoResource';
 
 interface IActiveProjectData {
@@ -95,6 +96,7 @@ export class ProjectsService extends Dependency {
     private readonly userInfoResource: UserInfoResource,
     private readonly userDataService: UserDataService,
     private readonly projectInfoEventHandler: ProjectInfoEventHandler,
+    private readonly dataSynchronizationService: DataSynchronizationService,
     navigationService: NavigationService
   ) {
     super();
@@ -126,6 +128,26 @@ export class ProjectsService extends Dependency {
     this.projectInfoEventHandler.onInit.addHandler(() => {
       this.projectInfoEventHandler.setActiveProjects(this.activeProjects.map(project => project.id));
     });
+
+    this.projectInfoEventHandler.onEvent<IProjectInfoEvent>(ServerEventId.CbRmProjectAdded, async key => {
+      await this.projectInfoResource.load(key.projectId);
+    }, undefined, this.projectInfoResource);
+
+    this.projectInfoEventHandler.onEvent<IProjectInfoEvent>(ServerEventId.CbRmProjectRemoved, key => {
+      if (this.activeProjectIds.includes(key.projectId)) {
+        const project = this.projectInfoResource.get(key.projectId)!;
+
+        this.dataSynchronizationService
+          .requestSynchronization('project', project.name)
+          .then(state => {
+            if (state) {
+              this.projectInfoResource.delete(key.projectId);
+            }
+          });
+      } else {
+        this.projectInfoResource.delete(key.projectId);
+      }
+    }, undefined, this.projectInfoResource);
 
     makeObservable(this, {
       userProject: computed,
