@@ -18,6 +18,7 @@ package io.cloudbeaver.server.jetty;
 
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
@@ -179,6 +180,16 @@ public class CBJettyServer {
                 return 1;
             }
         }*/;
+        var maxIdleSeconds = CBPlatform.getInstance().getSessionManager().getMaxSessionIdleTime();
+        int intMaxIdleSeconds;
+        if (maxIdleSeconds > Integer.MAX_VALUE) {
+            log.warn("Max session idle time value is greater than Integer.MAX_VALUE. Integer.MAX_VALUE will be used instead");
+            intMaxIdleSeconds = Integer.MAX_VALUE;
+        } else {
+            intMaxIdleSeconds = (int) maxIdleSeconds;
+        }
+        sessionHandler.setMaxInactiveInterval(intMaxIdleSeconds);
+
         DefaultSessionCache sessionCache = new DefaultSessionCache(sessionHandler);
         FileSessionDataStore sessionStore = new FileSessionDataStore();
 
