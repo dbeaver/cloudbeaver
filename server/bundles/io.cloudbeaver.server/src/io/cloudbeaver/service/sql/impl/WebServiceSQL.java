@@ -468,6 +468,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     public WebSQLScriptInfo parseSqlScript(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript) throws DBWebException {
         SQLDialect dialect = getSqlDialectFromConnection(connectionInfo.getDataSourceContainer());
         List<SQLScriptElement> queries = SQLScriptParser.parseScript(
+            connectionInfo.getDataSource(),
             dialect,
             connectionInfo.getDataSourceContainer().getPreferenceStore(),
             sqlScript);
@@ -481,6 +482,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     public WebSQLQueryInfo parseSqlQuery(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript, int cursorPosition) throws DBWebException {
         SQLDialect dialect = getSqlDialectFromConnection(connectionInfo.getDataSourceContainer());
         SQLScriptElement query = SQLScriptParser.parseQuery(
+            connectionInfo.getDataSource(),
             dialect,
             connectionInfo.getDataSourceContainer().getPreferenceStore(),
             sqlScript,
