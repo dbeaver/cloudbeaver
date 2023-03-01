@@ -18,9 +18,8 @@ package io.cloudbeaver.model.session;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.websocket.event.WSAbstractProjectEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSProjectResourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -55,12 +54,9 @@ public class WebSessionEventsFilter {
         ) {
             return false;
         }
-        if (event instanceof WSProjectUpdateEvent) {
-            return true;
-        }
 
-        if (!subscribedProjectIds.isEmpty() && event instanceof WSAbstractProjectEvent) {
-            var projectEvent = (WSAbstractProjectEvent) event;
+        if (!subscribedProjectIds.isEmpty() && event instanceof WSProjectResourceEvent) {
+            var projectEvent = (WSProjectResourceEvent) event;
             if (!subscribedProjectIds.contains(projectEvent.getProjectId())) {
                 return false;
             }

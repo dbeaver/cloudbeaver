@@ -21,17 +21,14 @@ import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
-import org.jkiss.dbeaver.model.websocket.event.WSAbstractProjectEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
-import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.*;
 
 import java.util.Collection;
 
 /**
  * Notify all active user session that project has been updated
  */
-public abstract class WSAbstractProjectEventHandler<Event extends WSAbstractProjectEvent> implements WSEventHandler {
+public abstract class WSAbstractProjectEventHandler<Event extends WSProjectEvent> implements WSEventHandler {
 
     @NotNull
     @Override
