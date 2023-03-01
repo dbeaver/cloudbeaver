@@ -23,6 +23,7 @@ import io.cloudbeaver.service.rm.DBWServiceRM;
 import io.cloudbeaver.service.rm.model.RMProjectPermissions;
 import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
 import io.cloudbeaver.service.security.SMUtils;
+import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -32,6 +33,7 @@ import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 
@@ -255,6 +257,9 @@ public class WebServiceRM implements DBWServiceRM {
         try {
             RMProject rmProject = getResourceController(session).createProject(name, description);
             session.createWebProject(rmProject);
+            WebAppUtils.getWebApplication().getEventController().addEvent(
+                WSProjectUpdateEvent.create(session.getSessionId(), session.getUserId(), rmProject.getId())
+            );
             return rmProject;
         } catch (DBException e) {
             throw new DBWebException("Error creating project", e);
@@ -267,6 +272,9 @@ public class WebServiceRM implements DBWServiceRM {
             var project = session.getProjectById(projectId);
             getResourceController(session).deleteProject(projectId);
             session.deleteSessionProject(project);
+            WebAppUtils.getWebApplication().getEventController().addEvent(
+                WSProjectUpdateEvent.delete(session.getSessionId(), session.getUserId(), projectId)
+            );
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error deleting project", e);
