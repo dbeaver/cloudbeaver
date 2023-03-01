@@ -20,6 +20,7 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
@@ -28,10 +29,19 @@ import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
  * Notify all active user session that datasource has been updated
  */
 public class WSDataSourceUpdatedEventHandlerImpl extends WSAbstractProjectEventHandler<WSDataSourceEvent> {
+
+    public static final Log log = Log.getLog(WSDataSourceUpdatedEventHandlerImpl.class);
+
     @NotNull
     @Override
     public String getSupportedTopicId() {
         return WSEventTopic.DATASOURCE.getTopicId();
+    }
+
+    @NotNull
+    @Override
+    protected Log getLog() {
+        return log;
     }
 
     @NotNull
@@ -41,10 +51,7 @@ public class WSDataSourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
     }
 
     @Override
-    protected void updateSessionData(BaseWebSession activeUserSession, WSDataSourceEvent event) {
-        if (!validateEvent(activeUserSession, event)) {
-            return;
-        }
+    protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSDataSourceEvent event) {
         var sendEvent = true;
         if (activeUserSession instanceof WebSession) {
             var webSession = (WebSession) activeUserSession;

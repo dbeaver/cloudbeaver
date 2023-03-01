@@ -22,6 +22,7 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
 import org.jkiss.dbeaver.model.rm.RMResource;
@@ -37,6 +38,7 @@ import java.util.List;
  */
 public class WSRmResourceUpdatedEventHandlerImpl extends WSAbstractProjectEventHandler<WSResourceUpdatedEvent> {
 
+    private static final Log log = Log.getLog(WSRmResourceUpdatedEventHandlerImpl.class);
     private static final Gson gson = new GsonBuilder().create();
 
     @NotNull
@@ -47,23 +49,23 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
 
     @NotNull
     @Override
+    protected Log getLog() {
+        return log;
+    }
+
+    @NotNull
+    @Override
     protected Class<WSResourceUpdatedEvent> getEventClass() {
         return WSResourceUpdatedEvent.class;
     }
 
     @Override
-    protected void updateSessionData(BaseWebSession activeUserSession, WSResourceUpdatedEvent event) {
-        if (!validateEvent(activeUserSession, event)) {
-            return;
-        }
-        Object parsedResourcePath = event.getResourceParsedPath();
-        RMResource[] resourceParsedPath;
-        if (parsedResourcePath instanceof RMResource[]) {
-            resourceParsedPath = (RMResource[]) parsedResourcePath;
-        } else {
-            resourceParsedPath = gson.fromJson(gson.toJson(parsedResourcePath), RMResource[].class);
-        }
+    protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSResourceUpdatedEvent event) {
         if (activeUserSession instanceof WebSession) {
+            var parsedResourcePath = event.getResourceParsedPath();
+            var resourceParsedPath = parsedResourcePath instanceof RMResource[]
+                ? (RMResource[]) parsedResourcePath
+                : gson.fromJson(gson.toJson(parsedResourcePath), RMResource[].class);
             var webSession = (WebSession) activeUserSession;
             acceptChangesInNavigatorTree(
                 WSEventType.valueById(event.getId()),

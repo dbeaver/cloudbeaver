@@ -31,8 +31,7 @@ import java.util.Collection;
 /**
  * Notify all active user session that project has been updated
  */
-public abstract class WSAbstractProjectEventHandler<Event extends WSEvent> implements WSEventHandler {
-    private static final Log log = Log.getLog(WSAbstractProjectEventHandler.class);
+public abstract class WSAbstractProjectEventHandler<Event extends WSAbstractProjectEvent> implements WSEventHandler {
 
     @NotNull
     @Override
@@ -42,29 +41,37 @@ public abstract class WSAbstractProjectEventHandler<Event extends WSEvent> imple
 
     @Override
     public void handleEvent(@NotNull WSEvent event) {
-        log.debug(getSupportedTopicId() + " event '" + event.getId() + "' processing");
         if (!getEventClass().isInstance(event)) {
             return;
         }
+        var typedEvent = getEventClass().cast(event);
         Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
         for (var activeUserSession : allSessions) {
             if (WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId())) {
                 continue; // skip events from current session
             }
-            log.debug(getSupportedTopicId() + " event '" + event.getId() + "' handled");
-            updateSessionData(activeUserSession, getEventClass().cast(event));
+            if (!validateEvent(activeUserSession, typedEvent)) {
+                getLog().debug(getSupportedTopicId() + " event '" + event.getId() + "' is not valid");
+                continue;
+            }
+            getLog().debug(getSupportedTopicId() + " event '" + event.getId() + "' handled");
+            updateSessionData(activeUserSession, typedEvent);
         }
     }
+
+    /**
+     * Method to get logger from implementation to display the implementation class name in the log
+     */
+    @NotNull
+    protected abstract Log getLog();
 
     @NotNull
     protected abstract Class<Event> getEventClass();
 
-    protected abstract void updateSessionData(BaseWebSession activeUserSession, Event event);
+    protected abstract void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull Event event);
 
-    protected boolean validateEvent(BaseWebSession activeUserSession, WSAbstractProjectEvent event) {
-        if (!activeUserSession.isProjectAccessible(event.getProjectId())) {
-            return false;
-        }
-        return WSEventType.valueById(event.getId()) != null;
+    protected boolean validateEvent(@NotNull BaseWebSession activeUserSession, @NotNull Event event) {
+        return activeUserSession.isProjectAccessible(event.getProjectId()) &&
+            WSEventType.valueById(event.getId()) != null;
     }
 }

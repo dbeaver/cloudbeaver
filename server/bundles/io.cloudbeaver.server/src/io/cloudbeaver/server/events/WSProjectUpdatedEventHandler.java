@@ -21,16 +21,18 @@ public class WSProjectUpdatedEventHandler extends WSAbstractProjectEventHandler<
 
     @NotNull
     @Override
+    protected Log getLog() {
+        return log;
+    }
+
+    @NotNull
+    @Override
     protected Class<WSProjectUpdateEvent> getEventClass() {
         return WSProjectUpdateEvent.class;
     }
 
     @Override
-    protected void updateSessionData(BaseWebSession activeUserSession, WSProjectUpdateEvent event) {
-        if (!activeUserSession.getUserContext().hasPermission(DBWConstants.PERMISSION_ADMIN)) {
-            log.debug("The current user is not an administrator. Event skipped");
-            return;
-        }
+    protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSProjectUpdateEvent event) {
         var eventId = event.getId();
         var projectId = event.getProjectId();
         try {
@@ -45,5 +47,11 @@ public class WSProjectUpdatedEventHandler extends WSAbstractProjectEventHandler<
         } catch (DBException e) {
             log.warn("Failed to handle project lifecycle event", e);
         }
+    }
+
+    @Override
+    protected boolean validateEvent(@NotNull BaseWebSession activeUserSession, @NotNull WSProjectUpdateEvent event) {
+        return event.getId().equals(WSEventType.RM_PROJECT_REMOVED.getEventId()) ||
+            activeUserSession.getUserContext().hasPermission(DBWConstants.PERMISSION_ADMIN);
     }
 }
