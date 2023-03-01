@@ -17,7 +17,7 @@ import { NavigationService } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { activeProjectsContext } from './activeProjectsContext';
-import { IProjectInfoEvent, ProjectInfoEventHandler } from './ProjectInfoEventHandler';
+import { IProjectUpdateEvent, ProjectInfoEventHandler } from './ProjectInfoEventHandler';
 import { ProjectInfo, ProjectInfoResource } from './ProjectInfoResource';
 
 interface IActiveProjectData {
@@ -129,11 +129,11 @@ export class ProjectsService extends Dependency {
       this.projectInfoEventHandler.setActiveProjects(this.activeProjects.map(project => project.id));
     });
 
-    this.projectInfoEventHandler.onEvent<IProjectInfoEvent>(ServerEventId.CbRmProjectAdded, async key => {
+    this.projectInfoEventHandler.onEvent<IProjectUpdateEvent>(ServerEventId.CbRmProjectAdded, async key => {
       await this.projectInfoResource.load(key.projectId);
     }, undefined, this.projectInfoResource);
 
-    this.projectInfoEventHandler.onEvent<IProjectInfoEvent>(ServerEventId.CbRmProjectRemoved, key => {
+    this.projectInfoEventHandler.onEvent<IProjectUpdateEvent>(ServerEventId.CbRmProjectRemoved, key => {
       if (this.activeProjectIds.includes(key.projectId)) {
         const project = this.projectInfoResource.get(key.projectId)!;
 

@@ -8,14 +8,14 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionEventSource, TopicEventHandler, ISessionEvent, ClientEventId, SessionEventTopic, SessionEventId } from '@cloudbeaver/core-root';
-import type { CbProjectsActiveEvent, CbProjectEvent as IProjectInfoEvent } from '@cloudbeaver/core-sdk';
+import type { CbProjectsActiveEvent, CbProjectUpdateEvent as IProjectUpdateEvent } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-export { IProjectInfoEvent };
+export { IProjectUpdateEvent };
 
 @injectable()
 export class ProjectInfoEventHandler
-  extends TopicEventHandler<IProjectInfoEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
+  extends TopicEventHandler<IProjectUpdateEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   private lastActiveProjects: string[];
 
   constructor(
@@ -38,7 +38,7 @@ export class ProjectInfoEventHandler
     this.lastActiveProjects = projectIds;
   }
 
-  map(event: any): IProjectInfoEvent {
+  map(event: any): IProjectUpdateEvent {
     return event;
   }
 }

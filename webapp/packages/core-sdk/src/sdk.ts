@@ -211,6 +211,12 @@ export interface CbProjectEvent extends CbClientEvent {
   topicId?: Maybe<CbEventTopic>;
 }
 
+export interface CbProjectUpdateEvent extends CbServerEvent {
+  id: CbServerEventId;
+  projectId: Scalars['String'];
+  topicId?: Maybe<CbEventTopic>;
+}
+
 export interface CbProjectsActiveEvent extends CbClientEvent {
   id: CbClientEventId;
   projectIds: Array<Scalars['String']>;
