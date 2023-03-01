@@ -386,13 +386,18 @@ export function useResource<
 
   useEffect(() => {
     refObj.use(key);
-    if (canLoad) {
+    if (canLoad /* && result.loaded // TODO: enable suspense */) {
       (refObj as any)[loadFunctionName]();
     }
   });
 
-  // if (canLoad && !refObj.loading) {
-  //   throw (refObj as any)[loadFunctionName]();
+  // TODO: enable suspense
+  // if (canLoad && !result.loaded) {
+  //   if (!refObj.loading) {
+  //     throw (refObj as any)[loadFunctionName]();
+  //   } else {
+  //     throw resource.waitLoad();
+  //   }
   // }
 
   return result;

@@ -8,15 +8,16 @@
 
 import { StrictMode, Suspense } from 'react';
 import { createRoot, Root } from 'react-dom/client';
+import styled from 'reshadow';
 
 import { Body } from '@cloudbeaver/core-app';
-import { AppRefreshButton, DisplayError, ErrorBoundary, Loader } from '@cloudbeaver/core-blocks';
+import { DisplayError, ErrorBoundary, Loader } from '@cloudbeaver/core-blocks';
 import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
 
 interface IRender {
   initRoot(): Root;
   renderApp(): void;
-  renderError(): void;
+  renderError(exception?: any): void;
   unmount(): void;
 }
 
@@ -46,7 +47,11 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
     },
     renderApp() {
       this.initRoot()
-        .render(
+        .render(styled`
+          Loader {
+            height: 100vh;
+          }
+        `(
         // <StrictMode>
           <AppContext app={serviceInjector}>
             <ErrorBoundary root>
@@ -56,15 +61,13 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
             </ErrorBoundary>
           </AppContext>
         // </StrictMode>
-        );
+        ));
     },
-    renderError() {
+    renderError(exception?: any) {
       this.initRoot()
         .render(
           <AppContext app={serviceInjector}>
-            <DisplayError root>
-              <AppRefreshButton />
-            </DisplayError>
+            <DisplayError error={exception} root />
           </AppContext>
         );
     },

@@ -11,8 +11,6 @@ import styled, { css } from 'reshadow';
 
 import { App, useService } from '@cloudbeaver/core-di';
 
-import { useAppLoadingScreen } from './useAppLoadingScreen';
-
 const style = css`
   button {
     color: white;
@@ -41,7 +39,6 @@ interface IProps {
 
 export const AppRefreshButton: React.FC<IProps> = function AppRefreshButton({ className }) {
   const app = useService(App);
-  useAppLoadingScreen();
 
   function refresh() {
     app.start();
