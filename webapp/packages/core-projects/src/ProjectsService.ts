@@ -129,19 +129,20 @@ export class ProjectsService extends Dependency {
       this.projectInfoEventHandler.setActiveProjects(this.activeProjects.map(project => project.id));
     });
 
-    this.projectInfoEventHandler.onEvent<IProjectUpdateEvent>(ServerEventId.CbRmProjectAdded, async key => {
-      await this.projectInfoResource.load(key.projectId);
+    this.projectInfoEventHandler.onEvent<IProjectUpdateEvent>(ServerEventId.CbRmProjectAdded, () => {
+      this.projectInfoResource.markOutdated();
     }, undefined, this.projectInfoResource);
 
     this.projectInfoEventHandler.onEvent<IProjectUpdateEvent>(ServerEventId.CbRmProjectRemoved, key => {
       if (this.activeProjectIds.includes(key.projectId)) {
-        const project = this.projectInfoResource.get(key.projectId)!;
+        const project = this.projectInfoResource.get(key.projectId);
 
         this.dataSynchronizationService
-          .requestSynchronization('project', project.name)
+          .requestSynchronization('project', project?.name ?? '')
           .then(state => {
             if (state) {
               this.projectInfoResource.delete(key.projectId);
+              this.setActiveProjects(this.activeProjects);
             }
           });
       } else {
