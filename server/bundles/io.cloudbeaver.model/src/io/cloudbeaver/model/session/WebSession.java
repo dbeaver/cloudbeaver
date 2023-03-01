@@ -1025,15 +1025,24 @@ public class WebSession extends BaseWebSession
     public void addSessionProject(@NotNull String projectId) throws DBException {
         super.addSessionProject(projectId);
         var rmProject = getRmController().getProject(projectId, false, false);
-        createWebProject(rmProject);
+        var webProject = createWebProject(rmProject);
+        var projectConnections = webProject.getDataSourceRegistry().getDataSources();
+        for (DBPDataSourceContainer c : projectConnections) {
+            addConnection(new WebConnectionInfo(this, c));
+        }
     }
 
     @Override
     public void removeSessionProject(@Nullable String projectId) throws DBException {
         super.removeSessionProject(projectId);
         var project = getProjectById(projectId);
-        if (projectId != null) {
-            deleteSessionProject(project);
+        if (project == null) {
+            return;
+        }
+        deleteSessionProject(project);
+        var projectConnections = project.getDataSourceRegistry().getDataSources();
+        for (DBPDataSourceContainer c : projectConnections) {
+            removeConnection(new WebConnectionInfo(this, c));
         }
     }
 
