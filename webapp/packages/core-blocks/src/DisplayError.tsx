@@ -11,6 +11,7 @@ import styled, { css, use } from 'reshadow';
 
 import { ENotificationType } from '@cloudbeaver/core-events';
 
+import { AppRefreshButton } from './AppRefreshButton';
 import { NotificationMark } from './Snackbars/NotificationMark';
 
 const style = css`
@@ -35,19 +36,39 @@ const style = css`
     width: 40px;
     height: 40px;
   }
+  details {
+    padding: 8px 16px;
+  }
 `;
 
 interface Props {
   root?: boolean;
+  error?: Error;
+  errorInfo?: React.ErrorInfo;
 }
 
-export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function DisplayError({ root, children }) {
+export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function DisplayError({
+  root,
+  children,
+  error,
+  errorInfo,
+}) {
+  const stack = errorInfo?.componentStack || error?.stack;
+
   return styled(style)(
     <container {...use({ root })}>
       <container-inner-block>
         <NotificationMark type={ENotificationType.Error} />
         <p>Something went wrong.</p>
+        {root && <AppRefreshButton />}
         {children}
+        {error && (
+          <details style={{ whiteSpace: 'pre-wrap' }}>
+            {error.toString()}
+            {stack && <br />}
+            {stack}
+          </details>
+        )}
       </container-inner-block>
     </container>
   );

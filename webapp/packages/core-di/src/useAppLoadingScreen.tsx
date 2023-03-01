@@ -26,6 +26,9 @@ export function useAppLoadingScreen() {
     appLoadingScreen.addEventListener('transitionend', onTransitionEnd);
     appLoadingScreen.classList.add('app-loading-screen--fade-out');
 
-    return () => appLoadingScreen.removeEventListener('transitionend', onTransitionEnd);
+    return () => {
+      appLoadingScreen.removeEventListener('transitionend', onTransitionEnd);
+      appLoadingScreen.classList.remove('app-loading-screen--fade-out', 'app-loading-screen--hidden');
+    };
   }, []);
 }
