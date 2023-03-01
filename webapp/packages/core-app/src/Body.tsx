@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useLayoutEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, useAppLoadingScreen, useResource, useStyles } from '@cloudbeaver/core-blocks';
+import { Loader, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
@@ -29,6 +29,9 @@ const bodyStyles = css`
       flex-direction: column;
       overflow: hidden;
     }
+    Loader[overlay] {
+      height: 100vh;
+    }
   `;
 
 const loaderStyle = css`
@@ -38,7 +41,6 @@ const loaderStyle = css`
   `;
 
 export const Body = observer(function Body() {
-  useAppLoadingScreen();
   // const serverConfigLoader = useResource(Body, ServerConfigResource, undefined);
   const themeService = useService(ThemeService);
   const style = useStyles(bodyStyles);
@@ -58,16 +60,18 @@ export const Body = observer(function Body() {
 
   return styled(style)(
     <DNDProvider>
-      <theme ref={ref} className={`theme-${themeService.currentTheme.id}`}>
-        <Loader state={[permissionsService]} style={loaderStyle}>{() => styled(style)(
-          <>
-            {Screen && <Screen {...screenService.routerService.params} />}
-          </>
-        )}
-        </Loader>
-        <DialogsPortal />
-        <Notifications />
-      </theme>
+      <Loader loading={false} overlay>
+        <theme ref={ref} className={`theme-${themeService.currentTheme.id}`}>
+          <Loader state={[permissionsService]} style={loaderStyle}>{() => styled(style)(
+            <>
+              {Screen && <Screen {...screenService.routerService.params} />}
+            </>
+          )}
+          </Loader>
+          <DialogsPortal />
+          <Notifications />
+        </theme>
+      </Loader>
     </DNDProvider>
   );
 });
