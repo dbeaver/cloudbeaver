@@ -17,6 +17,7 @@ export const topAppBarStyles = css`
       padding: 0 8px;
       background-color: #2A7CB4;
       z-index: 1;
+      flex-shrink: 0;
     }
   `;
 

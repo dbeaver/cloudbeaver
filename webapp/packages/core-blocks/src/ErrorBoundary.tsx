@@ -9,12 +9,11 @@
 import React, { ErrorInfo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { AppRefreshButton } from './AppRefreshButton';
 import { Button } from './Button';
 import { DisplayError } from './DisplayError';
 
 const style = css`
-  action, details {
+  action {
     padding: 8px 16px;
   }
 `;
@@ -55,15 +54,9 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
 
     if (errorInfo) {
       return styled(style)(
-        <DisplayError root={root}>
-          {root && <action><AppRefreshButton /></action>}
+        <DisplayError root={root} error={error || undefined} errorInfo={errorInfo}>
           {onRefresh && <action><Button onClick={this.refresh}>Refresh</Button></action>}
           {remount && <action><Button onClick={this.remount}>Refresh</Button></action>}
-          <details style={{ whiteSpace: 'pre-wrap' }}>
-            {error?.toString() ?? ''}
-            <br />
-            {errorInfo.componentStack}
-          </details>
         </DisplayError>
       );
     }

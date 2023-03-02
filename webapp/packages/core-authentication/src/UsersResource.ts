@@ -9,7 +9,7 @@
 import { runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -26,6 +26,7 @@ import {
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthInfoService } from './AuthInfoService';
 import { AuthProviderService } from './AuthProviderService';
+import { EAdminPermission } from './EAdminPermission';
 import type { IAuthCredentials } from './IAuthCredentials';
 
 const NEW_USER_SYMBOL = Symbol('new-user');
@@ -51,10 +52,14 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     private readonly graphQLService: GraphQLService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly authProviderService: AuthProviderService,
-    private readonly authInfoService: AuthInfoService
+    private readonly authInfoService: AuthInfoService,
+    sessionPermissionsResource: SessionPermissionsResource
   ) {
     super();
-    this.serverConfigResource.onDataUpdate.addHandler(this.refreshAllLazy.bind(this));
+
+    sessionPermissionsResource
+      .require(this, EAdminPermission.admin)
+      .outdateResource(this);
   }
 
   isNew(id: string): boolean {
@@ -205,11 +210,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     this.resetIncludes();
     await this.refresh(CachedMapAllKey);
     return this.data;
-  }
-
-  refreshAllLazy(): void {
-    this.resetIncludes();
-    this.markOutdated(CachedMapAllKey);
   }
 
   isActiveUser(userId: string): boolean {

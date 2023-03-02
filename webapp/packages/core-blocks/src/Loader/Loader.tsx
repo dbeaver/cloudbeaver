@@ -264,11 +264,11 @@ export const Loader = observer<Props>(function Loader({
         )}
         <loader ref={loaderRef} className={className} {...use({ small, fullSize, inline, secondary, overlay })}>
           <icon>
-            <StaticImage icon={spinnerType.primary} {...use({primaryIcon: true})} />
-            <StaticImage icon={spinnerType.primarySmall} {...use({primarySmallIcon: true})} />
-            <StaticImage icon={spinnerType.secondary} {...use({secondaryIcon: true})}/>
-            <StaticImage icon={spinnerType.secondarySmall} {...use({secondarySmallIcon: true})}/>
-            </icon>
+            <StaticImage icon={spinnerType.primary} {...use({ primaryIcon: true })} />
+            <StaticImage icon={spinnerType.primarySmall} {...use({ primarySmallIcon: true })} />
+            <StaticImage icon={spinnerType.secondary} {...use({ secondaryIcon: true })} />
+            <StaticImage icon={spinnerType.secondarySmall} {...use({ secondarySmallIcon: true })} />
+          </icon>
           {!hideMessage && <message><Translate token={message || 'ui_processing_loading'} /></message>}
           {onCancel && (
             <actions>

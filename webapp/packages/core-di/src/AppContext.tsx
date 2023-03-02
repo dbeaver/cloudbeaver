@@ -9,6 +9,7 @@
 import { createContext } from 'react';
 
 import type { IServiceInjector } from './IApp';
+import { useAppLoadingScreen } from './useAppLoadingScreen';
 
 export const appContext = createContext<IServiceInjector>(undefined as any);
 
@@ -17,5 +18,6 @@ interface Props {
 }
 
 export const AppContext: React.FC<React.PropsWithChildren<Props>> = function AppContext({ app, children }) {
+  useAppLoadingScreen();
   return <appContext.Provider value={app}>{children}</appContext.Provider>;
 };
