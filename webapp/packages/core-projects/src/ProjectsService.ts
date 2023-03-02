@@ -12,7 +12,7 @@ import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authenticat
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
-import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
@@ -129,6 +129,14 @@ export class ProjectsService extends Dependency {
       this.projectInfoEventHandler.setActiveProjects(this.activeProjects.map(project => project.id));
     });
 
+    this.projectInfoResource.onItemDelete.addHandler(async data => {
+      const ids = ResourceKeyUtils.toArray(data);
+      const wasActive = ids.some(id => this.activeProjectIds.includes(id));
+      if (wasActive) {
+        await this.setActiveProjects(this.activeProjects.filter(project => !ids.includes(project.id)));
+      }
+    });
+
     this.projectInfoEventHandler.onEvent<IProjectUpdateEvent>(ServerEventId.CbRmProjectAdded, () => {
       this.projectInfoResource.markOutdated();
     }, undefined, this.projectInfoResource);
@@ -142,7 +150,6 @@ export class ProjectsService extends Dependency {
           .then(state => {
             if (state) {
               this.projectInfoResource.delete(key.projectId);
-              this.setActiveProjects(this.activeProjects);
             }
           });
       } else {
