@@ -37,27 +37,23 @@ export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({
 
   if (typeof children === 'function') {
     return (
-      <ErrorBoundary remount>
-        <Loader loading={false} overlay>
-          <TabContext.Provider value={tabContext}>
-            <BaseTabPanel {...state.state} tabId={tabId} className={className}>
-              {(children as (state: TabStateReturn) => React.ReactNode)(state.state)}
-            </BaseTabPanel>
-          </TabContext.Provider>
-        </Loader>
-      </ErrorBoundary>
+      <Loader suspense>
+        <TabContext.Provider value={tabContext}>
+          <BaseTabPanel {...state.state} tabId={tabId} className={className}>
+            {(children as (state: TabStateReturn) => React.ReactNode)(state.state)}
+          </BaseTabPanel>
+        </TabContext.Provider>
+      </Loader>
     );
   }
 
   return (
-    <ErrorBoundary remount>
-      <Loader loading={false} overlay>
-        <TabContext.Provider value={tabContext}>
-          <BaseTabPanel {...state.state} tabId={tabId} className={className}>
-            {children}
-          </BaseTabPanel>
-        </TabContext.Provider>
-      </Loader>
-    </ErrorBoundary>
+    <Loader suspense>
+      <TabContext.Provider value={tabContext}>
+        <BaseTabPanel {...state.state} tabId={tabId} className={className}>
+          {children}
+        </BaseTabPanel>
+      </TabContext.Provider>
+    </Loader>
   );
 });

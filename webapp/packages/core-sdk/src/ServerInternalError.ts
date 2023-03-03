@@ -20,7 +20,7 @@ export class ServerInternalError extends DetailsError implements ServerError {
   readonly causedBy?: ServerError;
 
   constructor(error: ServerError) {
-    super(error.message);
+    super(undefined, error.message);
     this.name = 'Server Internal Error';
     this.errorCode = error.errorCode;
     this.errorType = error.errorType as ServerErrorType;

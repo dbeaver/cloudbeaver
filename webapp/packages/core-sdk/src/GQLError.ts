@@ -33,7 +33,7 @@ export class GQLError extends DetailsError {
       message = 'unknown error';
     }
 
-    super(message);
+    super(clientError, message);
     this.name = 'Server Error';
     this.response = clientError.response;
     this.request = clientError.request;
@@ -42,7 +42,7 @@ export class GQLError extends DetailsError {
       this.isTextBody = true;
     } else {
       const firstError = clientError.response.errors?.[0];
-      this.errorCode = firstError?.extensions?.webErrorCode;
+      this.errorCode = firstError?.extensions.webErrorCode;
     }
     this.errorMessage = message;
   }

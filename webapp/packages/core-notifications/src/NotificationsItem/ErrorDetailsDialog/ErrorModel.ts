@@ -7,6 +7,7 @@
  */
 
 import { GQLError, ServerInternalError } from '@cloudbeaver/core-sdk';
+import { errorOf } from '@cloudbeaver/core-utils';
 
 export interface IErrorInfo {
   message: string;
@@ -25,37 +26,39 @@ export class ErrorModel {
   htmlBody = '';
 
   constructor({ reason, error }: IErrorModelOptions) {
+    const gqlError = errorOf(error, GQLError);
+    const serverInternalError = errorOf(error, ServerInternalError);
     this.reason = reason || '';
     // text error
     if (!error) {
       this.textToCopy = this.reason;
-    } else if (error instanceof GQLError) { // GQL Error
-      this.errors = (error.response?.errors || [])
+    } else if (gqlError) { // GQL Error
+      this.errors = (gqlError.response.errors || [])
         .map(error => {
           const errorInfo: IErrorInfo = {
             message: error.message,
-            stackTrace: error.extensions?.stackTrace || '',
+            stackTrace: error.extensions.stackTrace || '',
           };
           return errorInfo;
         });
 
-      this.textToCopy = error.isTextBody
-        ? error.errorMessage
+      this.textToCopy = gqlError.isTextBody
+        ? gqlError.errorMessage
         : this.textToCopy = this.errors
           .map(error => `${error.message}\n${error.stackTrace}`)
           .join('------------------\n');
 
-      if (error.isTextBody) {
-        this.htmlBody = error.errorMessage;
+      if (gqlError.isTextBody) {
+        this.htmlBody = gqlError.errorMessage;
       }
-    } else if (error instanceof ServerInternalError) {
+    } else if (serverInternalError) {
       this.errors = [
         {
-          message: error.message,
-          stackTrace: error.stackTrace || '',
+          message: serverInternalError.message,
+          stackTrace: serverInternalError.stackTrace || '',
         },
       ];
-      this.textToCopy = `${error.message}\n${error.stackTrace}`;
+      this.textToCopy = `${serverInternalError.message}\n${serverInternalError.stackTrace}`;
     } else if (error instanceof Error) { // Common Error
       this.errors = [
         {

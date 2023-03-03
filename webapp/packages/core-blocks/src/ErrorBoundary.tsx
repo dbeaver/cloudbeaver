@@ -9,8 +9,12 @@
 import React, { ErrorInfo } from 'react';
 import styled, { css } from 'reshadow';
 
+import { errorOf, LoadingError } from '@cloudbeaver/core-utils';
+
 import { Button } from './Button';
 import { DisplayError } from './DisplayError';
+import { ErrorContext, IExceptionContext } from './ErrorContext';
+import { ExceptionMessage } from './ExceptionMessage';
 
 const style = css`
   action {
@@ -22,57 +26,98 @@ interface Props {
   onRefresh?: () => any;
   root?: boolean;
   remount?: boolean;
+  className?: string;
+}
+
+interface IErrorData {
+  error: Error;
+  errorInfo?: ErrorInfo;
 }
 
 interface IState {
-  error: Error | null;
-  errorInfo: ErrorInfo | null;
+  exceptions: IErrorData[];
 }
 
-export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props>, IState> {
+export class ErrorBoundary
+  extends React.Component<React.PropsWithChildren<Props>, IState>
+  implements IExceptionContext {
+  get canRefresh(): boolean {
+    return (
+      !!this.props.remount
+      || !!this.props.onRefresh
+      || this.state.exceptions.some(error => errorOf(error.error, LoadingError))
+    );
+  }
   constructor(props: Props) {
     super(props);
-    this.state = {
-      error: null,
-      errorInfo: null,
-    };
+    this.state = { exceptions: [] };
 
-    this.remount = this.remount.bind(this);
     this.refresh = this.refresh.bind(this);
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    this.setState({
-      error: error,
-      errorInfo: errorInfo,
+  catch(exception: Error): void {
+    this.componentDidCatch(exception);
+  }
+
+  componentDidCatch(error: Error, errorInfo?: ErrorInfo): void {
+    this.setState(state => {
+      if (state.exceptions.some(data => data.error === error)) {
+        return state;
+      }
+      return ({
+        exceptions: [...state.exceptions, {
+          error,
+          errorInfo,
+        }],
+      });
     });
   }
 
   render(): React.ReactNode {
-    const { errorInfo, error } = this.state;
-    const { remount, root, onRefresh } = this.props;
+    const { root, children, className } = this.props;
 
-    if (errorInfo) {
-      return styled(style)(
-        <DisplayError root={root} error={error || undefined} errorInfo={errorInfo}>
-          {onRefresh && <action><Button onClick={this.refresh}>Refresh</Button></action>}
-          {remount && <action><Button onClick={this.remount}>Refresh</Button></action>}
-        </DisplayError>
-      );
+    for (const errorData of this.state.exceptions) {
+      if (root) {
+        return styled(style)(
+          <DisplayError
+            className={className}
+            root={root}
+            error={errorData.error}
+            errorInfo={errorData.errorInfo}
+          >
+            {this.canRefresh && <action><Button onClick={this.refresh}>Refresh</Button></action>}
+          </DisplayError>
+        );
+      } else {
+        return (
+          <ExceptionMessage
+            className={className}
+            exception={errorData.error}
+            onRetry={this.canRefresh ? this.refresh : undefined}
+          />
+        );
+      }
     }
 
-    return this.props.children;
-  }
-
-  private remount() {
-    this.setState({
-      error: null,
-      errorInfo: null,
-    });
+    return (
+      <ErrorContext.Provider value={this}>
+        {children}
+      </ErrorContext.Provider>
+    );
   }
 
   private refresh() {
+    this.refreshExceptions();
     this.props.onRefresh?.();
-    this.remount();
+    this.setState({ exceptions: [] });
+  }
+
+  private refreshExceptions() {
+    for (const error of this.state.exceptions) {
+      const loadingError = errorOf(error.error, LoadingError);
+      if (loadingError) {
+        loadingError.refresh();
+      }
+    }
   }
 }

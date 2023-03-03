@@ -15,7 +15,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { DatabaseAuthModel, DetailsError, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
-import { getUniqueName } from '@cloudbeaver/core-utils';
+import { errorOf, getUniqueName } from '@cloudbeaver/core-utils';
 import type { IConnectionAuthenticationConfig } from '@cloudbeaver/plugin-connections';
 
 import { TemplateConnectionsResource } from '../TemplateConnectionsResource';
@@ -226,10 +226,11 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   }
 
   private showError(exception: Error, message: string) {
-    if (exception instanceof DetailsError && !this.isDistructed) {
-      this.responseMessage = exception.errorMessage;
-      this.hasDetails = exception.hasDetails();
-      this.exception = exception;
+    const detailsError = errorOf(exception, DetailsError);
+    if (detailsError && !this.isDistructed) {
+      this.responseMessage = detailsError.errorMessage;
+      this.hasDetails = detailsError.hasDetails();
+      this.exception = detailsError;
     } else {
       this.notificationService.logException(exception, message);
     }

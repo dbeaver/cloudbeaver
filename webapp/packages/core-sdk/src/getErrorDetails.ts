@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { errorOf } from '@cloudbeaver/core-utils';
+
 import { DetailsError } from './DetailsError';
 import { ServerErrorType, ServerInternalError } from './ServerInternalError';
 
@@ -16,22 +18,21 @@ export interface IErrorDetails {
   errorType?: ServerErrorType;
 }
 
-export function hasDetails(error: Error | undefined | null): error is DetailsError {
-  return error instanceof DetailsError && error.hasDetails();
-}
-
 export function getErrorDetails(error: Error | DetailsError | undefined | null): IErrorDetails {
-  const exceptionMessage = (hasDetails(error) ? error.errorMessage : error?.message) || error?.name || 'Unknown error';
+  const serverInternalError = errorOf(error, ServerInternalError);
+  const detailsError = errorOf(error, DetailsError);
+  const hasDetails = detailsError?.hasDetails() ?? false;
+  const exceptionMessage = detailsError?.errorMessage || error?.message || error?.name || 'Unknown error';
 
   const details: IErrorDetails = {
     name: error?.name ?? 'Error',
     message: exceptionMessage,
-    hasDetails: hasDetails(error),
+    hasDetails,
   };
 
-  if (error instanceof ServerInternalError && error.errorType) {
-    details.errorType = error.errorType;
-    if (error.errorType === ServerErrorType.QUOTE_EXCEEDED) {
+  if (serverInternalError?.errorType) {
+    details.errorType = serverInternalError.errorType;
+    if (serverInternalError.errorType === ServerErrorType.QUOTE_EXCEEDED) {
       details.hasDetails = false;
     }
   }

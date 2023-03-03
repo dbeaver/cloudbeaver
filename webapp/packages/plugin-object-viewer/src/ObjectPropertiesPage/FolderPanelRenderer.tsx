@@ -46,12 +46,12 @@ interface INavNodePanelProps {
   style?: ComponentStyle;
 }
 
-const NavNodePanel = observer<INavNodePanelProps>(function NavNodeTab({ nodeId, parents }) {
+const NavNodePanel = observer<INavNodePanelProps>(function NavNodeTab({ nodeId }) {
   const nodeInfo = useNode(nodeId);
 
   if (!nodeInfo.node) {
     return null;
   }
 
-  return <ObjectPropertyTable objectId={nodeId} parents={parents} parentId={nodeInfo.node.parentId} />;
+  return <ObjectPropertyTable objectId={nodeId} parentId={nodeInfo.node.parentId} />;
 });

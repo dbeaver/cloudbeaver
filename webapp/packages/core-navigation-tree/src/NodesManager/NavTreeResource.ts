@@ -24,7 +24,8 @@ import {
   NavNodeChildrenQuery as fake,
   ResourceKeyUtils,
   ICachedMapResourceMetadata,
-  CachedMapAllKey
+  CachedMapAllKey,
+  ResourceError
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -402,17 +403,29 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     this.navNodeInfoResource.delete(ResourceKeyUtils.exclude(allKeys, key));
   }
 
+  protected async preLoadData(
+    key: ResourceKey<string>
+  ): Promise<void> {
+    // this.performUpdate(key, undefined, async key => {
+    await ResourceKeyUtils.forEachAsync(key, async nodeId => {
+      const preloaded = await this.preloadNodeParents(this.navNodeInfoResource.getParents(nodeId), nodeId);
+
+      if (!preloaded) {
+        throw new ResourceError(this, key, undefined, undefined, 'Entity not found');
+      }
+    });
+    // });
+  }
+
   protected async loader(key: ResourceKey<string>): Promise<Map<string, string[]>> {
     const limit = this.childrenLimit + 1;
-    if (isResourceKeyList(key)) {
-      const values: NavNodeChildrenQuery[] = [];
-      for (const nodePath of key.list) {
-        values.push(await this.loadNodeChildren(nodePath, 0, limit));
-      }
-      this.setNavObject(values);
-    } else {
-      this.setNavObject(await this.loadNodeChildren(key, 0, limit));
-    }
+    const values: NavNodeChildrenQuery[] = [];
+
+    await ResourceKeyUtils.forEachAsync(key, async nodeId => {
+      values.push(await this.loadNodeChildren(nodeId, 0, limit));
+
+    });
+    this.setNavObject(values);
 
     return this.data;
   }
@@ -441,6 +454,10 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
   private setNavObject(data: NavNodeChildrenQuery | NavNodeChildrenQuery[]) {
     if (Array.isArray(data)) {
+      if (data.length === 0) {
+        return;
+      }
+
       for (const node of data) {
         const metadata = this.metadata.get(node.parentPath);
 

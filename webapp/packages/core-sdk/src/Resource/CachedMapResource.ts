@@ -13,6 +13,7 @@ import { ILoadableState, isArraysEqual, isContainsException, MetadataMap, uuid }
 
 import { CachedResource, CachedResourceKey, CachedResourceParamKey, ICachedResourceMetadata } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
+import { ResourceError } from './ResourceError';
 import { isResourceKeyList, ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from './ResourceKeyList';
 
 export type CachedMapResourceKey<TResource> = CachedResourceKey<TResource>;
@@ -235,10 +236,16 @@ export abstract class CachedMapResource<
     });
   }
 
-  markDataError(exception: Error, key: ResourceKey<TKey>): void {
+  markDataError(
+    exception: Error,
+    key: ResourceKey<TKey>,
+    includes?: CachedResourceIncludeArgs<TValue, TContext>
+  ): void {
     if (this.isAlias(key) && !this.isAliasLoaded(key)) {
       this.loadedKeys.push(key);
     }
+
+    exception = new ResourceError(this, key, includes, exception);
     key = this.transformParam(key);
 
     ResourceKeyUtils.forEach(key, key => {

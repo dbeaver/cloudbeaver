@@ -14,7 +14,7 @@ import styled, { css } from 'reshadow';
 import { Button, ErrorMessage, Loader, useClipboard, useErrorDetails, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { GQLErrorCatcher, SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
@@ -117,11 +117,29 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   });
 
   return styled(styles)(
-    <CommonDialogWrapper
-      size='large'
-      title='app_shared_sql_generators_dialog_title'
-      icon='sql-script'
-      footer={(
+    <CommonDialogWrapper size='large'>
+      <CommonDialogHeader
+        title='app_shared_sql_generators_dialog_title'
+        icon='sql-script'
+        onReject={rejectDialog}
+      />
+      <CommonDialogBody noOverflow noBodyPadding>
+        <wrapper>
+          <Loader loading={state.loading}>
+            {() => styled(styles)(
+              <SQLCodeEditorLoader
+                bindings={{
+                  autoCursor: false,
+                }}
+                value={state.query}
+                dialect={state.dialect}
+                readonly
+              />
+            )}
+          </Loader>
+        </wrapper>
+      </CommonDialogBody>
+      <CommonDialogFooter>
         <footer-container>
           {state.error.responseMessage && (
             <ErrorMessage
@@ -135,25 +153,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
             <Button mod={['unelevated']} onClick={rejectDialog}>{translate('ui_close')}</Button>
           </buttons>
         </footer-container>
-      )}
-      noBodyPadding
-      noOverflow
-      onReject={rejectDialog}
-    >
-      <wrapper>
-        <Loader loading={state.loading}>
-          {() => styled(styles)(
-            <SQLCodeEditorLoader
-              bindings={{
-                autoCursor: false,
-              }}
-              value={state.query}
-              dialect={state.dialect}
-              readonly
-            />
-          )}
-        </Loader>
-      </wrapper>
+      </CommonDialogFooter>
     </CommonDialogWrapper>
   );
 });

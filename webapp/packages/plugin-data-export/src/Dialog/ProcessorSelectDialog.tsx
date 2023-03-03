@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { Loader, useTranslate } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogHeader, CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 import { useNode } from '@cloudbeaver/plugin-navigation-tree';
 
@@ -60,20 +60,19 @@ export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDia
   const { node } = useNode(context.containerNodePath || '');
 
   return styled(styles)(
-    <CommonDialogWrapper
-      size='large'
-      title="data_transfer_dialog_title"
-      fixedSize
-      noBodyPadding
-      noOverflow
-      onReject={onClose}
-    >
-      <export-object>
-        {!context.sourceName && `${translate('data_transfer_exporting_table')} ${node?.name}`}
-        <pre title={context.sourceName}>{context.sourceName}</pre>
-      </export-object>
-      {isLoading && <Loader />}
-      {!isLoading && <ExportProcessorList processors={processors} onSelect={onSelect} />}
+    <CommonDialogWrapper size='large' fixedSize>
+      <CommonDialogHeader
+        title="data_transfer_dialog_title"
+        onReject={onClose}
+      />
+      <CommonDialogBody noBodyPadding noOverflow>
+        <export-object>
+          {!context.sourceName && `${translate('data_transfer_exporting_table')} ${node?.name}`}
+          <pre title={context.sourceName}>{context.sourceName}</pre>
+        </export-object>
+        {isLoading && <Loader />}
+        {!isLoading && <ExportProcessorList processors={processors} onSelect={onSelect} />}
+      </CommonDialogBody>
     </CommonDialogWrapper>
   );
 }

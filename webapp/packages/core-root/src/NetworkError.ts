@@ -7,9 +7,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-export class NetworkError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'NetworkError';
+import { InheritableError } from '@cloudbeaver/core-utils';
+
+export class NetworkError extends InheritableError {
+  constructor(error?: Error, message?: string) {
+    super(error, message);
+    this.name = 'Network Error';
   }
 }

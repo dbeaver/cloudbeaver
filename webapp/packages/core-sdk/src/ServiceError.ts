@@ -9,8 +9,8 @@
 import { DetailsError } from './DetailsError';
 
 export class ServiceError extends DetailsError {
-  constructor(message?: string) {
-    super(message);
+  constructor(inherit?: Error, message?: string) {
+    super(inherit, message);
     this.name = 'Service Error';
     this.errorMessage = message || 'Error';
   }

@@ -6,12 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-export class PromiseCancelledError extends Error {
+import { errorOf, InheritableError } from '../InheritableError';
+
+export class PromiseCancelledError extends InheritableError {
   constructor(public reason?: Error) {
-    super(reason?.message);
+    super(reason);
   }
 }
 
-export function isPromiseCancelledError(error: any): error is PromiseCancelledError {
-  return error instanceof PromiseCancelledError;
+export function isPromiseCancelledError(error: any): boolean {
+  return errorOf(error, PromiseCancelledError) !== undefined;
 }

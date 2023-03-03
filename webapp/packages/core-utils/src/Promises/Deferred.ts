@@ -8,6 +8,7 @@
 
 import { action, computed, observable, makeObservable } from 'mobx';
 
+import { errorOf } from '../InheritableError';
 import { PromiseCancelledError } from './PromiseCancelledError';
 import { PromiseExecutor } from './PromiseExecutor';
 
@@ -27,7 +28,7 @@ export class Deferred<T> {
   private rejectionReason: any;
   private state: EDeferredState = EDeferredState.PENDING;
 
-  private promiseExecutor = new PromiseExecutor<T>();
+  private readonly promiseExecutor = new PromiseExecutor<T>();
 
   constructor() {
     makeObservable<Deferred<T>, 'payload' | 'rejectionReason' | 'state' | 'toResolved' | 'toRejected' | 'toCancelled' | 'toCancelling' | 'toPending'>(this, {
@@ -56,8 +57,8 @@ export class Deferred<T> {
     return !this.isInProgress;
   }
 
-  getPayload(defaultValue: T): T
-  getPayload(): T | undefined
+  getPayload(defaultValue: T): T;
+  getPayload(): T | undefined;
   getPayload(defaultValue?: T): T | undefined {
     if (this.state === EDeferredState.RESOLVED) {
       return this.payload;
@@ -112,8 +113,9 @@ export class DeferredFromPromise<T> extends Deferred<T> {
     promise.then(
       value => this.toResolved(value),
       err => {
-        if (err instanceof PromiseCancelledError) {
-          this.toCancelled(err.reason);
+        const promiseCancelledError = errorOf(err, PromiseCancelledError);
+        if (promiseCancelledError) {
+          this.toCancelled(promiseCancelledError.reason);
         } else {
           this.toRejected(err);
         }
