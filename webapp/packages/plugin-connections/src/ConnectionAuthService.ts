@@ -62,6 +62,7 @@ export class ConnectionAuthService extends Dependency {
     }
 
     let connection = this.connectionInfoResource.get(key);
+    const isConnectedInitially = connection?.connected;
 
     if (!connection?.connected) {
       connection = await this.connectionInfoResource.refresh(key);
@@ -87,11 +88,14 @@ export class ConnectionAuthService extends Dependency {
       .filter(handler => handler.enabled && (!handler.savePassword || resetCredentials))
       .map(handler => handler.id);
 
-    if (connection.authNeeded || resetCredentials || networkHandlers.length > 0) {
+    if (connection.authNeeded || (resetCredentials && networkHandlers.length > 0)) {
       await this.commonDialogService.open(DatabaseAuthDialog, {
         connection: key,
         networkHandlers,
       });
+      if (resetCredentials && isConnectedInitially) {
+        await this.connectionInfoResource.init(key);
+      }
     } else {
       await this.connectionInfoResource.init({ projectId: key.projectId, connectionId: key.connectionId });
     }

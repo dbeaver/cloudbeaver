@@ -12,7 +12,8 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual, NavigatorViewSettings, PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
-import { ActionService, ACTION_DELETE, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
+import { ActionService, ACTION_DELETE, DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionAuthService } from '../ConnectionAuthService';
@@ -195,10 +196,19 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
-          return this.serverConfigResource.distributed;
+          return this.serverConfigResource.distributed && connection.credentialsSaved === true;
         }
 
         return false;
+      },
+      getLoader: (context, action) => {
+        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
+        const connection = context.get(DATA_CONTEXT_CONNECTION);
+
+        return state.getState(
+          action.id,
+          () => getCachedMapResourceLoaderState(this.connectionInfoResource, createConnectionParam(connection), ['includeCredentialsSaved'], true)
+        );
       },
       handler: async (context, action) => {
         const connection = context.get(DATA_CONTEXT_CONNECTION);
