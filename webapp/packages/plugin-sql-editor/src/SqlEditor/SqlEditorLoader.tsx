@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { ComplexLoader, createComplexLoader, Loader } from '@cloudbeaver/core-blocks';
+import { ComplexLoader, createComplexLoader } from '@cloudbeaver/core-blocks';
 
 import type { ISqlEditorProps } from './ISqlEditorProps';
 
@@ -19,7 +19,7 @@ const loader = createComplexLoader(async function loader() {
 
 export const SqlEditorLoader = observer<ISqlEditorProps>(function SqlEditorLoader(props) {
   return (
-    <ComplexLoader loader={loader} placeholder={<Loader />}>
+    <ComplexLoader loader={loader}>
       {({ SqlEditor }) => <SqlEditor {...props} />}
     </ComplexLoader>
   );

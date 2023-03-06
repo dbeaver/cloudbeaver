@@ -11,11 +11,14 @@ import styled, { css } from 'reshadow';
 import { Button, Translate, useStyles } from '@cloudbeaver/core-blocks';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
+import { CommonDialogBody } from './CommonDialog/CommonDialogBody';
+import { CommonDialogFooter } from './CommonDialog/CommonDialogFooter';
+import { CommonDialogHeader } from './CommonDialog/CommonDialogHeader';
 import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
 import type { DialogComponent, DialogueStateResult } from './CommonDialogService';
 
 const style = css`
-  footer {
+  CommonDialogFooter {
     align-items: center;
     gap: 16px;
   }
@@ -47,47 +50,44 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Dial
   const { icon, title, subTitle, bigIcon, viewBox, message, confirmActionText, cancelActionText } = payload;
 
   return styled(useStyles(style))(
-    <CommonDialogWrapper
-      size='small'
-      subTitle={subTitle}
-      title={title}
-      icon={icon}
-      viewBox={viewBox}
-      bigIcon={bigIcon}
-      className={className}
-      style={style}
-      footer={(
-        <>
+    <CommonDialogWrapper size='small' className={className} fixedWidth>
+      <CommonDialogHeader
+        title={title}
+        subTitle={subTitle}
+        icon={icon}
+        viewBox={viewBox}
+        bigIcon={bigIcon}
+        onReject={rejectDialog}
+      />
+      <CommonDialogBody>
+        <Translate token={message} />
+      </CommonDialogBody>
+      <CommonDialogFooter>
+        <Button
+          type="button"
+          mod={['outlined']}
+          onClick={rejectDialog}
+        >
+          <Translate token={cancelActionText || 'ui_processing_cancel'} />
+        </Button>
+        <fill />
+        {payload.extraStatus !== undefined && (
           <Button
             type="button"
             mod={['outlined']}
-            onClick={rejectDialog}
+            onClick={() => resolveDialog(payload.extraStatus)}
           >
-            <Translate token={cancelActionText || 'ui_processing_cancel'} />
+            <Translate token={cancelActionText || 'ui_no'} />
           </Button>
-          <fill />
-          {payload.extraStatus !== undefined && (
-            <Button
-              type="button"
-              mod={['outlined']}
-              onClick={() => resolveDialog(payload.extraStatus)}
-            >
-              <Translate token={cancelActionText || 'ui_no'} />
-            </Button>
-          )}
-          <Button
-            type="button"
-            mod={['unelevated']}
-            onClick={() => resolveDialog()}
-          >
-            <Translate token={confirmActionText || 'ui_processing_ok'} />
-          </Button>
-        </>
-      )}
-      fixedWidth
-      onReject={rejectDialog}
-    >
-      <Translate token={message} />
+        )}
+        <Button
+          type="button"
+          mod={['unelevated']}
+          onClick={() => resolveDialog()}
+        >
+          <Translate token={confirmActionText || 'ui_processing_ok'} />
+        </Button>
+      </CommonDialogFooter>
     </CommonDialogWrapper>
   );
 };

@@ -29,14 +29,8 @@ const bodyStyles = css`
       flex-direction: column;
       overflow: hidden;
     }
-    Loader[overlay] {
+    Loader {
       height: 100vh;
-    }
-  `;
-
-const loaderStyle = css`
-    ExceptionMessage {
-      padding: 24px;
     }
   `;
 
@@ -45,7 +39,7 @@ export const Body = observer(function Body() {
   const themeService = useService(ThemeService);
   const style = useStyles(bodyStyles);
   const ref = useRef<HTMLDivElement>(null);
-  const permissionsService = useResource(Body, SessionPermissionsResource, undefined);
+  useResource(Body, SessionPermissionsResource, undefined);
   const screenService = useService(ScreenService);
   const Screen = screenService.screen?.component;
   const { backendVersion } = useAppVersion();
@@ -60,13 +54,10 @@ export const Body = observer(function Body() {
 
   return styled(style)(
     <DNDProvider>
-      <Loader loading={false} overlay>
+      <Loader suspense>
         <theme ref={ref} className={`theme-${themeService.currentTheme.id}`}>
-          <Loader state={[permissionsService]} style={loaderStyle}>{() => styled(style)(
-            <>
-              {Screen && <Screen {...screenService.routerService.params} />}
-            </>
-          )}
+          <Loader suspense>
+            {Screen && <Screen {...screenService.routerService.params} />}
           </Loader>
           <DialogsPortal />
           <Notifications />

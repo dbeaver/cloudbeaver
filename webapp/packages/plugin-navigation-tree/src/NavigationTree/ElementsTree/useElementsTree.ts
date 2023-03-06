@@ -156,7 +156,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       while (children.length > 0) {
         const nextChildren: string[] = [];
 
-        for (const child of children) {
+        await Promise.all(children.map(async child => {
           await navTreeResource.waitLoad();
           await navNodeInfoResource.waitLoad();
 
@@ -169,7 +169,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
                 await navNodeInfoResource.load(child);
               }
             }
-            continue;
+            return;
           }
 
           const loaded = await options.loadChildren(child, false);
@@ -180,11 +180,11 @@ export function useElementsTree(options: IOptions): IElementsTree {
             if (node) {
               await elementsTree.expand(node, false);
             }
-            continue;
+            return;
           }
 
           nextChildren.push(...(navTreeResource.get(child) || []));
-        }
+        }));
 
         children = nextChildren;
       }

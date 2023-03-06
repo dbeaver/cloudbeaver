@@ -17,7 +17,8 @@
     "allowJs": true,
     "lib": [
       "dom",
-      "ES2019"
+      "ES2019",
+      "ES2022.Error"
     ],
     "useDefineForClassFields": true,
     "experimentalDecorators": true,

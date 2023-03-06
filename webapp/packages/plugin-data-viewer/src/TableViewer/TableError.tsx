@@ -11,7 +11,8 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { Button, IconOrImage, useErrorDetails, useObservableRef, useStateDelay, useTranslate } from '@cloudbeaver/core-blocks';
-import { ServerErrorType } from '@cloudbeaver/core-sdk';
+import { ServerErrorType, ServerInternalError } from '@cloudbeaver/core-sdk';
+import { errorOf } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 
@@ -113,11 +114,12 @@ export const TableError = observer<Props>(function TableError({
     errorInfo.display = !!model.source.error;
   }
 
-  const error = useErrorDetails(model.source.error || null);
+  const internalServerError = errorOf(model.source.error, ServerInternalError);
+  const error = useErrorDetails(model.source.error);
   const animated = useStateDelay(!!errorInfo.error && !loading, 1);
 
   const errorHidden = errorInfo.error === null;
-  const quote = error.details?.errorType === ServerErrorType.QUOTE_EXCEEDED;
+  const quote = internalServerError?.errorType === ServerErrorType.QUOTE_EXCEEDED;
 
   let icon = '/icons/error_icon.svg';
 
@@ -125,22 +127,37 @@ export const TableError = observer<Props>(function TableError({
     icon = '/icons/info_icon.svg';
   }
 
+  let onRetry = () => model.retry();
+
+  if (error.refresh) {
+    const retry = onRetry;
+    const refresh = error.refresh;
+    onRetry = async () => {
+      refresh();
+      await retry();
+    };
+  }
+
   return styled(style)(
     <error {...use({ animated, collapsed: !errorInfo.display, errorHidden })} className={className}>
       <error-body>
-        <IconOrImage icon={icon} title={error.details?.message} onClick={() => errorInfo.show()} />
-        <error-message>{error.details?.message}</error-message>
+        <IconOrImage
+          icon={icon}
+          title={error.message}
+          onClick={() => errorInfo.show()}
+        />
+        <error-message>{error.message}</error-message>
       </error-body>
       <controls>
         <Button type='button' mod={['outlined']} onClick={() => errorInfo.hide()}>
           {translate('ui_error_close')}
         </Button>
-        {error.details?.hasDetails && (
+        {error.hasDetails && (
           <Button type='button' mod={['outlined']} onClick={error.open}>
             {translate('ui_errors_details')}
           </Button>
         )}
-        <Button type='button' mod={['unelevated']} onClick={() => model.retry()}>
+        <Button type='button' mod={['unelevated']} onClick={onRetry}>
           {translate('ui_processing_retry')}
         </Button>
       </controls>
