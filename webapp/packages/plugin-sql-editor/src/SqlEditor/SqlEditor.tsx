@@ -95,10 +95,6 @@ const tabStyles = css`
     composes: theme-background-secondary theme-text-on-secondary from global;
     margin-right: 8px;
     margin-left: 4px;
-
-    &:empty, & tab-outer:only-child {
-      display: none;
-    }
   }
 `;
 
@@ -185,9 +181,11 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
           <SqlEditorTools data={data} state={state} style={styles} />
         </container>
         <TabPanelList />
-        <tabs>
-          <TabList style={tabListStyles} />
-        </tabs>
+        {displayedEditors > 1 ? (
+          <tabs>
+            <TabList style={tabListStyles} />
+          </tabs>
+        ) : null}
       </sql-editor>
     </TabsState>
   );
