@@ -430,7 +430,7 @@ export abstract class CachedResource<
       this.loadedKeys.push(param);
     }
 
-    exception = new ResourceError(this, param, context, exception);
+    exception = new ResourceError(this, param, context, undefined, exception);
     param = this.transformParam(param);
     this.updateMetadata(param, metadata => {
       metadata.exception = exception;

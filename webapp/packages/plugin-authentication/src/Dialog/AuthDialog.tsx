@@ -208,10 +208,10 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
               isAuthenticating={dialogData.authenticating}
               onLogin={login}
             >
-              {dialogData.exception && (
+              {errorDetails.name && (
                 <ErrorMessage
-                  text={errorDetails.details?.message || ''}
-                  hasDetails={errorDetails.details?.hasDetails}
+                  text={errorDetails.message || errorDetails.name}
+                  hasDetails={errorDetails.hasDetails}
                   onShowDetails={errorDetails.open}
                 />
               )}

@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-export class SessionError extends Error {
-  constructor(message: string, options?: ErrorOptions) {
+export class UIError extends Error {
+  constructor(message?: string, options?: ErrorOptions) {
     super(message, options);
-    this.name = 'Session Error';
+    this.name = 'UI Error';
   }
 }

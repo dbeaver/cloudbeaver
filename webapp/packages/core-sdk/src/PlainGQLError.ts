@@ -23,7 +23,7 @@ export class PlainGQLError extends DetailsError {
       message = getTextBetween(clientError.response.error, '<title>', '</title>');
     }
 
-    super(clientError, message);
+    super(message, { cause: clientError });
     this.name = 'GQL Error';
     this.response = clientError.response;
     this.request = clientError.request;

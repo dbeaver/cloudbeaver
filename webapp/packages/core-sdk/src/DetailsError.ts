@@ -6,18 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { InheritableError } from '@cloudbeaver/core-utils';
-
-export abstract class DetailsError extends InheritableError {
-  errorMessage: string;
-  constructor(
-    inherit?: Error,
-    message?: string
-  ) {
-    super(inherit, message);
-    this.name = 'Details Error';
-    this.errorMessage = message || 'Error';
+export class DetailsError extends Error {
+  constructor(message?: string, options?: ErrorOptions) {
+    super(message, options);
+    this.name = 'Error';
   }
 
-  abstract hasDetails(): boolean;
+  hasDetails(): boolean {
+    return true;
+  }
 }

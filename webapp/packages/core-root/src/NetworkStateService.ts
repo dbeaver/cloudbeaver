@@ -59,7 +59,7 @@ export class NetworkStateService extends Bootstrap {
         this.graphQLService.enableRequests();
       }
     } else {
-      this.graphQLService.blockRequests(new NetworkError(undefined, 'Network connection was lost'));
+      this.graphQLService.blockRequests(new NetworkError('Network connection was lost'));
     }
     this.networkState = state;
     this.networkStateExecutor.execute(this.networkState);
@@ -73,7 +73,7 @@ export class NetworkStateService extends Bootstrap {
         exception instanceof TypeError
         && exception.message === 'Failed to fetch'
       ) {
-        throw new NetworkError(exception, 'Error while processing request');
+        throw new NetworkError('Error while processing request', { cause: exception });
       }
       throw exception;
     }

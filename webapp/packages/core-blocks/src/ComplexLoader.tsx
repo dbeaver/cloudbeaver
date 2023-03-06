@@ -54,8 +54,8 @@ export function createComplexLoader<T>(loader: () => Promise<T>): IComplexLoader
       try {
         this.data = await this.promise;
         return this.data;
-      } catch (exception: any) {
-        this.error = new LoadingError(() => this.refresh(), exception);
+      } catch (cause: any) {
+        this.error = new LoadingError(() => this.refresh(), 'Can\'t load element', { cause });
         throw this.error;
       }
     },

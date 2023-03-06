@@ -8,7 +8,7 @@
 
 import { action, computed, observable, makeObservable } from 'mobx';
 
-import { errorOf } from '../InheritableError';
+import { errorOf } from '../errorOf';
 import { PromiseCancelledError } from './PromiseCancelledError';
 import { PromiseExecutor } from './PromiseExecutor';
 
@@ -115,7 +115,7 @@ export class DeferredFromPromise<T> extends Deferred<T> {
       err => {
         const promiseCancelledError = errorOf(err, PromiseCancelledError);
         if (promiseCancelledError) {
-          this.toCancelled(promiseCancelledError.reason);
+          this.toCancelled(promiseCancelledError.cause);
         } else {
           this.toRejected(err);
         }

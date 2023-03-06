@@ -30,7 +30,7 @@ export class GQLErrorCatcher {
   catch(exception: any): boolean {
     const detailsError = errorOf(exception, DetailsError);
     if (detailsError) {
-      this.responseMessage = detailsError.errorMessage;
+      this.responseMessage = detailsError.message;
       this.hasDetails = detailsError.hasDetails();
       this.exception = detailsError;
       return true;

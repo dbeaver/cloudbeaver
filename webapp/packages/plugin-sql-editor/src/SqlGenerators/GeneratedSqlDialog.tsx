@@ -144,7 +144,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
           {state.error.responseMessage && (
             <ErrorMessage
               text={state.error.responseMessage}
-              hasDetails={error.details?.hasDetails}
+              hasDetails={error.hasDetails}
               onShowDetails={error.open}
             />
           )}

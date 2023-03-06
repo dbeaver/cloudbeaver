@@ -262,7 +262,7 @@ export function useResource<
             this.exception = new LoadingError(() => {
               this.exception = null;
               this.load.bind(this, true);
-            }, exception);
+            }, 'Application is unable to load resource', { cause: exception });
             propertiesRef.errorContext.catch(this.exception);
           }
         }

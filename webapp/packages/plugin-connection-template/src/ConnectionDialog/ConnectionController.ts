@@ -228,7 +228,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   private showError(exception: Error, message: string) {
     const detailsError = errorOf(exception, DetailsError);
     if (detailsError && !this.isDistructed) {
-      this.responseMessage = detailsError.errorMessage;
+      this.responseMessage = detailsError.message;
       this.hasDetails = detailsError.hasDetails();
       this.exception = detailsError;
     } else {

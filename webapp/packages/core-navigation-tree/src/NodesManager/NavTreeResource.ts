@@ -25,13 +25,14 @@ import {
   ResourceKeyUtils,
   ICachedMapResourceMetadata,
   CachedMapAllKey,
-  ResourceError
+  ResourceError,
+  DetailsError
 } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { NavTreeSettingsService } from '../NavTreeSettingsService';
 import type { NavNode } from './EntityTypes';
-import { NavNodeInfoResource } from './NavNodeInfoResource';
+import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource';
 
 // TODO: so much dirty
 export interface NodePath {
@@ -408,10 +409,14 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   ): Promise<void> {
     // this.performUpdate(key, undefined, async key => {
     await ResourceKeyUtils.forEachAsync(key, async nodeId => {
+      if (!this.navNodeInfoResource.has(nodeId) && nodeId !== ROOT_NODE_PATH) {
+        await this.navNodeInfoResource.loadNodeParents(nodeId);
+      }
       const preloaded = await this.preloadNodeParents(this.navNodeInfoResource.getParents(nodeId), nodeId);
 
       if (!preloaded) {
-        throw new ResourceError(this, key, undefined, undefined, 'Entity not found');
+        const cause = new DetailsError(`Entity not found: ${nodeId}`);
+        throw new ResourceError(this, key, undefined, 'Entity not found', { cause });
       }
     });
     // });

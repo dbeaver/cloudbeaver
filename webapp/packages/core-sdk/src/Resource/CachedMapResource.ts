@@ -245,7 +245,7 @@ export abstract class CachedMapResource<
       this.loadedKeys.push(key);
     }
 
-    exception = new ResourceError(this, key, includes, exception);
+    exception = new ResourceError(this, key, includes, undefined, { cause:exception });
     key = this.transformParam(key);
 
     ResourceKeyUtils.forEach(key, key => {

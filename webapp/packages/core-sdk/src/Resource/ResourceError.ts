@@ -15,15 +15,15 @@ export class ResourceError extends LoadingError {
     private readonly resource: CachedResource<any, any, any, any, any>,
     private readonly key: any,
     private readonly context: any,
-    inherit?: Error,
-    message?: string
+    message?: string,
+    options?: ErrorOptions
   ) {
     super(
       () => {
         this.resource.markOutdated(this.key);
       },
-      inherit,
-      message
+      message,
+      options
     );
     this.name = 'Resource Error';
   }

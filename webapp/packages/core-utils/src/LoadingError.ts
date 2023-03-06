@@ -6,16 +6,32 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { InheritableError } from './InheritableError';
-
-export class LoadingError extends InheritableError {
+export class LoadingError extends Error {
   constructor(
-    public refresh: () => void,
-    inherit?: Error,
+    private readonly onRefresh: () => void,
     message?: string,
+    options?: ErrorOptions
   ) {
-    super(inherit, message);
+    super(message, options);
     this.name = 'Loading Error';
     this.refresh = this.refresh.bind(this);
+  }
+
+  refresh() {
+    this.onRefresh();
+    let cause = this.cause;
+
+    while (cause) {
+      if (cause instanceof LoadingError) {
+        cause.refresh();
+        return;
+      }
+
+      if (cause instanceof Error) {
+        cause = cause.cause;
+      } else {
+        return;
+      }
+    }
   }
 }

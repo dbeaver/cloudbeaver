@@ -20,9 +20,13 @@ function DisplayErrorInfo({ error }: { error: IErrorInfo }) {
   return styled(useStyles(styles))(
     <>
       <property>
-        <message>
-          {error.message}
-        </message>
+        {error.isHtml ? (
+          <Iframe srcDoc={error.message} />
+        ) : (
+          <message>
+            {error.message}
+          </message>
+        )}
       </property>
       {error.stackTrace && (
         <property>
@@ -37,9 +41,7 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
   const translate = useTranslate();
 
   const error = useMemo(
-    () => (props.payload instanceof Error
-      ? new ErrorModel({ error: props.payload })
-      : new ErrorModel({ reason: props.payload })),
+    () => new ErrorModel({ error: props.payload }),
     [props.payload]
   );
 
@@ -58,8 +60,6 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
         onReject={props.rejectDialog}
       />
       <CommonDialogBody>
-        {error.reason && <property>{error.reason}</property>}
-        {error.htmlBody && <Iframe srcDoc={error.htmlBody} />}
         {error.errors.map(
           (error, id) => (
             <div key={id}>

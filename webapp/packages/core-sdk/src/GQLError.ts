@@ -16,7 +16,6 @@ import { DetailsError } from './DetailsError';
 export class GQLError extends DetailsError {
   response: GraphQLResponse;
   request: GraphQLRequestContext;
-  errorMessage: string;
   errorCode?: string;
   isTextBody = false; // true when server returns not GQLError object but plain text or html error
 
@@ -30,10 +29,10 @@ export class GQLError extends DetailsError {
         .map(e => e.message)
         .join('\n');
     } else {
-      message = 'unknown error';
+      message = 'Unknown error';
     }
 
-    super(clientError, message);
+    super(message, { cause: clientError });
     this.name = 'Server Error';
     this.response = clientError.response;
     this.request = clientError.request;
@@ -44,7 +43,6 @@ export class GQLError extends DetailsError {
       const firstError = clientError.response.errors?.[0];
       this.errorCode = firstError?.extensions.webErrorCode;
     }
-    this.errorMessage = message;
   }
 
   hasDetails(): boolean {

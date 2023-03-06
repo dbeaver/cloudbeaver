@@ -6,11 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { errorOf, InheritableError } from '../InheritableError';
+import { errorOf } from '../errorOf';
 
-export class PromiseCancelledError extends InheritableError {
-  constructor(public reason?: Error) {
-    super(reason);
+export class PromiseCancelledError extends Error {
+  constructor(
+    message?: string,
+    options?: ErrorOptions
+  ) {
+    super(message, options);
   }
 }
 

@@ -19,7 +19,7 @@ export * from './generateFileName';
 export * from './getMIME';
 export * from './GlobalConstants';
 export * from './ILoadableState';
-export * from './InheritableError';
+export * from './errorOf';
 export * from './isArraysEqual';
 export * from './isPropertiesEqual';
 export * from './isValuesEqual';
