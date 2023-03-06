@@ -226,7 +226,7 @@ export class AdministrationScreenService {
       return true;
     }
 
-    const fromScreen = this.getScreen(toState);
+    const toScreen = this.getScreen(toState);
     const screen = this.getScreen(fromState);
 
     if (!screen) {
@@ -235,8 +235,9 @@ export class AdministrationScreenService {
 
     return this.administrationItemService.canDeActivate(
       screen,
+      toScreen,
       this.isConfigurationMode,
-      screen.item !== fromScreen?.item
+      screen.item !== toScreen?.item
     );
   }
 

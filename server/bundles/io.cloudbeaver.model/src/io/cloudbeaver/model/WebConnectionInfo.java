@@ -25,6 +25,7 @@ import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
@@ -293,8 +294,13 @@ public class WebConnectionInfo {
     @Property
     public boolean isAuthNeeded() throws DBException {
         return !dataSourceContainer.isConnected() &&
-            !dataSourceContainer.isCredentialsSaved() &&
+            !(dataSourceContainer.isCredentialsSaved() || isAuthPropertiesEmpty()) &&
             !dataSourceContainer.getDriver().isAnonymousAccess();
+    }
+
+    // we don't show non-secured properties in FE when connecting to DB without saved credentials
+    private boolean isAuthPropertiesEmpty() {
+        return Arrays.stream(getAuthProperties()).allMatch(f -> f.hasFeature(DBConstants.PROP_FEATURE_NON_SECURED));
     }
 
     @Property

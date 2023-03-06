@@ -18,6 +18,7 @@ package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.WebProjectImpl;
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -40,7 +41,6 @@ import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.*;
@@ -152,16 +152,17 @@ public class LocalResourceController implements RMController {
             projects.add(globalProject);
         }
 
-        // check if user has permission for private project
-        var hasPrivateProjectPermission = activeUserCreds != null &&
-            activeUserCreds.hasPermission(DBWConstants.PERMISSION_PRIVATE_PROJECT_ACCESS);
-        if (!WebAppUtils.getWebApplication().isMultiNode() || hasPrivateProjectPermission) {
+        // Checking if private projects are enabled in the configuration and if the user has permission to them
+        var webApp = WebAppUtils.getWebApplication();
+        var userHasPrivateProjectPermission = userHasAccessToPrivateProject(webApp, activeUserCreds);
+        if (webApp.getAppConfiguration().isSupportsCustomConnections() && userHasPrivateProjectPermission) {
             var userProjectPermission = getProjectPermissions(null, RMProjectType.USER);
             RMProject userProject = makeProjectFromPath(getPrivateProjectPath(), userProjectPermission, RMProjectType.USER, false);
             if (userProject != null) {
                 projects.add(0, userProject);
             }
         }
+
         projects.sort(Comparator.comparing(RMProject::getDisplayName));
         return projects.toArray(new RMProject[0]);
     }
@@ -201,20 +202,23 @@ public class LocalResourceController implements RMController {
                 }
                 return getRmProjectPermissions(projectId, activeUserCreds);
             case USER:
-                if (!WebAppUtils.getWebApplication().isMultiNode() || activeUserCreds == null) {
+                var webApp = WebAppUtils.getWebApplication();
+                if (userHasAccessToPrivateProject(webApp, activeUserCreds)) {
                     return Set.of(RMProjectPermission.RESOURCE_EDIT, RMProjectPermission.DATA_SOURCES_EDIT);
                 }
-                return activeUserCreds.getPermissions().stream()
-                    .map(RMProjectPermission::fromPermission)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
             default:
                 throw new DBException("Unknown project type:" + projectType);
         }
     }
 
+    private boolean userHasAccessToPrivateProject(WebApplication webApp, @Nullable SMCredentials activeUserCreds) {
+        return !webApp.isMultiNode() ||
+            (activeUserCreds != null && activeUserCreds.hasPermission(DBWConstants.PERMISSION_PRIVATE_PROJECT_ACCESS));
+    }
+
     @NotNull
-    private Set<RMProjectPermission> getRmProjectPermissions(@NotNull String projectId, SMCredentials activeUserCreds) throws DBException {
+    private Set<RMProjectPermission> getRmProjectPermissions(@NotNull String projectId,
+                                                             SMCredentials activeUserCreds) throws DBException {
         String[] permissions = getSecurityController().getObjectPermissions(activeUserCreds.getUserId(), projectId, SMObjects.PROJECT)
             .getPermissions();
         return Arrays.stream(permissions)
