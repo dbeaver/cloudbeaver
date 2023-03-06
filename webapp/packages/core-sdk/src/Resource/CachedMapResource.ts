@@ -646,9 +646,11 @@ export function getCachedMapResourceLoaderState<
 >(
   resource: CachedMapResource<TKey, TValue, TContext>,
   key: ResourceKey<TKey>,
-  includes?: CachedResourceIncludeArgs<TValue, TContext> | undefined
+  includes?: CachedResourceIncludeArgs<TValue, TContext> | undefined,
+  lazy?: boolean
 ): ILoadableState {
   return {
+    lazy,
     get exception() {
       return resource.getException(key);
     },
