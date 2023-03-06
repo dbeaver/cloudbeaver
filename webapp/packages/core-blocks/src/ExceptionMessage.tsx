@@ -103,14 +103,23 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({
   const translate = useTranslate();
   const error = useErrorDetails(exception);
 
+  if (error.refresh) {
+    const retry = onRetry;
+    const refresh = error.refresh;
+    onRetry = () => {
+      retry?.();
+      refresh();
+    };
+  }
+
   return styled(styles)(
     <error {...use({ inline })} className={className}>
       <error-icon><IconOrImage icon={inline ? '/icons/error_icon_sm.svg' : '/icons/error_icon.svg'} /></error-icon>
       <error-data>
-        <error-name><span>{name || error.details?.name}</span></error-name>
-        <error-message>{message || error.details?.message}</error-message>
+        <error-name><span>{name || error.name}</span></error-name>
+        <error-message>{message || error.message}</error-message>
         <error-actions>
-          {exception && error.details?.hasDetails && (
+          {error.hasDetails && (
             <Button type='button' mod={['outlined']} disabled={error.isOpen} onClick={error.open}>
               {translate('ui_errors_details')}
             </Button>

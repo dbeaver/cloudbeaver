@@ -314,7 +314,7 @@ export class NavNodeManagerService extends Bootstrap {
       if (!object) {
         return res;
       }
-      if (object.projectId) {
+      if (object.projectId && res.projectId !== object.projectId) {
         res.projectId = object.projectId;
       }
       if (object.objectFeatures.includes(EObjectFeature.dataSource)) {
@@ -325,6 +325,10 @@ export class NavNodeManagerService extends Bootstrap {
       }
       if (object.objectFeatures.includes(EObjectFeature.schema)) {
         res.schemaId = object.name; // note that schemaId is node name
+      }
+
+      if (object.parentId === nodeId) {
+        return res;
       }
       return scanParents(res, object.parentId);
     };

@@ -12,16 +12,10 @@ import styled, { css } from 'reshadow';
 import { Button, useClipboard, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionDialectResource, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 import { SQLCodeEditorLoader } from '../SqlEditor/SQLCodeEditor/SQLCodeEditorLoader';
-
-export const dialogStyle = css`
-  footer {
-    gap: 24px;
-  }
-`;
 
 const styles = css`
   wrapper {
@@ -37,6 +31,9 @@ const styles = css`
   }
   fill {
     flex: 1;
+  }
+  CommonDialogFooter {
+    gap: 24px;
   }
 `;
 
@@ -66,33 +63,30 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
   };
 
   return styled(styles)(
-    <CommonDialogWrapper
-      size='large'
-      title="data_viewer_script_preview_dialog_title"
-      icon='sql-script'
-      footer={(
-        <>
-          <Button mod={['unelevated']} onClick={apply}>{translate('ui_apply')}</Button>
-          <fill />
-          <Button mod={['outlined']} onClick={() => copy(payload.script, true)}>{translate('ui_copy_to_clipboard')}</Button>
-          <Button mod={['unelevated']} onClick={rejectDialog}>{translate('ui_close')}</Button>
-        </>
-      )}
-      style={dialogStyle}
-      noBodyPadding
-      noOverflow
-      onReject={rejectDialog}
-    >
-      <wrapper>
-        <SQLCodeEditorLoader
-          bindings={{
-            autoCursor: false,
-          }}
-          value={payload.script}
-          dialect={dialect.data}
-          readonly
-        />
-      </wrapper>
+    <CommonDialogWrapper size='large'>
+      <CommonDialogHeader
+        title="data_viewer_script_preview_dialog_title"
+        icon='sql-script'
+        onReject={rejectDialog}
+      />
+      <CommonDialogBody noBodyPadding noOverflow>
+        <wrapper>
+          <SQLCodeEditorLoader
+            bindings={{
+              autoCursor: false,
+            }}
+            value={payload.script}
+            dialect={dialect.data}
+            readonly
+          />
+        </wrapper>
+      </CommonDialogBody>
+      <CommonDialogFooter>
+        <Button mod={['unelevated']} onClick={apply}>{translate('ui_apply')}</Button>
+        <fill />
+        <Button mod={['outlined']} onClick={() => copy(payload.script, true)}>{translate('ui_copy_to_clipboard')}</Button>
+        <Button mod={['unelevated']} onClick={rejectDialog}>{translate('ui_close')}</Button>
+      </CommonDialogFooter>
     </CommonDialogWrapper>
   );
 });

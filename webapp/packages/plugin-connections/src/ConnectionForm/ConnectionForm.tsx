@@ -12,9 +12,7 @@ import styled, { css } from 'reshadow';
 
 import { Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage, Loader, ErrorMessage, useErrorDetails, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-
 import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormService } from './ConnectionFormService';
@@ -138,11 +136,11 @@ export const ConnectionForm = observer<Props>(function ConnectionForm({
     state.loadConnectionInfo();
   }, [state]);
 
-  if (state.initError) {
+  if (error.name) {
     return styled(styles)(
       <ErrorMessage
-        text={error.details?.message || ''}
-        hasDetails={error.details?.hasDetails}
+        text={error.message || error.name}
+        hasDetails={error.hasDetails}
         onShowDetails={error.open}
       />
     );

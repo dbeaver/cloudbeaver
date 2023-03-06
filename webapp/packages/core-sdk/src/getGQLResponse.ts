@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { errorOf } from '@cloudbeaver/core-utils';
+
 import { GQLError } from './GQLError';
 
 interface IGraphQLResponse<T>{
@@ -19,7 +21,8 @@ export async function getGQLResponse<T>(query: Promise<T>): Promise<IGraphQLResp
 
     return { data };
   } catch (exception: any) {
-    const data = exception instanceof GQLError ? exception.response.data : null;
+    const gqlError = errorOf(exception, GQLError);
+    const data = gqlError?.response.data || null;
     return {
       data,
       error: exception,

@@ -9,7 +9,6 @@ export function useAppLoadingScreen() {
     const appLoadingScreen = document.getElementById('app-loading-screen');
 
     if (!appLoadingScreen) {
-      console.warn('Can"t find any node with "app-loading-screen" id');
       return;
     }
 
@@ -26,6 +25,9 @@ export function useAppLoadingScreen() {
     appLoadingScreen.addEventListener('transitionend', onTransitionEnd);
     appLoadingScreen.classList.add('app-loading-screen--fade-out');
 
-    return () => appLoadingScreen.removeEventListener('transitionend', onTransitionEnd);
+    return () => {
+      appLoadingScreen.removeEventListener('transitionend', onTransitionEnd);
+      appLoadingScreen.classList.remove('app-loading-screen--fade-out', 'app-loading-screen--hidden');
+    };
   }, []);
 }

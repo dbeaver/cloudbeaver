@@ -11,6 +11,7 @@ import { observer } from 'mobx-react-lite';
 import type { ENotificationType } from '@cloudbeaver/core-events';
 
 import { Button } from '../Button';
+import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
 import { useActivationDelay } from '../useActivationDelay';
 import { SnackbarBody } from './SnackbarMarkups/SnackbarBody';
@@ -49,24 +50,26 @@ export const Snackbar = observer<SnackbarProps>(function Snackbar({
 
   return (
     <SnackbarWrapper closing={!!state?.deleteDelay} persistent={persistent} onClose={() => onClose(false)}>
-      <SnackbarStatus status={type} />
-      <SnackbarContent>
-        <SnackbarBody title={translate(title)}>
-          {message && translate(message)}
-        </SnackbarBody>
-        <SnackbarFooter timestamp={time}>
-          {onShowDetails && (
-            <Button
-              type="button"
-              mod={['outlined']}
-              disabled={disableShowDetails}
-              onClick={onShowDetails}
-            >
-              {translate('ui_errors_details')}
-            </Button>
-          )}
-        </SnackbarFooter>
-      </SnackbarContent>
+      <Loader suspense>
+        <SnackbarStatus status={type} />
+        <SnackbarContent>
+          <SnackbarBody title={translate(title)}>
+            {message && translate(message)}
+          </SnackbarBody>
+          <SnackbarFooter timestamp={time}>
+            {onShowDetails && (
+              <Button
+                type="button"
+                mod={['outlined']}
+                disabled={disableShowDetails}
+                onClick={onShowDetails}
+              >
+                {translate('ui_errors_details')}
+              </Button>
+            )}
+          </SnackbarFooter>
+        </SnackbarContent>
+      </Loader>
     </SnackbarWrapper>
   );
 });

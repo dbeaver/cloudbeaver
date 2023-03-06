@@ -13,23 +13,18 @@ import {
 import styled, { css } from 'reshadow';
 
 import { Button, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
-
-
-
-const dialogStyle = css`
-  footer {
-    align-items: center;
-    justify-content: flex-end;
-    gap: 24px;
-  }
-`;
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
 const styles = css`
   textarea {
     width: 100% !important;
     min-height: 250px;
     box-sizing: border-box;
+  }
+  CommonDialogFooter {
+    align-items: center;
+    justify-content: flex-end;
+    gap: 24px;
   }
 `;
 
@@ -50,22 +45,19 @@ export const EditorDialog: DialogComponent<string, string> = observer(
     }, []);
 
     return styled(useStyles(styles))(
-      <CommonDialogWrapper
-        title="app_shared_inlineEditor_dialog_title"
-        footer={(
-          <>
-            <Button type="button" mod={['outlined']} onClick={rejectDialog}>
-              {translate('app_shared_inlineEditor_dialog_cancel')}
-            </Button>
-            <Button type="button" mod={['unelevated']} onClick={handleApply}>
-              {translate('app_shared_inlineEditor_dialog_apply')}
-            </Button>
-          </>
-        )}
-        style={dialogStyle}
-        onReject={rejectDialog}
-      >
-        <textarea ref={textareaRef} value={value} onChange={handleChange} />
+      <CommonDialogWrapper>
+        <CommonDialogHeader title="app_shared_inlineEditor_dialog_title" onReject={rejectDialog} />
+        <CommonDialogBody>
+          <textarea ref={textareaRef} value={value} onChange={handleChange} />
+        </CommonDialogBody>
+        <CommonDialogFooter>
+          <Button type="button" mod={['outlined']} onClick={rejectDialog}>
+            {translate('app_shared_inlineEditor_dialog_cancel')}
+          </Button>
+          <Button type="button" mod={['unelevated']} onClick={handleApply}>
+            {translate('app_shared_inlineEditor_dialog_apply')}
+          </Button>
+        </CommonDialogFooter>
       </CommonDialogWrapper>
     );
   }

@@ -12,6 +12,7 @@ import { Dependency } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, IExecutorHandler, ISyncExecutor, SyncExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
+import { ResourceError } from './ResourceError';
 import { isResourceKeyList } from './ResourceKeyList';
 
 export interface ICachedResourceMetadata {
@@ -429,6 +430,7 @@ export abstract class CachedResource<
       this.loadedKeys.push(param);
     }
 
+    exception = new ResourceError(this, param, context, undefined, exception);
     param = this.transformParam(param);
     this.updateMetadata(param, metadata => {
       metadata.exception = exception;

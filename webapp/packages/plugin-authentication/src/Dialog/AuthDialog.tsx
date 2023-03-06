@@ -12,7 +12,7 @@ import styled, { css, use } from 'reshadow';
 import { AuthProvider, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { SubmittingForm, Loader, ErrorMessage, TextPlaceholder, Link, useErrorDetails, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { TabsState, TabList, Tab, TabTitle, UNDERLINE_TAB_STYLES, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { AuthenticationService } from '../AuthenticationService';
@@ -149,73 +149,75 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
 
   return styled(useStyles(BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES))(
     <TabsState currentTabId={state.tabId} onChange={tabData => { state.setTabId(tabData.tabId); }}>
-      <CommonDialogWrapper
-        size='large'
-        aria-label={translate('authentication_login_dialog_title')}
-        title={dialogTitle}
-        icon={icon}
-        subTitle={subTitle}
-        footer={!federate && (
-          <AuthDialogFooter
-            authAvailable={!dialogData.configure}
-            isAuthenticating={dialogData.authenticating}
-            onLogin={login}
-          >
-            {dialogData.exception && (
-              <ErrorMessage
-                text={errorDetails.details?.message || ''}
-                hasDetails={errorDetails.details?.hasDetails}
-                onShowDetails={errorDetails.open}
-              />
-            )}
-          </AuthDialogFooter>
-        )}
-        noBodyPadding
-        onReject={options?.persistent ? undefined : rejectDialog}
-      >
-        {showTabs && (
-          <TabList aria-label='Auth providers'>
-            {dialogData.providers.map(provider => (
-              <Tab
-                key={provider.id}
-                tabId={provider.id}
-                title={provider.description || provider.label}
-                disabled={dialogData.authenticating}
-                onClick={() => { state.setActiveProvider(provider); }}
-              >
-                <TabTitle>{provider.label}</TabTitle>
-              </Tab>
-            ))}
-            {dialogData.configurations.length > 0 && (
-              <Tab
-                key={FEDERATED_AUTH}
-                tabId={FEDERATED_AUTH}
-                title={translate('authentication_auth_federated')}
-                disabled={dialogData.authenticating}
-                onClick={() => { state.setActiveProvider(null); }}
-              >
-                <TabTitle>{translate('authentication_auth_federated')}</TabTitle>
-              </Tab>
-            )}
-          </TabList>
-        )}
-        <SubmittingForm {...use({ form: !federate })} onSubmit={login}>
-          <Loader state={dialogData.loadingState}>
-            {() => federate
-              ? (
-                <ConfigurationsList
-                  activeProvider={state.activeProvider}
-                  activeConfiguration={state.activeConfiguration}
-                  providers={dialogData.configurations}
-                  onAuthorize={(provider, configuration) => {
-                    state.setActiveConfiguration(provider, configuration);
-                  }}
-                  onClose={rejectDialog}
+      <CommonDialogWrapper size='large' aria-label={translate('authentication_login_dialog_title')}>
+        <CommonDialogHeader
+          title={dialogTitle}
+          icon={icon}
+          subTitle={subTitle}
+          onReject={options?.persistent ? undefined : rejectDialog}
+        />
+        <CommonDialogBody noBodyPadding>
+          {showTabs && (
+            <TabList aria-label='Auth providers'>
+              {dialogData.providers.map(provider => (
+                <Tab
+                  key={provider.id}
+                  tabId={provider.id}
+                  title={provider.description || provider.label}
+                  disabled={dialogData.authenticating}
+                  onClick={() => { state.setActiveProvider(provider); }}
+                >
+                  <TabTitle>{provider.label}</TabTitle>
+                </Tab>
+              ))}
+              {dialogData.configurations.length > 0 && (
+                <Tab
+                  key={FEDERATED_AUTH}
+                  tabId={FEDERATED_AUTH}
+                  title={translate('authentication_auth_federated')}
+                  disabled={dialogData.authenticating}
+                  onClick={() => { state.setActiveProvider(null); }}
+                >
+                  <TabTitle>{translate('authentication_auth_federated')}</TabTitle>
+                </Tab>
+              )}
+            </TabList>
+          )}
+          <SubmittingForm {...use({ form: !federate })} onSubmit={login}>
+            <Loader state={dialogData.loadingState}>
+              {() => federate
+                ? (
+                  <ConfigurationsList
+                    activeProvider={state.activeProvider}
+                    activeConfiguration={state.activeConfiguration}
+                    providers={dialogData.configurations}
+                    onAuthorize={(provider, configuration) => {
+                      state.setActiveConfiguration(provider, configuration);
+                    }}
+                    onClose={rejectDialog}
+                  />
+                )
+                : renderForm(state.activeProvider)}
+            </Loader>
+          </SubmittingForm>
+        </CommonDialogBody>
+        {!federate && (
+          <CommonDialogFooter>
+            <AuthDialogFooter
+              authAvailable={!dialogData.configure}
+              isAuthenticating={dialogData.authenticating}
+              onLogin={login}
+            >
+              {errorDetails.name && (
+                <ErrorMessage
+                  text={errorDetails.message || errorDetails.name}
+                  hasDetails={errorDetails.hasDetails}
+                  onShowDetails={errorDetails.open}
                 />
-              )
-              : renderForm(state.activeProvider)}
-          </Loader>
-        </SubmittingForm>
+              )}
+            </AuthDialogFooter>
+          </CommonDialogFooter>
+        )}
       </CommonDialogWrapper>
     </TabsState>
   );

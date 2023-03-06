@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
 import { TabPanel as BaseTabPanel, TabStateReturn } from 'reakit/Tab';
 
-import { ErrorBoundary, getComputed, Loader } from '@cloudbeaver/core-blocks';
+import { getComputed, Loader } from '@cloudbeaver/core-blocks';
 
 import { TabContext } from './TabContext';
 import type { TabPanelProps } from './TabPanelProps';
@@ -37,27 +37,23 @@ export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({
 
   if (typeof children === 'function') {
     return (
-      <ErrorBoundary remount>
-        <Loader loading={false} overlay>
-          <TabContext.Provider value={tabContext}>
-            <BaseTabPanel {...state.state} tabId={tabId} className={className}>
-              {(children as (state: TabStateReturn) => React.ReactNode)(state.state)}
-            </BaseTabPanel>
-          </TabContext.Provider>
-        </Loader>
-      </ErrorBoundary>
+      <TabContext.Provider value={tabContext}>
+        <BaseTabPanel {...state.state} tabId={tabId} className={className}>
+          <Loader suspense>
+            {(children as (state: TabStateReturn) => React.ReactNode)(state.state)}
+          </Loader>
+        </BaseTabPanel>
+      </TabContext.Provider>
     );
   }
 
   return (
-    <ErrorBoundary remount>
-      <Loader loading={false} overlay>
-        <TabContext.Provider value={tabContext}>
-          <BaseTabPanel {...state.state} tabId={tabId} className={className}>
-            {children}
-          </BaseTabPanel>
-        </TabContext.Provider>
-      </Loader>
-    </ErrorBoundary>
+    <TabContext.Provider value={tabContext}>
+      <BaseTabPanel {...state.state} tabId={tabId} className={className}>
+        <Loader suspense>
+          {children}
+        </Loader>
+      </BaseTabPanel>
+    </TabContext.Provider>
   );
 });

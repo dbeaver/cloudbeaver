@@ -9,6 +9,7 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { GQLError, GraphQLService, EServerErrorCode } from '@cloudbeaver/core-sdk';
+import { errorOf } from '@cloudbeaver/core-utils';
 
 import { SessionError } from './SessionError';
 
@@ -45,7 +46,8 @@ export class SessionExpireService extends Bootstrap {
     try {
       return await request;
     } catch (exception: any) {
-      if (exception instanceof GQLError && exception.errorCode === EServerErrorCode.sessionExpired) {
+      const gqlError = errorOf(exception, GQLError);
+      if (gqlError?.errorCode === EServerErrorCode.sessionExpired) {
         this.sessionExpired();
       }
       throw exception;
