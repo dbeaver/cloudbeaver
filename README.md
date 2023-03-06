@@ -22,6 +22,12 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 23.0.0 - 2023-03-06
+
+- Fixed a problem with using Chinese characters in SQL Editor.
+- SQL editor keeps focus inside even in case of errors.
+- Different bugs have been fixed.
+
 ### CloudBeaver 22.3.5 - 2023-02-20
 
 - Added formatting for execution plan for easy reading.
