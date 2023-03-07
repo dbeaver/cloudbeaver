@@ -16,19 +16,22 @@ export enum ServerErrorType {
 export class ServerInternalError extends DetailsError implements ServerError {
   readonly errorCode?: string;
   readonly errorType?: ServerErrorType;
-  readonly stackTrace?: string;
   readonly causedBy?: ServerError;
 
   constructor(error: ServerError) {
     super(error.message);
     this.name = 'Server Internal Error';
+    this.stack = error.stackTrace;
     this.errorCode = error.errorCode;
     this.errorType = error.errorType as ServerErrorType;
-    this.stackTrace = error.stackTrace;
     this.causedBy = error.causedBy;
   }
 
   hasDetails(): boolean {
-    return this.stackTrace !== undefined && this.stackTrace.length > 0;
+    return (
+      this.stack !== undefined
+      && this.stack.length > 0
+      && this.errorType !== ServerErrorType.QUOTE_EXCEEDED
+    );
   }
 }

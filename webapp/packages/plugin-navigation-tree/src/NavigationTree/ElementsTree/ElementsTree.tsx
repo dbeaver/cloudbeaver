@@ -14,6 +14,7 @@ import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFla
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { type NavNode, ROOT_NODE_PATH, NavTreeResource, NavNodeInfoResource, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { useNavTreeDropBox } from '../useNavTreeDropBox';
@@ -177,18 +178,12 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
 
   }, [folderExplorer]);
 
-  useResource(ElementsTree, navTreeResource, root, {
-    onLoad: async resource => {
-      let fullPath = folderExplorer.state.fullPath;
-      const preload = await resource.preloadNodeParents(fullPath);
-
-      if (!preload) {
-        fullPath = folderExplorer.state.fullPath;
-        exitFolders(fullPath);
-        return true;
-      }
-
-      return await autoOpenFolders(folderExplorer.state.folder, folderExplorer.state.path);
+  useResource(ElementsTree, navTreeResource, resourceKeyList(folderExplorer.state.fullPath), {
+    onError: () => {
+      exitFolders(folderExplorer.state.fullPath);
+    },
+    onData: () => {
+      autoOpenFolders(folderExplorer.state.folder, folderExplorer.state.path);
     },
   });
 

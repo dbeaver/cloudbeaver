@@ -82,9 +82,9 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
 
     if (keyList.length > 0) {
       this.set(resourceKeyList(keyList), values);
+      this.markUpdated(key);
+      this.onItemAdd.execute(key);
     }
-    this.markUpdated(key);
-    this.onItemAdd.execute(key);
   }
 
   setDetails(keyObject: ResourceKey<string>, state: boolean): void {
@@ -158,7 +158,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     let newNode: NavNode = {
       ...node,
       objectFeatures: node.object?.features || [],
-      parentId: parentId ?? this.get(node.id)?.parentId ?? requestPath ?? ROOT_NODE_PATH,
+      parentId: parentId ?? this.get(node.id)?.parentId ?? requestPath ?? node.id,
     };
 
     if (oldNode) {
@@ -194,22 +194,21 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     }
   }
 
-  private async loadNodeParents(nodePath: string): Promise<NavNode> {
+  async loadNodeParents(nodePath: string): Promise<NavNode> {
     const metadata = this.metadata.get(nodePath);
     const { node, parents } = await this.graphQLService.sdk.getNodeParents({
       nodePath,
       withDetails: metadata.withDetails,
     });
 
-
     return runInAction(() => {
-      const navNode = this.navNodeInfoToNavNode(node, parents[0]?.id ?? ROOT_NODE_PATH);
+      const navNode = this.navNodeInfoToNavNode(node, parents[0]?.id);
 
       this.updateNode(
         resourceKeyList(parents.map(node => node.id), node.id),
         [
           ...parents.reduce((list, node, index, array) => {
-            list.push(this.navNodeInfoToNavNode(node, array[index + 1]?.id ?? ROOT_NODE_PATH));
+            list.push(this.navNodeInfoToNavNode(node, array[index + 1]?.id));
             return list;
           }, [] as NavNode[]),
           navNode,

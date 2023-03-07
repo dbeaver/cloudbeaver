@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { AuthInfoService, DATA_CONTEXT_USER } from '@cloudbeaver/core-authentication';
-import { Icon } from '@cloudbeaver/core-blocks';
+import { Icon, Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
@@ -31,11 +31,11 @@ export const UserMenu = observer(function UserMenu() {
   }
 
   return styled(userMenuStyles)(
-    <>
+    <Loader suspense inline>
       <UserInfo info={authInfoService.userInfo} />
       <ContextMenu menu={menu} style={[topMenuStyles]} rtl modal>
         <Icon name="angle" viewBox="0 0 15 8" />
       </ContextMenu>
-    </>
+    </Loader>
   );
 });
