@@ -23,7 +23,7 @@
     "@cloudbeaver/core-sdk": "~0.1.0",
     "@cloudbeaver/core-ui": "~0.1.0",
     "leaflet": "~1.9.3",
-    "react-leaflet": "~4.2.0",
+    "react-leaflet": "~4.2.1",
     "wellknown": "~0.5.0"
   },
   "peerDependencies": {
