@@ -18,7 +18,6 @@ package io.cloudbeaver.server.jetty;
 
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
@@ -35,6 +34,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletMapping;
 import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -59,7 +59,10 @@ public class CBJettyServer {
         System.setProperty("org.eclipse.jetty.LEVEL", "WARN");
     }
 
-    public CBJettyServer() {
+    private final CBApplication application;
+
+    public CBJettyServer(@NotNull CBApplication application) {
+        this.application = application;
     }
 
     public void runServer() {
@@ -105,7 +108,7 @@ public class CBJettyServer {
                     }
                 }
 
-                initSessionManager(server, servletContextHandler);
+                initSessionManager(this.application, servletContextHandler);
 
                 server.setHandler(servletContextHandler);
 
@@ -155,7 +158,10 @@ public class CBJettyServer {
         }
     }
 
-    private void initSessionManager(Server server, ServletContextHandler servletContextHandler) {
+    private void initSessionManager(
+        @NotNull CBApplication application,
+        @NotNull ServletContextHandler servletContextHandler
+    ) {
         // Init sessions persistence
         Path metadataFolder = GeneralUtils.getMetadataFolder(DBWorkbench.getPlatform().getWorkspace().getAbsolutePath());
         Path sessionCacheFolder = metadataFolder.resolve(SESSION_CACHE_DIR);
@@ -180,7 +186,7 @@ public class CBJettyServer {
                 return 1;
             }
         }*/;
-        var maxIdleSeconds = CBPlatform.getInstance().getSessionManager().getMaxSessionIdleTime();
+        var maxIdleSeconds = application.getSessionManager().getMaxSessionIdleTime();
         int intMaxIdleSeconds;
         if (maxIdleSeconds > Integer.MAX_VALUE) {
             log.warn("Max session idle time value is greater than Integer.MAX_VALUE. Integer.MAX_VALUE will be used instead");

@@ -743,7 +743,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
     private void runWebServer() {
         log.debug("Starting Jetty server (" + serverPort + " on " + (CommonUtils.isEmpty(serverHost) ? "all interfaces" : serverHost) + ") ");
-        new CBJettyServer().runServer();
+        new CBJettyServer(this).runServer();
     }
 
 
