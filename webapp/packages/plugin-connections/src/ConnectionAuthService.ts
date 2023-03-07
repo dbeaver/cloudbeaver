@@ -9,7 +9,7 @@
 import { AuthProviderService } from '@cloudbeaver/core-authentication';
 import { Connection, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
@@ -89,11 +89,12 @@ export class ConnectionAuthService extends Dependency {
       .map(handler => handler.id);
 
     if (connection.authNeeded || (resetCredentials && networkHandlers.length > 0)) {
-      await this.commonDialogService.open(DatabaseAuthDialog, {
+      const result = await this.commonDialogService.open(DatabaseAuthDialog, {
         connection: key,
         networkHandlers,
       });
-      if (resetCredentials && isConnectedInitially) {
+
+      if (resetCredentials && isConnectedInitially && result === DialogueStateResult.Rejected) {
         await this.connectionInfoResource.init(key);
       }
     } else {
