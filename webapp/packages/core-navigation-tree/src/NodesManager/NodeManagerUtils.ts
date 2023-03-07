@@ -27,7 +27,7 @@ export const NodeManagerUtils = {
       parents.push(lastPath);
     }
 
-    return parents;
+    return parents.filter(id => id !== nodeId);
   },
 
   connectionIdToConnectionNodeId(connectionId: string): string {
