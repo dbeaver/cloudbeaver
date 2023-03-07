@@ -242,7 +242,10 @@ export const Loader = observer<Props>(function Loader({
     return renderWrappedChildren();
   }
 
-  if (exception && !loading && !hideException) {
+  if (exception && !loading) {
+    if (hideException) {
+      return null;
+    }
     return styled(style)(
       <ExceptionMessage
         exception={exception}

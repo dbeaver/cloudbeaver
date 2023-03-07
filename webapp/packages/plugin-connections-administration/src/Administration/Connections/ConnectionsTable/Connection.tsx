@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, StaticImage, Placeholder
+  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, StaticImage, Placeholder, Loader
 } from '@cloudbeaver/core-blocks';
 import { DatabaseConnection, DBDriverResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -65,10 +65,12 @@ export const Connection = observer<Props>(function Connection({ connectionKey, c
       {projectName !== undefined && (
         <TableColumnValue title={projectName ?? ''} expand ellipsis>{projectName}</TableColumnValue>)}
       <TableColumnValue flex>
-        <Placeholder
-          container={connectionsAdministrationService.connectionDetailsPlaceholder}
-          connection={connection}
-        />
+        <Loader suspense small inline hideMessage>
+          <Placeholder
+            container={connectionsAdministrationService.connectionDetailsPlaceholder}
+            connection={connection}
+          />
+        </Loader>
       </TableColumnValue>
     </TableItem>
   );

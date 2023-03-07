@@ -52,9 +52,7 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
   });
 
   useEffect(() => {
-    untracked(() => {
-      navNodeViewService.logDuplicates(objectId, duplicates);
-    });
+    navNodeViewService.logDuplicates(objectId, duplicates);
   });
 
   const objects = dbObject.data.filter(object => nodes.includes(object?.id ?? '')) as DBObject[];

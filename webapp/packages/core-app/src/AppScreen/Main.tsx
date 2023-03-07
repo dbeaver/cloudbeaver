@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { splitStyles, Split, ResizerControls, Pane, useSplitUserState, useStyles, Loader } from '@cloudbeaver/core-blocks';
+import { splitStyles, Split, ResizerControls, Pane, useSplitUserState, useStyles, Loader, getComputed } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { LeftBarPanelService, SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
 
@@ -38,11 +38,8 @@ export const Main = observer(function Main() {
   const splitMainState = useSplitUserState('main');
   const splitRightState = useSplitUserState('main-right');
 
-  const activeSideBars = sideBarPanelService.tabsContainer.getDisplayed();
-  const activeLeftBars = leftBarPanelService.tabsContainer.getDisplayed();
-
-  const sideBarDisabled = activeSideBars.length === 0;
-  const leftBarDisabled = activeLeftBars.length === 0;
+  const sideBarDisabled = getComputed(() => sideBarPanelService.tabsContainer.getDisplayed().length === 0);
+  const leftBarDisabled = getComputed(() => leftBarPanelService.tabsContainer.getDisplayed().length === 0);
 
   return styled(styles)(
     <Loader suspense>
