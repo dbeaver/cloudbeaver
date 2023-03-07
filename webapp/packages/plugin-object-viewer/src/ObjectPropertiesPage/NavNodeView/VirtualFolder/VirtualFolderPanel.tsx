@@ -48,9 +48,7 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
   });
 
   useEffect(() => {
-    untracked(() => {
-      navNodeViewService.logDuplicates(nodeId, duplicates);
-    });
+    navNodeViewService.logDuplicates(nodeId, duplicates);
   });
 
   const objects = dbObject.data
