@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage, useTranslate, useStyles, Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
@@ -149,7 +149,9 @@ export const AuthConfigurationForm = observer<Props>(function AuthConfigurationF
             <TabList style={style} disabled={false} />
           </configuration-top-bar-tabs>
           <configuration-top-bar-actions>
-            <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+            <Loader suspense inline hideMessage hideException>
+              <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+            </Loader>
           </configuration-top-bar-actions>
         </configuration-top-bar>
         <content-box>

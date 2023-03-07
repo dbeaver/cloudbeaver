@@ -20,8 +20,8 @@ interface Props {
 export const AppContext: React.FC<React.PropsWithChildren<Props>> = function AppContext({ app, children }) {
   useAppLoadingScreen();
   return (
-    <StrictMode>
-      <appContext.Provider value={app}>{children}</appContext.Provider>
-    </StrictMode>
+    //<StrictMode> // problems with TabState when empty -> displayed state switch
+    <appContext.Provider value={app}>{children}</appContext.Provider>
+    //</StrictMode>
   );
 };

@@ -8,6 +8,6 @@
 
 import { computed } from 'mobx';
 
-export function getComputed<T>(action: () => T): T {
-  return computed(action).get();
+export function getComputed<T>(action: () => T, equals?: (a: T, b: T) => boolean): T {
+  return computed(action, { equals }).get();
 }

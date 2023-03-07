@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable, toJS, untracked, when } from 'mobx';
+import { action, computed, observable, reaction, toJS, untracked, when } from 'mobx';
 import { useEffect, useContext, useState } from 'react';
 
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
@@ -271,6 +271,7 @@ export function useResource<
       }
     },
   }), {
+    load: action,
     resourceException: computed,
     exception: observable.ref,
     loadingPromise: observable.ref,
@@ -323,9 +324,9 @@ export function useResource<
         }
 
         // React Suspense block
-        if (refObj.loadingPromise) {
-          throw refObj.loadingPromise;
-        }
+        // if (refObj.loadingPromise) {
+        //   throw refObj.loadingPromise;
+        // }
 
         if (this.loading) {
           throw this.resource.waitLoad();
@@ -395,30 +396,24 @@ export function useResource<
     }, { preloaded });
 
   useEffect(() => {
-    let prevData: any;
-    const disposeDataUpdate = when(
-      () => {
-        try {
-          if (result.isError()) {
-            return false;
-          }
-          result.data;
-          return true;
-        } catch {
-          return false;
-        }
+    const disposeDataUpdate = reaction(
+      () => result.data,
+      (data, prev) => {
+        actions?.onData?.(data as any, resource, prev as any);
       },
-      () => {
-        const newData = result.data;
-        refObj.actions?.onData?.(newData, resource, prevData);
-        prevData = newData;
+      {
+        onError: () => {},
+        fireImmediately: true,
       }
     );
-    const disposeErrorUpdate = when(
-      () => result.isError(),
-      () => {
+    const disposeErrorUpdate = reaction(
+      () => result.exception,
+      exception => {
+        if (!result.isError()) {
+          return;
+        }
         if (propertiesRef.errorContext) {
-          const errors = Array.isArray(result.exception) ? result.exception : [result.exception];
+          const errors = Array.isArray(exception) ? exception : [exception];
 
           for (const error of errors) {
             if (error) {
@@ -426,7 +421,10 @@ export function useResource<
             }
           }
         }
-        refObj.actions?.onError?.(result.exception);
+        actions?.onError?.(exception);
+      },
+      {
+        fireImmediately: true,
       }
     );
     return () => {

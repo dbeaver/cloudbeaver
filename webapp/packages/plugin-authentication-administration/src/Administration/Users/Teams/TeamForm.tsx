@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import { Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage, useTranslate, useStyles, Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
@@ -150,7 +150,9 @@ export const TeamForm = observer<Props>(function TeamForm({
             <TabList style={style} disabled={false} />
           </team-top-bar-tabs>
           <team-top-bar-actions>
-            <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+            <Loader suspense inline hideMessage hideException>
+              <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+            </Loader>
           </team-top-bar-actions>
         </team-top-bar>
         <content-box>
