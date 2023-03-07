@@ -7,8 +7,8 @@
  */
 
 export class SessionError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'SessionError';
+  constructor(message: string, options?: ErrorOptions) {
+    super(message, options);
+    this.name = 'Session Error';
   }
 }

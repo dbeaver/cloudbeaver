@@ -138,7 +138,7 @@ export const CreateConnection = observer<Props>(function CreateConnection({
           <IconButton name="cross" viewBox="0 0 24 24" onClick={createConnectionService.cancelCreate} />
         </title-bar>
         <connection-create-content>
-          <Loader loading={false} overlay>
+          <Loader suspense>
             <ConnectionFormLoader
               state={createConnectionService.data}
               onCancel={createConnectionService.clearConnectionTemplate}

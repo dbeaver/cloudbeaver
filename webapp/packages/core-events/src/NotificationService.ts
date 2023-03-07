@@ -10,8 +10,8 @@ import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { getErrorDetails, GQLError } from '@cloudbeaver/core-sdk';
-import { OrderedMap } from '@cloudbeaver/core-utils';
+import { DetailsError, GQLError } from '@cloudbeaver/core-sdk';
+import { errorOf, OrderedMap } from '@cloudbeaver/core-utils';
 
 import { EventsSettingsService } from './EventsSettingsService';
 import {
@@ -163,13 +163,13 @@ export class NotificationService {
     message?: string,
     silent?: boolean
   ): void {
-    const errorDetails = getErrorDetails(exception);
+    const errorDetails = errorOf(exception, DetailsError);
 
     if (!silent) {
       this.logError({
-        title: title || errorDetails.name,
-        message: message || errorDetails.message,
-        details: errorDetails.hasDetails ? exception : undefined,
+        title: title || exception?.name || 'Error',
+        message: message || exception?.message,
+        details: errorDetails?.hasDetails() ? exception : undefined,
         isSilent: silent,
       });
     }

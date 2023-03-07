@@ -6,16 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DetailsError } from './DetailsError';
-
-export class ServiceError extends DetailsError {
-  constructor(message?: string) {
-    super(message);
+export class ServiceError extends Error {
+  constructor(message?: string, options?: ErrorOptions) {
+    super(message, options);
     this.name = 'Service Error';
-    this.errorMessage = message || 'Error';
-  }
-
-  hasDetails(): boolean {
-    return false;
   }
 }

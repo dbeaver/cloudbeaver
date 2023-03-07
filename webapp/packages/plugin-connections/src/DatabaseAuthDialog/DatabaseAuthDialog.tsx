@@ -19,7 +19,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { IConnectionInfoParams, useConnectionInfo, useDBDriver } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
-import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 
 import { ConnectionAuthenticationFormLoader } from '../ConnectionAuthentication/ConnectionAuthenticationFormLoader';
 import { DBAuthDialogController } from './DBAuthDialogController';
@@ -66,12 +66,32 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
   }
 
   return styled(useStyles(styles))(
-    <CommonDialogWrapper
-      size='large'
-      title="connections_database_authentication"
-      subTitle={connection.connectionInfo?.name}
-      icon={driver?.icon}
-      footer={(
+    <CommonDialogWrapper size='large'>
+      <CommonDialogHeader
+        title="connections_database_authentication"
+        subTitle={connection.connectionInfo?.name}
+        icon={driver?.icon}
+        onReject={options?.persistent ? undefined : rejectDialog}
+      />
+      <CommonDialogBody>
+        <SubmittingForm ref={focusedRef} onSubmit={controller.login}>
+          {!connection.isLoaded() || connection.isLoading() || !controller.configured
+            ? <Loader />
+            : (
+              <ConnectionAuthenticationFormLoader
+                config={controller.config}
+                authModelId={authModelId}
+                authProperties={connection.connectionInfo?.authProperties}
+                networkHandlers={payload.networkHandlers}
+                formId={`${payload.connection.projectId}:${payload.connection.connectionId}`}
+                allowSaveCredentials={credentialsSavingEnabled}
+                disabled={controller.isAuthenticating}
+                hideFeatures={['nonSecuredProperty']}
+              />
+            )}
+        </SubmittingForm>
+      </CommonDialogBody>
+      <CommonDialogFooter>
         <DBAuthDialogFooter
           isAuthenticating={controller.isAuthenticating}
           onLogin={controller.login}
@@ -84,25 +104,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
             />
           )}
         </DBAuthDialogFooter>
-      )}
-      onReject={options?.persistent ? undefined : rejectDialog}
-    >
-      <SubmittingForm ref={focusedRef} onSubmit={controller.login}>
-        {!connection.isLoaded() || connection.isLoading() || !controller.configured
-          ? <Loader />
-          : (
-            <ConnectionAuthenticationFormLoader
-              config={controller.config}
-              authModelId={authModelId}
-              authProperties={connection.connectionInfo?.authProperties}
-              networkHandlers={payload.networkHandlers}
-              formId={`${payload.connection.projectId}:${payload.connection.connectionId}`}
-              allowSaveCredentials={credentialsSavingEnabled}
-              disabled={controller.isAuthenticating}
-              hideFeatures={['nonSecuredProperty']}
-            />
-          )}
-      </SubmittingForm>
+      </CommonDialogFooter>
     </CommonDialogWrapper>
   );
 });

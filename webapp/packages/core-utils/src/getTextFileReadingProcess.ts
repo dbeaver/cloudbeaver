@@ -28,7 +28,7 @@ export function getTextFileReadingProcess(file: File): UploadProcess<string> {
     };
 
     reader.onerror = event => {
-      reject(new Error(`Error occurred reading file: "${file.name}"`));
+      reject(new Error(`Error occurred reading file: "${file.name}"`, { cause: event.target?.error }));
       if (event.target?.error) {
         console.error(event.target.error);
       }
