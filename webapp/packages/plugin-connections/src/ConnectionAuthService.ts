@@ -88,7 +88,7 @@ export class ConnectionAuthService extends Dependency {
       .filter(handler => handler.enabled && (!handler.savePassword || resetCredentials))
       .map(handler => handler.id);
 
-    if (connection.authNeeded || (resetCredentials && networkHandlers.length > 0)) {
+    if (connection.authNeeded || resetCredentials || networkHandlers.length > 0) {
       const result = await this.commonDialogService.open(DatabaseAuthDialog, {
         connection: key,
         networkHandlers,
