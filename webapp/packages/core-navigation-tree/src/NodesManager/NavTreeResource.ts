@@ -11,7 +11,7 @@ import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutionContext, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import {
@@ -141,8 +141,13 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       if (parent !== undefined && !children.includes(next)) {
         return false;
       }
+      await this.scheduler.waitRelease(next);
 
-      children = await this.load(next);
+      if (this.isLoadable(next)) {
+        children = await this.load(next);
+      } else {
+        children = this.get(next) || [];
+      }
       parent = next;
     }
 
@@ -374,6 +379,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       const children = this.data.get(key) || [];
       childrenToRemove.push(...children.filter(navNodeId => !value.includes(navNodeId)));
       this.dataSet(key, value);
+      this.cleanError(resourceKeyList(value));
     });
 
     this.delete(resourceKeyList(childrenToRemove));
@@ -405,9 +411,9 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
   }
 
   protected async preLoadData(
-    key: ResourceKey<string>
+    key: ResourceKey<string>,
+    contexts: IExecutionContext<ResourceKey<string>>
   ): Promise<void> {
-    // this.performUpdate(key, undefined, async key => {
     await ResourceKeyUtils.forEachAsync(key, async nodeId => {
       if (!this.navNodeInfoResource.has(nodeId) && nodeId !== ROOT_NODE_PATH) {
         await this.navNodeInfoResource.loadNodeParents(nodeId);
@@ -416,10 +422,11 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
       if (!preloaded) {
         const cause = new DetailsError(`Entity not found: ${nodeId}`);
-        throw new ResourceError(this, key, undefined, 'Entity not found', { cause });
+        const error = new ResourceError(this, key, undefined, 'Entity not found', { cause });
+        ExecutorInterrupter.interrupt(contexts);
+        throw this.markDataError(error, key);
       }
     });
-    // });
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, string[]>> {

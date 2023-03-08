@@ -81,8 +81,10 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     });
 
     if (keyList.length > 0) {
-      this.set(resourceKeyList(keyList), values);
+      const keyListKey = resourceKeyList(keyList);
+      this.set(keyListKey, values);
       this.markUpdated(key);
+      this.cleanError(ResourceKeyUtils.join(keyListKey, key));
       this.onItemAdd.execute(key);
     }
   }
