@@ -328,16 +328,18 @@ export function useResource<
         //   throw refObj.loadingPromise;
         // }
 
-        if (this.loading) {
-          throw this.resource.waitLoad();
-        }
+        if (!this.isLoaded()) {
+          if (this.loading) {
+            throw this.resource.waitLoad();
+          }
 
-        if (this.canLoad) {
-          throw refObj.load();
-        }
+          if (this.canLoad) {
+            throw refObj.load();
+          }
 
-        if (this.isError()) {
-          throw this.exception;
+          if (this.isError()) {
+            throw this.exception;
+          }
         }
         //---------------------
 
@@ -358,7 +360,7 @@ export function useResource<
         }
 
         if (this.isError()) {
-          return false;
+          return true;
         }
 
         return this.resource.isLoaded(propertiesRef.key, propertiesRef.includes);
