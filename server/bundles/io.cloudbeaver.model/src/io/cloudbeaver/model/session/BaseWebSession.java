@@ -47,7 +47,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     protected final String id;
     protected final long createTime;
     @NotNull
-    protected final WebUserContext userContext;
+    protected WebUserContext userContext;
     @NotNull
     protected final WebApplication application;
     protected volatile long lastAccessTime;
