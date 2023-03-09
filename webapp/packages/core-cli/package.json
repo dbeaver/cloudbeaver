@@ -18,7 +18,7 @@
     "core-cli-validate-dependencies": "./bin/validate-dependencies.js"
   },
   "engines": {
-    "node": ">=10.13.0"
+    "node": ">=17.0.0"
   },
   "dependencies": {
     "@babel/cli": "~7.21.0",
@@ -43,13 +43,13 @@
     "html-webpack-plugin": "~5.5.0",
     "json5-loader": "~4.0.1",
     "mini-css-extract-plugin": "~2.7.3",
-    "node-sass": "~8.0.0",
     "peer-deps-externals-webpack-plugin": "~1.0.4",
     "pnp-webpack-plugin": "~1.7.0",
     "postcss": "~8.4.21",
     "postcss-discard-comments": "~5.1.2",
     "postcss-loader": "~7.0.2",
     "postcss-preset-env": "~8.0.1",
+    "sass": "~1.58.3",
     "sass-loader": "~13.2.0",
     "source-map-loader": "~4.0.1",
     "style-loader": "~3.3.1",
