@@ -8,6 +8,8 @@
 
 import { observable, action, makeObservable } from 'mobx';
 
+import { errorOf } from '@cloudbeaver/core-utils';
+
 import { DetailsError } from './DetailsError';
 
 export class GQLErrorCatcher {
@@ -26,10 +28,11 @@ export class GQLErrorCatcher {
   }
 
   catch(exception: any): boolean {
-    if (exception instanceof DetailsError) {
-      this.responseMessage = exception.errorMessage;
-      this.hasDetails = exception.hasDetails();
-      this.exception = exception;
+    const detailsError = errorOf(exception, DetailsError);
+    if (detailsError) {
+      this.responseMessage = detailsError.message;
+      this.hasDetails = detailsError.hasDetails();
+      this.exception = detailsError;
       return true;
     }
     this.clear();

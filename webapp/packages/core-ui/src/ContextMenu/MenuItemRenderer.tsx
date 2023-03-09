@@ -11,7 +11,7 @@ import React, { useCallback } from 'react';
 import { MenuItem, MenuItemCheckbox, MenuSeparator, MenuStateReturn } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
-import { Checkbox, joinStyles, MenuItemElement, menuPanelStyles, useStyles } from '@cloudbeaver/core-blocks';
+import { Checkbox, joinStyles, Loader, MenuItemElement, menuPanelStyles, useStyles } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { IMenuItem, IMenuData, MenuSubMenuItem, MenuSeparatorItem, MenuActionItem, MenuBaseItem, MenuCustomItem, MenuCheckboxItem } from '@cloudbeaver/core-view';
 
@@ -130,12 +130,14 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
       >
         <MenuItemElement
           label={item.label}
-          icon={IconComponent ? (
-            <IconComponent
-              item={item}
-              style={joinStyles(menuPanelStyles, style)}
-              {...extraProps}
-            />
+          icon={IconComponent ? styled(styles)(
+            <Loader suspense small fullSize>
+              <IconComponent
+                item={item}
+                style={joinStyles(menuPanelStyles, style)}
+                {...extraProps}
+              />
+            </Loader>
           ) : item.icon}
           tooltip={item.tooltip}
           style={style}

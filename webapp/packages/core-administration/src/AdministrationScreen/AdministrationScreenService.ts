@@ -75,12 +75,7 @@ export class AdministrationScreenService {
     private readonly serverConfigResource: ServerConfigResource,
     private readonly notificationService: NotificationService
   ) {
-    this.info = {
-      workspaceId: '',
-      version: GlobalConstants.version || '',
-      serverVersion: '',
-      configurationMode: false,
-    };
+    this.info = getDefaultAdministrationScreenInfo();
     this.itemState = new Map();
     this.activationEvent = new Executor();
     this.ensurePermissions = new Executor();
@@ -91,8 +86,8 @@ export class AdministrationScreenService {
       activeScreen: computed,
     });
 
-    this.autoSaveService.withAutoSave(this.itemState, ADMINISTRATION_ITEMS_STATE);
-    this.autoSaveService.withAutoSave(this.info, ADMINISTRATION_INFO);
+    this.autoSaveService.withAutoSave(ADMINISTRATION_ITEMS_STATE, this.itemState, () => new Map());
+    this.autoSaveService.withAutoSave(ADMINISTRATION_INFO, this.info, getDefaultAdministrationScreenInfo);
     this.permissionsResource.onDataUpdate.addPostHandler(() => {
       this.checkPermissions(this.screenService.routerService.state);
     });
@@ -231,7 +226,7 @@ export class AdministrationScreenService {
       return true;
     }
 
-    const fromScreen = this.getScreen(toState);
+    const toScreen = this.getScreen(toState);
     const screen = this.getScreen(fromState);
 
     if (!screen) {
@@ -240,8 +235,9 @@ export class AdministrationScreenService {
 
     return this.administrationItemService.canDeActivate(
       screen,
+      toScreen,
       this.isConfigurationMode,
-      screen.item !== fromScreen?.item
+      screen.item !== toScreen?.item
     );
   }
 
@@ -335,4 +331,13 @@ export class AdministrationScreenService {
 
     return true;
   }
+}
+
+function getDefaultAdministrationScreenInfo(): IAdministrationScreenInfo {
+  return {
+    workspaceId: '',
+    version: GlobalConstants.version || '',
+    serverVersion: '',
+    configurationMode: false,
+  };
 }

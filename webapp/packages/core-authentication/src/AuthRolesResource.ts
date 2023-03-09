@@ -7,18 +7,22 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionResource } from '@cloudbeaver/core-root';
+import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { CachedDataResource, GraphQLService } from '@cloudbeaver/core-sdk';
+
+import { EAdminPermission } from './EAdminPermission';
 
 @injectable()
 export class AuthRolesResource extends CachedDataResource<string[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
-    sessionResource: SessionResource
+    sessionPermissionsResource: SessionPermissionsResource
   ) {
     super([]);
 
-    this.sync(sessionResource, () => {}, () => {});
+    sessionPermissionsResource
+      .require(this, EAdminPermission.admin)
+      .outdateResource(this);
   }
 
   protected async loader(): Promise<string[]> {

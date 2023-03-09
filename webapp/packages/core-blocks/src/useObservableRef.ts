@@ -67,7 +67,7 @@ export function useObservableRef<T extends Record<any, any>>(
     let state: T = typeof init === 'function' ? untracked(init as any) : init;
 
     if (update) {
-      Object.assign(state, update);
+      runInAction(() => assign(state, update));
       update = undefined;
     }
 
@@ -82,7 +82,7 @@ export function useObservableRef<T extends Record<any, any>>(
 
   if (update) {
     runInAction(() => {
-      Object.assign(state, update);
+      assign(state, update);
 
       if (Array.isArray(bind)) {
         bind = bind.filter(key => (key as any) in (update as T));
@@ -103,6 +103,14 @@ function bindFunctions<T>(object: T, keys: Array<keyof T>): void {
 
     if (typeof value === 'function') {
       object[key] = value.bind(object);
+    }
+  }
+}
+
+function assign(object: any, update: any): void {
+  for (const [key, value] of Object.entries(update)) {
+    if (!(key in object) || object[key] !== value) {
+      object[key] = value;
     }
   }
 }

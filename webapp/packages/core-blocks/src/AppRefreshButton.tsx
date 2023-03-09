@@ -9,7 +9,7 @@
 import type React from 'react';
 import styled, { css } from 'reshadow';
 
-import { useAppLoadingScreen } from './useAppLoadingScreen';
+import { App, useService } from '@cloudbeaver/core-di';
 
 const style = css`
   button {
@@ -38,11 +38,11 @@ interface IProps {
 }
 
 export const AppRefreshButton: React.FC<IProps> = function AppRefreshButton({ className }) {
-  useAppLoadingScreen();
+  const app = useService(App);
+
+  function refresh() {
+    app.start();
+  }
 
   return styled(style)(<button className={className} onClick={refresh}>Refresh</button>);
 };
-
-function refresh() {
-  window.location.reload();
-}

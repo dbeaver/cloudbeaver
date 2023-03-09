@@ -74,9 +74,7 @@ export class NavNodeViewService {
     });
   }
 
-  getFolders(nodeId: string): string[] | undefined {
-    const children = this.navTreeResource.get(nodeId);
-
+  getFolders(nodeId: string, children: string[] | undefined): string[] | undefined {
     if (!children) {
       return;
     }

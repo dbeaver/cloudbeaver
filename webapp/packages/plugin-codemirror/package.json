@@ -12,12 +12,13 @@
     "build": "webpack --config ../../configs/webpack.plugin.config.js",
     "postbuild": "tsc",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
     "@cloudbeaver/core-blocks": "~0.1.0",
     "@cloudbeaver/core-theming": "~0.1.0",
-    "codemirror": "~5.65.9",
+    "codemirror": "5.65.7",
     "react-codemirror2": "~7.2.1"
   },
   "devDependencies": {

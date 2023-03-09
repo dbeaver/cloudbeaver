@@ -40,8 +40,8 @@ export const CaptureView = observer<React.PropsWithChildren<Props>>(function Cap
   const parentContext = useContext(CaptureViewContext);
   const viewContext = useViewContext(view, parentContext);
   const actionService = useService(ActionService);
-  const [onFocus, onBlur] = useActiveView(view);
-  const [ref, state] = useFocus<HTMLDivElement>({ onFocus, onBlur });
+  const activeView = useActiveView(view);
+  const [ref, state] = useFocus<HTMLDivElement>({ onFocus: activeView.focusView, onBlur: activeView.blurView });
 
   const actionItems = (
     view.actions

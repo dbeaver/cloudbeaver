@@ -7,9 +7,9 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList, resourceKeyList, ResourceKeyUtils, ResourceKeyList
-} from '@cloudbeaver/core-sdk';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList, resourceKeyList, ResourceKeyUtils, ResourceKeyList, DetailsError } from '@cloudbeaver/core-sdk';
+import { flat } from '@cloudbeaver/core-utils';
 
 import type { DBObject } from './EntityTypes';
 import { NavNodeInfoResource } from './NavNodeInfoResource';
@@ -38,6 +38,30 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     // this.preloadResource(this.navNodeInfoResource);
     this.navNodeInfoResource.outdateResource(this);
     this.navNodeInfoResource.deleteInResource(this);
+    this.navNodeInfoResource.onDataOutdated.addHandler(this.outdateChildren.bind(this));
+    this.beforeLoad.addHandler(async (originalKey, context) => {
+      await this.navTreeResource.waitLoad();
+      if (isDBObjectParentKey(originalKey)) {
+        await this.navTreeResource.load(originalKey.mark);
+        return;
+      }
+
+      const key = this.transformParam(originalKey);
+      const parents = [...new Set(ResourceKeyUtils
+        .mapArray(key, nodeId => this.navNodeInfoResource.get(nodeId)?.parentId)
+        .filter<string>((nodeId): nodeId is string => nodeId !== undefined))];
+
+      const children = await this.navTreeResource.load(resourceKeyList(parents));
+
+      if (
+        ResourceKeyUtils.count(key) > 0
+         && !ResourceKeyUtils.includes(resourceKeyList(flat(children)), key)
+      ) {
+        ExecutorInterrupter.interrupt(context);
+        const cause = new DetailsError(`Entity not found: ${key.toString()}`);
+        throw this.markDataError(cause, key);
+      }
+    });
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, DBObject>> {

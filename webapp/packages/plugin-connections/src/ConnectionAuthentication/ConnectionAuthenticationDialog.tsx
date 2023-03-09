@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 
 import { SubmittingForm, useFocus, Button, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useDBDriver } from '@cloudbeaver/core-connections';
-import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 
@@ -50,27 +50,29 @@ export const ConnectionAuthenticationDialog: DialogComponent<Payload> = observer
   const { driver } = useDBDriver(payload.driverId || '');
 
   return styled(useStyles(styles))(
-    <CommonDialogWrapper
-      size='large'
-      title="connections_connection_credentials_provisioning"
-      subTitle="connections_connection_credentials_provisioning_description"
-      icon={driver?.icon}
-      footer={(
+    <CommonDialogWrapper size='large'>
+      <CommonDialogHeader
+        title="connections_connection_credentials_provisioning"
+        subTitle="connections_connection_credentials_provisioning_description"
+        icon={driver?.icon}
+        onReject={rejectDialog}
+      />
+      <CommonDialogBody>
+        <SubmittingForm ref={focusedRef} onSubmit={() => resolveDialog()}>
+          <ConnectionAuthenticationFormLoader
+            config={payload.config}
+            authModelId={payload.authModelId}
+            networkHandlers={payload.networkHandlers}
+            formId={payload.config.connectionId || payload.driverId}
+            hideFeatures={['nonSecuredProperty']}
+          />
+        </SubmittingForm>
+      </CommonDialogBody>
+      <CommonDialogFooter>
         <Button mod={['unelevated']} onClick={() => resolveDialog()}>
           {translate('ui_apply')}
         </Button>
-      )}
-      onReject={rejectDialog}
-    >
-      <SubmittingForm ref={focusedRef} onSubmit={() => resolveDialog()}>
-        <ConnectionAuthenticationFormLoader
-          config={payload.config}
-          authModelId={payload.authModelId}
-          networkHandlers={payload.networkHandlers}
-          formId={payload.config.connectionId || payload.driverId}
-          hideFeatures={['nonSecuredProperty']}
-        />
-      </SubmittingForm>
+      </CommonDialogFooter>
     </CommonDialogWrapper>
   );
 });

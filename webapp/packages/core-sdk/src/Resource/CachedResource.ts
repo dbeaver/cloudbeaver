@@ -9,9 +9,10 @@
 import { observable, makeObservable, action, computed, toJS } from 'mobx';
 
 import { Dependency } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, IExecutor, IExecutorHandler, ISyncExecutor, SyncExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
+import { ExecutionContext, Executor, ExecutorInterrupter, IExecutor, IExecutorHandler, IExecutionContextProvider, ISyncExecutor, SyncExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
+import { ResourceError } from './ResourceError';
 import { isResourceKeyList } from './ResourceKeyList';
 
 export interface ICachedResourceMetadata {
@@ -332,6 +333,10 @@ export abstract class CachedResource<
 
   abstract isLoaded(param: TParam, context?: TContext): boolean;
 
+  isLoadable(param: TParam, context?: TContext): boolean {
+    return !this.isLoaded(param, context) || this.isOutdated(param);
+  }
+
   isAlias(key: TParam): boolean {
     return this.paramAliases.some(alias => {
       if ('isEqual' in alias && alias.isEqual) {
@@ -420,7 +425,7 @@ export abstract class CachedResource<
     });
   }
 
-  markDataError(exception: Error, param: TParam, context?: TContext): void {
+  markDataError(exception: Error, param: TParam, context?: TContext): ResourceError {
     if (this.isAlias(param)) {
       this.updateMetadata(param, metadata => {
         metadata.exception = exception;
@@ -428,12 +433,14 @@ export abstract class CachedResource<
       });
     }
 
+    exception = new ResourceError(this, param, context, undefined, exception);
     param = this.transformParam(param);
     this.updateMetadata(param, metadata => {
       metadata.exception = exception;
       metadata.outdated = false;
     });
     this.onDataError.execute({ param, exception });
+    return exception as ResourceError;
   }
 
   cleanError(param: TParam): void {
@@ -531,13 +538,11 @@ export abstract class CachedResource<
   }
 
   async refresh(param: TParam, context?: TContext): Promise<any> {
-    await this.preLoadData(param, false, context);
     await this.loadData(param, true, context);
     return this.data;
   }
 
   async load(param: TParam, context?: TContext): Promise<any> {
-    await this.preLoadData(param, false, context);
     await this.loadData(param, false, context);
     return this.data;
   }
@@ -584,7 +589,6 @@ export abstract class CachedResource<
         }
       }
     });
-
   }
 
   protected setData(data: TData): void {
@@ -716,8 +720,9 @@ export abstract class CachedResource<
 
   protected async preLoadData(
     param: TParam,
+    contexts: IExecutionContextProvider<TParam>,
     refresh: boolean,
-    context?: TContext
+    context?: TContext,
   ): Promise<void> { }
 
   protected async loadData(
@@ -725,6 +730,8 @@ export abstract class CachedResource<
     refresh: boolean,
     context?: TContext
   ): Promise<void> {
+    const contexts = new ExecutionContext(param);
+    await this.preLoadData(param, contexts, refresh, context);
     if (!refresh) {
       if (this.isLoaded(param, context) && !this.isOutdated(param)) {
         return;
@@ -732,12 +739,12 @@ export abstract class CachedResource<
 
       await this.scheduler.waitRelease(param);
 
-      if (this.isLoaded(param, context) && !this.isOutdated(param)) {
+      if (!this.isLoadable(param, context)) {
         return;
       }
     }
 
-    const contexts = await this.beforeLoad.execute(param);
+    await this.beforeLoad.execute(param, contexts);
 
     if (ExecutorInterrupter.isInterrupted(contexts) && !refresh) {
       return;
@@ -748,7 +755,7 @@ export abstract class CachedResource<
       param,
       async () => {
         // repeated because previous task maybe has been load requested data
-        if (this.isLoaded(param, context) && !this.isOutdated(param)) {
+        if (!this.isLoadable(param, context)) {
           return;
         }
 

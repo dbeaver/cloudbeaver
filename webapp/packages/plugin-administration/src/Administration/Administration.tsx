@@ -79,7 +79,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
 
   const OptionsPanel = optionsPanelService.getPanelComponent();
   const items = administrationItemService.getActiveItems(configurationWizard);
-  const hasOnlyActive = items.some(filterOnlyActive(configurationWizard));
+  const onlyActiveItem = items.find(filterOnlyActive(configurationWizard));
 
   useLayoutEffect(() => {
     contentRef.current?.scrollTo({ top: 0, left: 0 });
@@ -95,7 +95,10 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
               item={item}
               configurationWizard={configurationWizard}
               style={[BASE_TAB_STYLES, verticalTabStyles, tabsStyles]}
-              disabled={hasOnlyActive}
+              disabled={(
+                onlyActiveItem
+                && onlyActiveItem.filterOnlyActive?.(configurationWizard, item) !== true
+              ) ? true : false}
               onSelect={onItemSelect}
             />
           ))}
@@ -104,22 +107,18 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
           {children}
           <SlideBox open={optionsPanelService.active}>
             <SlideElement>
-              <ErrorBoundary remount>
-                <Loader loading={false} overlay>
-                  <content>
-                    <OptionsPanel />
-                  </content>
-                </Loader>
-              </ErrorBoundary>
+              <Loader suspense>
+                <content>
+                  <OptionsPanel />
+                </content>
+              </Loader>
             </SlideElement>
             <SlideElement>
-              <ErrorBoundary remount>
-                <Loader loading={false} overlay>
-                  <content>
-                    <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
-                  </content>
-                </Loader>
-              </ErrorBoundary>
+              <Loader suspense>
+                <content>
+                  <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
+                </content>
+              </Loader>
               <SlideOverlay onClick={() => optionsPanelService.close()} />
             </SlideElement>
           </SlideBox>

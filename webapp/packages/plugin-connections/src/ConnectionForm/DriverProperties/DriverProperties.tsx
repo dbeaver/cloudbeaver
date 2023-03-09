@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable } from 'mobx';
+import { computed, observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
@@ -64,20 +64,22 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
     DriverProperties,
     DBDriverResource,
     { key: (selected && formState.config.driverId) || null, includes: ['includeDriverProperties'] as const },
-    {
-      active: selected && !!formState.config.driverId,
-      onData: driver => {
-        for (const key of Object.keys(formState.config.properties)) {
-          if (driver.driverProperties.some(property => property.id === key)
-           || state.propertiesList.some(property => property.key === key)) {
-            continue;
-          }
-
-          state.add(key, formState.config.properties[key]);
-        }
-      },
-    }
   );
+
+  runInAction(() => {
+    if (driver.data) {
+      for (const key of Object.keys(formState.config.properties)) {
+        if (
+          driver.data.driverProperties.some(property => property.id === key)
+          || state.propertiesList.some(property => property.key === key)
+        ) {
+          continue;
+        }
+
+        state.add(key, formState.config.properties[key]);
+      }
+    }
+  });
 
   const joinedProperties = useMemo(() => computed<IProperty[]>(() => ([
     ...state.propertiesList,
@@ -96,21 +98,17 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
   ])), [driver.data]);
 
   return styled(style)(
-    <Loader state={driver}>
-      {() => styled(style)(
-        <ColoredContainer parent>
-          <Group box keepSize large>
-            <PropertiesTable
-              properties={joinedProperties.get()}
-              propertiesState={formState.config.properties}
-              readOnly={formState.readonly}
-              filterable
-              onAdd={state.add}
-              onRemove={state.remove}
-            />
-          </Group>
-        </ColoredContainer>
-      )}
-    </Loader>
+    <ColoredContainer parent>
+      <Group box keepSize large>
+        <PropertiesTable
+          properties={joinedProperties.get()}
+          propertiesState={formState.config.properties}
+          readOnly={formState.readonly}
+          filterable
+          onAdd={state.add}
+          onRemove={state.remove}
+        />
+      </Group>
+    </ColoredContainer>
   );
 });

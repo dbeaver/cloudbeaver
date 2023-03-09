@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import { TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder, useStyles } from '@cloudbeaver/core-blocks';
+import { TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder, useStyles, Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 
@@ -53,7 +53,9 @@ export const Team = observer<Props>(function Team({ team }) {
       <TableColumnValue title={team.teamName} ellipsis>{team.teamName || ''}</TableColumnValue>
       <TableColumnValue title={team.description} ellipsis>{team.description || ''}</TableColumnValue>
       <TableColumnValue flex {...use({ gap: true })}>
-        <Placeholder container={service.teamDetailsInfoPlaceholder} team={team} />
+        <Loader suspense small inline hideMessage>
+          <Placeholder container={service.teamDetailsInfoPlaceholder} team={team} />
+        </Loader>
       </TableColumnValue>
     </TableItem>
   );

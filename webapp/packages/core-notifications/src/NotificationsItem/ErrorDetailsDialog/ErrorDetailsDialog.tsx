@@ -11,20 +11,22 @@ import { useCallback, useMemo } from 'react';
 import styled from 'reshadow';
 
 import { useClipboard, Button, Iframe, Textarea, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-
-
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 
 import { ErrorModel, IErrorInfo } from './ErrorModel';
-import { dialogStyle, styles } from './styles';
+import { styles } from './styles';
 
 function DisplayErrorInfo({ error }: { error: IErrorInfo }) {
   return styled(useStyles(styles))(
     <>
       <property>
-        <message>
-          {error.message}
-        </message>
+        {error.isHtml ? (
+          <Iframe srcDoc={error.message} />
+        ) : (
+          <message>
+            {error.message}
+          </message>
+        )}
       </property>
       {error.stackTrace && (
         <property>
@@ -39,9 +41,7 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
   const translate = useTranslate();
 
   const error = useMemo(
-    () => (props.payload instanceof Error
-      ? new ErrorModel({ error: props.payload })
-      : new ErrorModel({ reason: props.payload })),
+    () => new ErrorModel({ error: props.payload }),
     [props.payload]
   );
 
@@ -52,32 +52,29 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
   );
 
   return styled(useStyles(styles))(
-    <CommonDialogWrapper
-      size='large'
-      title="core_eventsLog_dbeaverErrorDetails"
-      icon='/icons/error_icon.svg'
-      footer={(
-        <>
-          {error.textToCopy && (
-            <Button type="button" mod={['outlined']} onClick={copyHandler}>{translate('ui_copy_to_clipboard')}</Button>
-          )}
-          <Button type="button" mod={['unelevated']} onClick={props.rejectDialog}>{translate('ui_close')}</Button>
-        </>
-      )}
-      style={dialogStyle}
-      bigIcon
-      onReject={props.rejectDialog}
-    >
-      {error.reason && <property>{error.reason}</property>}
-      {error.htmlBody && <Iframe srcDoc={error.htmlBody} />}
-      {error.errors.map(
-        (error, id) => (
-          <div key={id}>
-            {id > 0 && <hr />}
-            <DisplayErrorInfo error={error} />
-          </div>
-        )
-      )}
+    <CommonDialogWrapper size='large'>
+      <CommonDialogHeader
+        title="core_eventsLog_dbeaverErrorDetails"
+        icon='/icons/error_icon.svg'
+        bigIcon
+        onReject={props.rejectDialog}
+      />
+      <CommonDialogBody>
+        {error.errors.map(
+          (error, id) => (
+            <div key={id}>
+              {id > 0 && <hr />}
+              <DisplayErrorInfo error={error} />
+            </div>
+          )
+        )}
+      </CommonDialogBody>
+      <CommonDialogFooter>
+        {error.textToCopy && (
+          <Button type="button" mod={['outlined']} onClick={copyHandler}>{translate('ui_copy_to_clipboard')}</Button>
+        )}
+        <Button type="button" mod={['unelevated']} onClick={props.rejectDialog}>{translate('ui_close')}</Button>
+      </CommonDialogFooter>
     </CommonDialogWrapper>
   );
 }

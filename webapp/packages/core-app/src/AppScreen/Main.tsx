@@ -9,11 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { splitStyles, Split, ResizerControls, Pane, ErrorBoundary, useSplitUserState, useStyles, Loader } from '@cloudbeaver/core-blocks';
+import { splitStyles, Split, ResizerControls, Pane, useSplitUserState, useStyles, Loader, getComputed } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
-import { ConnectionsSettingsService } from '@cloudbeaver/plugin-connections';
-import { NavigationTreeLoader } from '@cloudbeaver/plugin-navigation-tree';
+import { LeftBarPanelService, SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
 
 import { RightArea } from './RightArea';
 
@@ -34,32 +32,28 @@ const mainStyles = css`
 
 export const Main = observer(function Main() {
   const sideBarPanelService = useService(SideBarPanelService);
-  const connectionsSettingsService = useService(ConnectionsSettingsService);
+  const leftBarPanelService = useService(LeftBarPanelService);
 
   const styles = useStyles(mainStyles, splitStyles);
   const splitMainState = useSplitUserState('main');
   const splitRightState = useSplitUserState('main-right');
 
-  const activeBars = sideBarPanelService.tabsContainer.getDisplayed();
-
-  const connectionsDisabled = connectionsSettingsService.settings.getValue('disabled');
-  const sideBarDisabled = activeBars.length === 0;
+  const sideBarDisabled = getComputed(() => sideBarPanelService.tabsContainer.getDisplayed().length === 0);
+  const leftBarDisabled = getComputed(() => leftBarPanelService.tabsContainer.getDisplayed().length === 0);
 
   return styled(styles)(
-    <Loader loading={false} overlay>
+    <Loader suspense>
       <space as="main">
         <Split
           {...splitMainState}
           sticky={30}
-          mode={connectionsDisabled ? 'minimize' : splitMainState.mode}
-          disable={connectionsDisabled}
+          mode={leftBarDisabled ? 'minimize' : splitMainState.mode}
+          disable={leftBarDisabled}
         >
           <Pane main>
-            <ErrorBoundary remount>
-              <Loader loading={false} overlay>
-                <NavigationTreeLoader />
-              </Loader>
-            </ErrorBoundary>
+            <Loader suspense>
+              <SideBarPanel container={leftBarPanelService.tabsContainer} />
+            </Loader>
           </Pane>
           <ResizerControls />
           <Pane>
@@ -74,11 +68,9 @@ export const Main = observer(function Main() {
               </Pane>
               <ResizerControls />
               <Pane main>
-                <ErrorBoundary remount>
-                  <Loader loading={false} overlay>
-                    <SideBarPanel container={sideBarPanelService.tabsContainer} />
-                  </Loader>
-                </ErrorBoundary>
+                <Loader suspense>
+                  <SideBarPanel container={sideBarPanelService.tabsContainer} />
+                </Loader>
               </Pane>
             </Split>
           </Pane>

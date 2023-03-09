@@ -9,7 +9,7 @@
 import { observable, toJS } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, IExecutionContext, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
 import { CachedMapResource, CachedResourceIncludeArgs, GetResourceListQueryVariables, GraphQLService, ICachedMapResourceMetadata, isResourceKeyList, ResourceKey, resourceKeyList, ResourceKeyUtils, RmResource } from '@cloudbeaver/core-sdk';
@@ -255,6 +255,7 @@ export class ResourceManagerResource
 
   protected async preLoadData(
     key: ResourceKey<IResourceManagerParams>,
+    contexts: IExecutionContext<ResourceKey<IResourceManagerParams>>,
     refresh: boolean,
     includes: CachedResourceIncludeArgs<RmResourceInfo, ResourceInfoIncludes>
   ): Promise<void> {

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import React, { useContext } from 'react';
 import styled from 'reshadow';
 
-import { AuthProviderService, AuthProvidersResource, AuthSettingsService, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
+import { AuthProvider, AuthProviderService, AuthProvidersResource, AuthSettingsService, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { BASE_CONTAINERS_STYLES, FormContext, Group, GroupTitle, Loader, PlaceholderComponent, Switch, useExecutor, useResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -33,8 +33,8 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
     throw new Error('Form state should be provided');
   }
 
-  const providerList = providers.resource.values.filter(provider => {
-    if (configurationWizard && provider.configurable) {
+  const providerList = providers.data.filter<AuthProvider>((provider): provider is AuthProvider => {
+    if (configurationWizard && provider?.configurable) {
       return false;
     }
 
@@ -89,56 +89,51 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
             {translate('administration_configuration_wizard_configuration_anonymous_access')}
           </Switch>
         ) : null}
-        <Loader state={providers} inline>
-          {() => styled(styles)(
-            <>
-              {providerList.map(provider => {
-                const links = authProviderService.getServiceDescriptionLinks(provider);
-                let disabled = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
-                const tooltip = disabled ? `Following services need to be enabled: "${provider.requiredFeatures.join(', ')}"` : '';
 
-                if (
-                  !localProvider
+        {providerList.map(provider => {
+          const links = authProviderService.getServiceDescriptionLinks(provider);
+          let disabled = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
+          const tooltip = disabled ? `Following services need to be enabled: "${provider.requiredFeatures.join(', ')}"` : '';
+
+          if (
+            !localProvider
                   && primaryProvider?.id === provider.id
                   && serverConfig.enabledAuthProviders?.length === 1
                   && serverConfig.enabledAuthProviders.includes(provider.id)
-                ) {
-                  disabled = true;
-                }
+          ) {
+            disabled = true;
+          }
 
-                if (provider.private || (configurationWizard && (disabled || provider.id !== AUTH_PROVIDER_LOCAL_ID))) {
-                  return null;
-                }
+          if (provider.private || (configurationWizard && (disabled || provider.id !== AUTH_PROVIDER_LOCAL_ID))) {
+            return null;
+          }
 
-                return (
-                  <Switch
-                    key={provider.id}
-                    id={`authProvider_${provider.id}`}
-                    title={tooltip}
-                    value={provider.id}
-                    name="enabledAuthProviders"
-                    state={serverConfig}
-                    description={(
-                      <>
-                        {provider.description}
-                        {links.map(link => {
-                          const Description = link.description();
-                          return <Description key={link.id} configurationWizard={configurationWizard} />;
-                        })}
-                      </>
-                    )}
-                    mod={['primary']}
-                    disabled={disabled}
-                    small
-                    autoHide
-                  >
-                    {provider.label}
-                  </Switch>
-                );
-              })}
-            </>
-          )}
-        </Loader>
+          return (
+            <Switch
+              key={provider.id}
+              id={`authProvider_${provider.id}`}
+              title={tooltip}
+              value={provider.id}
+              name="enabledAuthProviders"
+              state={serverConfig}
+              description={(
+                <>
+                  {provider.description}
+                  {links.map(link => {
+                    const Description = link.description();
+                    return <Description key={link.id} configurationWizard={configurationWizard} />;
+                  })}
+                </>
+              )}
+              mod={['primary']}
+              disabled={disabled}
+              small
+              autoHide
+            >
+              {provider.label}
+            </Switch>
+          );
+        })}
       </Group>
       {configurationWizard && localProvider && (
         <ServerConfigurationAdminForm serverConfig={serverConfig} />

@@ -20,7 +20,6 @@ import {
   splitStyles,
   SlideOverlay,
   useStyles,
-  ErrorBoundary,
   useSplitUserState,
   Loader
 } from '@cloudbeaver/core-blocks';
@@ -60,11 +59,9 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
   return styled(useStyles(styles, splitStyles, splitHorizontalStyles, slideBoxStyles))(
     <SlideBox open={optionsPanelService.active} className={className}>
       <SlideElement>
-        <ErrorBoundary remount>
-          <Loader loading={false} overlay>
-            <OptionsPanel />
-          </Loader>
-        </ErrorBoundary>
+        <Loader suspense>
+          <OptionsPanel />
+        </Loader>
       </SlideElement>
       <SlideElement>
         <Split
@@ -76,19 +73,15 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
           keepRatio
         >
           <Pane>
-            <ErrorBoundary remount>
-              <Loader loading={false} overlay>
-                <NavigationTabsBar />
-              </Loader>
-            </ErrorBoundary>
+            <Loader suspense>
+              <NavigationTabsBar />
+            </Loader>
           </Pane>
           <ResizerControls />
           <Pane basis='30%' main>
-            <ErrorBoundary remount>
-              <Loader loading={false} overlay>
-                <ToolsPanel container={toolsPanelService.tabsContainer} />
-              </Loader>
-            </ErrorBoundary>
+            <Loader suspense>
+              <ToolsPanel container={toolsPanelService.tabsContainer} />
+            </Loader>
           </Pane>
         </Split>
         <SlideOverlay onClick={() => optionsPanelService.close()} />

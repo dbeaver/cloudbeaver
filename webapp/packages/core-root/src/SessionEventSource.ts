@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { catchError, debounceTime, filter, map, merge, Observable, retry, RetryConfig, Subject } from 'rxjs';
+import { catchError, debounceTime, filter, interval, map, merge, Observable, repeat, retry, share, Subject, throwError } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -20,7 +20,9 @@ import {
   ServiceError,
 } from '@cloudbeaver/core-sdk';
 
+import { NetworkStateService } from './NetworkStateService';
 import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './ServerEventEmitter/IServerEventEmitter';
+import { SessionExpireService } from './SessionExpireService';
 
 export { ServerEventId, SessionEventTopic, ClientEventId };
 
@@ -37,11 +39,7 @@ export interface ITopicSubEvent extends ISessionEvent {
   topicId: SessionEventTopic;
 }
 
-const retryInterval = 5000;
-
-const retryConfig: RetryConfig = {
-  delay: retryInterval,
-};
+const RETRY_INTERVAL = 30 * 1000;
 
 @injectable()
 export class SessionEventSource
@@ -55,8 +53,11 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
   private readonly errorSubject: Subject<Error>;
   private readonly subject: WebSocketSubject<ISessionEvent>;
   private readonly oldEventsSubject: Subject<ISessionEvent>;
+  private readonly retryTimer: Observable<number>;
 
   constructor(
+    private readonly networkStateService: NetworkStateService,
+    private readonly sessionExpireService: SessionExpireService,
     private readonly environmentService: EnvironmentService,
     private readonly graphQLService: GraphQLService
   ) {
@@ -65,6 +66,10 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
     this.closeSubject = new Subject();
     this.openSubject = new Subject();
     this.errorSubject = new Subject();
+    this.retryTimer = interval(RETRY_INTERVAL)
+      .pipe(
+        filter(() => !this.sessionExpireService.expired && networkStateService.state)
+      );
     this.subject = webSocket({
       url: environmentService.wsEndpoint,
       closeObserver: this.closeSubject,
@@ -97,7 +102,7 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
   ): Subscription {
     const sub = this.eventsSubject
       .pipe(
-        catchError(this.errorHandler),
+        this.handleErrors(),
         filter(event => event.id === id),
         map(mapTo)
       )
@@ -115,7 +120,7 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
   ): Subscription {
     const sub = this.eventsSubject
       .pipe(
-        catchError(this.errorHandler),
+        this.handleErrors(),
         filter(filterFn),
         map(mapTo)
       )
@@ -139,7 +144,7 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
       this.oldEventsSubject,
     )
       .pipe(
-        catchError(this.errorHandler),
+        this.handleErrors(),
         map(mapTo)
       );
   }
@@ -149,8 +154,17 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
     return this;
   }
 
+  private handleErrors() {
+    return (source: Observable<ISessionEvent>):Observable<ISessionEvent> =>  source.pipe(
+      share(),
+      catchError(this.errorHandler),
+      retry({ delay: () =>  this.retryTimer }),
+      repeat({ delay: () =>  this.retryTimer }),
+    );
+  }
+
   private errorHandler(error: any, caught: Observable<ISessionEvent>): Observable<ISessionEvent> {
-    this.errorSubject.next(new ServiceError('WebSocket connection error'));
-    return caught;
+    this.errorSubject.next(new ServiceError('WebSocket connection error', { cause: error }));
+    return throwError(() => error);
   }
 }

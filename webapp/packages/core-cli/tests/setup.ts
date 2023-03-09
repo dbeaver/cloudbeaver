@@ -14,3 +14,12 @@ Object.defineProperty(global.self, 'crypto', {
     getRandomValues: arr => crypto.randomBytes(arr.length),
   },
 });
+
+class BroadcastChannel {
+
+}
+
+Object.defineProperty(global.self, 'BroadcastChannel', {
+  value: BroadcastChannel,
+});
+

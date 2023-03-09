@@ -157,7 +157,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       this.parser.setScript(this.value);
 
       this.reactionDisposer = autorun(() => {
-        if (this.dataSource?.executionContext) {
+        if (this.dataSource?.executionContext?.id) {
           const context = this.connectionExecutionContextService.get(this.dataSource.executionContext.id);
 
           if (context) {
@@ -461,11 +461,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       if (!query) {
         return undefined;
-      }
-
-      // TODO: should be moved to SQLParser
-      if (this.dialect?.scriptDelimiter && query.query.endsWith(this.dialect.scriptDelimiter)) {
-        query.query = query.query.slice(0, query.query.length - this.dialect.scriptDelimiter.length);
       }
 
       query.query = query.query.trim();

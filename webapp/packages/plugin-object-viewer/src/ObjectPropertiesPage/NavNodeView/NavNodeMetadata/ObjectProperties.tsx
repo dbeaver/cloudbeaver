@@ -9,27 +9,23 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { ColoredContainer, Loader, TextPlaceholder, useObjectPropertyCategories, GroupTitle, ObjectPropertyInfoForm, Group, useResource, BASE_CONTAINERS_STYLES, useTranslate } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
+import { ColoredContainer, TextPlaceholder, useObjectPropertyCategories, GroupTitle, ObjectPropertyInfoForm, Group, useResource, BASE_CONTAINERS_STYLES, useTranslate } from '@cloudbeaver/core-blocks';
 import { NavTreeResource, DBObjectResource } from '@cloudbeaver/core-navigation-tree';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
-
 interface Props {
   objectId: string;
-  parents: string[];
 }
 
 const emptyArray: ObjectPropertyInfo[] = [];
 
 export const ObjectProperties = observer<Props>(function ObjectProperties({
   objectId,
-  parents,
 }) {
   const translate = useTranslate();
-  const navTreeResource = useService(NavTreeResource);
+  const children = useResource(ObjectProperties, NavTreeResource, objectId);
   const dbObject = useResource(ObjectProperties, DBObjectResource, objectId, {
-    onLoad: async () => !(await navTreeResource.preloadNodeParents(parents, objectId)),
+    preload: [children],
   });
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(
     dbObject.data?.object?.properties ?? emptyArray
@@ -37,37 +33,34 @@ export const ObjectProperties = observer<Props>(function ObjectProperties({
   const properties = dbObject.data?.object?.properties;
 
   return styled(BASE_CONTAINERS_STYLES)(
-    <Loader state={dbObject}>{() => styled(BASE_CONTAINERS_STYLES)(
-      <>
-        {!properties || properties.length === 0 ? (
-          <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
-        ) : (
-          <ColoredContainer overflow parent gap>
-            {isUncategorizedExists && (
-              <Group gap large>
-                <ObjectPropertyInfoForm
-                  properties={properties}
-                  category={null}
-                  small
-                  readOnly
-                />
-              </Group>
-            )}
-            {categories.map(category => (
-              <Group key={category} gap large>
-                <GroupTitle>{category}</GroupTitle>
-                <ObjectPropertyInfoForm
-                  properties={properties}
-                  category={category}
-                  small
-                  readOnly
-                />
-              </Group>
-            ))}
-          </ColoredContainer>
-        )}
-      </>
-    )}
-    </Loader>
+    <>
+      {!properties || properties.length === 0 ? (
+        <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
+      ) : (
+        <ColoredContainer overflow parent gap>
+          {isUncategorizedExists && (
+            <Group gap large>
+              <ObjectPropertyInfoForm
+                properties={properties}
+                category={null}
+                small
+                readOnly
+              />
+            </Group>
+          )}
+          {categories.map(category => (
+            <Group key={category} gap large>
+              <GroupTitle>{category}</GroupTitle>
+              <ObjectPropertyInfoForm
+                properties={properties}
+                category={category}
+                small
+                readOnly
+              />
+            </Group>
+          ))}
+        </ColoredContainer>
+      )}
+    </>
   );
 });

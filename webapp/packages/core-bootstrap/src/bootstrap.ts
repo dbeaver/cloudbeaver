@@ -9,25 +9,31 @@
 import { configure } from 'mobx';
 
 import { App, PluginManifest } from '@cloudbeaver/core-di';
+import { executionExceptionContext, SyncExecutor } from '@cloudbeaver/core-executor';
 
-import { showErrorPage } from './ErrorPage';
 import { coreManifests } from './manifest';
 import { renderLayout } from './renderLayout';
 
-export async function bootstrap(plugins: PluginManifest[]): Promise<void> {
+export function bootstrap(plugins: PluginManifest[]): App {
   configure({ enforceActions: 'never' });
 
   const app = new App([...coreManifests, ...plugins]);
-  app.registerServices();
+  const render = renderLayout(app.getServiceInjector());
+  const unmountExecutor = new SyncExecutor();
 
-  try {
-    await app.initializeServices();
-    await app.loadServices();
+  unmountExecutor.addHandler(() => render.unmount());
+  app.onStart.before(unmountExecutor);
+  app.onStart.addHandler(() => render.renderApp());
+  app.onStart.addPostHandler((_, context) => {
+    const exception = context.getContext(executionExceptionContext);
 
-    renderLayout(app.getServiceInjector());
-  } catch (e: any) {
-    console.error(e);
-    showErrorPage();
-    throw e;
-  }
+    if (exception.exception) {
+      render.renderError(exception.exception);
+    }
+  });
+
+  app
+    .start()
+    .catch();
+  return app;
 }

@@ -6,15 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, observable, toJS, untracked } from 'mobx';
-import { useEffect, useState } from 'react';
+import { action, computed, observable, reaction, toJS, untracked, when } from 'mobx';
+import { useEffect, useContext, useState } from 'react';
 
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
-import { CachedMapResource, CachedMapResourceGetter, CachedMapResourceValue, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter, isResourceKeyList, CachedResourceData, CachedDataResourceGetter, CachedResource, CachedDataResource, CachedResourceParam, CachedResourceKey, CachedResourceContext } from '@cloudbeaver/core-sdk';
-import { ILoadableState, isArraysEqual, isContainsException } from '@cloudbeaver/core-utils';
+import { CachedMapResource, CachedMapResourceGetter, CachedMapResourceValue, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter, isResourceKeyList, CachedResourceData, CachedDataResourceGetter, CachedResource, CachedDataResource, CachedResourceParam, CachedResourceKey, CachedResourceContext, ResourceError } from '@cloudbeaver/core-sdk';
+import { ILoadableState, isArraysEqual, isContainsException, LoadingError } from '@cloudbeaver/core-utils';
 
+import { ErrorContext } from '../ErrorContext';
 import { getComputed } from '../getComputed';
+import { useObjectRef } from '../useObjectRef';
 import { useObservableRef } from '../useObservableRef';
 
 interface KeyWithIncludes<TKey, TIncludes> {
@@ -43,18 +44,18 @@ interface IActions<
 > {
   active?: boolean;
   silent?: boolean;
-  isActive?: (resource: TResource) => Promise<boolean> | boolean;
-  onLoad?: (
-    resource: TResource,
-    key: CachedResourceParam<TResource> | null
-  ) => Promise<boolean | void> | boolean | void;
   onData?: (
     data: ResourceData<TResource, TKey, TIncludes>,
     resource: TResource,
     prevData: ResourceData<TResource, TKey, TIncludes> | undefined,
   ) => Promise<any> | any;
-  onError?: (exception: Error) => void;
+  onError?: (exception: Error | Error[] | null) => void;
   preload?: ILoadableState[];
+}
+
+interface IResourcePrivateState {
+  canLoad: boolean;
+  preloaded: boolean;
 }
 
 interface IMapResourceState<TResource> extends ILoadableState {
@@ -72,6 +73,10 @@ interface IMapResourceListResult<TResource, TIncludes> extends IMapResourceState
   CachedMapResourceValue<TResource>,
   TIncludes
   >;
+  tryGetData: CachedMapResourceListGetter<
+  CachedMapResourceValue<TResource>,
+  TIncludes
+  >;
   exception: Error[] | null;
 }
 
@@ -80,11 +85,16 @@ interface IMapResourceResult<TResource, TIncludes> extends IMapResourceState<TRe
   CachedMapResourceValue<TResource>,
   TIncludes
   >;
+  tryGetData: CachedMapResourceGetter<
+  CachedMapResourceValue<TResource>,
+  TIncludes
+  >;
   exception: Error | null;
 }
 
 interface IDataResourceResult<TResource, TIncludes> extends IMapResourceState<TResource> {
   data: CachedDataResourceGetter<CachedResourceData<TResource>, TIncludes>;
+  tryGetData: CachedDataResourceGetter<CachedResourceData<TResource>, TIncludes>;
   exception: Error | null;
 }
 
@@ -123,8 +133,7 @@ export function useResource<
   | IDataResourceResult<TResource, TIncludes> {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const resource = ctor instanceof CachedResource ? ctor : useService(ctor);
-  const notifications = useService(NotificationService);
-  const [exception, setException] = useState<Error | null>(null);
+  const errorContext = useContext(ErrorContext);
   let key: TKeyArg | null = keyObj as TKeyArg;
   let includes: TIncludes = [] as unknown as TIncludes;
   const [loadFunctionName] = useState(`${component.name}.useResource(${resource.getName()}).load`);
@@ -134,266 +143,305 @@ export function useResource<
     includes = keyObj.includes;
   }
 
-  const keyRef = useObservableRef(() => ({
+  actions = useObjectRef(actions ?? {} as any);
+
+  const propertiesRef = useObservableRef(() => ({
     key,
     includes,
-    loadedKey: null as TKeyArg | null,
-    get actual() {
-      if (this.loadedKey === this.key) {
-        return true;
-      }
-
-      if (this.loadedKey === null || this.key === null) {
-        return false;
-      }
-
-      return untracked(() => resource.includes(this.loadedKey, this.key));
-    },
+    resource,
+    errorContext,
   }), {
-    loadedKey: observable.ref,
     key: observable.ref,
     includes: observable.ref,
-    actual: computed,
+    resource: observable.ref,
+    errorContext: observable.ref,
   }, false);
 
-  if (key === null && key !== keyRef.key) {
-    untracked(() => {
-      keyRef.key = null;
-      keyRef.loadedKey = null;
-    });
-  }
-
-  if (!isArraysEqual(includes, keyRef.includes)) {
-    untracked(() => {
-      keyRef.includes = includes;
-    });
-  }
-
   untracked(() => {
+    if (!isArraysEqual(includes, propertiesRef.includes)) {
+      propertiesRef.includes = includes;
+    }
+
     if (
       key === null
-      || keyRef.key === null
-      || !resource.includes(key, keyRef.key)
+      || propertiesRef.key === null
+      || !propertiesRef.resource.includes(key, propertiesRef.key)
     ) {
-      keyRef.key = key;
+      propertiesRef.key = key;
     }
   });
 
+  function getData(): any {
+    if (propertiesRef.resource instanceof CachedMapResource) {
+      if (propertiesRef.key === null) {
+        return undefined;
+      }
+      return propertiesRef.resource.get(propertiesRef.key);
+    }
+    return propertiesRef.resource.data;
+  }
+
+  const preloaded = getComputed(() => {
+    if (actions?.active === false) {
+      return false;
+    }
+    if (actions?.preload) {
+      for (const preload of actions.preload) {
+        if (
+          !preload.isLoaded()
+          || preload.isOutdated?.()
+          || preload.isLoading()
+          || preload.isError()
+        ) {
+          return false;
+        }
+      }
+    }
+    return true;
+  });
+
   const refObj = useObservableRef(() => ({
-    loading: false,
-    prevData: (isResourceKeyList(key) ? [] : undefined) as unknown | undefined,
+    loadingPromise: null as (Promise<void> | null),
+    exception: null as Error | null,
     useRef: [null, ''] as [TKeyArg | null, string],
+    get resourceException() {
+      if (propertiesRef.key === null) {
+        return null;
+      }
+
+      return propertiesRef.resource.getException(propertiesRef.key);
+    },
+    isResourceError() {
+      return isContainsException(this.resourceException);
+    },
     use(key: TKeyArg | null) {
       key = toJS(key);
 
       if (this.useRef[0] !== null) {
-        if (key !== null && this.resource.includes(key, this.useRef[0])) {
+        if (key !== null && propertiesRef.resource.includes(key, this.useRef[0])) {
           return;
         }
 
-        resource.free(this.useRef[0], this.useRef[1]);
+        propertiesRef.resource.free(this.useRef[0], this.useRef[1]);
       }
-      this.useRef = [key, key === null ? '' : resource.use(key)];
-    },
-    get preloaded(): boolean {
-      if (this.actions?.preload) {
-        for (const preload of this.actions.preload) {
-          if (
-            !preload.isLoaded()
-            || preload.isOutdated?.()
-            || preload.isError()
-          ) {
-            return false;
-          }
-        }
-      }
-      return true;
+      this.useRef = [key, key === null ? '' : propertiesRef.resource.use(key)];
     },
     async [loadFunctionName](refresh?: boolean) {
-      const { loading, resource, actions, prevData } = this;
-      const key = keyRef.key;
-      const includes = keyRef.includes;
+      const { key, includes, resource } = propertiesRef;
 
-      if (loading) {
+      if (refresh) {
+        resource.markOutdated(key);
+      }
+
+      await resource.load(key, includes as any);
+    },
+    async load(refresh?: boolean) {
+      if (this.loadingPromise) {
+        return this.loadingPromise;
+      }
+
+      if (propertiesRef.key === null) {
         return;
       }
 
       try {
-        const active = await actions?.isActive?.(resource);
-
-        if (active === false) {
-          return;
-        }
-
-        keyRef.loadedKey = key;
-        this.loading = true;
-
-        const prevent = await actions?.onLoad?.(resource, key);
-
-        if (key === null || prevent === true) {
-          setException(null);
-          return;
-        }
-
-        if (refresh) {
-          resource.markOutdated(key);
-        }
-
-        const newData = await resource.load(key, includes as any);
-        this.prevData = newData;
-
-        await actions?.onData?.(
-          newData,
-          resource,
-          prevData as any  // TODO: fix type error
-        );
-        setException(null);
+        this.loadingPromise = this[loadFunctionName](refresh);
+        await this.loadingPromise;
+        this.exception = null;
       } catch (exception: any) {
-        const resourceException = resource.getException(key);
+        if (propertiesRef.errorContext) {
+          if (this.isResourceError()) {
+            const errors = Array.isArray(this.resourceException) ? this.resourceException : [this.resourceException];
 
-        if (
-          !resourceException
-          || (
-            Array.isArray(resourceException) && !resourceException.some(Boolean)
-          )
-        ) {
-          setException(exception);
-        }
-
-        actions?.onError?.(exception);
-
-        if (!actions?.silent && !this.exceptionObserved) {
-          notifications.logException(exception, 'Can\'t load data');
+            for (const error of errors) {
+              if (error) {
+                propertiesRef.errorContext.catch(error);
+              }
+            }
+          } else {
+            this.exception = new LoadingError(() => {
+              this.exception = null;
+              this.load.bind(this, true);
+            }, 'Application is unable to load resource', { cause: exception });
+            propertiesRef.errorContext.catch(this.exception);
+          }
         }
       } finally {
-        this.loading = false;
+        this.loadingPromise = null;
       }
     },
   }), {
-    preloaded: computed,
+    load: action,
+    resourceException: computed,
     exception: observable.ref,
-    loading: observable.ref,
-    resource: observable.ref,
-  }, {
-    exceptionObserved: false,
-    resource,
-    exception,
-    actions,
-  });
-
-  const result = useObservableRef<
-  IMapResourceResult<TResource, TIncludes>
-  | IMapResourceListResult<TResource, TIncludes>
-  >(() => ({
-    get resource() {
-      return refObj.resource;
-    },
-    get exception() {
-      refObj.exceptionObserved = true;
-
-      if (refObj.exception) {
-        return refObj.exception;
-      }
-
-      if (keyRef.key === null) {
-        return null;
-      }
-
-      return refObj.resource.getException(keyRef.key);
-    },
-    get data() {
-      if (keyRef.key === null || !refObj.resource.isLoaded(keyRef.key, keyRef.includes as any)) {
-        if (isResourceKeyList(keyRef.key)) {
-          return [];
-        }
-
-        if (refObj.resource instanceof CachedMapResource) {
-          return undefined;
-        }
-      }
-
-      if (refObj.resource instanceof CachedMapResource) {
-        return refObj.resource.get(keyRef.key);
-      }
-      return refObj.resource.data;
-    },
-    get outdated() {
-      if (keyRef.key === null || !refObj.preloaded) {
-        return true;
-      }
-
-      return refObj.resource.isOutdated(keyRef.key);
-    },
-    get loaded() {
-      if (keyRef.key === null) {
-        return true;
-      }
-
-      if (this.isError()) {
-        return false;
-      }
-
-      return refObj.resource.isLoaded(keyRef.key, keyRef.includes as any);
-    },
-    get loading() {
-      if (keyRef.key === null) {
-        return false;
-      }
-
-      return refObj.loading || refObj.resource.isDataLoading(keyRef.key);
-    },
-    isError() {
-      return isContainsException(this.exception);
-    },
-    isOutdated() {
-      return this.outdated;
-    },
-    isLoaded() {
-      return this.loaded;
-    },
-    reload: () => {
-      (refObj as any)[loadFunctionName](true);
-    },
-    load: () => {
-      (refObj as any)[loadFunctionName]();
-    },
-    isLoading() {
-      return this.loading;
-    },
-  }), {
-    exception: computed,
-    data: computed,
-    outdated: computed,
-    loaded: computed,
-    loading: computed,
+    loadingPromise: observable.ref,
   }, false);
 
-  const canLoad = getComputed(() => (
-    (
-      !keyRef.actual
-      || result.outdated
-      || !result.loaded
-    )
-    && refObj.preloaded
-    && keyRef.key !== null
-    && actions?.active !== false
-    && !result.isError()
-  ));
+  const result = useObservableRef<(
+  IMapResourceResult<TResource, TIncludes>
+  | IMapResourceListResult<TResource, TIncludes>
+  ) & IResourcePrivateState
+  >(() => ({
+      preloaded,
+      get canLoad() {
+        return (
+          propertiesRef.key !== null
+          && this.preloaded
+          && this.outdated
+          && !this.loading
+        );
+      },
+      get resource() {
+        return propertiesRef.resource;
+      },
+      get exception() {
+        if (propertiesRef.key === null) {
+          return null;
+        }
 
-  useEffect(() => () => {
-    refObj.use(null);
+        if (refObj.exception) {
+          return refObj.exception;
+        }
+
+        return refObj.resourceException;
+      },
+      get tryGetData() {
+        if (
+          propertiesRef.key === null
+          && this.resource instanceof CachedMapResource
+        ) {
+          return undefined;
+        }
+
+        return getData();
+      },
+      get data() {
+        if (
+          propertiesRef.key === null
+          && this.resource instanceof CachedMapResource
+        ) {
+          return undefined;
+        }
+
+        // React Suspense block
+        // if (refObj.loadingPromise) {
+        //   throw refObj.loadingPromise;
+        // }
+
+        if (!this.isLoaded()) {
+          if (this.loading) {
+            throw this.resource.waitLoad();
+          }
+
+          if (this.canLoad) {
+            throw refObj.load();
+          }
+
+          if (this.isError()) {
+            throw this.exception;
+          }
+        }
+        //---------------------
+
+        return getData();
+      },
+      get outdated() {
+        return (
+          propertiesRef.key === null
+          || !this.preloaded
+          || this.loading
+          || !this.loaded
+          || this.resource.isOutdated(propertiesRef.key)
+        );
+      },
+      get loaded() {
+        if (propertiesRef.key === null) {
+          return true;
+        }
+
+        if (this.isError()) {
+          return true;
+        }
+
+        return this.resource.isLoaded(propertiesRef.key, propertiesRef.includes);
+      },
+      get loading(): boolean {
+        if (propertiesRef.key === null) {
+          return false;
+        }
+
+        return refObj.loadingPromise !== null || this.resource.isDataLoading(propertiesRef.key);
+      },
+      isError() {
+        return isContainsException(this.exception);
+      },
+      isOutdated() {
+        return this.outdated;
+      },
+      isLoaded() {
+        return this.loaded;
+      },
+      reload: () => refObj.load(true),
+      load: () => refObj.load(),
+      isLoading() {
+        return this.loading;
+      },
+    }), {
+      canLoad: computed,
+      exception: computed,
+      tryGetData: computed,
+      data: computed,
+      outdated: computed,
+      loaded: computed,
+      loading: computed,
+      preloaded: observable.ref,
+    }, { preloaded });
+
+  useEffect(() => {
+    const disposeDataUpdate = reaction(
+      () => result.data,
+      (data, prev) => {
+        actions?.onData?.(data as any, resource, prev as any);
+      },
+      {
+        onError: () => {},
+        fireImmediately: true,
+      }
+    );
+    const disposeErrorUpdate = reaction(
+      () => result.exception,
+      exception => {
+        if (!result.isError()) {
+          return;
+        }
+        if (propertiesRef.errorContext) {
+          const errors = Array.isArray(exception) ? exception : [exception];
+
+          for (const error of errors) {
+            if (error) {
+              propertiesRef.errorContext.catch(error);
+            }
+          }
+        }
+        actions?.onError?.(exception);
+      },
+      {
+        fireImmediately: true,
+      }
+    );
+    return () => {
+      disposeDataUpdate();
+      disposeErrorUpdate();
+      refObj.use(null);
+    };
   }, []);
 
   useEffect(() => {
     refObj.use(key);
-    if (canLoad) {
-      (refObj as any)[loadFunctionName]();
+    if (result.canLoad && !result.isError()) {
+      result.load();
     }
-  });
-
-  // if (canLoad && !refObj.loading) {
-  //   throw (refObj as any)[loadFunctionName]();
-  // }
+  }, [result.canLoad]);
 
   return result;
 }
