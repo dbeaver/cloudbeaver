@@ -22,6 +22,7 @@ import io.cloudbeaver.service.session.WebSessionManager;
 import org.eclipse.jetty.websocket.server.JettyServerUpgradeRequest;
 import org.eclipse.jetty.websocket.server.JettyServerUpgradeResponse;
 import org.eclipse.jetty.websocket.server.JettyWebSocketCreator;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -34,10 +35,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CBJettyWebSocketManager implements JettyWebSocketCreator {
     private static final Log log = Log.getLog(CBJettyWebSocketManager.class);
     private final Map<String, CBEventsWebSocket> socketBySessionId = new ConcurrentHashMap<>();
+
+    private final String applicationRunId;
     private final WebSessionManager webSessionManager;
 
-    public CBJettyWebSocketManager(WebSessionManager webSessionManager) {
+    public CBJettyWebSocketManager(@NotNull String applicationRunId, @NotNull WebSessionManager webSessionManager) {
+        this.applicationRunId = applicationRunId;
         this.webSessionManager = webSessionManager;
+
         new WebSocketPingPongJob(CBPlatform.getInstance(), this).scheduleMonitor();
     }
 
@@ -58,7 +63,7 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
         if (oldWebSocket != null) {
             oldWebSocket.close();
         }
-        var newWebSocket = new CBEventsWebSocket(webSession);
+        var newWebSocket = new CBEventsWebSocket(webSession, applicationRunId);
         socketBySessionId.put(webSessionId, newWebSocket);
         log.info("Websocket created for session: " + webSessionId);
         return newWebSocket;

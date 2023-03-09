@@ -116,7 +116,7 @@ public class CBJettyServer {
                         // Add websockets
                         wsContainer.addMapping(
                             application.getServicesURI() + "ws/*",
-                            new CBJettyWebSocketManager(application.getSessionManager())
+                            new CBJettyWebSocketManager(application.getApplicationRunId(), application.getSessionManager())
                         );
                     }
                 );

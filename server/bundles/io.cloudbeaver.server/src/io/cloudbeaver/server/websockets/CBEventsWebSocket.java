@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSSocketConnectedEvent;
 import org.jkiss.dbeaver.model.websocket.event.client.WSUpdateActiveProjectsClientEvent;
 
 import java.io.IOException;
@@ -40,19 +41,26 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
 
     @NotNull
     private final BaseWebSession webSession;
+    private final String applicationRunId;
 
     @NotNull
     private final WriteCallback callback;
 
-    public CBEventsWebSocket(@NotNull BaseWebSession webSession) {
+    public CBEventsWebSocket(@NotNull BaseWebSession webSession, @NotNull String applicationRunId) {
         this.webSession = webSession;
         this.callback = new WebSocketPingPongCallback(webSession);
+        this.applicationRunId = applicationRunId;
     }
 
     @Override
     public void onWebSocketConnect(Session session) {
         super.onWebSocketConnect(session);
         this.webSession.addEventHandler(this);
+        try {
+            getRemote().sendString(gson.toJson(new WSSocketConnectedEvent(applicationRunId)));
+        } catch (IOException e) {
+            log.error("Failed to send WSSocketConnectedEvent", e);
+        }
         log.debug("EventWebSocket connected to the " + webSession.getSessionId() + " session");
     }
 

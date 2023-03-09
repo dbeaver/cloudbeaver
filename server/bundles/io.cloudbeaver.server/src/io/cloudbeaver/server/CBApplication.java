@@ -98,6 +98,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return (CBApplication) BaseApplicationImpl.getInstance();
     }
 
+    private final String applicationRunId = UUID.randomUUID().toString();
     private String serverURL;
     protected int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverHost = null;
@@ -134,6 +135,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     private WebSessionManager sessionManager;
 
     public CBApplication() {
+    }
+
+    @NotNull
+    public String getApplicationRunId() {
+        return applicationRunId;
     }
 
     public String getServerURL() {
