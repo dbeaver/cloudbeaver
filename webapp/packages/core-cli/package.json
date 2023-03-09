@@ -18,7 +18,7 @@
     "core-cli-validate-dependencies": "./bin/validate-dependencies.js"
   },
   "engines": {
-    "node": ">=17.0.0"
+    "node": ">=16.0.0"
   },
   "dependencies": {
     "@babel/cli": "~7.21.0",
