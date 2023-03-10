@@ -56,11 +56,7 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
     public void onWebSocketConnect(Session session) {
         super.onWebSocketConnect(session);
         this.webSession.addEventHandler(this);
-        try {
-            getRemote().sendString(gson.toJson(new WSSocketConnectedEvent(applicationRunId)));
-        } catch (IOException e) {
-            log.error("Failed to send WSSocketConnectedEvent", e);
-        }
+        handeWebSessionEvent(new WSSocketConnectedEvent(applicationRunId));
         log.debug("EventWebSocket connected to the " + webSession.getSessionId() + " session");
     }
 

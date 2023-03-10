@@ -8,7 +8,7 @@ enum CBServerEventId {
 
     cb_session_log_updated,
 
-    cb_websocket_connected,
+    cb_session_websocket_connected,
 
     cb_datasource_created,
     cb_datasource_updated,
@@ -34,7 +34,7 @@ enum CBClientEventId {
 enum CBEventTopic {
     cb_config,
     cb_session_log,
-    cb_websocket,
+    cb_session,
     cb_datasource,
     cb_datasource_folder,
     cb_scripts,
