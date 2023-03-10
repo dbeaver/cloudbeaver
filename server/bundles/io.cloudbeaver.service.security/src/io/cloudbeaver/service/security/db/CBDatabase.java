@@ -110,7 +110,8 @@ public class CBDatabase {
         if (CommonUtils.isEmpty(databaseConfiguration.getDriver())) {
             throw new DBException("No database driver configured for CloudBeaver database");
         }
-        DBPDriver driver = DataSourceProviderRegistry.getInstance().findDriver(databaseConfiguration.getDriver());
+        var dataSourceProviderRegistry = DataSourceProviderRegistry.getInstance();
+        DBPDriver driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
         if (driver == null) {
             throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
         }
@@ -155,6 +156,9 @@ public class CBDatabase {
                 dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD, dbPassword);
             }
         }
+
+        var migrator = new H2Migrator(monitor, dataSourceProviderRegistry, databaseConfiguration, driverInstance, dbURL, dbProperties);
+        migrator.tryToMigrateDb();
 
         // Create connection pool with custom connection factory
         log.debug("\tInitiate connection pool with management database (" + driver.getFullName() + "; " + dbURL + ")");
