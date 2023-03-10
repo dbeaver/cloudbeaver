@@ -95,9 +95,10 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
     public static boolean changeUserPassword(@NotNull WebSession webSession, @NotNull String oldPassword, @NotNull String newPassword) throws DBException {
         String userName = webSession.getUser().getUserId();
 
+        SMController smController = webSession.getSecurityController();
         WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(PROVIDER_ID);
-        Map<String, Object> storedCredentials = webSession.getSecurityController().getUserCredentials(userName, authProvider.getId());
-        if (storedCredentials == null) {
+        Map<String, Object> storedCredentials = smController.getCurrentUserCredentials(authProvider.getId());
+        if (CommonUtils.isEmpty(storedCredentials)) {
             throw new DBException("Invalid user name or password");
         }
         String storedPasswordHash = CommonUtils.toString(storedCredentials.get(CRED_PASSWORD), null);
@@ -115,7 +116,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
         //String newPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, newPassword);
 
         storedCredentials.put(CRED_PASSWORD, newPassword);
-        webSession.getSecurityController().setCurrentUserCredentials(authProvider.getId(), storedCredentials);
+        smController.setCurrentUserCredentials(authProvider.getId(), storedCredentials);
         return true;
     }
 
