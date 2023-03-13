@@ -141,7 +141,9 @@ export class ConnectionFormState implements IConnectionFormState {
 
     this.submittingTask.addPostHandler(async (data, contexts) => {
       const status = contexts.getContext(service.connectionStatusContext);
-      if (data.submitType !== 'submit' || !status.saved) {
+      const validation = contexts.getContext(service.connectionValidationContext);
+
+      if (data.submitType !== 'submit' || !status.saved || !validation.valid) {
         return;
       }
 
