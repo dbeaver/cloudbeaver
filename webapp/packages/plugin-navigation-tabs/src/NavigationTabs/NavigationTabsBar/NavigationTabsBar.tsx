@@ -11,9 +11,9 @@ import { useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { TextPlaceholder, useExecutor, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, TextPlaceholder, useExecutor, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { TabsBox, TabPanel, BASE_TAB_STYLES, ITabData } from '@cloudbeaver/core-ui';
+import { TabsBox, TabPanel, BASE_TAB_STYLES, ITabData, LeftBarPanelService } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavigationTabsService } from '../NavigationTabsService';
@@ -42,6 +42,7 @@ interface Props {
 }
 
 export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ className }) {
+  const leftBarPanelService = useService(LeftBarPanelService);
   const userInfoResource = useService(UserInfoResource);
   const navigation = useService(NavigationTabsService);
   // TODO: we get exception when after closing the restored page trying to open another
@@ -51,6 +52,8 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
 
   const handleSelect = useCallback((tabId: string) => navigation.selectTab(tabId), [navigation]);
   const handleClose = useCallback((tabId: string) => navigation.closeTab(tabId), [navigation]);
+
+  const leftBarDisabled = getComputed(() => leftBarPanelService.tabsContainer.getDisplayed().length === 0);
 
   function unloadTabs() {
     navigation.unloadTabs();
@@ -82,7 +85,7 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
   if (navigation.tabIdList.length === 0) {
     return (
       <TextPlaceholder>
-        {translate('app_shared_navigationTabsBar_placeholder')}
+        {translate(leftBarDisabled ? 'app_shared_navigationTabsBar_placeholder' : 'app_shared_navigationTabsBar_navigator_placeholder')}
       </TextPlaceholder>
     );
   }

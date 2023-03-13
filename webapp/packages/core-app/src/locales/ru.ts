@@ -2,8 +2,9 @@ export default [
   ['app_shared_settingsMenu_config', 'Настройки'],
   ['app_shared_settingsMenu_theme', 'Тема'],
   ['app_shared_settingsMenu_lang', 'Язык'],
+  ['app_shared_navigationTabsBar_placeholder', 'Нет открытых объектов для отображения.'],
   [
-    'app_shared_navigationTabsBar_placeholder',
+    'app_shared_navigationTabsBar_navigator_placeholder',
     'Нет открытых объектов для отображения. Дважды нажмите на элемент в дереве навигации, чтобы открыть его.',
   ],
   ['app_shared_inlineEditor_dialog_title', 'Редактирование'],
