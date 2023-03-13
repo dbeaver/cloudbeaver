@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@types/md5": "~2.3.2",
-    "@types/uuid": "~9.0.0",
+    "@types/uuid": "~9.0.1",
     "@types/underscore": "^1.11.4"
   }
 }
