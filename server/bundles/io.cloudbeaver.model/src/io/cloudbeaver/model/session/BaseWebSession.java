@@ -47,7 +47,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     protected final String id;
     protected final long createTime;
     @NotNull
-    protected WebUserContext userContext;
+    protected final WebUserContext userContext;
     @NotNull
     protected final WebApplication application;
     protected volatile long lastAccessTime;
@@ -62,7 +62,11 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         this.lastAccessTime = this.createTime;
         this.sessionAuthContext = new SessionContextImpl(null);
         this.sessionAuthContext.addSession(this);
-        this.userContext = new WebUserContext(this.application);
+        this.userContext = createUserContext();
+    }
+
+    protected WebUserContext createUserContext() throws DBException {
+        return new WebUserContext(this.application);
     }
 
     public void addSessionEvent(WSEvent event) {
