@@ -66,7 +66,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     @Override
-    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
+    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider, @NotNull DBPWorkspace workspace) {
         throw new IllegalStateException("Resource controller is not supported by " + getClass().getSimpleName());
     }
 
@@ -137,6 +137,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         @NotNull DataSourceFilter dataSourceFilter
     ) {
         return new WebProjectImpl(
+            webSession.getWorkspace(),
             webSession.getRmController(),
             webSession.getSessionContext(),
             project,
