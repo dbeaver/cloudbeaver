@@ -117,7 +117,6 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   }
 
   function navToSettings() {
-    rejectDialog();
     commonDialogService.rejectAll();
     authenticationService.configureAuthProvider?.();
   }

@@ -81,7 +81,7 @@ export class CommonDialogService {
 
   rejectAll() {
     runInAction(() => {
-      for (const dialog of this.dialogs) {
+      for (const dialog of this.dialogs.slice()) {
         this.rejectDialog(dialog.promise);
       }
     });
