@@ -117,6 +117,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   }
 
   function navToSettings() {
+    // We should close the dialog that caused the additional authentication prompt if we are navigating to the settings
     commonDialogService.rejectAll();
     authenticationService.configureAuthProvider?.();
   }

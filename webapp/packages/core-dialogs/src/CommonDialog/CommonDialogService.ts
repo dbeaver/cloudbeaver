@@ -79,6 +79,7 @@ export class CommonDialogService {
     }
   }
 
+  /** Please avoid using this function, it can lead to the unpredictable behavior */
   rejectAll() {
     runInAction(() => {
       for (const dialog of this.dialogs.slice()) {
