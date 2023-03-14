@@ -10,9 +10,9 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { AuthProvider, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { SubmittingForm, Loader, ErrorMessage, TextPlaceholder, Link, useErrorDetails, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { SubmittingForm, ErrorMessage, TextPlaceholder, Link, useErrorDetails, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogService, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { TabsState, TabList, Tab, TabTitle, UNDERLINE_TAB_STYLES, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { AuthenticationService } from '../AuthenticationService';
@@ -75,6 +75,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   const errorDetails = useErrorDetails(dialogData.exception);
   const authenticationService = useService(AuthenticationService);
   const userInfo = useService(UserInfoResource);
+  const commonDialogService = useService(CommonDialogService);
   const translate = useTranslate();
   const state = dialogData.state;
 
@@ -117,6 +118,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
 
   function navToSettings() {
     rejectDialog();
+    commonDialogService.rejectAll();
     authenticationService.configureAuthProvider?.();
   }
 

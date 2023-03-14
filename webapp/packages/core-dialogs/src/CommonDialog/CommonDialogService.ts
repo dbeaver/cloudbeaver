@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
+import { observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 
@@ -77,6 +77,14 @@ export class CommonDialogService {
       dialog.resolve(DialogueStateResult.Rejected);
       this.removeDialog(dialog);
     }
+  }
+
+  rejectAll() {
+    runInAction(() => {
+      for (const dialog of this.dialogs) {
+        this.rejectDialog(dialog.promise);
+      }
+    });
   }
 
   resolveDialog<TResult>(promise: Promise<TResult | DialogueStateResult>, result?: TResult): void {
