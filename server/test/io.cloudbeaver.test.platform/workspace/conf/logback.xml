@@ -2,11 +2,6 @@
 <configuration>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
                 %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
@@ -17,7 +12,7 @@
     <!-- Disable logback status messages -->
     <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
 
-    <root level="debug">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
 
