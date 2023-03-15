@@ -21,22 +21,20 @@ public class H2Migrator {
 
     private static final Log log = Log.getLog(H2Migrator.class);
 
-    private static final String H2_PROVIDER_ID = "h2";
     private static final String H2_DRIVER_NAME = "h2_embedded";
-
     private static final String H2_V2_DRIVER_NAME = "h2_embedded_v2";
+    private static final String BACKUP_V1_FILENAME = "h2db_backup";
     private static final String EXPORT_FILE_NAME = "H2v1ExportScript";
     @SuppressWarnings("SqlNoDataSourceInspection")
     // language=H2
-    private static final String EXPORT_STATEMENT = "SCRIPT TO ? COMPRESSION DEFLATE CIPHER AES PASSWORD ? CHARSET 'UTF-8'";
+    private static final String EXPORT_SCRIPT = "SCRIPT TO ? COMPRESSION DEFLATE CIPHER AES PASSWORD ? CHARSET 'UTF-8'";
     @SuppressWarnings("SqlNoDataSourceInspection")
-    // language=H2
-    private static final String IMPORT_STATEMENT = "RUNSCRIPT FROM ? COMPRESSION DEFLATE CIPHER AES PASSWORD ? CHARSET 'UTF-8' FROM_1X";
+    // no 'language=H2' due to an annoying error about unresolvable statement 'FROM_1X'
+    private static final String IMPORT_SCRIPT = "RUNSCRIPT FROM ? COMPRESSION DEFLATE CIPHER AES PASSWORD ? CHARSET 'UTF-8' FROM_1X";
 
     private final DBRProgressMonitor monitor;
     private final DataSourceProviderRegistry dataSourceProviderRegistry;
     private final CBDatabaseConfig databaseConfiguration;
-    private final Driver v1Driver;
     private final String dbUrl;
     private final Properties dbProperties;
 
@@ -44,20 +42,25 @@ public class H2Migrator {
         @NotNull DBRProgressMonitor monitor,
         @NotNull DataSourceProviderRegistry dataSourceProviderRegistry,
         @NotNull CBDatabaseConfig databaseConfiguration,
-        @NotNull Driver v1Driver,
         @NotNull String dbUrl,
         @NotNull Properties dbProperties
     ) {
         this.monitor = monitor;
         this.dataSourceProviderRegistry = dataSourceProviderRegistry;
         this.databaseConfiguration = databaseConfiguration;
-        this.v1Driver = v1Driver;
         this.dbUrl = dbUrl;
         this.dbProperties = dbProperties;
     }
 
+    /**
+     * Migrates the H2 database from version 1 to version 2.
+     * <p>
+     * IMPORTANT: if the database is already version 2, but the driver in the configuration is version 1,
+     * this method updates the database configuration instance in memory only.
+     * </p>
+     */
     public void tryToMigrateDb() {
-        var v2Driver = getV2DriverIfMigrationNeeded();
+        Driver v2Driver = getV2DriverIfMigrationNeeded();
         if (v2Driver == null) {
             if (H2_DRIVER_NAME.equals(databaseConfiguration.getDriver())) {
                 updateConfig(); // if it is already migrated H2 v2 we need to update the config
@@ -68,6 +71,7 @@ public class H2Migrator {
         var workPaths = new WorkspacePaths(dbUrl);
         try {
             migrateDb(workPaths, v2Driver);
+            updateConfig();
         } catch (Exception e) {
             rollback(workPaths);
             log.error("H2 to v2 migration failed and reverted", e);
@@ -79,6 +83,7 @@ public class H2Migrator {
         if (!H2_DRIVER_NAME.equals(databaseConfiguration.getDriver()) &&
             !H2_V2_DRIVER_NAME.equals(databaseConfiguration.getDriver())
         ) {
+            log.debug("Non-H2 database detected. No migration needed");
             return null;
         }
 
@@ -102,14 +107,15 @@ public class H2Migrator {
 
         try (var ignored = v2Driver.connect(dbUrl, dbProperties)) {
             log.debug("Current H2 database is v2. No migration needed");
+            return null;
         } catch (SQLException connectionException) {
             if (connectionException.getMessage().startsWith("General error: \"The write format 1 is smaller than the supported format 2")) {
                 return v2Driver;
             } else {
                 log.error("Unexpected exception. Migration aborted", connectionException);
+                return null;
             }
         }
-        return null;
     }
 
     private void updateConfig() {
@@ -117,44 +123,50 @@ public class H2Migrator {
         databaseConfiguration.setDriver(H2_V2_DRIVER_NAME);
     }
 
-    private void migrateDb(@NotNull WorkspacePaths workspacePaths, @NotNull Driver v2Driver) throws SQLException, IOException, DBException {
+    private void migrateDb(
+        @NotNull WorkspacePaths workspacePaths,
+        @NotNull Driver v2Driver
+    ) throws SQLException, IOException, DBException {
         log.info("H2 database v1 -> v2 migration started");
 
-        createV1Script(workspacePaths.dbFolderPath);
+        var exportFilePath = workspacePaths.exportFilePath.toString();
+        var password = dbProperties.getProperty(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD);
 
+        //noinspection ConstantConditions by this time driver availability has already been checked by CBDatabase
+        Driver v1Driver = dataSourceProviderRegistry.findDriver(H2_DRIVER_NAME)
+            .getDriverInstance(monitor);
+
+        log.info("Exporting v1 database");
+        executeScript(v1Driver, EXPORT_SCRIPT, exportFilePath, password);
+
+        log.info("Creating v1 database backup in '" + workspacePaths.dbV1BackupPath + "'");
         Files.move(workspacePaths.dbPath, workspacePaths.dbV1BackupPath, StandardCopyOption.REPLACE_EXISTING);
 
-        try (
-            var connection = v2Driver.connect(dbUrl, dbProperties);
-            var statement = connection.prepareStatement(IMPORT_STATEMENT)
-        ) {
-            statement.setString(1, workspacePaths.dbPath.resolve(EXPORT_FILE_NAME).toString());
-            statement.setString(2, dbProperties.getProperty(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD));
-            if (!statement.execute()) {
-                throw new DBException("Failed to execute import query");
-            }
-        }
+        log.info("Importing data to new v2 database");
+        executeScript(v2Driver, IMPORT_SCRIPT, exportFilePath, password);
 
-        removeExportScript(workspacePaths.dbFolderPath);
-
-        updateConfig();
+        removeExportFile(workspacePaths.dbFolderPath);
+        log.debug("Export file removed");
     }
 
-    private void createV1Script(@NotNull Path dbFolderPath) throws SQLException, DBException {
+    private void executeScript(
+        @NotNull Driver driver,
+        @NotNull String script,
+        @NotNull String filePath,
+        @NotNull String password
+    ) throws SQLException {
         try (
-            var connection = v1Driver.connect(dbUrl, dbProperties);
-            var statement = connection.prepareStatement(EXPORT_STATEMENT)
+            var connection = driver.connect(dbUrl, dbProperties);
+            var statement = connection.prepareStatement(script)
         ) {
-            statement.setString(1, dbFolderPath.resolve(EXPORT_FILE_NAME).toString());
-            statement.setString(2, dbProperties.getProperty(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD));
-            if (!statement.execute()) {
-                throw new DBException("Failed to execute export query");
-            }
+            statement.setString(1, filePath);
+            statement.setString(2, password);
+            statement.execute();
         }
     }
 
     private void rollback(@NotNull WorkspacePaths workspacePaths) {
-        removeExportScript(workspacePaths.dbFolderPath);
+        removeExportFile(workspacePaths.dbFolderPath);
         try {
             Files.move(workspacePaths.dbV1BackupPath, workspacePaths.dbPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
@@ -162,20 +174,21 @@ public class H2Migrator {
         }
     }
 
-    private void removeExportScript(@NotNull Path dbFolderPath) {
+    private void removeExportFile(@NotNull Path dbFolderPath) {
         var dbFolder = dbFolderPath.toFile();
         if (!dbFolder.exists()) {
             return;
         }
-        var exportScript = dbFolder.listFiles((file, name) -> name.equals(EXPORT_FILE_NAME));
-        if (exportScript == null || exportScript.length == 0) {
+        var exportFile = dbFolder.listFiles((file, name) -> name.equals(EXPORT_FILE_NAME));
+        if (exportFile == null || exportFile.length == 0) {
             return;
         }
-        var fileDeleted = exportScript[0].delete();
+        var fileDeleted = exportFile[0].delete();
         if (!fileDeleted) {
             log.error("Unable to remove H2 v1 export script file");
         }
     }
+
 
     private static class WorkspacePaths {
         @NotNull
@@ -184,11 +197,14 @@ public class H2Migrator {
         private final Path dbFolderPath;
         @NotNull
         private final Path dbV1BackupPath;
+        @NotNull
+        private final Path exportFilePath;
 
         WorkspacePaths(@NotNull String dbUrl) {
             dbPath = createDbPath(dbUrl);
             dbFolderPath = dbPath.getParent();
-            dbV1BackupPath = dbFolderPath.resolve("h2db_backup");
+            dbV1BackupPath = dbFolderPath.resolve(BACKUP_V1_FILENAME);
+            exportFilePath = dbFolderPath.resolve(EXPORT_FILE_NAME);
         }
 
         @NotNull
