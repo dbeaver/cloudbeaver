@@ -22,7 +22,6 @@ import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 
 import java.util.List;
 
@@ -62,17 +61,20 @@ public interface DBWServiceNavigator extends DBWService {
         String catalog) throws DBWebException;
 
     @WebAction
+    @Deprecated
     String renameNode(
         @NotNull WebSession session,
         @NotNull String nodePath,
         @NotNull String newName) throws DBWebException;
 
     @WebAction
+    @Deprecated
     int deleteNodes(
         @NotNull WebSession session,
         @NotNull List<String> nodePaths) throws DBWebException;
 
     @WebAction
+    @Deprecated
     boolean moveNodesToFolder(
         @NotNull WebSession session,
         @NotNull List<String> nodePaths,

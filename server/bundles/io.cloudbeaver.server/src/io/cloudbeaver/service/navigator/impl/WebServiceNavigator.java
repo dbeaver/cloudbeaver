@@ -56,7 +56,6 @@ import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.*;
@@ -111,16 +110,18 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     // Skip empty folders. Folder may become empty if their nested elements are provided by UI plugins.
                     continue;
                 }
-                if (!CommonUtils.toBoolean(onlyFolders) || node instanceof DBNContainer) {
-                    // Skip connections which are not supported in CB
-                    if (node instanceof DBNDataSource) {
-                        DBPDataSourceContainer container = ((DBNDataSource) node).getDataSourceContainer();
-                        if (!applicableDrivers.contains(container.getDriver())) {
-                            continue;
-                        }
-                    }
-                    result.add(new WebNavigatorNodeInfo(session, node));
+                if (CommonUtils.toBoolean(onlyFolders) || !(node instanceof DBNContainer)) {
+                    continue;
                 }
+                // Skip connections which are not supported in CB
+                if (node instanceof DBNDataSource) {
+                    DBPDataSourceContainer container = ((DBNDataSource) node).getDataSourceContainer();
+                    if (!applicableDrivers.contains(container.getDriver())) {
+                        continue;
+                    }
+                }
+                result.add(new WebNavigatorNodeInfo(session, node));
+
             }
             // Checks the range of the expected result
             if (offset == null || limit == null || (offset == 0 && limit >= result.size())) {
@@ -192,19 +193,22 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
             DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, nodePath);
             if (node == null) {
-                throw new DBWebException("Navigator node '"  + nodePath + "' not found");
+                throw new DBWebException("Navigator node '" + nodePath + "' not found");
             }
+            if (node instanceof DBNLocalFolder) {
+                // Refresh can't be applied to the local folder node
+                return true;
+            }
+
             if (node instanceof DBNDataSource) {
                 // Do not refresh entire tree - just clear child nodes
                 // Otherwise refresh may fail if navigator settings were changed.
-                DBPDataSource dataSource = ((DBNDataSource) node).getDataSource();
+                DBNDataSource datasourceNode = (DBNDataSource) node;
+                DBPDataSource dataSource = datasourceNode.getDataSource();
                 if (dataSource instanceof DBPRefreshableObject) {
                     ((DBPRefreshableObject) dataSource).refreshObject(monitor);
                 }
-                ((DBNDataSource) node).cleanupNode();
-            } else if (node instanceof DBNLocalFolder) {
-                // Refresh can't be applied to the local folder node
-                return true;
+                datasourceNode.cleanupNode();
             } else {
                 node.refreshNode(monitor, this);
             }
@@ -324,6 +328,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     }
 
     @Override
+    @Deprecated
     public String renameNode(
         @NotNull WebSession session,
         @NotNull String nodePath,
@@ -432,6 +437,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     }
 
     @Override
+    @Deprecated
     public int deleteNodes(
         @NotNull WebSession session,
         @NotNull List<String> nodePaths
@@ -527,6 +533,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     }
 
     @Override
+    @Deprecated
     public boolean moveNodesToFolder(
         @NotNull WebSession session,
         @NotNull List<String> nodePaths,

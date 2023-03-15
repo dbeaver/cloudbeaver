@@ -130,11 +130,6 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
     }
 
     @Override
-    public String getNodeItemPath() {
-        return getParentNode().getNodeItemPath() + "/" + getNodeName();
-    }
-
-    @Override
     public DBNNode refreshNode(DBRProgressMonitor monitor, Object source) throws DBException {
         this.children = null;
         return super.refreshNode(monitor, source);
