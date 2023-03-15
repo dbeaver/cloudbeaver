@@ -8,14 +8,6 @@
 
 import { css } from 'reshadow';
 
-export const dialogStyle = css`
-  footer {
-    align-items: center;
-    justify-content: flex-end;
-    gap: 24px;
-  }
-`;
-
 export const styles = css`
   code, message {
     display: block;
@@ -33,5 +25,10 @@ export const styles = css`
   }
   error-details {
     border: solid 1px;
+  }
+  CommonDialogFooter {
+    align-items: center;
+    justify-content: flex-end;
+    gap: 24px;
   }
 `;

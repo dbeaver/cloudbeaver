@@ -17,7 +17,7 @@ const loader = createComplexLoader(async function loader() {
 
 export const CodeEditorLoader: React.FC<ICodeEditorProps> = function CodeEditorLoader(props) {
   return (
-    <ComplexLoader loader={loader} placeholder={<Loader />}>
+    <ComplexLoader loader={loader}>
       {({ CodeEditor }) => <CodeEditor {...props} />}
     </ComplexLoader>
   );

@@ -13,6 +13,7 @@ import { ILoadableState, isArraysEqual, isContainsException, MetadataMap, uuid }
 
 import { CachedResource, CachedResourceKey, CachedResourceParamKey, ICachedResourceMetadata } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
+import { ResourceError } from './ResourceError';
 import { isResourceKeyList, ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from './ResourceKeyList';
 
 export type CachedMapResourceKey<TResource> = CachedResourceKey<TResource>;
@@ -235,10 +236,16 @@ export abstract class CachedMapResource<
     });
   }
 
-  markDataError(exception: Error, key: ResourceKey<TKey>): void {
+  markDataError(
+    exception: Error,
+    key: ResourceKey<TKey>,
+    includes?: CachedResourceIncludeArgs<TValue, TContext>
+  ): ResourceError {
     if (this.isAlias(key) && !this.isAliasLoaded(key)) {
       this.loadedKeys.push(key);
     }
+
+    exception = new ResourceError(this, key, includes, undefined, { cause:exception });
     key = this.transformParam(key);
 
     ResourceKeyUtils.forEach(key, key => {
@@ -249,6 +256,7 @@ export abstract class CachedMapResource<
     });
 
     this.onDataError.execute({ param: key, exception });
+    return exception as ResourceError;
   }
 
   markOutdated(): void;
@@ -398,7 +406,6 @@ export abstract class CachedMapResource<
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
-    await this.preLoadData(key, false, includes);
     await this.loadData(key, true, includes);
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
@@ -419,7 +426,6 @@ export abstract class CachedMapResource<
     key: ResourceKey<TKey>,
     includes?: T
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
-    await this.preLoadData(key, false, includes);
     await this.loadData(key, false, includes);
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }

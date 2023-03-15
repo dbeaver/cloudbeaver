@@ -37,7 +37,7 @@ export const SearchDatabase: React.FC = observer(function SearchDatabase() {
 
   if (connectionSearchService.formState) {
     return styled(styles)(
-      <Loader loading={false} overlay>
+      <Loader suspense>
         <ConnectionFormLoader
           state={connectionSearchService.formState}
           onSave={() => connectionSearchService.saveConnection()}

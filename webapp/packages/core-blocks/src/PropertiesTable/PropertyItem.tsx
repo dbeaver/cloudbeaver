@@ -183,6 +183,20 @@ export const PropertyItem = observer<Props>(function PropertyItem({
         >
           {propertyValue}
         </ShadowInput>
+        {edited && !isDeletable && (
+          <property-remove title={translate('core_blocks_properties_table_item_reset')}>
+            <button type="button" onClick={handleRevert}>
+              <IconOrImage icon="/icons/data_revert_all_sm.svg" viewBox="0 0 16 16" />
+            </button>
+          </property-remove>
+        )}
+        {isDeletable && (
+          <property-remove title={translate('core_blocks_properties_table_item_remove')}>
+            <button type="button" onClick={handleRemove}>
+              <Icon name="reject" viewBox="0 0 11 11" />
+            </button>
+          </property-remove>
+        )}
         {(!readOnly && property.validValues && property.validValues.length > 0) && (
           <property-select>
             <PropertyValueSelector
@@ -197,20 +211,6 @@ export const PropertyItem = observer<Props>(function PropertyItem({
           </property-select>
         )}
       </property-value>
-      {edited && !isDeletable && (
-        <property-remove title={translate('core_blocks_properties_table_item_reset')}>
-          <button type="button" onClick={handleRevert}>
-            <IconOrImage icon="/icons/data_revert_all_sm.svg" viewBox="0 0 16 16" />
-          </button>
-        </property-remove>
-      )}
-      {isDeletable && (
-        <property-remove title={translate('core_blocks_properties_table_item_remove')}>
-          <button type="button" onClick={handleRemove}>
-            <Icon name="reject" viewBox="0 0 11 11" />
-          </button>
-        </property-remove>
-      )}
     </property-item>
   );
 });

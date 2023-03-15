@@ -15,7 +15,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { ServerInternalError, ServerErrorType } from '@cloudbeaver/core-sdk';
-import { Deferred, EDeferredState } from '@cloudbeaver/core-utils';
+import { Deferred, EDeferredState, errorOf } from '@cloudbeaver/core-utils';
 
 import { DataExportProcessService, ExportProcess } from '../DataExportProcessService';
 
@@ -78,10 +78,11 @@ export class ExportNotificationController implements IInitializableController {
         let status = ENotificationType.Error;
         let message = '';
 
-        if (error instanceof ServerInternalError && error.errorType === ServerErrorType.QUOTE_EXCEEDED) {
+        const serverInternalError = errorOf(error, ServerInternalError);
+        if (serverInternalError && serverInternalError.errorType === ServerErrorType.QUOTE_EXCEEDED) {
           title = 'app_root_quota_exceeded';
           status = ENotificationType.Info;
-          message = error.message;
+          message = serverInternalError.message;
         }
 
         return { title, status, message };

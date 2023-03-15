@@ -58,7 +58,7 @@ function logger(planAndResolve: interfaces.Next): interfaces.Next {
 
       const dependenciesList = metadata.map((value, i) => `${i} - ${getName(value)}`);
 
-      throw new Error(`Can't find dependency ${notFoundServiceName}(${index}) \n\rin ${serviceName}(\n\r  ${dependenciesList.join(', \n\r  ')}\n\r)\r\n${exception.message}`);
+      throw new Error(`Can't find dependency ${notFoundServiceName}(${index}) \n\rin ${serviceName}(\n\r  ${dependenciesList.join(', \n\r  ')}\n\r)\r\n${exception.message}`, { cause: exception });
     }
   };
 }
