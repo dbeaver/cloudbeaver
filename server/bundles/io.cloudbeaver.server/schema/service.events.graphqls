@@ -8,6 +8,8 @@ enum CBServerEventId {
 
     cb_session_log_updated,
 
+    cb_session_websocket_connected,
+
     cb_datasource_created,
     cb_datasource_updated,
     cb_datasource_deleted,
@@ -32,6 +34,7 @@ enum CBClientEventId {
 enum CBEventTopic {
     cb_config,
     cb_session_log,
+    cb_session,
     cb_datasource,
     cb_datasource_folder,
     cb_scripts,
@@ -84,6 +87,13 @@ type CBConfigEvent implements CBServerEvent {
 type CBSessionLogEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
+}
+
+# WebSocket connected event
+type WSSocketConnectedEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    applicationRunId: String!
 }
 
 # Topic subscription event
