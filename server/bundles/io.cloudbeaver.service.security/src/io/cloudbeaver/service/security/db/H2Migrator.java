@@ -59,6 +59,9 @@ public class H2Migrator {
     public void tryToMigrateDb() {
         var v2Driver = getV2DriverIfMigrationNeeded();
         if (v2Driver == null) {
+            if (H2_DRIVER_NAME.equals(databaseConfiguration.getDriver())) {
+                updateConfig(); // if it is already migrated H2 v2 we need to update the config
+            }
             return;
         }
 
@@ -109,6 +112,11 @@ public class H2Migrator {
         return null;
     }
 
+    private void updateConfig() {
+        log.info("Using '" + H2_V2_DRIVER_NAME + "' instead of '" + H2_DRIVER_NAME + "' from config");
+        databaseConfiguration.setDriver(H2_V2_DRIVER_NAME);
+    }
+
     private void migrateDb(@NotNull WorkspacePaths workspacePaths, @NotNull Driver v2Driver) throws SQLException, IOException, DBException {
         log.info("H2 database v1 -> v2 migration started");
 
@@ -128,6 +136,8 @@ public class H2Migrator {
         }
 
         removeExportScript(workspacePaths.dbFolderPath);
+
+        updateConfig();
     }
 
     private void createV1Script(@NotNull Path dbFolderPath) throws SQLException, DBException {
