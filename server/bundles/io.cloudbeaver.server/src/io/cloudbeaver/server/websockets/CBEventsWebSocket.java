@@ -41,15 +41,16 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
 
     @NotNull
     private final BaseWebSession webSession;
+    @NotNull
     private final String applicationRunId;
-
     @NotNull
     private final WriteCallback callback;
 
-    public CBEventsWebSocket(@NotNull BaseWebSession webSession, @NotNull String applicationRunId) {
+    public CBEventsWebSocket(@NotNull BaseWebSession webSession) {
         this.webSession = webSession;
-        this.callback = new WebSocketPingPongCallback(webSession);
-        this.applicationRunId = applicationRunId;
+
+        callback = new WebSocketPingPongCallback(webSession);
+        applicationRunId = webSession.getApplication().getApplicationRunId();
     }
 
     @Override

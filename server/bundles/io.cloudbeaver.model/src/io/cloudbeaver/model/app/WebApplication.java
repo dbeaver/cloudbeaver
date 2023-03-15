@@ -73,6 +73,9 @@ public interface WebApplication extends DBPApplication {
 
     String getApplicationInstanceId() throws DBException;
 
+    @NotNull
+    String getApplicationRunId();
+
     WSEventController getEventController();
 
     /**

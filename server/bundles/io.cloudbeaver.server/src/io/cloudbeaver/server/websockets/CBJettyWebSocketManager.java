@@ -36,11 +36,9 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
     private static final Log log = Log.getLog(CBJettyWebSocketManager.class);
     private final Map<String, CBEventsWebSocket> socketBySessionId = new ConcurrentHashMap<>();
 
-    private final String applicationRunId;
     private final WebSessionManager webSessionManager;
 
-    public CBJettyWebSocketManager(@NotNull String applicationRunId, @NotNull WebSessionManager webSessionManager) {
-        this.applicationRunId = applicationRunId;
+    public CBJettyWebSocketManager(@NotNull WebSessionManager webSessionManager) {
         this.webSessionManager = webSessionManager;
 
         new WebSocketPingPongJob(CBPlatform.getInstance(), this).scheduleMonitor();
@@ -63,7 +61,7 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
         if (oldWebSocket != null) {
             oldWebSocket.close();
         }
-        var newWebSocket = new CBEventsWebSocket(webSession, applicationRunId);
+        var newWebSocket = new CBEventsWebSocket(webSession);
         socketBySessionId.put(webSessionId, newWebSocket);
         log.info("Websocket created for session: " + webSessionId);
         return newWebSocket;
