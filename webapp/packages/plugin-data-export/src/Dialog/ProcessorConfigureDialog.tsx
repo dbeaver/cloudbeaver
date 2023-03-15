@@ -10,7 +10,7 @@ import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { IProperty, PropertiesTable, ErrorMessage, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 import type { DataTransferOutputSettings, DataTransferProcessorInfo, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 import { ITabData, Tab, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
@@ -96,10 +96,39 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
   }
 
   return styled(useStyles(UNDERLINE_TAB_STYLES, styles))(
-    <CommonDialogWrapper
-      size='large'
-      title={title}
-      footer={(
+    <CommonDialogWrapper size='large' fixedSize>
+      <CommonDialogHeader title={title} onReject={onClose} />
+      <CommonDialogBody noOverflow noBodyPadding>
+        {!processor.isBinary ? (
+          <TabsState currentTabId={currentTabId} onChange={handleTabChange}>
+            <TabList aria-label='Export Settings tabs'>
+              <Tab tabId={SETTINGS_TABS.EXTRACTION} style={UNDERLINE_TAB_STYLES}>
+                {translate('data_transfer_format_settings')}
+              </Tab>
+              <Tab tabId={SETTINGS_TABS.OUTPUT} style={UNDERLINE_TAB_STYLES}>
+                {translate('data_transfer_output_settings')}
+              </Tab>
+            </TabList>
+          </TabsState>
+        ) : null}
+        {currentTabId === SETTINGS_TABS.EXTRACTION ? (
+          <PropertiesTable
+            properties={properties}
+            propertiesState={processorProperties}
+          />
+        ) : (
+          <OutputOptionsForm outputSettings={outputSettings} />
+        )}
+
+        {error.responseMessage && (
+          <ErrorMessage
+            text={error.responseMessage}
+            hasDetails={error.hasDetails}
+            onShowDetails={onShowDetails}
+          />
+        )}
+      </CommonDialogBody>
+      <CommonDialogFooter>
         <ProcessorConfigureDialogFooter
           isExporting={isExporting}
           isFinalStep={currentTabId === SETTINGS_TABS.OUTPUT || !!processor.isBinary}
@@ -108,40 +137,7 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
           onCancel={onClose}
           onNext={handleNextClick}
         />
-      )}
-      fixedSize
-      noOverflow
-      noBodyPadding
-      onReject={onClose}
-    >
-      {!processor.isBinary ? (
-        <TabsState currentTabId={currentTabId} onChange={handleTabChange}>
-          <TabList aria-label='Export Settings tabs'>
-            <Tab tabId={SETTINGS_TABS.EXTRACTION} style={UNDERLINE_TAB_STYLES}>
-              {translate('data_transfer_format_settings')}
-            </Tab>
-            <Tab tabId={SETTINGS_TABS.OUTPUT} style={UNDERLINE_TAB_STYLES}>
-              {translate('data_transfer_output_settings')}
-            </Tab>
-          </TabList>
-        </TabsState>
-      ) : null}
-      {currentTabId === SETTINGS_TABS.EXTRACTION ? (
-        <PropertiesTable
-          properties={properties}
-          propertiesState={processorProperties}
-        />
-      ) : (
-        <OutputOptionsForm outputSettings={outputSettings} />
-      )}
-
-      {error.responseMessage && (
-        <ErrorMessage
-          text={error.responseMessage}
-          hasDetails={error.hasDetails}
-          onShowDetails={onShowDetails}
-        />
-      )}
+      </CommonDialogFooter>
     </CommonDialogWrapper>
   );
 });

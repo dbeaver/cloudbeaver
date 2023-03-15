@@ -79,8 +79,8 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
         }
       });
 
-    } catch {
-      throw new Error('versions_load_fail');
+    } catch (exception: any) {
+      throw new Error('versions_load_fail', { cause: exception });
     }
 
     return this.data;

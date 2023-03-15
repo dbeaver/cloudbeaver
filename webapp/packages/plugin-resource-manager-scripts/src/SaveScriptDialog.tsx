@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, Translate, useFocus, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 import { RESOURCE_NAME_REGEX } from '@cloudbeaver/plugin-resource-manager';
 
@@ -75,54 +75,51 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
   }, false);
 
   return styled(style, BASE_CONTAINERS_STYLES)(
-    <CommonDialogWrapper
-      size='small'
-      title={translate('plugin_resource_manager_scripts_save_script')}
-      icon='/icons/sql_script_m.svg'
-      className={className}
-      style={style}
-      footer={(
-        <>
-          <Button
-            type="button"
-            mod={['outlined']}
-            onClick={rejectDialog}
-          >
-            <Translate token='ui_processing_cancel' />
-          </Button>
-          <fill />
-          <Button
-            type="button"
-            mod={['unelevated']}
-            disabled={!state.name.trim() || state.projectId === null}
-            onClick={state.submit}
-          >
-            <Translate token='ui_processing_save' />
-          </Button>
-        </>
-      )}
-      fixedWidth
-      onReject={rejectDialog}
-    >
-      <SubmittingForm ref={focusedRef} onSubmit={state.submit}>
-        <Container center gap>
-          <InputField
-            name='name'
-            state={state}
-            error={!!state.errorMessage}
-            description={state.errorMessage ?? undefined}
-          >
-            {translate('ui_name') + ':'}
-          </InputField>
-          <ProjectSelect
-            value={state.projectId}
-            filter={p => (p.canEditResources && p.id === (payload.projectId ?? p.id))}
-            descriptionGetter={(_, options) => options.length <= 1 ? translate('plugin_resource_manager_scripts_save_script_project_restriction_descripion') : undefined}
-            autoHide
-            onChange={projectId => { state.projectId = projectId; }}
-          />
-        </Container>
-      </SubmittingForm>
+    <CommonDialogWrapper size='small' className={className} fixedWidth>
+      <CommonDialogHeader
+        title={translate('plugin_resource_manager_scripts_save_script')}
+        icon='/icons/sql_script_m.svg'
+        onReject={rejectDialog}
+      />
+      <CommonDialogBody>
+        <SubmittingForm ref={focusedRef} onSubmit={state.submit}>
+          <Container center gap>
+            <InputField
+              name='name'
+              state={state}
+              error={!!state.errorMessage}
+              description={state.errorMessage ?? undefined}
+            >
+              {translate('ui_name') + ':'}
+            </InputField>
+            <ProjectSelect
+              value={state.projectId}
+              filter={p => (p.canEditResources && p.id === (payload.projectId ?? p.id))}
+              descriptionGetter={(_, options) => options.length <= 1 ? translate('plugin_resource_manager_scripts_save_script_project_restriction_descripion') : undefined}
+              autoHide
+              onChange={projectId => { state.projectId = projectId; }}
+            />
+          </Container>
+        </SubmittingForm>
+      </CommonDialogBody>
+      <CommonDialogFooter>
+        <Button
+          type="button"
+          mod={['outlined']}
+          onClick={rejectDialog}
+        >
+          <Translate token='ui_processing_cancel' />
+        </Button>
+        <fill />
+        <Button
+          type="button"
+          mod={['unelevated']}
+          disabled={!state.name.trim() || state.projectId === null}
+          onClick={state.submit}
+        >
+          <Translate token='ui_processing_save' />
+        </Button>
+      </CommonDialogFooter>
     </CommonDialogWrapper>
   );
 });

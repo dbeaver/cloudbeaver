@@ -79,7 +79,6 @@ export abstract class CachedDataResource<
     param: TParam,
     context?: T
   ): Promise<CachedResourceValueIncludes<TData, T>> {
-    await this.preLoadData(param, false, context);
     await this.loadData(param, true, context);
     return this.data as CachedResourceValueIncludes<TData, T>;
   }
@@ -88,7 +87,6 @@ export abstract class CachedDataResource<
     param: TParam,
     context?: T
   ): Promise<CachedResourceValueIncludes<TData, T>> {
-    await this.preLoadData(param, false, context);
     await this.loadData(param, false, context);
     return this.data as CachedResourceValueIncludes<TData, T>;
   }

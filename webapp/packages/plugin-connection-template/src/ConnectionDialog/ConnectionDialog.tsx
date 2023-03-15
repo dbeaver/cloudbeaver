@@ -18,7 +18,7 @@ import {
   useAdministrationSettings,
 } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
-import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ConnectionAuthenticationFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionController, ConnectionStep } from './ConnectionController';
@@ -60,53 +60,54 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
   }
 
   return styled(styles)(
-    <CommonDialogWrapper
-      size='large'
-      title="basicConnection_connectionDialog_newConnection"
-      subTitle={subtitle}
-      icon={controller.dbDriver?.icon}
-      footer={controller.step === ConnectionStep.Connection && (
-        <ConnectionDialogFooter
-          isConnecting={controller.isConnecting}
-          onBack={() => controller.onStep(ConnectionStep.ConnectionTemplateSelect)}
-          onConnect={controller.onConnect}
-        />
-      )}
-      noBodyPadding={controller.step === ConnectionStep.ConnectionTemplateSelect}
-      fixedSize
-      noOverflow
-      onReject={rejectDialog}
-    >
-      {controller.isLoading && <Loader />}
-      {!controller.isLoading && controller.step === ConnectionStep.ConnectionTemplateSelect && (
-        <TemplateConnectionSelector
-          templateConnections={controller.templateConnections}
-          dbDrivers={controller.dbDrivers}
-          onSelect={controller.onTemplateSelect}
-        />
-      )}
-      {controller.step === ConnectionStep.Connection && (!controller.authModel ? (
-        <center>
-          {controller.isConnecting && translate('basicConnection_connectionDialog_connecting_message')}
-        </center>
-      ) : (
-        <SubmittingForm ref={focusedRef} onSubmit={controller.onConnect}>
-          <ConnectionAuthenticationFormLoader
-            config={controller.config}
-            authModelId={controller.authModel.id}
-            networkHandlers={controller.networkHandlers}
-            formId={controller.template?.id}
-            allowSaveCredentials={credentialsSavingEnabled}
-            disabled={controller.isConnecting}
+    <CommonDialogWrapper size='large' fixedSize>
+      <CommonDialogHeader
+        title="basicConnection_connectionDialog_newConnection"
+        subTitle={subtitle}
+        icon={controller.dbDriver?.icon}
+        onReject={rejectDialog}
+      />
+      <CommonDialogBody noBodyPadding={controller.step === ConnectionStep.ConnectionTemplateSelect} noOverflow>
+        {controller.isLoading && <Loader />}
+        {!controller.isLoading && controller.step === ConnectionStep.ConnectionTemplateSelect && (
+          <TemplateConnectionSelector
+            templateConnections={controller.templateConnections}
+            dbDrivers={controller.dbDrivers}
+            onSelect={controller.onTemplateSelect}
           />
-        </SubmittingForm>
-      ))}
-      {controller.responseMessage && (
-        <ErrorMessage
-          text={controller.responseMessage}
-          hasDetails={controller.hasDetails}
-          onShowDetails={controller.onShowDetails}
-        />
+        )}
+        {controller.step === ConnectionStep.Connection && (!controller.authModel ? (
+          <center>
+            {controller.isConnecting && translate('basicConnection_connectionDialog_connecting_message')}
+          </center>
+        ) : (
+          <SubmittingForm ref={focusedRef} onSubmit={controller.onConnect}>
+            <ConnectionAuthenticationFormLoader
+              config={controller.config}
+              authModelId={controller.authModel.id}
+              networkHandlers={controller.networkHandlers}
+              formId={controller.template?.id}
+              allowSaveCredentials={credentialsSavingEnabled}
+              disabled={controller.isConnecting}
+            />
+          </SubmittingForm>
+        ))}
+        {controller.responseMessage && (
+          <ErrorMessage
+            text={controller.responseMessage}
+            hasDetails={controller.hasDetails}
+            onShowDetails={controller.onShowDetails}
+          />
+        )}
+      </CommonDialogBody>
+      {controller.step === ConnectionStep.Connection && (
+        <CommonDialogFooter>
+          <ConnectionDialogFooter
+            isConnecting={controller.isConnecting}
+            onBack={() => controller.onStep(ConnectionStep.ConnectionTemplateSelect)}
+            onConnect={controller.onConnect}
+          />
+        </CommonDialogFooter>
       )}
     </CommonDialogWrapper>
   );

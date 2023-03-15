@@ -9,7 +9,6 @@ export function useAppLoadingScreen() {
     const appLoadingScreen = document.getElementById('app-loading-screen');
 
     if (!appLoadingScreen) {
-      console.warn('Can"t find any node with "app-loading-screen" id');
       return;
     }
 

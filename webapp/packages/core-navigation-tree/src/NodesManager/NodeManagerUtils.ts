@@ -14,6 +14,10 @@ export const NodeManagerUtils = {
     let lastPath = '';
     const parents: string[] = [];
 
+    if (parts.length < 2) {
+      return parents;
+    }
+
     for (const part of parts) {
       if (lastPath !== '') {
         lastPath += '/';
@@ -23,7 +27,7 @@ export const NodeManagerUtils = {
       parents.push(lastPath);
     }
 
-    return parents;
+    return parents.filter(id => id !== nodeId);
   },
 
   connectionIdToConnectionNodeId(connectionId: string): string {

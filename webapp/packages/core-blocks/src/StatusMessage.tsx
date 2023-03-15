@@ -63,7 +63,7 @@ export const StatusMessage = observer<Props>(function StatusMessage({
     message = translate(message);
   }
 
-  message = message ?? errorDetails.details?.message;
+  message = message ?? errorDetails.message;
   let icon = '/icons/info_icon.svg';
 
   if (status === ENotificationType.Error || exception !== null) {
@@ -72,7 +72,7 @@ export const StatusMessage = observer<Props>(function StatusMessage({
     icon = '/icons/success_icon.svg';
   }
 
-  if (errorDetails.details?.hasDetails && !onShowDetails) {
+  if (errorDetails.hasDetails && !onShowDetails) {
     onShowDetails = errorDetails.open;
   }
 

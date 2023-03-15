@@ -99,17 +99,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const optionsHook = useOptions(state);
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
-  const handleDriverSelect = useCallback(async (value?: string, name?: string, prev?: string) => {
-    if (!value) {
-      return;
-    }
-
-    const prevDriver = prev ? await driverMap.resource.load(prev) : undefined;
-    const newDriver = await driverMap.resource.load(value);
-
-    optionsHook.setDefaults(newDriver, prevDriver);
-  }, []);
-
   const handleAuthModelSelect = useCallback(async (value?: string, name?: string, prev?: string) => {
     const model = applicableAuthModels.find(model => model?.id === value);
 
@@ -125,10 +114,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     DBDriverResource,
     { key: config.driverId || null, includes: ['includeProviderProperties'] as const },
     {
-      onData: (data, resource, prevData) => {
-        if (data.id !== prevData?.id) {
-          optionsHook.setDefaults(data);
-        }
+      onData: (data, resource, prevDriver) => {
+        optionsHook.setDefaults(data, prevDriver);
       },
     }
   );
@@ -222,7 +209,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 loading={driverMap.isLoading()}
                 tiny
                 fill
-                onSelect={handleDriverSelect}
               >
                 {translate('connections_connection_driver')}
               </Combobox>

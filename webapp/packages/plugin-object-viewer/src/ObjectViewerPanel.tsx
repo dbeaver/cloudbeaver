@@ -25,19 +25,16 @@ import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
 import { DBObjectPageTab } from './ObjectPage/DBObjectPageTab';
 
 const styles = css`
-    Tab {
-      composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
-    }
-    tabs {
-      composes: theme-background-background theme-text-text-primary-on-light from global;
-    }
-    tab-outer:only-child {
-      display: none;
-    }
-    ExceptionMessage {
-      padding: 24px;
-    }
-  `;
+  Tab {
+    composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
+  }
+  tabs {
+    composes: theme-background-background theme-text-text-primary-on-light from global;
+  }
+  tab-outer:only-child {
+    display: none;
+  }
+`;
 
 export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> = observer(function ObjectViewerPanel({
   tab,
@@ -51,8 +48,6 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
 
   const objectId = tab.handlerState.objectId;
   const connectionKey = tab.handlerState.connectionKey || null;
-  const parentId = tab.handlerState.parentId;
-  const parents = tab.handlerState.parents;
 
   const state = useObservableRef(() => ({
     connecting: false,
@@ -62,31 +57,18 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
     notFound: observable.ref,
   }, false);
 
-  const connection = useResource(ObjectViewerPanel, ConnectionInfoResource, connectionKey, {
-    isActive: resource => !connectionKey || !resource.has(connectionKey),
-  });
-
+  const connection = useResource(ObjectViewerPanel, ConnectionInfoResource, connectionKey);
   const connected = getComputed(() => connection.data?.connected || false);
 
-  const children = useResource(ObjectViewerPanel, NavTreeResource, parentId, {
-    onLoad: async resource => {
-      if (!connected) {
-        return true;
-      }
-
-      const preload = await resource.preloadNodeParents(parents);
-      state.notFound = !preload;
-      return state.notFound;
-    },
+  const children = useResource(ObjectViewerPanel, NavTreeResource, objectId, {
     active: connected,
-    onData: data => {
-      state.notFound = !data.includes(objectId);
-    },
+    // onData: data => {
+    //   state.notFound = !data.includes(objectId);
+    // },
     preload: [connection],
   });
 
   const node = useResource(ObjectViewerPanel, navNodeInfoResource, objectId, {
-    onLoad: async () => !(await children.resource.preloadNodeParents(parents, objectId)),
     onData(data) {
       tab.handlerState.tabIcon = data.icon;
       tab.handlerState.tabTitle = data.name;
@@ -128,35 +110,31 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   }
 
   return styled(style)(
-    <Loader state={[node, children]} style={styles}>
-      {() => styled(style)(
-        <>
-          {node.data ? (
-            <TabsBox
-              currentTabId={tab.handlerState.pageId}
-              tabs={pages.map(page => (
-                <DBObjectPageTab
-                  key={page.key}
-                  tab={tab}
-                  page={page}
-                  style={styles}
-                  onSelect={dbObjectPagesService.selectPage}
-                />
-              ))}
-              localState={innerTabState}
+    <>
+      {node.data ? (
+        <TabsBox
+          currentTabId={tab.handlerState.pageId}
+          tabs={pages.map(page => (
+            <DBObjectPageTab
+              key={page.key}
+              tab={tab}
+              page={page}
               style={styles}
-            >
-              {pages.map(page => (
-                <TabPanel key={page.key} tabId={page.key} lazy>
-                  <DBObjectPagePanel tab={tab} page={page} />
-                </TabPanel>
-              ))}
-            </TabsBox>
-          ) : (
-            <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
-          )}
-        </>
+              onSelect={dbObjectPagesService.selectPage}
+            />
+          ))}
+          localState={innerTabState}
+          style={styles}
+        >
+          {pages.map(page => (
+            <TabPanel key={page.key} tabId={page.key} lazy>
+              <DBObjectPagePanel tab={tab} page={page} />
+            </TabPanel>
+          ))}
+        </TabsBox>
+      ) : (
+        <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       )}
-    </Loader>
+    </>
   );
 });

@@ -45,6 +45,7 @@ interface Props {
   root?: boolean;
   error?: Error;
   errorInfo?: React.ErrorInfo;
+  className?: string;
 }
 
 export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function DisplayError({
@@ -52,11 +53,12 @@ export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function D
   children,
   error,
   errorInfo,
+  className,
 }) {
   const stack = errorInfo?.componentStack || error?.stack;
 
   return styled(style)(
-    <container {...use({ root })}>
+    <container className={className} {...use({ root })}>
       <container-inner-block>
         <NotificationMark type={ENotificationType.Error} />
         <p>Something went wrong.</p>
