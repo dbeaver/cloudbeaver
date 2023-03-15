@@ -62,7 +62,7 @@ public class H2Migrator {
             return;
         }
 
-        var workPaths = new WorkPaths(dbUrl);
+        var workPaths = new WorkspacePaths(dbUrl);
         try {
             migrateDb(workPaths, v2Driver);
         } catch (Exception e) {
@@ -74,7 +74,8 @@ public class H2Migrator {
     @Nullable
     private Driver getV2DriverIfMigrationNeeded() {
         if (!H2_DRIVER_NAME.equals(databaseConfiguration.getDriver()) &&
-            !H2_V2_DRIVER_NAME.equals(databaseConfiguration.getDriver())) {
+            !H2_V2_DRIVER_NAME.equals(databaseConfiguration.getDriver())
+        ) {
             return null;
         }
 
@@ -98,36 +99,35 @@ public class H2Migrator {
 
         try (var ignored = v2Driver.connect(dbUrl, dbProperties)) {
             log.debug("Current H2 database is v2. No migration needed");
-        } catch (SQLException expectedException) {
-            if (expectedException.getMessage().startsWith("General error: \"The write format 1 is smaller than the supported format 2")) {
+        } catch (SQLException connectionException) {
+            if (connectionException.getMessage().startsWith("General error: \"The write format 1 is smaller than the supported format 2")) {
                 return v2Driver;
             } else {
-                log.error("Unexpected exception. Migration aborted", expectedException);
+                log.error("Unexpected exception. Migration aborted", connectionException);
             }
         }
-
         return null;
     }
 
-    private void migrateDb(@NotNull WorkPaths workPaths, @NotNull Driver v2Driver) throws SQLException, IOException, DBException {
+    private void migrateDb(@NotNull WorkspacePaths workspacePaths, @NotNull Driver v2Driver) throws SQLException, IOException, DBException {
         log.info("H2 database v1 -> v2 migration started");
 
-        createV1Script(workPaths.dbFolderPath);
+        createV1Script(workspacePaths.dbFolderPath);
 
-        Files.move(workPaths.dbPath, workPaths.dbV1BackupPath, StandardCopyOption.REPLACE_EXISTING);
+        Files.move(workspacePaths.dbPath, workspacePaths.dbV1BackupPath, StandardCopyOption.REPLACE_EXISTING);
 
         try (
             var connection = v2Driver.connect(dbUrl, dbProperties);
             var statement = connection.prepareStatement(IMPORT_STATEMENT)
         ) {
-            statement.setString(1, workPaths.dbPath.resolve(EXPORT_FILE_NAME).toString());
+            statement.setString(1, workspacePaths.dbPath.resolve(EXPORT_FILE_NAME).toString());
             statement.setString(2, dbProperties.getProperty(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD));
             if (!statement.execute()) {
                 throw new DBException("Failed to execute import query");
             }
         }
 
-        removeExportScript(workPaths.dbFolderPath);
+        removeExportScript(workspacePaths.dbFolderPath);
     }
 
     private void createV1Script(@NotNull Path dbFolderPath) throws SQLException, DBException {
@@ -143,12 +143,12 @@ public class H2Migrator {
         }
     }
 
-    private void rollback(@NotNull WorkPaths workPaths) {
-        removeExportScript(workPaths.dbFolderPath);
+    private void rollback(@NotNull WorkspacePaths workspacePaths) {
+        removeExportScript(workspacePaths.dbFolderPath);
         try {
-            Files.move(workPaths.dbV1BackupPath, workPaths.dbPath, StandardCopyOption.REPLACE_EXISTING);
+            Files.move(workspacePaths.dbV1BackupPath, workspacePaths.dbPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            log.error("Unable to restore old database file '" + workPaths.dbPath + "'");
+            log.error("Unable to restore old database file '" + workspacePaths.dbPath + "'");
         }
     }
 
@@ -167,7 +167,7 @@ public class H2Migrator {
         }
     }
 
-    private static class WorkPaths {
+    private static class WorkspacePaths {
         @NotNull
         private final Path dbPath;
         @NotNull
@@ -175,7 +175,7 @@ public class H2Migrator {
         @NotNull
         private final Path dbV1BackupPath;
 
-        WorkPaths(@NotNull String dbUrl) {
+        WorkspacePaths(@NotNull String dbUrl) {
             dbPath = createDbPath(dbUrl);
             dbFolderPath = dbPath.getParent();
             dbV1BackupPath = dbFolderPath.resolve("h2db_backup");
@@ -183,7 +183,7 @@ public class H2Migrator {
 
         @NotNull
         private static Path createDbPath(@NotNull String dbUrl) {
-            var filePath = dbUrl.substring(8); // remove jdbc:h2:
+            var filePath = dbUrl.substring("jdbc:h2:".length());
             if (!filePath.endsWith(".mv.db")) {
                 filePath += ".mv.db";
             }
