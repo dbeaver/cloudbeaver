@@ -9,12 +9,10 @@
 import styled, { css } from 'reshadow';
 
 import { Button, Translate } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-
-
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 
 const style = css`
-  footer {
+  CommonDialogFooter {
     align-items: center;
   }
 
@@ -35,12 +33,12 @@ export const ScriptImportDialog: DialogComponent<null, boolean> = function Scrip
   className,
 }) {
   return styled(style)(
-    <CommonDialogWrapper
-      size='small'
-      title='ui_changes_might_be_lost'
-      className={className}
-      style={style}
-      footer={(
+    <CommonDialogWrapper size='small' className={className} fixedWidth>
+      <CommonDialogHeader title='ui_changes_might_be_lost' onReject={rejectDialog} />
+      <CommonDialogBody>
+        <Translate token='sql_editor_upload_script_unsaved_changes_dialog_message' />
+      </CommonDialogBody>
+      <CommonDialogFooter>
         <container>
           <Button
             type="button"
@@ -65,11 +63,7 @@ export const ScriptImportDialog: DialogComponent<null, boolean> = function Scrip
             <Translate token='ui_yes' />
           </Button>
         </container>
-      )}
-      fixedWidth
-      onReject={rejectDialog}
-    >
-      <Translate token='sql_editor_upload_script_unsaved_changes_dialog_message' />
+      </CommonDialogFooter>
     </CommonDialogWrapper>
   );
 };

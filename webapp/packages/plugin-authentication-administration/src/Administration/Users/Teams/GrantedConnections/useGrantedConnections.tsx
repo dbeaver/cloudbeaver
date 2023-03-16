@@ -13,12 +13,12 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTabState } from '@cloudbeaver/core-ui';
-import { isArraysEqual } from '@cloudbeaver/core-utils';
+import { ILoadableState, isArraysEqual } from '@cloudbeaver/core-utils';
 
 import type { TeamFormMode } from '../ITeamFormProps';
 import type { IGrantedConnectionsTabState } from './IGrantedConnectionsTabState';
 
-interface State {
+interface State extends ILoadableState {
   state: IGrantedConnectionsTabState;
   changed: boolean;
   edit: () => void;
@@ -35,6 +35,15 @@ export function useGrantedConnections(team: TeamInfo, mode: TeamFormMode): Reado
   return useObservableRef(() => ({
     get changed() {
       return !isArraysEqual(this.state.initialGrantedSubjects, this.state.grantedSubjects);
+    },
+    isLoading() {
+      return this.state.loading;
+    },
+    isLoaded() {
+      return this.state.loaded;
+    },
+    isError() {
+      return false;
     },
     edit() {
       this.state.editing = !this.state.editing;

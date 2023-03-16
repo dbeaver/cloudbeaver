@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createComplexLoader, ComplexLoader, Loader } from '@cloudbeaver/core-blocks';
+import { createComplexLoader, ComplexLoader } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import type { IDataValuePanelProps, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
 
@@ -17,10 +17,7 @@ const loader = createComplexLoader(async function loader() {
 
 export const GISViewer: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = function GISViewer({ model, resultIndex }) {
   return (
-    <ComplexLoader
-      loader={loader}
-      placeholder={<Loader />}
-    >
+    <ComplexLoader loader={loader}>
       {({ GISValuePresentation }) => (
         <GISValuePresentation model={model} resultIndex={resultIndex} />
       )}

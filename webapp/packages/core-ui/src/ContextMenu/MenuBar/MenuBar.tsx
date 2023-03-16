@@ -11,7 +11,7 @@ import { forwardRef, useCallback } from 'react';
 import { MenuInitialState, MenuSeparator } from 'reakit';
 import styled, { use } from 'reshadow';
 
-import { getComputed, useAutoLoad, useStyles } from '@cloudbeaver/core-blocks';
+import { getComputed, Loader, useAutoLoad, useStyles } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { DATA_CONTEXT_MENU_NESTED, DATA_CONTEXT_SUBMENU_ITEM, IMenuActionItem, IMenuData, IMenuItem, MenuActionItem, MenuBaseItem, MenuSeparatorItem, MenuSubMenuItem, useMenu } from '@cloudbeaver/core-view';
 
@@ -232,12 +232,14 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
           aria-label={item.menu.label}
           label={label}
           displayLabel={displayLabel}
-          icon={IconComponent ? (
-            <IconComponent
-              item={item}
-              style={style}
-              {...extraProps}
-            />
+          icon={IconComponent ? styled(styles)(
+            <Loader suspense small fullSize>
+              <IconComponent
+                item={item}
+                style={style}
+                {...extraProps}
+              />
+            </Loader>
           ) : icon}
           title={tooltip}
           loading={loading}

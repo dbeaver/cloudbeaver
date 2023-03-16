@@ -58,11 +58,11 @@ export const ConnectionEdit = observer<Props>(function ConnectionEditNew({
 
   return styled(styles)(
     <box ref={boxRef}>
-      <Loader loading={false} overlay>
+      <Loader suspense>
         <ConnectionFormLoader
           state={data}
-        // onCancel={collapse}
-        // onSave={collapse}
+          // onCancel={collapse}
+          // onSave={collapse}
         />
       </Loader>
     </box>

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef, useRef } from 'react';
 import styled from 'reshadow';
 
-import { getComputed, IMenuState, joinStyles, Menu, MenuItemElement, menuPanelStyles, useAutoLoad, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import { getComputed, IMenuState, joinStyles, Loader, Menu, MenuItemElement, menuPanelStyles, useAutoLoad, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { DATA_CONTEXT_MENU_NESTED, DATA_CONTEXT_SUBMENU_ITEM, IMenuData, IMenuSubMenuItem, MenuActionItem, useMenu } from '@cloudbeaver/core-view';
 
@@ -121,12 +121,14 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
       <MenuItemElement
         label={label}
         displayLabel={displayLabel}
-        icon={IconComponent ? (
-          <IconComponent
-            item={subMenu}
-            style={joinStyles(menuPanelStyles, style)}
-            {...extraProps}
-          />
+        icon={IconComponent ? styled(styles)(
+          <Loader suspense small fullSize>
+            <IconComponent
+              item={subMenu}
+              style={joinStyles(menuPanelStyles, style)}
+              {...extraProps}
+            />
+          </Loader>
         ) : icon}
         tooltip={tooltip}
         panelAvailable={panelAvailable}

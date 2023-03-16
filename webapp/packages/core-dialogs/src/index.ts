@@ -1,3 +1,6 @@
+export * from './CommonDialog/CommonDialog/CommonDialogBody';
+export * from './CommonDialog/CommonDialog/CommonDialogFooter';
+export * from './CommonDialog/CommonDialog/CommonDialogHeader';
 export * from './CommonDialog/CommonDialog/CommonDialogWrapper';
 export * from './CommonDialog/CommonDialogService';
 export * from './CommonDialog/ConfirmationDialog';

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ComplexLoader, createComplexLoader, Loader } from '@cloudbeaver/core-blocks';
+import { ComplexLoader, createComplexLoader } from '@cloudbeaver/core-blocks';
 import type { IDataPresentationProps } from '@cloudbeaver/plugin-data-viewer';
 
 const loader = createComplexLoader(async function loader() {
@@ -16,10 +16,7 @@ const loader = createComplexLoader(async function loader() {
 
 export const DataGridLoader: React.FC<IDataPresentationProps> = function DataGridLoader(props) {
   return (
-    <ComplexLoader
-      loader={loader}
-      placeholder={<Loader />}
-    >
+    <ComplexLoader loader={loader}>
       {({ DataGridTable }) => (
         <DataGridTable {...props} />
       )}

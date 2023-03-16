@@ -107,22 +107,18 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
           {children}
           <SlideBox open={optionsPanelService.active}>
             <SlideElement>
-              <ErrorBoundary remount>
-                <Loader loading={false} overlay>
-                  <content>
-                    <OptionsPanel />
-                  </content>
-                </Loader>
-              </ErrorBoundary>
+              <Loader suspense>
+                <content>
+                  <OptionsPanel />
+                </content>
+              </Loader>
             </SlideElement>
             <SlideElement>
-              <ErrorBoundary remount>
-                <Loader loading={false} overlay>
-                  <content>
-                    <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
-                  </content>
-                </Loader>
-              </ErrorBoundary>
+              <Loader suspense>
+                <content>
+                  <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
+                </content>
+              </Loader>
               <SlideOverlay onClick={() => optionsPanelService.close()} />
             </SlideElement>
           </SlideBox>
