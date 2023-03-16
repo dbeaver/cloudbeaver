@@ -521,7 +521,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     const { navNodeChildren, navNodeInfo } = await this.graphQLService.sdk.navNodeChildren({
       parentPath,
       offset,
-      limit,
+      limit: undefined,
       withDetails: metadata.withDetails,
     });
 
