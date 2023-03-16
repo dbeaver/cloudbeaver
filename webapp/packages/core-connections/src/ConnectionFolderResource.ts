@@ -11,17 +11,7 @@ import { action, makeObservable, runInAction } from 'mobx';
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionDataResource } from '@cloudbeaver/core-root';
-import {
-  GraphQLService,
-  CachedMapResource,
-  resourceKeyList,
-  ResourceKey,
-  ResourceKeyUtils,
-  CachedMapAllKey,
-  ConnectionFolderInfoFragment,
-  isResourceKeyList,
-  ResourceKeyList,
-} from '@cloudbeaver/core-sdk';
+import { GraphQLService, CachedMapResource, resourceKeyList, ResourceKeyUtils, CachedMapAllKey, ConnectionFolderInfoFragment, isResourceKeyList, isResourceKeyAlias, resourceKeyAliasFactory, ResourceKey, isResourceAlias } from '@cloudbeaver/core-sdk';
 
 export type ConnectionFolder = ConnectionFolderInfoFragment;
 
@@ -32,10 +22,9 @@ export interface IConnectionFolderParam {
 
 export const CONNECTION_FOLDER_NAME_VALIDATION = /^(?!\.)[\p{L}\w\-$.\s()@]+$/u;
 
-const connectionFolderProjectKeySymbol = Symbol('@connection-folder/project') as unknown as IConnectionFolderParam;
-export const ConnectionFolderProjectKey = (projectId: string) => resourceKeyList<IConnectionFolderParam>(
-  [connectionFolderProjectKeySymbol],
-  projectId
+export const ConnectionFolderProjectKey = resourceKeyAliasFactory(
+  '@connection-folder/project',
+  (projectId: string) => ({ projectId })
 );
 
 @injectable()
@@ -51,9 +40,8 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
     sessionDataResource.outdateResource(this);
 
     this.addAlias(
-      isConnectionFolderProjectKey,
-      param => resourceKeyList(this.keys.filter(key => key.projectId === param.mark)),
-      (a, b) => a.mark === b.mark
+      ConnectionFolderProjectKey,
+      param => resourceKeyList(this.keys.filter(key => key.projectId === param.options.projectId)),
     );
 
     makeObservable<this>(this, {
@@ -98,21 +86,20 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
   protected async loader(
     originalKey: ResourceKey<IConnectionFolderParam>
   ): Promise<Map<IConnectionFolderParam, ConnectionFolder>> {
+    const all = this.isAlias(originalKey, CachedMapAllKey);
+    const isProjectFolders = this.isAlias(originalKey, ConnectionFolderProjectKey);
+    const folders: ConnectionFolder[] = [];
     let projectId: string | undefined;
-    const all = ResourceKeyUtils.includes(originalKey, CachedMapAllKey);
-    const isProjectFolders = isConnectionFolderProjectKey(originalKey);
-    const key = this.transformParam(originalKey);
+    let folderId: string | undefined;
 
     if (isProjectFolders) {
-      projectId = (originalKey as ResourceKeyList<IConnectionFolderParam>).mark;
+      projectId = originalKey.options.projectId;
     }
 
     await ResourceKeyUtils.forEachAsync(
-      (all || isProjectFolders) ? CachedMapAllKey : key,
-      async (key: IConnectionFolderParam) => {
-        let folderId: string | undefined;
-
-        if (!all && !isProjectFolders) {
+      originalKey,
+      async key => {
+        if (!isResourceAlias(key)) {
           folderId = key.folderId;
           projectId = key.projectId;
         }
@@ -121,32 +108,31 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
           projectId,
           path: folderId,
         });
-
-        runInAction(() => {
-          if (all) {
-            this.resetIncludes();
-            this.clear();
-          }
-
-          if (isProjectFolders) {
-            const removedFolders = this.keys
-              .filter(key => !folders.some(f => (
-                key.projectId === projectId
-                && key.folderId === f.id
-              )));
-
-            this.delete(resourceKeyList(removedFolders));
-          }
-
-          this.set(
-            resourceKeyList(folders.map<IConnectionFolderParam>(folder => createConnectionFolderParam(
-              folder.projectId,
-              folder.id,
-            ))),
-            folders
-          );
-        });
+        folders.push(...folders);
       });
+
+    const key = resourceKeyList(folders.map<IConnectionFolderParam>(folder => createConnectionFolderParam(
+      folder.projectId,
+      folder.id,
+    )));
+
+    runInAction(() => {
+      if (all) {
+        this.replace(key, folders);
+      } else {
+        if (isProjectFolders) {
+          const removedFolders = this.keys
+            .filter(key => !folders.some(f => (
+              key.projectId === projectId
+                && key.folderId === f.id
+            )));
+
+          this.delete(resourceKeyList(removedFolders));
+        }
+
+        this.set(key,  folders);
+      }
+    });
 
     return this.data;
   }
@@ -158,22 +144,13 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
     );
   }
 
-  protected validateParam(param: ResourceKey<IConnectionFolderParam>): boolean {
+  protected validateKey(key: IConnectionFolderParam): boolean {
     return (
-      super.validateParam(param)
-      || (
-        typeof param === 'object' && !isResourceKeyList(param)
-        && typeof param.projectId === 'string'
-        && ['string'].includes(typeof param.folderId)
-      )
+      typeof key === 'object'
+      && typeof key.projectId === 'string'
+      && ['string'].includes(typeof key.folderId)
     );
   }
-}
-
-function isConnectionFolderProjectKey(
-  param: ResourceKey<IConnectionFolderParam>
-): param is ResourceKeyList<IConnectionFolderParam> {
-  return isResourceKeyList(param) && param.list.includes(connectionFolderProjectKeySymbol);
 }
 
 export function createConnectionFolderParam(

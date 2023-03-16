@@ -13,7 +13,7 @@ import { ExecutorInterrupter, IAsyncContextLoader, IExecutionContextProvider } f
 import { INodeNavigationData, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
 import { ServerEventId } from '@cloudbeaver/core-root';
-import { type ResourceKey, ResourceKeyUtils, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { type ResourceKey, ResourceKeyUtils, resourceKeyList, isResourceAlias, ResourceKeySimple } from '@cloudbeaver/core-sdk';
 
 import { ConnectionFolderEventHandler, IConnectionFolderEvent } from '../ConnectionFolderEventHandler';
 import { Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
@@ -41,7 +41,7 @@ export class ConnectionNavNodeService extends Dependency {
     });
 
     this.connectionInfoResource.onDataOutdated.addHandler(this.connectionUpdateHandler); // duplicates onItemAdd in some cases
-    this.connectionInfoResource.onItemAdd.addHandler(this.connectionUpdateHandler);
+    this.connectionInfoResource.onItemUpdate.addHandler(this.connectionUpdateHandler);
     this.connectionInfoResource.onItemDelete.addHandler(this.connectionRemoveHandler);
     this.connectionInfoResource.onConnectionCreate.addHandler(this.connectionCreateHandler);
 
@@ -104,12 +104,14 @@ export class ConnectionNavNodeService extends Dependency {
     key: ResourceKey<string>,
     context: IExecutionContextProvider<ResourceKey<string>>
   ) {
+    if (isResourceAlias(key)) {
+      return;
+    }
     if (!ResourceKeyUtils.some(key, key => NodeManagerUtils.isDatabaseObject(key))) {
       return;
     }
 
     await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
-    key = this.navTreeResource.transformParam(key);
 
     const notConnected = ResourceKeyUtils.some(key, key => {
       const connection = this.connectionInfoResource.getConnectionForNode(key);
@@ -123,17 +125,13 @@ export class ConnectionNavNodeService extends Dependency {
     }
   }
 
-  private connectionUpdateHandler(key: ResourceKey<IConnectionInfoParams> | undefined) {
-    if (key === undefined) {
-      key = ConnectionInfoActiveProjectKey;
-    }
-
-    key = this.connectionInfoResource.transformParam(key);
+  private connectionUpdateHandler(key: ResourceKey<IConnectionInfoParams>) {
+    let connectionInfos = this.connectionInfoResource.get(key);
     const outdatedTrees: string[] = [];
     const closedConnections: string[] = [];
 
-    ResourceKeyUtils.forEach(key, key => {
-      const connectionInfo = this.connectionInfoResource.get(key);
+    connectionInfos = Array.isArray(connectionInfos) ? connectionInfos : [connectionInfos];
+    for (const connectionInfo of connectionInfos) {
 
       if (!connectionInfo?.nodePath || connectionInfo.template) {
         return;
@@ -156,7 +154,7 @@ export class ConnectionNavNodeService extends Dependency {
       if (!outdatedTrees.includes(parentId)) {
         outdatedTrees.push(parentId);
       }
-    });
+    }
 
     if (closedConnections.length > 0) {
       const key = resourceKeyList(closedConnections);
@@ -172,8 +170,7 @@ export class ConnectionNavNodeService extends Dependency {
     }
   }
 
-  private connectionRemoveHandler(key: ResourceKey<IConnectionInfoParams>) {
-    key = this.connectionInfoResource.transformParam(key);
+  private connectionRemoveHandler(key: ResourceKeySimple<IConnectionInfoParams>) {
     ResourceKeyUtils.forEach(key, key => {
       const connectionInfo = this.connectionInfoResource.get(key);
 

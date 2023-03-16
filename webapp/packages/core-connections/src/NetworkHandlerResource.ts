@@ -8,36 +8,20 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import {
-  NetworkHandlerDescriptor,
-  GraphQLService,
-  CachedMapResource,
-  resourceKeyList,
-  NetworkHandlerConfigInput,
-  ResourceKey
-} from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { NetworkHandlerDescriptor, GraphQLService, CachedMapResource, resourceKeyList, NetworkHandlerConfigInput, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 export const SSH_TUNNEL_ID = 'ssh_tunnel';
 
 @injectable()
 export class NetworkHandlerResource extends CachedMapResource<string, NetworkHandlerDescriptor> {
-  private readonly loadedKeyMetadata: MetadataMap<string, boolean>;
-
   constructor(
     private readonly graphQLService: GraphQLService,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
+    serverConfigResource: ServerConfigResource
   ) {
     super();
-    this.loadedKeyMetadata = new MetadataMap(() => false);
-  }
-
-  has(id: string): boolean {
-    if (this.loadedKeyMetadata.has(id)) {
-      return this.loadedKeyMetadata.get(id);
-    }
-
-    return this.data.has(id);
+    this.sync(serverConfigResource, () => {}, () => CachedMapAllKey);
   }
 
   async test(config: NetworkHandlerConfigInput): Promise<void> {
@@ -52,27 +36,14 @@ export class NetworkHandlerResource extends CachedMapResource<string, NetworkHan
     }
   }
 
-  async loadAll(): Promise<Map<string, NetworkHandlerDescriptor>> {
-    await this.load('all');
-    return this.data;
-  }
-
-  protected async loader(key: string): Promise<Map<string, NetworkHandlerDescriptor>> {
+  protected async loader(): Promise<Map<string, NetworkHandlerDescriptor>> {
     const { handlers } = await this.graphQLService.sdk.getNetworkHandlers();
 
-    this.set(resourceKeyList(handlers.map(handler => handler.id)), handlers as NetworkHandlerDescriptor[]);
-
-    // TODO: networkHandlers must accept descriptorId, so we can update some descriptor or all descriptors,
-    //       here we should check is it's was a full update
-    this.loadedKeyMetadata.set('all', true);
-
+    this.replace(resourceKeyList(handlers.map(handler => handler.id)), handlers);
     return this.data;
   }
 
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }

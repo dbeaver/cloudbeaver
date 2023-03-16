@@ -19,7 +19,7 @@ export function elementsTreeLimitFilter(
   limit?: number
 ): IElementsTreeFilter {
   return (tree, filter, node, children) => {
-    limit = limit ?? navTreeResource.childrenLimit;
+    limit = 1000000;
     const nextChildren = children.slice(0, limit);
 
     if (children.length > limit) {

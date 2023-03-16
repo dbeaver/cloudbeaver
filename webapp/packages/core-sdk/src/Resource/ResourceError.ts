@@ -12,7 +12,7 @@ import type { CachedResource } from './CachedResource';
 
 export class ResourceError extends LoadingError {
   constructor(
-    private readonly resource: CachedResource<any, any, any, any, any>,
+    private readonly resource: CachedResource<any, any, any, any>,
     private readonly key: any,
     private readonly context: any,
     message?: string,
