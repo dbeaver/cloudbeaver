@@ -619,7 +619,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
   });
 
   useExecutor({
-    executor: navTreeResource.onItemAdd,
+    executor: navTreeResource.onItemUpdate,
     handlers: [function exitFolder(key) {
       ResourceKeyUtils.forEach(key, key => {
         const children = navTreeResource.get(key);
