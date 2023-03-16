@@ -175,8 +175,9 @@ public class LocalResourceController implements RMController {
 
         return accessibleSharedProjects
             .stream()
+            .filter(smObjectPermissions -> CommonUtils.isNotEmpty(smObjectPermissions.getObjectId()))
             .map(projectPermission -> makeProjectFromPath(
-                sharedProjectsPath.resolve(parseProjectName(projectPermission.getObjectId()).getName()),
+                sharedProjectsPath.resolve(parseProjectNameUnsafe(projectPermission.getObjectId()).getName()),
                 Arrays.stream(projectPermission.getPermissions()).map(RMProjectPermission::fromPermission).collect(Collectors.toSet()),
                 RMProjectType.SHARED, true)
             )
@@ -806,7 +807,7 @@ public class LocalResourceController implements RMController {
                 return getGlobalProjectPath();
             case SHARED:
                 return sharedProjectsPath.resolve(projectName);
-            default:
+            case USER:
                 var activeUserCredentials = credentialsProvider.getActiveUserCredentials();
                 var userId = activeUserCredentials == null ? null : activeUserCredentials.getUserId();
                 var isAdmin = activeUserCredentials != null && activeUserCredentials.hasPermission(DBWConstants.PERMISSION_ADMIN);
@@ -814,6 +815,8 @@ public class LocalResourceController implements RMController {
                     throw new DBException("No access to the project: " + projectName);
                 }
                 return userProjectsPath.resolve(projectName);
+            default:
+                throw new DBException("Invalid project type [" + type + "]");
         }
     }
 
@@ -981,7 +984,15 @@ public class LocalResourceController implements RMController {
             return RMProjectType.getByPrefix(prefix);
         }
     }
-    public static RMProjectName parseProjectName(String projectId) {
+
+    public static RMProjectName parseProjectName(String projectId) throws DBException {
+        if (CommonUtils.isEmpty(projectId)) {
+            throw new DBException("Project id is empty");
+        }
+        return parseProjectNameUnsafe(projectId);
+    }
+
+    private static RMProjectName parseProjectNameUnsafe(String projectId) {
         String prefix;
         String name;
         int divPos = projectId.indexOf("_");
@@ -996,16 +1007,13 @@ public class LocalResourceController implements RMController {
     }
 
     public static boolean isGlobalProject(String projectId) {
-        RMProjectName rmProjectName = parseProjectName(projectId);
+        RMProjectName rmProjectName = parseProjectNameUnsafe(projectId);
         return RMProjectType.GLOBAL.getPrefix().equals(rmProjectName.getPrefix());
     }
 
     public static boolean isPrivateProject(String projectId, String userId) {
-        RMProjectName rmProjectName = parseProjectName(projectId);
+        RMProjectName rmProjectName = parseProjectNameUnsafe(projectId);
         return RMProjectType.USER.getPrefix().equals(rmProjectName.getPrefix()) &&
             rmProjectName.name.equals(userId);
     }
-
-
-
 }
