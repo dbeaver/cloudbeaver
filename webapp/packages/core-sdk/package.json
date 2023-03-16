@@ -8,7 +8,7 @@
   "module": "lib/index.js",
   "types": "src/index.ts",
   "scripts": {
-    "prebuild": "rimraf lib/*",
+    "prebuild": "rimraf --glob lib/*",
     "build": "webpack --config ../../configs/webpack.plugin.config.js",
     "postbuild": "tsc",
     "pregql:gen": "rimraf node_modules",

@@ -13,7 +13,7 @@
   },
   "scripts": {
     "prebuild": "npm run clean-dist",
-    "clean-dist": "rimraf lib/*"
+    "clean-dist": "rimraf --glob lib/*"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",
