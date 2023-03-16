@@ -28,7 +28,7 @@ export class UserMetaParametersResource extends CachedDataResource<UserMetaParam
     sessionResource: SessionResource,
     userInfoResource: UserInfoResource
   ) {
-    super([]);
+    super(() => []);
 
     this.sync(sessionResource, () => {}, () => {});
     this
@@ -41,6 +41,7 @@ export class UserMetaParametersResource extends CachedDataResource<UserMetaParam
 
     this.data.push(parameter);
 
+    this.dataUpdate();
     return parameter;
   }
 
@@ -52,6 +53,7 @@ export class UserMetaParametersResource extends CachedDataResource<UserMetaParam
     if (index > -1) {
       this.data.splice(index, 1);
     }
+    this.dataUpdate();
   }
 
   protected async loader(): Promise<UserMetaParameter[]> {

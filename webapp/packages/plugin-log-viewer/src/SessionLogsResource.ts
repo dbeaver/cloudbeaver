@@ -24,7 +24,6 @@ export interface ILogEntry extends LogEntry {
 
 @injectable()
 export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
-
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly coreSettingsService: CoreSettingsService,
@@ -33,7 +32,7 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
     appAuthService: AppAuthService,
     sessionLogsEventHandler: SessionLogsEventHandler,
   ) {
-    super([]);
+    super(() => []);
     this.sync(sessionDataResource, () => { }, () => { });
     sessionDataResource.onDataUpdate.addHandler(() => {
       this.clear();
@@ -44,11 +43,6 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
     sessionLogsEventHandler.onEvent(ServerEventId.CbSessionLogUpdated, () => {
       this.markOutdated();
     }, undefined, this);
-  }
-
-  clear() {
-    this.data = [];
-    this.markOutdated();
   }
 
   protected async loader(): Promise<ILogEntry[]> {

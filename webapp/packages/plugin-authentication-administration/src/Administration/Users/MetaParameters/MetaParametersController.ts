@@ -14,7 +14,7 @@ import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } fr
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class MetaParametersController
@@ -54,11 +54,11 @@ implements IInitializableController {
   }
 
   constructor(
-    private notificationService: NotificationService,
-    private authProvidersResource: AuthProvidersResource,
-    private usersResource: UsersResource,
-    private commonDialogService: CommonDialogService,
-    private localizationService: LocalizationService
+    private readonly notificationService: NotificationService,
+    private readonly authProvidersResource: AuthProvidersResource,
+    private readonly usersResource: UsersResource,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly localizationService: LocalizationService
   ) {
     makeObservable(this, {
       isDeleting: observable,
@@ -68,7 +68,7 @@ implements IInitializableController {
   }
 
   init(): void {
-    this.authProvidersResource.loadAll();
+    this.authProvidersResource.load(CachedMapAllKey);
   }
 
   update = async () => {
