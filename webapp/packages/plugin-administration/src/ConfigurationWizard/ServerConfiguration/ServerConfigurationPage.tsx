@@ -36,6 +36,10 @@ const styles = css`
     white-space: pre-wrap;
     line-height: 2;
   }
+
+  Loader {
+    height: 100%;
+  }
 `;
 
 export const ServerConfigurationPage: AdministrationItemContentComponent = observer(function ServerConfigurationPage({
@@ -118,27 +122,29 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
         )}
         <Loader state={service}>
           {() => styled(style)(
-            <Container wrap gap grid medium>
-              <ServerConfigurationInfoForm state={service.state} />
-              <Group form gap>
-                <GroupTitle>{translate('administration_configuration_wizard_configuration_plugins')}</GroupTitle>
-                <ServerConfigurationConfigurationForm serverConfig={service.state.serverConfig} />
-                <ServerConfigurationNavigatorViewForm configs={service.state} />
-                <ServerConfigurationFeaturesForm state={service.state} configurationWizard={configurationWizard} />
+            <Loader suspense>
+              <Container wrap gap grid medium>
+                <ServerConfigurationInfoForm state={service.state} />
+                <Group form gap>
+                  <GroupTitle>{translate('administration_configuration_wizard_configuration_plugins')}</GroupTitle>
+                  <ServerConfigurationConfigurationForm serverConfig={service.state.serverConfig} />
+                  <ServerConfigurationNavigatorViewForm configs={service.state} />
+                  <ServerConfigurationFeaturesForm state={service.state} configurationWizard={configurationWizard} />
+                  <Placeholder
+                    container={service.pluginsContainer}
+                    configurationWizard={configurationWizard}
+                    state={service.state}
+                  />
+                </Group>
                 <Placeholder
-                  container={service.pluginsContainer}
+                  container={service.configurationContainer}
                   configurationWizard={configurationWizard}
                   state={service.state}
                 />
-              </Group>
-              <Placeholder
-                container={service.configurationContainer}
-                configurationWizard={configurationWizard}
-                state={service.state}
-              />
-              <ServerConfigurationSecurityForm serverConfig={service.state.serverConfig} />
-              <ServerConfigurationDriversForm serverConfig={service.state.serverConfig} />
-            </Container>
+                <ServerConfigurationSecurityForm serverConfig={service.state.serverConfig} />
+                <ServerConfigurationDriversForm serverConfig={service.state.serverConfig} />
+              </Container>
+            </Loader>
           )}
         </Loader>
       </ColoredContainer>

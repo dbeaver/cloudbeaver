@@ -175,7 +175,9 @@ export const ConnectionForm = observer<Props>(function ConnectionForm({
             <TabList style={style} disabled={state.disabled} />
           </connection-top-bar-tabs>
           <connection-top-bar-actions>
-            <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+            <Loader suspense inline hideMessage hideException>
+              <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+            </Loader>
           </connection-top-bar-actions>
         </connection-top-bar>
         <content-box>

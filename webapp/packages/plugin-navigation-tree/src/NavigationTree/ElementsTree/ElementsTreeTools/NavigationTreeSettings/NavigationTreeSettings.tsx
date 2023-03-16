@@ -9,9 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, Placeholder, PlaceholderElement, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Group, Loader, Placeholder, PlaceholderElement, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-
 
 import { ElementsTreeSettingsService, IElementsTreeSettingsProps } from './ElementsTreeSettingsService';
 
@@ -47,12 +46,14 @@ export const NavigationTreeSettings = observer<Props>(function NavigationTreeSet
   return styled(styles)(
     <settings className={className}>
       <Group keepSize form gap dense>
-        <Placeholder
-          container={elementsTreeSettingsService.placeholder}
-          elements={elements}
-          tree={tree}
-          style={style}
-        />
+        <Loader suspense>
+          <Placeholder
+            container={elementsTreeSettingsService.placeholder}
+            elements={elements}
+            tree={tree}
+            style={style}
+          />
+        </Loader>
       </Group>
     </settings>
   );

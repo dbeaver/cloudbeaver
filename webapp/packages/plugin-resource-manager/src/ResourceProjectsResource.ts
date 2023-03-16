@@ -20,15 +20,14 @@ export class ResourceProjectsResource extends CachedDataResource<Project[]> {
     private readonly userInfoResource: UserInfoResource,
     private readonly sharedProjectsResource: SharedProjectsResource,
   ) {
-    super([]);
+    super(() => []);
 
     this.userInfoResource.onUserChange.addPostHandler(() => {
-      this.loaded = false;
-      this.markOutdated();
+      this.clear();
     });
 
     this.sharedProjectsResource.onDataOutdated.addHandler(() => this.markOutdated());
-    this.sharedProjectsResource.onItemAdd.addHandler(() => this.markOutdated());
+    this.sharedProjectsResource.onItemUpdate.addHandler(() => this.markOutdated());
     this.sharedProjectsResource.onItemDelete.addHandler(() => this.markOutdated());
   }
 

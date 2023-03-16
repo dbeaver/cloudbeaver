@@ -12,7 +12,7 @@ import { UserDataService } from '@cloudbeaver/core-authentication';
 import { IConnectionExecutionContextInfo, NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import type { ProjectInfo } from '@cloudbeaver/core-projects';
-import { IResourceManagerParams, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
+import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
@@ -72,7 +72,7 @@ export class ResourceManagerScriptsService {
   }
 
   async createScript(
-    resourceKey: IResourceManagerParams,
+    resourceKey: string,
     executionContext?: IConnectionExecutionContextInfo,
     script = ''
   ) {
@@ -87,14 +87,15 @@ export class ResourceManagerScriptsService {
   }
 
   async setExecutionContextInfo(
-    resourceKey: IResourceManagerParams,
+    path: string,
     executionContext: IConnectionExecutionContextInfo | undefined
   ): Promise<IConnectionExecutionContextInfo | undefined> {
     if (!this.enabled) {
       return undefined;
     }
+    const resourceKey = getRmResourceKey(path);
 
-    const properties: IResourceProperties = await this.resourceManagerResource.setProperties(resourceKey, {
+    const properties: IResourceProperties = await this.resourceManagerResource.setProperties(path, {
       'default-datasource': executionContext?.connectionId,
       'default-catalog': executionContext?.defaultCatalog,
       'default-schema': executionContext?.defaultSchema,
@@ -114,10 +115,11 @@ export class ResourceManagerScriptsService {
   }
 
   async getExecutionContextInfo(
-    resourceKey: IResourceManagerParams
+    path: string
   ): Promise<IConnectionExecutionContextInfo | undefined> {
-    const resourcesInfo = await this.resourceManagerResource.load(resourceKey, ['includeProperties']);
-    const properties: IResourceProperties = resourcesInfo[0].properties;
+    const resourcesInfo = await this.resourceManagerResource.load(path, ['includeProperties']);
+    const properties: IResourceProperties = resourcesInfo.properties;
+    const resourceKey = getRmResourceKey(path);
 
     if (!properties['default-datasource']) {
       return undefined;

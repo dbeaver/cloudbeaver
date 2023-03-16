@@ -14,7 +14,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { isArraysEqual, MetadataMap, TempMap } from '@cloudbeaver/core-utils';
 import { ACTION_OPEN_IN_TAB, IActiveView, View } from '@cloudbeaver/core-view';
@@ -282,7 +282,7 @@ export class NavigationTabsService extends View<ITab> {
     this.closeTabSilent(tabId, skipHandlers);
   }
 
-  closeTabSilent(key: ResourceKey<string>, skipHandlers?: boolean): void {
+  closeTabSilent(key: ResourceKeySimple<string>, skipHandlers?: boolean): void {
     ResourceKeyUtils.forEach(key, tabId => {
       if (!this.userTabsState.tabs.includes(tabId)) {
         return;
@@ -301,7 +301,7 @@ export class NavigationTabsService extends View<ITab> {
       }
     });
 
-    if (ResourceKeyUtils.includes(key, this.history.currentId)) {
+    if (ResourceKeyUtils.isIntersect(key, this.history.currentId)) {
       this.selectTab(this.history.history.shift() ?? '', skipHandlers);
     }
   }
