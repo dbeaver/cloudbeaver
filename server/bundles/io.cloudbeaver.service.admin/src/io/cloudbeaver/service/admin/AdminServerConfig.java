@@ -17,7 +17,7 @@
 package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.server.CBAppConfig;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
 import java.util.Arrays;
@@ -53,7 +53,7 @@ public class AdminServerConfig {
         this.adminName = JSONUtils.getString(params, "adminName");
         this.adminPassword = JSONUtils.getString(params, "adminPassword");
 
-        CBAppConfig appConfig = CBApplication.getInstance().getAppConfiguration();
+        CBAppConfig appConfig = CBApplicationBase.getInstance().getAppConfiguration();
         this.anonymousAccessEnabled = JSONUtils.getBoolean(params, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
         this.customConnectionsEnabled = JSONUtils.getBoolean(params, "customConnectionsEnabled", appConfig.isSupportsCustomConnections());
         this.publicCredentialsSaveEnabled = JSONUtils.getBoolean(params, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());

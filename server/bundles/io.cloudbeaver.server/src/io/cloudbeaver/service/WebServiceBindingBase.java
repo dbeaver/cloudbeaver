@@ -23,7 +23,7 @@ import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.security.SMUtils;
@@ -32,7 +32,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.utils.ArrayUtils;
-import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +40,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.*;
-import java.util.Set;
 
 /**
  * Web service implementation
@@ -234,8 +232,8 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             String[] features = actionSet.requireFeatures();
             if (features.length > 0) {
                 for (String feature : features) {
-                    if (!CBApplication.getInstance().isConfigurationMode() &&
-                        !CBApplication.getInstance().getAppConfiguration().isFeatureEnabled(feature)) {
+                    if (!CBApplicationBase.getInstance().isConfigurationMode() &&
+                        !CBApplicationBase.getInstance().getAppConfiguration().isFeatureEnabled(feature)) {
                         throw new DBWebException("Feature " + feature + " is disabled");
                     }
                 }
@@ -251,7 +249,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             if (session == null) {
                 throw new DBWebExceptionAccessDenied("No open session - anonymous access restricted");
             }
-            CBApplication application = CBApplication.getInstance();
+            CBApplicationBase application = CBApplicationBase.getInstance();
             if (!application.isConfigurationMode()) {
                 if (webAction.authRequired() && !session.isAuthorizedInSecurityManager()) {
                     log.debug("Anonymous access to " + method.getName() + " restricted");

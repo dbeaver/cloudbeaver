@@ -24,7 +24,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionAuthProcessor;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWSessionHandler;
 import org.jkiss.code.NotNull;
@@ -50,10 +50,10 @@ public class WebSessionManager {
 
     private static final Log log = Log.getLog(WebSessionManager.class);
 
-    private final CBApplication application;
+    private final CBApplicationBase application;
     private final Map<String, BaseWebSession> sessionMap = new HashMap<>();
 
-    public WebSessionManager(CBApplication application) {
+    public WebSessionManager(CBApplicationBase application) {
         this.application = application;
     }
 
@@ -73,14 +73,14 @@ public class WebSessionManager {
         return null;
     }
 
-    protected CBApplication getApplication() {
+    protected CBApplicationBase getApplication() {
         return application;
     }
 
     public boolean touchSession(@NotNull HttpServletRequest request,
                                 @NotNull HttpServletResponse response) throws DBWebException {
         WebSession webSession = getWebSession(request, response, false);
-        long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
+        long maxSessionIdleTime = CBApplicationBase.getInstance().getMaxSessionIdleTime();
         webSession.updateInfo(request, response, maxSessionIdleTime);
         return true;
     }
@@ -111,7 +111,7 @@ public class WebSessionManager {
                 }
                 sessionMap.put(sessionId, webSession);
 
-                if (!CBApplication.getInstance().isConfigurationMode()) {
+                if (!CBApplicationBase.getInstance().isConfigurationMode()) {
                     if (!httpSession.isNew()) {
                         webSession.setCacheExpired(true);
                         if (errorOnNoFound) {
@@ -196,7 +196,7 @@ public class WebSessionManager {
 
     public void expireIdleSessions() {
         long maxSessionIdleTime = DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
-        if (CBApplication.getInstance().isConfigurationMode()) {
+        if (CBApplicationBase.getInstance().isConfigurationMode()) {
             // In configuration mode sessions expire after a week
             maxSessionIdleTime = 60 * 60 * 1000 * 24 * 7;
         }

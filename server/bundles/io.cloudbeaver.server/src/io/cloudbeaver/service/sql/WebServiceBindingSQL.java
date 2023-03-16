@@ -20,7 +20,7 @@ import graphql.schema.DataFetchingEnvironment;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServletContext;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 /**
  * Web service implementation
  */
-public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> implements DBWServiceBindingServlet<CBApplication> {
+public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> implements DBWServiceBindingServlet<CBApplicationBase> {
 
     public WebServiceBindingSQL() {
         super(DBWServiceSQL.class, new WebServiceSQL(), "schema/service.sql.graphqls");
@@ -240,7 +240,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
     }
 
     @Override
-    public void addServlets(CBApplication application, DBWServletContext servletContext) throws DBException {
+    public void addServlets(CBApplicationBase application, DBWServletContext servletContext) throws DBException {
         servletContext.addServlet(
             "sqlResultValueViewer",
             new WebSQLResultServlet(application, getServiceImpl()),

@@ -68,7 +68,7 @@ public class CBPlatform extends BasePlatformImpl {
     static CBPlatform instance;
 
     @Nullable
-    private static CBApplication application = null;
+    private static CBApplicationBase application = null;
 
     private Path tempFolder;
 
@@ -119,7 +119,7 @@ public class CBPlatform extends BasePlatformImpl {
     private CBPlatform() {
     }
 
-    public static void setApplication(CBApplication application) {
+    public static void setApplication(CBApplicationBase application) {
         CBPlatform.application = application;
     }
 
@@ -201,7 +201,7 @@ public class CBPlatform extends BasePlatformImpl {
 
     @NotNull
     @Override
-    public CBApplication getApplication() {
+    public CBApplicationBase getApplication() {
         return application;
     }
 

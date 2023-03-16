@@ -20,7 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
@@ -203,7 +203,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         }
         IStreamDataExporter exporter = (IStreamDataExporter) processorInstance;
 
-        Number fileSizeLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(QUOTA_PROP_FILE_LIMIT);
+        Number fileSizeLimit = CBApplicationBase.getInstance().getAppConfiguration().getResourceQuota(QUOTA_PROP_FILE_LIMIT);
 
         StreamTransferConsumer consumer = new StreamTransferConsumer() {
             @Override

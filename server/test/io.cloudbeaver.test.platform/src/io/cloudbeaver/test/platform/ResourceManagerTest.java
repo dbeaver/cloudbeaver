@@ -18,7 +18,7 @@
 package io.cloudbeaver.test.platform;
 
 import io.cloudbeaver.model.rm.local.LocalResourceController;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.utils.WebTestUtils;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -37,7 +37,7 @@ public class ResourceManagerTest {
 
     @Test
     public void createDeleteResourceTest() throws Exception {
-        Assert.assertTrue(CBApplication.getInstance().getAppConfiguration().isResourceManagerEnabled());
+        Assert.assertTrue(CBApplicationBase.getInstance().getAppConfiguration().isResourceManagerEnabled());
         HttpClient client = HttpClient.newBuilder()
             .cookieHandler(new CookieManager())
             .version(HttpClient.Version.HTTP_2)

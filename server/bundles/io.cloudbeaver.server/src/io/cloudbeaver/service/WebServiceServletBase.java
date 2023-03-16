@@ -1,7 +1,7 @@
 package io.cloudbeaver.service;
 
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -16,13 +16,13 @@ public abstract class WebServiceServletBase extends HttpServlet {
 
     private static final Log log = Log.getLog(WebServiceServletBase.class);
 
-    private final CBApplication application;
+    private final CBApplicationBase application;
 
-    public WebServiceServletBase(CBApplication application) {
+    public WebServiceServletBase(CBApplicationBase application) {
         this.application = application;
     }
 
-    public CBApplication getApplication() {
+    public CBApplicationBase getApplication() {
         return application;
     }
 

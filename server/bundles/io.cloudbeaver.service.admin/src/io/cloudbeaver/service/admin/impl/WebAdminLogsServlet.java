@@ -3,7 +3,7 @@ package io.cloudbeaver.service.admin.impl;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.service.WebServiceServletBase;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -23,7 +23,7 @@ public class WebAdminLogsServlet extends WebServiceServletBase {
 
     private static final Log log = Log.getLog(WebAdminLogsServlet.class);
 
-    public WebAdminLogsServlet(CBApplication application) {
+    public WebAdminLogsServlet(CBApplicationBase application) {
         super(application);
     }
 

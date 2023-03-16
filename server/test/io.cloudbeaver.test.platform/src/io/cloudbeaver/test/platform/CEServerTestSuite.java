@@ -18,6 +18,7 @@
 package io.cloudbeaver.test.platform;
 
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.utils.WebTestUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -38,7 +39,7 @@ public class CEServerTestSuite {
     private static boolean setUpIsDone = false;
     private static boolean testFinished = false;
 
-    private static CBApplication testApp;
+    private static CBApplicationBase testApp;
     private static HttpClient client;
     private static Path scriptsPath;
     private static Thread thread;

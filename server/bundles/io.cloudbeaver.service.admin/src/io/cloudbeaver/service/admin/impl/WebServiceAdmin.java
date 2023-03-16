@@ -22,13 +22,12 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.*;
 import io.cloudbeaver.server.CBAppConfig;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
@@ -156,7 +155,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public Set<String> listAuthRoles() {
-        return CBApplication.getInstance().getAvailableAuthRoles();
+        return CBApplicationBase.getInstance().getAvailableAuthRoles();
     }
 
     @Override
@@ -375,7 +374,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         return authProvider.getConfigurationParameters().stream().filter(p -> {
             if (p.hasFeature("distributed")) {
-                return CBApplication.getInstance().isDistributed();
+                return CBApplicationBase.getInstance().isDistributed();
             }
             return true;
         }).map(p -> new WebPropertyInfo(webSession, p)).collect(Collectors.toList());
@@ -384,7 +383,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public List<WebAuthProviderConfiguration> listAuthProviderConfigurations(@NotNull WebSession webSession, @Nullable String providerId) throws DBWebException {
         List<WebAuthProviderConfiguration> result = new ArrayList<>();
-        for (SMAuthProviderCustomConfiguration cfg : CBApplication.getInstance().getAppConfiguration().getAuthCustomConfigurations()) {
+        for (SMAuthProviderCustomConfiguration cfg : CBApplicationBase.getInstance().getAppConfiguration().getAuthCustomConfigurations()) {
             if (providerId != null && !providerId.equals(cfg.getProvider())) {
                 continue;
             }
@@ -419,9 +418,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         providerConfig.setIconURL(iconURL);
         providerConfig.setDescription(description);
         providerConfig.setParameters(parameters);
-        CBApplication.getInstance().getAppConfiguration().addAuthProviderConfiguration(providerConfig);
+        CBApplicationBase.getInstance().getAppConfiguration().addAuthProviderConfiguration(providerConfig);
         try {
-            CBApplication.getInstance().flushConfiguration(webSession);
+            CBApplicationBase.getInstance().flushConfiguration(webSession);
         } catch (DBException e) {
             throw new DBWebException("Error saving server configuration", e);
         }
@@ -432,9 +431,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public boolean deleteAuthProviderConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException {
         webSession.addInfoMessage("Delete configuration for auth provider - " + id);
 
-        if (CBApplication.getInstance().getAppConfiguration().deleteAuthProviderConfiguration(id)) {
+        if (CBApplicationBase.getInstance().getAppConfiguration().deleteAuthProviderConfiguration(id)) {
             try {
-                CBApplication.getInstance().flushConfiguration(webSession);
+                CBApplicationBase.getInstance().flushConfiguration(webSession);
             } catch (DBException e) {
                 throw new DBWebException("Error saving server configuration", e);
             }
@@ -450,12 +449,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public boolean configureServer(WebSession webSession, Map<String, Object> params) throws DBWebException {
         try {
-            CBAppConfig appConfig = new CBAppConfig(CBApplication.getInstance().getAppConfiguration());
+            CBAppConfig appConfig = new CBAppConfig(CBApplicationBase.getInstance().getAppConfiguration());
             String adminName = null;
             String adminPassword = null;
-            String serverName = CBApplication.getInstance().getServerName();
-            String serverURL = CBApplication.getInstance().getServerURL();
-            long sessionExpireTime = CBApplication.getInstance().getMaxSessionIdleTime();
+            String serverName = CBApplicationBase.getInstance().getServerName();
+            String serverURL = CBApplicationBase.getInstance().getServerURL();
+            long sessionExpireTime = CBApplicationBase.getInstance().getMaxSessionIdleTime();
 
             if (!params.isEmpty()) {    // FE can send an empty configuration
                 var config = new AdminServerConfig(params);
@@ -476,7 +475,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 }
 
                 appConfig.setDefaultNavigatorSettings(
-                    CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
+                    CBApplicationBase.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
 
                 adminName = config.getAdminName();
                 adminPassword = config.getAdminPassword();
@@ -505,15 +504,15 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             // Patch configuration by services
             for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance().getWebServices(DBWServiceServerConfigurator.class)) {
                 try {
-                    wsc.configureServer(CBApplication.getInstance(), webSession, appConfig);
+                    wsc.configureServer(CBApplicationBase.getInstance(), webSession, appConfig);
                 } catch (Exception e) {
                     log.warn("Error configuring server by web service " + wsc.getClass().getName(), e);
                 }
             }
 
-            boolean configurationMode = CBApplication.getInstance().isConfigurationMode();
+            boolean configurationMode = CBApplicationBase.getInstance().isConfigurationMode();
 
-            CBApplication.getInstance().finishConfiguration(
+            CBApplicationBase.getInstance().finishConfiguration(
                 serverName,
                 serverURL,
                 adminName,
@@ -541,12 +540,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings) throws DBWebException {
-        CBApplication.getInstance().getAppConfiguration().setDefaultNavigatorSettings(settings);
-        if (CBApplication.getInstance().isConfigurationMode()) {
+        CBApplicationBase.getInstance().getAppConfiguration().setDefaultNavigatorSettings(settings);
+        if (CBApplicationBase.getInstance().isConfigurationMode()) {
             return true;
         }
         try {
-            CBApplication.getInstance().flushConfiguration(webSession);
+            CBApplicationBase.getInstance().flushConfiguration(webSession);
         } catch (DBException e) {
             throw new DBWebException("Error saving server configuration", e);
         }

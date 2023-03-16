@@ -17,7 +17,7 @@
 package io.cloudbeaver.server.jetty;
 
 import io.cloudbeaver.registry.WebServiceRegistry;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
@@ -62,7 +62,7 @@ public class CBJettyServer {
     }
 
     public void runServer() {
-        CBApplication application = CBApplication.getInstance();
+        CBApplicationBase application = CBApplicationBase.getInstance();
         try {
             JettyServer server;
             int serverPort = application.getServerPort();

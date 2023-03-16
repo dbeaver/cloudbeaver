@@ -18,7 +18,7 @@ package io.cloudbeaver.model;
 
 import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -37,9 +37,9 @@ import java.util.Map;
  */
 public class WebServerConfig {
 
-    private final CBApplication application;
+    private final CBApplicationBase application;
 
-    public WebServerConfig(CBApplication application) {
+    public WebServerConfig(CBApplicationBase application) {
         this.application = application;
     }
 

@@ -2,7 +2,7 @@ package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.service.WebServiceServletBase;
 import org.eclipse.jetty.server.Request;
@@ -35,7 +35,7 @@ public class WebSQLResultServlet extends WebServiceServletBase {
 
     private final DBWServiceSQL sqlService;
 
-    public WebSQLResultServlet(CBApplication application, DBWServiceSQL sqlService) {
+    public WebSQLResultServlet(CBApplicationBase application, DBWServiceSQL sqlService) {
         super(application);
         this.sqlService = sqlService;
     }

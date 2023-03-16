@@ -35,12 +35,10 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.service.WebServiceBindingBase;
-import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.utils.IOUtils;
 
 import javax.servlet.ServletException;
@@ -53,7 +51,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -125,7 +122,7 @@ public class GraphQLEndpoint extends HttpServlet {
     }
 
     private void setDevelHeaders(HttpServletRequest request, HttpServletResponse response) {
-        if (CBApplication.getInstance().isDevelMode()) {
+        if (CBApplicationBase.getInstance().isDevelMode()) {
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_HEADERS, "*");
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "*");
@@ -206,7 +203,7 @@ public class GraphQLEndpoint extends HttpServlet {
         if (path == null) {
             path = request.getServletPath();
         }
-        boolean develMode = CBApplication.getInstance().isDevelMode();
+        boolean develMode = CBApplicationBase.getInstance().isDevelMode();
 
         if (path.contentEquals("/schema.json") && develMode) {
             executeQuery(request, response, GraphQLConstants.SCHEMA_READ_QUERY, null, null);

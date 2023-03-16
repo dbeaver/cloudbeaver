@@ -19,7 +19,7 @@ package io.cloudbeaver.service.auth.local;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.server.actions.CBServerAction;
 import io.cloudbeaver.server.actions.AbstractActionSessionHandler;
 import org.jkiss.dbeaver.DBException;
@@ -38,7 +38,7 @@ public class LocalSessionHandler extends AbstractActionSessionHandler {
 
     @Override
     public boolean handleSessionAuth(WebSession webSession) throws DBException, IOException {
-        if (webSession.getUser() == null && !CBApplication.getInstance().getAppConfiguration().isAnonymousAccessEnabled()) {
+        if (webSession.getUser() == null && !CBApplicationBase.getInstance().getAppConfiguration().isAnonymousAccessEnabled()) {
             return false;
         }
         executeAction(webSession);

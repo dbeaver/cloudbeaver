@@ -28,7 +28,7 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebMetaParametersRegistry;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
 import io.cloudbeaver.service.auth.WebAuthStatus;
 import io.cloudbeaver.service.auth.WebUserInfo;
@@ -72,7 +72,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             authParameters = Map.of();
         }
         SMController securityController = webSession.getSecurityController();
-        String currentSmSessionId = (webSession.getUser() == null || CBApplication.getInstance().isConfigurationMode())
+        String currentSmSessionId = (webSession.getUser() == null || CBApplicationBase.getInstance().isConfigurationMode())
             ? null
             : webSession.getUserContext().getSmSessionId();
 
@@ -87,7 +87,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 authParameters
             );
 
-            linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration().isLinkExternalCredentialsWithUser();
+            linkWithActiveUser = linkWithActiveUser && CBApplicationBase.getInstance().getAppConfiguration().isLinkExternalCredentialsWithUser();
             if (smAuthInfo.getAuthStatus() == SMAuthStatus.IN_PROGRESS) {
                 //run async auth process
                 return new WebAuthStatus(smAuthInfo.getAuthAttemptId(), smAuthInfo.getRedirectUrl(), smAuthInfo.getAuthStatus());
@@ -105,7 +105,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebAuthStatus authUpdateStatus(@NotNull WebSession webSession, @NotNull String authId, boolean linkWithActiveUser) throws DBWebException {
         try {
-            linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration().isLinkExternalCredentialsWithUser();
+            linkWithActiveUser = linkWithActiveUser && CBApplicationBase.getInstance().getAppConfiguration().isLinkExternalCredentialsWithUser();
             SMAuthInfo smAuthInfo = webSession.getSecurityController().getAuthStatus(authId);
             switch (smAuthInfo.getAuthStatus()) {
                 case SUCCESS:

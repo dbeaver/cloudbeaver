@@ -17,10 +17,9 @@
 package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.SMAuthCredentialsProfile;
@@ -80,7 +79,7 @@ public class WebAuthProviderInfo {
 
     public List<WebAuthProviderConfiguration> getConfigurations() {
         List<WebAuthProviderConfiguration> result = new ArrayList<>();
-        for (SMAuthProviderCustomConfiguration cfg : CBApplication.getInstance().getAppConfiguration().getAuthCustomConfigurations()) {
+        for (SMAuthProviderCustomConfiguration cfg : CBApplicationBase.getInstance().getAppConfiguration().getAuthCustomConfigurations()) {
             if (!cfg.isDisabled() && getId().equals(cfg.getProvider())) {
                 result.add(new WebAuthProviderConfiguration(descriptor, cfg));
             }

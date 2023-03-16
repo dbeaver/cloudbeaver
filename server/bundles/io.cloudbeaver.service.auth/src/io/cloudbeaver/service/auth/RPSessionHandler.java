@@ -24,7 +24,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionAuthProcessor;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
@@ -49,7 +49,7 @@ public class RPSessionHandler implements DBWSessionHandler {
 
     @Override
     public boolean handleSessionOpen(WebSession webSession, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
-        boolean configMode = CBApplication.getInstance().isConfigurationMode();
+        boolean configMode = CBApplicationBase.getInstance().isConfigurationMode();
         //checks if the app is not in configuration mode and reverse proxy auth is enabled in the config file
         WebAuthConfiguration appConfiguration = (WebAuthConfiguration) WebAppUtils.getWebApplication().getAppConfiguration();
         boolean isReverseProxyAuthEnabled = appConfiguration.isAuthProviderEnabled(RPAuthProvider.AUTH_PROVIDER);

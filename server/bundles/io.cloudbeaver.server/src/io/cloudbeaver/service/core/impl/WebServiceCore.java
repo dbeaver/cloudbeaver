@@ -25,7 +25,7 @@ import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.core.DBWServiceCore;
 import io.cloudbeaver.service.security.SMUtils;
@@ -77,7 +77,7 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebServerConfig getServerConfig() {
-        return new WebServerConfig(CBApplication.getInstance());
+        return new WebServerConfig(CBApplicationBase.getInstance());
     }
 
     @Override
@@ -207,7 +207,7 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public String[] getSessionPermissions(@NotNull WebSession webSession) throws DBWebException {
-        if (CBApplication.getInstance().isConfigurationMode()) {
+        if (CBApplicationBase.getInstance().isConfigurationMode()) {
             return new String[] {
                 DBWConstants.PERMISSION_ADMIN
             };
@@ -378,7 +378,7 @@ public class WebServiceCore implements DBWServiceCore {
         var rmProject = project.getRmProject();
         if (rmProject.getType() == RMProjectType.USER
             && !webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)
-            && !CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()
+            && !CBApplicationBase.getInstance().getAppConfiguration().isSupportsCustomConnections()
         ) {
             throw new DBWebException("New connection create is restricted by server configuration");
         }
@@ -527,7 +527,7 @@ public class WebServiceCore implements DBWServiceCore {
         DBPDataSourceContainer newDataSource = projectRegistry.createDataSource(dataSourceTemplate);
 
         ((DataSourceDescriptor) newDataSource).setNavigatorSettings(
-            CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
+            CBApplicationBase.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
 
         if (!CommonUtils.isEmpty(connectionName)) {
             newDataSource.setName(connectionName);
@@ -567,7 +567,7 @@ public class WebServiceCore implements DBWServiceCore {
             DBPDataSourceContainer newDataSource = dataSourceRegistry.createDataSource(dataSourceTemplate);
 
             ((DataSourceDescriptor) newDataSource).setNavigatorSettings(
-                CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
+                CBApplicationBase.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
 
             // Copy props from config
             if (!CommonUtils.isEmpty(config.getName())) {
@@ -604,7 +604,7 @@ public class WebServiceCore implements DBWServiceCore {
         connectionConfig.setSaveCredentials(true); // It is used in createConnectionFromConfig
 
         DBPDataSourceContainer dataSource = WebDataSourceUtils.getLocalOrGlobalDataSource(
-            CBApplication.getInstance(), webSession, projectId, connectionId);
+            CBApplicationBase.getInstance(), webSession, projectId, connectionId);
 
         WebProjectImpl project = getProjectById(webSession, projectId);
         DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
@@ -758,7 +758,7 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public List<WebProjectInfo> getProjects(@NotNull WebSession session) {
         var customConnectionsEnabled =
-            CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()
+            CBApplicationBase.getInstance().getAppConfiguration().isSupportsCustomConnections()
                 || SMUtils.isRMAdmin(session);
         return session.getAccessibleProjects().stream()
             .map(pr -> new WebProjectInfo(session, pr, customConnectionsEnabled))

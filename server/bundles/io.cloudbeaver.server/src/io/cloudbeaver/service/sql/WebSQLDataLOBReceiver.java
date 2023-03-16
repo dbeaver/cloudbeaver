@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
@@ -73,7 +73,7 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
         fileName.append(s);
         exportFileName = CommonUtils.escapeFileName(fileName.toString());
         byte[] binaryValue;
-        Number fileSizeLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(CBConstants.QUOTA_PROP_FILE_LIMIT);
+        Number fileSizeLimit = CBApplicationBase.getInstance().getAppConfiguration().getResourceQuota(CBConstants.QUOTA_PROP_FILE_LIMIT);
         if (lobValue instanceof DBDContent) {
             binaryValue = ContentUtils.getContentBinaryValue(session.getProgressMonitor(), (DBDContent) lobValue);
         } else if (lobValue instanceof DBDValue) {

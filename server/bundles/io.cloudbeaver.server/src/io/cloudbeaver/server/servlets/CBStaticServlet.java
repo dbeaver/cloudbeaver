@@ -27,7 +27,7 @@ import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebServletHandlerDescriptor;
 import io.cloudbeaver.server.CBAppConfig;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.server.CBPlatform;
 import org.eclipse.jetty.http.HttpContent;
 import org.eclipse.jetty.http.HttpField;
@@ -82,7 +82,7 @@ public class CBStaticServlet extends DefaultServlet {
                 request, response, false);
             performAutoLoginIfNeeded(request, webSession);
             WebActionParameters webActionParameters = WebActionParameters.fromSession(webSession, false);
-            if (CBApplication.getInstance().getAppConfiguration().isRedirectOnFederatedAuth()
+            if (CBApplicationBase.getInstance().getAppConfiguration().isRedirectOnFederatedAuth()
                 && (CommonUtils.isEmpty(uri) || uri.equals("/") || uri.equals("/index.html"))
                 && request.getParameterMap().isEmpty()
                 && (webActionParameters == null || !webActionParameters.getParameters().containsValue(AUTO_LOGIN_ACTION))
@@ -121,7 +121,7 @@ public class CBStaticServlet extends DefaultServlet {
     }
 
     private boolean processSessionStart(HttpServletRequest request, HttpServletResponse response, WebSession webSession) {
-        CBApplication application = CBApplication.getInstance();
+        CBApplicationBase application = CBApplicationBase.getInstance();
         if (application.isConfigurationMode()) {
             return false;
         }
@@ -213,8 +213,8 @@ public class CBStaticServlet extends DefaultServlet {
             }
             String indexContents = baos.toString(StandardCharsets.UTF_8);
             indexContents = indexContents
-                .replace("{ROOT_URI}", CBApplication.getInstance().getRootURI())
-                .replace("{STATIC_CONTENT}", CBApplication.getInstance().getStaticContent());
+                .replace("{ROOT_URI}", CBApplicationBase.getInstance().getRootURI())
+                .replace("{STATIC_CONTENT}", CBApplicationBase.getInstance().getStaticContent());
             byte[] indexBytes = indexContents.getBytes(StandardCharsets.UTF_8);
 
             putHeaders(response, content, indexBytes.length);

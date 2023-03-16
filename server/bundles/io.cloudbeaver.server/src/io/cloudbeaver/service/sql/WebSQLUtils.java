@@ -19,7 +19,7 @@ package io.cloudbeaver.service.sql;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBAppConfig;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.utils.CBModelConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
@@ -157,7 +157,7 @@ public class WebSQLUtils {
             if (binaryValue != null) {
                 byte[] previewValue = binaryValue;
                 // gets parameters from the configuration file
-                CBAppConfig config = CBApplication.getInstance().getAppConfiguration();
+                CBAppConfig config = CBApplicationBase.getInstance().getAppConfiguration();
                 // the max length of the text preview
                 int textPreviewMaxLength = CommonUtils.toInt(
                     config.getResourceQuota(
@@ -207,7 +207,7 @@ public class WebSQLUtils {
      */
     public static Object serializeStringValue(Object value) {
         int textPreviewMaxLength = CommonUtils.toInt(
-            CBApplication.getInstance().getAppConfiguration().getResourceQuota(
+            CBApplicationBase.getInstance().getAppConfiguration().getResourceQuota(
                 WebSQLConstants.QUOTA_PROP_BINARY_PREVIEW_MAX_LENGTH,
                 WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH));
         String stringValue = value.toString();

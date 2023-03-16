@@ -26,7 +26,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.server.CBAppConfig;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
@@ -133,7 +133,7 @@ public class WebServiceUtils extends WebCommonUtils {
 
         // Set default navigator settings
         DataSourceNavigatorSettings navSettings = new DataSourceNavigatorSettings(
-            CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
+            CBApplicationBase.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
         //navSettings.setShowSystemObjects(false);
         ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
 
@@ -285,7 +285,7 @@ public class WebServiceUtils extends WebCommonUtils {
     }
 
     public static void checkServerConfigured() throws DBWebException {
-        if (CBApplication.getInstance().isConfigurationMode()) {
+        if (CBApplicationBase.getInstance().isConfigurationMode()) {
             throw new DBWebException("Server is in configuration mode");
         }
     }
@@ -314,12 +314,12 @@ public class WebServiceUtils extends WebCommonUtils {
     }
 
     public static boolean isGlobalProject(DBPProject project) {
-        return project.getId().equals(RMProjectType.GLOBAL.getPrefix() + "_" + CBApplication.getInstance().getDefaultProjectName());
+        return project.getId().equals(RMProjectType.GLOBAL.getPrefix() + "_" + CBApplicationBase.getInstance().getDefaultProjectName());
     }
 
     public static List<WebAuthProviderDescriptor> getEnabledAuthProviders() {
         List<WebAuthProviderDescriptor> result = new ArrayList<>();
-        CBAppConfig appConfig = CBApplication.getInstance().getAppConfiguration();
+        CBAppConfig appConfig = CBApplicationBase.getInstance().getAppConfiguration();
         String[] authProviders = appConfig.getEnabledAuthProviders();
         for (String apId : authProviders) {
             WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(apId);

@@ -18,7 +18,7 @@ package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServletContext;
@@ -31,7 +31,7 @@ import org.jkiss.utils.CommonUtils;
 /**
  * Web service implementation
  */
-public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmin> implements DBWServiceBindingServlet<CBApplication> {
+public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmin> implements DBWServiceBindingServlet<CBApplicationBase> {
 
     private static final String SCHEMA_FILE_NAME = "schema/service.admin.graphqls";
 
@@ -159,7 +159,7 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
     }
 
     @Override
-    public void addServlets(CBApplication application, DBWServletContext servletContext) throws DBException {
+    public void addServlets(CBApplicationBase application, DBWServletContext servletContext) throws DBException {
         servletContext.addServlet("adminLogs", new WebAdminLogsServlet(application), application.getServicesURI() + "logs/*");
     }
 

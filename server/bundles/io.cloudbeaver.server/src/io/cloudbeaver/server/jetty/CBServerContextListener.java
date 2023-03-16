@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.server.jetty;
 
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import io.cloudbeaver.server.CBConstants;
 
 import javax.servlet.ServletContextEvent;
@@ -35,7 +35,7 @@ public class CBServerContextListener implements ServletContextListener {
         //scf.setDomain(domain);
         //scf.setHttpOnly(httpOnly);
         //scf.setMaxAge(CB_SESSION_LIFE_TIME);
-        scf.setPath(CBApplication.getInstance().getRootURI());
+        scf.setPath(CBApplicationBase.getInstance().getRootURI());
         //scf.setSecure(isSecure);
         scf.setName(CBConstants.CB_SESSION_COOKIE_NAME);
     }

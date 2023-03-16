@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.model;
 
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationBase;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -68,7 +68,7 @@ public class WebProductInfo {
 
     @Property
     public String getLicenseInfo() {
-        return CBApplication.getInstance().getInfoDetails(new VoidProgressMonitor());
+        return CBApplicationBase.getInstance().getInfoDetails(new VoidProgressMonitor());
     }
 
     @Property
