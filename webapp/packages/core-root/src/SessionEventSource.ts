@@ -164,7 +164,7 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
   }
 
   private errorHandler(error: any, caught: Observable<ISessionEvent>): Observable<ISessionEvent> {
-    this.errorSubject.next(new ServiceError('WebSocket connection error'));
+    this.errorSubject.next(new ServiceError('WebSocket connection error', { cause: error }));
     return throwError(() => error);
   }
 }

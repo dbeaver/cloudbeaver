@@ -11,7 +11,7 @@ import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, Button, Container, FieldCheckbox, Group, InputField, SubmittingForm, useTranslate } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
 
 import type { IAutoRefreshSettings } from './IAutoRefreshSettings';
@@ -64,11 +64,41 @@ export const AutoRefreshSettingsDialog = observer<DialogComponentProps<Payload>>
   }
 
   return styled(styles, BASE_CONTAINERS_STYLES)(
-    <CommonDialogWrapper
-      size='small'
-      title='data_viewer_auto_refresh_settings'
-      icon='/icons/settings_cog_m.svg'
-      footer={(
+    <CommonDialogWrapper size='small'>
+      <CommonDialogHeader
+        title='data_viewer_auto_refresh_settings'
+        icon='/icons/settings_cog_m.svg'
+        onReject={rejectDialog}
+      />
+      <CommonDialogBody noBodyPadding noOverflow>
+        <wrapper>
+          <SubmittingForm ref={formRef} onSubmit={() => resolve()}>
+            <Container>
+              <Group form gap>
+                <InputField
+                  name='interval'
+                  state={payload.settings}
+                  type='number'
+                  min={5}
+                  max={3600}
+                >
+                  {translate('ui_interval')}
+                </InputField>
+
+                <FieldCheckbox
+                  id="dataViewer.tableViewer.autoRefresh.stopOnError"
+                  name="stopOnError"
+                  state={payload.settings}
+                >
+                  {translate('data_viewer_auto_refresh_settings_stop_on_error')}
+                </FieldCheckbox>
+              </Group>
+            </Container>
+          </SubmittingForm>
+        </wrapper>
+      </CommonDialogBody>
+      <CommonDialogFooter>
+
         <footer-container>
           <buttons>
             <Button mod={['outlined']} onClick={() => rejectDialog()}>{translate('ui_processing_cancel')}</Button>
@@ -76,36 +106,7 @@ export const AutoRefreshSettingsDialog = observer<DialogComponentProps<Payload>>
             <Button mod={['unelevated']} onClick={() => resolve()}>{translate('ui_processing_ok')}</Button>
           </buttons>
         </footer-container>
-      )}
-      noBodyPadding
-      noOverflow
-      onReject={rejectDialog}
-    >
-      <wrapper>
-        <SubmittingForm ref={formRef} onSubmit={() => resolve()}>
-          <Container>
-            <Group form gap>
-              <InputField
-                name='interval'
-                state={payload.settings}
-                type='number'
-                min={5}
-                max={3600}
-              >
-                {translate('ui_interval')}
-              </InputField>
-
-              <FieldCheckbox
-                id="dataViewer.tableViewer.autoRefresh.stopOnError"
-                name="stopOnError"
-                state={payload.settings}
-              >
-                {translate('data_viewer_auto_refresh_settings_stop_on_error')}
-              </FieldCheckbox>
-            </Group>
-          </Container>
-        </SubmittingForm>
-      </wrapper>
+      </CommonDialogFooter>
     </CommonDialogWrapper>
   );
 });

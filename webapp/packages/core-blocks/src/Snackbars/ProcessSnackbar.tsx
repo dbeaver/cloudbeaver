@@ -56,7 +56,7 @@ export const ProcessSnackbar: NotificationComponent<Props> = observer(function P
           {message && translate(message)}
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
-          {error && (
+          {details.hasDetails && (
             <Button
               type="button"
               mod={['outlined']}

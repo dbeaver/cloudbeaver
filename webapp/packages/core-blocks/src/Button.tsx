@@ -63,7 +63,7 @@ const buttonStyles = css`
       }
 
       &[href] {
-        text-decoration: none;
+        text-decoration: none !important;
       }
     }
   `;

@@ -6,17 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { StrictMode, Suspense } from 'react';
+import { Suspense } from 'react';
 import { createRoot, Root } from 'react-dom/client';
+import styled from 'reshadow';
 
 import { Body } from '@cloudbeaver/core-app';
-import { AppRefreshButton, DisplayError, ErrorBoundary, Loader } from '@cloudbeaver/core-blocks';
+import { DisplayError, ErrorBoundary, Loader } from '@cloudbeaver/core-blocks';
 import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
 
 interface IRender {
   initRoot(): Root;
   renderApp(): void;
-  renderError(): void;
+  renderError(exception?: any): void;
   unmount(): void;
 }
 
@@ -46,8 +47,11 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
     },
     renderApp() {
       this.initRoot()
-        .render(
-        // <StrictMode>
+        .render(styled`
+          Loader {
+            height: 100vh;
+          }
+        `(
           <AppContext app={serviceInjector}>
             <ErrorBoundary root>
               <Suspense fallback={<Loader />}>
@@ -55,16 +59,13 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
               </Suspense>
             </ErrorBoundary>
           </AppContext>
-        // </StrictMode>
-        );
+        ));
     },
-    renderError() {
+    renderError(exception?: any) {
       this.initRoot()
         .render(
           <AppContext app={serviceInjector}>
-            <DisplayError root>
-              <AppRefreshButton />
-            </DisplayError>
+            <DisplayError error={exception} root />
           </AppContext>
         );
     },

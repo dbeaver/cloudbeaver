@@ -10,12 +10,13 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useResource, useUserData } from '@cloudbeaver/core-blocks';
+import { getComputed, useResource, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { IResourceManagerParams, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
+import { getRmResourcePath, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
 import { NavigationTreeService, ElementsTreeLoader, IElementsTreeSettings, createElementsTreeSettings, validateElementsTreeSettings, getNavigationTreeUserSettingsId } from '@cloudbeaver/plugin-navigation-tree';
 
@@ -79,8 +80,12 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
   const resourceManagerService = useService(ResourceManagerService);
   const navTreeResource = useService(NavTreeResource);
 
-  const key: IResourceManagerParams[] = projectsService.activeProjectIds.map(id => ({ projectId: id }));
+  const key = getComputed<string[]>(
+    () => projectsService.activeProjects.map(project => getRmResourcePath(project.id)),
+    isArraysEqual
+  );
   useResource(ResourceManagerTree, ResourceManagerResource, resourceKeyList(key));
+
 
   const settings = useUserData<IElementsTreeSettings>(
     getNavigationTreeUserSettingsId(root),
@@ -165,7 +170,6 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
   );
 
   const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);
-
 
   return styled(styles)(
     <CaptureView view={navTreeService}>

@@ -8,7 +8,8 @@
 
 import { observable, makeObservable } from 'mobx';
 
-import { getErrorDetails, GQLError } from '@cloudbeaver/core-sdk';
+import { DetailsError, GQLError } from '@cloudbeaver/core-sdk';
+import { errorOf } from '@cloudbeaver/core-utils';
 
 import { ENotificationType, IProcessNotificationState } from './INotification';
 
@@ -45,11 +46,11 @@ export class ProcessNotificationController implements IProcessNotificationState 
   }
 
   reject(error: Error | GQLError, title?: string, message: string | null = null) {
-    const errorDetails = getErrorDetails(error);
+    const errorDetails = errorOf(error, DetailsError);
 
     this.status = ENotificationType.Error;
-    this.title = title || errorDetails.name;
-    this.message = message || errorDetails.message;
+    this.title = title || errorDetails?.name || error.name;
+    this.message = message || errorDetails?.message || error.message;
     this.error = error;
   }
 }

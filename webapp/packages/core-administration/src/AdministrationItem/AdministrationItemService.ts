@@ -179,16 +179,21 @@ export class AdministrationItemService {
 
   async canDeActivate(
     screen: IAdministrationItemRoute,
+    toScreen: IAdministrationItemRoute | null,
     configurationWizard: boolean,
     outside: boolean
   ): Promise<boolean> {
     const item = this.getItem(screen.item, configurationWizard);
+    let nextItem = null;
+    if (toScreen) {
+      nextItem = this.getItem(toScreen.item, configurationWizard);
+    }
 
     if (!item) {
       return true;
     }
 
-    if (item.canDeActivate && !(await item.canDeActivate(configurationWizard, outside))) {
+    if (item.canDeActivate && !(await item.canDeActivate(configurationWizard, outside, nextItem))) {
       return false;
     }
 

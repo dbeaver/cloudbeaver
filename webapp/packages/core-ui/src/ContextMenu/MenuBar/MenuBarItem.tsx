@@ -42,7 +42,7 @@ export const MenuBarItem = observer<Props, HTMLButtonElement>(forwardRef(functio
     <menu-bar-item ref={ref} as='button' {...rest} title={title} aria-label={title}>
       <menu-bar-item-box>
         {loading ? (
-          <menu-bar-item-icon><Loader small /></menu-bar-item-icon>
+          <menu-bar-item-icon><Loader small fullSize /></menu-bar-item-icon>
         ) : icon && (
           <menu-bar-item-icon>
             {typeof icon === 'string' ? <IconOrImage icon={icon} viewBox={viewBox} /> : icon}

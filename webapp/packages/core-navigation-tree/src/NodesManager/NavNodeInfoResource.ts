@@ -10,18 +10,8 @@ import { action, makeObservable, observable, runInAction } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  GraphQLService,
-  CachedMapResource,
-  ResourceKey,
-  isResourceKeyList,
-  NavNodeInfoFragment,
-  ResourceKeyUtils,
-  ICachedMapResourceMetadata,
-  ResourceKeyList,
-  resourceKeyList
-} from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
+import { GraphQLService, CachedMapResource, ResourceKey, NavNodeInfoFragment, ResourceKeyUtils, ICachedResourceMetadata, ResourceKeyList, resourceKeyList, ResourceKeySimple } from '@cloudbeaver/core-sdk';
+import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from './EntityTypes';
 import { NodeManagerUtils } from './NodeManagerUtils';
@@ -30,67 +20,28 @@ type NavNodeInfo = NavNodeInfoFragment;
 
 export const ROOT_NODE_PATH = '';
 
-interface INodeMetadata extends ICachedMapResourceMetadata {
+interface INodeMetadata extends ICachedResourceMetadata {
   withDetails: boolean;
 }
 
 @injectable()
-export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
-  protected metadata: MetadataMap<string, INodeMetadata>;
+export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Record<string, unknown>, INodeMetadata> {
   constructor(
     private readonly graphQLService: GraphQLService,
     appAuthService: AppAuthService,
   ) {
     super();
 
-    this.metadata = new MetadataMap<string, INodeMetadata>(() => ({
-      outdated: true,
-      loading: false,
-      withDetails: false,
-      exception: null,
-      includes: observable([]),
-      dependencies: observable([]),
-    }));
-
     makeObservable(this, {
       setDetails: action,
-      updateNode: action,
       setParent: action,
     });
 
     appAuthService.requireAuthentication(this);
   }
 
-  updateNode(key: string, node: NavNode): void;
-  updateNode(key: ResourceKeyList<string>, nodes: NavNode[]): void;
-  updateNode(key: ResourceKey<string>, nodes: NavNode[] | NavNode): void;
-  updateNode(key: ResourceKey<string>, nodes: NavNode[] | NavNode): void {
-    const keyList: string[] = [];
-    const values: NavNode[] = [];
-
-    ResourceKeyUtils.forEach(key, (key, i) => {
-      const value = i === -1 ? (nodes as NavNode) : (nodes as NavNode[])[i];
-      const currentValue = this.get(key);
-
-      if (currentValue && value) {
-        Object.assign(currentValue, value);
-      } else {
-        keyList.push(key);
-        values.push(value);
-      }
-    });
-
-    if (keyList.length > 0) {
-      this.set(resourceKeyList(keyList), values);
-    }
-    this.markUpdated(key);
-    this.onItemAdd.execute(key);
-  }
-
-  setDetails(keyObject: ResourceKey<string>, state: boolean): void {
-    ResourceKeyUtils.forEach(keyObject, key => {
-      const metadata = this.metadata.get(key);
-
+  setDetails(keyObject: ResourceKeySimple<string>, state: boolean): void {
+    this.updateMetadata(keyObject, metadata => {
       if (!metadata.withDetails && state) {
         metadata.outdated = true;
       }
@@ -120,15 +71,15 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
 
   getParent(key: string): string | undefined;
   getParent(key: ResourceKeyList<string>): (string | undefined)[];
-  getParent(key: ResourceKey<string>): string | undefined | (string | undefined)[];
-  getParent(key: ResourceKey<string>): string | undefined | (string | undefined)[] {
+  getParent(key: ResourceKeySimple<string>): string | undefined | (string | undefined)[];
+  getParent(key: ResourceKeySimple<string>): string | undefined | (string | undefined)[] {
     return ResourceKeyUtils.map(key, key => this.get(key)?.parentId);
   }
 
   setParent(key: string, parentId: string): void;
   setParent(key: ResourceKeyList<string>, parentId: string): void;
-  setParent(key: ResourceKey<string>, parentId: string): void;
-  setParent(key: ResourceKey<string>, parentId: string): void {
+  setParent(key: ResourceKeySimple<string>, parentId: string): void;
+  setParent(key: ResourceKeySimple<string>, parentId: string): void {
     ResourceKeyUtils.forEach(key, key => {
       const node = this.get(key);
 
@@ -139,15 +90,15 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, NavNode>> {
-    if (isResourceKeyList(key)) {
-      const values: NavNode[] = [];
-      for (const nodePath of key.list) {
-        values.push(await this.loadNodeInfo(nodePath));
-      }
-      this.set(key, values);
-    } else {
-      this.set(key, await this.loadNodeInfo(key));
+    if (this.isAlias(key)) {
+      throw new Error('Aliases not supported by this resource');
     }
+    const values: NavNode[] = [];
+
+    await ResourceKeyUtils.forEachAsync(key, async nodePath => {
+      values.push(await this.loadNodeInfo(nodePath));
+    });
+    this.set(ResourceKeyUtils.toList(key), values);
 
     return this.data;
   }
@@ -158,12 +109,11 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     let newNode: NavNode = {
       ...node,
       objectFeatures: node.object?.features || [],
-      parentId: parentId ?? this.get(node.id)?.parentId ?? requestPath ?? ROOT_NODE_PATH,
+      parentId: parentId ?? this.get(node.id)?.parentId ?? requestPath ?? node.id,
     };
 
     if (oldNode) {
-      Object.assign(oldNode, newNode);
-      newNode = oldNode;
+      newNode = observable({ ...oldNode, ...newNode });
     }
 
     return newNode;
@@ -194,22 +144,21 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     }
   }
 
-  private async loadNodeParents(nodePath: string): Promise<NavNode> {
+  async loadNodeParents(nodePath: string): Promise<NavNode> {
     const metadata = this.metadata.get(nodePath);
     const { node, parents } = await this.graphQLService.sdk.getNodeParents({
       nodePath,
       withDetails: metadata.withDetails,
     });
 
-
     return runInAction(() => {
-      const navNode = this.navNodeInfoToNavNode(node, parents[0]?.id ?? ROOT_NODE_PATH);
+      const navNode = this.navNodeInfoToNavNode(node, parents[0]?.id);
 
-      this.updateNode(
-        resourceKeyList(parents.map(node => node.id), node.id),
+      this.set(
+        resourceKeyList(parents.map(node => node.id)),
         [
           ...parents.reduce((list, node, index, array) => {
-            list.push(this.navNodeInfoToNavNode(node, array[index + 1]?.id ?? ROOT_NODE_PATH));
+            list.push(this.navNodeInfoToNavNode(node, array[index + 1]?.id));
             return list;
           }, [] as NavNode[]),
           navNode,
@@ -219,11 +168,20 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode> {
     });
   }
 
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
+  protected getDefaultMetadata(key: string, metadata: MetadataMap<string, INodeMetadata>): INodeMetadata {
+    return {
+      ...super.getDefaultMetadata(key, metadata),
+      withDetails: false,
+    };
+  }
+
+  protected dataSet(key: string, value: NavNode): void {
+    const currentValue = this.dataGet(key);
+    super.dataSet(key, Object.assign(currentValue ?? {}, value));
+  }
+
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }
 

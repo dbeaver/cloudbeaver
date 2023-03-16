@@ -23,7 +23,7 @@ export class FeaturesResource extends CachedDataResource<ApplicationFeature[]> {
     private readonly graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource
   ) {
-    super([]);
+    super(() => []);
 
     this.sync(serverConfigResource, () => {}, () => {});
   }

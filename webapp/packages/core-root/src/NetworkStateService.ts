@@ -11,6 +11,7 @@ import { makeObservable, observable } from 'mobx';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
+import { errorOf } from '@cloudbeaver/core-utils';
 
 import { NetworkError } from './NetworkError';
 
@@ -54,7 +55,7 @@ export class NetworkStateService extends Bootstrap {
     }
 
     if (state) {
-      if (this.graphQLService.client.blockReason instanceof NetworkError) {
+      if (errorOf(this.graphQLService.client.blockReason, NetworkError)) {
         this.graphQLService.enableRequests();
       }
     } else {
@@ -72,7 +73,7 @@ export class NetworkStateService extends Bootstrap {
         exception instanceof TypeError
         && exception.message === 'Failed to fetch'
       ) {
-        throw new NetworkError('Error while processing request');
+        throw new NetworkError('Error while processing request', { cause: exception });
       }
       throw exception;
     }

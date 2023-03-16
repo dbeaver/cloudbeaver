@@ -6,12 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { untracked } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, TextPlaceholder, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavTreeResource, DBObjectResource, type DBObject, DBObjectParentKey } from '@cloudbeaver/core-navigation-tree';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
@@ -25,27 +24,22 @@ const styles = css`
     display: flex;
     flex-direction: column;
   }
-  ExceptionMessage {
-    padding: 24px;
-  }
 `;
 
 interface ObjectPropertyTableProps {
   objectId: string;
   parentId: string;
-  parents: string[];
 }
 
 export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function ObjectPropertyTable({
   objectId,
   parentId,
-  parents,
 }) {
-  parents = [...parents, parentId];
   const translate = useTranslate();
   const navNodeViewService = useService(NavNodeViewService);
+  const children = useResource(ObjectPropertyTable, NavTreeResource, parentId);
   const tree = useResource(ObjectPropertyTable, NavTreeResource, objectId, {
-    onLoad: async resource => !(await resource.preloadNodeParents(parents, objectId)),
+    preload: [children],
   });
 
   const limited = navNodeViewService.limit(tree.data || []);
@@ -57,26 +51,20 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
   });
 
   useEffect(() => {
-    untracked(() => {
-      navNodeViewService.logDuplicates(objectId, duplicates);
-    });
+    navNodeViewService.logDuplicates(objectId, duplicates);
   });
 
   const objects = dbObject.data.filter(object => nodes.includes(object?.id ?? '')) as DBObject[];
 
   return styled(styles)(
-    <Loader state={[tree, dbObject]} style={styles}>
-      {() => styled(styles)(
-        <>
-          {nodes.length === 0 ? (
-            <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
-          ) : (
-            <div>
-              <TableLoader objects={objects} truncated={limited.truncated > 0} />
-            </div>
-          )}
-        </>
+    <>
+      {nodes.length === 0 ? (
+        <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
+      ) : (
+        <div>
+          <TableLoader objects={objects} truncated={limited.truncated > 0} />
+        </div>
       )}
-    </Loader>
+    </>
   );
 });

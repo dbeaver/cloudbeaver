@@ -29,7 +29,7 @@ export function useNode(navNodeId: string): IUseNodeHook {
     navNodeId,
     node,
     isLoading() {
-      return navNodeInfoResource.isDataLoading(this.navNodeId);
+      return navNodeInfoResource.isLoading(this.navNodeId);
     },
     isLoaded() {
       return navNodeInfoResource.isLoaded(this.navNodeId);

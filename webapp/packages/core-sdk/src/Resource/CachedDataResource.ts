@@ -6,20 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable } from 'mobx';
-
 import { ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 
-import { CachedResource } from './CachedResource';
+import { CachedResource, CachedResourceParamKey, ICachedResourceMetadata } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
 
-export type CachedDataResourceData<TResource> = TResource extends CachedDataResource<infer T, any, any, any>
+export type CachedDataResourceData<TResource> = TResource extends CachedDataResource<infer T, any, any>
   ? T
   : never;
-export type CachedDataResourceParam<TResource> = TResource extends CachedDataResource<any, infer T, any, any>
-  ? T
-  : never;
-export type CachedDataResourceKey<TResource> = TResource extends CachedDataResource<any, any, infer T, any>
+export type CachedDataResourceKey<TResource> = TResource extends CachedDataResource<any, infer T, any>
   ? T
   : never;
 
@@ -34,82 +29,58 @@ export type CachedDataResourceGetter<
 
 export abstract class CachedDataResource<
   TData,
-  TParam = void,
-  TKey = TParam,
-  TContext extends Record<string, any> = Record<string, never>
+  TKey = void,
+  TContext extends Record<string, any> = Record<string, never>,
+  TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata,
 > extends CachedResource<
   TData,
   TData,
-  TParam,
   TKey,
-  CachedResourceIncludeArgs<TData, TContext>
+  CachedResourceIncludeArgs<TData, TContext>,
+  TMetadata
   > {
-  protected loaded: boolean;
-
-  constructor(defaultValue: TData, defaultIncludes: CachedResourceIncludeArgs<TData, TContext> = [] as any) {
-    super(defaultValue, defaultIncludes);
-
-    this.loaded = false;
-
-    makeObservable<this, 'loaded'>(this, {
-      loaded: observable,
-    });
-
-    this.onDataUpdate.addHandler(() => { this.loaded = true; });
-  }
-
-  isLoaded(param: TParam, includes?: CachedResourceIncludeArgs<TData, TContext>): boolean {
-    if (!this.loaded) {
-      return false;
-    }
-
-    param = this.transformParam(param);
-
-    if (includes) {
-      const metadata = this.getMetadata(param);
-
-      if ((includes as string[]).some(include => !metadata.includes.includes(include))) {
-        return false;
-      }
-    }
-    return true;
+  constructor(
+    defaultValue: () => TData,
+    defaultKey: TKey = undefined as TKey,
+    defaultIncludes: CachedResourceIncludeArgs<TData, TContext> = [] as any
+  ) {
+    super(defaultKey, defaultValue, defaultIncludes);
   }
 
   async refresh<T extends CachedResourceIncludeArgs<TData, TContext> = []>(
-    param: TParam,
+    param: TKey,
     context?: T
   ): Promise<CachedResourceValueIncludes<TData, T>> {
-    await this.preLoadData(param, false, context);
+    if (param === undefined) {
+      param = CachedResourceParamKey as TKey;
+    }
     await this.loadData(param, true, context);
     return this.data as CachedResourceValueIncludes<TData, T>;
   }
 
   async load<T extends CachedResourceIncludeArgs<TData, TContext> = []>(
-    param: TParam,
+    param: TKey,
     context?: T
   ): Promise<CachedResourceValueIncludes<TData, T>> {
-    await this.preLoadData(param, false, context);
+    if (param === undefined) {
+      param = CachedResourceParamKey as TKey;
+    }
     await this.loadData(param, false, context);
     return this.data as CachedResourceValueIncludes<TData, T>;
   }
 
-
-  protected validateParam(param: TParam): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'undefined'
-    );
+  protected validateKey(key: TKey): boolean {
+    return key === undefined;
   }
 }
 
 export function getCachedDataResourceLoaderState<
   TData,
-  TParam = void,
-  TKey = TParam,
+  TKey = void,
   TContext extends Record<string, any> = Record<string, never>,
 >(
-  resource: CachedDataResource<TData, TParam, TKey, TContext>,
-  param: TParam,
+  resource: CachedDataResource<TData, TKey, TContext>,
+  param: TKey,
   context?: CachedResourceIncludeArgs<TData, TContext>
 ): ILoadableState {
   return {
@@ -117,7 +88,7 @@ export function getCachedDataResourceLoaderState<
       return resource.getException(param);
     },
     isLoading() {
-      return resource.isDataLoading(param);
+      return resource.isLoading(param);
     },
     isError() {
       return isContainsException(this.exception);

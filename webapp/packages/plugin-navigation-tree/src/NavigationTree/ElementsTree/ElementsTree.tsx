@@ -7,13 +7,14 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useMemo, useCallback, useEffect } from 'react';
+import { useMemo, useCallback, useEffect, useRef } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, Loader, PlaceholderElement, Translate, TreeNodeNested, TreeNodeNestedMessage, TREE_NODE_STYLES, useFolderExplorer, useResource, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { type NavNode, ROOT_NODE_PATH, NavTreeResource, NavNodeInfoResource, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { useNavTreeDropBox } from '../useNavTreeDropBox';
@@ -138,6 +139,7 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   const navTreeResource = useService(NavTreeResource);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const ref = useObjectRef({ settings, getChildren, loadChildren });
+  const treeRootRef = useRef<HTMLDivElement>(null);
 
   const root = folderExplorer.state.folder;
 
@@ -177,18 +179,12 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
 
   }, [folderExplorer]);
 
-  useResource(ElementsTree, navTreeResource, root, {
-    onLoad: async resource => {
-      let fullPath = folderExplorer.state.fullPath;
-      const preload = await resource.preloadNodeParents(fullPath);
-
-      if (!preload) {
-        fullPath = folderExplorer.state.fullPath;
-        exitFolders(fullPath);
-        return true;
-      }
-
-      return await autoOpenFolders(folderExplorer.state.folder, folderExplorer.state.path);
+  useResource(ElementsTree, navTreeResource, resourceKeyList(folderExplorer.state.fullPath), {
+    onError: () => {
+      exitFolders(folderExplorer.state.fullPath);
+    },
+    onData: () => {
+      autoOpenFolders(folderExplorer.state.folder, folderExplorer.state.path);
     },
   });
 
@@ -233,6 +229,7 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
       folderExplorer,
       selectionTree,
       control,
+      getTreeRoot: () => treeRootRef.current,
       onOpen: async (node, path, leaf) => {
         const folder = !leaf && tree.settings?.foldersTree || false;
 
@@ -303,7 +300,7 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   return styled(useStyles(TREE_NODE_STYLES, styles, style))(
     <>
       <ElementsTreeTools tree={tree} settingsElements={settingsElements} style={style} />
-      <tree-box {...use({ big })}>
+      <tree-box ref={treeRootRef} {...use({ big })}>
         <ElementsTreeContext.Provider value={context}>
           <box className={className}>
             <FolderExplorer state={folderExplorer}>

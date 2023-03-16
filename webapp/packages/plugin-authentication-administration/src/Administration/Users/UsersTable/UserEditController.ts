@@ -13,7 +13,7 @@ import {
   injectable, IInitializableController, IDestructibleController
 } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GQLErrorCatcher, AdminUserInfo, ResourceKeyUtils, ResourceKey } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher, AdminUserInfo, ResourceKeyUtils, ResourceKey, ResourceKeySimple } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class UserEditController
@@ -22,7 +22,7 @@ implements IInitializableController, IDestructibleController {
   user: AdminUserInfo | null = null;
 
   get isDisabled() {
-    return this.usersResource.isDataLoading(this.userId);
+    return this.usersResource.isLoading(this.userId);
   }
 
   userId!: string;
@@ -30,8 +30,8 @@ implements IInitializableController, IDestructibleController {
   readonly error = new GQLErrorCatcher();
 
   constructor(
-    private notificationService: NotificationService,
-    private usersResource: UsersResource
+    private readonly notificationService: NotificationService,
+    private readonly usersResource: UsersResource
   ) {
     makeObservable(this, {
       isLoading: observable,
@@ -46,11 +46,11 @@ implements IInitializableController, IDestructibleController {
     this.userId = id;
 
     await this.loadUser();
-    this.usersResource.onItemAdd.addHandler(this.updateUser);
+    this.usersResource.onItemUpdate.addHandler(this.updateUser);
   }
 
   destruct(): void {
-    this.usersResource.onItemAdd.removeHandler(this.updateUser);
+    this.usersResource.onItemUpdate.removeHandler(this.updateUser);
   }
 
   private async loadUser() {
@@ -63,8 +63,8 @@ implements IInitializableController, IDestructibleController {
     }
   }
 
-  private async updateUser(key: ResourceKey<string>) {
-    if (!ResourceKeyUtils.includes(key, this.userId)) {
+  private async updateUser(key: ResourceKeySimple<string>) {
+    if (!ResourceKeyUtils.isIntersect(key, this.userId)) {
       return;
     }
     this.user = JSON.parse(JSON.stringify(await this.usersResource.load(this.userId, ['includeMetaParameters'])));

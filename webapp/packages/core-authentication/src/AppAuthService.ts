@@ -9,7 +9,7 @@
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedDataResourceParam, CachedResource, getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
+import { CachedDataResourceKey, CachedResource, getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import { UserInfoResource } from './UserInfoResource';
@@ -44,7 +44,7 @@ export class AppAuthService extends Bootstrap {
     this.userInfoResource.onDataUpdate.addHandler(this.authUser.bind(this));
   }
 
-  requireAuthentication<T = CachedDataResourceParam<UserInfoResource>>(
+  requireAuthentication<T = CachedDataResourceKey<UserInfoResource>>(
     resource: CachedResource<any, any, T, any, any>,
     map?: (param: T | undefined) => T
   ): this {

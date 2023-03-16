@@ -120,7 +120,7 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
     public void setResourceManagerEnabled(boolean resourceManagerEnabled) {
         this.resourceManagerEnabled = resourceManagerEnabled;
     }
-    
+
     public boolean isSupportsCustomConnections() {
         return supportsCustomConnections;
     }

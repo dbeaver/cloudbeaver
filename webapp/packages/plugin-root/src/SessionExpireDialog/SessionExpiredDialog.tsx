@@ -11,22 +11,17 @@ import styled, { css } from 'reshadow';
 
 import { Button, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { RouterService } from '@cloudbeaver/core-routing';
-
-
-
-const dialogStyle = css`
-  footer {
-    align-items: center;
-    justify-content: flex-end;
-    gap: 24px;
-  }
-`;
 
 const styles = css`
   p {
     margin: 0;
+  }
+  CommonDialogFooter {
+    align-items: center;
+    justify-content: flex-end;
+    gap: 24px;
   }
 `;
 
@@ -40,10 +35,12 @@ export const SessionExpiredDialog: DialogComponent<null, null> = observer(functi
   }
 
   return styled(styles)(
-    <CommonDialogWrapper
-      size='small'
-      title='app_root_session_expired_title'
-      footer={(
+    <CommonDialogWrapper size='small' fixedSize>
+      <CommonDialogHeader title="app_root_session_expired_title" onReject={rejectDialog} />
+      <CommonDialogBody noOverflow>
+        <p>{translate('app_root_session_expired_message')}</p>
+      </CommonDialogBody>
+      <CommonDialogFooter>
         <Button
           type="button"
           mod={['unelevated']}
@@ -51,13 +48,7 @@ export const SessionExpiredDialog: DialogComponent<null, null> = observer(functi
         >
           {translate('app_root_session_expired_reload')}
         </Button>
-      )}
-      style={dialogStyle}
-      fixedSize
-      noOverflow
-      onReject={rejectDialog}
-    >
-      <p>{translate('app_root_session_expired_message')}</p>
+      </CommonDialogFooter>
     </CommonDialogWrapper>
   );
 });

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { Loader } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogHeader, CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 
 import type { IDriver } from './Driver';
 import { DriverSelector } from './DriverSelector';
@@ -37,16 +37,12 @@ export const DriverSelectorDialog = observer<IProps>(function DriverSelectorDial
   onClose,
 }) {
   return styled(styles)(
-    <CommonDialogWrapper
-      size='large'
-      title={title}
-      fixedSize
-      noBodyPadding
-      noOverflow
-      onReject={onClose}
-    >
-      {isLoading && <Loader />}
-      {!isLoading && <DriverSelector drivers={drivers} onSelect={onSelect} />}
+    <CommonDialogWrapper size='large' fixedSize>
+      <CommonDialogHeader title={title} onReject={onClose} />
+      <CommonDialogBody noBodyPadding noOverflow>
+        {isLoading && <Loader />}
+        {!isLoading && <DriverSelector drivers={drivers} onSelect={onSelect} />}
+      </CommonDialogBody>
     </CommonDialogWrapper>
   );
 }

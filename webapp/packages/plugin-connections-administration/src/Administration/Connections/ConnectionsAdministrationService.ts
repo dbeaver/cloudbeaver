@@ -14,6 +14,7 @@ import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DatabaseConnect
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { CreateConnectionService } from './CreateConnectionService';
 
@@ -132,7 +133,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
   private async loadConnections() {
     try {
       await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
-      await this.dbDriverResource.loadAll();
+      await this.dbDriverResource.load(CachedMapAllKey);
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Error occurred while loading connections');
     }
