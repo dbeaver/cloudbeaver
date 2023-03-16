@@ -67,6 +67,11 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
     }
 
     @Override
+    public String getNodeId() {
+        return project.getId();
+    }
+
+    @Override
     public String getLocalizedName(String locale) {
         return getNodeName();
     }

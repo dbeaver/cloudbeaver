@@ -110,18 +110,19 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     // Skip empty folders. Folder may become empty if their nested elements are provided by UI plugins.
                     continue;
                 }
-                if (CommonUtils.toBoolean(onlyFolders) || !(node instanceof DBNContainer)) {
+                if (CommonUtils.toBoolean(onlyFolders)) {
                     continue;
                 }
-                // Skip connections which are not supported in CB
-                if (node instanceof DBNDataSource) {
-                    DBPDataSourceContainer container = ((DBNDataSource) node).getDataSourceContainer();
-                    if (!applicableDrivers.contains(container.getDriver())) {
-                        continue;
+                if (node instanceof DBNContainer) {
+                    // Skip connections which are not supported in CB
+                    if (node instanceof DBNDataSource) {
+                        DBPDataSourceContainer container = ((DBNDataSource) node).getDataSourceContainer();
+                        if (!applicableDrivers.contains(container.getDriver())) {
+                            continue;
+                        }
                     }
                 }
                 result.add(new WebNavigatorNodeInfo(session, node));
-
             }
             // Checks the range of the expected result
             if (offset == null || limit == null || (offset == 0 && limit >= result.size())) {
