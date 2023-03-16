@@ -14,11 +14,14 @@ import styled, { css } from 'reshadow';
 import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, useFocus, useObservableRef, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { throttleAsync } from '@cloudbeaver/core-utils';
 
+import { CommonDialogBody } from './CommonDialog/CommonDialogBody';
+import { CommonDialogFooter } from './CommonDialog/CommonDialogFooter';
+import { CommonDialogHeader } from './CommonDialog/CommonDialogHeader';
 import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
 import type { DialogComponent } from './CommonDialogService';
 
 const style = css`
-  footer {
+  CommonDialogFooter {
     align-items: center;
   }
 
@@ -100,51 +103,48 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
   const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
 
   return styled(useStyles(style, BASE_CONTAINERS_STYLES))(
-    <CommonDialogWrapper
-      size='small'
-      subTitle={subTitle}
-      title={title}
-      icon={icon}
-      viewBox={viewBox}
-      bigIcon={bigIcon}
-      className={className}
-      style={style}
-      footer={(
-        <>
-          <Button
-            type="button"
-            mod={['outlined']}
-            onClick={rejectDialog}
-          >
-            {translate('ui_processing_cancel')}
-          </Button>
-          <fill />
-          <Button
-            type="button"
-            mod={['unelevated']}
-            disabled={!state.valid}
-            onClick={() => resolveDialog(state.value)}
-          >
-            {translate(confirmActionText || (create ? 'ui_create' : 'ui_rename'))}
-          </Button>
-        </>
-      )}
-      fixedWidth
-      onReject={rejectDialog}
-    >
-      <SubmittingForm ref={focusedRef} onSubmit={() => resolveDialog(state.value)}>
-        <Container center>
-          <InputField
-            name='value'
-            state={state}
-            error={!state.valid}
-            description={errorMessage}
-            onChange={() => state.validate()}
-          >
-            {translate('ui_name') + ':'}
-          </InputField>
-        </Container>
-      </SubmittingForm>
+    <CommonDialogWrapper size='small' className={className} fixedWidth>
+      <CommonDialogHeader
+        title={title}
+        subTitle={subTitle}
+        icon={icon}
+        viewBox={viewBox}
+        bigIcon={bigIcon}
+        onReject={rejectDialog}
+      />
+      <CommonDialogBody>
+        <SubmittingForm ref={focusedRef} onSubmit={() => resolveDialog(state.value)}>
+          <Container center>
+            <InputField
+              name='value'
+              state={state}
+              error={!state.valid}
+              description={errorMessage}
+              onChange={() => state.validate()}
+            >
+              {translate('ui_name') + ':'}
+            </InputField>
+          </Container>
+        </SubmittingForm>
+      </CommonDialogBody>
+      <CommonDialogFooter>
+        <Button
+          type="button"
+          mod={['outlined']}
+          onClick={rejectDialog}
+        >
+          {translate('ui_processing_cancel')}
+        </Button>
+        <fill />
+        <Button
+          type="button"
+          mod={['unelevated']}
+          disabled={!state.valid}
+          onClick={() => resolveDialog(state.value)}
+        >
+          {translate(confirmActionText || (create ? 'ui_create' : 'ui_rename'))}
+        </Button>
+      </CommonDialogFooter>
     </CommonDialogWrapper>
   );
 });

@@ -9,7 +9,7 @@
 import { runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   CachedMapResource,
@@ -20,12 +20,16 @@ import {
   ResourceKeyUtils,
   GetUsersListQueryVariables,
   CachedMapAllKey,
-  resourceKeyList
+  resourceKeyList,
+  isResourceKeyAlias,
+  ResourceKeySimple,
+  isResourceAlias
 } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthInfoService } from './AuthInfoService';
 import { AuthProviderService } from './AuthProviderService';
+import { EAdminPermission } from './EAdminPermission';
 import type { IAuthCredentials } from './IAuthCredentials';
 
 const NEW_USER_SYMBOL = Symbol('new-user');
@@ -51,10 +55,14 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     private readonly graphQLService: GraphQLService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly authProviderService: AuthProviderService,
-    private readonly authInfoService: AuthInfoService
+    private readonly authInfoService: AuthInfoService,
+    sessionPermissionsResource: SessionPermissionsResource
   ) {
     super();
-    this.serverConfigResource.onDataUpdate.addHandler(this.refreshAllLazy.bind(this));
+
+    sessionPermissionsResource
+      .require(this, EAdminPermission.admin)
+      .outdateResource(this);
   }
 
   isNew(id: string): boolean {
@@ -180,18 +188,13 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     });
   }
 
-  async delete(key: ResourceKey<string>): Promise<void> {
+  async delete(key: ResourceKeySimple<string>): Promise<void> {
     await ResourceKeyUtils.forEachAsync(key, async key => {
       if (this.isActiveUser(key)) {
         throw new Error('You can\'t delete current logged user');
       }
       await this.graphQLService.sdk.deleteUser({ userId: key });
-
-      runInAction(() => {
-        this.data.delete(key);
-        this.markUpdated(key);
-        this.onItemDelete.execute(key);
-      });
+      super.delete(key);
     });
   }
 
@@ -207,22 +210,23 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     return this.data;
   }
 
-  refreshAllLazy(): void {
-    this.resetIncludes();
-    this.markOutdated(CachedMapAllKey);
-  }
-
   isActiveUser(userId: string): boolean {
     return this.authInfoService.userInfo?.userId === userId;
   }
 
-  protected async loader(key: ResourceKey<string>, includes: string[] | undefined): Promise<Map<string, AdminUser>> {
-    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
-    key = this.transformParam(key);
+  protected async loader(
+    originalKey: ResourceKey<string>,
+    includes?: string[]
+  ): Promise<Map<string, AdminUser>> {
+    const all = this.isAlias(originalKey, CachedMapAllKey);
     const usersList: AdminUser[] = [];
 
-    await ResourceKeyUtils.forEachAsync(all ? CachedMapAllKey : key, async key => {
-      const userId = all ? undefined : key;
+    await ResourceKeyUtils.forEachAsync(originalKey, async key => {
+      let userId: string | undefined;
+
+      if (!isResourceAlias(key)) {
+        userId = key;
+      }
 
       const { users } = await this.graphQLService.sdk.getUsersList({
         userId,
@@ -233,14 +237,12 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       usersList.push(...users);
     });
 
-    runInAction(() => {
-      if (all) {
-        this.data.clear();
-        this.resetIncludes();
-      }
-
-      this.set(resourceKeyList(usersList.map(user => user.userId)), usersList);
-    });
+    const key = resourceKeyList(usersList.map(user => user.userId));
+    if (all) {
+      this.replace(key, usersList);
+    } else {
+      this.set(key, usersList);
+    }
 
     return this.data;
   }
@@ -252,11 +254,8 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     };
   }
 
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }
 

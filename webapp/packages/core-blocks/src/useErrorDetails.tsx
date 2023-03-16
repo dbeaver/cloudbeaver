@@ -11,17 +11,30 @@ import { useState } from 'react';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { getErrorDetails, IErrorDetails } from '@cloudbeaver/core-sdk';
+import { DetailsError } from '@cloudbeaver/core-sdk';
+import { errorOf, LoadingError } from '@cloudbeaver/core-utils';
 
 interface IErrorDetailsHook {
-  details: IErrorDetails | null;
+  name?: string;
+  message?: string;
+  error: Error | null;
+  details?: DetailsError;
+  hasDetails: boolean;
   isOpen: boolean;
   open: () => void;
+  refresh?: () => void;
 }
 
-export function useErrorDetails(error: Error | null): IErrorDetailsHook {
+type HookType = IErrorDetailsHook | ({
+  name: string;
+  error: Error;
+} & IErrorDetailsHook);
+
+export function useErrorDetails(error: Error | null): HookType {
   const service = useService(CommonDialogService);
   const [isOpen, setIsOpen] = useState(false);
+  const details = errorOf(error, DetailsError);
+  const loadingError = errorOf(error, LoadingError);
 
   const open = async () => {
     if (!error) {
@@ -34,10 +47,17 @@ export function useErrorDetails(error: Error | null): IErrorDetailsHook {
       setIsOpen(false);
     }
   };
+  const name = error?.name;
+  const message = error?.message;
 
   return {
-    details: error && getErrorDetails(error),
+    name,
+    message,
+    error,
+    details,
+    hasDetails: details?.hasDetails() ?? false,
     isOpen,
     open,
+    refresh: loadingError?.refresh,
   };
 }

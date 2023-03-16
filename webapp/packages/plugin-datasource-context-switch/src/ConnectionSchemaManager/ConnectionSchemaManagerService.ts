@@ -14,6 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ExtensionUtils, IExtension } from '@cloudbeaver/core-extensions';
 import { type IObjectNavNodeProvider, type IDataContextActiveNode, isObjectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
 import { IProjectProvider, IProjectSetter, IProjectSetterState, isProjectProvider, isProjectSetter, isProjectSetterState } from '@cloudbeaver/core-projects';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 
@@ -396,7 +397,7 @@ export class ConnectionSchemaManagerService {
     }
 
     try {
-      await this.dbDriverResource.loadAll();
+      await this.dbDriverResource.load(CachedMapAllKey);
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load database drivers', '', true);
     }

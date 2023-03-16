@@ -11,6 +11,7 @@ import styled, { css, use } from 'reshadow';
 
 import { ConnectionImageWithMask, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { IConnectionSelectorExtraProps } from './IConnectionSelectorExtraProps';
@@ -50,19 +51,22 @@ export const ConnectionIcon: React.FC<Props> = observer(function ConnectionIcon(
     ConnectionInfoResource,
     connectionKey ?? null
   );
-  const driverId = connection.data?.driverId;
 
-  const driver = useResource(ConnectionIcon, DBDriverResource, driverId!, {
-    active: driverId !== undefined,
-  });
+  const drivers = useResource(ConnectionIcon, DBDriverResource, CachedMapAllKey);
 
-  if (!driver.data?.icon) {
+  if (!connection.data?.driverId) {
+    return null;
+  }
+
+  const driver = drivers.resource.get(connection.data.driverId);
+
+  if (!driver?.icon) {
     return null;
   }
 
   return styled(styles)(
     <icon className={className}>
-      <ConnectionImageWithMask icon={driver.data.icon} connected={connection.data?.connected ?? false} maskId="connection-icon" size={24} paddingSize={4} {...use({ small })} />
+      <ConnectionImageWithMask icon={driver.icon} connected={connection.data.connected} maskId="connection-icon" size={24} paddingSize={4} {...use({ small })} />
     </icon>
   );
 });

@@ -13,12 +13,12 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTabState } from '@cloudbeaver/core-ui';
-import { isArraysEqual } from '@cloudbeaver/core-utils';
+import { ILoadableState, isArraysEqual } from '@cloudbeaver/core-utils';
 
 import type { TeamFormMode } from '../ITeamFormProps';
 import type { IGrantedUsersTabState } from './IGrantedUsersTabState';
 
-interface State {
+interface State extends ILoadableState {
   state: IGrantedUsersTabState;
   changed: boolean;
   edit: () => void;
@@ -35,6 +35,15 @@ export function useGrantedUsers(team: TeamInfo, mode: TeamFormMode): Readonly<St
   return useObservableRef(() => ({
     get changed() {
       return !isArraysEqual(this.state.initialGrantedUsers, this.state.grantedUsers);
+    },
+    isLoading() {
+      return this.state.loading;
+    },
+    isLoaded() {
+      return this.state.loaded;
+    },
+    isError() {
+      return false;
     },
     edit() {
       this.state.editing = !this.state.editing;

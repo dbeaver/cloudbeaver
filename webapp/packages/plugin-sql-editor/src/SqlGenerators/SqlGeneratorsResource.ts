@@ -16,6 +16,7 @@ import {
   ResourceKeyUtils,
   resourceKeyList,
 } from '@cloudbeaver/core-sdk';
+import { isResourceAlias } from '@cloudbeaver/core-sdk/src/Resource/ResourceAlias';
 
 export const MAX_GENERATORS_LENGTH = 15;
 
@@ -45,6 +46,9 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, SqlQueryGenerator[]>> {
+    if (isResourceAlias(key)) {
+      throw new Error('Aliases not supported by this resource.');
+    }
     const values = new Map();
 
     await ResourceKeyUtils.forEachAsync(key, async key => {
@@ -58,10 +62,7 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
     return this.data;
   }
 
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }

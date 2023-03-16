@@ -10,20 +10,15 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { Button, useTranslate } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-
-
-
-const dialogStyle = css`
-  footer {
-    align-items: center;
-    justify-content: flex-end;
-  }
-`;
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 
 const styles = css`
   p {
     margin: 0;
+  }
+  CommonDialogFooter {
+    align-items: center;
+    justify-content: flex-end;
   }
 `;
 
@@ -33,10 +28,12 @@ export const SessionExpireWarningDialog: DialogComponent<null, null> = observer(
   const translate = useTranslate();
 
   return styled(styles)(
-    <CommonDialogWrapper
-      size='small'
-      title="app_root_session_expire_warning_title"
-      footer={(
+    <CommonDialogWrapper size='small' fixedSize>
+      <CommonDialogHeader title="app_root_session_expire_warning_title" onReject={rejectDialog} />
+      <CommonDialogBody noOverflow>
+        <p>{translate('app_root_session_expire_warning_message')}</p>
+      </CommonDialogBody>
+      <CommonDialogFooter>
         <Button
           type="button"
           mod={['unelevated']}
@@ -44,13 +41,7 @@ export const SessionExpireWarningDialog: DialogComponent<null, null> = observer(
         >
           {translate('app_root_session_expire_warning_button')}
         </Button>
-      )}
-      style={dialogStyle}
-      fixedSize
-      noOverflow
-      onReject={rejectDialog}
-    >
-      <p>{translate('app_root_session_expire_warning_message')}</p>
+      </CommonDialogFooter>
     </CommonDialogWrapper>
   );
 });

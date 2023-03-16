@@ -9,11 +9,13 @@
 import { useEffect } from 'react';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 
 import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource';
-
+import { SqlEditorService } from './SqlEditorService';
 
 export function useDataSource(dataSource?: ISqlDataSource) {
+  const sqlEditorService = useService(SqlEditorService);
   const refObj = useObservableRef(() => ({
     async load(refresh?: boolean) {
       if (!this.dataSource || this.dataSource.isLoading()) {
@@ -46,4 +48,15 @@ export function useDataSource(dataSource?: ISqlDataSource) {
       refObj.load();
     }
   });
+
+  const executionContextId = dataSource?.executionContext?.id;
+
+  useEffect(() => () => {
+    if (
+      executionContextId !== undefined
+      && dataSource?.executionContext?.id !== executionContextId
+    ) {
+      sqlEditorService.destroyContext({ id: executionContextId, connectionId: '', projectId: '' });
+    }
+  }, [executionContextId, dataSource]);
 }

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useLayoutEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, useAppLoadingScreen, useResource, useStyles } from '@cloudbeaver/core-blocks';
+import { Loader, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
@@ -29,21 +29,17 @@ const bodyStyles = css`
       flex-direction: column;
       overflow: hidden;
     }
-  `;
-
-const loaderStyle = css`
-    ExceptionMessage {
-      padding: 24px;
+    Loader {
+      height: 100vh;
     }
   `;
 
 export const Body = observer(function Body() {
-  useAppLoadingScreen();
   // const serverConfigLoader = useResource(Body, ServerConfigResource, undefined);
   const themeService = useService(ThemeService);
   const style = useStyles(bodyStyles);
   const ref = useRef<HTMLDivElement>(null);
-  const permissionsService = useResource(Body, SessionPermissionsResource, undefined);
+  useResource(Body, SessionPermissionsResource, undefined);
   const screenService = useService(ScreenService);
   const Screen = screenService.screen?.component;
   const { backendVersion } = useAppVersion();
@@ -58,16 +54,15 @@ export const Body = observer(function Body() {
 
   return styled(style)(
     <DNDProvider>
-      <theme ref={ref} className={`theme-${themeService.currentTheme.id}`}>
-        <Loader state={[permissionsService]} style={loaderStyle}>{() => styled(style)(
-          <>
+      <Loader suspense>
+        <theme ref={ref} className={`theme-${themeService.currentTheme.id}`}>
+          <Loader suspense>
             {Screen && <Screen {...screenService.routerService.params} />}
-          </>
-        )}
-        </Loader>
-        <DialogsPortal />
-        <Notifications />
-      </theme>
+          </Loader>
+          <DialogsPortal />
+          <Notifications />
+        </theme>
+      </Loader>
     </DNDProvider>
   );
 });

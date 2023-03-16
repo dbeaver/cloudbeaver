@@ -11,12 +11,11 @@ import { action, computed, observable, makeObservable } from 'mobx';
 import './styles/main/normalize.pure.css';
 import './styles/main/base.pure.css';
 import './styles/main/fonts.pure.css';
-import './styles/main/app-loading-screen.pure.css';
 import './styles/main/elevation.pure.scss';
 import './styles/main/typography.pure.scss';
 import './styles/main/color.pure.scss';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { DbeaverError, NotificationService } from '@cloudbeaver/core-events';
+import { UIError, NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { SettingsService } from '@cloudbeaver/core-settings';
@@ -150,7 +149,7 @@ export class ThemeService extends Bootstrap {
   private async loadThemeStylesAsync(id: string): Promise<void> {
     const theme = this.themeMap.get(id);
     if (!theme) {
-      throw new DbeaverError({ message: `Theme ${id} not found.` });
+      throw new UIError(`Theme ${id} not found.`);
     }
 
     if (!theme.styles) {

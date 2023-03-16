@@ -14,8 +14,8 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { DatabaseAuthModel, DetailsError, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
-import { getUniqueName } from '@cloudbeaver/core-utils';
+import { CachedMapAllKey, DatabaseAuthModel, DetailsError, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
+import { errorOf, getUniqueName } from '@cloudbeaver/core-utils';
 import type { IConnectionAuthenticationConfig } from '@cloudbeaver/plugin-connections';
 
 import { TemplateConnectionsResource } from '../TemplateConnectionsResource';
@@ -226,10 +226,11 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   }
 
   private showError(exception: Error, message: string) {
-    if (exception instanceof DetailsError && !this.isDistructed) {
-      this.responseMessage = exception.errorMessage;
-      this.hasDetails = exception.hasDetails();
-      this.exception = exception;
+    const detailsError = errorOf(exception, DetailsError);
+    if (detailsError && !this.isDistructed) {
+      this.responseMessage = detailsError.message;
+      this.hasDetails = detailsError.hasDetails();
+      this.exception = detailsError;
     } else {
       this.notificationService.logException(exception, message);
     }
@@ -238,7 +239,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
   private async loadTemplateConnections() {
     try {
       await this.templateConnectionsResource.load();
-      await this.dbDriverResource.loadAll();
+      await this.dbDriverResource.load(CachedMapAllKey);
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load database sources');
     } finally {

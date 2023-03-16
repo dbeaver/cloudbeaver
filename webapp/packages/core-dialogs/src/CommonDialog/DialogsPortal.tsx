@@ -11,7 +11,7 @@ import { useMemo } from 'react';
 import { DialogBackdrop } from 'reakit/Dialog';
 import styled from 'reshadow';
 
-import { useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import { Loader, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 
@@ -40,7 +40,7 @@ export const DialogsPortal = observer(function DialogsPortal() {
         commonDialogService.resolveDialog(this.dialog.promise, result);
       }
     },
-    backdropClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    backdropClick(e: React.MouseEvent<HTMLDivElement>) {
       if (!this.dialog?.options?.persistent && e.currentTarget.isEqualNode(e.target as HTMLElement)) {
         this.reject();
       }
@@ -50,19 +50,21 @@ export const DialogsPortal = observer(function DialogsPortal() {
   }, ['reject', 'resolve', 'backdropClick']);
 
   return styled(styles)(
-    <DialogBackdrop visible={!!activeDialog} onMouseDown={state.backdropClick}>
-      <inner-box>
-        {commonDialogService.dialogs.map((dialog, i, arr) => (
-          <NestedDialog
-            key={i}
-            visible={i === arr.length - 1}
-            dialog={dialog}
-            resolveDialog={state.resolve}
-            rejectDialog={state.reject}
-          />
-        ))}
-      </inner-box>
-    </DialogBackdrop>
+    <Loader suspense overlay>
+      <DialogBackdrop visible={!!activeDialog} onMouseDown={state.backdropClick}>
+        <inner-box>
+          {commonDialogService.dialogs.map((dialog, i, arr) => (
+            <NestedDialog
+              key={i}
+              visible={i === arr.length - 1}
+              dialog={dialog}
+              resolveDialog={state.resolve}
+              rejectDialog={state.reject}
+            />
+          ))}
+        </inner-box>
+      </DialogBackdrop>
+    </Loader>
   );
 });
 

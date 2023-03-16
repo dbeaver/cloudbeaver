@@ -6,64 +6,62 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { GQLError, ServerInternalError } from '@cloudbeaver/core-sdk';
+import { DetailsError, GQLError } from '@cloudbeaver/core-sdk';
+import { errorOf } from '@cloudbeaver/core-utils';
 
 export interface IErrorInfo {
   message: string;
-  stackTrace: string;
+  isHtml?: boolean;
+  stackTrace?: string;
 }
 
 export interface IErrorModelOptions {
-  reason?: string;
-  error?: Error;
+  error?: Error | string;
 }
 
 export class ErrorModel {
-  reason: string;
   errors: IErrorInfo[] = [];
-  textToCopy = '';
-  htmlBody = '';
+  get textToCopy(): string {
+    return this.errors
+      .map(error => `${error.message}\n${error.stackTrace}`)
+      .join('------------------\n');
+  }
 
-  constructor({ reason, error }: IErrorModelOptions) {
-    this.reason = reason || '';
+  constructor({ error }: IErrorModelOptions) {
+    const gqlError = errorOf(error, GQLError);
+    const detailsError = errorOf(error, DetailsError);
     // text error
-    if (!error) {
-      this.textToCopy = this.reason;
-    } else if (error instanceof GQLError) { // GQL Error
-      this.errors = (error.response?.errors || [])
-        .map(error => {
-          const errorInfo: IErrorInfo = {
-            message: error.message,
-            stackTrace: error.extensions?.stackTrace || '',
-          };
-          return errorInfo;
+    if (typeof error === 'string') {
+      this.errors = [{
+        message: error,
+      }];
+    } else if (gqlError) { // GQL Error
+      this.errors = (gqlError.response.errors || [])
+        .map<IErrorInfo>(error => ({
+        message: error.message,
+        stackTrace: error.extensions.stackTrace || '',
+      }));
+
+      if (gqlError.isTextBody) {
+        this.errors.push({
+          message: gqlError.message,
+          isHtml: true,
         });
-
-      this.textToCopy = error.isTextBody
-        ? error.errorMessage
-        : this.textToCopy = this.errors
-          .map(error => `${error.message}\n${error.stackTrace}`)
-          .join('------------------\n');
-
-      if (error.isTextBody) {
-        this.htmlBody = error.errorMessage;
       }
-    } else if (error instanceof ServerInternalError) {
+    } else if (detailsError) {
+      this.errors = [
+        {
+          message: detailsError.message,
+          stackTrace: detailsError.stack,
+        },
+      ];
+    } else if (error instanceof Error) {
       this.errors = [
         {
           message: error.message,
-          stackTrace: error.stackTrace || '',
+          stackTrace: error.stack,
         },
       ];
-      this.textToCopy = `${error.message}\n${error.stackTrace}`;
-    } else if (error instanceof Error) { // Common Error
-      this.errors = [
-        {
-          message: error.message,
-          stackTrace: error.stack || '',
-        },
-      ];
-      this.textToCopy = `${error.message}\n${error.stack}`;
     }
   }
 }
