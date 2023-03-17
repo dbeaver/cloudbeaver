@@ -118,9 +118,13 @@ public class WebSessionWorkspace implements DBPWorkspace {
 
     @Override
     public void dispose() {
-        workspaceAuthContext.close();
+        clearAuthData();
 
         clearProjects();
+    }
+
+    void clearAuthData() {
+        workspaceAuthContext.close();
     }
 
     public void setActiveProject(DBPProject activeProject) {

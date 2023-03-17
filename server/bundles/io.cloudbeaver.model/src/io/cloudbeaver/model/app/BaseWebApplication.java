@@ -20,7 +20,7 @@ import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.WebWorkspace;
+import io.cloudbeaver.server.WebGlobalWorkspace;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -62,7 +62,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     @NotNull
     @Override
     public DBPWorkspace createWorkspace(@NotNull DBPPlatform platform, @NotNull IWorkspace eclipseWorkspace) {
-        return new WebWorkspace(platform, eclipseWorkspace);
+        return new WebGlobalWorkspace(platform, eclipseWorkspace);
     }
 
     @Override

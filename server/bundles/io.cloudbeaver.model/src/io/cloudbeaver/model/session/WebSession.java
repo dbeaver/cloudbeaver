@@ -402,8 +402,6 @@ public class WebSession extends BaseWebSession
 
     @NotNull
     private Set<String> readAccessibleConnectionIds() {
-        WebUser user = getUser();
-
         try {
             return getSecurityController()
                 .getAllAvailableObjectsPermissions(SMObjects.DATASOURCE)
@@ -452,7 +450,6 @@ public class WebSession extends BaseWebSession
 
     private synchronized void refreshSessionAuth() {
         try {
-
             if (!isAuthorizedInSecurityManager()) {
                 authAsAnonymousUser();
             } else if (getUserId() != null) {
@@ -548,7 +545,11 @@ public class WebSession extends BaseWebSession
             connectionInfo = connections.get(connectionID);
         }
         if (connectionInfo == null) {
-            DBPDataSourceContainer dataSource = getProjectById(projectId).getDataSourceRegistry().getDataSource(connectionID);
+            WebProjectImpl project = getProjectById(projectId);
+            if (project == null) {
+                throw new DBWebException("Project '" + projectId + "' not found in web workspace");
+            }
+            DBPDataSourceContainer dataSource = project.getDataSourceRegistry().getDataSource(connectionID);
             if (dataSource != null) {
                 connectionInfo = new WebConnectionInfo(this, dataSource);
                 synchronized (connections) {

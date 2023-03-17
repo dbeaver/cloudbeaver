@@ -28,7 +28,6 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  io.cloudbeaver.service.security;visibility:=reexport
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.model,
- io.cloudbeaver.model.resources,
  io.cloudbeaver.model.user,
  io.cloudbeaver.registry,
  io.cloudbeaver.server,

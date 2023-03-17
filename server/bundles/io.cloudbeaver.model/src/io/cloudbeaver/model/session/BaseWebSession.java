@@ -51,7 +51,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new ArrayList<>();
     private WebSessionEventsFilter eventsFilter = new WebSessionEventsFilter();
-    private WebSessionWorkspace workspace;
+    private final WebSessionWorkspace workspace;
 
     public BaseWebSession(@NotNull String id, @NotNull WebApplication application) throws DBException {
         this.id = id;
