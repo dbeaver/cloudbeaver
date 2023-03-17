@@ -26,7 +26,6 @@ interface IData {
   destroyed: boolean;
   configure: boolean;
   adminPageActive: boolean;
-  loadingState: ILoadableState;
   providers: AuthProvider[];
   configurations: AuthProvider[];
 
@@ -52,7 +51,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
 
   const primaryId = authProvidersResource.resource.getPrimary();
   const adminPageActive = administrationScreenService.isAdministrationPageActive;
-  const providers = authProvidersResource.resource.values
+  const providers = authProvidersResource.data
     .filter(notEmptyProvider)
     .sort(compareProviders);
 
@@ -129,7 +128,6 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
     exception: null,
     authenticating: false,
     destroyed: false,
-    loadingState: authProvidersResource,
 
     get configure(): boolean {
       if (state.activeProvider) {
@@ -197,7 +195,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
 }
 
 function notEmptyProvider(obj: any): obj is AuthProvider {
-  return typeof obj === 'object';
+  return !!obj && typeof obj === 'object';
 }
 
 function compareProviders(providerA: AuthProvider, providerB: AuthProvider): number {

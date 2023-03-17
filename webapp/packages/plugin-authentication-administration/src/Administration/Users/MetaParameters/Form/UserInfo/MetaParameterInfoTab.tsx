@@ -9,9 +9,9 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { Tab } from '@cloudbeaver/core-ui';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 interface Props {
   className?: string;

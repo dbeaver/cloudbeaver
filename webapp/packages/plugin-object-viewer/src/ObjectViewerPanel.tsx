@@ -62,9 +62,9 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
 
   const children = useResource(ObjectViewerPanel, NavTreeResource, objectId, {
     active: connected,
-    onData: data => {
-      state.notFound = !data.includes(objectId);
-    },
+    // onData: data => {
+    //   state.notFound = !data.includes(objectId);
+    // },
     preload: [connection],
   });
 

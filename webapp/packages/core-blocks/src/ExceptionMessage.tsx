@@ -18,6 +18,7 @@ const styles = css`
   error {
     flex: 1;
     display: flex;
+    padding: 24px;
   }
 
   error-name {
@@ -55,6 +56,7 @@ const styles = css`
   error[|inline] {
     align-items: center;
     height: 38px;
+    padding: 0;
 
     & error-data {
       display: flex;

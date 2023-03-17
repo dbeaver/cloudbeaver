@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { untracked } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
@@ -52,9 +51,7 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
   });
 
   useEffect(() => {
-    untracked(() => {
-      navNodeViewService.logDuplicates(objectId, duplicates);
-    });
+    navNodeViewService.logDuplicates(objectId, duplicates);
   });
 
   const objects = dbObject.data.filter(object => nodes.includes(object?.id ?? '')) as DBObject[];

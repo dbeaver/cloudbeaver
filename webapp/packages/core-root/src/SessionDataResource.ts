@@ -16,7 +16,7 @@ export class SessionDataResource extends CachedDataResource<null> {
   constructor(
     sessionResource: SessionResource
   ) {
-    super(null);
+    super(() => null);
 
     this.sync(sessionResource, () => {}, () => {});
   }

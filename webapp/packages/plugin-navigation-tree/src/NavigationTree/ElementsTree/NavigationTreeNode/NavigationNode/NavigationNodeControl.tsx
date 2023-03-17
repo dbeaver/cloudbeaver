@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React, { forwardRef, useContext, useState } from 'react';
+import React, { forwardRef, useContext, useDeferredValue, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { ConnectionImageWithMask, getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
@@ -95,7 +95,8 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
     treeNodeContext.select(event.ctrlKey || event.metaKey);
   }
 
-  const expandable = getComputed(() => treeContext?.tree.isNodeExpandable(node.id) ?? true);
+  const expandable = useDeferredValue(getComputed(() => treeContext?.tree.isNodeExpandable(node.id) ?? true));
+  const filterActive = useDeferredValue(getComputed(() => treeContext?.tree.filtering));
 
   const attributes = { [DATA_ATTRIBUTE_NODE_EDITING]: editing };
 
@@ -106,7 +107,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
       onClick={onClickHandler}
       {...use({ outdated, editing, dragging: dndElement })}
     >
-      {expandable && <TreeNodeExpand filterActive={treeContext?.tree.filtering} />}
+      {expandable && <TreeNodeExpand filterActive={filterActive} />}
       <TreeNodeIcon {...use({ connected })}>
         <ConnectionImageWithMask icon={icon} connected={connected} maskId="tree-node-icon" />
       </TreeNodeIcon>

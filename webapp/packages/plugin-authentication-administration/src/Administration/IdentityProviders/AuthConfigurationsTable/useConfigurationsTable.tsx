@@ -13,8 +13,7 @@ import { TableState, useObservableRef, useTranslate } from '@cloudbeaver/core-bl
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-
-import { AdminAuthProviderConfiguration, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { AdminAuthProviderConfiguration, CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 interface State {
   tableState: TableState;
@@ -44,7 +43,7 @@ export function useConfigurationsTable(): Readonly<State> {
 
       try {
         this.processing = true;
-        await resource.refreshAll();
+        await resource.refresh(CachedMapAllKey);
         notificationService.logSuccess({ title: 'administration_identity_providers_configuration_list_update_success' });
       } catch (exception: any) {
         notificationService.logException(exception, 'administration_identity_providers_configuration_list_update_fail');

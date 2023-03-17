@@ -10,13 +10,13 @@ import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TeamMetaParametersResource } from '@cloudbeaver/core-authentication';
 import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, InputField, SubmittingForm, Textarea, useTranslate, useStyles, useResource, Loader, GroupTitle, ObjectPropertyInfoForm } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormProps } from '../ITeamFormProps';
 import { Permissions } from './Permissions';
+import { TeamMetaParameters } from './TeamMetaParameters';
 
 const styles = css`
   SubmittingForm {
@@ -28,13 +28,10 @@ const styles = css`
 export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(function TeamOptions({
   state,
 }) {
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const translate = useTranslate();
   const serverConfigResource = useResource(TeamOptions, ServerConfigResource, undefined);
-  const teamMetaParameters = useResource(TeamOptions, TeamMetaParametersResource, undefined);
-
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
+  const formRef = useRef<HTMLFormElement>(null);
+  const translate = useTranslate();
   const edit = state.mode === 'edit';
 
   return styled(style)(
@@ -74,20 +71,7 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
           </Textarea>
         </Group>
         {!serverConfigResource.resource.distributed && <Permissions state={state} />}
-        <Loader state={teamMetaParameters} inline>
-          {() => teamMetaParameters.data.length > 0 && styled(style)(
-            <Group small gap vertical overflow>
-              <GroupTitle keepSize>{translate('authentication_team_meta_parameters')}</GroupTitle>
-              <ObjectPropertyInfoForm
-                state={state.config.metaParameters}
-                properties={teamMetaParameters.data}
-                disabled={state.disabled}
-                keepSize
-                tiny
-              />
-            </Group>
-          )}
-        </Loader>
+        <TeamMetaParameters state={state} />
       </ColoredContainer>
     </SubmittingForm>
   );

@@ -16,6 +16,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ISessionAction, ServerConfigResource, sessionActionContext, SessionActionService, SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService, WindowsService } from '@cloudbeaver/core-routing';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
@@ -148,7 +149,7 @@ export class AuthenticationService extends Bootstrap {
       });
 
     if (this.serverConfigResource.redirectOnFederatedAuth) {
-      await this.authProvidersResource.loadAll();
+      await this.authProvidersResource.load(CachedMapAllKey);
 
       const providers = this.authProvidersResource
         .getEnabledProviders();
@@ -222,7 +223,7 @@ export class AuthenticationService extends Bootstrap {
       return;
     }
 
-    await this.authProvidersResource.loadAll();
+    await this.authProvidersResource.load();
     await this.userInfoResource.load();
 
     if (!this.authProvidersResource.has(data.providerId)) {

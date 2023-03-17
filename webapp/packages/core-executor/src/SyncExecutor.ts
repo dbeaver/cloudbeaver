@@ -29,6 +29,10 @@ export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implem
     context?: IExecutionContext<T>,
     scope?: IExecutorHandlersCollection<T> | Array<IExecutorHandlersCollection<T>>
   ): IExecutionContextProvider<T> {
+    if (context && ExecutorInterrupter.isInterrupted(context)) {
+      return context;
+    }
+
     data = this.getDefaultData(data);
 
     if (!context) {
@@ -42,6 +46,10 @@ export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implem
     scope?: IExecutorHandlersCollection<T> | Array<IExecutorHandlersCollection<T>>,
     context?: IExecutionContext<T>
   ): IExecutionContextProvider<T> {
+    if (context && ExecutorInterrupter.isInterrupted(context)) {
+      return context;
+    }
+
     data = this.getDefaultData(data);
 
     if (!context) {

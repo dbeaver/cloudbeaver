@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createContext } from 'react';
+import { createContext, StrictMode } from 'react';
 
 import type { IServiceInjector } from './IApp';
 import { useAppLoadingScreen } from './useAppLoadingScreen';
@@ -19,5 +19,9 @@ interface Props {
 
 export const AppContext: React.FC<React.PropsWithChildren<Props>> = function AppContext({ app, children }) {
   useAppLoadingScreen();
-  return <appContext.Provider value={app}>{children}</appContext.Provider>;
+  return (
+    //<StrictMode> // problems with TabState when empty -> displayed state switch
+    <appContext.Provider value={app}>{children}</appContext.Provider>
+    //</StrictMode>
+  );
 };
