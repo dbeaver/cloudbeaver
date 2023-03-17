@@ -16,8 +16,6 @@
  */
 package io.cloudbeaver.server.events;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
@@ -35,8 +33,6 @@ import java.util.List;
  */
 public class WSUserSecretEventHandlerImpl extends WSProjectUpdatedEventHandler {
 
-    private static final Gson gson = new GsonBuilder().create();
-
     @NotNull
     @Override
     public String getSupportedTopicId() {
@@ -45,29 +41,27 @@ public class WSUserSecretEventHandlerImpl extends WSProjectUpdatedEventHandler {
 
     @Override
     protected void updateSessionData(BaseWebSession activeUserSession, WSEvent event) {
-        if (!(event instanceof WSUserSecretEvent)) {
+        if (!(event instanceof WSUserSecretEvent && activeUserSession instanceof WebSession)) {
             return;
         }
         var resourceUpdateEvent = (WSUserSecretEvent) event;
-        if (activeUserSession instanceof WebSession) {
-            var connectionInfo = ((WebSession) activeUserSession).findWebConnectionInfo(resourceUpdateEvent.getDataSourceId());
-            if (connectionInfo == null) {
-                return;
-            }
-            try {
-                connectionInfo.getDataSourceContainer().resolveSecrets(activeUserSession.getUserContext().getSecretController());
-            } catch (DBException e) {
-                return;
-            }
-            activeUserSession.addSessionEvent(
-                WSDataSourceEvent.update(
-                    event.getSessionId(),
-                    event.getUserId(),
-                    connectionInfo.getProjectId(),
-                    List.of(resourceUpdateEvent.getDataSourceId()),
-                    WSDataSourceProperty.CONFIGURATION
-                )
-            );
+        var connectionInfo = ((WebSession) activeUserSession).findWebConnectionInfo(resourceUpdateEvent.getDataSourceId());
+        if (connectionInfo == null) {
+            return;
         }
+        try {
+            connectionInfo.getDataSourceContainer().resolveSecrets(activeUserSession.getUserContext().getSecretController());
+        } catch (DBException e) {
+            return;
+        }
+        activeUserSession.addSessionEvent(
+            WSDataSourceEvent.update(
+                event.getSessionId(),
+                event.getUserId(),
+                connectionInfo.getProjectId(),
+                List.of(resourceUpdateEvent.getDataSourceId()),
+                WSDataSourceProperty.CONFIGURATION
+            )
+        );
     }
 }
