@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable, observable, runInAction } from 'mobx';
+import { computed, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ISyncExecutor, ITask, AutoRunningTask, whileTask } from '@cloudbeaver/core-executor';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { AuthInfo, AuthStatus, CachedDataResource, GetActiveUserQueryVariables, GraphQLService, isResourceKeyList, ResourceKey, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
+import { AuthInfo, AuthStatus, CachedDataResource, GetActiveUserQueryVariables, GraphQLService, ResourceKeySimple, ResourceKeyUtils, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthProviderService } from './AuthProviderService';
@@ -30,7 +30,6 @@ export interface ILoginOptions {
 export class UserInfoResource extends CachedDataResource<
 UserInfo | null,
 void,
-void,
 UserInfoIncludes
 > {
   readonly onUserChange: ISyncExecutor<string>;
@@ -48,7 +47,7 @@ UserInfoIncludes
     private readonly authProviderService: AuthProviderService,
     private readonly sessionResource: SessionResource
   ) {
-    super(null, ['customIncludeOriginDetails', 'includeConfigurationParameters']);
+    super(() => null, undefined, ['customIncludeOriginDetails', 'includeConfigurationParameters']);
 
     this.onUserChange = new SyncExecutor();
 
@@ -191,31 +190,22 @@ UserInfoIncludes
     return this.data;
   }
 
-  async deleteConfigurationParameter(key: ResourceKey<string>): Promise<UserInfo | null> {
-    if (isResourceKeyList(key)) {
-      const keyList: string[] = [];
-      for (const item of key.list) {
-        await this.graphQLService.sdk.setUserConfigurationParameter({
-          name: item,
-          value: null,
-        });
-
-        keyList.push(item);
-      }
-
-      runInAction(() => {
-        for (const item of keyList) {
-          delete this.data?.configurationParameters[item];
-        }
-      });
-    } else {
+  async deleteConfigurationParameter(key: ResourceKeySimple<string>): Promise<UserInfo | null> {
+    const keyList: string[] = [];
+    await ResourceKeyUtils.forEachAsync(key, async name => {
       await this.graphQLService.sdk.setUserConfigurationParameter({
-        name: key,
+        name,
         value: null,
       });
 
-      delete this.data?.configurationParameters[key];
-    }
+      keyList.push(name);
+    });
+
+    runInAction(() => {
+      for (const item of keyList) {
+        delete this.data?.configurationParameters[item];
+      }
+    });
 
     return this.data;
   }
@@ -252,16 +242,5 @@ UserInfoIncludes
       includeConfigurationParameters: false,
       includeMetaParameters: false,
     };
-  }
-
-  protected resetIncludes(): void {
-    const metadata = this.getMetadata();
-    metadata.includes = observable([...this.defaultIncludes]);
-  }
-
-  getIncludes(key: void): string[] {
-    key = this.transformParam(key);
-    const metadata = this.getMetadata(key);
-    return metadata.includes;
   }
 }

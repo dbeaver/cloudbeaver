@@ -13,7 +13,7 @@ import { DBObjectResource } from '@cloudbeaver/core-navigation-tree';
 export function useDatabaseObjectInfo(navNodeId: string) {
   const dbObjectResource = useService(DBObjectResource);
   const dbObject = dbObjectResource.get(navNodeId);
-  const isLoading = dbObjectResource.isDataLoading(navNodeId);
+  const isLoading = dbObjectResource.isLoading(navNodeId);
   const isLoaded = dbObjectResource.isLoaded(navNodeId);
 
   return { dbObject, isLoading, isLoaded };

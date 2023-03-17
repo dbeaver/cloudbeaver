@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, computed, observable, reaction, toJS, untracked, when } from 'mobx';
+import { action, computed, observable, reaction, toJS, untracked, comparer } from 'mobx';
 import { useEffect, useContext, useState } from 'react';
 
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
-import { CachedMapResource, CachedMapResourceGetter, CachedMapResourceValue, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter, isResourceKeyList, CachedResourceData, CachedDataResourceGetter, CachedResource, CachedDataResource, CachedResourceParam, CachedResourceKey, CachedResourceContext, ResourceError } from '@cloudbeaver/core-sdk';
+import { CachedMapResource, CachedMapResourceGetter, CachedMapResourceValue, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter, CachedResourceData, CachedDataResourceGetter, CachedResource, CachedDataResource, CachedResourceKey, CachedResourceContext, ResourceKey } from '@cloudbeaver/core-sdk';
+import type { ResourceKeyListAlias } from '@cloudbeaver/core-sdk/src/Resource/ResourceKeyListAlias';
 import { ILoadableState, isArraysEqual, isContainsException, LoadingError } from '@cloudbeaver/core-utils';
 
 import { ErrorContext } from '../ErrorContext';
@@ -24,10 +25,10 @@ interface KeyWithIncludes<TKey, TIncludes> {
 }
 
 type ResourceData<
-  TResource extends CachedResource<any, any, any, any, any>,
+  TResource extends CachedResource<any, any, any, any>,
   TKey,
   TIncludes
-> = TResource extends CachedDataResource<any, any, any, any>
+> = TResource extends CachedDataResource<any, any, any>
   ? CachedResourceData<TResource>
   : CachedMapResourceLoader<
   TKey,
@@ -38,7 +39,7 @@ type ResourceData<
 ;
 
 interface IActions<
-  TResource extends CachedResource<any, any, any, any, any>,
+  TResource extends CachedResource<any, any, any, any>,
   TKey,
   TIncludes
 > {
@@ -99,18 +100,18 @@ interface IDataResourceResult<TResource, TIncludes> extends IMapResourceState<TR
 }
 
 type TResult<TResource, TKey, TIncludes> = (
-  TResource extends CachedDataResource<any, any, any, any>
+  TResource extends CachedDataResource<any, any, any>
     ? IDataResourceResult<TResource, TIncludes>
     : (
-      TKey extends ResourceKeyList<any>
+      TKey extends ResourceKeyList<any> | ResourceKeyListAlias<any, any>
         ? IMapResourceListResult<TResource, TIncludes>
         : IMapResourceResult<TResource, TIncludes>
     )
 );
 
 export function useResource<
-  TResource extends CachedResource<any, any, any, any, any>,
-  TKeyArg extends CachedResourceParam<TResource>,
+  TResource extends CachedResource<any, any, any, any>,
+  TKeyArg extends ResourceKey<CachedResourceKey<TResource>>,
   TIncludes extends Readonly<CachedResourceContext<TResource>>
 >(
   component: { name: string },
@@ -120,8 +121,8 @@ export function useResource<
 ): TResult<TResource, TKeyArg, TIncludes>;
 
 export function useResource<
-  TResource extends CachedResource<any, any, any, any, any>,
-  TKeyArg extends CachedResourceParam<TResource>,
+  TResource extends CachedResource<any, any, any, any>,
+  TKeyArg extends ResourceKey<CachedResourceKey<TResource>>,
   TIncludes extends CachedResourceContext<TResource>
 >(
   component: { name: string },
@@ -134,7 +135,7 @@ export function useResource<
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const resource = ctor instanceof CachedResource ? ctor : useService(ctor);
   const errorContext = useContext(ErrorContext);
-  let key: TKeyArg | null = keyObj as TKeyArg;
+  let key: ResourceKey<TKeyArg> | null = keyObj as ResourceKey<TKeyArg>;
   let includes: TIncludes = [] as unknown as TIncludes;
   const [loadFunctionName] = useState(`${component.name}.useResource(${resource.getName()}).load`);
 
@@ -165,7 +166,7 @@ export function useResource<
     if (
       key === null
       || propertiesRef.key === null
-      || !propertiesRef.resource.includes(key, propertiesRef.key)
+      || !propertiesRef.resource.isIntersect(key, propertiesRef.key)
     ) {
       propertiesRef.key = key;
     }
@@ -218,7 +219,7 @@ export function useResource<
       key = toJS(key);
 
       if (this.useRef[0] !== null) {
-        if (key !== null && propertiesRef.resource.includes(key, this.useRef[0])) {
+        if (key !== null && propertiesRef.resource.isIntersect(key, this.useRef[0])) {
           return;
         }
 
@@ -370,7 +371,7 @@ export function useResource<
           return false;
         }
 
-        return refObj.loadingPromise !== null || this.resource.isDataLoading(propertiesRef.key);
+        return refObj.loadingPromise !== null || this.resource.isLoading(propertiesRef.key);
       },
       isError() {
         return isContainsException(this.exception);
@@ -388,9 +389,33 @@ export function useResource<
       },
     }), {
       canLoad: computed,
-      exception: computed,
-      tryGetData: computed,
-      data: computed,
+      exception: computed<any>({
+        equals: (a, b) => {
+          if (Array.isArray(a) && Array.isArray(b)) {
+            return isArraysEqual(a, b, undefined, true);
+          }
+
+          return comparer.default(a, b);
+        },
+      }),
+      tryGetData: computed<any>({
+        equals: (a, b) => {
+          if (Array.isArray(a) && Array.isArray(b)) {
+            return isArraysEqual(a, b, undefined, true);
+          }
+
+          return comparer.default(a, b);
+        },
+      }),
+      data: computed<any>({
+        equals: (a, b) => {
+          if (Array.isArray(a) && Array.isArray(b)) {
+            return isArraysEqual(a, b, undefined, true);
+          }
+
+          return comparer.default(a, b);
+        },
+      }),
       outdated: computed,
       loaded: computed,
       loading: computed,

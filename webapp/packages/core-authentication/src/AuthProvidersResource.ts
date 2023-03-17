@@ -10,17 +10,7 @@ import { computed, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import {
-  GraphQLService,
-  CachedMapResource,
-  ResourceKey,
-  resourceKeyList,
-  ResourceKeyUtils,
-  isResourceKeyList,
-  CachedMapAllKey,
-  AuthProviderInfoFragment,
-  AuthProviderConfigurationInfoFragment,
-} from '@cloudbeaver/core-sdk';
+import { GraphQLService, CachedMapResource, ResourceKey, resourceKeyList, ResourceKeyUtils, CachedMapAllKey, AuthProviderInfoFragment, AuthProviderConfigurationInfoFragment, ResourceKeySimple } from '@cloudbeaver/core-sdk';
 
 import { AuthConfigurationsResource } from './AuthConfigurationsResource';
 import { AuthSettingsService } from './AuthSettingsService';
@@ -45,7 +35,7 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     this.preloadResource(serverConfigResource, () => {});
     this.serverConfigResource.outdateResource(this);
 
-    this.authConfigurationsResource.onItemAdd.addHandler(this.updateConfigurations.bind(this));
+    this.authConfigurationsResource.onItemUpdate.addHandler(this.updateConfigurations.bind(this));
     this.authConfigurationsResource.onItemDelete.addHandler(this.deleteConfigurations.bind(this));
 
     makeObservable(this, {
@@ -91,12 +81,6 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     return this.serverConfigResource.enabledAuthProviders.includes(id);
   }
 
-  async loadAll(): Promise<AuthProvider[]> {
-    await this.load(CachedMapAllKey);
-
-    return this.values;
-  }
-
   async refreshAll(): Promise<AuthProvider[]> {
     this.resetIncludes();
     await this.refresh(CachedMapAllKey);
@@ -108,27 +92,22 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     this.markOutdated(CachedMapAllKey);
   }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, AuthProvider>> {
-    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
+  protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, AuthProvider>> {
+    const all = this.isAlias(originalKey, CachedMapAllKey);
 
     const { providers } = await this.graphQLService.sdk.getAuthProviders();
 
-    runInAction(() => {
-      if (all) {
-        this.data.clear();
-      }
-
-      for (const provider of providers) {
-        this.data.set(provider.id, provider as AuthProvider);
-      }
-    });
+    const key = resourceKeyList(providers.map(provider => provider.id));
+    if (all) {
+      this.replace(key, providers);
+    } else {
+      this.set(key, providers);
+    }
     return this.data;
   }
 
-  private updateConfigurations(key: ResourceKey<string>) {
-    const configurations = isResourceKeyList(key)
-      ? this.authConfigurationsResource.get(key)
-      : [this.authConfigurationsResource.get(key)];
+  private updateConfigurations(key: ResourceKeySimple<string>) {
+    const configurations = this.authConfigurationsResource.get(ResourceKeyUtils.toList(key));
 
     const providerIds = resourceKeyList(
       configurations.filter(Boolean).map(configuration => configuration!.providerId)
@@ -137,7 +116,7 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     this.markOutdated(providerIds);
   }
 
-  private deleteConfigurations(key: ResourceKey<string>) {
+  private deleteConfigurations(key: ResourceKeySimple<string>) {
     runInAction(() => {
       for (const provider of this.values) {
         if (provider.configurable && provider.configurations?.length) {
@@ -152,10 +131,7 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     });
   }
 
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }

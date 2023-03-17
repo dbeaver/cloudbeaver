@@ -15,7 +15,7 @@ import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@c
 import { NotificationService } from '@cloudbeaver/core-events';
 import { executorHandlerFilter, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import type { ConnectionConfig, ResourceKey } from '@cloudbeaver/core-sdk';
+import type { ConnectionConfig, ResourceKey, ResourceKeySimple } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
@@ -153,12 +153,12 @@ export class PublicConnectionFormService {
     }
   };
 
-  private readonly closeDeleted: IExecutorHandler<ResourceKey<IConnectionInfoParams>> = (data, contexts) => {
+  private readonly closeDeleted: IExecutorHandler<ResourceKeySimple<IConnectionInfoParams>> = (data, contexts) => {
     if (!this.formState || !this.formState.config.connectionId || this.formState.projectId === null) {
       return;
     }
 
-    if (this.connectionInfoResource.includes(data, createConnectionParam(
+    if (this.connectionInfoResource.isIntersect(data, createConnectionParam(
       this.formState.projectId,
       this.formState.config.connectionId
     ))) {

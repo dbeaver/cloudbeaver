@@ -39,7 +39,7 @@ export function useChildren(navNodeId = ROOT_NODE_PATH): Hook {
 
   const deps = [navNodeId];
 
-  const isLoading = useCallback(() => navTreeResource.isDataLoading(navNodeId), deps);
+  const isLoading = useCallback(() => navTreeResource.isLoading(navNodeId), deps);
   const isLoaded = useCallback(() => navTreeResource.isLoaded(navNodeId), deps);
   const isOutdated = useCallback(() => navTreeResource.isOutdated(navNodeId), deps);
 

@@ -8,17 +8,15 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList, resourceKeyList, ResourceKeyUtils, ResourceKeyList, DetailsError } from '@cloudbeaver/core-sdk';
-import { flat } from '@cloudbeaver/core-utils';
+import { GraphQLService, CachedMapResource, ResourceKey, resourceKeyList, ResourceKeyUtils, DetailsError, isResourceAlias, resourceKeyListAliasFactory } from '@cloudbeaver/core-sdk';
 
 import type { DBObject } from './EntityTypes';
 import { NavNodeInfoResource } from './NavNodeInfoResource';
 import { NavTreeResource } from './NavTreeResource';
 
-const dbObjectParentKeySymbol = Symbol('@db-object/parent') as unknown as string;
-export const DBObjectParentKey = (parentId: string) => resourceKeyList<string>(
-  [dbObjectParentKeySymbol],
-  parentId
+export const DBObjectParentKey = resourceKeyListAliasFactory(
+  '@db-object/parent',
+  (parentId: string) => ({ parentId })
 );
 
 @injectable()
@@ -31,55 +29,48 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     super();
 
     this.addAlias(
-      isDBObjectParentKey,
-      param => resourceKeyList(navTreeResource.get(param.mark) || []),
-      (a, b) => a.mark === b.mark
+      DBObjectParentKey,
+      param => resourceKeyList(navTreeResource.get(param.options.parentId) || [])
     );
     // this.preloadResource(this.navNodeInfoResource);
     this.navNodeInfoResource.outdateResource(this);
     this.navNodeInfoResource.deleteInResource(this);
-    this.navNodeInfoResource.onDataOutdated.addHandler(this.outdateChildren.bind(this));
     this.beforeLoad.addHandler(async (originalKey, context) => {
       await this.navTreeResource.waitLoad();
-      if (isDBObjectParentKey(originalKey)) {
-        await this.navTreeResource.load(originalKey.mark);
+      if (this.isAlias(originalKey, DBObjectParentKey)) {
+        await this.navTreeResource.load(originalKey.options.parentId);
         return;
       }
 
-      const key = this.transformParam(originalKey);
-      const parents = [...new Set(ResourceKeyUtils
-        .mapArray(key, nodeId => this.navNodeInfoResource.get(nodeId)?.parentId)
-        .filter<string>((nodeId): nodeId is string => nodeId !== undefined))];
+      const key = ResourceKeyUtils.toList(this.transformToKey(originalKey));
+      const parents = [...new Set(
+        key.map(nodeId => this.navNodeInfoResource.get(nodeId)?.parentId)
+          .filter<string>((nodeId): nodeId is string => nodeId !== undefined)
+      )];
 
-      const children = await this.navTreeResource.load(resourceKeyList(parents));
+      await this.navTreeResource.load(resourceKeyList(parents));
 
-      if (
-        ResourceKeyUtils.count(key) > 0
-         && !ResourceKeyUtils.includes(resourceKeyList(flat(children)), key)
-      ) {
+      if (key.length > 0 && !navNodeInfoResource.has(key)) {
         ExecutorInterrupter.interrupt(context);
         const cause = new DetailsError(`Entity not found: ${key.toString()}`);
-        throw this.markDataError(cause, key);
+        throw this.markError(cause, key);
       }
     });
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, DBObject>> {
-    const key = this.transformParam(originalKey);
-
-    if (isDBObjectParentKey(originalKey)) {
-      await this.loadFromChildren(originalKey.mark, 0, this.navTreeResource.childrenLimit + 1);
+    if (this.isAlias(originalKey, DBObjectParentKey)) {
+      await this.loadFromChildren(originalKey.options.parentId, 0, this.navTreeResource.childrenLimit + 1);
       return this.data;
     }
 
-    if (isResourceKeyList(key)) {
+    if (!isResourceAlias(originalKey)) {
       const values: DBObject[] = [];
-      for (const navNodeId of key.list) {
+      originalKey = ResourceKeyUtils.toList(originalKey);
+      await ResourceKeyUtils.forEachAsync(originalKey, async navNodeId => {
         values.push(await this.loadDBObjectInfo(navNodeId));
-      }
-      this.set(key, values);
-    } else {
-      this.set(key, await this.loadDBObjectInfo(key));
+      });
+      this.set(originalKey, values);
     }
 
     return this.data;
@@ -103,35 +94,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     return objectInfo;
   }
 
-  private outdateChildren(key: ResourceKey<string> | undefined): void {
-    if (!key) {
-      this.markOutdated();
-      return;
-    }
-
-    const childrenToOutdate: string[] = [];
-
-    ResourceKeyUtils.forEach(key, key => {
-      childrenToOutdate.push(...this.navTreeResource.get(key) || []);
-    });
-
-    const outdateKey = resourceKeyList(childrenToOutdate);
-
-    // if (!this.isOutdated(outdateKey)) {
-    this.markOutdated(outdateKey);
-    // }
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
-
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
-  }
-}
-
-function isDBObjectParentKey(
-  param: ResourceKey<string>
-): param is ResourceKeyList<string> {
-  return isResourceKeyList(param) && param.list.includes(dbObjectParentKeySymbol);
 }

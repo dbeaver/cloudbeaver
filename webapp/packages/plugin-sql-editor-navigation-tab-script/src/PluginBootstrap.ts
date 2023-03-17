@@ -12,15 +12,15 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeManagerService, NavNodeInfoResource, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
 import { createResourceOfType, isResourceOfType, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { createChildResourceKey, NAV_NODE_TYPE_RM_RESOURCE, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
+import { NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { createPath } from '@cloudbeaver/core-utils';
+import { createPath, getPathName } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavResourceNodeService, ResourceManagerService, getResourceKeyFromNodeId } from '@cloudbeaver/plugin-resource-manager';
 import { ResourceManagerScriptsService, SaveScriptDialog, SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, ISqlDataSource, SqlDataSourceService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
-import { isSQLEditorTab, SqlEditorNavigatorService, SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { ResourceSqlDataSource } from './ResourceSqlDataSource';
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
@@ -43,7 +43,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly menuService: MenuService,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
-    private readonly sqlEditorTabService: SqlEditorTabService,
+    private readonly resourceManagerResource: ResourceManagerResource,
     private readonly resourceManagerScriptsService: ResourceManagerScriptsService,
   ) {
     super();
@@ -129,7 +129,7 @@ export class PluginBootstrap extends Bootstrap {
                 return;
               }
 
-              const resourceKey = createChildResourceKey(folderResourceKey, scriptName);
+              const resourceKey = createPath(folderResourceKey, scriptName);
 
               await this.resourceManagerScriptsService.createScript(
                 resourceKey,
@@ -148,7 +148,7 @@ export class PluginBootstrap extends Bootstrap {
 
               (dataSource as ResourceSqlDataSource).setResourceKey(resourceKey);
 
-              this.notificationService.logSuccess({ title: 'plugin_sql_editor_navigation_tab_resource_save_script_success', message: resourceKey.name });
+              this.notificationService.logSuccess({ title: 'plugin_sql_editor_navigation_tab_resource_save_script_success', message: getPathName(resourceKey) });
 
               if (!this.resourceManagerScriptsService.active) {
                 this.resourceManagerScriptsService.togglePanel();
@@ -238,7 +238,7 @@ export class PluginBootstrap extends Bootstrap {
         return;
       }
 
-      const resource = await this.navResourceNodeService.loadResourceInfo(resourceKey);
+      const resource = await this.resourceManagerResource.load(resourceKey);
 
       const maxSize = this.sqlEditorSettingsService.settings.isValueDefault('maxFileSize')
         ? this.sqlEditorSettingsService.deprecatedSettings.getValue('maxFileSize')
@@ -261,7 +261,7 @@ export class PluginBootstrap extends Bootstrap {
         this.navigationTabsService.selectTab(tab.id);
       } else {
         const contextProvider = await this.sqlEditorNavigatorService.openNewEditor({
-          name: resourceKey.name ?? 'Unknown script',
+          name: getPathName(resourceKey),
           dataSourceKey: ResourceSqlDataSource.key,
         });
 
