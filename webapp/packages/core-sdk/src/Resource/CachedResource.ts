@@ -752,10 +752,8 @@ export abstract class CachedResource<
 
   protected transformToKey(param: ResourceKey<TKey>): TKey | ResourceKeyList<TKey> {
     let deep = 0;
-    // eslint-disable-next-line no-labels
-    transform:
 
-    if (deep < 10) {
+    while (deep < 10) {
       if (!this.validateResourceKey(param)) {
         let paramString = JSON.stringify(toJS(param));
 
@@ -770,17 +768,20 @@ export abstract class CachedResource<
           if (alias.id === param.id) {
             param = alias.getAlias(param);
             deep++;
-            // eslint-disable-next-line no-labels
-            break transform;
+            break;
           }
         }
+      } else {
+        break;
       }
-    } else {
-      console.warn('CachedResource: parameter transform was stopped');
+    }
+
+    if (deep === 10) {
+      console.warn(this.getActionPrefixedName('parameter transform was stopped'));
     }
 
     if (isResourceAlias(param)) {
-      throw new Error(`Can't resolve alias ${param.toString()}`);
+      throw new Error(this.getActionPrefixedName(`Can't resolve alias ${param.toString()}`));
     }
     return param;
   }
