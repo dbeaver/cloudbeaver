@@ -122,7 +122,6 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
     @Override
     public void close() {
         getSession().close();
-        onWebSocketClose(WSConstants.NORMAL_STATUS, "Closed by web session");
     }
 
     @NotNull
