@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.CommonUtils;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -55,7 +56,11 @@ public class WebSessionWorkspace implements DBPWorkspace {
     @NotNull
     @Override
     public String getWorkspaceId() {
-        return session.getUserContext().getUserId();
+        String userId = session.getUserContext().getUserId();
+        if (CommonUtils.isEmpty(userId)) {
+            userId = "anonymous";
+        }
+        return userId;
     }
 
     @Override
