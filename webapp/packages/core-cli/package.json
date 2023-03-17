@@ -6,6 +6,7 @@
   "license": "Apache-2.0",
   "files": [
     "/package.json",
+    "/tsconfig.json",
     "/src",
     "/configs",
     "/bin",
@@ -16,6 +17,10 @@
     "core-cli-test": "./bin/test.js",
     "core-cli-analyzer": "./bin/analyzer.js",
     "core-cli-validate-dependencies": "./bin/validate-dependencies.js"
+  },
+  "scripts": {
+    "preinstall": "rimraf --glob lib/* && rimraf tsconfig.tsbuildinfo",
+    "install": "tsc"
   },
   "engines": {
     "node": ">=16.0.0"
