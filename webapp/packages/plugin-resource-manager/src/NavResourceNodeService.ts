@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { IResourceManagerParams, ResourceManagerResource, RmResourceInfo } from '@cloudbeaver/core-resource-manager';
+import { ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 
 import { getResourceNodeId } from './NavNodes/getResourceNodeId';
 
@@ -17,25 +17,21 @@ export class NavResourceNodeService {
     private readonly resourceManagerResource: ResourceManagerResource,
   ) { }
 
-  async loadResourceInfo(key: IResourceManagerParams): Promise<RmResourceInfo> {
-    return (await this.resourceManagerResource.load(key))[0];
-  }
-
-  async move(key: IResourceManagerParams, newKey: IResourceManagerParams): Promise<string> {
+  async move(key: string, newKey: string): Promise<string> {
     await this.resourceManagerResource.move(key, newKey);
 
     return getResourceNodeId(newKey);
   }
 
-  async delete(key: IResourceManagerParams) {
+  async delete(key: string) {
     await this.resourceManagerResource.deleteResource(key);
   }
 
-  async read(key: IResourceManagerParams): Promise<string> {
+  async read(key: string): Promise<string> {
     return await this.resourceManagerResource.readText(key);
   }
 
-  async write(key: IResourceManagerParams, value: string) {
+  async write(key: string, value: string) {
     await this.resourceManagerResource.writeText(
       key,
       value,
@@ -43,7 +39,7 @@ export class NavResourceNodeService {
     );
   }
 
-  async setProperties(key: IResourceManagerParams, diff: Record<string, any>): Promise<Record<string, any>> {
+  async setProperties(key: string, diff: Record<string, any>): Promise<Record<string, any>> {
     return await this.resourceManagerResource.setProperties(
       key,
       diff

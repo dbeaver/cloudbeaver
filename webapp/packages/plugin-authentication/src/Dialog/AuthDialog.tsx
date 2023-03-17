@@ -184,21 +184,17 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
             </TabList>
           )}
           <SubmittingForm {...use({ form: !federate })} onSubmit={login}>
-            <Loader state={dialogData.loadingState}>
-              {() => federate
-                ? (
-                  <ConfigurationsList
-                    activeProvider={state.activeProvider}
-                    activeConfiguration={state.activeConfiguration}
-                    providers={dialogData.configurations}
-                    onAuthorize={(provider, configuration) => {
-                      state.setActiveConfiguration(provider, configuration);
-                    }}
-                    onClose={rejectDialog}
-                  />
-                )
-                : renderForm(state.activeProvider)}
-            </Loader>
+            {federate ? (
+              <ConfigurationsList
+                activeProvider={state.activeProvider}
+                activeConfiguration={state.activeConfiguration}
+                providers={dialogData.configurations}
+                onAuthorize={(provider, configuration) => {
+                  state.setActiveConfiguration(provider, configuration);
+                }}
+                onClose={rejectDialog}
+              />
+            ) : renderForm(state.activeProvider)}
           </SubmittingForm>
         </CommonDialogBody>
         {!federate && (

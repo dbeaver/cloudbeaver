@@ -27,7 +27,7 @@ const styles = css`
   a[|wrapper] {
     &, &:hover, &:focus, &:active {
       color: inherit;
-      text-decoration: none;
+      text-decoration: none !important;
       outline: none;
     }
   }

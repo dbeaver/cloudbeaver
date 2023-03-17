@@ -12,7 +12,7 @@ import styled, { css } from 'reshadow';
 
 import {
   BASE_CONTAINERS_STYLES, ColoredContainer, Container, getComputed, Group,
-  InfoItem, Loader, TextPlaceholder, useResource, useStyles, useTranslate
+  InfoItem, Loader, TextPlaceholder, useAutoLoad, useResource, useStyles, useTranslate
 } from '@cloudbeaver/core-blocks';
 import { Connection, ConnectionInfoProjectKey, ConnectionInfoResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
@@ -60,7 +60,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
       .map(project => project.id)
   );
 
-  const dbDriverResource = useResource(
+  useResource(
     GrantedConnections,
     DBDriverResource,
     CachedMapAllKey,
@@ -80,11 +80,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
     .filter(connection => state.state.grantedSubjects.includes(connection.id))
   );
 
-  useEffect(() => {
-    if (selected && !loaded) {
-      state.load();
-    }
-  });
+  useAutoLoad(state, selected && !loaded);
 
   if (!selected) {
     return null;
@@ -103,7 +99,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
   }
 
   return styled(style)(
-    <Loader state={[connectionsLoader, dbDriverResource, projects, state.state]}>
+    <Loader state={[state.state]}>
       {() => styled(style)(
         <ColoredContainer parent gap vertical>
           {!connections.length ? (
