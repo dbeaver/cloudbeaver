@@ -42,22 +42,19 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
     @NotNull
     private final BaseWebSession webSession;
     @NotNull
-    private final String applicationRunId;
-    @NotNull
     private final WriteCallback callback;
 
     public CBEventsWebSocket(@NotNull BaseWebSession webSession) {
         this.webSession = webSession;
 
         callback = new WebSocketPingPongCallback(webSession);
-        applicationRunId = webSession.getApplication().getApplicationRunId();
     }
 
     @Override
     public void onWebSocketConnect(Session session) {
         super.onWebSocketConnect(session);
         this.webSession.addEventHandler(this);
-        handeWebSessionEvent(new WSSocketConnectedEvent(applicationRunId));
+        handeWebSessionEvent(new WSSocketConnectedEvent(webSession.getApplication().getApplicationRunId()));
         log.debug("EventWebSocket connected to the " + webSession.getSessionId() + " session");
     }
 
@@ -126,8 +123,13 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
 
     @Override
     public void close() {
-        getSession().close();
-        onWebSocketClose(WSConstants.NORMAL_STATUS, "Closed by web session");
+        var session = getSession();
+        if (session != null) {
+            session.close();
+            onWebSocketClose(WSConstants.NORMAL_STATUS, "Closed by web session");
+        } else {
+            onWebSocketClose(WSConstants.NORMAL_STATUS, "Closed socket not connected to client");
+        }
     }
 
     @NotNull
