@@ -90,7 +90,7 @@ module.exports = (env, argv) => {
         options: {
           sourceMap: true,
           sassOptions: {
-            implementation: require('node-sass'),
+            implementation: require('sass'),
             includePaths: nodeModules,
           },
         },

@@ -41,7 +41,7 @@ export function useConnectionInfo(key: IConnectionInfoParams): IPublic {
       return this.resource.get(this.key);
     },
     isLoading() {
-      return this.resource.isDataLoading(this.key);
+      return this.resource.isLoading(this.key);
     },
     isLoaded() {
       return this.resource.isLoaded(this.key);
