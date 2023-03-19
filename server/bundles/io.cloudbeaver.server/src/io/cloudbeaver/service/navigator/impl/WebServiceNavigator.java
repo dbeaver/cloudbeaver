@@ -399,6 +399,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
     @NotNull
     private String renameRmResourceNode(@NotNull WebSession session, DBNNode node, @NotNull String newName) throws DBException {
+        if (newName.contains("/") || newName.contains("\\")) {
+            throw new DBWebException("New node name has prohibited symbols: \\ /");
+        }
         DBNResourceManagerResource rmNode = (DBNResourceManagerResource) node;
         // Get project id from node
         String projectId = rmNode.getResourceProject().getId();
