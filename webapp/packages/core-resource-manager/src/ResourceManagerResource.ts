@@ -6,33 +6,25 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable, toJS } from 'mobx';
-
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutionContext, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
-import { CachedMapResource, CachedResourceIncludeArgs, GetResourceListQueryVariables, GraphQLService, ICachedMapResourceMetadata, isResourceKeyList, ResourceKey, resourceKeyList, ResourceKeyUtils, RmResource } from '@cloudbeaver/core-sdk';
-import { createPath, isValuesEqual, MetadataMap } from '@cloudbeaver/core-utils';
+import { CachedResourceIncludeArgs, CachedTreeChildrenKey, CachedTreeResource, DetailsError, GetResourceListQueryVariables, GraphQLService, ResourceKey, resourceKeyList, ResourceKeyUtils, RmResource } from '@cloudbeaver/core-sdk';
+import { createPath, getPathParent, getPathParts } from '@cloudbeaver/core-utils';
 
 import { ResourceManagerEventHandler } from './ResourceManagerEventHandler';
 
 export type ResourceInfoIncludes = Omit<GetResourceListQueryVariables, 'projectId'>;
 export type RmResourceInfo = RmResource;
-export interface IResourceManagerParams {
-  projectId: string;
-  path?: string;
-  name?: string;
-}
 
 export interface IResourceManagerMoveData {
-  from: IResourceManagerParams;
-  to: IResourceManagerParams;
+  from: string;
+  to: string;
 }
 
 @injectable()
-export class ResourceManagerResource
-  extends CachedMapResource<IResourceManagerParams, RmResourceInfo[], ResourceInfoIncludes> {
+export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, ResourceInfoIncludes> {
   readonly onMove: IExecutor<IResourceManagerMoveData>;
   constructor(
     private readonly graphQLService: GraphQLService,
@@ -46,58 +38,39 @@ export class ResourceManagerResource
 
     this.projectsService.onActiveProjectChange.addHandler(data => {
       if (data.type === 'after') {
-        const updated: IResourceManagerParams[] = [];
-
-        for (const projectId of data.projects) {
-          const key = createParentResourceKey({
-            projectId,
-          });
-
-          updated.push(key);
-        }
-
-        this.markOutdated(resourceKeyList(updated));
+        this.markOutdated(resourceKeyList(data.projects));
       }
     });
 
-    resourceManagerEventHandler.onEvent<IResourceManagerParams>(
+    resourceManagerEventHandler.onEvent<string>(
       ServerEventId.CbRmResourceCreated,
       async key => {
-        let parentFolderKey = createParentResourceKey(key);
-        parentFolderKey = {
-          projectId: parentFolderKey.projectId,
-          path: [parentFolderKey.path, parentFolderKey.name].filter(Boolean).join('/'),
-          name: undefined,
-        };
+        const parent = getPathParent(key);
 
-        if (this.isInUse({ ...key, name: undefined })) {
+        if (this.isInUse(key)) {
           dataSynchronizationService
-            .requestSynchronization('resource', createPath(key.path, key.name))
+            .requestSynchronization('resource', key)
             .then(async state => {
-              if (state && !this.isOutdated(parentFolderKey)) {
+              if (state && !this.isOutdated(parent)) {
                 await this.load(key);
               }
             });
         } else {
-          if (!this.isOutdated(parentFolderKey)) {
+          if (!this.isOutdated(parent)) {
             await this.load(key);
           }
         }
       },
-      data => ({
-        projectId: data.projectId,
-        path: this.getFolder(data.resourcePath),
-        name: this.getResourceName(data.resourcePath),
-      }),
+      data => getRmResourcePath(data.projectId, data.resourcePath),
       this
     );
 
-    resourceManagerEventHandler.onEvent<IResourceManagerParams>(
+    resourceManagerEventHandler.onEvent<string>(
       ServerEventId.CbRmResourceUpdated,
       key => {
         if (this.isInUse(key)) {
           dataSynchronizationService
-            .requestSynchronization('resource', createPath(key.path, key.name))
+            .requestSynchronization('resource', key)
             .then(state => {
               if (state) {
                 this.onDataUpdate.execute(key);
@@ -109,63 +82,40 @@ export class ResourceManagerResource
           this.markOutdated(key);
         }
       },
-      data => ({
-        projectId: data.projectId,
-        path: this.getFolder(data.resourcePath),
-        name: this.getResourceName(data.resourcePath),
-      }),
+      data => getRmResourcePath(data.projectId, data.resourcePath),
       this
     );
 
-    resourceManagerEventHandler.onEvent<IResourceManagerParams>(
+    resourceManagerEventHandler.onEvent<string>(
       ServerEventId.CbRmResourceDeleted,
       key => {
         if (this.isInUse(key)) {
           dataSynchronizationService
-            .requestSynchronization('resource', createPath(key.path, key.name))
+            .requestSynchronization('resource', key)
             .then(state => {
               if (state) {
                 this.delete(key);
-                this.onDataUpdate.execute({ ...key, name: undefined });
+                this.onDataUpdate.execute(key);
               }
             });
         } else {
           this.delete(key);
-          this.onDataUpdate.execute({ ...key, name: undefined });
+          this.onDataUpdate.execute(key);
         }
       },
-      data => ({
-        projectId: data.projectId,
-        path: this.getFolder(data.resourcePath),
-        name: this.getResourceName(data.resourcePath),
-      }),
+      data => getRmResourcePath(data.projectId, data.resourcePath),
       this
     );
   }
 
-  getResourceName(resourcePath: string): string {
-    const parts = resourcePath.split('/');
-    return parts[parts.length - 1];
-  }
-
-  getFolder(resourcePath: string): string {
-    const parts = resourcePath.split('/');
-    return parts.slice(0, parts.length - 1).join('/');
-  }
-
-  getResource(key: IResourceManagerParams, resourcePath: string): RmResourceInfo | undefined {
-    const resources = this.get(key);
-    const name = this.getResourceName(resourcePath);
-
-    return resources?.find(resource => resource.name === name);
-  }
-
-  async move(from: IResourceManagerParams, to: IResourceManagerParams): Promise<void> {
+  async move(from: string, to: string): Promise<void> {
+    const fromResourceKey = getRmResourceKey(from);
+    const toResourceKey = getRmResourceKey(to);
     await this.performUpdate(from, undefined, async () => {
       await this.graphQLService.sdk.moveResource({
-        projectId: from.projectId,
-        newPath: createPath(to.path, to.name),
-        oldPath: createPath(from.path, from.name),
+        projectId: fromResourceKey.projectId,
+        oldPath: fromResourceKey.path,
+        newPath: toResourceKey.path,
       });
 
       await this.onMove.execute({ from, to });
@@ -176,12 +126,13 @@ export class ResourceManagerResource
   }
 
   async setProperties(
-    key: IResourceManagerParams,
+    key: string,
     diff: Record<string, any>
   ): Promise<Record<string, any>> {
     const propertiesPatch: Record<string, any> = {};
     const elements = await this.load(key, ['includeProperties']);
-    const properties = elements[0].properties;
+    const properties = elements.properties;
+    const resourceKey = getRmResourceKey(key);
 
     await this.performUpdate(key, undefined, async () => {
       for (const [name, value] of Object.entries(diff)) {
@@ -193,8 +144,8 @@ export class ResourceManagerResource
         }
 
         await this.graphQLService.sdk.setResourceProperty({
-          projectId: key.projectId,
-          resourcePath: createPath(key.path, key.name),
+          projectId: resourceKey.projectId,
+          resourcePath: resourceKey.path,
           name,
           value,
         });
@@ -208,20 +159,22 @@ export class ResourceManagerResource
     return properties;
   }
 
-  async create(key: IResourceManagerParams, folder: boolean) {
+  async create(key: string, folder: boolean) {
+    const resourceKey = getRmResourceKey(key);
     await this.graphQLService.sdk.createResource({
-      projectId: key.projectId,
-      resourcePath: createPath(key.path, key.name),
+      projectId: resourceKey.projectId,
+      resourcePath: resourceKey.path,
       isFolder: folder,
     });
 
     await this.load(key);
   }
 
-  async writeText(key: IResourceManagerParams, data: string, forceOverwrite: boolean) {
+  async writeText(key: string, data: string, forceOverwrite: boolean) {
+    const resourceKey = getRmResourceKey(key);
     await this.graphQLService.sdk.writeResourceContent({
-      projectId: key.projectId,
-      resourcePath: createPath(key.path, key.name),
+      projectId: resourceKey.projectId,
+      resourcePath: resourceKey.path,
       data,
       forceOverwrite,
     });
@@ -230,272 +183,80 @@ export class ResourceManagerResource
     await this.load(key);
   }
 
-  async readText(key: IResourceManagerParams) {
+  async readText(key: string) {
     await this.load(key);
 
+    const resourceKey = getRmResourceKey(key);
     const result = await this.graphQLService.sdk.readResource({
-      projectId: key.projectId,
-      resourcePath: createPath(key.path, key.name),
+      projectId: resourceKey.projectId,
+      resourcePath: resourceKey.path,
     });
 
     return result.value;
   }
 
-  async deleteResource(key: IResourceManagerParams) {
-    await this.performUpdate(key, undefined, async () => {
+  async deleteResource(path: string) {
+    await this.performUpdate(path, undefined, async () => {
+      const resourceKey = getRmResourceKey(path);
       await this.graphQLService.sdk.deleteResource({
-        projectId: key.projectId,
-        resourcePath: createPath(key.path, key.name),
+        projectId: resourceKey.projectId,
+        resourcePath: resourceKey.path,
         recursive: false,
       });
 
-      this.delete(key);
+      this.delete(path);
     });
   }
 
-  protected async preLoadData(
-    key: ResourceKey<IResourceManagerParams>,
-    contexts: IExecutionContext<ResourceKey<IResourceManagerParams>>,
-    refresh: boolean,
-    includes: CachedResourceIncludeArgs<RmResourceInfo, ResourceInfoIncludes>
-  ): Promise<void> {
-    if (ResourceKeyUtils.some(key, key => !!key.name)) {
-      key = ResourceKeyUtils.map(key, key => ({ ...key, name: undefined }));
-
-      if (refresh) {
-        await this.refresh(key);
-      } else {
-        await this.load(key);
-      }
-    }
-  }
-
   protected async loader(
-    key: ResourceKey<IResourceManagerParams>,
+    key: ResourceKey<string>,
     includes: CachedResourceIncludeArgs<RmResourceInfo, ResourceInfoIncludes>
-  ): Promise<Map<IResourceManagerParams, RmResourceInfo[]>> {
-    await ResourceKeyUtils.forEachAsync(key, async key => {
-      const { projectId, path, name } = key;
-      const parentKey = { projectId, path };
+  ) {
+    const resourcesList = new Map<string, RmResourceInfo>();
 
-      if (!this.has(parentKey) || !name) {
+    await ResourceKeyUtils.forEachAsync(key, async key => {
+      if (this.isAlias(key, CachedTreeChildrenKey)) {
+        const resourceKey = getRmResourceKey(key.options.path);
+
         const { resources } = await this.graphQLService.sdk.getResourceList({
-          projectId,
-          path,
+          projectId: resourceKey.projectId,
+          path: resourceKey.path,
           ...this.getDefaultIncludes(),
-          ...this.getIncludesMap(parentKey, includes),
+          ...this.getIncludesMap(key.options.path, includes),
         });
-        this.set(parentKey, resources);
-      } else {
+
+        for (const resource of resources) {
+          resourcesList.set(createPath(key.options.path, resource.name), resource);
+        }
+
+        const parent = getPathParent(key.options.path);
+        if (parent) {
+          key = parent;
+        }
+      }
+
+      if (!this.isAlias(key)) {
+        const resourceKey = getRmResourceKey(key);
         const { resources } = await this.graphQLService.sdk.getResourceList({
-          projectId,
-          path,
-          nameMask: name,
+          projectId: resourceKey.projectId,
+          path: resourceKey.parent,
+          nameMask: resourceKey.name,
           ...this.getDefaultIncludes(),
           ...this.getIncludesMap(key, includes),
         });
 
-        if (name && resources.length === 0) {
-          throw new Error(`Resource ${createPath(projectId, path, name)} not found`);
+        if (resourceKey.name && resources.length === 0) {
+          throw new DetailsError(`Resource "${key}" not found`);
         }
-        this.set(key, resources);
+
+        resourcesList.set(key, resources[0]);
       }
+
     });
+
+    this.set(resourceKeyList([...resourcesList.keys()]), [...resourcesList.values()]);
 
     return this.data;
-  }
-
-  getMetadataKeyRef(key: IResourceManagerParams): IResourceManagerParams {
-    const keys = Array.from(this.metadata.keys());
-    if (keys.includes(key)) {
-      return key;
-    }
-
-    const ref = keys.find(k => isResourceManagerParamEqual(k, key, true));
-
-    if (ref) {
-      return ref;
-    }
-
-    return key;
-  }
-
-  isKeyEqual(param: IResourceManagerParams, second: IResourceManagerParams): boolean {
-    return isResourceManagerParamEqual(param, second, true);
-  }
-
-  delete(key: ResourceKey<IResourceManagerParams>): void {
-    key = this.transformParam(key);
-    const items = this.getNestedChildren(key);
-
-    if (items.length === 0) {
-      return;
-    }
-
-    key = resourceKeyList(items);
-
-    this.onItemDelete.execute(key);
-    ResourceKeyUtils.forEach(key, key => {
-      this.dataDelete(key);
-    });
-  }
-
-  updateMetadata(key: IResourceManagerParams, callback: (data: ICachedMapResourceMetadata) => void): void {
-    const folderMetadata = this.getMetadata(key);
-    callback(folderMetadata);
-
-    if (!key.name) {
-      const elements = this.dataGet(key);
-
-      if (elements) {
-        const keys = elements.map(e => createChildResourceKey(key, e.name));
-
-        for (const key of keys) {
-          const metadata = this.getMetadata(key);
-          callback(metadata);
-        }
-      }
-    }
-  }
-
-  dataUpdate(key: ResourceKey<IResourceManagerParams>): void {
-    this.onDataUpdate.execute(resourceKeyList(this.getNestedChildren(key)));
-  }
-
-  protected commitIncludes(key: ResourceKey<IResourceManagerParams>, includes: string[]): void {
-    key = this.transformParam(key);
-    ResourceKeyUtils.forEach(key, key => {
-      this.updateMetadata(key, parentMetadata => {
-        for (const include of includes) {
-          if (!parentMetadata.includes.includes(include)) {
-            parentMetadata.includes.push(include);
-          }
-        }
-
-        if (!key.name) {
-          const elements = this.dataGet(key);
-
-          if (elements) {
-            const keys = elements.map(e => createChildResourceKey(key, e.name));
-
-            for (const key of keys) {
-              this.updateMetadata(key, metadata => {
-                metadata.includes = toJS(parentMetadata.includes);
-              });
-            }
-          }
-        }
-      });
-    });
-  }
-
-  protected populateMetadata(
-    key: IResourceManagerParams,
-    metadata: MetadataMap<IResourceManagerParams, ICachedMapResourceMetadata>
-  ): Record<string, any> {
-    if (key.name) {
-      return {
-        ...toJS(this.getMetadata({ ...key, name: undefined })),
-        dependencies: observable([]),
-        outdated: true, // trigger infinity update because of
-        loading: false,
-        exception: null,
-      };
-    }
-    return {};
-  }
-
-  getNestedChildren(key: ResourceKey<IResourceManagerParams>): IResourceManagerParams[] {
-    const nestedChildren: IResourceManagerParams[] = [];
-    let prevChildren: IResourceManagerParams[];
-
-    if (isResourceKeyList(key)) {
-      prevChildren = key.list.concat();
-    } else {
-      prevChildren = [
-        key,
-        ...(
-          this.dataGet(createChildResourceKey(key, ''))?.map(e => createChildResourceKey(key, e.name))
-          || []
-        ),
-      ];
-    }
-
-    nestedChildren.push(...prevChildren);
-
-    while (prevChildren.length) {
-      const key = prevChildren.shift()!;
-      const children = (
-        this.dataGet(createChildResourceKey(key, ''))?.map(e => createChildResourceKey(key, e.name))
-        || []
-      );
-      prevChildren.push(...children);
-      nestedChildren.push(...children);
-    }
-
-    return nestedChildren;
-  }
-
-  protected getLockedKeys(key: ResourceKey<IResourceManagerParams>): ResourceKey<IResourceManagerParams> {
-    return getResourceManagerParamParents(key);
-  }
-
-  protected dataGet(key: IResourceManagerParams): RmResourceInfo[] | undefined {
-    const name = key.name;
-    key = this.getKeyRef(key);
-    const elements = this.data.get(key)
-      ?.filter(r => name === undefined || r.name === name);
-    return elements;
-  }
-
-  protected dataSet(key: IResourceManagerParams, value: RmResourceInfo[]): void {
-    const name = key.name;
-    key = this.getKeyRef(key);
-    const currentValue = this.data.get(key) || [];
-    const deleted = name
-      ? []
-      : currentValue.filter(r => !value.some(v => v.name === r.name));
-
-    this.delete(resourceKeyList(deleted.map(r => ({ ...key, name: r.name }))));
-
-    if (name) {
-      this.data.set(
-        key,
-        [
-          ...currentValue.filter(r => !value.some(v => v.name === r.name)),
-          ...value,
-        ]
-      );
-    } else {
-      this.data.set(key, value);
-    }
-  }
-
-  protected dataDelete(key: IResourceManagerParams): void {
-    const name = key.name;
-    key = this.getKeyRef(key);
-
-    if (!name) {
-      this.data.delete(key);
-    } else {
-      const currentValue = this.data.get(key);
-
-      if (currentValue) {
-        this.data.set(key, currentValue.filter(v => v.name !== name));
-      }
-    }
-  }
-
-  protected dataHas(key: IResourceManagerParams): boolean {
-    const name = key.name;
-    key = this.getKeyRef(key);
-    const currentValue = this.data.get(key);
-
-    if (!currentValue) {
-      return false;
-    }
-
-    return name ? currentValue.some(v => v.name === name) : true;
   }
 
   private getDefaultIncludes(): ResourceInfoIncludes {
@@ -503,75 +264,28 @@ export class ResourceManagerResource
       includeProperties: false,
     };
   }
-
-  protected validateParam(param: ResourceKey<IResourceManagerParams>): boolean {
-    return (
-      super.validateParam(param)
-      || (
-        typeof param === 'object' && !isResourceKeyList(param)
-        && typeof param.projectId === 'string'
-        && ['string', 'undefined'].includes(typeof param.path)
-        && ['string', 'undefined'].includes(typeof param.name)
-      )
-    );
-  }
 }
 
-export function createParentResourceKey(key: IResourceManagerParams): IResourceManagerParams {
-  const path = key.path?.split('/');
-
-  return {
-    projectId: key.projectId,
-    path: path?.slice(0, path.length - 1).join('/'),
-    name: path?.[path.length - 1],
-  };
+export function getRmResourcePath(projectId: string, path?: string): string {
+  return createPath(projectId, path);
 }
 
-export function createChildResourceKey(key: IResourceManagerParams, name: string): IResourceManagerParams {
+interface IRmResourceKey {
+  path: string;
+  projectId: string;
+  parent: string;
+  name?: string;
+}
+
+export function getRmResourceKey(path: string): IRmResourceKey {
+  const parts = getPathParts(path);
+  const projectId = parts[0];
+  const name = parts.length > 1 ? parts[parts.length - 1] : undefined;
+
   return {
-    projectId: key.projectId,
-    path: createPath(key.path, key.name),
+    path: createPath(...parts.slice(1, parts.length)),
+    projectId,
+    parent: createPath(...parts.slice(1, parts.length - 1)),
     name,
   };
-}
-
-export function isResourceManagerParamEqual(
-  param: IResourceManagerParams,
-  second: IResourceManagerParams,
-  strict?: boolean
-): boolean {
-  return (
-    param.projectId === second.projectId
-    && isValuesEqual(param.path, second.path, '')
-    && (!strict || isValuesEqual(param.name, second.name, ''))
-  );
-}
-
-export function getResourceManagerParamParents(
-  key: ResourceKey<IResourceManagerParams>
-): ResourceKey<IResourceManagerParams> {
-  const nestedChildren: IResourceManagerParams[] = [];
-  let prevChildren: IResourceManagerParams[];
-
-  if (isResourceKeyList(key)) {
-    prevChildren = key.list.concat();
-  } else {
-    prevChildren = [key];
-  }
-
-  nestedChildren.push(...prevChildren);
-
-  for (const key of prevChildren) {
-    const path = key.path?.split('/') || [];
-
-    const children = path.map<IResourceManagerParams>((name, i, array) => ({
-      projectId: key.projectId,
-      path: array.slice(0, i).join('/'),
-      name,
-    }));
-
-    nestedChildren.push(...children);
-  }
-
-  return resourceKeyList(nestedChildren);
 }

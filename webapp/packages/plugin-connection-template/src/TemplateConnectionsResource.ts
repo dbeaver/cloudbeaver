@@ -20,7 +20,7 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
     sessionDataResource:SessionDataResource,
     appAuthService: AppAuthService,
   ) {
-    super([]);
+    super(() => []);
 
     this.sync(sessionDataResource);
 
@@ -40,10 +40,6 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
         this.markOutdated();
       }
     });
-  }
-
-  isLoaded(): boolean {
-    return this.loaded;
   }
 
   protected async loader(): Promise<Connection[]> {
