@@ -32,6 +32,7 @@ export default [
   ['app_navigationTree_refresh_error', 'Не удалось обновить узел'],
   ['app_navigationTree_node_change_name_error', 'Не удалось изменить название'],
   ['app_navigationTree_context_disconnect', 'Отключить'],
+  ['app_navigationTree_context_change_credentials', 'Изменить данные'],
   ['app_navigationTree_connection_group_user', 'Пользовательские подключения'],
   ['app_navigationTree_connection_group_shared', 'Общие подключения'],
   ['app_navigationTree_empty_placeholder', 'Нет подключений.\nИспользуйте верхнее меню для создания подключения к базе.'],

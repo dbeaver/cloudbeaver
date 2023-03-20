@@ -16,7 +16,11 @@ export interface IAutoLoadable extends ILoadableState {
   load: () => void;
 }
 
-export function useAutoLoad(state: IAutoLoadable | IAutoLoadable[], enabled = true) {
+export function useAutoLoad(
+  state: IAutoLoadable | IAutoLoadable[],
+  enabled = true,
+  lazy = false
+) {
   if (!Array.isArray(state)) {
     state = [state];
   }
@@ -38,7 +42,10 @@ export function useAutoLoad(state: IAutoLoadable | IAutoLoadable[], enabled = tr
     }
 
     for (const loader of state as IAutoLoadable[]) {
-      if (isLoadableStateHasException(loader)) {
+      if (
+        isLoadableStateHasException(loader)
+        || (loader.lazy === true && !lazy)
+      ) {
         continue;
       }
 

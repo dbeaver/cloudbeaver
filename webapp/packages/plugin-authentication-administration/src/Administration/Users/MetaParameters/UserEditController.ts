@@ -46,11 +46,11 @@ implements IInitializableController, IDestructibleController {
     this.userId = id;
 
     await this.loadUser();
-    this.usersResource.onItemAdd.addHandler(this.updateUser);
+    this.usersResource.onItemUpdate.addHandler(this.updateUser);
   }
 
   destruct(): void {
-    this.usersResource.onItemAdd.removeHandler(this.updateUser);
+    this.usersResource.onItemUpdate.removeHandler(this.updateUser);
   }
 
   private async loadUser() {

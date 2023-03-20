@@ -13,9 +13,9 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { IResourceManagerMoveData, IResourceManagerParams, isResourceManagerParamEqual, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
+import { getRmResourceKey, IResourceManagerMoveData, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { NetworkStateService, WindowEventsService } from '@cloudbeaver/core-root';
-import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { throttle } from '@cloudbeaver/core-utils';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
@@ -68,10 +68,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       map => {
         for (const [key, value] of Array.from(map.entries())) {
           if (
-            !['undefined', 'object'].includes(typeof value.resourceKey)
-            || !['string', 'undefined'].includes(typeof value.resourceKey?.name)
-            || !['string', 'undefined'].includes(typeof value.resourceKey?.projectId)
-            || !['string', 'undefined'].includes(typeof value.resourceKey?.path)
+            !['string', 'undefined'].includes(typeof value.resourceKey)
             || !['undefined', 'object'].includes(typeof value.executionContext)
             || !['string', 'undefined'].includes(typeof value.executionContext?.connectionId)
             || !['string', 'undefined'].includes(typeof value.executionContext?.id)
@@ -127,9 +124,10 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
             if (!dataSource.resourceKey) {
               return true;
             }
+            const resourceKey = getRmResourceKey(dataSource.resourceKey);
 
             untracked(() => this.projectInfoResource.load(CachedMapAllKey));
-            const project = this.projectInfoResource.get(dataSource.resourceKey.projectId);
+            const project = this.projectInfoResource.get(resourceKey.projectId);
 
             return !this.networkStateService.state || !project?.canEditResources;
           },
@@ -176,7 +174,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
   private createState(
     editorId: string,
-    resourceKey?: IResourceManagerParams
+    resourceKey?: string
   ): IResourceSqlDataSourceState {
     let state = this.dataSourceStateState.get(editorId);
 
@@ -223,12 +221,12 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
         dataSource instanceof ResourceSqlDataSource
       ))
       .map(([,dataSource]) => dataSource as ResourceSqlDataSource)
-      .find(ds => ds.resourceKey && isResourceManagerParamEqual(ds.resourceKey, data.from, true));
+      .find(ds => ds.resourceKey && ds.resourceKey === data.from);
 
     dataSource?.setResourceKey(data.to);
   }
 
-  private resourceDeleteHandler(keyObj: ResourceKey<IResourceManagerParams>) {
+  private resourceDeleteHandler(keyObj: ResourceKeySimple<string>) {
     if (!this.resourceManagerService.enabled) {
       return;
     }
@@ -248,9 +246,9 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
   private async rename(
     dataSource: ResourceSqlDataSource,
-    resourceKey: IResourceManagerParams,
-    newResourceKey: IResourceManagerParams
-  ): Promise<IResourceManagerParams> {
+    resourceKey: string,
+    newResourceKey: string
+  ): Promise<string> {
     if (!this.resourceManagerService.enabled) {
       throw new Error('Resource Manager disabled');
     }
@@ -266,7 +264,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
   private async write(
     dataSource: ResourceSqlDataSource,
-    resourceKey: IResourceManagerParams,
+    resourceKey: string,
     value: string
   ): Promise<void> {
     if (!this.resourceManagerService.enabled) {
@@ -284,7 +282,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
   private async getProperties(
     dataSource: ResourceSqlDataSource,
-    resourceKey: IResourceManagerParams
+    resourceKey: string
   ): Promise<IConnectionExecutionContextInfo | undefined> {
     try {
       return await this.resourceManagerScriptsService.getExecutionContextInfo(resourceKey);
@@ -296,7 +294,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
   private async setProperties(
     dataSource: ResourceSqlDataSource,
-    resourceKey: IResourceManagerParams,
+    resourceKey: string,
     executionContext: IConnectionExecutionContextInfo | undefined
   ): Promise<IConnectionExecutionContextInfo | undefined> {
     try {
@@ -310,7 +308,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     }
   }
 
-  private async read(dataSource: ResourceSqlDataSource, resourceKey: IResourceManagerParams): Promise<string> {
+  private async read(dataSource: ResourceSqlDataSource, resourceKey: string): Promise<string> {
     try {
       const data = await this.navResourceNodeService.read(resourceKey);
       return data;

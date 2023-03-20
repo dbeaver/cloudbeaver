@@ -20,7 +20,6 @@ package io.cloudbeaver.model.rm;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBIcon;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.DBPObject;
@@ -30,7 +29,11 @@ import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
+import org.jkiss.dbeaver.model.rm.RMResourceType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
+import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -38,9 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
-    private static final Log log = Log.getLog(DBNResourceManagerResource.class);
-    private static final String FILE_EXTENSION_SQL = "sql";
-    private static final String FILE_EXTENSION_DATASET = "ds";
 
     private final RMResource resource;
 
@@ -66,17 +66,42 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
 
     @Override
     public DBPImage getNodeIcon() {
-        return resource.isFolder() ? DBIcon.TREE_FOLDER : getNodeIconByType();
+        if (resource.isFolder()) {
+            if (getParentNode() instanceof DBNResourceManagerResource) {
+                return DBIcon.TREE_FOLDER;
+            }
+            // It may be a special folder
+            ResourceTypeDescriptor folderResType = ResourceTypeRegistry.getInstance().getResourceTypeByRootPath(
+                getOwnerProject(),
+                getName()
+            );
+            if (folderResType != null) {
+                return folderResType.getFolderIcon();
+            }
+            return DBIcon.TREE_FOLDER;
+        } else {
+            var fileExtension = IOUtils.getFileExtension(getNodeName());
+            if (!CommonUtils.isEmpty(fileExtension)) {
+                RMProject project = getProjectNode();
+                if (project != null) {
+                    for (RMResourceType rt : project.getResourceTypes()) {
+                        if (ArrayUtils.contains(rt.getFileExtensions(), fileExtension)) {
+                            return new DBIcon(null, rt.getIcon());
+                        }
+                    }
+                }
+            }
+            return DBIcon.TREE_PAGE;
+        }
     }
 
-    private DBPImage getNodeIconByType() {
-        var fileExtension = IOUtils.getFileExtension(getNodeName());
-        if (FILE_EXTENSION_SQL.equals(fileExtension)) {
-            return DBIcon.TREE_FILE;
-        } else if (FILE_EXTENSION_DATASET.equals(fileExtension)) {
-            return DBIcon.TREE_DATASET;
+    private RMProject getProjectNode() {
+        for (DBNNode node = this; node != null; node = node.getParentNode()) {
+            if (node instanceof DBNResourceManagerProject) {
+                return  ((DBNResourceManagerProject) node).getProject();
+            }
         }
-        return DBIcon.TREE_PAGE;
+        return null;
     }
 
     @Override

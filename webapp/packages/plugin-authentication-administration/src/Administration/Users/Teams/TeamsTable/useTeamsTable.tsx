@@ -46,7 +46,7 @@ export function useTeamsTable(): Readonly<State> {
 
       try {
         this.processing = true;
-        await resource.resource.refreshAll();
+        await resource.resource.refresh(CachedMapAllKey);
         notificationService.logSuccess({ title: 'administration_teams_team_list_update_success' });
       } catch (exception: any) {
         notificationService.logException(exception, 'administration_teams_team_list_update_fail');
