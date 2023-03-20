@@ -99,6 +99,10 @@ export default [
   ['app_root_session_expired_title', 'Сессия истекла'],
   ['app_root_session_expired_message', 'Сессия истекла. Хотите перезагрузить страницу?'],
   ['app_root_session_expired_reload', 'Перезагрузить'],
+  ['app_root_server_node_changed_title', 'Узел сервера изменён'],
+  ['app_root_server_node_changed_message', 'Узел сервера изменён. Необходимо перезагрузить приложение.'],
+  ['app_root_server_node_changed_reload', 'Перезагрузить'],
+  ['app_root_server_node_changed_cancel', 'Отменить'],
   ['app_root_quota_exceeded', 'Квота превышена'],
   ['core_eventsLog_dbeaverErrorDetails', 'Детали ошибки'],
 ];

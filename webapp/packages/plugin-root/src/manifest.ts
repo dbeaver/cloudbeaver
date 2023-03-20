@@ -12,6 +12,7 @@ import { DataSynchronizationResolverBootstrap } from './DataSynchronization/Data
 import { LocaleService } from './LocaleService';
 import { NetworkStateNotificationService } from './NetworkStateNotification/NetworkStateNotificationService';
 import { PluginBootstrap } from './PluginBootstrap';
+import { ServerNodeChangedDialogService } from './ServerNodeChangedDialog/ServerNodeChangedDialogService';
 import { SessionExpiredDialogService } from './SessionExpireDialog/SessionExpiredDialogService';
 import { SessionExpireWarningDialogService } from './SessionExpireWarningDialog/SessionExpireWarningDialogService';
 
@@ -21,6 +22,7 @@ export const rootPlugin: PluginManifest = {
     LocaleService,
     PluginBootstrap,
     SessionExpiredDialogService,
+    ServerNodeChangedDialogService,
     SessionExpireWarningDialogService,
     NetworkStateNotificationService,
     DataSynchronizationResolverBootstrap,

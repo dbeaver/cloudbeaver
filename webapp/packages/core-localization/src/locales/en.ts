@@ -101,6 +101,10 @@ export default [
   ['app_root_session_expired_title', 'Session expired'],
   ['app_root_session_expired_message', 'Session has expired. Do you want to reload?'],
   ['app_root_session_expired_reload', 'Reload'],
+  ['app_root_server_node_changed_title', 'Server node changed'],
+  ['app_root_server_node_changed_message', 'Server node changed. You need to reload application.'],
+  ['app_root_server_node_changed_reload', 'Reload'],
+  ['app_root_server_node_changed_cancel', 'Cancel'],
   ['app_root_quota_exceeded', 'Quota exceeded'],
   ['core_eventsLog_dbeaverErrorDetails', 'Error details'],
 ];
