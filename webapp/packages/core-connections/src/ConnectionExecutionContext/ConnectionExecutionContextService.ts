@@ -8,7 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
-import { ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { IConnectionInfoParams } from '../IConnectionsResource';
@@ -42,7 +42,7 @@ export class ConnectionExecutionContextService {
   }
 
   async load(): Promise<void> {
-    await this.connectionExecutionContextResource.loadAll();
+    await this.connectionExecutionContextResource.load(CachedMapAllKey);
   }
 
   async create(

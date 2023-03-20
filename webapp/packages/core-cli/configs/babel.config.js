@@ -1,3 +1,4 @@
+const testingAttributes = require('../lib/babel-plugins/TestingAttributes.js');
 const devMode = process.env.NODE_ENV !== 'production';
 const testMode = process.env.NODE_ENV === 'test';
 const { warn } = console;
@@ -62,7 +63,8 @@ module.exports = {
     ['@babel/plugin-proposal-decorators', { legacy: true }],
     ['@babel/plugin-proposal-class-properties'],
     ['@babel/plugin-proposal-object-rest-spread', { useBuiltIns: true }],
-    require('@reshadow/babel'),
+    [testingAttributes, {}],
+    [require('@reshadow/babel'), { }],
     /*devMode &&*/[
       'babel-plugin-module-resolver',
       {

@@ -33,11 +33,6 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
   },
   optimization: {
     minimize: true,
-    runtimeChunk: 'single',
-    moduleIds: 'deterministic',
-    usedExports: true,
-    sideEffects: true,
-    concatenateModules: true,
 
     minimizer: [new TerserPlugin({
       extractComments: /Copyright \(C\)/i,

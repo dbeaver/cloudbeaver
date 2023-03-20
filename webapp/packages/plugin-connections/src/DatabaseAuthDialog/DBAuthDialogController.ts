@@ -13,7 +13,7 @@ import { injectable, IInitializableController, IDestructibleController } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { GQLErrorCatcher, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, GQLErrorCatcher, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionAuthenticationConfig } from '../ConnectionAuthentication/IConnectionAuthenticationConfig';
 
@@ -139,7 +139,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
   private async loadDrivers() {
     try {
-      this.dbDriverResource.loadAll();
+      await this.dbDriverResource.load(CachedMapAllKey);
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load database drivers', '', true);
     }

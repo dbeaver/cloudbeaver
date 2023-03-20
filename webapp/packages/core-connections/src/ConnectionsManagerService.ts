@@ -16,7 +16,7 @@ import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-exec
 import { ProjectInfo, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-import { ConnectionInfoResource, Connection, createConnectionParam } from './ConnectionInfoResource';
+import { ConnectionInfoResource, Connection, createConnectionParam, isConnectionInfoParamEqual } from './ConnectionInfoResource';
 import { ContainerResource, IStructContainers, ObjectContainer } from './ContainerResource';
 import type { IConnectionInfoParams } from './IConnectionsResource';
 
@@ -51,9 +51,7 @@ export class ConnectionsManagerService {
   ) {
     this.disconnecting = false;
 
-    this.connectionExecutor = new Executor<IConnectionInfoParams>(null, (active, current) => (
-      connectionInfo.includes(active, current)
-    ));
+    this.connectionExecutor = new Executor<IConnectionInfoParams>(null, isConnectionInfoParamEqual);
     this.onDisconnect = new Executor();
     this.onDelete = new Executor();
 

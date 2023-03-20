@@ -348,7 +348,7 @@ export class UserFormController implements IInitializableController, IDestructib
 
   private async loadTeams() {
     try {
-      await this.teamsResource.loadAll();
+      await this.teamsResource.load(CachedMapAllKey);
       await this.loadUser();
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load teams');
@@ -371,7 +371,7 @@ export class UserFormController implements IInitializableController, IDestructib
 
   private async loadConnections() {
     try {
-      await this.dbDriverResource.loadAll();
+      await this.dbDriverResource.load(CachedMapAllKey);
       const projects = await this.projectInfoResource.load(CachedMapAllKey);
 
       await this.connectionInfoResource.load(ConnectionInfoProjectKey(
