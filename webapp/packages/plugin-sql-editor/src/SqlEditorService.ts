@@ -12,7 +12,7 @@ import { Connection, ConnectionExecutionContextProjectKey, ConnectionExecutionCo
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 
 import { getSqlEditorName } from './getSqlEditorName';
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
@@ -254,7 +254,7 @@ export class SqlEditorService {
   }
 
   async destroyContext(contextInfo: IConnectionExecutionContextInfo) {
-    await this.connectionExecutionContextResource.loadAll();
+    await this.connectionExecutionContextResource.load(CachedMapAllKey);
 
     const executionContext = this.connectionExecutionContextService.get(contextInfo.id);
 

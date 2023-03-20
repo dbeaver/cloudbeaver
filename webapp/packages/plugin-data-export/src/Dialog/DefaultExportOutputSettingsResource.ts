@@ -18,7 +18,7 @@ export class DefaultExportOutputSettingsResource
   extends CachedDataResource<DataTransferDefaultExportSettings | null> {
 
   constructor(private readonly graphQLService: GraphQLService) {
-    super(null);
+    super(() => null);
   }
 
   async loader() {

@@ -14,7 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeManagerService, objectNavNodeProvider, type INodeNavigationData, NodeManagerUtils, NavigationType } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider } from '@cloudbeaver/core-projects';
-import { ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationTabsService, ITab, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabContext } from './IObjectViewerTabContext';
@@ -66,7 +66,7 @@ export class ObjectViewerTabService {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
     this.navNodeManagerService.navigator.addPostHandler(this.navigationPostHandler.bind(this));
     this.connectionInfoResource.onConnectionClose.addHandler(this.closeConnectionInfoTabs.bind(this));
-    this.connectionInfoResource.onItemAdd.addHandler(this.updateConnectionTabs.bind(this));
+    this.connectionInfoResource.onItemUpdate.addHandler(this.updateConnectionTabs.bind(this));
     this.connectionInfoResource.onItemDelete.addHandler(this.closeConnectionTabs.bind(this));
     this.navNodeManagerService.navTree.onItemDelete.addHandler(this.removeTabs.bind(this));
   }
@@ -194,12 +194,12 @@ export class ObjectViewerTabService {
     };
   };
 
-  private closeConnectionTabs(key: ResourceKey<IConnectionInfoParams>) {
+  private closeConnectionTabs(key: ResourceKeySimple<IConnectionInfoParams>) {
     const tabs = Array.from(
       this.navigationTabsService.findTabs(
         isObjectViewerTab(tab => (
           tab.handlerState.connectionKey !== undefined
-          && this.connectionInfoResource.includes(
+          && this.connectionInfoResource.isIntersect(
             key,
             tab.handlerState.connectionKey
           )
@@ -211,7 +211,7 @@ export class ObjectViewerTabService {
     this.navigationTabsService.closeTabSilent(resourceKeyList(tabs), true);
   }
 
-  private updateConnectionTabs(key: ResourceKey<IConnectionInfoParams>) {
+  private updateConnectionTabs(key: ResourceKeySimple<IConnectionInfoParams>) {
     ResourceKeyUtils.forEach(key, key => {
       const tab = this.navigationTabsService.findTab(
         isObjectViewerTab(tab =>

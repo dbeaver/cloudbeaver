@@ -214,7 +214,7 @@ export const Loader = observer<Props>(function Loader({
   function renderWrappedChildren() {
     return (
       <LoaderContext.Provider value={contextState}>
-        <ErrorBoundary remount>
+        <ErrorBoundary icon={small} inline={inline} remount>
           <Suspense
             fallback={(
               <Loader

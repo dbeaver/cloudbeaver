@@ -14,7 +14,7 @@ import { getComputed, useResource, useUserData } from '@cloudbeaver/core-blocks'
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { IResourceManagerParams, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
+import { getRmResourcePath, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
@@ -80,8 +80,8 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
   const resourceManagerService = useService(ResourceManagerService);
   const navTreeResource = useService(NavTreeResource);
 
-  const key = getComputed<IResourceManagerParams[]>(
-    () => projectsService.activeProjects.map(project => ({ projectId: project.id })),
+  const key = getComputed<string[]>(
+    () => projectsService.activeProjects.map(project => getRmResourcePath(project.id)),
     isArraysEqual
   );
   useResource(ResourceManagerTree, ResourceManagerResource, resourceKeyList(key));

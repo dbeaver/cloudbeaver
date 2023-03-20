@@ -12,7 +12,7 @@ import type { IFormStateInfo } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
 import type { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import type { ConnectionConfig, ResourceKey } from '@cloudbeaver/core-sdk';
+import type { ConnectionConfig, ResourceKey, ResourceKeySimple } from '@cloudbeaver/core-sdk';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
 import { connectionFormConfigureContext } from './connectionFormConfigureContext';
@@ -130,7 +130,7 @@ export class ConnectionFormState implements IConnectionFormState {
       .addCollection(service.formStateTask)
       .addPostHandler(this.updateFormState);
 
-    this.resource.onItemAdd
+    this.resource.onItemUpdate
       .addHandler(this.syncInfo);
 
     this.projectInfoResource.onDataUpdate
@@ -141,7 +141,9 @@ export class ConnectionFormState implements IConnectionFormState {
 
     this.submittingTask.addPostHandler(async (data, contexts) => {
       const status = contexts.getContext(service.connectionStatusContext);
-      if (data.submitType !== 'submit' || !status.saved) {
+      const validation = contexts.getContext(service.connectionValidationContext);
+
+      if (data.submitType !== 'submit' || !status.saved || !validation.valid) {
         return;
       }
 
@@ -265,7 +267,7 @@ export class ConnectionFormState implements IConnectionFormState {
   }
 
   dispose(): void {
-    this.resource.onItemAdd
+    this.resource.onItemUpdate
       .removeHandler(this.syncInfo);
     this.projectInfoResource.onDataUpdate
       .removeHandler(this.syncProject);
@@ -296,11 +298,11 @@ export class ConnectionFormState implements IConnectionFormState {
     this.configured = true;
   }
 
-  private syncInfo(key: ResourceKey<IConnectionInfoParams>) {
+  private syncInfo(key: ResourceKeySimple<IConnectionInfoParams>) {
     if (
       !this.config.connectionId
       || this.projectId === null
-      || !this.resource.includes(key, createConnectionParam(this.projectId, this.config.connectionId))
+      || !this.resource.isIntersect(key, createConnectionParam(this.projectId, this.config.connectionId))
     ) {
       return;
     }

@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable, observable, runInAction } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedMapAllKey, CachedMapResource, ResourceKey } from '@cloudbeaver/core-sdk';
+import { CachedMapResource, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 export interface IVersion {
   number: string;
@@ -45,11 +45,6 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
     });
   }
 
-  async refreshAll(): Promise<Map<string, IVersion>> {
-    await this.refresh(CachedMapAllKey);
-    return this.data;
-  }
-
   protected async loader(): Promise<Map<string, IVersion>> {
     const versionLink = this.serverConfigResource.data?.productInfo.latestVersionInfo;
     if (!versionLink) {
@@ -67,17 +62,11 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
         this.latestVersionNumber = json.latestVersion;
       }
 
-
       if (!json.versions) {
         return this.data;
       }
 
-      runInAction(() => {
-        this.data.clear();
-        for (const version of json.versions!) {
-          this.data.set(version.number, version);
-        }
-      });
+      this.replace(resourceKeyList(json.versions.map(version => version.number)), json.versions);
 
     } catch (exception: any) {
       throw new Error('versions_load_fail', { cause: exception });
@@ -86,10 +75,7 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
     return this.data;
   }
 
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }

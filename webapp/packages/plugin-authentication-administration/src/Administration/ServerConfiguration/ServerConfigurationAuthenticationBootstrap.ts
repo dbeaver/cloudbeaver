@@ -12,6 +12,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { ILoadConfigData, IServerConfigSaveData, ServerConfigurationService, serverConfigValidationContext } from '@cloudbeaver/plugin-administration';
 
 @injectable()
@@ -46,7 +47,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
       }
 
       if (this.administrationScreenService.isConfigurationMode) {
-        await this.authProvidersResource.loadAll();
+        await this.authProvidersResource.load(CachedMapAllKey);
         if (this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID)) {
           data.state.serverConfig.adminName = 'cbadmin';
           data.state.serverConfig.adminPassword = '';
@@ -66,7 +67,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
   };
 
   private readonly validateForm: IExecutorHandler<IServerConfigSaveData> = async (data, contexts) => {
-    await this.authProvidersResource.loadAll();
+    await this.authProvidersResource.load(CachedMapAllKey);
     const administratorPresented = data.configurationWizard && this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
 
     if (!administratorPresented) {

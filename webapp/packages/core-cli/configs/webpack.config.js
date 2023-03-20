@@ -4,6 +4,7 @@ const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
+const WorkboxPlugin = require('workbox-webpack-plugin');
 
 const excludedFromVendor = require('./excludedFromVendor.js');
 // const ESLintPlugin = require('eslint-webpack-plugin');
@@ -90,7 +91,7 @@ module.exports = (env, argv) => {
         options: {
           sourceMap: true,
           sassOptions: {
-            implementation: require('node-sass'),
+            implementation: require('sass'),
             includePaths: nodeModules,
           },
         },
@@ -108,10 +109,13 @@ module.exports = (env, argv) => {
   return {
     // target: !devMode ? "web" : "browserslist",
     optimization: {
-      removeAvailableModules: false,
-      removeEmptyChunks: false,
       runtimeChunk: 'single',
       moduleIds: 'deterministic',
+      usedExports: true,
+      sideEffects: true,
+      concatenateModules: true,
+      removeAvailableModules: false,
+      removeEmptyChunks: false,
       splitChunks: {
         chunks: 'async',
         minSize: 20000,
@@ -265,6 +269,14 @@ module.exports = (env, argv) => {
           }
         },
       }),
+      ...devMode
+        ? []
+        : [
+          new WorkboxPlugin.GenerateSW({
+            clientsClaim: true,
+            skipWaiting: true,
+          }),
+        ],
     ],
   };
 };

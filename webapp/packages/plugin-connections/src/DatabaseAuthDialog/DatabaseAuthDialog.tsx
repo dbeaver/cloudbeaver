@@ -51,9 +51,10 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
   payload,
   options,
   rejectDialog,
+  resolveDialog,
 }) {
   const connection = useConnectionInfo(payload.connection);
-  const controller = useController(DBAuthDialogController, payload.connection, payload.networkHandlers, rejectDialog);
+  const controller = useController(DBAuthDialogController, payload.connection, payload.networkHandlers, resolveDialog);
 
   const { driver } = useDBDriver(connection.connectionInfo?.driverId || '');
   const { credentialsSavingEnabled } = useAdministrationSettings();

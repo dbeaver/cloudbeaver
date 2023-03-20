@@ -18,7 +18,7 @@ export class SessionPermissionsResource extends CachedDataResource<Set<string>> 
     private readonly graphQLService: GraphQLService,
     sessionDataResource: SessionDataResource
   ) {
-    super(new Set());
+    super(() => new Set());
 
     this.sync(sessionDataResource, () => {}, () => {});
   }
