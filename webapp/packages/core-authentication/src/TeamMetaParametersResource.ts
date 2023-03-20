@@ -18,7 +18,7 @@ export class TeamMetaParametersResource extends CachedDataResource<TeamMetaParam
     private readonly graphQLService: GraphQLService,
     sessionResource: SessionResource,
   ) {
-    super([]);
+    super(() => []);
 
     this.sync(sessionResource, () => { }, () => { });
   }

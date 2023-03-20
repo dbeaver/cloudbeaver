@@ -25,7 +25,6 @@ import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.api.WriteCallback;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEventType;
@@ -124,11 +123,9 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
     @Override
     public void close() {
         var session = getSession();
+        // the socket may not be connected to the client
         if (session != null) {
-            session.close();
-            onWebSocketClose(WSConstants.NORMAL_STATUS, "Closed by web session");
-        } else {
-            onWebSocketClose(WSConstants.NORMAL_STATUS, "Closed socket not connected to client");
+            getSession().close();
         }
     }
 

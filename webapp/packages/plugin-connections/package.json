@@ -8,7 +8,7 @@
   "module": "lib/index.js",
   "types": "src/index.ts",
   "scripts": {
-    "prebuild": "rimraf lib/*",
+    "prebuild": "rimraf --glob lib/*",
     "build": "webpack --config ../../configs/webpack.plugin.config.js",
     "postbuild": "tsc",
     "lint": "eslint ./src/ --ext .ts,.tsx",

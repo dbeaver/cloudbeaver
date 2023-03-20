@@ -29,8 +29,8 @@ export class CustomGraphQLClient extends GraphQLClient {
   }
 
   request<T = any, V = Variables>(document: RequestDocument, variables?: V, requestHeaders?: Dom.RequestInit['headers']): Promise<T>;
-  request<T = any, V = Variables>(options: RequestOptions<V>): Promise<T>;
-  request<T = any, V = Variables>(
+  request<T = any, V extends Variables = Variables>(options: RequestOptions<V>): Promise<T>;
+  request<T = any, V extends Variables = Variables>(
     document: RequestDocument | RequestOptions<V>,
     variables?: V,
     requestHeaders?: Dom.RequestInit['headers']
@@ -61,7 +61,7 @@ export class CustomGraphQLClient extends GraphQLClient {
     }
   }
 
-  private async overrideRequest<T, V = Variables>(
+  private async overrideRequest<T, V extends Variables = Variables>(
     documentOrOptions: RequestDocument | RequestOptions<V>,
     variables?: V,
     requestHeaders?: Dom.RequestInit['headers']
