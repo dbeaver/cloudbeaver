@@ -51,6 +51,11 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
     }
 
     @Override
+    public String getNodeId() {
+        return "root";
+    }
+
+    @Override
     public String getNodeName() {
         return "resources";
     }
