@@ -7,6 +7,7 @@
  */
 
 export interface ILoadableState {
+  lazy?: boolean;
   isLoading: () => boolean;
   isLoaded: () => boolean;
   isError: () => boolean;
