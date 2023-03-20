@@ -158,6 +158,10 @@ public class WebSessionManager {
     @Nullable
     public WebSession getOrRestoreSession(@NotNull HttpServletRequest request) {
         var httpSession = request.getSession();
+        if (httpSession == null) {
+            log.debug("Http session is null. No Web Session returned");
+            return null;
+        }
         var sessionId = httpSession.getId();
         WebSession webSession;
         synchronized (sessionMap) {
