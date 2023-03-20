@@ -59,7 +59,7 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
         try {
             var headlessSession = createHeadlessSession(httpRequest);
             if (headlessSession == null) {
-                log.error("Couldn't create headless session");
+                log.debug("Couldn't create headless session");
                 return null;
             }
             return createNewEventsWebSocket(headlessSession);
@@ -86,9 +86,9 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
         var httpSession = request.getSession(false);
         if (httpSession == null) {
             log.debug("CloudBeaver web session not exist, try to create headless session");
-            return webSessionManager.getHeadlessSession(request, true);
+        } else {
+            log.debug("CloudBeaver session not found with id " + httpSession.getId() + ", try to create headless session");
         }
-        log.debug("CloudBeaver session not found with id " + httpSession.getId() + ", try to create headless session");
         return webSessionManager.getHeadlessSession(request, true);
     }
 

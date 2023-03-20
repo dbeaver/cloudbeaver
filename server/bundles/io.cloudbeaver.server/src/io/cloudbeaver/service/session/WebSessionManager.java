@@ -178,12 +178,14 @@ public class WebSessionManager {
                     var restored = restorePreviousUserSession(webSession);
                     if (restored) {
                         sessionMap.put(sessionId, webSession);
+                        log.debug("Web session restored");
                         return webSession;
                     } else {
+                        log.debug("Couldn't restore previous user session");
                         return null;
                     }
                 } catch (DBException e) {
-                    log.warn("Failed to restore previous user session", e);
+                    log.error("Failed to restore previous user session", e);
                     return null;
                 }
             }
