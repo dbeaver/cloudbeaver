@@ -74,7 +74,7 @@ public interface WebApplication extends DBPApplication {
     String getApplicationInstanceId() throws DBException;
 
     /**
-     * @return Random UUID, new on every launch
+     * Returns random UUID, new on every launch
      */
     @NotNull
     String getApplicationRunId();
