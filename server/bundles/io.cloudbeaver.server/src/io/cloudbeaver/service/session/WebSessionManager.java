@@ -56,6 +56,9 @@ public class WebSessionManager {
         this.application = application;
     }
 
+    /**
+     * Closes Web Session, associated to HttpSession from {@code request}
+     */
     public BaseWebSession closeSession(@NotNull HttpServletRequest request) {
         HttpSession session = request.getSession();
         if (session != null) {
