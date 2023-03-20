@@ -10,17 +10,19 @@ import { action, makeObservable } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { INodeNavigationData, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
-import { getProjectNodeId } from '@cloudbeaver/core-projects';
+import { INodeNavigationData, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { getNodeIdResourceProject } from '@cloudbeaver/core-projects';
 import { ServerEventId } from '@cloudbeaver/core-root';
 import { type ResourceKey, ResourceKeyUtils, resourceKeyList, isResourceAlias, ResourceKeySimple } from '@cloudbeaver/core-sdk';
+import { getPathParent, isDefined } from '@cloudbeaver/core-utils';
 
 import { ConnectionFolderEventHandler, IConnectionFolderEvent } from '../ConnectionFolderEventHandler';
 import { Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
 import { ConnectionsManagerService } from '../ConnectionsManagerService';
 import type { IConnectionInfoParams } from '../IConnectionsResource';
 import { getConnectionParentId } from './getConnectionParentId';
-import { getFolderNodeParents } from './getFolderParents';
+import { getNodeIdDatasource } from './getNodeIdDatasource';
+import { testNodeIdDatasource } from './testNodeIdDatasource';
 
 @injectable()
 export class ConnectionNavNodeService extends Dependency {
@@ -54,11 +56,7 @@ export class ConnectionNavNodeService extends Dependency {
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderCreated,
       data => {
-        const parents = data.nodePaths.map(nodeId => {
-          const parents = getFolderNodeParents(nodeId);
-
-          return parents[parents.length - 2];
-        });
+        const parents = data.nodePaths.map(nodeId => getPathParent(nodeId));
         this.navTreeResource.markTreeOutdated(resourceKeyList(parents));
       },
       undefined,
@@ -67,11 +65,7 @@ export class ConnectionNavNodeService extends Dependency {
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderDeleted,
       data => {
-        const parents = data.nodePaths.map(nodeId => {
-          const parents = getFolderNodeParents(nodeId);
-
-          return parents[parents.length - 2];
-        });
+        const parents = data.nodePaths.map(nodeId => getPathParent(nodeId));
 
         this.navTreeResource.deleteInNode(resourceKeyList(parents), data.nodePaths);
       },
@@ -107,7 +101,7 @@ export class ConnectionNavNodeService extends Dependency {
     if (isResourceAlias(key)) {
       return;
     }
-    if (!ResourceKeyUtils.some(key, key => NodeManagerUtils.isDatabaseObject(key))) {
+    if (!ResourceKeyUtils.some(key, key => testNodeIdDatasource(key) !== null)) {
       return;
     }
 
@@ -130,25 +124,18 @@ export class ConnectionNavNodeService extends Dependency {
     const outdatedTrees: string[] = [];
     const closedConnections: string[] = [];
 
-    connectionInfos = Array.isArray(connectionInfos) ? connectionInfos : [connectionInfos];
+    connectionInfos = (Array.isArray(connectionInfos) ? connectionInfos : [connectionInfos]);
     for (const connectionInfo of connectionInfos) {
-
-      if (!connectionInfo?.nodePath || connectionInfo.template) {
+      if (!connectionInfo || connectionInfo.template) {
         return;
       }
 
-      const node = this.navNodeInfoResource.get(connectionInfo.nodePath);
-      const parentId = getConnectionParentId(connectionInfo.projectId, connectionInfo.folder); // new parent
+      const nodePath = getNodeIdDatasource(connectionInfo);
+      const parentId = getPathParent(nodePath);
 
       if (!connectionInfo.connected) {
-        closedConnections.push(connectionInfo.nodePath);
-        outdatedTrees.push(connectionInfo.nodePath);
-      }
-
-      const folderId = node?.parentId; // current parent
-
-      if (folderId && !outdatedTrees.includes(folderId)) {
-        outdatedTrees.push(folderId);
+        closedConnections.push(nodePath);
+        outdatedTrees.push(nodePath);
       }
 
       if (!outdatedTrees.includes(parentId)) {
@@ -178,26 +165,21 @@ export class ConnectionNavNodeService extends Dependency {
         return;
       }
 
-      const nodePath = connectionInfo.nodePath ?? NodeManagerUtils.connectionIdToConnectionNodeId(key.connectionId);
-
-      const node = this.navNodeInfoResource.get(nodePath);
-      const folder = (
-        node?.parentId
-        ?? getProjectNodeId(key.projectId)
-      );
+      const nodePath = getNodeIdDatasource(connectionInfo);
 
       if (nodePath) {
-        this.navTreeResource.deleteInNode(folder, [nodePath]);
+        this.navTreeResource.deleteInNode(getPathParent(nodePath), [nodePath]);
       }
     });
   }
 
   private async connectionCreateHandler(connection: Connection) {
-    if (!connection.nodePath || connection.template) {
+    if (connection.template) {
       return;
     }
 
-    const parentId = getConnectionParentId(connection.projectId, connection.folder);
+    const nodePath = getNodeIdDatasource(connection);
+    const parentId = getPathParent(nodePath);
 
     await this.navTreeResource.waitLoad();
     if (!this.navTreeResource.has(parentId)) {
@@ -206,18 +188,18 @@ export class ConnectionNavNodeService extends Dependency {
 
     let children = this.navTreeResource.get(parentId);
 
-    if (!children || children.includes(connection.nodePath)) {
+    if (!children || children.includes(nodePath)) {
       return;
     }
 
-    const connectionNode = await this.navNodeInfoResource.load(connection.nodePath);
+    const connectionNode = await this.navNodeInfoResource.load(nodePath);
     await this.navTreeResource.waitLoad();
 
-    this.navNodeInfoResource.setParent(connection.nodePath, parentId);
+    this.navNodeInfoResource.setParent(nodePath, parentId);
 
     children = this.navTreeResource.get(parentId);
 
-    if (!children || children.includes(connection.nodePath)) {
+    if (!children || children.includes(nodePath)) {
       return; // double check
     }
 
@@ -232,7 +214,7 @@ export class ConnectionNavNodeService extends Dependency {
       insertIndex++;
     }
 
-    this.navTreeResource.insertToNode(parentId, insertIndex, connection.nodePath);
+    this.navTreeResource.insertToNode(parentId, insertIndex, nodePath);
   }
 
   private async navigateHandler(
@@ -248,7 +230,7 @@ export class ConnectionNavNodeService extends Dependency {
 
     let connection: Connection | undefined | null = await contexts.getContext(this.navigationNavNodeConnectionContext);
 
-    if (NodeManagerUtils.isDatabaseObject(nodeId) && connection) {
+    if (testNodeIdDatasource(nodeId) && connection) {
       connection = await this.connectionsManagerService.requireConnection(
         createConnectionParam(connection)
       );

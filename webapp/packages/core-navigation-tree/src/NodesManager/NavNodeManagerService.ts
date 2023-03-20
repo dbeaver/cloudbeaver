@@ -8,6 +8,7 @@
 
 import { makeObservable, observable } from 'mobx';
 
+import { testNodeIdDatasource } from '@cloudbeaver/core-connections';
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { IExecutor, Executor, IExecutionContextProvider, ISyncContextLoader } from '@cloudbeaver/core-executor';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
@@ -20,7 +21,6 @@ import { EObjectFeature } from './EObjectFeature';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource';
 import { navNodeMoveContext } from './navNodeMoveContext';
 import { NavTreeResource } from './NavTreeResource';
-import { NodeManagerUtils } from './NodeManagerUtils';
 import { ProjectsNavNodeService } from './ProjectsNavNodeService';
 
 export enum NavigationType {
@@ -30,7 +30,7 @@ export enum NavigationType {
 
 export interface NavNodeKey {
   nodeId: string;
-  parentId: string;
+  parentId?: string;
 }
 
 export interface NavNodeValue {
@@ -70,7 +70,7 @@ export interface INodeNavigationContext {
   type: NavigationType;
   projectId: string | undefined;
   nodeId: string;
-  parentId: string;
+  parentId?: string;
   folderId: string;
   name?: string;
   icon?: string;
@@ -85,7 +85,7 @@ export interface INodeNavigationData {
   type: NavigationType;
   projectId?: string;
   nodeId: string;
-  parentId: string;
+  parentId?: string;
   folderId?: string;
 }
 
@@ -174,7 +174,7 @@ export class NavNodeManagerService extends Bootstrap {
     return move.canMove;
   }
 
-  async canOpen(nodeId: string, parentId: string, folderId?: string): Promise<boolean> {
+  async canOpen(nodeId: string, parentId?: string, folderId?: string): Promise<boolean> {
     if (!this.navNodeInfoResource.has(nodeId)) {
       return false;
     }
@@ -200,7 +200,7 @@ export class NavNodeManagerService extends Bootstrap {
     return data.canOpen;
   }
 
-  async navToNode(nodeId: string, parentId: string, folderId?: string): Promise<void> {
+  async navToNode(nodeId: string, parentId?: string, folderId?: string): Promise<void> {
     await this.navigator.execute({
       type: NavigationType.open,
       nodeId,
@@ -272,6 +272,9 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   getParent(node: NavNode): NavNode | undefined {
+    if (node.parentId === undefined) {
+      return undefined;
+    }
     return this.navNodeInfoResource.get(node.parentId);
   }
 
@@ -348,7 +351,7 @@ export class NavNodeManagerService extends Bootstrap {
     let icon: string | undefined;
     let canOpen = false;
 
-    if (NodeManagerUtils.isDatabaseObject(nodeId)) {
+    if (testNodeIdDatasource(nodeId)) {
       const node = this.getNode(nodeId);
 
       if (node) {
@@ -356,7 +359,7 @@ export class NavNodeManagerService extends Bootstrap {
         icon = node.icon;
 
         if (node.folder) {
-          const parent = this.getNode(node.parentId);
+          const parent = this.getParent(node);
           folderId = nodeId;
           if (parent && !parent.folder) {
             nodeId = parent.id;

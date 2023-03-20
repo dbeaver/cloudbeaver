@@ -6,8 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { buildTemplatePath } from '@cloudbeaver/core-utils';
+
 import type { IConnectionFolderParam } from '../ConnectionFolderResource';
+import { NODE_PATH_TEMPLATE_RESOURCE_CONNECTION_FOLDER } from './NODE_PATH_TEMPLATE_RESOURCE_CONNECTION_FOLDER';
 
 export function getConnectionFolderId(key: IConnectionFolderParam): string {
-  return `folder://${key.projectId}/${key.folderId}`;
+  return buildTemplatePath(NODE_PATH_TEMPLATE_RESOURCE_CONNECTION_FOLDER, {
+    projectId: key.projectId,
+    folder: key.folderId,
+  });
 }

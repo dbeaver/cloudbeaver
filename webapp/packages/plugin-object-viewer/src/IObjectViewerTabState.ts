@@ -15,7 +15,7 @@ export interface IObjectViewerTabState {
   error: boolean;
   childrenError: boolean;
   objectId: string;
-  parentId: string;
+  parentId?: string;
   parents: string[];
   folderId: string;
   tabIcon?: string;

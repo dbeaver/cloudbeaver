@@ -7,30 +7,35 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { NAV_NODE_TYPE_PROJECT, ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { NAV_NODE_TYPE_PROJECT, NODE_PATH_TEMPLATE_RESOURCE_PROJECT, ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { PathTemplate, testPath } from '@cloudbeaver/core-utils';
 
 import { NavNodeInfoResource } from './NavNodeInfoResource';
+
+export interface IProjectPathTemplateParams {
+  projectId: string;
+}
 
 @injectable()
 export class ProjectsNavNodeService {
   projectTypes: string[];
-  projectPrefixes: string[];
+  projectPathTemplates: PathTemplate<IProjectPathTemplateParams>[];
 
   constructor(
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly projectInfoResource: ProjectInfoResource
   ) {
     this.projectTypes = [NAV_NODE_TYPE_PROJECT];
-    this.projectPrefixes = ['resource://'];
+    this.projectPathTemplates = [NODE_PATH_TEMPLATE_RESOURCE_PROJECT];
   }
 
   addProjectType(type: string): void {
     this.projectTypes.push(type);
   }
 
-  addProjectPrefix(prefix: string): void {
-    this.projectPrefixes.push(prefix);
+  addProjectPathTemplate(template: PathTemplate<IProjectPathTemplateParams>): void {
+    this.projectPathTemplates.push(template);
   }
 
   getProject(nodeId: string): ProjectInfo | undefined {
@@ -47,8 +52,12 @@ export class ProjectsNavNodeService {
   }
 
   getByNodeId(nodeId: string): ProjectInfo | undefined {
-    return this.projectInfoResource.get(
-      this.projectPrefixes.reduce((nodeId, prefix) => nodeId.replace(prefix, ''), nodeId)
-    );
+    for (const template of this.projectPathTemplates) {
+      const match = testPath(template, nodeId, true);
+      if (match) {
+        return this.projectInfoResource.get(match.projectId);
+      }
+    }
+    return undefined;
   }
 }

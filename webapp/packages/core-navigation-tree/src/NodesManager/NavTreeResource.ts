@@ -15,7 +15,7 @@ import { Executor, ExecutorInterrupter, IExecutionContext, IExecutor } from '@cl
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import { GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList, ResourceKeyList, resourceKeyList, NavNodeChildrenQuery as fake, ResourceKeyUtils, ICachedResourceMetadata, CachedMapAllKey, ResourceError, DetailsError, ResourceKeySimple } from '@cloudbeaver/core-sdk';
-import { flat, MetadataMap } from '@cloudbeaver/core-utils';
+import { flat, isDefined, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { NavTreeSettingsService } from '../NavTreeSettingsService';
 import type { NavNode } from './EntityTypes';
@@ -185,21 +185,26 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
         }
       } finally {
         runInAction(() => {
+          const deletedNodes: string[] = [];
           const deletionMap = new Map<string, string[]>();
 
           for (const path of deletedPaths) {
             const node = this.navNodeInfoResource.get(path);
 
             if (node) {
-              const deletedIds = deletionMap.get(node.parentId) ?? [];
-              deletedIds.push(path);
-              deletionMap.set(node.parentId, deletedIds);
+              deletedNodes.push(path);
+
+              if (node.parentId !== undefined) {
+                const deletedIds = deletionMap.get(node.parentId) ?? [];
+                deletionMap.set(node.parentId, deletedIds);
+              }
             }
           }
 
           const keys = resourceKeyList([...deletionMap.keys()]);
           const nodes = [...deletionMap.values()];
 
+          this.delete(resourceKeyList(deletedNodes));
           this.deleteInNode(keys, nodes);
         });
       }
@@ -210,7 +215,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     const parents = Array.from(new Set(
       ResourceKeyUtils
         .mapArray(key, key => this.navNodeInfoResource.get(key)?.parentId)
-        .filter<string>(((id: string | undefined) => id !== undefined) as any)
+        .filter(isDefined)
     ));
 
     await this.performUpdate(resourceKeyList(parents), [], async () => {
@@ -234,7 +239,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   async changeName(node: NavNode, name: string): Promise<string> {
-    const newNodeId = await this.performUpdate(node.parentId, [], async () => {
+    const newNodeId = await this.performUpdate(node.parentId ?? node.id, [], async () => {
       this.markLoading(node.id, true);
       try {
         await this.graphQLService.sdk.navRenameNode({
@@ -245,7 +250,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
         const parts = node.id.split('/');
         parts.splice(parts.length - 1, 1, name);
 
-        this.markTreeOutdated(node.parentId);
+        this.markTreeOutdated(node.parentId ?? node.id);
         this.markLoaded(node.id);
         return parts.join('/');
       } finally {
@@ -470,11 +475,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
           ...data.map(data => data.parentPath),
           ...data.map(data => data.navNodeChildren.map(node => node.id)).flat(),
         ]), [
-          ...data.map(data => this.navNodeInfoResource.navNodeInfoToNavNode(
-            data.navNodeInfo,
-            undefined,
-            data.parentPath
-          )).flat(),
+          ...data.map(data => this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo)).flat(),
           ...data.map(
             data => data.navNodeChildren.map(
               node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)
@@ -499,11 +500,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
           data.parentPath,
           ...data.navNodeChildren.map(node => node.id),
         ]), [
-          this.navNodeInfoResource.navNodeInfoToNavNode(
-            data.navNodeInfo,
-            undefined,
-            data.parentPath
-          ),
+          this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo),
           ...data.navNodeChildren.map(node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)),
         ]
       );

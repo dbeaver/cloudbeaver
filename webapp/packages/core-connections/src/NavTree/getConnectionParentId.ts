@@ -7,13 +7,13 @@
  */
 
 
-import { getProjectNodeId } from '@cloudbeaver/core-projects';
+import { getNodeIdResourceProject } from '@cloudbeaver/core-projects';
 
 import { getConnectionFolderId } from './getConnectionFolderId';
 
 export function getConnectionParentId(projectId: string, folderId?: string): string {
-  if (!folderId) {
-    return getProjectNodeId(projectId);
+  if (folderId === undefined) {
+    return getNodeIdResourceProject(projectId);
   }
 
   return getConnectionFolderId({ projectId, folderId });

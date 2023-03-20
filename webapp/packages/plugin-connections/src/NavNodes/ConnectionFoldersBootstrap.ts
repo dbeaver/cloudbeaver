@@ -17,7 +17,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ENodeMoveType, getNodesFromContext, INodeMoveData, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, nodeDeleteContext, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
-import { getProjectNodeId, NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { getNodeIdResourceProject, NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
@@ -303,7 +303,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
             this.navTreeResource.markOutdated(
               targetNode.folderId !== undefined
                 ? targetNode.folderId
-                : getProjectNodeId(result.projectId)
+                : getNodeIdResourceProject(result.projectId)
             );
           } catch (exception: any) {
             this.notificationService.logException(exception, 'Can\'t create folder');
@@ -338,7 +338,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         return {
           projectId: project.id,
-          projectNodeId: getProjectNodeId(project.id),
+          projectNodeId: getNodeIdResourceProject(project.id),
           selectProject: editableProjects.length > 1,
         };
       }

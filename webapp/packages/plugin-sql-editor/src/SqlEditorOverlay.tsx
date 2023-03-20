@@ -10,10 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Overlay, OverlayMessage, OverlayActions, Button, useResource, getComputed, OverlayHeader, OverlayHeaderIcon, OverlayHeaderTitle, OverlayHeaderSubTitle, useSplitUserState, Loader, useStyles, useTranslate, useExecutor } from '@cloudbeaver/core-blocks';
-import { ConnectionExecutionContextResource, ConnectionInfoResource, createConnectionParam, DBDriverResource, getRealExecutionContextId } from '@cloudbeaver/core-connections';
+import { Overlay, OverlayMessage, OverlayActions, Button, useResource, getComputed, OverlayHeader, OverlayHeaderIcon, OverlayHeaderTitle, OverlayHeaderSubTitle, useTranslate } from '@cloudbeaver/core-blocks';
+import { concatSchemaAndCatalog, ConnectionExecutionContextResource, ConnectionInfoResource, createConnectionParam, DBDriverResource, getRealExecutionContextId } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
@@ -76,7 +75,7 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
     await sqlEditorService.initEditorConnection(state);
   }
 
-  const dataContainer = getComputed(() => NodeManagerUtils.concatSchemaAndCatalog(
+  const dataContainer = getComputed(() => concatSchemaAndCatalog(
     dataSource?.executionContext?.defaultCatalog,
     dataSource?.executionContext?.defaultSchema
   ));

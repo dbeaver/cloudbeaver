@@ -7,9 +7,9 @@
  */
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
-import { compareConnectionsInfo, ConnectionInfoResource, ConnectionsManagerService, ConnectionsSettingsService, ContainerResource, createConnectionParam, serializeConnectionParam } from '@cloudbeaver/core-connections';
+import { compareConnectionsInfo, concatSchemaAndCatalog, ConnectionInfoResource, ConnectionsManagerService, ConnectionsSettingsService, ContainerResource, createConnectionParam, serializeConnectionParam } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
@@ -205,7 +205,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
         let icon: string | undefined = '/icons/plugin_datasource_context_switch_database_m.svg';
 
-        let label = NodeManagerUtils.concatSchemaAndCatalog(
+        let label = concatSchemaAndCatalog(
           connectionSchemaManagerService.currentObjectCatalogId,
           connectionSchemaManagerService.currentObjectSchemaId
         );
@@ -356,10 +356,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
               continue;
             }
 
-            const title = NodeManagerUtils.concatSchemaAndCatalog(
-              catalog.name,
-              schema.name
-            );
+            const title = concatSchemaAndCatalog(catalog.name, schema.name);
 
             items.push(new MenuBaseItem(
               {

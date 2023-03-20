@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { NODE_PATH_TEMPLATE_RESOURCE_CONNECTION_FOLDER } from './NODE_PATH_TEMPLATE_RESOURCE_CONNECTION_FOLDER';
+
 export function isFolderNodeId(nodeId: string): boolean {
-  return nodeId.startsWith('folder://');
+  return NODE_PATH_TEMPLATE_RESOURCE_CONNECTION_FOLDER.test(nodeId) !== null;
 }

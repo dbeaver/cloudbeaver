@@ -7,5 +7,6 @@ export * from './isResourceOfType';
 export * from './ProjectInfoResource';
 export * from './ProjectsService';
 export * from './NAV_NODE_TYPE_PROJECT';
-export * from './NavTree/getProjectNodeId';
+export * from './NavTree/getNodeIdResourceProject';
+export * from './NavTree/NODE_PATH_TEMPLATE_RESOURCE_PROJECT';
 export { manifest as coreProjectsManifest } from './manifest';

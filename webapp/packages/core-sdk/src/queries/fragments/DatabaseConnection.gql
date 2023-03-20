@@ -14,7 +14,6 @@ fragment DatabaseConnection on ConnectionInfo {
   sharedCredentials
 
   folder
-  nodePath
 
   configurationType @include(if: $customIncludeOptions)
   useUrl @include(if: $customIncludeOptions)

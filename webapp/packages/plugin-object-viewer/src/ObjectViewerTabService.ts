@@ -8,11 +8,11 @@
 
 import { action, makeObservable, runInAction } from 'mobx';
 
-import { connectionProvider, ConnectionInfoResource, Connection, createConnectionParam, IConnectionInfoParams, ConnectionNavNodeService, objectCatalogProvider, objectSchemaProvider, ConnectionInfoActiveProjectKey } from '@cloudbeaver/core-connections';
+import { connectionProvider, ConnectionInfoResource, Connection, createConnectionParam, IConnectionInfoParams, ConnectionNavNodeService, objectCatalogProvider, objectSchemaProvider, ConnectionInfoActiveProjectKey, testNodeIdDatasource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, objectNavNodeProvider, type INodeNavigationData, NodeManagerUtils, NavigationType } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeManagerService, objectNavNodeProvider, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider } from '@cloudbeaver/core-projects';
 import { ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationTabsService, ITab, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
@@ -95,7 +95,7 @@ export class ObjectViewerTabService {
     }
 
     function isSupported(): boolean {
-      return NodeManagerUtils.isDatabaseObject(data.nodeId);
+      return testNodeIdDatasource(data.nodeId) !== null;
     }
 
     const initTab = (): ITab<IObjectViewerTabState> | null => {
@@ -336,7 +336,7 @@ export class ObjectViewerTabService {
   private async restoreObjectTab(tab: ITab<IObjectViewerTabState>) {
     if (
       typeof tab.handlerState.folderId === 'string'
-      && typeof tab.handlerState.parentId === 'string'
+      && ['string', 'undefined'].includes(typeof tab.handlerState.parentId)
       && ['object', 'undefined'].includes(typeof tab.handlerState.connectionKey)
       && ['string', 'undefined'].includes(typeof tab.handlerState.projectId)
       && Array.isArray(tab.handlerState.parents)

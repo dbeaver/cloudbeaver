@@ -18,6 +18,7 @@ import {
   ConnectionsManagerService,
   ContainerResource,
   createConnectionParam,
+  getNodeIdDatasource,
   ICatalogData,
   IConnectionExecutorData,
   IConnectionInfoParams,
@@ -29,7 +30,7 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { objectNavNodeProvider, NodeManagerUtils, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { objectNavNodeProvider, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider, projectSetter, projectSetterState } from '@cloudbeaver/core-projects';
 import { NavNodeInfoFragment, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
@@ -212,7 +213,7 @@ export class SqlEditorTabService extends Bootstrap {
     let nodeId = schema?.id ?? catalogData?.catalog.id;
 
     if (!nodeId) {
-      nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connectionId);
+      nodeId = getNodeIdDatasource(connection);
     }
 
     const parents = this.navNodeInfoResource.getParents(nodeId);

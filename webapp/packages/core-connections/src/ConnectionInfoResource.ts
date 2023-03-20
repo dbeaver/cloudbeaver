@@ -18,6 +18,7 @@ import { GraphQLService, CachedMapResource, ConnectionConfig, UserConnectionAuth
 import { ConnectionInfoEventHandler, IConnectionInfoEvent } from './ConnectionInfoEventHandler';
 import type { DatabaseConnection } from './DatabaseConnection';
 import type { IConnectionInfoParams } from './IConnectionsResource';
+import { testNodeIdDatasource } from './NavTree/testNodeIdDatasource';
 
 export type Connection = DatabaseConnection & {
   authProperties?: UserConnectionAuthPropertiesFragment[];
@@ -53,7 +54,6 @@ export class ConnectionInfoResource
   readonly onConnectionClose: ISyncExecutor<Connection>;
 
   private sessionUpdate: boolean;
-  private readonly nodeIdMap: Map<string, IConnectionInfoParams>;
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly projectsService: ProjectsService,
@@ -68,7 +68,6 @@ export class ConnectionInfoResource
     this.onConnectionCreate = new SyncExecutor();
     this.onConnectionClose = new SyncExecutor();
     this.sessionUpdate = false;
-    this.nodeIdMap = new Map();
 
     this.addAlias(
       ConnectionInfoProjectKey,
@@ -167,8 +166,7 @@ export class ConnectionInfoResource
       this
     );
 
-    makeObservable<this, 'nodeIdMap'>(this, {
-      nodeIdMap: observable,
+    makeObservable<this>(this, {
       createFromTemplate: action,
       create: action,
       createFromNode: action,
@@ -191,25 +189,13 @@ export class ConnectionInfoResource
     return this.get(key).every(connection => connection?.connected ?? false);
   }
 
-  // TODO: we need here node path ie ['', 'project://', 'database://...', '...']
   getConnectionForNode(nodeId: string): Connection | undefined {
-    if (!nodeId.startsWith('database://')) {
+    const params = testNodeIdDatasource(nodeId);
+    if (!params) {
       return;
     }
 
-    const indexOfConnectionPart = nodeId.indexOf('/', 11);
-    const connectionPart = nodeId.slice(
-      0,
-      indexOfConnectionPart > -1 ? indexOfConnectionPart : nodeId.length
-    );
-
-    const connectionId = this.nodeIdMap.get(connectionPart);
-
-    if (connectionId) {
-      return this.get(connectionId);
-    }
-
-    return undefined;
+    return this.get(createConnectionParam(params.projectId, params.connectionId));
   }
 
   async create(projectId: string, config: ConnectionConfig): Promise<Connection> {
@@ -492,23 +478,8 @@ export class ConnectionInfoResource
 
   protected dataSet(key: IConnectionInfoParams, value: Connection): void {
     const oldConnections = this.dataGet(key);
-    if (value.nodePath) {
-      this.nodeIdMap.set(value.nodePath, key);
-    }
-    super.dataSet(key, { ...oldConnections, ...value });
-  }
-
-  protected dataDelete(key: IConnectionInfoParams): void {
-    const connection = this.dataGet(key);
-    if (connection?.nodePath) {
-      this.nodeIdMap.delete(connection.nodePath);
-    }
-    super.dataDelete(key);
-  }
-
-  protected clearData(): void {
-    super.clearData();
-    this.nodeIdMap.clear();
+    value = { ...oldConnections, ...value };
+    super.dataSet(key, { ...value, folder: value.folder === null ? undefined : value.folder });
   }
 
   private getDefaultIncludes(): ConnectionInfoIncludes {

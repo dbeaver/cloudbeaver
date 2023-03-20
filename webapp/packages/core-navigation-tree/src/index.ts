@@ -10,7 +10,6 @@ export * from './NodesManager/NavNodeInfoResource';
 export * from './NodesManager/NavNodeManagerService';
 export * from './NodesManager/NavTreeResource';
 export * from './NodesManager/nodeDeleteContext';
-export * from './NodesManager/NodeManagerUtils';
 export * from './NodesManager/navNodeMoveContext';
 export * from './NodesManager/getNodesFromContext';
 export * from './NodesManager/NAV_NODE_TYPE_FOLDER';
@@ -20,6 +19,5 @@ export * from './NodesManager/ENodeFeature';
 export * from './NodesManager/EObjectFeature';
 export * from './NodesManager/INodeActions';
 
-export * from './NodesManager/NodeManagerUtils';
 export * from './NodesManager/EntityTypes';
 export * from './NodesManager/ProjectsNavNodeService';
