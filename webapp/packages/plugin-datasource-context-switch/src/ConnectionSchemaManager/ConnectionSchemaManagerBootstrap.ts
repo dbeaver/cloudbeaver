@@ -10,7 +10,7 @@ import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { compareConnectionsInfo, ConnectionInfoResource, ConnectionsManagerService, ConnectionsSettingsService, ContainerResource, createConnectionParam, serializeConnectionParam } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
-import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
@@ -81,13 +81,18 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
         return state.getState(
           menu.id,
-          () => [
-            ...this.appAuthService.loaders,
-            getCachedDataResourceLoaderState(this.containerResource, {
-              ...this.connectionSchemaManagerService.activeConnectionKey!,
-              catalogId: this.connectionSchemaManagerService.activeObjectCatalogId,
-            }, undefined),
-          ]
+          () => {
+            if (!this.connectionSchemaManagerService.activeConnectionKey) {
+              return this.appAuthService.loaders;
+            }
+            return [
+              ...this.appAuthService.loaders,
+              getCachedMapResourceLoaderState(this.containerResource, {
+                ...this.connectionSchemaManagerService.activeConnectionKey,
+                catalogId: this.connectionSchemaManagerService.activeObjectCatalogId,
+              }, undefined),
+            ];
+          }
         );
       },
     });

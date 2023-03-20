@@ -8,7 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { GraphQLService, CachedMapResource, ResourceKey, ResourceKeyUtils, isResourceKeyList } from '@cloudbeaver/core-sdk';
+import { GraphQLService, CachedMapResource, ResourceKey, ResourceKeyUtils, isResourceAlias } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class ExtendedDDLResource extends CachedMapResource<string, string> {
@@ -23,6 +23,9 @@ export class ExtendedDDLResource extends CachedMapResource<string, string> {
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, string>> {
+    if (isResourceAlias(key)) {
+      throw new Error('Aliases not supported by this resource.');
+    }
     const values: string[] = [];
 
     await ResourceKeyUtils.forEachAsync(key, async nodeId => {
@@ -32,8 +35,12 @@ export class ExtendedDDLResource extends CachedMapResource<string, string> {
       }
     });
 
-    this.set(key, isResourceKeyList(key) ? values : values[0]);
+    this.set(ResourceKeyUtils.toList(key), values);
 
     return this.data;
+  }
+
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }

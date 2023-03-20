@@ -10,9 +10,9 @@ import { action, computed, makeObservable, observable, runInAction, toJS } from 
 
 import { ConnectionInfoResource, createConnectionParam, IConnectionExecutionContextInfo, NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
-import { IResourceManagerParams, isResourceManagerParamEqual, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
-import { ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { debounce, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
+import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
+import { isResourceAlias, ResourceKey, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { createPath, debounce, getPathName, getPathParent, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
@@ -24,18 +24,18 @@ interface IResourceInfo {
 interface IResourceActions {
   rename(
     dataSource: ResourceSqlDataSource,
-    key: IResourceManagerParams,
-    newKey: IResourceManagerParams
-  ): Promise<IResourceManagerParams>;
-  read(dataSource: ResourceSqlDataSource, key: IResourceManagerParams): Promise<string>;
-  write(dataSource: ResourceSqlDataSource, key: IResourceManagerParams, value: string): Promise<void>;
+    key: string,
+    newKey: string
+  ): Promise<string>;
+  read(dataSource: ResourceSqlDataSource, key: string): Promise<string>;
+  write(dataSource: ResourceSqlDataSource, key: string, value: string): Promise<void>;
   getProperties(
     dataSource: ResourceSqlDataSource,
-    key: IResourceManagerParams
+    key: string
   ): Promise<IConnectionExecutionContextInfo | undefined>;
   setProperties(
     dataSource: ResourceSqlDataSource,
-    key: IResourceManagerParams,
+    key: string,
     executionContext: IConnectionExecutionContextInfo | undefined
   ): Promise<IConnectionExecutionContextInfo | undefined>;
 }
@@ -50,9 +50,9 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       return null;
     }
 
-    const resource = this.resourceManagerResource.get(this.resourceKey)?.[0];
+    const resource = this.resourceManagerResource.get(this.resourceKey);
 
-    return resource?.name ?? this.resourceKey.name ?? null;
+    return resource?.name ?? getPathName(this.resourceKey);
   }
 
   get script(): string {
@@ -60,7 +60,11 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   get projectId(): string | null {
-    return this.resourceKey?.projectId ?? super.projectId;
+    if (this.resourceKey === undefined) {
+      return super.projectId;
+    }
+    const key = getRmResourceKey(this.resourceKey);
+    return key.projectId;
   }
 
   get executionContext(): IConnectionExecutionContextInfo | undefined {
@@ -75,7 +79,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     return this.state.executionContext;
   }
 
-  get resourceKey(): IResourceManagerParams | undefined {
+  get resourceKey(): string | undefined {
     return this.state.resourceKey;
   }
 
@@ -117,7 +121,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.debouncedWrite = debounce(this.debouncedWrite.bind(this), VALUE_SYNC_DELAY);
     this.syncResource = this.syncResource.bind(this);
 
-    resourceManagerResource.onDataUpdate.addHandler(this.syncResource);
+    resourceManagerResource.onItemUpdate.addHandler(this.syncResource);
 
     makeObservable<this, '_script' | 'lastAction' | 'loaded'>(this, {
       script: computed,
@@ -151,7 +155,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     return this.scheduler.executing;
   }
 
-  setResourceKey(resourceKey: IResourceManagerParams): void {
+  setResourceKey(resourceKey: string): void {
     if (this.state.resourceKey && this.resourceUseKeyId) {
       this.resourceManagerResource.free(toJS(this.state.resourceKey), this.resourceUseKeyId);
       this.resourceUseKeyId = null;
@@ -212,16 +216,16 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   dispose(): void {
     super.dispose();
-    this.resourceManagerResource.onDataUpdate.removeHandler(this.syncResource);
+    this.resourceManagerResource.onItemUpdate.removeHandler(this.syncResource);
     if (this.state.resourceKey && this.resourceUseKeyId) {
-      this.resourceManagerResource.free(toJS(this.state.resourceKey), this.resourceUseKeyId);
+      this.resourceManagerResource.free(this.state.resourceKey, this.resourceUseKeyId);
       this.resourceUseKeyId = null;
     }
   }
 
-  syncResource(key: ResourceKey<IResourceManagerParams>) {
+  syncResource(key: ResourceKeySimple<string>) {
     const resourceKey = this.resourceKey;
-    if (resourceKey && ResourceKeyUtils.some(key, key => isResourceManagerParamEqual(key, resourceKey, true))) {
+    if (resourceKey && ResourceKeyUtils.some(key, key => resourceKey.startsWith(key))) {
       this.reloadResource();
     }
   }
@@ -234,16 +238,16 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   async load(): Promise<void> {
     if (this.state.resourceKey && !this.resourceUseKeyId) {
-      this.resourceUseKeyId = this.resourceManagerResource.use(toJS(this.state.resourceKey));
+      this.resourceUseKeyId = this.resourceManagerResource.use(this.state.resourceKey);
     }
     await this.read();
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
     if (
-      this.resourceKey?.projectId
+      this.resourceKey
       && executionContext?.projectId
-      && this.resourceKey.projectId !== executionContext.projectId
+      && getRmResourceKey(this.resourceKey).projectId !== executionContext.projectId
     ) {
       throw new Error('Resource SQL Data Source and Execution context projects don\t match');
     }
@@ -300,7 +304,11 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
       try {
         this.exception = null;
-        this.setResourceKey(await this.actions.rename(this, this.resourceKey, { ...this.resourceKey, name }));
+        this.setResourceKey(await this.actions.rename(
+          this,
+          this.resourceKey,
+          createPath(getPathParent(this.resourceKey), name))
+        );
       } catch (exception: any) {
         this.exception = exception;
       } finally {

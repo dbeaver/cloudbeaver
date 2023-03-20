@@ -59,7 +59,7 @@ const NavNodeTab = observer<INavNodeTabProps>(function NavNodeTab({ nodeId, styl
   ) || (
     children.isLoaded() && children.isLoading()
   ) || (
-    dbObjectResource.isLoaded(childrenList) && dbObjectResource.isDataLoading(childrenList)
+    dbObjectResource.isLoaded(childrenList) && dbObjectResource.isLoading(childrenList)
   )), 300);
 
   return styled(useStyles(style))(

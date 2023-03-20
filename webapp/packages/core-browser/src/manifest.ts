@@ -10,6 +10,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { BrowserSettingsService } from './BrowserSettingsService';
 import { CookiesService } from './CookiesService';
+import { ServiceWorkerBootstrap } from './ServiceWorkerBootstrap';
 
 export const coreBrowserManifest: PluginManifest = {
   info: {
@@ -19,5 +20,6 @@ export const coreBrowserManifest: PluginManifest = {
   providers: [
     BrowserSettingsService,
     CookiesService,
+    ServiceWorkerBootstrap,
   ],
 };
