@@ -43,7 +43,10 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWNetworkHandler;
 import org.jkiss.dbeaver.model.net.DBWTunnel;
@@ -60,13 +63,13 @@ import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Web service implementation
@@ -789,7 +792,7 @@ public class WebServiceCore implements DBWServiceCore {
             WebEventUtils.addNavigatorNodeUpdatedEvent(
                 session.getProjectById(projectId),
                 session,
-                DBNLocalFolder.makeLocalFolderItemPath(newFolder),
+                newFolder.getFolderPath(),
                 WSConstants.EventAction.CREATE
             );
             return folderInfo;
@@ -807,14 +810,14 @@ public class WebServiceCore implements DBWServiceCore {
     ) throws DBWebException {
         WebConnectionFolderUtils.validateConnectionFolder(newName);
         WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(session, projectId, folderPath);
-        var oldFolderNode = DBNLocalFolder.makeLocalFolderItemPath(folderInfo.getDataSourceFolder());
+        var oldFolderPath = folderInfo.getDataSourceFolder().getFolderPath();
         folderInfo.getDataSourceFolder().setName(newName);
-        var newFolderNode = DBNLocalFolder.makeLocalFolderItemPath(folderInfo.getDataSourceFolder());
+        var newFolderNode = folderInfo.getDataSourceFolder().getFolderPath();
         WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
         WebEventUtils.addNavigatorNodeUpdatedEvent(
             session.getProjectById(projectId),
             session,
-            oldFolderNode,
+            oldFolderPath,
             WSConstants.EventAction.DELETE
         );
         WebEventUtils.addNavigatorNodeUpdatedEvent(
@@ -837,7 +840,6 @@ public class WebServiceCore implements DBWServiceCore {
             if (folder.getDataSourceRegistry().getProject() != project) {
                 throw new DBWebException("Global folder '" + folderInfo.getId() + "' cannot be deleted");
             }
-            var folderNode = DBNLocalFolder.makeLocalFolderItemPath(folderInfo.getDataSourceFolder());
             session.addInfoMessage("Delete folder");
             DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
             sessionRegistry.removeFolder(folderInfo.getDataSourceFolder(), false);
@@ -845,7 +847,7 @@ public class WebServiceCore implements DBWServiceCore {
             WebEventUtils.addNavigatorNodeUpdatedEvent(
                 session.getProjectById(projectId),
                 session,
-                folderNode,
+                folderPath,
                 WSConstants.EventAction.DELETE
             );
         } catch (DBException e) {

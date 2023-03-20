@@ -20,7 +20,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
 import io.cloudbeaver.model.rm.DBNResourceManagerProject;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
@@ -75,7 +74,7 @@ public class WebNavigatorNodeInfo {
 
     @Property
     public String getId() {
-        return node.getNodeItemPath();
+        return node.getNodeFullPath();
     }
 
     @Property
@@ -262,6 +261,6 @@ public class WebNavigatorNodeInfo {
 
     @Override
     public String toString() {
-        return node.getNodeItemPath();
+        return node.getNodeFullPath();
     }
 }

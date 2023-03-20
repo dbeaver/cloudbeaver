@@ -317,7 +317,6 @@ type ConnectionInfo {
     authNeeded: Boolean!
 
     folder: ID
-    nodePath: String
 
     connectTime: String
     connectionError: ServerError

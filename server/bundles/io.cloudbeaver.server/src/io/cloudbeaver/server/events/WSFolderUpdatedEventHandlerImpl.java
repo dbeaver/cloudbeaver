@@ -41,7 +41,7 @@ public class WSFolderUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandle
         }
         var dsFolderUpdateEvent = (WSDatasourceFolderEvent) event;
         boolean isProjectAccessible = activeUserSession.isProjectAccessible(dsFolderUpdateEvent.getProjectId());
-        if (!isProjectAccessible || CommonUtils.isEmpty(dsFolderUpdateEvent.getNodePaths())) {
+        if (!isProjectAccessible || CommonUtils.isEmpty(dsFolderUpdateEvent.getFolderPaths())) {
             return;
         }
 

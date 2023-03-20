@@ -36,7 +36,6 @@ import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
-import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -188,11 +187,6 @@ public class WebConnectionInfo {
     public String getFolder() {
         DBPDataSourceFolder folder = dataSourceContainer.getFolder();
         return folder == null ? null : folder.getFolderPath();
-    }
-
-    @Property
-    public String getNodePath() {
-        return DBNDataSource.makeDataSourceItemPath(dataSourceContainer);
     }
 
     @Property
