@@ -12,6 +12,7 @@ import { ConnectionsManagerService, DBDriver, DBDriverResource } from '@cloudbea
 import { injectable, IInitializableController } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ProjectsService } from '@cloudbeaver/core-projects';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { PublicConnectionFormService } from '@cloudbeaver/plugin-connections';
 
@@ -69,7 +70,7 @@ export class CustomConnectionController implements IInitializableController {
 
   private async loadDBDrivers() {
     try {
-      await this.dbDriverResource.loadAll();
+      await this.dbDriverResource.load(CachedMapAllKey);
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Can\'t load database drivers');
     } finally {

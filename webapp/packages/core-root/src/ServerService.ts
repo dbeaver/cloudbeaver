@@ -23,10 +23,10 @@ export class ServerService {
     private readonly sessionService: SessionService
   ) {
     this.settings =  new ServerSettingsService(this.sessionService.settings);
-    this.config.onDataUpdate.addHandler(this.refreshConfigAsync.bind(this));
+    this.config.onDataUpdate.addHandler(this.refreshConfig.bind(this));
   }
 
-  private refreshConfigAsync() {
+  private refreshConfig() {
     if (!this.config.data) {
       return;
     }

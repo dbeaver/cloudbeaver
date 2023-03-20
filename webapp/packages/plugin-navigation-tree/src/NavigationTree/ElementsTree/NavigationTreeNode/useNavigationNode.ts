@@ -23,7 +23,7 @@ import type { NavTreeControlComponent } from '../NavigationNodeComponent';
 import type { IElementsTree } from '../useElementsTree';
 
 
-interface INavigationNode {
+export interface INavigationNode {
   ref: React.RefObject<HTMLDivElement>;
   control?: NavTreeControlComponent;
   disabled: boolean;

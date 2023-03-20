@@ -30,7 +30,7 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     private readonly graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource
   ) {
-    super(null);
+    super(() => null);
 
     this.action = null;
     this.sync(serverConfigResource, () => {}, () => {});
@@ -77,6 +77,6 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
       this.action = data?.actionParameters;
     }
 
-    this.data = data;
+    super.setData(data);
   }
 }

@@ -18,7 +18,7 @@ export function useDBDriver(driverId: string) {
   const driver = service.get(driverId);
   const load = useCallback(() => service.load(driverId), [service, driverId]);
   const refresh = useCallback(() => service.refresh(driverId), [service, driverId]);
-  const isLoading = useCallback(() => service.isDataLoading(driverId), [service, driverId]);
+  const isLoading = useCallback(() => service.isLoading(driverId), [service, driverId]);
   const isLoaded = useCallback(() => service.isLoaded(driverId), [service, driverId]);
 
   return {

@@ -6,21 +6,22 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { IResourceManagerParams, isRMNavNode } from '@cloudbeaver/core-resource-manager';
+import { getRmResourcePath, isRMNavNode } from '@cloudbeaver/core-resource-manager';
+import { createPath, getPathParts } from '@cloudbeaver/core-utils';
 
-export function getResourceKeyFromNodeId(nodeId: string): IResourceManagerParams | undefined {
+export function getResourceKeyFromNodeId(nodeId: string): string | undefined {
   if (!isRMNavNode(nodeId)) {
     return;
   }
 
-  const parts = nodeId.replace('//', '\\').split('/');
+  const parts = getPathParts(nodeId.replace('//', '\\'));
   const projectId = parts[1];
-  const path = parts.slice(2, parts.length - 1).join('/');
+  const path = createPath(...parts.slice(2, parts.length - 1));
   let name: string | undefined;
 
   if (parts.length > 2) {
     name = parts[parts.length - 1];
   }
 
-  return { projectId, path, name };
+  return getRmResourcePath(projectId, createPath(path, name));
 }
