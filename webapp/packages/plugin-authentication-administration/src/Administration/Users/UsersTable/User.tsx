@@ -11,7 +11,7 @@ import styled, { css, use } from 'reshadow';
 
 import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
 import {
-  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder, Checkbox, useTranslate
+  TableItem, TableColumnValue, TableItemSelect, TableItemExpand, Placeholder, Checkbox, useTranslate, Loader
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -76,7 +76,9 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
         />
       </TableColumnValue>
       <TableColumnValue flex {...use({ gap: true })}>
-        <Placeholder container={usersAdministrationService.userDetailsInfoPlaceholder} user={user} />
+        <Loader suspense small inline hideMessage>
+          <Placeholder container={usersAdministrationService.userDetailsInfoPlaceholder} user={user} />
+        </Loader>
       </TableColumnValue>
     </TableItem>
   );

@@ -11,6 +11,7 @@ import React from 'react';
 import { AuthConfigurationsResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 
 import { AuthConfigurationFormService } from '../AuthConfigurationFormService';
@@ -139,7 +140,7 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
 
   private async setDefaults(state: IAuthConfigurationFormState) {
     if (state.mode === 'create') {
-      await this.authProvidersResource.loadAll();
+      await this.authProvidersResource.load(CachedMapAllKey);
       if (this.authProvidersResource.configurable.length > 0 && !state.config.providerId) {
         state.config.providerId = this.authProvidersResource.configurable[0].id;
       }

@@ -13,7 +13,7 @@ import { useTabState } from 'reakit/Tab';
 
 import { useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import { isNull, isUndefined, MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import type { ITabData, ITabsContainer } from './TabsContainer/ITabsContainer';
 import { TabsContext, ITabsContext } from './TabsContext';
@@ -96,12 +96,21 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     tabList,
   });
 
-  if (currentTabId !== undefined && currentTabId !== null) {
+  if (
+    !isNull(currentTabId)
+    && !isUndefined(currentTabId)
+  ) {
     state.selectedId = currentTabId;
     dynamic.selectedId = currentTabId;
   }
 
-  if (displayed.length > 0 && dynamic.selectedId && selectedId) {
+  if (
+    displayed.length > 0
+    && !isNull(dynamic.selectedId)
+    && !isUndefined(dynamic.selectedId)
+    && !isNull(selectedId)
+    && !isUndefined(selectedId)
+  ) {
     const tabExists = displayed.includes(dynamic.selectedId);
 
     if (!tabExists) {
@@ -134,7 +143,10 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   });
 
   useEffect(() => {
-    if (currentTabId !== undefined && currentTabId !== null) {
+    if (
+      !isNull(currentTabId)
+      && !isUndefined(currentTabId)
+    ) {
       return;
     }
 
@@ -145,13 +157,16 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   }, [currentTabId, state.selectedId]);
 
   useEffect(() => {
-    if (state.selectedId) {
+    if (
+      !isNull(state.selectedId)
+      && !isUndefined(state.selectedId)
+    ) {
       openExecutor.execute({
-        tabId: state.selectedId!,
+        tabId: state.selectedId,
         props,
       });
     }
-  }, []);
+  }, [!isNull(state.selectedId) && !isUndefined(state.selectedId)]);
 
   const value = useObservableRef<ITabsContext<T>>(() => ({
     getTabInfo(tabId: string) {

@@ -6,21 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable, runInAction } from 'mobx';
+import { computed, makeObservable } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import {
-  GraphQLService,
-  CachedMapResource,
-  ResourceKey,
-  ResourceKeyUtils,
-  DatabaseDriverFragment,
-  DriverListQueryVariables,
-  CachedMapAllKey,
-  resourceKeyList
-} from '@cloudbeaver/core-sdk';
+import { GraphQLService, CachedMapResource, ResourceKey, ResourceKeyUtils, DatabaseDriverFragment, DriverListQueryVariables, CachedMapAllKey,  resourceKeyList, isResourceKeyAlias, isResourceAlias } from '@cloudbeaver/core-sdk';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export type DBDriver = DatabaseDriverFragment;
 
@@ -39,17 +31,13 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
   ) {
     super();
     appAuthService.requireAuthentication(this);
-
-    this.serverConfigResource.onDataOutdated.addHandler(() => this.markOutdated());
+    this.sync(this.serverConfigResource, () => {}, () => CachedMapAllKey);
 
     makeObservable(this, {
-      enabledDrivers: computed,
+      enabledDrivers: computed<DBDriver[]>({
+        equals: isArraysEqual,
+      }),
     });
-  }
-
-  async loadAll(): Promise<Map<string, DBDriver>> {
-    await this.load(CachedMapAllKey);
-    return this.data;
   }
 
   compare(driverA: DBDriver, driverB: DBDriver): number {
@@ -60,12 +48,15 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
     return (driverB.promotedScore || 0) - (driverA.promotedScore || 0);
   }
 
-  protected async loader(key: ResourceKey<string>, includes?: ReadonlyArray<string>): Promise<Map<string, DBDriver>> {
-    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
-    key = this.transformParam(key);
+  protected async loader(
+    originalKey: ResourceKey<string>,
+    includes?: ReadonlyArray<string>
+  ): Promise<Map<string, DBDriver>> {
+    const driversList: DBDriver[] = [];
+    const all = this.isAlias(originalKey, CachedMapAllKey);
 
-    await ResourceKeyUtils.forEachAsync(all ? CachedMapAllKey : key, async key => {
-      const driverId = all ? undefined : key;
+    await ResourceKeyUtils.forEachAsync(originalKey, async key => {
+      const driverId = isResourceAlias(key) ? undefined : key;
 
       const { drivers } = await this.graphQLService.sdk.driverList({
         driverId,
@@ -79,30 +70,25 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
         throw new Error('Driver is not found');
       }
 
-      runInAction(() => {
-        if (all) {
-          const removedDrivers = this.keys.filter(key => !drivers.some(driver => driver.id === key));
-          this.delete(resourceKeyList(removedDrivers));
-        }
-
-        this.updateDriver(...drivers);
-      });
+      driversList.push(...drivers);
     });
+
+    const key = resourceKeyList(driversList.map(driver => driver.id));
+    if (all) {
+      this.replace(key, driversList);
+    } else {
+      this.set(key, driversList);
+    }
 
     return this.data;
   }
 
-  private updateDriver(...drivers: DBDriver[]) {
-    const keys = resourceKeyList(drivers.map(driver => driver.id));
-
-    const oldDriver = this.get(keys);
-    this.set(keys, oldDriver.map((oldDriver, i) => (Object.assign(oldDriver ?? {}, drivers[i]))));
+  protected dataSet(key: string, value: DBDriver): void {
+    const oldDriver = this.dataGet(key);
+    this.data.set(key, { ...oldDriver, ...value });
   }
 
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }

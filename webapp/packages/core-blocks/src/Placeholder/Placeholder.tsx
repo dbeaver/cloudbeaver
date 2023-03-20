@@ -8,7 +8,6 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { Loader } from '../Loader/Loader';
 import type { PlaceholderContainer, PlaceholderElement } from './PlaceholderContainer';
 
 type Props<T extends Record<string, any>> = T & {
@@ -35,8 +34,8 @@ export const Placeholder = observer(function Placeholder<T extends Record<string
   }
 
   return (
-    <Loader suspense>
+    <>
       {elements.map(({ id, component: Component }) => <Component key={id} {...(rest as any as T)} />)}
-    </Loader>
+    </>
   );
 });

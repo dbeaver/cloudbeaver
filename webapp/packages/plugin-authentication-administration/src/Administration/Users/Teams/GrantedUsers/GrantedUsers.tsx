@@ -6,15 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
+import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group,
-  InfoItem, Loader, TextPlaceholder, useResource, useStyles, useTranslate
+  BASE_CONTAINERS_STYLES, ColoredContainer, Container, getComputed, Group,
+  InfoItem, Loader, TextPlaceholder, useAutoLoad, useResource, useStyles, useTranslate
 } from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
@@ -51,24 +49,20 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
   const state = useGrantedUsers(formState.config, formState.mode);
   const { selected } = useTab(tabId);
 
-  const users = useResource(GrantedUsers, UsersResource, selected ? CachedMapAllKey : null);
+  const users = useResource(GrantedUsers, UsersResource, CachedMapAllKey, { active: selected });
 
-  const grantedUsers = useMemo(() => computed(() => users.resource.values
-    .filter(user => state.state.grantedUsers.includes(user.userId))
-  ), [state.state.grantedUsers, users.resource]);
+  const grantedUsers = getComputed(() => users.data
+    .filter<AdminUser>((user): user is AdminUser => !!user && state.state.grantedUsers.includes(user.userId))
+  );
 
-  useEffect(() => {
-    if (selected && !state.state.loaded) {
-      state.load();
-    }
-  }, [selected, state.state.loaded]);
+  useAutoLoad(state, selected && !state.state.loaded);
 
   if (!selected) {
     return null;
   }
 
   return styled(style)(
-    <Loader state={[users, state.state]}>
+    <Loader state={[state.state]}>
       {() => styled(style)(
         <ColoredContainer parent gap vertical>
           {!users.resource.values.length ? (
@@ -80,7 +74,7 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
               {formState.mode === 'edit' && state.changed && <InfoItem info='ui_save_reminder' />}
               <Container gap overflow>
                 <GrantedUserList
-                  grantedUsers={grantedUsers.get()}
+                  grantedUsers={grantedUsers}
                   disabled={formState.disabled}
                   onEdit={state.edit}
                   onRevoke={state.revoke}

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { StrictMode, Suspense } from 'react';
+import { Suspense } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import styled from 'reshadow';
 
@@ -52,7 +52,6 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
             height: 100vh;
           }
         `(
-        // <StrictMode>
           <AppContext app={serviceInjector}>
             <ErrorBoundary root>
               <Suspense fallback={<Loader />}>
@@ -60,7 +59,6 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
               </Suspense>
             </ErrorBoundary>
           </AppContext>
-        // </StrictMode>
         ));
     },
     renderError(exception?: any) {

@@ -18,7 +18,7 @@ export class AuthRolesResource extends CachedDataResource<string[]> {
     private readonly graphQLService: GraphQLService,
     sessionPermissionsResource: SessionPermissionsResource
   ) {
-    super([]);
+    super(() => []);
 
     sessionPermissionsResource
       .require(this, EAdminPermission.admin)

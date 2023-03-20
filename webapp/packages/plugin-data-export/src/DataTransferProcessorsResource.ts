@@ -7,25 +7,28 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { GraphQLService, CachedDataResource, DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { GraphQLService, CachedMapResource, DataTransferProcessorInfo, resourceKeyList, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class DataTransferProcessorsResource extends CachedDataResource<Map<string, DataTransferProcessorInfo>> {
+export class DataTransferProcessorsResource extends CachedMapResource<string, DataTransferProcessorInfo> {
   constructor(
-    private readonly graphQLService: GraphQLService
+    private readonly graphQLService: GraphQLService,
+    serverConfigResource: ServerConfigResource
   ) {
-    super(new Map());
+    super(() => new Map());
+    this.sync(serverConfigResource, () => {}, () => CachedMapAllKey);
   }
 
   protected async loader(): Promise<Map<string, DataTransferProcessorInfo>> {
     const { processors } = await this.graphQLService.sdk.getDataTransferProcessors();
 
-    this.data.clear();
-
-    for (const processor of processors) {
-      this.data.set(processor.id, processor);
-    }
+    this.replace(resourceKeyList(processors.map(processor => processor.id)), processors);
 
     return this.data;
+  }
+
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }
