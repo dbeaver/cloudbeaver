@@ -63,4 +63,11 @@
       </radialGradient>
     </defs>
   </svg>
+  <script>
+    var isCached = performance.getEntriesByType("navigation")[0].transferSize === 0;
+    // console.log("isCached", isCached);
+    if(isCached) {
+      // location.reload();
+    }
+  </script>
 </div>
