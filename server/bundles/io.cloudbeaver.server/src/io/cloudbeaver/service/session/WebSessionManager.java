@@ -110,10 +110,6 @@ public class WebSessionManager {
                 }
                 sessionMap.put(sessionId, webSession);
             } else if (baseWebSession == null) {
-                if (errorOnNoFound && !httpSession.isNew()) {
-                    throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
-                }
-
                 try {
                     webSession = createWebSessionImpl(httpSession);
                 } catch (DBException e) {
@@ -126,6 +122,11 @@ public class WebSessionManager {
                 } catch (DBException e) {
                     log.error("Failed to restore previous user session", e);
                 }
+
+                if (!restored && errorOnNoFound && !httpSession.isNew()) {
+                    throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
+                }
+
                 log.debug((restored ? "Restored " : "New ") + "web session '" + webSession.getSessionId() + "'");
 
                 webSession.setCacheExpired(!httpSession.isNew());
@@ -156,7 +157,7 @@ public class WebSessionManager {
      */
     @Nullable
     public WebSession getOrRestoreSession(@NotNull HttpServletRequest request) {
-        var httpSession = request.getSession(true);
+        var httpSession = request.getSession();
         var sessionId = httpSession.getId();
         WebSession webSession;
         synchronized (sessionMap) {
@@ -234,17 +235,6 @@ public class WebSessionManager {
             }
             return null;
         }
-    }
-
-    public WebSession findWebSession(HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
-        WebSession webSession = findWebSession(request);
-        if (webSession != null) {
-            return webSession;
-        }
-        if (errorOnNoFound) {
-            throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
-        }
-        return null;
     }
 
     public void expireIdleSessions() {

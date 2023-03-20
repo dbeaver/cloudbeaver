@@ -28,11 +28,11 @@ import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.utils.ArrayUtils;
-import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +41,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.*;
-import java.util.Set;
 
 /**
  * Web service implementation
@@ -121,14 +120,17 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         return getWebConnection(getWebSession(env), getProjectReference(env), env.getArgument("connectionId"));
     }
 
+    @Nullable
     public static WebSession findWebSession(DataFetchingEnvironment env) {
-        return CBPlatform.getInstance().getSessionManager().findWebSession(
-            getServletRequest(env));
+        return CBPlatform.getInstance().getSessionManager().getOrRestoreSession(getServletRequest(env));
     }
 
     public static WebSession findWebSession(DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
-        return CBPlatform.getInstance().getSessionManager().findWebSession(
-            getServletRequest(env), errorOnNotFound);
+        var webSession = CBPlatform.getInstance().getSessionManager().getOrRestoreSession(getServletRequest(env));
+        if (webSession == null && errorOnNotFound) {
+            throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
+        }
+        return webSession;
     }
 
     @NotNull
