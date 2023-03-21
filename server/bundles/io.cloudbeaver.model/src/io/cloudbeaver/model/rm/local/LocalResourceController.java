@@ -34,6 +34,8 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.app.DBPResourceTypeDescriptor;
+import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
@@ -72,6 +74,7 @@ public class LocalResourceController implements RMController {
 
     public static final String DEFAULT_CHANGE_ID = "0";
 
+    private final DBPWorkspace workspace;
     private final SMCredentialsProvider credentialsProvider;
 
     private final Path rootPath;
@@ -83,12 +86,14 @@ public class LocalResourceController implements RMController {
     private final Map<String, WebProjectImpl> projectRegistries = new LinkedHashMap<>();
 
     public LocalResourceController(
+        DBPWorkspace workspace,
         SMCredentialsProvider credentialsProvider,
         Path rootPath,
         Path userProjectsPath,
         Path sharedProjectsPath,
         Supplier<SMController> smControllerSupplier
     ) {
+        this.workspace = workspace;
         this.credentialsProvider = credentialsProvider;
         this.rootPath = rootPath;
         this.userProjectsPath = userProjectsPath;
@@ -119,6 +124,7 @@ public class LocalResourceController implements RMController {
                 SessionContextImpl sessionContext = new SessionContextImpl(null);
                 RMProject rmProject = makeProjectFromId(projectId, false);
                 project = new WebProjectImpl(
+                    workspace,
                     this,
                     sessionContext,
                     rmProject,
@@ -914,18 +920,20 @@ public class LocalResourceController implements RMController {
         );
     }
 
-    public static Builder builder(SMCredentialsProvider credentialsProvider, Supplier<SMController> smControllerSupplier) {
-        return new Builder(credentialsProvider, smControllerSupplier);
+    public static Builder builder(SMCredentialsProvider credentialsProvider, DBPWorkspace workspace, Supplier<SMController> smControllerSupplier) {
+        return new Builder(workspace, credentialsProvider, smControllerSupplier);
     }
     public static final class Builder {
         private final SMCredentialsProvider credentialsProvider;
         private final Supplier<SMController> smController;
+        private final DBPWorkspace workspace;
 
         private Path rootPath;
         private Path userProjectsPath;
         private Path sharedProjectsPath;
 
-        private Builder(SMCredentialsProvider credentialsProvider, Supplier<SMController> smControllerSupplier) {
+        private Builder(DBPWorkspace workspace, SMCredentialsProvider credentialsProvider, Supplier<SMController> smControllerSupplier) {
+            this.workspace = workspace;
             this.credentialsProvider = credentialsProvider;
             this.smController = smControllerSupplier;
             this.rootPath = RMUtils.getRootPath();
@@ -949,7 +957,7 @@ public class LocalResourceController implements RMController {
         }
 
         public LocalResourceController build() {
-            return new LocalResourceController(credentialsProvider, rootPath, userProjectsPath, sharedProjectsPath, smController);
+            return new LocalResourceController(workspace, credentialsProvider, rootPath, userProjectsPath, sharedProjectsPath, smController);
         }
     }
 
