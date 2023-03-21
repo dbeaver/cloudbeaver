@@ -95,9 +95,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 if (!parentNode.hasChildren(false)) {
                     return EMPTY_NODE_LIST;
                 }
-                if (parentNode instanceof DBNProject) {
-                    parentNode = ((DBNProject) parentNode).getDatabases();
-                }
                 nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, parentNode, false);
             }
             if (nodeChildren == null) {
