@@ -98,12 +98,12 @@ public class H2Migrator {
         if (!H2_DRIVER_NAME.equals(databaseConfiguration.getDriver()) &&
             !H2_V2_DRIVER_NAME.equals(databaseConfiguration.getDriver())
         ) {
-            log.debug("Non-H2 database detected. No migration needed");
+            log.trace("Non-H2 database detected. No migration needed");
             return null;
         }
 
         if (dbUrl.startsWith("jdbc:h2:mem:")) {
-            log.debug("In-memory database detected. No migration needed");
+            log.trace("In-memory database detected. No migration needed");
             return null;
         }
 
@@ -121,7 +121,7 @@ public class H2Migrator {
         }
 
         try (var ignored = v2Driver.connect(dbUrl, dbProperties)) {
-            log.debug("Current H2 database is v2. No migration needed");
+            log.trace("Current H2 database is v2. No migration needed");
             return null;
         } catch (SQLException connectionException) {
             if (connectionException.getMessage().startsWith("General error: \"The write format 1 is smaller than the supported format 2")) {
