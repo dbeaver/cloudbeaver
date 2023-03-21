@@ -19,6 +19,21 @@ type FunctionType =
   | t.FunctionExpression
   | t.ArrowFunctionExpression;
 
+function addTestIdAttribute(
+  node: t.JSXOpeningElement,
+  name: string
+): void {
+  if (!hasDataAttribute(node, DEFAULT_DATA_TESTID)) {
+    const dataAttribute = createDataAttribute(name, DEFAULT_DATA_TESTID);
+    const indexOf = node.attributes.findIndex(attribute => t.isJSXSpreadAttribute(attribute));
+    if (indexOf !== -1) {
+      node.attributes.splice(indexOf, 0, dataAttribute);
+    } else {
+      node.attributes.push(dataAttribute);
+    }
+  }
+}
+
 function nameForReactComponent(
   path: NodePath<FunctionType>
 ): t.Identifier | null {
@@ -50,23 +65,18 @@ function hasDataAttribute(
   );
 }
 
-type VisitorState = { name: string; attributes: string[] };
+type VisitorState = { name: string };
 
 const returnStatementVisitor: Visitor<VisitorState> = {
   JSXFragment(path) {
     path.skip();
   },
-  JSXElement(path, { name, attributes }) {
+  JSXElement(path, { name }) {
     const openingElement = path.get('openingElement');
 
     path.skip();
 
-    for (const attribute of attributes) {
-      if (!hasDataAttribute(openingElement.node, attribute)) {
-        const dataAttribute = createDataAttribute(name, attribute);
-        openingElement.node.attributes.push(dataAttribute);
-      }
-    }
+    addTestIdAttribute(openingElement.node, name);
   },
 };
 
@@ -77,12 +87,6 @@ const functionVisitor: Visitor<VisitorState> = {
       path.traverse(returnStatementVisitor, state);
     }
   },
-};
-
-type State = {
-  opts: {
-    attributes?: string[];
-  };
 };
 
 function getElementName(node: t.JSXOpeningElement['name']): string {
@@ -100,50 +104,32 @@ function getElementName(node: t.JSXOpeningElement['name']): string {
   ].join('.');
 }
 
-export default function plugin(): PluginObj<State> {
+export default function plugin(): PluginObj {
   return {
     name: 'cloudbeaver-data-testid',
     inherits: syntaxJsx,
     visitor: {
       'FunctionExpression|ArrowFunctionExpression|FunctionDeclaration': (
-        path: NodePath<FunctionType>,
-        state: State
+        p: NodePath<FunctionType>,
       ) => {
-        const identifier = nameForReactComponent(path);
+        const identifier = nameForReactComponent(p);
         if (!identifier) {
           return;
         }
 
-        const attributes = state.opts.attributes ?? [DEFAULT_DATA_TESTID];
-
-        if (path.isArrowFunctionExpression()) {
-          path.traverse(returnStatementVisitor, {
-            name: identifier.name,
-            attributes,
-          });
+        if (p.isArrowFunctionExpression()) {
+          p.traverse(returnStatementVisitor, { name: identifier.name });
         } else {
-          path.traverse(functionVisitor, { name: identifier.name, attributes });
+          p.traverse(functionVisitor, { name: identifier.name });
         }
       },
       CallExpression(p) {
         p.traverse({
           JSXOpeningElement({ node }) {
-            const dataAttributeExists = node.attributes.find(
-              attribute => t.isJSXAttribute(attribute) && attribute.name.name === DEFAULT_DATA_TESTID
-            );
-
-            if (dataAttributeExists) {
-              return;
-            }
-
-            const newProp = t.jSXAttribute(
-              t.jSXIdentifier(DEFAULT_DATA_TESTID),
-              t.stringLiteral(getElementName(node.name))
-            );
-            node.attributes.push(newProp);
+            addTestIdAttribute(node, getElementName(node.name));
           },
         });
       },
     },
-  } as PluginObj<State>;
+  } as PluginObj;
 }
