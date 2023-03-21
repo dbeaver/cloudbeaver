@@ -7,7 +7,7 @@
  */
 
 import { EAdminPermission } from '@cloudbeaver/core-authentication';
-import { Connection, ConnectionInfoResource, ConnectionsManagerService, ConnectionsSettingsService, createConnectionParam } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionInfoResource, ConnectionsManagerService, ConnectionsSettingsService, createConnectionParam, getNodeIdDatasource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
@@ -259,9 +259,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         settings
       );
 
-      if (connection.nodePath) {
-        await this.navNodeManagerService.refreshTree(connection.nodePath);
-      }
+      await this.navNodeManagerService.refreshTree(getNodeIdDatasource(connection));
     } catch (exception: any) {
       this.notificationService.logException(exception);
     }

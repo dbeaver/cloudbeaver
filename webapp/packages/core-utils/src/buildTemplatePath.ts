@@ -7,6 +7,7 @@
  */
 
 import type { PathParams, PathTemplate } from './createPathTemplate';
+import { mapTemplateParams } from './mapTemplateParams';
 
 export function buildTemplatePath<
   TTemplate extends string,
@@ -15,22 +16,5 @@ export function buildTemplatePath<
   template: PathTemplate<TParams>,
   params: TParams,
 ): string {
-  params = { ...params };
-
-  for (const param of template.params) {
-    const token = template.tokens.find(token => token.type === 'url-parameter' && token.val.includes(param));
-    if (!token) {
-      continue;
-    }
-    const type = RegExp(`:${param}<(\\^\\(|)(.+?)\\[`).exec(token.match);
-
-    if (!type) {
-      continue;
-    }
-    if (param in params) {
-      (params as any)[param] = `${type[2]}${(params as any)[param]}`;
-    }
-  }
-
-  return template.build(params);
+  return template.build(mapTemplateParams(template, params));
 }

@@ -26,7 +26,7 @@ export function navigationTreeProjectFilter(
 ): IElementsTreeFilter {
   return (tree, filter, node, children) => {
     if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT && resourceTypeId !== undefined) {
-      const project = projectsNavNodeService.getProject(node.id);
+      const project = projectsNavNodeService.getByNodeId(node.id);
 
       if (!project) {
         return children;
@@ -64,7 +64,7 @@ export function navigationTreeProjectFilter(
       .filter<NavNode>((node => node !== undefined) as (node: NavNode | undefined) => node is NavNode)
       .filter(node => {
         if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT) {
-          const project = projectsNavNodeService.getProject(node.id);
+          const project = projectsNavNodeService.getByNodeId(node.id);
 
           if (!project || !projectsService.activeProjects.includes(project)) {
             return false;

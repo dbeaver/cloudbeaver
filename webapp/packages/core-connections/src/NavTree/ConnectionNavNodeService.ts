@@ -11,16 +11,14 @@ import { action, makeObservable } from 'mobx';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { INodeNavigationData, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { getNodeIdResourceProject } from '@cloudbeaver/core-projects';
 import { ServerEventId } from '@cloudbeaver/core-root';
 import { type ResourceKey, ResourceKeyUtils, resourceKeyList, isResourceAlias, ResourceKeySimple } from '@cloudbeaver/core-sdk';
-import { getPathParent, isDefined } from '@cloudbeaver/core-utils';
+import { getPathParent } from '@cloudbeaver/core-utils';
 
 import { ConnectionFolderEventHandler, IConnectionFolderEvent } from '../ConnectionFolderEventHandler';
 import { Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
 import { ConnectionsManagerService } from '../ConnectionsManagerService';
 import type { IConnectionInfoParams } from '../IConnectionsResource';
-import { getConnectionParentId } from './getConnectionParentId';
 import { getNodeIdDatasource } from './getNodeIdDatasource';
 import { testNodeIdDatasource } from './testNodeIdDatasource';
 

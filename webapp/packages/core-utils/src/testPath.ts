@@ -7,6 +7,7 @@
  */
 
 import type { PathParams, PathTemplate } from './createPathTemplate';
+import { mapTemplateParams } from './mapTemplateParams';
 
 export function testPath<
   TTemplate extends string,
@@ -16,9 +17,17 @@ export function testPath<
   path: string,
   partial?: boolean
 ): TParams | null {
+  let params: TParams | null = null;
+
   if (partial) {
-    return template.partialTest(path);
+    params = template.partialTest(path);
+  } else {
+    params = template.test(path);
   }
 
-  return template.test(path);
+  if (!params) {
+    return null;
+  }
+
+  return mapTemplateParams(template, params);
 }

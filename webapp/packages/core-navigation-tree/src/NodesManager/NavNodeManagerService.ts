@@ -376,7 +376,7 @@ export class NavNodeManagerService extends Bootstrap {
     }
 
     if (!projectId) {
-      projectId = this.projectsNavNodeService.getProject(nodeId)?.id;
+      projectId = this.projectsNavNodeService.getByNodeId(nodeId)?.id;
     }
 
     const markOpen = () => {

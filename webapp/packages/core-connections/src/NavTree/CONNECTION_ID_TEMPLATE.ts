@@ -8,4 +8,4 @@
 
 import { createPathParamTemplate } from '@cloudbeaver/core-utils';
 
-export const CONNECTION_ID_TEMPLATE = createPathParamTemplate('connectionId', 'Connection');
+export const CONNECTION_ID_TEMPLATE = createPathParamTemplate('connectionId', 'datasource');

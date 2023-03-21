@@ -58,7 +58,7 @@ export function navigationTreeProjectsRendererRenderer(
       return undefined;
     }
 
-    const project = projectsNavNodeService.getProject(nodeId);
+    const project = projectsNavNodeService.getByNodeId(nodeId);
 
     if (!project) {
       return undefined;

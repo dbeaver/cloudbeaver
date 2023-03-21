@@ -38,19 +38,6 @@ export class ProjectsNavNodeService {
     this.projectPathTemplates.push(template);
   }
 
-  getProject(nodeId: string): ProjectInfo | undefined {
-    const parentIds = [...this.navNodeInfoResource.getParents(nodeId), nodeId];
-    const parents = this.navNodeInfoResource.get(resourceKeyList(parentIds));
-
-    const projectNode = parents.find(parent => this.projectTypes.includes(parent?.nodeType || ''));
-
-    if (!projectNode) {
-      return;
-    }
-
-    return this.getByNodeId(projectNode.id);
-  }
-
   getByNodeId(nodeId: string): ProjectInfo | undefined {
     for (const template of this.projectPathTemplates) {
       const match = testPath(template, nodeId, true);

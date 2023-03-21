@@ -33,7 +33,7 @@ export function navigationTreeResourceTypeFilter(
             return true;
           }
 
-          const project = projectsNavNodeService.getProject(node.id);
+          const project = projectsNavNodeService.getByNodeId(node.id);
 
           if (project) {
             const resourceType = projectInfoResource.getResourceType(project, resourceTypeId);

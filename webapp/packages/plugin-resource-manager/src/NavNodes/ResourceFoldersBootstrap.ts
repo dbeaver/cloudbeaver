@@ -116,7 +116,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     const nodes = getNodesFromContext(moveContexts);
     const nodeIdList = nodes.map(node => node.id);
     const children = this.navTreeResource.get(targetNode.id) ?? [];
-    const targetProject = this.projectsNavNodeService.getProject(targetNode.id);
+    const targetProject = this.projectsNavNodeService.getByNodeId(targetNode.id);
 
     if (!targetProject?.canEditResources || (!targetNode.folder && targetNode.nodeType !== NAV_NODE_TYPE_RM_PROJECT)) {
       return;
@@ -125,7 +125,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     const supported = nodes.every(node => {
       if (
         ![NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE].includes(node.nodeType!)
-        || targetProject !== this.projectsNavNodeService.getProject(node.id)
+        || targetProject !== this.projectsNavNodeService.getByNodeId(node.id)
         || children.includes(node.id)
         || targetNode.id === node.id
       ) {

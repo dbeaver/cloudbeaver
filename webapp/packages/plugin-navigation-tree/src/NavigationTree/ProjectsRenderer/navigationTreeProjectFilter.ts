@@ -10,6 +10,7 @@
 import { NavNode, NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT, ProjectsService } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { isDefined } from '@cloudbeaver/core-utils';
 
 import type { IElementsTreeFilter } from '../ElementsTree/useElementsTree';
 
@@ -26,10 +27,10 @@ export function navigationTreeProjectFilter(
 
     const nodes = navNodeInfoResource
       .get(resourceKeyList(children))
-      .filter<NavNode>((node => node !== undefined) as (node: NavNode | undefined) => node is NavNode)
+      .filter(isDefined)
       .filter(node => {
         if (node.nodeType === NAV_NODE_TYPE_PROJECT) {
-          const project = projectsNavNodeService.getProject(node.id);
+          const project = projectsNavNodeService.getByNodeId(node.id);
 
           if (!project || !projectsService.activeProjects.includes(project)) {
             return false;

@@ -9,6 +9,6 @@
 import { createPathParamTemplate, createPathTemplate } from '@cloudbeaver/core-utils';
 
 export const NODE_PATH_TEMPLATE_EXT_RESOURCES_PROJECT = createPathTemplate(
-  'ext!rm',
+  'rm!root',
   createPathParamTemplate('projectId', 'rm\\.project')
 );

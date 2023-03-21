@@ -27,7 +27,7 @@ export function navigationTreeResourceExpandStateGetter(
       return null;
     }
 
-    const project = projectsNavNodeService.getProject(nodeId);
+    const project = projectsNavNodeService.getByNodeId(nodeId);
 
     if (!project) {
       return null;

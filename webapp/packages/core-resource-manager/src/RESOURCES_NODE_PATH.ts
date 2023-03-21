@@ -6,4 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export const RESOURCES_NODE_PATH = 'ext!resources';
+export const RESOURCES_NODE_PATH = 'resources!root';
