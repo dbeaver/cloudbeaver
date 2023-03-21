@@ -155,7 +155,7 @@ public class CBDatabase {
             }
         }
 
-        var migrator = new H2Migrator(monitor, dataSourceProviderRegistry, databaseConfiguration, dbURL, dbProperties);
+        var migrator = new H2Migrator(monitor, dataSourceProviderRegistry, databaseConfiguration, dbURL, dbProperties, variablesResolver);
         migrator.migrateDatabaseIfNeeded();
 
         // reload the driver and url due to a possible configuration update
