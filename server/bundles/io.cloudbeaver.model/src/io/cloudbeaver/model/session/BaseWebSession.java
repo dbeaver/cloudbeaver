@@ -31,8 +31,8 @@ import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Base CB web session
@@ -49,7 +49,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     protected final WebApplication application;
     protected volatile long lastAccessTime;
 
-    private final List<CBWebSessionEventHandler> sessionEventHandlers = new ArrayList<>();
+    private final List<CBWebSessionEventHandler> sessionEventHandlers = new CopyOnWriteArrayList<>();
     private WebSessionEventsFilter eventsFilter = new WebSessionEventsFilter();
     private final WebSessionWorkspace workspace;
 

@@ -99,7 +99,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return (CBApplication) BaseApplicationImpl.getInstance();
     }
 
-    private String serverURL;
+    protected String serverURL;
     protected int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverHost = null;
     private String serverName = null;

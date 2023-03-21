@@ -37,11 +37,14 @@ module.exports = (env, argv) => {
   const urlObject = new URL(env.server);
 
   return merge(commonConfig(env, argv), {
+    mode: 'development',
     entry: {
       main,
       sso,
     },
-    mode: 'development',
+    optimization: {
+      minimize: true,
+    },
     devServer: {
       allowedHosts: 'all',
       // port: 8080,
