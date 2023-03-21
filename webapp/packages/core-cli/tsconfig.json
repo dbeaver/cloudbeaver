@@ -1,11 +1,14 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "rootDir": ".",
+    "rootDir": "src",
+    "module": "CommonJS",
     "outDir": "lib",
-    "composite": true
+    "moduleResolution": "node",
+    "composite": true,
+    "esModuleInterop": true,
+    "emitDeclarationOnly": false,
+    "skipLibCheck": true
   },
   "include": ["src"],
-  "exclude": ["**/node_modules", "**/.*/"],
-  "references": [{ "path": "../*" }]
+  "exclude": ["**/node_modules", "**/lib"]
 }

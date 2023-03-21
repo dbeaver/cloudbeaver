@@ -10,7 +10,8 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { Group, GroupTitle, BASE_CONTAINERS_STYLES, InputField, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { Group, GroupTitle, BASE_CONTAINERS_STYLES, InputField, useTranslate, useStyles, useResource } from '@cloudbeaver/core-blocks';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState';
 
@@ -21,6 +22,7 @@ interface Props {
 export const ServerConfigurationInfoForm = observer<Props>(function ServerConfigurationInfoForm({
   state,
 }) {
+  const serverConfigLoader = useResource(ServerConfigurationInfoForm, ServerConfigResource, undefined);
   const translate = useTranslate();
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <Group form gap>
@@ -40,6 +42,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         type="url"
         name="serverURL"
         state={state.serverConfig}
+        readOnly={serverConfigLoader.resource.distributed}
         mod='surface'
         required
         medium

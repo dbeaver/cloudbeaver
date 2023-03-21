@@ -8,10 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
-import {
-  AuthProviderConfigurationParametersFragment, CachedMapResource, GetAuthProviderConfigurationParametersQueryVariables,
-  GraphQLService, isResourceKeyList, ResourceKey, ResourceKeyUtils
-} from '@cloudbeaver/core-sdk';
+import { AuthProviderConfigurationParametersFragment, CachedMapResource, GetAuthProviderConfigurationParametersQueryVariables, GraphQLService, isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
 import { EAdminPermission } from './EAdminPermission';
 
@@ -36,6 +33,10 @@ export class AuthConfigurationParametersResource
   protected async loader(
     key: ResourceKey<string>
   ): Promise<Map<string, AuthProviderConfigurationParametersFragment[]>> {
+    if (isResourceAlias(key)) {
+      throw new Error('Aliases not supported by this resource.');
+    }
+
     const values: AuthProviderConfigurationParametersFragment[][] = [];
     await ResourceKeyUtils.forEachAsync(key, async key => {
       const { parameters } = await this.graphQLService.sdk.getAuthProviderConfigurationParameters({ providerId: key });
@@ -43,15 +44,12 @@ export class AuthConfigurationParametersResource
       values.push(parameters);
     });
 
-    this.set(key, isResourceKeyList(key) ? values : values[0]);
+    this.set(ResourceKeyUtils.toList(key), values);
 
     return this.data;
   }
 
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }

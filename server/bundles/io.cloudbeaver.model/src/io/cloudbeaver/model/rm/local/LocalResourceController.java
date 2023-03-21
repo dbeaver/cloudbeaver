@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPResourceTypeDescriptor;
+import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
@@ -73,6 +74,7 @@ public class LocalResourceController implements RMController {
 
     public static final String DEFAULT_CHANGE_ID = "0";
 
+    private final DBPWorkspace workspace;
     private final SMCredentialsProvider credentialsProvider;
 
     private final Path rootPath;
@@ -84,12 +86,14 @@ public class LocalResourceController implements RMController {
     private final Map<String, WebProjectImpl> projectRegistries = new LinkedHashMap<>();
 
     public LocalResourceController(
+        DBPWorkspace workspace,
         SMCredentialsProvider credentialsProvider,
         Path rootPath,
         Path userProjectsPath,
         Path sharedProjectsPath,
         Supplier<SMController> smControllerSupplier
     ) {
+        this.workspace = workspace;
         this.credentialsProvider = credentialsProvider;
         this.rootPath = rootPath;
         this.userProjectsPath = userProjectsPath;
@@ -120,6 +124,7 @@ public class LocalResourceController implements RMController {
                 SessionContextImpl sessionContext = new SessionContextImpl(null);
                 RMProject rmProject = makeProjectFromId(projectId, false);
                 project = new WebProjectImpl(
+                    workspace,
                     this,
                     sessionContext,
                     rmProject,
@@ -445,6 +450,7 @@ public class LocalResourceController implements RMController {
             if (!folderPath.startsWith(projectPath)) {
                 throw new DBException("Invalid folder path");
             }
+            createFolder(folderPath);
             return readChildResources(projectId, folderPath, nameMask, readProperties, readHistory, recursive);
         } catch (NoSuchFileException e) {
             throw new DBException("Invalid resource folder " + folder);
@@ -485,6 +491,7 @@ public class LocalResourceController implements RMController {
         if (Files.exists(targetPath)) {
             throw new DBException("Resource '" + resourcePath + "' already exists");
         }
+        createFolder(targetPath.getParent());
         try {
             if (isFolder) {
                 Files.createDirectories(targetPath);
@@ -655,26 +662,7 @@ public class LocalResourceController implements RMController {
         if (!forceOverwrite && Files.exists(targetPath)) {
             throw new DBException("Resource '" + resourcePath + "' exists");
         }
-        if (!Files.exists(targetPath.getParent())) {
-            boolean parentExists = false;
-            if (getProjectPath(projectId).equals(targetPath.toAbsolutePath().getParent().getParent())) {
-                // Create special folder on demand or throw error
-                for (DBPResourceTypeDescriptor rtd : ResourceTypeRegistry.getInstance().getResourceTypes()) {
-                    if (targetPath.getParent().getFileName().toString().equals(rtd.getDefaultRoot(null))) {
-                        try {
-                            Files.createDirectories(targetPath.getParent());
-                            parentExists = true;
-                            break;
-                        } catch (IOException e) {
-                            throw new DBException("Error creating special folder '" + targetPath.getParent() + "'");
-                        }
-                    }
-                }
-            }
-            if (!parentExists) {
-                throw new DBException("Parent folder '" + targetPath.getParent().getFileName() + "' doesn't exist");
-            }
-        }
+        createFolder(targetPath.getParent());
         try {
             Files.write(targetPath, data);
         } catch (IOException e) {
@@ -684,6 +672,16 @@ public class LocalResourceController implements RMController {
             fireRmResourceAddEvent(projectId, resourcePath);
         }
         return DEFAULT_CHANGE_ID;
+    }
+
+    private void createFolder(Path targetPath) throws DBException {
+        if (!Files.exists(targetPath)) {
+            try {
+                Files.createDirectories(targetPath);
+            } catch (IOException e) {
+                throw new DBException("Error creating folder '" + targetPath + "'");
+            }
+        }
     }
 
     @NotNull
@@ -925,18 +923,20 @@ public class LocalResourceController implements RMController {
         );
     }
 
-    public static Builder builder(SMCredentialsProvider credentialsProvider, Supplier<SMController> smControllerSupplier) {
-        return new Builder(credentialsProvider, smControllerSupplier);
+    public static Builder builder(SMCredentialsProvider credentialsProvider, DBPWorkspace workspace, Supplier<SMController> smControllerSupplier) {
+        return new Builder(workspace, credentialsProvider, smControllerSupplier);
     }
     public static final class Builder {
         private final SMCredentialsProvider credentialsProvider;
         private final Supplier<SMController> smController;
+        private final DBPWorkspace workspace;
 
         private Path rootPath;
         private Path userProjectsPath;
         private Path sharedProjectsPath;
 
-        private Builder(SMCredentialsProvider credentialsProvider, Supplier<SMController> smControllerSupplier) {
+        private Builder(DBPWorkspace workspace, SMCredentialsProvider credentialsProvider, Supplier<SMController> smControllerSupplier) {
+            this.workspace = workspace;
             this.credentialsProvider = credentialsProvider;
             this.smController = smControllerSupplier;
             this.rootPath = RMUtils.getRootPath();
@@ -960,7 +960,7 @@ public class LocalResourceController implements RMController {
         }
 
         public LocalResourceController build() {
-            return new LocalResourceController(credentialsProvider, rootPath, userProjectsPath, sharedProjectsPath, smController);
+            return new LocalResourceController(workspace, credentialsProvider, rootPath, userProjectsPath, sharedProjectsPath, smController);
         }
     }
 

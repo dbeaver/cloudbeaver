@@ -21,13 +21,13 @@ import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
 
 /**
- * Web workspace.
+ * Web global workspace.
  * <p>
  * Basically just a wrapper around Eclipse workspace.
  */
-public class WebWorkspace extends EclipseWorkspaceImpl {
+public class WebGlobalWorkspace extends EclipseWorkspaceImpl {
 
-    public WebWorkspace(DBPPlatform platform, IWorkspace eclipseWorkspace) {
+    public WebGlobalWorkspace(DBPPlatform platform, IWorkspace eclipseWorkspace) {
         super(platform, eclipseWorkspace);
     }
 
