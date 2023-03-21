@@ -111,8 +111,8 @@ public class CBDatabase {
             throw new DBException("No database driver configured for CloudBeaver database");
         }
         var dataSourceProviderRegistry = DataSourceProviderRegistry.getInstance();
-        DBPDriver driverProvider = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
-        if (driverProvider == null) {
+        DBPDriver driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
+        if (driver == null) {
             throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
         }
 
@@ -120,9 +120,9 @@ public class CBDatabase {
 
         String dbUser = databaseConfiguration.getUser();
         String dbPassword = databaseConfiguration.getPassword();
-        if (CommonUtils.isEmpty(dbUser) && driverProvider.isEmbedded()) {
+        if (CommonUtils.isEmpty(dbUser) && driver.isEmbedded()) {
             File pwdFile = application.getDataDirectory(true).resolve(DEFAULT_DB_PWD_FILE).toFile();
-            if (!driverProvider.isAnonymousAccess()) {
+            if (!driver.isAnonymousAccess()) {
                 // No database credentials specified
                 dbUser = DEFAULT_DB_USER_NAME;
 
@@ -158,14 +158,14 @@ public class CBDatabase {
         var migrator = new H2Migrator(monitor, dataSourceProviderRegistry, databaseConfiguration, dbURL, dbProperties);
         migrator.tryToMigrateDb();
         // reload the driver due to a possible configuration instance update
-        driverProvider = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
-        if (driverProvider == null) {
+        driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
+        if (driver == null) {
             throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
         }
-        Driver driverInstance = driverProvider.getDriverInstance(monitor);
+        Driver driverInstance = driver.getDriverInstance(monitor);
 
         // Create connection pool with custom connection factory
-        log.debug("\tInitiate connection pool with management database (" + driverProvider.getFullName() + "; " + dbURL + ")");
+        log.debug("\tInitiate connection pool with management database (" + driver.getFullName() + "; " + dbURL + ")");
         DriverConnectionFactory conFactory = new DriverConnectionFactory(driverInstance, dbURL, dbProperties);
         PoolableConnectionFactory pcf = new PoolableConnectionFactory(conFactory, null);
         pcf.setValidationQuery(databaseConfiguration.getPool().getValidationQuery());
@@ -190,7 +190,7 @@ public class CBDatabase {
                     SCHEMA_UPDATE_SQL_PATH),
                 monitor1 -> connection,
                 new CBSchemaVersionManager(),
-                driverProvider.getScriptDialect().createInstance(),
+                driver.getScriptDialect().createInstance(),
                 null,
                 CURRENT_SCHEMA_VERSION,
                 0);
