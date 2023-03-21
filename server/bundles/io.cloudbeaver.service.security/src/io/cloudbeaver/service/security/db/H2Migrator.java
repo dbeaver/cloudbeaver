@@ -1,3 +1,19 @@
+/*
+ * DBeaver - Universal Database Manager
+ * Copyright (C) 2010-2023 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.cloudbeaver.service.security.db;
 
 import org.jkiss.code.NotNull;
@@ -25,11 +41,10 @@ public class H2Migrator {
     private static final String H2_V2_DRIVER_NAME = "h2_embedded_v2";
     private static final String BACKUP_V1_FILENAME = "h2db_backup";
     private static final String EXPORT_FILE_NAME = "H2v1ExportScript";
-    @SuppressWarnings("SqlNoDataSourceInspection")
     // language=H2
     private static final String EXPORT_SCRIPT = "SCRIPT TO ? COMPRESSION DEFLATE CIPHER AES PASSWORD ? CHARSET 'UTF-8'";
-    @SuppressWarnings("SqlNoDataSourceInspection")
-    // no 'language=H2' due to an annoying error about unresolvable statement 'FROM_1X'
+
+    // no 'language=H2' — due to an annoying error about unresolvable statement 'FROM_1X'
     private static final String IMPORT_SCRIPT = "RUNSCRIPT FROM ? COMPRESSION DEFLATE CIPHER AES PASSWORD ? CHARSET 'UTF-8' FROM_1X";
 
     private final DBRProgressMonitor monitor;
