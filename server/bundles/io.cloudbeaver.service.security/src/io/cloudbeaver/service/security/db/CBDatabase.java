@@ -158,12 +158,13 @@ public class CBDatabase {
         var migrator = new H2Migrator(monitor, dataSourceProviderRegistry, databaseConfiguration, dbURL, dbProperties);
         migrator.migrateDatabaseIfNeeded();
 
-        // reload the driver due to a possible configuration instance update
+        // reload the driver and url due to a possible configuration update
         driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
         if (driver == null) {
             throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
         }
         Driver driverInstance = driver.getDriverInstance(monitor);
+        dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), variablesResolver);
 
         // Create connection pool with custom connection factory
         log.debug("\tInitiate connection pool with management database (" + driver.getFullName() + "; " + dbURL + ")");

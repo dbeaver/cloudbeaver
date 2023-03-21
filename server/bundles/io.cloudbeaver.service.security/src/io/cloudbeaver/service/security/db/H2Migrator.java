@@ -37,15 +37,8 @@ public class H2Migrator {
 
     private static final Log log = Log.getLog(H2Migrator.class);
 
-    private static final String H2_V1_FILE_NAME = "cb.h2.dat";
-    private static final String H2_V2_FILE_NAME = "cb.h2v2.dat";
-
-    private static final String H2_V1_DRIVER_NAME = "h2_embedded";
+    private static final String V1_DRIVER_NAME = "h2_embedded";
     private static final String H2_V2_DRIVER_NAME = "h2_embedded_v2";
-
-    private static final String BACKUP_V1_FILENAME = "h2db_v1_backup";
-
-    private static final String EXPORT_FILE_NAME = "H2v1ExportScript";
 
     // language=H2
     private static final String EXPORT_SCRIPT = "SCRIPT TO ? COMPRESSION DEFLATE CIPHER AES PASSWORD ? CHARSET 'UTF-8'";
@@ -87,8 +80,8 @@ public class H2Migrator {
      * </p>
      */
     public void migrateDatabaseIfNeeded() {
-        if (!dbUrl.endsWith(H2_V1_FILE_NAME) ||
-            !H2_V1_DRIVER_NAME.equals(databaseConfiguration.getDriver()) ||
+        if (!dbUrl.endsWith(WorkspacePaths.V1_DB_NAME) ||
+            !V1_DRIVER_NAME.equals(databaseConfiguration.getDriver()) ||
             dbUrl.startsWith("jdbc:h2:mem:")
         ) {
             log.trace("No migration needed");
@@ -98,10 +91,10 @@ public class H2Migrator {
         var workspacePaths = new WorkspacePaths(dbUrl);
 
         // the changed config is not written to disk immediately, so it is possible that the database is migrated, but the config on disk remains old
-        if (workspacePaths.dbV2Path.toFile().exists() &&
-            (dbUrl.endsWith(H2_V1_FILE_NAME) || H2_V1_DRIVER_NAME.equals(databaseConfiguration.getDriver()))
+        if (workspacePaths.v2Paths.dbDataFile.toFile().exists() &&
+            (dbUrl.endsWith(WorkspacePaths.V1_DB_NAME) || V1_DRIVER_NAME.equals(databaseConfiguration.getDriver()))
         ) {
-            updateConfig();
+            updateConfig(workspacePaths);
             return;
         }
 
@@ -117,7 +110,7 @@ public class H2Migrator {
     private void migrateDatabase(@NotNull WorkspacePaths workspacePaths) throws DBException, SQLException, IOException {
         log.info("H2 database v1 -> v2 migration started");
 
-        final var v1Driver = getDriver(H2_V1_DRIVER_NAME);
+        final var v1Driver = getDriver(V1_DRIVER_NAME);
         final var v2Driver = getDriver(H2_V2_DRIVER_NAME);
 
         final var exportFilePath = workspacePaths.exportFilePath.toString();
@@ -126,16 +119,19 @@ public class H2Migrator {
         log.info("Exporting v1 database");
         executeScript(v1Driver, EXPORT_SCRIPT, exportFilePath, password);
 
-        log.info("Creating v1 database backup '" + workspacePaths.dbV1BackupPath + "'");
-        Files.move(workspacePaths.dbV1Path, workspacePaths.dbV1BackupPath, StandardCopyOption.REPLACE_EXISTING);
+        log.info("Creating v1 database backup '" + workspacePaths.v1DataBackupPath + "'");
+        Files.move(workspacePaths.v1Paths.dbDataFile, workspacePaths.v1DataBackupPath, StandardCopyOption.REPLACE_EXISTING);
+        if (workspacePaths.v1Paths.dbTraceFile.toFile().exists()) {
+            Files.move(workspacePaths.v1Paths.dbTraceFile, workspacePaths.v1TraceBackupPath, StandardCopyOption.REPLACE_EXISTING);
+        }
 
         log.info("Importing data to new v2 database");
         executeScript(v2Driver, IMPORT_SCRIPT, exportFilePath, password);
 
-        updateConfig();
+        updateConfig(workspacePaths);
 
-        removeExportFile(workspacePaths.dbFolderPath);
-        log.debug("Export file removed");
+        removeExportFile(workspacePaths);
+        log.debug("Export file removed '" + workspacePaths.exportFilePath + "'");
     }
 
     @NotNull
@@ -162,73 +158,96 @@ public class H2Migrator {
         }
     }
 
-    private void updateConfig() {
+    private void updateConfig(@NotNull WorkspacePaths workspacePaths) {
         if (!H2_V2_DRIVER_NAME.equals(databaseConfiguration.getDriver())) {
-            log.info("Using database driver '" + H2_V2_DRIVER_NAME + "' instead of '" + H2_V1_DRIVER_NAME + "' from config");
+            log.info("Using database driver '" + H2_V2_DRIVER_NAME + "' instead of '" + V1_DRIVER_NAME + "' from config");
             databaseConfiguration.setDriver(H2_V2_DRIVER_NAME);
         }
 
-        var updatedDbUrl = CommonUtils.replaceLast(dbUrl, H2_V1_FILE_NAME, H2_V2_FILE_NAME);
+        var updatedDbUrl = CommonUtils.replaceLast(dbUrl, workspacePaths.v1Paths.dbName, workspacePaths.v2Paths.dbName);
         if (!updatedDbUrl.equals(databaseConfiguration.getUrl())) {
-            log.info("Using database file '" + H2_V2_FILE_NAME + "' instead of '" + H2_V1_FILE_NAME + "' from config");
+            log.info("Using database file '" + workspacePaths.v2Paths.dbDataFile + "' instead of '" + workspacePaths.v1Paths.dbDataFile + "' from config");
             databaseConfiguration.setUrl(updatedDbUrl);
         }
     }
 
-    private void removeExportFile(@NotNull Path dbFolderPath) {
-        var dbFolder = dbFolderPath.toFile();
-        if (!dbFolder.exists()) {
-            return;
-        }
-        var exportFile = dbFolder.listFiles((file, name) -> name.equals(EXPORT_FILE_NAME));
-        if (exportFile == null || exportFile.length == 0) {
-            return;
-        }
-        var fileDeleted = exportFile[0].delete();
-        if (!fileDeleted) {
-            log.error("Unable to remove H2 v1 export script file");
+    private void removeExportFile(@NotNull WorkspacePaths workspacePaths) {
+        var exportFile = workspacePaths.exportFilePath.toFile();
+        if (exportFile.exists()) {
+            if (!exportFile.delete()) {
+                log.error("Unable to remove H2 v1 export script file");
+            }
         }
     }
 
     private void rollback(@NotNull WorkspacePaths workspacePaths) {
-        removeExportFile(workspacePaths.dbFolderPath);
+        removeExportFile(workspacePaths);
         try {
-            Files.move(workspacePaths.dbV1BackupPath, workspacePaths.dbV1Path, StandardCopyOption.REPLACE_EXISTING);
+            Files.move(workspacePaths.v1DataBackupPath, workspacePaths.v1Paths.dbDataFile, StandardCopyOption.REPLACE_EXISTING);
+            if (workspacePaths.v1TraceBackupPath.toFile().exists()) {
+                Files.move(workspacePaths.v1TraceBackupPath, workspacePaths.v1Paths.dbTraceFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+            log.info("v1 files restored");
         } catch (IOException e) {
-            log.error("Unable to restore old database file '" + workspacePaths.dbV1Path + "'");
+            log.error("Unable to restore old database file '" + workspacePaths.v1Paths.dbDataFile + "'");
         }
     }
 
 
     private static class WorkspacePaths {
+
+        private static final String V1_DB_NAME = "cb.h2.dat";
+        private static final String V2_DB_NAME = "cb.h2v2.dat";
+
+        private static final String V1_DATA_BACKUP_FILE_NAME = "h2db_v1_backup";
+        private static final String V1_TRACE_BACKUP_FILE_NAME = "h2db_trace_v1_backup";
+
+        private static final String EXPORT_SCRIPT_FILE_NAME = "H2v1ExportScript";
+
         @NotNull
-        private final Path dbV1Path;
+        private final H2FilesPaths v1Paths;
         @NotNull
-        private final Path dbV2Path;
+        private final H2FilesPaths v2Paths;
+
         @NotNull
-        private final Path dbFolderPath;
+        private final Path v1DataBackupPath;
         @NotNull
-        private final Path dbV1BackupPath;
+        private final Path v1TraceBackupPath;
         @NotNull
         private final Path exportFilePath;
 
         private WorkspacePaths(@NotNull String dbUrl) {
-            var filePath = getFilePath(dbUrl);
-            dbV1Path = Paths.get(CommonUtils.replaceLast(filePath, H2_V2_FILE_NAME, H2_V1_FILE_NAME));
-            dbV2Path = Paths.get(CommonUtils.replaceLast(filePath, H2_V1_FILE_NAME, H2_V2_FILE_NAME));
+            var dbFolderPath = getFolderPath(dbUrl);
 
-            dbFolderPath = dbV1Path.getParent();
-            dbV1BackupPath = dbFolderPath.resolve(BACKUP_V1_FILENAME);
-            exportFilePath = dbFolderPath.resolve(EXPORT_FILE_NAME);
+            v1Paths = new H2FilesPaths(dbFolderPath, V1_DB_NAME);
+            v2Paths = new H2FilesPaths(dbFolderPath, V2_DB_NAME);
+
+            v1DataBackupPath = dbFolderPath.resolve(V1_DATA_BACKUP_FILE_NAME);
+            v1TraceBackupPath = dbFolderPath.resolve(V1_TRACE_BACKUP_FILE_NAME);
+
+            exportFilePath = dbFolderPath.resolve(EXPORT_SCRIPT_FILE_NAME);
         }
 
         @NotNull
-        private static String getFilePath(@NotNull String dbUrl) {
-            var filePath = dbUrl.substring("jdbc:h2:".length());
-            if (!filePath.endsWith(".mv.db")) {
-                filePath += ".mv.db";
-            }
-            return filePath;
+        private static Path getFolderPath(@NotNull String dbUrl) {
+            var filePath = Paths.get(dbUrl.substring("jdbc:h2:".length()));
+            return filePath.getParent();
+        }
+    }
+
+    private static class H2FilesPaths {
+        @NotNull
+        private final String dbName;
+        @NotNull
+        private final Path dbDataFile;
+        @NotNull
+        private final Path dbTraceFile;
+
+        private H2FilesPaths(@NotNull Path folderPath, @NotNull String dbName) {
+            this.dbName = dbName;
+
+            dbDataFile = folderPath.resolve(dbName + ".mv.db");
+            dbTraceFile = folderPath.resolve(dbName + ".trace.db");
         }
     }
 }
