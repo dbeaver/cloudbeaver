@@ -56,6 +56,8 @@ type DatabaseObjectInfo {
 type NavigatorNodeInfo {
     # Node ID - generally a full path to the node from root of tree
     id: ID!
+    # Node path part related to the current node
+    nodePathItem: String!
     # Node human readable name
     name: String
     #Node full name

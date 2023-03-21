@@ -78,6 +78,11 @@ public class WebNavigatorNodeInfo {
     }
 
     @Property
+    public String getNodePathItem() {
+        return node.getNavNodePathItem();
+    }
+
+    @Property
     public String getName() {
         return node.getLocalizedName(session.getLocale());
     }
