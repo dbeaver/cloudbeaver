@@ -43,15 +43,17 @@ import java.util.List;
 public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
 
     private final RMResource resource;
+    private final String nodeType;
 
     DBNResourceManagerResource(DBNNode parentNode, RMResource resource) {
         super(parentNode);
         this.resource = resource;
+        this.nodeType = "rm." + (resource.isFolder() ? "folder" : "resource");
     }
 
     @Override
     public String getNodeType() {
-        return "rm.resource";
+        return nodeType;
     }
 
     @Override
