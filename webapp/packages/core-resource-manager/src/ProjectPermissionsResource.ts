@@ -17,7 +17,7 @@ export class ProjectPermissionsResource extends CachedDataResource<PermissionInf
     private readonly graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource
   ) {
-    super([]);
+    super(() => []);
 
     this.sync(serverConfigResource, () => {}, () => {});
   }

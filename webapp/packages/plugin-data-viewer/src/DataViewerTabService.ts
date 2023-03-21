@@ -65,7 +65,7 @@ export class DataViewerTabService {
           if (!tab.handlerState.connectionKey) {
             return false;
           }
-          return this.connectionInfoResource.includes(connectionsKey, tab.handlerState.connectionKey);
+          return this.connectionInfoResource.isIntersect(connectionsKey, tab.handlerState.connectionKey);
         })
       ));
 

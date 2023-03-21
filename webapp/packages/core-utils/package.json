@@ -8,7 +8,7 @@
   "module": "lib/index.js",
   "types": "src/index.ts",
   "scripts": {
-    "prebuild": "rimraf lib/*",
+    "prebuild": "rimraf --glob lib/*",
     "build": "webpack --config ../../configs/webpack.plugin.config.js",
     "postbuild": "tsc",
     "lint": "eslint ./src/ --ext .ts,.tsx",
@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@types/md5": "~2.3.2",
-    "@types/uuid": "~9.0.0",
+    "@types/uuid": "~9.0.1",
     "@types/underscore": "^1.11.4"
   }
 }

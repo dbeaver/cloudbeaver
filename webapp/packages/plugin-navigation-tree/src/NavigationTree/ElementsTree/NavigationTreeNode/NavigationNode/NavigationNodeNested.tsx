@@ -7,10 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useContext, useMemo } from 'react';
+import { forwardRef, useContext, useDeferredValue, useMemo } from 'react';
 import styled from 'reshadow';
 
 import { getComputed, TreeNodeNested, TreeNodeNestedMessage, TREE_NODE_STYLES, useTranslate } from '@cloudbeaver/core-blocks';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { ElementsTreeContext } from '../../ElementsTreeContext';
 import type { NavTreeNodeComponent } from '../../NavigationNodeComponent';
@@ -19,7 +20,6 @@ interface Props {
   nodeId?: string;
   component: NavTreeNodeComponent;
   path: string[];
-  dndNodes?: string[];
   root?: boolean;
   className?: string;
 }
@@ -28,7 +28,6 @@ export const NavigationNodeNested = observer(forwardRef<HTMLDivElement, Props>(f
   nodeId,
   component,
   path,
-  dndNodes,
   root,
   className,
 }, ref) {
@@ -36,51 +35,43 @@ export const NavigationNodeNested = observer(forwardRef<HTMLDivElement, Props>(f
   const translate = useTranslate();
 
   const NavigationNode = component;
-  const nextPath = useMemo(() => [...path, nodeId ?? ''], [path, nodeId]);
-  const children: string[] = [...(dndNodes || [])];
+  const nextPath = useMemo(() => [...path, nodeId].filter((a): a is string => a !== undefined), [path, nodeId]);
+  let children: string[] = [];
   let empty = true;
+  let rootFolder = false;
 
   if (nodeId !== undefined) {
-    children.push(...getComputed(
-      () => treeContext?.tree.getNodeChildren(nodeId) || []
+    rootFolder = getComputed(() => (
+      !!root && treeContext?.folderExplorer.state.folder !== treeContext?.folderExplorer.root
     ));
 
-    const state = getComputed(
-      () => treeContext?.tree.getNodeState(nodeId)
-    );
 
-    if (root) {
-      const rootFolder = getComputed(() => (
-        treeContext?.folderExplorer.state.folder !== treeContext?.folderExplorer.root
+    if (!rootFolder) {
+      children = getComputed(
+        () => treeContext?.tree.getNodeChildren(nodeId) || [],
+        (a, b) => isArraysEqual(a, b, undefined, true));
+      empty = getComputed(() => (
+        children.length === 0 && (
+          !treeContext?.tree.filtering
+        || !!treeContext.tree.getNodeState(nodeId).showInFilter
+        )
       ));
-
-      if (rootFolder) {
-        return styled(TREE_NODE_STYLES)(
-          <NavigationNode nodeId={nodeId} path={path} expanded />
-        );
-      }
     }
+  }
 
-    empty = getComputed(() => (
-      children.length === 0 && (
-        !treeContext?.tree.filtering
-        || !!state?.showInFilter
-      )
-    ));
-  } else {
-    empty = children.length === 0;
+  children = useDeferredValue(children);
+  empty = useDeferredValue(empty);
+
+  if (nodeId !== undefined && rootFolder) {
+    return styled(TREE_NODE_STYLES)(
+      <NavigationNode nodeId={nodeId} path={path} expanded />
+    );
   }
 
   return styled(TREE_NODE_STYLES)(
     <TreeNodeNested ref={ref} root={root} className={className}>
       {children.map(child => (
-        <NavigationNode
-          key={child}
-          nodeId={child}
-          path={nextPath}
-          dragging={dndNodes?.includes(child)}
-          expanded={dndNodes?.includes(child) === true ? false : undefined}
-        />
+        <NavigationNode key={child} nodeId={child} path={nextPath} />
       ))}
       {empty && (
         <TreeNodeNestedMessage>
