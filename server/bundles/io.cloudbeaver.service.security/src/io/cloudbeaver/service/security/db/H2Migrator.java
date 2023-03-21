@@ -38,7 +38,7 @@ public class H2Migrator {
     private static final Log log = Log.getLog(H2Migrator.class);
 
     private static final String V1_DRIVER_NAME = "h2_embedded";
-    private static final String H2_V2_DRIVER_NAME = "h2_embedded_v2";
+    private static final String V2_DRIVER_NAME = "h2_embedded_v2";
 
     // language=H2
     private static final String EXPORT_SCRIPT = "SCRIPT TO ? COMPRESSION DEFLATE CIPHER AES PASSWORD ? CHARSET 'UTF-8'";
@@ -112,7 +112,7 @@ public class H2Migrator {
         log.info("H2 database v1 -> v2 migration started");
 
         final var v1Driver = getDriver(V1_DRIVER_NAME);
-        final var v2Driver = getDriver(H2_V2_DRIVER_NAME);
+        final var v2Driver = getDriver(V2_DRIVER_NAME);
 
         final var exportFilePath = workspacePaths.exportFilePath.toString();
         final var password = dbProperties.getProperty(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD);
@@ -160,9 +160,9 @@ public class H2Migrator {
     }
 
     private void updateConfig(@NotNull WorkspacePaths workspacePaths) {
-        if (!H2_V2_DRIVER_NAME.equals(databaseConfiguration.getDriver())) {
-            log.info("Using database driver '" + H2_V2_DRIVER_NAME + "' instead of '" + V1_DRIVER_NAME + "' from config");
-            databaseConfiguration.setDriver(H2_V2_DRIVER_NAME);
+        if (!V2_DRIVER_NAME.equals(databaseConfiguration.getDriver())) {
+            log.info("Using database driver '" + V2_DRIVER_NAME + "' instead of '" + V1_DRIVER_NAME + "' from config");
+            databaseConfiguration.setDriver(V2_DRIVER_NAME);
         }
 
         var updatedDbUrl = CommonUtils.replaceLast(dbUrl, workspacePaths.v1Paths.dbName, workspacePaths.v2Paths.dbName);
