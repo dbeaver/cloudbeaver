@@ -90,7 +90,8 @@ public class H2Migrator {
 
         var workspacePaths = new WorkspacePaths(dbUrl);
 
-        // the changed config is not written to disk immediately, so it is possible that the database is migrated, but the config on disk remains old
+        // the changed config is not written to disk immediately, so it is possible that the database is migrated,
+        // but the config on disk remains old
         if (workspacePaths.v2Paths.dbDataFile.toFile().exists() &&
             (dbUrl.endsWith(WorkspacePaths.V1_DB_NAME) || V1_DRIVER_NAME.equals(databaseConfiguration.getDriver()))
         ) {
@@ -166,7 +167,8 @@ public class H2Migrator {
 
         var updatedDbUrl = CommonUtils.replaceLast(dbUrl, workspacePaths.v1Paths.dbName, workspacePaths.v2Paths.dbName);
         if (!updatedDbUrl.equals(databaseConfiguration.getUrl())) {
-            log.info("Using database file '" + workspacePaths.v2Paths.dbDataFile + "' instead of '" + workspacePaths.v1Paths.dbDataFile + "' from config");
+            log.info("Using database file '" + workspacePaths.v2Paths.dbDataFile + "' instead of '"
+                + workspacePaths.v1Paths.dbDataFile + "' from config");
             databaseConfiguration.setUrl(updatedDbUrl);
         }
     }
