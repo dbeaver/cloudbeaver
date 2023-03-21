@@ -11,6 +11,7 @@ import { computed, makeObservable } from 'mobx';
 import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
 import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
@@ -97,6 +98,7 @@ export class ProjectsService extends Dependency {
     private readonly userDataService: UserDataService,
     private readonly projectInfoEventHandler: ProjectInfoEventHandler,
     private readonly dataSynchronizationService: DataSynchronizationService,
+    private readonly navTreeResource: NavTreeResource,
     navigationService: NavigationService
   ) {
     super();
@@ -139,6 +141,7 @@ export class ProjectsService extends Dependency {
 
     this.projectInfoEventHandler.onEvent<IProjectUpdateEvent>(ServerEventId.CbRmProjectAdded, () => {
       this.projectInfoResource.markOutdated();
+      this.navTreeResource.markOutdated(ROOT_NODE_PATH);
     }, undefined, this.projectInfoResource);
 
     this.projectInfoEventHandler.onEvent<IProjectUpdateEvent>(ServerEventId.CbRmProjectRemoved, key => {
