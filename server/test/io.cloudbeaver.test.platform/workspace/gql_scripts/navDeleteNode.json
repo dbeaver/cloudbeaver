@@ -2,7 +2,7 @@
   "query": "\n    mutation navDeleteNodes($nodePaths: [ID!]!) {\n  navDeleteNodes(nodePaths: $nodePaths)\n}\n    ",
   "variables": {
     "nodePaths": [
-      "rm!root/rm.project!u_test/rm.resource!testScript.sql"
+      "rm:root/rm.project:u_test/rm.resource:testScript.sql"
     ]
   },
   "operationName": "navDeleteNodes"
