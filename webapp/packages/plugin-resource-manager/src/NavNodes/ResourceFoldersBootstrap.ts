@@ -15,9 +15,9 @@ import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/c
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NavTreeResource, NavNodeManagerService, NavNodeInfoResource, type INodeMoveData, navNodeMoveContext, getNodesFromContext, ENodeMoveType, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfo, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { IResourceManagerParams, NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
-import { CachedMapAllKey, getCachedMapResourceLoaderState, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { createPath } from '@cloudbeaver/core-utils';
+import { getRmResourceKey, getRmResourcePath, NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
+import { CachedMapAllKey, CachedTreeChildrenKey, getCachedMapResourceLoaderState, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { createPath, getPathParent, isDefined } from '@cloudbeaver/core-utils';
 import { ActionService, MenuService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, DATA_CONTEXT_LOADABLE_STATE } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
@@ -25,7 +25,7 @@ import { FolderDialog } from '@cloudbeaver/plugin-projects';
 import { ResourceManagerService } from '../ResourceManagerService';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../Tree/DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
 import { getResourceKeyFromNodeId } from './getResourceKeyFromNodeId';
-import { getResourceParentNodeId } from './getResourceNodeId';
+import { getResourceNodeId } from './getResourceNodeId';
 import { getRmProjectNodeId } from './getRmProjectNodeId';
 
 interface ITargetNode {
@@ -172,8 +172,11 @@ export class ResourceFoldersBootstrap extends Bootstrap {
         if (targetNode.folderId) {
           const resourceKey = getResourceKeyFromNodeId(targetNode.folderId);
 
-          if (resourceKey) {
-            path = createPath(resourceKey.path, resourceKey.name);
+          if (resourceKey !== undefined) {
+            const key = getRmResourceKey(resourceKey);
+            if (key.path) {
+              path = resourceKey;
+            }
           }
         }
 
@@ -193,16 +196,19 @@ export class ResourceFoldersBootstrap extends Bootstrap {
               return false;
             }
 
-            await this.resourceManagerResource.load({ projectId, path });
+            const key = path !== undefined ? path : getRmResourcePath(projectId);
 
-            return !this.resourceManagerResource.has({ projectId, path, name: trimmed });
+            await this.resourceManagerResource.load(CachedTreeChildrenKey(key));
+
+            return !this.resourceManagerResource.has(createPath(key, trimmed));
           },
         });
 
         if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
           try {
+            const key = path !== undefined ? path : getRmResourcePath(result.projectId);
             await this.resourceManagerResource.create(
-              { projectId: result.projectId, path, name: result.folder },
+              createPath(key, result.folder),
               true
             );
 
@@ -283,17 +289,21 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     this.navNodeManagerService.onMove.addHandler(this.moveResourceToFolder.bind(this));
     let syncOutdate = true;
 
-    this.navNodeInfoResource.onDataUpdate.addHandler(executorHandlerFilter(
+    this.navNodeInfoResource.onItemUpdate.addHandler(executorHandlerFilter(
       () => syncOutdate,
       key => {
         syncOutdate = false;
         try {
-          const resources = ResourceKeyUtils
+          const resources = [...new Set(ResourceKeyUtils
             .mapArray(key, getResourceKeyFromNodeId)
-            .filter((obj: any): obj is IResourceManagerParams => !!obj)
-            .map<IResourceManagerParams>(key => ({ projectId: key.projectId, path: key.path }));
+            .filter(isDefined)
+            .map(getPathParent))];
 
-          this.resourceManagerResource.markOutdated(resourceKeyList(resources)); // because of this
+          const keyList = resourceKeyList(resources);
+
+          if (!this.resourceManagerResource.isOutdated(keyList)) {
+            this.resourceManagerResource.markOutdated(keyList); // because of this
+          }
         } finally {
           syncOutdate = true;
         }
@@ -305,28 +315,22 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       key => {
         const resources = ResourceKeyUtils
           .mapArray(key, getResourceKeyFromNodeId)
-          .filter((obj: any): obj is IResourceManagerParams => !!obj);
+          .filter(isDefined);
 
         this.resourceManagerResource.delete(resourceKeyList(resources));
       }
     ));
 
-    this.resourceManagerResource.onDataUpdate.addHandler(executorHandlerFilter(
+    this.resourceManagerResource.onItemUpdate.addHandler(executorHandlerFilter(
       () => syncOutdate,
       key => {
         syncOutdate = false;
         try {
-          const updated: string[] = [];
-
-          ResourceKeyUtils.forEach(key, key => {
-            const parentId = getResourceParentNodeId(key);
-
-            if (!updated.includes(parentId)) {
-              updated.push(parentId);
-            }
-          });
-
-          this.navTreeResource.markTreeOutdated(resourceKeyList(updated));
+          const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getResourceNodeId)
+            .map(getPathParent))]);
+          if (!this.navTreeResource.isOutdated(updated)) {
+            this.navTreeResource.markTreeOutdated(updated);
+          }
         } finally {
           syncOutdate = true;
         }

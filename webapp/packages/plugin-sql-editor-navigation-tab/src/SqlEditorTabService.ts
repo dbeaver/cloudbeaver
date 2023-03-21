@@ -31,7 +31,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { objectNavNodeProvider, NodeManagerUtils, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider, projectSetter, projectSetterState } from '@cloudbeaver/core-projects';
-import { NavNodeInfoFragment, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { NavNodeInfoFragment, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { NavigationTabsService, TabHandler, ITab, ITabOptions } from '@cloudbeaver/plugin-navigation-tabs';
 import { SqlResultTabsService, ISqlEditorTabState, SqlEditorService, SqlDataSourceService, ESqlDataSourceFeatures, ISQLDatasourceUpdateData } from '@cloudbeaver/plugin-sql-editor';
@@ -102,7 +102,7 @@ export class SqlEditorTabService extends Bootstrap {
     this.sqlDataSourceService.onUpdate.addHandler(this.syncDatasourceUpdate.bind(this));
     this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
     this.connectionInfoResource.onItemDelete.addHandler(this.handleConnectionDelete.bind(this));
-    this.connectionExecutionContextResource.onItemAdd.addHandler(this.handleExecutionContextUpdate.bind(this));
+    this.connectionExecutionContextResource.onItemUpdate.addHandler(this.handleExecutionContextUpdate.bind(this));
     this.connectionExecutionContextResource.onItemDelete.addHandler(this.handleExecutionContextDelete.bind(this));
   }
 
@@ -149,7 +149,7 @@ export class SqlEditorTabService extends Bootstrap {
     this.attachToProject(tab, null);
   }
 
-  private async handleConnectionDelete(key: ResourceKey<IConnectionInfoParams>) {
+  private async handleConnectionDelete(key: ResourceKeySimple<IConnectionInfoParams>) {
     const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
       isSQLEditorTab(tab => {
         const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
@@ -167,7 +167,7 @@ export class SqlEditorTabService extends Bootstrap {
           dataSource.executionContext.connectionId
         );
 
-        if (this.connectionInfoResource.includes(key, contextConnection)) {
+        if (this.connectionInfoResource.isIntersect(key, contextConnection)) {
           this.resetConnectionInfo(tab);
         }
       }
@@ -225,14 +225,14 @@ export class SqlEditorTabService extends Bootstrap {
     };
   }
 
-  private async handleExecutionContextUpdate(key: ResourceKey<string>) {
+  private async handleExecutionContextUpdate(key: ResourceKeySimple<string>) {
     const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
       isSQLEditorTab(tab => {
         const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
 
         return (
           !!dataSource?.executionContext
-          && ResourceKeyUtils.includes(key, dataSource.executionContext.id)
+          && ResourceKeyUtils.isIntersect(key, dataSource.executionContext.id)
         );
       })
     );
@@ -259,7 +259,7 @@ export class SqlEditorTabService extends Bootstrap {
     }
   }
 
-  private async handleExecutionContextDelete(key: ResourceKey<string>) {
+  private async handleExecutionContextDelete(key: ResourceKeySimple<string>) {
     const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
       isSQLEditorTab(tab => {
         const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
@@ -278,7 +278,7 @@ export class SqlEditorTabService extends Bootstrap {
         );
 
         if (
-          ResourceKeyUtils.includes(key, dataSource.executionContext!.id)
+          ResourceKeyUtils.isIntersect(key, dataSource.executionContext!.id)
           && !this.connectionInfoResource.has(contextConnection)
         ) {
           this.resetConnectionInfo(tab);
@@ -481,7 +481,7 @@ export class SqlEditorTabService extends Bootstrap {
           dataSource.executionContext.connectionId
         );
 
-        if (!this.connectionInfoResource.includes(connectionsKey, connectionKey)) {
+        if (!this.connectionInfoResource.isIntersect(connectionsKey, connectionKey)) {
           continue;
         }
 

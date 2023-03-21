@@ -1,3 +1,13 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2023 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+/* eslint-disable @typescript-eslint/no-var-requires */
+
+const testingAttributes = require('../lib/babel-plugins/TestingAttributes.js');
 const devMode = process.env.NODE_ENV !== 'production';
 const testMode = process.env.NODE_ENV === 'test';
 const { warn } = console;
@@ -62,7 +72,8 @@ module.exports = {
     ['@babel/plugin-proposal-decorators', { legacy: true }],
     ['@babel/plugin-proposal-class-properties'],
     ['@babel/plugin-proposal-object-rest-spread', { useBuiltIns: true }],
-    require('@reshadow/babel'),
+    [testingAttributes, {}],
+    [require('@reshadow/babel'), { }],
     /*devMode &&*/[
       'babel-plugin-module-resolver',
       {

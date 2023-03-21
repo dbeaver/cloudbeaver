@@ -75,7 +75,7 @@ public class CBPlatform extends BasePlatformImpl {
     private QMRegistryImpl queryManager;
     private QMLogFileWriter qmLogWriter;
     private DBACertificateStorage certificateStorage;
-    private WebWorkspace workspace;
+    private WebGlobalWorkspace workspace;
 
     private final List<DBPDriver> applicableDrivers = new ArrayList<>();
 
@@ -132,7 +132,7 @@ public class CBPlatform extends BasePlatformImpl {
         SecurityProviderUtils.registerSecurityProvider();
 
         // Register properties adapter
-        this.workspace = new WebWorkspace(this, ResourcesPlugin.getWorkspace());
+        this.workspace = new WebGlobalWorkspace(this, ResourcesPlugin.getWorkspace());
         this.workspace.initializeProjects();
 
         QMUtils.initApplication(this);

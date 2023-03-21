@@ -7,9 +7,8 @@
  */
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
-import type { IResourceManagerParams } from '@cloudbeaver/core-resource-manager';
 
 export interface IResourceSqlDataSourceState {
-  resourceKey?: IResourceManagerParams;
+  resourceKey?: string;
   executionContext?: IConnectionExecutionContextInfo;
 }

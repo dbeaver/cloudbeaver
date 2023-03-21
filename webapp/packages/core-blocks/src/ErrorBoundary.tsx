@@ -24,7 +24,9 @@ const style = css`
 
 interface Props {
   onRefresh?: () => any;
+  icon?: boolean;
   root?: boolean;
+  inline?: boolean;
   remount?: boolean;
   className?: string;
 }
@@ -74,7 +76,7 @@ export class ErrorBoundary
   }
 
   render(): React.ReactNode {
-    const { root, children, className } = this.props;
+    const { root, inline, icon, children, className } = this.props;
 
     for (const errorData of this.state.exceptions) {
       if (root) {
@@ -91,6 +93,8 @@ export class ErrorBoundary
       } else {
         return (
           <ExceptionMessage
+            inline={inline}
+            icon={icon}
             className={className}
             exception={errorData.error}
             onRetry={this.canRefresh ? this.refresh : undefined}

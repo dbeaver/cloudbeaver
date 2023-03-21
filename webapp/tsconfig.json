@@ -4,11 +4,10 @@
     "typings.d.ts"
   ],
   "include": [
-    "src"
+    "**/src"
   ],
   "exclude": [
     "**/node_modules",
-    "**/.*/"
   ],
   "compilerOptions": {
     "baseUrl": ".",

@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useRef } from 'react';
+import { forwardRef, useRef, useState } from 'react';
 import styled from 'reshadow';
 
 import { getComputed, IMenuState, joinStyles, Loader, Menu, MenuItemElement, menuPanelStyles, useAutoLoad, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
@@ -42,12 +42,13 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
   const menu = useRef<IMenuState>();
   const styles = useStyles(menuPanelStyles, style);
   const subMenuData = useMenu({ menu: subMenu.menu, context: menuData.context });
+  const [visible, setVisible] = useState(false);
   subMenuData.context.set(DATA_CONTEXT_MENU_NESTED, true);
   subMenuData.context.set(DATA_CONTEXT_SUBMENU_ITEM, subMenu);
 
   const handler = subMenuData.handler;
   const hidden = getComputed(() => handler?.isHidden?.(subMenuData.context));
-  useAutoLoad(subMenuData.loaders, !hidden);
+  useAutoLoad(subMenuData.loaders, !hidden, visible);
 
   const handlers = useObjectRef(() => ({
     handleItemClose() {
@@ -60,6 +61,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
       );
     },
     handleVisibleSwitch(visible: boolean) {
+      setVisible(visible);
       if (visible) {
         this.subMenu.events?.onOpen?.();
         this.handler?.handler?.(this.subMenuData.context);

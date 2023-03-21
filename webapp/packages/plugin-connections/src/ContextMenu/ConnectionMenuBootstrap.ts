@@ -11,12 +11,15 @@ import { Connection, ConnectionInfoResource, ConnectionsManagerService, Connecti
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual, NavigatorViewSettings, PermissionsService } from '@cloudbeaver/core-root';
-import { ActionService, ACTION_DELETE, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual, NavigatorViewSettings, PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
+import { ActionService, ACTION_DELETE, DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
+import { ConnectionAuthService } from '../ConnectionAuthService';
 import { PluginConnectionsSettingsService } from '../PluginConnectionsSettingsService';
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService';
+import { ACTION_CONNECTION_CHANGE_CREDENTIALS } from './Actions/ACTION_CONNECTION_CHANGE_CREDENTIALS';
 import { ACTION_CONNECTION_DISCONNECT } from './Actions/ACTION_CONNECTION_DISCONNECT';
 import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DISCONNECT_ALL';
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT';
@@ -40,6 +43,8 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     private readonly connectionsSettingsService: ConnectionsSettingsService,
     private readonly pluginConnectionsSettingsService: PluginConnectionsSettingsService,
     private readonly permissionsService: PermissionsService,
+    private readonly connectionAuthService: ConnectionAuthService,
+    private readonly serverConfigResource: ServerConfigResource,
   ) {
     super();
   }
@@ -153,6 +158,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       isApplicable: context => context.has(DATA_CONTEXT_CONNECTION) && !context.has(DATA_CONTEXT_MENU_NESTED),
       getItems: (context, items) => [
         ...items,
+        ACTION_CONNECTION_CHANGE_CREDENTIALS,
         ACTION_CONNECTION_EDIT,
         ACTION_CONNECTION_DISCONNECT,
         ACTION_CONNECTION_DISCONNECT_ALL,
@@ -189,7 +195,20 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           return connection.canEdit || connection.canViewSettings;
         }
 
+        if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
+          return this.serverConfigResource.distributed && connection.credentialsSaved === true;
+        }
+
         return false;
+      },
+      getLoader: (context, action) => {
+        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
+        const connection = context.get(DATA_CONTEXT_CONNECTION);
+
+        return state.getState(
+          action.id,
+          () => getCachedMapResourceLoaderState(this.connectionInfoResource, createConnectionParam(connection), ['includeCredentialsSaved'], true)
+        );
       },
       handler: async (context, action) => {
         const connection = context.get(DATA_CONTEXT_CONNECTION);
@@ -217,6 +236,13 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           }
           case ACTION_CONNECTION_EDIT: {
             this.publicConnectionFormService.open(connection.projectId, { connectionId: connection.id });
+            break;
+          }
+          case ACTION_CONNECTION_CHANGE_CREDENTIALS: {
+            await this.connectionAuthService.auth(
+              { connectionId: connection.id, projectId: connection.projectId },
+              true
+            );
             break;
           }
         }

@@ -7,18 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  GraphQLService,
-  CachedMapResource,
-  ResourceKey,
-  resourceKeyList,
-  ResourceKeyList,
-  ResourceKeyUtils,
-  AdminTeamInfoFragment,
-  AdminConnectionGrantInfo,
-  CachedMapAllKey,
-  GetTeamsListQueryVariables
-} from '@cloudbeaver/core-sdk';
+import { GraphQLService, CachedMapResource, ResourceKey, ResourceKeyUtils, AdminTeamInfoFragment, AdminConnectionGrantInfo, CachedMapAllKey, GetTeamsListQueryVariables, ResourceKeySimple, resourceKeyList, isResourceAlias } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 const NEW_TEAM_SYMBOL = Symbol('new-team');
@@ -32,16 +21,6 @@ type NewTeam = TeamInfo & { [NEW_TEAM_SYMBOL]: boolean; timestamp: number };
 export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResourceIncludes> {
   constructor(private readonly graphQLService: GraphQLService) {
     super();
-  }
-
-  async loadAll(): Promise<Map<string, TeamInfo>> {
-    await this.load(CachedMapAllKey);
-    return this.data;
-  }
-
-  async refreshAll(): Promise<Map<string, TeamInfo>> {
-    await this.refresh(CachedMapAllKey);
-    return this.data;
   }
 
   async createTeam({
@@ -65,7 +44,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
       timestamp: Date.now(),
     };
 
-    this.updateTeams(newTeam);
+    this.set(newTeam.teamId, newTeam);
 
     await this.setMetaParameters(newTeam.teamId, metaParameters);
     await this.setSubjectPermissions(newTeam.teamId, teamPermissions);
@@ -88,7 +67,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
       ...this.getIncludesMap(teamId),
     });
 
-    this.updateTeams(team);
+    this.set(team.teamId, team);
 
     await this.setMetaParameters(team.teamId, metaParameters);
     await this.setSubjectPermissions(team.teamId, teamPermissions);
@@ -98,7 +77,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     return this.get(teamId)!;
   }
 
-  async deleteTeam(key: ResourceKey<string>): Promise<Map<string, TeamInfo>> {
+  async deleteTeam(key: ResourceKeySimple<string>): Promise<Map<string, TeamInfo>> {
     await ResourceKeyUtils.forEachAsync(key, async key => {
       await this.graphQLService.sdk.deleteTeam({
         teamId: key,
@@ -142,11 +121,19 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     await this.graphQLService.sdk.saveTeamMetaParameters({ teamId, parameters });
   }
 
-  protected async loader(key: ResourceKey<string>, includes: string[] | undefined): Promise<Map<string, TeamInfo>> {
-    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
+  protected async loader(
+    originalKey: ResourceKey<string>,
+    includes?: string[]
+  ): Promise<Map<string, TeamInfo>> {
+    const all = this.isAlias(originalKey, CachedMapAllKey);
+    const teamsList: TeamInfo[] = [];
 
-    await ResourceKeyUtils.forEachAsync(all ? CachedMapAllKey : key, async key => {
-      const teamId = all ? undefined : key;
+    await ResourceKeyUtils.forEachAsync(originalKey, async key => {
+      let teamId: string | undefined;
+
+      if (!isResourceAlias(key)) {
+        teamId = key;
+      }
 
       const { teams } = await this.graphQLService.sdk.getTeamsList({
         teamId,
@@ -154,13 +141,15 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
         ...this.getIncludesMap(teamId, includes),
       });
 
-      if (all) {
-        this.resetIncludes();
-        this.data.clear();
-      }
-
-      this.updateTeams(...teams);
+      teamsList.push(...teams);
     });
+
+    const key = resourceKeyList(teamsList.map(team => team.teamId));
+    if (all) {
+      this.replace(key, teamsList);
+    } else {
+      this.set(key, teamsList);
+    }
 
     return this.data;
   }
@@ -171,13 +160,9 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     }
   }
 
-  private updateTeams(...teams: TeamInfo[]): ResourceKeyList<string> {
-    const key = resourceKeyList(teams.map(team => team.teamId));
-
-    const oldTeams = this.get(key);
-    this.set(key, oldTeams.map((team, i) => ({ ...team, ...teams[i] })));
-
-    return key;
+  protected dataSet(key: string, value: AdminTeamInfoFragment): void {
+    const oldTeam = this.dataGet(key);
+    super.dataSet(key, { ...oldTeam, ...value });
   }
 
   private getDefaultIncludes(): TeamResourceIncludes {
@@ -186,11 +171,8 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     };
   }
 
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }
 

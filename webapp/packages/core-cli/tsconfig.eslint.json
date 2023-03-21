@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src",
+    "tests",
+    "bin",
+    "configs"
+  ],
+  "exclude": ["**/node_modules", "**/lib"]
+}
