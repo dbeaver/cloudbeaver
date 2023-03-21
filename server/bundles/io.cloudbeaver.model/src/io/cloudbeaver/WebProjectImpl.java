@@ -21,12 +21,12 @@ import org.eclipse.core.resources.IProject;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.registry.BaseProjectImpl;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.Pair;
 
@@ -45,12 +45,13 @@ public class WebProjectImpl extends BaseProjectImpl {
     private final RMController resourceController;
 
     public WebProjectImpl(
+        @NotNull DBPWorkspace workspace,
         @NotNull RMController resourceController,
         @NotNull SMSessionContext sessionContext,
         @NotNull RMProject project,
         @NotNull DataSourceFilter dataSourceFilter
     ) {
-        super(DBWorkbench.getPlatform().getWorkspace(), sessionContext);
+        super(workspace, sessionContext);
         this.resourceController = resourceController;
         this.path = RMUtils.getProjectPath(project);
         this.project = project;

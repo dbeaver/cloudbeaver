@@ -126,7 +126,7 @@ public class H2Migrator {
         log.info("Exporting v1 database");
         executeScript(v1Driver, EXPORT_SCRIPT, exportFilePath, password);
 
-        log.info("Creating v1 database backup in '" + workspacePaths.dbV1BackupPath + "'");
+        log.info("Creating v1 database backup '" + workspacePaths.dbV1BackupPath + "'");
         Files.move(workspacePaths.dbV1Path, workspacePaths.dbV1BackupPath, StandardCopyOption.REPLACE_EXISTING);
 
         log.info("Importing data to new v2 database");
