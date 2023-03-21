@@ -190,8 +190,8 @@ export interface CbDatasourceEvent extends CbServerEvent {
 }
 
 export interface CbDatasourceFolderEvent extends CbServerEvent {
+  folderPaths: Array<Scalars['String']>;
   id: CbServerEventId;
-  nodePaths: Array<Scalars['String']>;
   projectId: Scalars['String'];
   topicId?: Maybe<CbEventTopic>;
 }
@@ -303,7 +303,6 @@ export interface ConnectionInfo {
   name: Scalars['String'];
   navigatorSettings: NavigatorSettings;
   networkHandlersConfig: Array<NetworkHandlerConfig>;
-  nodePath?: Maybe<Scalars['String']>;
   origin: ObjectOrigin;
   port?: Maybe<Scalars['String']>;
   projectId: Scalars['ID'];
@@ -810,6 +809,7 @@ export interface NavigatorNodeInfo {
   name?: Maybe<Scalars['String']>;
   navigable?: Maybe<Scalars['Boolean']>;
   nodeDetails?: Maybe<Array<ObjectPropertyInfo>>;
+  nodePathItem: Scalars['String'];
   nodeType?: Maybe<Scalars['String']>;
   object?: Maybe<DatabaseObjectInfo>;
   projectId?: Maybe<Scalars['String']>;
@@ -2376,7 +2376,7 @@ export type NavGetStructContainersQueryVariables = Exact<{
 }>;
 
 
-export type NavGetStructContainersQuery = { navGetStructContainers: { supportsCatalogChange: boolean, supportsSchemaChange: boolean, catalogList: Array<{ catalog: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }, schemaList: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> }>, schemaList: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> } };
+export type NavGetStructContainersQuery = { navGetStructContainers: { supportsCatalogChange: boolean, supportsSchemaChange: boolean, catalogList: Array<{ catalog: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, nodePathItem: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }, schemaList: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, nodePathItem: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> }>, schemaList: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, nodePathItem: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> } };
 
 export type AdminObjectGrantInfoFragment = { subjectId: string, subjectType: AdminSubjectType, objectPermissions: { objectId: string, permissions: Array<string> } };
 
@@ -2408,7 +2408,7 @@ export type ExecutionContextInfoFragment = { id: string, projectId: string, conn
 
 export type NavNodeDbObjectInfoFragment = { id: string, object?: { type?: string, features?: Array<string>, properties?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> } };
 
-export type NavNodeInfoFragment = { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> };
+export type NavNodeInfoFragment = { id: string, name?: string, hasChildren?: boolean, nodeType?: string, nodePathItem: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> };
 
 export type NavNodePropertiesFragment = { id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number };
 
@@ -2580,7 +2580,7 @@ export type GetNodeParentsQueryVariables = Exact<{
 }>;
 
 
-export type GetNodeParentsQuery = { node: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }, parents: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> };
+export type GetNodeParentsQuery = { node: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, nodePathItem: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }, parents: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, nodePathItem: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> };
 
 export type NavDeleteNodesMutationVariables = Exact<{
   nodePaths: Array<Scalars['ID']> | Scalars['ID'];
@@ -2605,7 +2605,7 @@ export type NavNodeChildrenQueryVariables = Exact<{
 }>;
 
 
-export type NavNodeChildrenQuery = { navNodeChildren: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }>, navNodeInfo: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> } };
+export type NavNodeChildrenQuery = { navNodeChildren: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, nodePathItem: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }>, navNodeInfo: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, nodePathItem: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> } };
 
 export type NavNodeInfoQueryVariables = Exact<{
   nodePath: Scalars['ID'];
@@ -2613,7 +2613,7 @@ export type NavNodeInfoQueryVariables = Exact<{
 }>;
 
 
-export type NavNodeInfoQuery = { navNodeInfo: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> } };
+export type NavNodeInfoQuery = { navNodeInfo: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, nodePathItem: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> } };
 
 export type NavRefreshNodeQueryVariables = Exact<{
   nodePath: Scalars['ID'];
@@ -3206,6 +3206,7 @@ export const NavNodeInfoFragmentDoc = `
   name
   hasChildren
   nodeType
+  nodePathItem
   icon
   folder
   inline

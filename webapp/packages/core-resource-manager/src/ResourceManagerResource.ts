@@ -11,8 +11,10 @@ import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
 import { CachedResourceIncludeArgs, CachedTreeChildrenKey, CachedTreeResource, DetailsError, GetResourceListQueryVariables, GraphQLService, ResourceKey, resourceKeyList, ResourceKeyUtils, RmResource } from '@cloudbeaver/core-sdk';
-import { createPath, getPathParent, getPathParts } from '@cloudbeaver/core-utils';
+import { buildTemplatePath, createPath, getPathParent, getPathParts, testPath } from '@cloudbeaver/core-utils';
 
+import { PATH_TEMPLATE_RM_PROJECT } from './PATH_TEMPLATE_RM_PROJECT';
+import { PATH_TEMPLATE_RM_PROJECT_RESOURCE } from './PATH_TEMPLATE_RM_PROJECT_RESOURCE';
 import { ResourceManagerEventHandler } from './ResourceManagerEventHandler';
 
 export type ResourceInfoIncludes = Omit<GetResourceListQueryVariables, 'projectId'>;
@@ -266,8 +268,11 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
   }
 }
 
-export function getRmResourcePath(projectId: string, path?: string): string {
-  return createPath(projectId, path);
+export function getRmResourcePath(projectId: string, resourcePath?: string): string {
+  if (resourcePath === undefined) {
+    return buildTemplatePath(PATH_TEMPLATE_RM_PROJECT, { projectId });
+  }
+  return buildTemplatePath(PATH_TEMPLATE_RM_PROJECT_RESOURCE, { projectId, resourcePath });
 }
 
 interface IRmResourceKey {

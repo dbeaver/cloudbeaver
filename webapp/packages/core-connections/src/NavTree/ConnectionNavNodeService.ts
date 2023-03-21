@@ -20,6 +20,7 @@ import { Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, cre
 import { ConnectionsManagerService } from '../ConnectionsManagerService';
 import type { IConnectionInfoParams } from '../IConnectionsResource';
 import { getNodeIdDatasource } from './getNodeIdDatasource';
+import { getNodeIdDatasourceParent } from './getNodeIdDatasourceParent';
 import { testNodeIdDatasource } from './testNodeIdDatasource';
 
 @injectable()
@@ -54,7 +55,9 @@ export class ConnectionNavNodeService extends Dependency {
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderCreated,
       data => {
-        const parents = data.nodePaths.map(nodeId => getPathParent(nodeId));
+        const parents = data.folderPaths.map(
+          folder => getNodeIdDatasourceParent(data.projectId, getPathParent(folder))
+        );
         this.navTreeResource.markTreeOutdated(resourceKeyList(parents));
       },
       undefined,
@@ -63,9 +66,12 @@ export class ConnectionNavNodeService extends Dependency {
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderDeleted,
       data => {
-        const parents = data.nodePaths.map(nodeId => getPathParent(nodeId));
+        const nodes = data.folderPaths.map(
+          folder => getNodeIdDatasourceParent(data.projectId, folder)
+        );
+        const parents = nodes.map(getPathParent);
 
-        this.navTreeResource.deleteInNode(resourceKeyList(parents), data.nodePaths);
+        this.navTreeResource.deleteInNode(resourceKeyList(parents), nodes);
       },
       undefined,
       this.navTreeResource
@@ -73,7 +79,10 @@ export class ConnectionNavNodeService extends Dependency {
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderUpdated,
       data => {
-        this.navTreeResource.markOutdated(resourceKeyList(data.nodePaths));
+        const nodes = data.folderPaths.map(
+          folder => getNodeIdDatasourceParent(data.projectId, folder)
+        );
+        this.navTreeResource.markOutdated(resourceKeyList(nodes));
       },
       undefined,
       this.navTreeResource

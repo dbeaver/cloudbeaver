@@ -15,9 +15,9 @@ import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/c
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NavTreeResource, NavNodeManagerService, NavNodeInfoResource, type INodeMoveData, navNodeMoveContext, getNodesFromContext, ENodeMoveType, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfo, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { getRmResourceKey, getRmResourcePath, NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
+import { getRmNodeId, getRmResourceKey, getRmResourcePath, NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH, getRmNodeIdParams } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey, CachedTreeChildrenKey, getCachedMapResourceLoaderState, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { createPath, getPathParent, isDefined } from '@cloudbeaver/core-utils';
+import { createPath, getPathParent, isDefined, isNotNull } from '@cloudbeaver/core-utils';
 import { ActionService, MenuService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, DATA_CONTEXT_LOADABLE_STATE } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
@@ -25,8 +25,6 @@ import { FolderDialog } from '@cloudbeaver/plugin-projects';
 import { ResourceManagerService } from '../ResourceManagerService';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../Tree/DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
 import { getResourceKeyFromNodeId } from './getResourceKeyFromNodeId';
-import { getResourceNodeId } from './getResourceNodeId';
-import { getRmProjectNodeId } from './getRmProjectNodeId';
 
 interface ITargetNode {
   projectId: string;
@@ -212,7 +210,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
               true
             );
 
-            this.navTreeResource.refreshTree(getRmProjectNodeId(result.projectId));
+            this.navTreeResource.refreshTree(getRmNodeId(result.projectId));
           } catch (exception: any) {
             this.notificationService.logException(exception, 'Error occurred while renaming');
           }
@@ -240,7 +238,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
 
         return {
           projectId: project.id,
-          projectNodeId: getRmProjectNodeId(project.id),
+          projectNodeId: getRmNodeId(project.id),
           selectProject: editableProjects.length > 1,
         };
       }
@@ -282,7 +280,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     }
 
     const resourceFolder = this.resourceManagerService.getRootFolder(project, resourceTypeId);
-    return createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
+    return getRmNodeId(project.id, resourceFolder);
   }
 
   private syncNavTree() {
@@ -326,8 +324,9 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       key => {
         syncOutdate = false;
         try {
-          const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getResourceNodeId)
-            .map(getPathParent))]);
+          const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getRmNodeIdParams)
+            .filter(isNotNull)
+            .map(key => getPathParent(getRmNodeId(key.projectId, key.resourcePath))))]);
           if (!this.navTreeResource.isOutdated(updated)) {
             this.navTreeResource.markTreeOutdated(updated);
           }

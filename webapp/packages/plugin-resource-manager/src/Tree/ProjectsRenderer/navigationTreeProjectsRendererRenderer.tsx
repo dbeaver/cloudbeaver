@@ -14,8 +14,7 @@ import { getComputed, Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from 
 import { useService } from '@cloudbeaver/core-di';
 import type { NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { NAV_NODE_TYPE_RM_PROJECT, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
-import { createPath } from '@cloudbeaver/core-utils';
+import { getRmNodeId, NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { type IElementsTreeCustomRenderer, type NavigationNodeRendererComponent, useNode, NavigationNodeRendererLoader, ElementsTreeContext, isDraggingInsideProject } from '@cloudbeaver/plugin-navigation-tree';
 
 import type { ResourceManagerService } from '../../ResourceManagerService';
@@ -65,7 +64,7 @@ export function navigationTreeProjectsRendererRenderer(
     }
 
     const resourceFolder = resourceManagerService.getRootFolder(project, resourceTypeId);
-    const folderNodeId = createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
+    const folderNodeId = getRmNodeId(project.id, resourceFolder);
 
     if (nodeId === folderNodeId) {
       return ProjectRenderer;

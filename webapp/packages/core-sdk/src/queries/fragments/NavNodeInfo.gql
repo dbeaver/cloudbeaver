@@ -3,6 +3,7 @@ fragment NavNodeInfo on NavigatorNodeInfo {
   name
   hasChildren
   nodeType
+  nodePathItem
   icon
   folder
   inline

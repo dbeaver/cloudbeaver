@@ -60,5 +60,7 @@ export function createPathTemplate<
 ): PathTemplate<TParams> {
   return new Path(createPath(...templates
     .map(template => typeof template === 'string' ? template : template.path)
-  ));
+  ), {
+    urlParamsEncoding: 'none',
+  });
 }

@@ -12,12 +12,12 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeManagerService, NavNodeInfoResource, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
 import { createResourceOfType, isResourceOfType, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
+import { getRmNodeId, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { createPath, getPathName } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { NavResourceNodeService, ResourceManagerService, getResourceKeyFromNodeId } from '@cloudbeaver/plugin-resource-manager';
+import { ResourceManagerService, getResourceKeyFromNodeId } from '@cloudbeaver/plugin-resource-manager';
 import { ResourceManagerScriptsService, SaveScriptDialog, SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, ISqlDataSource, SqlDataSourceService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
@@ -29,7 +29,6 @@ import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
-    private readonly navResourceNodeService: NavResourceNodeService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navigationTabsService: NavigationTabsService,
     private readonly notificationService: NotificationService,
@@ -121,7 +120,7 @@ export class PluginBootstrap extends Bootstrap {
               const scriptName = createResourceOfType(resourceType, result.name.trim());
               const scriptsRootFolder = this.resourceManagerScriptsService.getRootFolder(project);
               const folderResourceKey = getResourceKeyFromNodeId(
-                createPath(RESOURCES_NODE_PATH, projectId, scriptsRootFolder)
+                getRmNodeId(projectId, scriptsRootFolder)
               );
 
               if (!folderResourceKey) {

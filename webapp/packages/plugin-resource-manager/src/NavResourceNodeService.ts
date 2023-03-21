@@ -7,9 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
-
-import { getResourceNodeId } from './NavNodes/getResourceNodeId';
+import { getRmNodeId, ResourceManagerResource, getRmNodeIdParams } from '@cloudbeaver/core-resource-manager';
 
 @injectable()
 export class NavResourceNodeService {
@@ -19,8 +17,9 @@ export class NavResourceNodeService {
 
   async move(key: string, newKey: string): Promise<string> {
     await this.resourceManagerResource.move(key, newKey);
+    const params = getRmNodeIdParams(newKey)!;
 
-    return getResourceNodeId(newKey);
+    return getRmNodeId(params.projectId, params.resourcePath);
   }
 
   async delete(key: string) {

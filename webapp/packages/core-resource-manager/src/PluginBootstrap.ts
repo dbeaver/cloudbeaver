@@ -10,7 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 
 import { NAV_NODE_TYPE_RM_PROJECT } from './NAV_NODE_TYPE_RM_PROJECT';
-import { NODE_PATH_TEMPLATE_EXT_RESOURCES_PROJECT } from './NODE_PATH_TEMPLATE_EXT_RESOURCES_PROJECT';
+import { NODE_PATH_TEMPLATE_RM_PROJECT } from './NODE_PATH_TEMPLATE_RM_PROJECT';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -28,7 +28,7 @@ export class PluginBootstrap extends Bootstrap {
 
   private addRmProjectIds() {
     this.projectsNavNodeService.addProjectType(NAV_NODE_TYPE_RM_PROJECT);
-    this.projectsNavNodeService.addProjectPathTemplate(NODE_PATH_TEMPLATE_EXT_RESOURCES_PROJECT);
+    this.projectsNavNodeService.addProjectPathTemplate(NODE_PATH_TEMPLATE_RM_PROJECT);
   }
 
 }

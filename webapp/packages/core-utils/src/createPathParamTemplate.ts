@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { PATH_TEMPLATE_LINK_SYMBOL } from './PATH_TEMPLATE_LINK_SYMBOL';
+
 export function createPathParamTemplate<T extends string>(id: T, regexp?: string): `:${T}` {
-  return `:${id}${regexp ? `<${regexp}![^\\/]+>` : ''}` as `:${T}`;
+  return `:${id}${regexp ? `<${regexp}${PATH_TEMPLATE_LINK_SYMBOL}[^\\/]+>` : ''}` as `:${T}`;
 }

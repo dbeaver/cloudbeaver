@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createPathPart } from '@cloudbeaver/core-utils';
-
-export const RESOURCES_NODE_PATH = createPathPart('root', 'rm');
+export function isNotNull<T>(value: T | null): value is T {
+  return value !== null;
+}

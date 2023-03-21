@@ -7,10 +7,10 @@
  */
 
 import { NODE_PATH_TEMPLATE_RESOURCE_PROJECT } from '@cloudbeaver/core-projects';
-import { createPathTemplate } from '@cloudbeaver/core-utils';
+import { createPathPart, createPathTemplate } from '@cloudbeaver/core-utils';
 
 export const NODE_PATH_TEMPLATE_CONNECTIONS = createPathTemplate(
   NODE_PATH_TEMPLATE_RESOURCE_PROJECT,
-  'datasources!root'
+  createPathPart('root', 'datasources')
 );
 

@@ -15,11 +15,10 @@ import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource, type INodeActions } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
+import { getRmNodeIdParams, NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import { ElementsTreeContext, isDraggingInsideProject, NavigationNodeEditorLoader, NavTreeControlComponent, NavTreeControlProps, TreeNodeMenuLoader } from '@cloudbeaver/plugin-navigation-tree';
 
-import { getRmProjectNodeId } from '../../NavNodes/getRmProjectNodeId';
 import { ResourceManagerService } from '../../ResourceManagerService';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
 
@@ -113,11 +112,13 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
         }
       }
     } else {
-      const project = getRmProjectNodeId(node.projectId);
-      const projectName = navNodeInfoResource.get(project)?.name;
+      const params = getRmNodeIdParams(node.projectId);
+      if (params) {
+        const projectName = navNodeInfoResource.get(params.projectId)?.name;
 
-      if (projectName) {
-        name = projectName;
+        if (projectName) {
+          name = projectName;
+        }
       }
     }
   }

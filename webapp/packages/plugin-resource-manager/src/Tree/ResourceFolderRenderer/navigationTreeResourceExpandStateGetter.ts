@@ -7,8 +7,7 @@
  */
 
 import type { NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
-import { RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
-import { createPath } from '@cloudbeaver/core-utils';
+import { getRmNodeId } from '@cloudbeaver/core-resource-manager';
 import type { IElementsTreeNodeExpandInfoGetter } from '@cloudbeaver/plugin-navigation-tree';
 
 import type { ResourceManagerService } from '../../ResourceManagerService';
@@ -34,7 +33,7 @@ export function navigationTreeResourceExpandStateGetter(
     }
 
     const resourceFolder = resourceManagerService.getRootFolder(project, resourceTypeId);
-    const folderNodeId = createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
+    const folderNodeId = getRmNodeId(project.id, resourceFolder);
 
     if (nodeId !== folderNodeId) {
       return null;

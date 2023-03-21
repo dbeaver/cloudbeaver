@@ -6,7 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { createPath } from './createPath';
 import type { PathParams, PathTemplate } from './createPathTemplate';
+import { getPathParts } from './getPathParts';
 
 export function mapTemplateParams<
   TTemplate extends string,
@@ -22,21 +24,22 @@ export function mapTemplateParams<
     if (!token) {
       continue;
     }
-    const type = RegExp(`:${param}<(\\^\\(|)(.+?)\\[`).exec(token.match);
+    const type = RegExp(`:${param}<(\\(|)(.+?)\\[`).exec(token.match);
 
     if (!type) {
       continue;
     }
 
     if (param in params) {
-      const link = type[2];
-      const paramValue = (params as any)[param] as string;
+      const link = type[2].replace('\\', '');
+      (params as any)[param] = createPath(...getPathParts((params as any)[param] as string)
+        .map(paramValue => {
+          if (paramValue.startsWith(link)) {
+            return paramValue.slice(link.length);
+          }
+          return `${link}${paramValue}`;
+        }));
 
-      if (paramValue.startsWith(link)) {
-        (params as any)[param] = paramValue.slice(link.length);
-      } else {
-        (params as any)[param] = `${link}${paramValue}`;
-      }
     }
   }
 

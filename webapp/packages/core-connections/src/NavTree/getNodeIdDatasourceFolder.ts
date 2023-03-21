@@ -11,7 +11,7 @@ import { buildTemplatePath } from '@cloudbeaver/core-utils';
 import type { IConnectionFolderParam } from '../ConnectionFolderResource';
 import { NODE_PATH_TEMPLATE_RESOURCE_CONNECTION_FOLDER } from './NODE_PATH_TEMPLATE_RESOURCE_CONNECTION_FOLDER';
 
-export function getConnectionFolderId(key: IConnectionFolderParam): string {
+export function getNodeIdDatasourceFolder(key: IConnectionFolderParam): string {
   return buildTemplatePath(NODE_PATH_TEMPLATE_RESOURCE_CONNECTION_FOLDER, {
     projectId: key.projectId,
     folder: key.folderId,

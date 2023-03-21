@@ -16,5 +16,8 @@ export function buildTemplatePath<
   template: PathTemplate<TParams>,
   params: TParams,
 ): string {
-  return template.build(mapTemplateParams(template, params));
+  return template.build(mapTemplateParams(template, params), {
+    urlParamsEncoding: 'none',
+    ignoreConstraints: true,
+  });
 }

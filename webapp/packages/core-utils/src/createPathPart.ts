@@ -8,6 +8,6 @@
 
 import { PATH_TEMPLATE_LINK_SYMBOL } from './PATH_TEMPLATE_LINK_SYMBOL';
 
-export function createPathParamTemplateSplat<T extends string>(id: T, regexp?: string): `:${T}` {
-  return `:${id}${regexp ? `<(${regexp}${PATH_TEMPLATE_LINK_SYMBOL}[^\\/]+\\/?)+>` : ''}` as `:${T}`;
+export function createPathPart<T extends string, TLink extends string>(id: T, link?: TLink): `${TLink}${typeof PATH_TEMPLATE_LINK_SYMBOL}${T}` {
+  return `${link ? `${link}${PATH_TEMPLATE_LINK_SYMBOL}` : ''}${id}` as `${TLink}${typeof PATH_TEMPLATE_LINK_SYMBOL}${T}`;
 }

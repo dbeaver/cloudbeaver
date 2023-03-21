@@ -20,9 +20,9 @@ export function testPath<
   let params: TParams | null = null;
 
   if (partial) {
-    params = template.partialTest(path);
+    params = template.partialTest(path, { urlParamsEncoding: 'none' });
   } else {
-    params = template.test(path);
+    params = template.test(path, { urlParamsEncoding: 'none' });
   }
 
   if (!params) {
