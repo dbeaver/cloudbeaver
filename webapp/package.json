@@ -11,6 +11,7 @@
       "**/core-cli/**"
     ]
   },
+  "type": "module",
   "scripts": {
     "prebuild": "npm run clean-dist",
     "clean-dist": "rimraf --glob lib/*"
