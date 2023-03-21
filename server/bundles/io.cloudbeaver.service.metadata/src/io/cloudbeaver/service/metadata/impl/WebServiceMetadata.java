@@ -40,7 +40,7 @@ public class WebServiceMetadata implements DBWServiceMetadata {
         validateDatabaseNode(dbNode);
         DBSObject object = ((DBNDatabaseNode) dbNode).getObject();
         if (!(object instanceof DBPScriptObject)) {
-            throw new DBWebException("Object '" + dbNode.getNodeFullPath() + "' doesn't support DDL");
+            throw new DBWebException("Object '" + dbNode.getNodeItemPath() + "' doesn't support DDL");
         }
         if (options == null) {
             options = new LinkedHashMap<>();
@@ -57,7 +57,7 @@ public class WebServiceMetadata implements DBWServiceMetadata {
         validateDatabaseNode(dbNode);
         DBSObject object = ((DBNDatabaseNode) dbNode).getObject();
         if (!(object instanceof DBPScriptObjectExt)) {
-            throw new DBWebException("Object '" + dbNode.getNodeFullPath() + "' doesn't support extended DDL");
+            throw new DBWebException("Object '" + dbNode.getNodeItemPath() + "' doesn't support extended DDL");
         }
         try {
             return ((DBPScriptObjectExt) object).getExtendedDefinitionText(webSession.getProgressMonitor());
@@ -68,7 +68,7 @@ public class WebServiceMetadata implements DBWServiceMetadata {
 
     private void validateDatabaseNode(DBNNode dbNode) throws DBWebException {
         if (!(dbNode instanceof DBNDatabaseNode)) {
-            throw new DBWebException("Node '" + dbNode.getNodeFullPath() + "' is not database node");
+            throw new DBWebException("Node '" + dbNode.getNodeItemPath() + "' is not database node");
         }
     }
 }

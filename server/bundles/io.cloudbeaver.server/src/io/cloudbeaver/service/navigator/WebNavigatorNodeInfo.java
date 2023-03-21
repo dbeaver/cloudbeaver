@@ -74,12 +74,12 @@ public class WebNavigatorNodeInfo {
 
     @Property
     public String getId() {
-        return node.getNodeFullPath();
+        return node.getNodeItemPath();
     }
 
     @Property
     public String getNodePathItem() {
-        return node.getNavNodePathItem();
+        return node.getCurrentNodePathItem();
     }
 
     @Property
@@ -266,6 +266,6 @@ public class WebNavigatorNodeInfo {
 
     @Override
     public String toString() {
-        return node.getNodeFullPath();
+        return node.getNodeItemPath();
     }
 }

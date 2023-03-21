@@ -56,7 +56,7 @@ public class WebConnectionFolderUtils {
         } else if (folderNode instanceof DBNLocalFolder) {
             return ((DBNLocalFolder) folderNode).getFolder();
         } else {
-            throw new DBWebException("Navigator node '" + folderNode.getNodeFullPath() + "' is not a folder node");
+            throw new DBWebException("Navigator node '" + folderNode.getNodeItemPath() + "' is not a folder node");
         }
     }
 
