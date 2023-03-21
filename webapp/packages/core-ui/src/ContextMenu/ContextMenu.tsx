@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { ButtonHTMLAttributes, forwardRef, useRef } from 'react';
+import { ButtonHTMLAttributes, forwardRef, useRef, useState } from 'react';
 import type { MenuInitialState } from 'reakit/Menu';
 import styled from 'reshadow';
 
@@ -49,6 +49,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(forwar
   ...props
 }, ref) {
   const translate = useTranslate();
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const handler = menuData.handler;
   const hidden = getComputed(() => handler?.isHidden?.(menuData.context) || false);
@@ -63,7 +64,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(forwar
   const menu = useRef<IMenuState>();
   const styles = useStyles(menuPanelStyles, style);
 
-  useAutoLoad(menuData.loaders, !lazy);
+  useAutoLoad(menuData.loaders, !lazy, menuVisible);
 
   const handlers = useObjectRef(() => ({
     handleItemClose() {
@@ -75,6 +76,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(forwar
       );
     },
     handleVisibleSwitch(visible: boolean) {
+      setMenuVisible(visible);
       this.onVisibleSwitch?.(visible);
 
       if (visible) {
