@@ -64,7 +64,7 @@ export class PluginBootstrap extends Bootstrap {
               tooltip: label,
             },
             { onSelect: () => this.localizationService.changeLocaleAsync(lang.isoCode) },
-            { isDisabled: () => this.localizationService.getCurrentLanguage() === lang.isoCode }
+            { isDisabled: () => this.localizationService.currentLanguage === lang.isoCode }
           );
         });
 

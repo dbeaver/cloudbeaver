@@ -434,7 +434,23 @@ export abstract class CachedResource<
       return param.some(key => predicate(this.getMetadata(key)));
     }
 
-    return predicate(this.getMetadata(param));
+    let result = false;
+
+    if (predicate(this.getMetadata(param))) {
+      result = true;
+    }
+
+    if (isResourceAlias(param)) {
+      param = this.transformToKey(param);
+
+      if (isResourceKeyList(param)) {
+        if (this.someMetadata(param, predicate)) {
+          result = true;
+        }
+      }
+    }
+
+    return result;
   }
 
   mapMetadata<TValue>(

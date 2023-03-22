@@ -59,7 +59,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   const loaded = getComputed(() => children.children !== undefined && children.isLoaded() && isLoaded());
   const showInFilter = getComputed(() => contextRef.context?.tree.getNodeState(node.id).showInFilter || false);
   const isExpanded = getComputed(() => contextRef.context?.tree.isNodeExpanded(node.id) || false);
-  const leaf = getComputed(() => isLeaf(node, children.children, contextRef.context?.tree));
+  const leaf = getComputed(() => isLeaf(node, children.children, contextRef.context?.tree, outdated));
   const group = getComputed(() => contextRef.context?.tree.isGroup?.(node) || false);
   const empty = getComputed(() => children.children?.length === 0);
   const expanded = getComputed(() => isExpanded);
@@ -131,7 +131,12 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   });
 }
 
-export function isLeaf(node: NavNode, children: string[] | undefined, tree: IElementsTree | undefined): boolean {
+export function isLeaf(
+  node: NavNode,
+  children: string[] | undefined,
+  tree: IElementsTree | undefined,
+  outdated: boolean
+): boolean {
   if (node.folder && tree?.settings?.foldersTree) {
     return false;
   }
@@ -139,6 +144,6 @@ export function isLeaf(node: NavNode, children: string[] | undefined, tree: IEle
   return (
     node.objectFeatures.includes(EObjectFeature.entity)
     || !node.hasChildren
-    || children?.length === 0
+    || (children?.length === 0 && !outdated)
   );
 }

@@ -66,7 +66,7 @@ export class ThemeService extends Bootstrap {
     return theme;
   }
 
-  readonly onThemeChange: ISyncExecutor<ITheme>;
+  readonly onChange: ISyncExecutor<ITheme>;
 
   private readonly themeMap: Map<string, ITheme> = new Map();
   private readonly settings: ISettings;
@@ -80,7 +80,7 @@ export class ThemeService extends Bootstrap {
     super();
 
     this.settings = getDefaultThemeSettings();
-    this.onThemeChange = new SyncExecutor();
+    this.onChange = new SyncExecutor();
 
     makeObservable<ThemeService, 'themeMap' | 'settings' | 'setCurrentThemeId'>(this, {
       themes: computed,
@@ -103,9 +103,9 @@ export class ThemeService extends Bootstrap {
       THEME_SETTINGS_KEY,
       this.settings,
       getDefaultThemeSettings,
-      () => this.tryChangeTheme(this.currentThemeId)
+      () => this.setTheme(this.currentThemeId)
     ); // load user state theme
-    await this.tryChangeTheme(this.currentThemeId);
+    await this.setTheme(this.currentThemeId);
   }
 
   getThemeStyles(themeId: string): ClassCollection[] {
@@ -119,6 +119,14 @@ export class ThemeService extends Bootstrap {
   }
 
   async changeTheme(themeId: string): Promise<void> {
+    if (themeId === this.currentThemeId) {
+      return;
+    }
+    await this.setTheme(themeId);
+    this.onChange.execute(this.currentTheme);
+  }
+
+  async setTheme(themeId: string): Promise<void> {
     await this.tryChangeTheme(themeId);
   }
 
@@ -137,7 +145,6 @@ export class ThemeService extends Bootstrap {
 
   private setCurrentThemeId(themeId: string) {
     this.settings.currentThemeId = themeId;
-    this.onThemeChange.execute(this.currentTheme);
   }
 
   private loadAllThemes(): void {

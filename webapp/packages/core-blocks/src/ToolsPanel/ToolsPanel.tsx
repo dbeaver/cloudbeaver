@@ -12,6 +12,7 @@ const styles = css`
   container {
     height: 32px;
     display: flex;
+    flex-shrink: 0;
   }
 `;
 
