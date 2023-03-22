@@ -62,7 +62,7 @@ export class NavigationTreeService extends View<string> {
     return this.navNodeManagerService.getTree(id);
   }
 
-  async navToNode(id: string, parentId: string): Promise<void> {
+  async navToNode(id: string, parentId?: string): Promise<void> {
     await this.navNodeManagerService.navToNode(id, parentId);
   }
 

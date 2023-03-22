@@ -30,7 +30,7 @@ export enum NavigationType {
 
 export interface NavNodeKey {
   nodeId: string;
-  parentId: string;
+  parentId?: string;
 }
 
 export interface NavNodeValue {
@@ -70,7 +70,7 @@ export interface INodeNavigationContext {
   type: NavigationType;
   projectId: string | undefined;
   nodeId: string;
-  parentId: string;
+  parentId?: string;
   folderId: string;
   name?: string;
   icon?: string;
@@ -85,7 +85,7 @@ export interface INodeNavigationData {
   type: NavigationType;
   projectId?: string;
   nodeId: string;
-  parentId: string;
+  parentId?: string;
   folderId?: string;
 }
 
@@ -174,7 +174,7 @@ export class NavNodeManagerService extends Bootstrap {
     return move.canMove;
   }
 
-  async canOpen(nodeId: string, parentId: string, folderId?: string): Promise<boolean> {
+  async canOpen(nodeId: string, parentId?: string, folderId?: string): Promise<boolean> {
     if (!this.navNodeInfoResource.has(nodeId)) {
       return false;
     }
@@ -200,7 +200,7 @@ export class NavNodeManagerService extends Bootstrap {
     return data.canOpen;
   }
 
-  async navToNode(nodeId: string, parentId: string, folderId?: string): Promise<void> {
+  async navToNode(nodeId: string, parentId?: string, folderId?: string): Promise<void> {
     await this.navigator.execute({
       type: NavigationType.open,
       nodeId,
@@ -272,6 +272,9 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   getParent(node: NavNode): NavNode | undefined {
+    if (node.parentId === undefined) {
+      return undefined;
+    }
     return this.navNodeInfoResource.get(node.parentId);
   }
 
@@ -356,7 +359,7 @@ export class NavNodeManagerService extends Bootstrap {
         icon = node.icon;
 
         if (node.folder) {
-          const parent = this.getNode(node.parentId);
+          const parent = this.getParent(node);
           folderId = nodeId;
           if (parent && !parent.folder) {
             nodeId = parent.id;

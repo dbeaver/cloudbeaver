@@ -14,7 +14,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { isArraysEqual, MetadataMap, TempMap } from '@cloudbeaver/core-utils';
 import { ACTION_OPEN_IN_TAB, IActiveView, View } from '@cloudbeaver/core-view';
@@ -208,7 +208,7 @@ export class NavigationTabsService extends View<ITab> {
       }
     );
 
-    this.userInfoResource.onDataUpdate.addHandler(this.unloadTabs.bind(this));
+    this.userInfoResource.onUserChange.addHandler(this.unloadTabs.bind(this));
     this.autoSaveService.onStorageChange.next(this.onStateUpdate, () => {});
   }
 
@@ -390,19 +390,23 @@ export class NavigationTabsService extends View<ITab> {
   }
 
   async unloadTabs(): Promise<void> {
-    // if (this.administrationScreenService.publicDisabled) {
-    //   return;
-    // }
-    this.onInit.execute(false);
-    for (const tab of this.tabsMap.values()) {
-      if (tab.userId !== this.userInfoResource.getId()) {
-        const metadata = this.getTabMetadata(tab.id);
-        if (metadata.restored) {
-          await this.callHandlerCallback(tab, handler => handler.onUnload);
-          metadata.restored = false;
+    const unloadHandlers: Promise<void>[] = [];
+
+    runInAction(() => {
+      this.onInit.execute(false);
+
+      for (const tab of this.tabsMap.values()) {
+        if (tab.userId !== this.userInfoResource.getId()) {
+          const metadata = this.getTabMetadata(tab.id);
+          if (metadata.restored) {
+            metadata.restored = false;
+            unloadHandlers.push(this.callHandlerCallback(tab, handler => handler.onUnload));
+          }
         }
       }
-    }
+    });
+
+    await Promise.all(unloadHandlers);
   }
 
   // must be executed with low priority, because this call runs many requests to backend and blocks others

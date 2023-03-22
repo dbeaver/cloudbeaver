@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed } from 'mobx';
+import { computed, observable } from 'mobx';
 
 
-import { useObservableRef } from '@cloudbeaver/core-blocks';
+import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import type { DBObject } from '@cloudbeaver/core-navigation-tree';
 import type { CalculatedColumn as GridCalculatedColumn } from '@cloudbeaver/plugin-react-data-grid';
 
@@ -24,9 +24,12 @@ export interface ITableData {
 }
 
 export function useTableData(dataColumns: IDataColumn[], customColumns: ICustomColumn[]): ITableData {
-  return useObservableRef(() => ({
+  return useObjectRef(() => ({
     get columns() {
-      return this.customColumns.slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).concat(this.dataColumns);
+      return this.customColumns
+        .slice()
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+        .concat(this.dataColumns);
     },
     isCustomColumn(column: CalculatedColumn) {
       return this.customColumns.some(c => c.key === column.key);
@@ -34,5 +37,5 @@ export function useTableData(dataColumns: IDataColumn[], customColumns: ICustomC
     getColumnIdx(column: CalculatedColumn) {
       return this.isCustomColumn(column) ? column.idx : column.idx - this.customColumns.length;
     },
-  }), { columns: computed }, { dataColumns, customColumns });
+  }), { dataColumns, customColumns });
 }
