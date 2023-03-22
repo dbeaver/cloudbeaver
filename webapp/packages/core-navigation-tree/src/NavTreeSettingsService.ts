@@ -11,7 +11,7 @@ import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
   // temporary limit for all nodes children in app
-  childrenLimit: 500,
+  childrenLimit: 1000,
   editing: true,
   deleting: true,
 };
