@@ -120,20 +120,15 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         return getWebConnection(getWebSession(env), getProjectReference(env), env.getArgument("connectionId"));
     }
 
-    /**
-     * Returns WebSession or null if the session was not found in the cache, the session could not be restored, or an error occurred
-     */
     @Nullable
     public static WebSession findWebSession(DataFetchingEnvironment env) {
-        return CBPlatform.getInstance().getSessionManager().getOrRestoreSession(getServletRequest(env));
+        return CBPlatform.getInstance().getSessionManager().findWebSession(
+            getServletRequest(env));
     }
 
     public static WebSession findWebSession(DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
-        var webSession = CBPlatform.getInstance().getSessionManager().getOrRestoreSession(getServletRequest(env));
-        if (webSession == null && errorOnNotFound) {
-            throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
-        }
-        return webSession;
+        return CBPlatform.getInstance().getSessionManager().findWebSession(
+            getServletRequest(env), errorOnNotFound);
     }
 
     @NotNull
