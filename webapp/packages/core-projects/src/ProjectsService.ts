@@ -11,14 +11,13 @@ import { computed, makeObservable } from 'mobx';
 import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
 import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { activeProjectsContext } from './activeProjectsContext';
-import { IProjectUpdateEvent, ProjectInfoEventHandler } from './ProjectInfoEventHandler';
+import { IProjectInfoEvent, ProjectInfoEventHandler } from './ProjectInfoEventHandler';
 import { ProjectInfo, ProjectInfoResource } from './ProjectInfoResource';
 
 interface IActiveProjectData {
@@ -98,7 +97,6 @@ export class ProjectsService extends Dependency {
     private readonly userDataService: UserDataService,
     private readonly projectInfoEventHandler: ProjectInfoEventHandler,
     private readonly dataSynchronizationService: DataSynchronizationService,
-    private readonly navTreeResource: NavTreeResource,
     navigationService: NavigationService
   ) {
     super();
@@ -139,12 +137,11 @@ export class ProjectsService extends Dependency {
       }
     });
 
-    this.projectInfoEventHandler.onEvent<IProjectUpdateEvent>(ServerEventId.CbRmProjectAdded, () => {
+    this.projectInfoEventHandler.onEvent<IProjectInfoEvent>(ServerEventId.CbRmProjectAdded, () => {
       this.projectInfoResource.markOutdated();
-      this.navTreeResource.markOutdated(ROOT_NODE_PATH);
     }, undefined, this.projectInfoResource);
 
-    this.projectInfoEventHandler.onEvent<IProjectUpdateEvent>(ServerEventId.CbRmProjectRemoved, key => {
+    this.projectInfoEventHandler.onEvent<IProjectInfoEvent>(ServerEventId.CbRmProjectRemoved, key => {
       if (this.activeProjectIds.includes(key.projectId)) {
         const project = this.projectInfoResource.get(key.projectId);
 
