@@ -56,7 +56,6 @@ import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.*;
@@ -90,9 +89,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, rootNode, true);
             } else {
                 DBNNode parentNode = navigatorModel.getNodeByPath(monitor, parentPath);
-                if (parentNode == null) {
-                    throw new DBWebException("Node '" + parentPath + "' not found");
-                }
+                    if (parentNode == null) {
+                        throw new DBWebException("Node '" + parentPath + "' not found");
+                    }
                 if (!parentNode.hasChildren(false)) {
                     return EMPTY_NODE_LIST;
                 }

@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.rm.RMUtils;
+import io.cloudbeaver.model.rm.lock.RMFileLockController;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -34,7 +35,6 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.app.DBPResourceTypeDescriptor;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
@@ -82,6 +82,7 @@ public class LocalResourceController implements RMController {
     private final Path sharedProjectsPath;
     private final String globalProjectName;
     private Supplier<SMController> smControllerSupplier;
+    private final RMFileLockController lockController;
 
     private final Map<String, WebProjectImpl> projectRegistries = new LinkedHashMap<>();
 
@@ -92,13 +93,14 @@ public class LocalResourceController implements RMController {
         Path userProjectsPath,
         Path sharedProjectsPath,
         Supplier<SMController> smControllerSupplier
-    ) {
+    ) throws DBException {
         this.workspace = workspace;
         this.credentialsProvider = credentialsProvider;
         this.rootPath = rootPath;
         this.userProjectsPath = userProjectsPath;
         this.sharedProjectsPath = sharedProjectsPath;
         this.smControllerSupplier = smControllerSupplier;
+        this.lockController = new RMFileLockController(WebAppUtils.getWebApplication());
 
         this.globalProjectName = DBWorkbench.getPlatform().getApplication().getDefaultProjectName();
     }
@@ -287,16 +289,18 @@ public class LocalResourceController implements RMController {
 
     @Override
     public void deleteProject(@NotNull String projectId) throws DBException {
-        RMProject project = makeProjectFromId(projectId, false);
-        Path targetPath = getProjectPath(projectId);
-        if (!Files.exists(targetPath)) {
-            throw new DBException("Project '" + project.getName() + "' doesn't exists");
-        }
-        try {
-            IOUtils.deleteDirectory(targetPath);
-            getSecurityController().deleteAllObjectPermissions(projectId, SMObjects.PROJECT);
-        } catch (IOException e) {
-            throw new DBException("Error deleting project '" + project.getName() + "'", e);
+        try (var projectLock = lockController.lockProject(projectId, "deleteProject")) {
+            RMProject project = makeProjectFromId(projectId, false);
+            Path targetPath = getProjectPath(projectId);
+            if (!Files.exists(targetPath)) {
+                throw new DBException("Project '" + project.getName() + "' doesn't exists");
+            }
+            try {
+                IOUtils.deleteDirectory(targetPath);
+                getSecurityController().deleteAllObjectPermissions(projectId, SMObjects.PROJECT);
+            } catch (IOException e) {
+                throw new DBException("Error deleting project '" + project.getName() + "'", e);
+            }
         }
     }
 
@@ -347,7 +351,9 @@ public class LocalResourceController implements RMController {
         @NotNull String configuration,
         @Nullable List<String> dataSourceIds
     ) throws DBException {
-        updateProjectDataSources(projectId, configuration, dataSourceIds);
+        try (var projectLock = lockController.lockProject(projectId, "createDatasources")) {
+            updateProjectDataSources(projectId, configuration, dataSourceIds);
+        }
     }
 
     @Override
@@ -368,32 +374,38 @@ public class LocalResourceController implements RMController {
     }
 
     @Override
-    public void deleteProjectDataSources(@NotNull String projectId, @NotNull String[] dataSourceIds) throws DBException {
-        final DBPProject project = getProjectMetadata(projectId, false);
-        final DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+    public void deleteProjectDataSources(@NotNull String projectId,
+                                         @NotNull String[] dataSourceIds) throws DBException {
+        try (var projectLock = lockController.lockProject(projectId, "deleteDatasources")) {
+            final DBPProject project = getProjectMetadata(projectId, false);
+            final DBPDataSourceRegistry registry = project.getDataSourceRegistry();
 
-        for (String dataSourceId : dataSourceIds) {
-            final DBPDataSourceContainer dataSource = registry.getDataSource(dataSourceId);
+            for (String dataSourceId : dataSourceIds) {
+                final DBPDataSourceContainer dataSource = registry.getDataSource(dataSourceId);
 
-            if (dataSource != null) {
-                registry.removeDataSource(dataSource);
-            } else {
-                log.warn("Could not find datasource " + dataSourceId + " for deletion");
+                if (dataSource != null) {
+                    registry.removeDataSource(dataSource);
+                } else {
+                    log.warn("Could not find datasource " + dataSourceId + " for deletion");
+                }
             }
+            registry.checkForErrors();
         }
-        registry.checkForErrors();
     }
 
     @Override
-    public void createProjectDataSourceFolder(@NotNull String projectId, @NotNull String folderPath) throws DBException {
-        DBPProject project = getProjectMetadata(projectId, false);
-        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-        var result = Path.of(folderPath);
-        var newName = result.getFileName().toString();
-        var parent = result.getParent();
-        var parentFolder = parent == null ? null : registry.getFolder(parent.toString().replace("\\", "/"));
-        DBPDataSourceFolder newFolder = registry.addFolder(parentFolder, newName);
-        registry.checkForErrors();
+    public void createProjectDataSourceFolder(@NotNull String projectId,
+                                              @NotNull String folderPath) throws DBException {
+        try (var projectLock = lockController.lockProject(projectId, "createDatasourceFolder")) {
+            DBPProject project = getProjectMetadata(projectId, false);
+            DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+            var result = Path.of(folderPath);
+            var newName = result.getFileName().toString();
+            var parent = result.getParent();
+            var parentFolder = parent == null ? null : registry.getFolder(parent.toString().replace("\\", "/"));
+            DBPDataSourceFolder newFolder = registry.addFolder(parentFolder, newName);
+            registry.checkForErrors();
+        }
     }
 
     @Override
@@ -402,17 +414,19 @@ public class LocalResourceController implements RMController {
         @NotNull String[] folderPaths,
         boolean dropContents
     ) throws DBException {
-        DBPProject project = getProjectMetadata(projectId, false);
-        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-        for (String folderPath : folderPaths) {
-            DBPDataSourceFolder folder = registry.getFolder(folderPath);
-            if (folder != null) {
-                registry.removeFolder(folder, dropContents);
-            } else {
-                log.warn("Can not find folder by path [" + folderPath + "] for deletion");
+        try (var projectLock = lockController.lockProject(projectId, "createDatasourceFolder")) {
+            DBPProject project = getProjectMetadata(projectId, false);
+            DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+            for (String folderPath : folderPaths) {
+                DBPDataSourceFolder folder = registry.getFolder(folderPath);
+                if (folder != null) {
+                    registry.removeFolder(folder, dropContents);
+                } else {
+                    log.warn("Can not find folder by path [" + folderPath + "] for deletion");
+                }
             }
+            registry.checkForErrors();
         }
-        registry.checkForErrors();
     }
 
     @Override
@@ -421,10 +435,12 @@ public class LocalResourceController implements RMController {
         @NotNull String oldPath,
         @NotNull String newPath
     ) throws DBException {
-        DBPProject project = getProjectMetadata(projectId, false);
-        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-        registry.moveFolder(oldPath, newPath);
-        registry.checkForErrors();
+        try (var projectLock = lockController.lockProject(projectId, "createDatasourceFolder")) {
+            DBPProject project = getProjectMetadata(projectId, false);
+            DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+            registry.moveFolder(oldPath, newPath);
+            registry.checkForErrors();
+        }
     }
 
     @NotNull
@@ -923,9 +939,12 @@ public class LocalResourceController implements RMController {
         );
     }
 
-    public static Builder builder(SMCredentialsProvider credentialsProvider, DBPWorkspace workspace, Supplier<SMController> smControllerSupplier) {
+    public static Builder builder(SMCredentialsProvider credentialsProvider,
+                                  DBPWorkspace workspace,
+                                  Supplier<SMController> smControllerSupplier) {
         return new Builder(workspace, credentialsProvider, smControllerSupplier);
     }
+
     public static final class Builder {
         private final SMCredentialsProvider credentialsProvider;
         private final Supplier<SMController> smController;
@@ -959,7 +978,7 @@ public class LocalResourceController implements RMController {
             return this;
         }
 
-        public LocalResourceController build() {
+        public LocalResourceController build() throws DBException {
             return new LocalResourceController(workspace, credentialsProvider, rootPath, userProjectsPath, sharedProjectsPath, smController);
         }
     }

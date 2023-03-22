@@ -60,7 +60,8 @@ public interface WebApplication extends DBPApplication {
 
     DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
-    RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider, @NotNull DBPWorkspace workspace);
+    RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
+                                          @NotNull DBPWorkspace workspace) throws DBException;
 
     String getServerURL();
 
