@@ -8,6 +8,7 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
+import { SessionResource } from '@cloudbeaver/core-root';
 import { ThemeService } from '@cloudbeaver/core-theming';
 
 import { UserInfoResource } from './UserInfoResource';
@@ -22,6 +23,7 @@ export class UserConfigurationBootstrap extends Bootstrap {
     private readonly userInfoResource: UserInfoResource,
     private readonly themeService: ThemeService,
     private readonly localizationService: LocalizationService,
+    private readonly sessionResource: SessionResource
   ) {
     super();
     this.userInfoResource.onDataUpdate.addHandler(() => {
@@ -35,6 +37,7 @@ export class UserConfigurationBootstrap extends Bootstrap {
 
       if (typeof language === 'string') {
         this.localizationService.setLocale(language);
+        this.sessionResource.changeLanguage(language);
       }
     });
 
