@@ -14,8 +14,10 @@ import { Loader, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
+import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { ThemeService } from '@cloudbeaver/core-theming';
 import { DNDProvider } from '@cloudbeaver/core-ui';
 import { useAppVersion } from '@cloudbeaver/plugin-version';
@@ -43,6 +45,8 @@ export const Body = observer(function Body() {
   const screenService = useService(ScreenService);
   const Screen = screenService.screen?.component;
   const { backendVersion } = useAppVersion();
+
+  useResource(Body, ProjectInfoResource, CachedMapAllKey);
 
   // sync classes from theme with body for popup components and etc
   useLayoutEffect(() => {

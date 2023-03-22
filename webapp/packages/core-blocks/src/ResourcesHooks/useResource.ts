@@ -424,7 +424,7 @@ export function useResource<
 
   useEffect(() => {
     const disposeDataUpdate = reaction(
-      () => result.data,
+      () => result.tryGetData,
       (data, prev) => {
         actions?.onData?.(data as any, resource, prev as any);
       },

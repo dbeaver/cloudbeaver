@@ -110,6 +110,9 @@ implements IExecutorHandlersCollection<T, TResult> {
   }
 
   addHandler(handler: IExecutorHandler<T, TResult>): this {
+    if (this.hasHandler(handler)) {
+      return this;
+    }
     this.handlers.push(handler);
     this.executeHandlerWithInitialData(handler);
     return this;
@@ -120,6 +123,9 @@ implements IExecutorHandlersCollection<T, TResult> {
   }
 
   addPostHandler(handler: IExecutorHandler<T, TResult>): this {
+    if (this.postHandlers.includes(handler)) {
+      return this;
+    }
     this.postHandlers.push(handler);
     return this;
   }

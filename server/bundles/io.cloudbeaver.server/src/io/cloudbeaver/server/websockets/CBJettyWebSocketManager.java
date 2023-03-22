@@ -28,12 +28,14 @@ import org.jkiss.dbeaver.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CBJettyWebSocketManager implements JettyWebSocketCreator {
     private static final Log log = Log.getLog(CBJettyWebSocketManager.class);
-    private final Map<String, CBEventsWebSocket> socketBySessionId = new ConcurrentHashMap<>();
+    private final Map<String, List<CBEventsWebSocket>> socketBySessionId = new ConcurrentHashMap<>();
     private final WebSessionManager webSessionManager;
 
     public CBJettyWebSocketManager(WebSessionManager webSessionManager) {
@@ -54,12 +56,8 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
             return null;
         }
         var webSessionId = webSession.getSessionId();
-        var oldWebSocket = socketBySessionId.get(webSessionId);
-        if (oldWebSocket != null) {
-            oldWebSocket.close();
-        }
         var newWebSocket = new CBEventsWebSocket(webSession);
-        socketBySessionId.put(webSessionId, newWebSocket);
+        socketBySessionId.computeIfAbsent(webSessionId, key -> new ArrayList<>()).add(newWebSocket);
         log.info("Websocket created for session: " + webSessionId);
         return newWebSocket;
     }
@@ -83,8 +81,11 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
     public void sendPing() {
         //remove expired sessions
         socketBySessionId.entrySet()
-            .removeIf(entry ->
-                entry.getValue().isNotConnected() || webSessionManager.getSession(entry.getKey()) == null
+            .removeIf(entry -> {
+                    entry.getValue().removeIf(ws -> !ws.isConnected());
+                    return webSessionManager.getSession(entry.getKey()) == null ||
+                        entry.getValue().isEmpty();
+                }
             );
 
         socketBySessionId.entrySet()
@@ -93,14 +94,16 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
             .forEach(
                 entry -> {
                     var sessionId = entry.getKey();
-                    var webSocket = entry.getValue();
-                    try {
-                        webSocket.getRemote().sendPing(
-                            ByteBuffer.wrap("cb-ping".getBytes(StandardCharsets.UTF_8)),
-                            webSocket.getCallback()
-                        );
-                    } catch (Exception e) {
-                        log.error("Failed to send ping in web socket: " + sessionId);
+                    var webSockets = entry.getValue();
+                    for (CBEventsWebSocket webSocket : webSockets) {
+                        try {
+                            webSocket.getRemote().sendPing(
+                                ByteBuffer.wrap("cb-ping".getBytes(StandardCharsets.UTF_8)),
+                                webSocket.getCallback()
+                            );
+                        } catch (Exception e) {
+                            log.error("Failed to send ping in web socket: " + sessionId);
+                        }
                     }
                 }
             );

@@ -11,7 +11,7 @@ import { action, makeObservable, observable, runInAction } from 'mobx';
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService, CachedMapResource, ResourceKey, NavNodeInfoFragment, ResourceKeyUtils, ICachedResourceMetadata, ResourceKeyList, resourceKeyList, ResourceKeySimple } from '@cloudbeaver/core-sdk';
-import type { MetadataMap } from '@cloudbeaver/core-utils';
+import { getPathParents, MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from './EntityTypes';
 import { NodeManagerUtils } from './NodeManagerUtils';
@@ -54,14 +54,10 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
     let current = this.get(key);
 
     if (!current) {
-      return NodeManagerUtils.parentsFromPath(key);
+      return getPathParents(key);
     }
 
-    while (
-      current
-      && current.parentId !== current.id
-      // && current.parentId !== ROOT_NODE_PATH
-    ) {
+    while (current && current.parentId !== undefined) {
       parents.unshift(current.parentId);
       current = this.get(current.parentId);
     }
@@ -76,10 +72,10 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
     return ResourceKeyUtils.map(key, key => this.get(key)?.parentId);
   }
 
-  setParent(key: string, parentId: string): void;
-  setParent(key: ResourceKeyList<string>, parentId: string): void;
-  setParent(key: ResourceKeySimple<string>, parentId: string): void;
-  setParent(key: ResourceKeySimple<string>, parentId: string): void {
+  setParent(key: string, parentId?: string): void;
+  setParent(key: ResourceKeyList<string>, parentId?: string): void;
+  setParent(key: ResourceKeySimple<string>, parentId?: string): void;
+  setParent(key: ResourceKeySimple<string>, parentId?: string): void {
     ResourceKeyUtils.forEach(key, key => {
       const node = this.get(key);
 
@@ -103,13 +99,13 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
     return this.data;
   }
 
-  navNodeInfoToNavNode(node: NavNodeInfo, parentId?: string, requestPath?: string): NavNode {
+  navNodeInfoToNavNode(node: NavNodeInfo, parentId?: string): NavNode {
     const oldNode = this.get(node.id);
 
     let newNode: NavNode = {
       ...node,
       objectFeatures: node.object?.features || [],
-      parentId: parentId ?? this.get(node.id)?.parentId ?? requestPath ?? node.id,
+      parentId: parentId ?? oldNode?.parentId,
     };
 
     if (oldNode) {
@@ -155,7 +151,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
       const navNode = this.navNodeInfoToNavNode(node, parents[0]?.id);
 
       this.set(
-        resourceKeyList(parents.map(node => node.id)),
+        resourceKeyList([...parents.map(node => node.id), navNode.id]),
         [
           ...parents.reduce((list, node, index, array) => {
             list.push(this.navNodeInfoToNavNode(node, array[index + 1]?.id));
