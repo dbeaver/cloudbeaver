@@ -74,7 +74,12 @@ export class LocalizationService extends Bootstrap {
     this.onChange = new SyncExecutor();
     this.pluginSettings = this.pluginManagerService.getCoreSettings('localization', defaultThemeSettings);
     this.deprecatedPluginSettings = this.pluginManagerService.getCoreSettings('user', defaultThemeSettings);
+
     sessionResource.onDataUpdate.addHandler(this.syncLanguage.bind(this));
+    this.onChange.addHandler(key => {
+      this.sessionResource.setDefaultLocale(key);
+      this.sessionResource.changeLanguage(key);
+    });
 
     makeObservable<LocalizationService, 'localeMap' | 'setCurrentLocale'>(this, {
       settings: observable,
@@ -98,7 +103,7 @@ export class LocalizationService extends Bootstrap {
     }
 
     let translation = this.localeMap
-      .get(this.getCurrentLanguage())
+      .get(this.currentLanguage)
       ?.get(token as TLocalizationToken);
 
     if (!translation) {
@@ -126,7 +131,7 @@ export class LocalizationService extends Bootstrap {
 
   register(): void | Promise<void> {
     this.addProvider(this.coreProvider.bind(this));
-    this.sessionResource.setDefaultLocale(this.settings.language);
+    this.sessionResource.setDefaultLocale(this.currentLanguage);
   }
 
   async load(): Promise<void> {
@@ -137,22 +142,17 @@ export class LocalizationService extends Bootstrap {
       this.settings,
       getDefaultLocalizationSettings
     ); // load user state locale
-    this.sessionResource.setDefaultLocale(this.settings.language);
+    this.sessionResource.setDefaultLocale(this.currentLanguage);
     await this.loadLocaleAsync(DEFAULT_LOCALE_NAME);
-    await this.loadLocaleAsync(this.settings.language);
-  }
-
-  getCurrentLanguage(): string {
-    return this.settings.language;
+    await this.loadLocaleAsync(this.currentLanguage);
   }
 
   async changeLocaleAsync(key: string): Promise<void> {
-    if (key === this.settings.language) {
+    if (key === this.currentLanguage) {
       return;
     }
-    this.sessionResource.setDefaultLocale(this.settings.language);
-    await this.sessionResource.changeLanguage(key);
-    this.onChange.execute(key);
+    await this.setLocale(key);
+    this.onChange.execute(this.currentLanguage);
   }
 
   private async syncLanguage() {
@@ -180,7 +180,7 @@ export class LocalizationService extends Bootstrap {
     this.settings.language = lang;
   }
 
-  private async setLocale(key: string) {
+  async setLocale(key: string) {
     const config = await this.serverConfigResource.load();
 
     if (!config) {

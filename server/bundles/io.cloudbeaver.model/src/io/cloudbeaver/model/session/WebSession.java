@@ -117,8 +117,6 @@ public class WebSession extends BaseWebSession
 
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
-    private WebProjectImpl defaultProject;
-    private final List<WebProjectImpl> accessibleProjects = new ArrayList<>();
     private final Map<String, DBWSessionHandler> sessionHandlers;
 
     public WebSession(
@@ -150,7 +148,7 @@ public class WebSession extends BaseWebSession
 
     @NotNull
     public DBPProject getSingletonProject() {
-        return defaultProject;
+        return getWorkspace().getActiveProject();
     }
 
     @Property
@@ -304,29 +302,21 @@ public class WebSession extends BaseWebSession
             this.navigatorModel.dispose();
             this.navigatorModel = null;
         }
-
-        if (!this.accessibleProjects.isEmpty()) {
-            for (WebProjectImpl project : accessibleProjects) {
-                if (project.equals(DBWorkbench.getPlatform().getWorkspace().getActiveProject())) {
-                    continue;
-                }
-                project.dispose();
-            }
-            this.defaultProject = null;
-            this.accessibleProjects.clear();
-        }
         this.connections.clear();
 
         loadProjects();
 
-        this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), this.accessibleProjects);
-        this.navigatorModel.setModelAuthContext(sessionAuthContext);
+        this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), getWorkspace().getProjects());
+        this.navigatorModel.setModelAuthContext(getWorkspace().getAuthContext());
         this.navigatorModel.initialize();
 
         this.locale = Locale.getDefault().getLanguage();
     }
 
     private void loadProjects() {
+        WebSessionWorkspace workspace = getWorkspace();
+        workspace.clearProjects();
+
         WebUser user = userContext.getUser();
         if (user == null && DBWorkbench.isDistributed()) {
             // No anonymous mode in distributed apps
@@ -343,8 +333,8 @@ public class WebSession extends BaseWebSession
                 WebProjectImpl anonymousProject = createWebProject(RMUtils.createAnonymousProject());
                 anonymousProject.setInMemory(true);
             }
-            if (defaultProject == null && !accessibleProjects.isEmpty()) {
-                defaultProject = accessibleProjects.get(0);
+            if (workspace.getActiveProject() == null && !workspace.getProjects().isEmpty()) {
+                workspace.setActiveProject(workspace.getProjects().get(0));
             }
         } catch (DBException e) {
             addSessionError(e);
@@ -362,7 +352,7 @@ public class WebSession extends BaseWebSession
         dataSourceRegistry.setAuthCredentialsProvider(this);
         addSessionProject(sessionProject);
         if (!project.isShared() || application.isConfigurationMode()) {
-            this.defaultProject = sessionProject;
+            getWorkspace().setActiveProject(sessionProject);
         }
         for (DBPDataSourceContainer ds : dataSourceRegistry.getDataSources()) {
             addConnection(new WebConnectionInfo(this, ds));
@@ -388,8 +378,6 @@ public class WebSession extends BaseWebSession
 
     @NotNull
     private Set<String> readAccessibleConnectionIds() {
-        WebUser user = getUser();
-
         try {
             return getSecurityController()
                 .getAllAvailableObjectsPermissions(SMObjects.DATASOURCE)
@@ -438,7 +426,6 @@ public class WebSession extends BaseWebSession
 
     private synchronized void refreshSessionAuth() {
         try {
-
             if (!isAuthorizedInSecurityManager()) {
                 authAsAnonymousUser();
             } else if (getUserId() != null) {
@@ -534,7 +521,11 @@ public class WebSession extends BaseWebSession
             connectionInfo = connections.get(connectionID);
         }
         if (connectionInfo == null) {
-            DBPDataSourceContainer dataSource = getProjectById(projectId).getDataSourceRegistry().getDataSource(connectionID);
+            WebProjectImpl project = getProjectById(projectId);
+            if (project == null) {
+                throw new DBWebException("Project '" + projectId + "' not found in web workspace");
+            }
+            DBPDataSourceContainer dataSource = project.getDataSourceRegistry().getDataSource(connectionID);
             if (dataSource != null) {
                 connectionInfo = new WebConnectionInfo(this, dataSource);
                 synchronized (connections) {
@@ -579,13 +570,7 @@ public class WebSession extends BaseWebSession
         } catch (Exception e) {
             log.error("Error closing web session tokens");
         }
-        this.sessionAuthContext.close();
         this.userContext.setUser(null);
-
-        if (this.defaultProject != null) {
-            this.defaultProject.dispose();
-            this.defaultProject = null;
-        }
 
         super.close();
     }
@@ -964,34 +949,22 @@ public class WebSession extends BaseWebSession
 
     @Nullable
     public WebProjectImpl getProjectById(@Nullable String projectId) {
-        if (projectId == null) {
-            return defaultProject;
-        }
-        for (WebProjectImpl project : accessibleProjects) {
-            if (project.getId().equals(projectId)) {
-                return project;
-            }
-        }
-        return null;
+        return getWorkspace().getProjectById(projectId);
     }
 
     public List<WebProjectImpl> getAccessibleProjects() {
-        return accessibleProjects;
+        return getWorkspace().getProjects();
     }
 
     public void addSessionProject(@NotNull WebProjectImpl project) {
-        synchronized (accessibleProjects) {
-            accessibleProjects.add(project);
-        }
+        getWorkspace().addProject(project);
         if (navigatorModel != null) {
             navigatorModel.getRoot().addProject(project, false);
         }
     }
 
     public void deleteSessionProject(@Nullable WebProjectImpl project) {
-        synchronized (accessibleProjects) {
-            accessibleProjects.remove(project);
-        }
+        getWorkspace().remoteProject((WebProjectImpl) project);
         if (navigatorModel != null) {
             navigatorModel.getRoot().removeProject(project);
         }

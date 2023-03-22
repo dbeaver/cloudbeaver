@@ -23,6 +23,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
@@ -50,6 +51,7 @@ public class WebUserContext implements SMCredentialsProvider {
     private static final Log log = Log.getLog(WebUserContext.class);
 
     private final WebApplication application;
+    private final DBPWorkspace workspace;
 
     private WebUser user;
     private Set<String> userPermissions;
@@ -63,10 +65,11 @@ public class WebUserContext implements SMCredentialsProvider {
     private RMController rmController;
     private Set<String> accessibleProjectIds = new HashSet<>();
 
-    public WebUserContext(WebApplication application) throws DBException {
+    public WebUserContext(WebApplication application, DBPWorkspace workspace) throws DBException {
         this.application = application;
+        this.workspace = workspace;
         this.securityController = application.createSecurityController(this);
-        this.rmController = application.createResourceController(this);
+        this.rmController = application.createResourceController(this, workspace);
         setUserPermissions(getDefaultPermissions());
     }
 
@@ -107,7 +110,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.securityController = application.createSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
         this.secretController = application.getSecretController(this);
-        this.rmController = application.createResourceController(this);
+        this.rmController = application.createResourceController(this, workspace);
         if (isSessionChanged) {
             this.smSessionId = smAuthPermissions.getSessionId();
             setUser(smAuthPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));

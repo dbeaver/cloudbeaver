@@ -289,26 +289,26 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     this.navNodeManagerService.onMove.addHandler(this.moveResourceToFolder.bind(this));
     let syncOutdate = true;
 
-    this.navNodeInfoResource.onItemUpdate.addHandler(executorHandlerFilter(
-      () => syncOutdate,
-      key => {
-        syncOutdate = false;
-        try {
-          const resources = [...new Set(ResourceKeyUtils
-            .mapArray(key, getResourceKeyFromNodeId)
-            .filter(isDefined)
-            .map(getPathParent))];
+    // this.navNodeInfoResource.onItemUpdate.addHandler(executorHandlerFilter(
+    //   () => syncOutdate,
+    //   key => {
+    //     syncOutdate = false;
+    //     try {
+    //       const resources = [...new Set(ResourceKeyUtils
+    //         .mapArray(key, getResourceKeyFromNodeId)
+    //         .filter(isDefined)
+    //         .map(getPathParent))];
 
-          const keyList = resourceKeyList(resources);
+    //       const keyList = resourceKeyList(resources);
 
-          if (!this.resourceManagerResource.isOutdated(keyList)) {
-            this.resourceManagerResource.markOutdated(keyList); // because of this
-          }
-        } finally {
-          syncOutdate = true;
-        }
-      }
-    ));
+    //       if (!this.resourceManagerResource.isOutdated(keyList)) {
+    //         this.resourceManagerResource.markOutdated(keyList); // because of this
+    //       }
+    //     } finally {
+    //       syncOutdate = true;
+    //     }
+    //   }
+    // ));
 
     this.navNodeInfoResource.onItemDelete.addHandler(executorHandlerFilter(
       () => true,

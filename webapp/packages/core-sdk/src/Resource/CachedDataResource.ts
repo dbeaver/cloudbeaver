@@ -81,9 +81,11 @@ export function getCachedDataResourceLoaderState<
 >(
   resource: CachedDataResource<TData, TKey, TContext>,
   param: TKey,
-  context?: CachedResourceIncludeArgs<TData, TContext>
+  context?: CachedResourceIncludeArgs<TData, TContext>,
+  lazy?: boolean
 ): ILoadableState {
   return {
+    lazy,
     get exception() {
       return resource.getException(param);
     },

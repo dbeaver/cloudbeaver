@@ -10,7 +10,7 @@ import { computed, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SyncExecutor, ISyncExecutor, ITask, AutoRunningTask, whileTask } from '@cloudbeaver/core-executor';
-import { SessionResource } from '@cloudbeaver/core-root';
+import { SessionDataResource, SessionResource } from '@cloudbeaver/core-root';
 import { AuthInfo, AuthStatus, CachedDataResource, GetActiveUserQueryVariables, GraphQLService, ResourceKeySimple, ResourceKeyUtils, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
@@ -45,7 +45,8 @@ UserInfoIncludes
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly authProviderService: AuthProviderService,
-    private readonly sessionResource: SessionResource
+    private readonly sessionResource: SessionResource,
+    private readonly sessionDataResource: SessionDataResource
   ) {
     super(() => null, undefined, ['customIncludeOriginDetails', 'includeConfigurationParameters']);
 
@@ -103,12 +104,12 @@ UserInfoIncludes
     if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
       if (this.data === null || linkUser) {
         this.resetIncludes();
-        this.setData(await this.loader());
+        this.markOutdated();
       } else {
         this.data.authTokens.push(...authInfo.userTokens as UserAuthToken[]);
       }
 
-      this.sessionResource.markOutdated();
+      this.sessionDataResource.markOutdated();
     }
 
     return authInfo as AuthInfo;
@@ -152,7 +153,7 @@ UserInfoIncludes
             this.data.authTokens.push(...authInfo.userTokens as UserAuthToken[]);
           }
 
-          this.sessionResource.markOutdated();
+          this.sessionDataResource.markOutdated();
         }
 
         return this.data;
@@ -168,45 +169,60 @@ UserInfoIncludes
       configuration,
     });
 
-    if (!provider || (this.data?.authTokens.length || 0) <= 1) {
-      this.setData(null);
-      this.resetIncludes();
-    }
-    this.sessionResource.markOutdated();
+    runInAction(() => {
+      if (!provider || (this.data?.authTokens.length || 0) <= 1) {
+        this.setData(null);
+        this.resetIncludes();
+      }
+      this.sessionDataResource.markOutdated();
+    });
   }
 
   async setConfigurationParameter(key: string, value: any): Promise<UserInfo | null> {
-    if (!this.data) {
-      return null;
+    await this.load();
+
+    if (!this.parametersAvailable) {
+      return this.data;
     }
 
-    await this.graphQLService.sdk.setUserConfigurationParameter({
-      name: key,
-      value,
-    });
+    this.performUpdate(undefined, [], async () => {
+      await this.graphQLService.sdk.setUserConfigurationParameter({
+        name: key,
+        value,
+      });
 
-    this.data.configurationParameters[key] = value;
+      if (this.data) {
+        this.data.configurationParameters[key] = value;
+      }
+    });
 
     return this.data;
   }
 
   async deleteConfigurationParameter(key: ResourceKeySimple<string>): Promise<UserInfo | null> {
+    await this.load();
+
+    if (!this.parametersAvailable) {
+      return this.data;
+    }
+
     const keyList: string[] = [];
-    await ResourceKeyUtils.forEachAsync(key, async name => {
-      await this.graphQLService.sdk.setUserConfigurationParameter({
-        name,
-        value: null,
+    this.performUpdate(undefined, [], async () => {
+      await ResourceKeyUtils.forEachAsync(key, async name => {
+        await this.graphQLService.sdk.setUserConfigurationParameter({
+          name,
+          value: null,
+        });
+
+        keyList.push(name);
       });
 
-      keyList.push(name);
+      runInAction(() => {
+        for (const item of keyList) {
+          delete this.data?.configurationParameters[item];
+        }
+      });
     });
-
-    runInAction(() => {
-      for (const item of keyList) {
-        delete this.data?.configurationParameters[item];
-      }
-    });
-
     return this.data;
   }
 
@@ -228,7 +244,7 @@ UserInfoIncludes
 
   protected setData(data: UserInfo | null): void {
     const prevUserId = this.getId();
-    this.data = data;
+    super.setData(data);
     const currentUserId = this.getId();
 
     if (prevUserId !== currentUserId) {

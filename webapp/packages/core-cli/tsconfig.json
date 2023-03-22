@@ -3,11 +3,12 @@
     "rootDir": "src",
     "module": "CommonJS",
     "outDir": "lib",
+    "moduleResolution": "node",
     "composite": true,
     "esModuleInterop": true,
     "emitDeclarationOnly": false,
     "skipLibCheck": true
   },
   "include": ["src"],
-  "exclude": ["**/node_modules", "**/.*/"]
+  "exclude": ["**/node_modules", "**/lib"]
 }

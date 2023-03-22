@@ -14,20 +14,20 @@ import { Icon } from './Icon';
 test('icons.svg#name', () => {
   (globalThis as any)._ROOT_URI_ = undefined;
 
-  render(<Icon name='test' data-testid="icon" />);
-  expect(screen.getByTestId('icon').querySelector('use')).toHaveAttribute('href', '/icons/icons.svg#test');
+  render(<Icon name='test' />);
+  expect(screen.getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/icons/icons.svg#test');
 });
 
 test('/image.jpg', () => {
   (globalThis as any)._ROOT_URI_ = undefined;
 
-  render(<Icon name='/image.jpg' data-testid="icon" />);
-  expect(screen.getByTestId('icon').querySelector('use')).toHaveAttribute('href', '/image.jpg');
+  render(<Icon name='/image.jpg' />);
+  expect(screen.getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/image.jpg');
 });
 
 test('{_ROOT_URI_}/icons.svg#name', () => {
   (globalThis as any)._ROOT_URI_ = '/path/';
 
-  render(<Icon name='test' data-testid="icon" />);
-  expect(screen.getByTestId('icon').querySelector('use')).toHaveAttribute('href', '/path/icons/icons.svg#test');
+  render(<Icon name='test' />);
+  expect(screen.getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/path/icons/icons.svg#test');
 });

@@ -26,10 +26,8 @@ import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthSpace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
-import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -43,7 +41,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public abstract class BaseWebSession extends AbstractSessionPersistent {
     private static final Log log = Log.getLog(BaseWebSession.class);
 
-    protected final SessionContextImpl sessionAuthContext;
     @NotNull
     protected final String id;
     protected final long createTime;
@@ -55,15 +52,24 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new CopyOnWriteArrayList<>();
     private WebSessionEventsFilter eventsFilter = new WebSessionEventsFilter();
+    private final WebSessionWorkspace workspace;
 
     public BaseWebSession(@NotNull String id, @NotNull WebApplication application) throws DBException {
         this.id = id;
         this.application = application;
         this.createTime = System.currentTimeMillis();
         this.lastAccessTime = this.createTime;
-        this.sessionAuthContext = new SessionContextImpl(null);
-        this.sessionAuthContext.addSession(this);
-        this.userContext = new WebUserContext(this.application);
+        this.workspace = new WebSessionWorkspace(this);
+        this.workspace.getAuthContext().addSession(this);
+        this.userContext = createUserContext();
+    }
+
+    protected WebUserContext createUserContext() throws DBException {
+        return new WebUserContext(this.application, this.workspace);
+    }
+
+    public WebSessionWorkspace getWorkspace() {
+        return workspace;
     }
 
     public void addSessionEvent(WSEvent event) {
@@ -104,13 +110,13 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @NotNull
     @Override
     public SMAuthSpace getSessionSpace() {
-        return DBWorkbench.getPlatform().getWorkspace();
+        return workspace;
     }
 
     @NotNull
     @Override
     public SMSessionContext getSessionContext() {
-        return sessionAuthContext;
+        return workspace.getAuthContext();
     }
 
     @NotNull
@@ -146,6 +152,8 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
                 sessionEventHandler.close();
             }
             sessionEventHandlers.clear();
+
+            workspace.dispose();
         }
     }
 

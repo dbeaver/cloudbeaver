@@ -9,7 +9,7 @@
 import { AuthProviderService } from '@cloudbeaver/core-authentication';
 import { Connection, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
@@ -56,21 +56,22 @@ export class ConnectionAuthService extends Dependency {
     }
   }
 
-  async auth(key: IConnectionInfoParams): Promise<Connection | null> {
+  async auth(key: IConnectionInfoParams, resetCredentials?: boolean): Promise<Connection | null> {
     if (!this.connectionInfoResource.has(key)) {
       return null;
     }
 
     let connection = this.connectionInfoResource.get(key);
+    const isConnectedInitially = connection?.connected;
 
     if (!connection?.connected) {
       connection = await this.connectionInfoResource.refresh(key);
     } else {
-      return connection;
-    }
-
-    if (connection.connected) {
-      return connection;
+      if (resetCredentials) {
+        this.connectionInfoResource.close(key);
+      } else {
+        return connection;
+      }
     }
 
     if (connection.requiredAuth) {
@@ -81,17 +82,21 @@ export class ConnectionAuthService extends Dependency {
       }
     }
 
-    connection = await this.connectionInfoResource.load(key, ['includeAuthNeeded', 'includeNetworkHandlersConfig']);
+    connection = await this.connectionInfoResource.load(key, ['includeAuthNeeded', 'includeNetworkHandlersConfig', 'includeCredentialsSaved']);
 
     const networkHandlers = connection.networkHandlersConfig!
-      .filter(handler => handler.enabled && !handler.savePassword)
+      .filter(handler => handler.enabled && (!handler.savePassword || resetCredentials))
       .map(handler => handler.id);
 
-    if (connection.authNeeded || networkHandlers.length > 0) {
-      await this.commonDialogService.open(DatabaseAuthDialog, {
+    if (connection.authNeeded || (connection.credentialsSaved && resetCredentials) || networkHandlers.length > 0) {
+      const result = await this.commonDialogService.open(DatabaseAuthDialog, {
         connection: key,
         networkHandlers,
       });
+
+      if (resetCredentials && isConnectedInitially && result === DialogueStateResult.Rejected) {
+        await this.connectionInfoResource.init(key);
+      }
     } else {
       await this.connectionInfoResource.init({ projectId: key.projectId, connectionId: key.connectionId });
     }

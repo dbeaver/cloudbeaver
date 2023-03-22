@@ -56,14 +56,17 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
   }
 
   async changeLanguage(locale: string): Promise<void> {
-    await this.performUpdate(undefined, undefined, async () => {
-      await this.graphQLService.sdk.changeSessionLanguage({ locale });
+    if (this.data?.locale === locale) {
+      return;
+    }
+    await this.graphQLService.sdk.changeSessionLanguage({ locale });
 
-      this.defaultLocale = locale;
-      if (this.data) {
-        this.data.locale = locale;
-      }
-    });
+    this.defaultLocale = locale;
+    if (this.data) {
+      this.data.locale = locale;
+    }
+
+    this.markOutdated();
   }
 
   protected async loader(): Promise<SessionState> {
