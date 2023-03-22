@@ -37,7 +37,7 @@ export class ServerNodeChangedDialogService extends Bootstrap {
 
     if (state === DialogueStateResult.Rejected) {
       this.notificationService.customNotification(() => ActionSnackbar, {
-        actionText: 'app_root_server_node_changed_reload',
+        actionText: 'ui_processing_reload',
         onAction: () => this.routerService.reload(),
       }, { title: 'app_root_server_node_changed_title', message: 'app_root_server_node_changed_message', persistent: true, type: ENotificationType.Error });
     }

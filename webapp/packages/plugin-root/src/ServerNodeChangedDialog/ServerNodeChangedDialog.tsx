@@ -46,14 +46,14 @@ export const ServerNodeChangedDialog: DialogComponent<null, null> = observer(fun
           mod={['outlined']}
           onClick={rejectDialog}
         >
-          {translate('app_root_server_node_changed_cancel')}
+          {translate('ui_processing_cancel')}
         </Button>
         <Button
           type="button"
           mod={['unelevated']}
           onClick={reload}
         >
-          {translate('app_root_server_node_changed_reload')}
+          {translate('ui_processing_reload')}
         </Button>
       </CommonDialogFooter>
     </CommonDialogWrapper>

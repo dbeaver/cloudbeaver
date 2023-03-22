@@ -10,6 +10,7 @@ export default [
   ['ui_processing_loading', 'Loading...'],
   ['ui_processing_cancel', 'Cancel'],
   ['ui_processing_canceling', 'Cancelling...'],
+  ['ui_processing_reload', 'Reload'],
   ['ui_processing_retry', 'Retry'],
   ['ui_processing_ok', 'Ok'],
   ['ui_processing_create', 'Create'],
@@ -103,8 +104,6 @@ export default [
   ['app_root_session_expired_reload', 'Reload'],
   ['app_root_server_node_changed_title', 'Server node changed'],
   ['app_root_server_node_changed_message', 'Server node changed. You need to reload the application.'],
-  ['app_root_server_node_changed_reload', 'Reload'],
-  ['app_root_server_node_changed_cancel', 'Cancel'],
   ['app_root_quota_exceeded', 'Quota exceeded'],
   ['core_eventsLog_dbeaverErrorDetails', 'Error details'],
 ];

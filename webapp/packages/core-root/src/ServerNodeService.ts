@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { GraphQLService, WsSocketConnectedEvent } from '@cloudbeaver/core-sdk';
 
@@ -14,9 +14,8 @@ import { ServerNodeError } from './ServerNodeError';
 import { ServerEventId, SessionEventSource } from './SessionEventSource';
 
 @injectable()
-export class ServerNodeService extends Bootstrap {
-  applicationRunId = '';
-
+export class ServerNodeService extends Dependency {
+  private applicationRunId: string | null;
   onApplicationRunIdChange: IExecutor;
   constructor(
     private readonly graphQLService: GraphQLService,
@@ -24,17 +23,14 @@ export class ServerNodeService extends Bootstrap {
   ) {
     super();
     this.onApplicationRunIdChange = new Executor();
+    this.applicationRunId = null;
     this.sessionEventSource.onEvent<WsSocketConnectedEvent>(ServerEventId.CbSessionWebsocketConnected, data => {
       this.applicationRunIdChanged(data.applicationRunId);
     });
   }
 
-  register(): void { }
-
-  load(): void { }
-
-  applicationRunIdChanged(applicationRunId: string): void {
-    if (this.applicationRunId === '') {
+  private applicationRunIdChanged(applicationRunId: string): void {
+    if (this.applicationRunId === null) {
       this.applicationRunId = applicationRunId;
       return;
     }
@@ -45,6 +41,7 @@ export class ServerNodeService extends Bootstrap {
 
     this.applicationRunId = applicationRunId;
     this.graphQLService.blockRequests(new ServerNodeError('Server node changed'));
+    this.sessionEventSource.disconnect();
     this.onApplicationRunIdChange.execute();
   }
 }

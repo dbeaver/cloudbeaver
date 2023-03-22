@@ -8,6 +8,7 @@ export default [
   ['ui_processing_loading', 'Загрузка...'],
   ['ui_processing_cancel', 'Отменить'],
   ['ui_processing_canceling', 'Отмена...'],
+  ['ui_processing_reload', 'Перезагрузить'],
   ['ui_processing_retry', 'Повторить'],
   ['ui_processing_ok', 'Принять'],
   ['ui_processing_create', 'Создать'],
@@ -101,8 +102,6 @@ export default [
   ['app_root_session_expired_reload', 'Перезагрузить'],
   ['app_root_server_node_changed_title', 'Узел сервера изменён'],
   ['app_root_server_node_changed_message', 'Узел сервера изменён. Необходимо перезагрузить приложение.'],
-  ['app_root_server_node_changed_reload', 'Перезагрузить'],
-  ['app_root_server_node_changed_cancel', 'Отменить'],
   ['app_root_quota_exceeded', 'Квота превышена'],
   ['core_eventsLog_dbeaverErrorDetails', 'Детали ошибки'],
 ];
