@@ -125,7 +125,7 @@ public class H2Migrator {
         final var exportFilePath = workspacePaths.exportFilePath.toString();
 
         log.info("Exporting v1 database");
-        executeScript(v1Driver, EXPORT_SCRIPT, resolvedDbUrl, exportFilePath);
+        executeScript(v1Driver, resolvedDbUrl, EXPORT_SCRIPT, exportFilePath);
 
         log.info("Creating v1 database backup '" + workspacePaths.v1DataBackupPath + "'");
         Files.move(workspacePaths.v1Paths.dbDataFile, workspacePaths.v1DataBackupPath, StandardCopyOption.REPLACE_EXISTING);
@@ -137,7 +137,7 @@ public class H2Migrator {
 
         log.info("Importing data to new v2 database");
         var updatedResolvedDbUrl = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), variablesResolver);
-        executeScript(v2Driver, IMPORT_SCRIPT, updatedResolvedDbUrl, exportFilePath);
+        executeScript(v2Driver, updatedResolvedDbUrl, IMPORT_SCRIPT, exportFilePath);
 
         removeExportFile(workspacePaths);
         log.debug("Export file removed '" + workspacePaths.exportFilePath + "'");
