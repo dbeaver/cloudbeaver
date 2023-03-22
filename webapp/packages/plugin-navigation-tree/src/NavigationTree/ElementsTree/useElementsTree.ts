@@ -494,7 +494,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
           }
         } else {
           await options.onExpand?.(node, state);
-          treeNodeState.expanded = state;
+          treeNodeState.expanded = state && this.getNodeChildren(node.id).length > 0;
         }
 
         if (state) {

@@ -65,7 +65,7 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
   }
 
   useExecutor({
-    executor: userInfoResource.onDataUpdate,
+    executor: userInfoResource.onUserChange,
     postHandlers: [unloadTabs, restoreTabs],
   });
 
