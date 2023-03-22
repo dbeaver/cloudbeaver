@@ -26,18 +26,18 @@ import java.io.IOException;
 /**
  * DBWSessionHandler
  */
-public interface DBWSessionHandler {
+public interface DBWSessionHandler<SESSION extends WebSession> {
 
-    boolean handleSessionOpen(WebSession webSession, HttpServletRequest request, HttpServletResponse response)
+    boolean handleSessionOpen(SESSION webSession, HttpServletRequest request, HttpServletResponse response)
         throws DBException, IOException;
 
-    default boolean handleSessionAuth(WebSession webSession)
+    default boolean handleSessionAuth(SESSION webSession)
         throws DBException, IOException
     {
         return false;
     }
 
-    boolean handleSessionClose(WebSession webSession)
+    boolean handleSessionClose(SESSION webSession)
         throws DBException, IOException;
 
 }

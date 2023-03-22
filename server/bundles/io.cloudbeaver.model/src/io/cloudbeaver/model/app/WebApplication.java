@@ -22,6 +22,7 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.app.DBPApplication;
+import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
@@ -59,7 +60,7 @@ public interface WebApplication extends DBPApplication {
 
     DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
-    RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider);
+    RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider, @NotNull DBPWorkspace workspace);
 
     String getServerURL();
 

@@ -44,6 +44,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPApplication;
+import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -518,8 +519,8 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     @Override
-    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
-        return LocalResourceController.builder(credentialsProvider, this::getSecurityController).build();
+    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider, @NotNull DBPWorkspace workspace) {
+        return LocalResourceController.builder(credentialsProvider, workspace, this::getSecurityController).build();
     }
 
     private void parseConfiguration(File configFile) throws DBException {

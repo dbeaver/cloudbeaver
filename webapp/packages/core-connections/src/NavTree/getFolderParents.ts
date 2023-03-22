@@ -6,14 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
+import { getPathParents } from '@cloudbeaver/core-utils';
 
 import { isFolderNodeId } from './isFolderNodeId';
 
 export function getFolderNodeParents(nodeId: string): string[] {
   if (isFolderNodeId(nodeId)) {
-    const parents = NodeManagerUtils.parentsFromPath(nodeId);
+    const parents = getPathParents(nodeId);
 
     return [getProjectNodeId(parents[0].replace('folder://', '')), ...parents.slice(1)];
   }
