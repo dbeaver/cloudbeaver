@@ -11,7 +11,7 @@ import type { NavNode, NavNodeInfoResource, NavTreeResource, ProjectsNavNodeServ
 import type { ProjectsService } from '@cloudbeaver/core-projects';
 import { RESOURCES_NODE_PATH, NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
-import { createPath } from '@cloudbeaver/core-utils';
+import { createPath, isDefined } from '@cloudbeaver/core-utils';
 import type { IElementsTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
 import type { ResourceManagerService } from '../../ResourceManagerService';
@@ -42,7 +42,7 @@ export function navigationTreeProjectFilter(
 
       const nodes = navNodeInfoResource
         .get(resourceKeyList(children))
-        .filter<NavNode>((node => node !== undefined) as (node: NavNode | undefined) => node is NavNode)
+        .filter(isDefined)
         .filter(node => {
           if (node.id === folderNodeId) {
             return navTreeResource.get(node.id)?.length;

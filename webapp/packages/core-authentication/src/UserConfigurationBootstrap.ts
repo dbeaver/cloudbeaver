@@ -24,24 +24,21 @@ export class UserConfigurationBootstrap extends Bootstrap {
     private readonly localizationService: LocalizationService,
   ) {
     super();
-  }
-
-  register(): void {
     this.userInfoResource.onDataUpdate.addHandler(() => {
       const theme = this.userInfoResource.getConfigurationParameter(USER_APP_THEME);
 
-      if (typeof theme === 'string' && theme !== this.themeService.currentThemeId) {
-        this.themeService.changeTheme(theme);
+      if (typeof theme === 'string') {
+        this.themeService.setTheme(theme);
       }
 
       const language = this.userInfoResource.getConfigurationParameter(USER_APP_LANGUAGE);
 
-      if (typeof language === 'string' && language !== this.localizationService.currentLanguage) {
-        this.localizationService.changeLocaleAsync(language);
+      if (typeof language === 'string') {
+        this.localizationService.setLocale(language);
       }
     });
 
-    this.themeService.onThemeChange.addHandler(async theme => {
+    this.themeService.onChange.addHandler(async theme => {
       const currentTheme = this.userInfoResource.getConfigurationParameter(USER_APP_THEME);
 
       if (currentTheme !== theme.id) {
@@ -58,8 +55,10 @@ export class UserConfigurationBootstrap extends Bootstrap {
     });
   }
 
+  register(): void {  }
+
   async load(): Promise<void> {
-    await this.userInfoResource.load(undefined, ['includeConfigurationParameters']);
+    await this.userInfoResource.load();
   }
 
 }

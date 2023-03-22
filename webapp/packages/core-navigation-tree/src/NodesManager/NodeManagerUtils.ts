@@ -7,29 +7,6 @@
  */
 
 export const NodeManagerUtils = {
-  parentsFromPath(nodeId: string): string[] {
-    const parts = nodeId
-      .replace('//', '\\')
-      .split('/');
-    let lastPath = '';
-    const parents: string[] = [];
-
-    if (parts.length < 2) {
-      return parents;
-    }
-
-    for (const part of parts) {
-      if (lastPath !== '') {
-        lastPath += '/';
-      }
-      lastPath += part.replace('\\', '//');
-
-      parents.push(lastPath);
-    }
-
-    return parents.filter(id => id !== nodeId);
-  },
-
   connectionIdToConnectionNodeId(connectionId: string): string {
     return `database://${connectionId}`;
   },

@@ -60,7 +60,10 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
   const controller = useController(ConnectionsAdministrationController);
   const translate = useTranslate();
 
-  useResource(ConnectionsAdministration, ConnectionInfoResource, ConnectionInfoActiveProjectKey);
+  useResource(ConnectionsAdministration, ConnectionInfoResource, {
+    key: ConnectionInfoActiveProjectKey,
+    includes: ['customIncludeOptions'],
+  });
   useResource(ConnectionsAdministration, DBDriverResource, CachedMapAllKey);
 
   return styled(useStyles(BASE_LAYOUT_GRID_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES))(

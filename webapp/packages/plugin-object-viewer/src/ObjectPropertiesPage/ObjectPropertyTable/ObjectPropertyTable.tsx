@@ -28,7 +28,7 @@ const styles = css`
 
 interface ObjectPropertyTableProps {
   objectId: string;
-  parentId: string;
+  parentId?: string;
 }
 
 export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function ObjectPropertyTable({
@@ -37,7 +37,7 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
 }) {
   const translate = useTranslate();
   const navNodeViewService = useService(NavNodeViewService);
-  const children = useResource(ObjectPropertyTable, NavTreeResource, parentId);
+  const children = useResource(ObjectPropertyTable, NavTreeResource, parentId ?? null);
   const tree = useResource(ObjectPropertyTable, NavTreeResource, objectId, {
     preload: [children],
   });

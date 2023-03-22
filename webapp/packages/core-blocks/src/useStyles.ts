@@ -35,7 +35,7 @@ export function useStyles(
   const trackTheme = filteredStyles.some(style => typeof style === 'function');
 
   useExecutor({
-    executor: themeService.onThemeChange,
+    executor: themeService.onChange,
     handlers: [function updateThemeId(theme) {
       if (currentThemeId !== themeService.currentThemeId && trackTheme) {
         setCurrentThemeId(theme.id);
