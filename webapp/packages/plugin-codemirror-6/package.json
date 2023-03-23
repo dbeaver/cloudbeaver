@@ -1,0 +1,38 @@
+{
+  "name": "@cloudbeaver/plugin-codemirror-6",
+  "sideEffects": false,
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "prebuild": "rimraf --glob lib/*",
+    "build": "webpack --config ../../configs/webpack.plugin.config.js",
+    "postbuild": "tsc",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "validate-dependencies": "core-cli-validate-dependencies"
+  },
+  "dependencies": {
+    "@cloudbeaver/core-blocks": "~0.1.0",
+    "@cloudbeaver/core-theming": "~0.1.0",
+    "@codemirror/autocomplete": "^6.4.2",
+    "@codemirror/lang-javascript": "^6.1.4",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-sql": "^6.4.0",
+    "@codemirror/lang-xml": "^6.0.2",
+    "@codemirror/view": "^6.9.3",
+    "@uiw/codemirror-extensions-color": "^4.19.9",
+    "@uiw/react-codemirror": "~4.19.9",
+    "codemirror": "5.65.7",
+    "codemirror6": "npm:codemirror@6.0.0"
+  },
+  "peerDependencies": {
+    "mobx": "~6.x.x",
+    "mobx-react-lite": "~3.x.x",
+    "react": "~18.x.x",
+    "reshadow": "~0.x.x"
+  }
+}

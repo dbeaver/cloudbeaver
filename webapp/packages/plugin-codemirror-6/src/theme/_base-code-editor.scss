@@ -1,0 +1,69 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2022 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@mixin base-code-editor() {
+  .react-codemirror {
+    height: 100%;
+    flex: 1 auto;
+
+    .cm-editor {
+      height: 100%;
+      @include mdc-theme-prop(background-color, surface, false);
+      @include mdc-theme-prop(color, on-surface, false);
+      // color: #EEFFFF;
+    }
+
+    .cm-editor .cm-gutters {
+      @include mdc-theme-prop(background, secondary, false);
+      @include mdc-theme-prop(color, on-secondary, false);
+      @include mdc-theme-prop(border-color, background, false);
+      // color: #546E7A;
+      // border: none;
+    }
+
+    .cm-editor .cm-content {
+      caret-color: $cursor;
+    }
+
+    .cm-editor .cm-cursor {
+      border-left-color: $cursor;
+    }
+
+    .cm-editor .cm-dropCursor {
+      border-left-color: $cursor;
+    }
+
+    .cm-editor .cm-activeLine {
+      @include mdc-theme-prop(background, background, false);
+    }
+
+    .cm-editor .cm-activeLineGutter {
+      @include mdc-theme-prop(background, background, false);
+    }
+
+    .cm-editor .cm-line::selection,
+    .cm-editor .cm-line > :global(span)::selection,
+    .cm-editor .cm-line > :global(span) > :global(span)::selection {
+      @include mdc-theme-prop(background, primary, false);
+    }
+
+    .cm-editor .cm-line::-moz-selection,
+    .cm-editor .cm-line > :global(span)::-moz-selection,
+    .cm-editor .cm-line > :global(span) > :global(span)::-moz-selection {
+      @include mdc-theme-prop(background, primary, false);
+    }
+
+    .cm-editor .cm-activeline-background {
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .cm-editor .cm-content ::selection {
+      color: white;
+    }
+  }
+}
