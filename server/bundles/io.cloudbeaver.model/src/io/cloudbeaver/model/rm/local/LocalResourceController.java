@@ -708,9 +708,11 @@ public class LocalResourceController implements RMController {
         @NotNull String propertyName,
         @Nullable Object propertyValue
     ) throws DBException {
-        validateResourcePath(resourcePath);
-        getProjectMetadata(projectId, false).setResourceProperty(resourcePath, propertyName, propertyValue);
-        return DEFAULT_CHANGE_ID;
+        try (var projectLock = lockController.lockProject(projectId, "resourcePropertyUpdate")) {
+            validateResourcePath(resourcePath);
+            getProjectMetadata(projectId, false).setResourceProperty(resourcePath, propertyName, propertyValue);
+            return DEFAULT_CHANGE_ID;
+        }
     }
 
     private void validateResourcePath(String resourcePath) throws DBException {
