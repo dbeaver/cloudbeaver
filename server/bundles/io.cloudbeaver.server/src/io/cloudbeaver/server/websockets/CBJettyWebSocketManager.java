@@ -31,11 +31,10 @@ import org.jkiss.dbeaver.Log;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CBJettyWebSocketManager implements JettyWebSocketCreator {
     private static final Log log = Log.getLog(CBJettyWebSocketManager.class);
@@ -75,7 +74,7 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
     private CBEventsWebSocket createNewEventsWebSocket(@NotNull BaseWebSession webSession) {
         var sessionId = webSession.getSessionId();
         var newWebSocket = new CBEventsWebSocket(webSession);
-        socketBySessionId.computeIfAbsent(sessionId, key -> Collections.synchronizedList(new ArrayList<>()))
+        socketBySessionId.computeIfAbsent(sessionId, key -> new CopyOnWriteArrayList<>())
             .add(newWebSocket);
         log.info("Websocket created for session: " + sessionId);
         return newWebSocket;
