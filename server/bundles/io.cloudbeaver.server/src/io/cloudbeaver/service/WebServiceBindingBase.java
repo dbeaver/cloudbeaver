@@ -34,13 +34,13 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.utils.ArrayUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Web service implementation
@@ -120,6 +120,9 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         return getWebConnection(getWebSession(env), getProjectReference(env), env.getArgument("connectionId"));
     }
 
+    /**
+     * Returns WebSession from cache or null
+     */
     @Nullable
     public static WebSession findWebSession(DataFetchingEnvironment env) {
         return CBPlatform.getInstance().getSessionManager().findWebSession(
