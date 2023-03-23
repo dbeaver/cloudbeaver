@@ -49,6 +49,11 @@ public class WebSessionManager {
 
     private static final Log log = Log.getLog(WebSessionManager.class);
 
+    /**
+     * In configuration mode sessions expire after a week
+     */
+    private static final long CONFIGURATION_MODE_SESSION_IDLE_TIME = 60 * 60 * 1000 * 24 * 7;
+
     private final CBApplication application;
     private final Map<String, BaseWebSession> sessionMap = new HashMap<>();
 
@@ -255,12 +260,14 @@ public class WebSessionManager {
         return null;
     }
 
+    public long getMaxSessionIdleTime() {
+        return CBApplication.getInstance().isConfigurationMode()
+            ? CONFIGURATION_MODE_SESSION_IDLE_TIME
+            : DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
+    }
+
     public void expireIdleSessions() {
-        long maxSessionIdleTime = DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
-        if (CBApplication.getInstance().isConfigurationMode()) {
-            // In configuration mode sessions expire after a week
-            maxSessionIdleTime = 60 * 60 * 1000 * 24 * 7;
-        }
+        long maxSessionIdleTime = getMaxSessionIdleTime();
 
         List<BaseWebSession> expiredList = new ArrayList<>();
         synchronized (sessionMap) {

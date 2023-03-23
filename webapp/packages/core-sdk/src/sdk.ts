@@ -206,6 +206,18 @@ export enum CbEventTopic {
   CbSessionLog = 'cb_session_log'
 }
 
+export interface CbProjectEvent extends CbClientEvent {
+  id: CbClientEventId;
+  projectId: Scalars['String'];
+  topicId?: Maybe<CbEventTopic>;
+}
+
+export interface CbProjectUpdateEvent extends CbServerEvent {
+  id: CbServerEventId;
+  projectId: Scalars['String'];
+  topicId?: Maybe<CbEventTopic>;
+}
+
 export interface CbProjectsActiveEvent extends CbClientEvent {
   id: CbClientEventId;
   projectIds: Array<Scalars['String']>;
@@ -232,6 +244,8 @@ export enum CbServerEventId {
   CbDatasourceFolderDeleted = 'cb_datasource_folder_deleted',
   CbDatasourceFolderUpdated = 'cb_datasource_folder_updated',
   CbDatasourceUpdated = 'cb_datasource_updated',
+  CbRmProjectAdded = 'cb_rm_project_added',
+  CbRmProjectRemoved = 'cb_rm_project_removed',
   CbRmResourceCreated = 'cb_rm_resource_created',
   CbRmResourceDeleted = 'cb_rm_resource_deleted',
   CbRmResourceUpdated = 'cb_rm_resource_updated',

@@ -49,6 +49,9 @@
         <eventHandler class="io.cloudbeaver.server.events.WSDataSourceUpdatedEventHandlerImpl"/>
         <eventHandler class="io.cloudbeaver.server.events.WSFolderUpdatedEventHandlerImpl"/>
         <eventHandler class="io.cloudbeaver.server.events.WSRmResourceUpdatedEventHandlerImpl"/>
+        <eventHandler class="io.cloudbeaver.server.events.WSPermissionUpdatedEventHandler"/>
+        <eventHandler class="io.cloudbeaver.server.events.WSProjectUpdatedEventHandler"/>
+        <eventHandler class="io.cloudbeaver.server.events.WSUserSecretEventHandlerImpl"/>
     </extension>
 
 </plugin>
