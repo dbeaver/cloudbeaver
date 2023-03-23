@@ -18,20 +18,26 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.websocket.WSEventHandler;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 import org.jkiss.dbeaver.model.websocket.event.WSUserSecretEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Notify all active user session that rm resource has been updated
  */
-public class WSUserSecretEventHandlerImpl extends WSProjectUpdatedEventHandler {
+public class WSUserSecretEventHandlerImpl implements WSEventHandler {
+
+    private static final Log log = Log.getLog(WSUserSecretEventHandlerImpl.class);
 
     @NotNull
     @Override
@@ -40,6 +46,16 @@ public class WSUserSecretEventHandlerImpl extends WSProjectUpdatedEventHandler {
     }
 
     @Override
+    public void handleEvent(@NotNull WSEvent event) {
+        Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
+        for (var activeUserSession : allSessions) {
+            if (WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId())) {
+                continue; // skip events from current session
+            }
+            updateSessionData(activeUserSession, event);
+        }
+    }
+
     protected void updateSessionData(BaseWebSession activeUserSession, WSEvent event) {
         if (!(event instanceof WSUserSecretEvent && activeUserSession instanceof WebSession)) {
             return;
