@@ -18,7 +18,7 @@ import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/cor
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ENodeMoveType, getNodesFromContext, INodeMoveData, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, nodeDeleteContext, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId, NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, type IElementsTree } from '@cloudbeaver/plugin-navigation-tree';
@@ -36,7 +36,6 @@ interface ITargetNode {
 
 @injectable()
 export class ConnectionFoldersBootstrap extends Bootstrap {
-
   constructor(
     private readonly localizationService: LocalizationService,
     private readonly userInfoResource: UserInfoResource,

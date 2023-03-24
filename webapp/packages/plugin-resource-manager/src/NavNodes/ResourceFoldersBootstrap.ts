@@ -11,13 +11,13 @@ import { CONNECTION_FOLDER_NAME_VALIDATION } from '@cloudbeaver/core-connections
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DialogueStateResult, CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NavTreeResource, NavNodeManagerService, NavNodeInfoResource, type INodeMoveData, navNodeMoveContext, getNodesFromContext, ENodeMoveType, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfo, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { getRmResourceKey, getRmResourcePath, NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey, CachedTreeChildrenKey, getCachedMapResourceLoaderState, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { createPath, getPathParent, isDefined } from '@cloudbeaver/core-utils';
+import { createPath, getPathParent } from '@cloudbeaver/core-utils';
 import { ActionService, MenuService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, DATA_CONTEXT_LOADABLE_STATE } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
@@ -287,7 +287,6 @@ export class ResourceFoldersBootstrap extends Bootstrap {
 
   private syncNavTree() {
     this.navNodeManagerService.onMove.addHandler(this.moveResourceToFolder.bind(this));
-    let syncOutdate = true;
 
     // this.navNodeInfoResource.onItemUpdate.addHandler(executorHandlerFilter(
     //   () => syncOutdate,
@@ -310,31 +309,29 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     //   }
     // ));
 
-    this.navNodeInfoResource.onItemDelete.addHandler(executorHandlerFilter(
-      () => true,
-      key => {
-        const resources = ResourceKeyUtils
-          .mapArray(key, getResourceKeyFromNodeId)
-          .filter(isDefined);
+    // this.navNodeInfoResource.onItemDelete.addHandler(executorHandlerFilter(
+    //   () => true,
+    //   key => {
+    //     const resources = ResourceKeyUtils
+    //       .mapArray(key, getResourceKeyFromNodeId)
+    //       .filter(isDefined);
 
-        this.resourceManagerResource.delete(resourceKeyList(resources));
-      }
-    ));
+    //     this.resourceManagerResource.delete(resourceKeyList(resources));
+    //   }
+    // ));
 
-    this.resourceManagerResource.onItemUpdate.addHandler(executorHandlerFilter(
-      () => syncOutdate,
-      key => {
-        syncOutdate = false;
-        try {
-          const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getResourceNodeId)
-            .map(getPathParent))]);
-          if (!this.navTreeResource.isOutdated(updated)) {
-            this.navTreeResource.markTreeOutdated(updated);
-          }
-        } finally {
-          syncOutdate = true;
-        }
+    this.resourceManagerResource.onItemUpdate.addHandler(key => {
+      const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getResourceNodeId)
+        .map(getPathParent))]);
+      if (!this.navTreeResource.isOutdated(updated)) {
+        this.navTreeResource.markTreeOutdated(updated);
       }
-    ));
+    });
+
+    this.resourceManagerResource.onItemDelete.addHandler(key => {
+      const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getResourceNodeId)
+        .map(getPathParent))]);
+      this.navTreeResource.deleteInNode(updated, ResourceKeyUtils.toArray(key).map(value => [value]));
+    });
   }
 }
