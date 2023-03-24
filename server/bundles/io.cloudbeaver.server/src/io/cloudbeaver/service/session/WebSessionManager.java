@@ -31,16 +31,17 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Web session manager
@@ -189,10 +190,7 @@ public class WebSessionManager {
                     }
 
                     webSession = createWebSessionImpl(httpSession);
-
-                    var linkWithActiveUser = false; // because its old credentials and should already be linked if needed
-                    new WebSessionAuthProcessor(webSession, oldAuthInfo, linkWithActiveUser)
-                        .authenticateSession();
+                    restorePreviousUserSession(webSession, oldAuthInfo);
 
                     sessionMap.put(sessionId, webSession);
                     log.debug("Web session restored");
@@ -211,11 +209,17 @@ public class WebSessionManager {
             return false;
         }
 
-        var linkWithActiveUser = false; // because its old credentials and should already be linked if needed
-        new WebSessionAuthProcessor(webSession, oldAuthInfo, linkWithActiveUser)
-            .authenticateSession();
-
+        restorePreviousUserSession(webSession, oldAuthInfo);
         return true;
+    }
+
+    private void restorePreviousUserSession(
+        @NotNull WebSession webSession,
+        @NotNull SMAuthInfo authInfo
+    ) throws DBException {
+        var linkWithActiveUser = false; // because its old credentials and should already be linked if needed
+        new WebSessionAuthProcessor(webSession, authInfo, linkWithActiveUser)
+            .authenticateSession();
     }
 
     @NotNull
