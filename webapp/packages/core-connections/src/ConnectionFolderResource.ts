@@ -88,7 +88,7 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
   ): Promise<Map<IConnectionFolderParam, ConnectionFolder>> {
     const all = this.isAlias(originalKey, CachedMapAllKey);
     const isProjectFolders = this.isAlias(originalKey, ConnectionFolderProjectKey);
-    const folders: ConnectionFolder[] = [];
+    const folderList: ConnectionFolder[] = [];
     let projectId: string | undefined;
     let folderId: string | undefined;
 
@@ -108,21 +108,21 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
           projectId,
           path: folderId,
         });
-        folders.push(...folders);
+        folderList.push(...folders);
       });
 
-    const key = resourceKeyList(folders.map<IConnectionFolderParam>(folder => createConnectionFolderParam(
+    const key = resourceKeyList(folderList.map<IConnectionFolderParam>(folder => createConnectionFolderParam(
       folder.projectId,
       folder.id,
     )));
 
     runInAction(() => {
       if (all) {
-        this.replace(key, folders);
+        this.replace(key, folderList);
       } else {
         if (isProjectFolders) {
           const removedFolders = this.keys
-            .filter(key => !folders.some(f => (
+            .filter(key => !folderList.some(f => (
               key.projectId === projectId
                 && key.folderId === f.id
             )));
@@ -130,7 +130,7 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
           this.delete(resourceKeyList(removedFolders));
         }
 
-        this.set(key,  folders);
+        this.set(key,  folderList);
       }
     });
 
