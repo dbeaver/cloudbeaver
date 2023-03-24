@@ -182,21 +182,21 @@ public class WebSessionManager {
                 return (WebSession) cachedWebSession;
             } else {
                 try {
-                    webSession = createWebSessionImpl(httpSession);
-                } catch (DBException e) {
-                    log.error("Failed to create web session", e);
-                    return null;
-                }
-                try {
-                    var restored = restorePreviousUserSession(webSession);
-                    if (restored) {
-                        sessionMap.put(sessionId, webSession);
-                        log.debug("Web session restored");
-                        return webSession;
-                    } else {
-                        log.debug("Couldn't restore previous user session");
+                    var oldAuthInfo = getApplication().getSecurityController().restoreUserSession(sessionId);
+                    if (oldAuthInfo == null) {
+                        log.debug("Couldn't restore previous user session '" + sessionId + "'");
                         return null;
                     }
+
+                    webSession = createWebSessionImpl(httpSession);
+
+                    var linkWithActiveUser = false; // because its old credentials and should already be linked if needed
+                    new WebSessionAuthProcessor(webSession, oldAuthInfo, linkWithActiveUser)
+                        .authenticateSession();
+
+                    sessionMap.put(sessionId, webSession);
+                    log.debug("Web session restored");
+                    return webSession;
                 } catch (DBException e) {
                     log.error("Failed to restore previous user session", e);
                     return null;
