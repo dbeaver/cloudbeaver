@@ -9,6 +9,7 @@
 import { observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { uuid } from '@cloudbeaver/core-utils';
 
 export interface DialogOptions {
   persistent?: boolean;
@@ -33,6 +34,7 @@ export enum DialogueStateResult {
 }
 
 export interface DialogInternal<TResult> {
+  id: string;
   component: DialogComponent<any, any>;
   payload: any;
   options?: DialogOptions;
@@ -59,6 +61,7 @@ export class CommonDialogService {
     });
 
     const dialogInternal: DialogInternal<TResult> = {
+      id: uuid(),
       component,
       payload,
       resolve: _resolve!,

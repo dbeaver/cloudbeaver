@@ -30,6 +30,10 @@ export const dialogStyles = css`
       padding: 24px;
       flex-direction: column;
       align-items: center;
+      
+      & > :not(:last-child) {
+        display: none;
+      }
     }
 
     Dialog {

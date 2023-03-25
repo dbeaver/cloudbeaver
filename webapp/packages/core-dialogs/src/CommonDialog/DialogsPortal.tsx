@@ -11,10 +11,11 @@ import { useMemo } from 'react';
 import { DialogBackdrop } from 'reakit/Dialog';
 import styled from 'reshadow';
 
-import { Loader, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import { ErrorBoundary, Loader, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 
+import { commonDialogContainerStyles } from './CommonDialog/styles';
 import { CommonDialogService, DialogInternal } from './CommonDialogService';
 import { DialogContext, IDialogContext } from './DialogContext';
 import { dialogStyles } from './styles';
@@ -54,13 +55,20 @@ export const DialogsPortal = observer(function DialogsPortal() {
       <DialogBackdrop visible={!!activeDialog} onMouseDown={state.backdropClick}>
         <inner-box>
           {commonDialogService.dialogs.map((dialog, i, arr) => (
-            <NestedDialog
-              key={i}
-              visible={i === arr.length - 1}
-              dialog={dialog}
-              resolveDialog={state.resolve}
-              rejectDialog={state.reject}
-            />
+            <ErrorBoundary
+              key={dialog.id}
+              styles={commonDialogContainerStyles}
+              remount
+              onClose={state.reject}
+            >
+              <NestedDialog
+                key={dialog.id}
+                visible={i === arr.length - 1}
+                dialog={dialog}
+                resolveDialog={state.resolve}
+                rejectDialog={state.reject}
+              />
+            </ErrorBoundary>
           ))}
         </inner-box>
       </DialogBackdrop>

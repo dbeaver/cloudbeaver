@@ -12,4 +12,4 @@ export type BaseStyles = ClassCollection;
 export type ThemeSelector = (theme: string) => Promise<undefined | BaseStyles | BaseStyles[]>;
 export type Style = BaseStyles | ThemeSelector;
 export type DynamicStyle = Style | boolean | undefined;
-export type ComponentStyle = DynamicStyle | DynamicStyle[];
+export type ComponentStyle = DynamicStyle | DynamicStyle[] | DynamicStyle[][];
