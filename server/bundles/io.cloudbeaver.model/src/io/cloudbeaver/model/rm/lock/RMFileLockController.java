@@ -30,7 +30,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
-// File based resource locks
+/**
+ * File based resource locks
+ */
 public class RMFileLockController {
     private static final Log log = Log.getLog(RMFileLockController.class);
     private static final int DEFAULT_MAX_LOCK_TIME = 1 * 60 * 1000; // 1 min
@@ -59,6 +61,16 @@ public class RMFileLockController {
         this.maxLockTime = maxLockTime;
     }
 
+    /**
+     * Lock the project for the duration of any operation.
+     * Other threads/processes will also see this lock, and will wait for it to end
+     * or force intercept lock, if the operation will take too long and
+     * exceeds the maximum available locking time {@link #maxLockTime} or the lock is invalid {@link #awaitUnlock)}.
+     *
+     * @param projectId     - project to be locked
+     * @param operationName - executed operation name
+     * @return - lock
+     */
     public RMLock lockProject(String projectId, String operationName) throws DBException {
         synchronized (RMFileLockController.class) {
             try {
@@ -77,6 +89,14 @@ public class RMFileLockController {
                 throw new DBException("Failed to lock project: " + projectId, e);
             }
         }
+    }
+
+    /**
+     * Check that project locked
+     */
+    public boolean isProjectLocked(String projectId) {
+        Path projectLockFilePath = getProjectLockFilePath(projectId);
+        return Files.exists(projectLockFilePath);
     }
 
     private void createLockFile(Path projectLockFile, RMLockInfo lockInfo) throws DBException, InterruptedException {
@@ -128,13 +148,16 @@ public class RMFileLockController {
         }
     }
 
-    private void awaitUnlock(String projectId, Path projectLockFile) throws InterruptedException, DBException {
+    protected void awaitUnlock(String projectId, Path projectLockFile) throws InterruptedException, DBException {
         if (Files.notExists(projectLockFile)) {
             // project not locked
             return;
         }
-        log.info("Waiting for a file to be unlocked: " + projectLockFile);
+        awaitingUnlock(projectId, projectLockFile);
+    }
 
+    protected void awaitingUnlock(String projectId, Path projectLockFile) throws DBException, InterruptedException {
+        log.info("Waiting for a file to be unlocked: " + projectLockFile);
         RMLockInfo originalLockInfo = readLockInfo(projectId, projectLockFile);
         boolean fileUnlocked = originalLockInfo == null; //lock can be removed at the moment when we try to read lock file info
         int maxIterations = maxLockTime / CHECK_PERIOD;
@@ -165,15 +188,19 @@ public class RMFileLockController {
 
         //checking that this is not a new lock from another operation
         if (originalLockInfo.getOperationId().equals(currentLockInfo.getOperationId())) {
-            // something went wrong and lock is invalid
-            log.warn("File has not been unlocked within the expected period, force unlock");
-            try {
-                Files.deleteIfExists(projectLockFile);
-            } catch (IOException e) {
-                log.error(e);
-            }
+            forceUnlock(projectLockFile);
         } else {
             awaitUnlock(projectId, lockFolderPath);
+        }
+    }
+
+    protected void forceUnlock(Path projectLockFile) {
+        // something went wrong and lock is invalid
+        log.warn("File has not been unlocked within the expected period, force unlock");
+        try {
+            Files.deleteIfExists(projectLockFile);
+        } catch (IOException e) {
+            log.error(e);
         }
     }
 

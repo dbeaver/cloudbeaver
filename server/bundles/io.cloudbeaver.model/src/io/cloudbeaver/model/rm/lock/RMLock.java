@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Resource Manager resource lock
+ */
 public class RMLock implements AutoCloseable {
     private static final Log log = Log.getLog(RMLock.class);
 
@@ -31,6 +34,9 @@ public class RMLock implements AutoCloseable {
         this.lockFilePath = lockFilePath;
     }
 
+    /**
+     * Unlock resource and remove .lock file
+     */
     public void unlock() {
         try {
             Files.deleteIfExists(lockFilePath);
@@ -41,6 +47,13 @@ public class RMLock implements AutoCloseable {
                 unlock();
             }
         }
+    }
+
+    /**
+     * @return path to the lock file
+     */
+    protected Path getLockFilePath() {
+        return lockFilePath;
     }
 
     @Override
