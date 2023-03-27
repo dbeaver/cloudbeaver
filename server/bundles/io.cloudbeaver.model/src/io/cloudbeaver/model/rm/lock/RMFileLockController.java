@@ -33,6 +33,9 @@ import java.util.UUID;
 // File based resource locks
 public class RMFileLockController {
     private static final Log log = Log.getLog(RMFileLockController.class);
+    private static final int DEFAULT_MAX_LOCK_TIME = 1 * 60 * 1000; // 1 min
+    private static final int CHECK_PERIOD = 10;
+
     private static final String LOCK_META_FOLDER = ".locks";
     private static final String LOCK_FILE_EXTENSION = ".lock";
 
@@ -40,20 +43,20 @@ public class RMFileLockController {
 
     private final Path lockFolderPath;
     private final String applicationId;
-    private final int lockTimeout;
+    private final int maxLockTime;
 
 
     public RMFileLockController(WebApplication application) throws DBException {
-        this(application, 1 * 60 * 1000);
+        this(application, DEFAULT_MAX_LOCK_TIME);
     }
 
     // for tests
-    public RMFileLockController(WebApplication application, int lockTimeout) throws DBException {
+    public RMFileLockController(WebApplication application, int maxLockTime) throws DBException {
         this.lockFolderPath = application.getWorkspaceDirectory()
             .resolve(DBPWorkspace.METADATA_FOLDER)
             .resolve(LOCK_META_FOLDER);
         this.applicationId = application.getApplicationInstanceId();
-        this.lockTimeout = lockTimeout;
+        this.maxLockTime = maxLockTime;
     }
 
     public RMLock lockProject(String projectId, String operationName) throws DBException {
@@ -134,8 +137,7 @@ public class RMFileLockController {
 
         RMLockInfo originalLockInfo = readLockInfo(projectId, projectLockFile);
         boolean fileUnlocked = originalLockInfo == null; //lock can be removed at the moment when we try to read lock file info
-        int waitTimeInMillis = 100;
-        int maxIterations = lockTimeout / waitTimeInMillis;
+        int maxIterations = maxLockTime / CHECK_PERIOD;
         int currentCheckCount = 0;
 
         while (!fileUnlocked) {
@@ -149,7 +151,7 @@ public class RMFileLockController {
                 originalLockInfo = readLockInfo(projectId, projectLockFile);
             }
             currentCheckCount++;
-            Thread.sleep(100);
+            Thread.sleep(CHECK_PERIOD);
         }
         if (fileUnlocked) {
             return;
