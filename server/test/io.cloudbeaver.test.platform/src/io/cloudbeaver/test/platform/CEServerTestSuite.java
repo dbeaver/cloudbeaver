@@ -18,6 +18,7 @@
 package io.cloudbeaver.test.platform;
 
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationEmbedded;
 import io.cloudbeaver.utils.WebTestUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -49,7 +50,7 @@ public class CEServerTestSuite {
             return;
         } else {
             System.out.println("Start CBApplication");
-            testApp = new CBApplication();
+            testApp = new CBApplicationEmbedded();
             thread = new Thread(() -> {
                 testApp.start(null);
             });
