@@ -44,7 +44,12 @@ export const FolderExplorerPath = observer<Props>(function FolderExplorerPath({
     const path = context.state.fullPath.slice(0, i);
     const skipFolder = !canSkip || canSkip(folder);
 
-    if (i === 0 || i === context.state.fullPath.length - 1 || !skipFolder || context.state.fullPath.length < 5) {
+    if (
+      i === 0
+      || i === context.state.fullPath.length - 1
+      || !skipFolder
+      || context.state.fullPath.length < 5
+    ) {
       if (skip) {
         pathElements.push(
           <FolderName

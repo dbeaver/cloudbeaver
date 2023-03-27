@@ -45,7 +45,6 @@ export const NavigationNodeNested = observer(forwardRef<HTMLDivElement, Props>(f
       !!root && treeContext?.folderExplorer.state.folder !== treeContext?.folderExplorer.root
     ));
 
-
     if (!rootFolder) {
       children = getComputed(
         () => treeContext?.tree.getNodeChildren(nodeId) || [],

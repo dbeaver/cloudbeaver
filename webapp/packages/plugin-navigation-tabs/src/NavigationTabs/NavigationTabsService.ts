@@ -131,7 +131,7 @@ export class NavigationTabsService extends View<ITab> {
     this.onTabClose = new SyncExecutor();
     this.onInit = new SyncExecutor();
     this.onStateUpdate = new SyncExecutor();
-    this.metadata = new MetadataMap(() => ({ restored: false }));
+    this.metadata = new MetadataMap<string, ITabMetadata>(() => ({ restored: false }));
 
     this.navigationTabContext = (): ITabNavigationContext => new TabNavigationContext(this, this.userInfoResource);
     this.registerAction(ACTION_OPEN_IN_TAB);

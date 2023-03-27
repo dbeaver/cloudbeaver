@@ -92,6 +92,10 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     treeNodeContext.select(event.ctrlKey || event.metaKey);
   }
 
+  function onDbClickHandler(event: React.MouseEvent<HTMLDivElement>) {
+    elementsTreeContext?.tree.open(node, navNodeInfoResource.getParents(node.id), false);
+  }
+
   if (elementsTreeContext?.tree.settings?.projects === false && !isDragging) {
     return null;
   }
@@ -100,6 +104,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     <TreeNodeControl
       ref={ref}
       onClick={onClickHandler}
+      onDoubleClick={onDbClickHandler}
       {...use({ outdated, editing, dragging: dndElement })}
       className={className}
     >

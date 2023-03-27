@@ -751,7 +751,7 @@ export abstract class CachedResource<
    * Can be override to provide static link to complicated keys
    */
   protected getMetadataKeyRef(key: ResourceKeyFlat<TKey>): TKey {
-    if (this.isAlias(key)) {
+    if (isResourceAlias(key)) {
       return this.transformToAlias(key)
         .toString() as TKey;
     }

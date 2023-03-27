@@ -7,58 +7,36 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
-import { Loader, Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+import { getComputed, Loader, Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import type { IElementsTreeContext } from './ElementsTreeContext';
 
-const styles = css`
-  center {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    min-width: 240px;
-  }
-`;
-
 interface Props {
-  root: string;
   context: IElementsTreeContext;
   childrenState: ILoadableState;
   emptyPlaceholder?: React.FC;
-  hasChildren?: boolean;
 }
 
 export const ElementsTreeContentLoader = observer<React.PropsWithChildren<Props>>(function ElementsTreeContentLoader({
-  root,
   context,
   childrenState,
   emptyPlaceholder: Placeholder,
-  hasChildren,
   children,
 }) {
-  let loading = childrenState.isLoading() || context.tree.loading;
+  const hasChildren = getComputed(() => context.tree.getNodeChildren(context.tree.root).length > 0);
 
-  if (context.tree.settings?.foldersTree && context.folderExplorer.root !== root) {
-    loading = false;
-  }
-
-  if (context.tree.settings?.saveExpanded && context.tree.loading) {
-    return styled(styles)(
-      <center>
-        <Loader />
-      </center>
-    );
-  }
+  const loading = getComputed(() => (
+    childrenState.isLoading()
+    || context.tree.loading
+  ) && !context.tree.isLoaded());
 
   if (!hasChildren) {
     if (loading) {
-      return styled(styles)(
-        <center>
-          <Loader />
-        </center>
+      return (
+        <Loader />
       );
     } else if (context.tree.filtering) {
       return styled(TREE_NODE_STYLES)(
@@ -72,8 +50,8 @@ export const ElementsTreeContentLoader = observer<React.PropsWithChildren<Props>
   }
 
   return (
-    <>
+    <Loader suspense>
       {children}
-    </>
+    </Loader>
   );
 });

@@ -25,10 +25,10 @@ interface KeyWithIncludes<TKey, TIncludes> {
 }
 
 type ResourceData<
-  TResource extends CachedResource<any, any, any, any>,
+  TResource extends CachedResource<any, any, any, any, any>,
   TKey,
   TIncludes
-> = TResource extends CachedDataResource<any, any, any>
+> = TResource extends CachedDataResource<any, any, any, any>
   ? CachedResourceData<TResource>
   : CachedMapResourceLoader<
   TKey,
@@ -39,7 +39,7 @@ type ResourceData<
 ;
 
 interface IActions<
-  TResource extends CachedResource<any, any, any, any>,
+  TResource extends CachedResource<any, any, any, any, any>,
   TKey,
   TIncludes
 > {
@@ -110,7 +110,7 @@ type TResult<TResource, TKey, TIncludes> = (
 );
 
 export function useResource<
-  TResource extends CachedResource<any, any, any, any>,
+  TResource extends CachedResource<any, any, any, any, any>,
   TKeyArg extends ResourceKey<CachedResourceKey<TResource>>,
   TIncludes extends Readonly<CachedResourceContext<TResource>>
 >(
@@ -121,7 +121,7 @@ export function useResource<
 ): TResult<TResource, TKeyArg, TIncludes>;
 
 export function useResource<
-  TResource extends CachedResource<any, any, any, any>,
+  TResource extends CachedResource<any, any, any, any, any>,
   TKeyArg extends ResourceKey<CachedResourceKey<TResource>>,
   TIncludes extends CachedResourceContext<TResource>
 >(
