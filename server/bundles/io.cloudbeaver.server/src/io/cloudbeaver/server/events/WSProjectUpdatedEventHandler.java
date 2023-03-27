@@ -35,18 +35,6 @@ public class WSProjectUpdatedEventHandler extends WSAbstractProjectEventHandler<
         return WSEventTopic.PROJECTS.getTopicId();
     }
 
-    @NotNull
-    @Override
-    protected Log getLog() {
-        return log;
-    }
-
-    @NotNull
-    @Override
-    protected Class<WSProjectUpdateEvent> getEventClass() {
-        return WSProjectUpdateEvent.class;
-    }
-
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSProjectUpdateEvent event) {
         var eventId = event.getId();

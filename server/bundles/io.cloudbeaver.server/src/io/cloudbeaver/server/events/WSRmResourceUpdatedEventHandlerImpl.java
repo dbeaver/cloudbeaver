@@ -47,18 +47,6 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
         return WSEventTopic.RM_SCRIPTS.getTopicId();
     }
 
-    @NotNull
-    @Override
-    protected Log getLog() {
-        return log;
-    }
-
-    @NotNull
-    @Override
-    protected Class<WSResourceUpdatedEvent> getEventClass() {
-        return WSResourceUpdatedEvent.class;
-    }
-
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSResourceUpdatedEvent event) {
         if (activeUserSession instanceof WebSession) {

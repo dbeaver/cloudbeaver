@@ -37,23 +37,15 @@ public class WSFolderUpdatedEventHandlerImpl extends WSAbstractProjectEventHandl
         return WSEventTopic.DATASOURCE_FOLDER.getTopicId();
     }
 
-    @NotNull
-    @Override
-    protected Log getLog() {
-        return log;
-    }
-
-    @NotNull
-    @Override
-    protected Class<WSDatasourceFolderEvent> getEventClass() {
-        return WSDatasourceFolderEvent.class;
-    }
-
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSDatasourceFolderEvent event) {
         if (activeUserSession instanceof WebSession) {
             var webSession = (WebSession) activeUserSession;
             var project = webSession.getProjectById(event.getProjectId());
+            if (project == null) {
+                log.debug("Project " + event.getProjectId() + " is not found in session " + webSession.getSessionId());
+                return;
+            }
             project.getDataSourceRegistry().refreshConfig();
             webSession.getNavigatorModel().getRoot().getProjectNode(project).getDatabases().refreshChildren();
         }

@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * Notify all active user session that rm resource has been updated
  */
-public class WSUserSecretEventHandlerImpl implements WSEventHandler {
+public class WSUserSecretEventHandlerImpl extends WSAbstractEventHandler<WSUserSecretEvent> {
 
     private static final Log log = Log.getLog(WSUserSecretEventHandlerImpl.class);
 
@@ -46,7 +46,7 @@ public class WSUserSecretEventHandlerImpl implements WSEventHandler {
     }
 
     @Override
-    public void handleEvent(@NotNull WSEvent event) {
+    public void handleEvent(@NotNull WSUserSecretEvent event) {
         Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
         for (var activeUserSession : allSessions) {
             if (WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId())) {
@@ -56,18 +56,20 @@ public class WSUserSecretEventHandlerImpl implements WSEventHandler {
         }
     }
 
-    protected void updateSessionData(BaseWebSession activeUserSession, WSEvent event) {
-        if (!(event instanceof WSUserSecretEvent && activeUserSession instanceof WebSession)) {
+    protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSUserSecretEvent event) {
+        if (!(activeUserSession instanceof WebSession)) {
+            activeUserSession.addSessionEvent(event);
             return;
         }
-        var resourceUpdateEvent = (WSUserSecretEvent) event;
-        var connectionInfo = ((WebSession) activeUserSession).findWebConnectionInfo(resourceUpdateEvent.getDataSourceId());
+        var connectionInfo = ((WebSession) activeUserSession).findWebConnectionInfo(event.getDataSourceId());
         if (connectionInfo == null) {
+            log.debug("Connection " + event.getDataSourceId() + " is not found in session " + activeUserSession.getSessionId());
             return;
         }
         try {
             connectionInfo.getDataSourceContainer().resolveSecrets(activeUserSession.getUserContext().getSecretController());
         } catch (DBException e) {
+            log.error("Error on resolving secrets in session " + activeUserSession.getSessionId(), e);
             return;
         }
         activeUserSession.addSessionEvent(
@@ -75,7 +77,7 @@ public class WSUserSecretEventHandlerImpl implements WSEventHandler {
                 event.getSessionId(),
                 event.getUserId(),
                 connectionInfo.getProjectId(),
-                List.of(resourceUpdateEvent.getDataSourceId()),
+                List.of(event.getDataSourceId()),
                 WSDataSourceProperty.CONFIGURATION
             )
         );

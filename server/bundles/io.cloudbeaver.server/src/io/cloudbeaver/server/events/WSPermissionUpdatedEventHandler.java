@@ -24,7 +24,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.SMObjectPermissionsGrant;
 import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
-import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
@@ -34,7 +33,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class WSPermissionUpdatedEventHandler implements WSEventHandler {
+public class WSPermissionUpdatedEventHandler implements WSEventHandler<WSObjectPermissionEvent> {
     private static final Log log = Log.getLog(WSPermissionUpdatedEventHandler.class);
 
     @NotNull
@@ -44,18 +43,14 @@ public class WSPermissionUpdatedEventHandler implements WSEventHandler {
     }
 
     @Override
-    public void handleEvent(@NotNull WSEvent event) {
-        if (!(event instanceof WSObjectPermissionEvent)) {
-            return;
-        }
-        var permissionEvent = (WSObjectPermissionEvent) event;
-        if (!SMObjects.PROJECT_OBJECT_TYPE_ID.equals(permissionEvent.getSmObjectType().getObjectType())) {
+    public void handleEvent(@NotNull WSObjectPermissionEvent event) {
+        if (!SMObjects.PROJECT_OBJECT_TYPE_ID.equals(event.getSmObjectType().getObjectType())) {
             return;
         }
         var smController = CBPlatform.getInstance().getApplication().getSecurityController();
         try {
-            var projectId = permissionEvent.getObjectId();
-            var permissionGrants = smController.getObjectPermissionGrants(projectId, permissionEvent.getSmObjectType());
+            var projectId = event.getObjectId();
+            var permissionGrants = smController.getObjectPermissionGrants(projectId, event.getSmObjectType());
             var subjectsWithProjectAccess = permissionGrants.stream()
                 .map(SMObjectPermissionsGrant::getSubjectId)
                 .collect(Collectors.toSet());
