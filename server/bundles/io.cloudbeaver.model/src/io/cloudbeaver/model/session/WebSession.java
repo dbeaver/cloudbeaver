@@ -302,6 +302,7 @@ public class WebSession extends BaseWebSession
             this.navigatorModel.dispose();
             this.navigatorModel = null;
         }
+        this.connections.clear();
 
         loadProjects();
 
@@ -310,13 +311,6 @@ public class WebSession extends BaseWebSession
         this.navigatorModel.initialize();
 
         this.locale = Locale.getDefault().getLanguage();
-
-        try {
-            this.refreshConnections();
-        } catch (Exception e) {
-            addSessionError(e);
-            log.error("Error getting connection list", e);
-        }
     }
 
     private void loadProjects() {
@@ -360,33 +354,15 @@ public class WebSession extends BaseWebSession
         if (!project.isShared() || application.isConfigurationMode()) {
             getWorkspace().setActiveProject(sessionProject);
         }
+        for (DBPDataSourceContainer ds : dataSourceRegistry.getDataSources()) {
+            addConnection(new WebConnectionInfo(this, ds));
+        }
+        Throwable lastError = dataSourceRegistry.getLastError();
+        if (lastError != null) {
+            addSessionError(lastError);
+            log.error("Error refreshing connections from project '" + project.getId() + "'", lastError);
+        }
         return sessionProject;
-    }
-
-    public void refreshConnections() {
-
-        // Add all provided datasources to the session
-        List<WebConnectionInfo> connList = new ArrayList<>();
-        for (DBPProject project : getWorkspace().getProjects()) {
-            DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-
-            for (DBPDataSourceContainer ds : registry.getDataSources()) {
-                connList.add(new WebConnectionInfo(this, ds));
-            }
-            Throwable lastError = registry.getLastError();
-            if (lastError != null) {
-                addSessionError(lastError);
-                log.error("Error refreshing connections from project '" + project.getId() + "'", lastError);
-            }
-        }
-
-        // Add all provided datasources to the session
-        synchronized (connections) {
-            connections.clear();
-            for (WebConnectionInfo connectionInfo : connList) {
-                connections.put(connectionInfo.getId(), connectionInfo);
-            }
-        }
     }
 
     public void filterAccessibleConnections(List<WebConnectionInfo> connections) {
@@ -980,17 +956,38 @@ public class WebSession extends BaseWebSession
         return getWorkspace().getProjects();
     }
 
-    public void addSessionProject(WebProjectImpl project) {
+    public void addSessionProject(@NotNull WebProjectImpl project) {
         getWorkspace().addProject(project);
         if (navigatorModel != null) {
             navigatorModel.getRoot().addProject(project, false);
         }
     }
 
-    public void deleteSessionProject(DBPProject project) {
+    public void deleteSessionProject(@Nullable WebProjectImpl project) {
         getWorkspace().remoteProject((WebProjectImpl) project);
         if (navigatorModel != null) {
             navigatorModel.getRoot().removeProject(project);
+        }
+    }
+
+    @Override
+    public void addSessionProject(@NotNull String projectId) throws DBException {
+        super.addSessionProject(projectId);
+        var rmProject = getRmController().getProject(projectId, false, false);
+        createWebProject(rmProject);
+    }
+
+    @Override
+    public void removeSessionProject(@Nullable String projectId) throws DBException {
+        super.removeSessionProject(projectId);
+        var project = getProjectById(projectId);
+        if (project == null) {
+            return;
+        }
+        deleteSessionProject(project);
+        var projectConnections = project.getDataSourceRegistry().getDataSources();
+        for (DBPDataSourceContainer c : projectConnections) {
+            removeConnection(new WebConnectionInfo(this, c));
         }
     }
 

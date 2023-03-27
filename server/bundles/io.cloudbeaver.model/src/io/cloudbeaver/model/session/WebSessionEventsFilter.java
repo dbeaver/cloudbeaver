@@ -18,7 +18,7 @@ package io.cloudbeaver.model.session;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.websocket.event.WSAbstractProjectEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSProjectResourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 
 import java.util.Set;
@@ -55,8 +55,8 @@ public class WebSessionEventsFilter {
             return false;
         }
 
-        if (!subscribedProjectIds.isEmpty() && event instanceof WSAbstractProjectEvent) {
-            var projectEvent = (WSAbstractProjectEvent) event;
+        if (!subscribedProjectIds.isEmpty() && event instanceof WSProjectResourceEvent) {
+            var projectEvent = (WSProjectResourceEvent) event;
             if (!subscribedProjectIds.contains(projectEvent.getProjectId())) {
                 return false;
             }

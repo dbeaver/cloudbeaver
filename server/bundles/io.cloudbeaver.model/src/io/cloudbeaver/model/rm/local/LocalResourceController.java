@@ -190,7 +190,7 @@ public class LocalResourceController implements RMController {
             .collect(Collectors.toList());
     }
 
-    private Set<RMProjectPermission> getProjectPermissions(@Nullable String projectId, RMProjectType projectType) throws DBException {
+    private Set<RMProjectPermission> getProjectPermissions(@Nullable String projectId, @NotNull RMProjectType projectType) throws DBException {
         var activeUserCreds = credentialsProvider.getActiveUserCredentials();
 
         switch (projectType) {

@@ -14,7 +14,7 @@ import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '@cloudbe
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { type NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import type { IDNDData } from '@cloudbeaver/core-ui';
@@ -81,7 +81,7 @@ export interface IElementsTreeOptions {
   isGroup?: (node: NavNode) => boolean;
   customSelect?: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void> | void;
   beforeSelect?: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void> | void;
-  customSelectReset?: ()=> Promise<void> | void;
+  customSelectReset?: () => Promise<void> | void;
 }
 
 interface IOptions extends IElementsTreeOptions {
@@ -125,6 +125,7 @@ export interface IElementsTree extends ILoadableState {
 
 export function useElementsTree(options: IOptions): IElementsTree {
   const projectsService = useService(ProjectsService);
+  const projectInfoResource = useService(ProjectInfoResource);
   const notificationService = useService(NotificationService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
@@ -616,6 +617,11 @@ export function useElementsTree(options: IOptions): IElementsTree {
         loadTreeThreshold();
       }
     }],
+  });
+
+  useExecutor({
+    executor: projectInfoResource.onDataOutdated,
+    handlers: [() => navTreeResource.markOutdated(ROOT_NODE_PATH)],
   });
 
   useExecutor({
