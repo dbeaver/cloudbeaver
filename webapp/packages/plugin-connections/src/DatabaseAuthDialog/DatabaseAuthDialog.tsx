@@ -45,6 +45,7 @@ const styles = css`
 interface Payload {
   connection: IConnectionInfoParams;
   networkHandlers: string[];
+  resetCredentials?: boolean;
 }
 
 export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function DatabaseAuthDialog({
@@ -62,8 +63,8 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
 
   let authModelId: string | null = null;
 
-  if (connection.connectionInfo?.authNeeded) {
-    authModelId = connection.connectionInfo.authModel || driver?.defaultAuthModel || null;
+  if (connection.connectionInfo?.authNeeded || payload.resetCredentials) {
+    authModelId = connection.connectionInfo?.authModel || driver?.defaultAuthModel || null;
   }
 
   return styled(useStyles(styles))(
