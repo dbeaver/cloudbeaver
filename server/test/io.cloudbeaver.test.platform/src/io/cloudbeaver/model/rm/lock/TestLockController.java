@@ -30,9 +30,15 @@ public class TestLockController extends RMFileLockController {
         super(application, maxTimeout);
     }
 
-    @Override
     //avoid mockito access method error
+    @Override
     public void awaitingUnlock(String projectId, Path projectLockFile) throws InterruptedException, DBException {
-        super.awaitUnlock(projectId, projectLockFile);
+        super.awaitingUnlock(projectId, projectLockFile);
+    }
+
+    //avoid mockito access method error
+    @Override
+    public boolean isLocked(Path lockFilePath) {
+        return super.isLocked(lockFilePath);
     }
 }

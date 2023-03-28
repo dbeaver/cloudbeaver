@@ -97,6 +97,7 @@ public class RMLockTest {
         if (exceptionReference.get() != null) {
             throw exceptionReference.get();
         }
+        Assert.assertFalse(lockController2.isProjectLocked(project1));
     }
 
     @Test
@@ -153,4 +154,50 @@ public class RMLockTest {
         Assert.assertFalse(lockController2.isProjectLocked(project2));
     }
 
+    @Test
+    public void testForceUnlock() throws Throwable {
+        var lockController1 = new TestLockController(CEServerTestSuite.getTestApp(), 1);
+
+        CountDownLatch thread1CDL = new CountDownLatch(1);
+        CountDownLatch thread2CDL = new CountDownLatch(1);
+        CountDownLatch globalCountDown = new CountDownLatch(2);
+
+        AtomicBoolean isLockedByThread1 = new AtomicBoolean(false);
+        AtomicReference<Throwable> exceptionReference = new AtomicReference<>();
+        var thread1 = new Thread(() -> {
+            try (var lock = lockController1.lockProject(project1, "testForceUnlock1")) {
+                isLockedByThread1.set(true);
+                thread1CDL.await(1, TimeUnit.MINUTES);
+            } catch (Throwable e) {
+                log.error(e);
+                exceptionReference.set(e);
+            } finally {
+                isLockedByThread1.set(false);
+                globalCountDown.countDown();
+            }
+        });
+        thread1.start();
+
+        var lockController2 = Mockito.spy(new TestLockController(CEServerTestSuite.getTestApp(), 100));
+        var thread2 = new Thread(() -> {
+            try {
+                try (var lock = lockController2.lockProject(project1, "testForceUnlock2")) {
+                    Assert.assertTrue("Project1 not locket by thread1", isLockedByThread1.get());
+                    Mockito.verify(lockController2, Mockito.atLeast(5)).isLocked(Mockito.any());
+                    thread1CDL.countDown();
+                }
+            } catch (Throwable e) {
+                log.error(e);
+                exceptionReference.set(e);
+            } finally {
+                globalCountDown.countDown();
+            }
+        });
+        thread2.start();
+        globalCountDown.await(1, TimeUnit.MINUTES);
+        if (exceptionReference.get() != null) {
+            throw exceptionReference.get();
+        }
+        Assert.assertFalse(lockController2.isProjectLocked(project1));
+    }
 }

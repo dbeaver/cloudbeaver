@@ -96,7 +96,11 @@ public class RMFileLockController {
      */
     public boolean isProjectLocked(String projectId) {
         Path projectLockFilePath = getProjectLockFilePath(projectId);
-        return Files.exists(projectLockFilePath);
+        return isLocked(projectLockFilePath);
+    }
+
+    protected boolean isLocked(Path lockFilePath) {
+        return Files.exists(lockFilePath);
     }
 
     private void createLockFile(Path projectLockFile, RMLockInfo lockInfo) throws DBException, InterruptedException {
@@ -149,8 +153,7 @@ public class RMFileLockController {
     }
 
     protected void awaitUnlock(String projectId, Path projectLockFile) throws InterruptedException, DBException {
-        if (Files.notExists(projectLockFile)) {
-            // project not locked
+        if (!isLocked(projectLockFile)) {
             return;
         }
         awaitingUnlock(projectId, projectLockFile);
@@ -164,7 +167,7 @@ public class RMFileLockController {
         int currentCheckCount = 0;
 
         while (!fileUnlocked) {
-            fileUnlocked = Files.notExists(projectLockFile);
+            fileUnlocked = !isLocked(projectLockFile);
             if (currentCheckCount >= maxIterations || fileUnlocked) {
                 break;
             }
@@ -218,7 +221,7 @@ public class RMFileLockController {
         try (Reader reader = Files.newBufferedReader(projectLockFile, StandardCharsets.UTF_8)) {
             return gson.fromJson(reader, RMLockInfo.class);
         } catch (IOException e) {
-            if (Files.notExists(projectLockFile)) {
+            if (!isLocked(projectLockFile)) {
                 return null;
             }
             log.warn("Failed to read lock file info, but lock file still exist: " + projectLockFile);
