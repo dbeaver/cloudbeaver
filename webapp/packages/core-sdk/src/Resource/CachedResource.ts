@@ -10,7 +10,7 @@ import { observable, makeObservable, action, computed, toJS } from 'mobx';
 
 import { Dependency } from '@cloudbeaver/core-di';
 import { ExecutionContext, Executor, ExecutorInterrupter, IExecutor, IExecutorHandler, IExecutionContextProvider, ISyncExecutor, SyncExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
-import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
+import { isPrimitive, MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
 import { isResourceAlias, ResourceAlias, ResourceAliasFactory, ResourceAliasOptions } from './ResourceAlias';
 import { ResourceError } from './ResourceError';
@@ -744,6 +744,9 @@ export abstract class CachedResource<
    * Can be override to provide static link to complicated keys
    */
   protected getKeyRef(key: TKey): TKey {
+    if (isPrimitive(key)) {
+      return key;
+    }
     return Object.freeze(toJS(key));
   }
 
@@ -754,6 +757,10 @@ export abstract class CachedResource<
     if (isResourceAlias(key)) {
       return this.transformToAlias(key)
         .toString() as TKey;
+    }
+
+    if (isPrimitive(key)) {
+      return key;
     }
 
     const ref = Array.from(this.metadata.keys())

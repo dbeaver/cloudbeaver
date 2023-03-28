@@ -8,8 +8,11 @@
 
 import { useEffect, useRef } from 'react';
 
-import { UserDataService } from '@cloudbeaver/core-authentication';
+import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { useService } from '@cloudbeaver/core-di';
+
+import { useResource } from './ResourcesHooks/useResource';
+import { useObjectRef } from './useObjectRef';
 
 export function useUserData<T extends Record<any, any>>(
   key: string,
@@ -17,17 +20,18 @@ export function useUserData<T extends Record<any, any>>(
   onUpdate?: (data: T) => void,
   validate?: (data: T) => boolean
 ): T {
+  const optionsRef = useObjectRef({ defaultValue, onUpdate, validate });
+  useResource(useUserData, UserInfoResource, undefined);
   const userDataService = useService(UserDataService);
   const ref = useRef<T | null>(null);
   const data = userDataService.getUserData(key, defaultValue, validate);
-  const previous = ref.current;
-  ref.current = data;
 
   useEffect(() => {
-    if (previous !== data) {
-      onUpdate?.(data);
+    if (ref.current !== data) {
+      ref.current = data;
+      optionsRef.onUpdate?.(data);
     }
-  });
+  }, [ref.current, data]);
 
   return data;
 }

@@ -44,6 +44,7 @@ interface IActions<
   TIncludes
 > {
   active?: boolean;
+  forceSuspense?: boolean;
   silent?: boolean;
   onData?: (
     data: ResourceData<TResource, TKey, TIncludes>,
@@ -467,6 +468,10 @@ export function useResource<
       result.load();
     }
   }, [result.canLoad]);
+
+  if (actions?.forceSuspense) {
+    result.data;
+  }
 
   return result;
 }

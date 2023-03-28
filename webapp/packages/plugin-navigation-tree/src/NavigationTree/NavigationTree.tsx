@@ -84,7 +84,6 @@ export const NavigationTree = observer(function NavigationTree() {
   const navNodeViewService = useService(NavNodeViewService);
 
   const root = ROOT_NODE_PATH;
-  const { authenticated } = useService(AppAuthService);
   const { handleOpen, handleSelect, handleSelectReset } = useNavigationTree();
 
   const connectionGroupFilter = useMemo(() => navigationTreeConnectionGroupFilter(
@@ -113,10 +112,6 @@ export const NavigationTree = observer(function NavigationTree() {
   );
 
   const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);
-
-  if (!authenticated) {
-    return null;
-  }
 
   return styled(navigationTreeStyles)(
     <CaptureView view={navTreeService}>

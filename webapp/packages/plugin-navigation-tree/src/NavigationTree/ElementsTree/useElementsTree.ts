@@ -152,6 +152,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     async loadTree(nodeId: string) {
       elementsTree.loading = true;
       try {
+        await projectInfoResource.load();
         await connectionInfoResource.load(ConnectionInfoActiveProjectKey);
         const preloadedRoot = await elementsTree.loadPath(options.folderExplorer.state.fullPath);
 
@@ -171,6 +172,8 @@ export function useElementsTree(options: IOptions): IElementsTree {
           const nextChildren: string[] = [];
 
           await Promise.all(children.map(async child => {
+            await projectInfoResource.waitLoad();
+            await connectionInfoResource.waitLoad();
             await navTreeResource.waitLoad();
             await navNodeInfoResource.waitLoad();
 
@@ -449,6 +452,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     },
     getNodeChildren(nodeId: string): string[] {
       const node = navNodeInfoResource.get(nodeId);
+      const children = options.getChildren(nodeId) || [];
 
       if (!node) {
         return []; // Maybe filter should accept nodeId, so we be able to apply filters to empty node
@@ -457,7 +461,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       return (options.filters || [])
         .reduce(
           (children, filter) => filter(elementsTree, elementsTree.filter, node, children, this.state),
-          options.getChildren(node.id) || []
+          children
         );
     },
     async setFilter(value: string) {
@@ -655,6 +659,10 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const loadTreeThreshold = useCallback(throttle(function refreshRoot() {
     functionsRef.loadTree(options.root);
   }, 100), []);
+
+  useResource(useElementsTree, navTreeResource, options.baseRoot, {
+    onData: () => loadTreeThreshold(),
+  });
 
   useResource(useElementsTree, ProjectInfoResource, CachedMapAllKey, {
     onData: () => {

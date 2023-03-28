@@ -10,6 +10,7 @@ export * from './underscore';
 
 export * from './blobToData';
 export * from './bytesToSize';
+export * from './cacheValue';
 export * from './clsx';
 export * from './copyToClipboard';
 export * from './declensionOfNumber';
@@ -25,6 +26,7 @@ export * from './GlobalConstants';
 export * from './ILoadableState';
 export * from './errorOf';
 export * from './isArraysEqual';
+export * from './isPrimitive';
 export * from './isPropertiesEqual';
 export * from './isValuesEqual';
 export * from './md5';
