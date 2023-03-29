@@ -164,18 +164,13 @@ export class ResourceFoldersBootstrap extends Bootstrap {
 
         let path: string | undefined;
 
-        if (!targetNode.folderId) {
-          const project = this.projectInfoResource.get(targetNode.projectId);
-          targetNode.folderId = this.getResourceTypeFolder(project!, resourceTypeId);
-        }
-
         if (targetNode.folderId) {
           const resourceKey = getResourceKeyFromNodeId(targetNode.folderId);
 
           if (resourceKey !== undefined) {
             const key = getRmResourceKey(resourceKey);
             if (key.path) {
-              path = resourceKey;
+              path = key.path;
             }
           }
         }
@@ -183,32 +178,39 @@ export class ResourceFoldersBootstrap extends Bootstrap {
         const result = await this.commonDialogService.open(FolderDialog, {
           value: this.localizationService.translate('ui_folder_new'),
           projectId: targetNode.projectId,
+          folder: path,
           title: 'core_view_action_new_folder',
-          subTitle: path,
           icon: '/icons/folder.svg#root',
           create: true,
           selectProject: targetNode.selectProject,
-          validation: async ({ folder, projectId }, setMessage) => {
-            const trimmed = folder.trim();
+          validation: async ({ name, folder, projectId }, setMessage) => {
+            const trimmed = name.trim();
 
-            if (trimmed.length === 0 || !folder.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
+            if (trimmed.length === 0 || !name.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
               setMessage('connections_connection_folder_validation');
               return false;
             }
 
-            const key = path !== undefined ? path : getRmResourcePath(projectId);
+            const root = this.getResourceTypeFolder(projectId, resourceTypeId);
+            const key = getRmResourcePath(projectId, folder ?? root);
 
-            await this.resourceManagerResource.load(CachedTreeChildrenKey(key));
+            try {
+              await this.resourceManagerResource.load(CachedTreeChildrenKey(key));
 
-            return !this.resourceManagerResource.has(createPath(key, trimmed));
+              return !this.resourceManagerResource.has(createPath(key, trimmed));
+            } catch (exception: any) {
+              setMessage('connections_connection_folder_validation');
+              return false;
+            }
           },
         });
 
         if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
           try {
-            const key = path !== undefined ? path : getRmResourcePath(result.projectId);
+            const root = this.getResourceTypeFolder(result.projectId, resourceTypeId);
+            const key = getRmResourcePath(result.projectId, result.folder ?? root);
             await this.resourceManagerResource.create(
-              createPath(key, result.folder),
+              createPath(key, result.name),
               true
             );
 
@@ -276,13 +278,18 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     };
   }
 
-  private getResourceTypeFolder(project: ProjectInfo, resourceTypeId: string | undefined): string | undefined {
+  private getResourceTypeFolder(projectId: string, resourceTypeId: string | undefined): string | undefined {
     if (!resourceTypeId) {
+      return undefined;
+    }
+    const project = this.projectInfoResource.get(projectId);
+
+    if (!project) {
       return undefined;
     }
 
     const resourceFolder = this.resourceManagerService.getRootFolder(project, resourceTypeId);
-    return createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
+    return resourceFolder;
   }
 
   private syncNavTree() {

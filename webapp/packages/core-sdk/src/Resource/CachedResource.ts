@@ -886,6 +886,9 @@ export abstract class CachedResource<
   }
 
   protected markOutdatedSync(key: ResourceKey<TKey>): void {
+    if (!this.hasMetadata(key)) {
+      return;
+    }
     this.updateMetadata(key, metadata => {
       metadata.outdated = true;
     });

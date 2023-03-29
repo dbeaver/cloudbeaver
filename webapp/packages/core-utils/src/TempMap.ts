@@ -105,6 +105,12 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
 
   set(key: TKey, value: TValue): this {
     this.temp.set(key, value);
+
+    const indexOfDeleted = this.deleted.indexOf(key);
+    if (indexOfDeleted !== -1) {
+      this.deleted.splice(indexOfDeleted, 1);
+    }
+
     this.scheduleFlush();
     return this;
   }

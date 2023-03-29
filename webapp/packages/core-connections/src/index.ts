@@ -10,6 +10,10 @@ export * from './extensions/IObjectSchemaProvider';
 export * from './extensions/IObjectSchemaSetter';
 export * from './NavTree/ConnectionNavNodeService';
 export * from './NavTree/NavNodeExtensionsService';
+export * from './NavTree/getConnectionFolderIdFromNodeId';
+export * from './NavTree/getConnectionFolderId';
+export * from './NavTree/getConnectionParentId';
+export * from './NavTree/getFolderNodeParents';
 
 export * from './extensions/IConnectionProvider';
 export * from './extensions/IConnectionSetter';
@@ -22,6 +26,7 @@ export * from './EConnectionFeature';
 export * from './ConnectionsSettingsService';
 export * from './ContainerResource';
 export * from './ConnectionsLocaleService';
+export * from './createConnectionFolderParam';
 export * from './DatabaseAuthModelsResource';
 export * from './DatabaseConnection';
 export * from './DBDriverResource';

@@ -11,7 +11,10 @@ import { action, makeObservable, runInAction } from 'mobx';
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionDataResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedMapResource, resourceKeyList, ResourceKeyUtils, CachedMapAllKey, ConnectionFolderInfoFragment, isResourceKeyList, isResourceKeyAlias, resourceKeyAliasFactory, ResourceKey, isResourceAlias } from '@cloudbeaver/core-sdk';
+import { GraphQLService, CachedMapResource, resourceKeyList, ResourceKeyUtils, CachedMapAllKey, ConnectionFolderInfoFragment, resourceKeyAliasFactory, ResourceKey, isResourceAlias } from '@cloudbeaver/core-sdk';
+
+import { createConnectionFolderParam } from './createConnectionFolderParam';
+import { getConnectionFolderIdFromNodeId } from './NavTree/getConnectionFolderIdFromNodeId';
 
 export type ConnectionFolder = ConnectionFolderInfoFragment;
 
@@ -49,13 +52,14 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
     });
   }
 
-  async create(key: IConnectionFolderParam, parentId?: string): Promise<ConnectionFolder> {
+  async create(projectId: string, name: string, parentId?: string): Promise<ConnectionFolder> {
     const { folder } = await this.graphQLService.sdk.createConnectionFolder({
-      projectId: key.projectId,
-      folderName: key.folderId,
+      projectId,
+      folderName: name,
       parentFolderPath: parentId,
     });
 
+    const key = createConnectionFolderParam(projectId, folder.id);
     this.set(key, { ...folder, projectId: key.projectId });
 
     return this.get(key)!;
@@ -72,12 +76,10 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
   }
 
   fromNodeId(nodeId: string): ConnectionFolder | undefined {
-    const data = /^folder:\/\/(.*?)\/(.*)$/ig.exec(nodeId);
+    const key = getConnectionFolderIdFromNodeId(nodeId);
 
-    if (data) {
-      const [t, projectId, folderId] = data;
-
-      return this.get(createConnectionFolderParam(projectId, folderId));
+    if (key) {
+      return this.get(key);
     }
 
     return undefined;
@@ -151,26 +153,4 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
       && ['string'].includes(typeof key.folderId)
     );
   }
-}
-
-export function createConnectionFolderParam(
-  projectId: string,
-  folder: ConnectionFolder
-): IConnectionFolderParam;
-export function createConnectionFolderParam(
-  projectId: string,
-  folderId: string
-): IConnectionFolderParam;
-export function createConnectionFolderParam(
-  projectId: string,
-  folderIdOrFolder: string | ConnectionFolder
-): IConnectionFolderParam {
-  if (typeof folderIdOrFolder === 'object') {
-    folderIdOrFolder = folderIdOrFolder.id;
-  }
-
-  return {
-    projectId: projectId,
-    folderId: folderIdOrFolder,
-  };
 }
