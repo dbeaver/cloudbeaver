@@ -9,9 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { Loader, useResource, useStyles } from '@cloudbeaver/core-blocks';
-import { ConnectionDialectResource, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
-import { useService } from '@cloudbeaver/core-di';
+import { useResource, useStyles } from '@cloudbeaver/core-blocks';
+import { ConnectionDialectResource, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { MenuBar, MENU_BAR_DEFAULT_STYLES } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
@@ -29,31 +28,31 @@ export const ExtendedDDLViewerTabPanel: NavNodeTransformViewComponent = observer
   const style = useStyles(TAB_PANEL_STYLES);
   const menu = useMenu({ menu: MENU_DDL_VIEWER_FOOTER });
 
-  const connectionInfoResource = useService(ConnectionInfoResource);
-
   const extendedDDLResource = useResource(ExtendedDDLViewerTabPanel, ExtendedDDLResource, nodeId);
 
-  const connection = connectionInfoResource.getConnectionForNode(nodeId);
+  const connectionInfoResource = useResource(
+    ExtendedDDLViewerTabPanel,
+    ConnectionInfoResource,
+    ConnectionInfoActiveProjectKey
+  );
+  const connection = connectionInfoResource.resource.getConnectionForNode(nodeId);
   const connectionParam = connection ? createConnectionParam(connection) : null;
-
   const connectionDialectResource = useResource(ExtendedDDLViewerTabPanel, ConnectionDialectResource, connectionParam);
 
   menu.context.set(DATA_CONTEXT_DDL_VIEWER_NODE, nodeId);
   menu.context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, extendedDDLResource.data);
 
   return styled(style)(
-    <Loader state={[extendedDDLResource, connectionDialectResource]}>
-      <wrapper>
-        <SQLCodeEditorLoader
-          bindings={{
-            autoCursor: false,
-          }}
-          value={extendedDDLResource.data}
-          dialect={connectionDialectResource.data}
-          readonly
-        />
-        <MenuBar menu={menu} style={MENU_BAR_DEFAULT_STYLES} />
-      </wrapper>
-    </Loader>
+    <wrapper>
+      <SQLCodeEditorLoader
+        bindings={{
+          autoCursor: false,
+        }}
+        value={extendedDDLResource.data}
+        dialect={connectionDialectResource.data}
+        readonly
+      />
+      <MenuBar menu={menu} style={MENU_BAR_DEFAULT_STYLES} />
+    </wrapper>
   );
 });
