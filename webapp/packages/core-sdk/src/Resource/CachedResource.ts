@@ -560,6 +560,16 @@ export abstract class CachedResource<
         this.commitIncludes(metadata, includes);
       }
     });
+    if (isResourceAlias(param)) {
+      param = this.transformToKey(param);
+
+      this.updateMetadata(param, metadata => {
+        metadata.loaded = true;
+        if (includes) {
+          this.commitIncludes(metadata, includes);
+        }
+      });
+    }
   }
 
   markError(exception: Error, key: ResourceKey<TKey>, include?: TInclude): ResourceError {
