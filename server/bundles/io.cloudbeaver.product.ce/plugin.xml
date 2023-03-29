@@ -5,7 +5,7 @@
 
     <extension point="org.eclipse.core.runtime.applications" id="application" name="CloudBeaver Web Application">
         <application visible="true">
-            <run class="io.cloudbeaver.server.CBApplicationEmbedded"/>
+            <run class="io.cloudbeaver.server.CBApplicationCE"/>
         </application>
     </extension>
 

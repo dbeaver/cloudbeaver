@@ -33,8 +33,8 @@ import org.jkiss.dbeaver.model.security.SMController;
 
 import java.util.List;
 
-public class CBApplicationEmbedded extends CBApplication {
-    private static final Log log = Log.getLog(CBApplicationEmbedded.class);
+public class CBApplicationCE extends CBApplication {
+    private static final Log log = Log.getLog(CBApplicationCE.class);
 
     @Override
     public SMController createSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
