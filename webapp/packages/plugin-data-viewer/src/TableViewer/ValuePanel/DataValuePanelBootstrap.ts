@@ -10,6 +10,7 @@ import React from 'react';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
+import { ResultSetDataAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
 import { DataValuePanelService } from './DataValuePanelService';
 
@@ -37,7 +38,15 @@ export class DataValuePanelBootstrap extends Bootstrap {
         dataFormat,
         model,
         resultIndex
-      ) => this.dataValuePanelService.getDisplayed({ model, resultIndex, dataFormat }).length === 0,
+      ) => {
+        if (!model.source.hasResult(resultIndex)) {
+          return true;
+        }
+
+        const data = model.source.getAction(resultIndex, ResultSetDataAction);
+        return data.empty
+          || this.dataValuePanelService.getDisplayed({ model, resultIndex, dataFormat }).length === 0;
+      },
       getPresentationComponent: () => ValuePanel,
     });
   }
