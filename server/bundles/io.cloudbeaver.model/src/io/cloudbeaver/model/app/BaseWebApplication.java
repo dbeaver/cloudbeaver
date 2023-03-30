@@ -47,6 +47,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Web application
@@ -58,6 +59,13 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
 
     private static final Log log = Log.getLog(BaseWebApplication.class);
+
+    private final String applicationRunId = UUID.randomUUID().toString();
+
+    @NotNull
+    public String getApplicationRunId() {
+        return applicationRunId;
+    }
 
     @NotNull
     @Override
