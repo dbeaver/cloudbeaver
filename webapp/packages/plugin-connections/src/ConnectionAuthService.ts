@@ -92,6 +92,7 @@ export class ConnectionAuthService extends Dependency {
       const result = await this.commonDialogService.open(DatabaseAuthDialog, {
         connection: key,
         networkHandlers,
+        resetCredentials,
       });
 
       if (resetCredentials && isConnectedInitially && result === DialogueStateResult.Rejected) {

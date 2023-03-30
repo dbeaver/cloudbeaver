@@ -196,7 +196,16 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
-          return this.serverConfigResource.distributed && connection.credentialsSaved === true;
+          return this.serverConfigResource.distributed;
+        }
+
+        return false;
+      },
+      isHidden: (context, action) => {
+        const connection = context.tryGet(DATA_CONTEXT_CONNECTION);
+
+        if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
+          return !connection?.credentialsSaved;
         }
 
         return false;
