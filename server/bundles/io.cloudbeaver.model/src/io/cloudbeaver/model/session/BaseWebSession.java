@@ -19,6 +19,7 @@ package io.cloudbeaver.model.session;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
@@ -167,5 +168,13 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     public boolean isProjectAccessible(String projectId) {
         return userContext.getAccessibleProjectIds().contains(projectId);
+    }
+
+    public void addSessionProject(@NotNull String projectId) throws DBException {
+        userContext.getAccessibleProjectIds().add(projectId);
+    }
+
+    public void removeSessionProject(@Nullable String projectId) throws DBException {
+        userContext.getAccessibleProjectIds().remove(projectId);
     }
 }

@@ -38,6 +38,10 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
     context?: IExecutionContext<T>,
     scope?: IExecutorHandlersCollection<T> | Array<IExecutorHandlersCollection<T>>
   ): Promise<IExecutionContextProvider<T>> {
+    if (context && ExecutorInterrupter.isInterrupted(context)) {
+      return context;
+    }
+
     data = this.getDefaultData(data);
 
     return await this.scheduler.schedule(data, async () => {
@@ -53,6 +57,10 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
     scope?: IExecutorHandlersCollection<T> | Array<IExecutorHandlersCollection<T>>,
     context?: IExecutionContext<T>
   ): Promise<IExecutionContextProvider<T>> {
+    if (context && ExecutorInterrupter.isInterrupted(context)) {
+      return context;
+    }
+
     data = this.getDefaultData(data);
 
     return await this.scheduler.schedule(data, async () => {

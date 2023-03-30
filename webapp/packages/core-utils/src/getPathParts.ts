@@ -7,5 +7,8 @@
  */
 
 export function getPathParts(path: string): string[] {
-  return path.replace('//', '[\\]/').split('/').map(v => v.replace(/\[\\\]$/, '/'));
+  return path
+    .replace('//', '[\\\\]')
+    .split('/')
+    .map(v => v.replace(/\[\\\\\]/, '//'));
 }

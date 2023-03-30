@@ -22,10 +22,10 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
 import org.jkiss.dbeaver.model.rm.RMResource;
-import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
@@ -36,8 +36,9 @@ import java.util.List;
 /**
  * Notify all active user session that rm resource has been updated
  */
-public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler {
+public class WSRmResourceUpdatedEventHandlerImpl extends WSAbstractProjectEventHandler<WSResourceUpdatedEvent> {
 
+    private static final Log log = Log.getLog(WSRmResourceUpdatedEventHandlerImpl.class);
     private static final Gson gson = new GsonBuilder().create();
 
     @NotNull
@@ -46,33 +47,31 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHa
         return WSEventTopic.RM_SCRIPTS.getTopicId();
     }
 
+    @NotNull
     @Override
-    protected void updateSessionData(BaseWebSession activeUserSession, WSEvent event) {
-        if (!(event instanceof WSResourceUpdatedEvent)) {
-            return;
-        }
-        var resourceUpdateEvent = (WSResourceUpdatedEvent) event;
-        String projectId = resourceUpdateEvent.getProjectId();
-        if (!activeUserSession.isProjectAccessible(projectId)) {
-            return;
-        }
-        if (resourceUpdateEvent.getResourcePath() == null) {
-            return;
-        }
-        Object parsedResourcePath = resourceUpdateEvent.getResourceParsedPath();
-        RMResource[] resourceParsedPath;
-        if (parsedResourcePath instanceof RMResource[]) {
-            resourceParsedPath = (RMResource[]) parsedResourcePath;
-        } else {
-            resourceParsedPath = gson.fromJson(gson.toJson(parsedResourcePath), RMResource[].class);
-        }
-        var eventType = WSEventType.valueById(resourceUpdateEvent.getId());
-        if (eventType == null) {
-            return;
-        }
+    protected Log getLog() {
+        return log;
+    }
+
+    @NotNull
+    @Override
+    protected Class<WSResourceUpdatedEvent> getEventClass() {
+        return WSResourceUpdatedEvent.class;
+    }
+
+    @Override
+    protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSResourceUpdatedEvent event) {
         if (activeUserSession instanceof WebSession) {
+            var parsedResourcePath = event.getResourceParsedPath();
+            var resourceParsedPath = parsedResourcePath instanceof RMResource[]
+                ? (RMResource[]) parsedResourcePath
+                : gson.fromJson(gson.toJson(parsedResourcePath), RMResource[].class);
             var webSession = (WebSession) activeUserSession;
-            acceptChangesInNavigatorTree(eventType, resourceParsedPath, webSession.getProjectById(projectId));
+            acceptChangesInNavigatorTree(
+                WSEventType.valueById(event.getId()),
+                resourceParsedPath,
+                webSession.getProjectById(event.getProjectId())
+            );
         }
         activeUserSession.addSessionEvent(event);
     }

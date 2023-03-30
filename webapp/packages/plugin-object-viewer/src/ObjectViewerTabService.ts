@@ -336,7 +336,7 @@ export class ObjectViewerTabService {
   private async restoreObjectTab(tab: ITab<IObjectViewerTabState>) {
     if (
       typeof tab.handlerState.folderId === 'string'
-      && typeof tab.handlerState.parentId === 'string'
+      && ['string', 'undefined'].includes(typeof tab.handlerState.parentId)
       && ['object', 'undefined'].includes(typeof tab.handlerState.connectionKey)
       && ['string', 'undefined'].includes(typeof tab.handlerState.projectId)
       && Array.isArray(tab.handlerState.parents)

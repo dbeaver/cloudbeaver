@@ -11,7 +11,7 @@ import type { NavigatorNodeInfo, NavNodeDbObjectInfoFragment } from '@cloudbeave
 export type NavNodeInfo = NavigatorNodeInfo;
 
 export type NavNode = Omit<NavNodeInfo, 'object'> & {
-  parentId: string;
+  parentId?: string;
   fullName?: string;
   objectFeatures: string[];
 };

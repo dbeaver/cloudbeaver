@@ -16,9 +16,12 @@ enum CBServerEventId {
     cb_datasource_folder_updated,
     cb_datasource_folder_deleted,
 
-    cb_rm_resource_created
-    cb_rm_resource_updated
-    cb_rm_resource_deleted
+    cb_rm_resource_created,
+    cb_rm_resource_updated,
+    cb_rm_resource_deleted,
+
+    cb_rm_project_added,
+    cb_rm_project_removed
 }
 
 # Events sent by client
@@ -86,10 +89,24 @@ type CBSessionLogEvent implements CBServerEvent {
     topicId: CBEventTopic
 }
 
+# RM project update event
+type CBProjectUpdateEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    projectId: String!
+}
+
 # Topic subscription event
 type CBTopicEvent implements CBClientEvent {
     id: CBClientEventId!
     topicId: CBEventTopic! # topic to subscribe / unsubscribe
+}
+
+# Project event
+type CBProjectEvent implements CBClientEvent {
+    id: CBClientEventId!
+    topicId: CBEventTopic
+    projectId: String!
 }
 
 # Active projects event

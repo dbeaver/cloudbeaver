@@ -8,8 +8,8 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { DdlResource } from './DdlViewer/DdlResource';
 import { DDLViewerFooterService } from './DdlViewer/DDLViewerFooterService';
-import { DdlViewerService } from './DdlViewer/DdlViewerService';
 import { DdlViewerBootstrap } from './DdlViewerBootstrap';
 import { ExtendedDDLResource } from './ExtendedDDLViewer/ExtendedDDLResource';
 
@@ -20,8 +20,8 @@ export const manifest: PluginManifest = {
 
   providers: [
     DdlViewerBootstrap,
-    DdlViewerService,
     DDLViewerFooterService,
     ExtendedDDLResource,
+    DdlResource,
   ],
 };

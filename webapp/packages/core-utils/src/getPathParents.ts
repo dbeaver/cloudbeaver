@@ -12,5 +12,7 @@ import { getPathParts } from './getPathParts';
 export function getPathParents(path: string): string[] {
   const parts = getPathParts(path);
 
-  return parts.map((_, i, array) => createPath(...array.slice(0, i)));
+  return parts
+    .map((_, i, array) => createPath(...array.slice(0, i)))
+    .filter(parent => parent !== path);
 }

@@ -23,16 +23,18 @@ import io.cloudbeaver.service.rm.DBWServiceRM;
 import io.cloudbeaver.service.rm.model.RMProjectPermissions;
 import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
 import io.cloudbeaver.service.security.SMUtils;
+import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
+import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 
 import java.nio.charset.StandardCharsets;
@@ -255,6 +257,9 @@ public class WebServiceRM implements DBWServiceRM {
         try {
             RMProject rmProject = getResourceController(session).createProject(name, description);
             session.createWebProject(rmProject);
+            WebAppUtils.getWebApplication().getEventController().addEvent(
+                WSProjectUpdateEvent.create(session.getSessionId(), session.getUserId(), rmProject.getId())
+            );
             return rmProject;
         } catch (DBException e) {
             throw new DBWebException("Error creating project", e);
@@ -264,9 +269,12 @@ public class WebServiceRM implements DBWServiceRM {
     @Override
     public boolean deleteProject(@NotNull WebSession session, @NotNull String projectId) throws DBWebException {
         try {
-            DBPProject project = session.getProjectById(projectId);
+            var project = session.getProjectById(projectId);
             getResourceController(session).deleteProject(projectId);
             session.deleteSessionProject(project);
+            WebAppUtils.getWebApplication().getEventController().addEvent(
+                WSProjectUpdateEvent.delete(session.getSessionId(), session.getUserId(), projectId)
+            );
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error deleting project", e);
@@ -301,10 +309,24 @@ public class WebServiceRM implements DBWServiceRM {
                     webSession.getUserId()
                 );
             }
+            addProjectPermissionsUpdatedEvent(webSession, projectId);
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error granting project permissions", e);
         }
+    }
+
+    private void addProjectPermissionsUpdatedEvent(
+        @NotNull WebSession webSession,
+        @NotNull String projectId
+    ) {
+        var event = WSObjectPermissionEvent.update(
+            webSession.getUserContext().getSmSessionId(),
+            webSession.getUserId(),
+            SMObjects.PROJECT,
+            projectId
+        );
+        webSession.getApplication().getEventController().addEvent(event);
     }
 
     @Override
@@ -325,6 +347,7 @@ public class WebServiceRM implements DBWServiceRM {
                     permissions,
                     webSession.getUserId()
                 );
+                addProjectPermissionsUpdatedEvent(webSession, projectId);
             }
             return true;
         } catch (Exception e) {
