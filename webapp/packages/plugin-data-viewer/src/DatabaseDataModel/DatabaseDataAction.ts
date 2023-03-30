@@ -13,11 +13,15 @@ import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { IDatabaseDataSource } from './IDatabaseDataSource';
 
 export abstract class DatabaseDataAction<TOptions, TResult extends IDatabaseDataResult>
-  implements IDatabaseDataAction<TOptions, TResult> {
+implements IDatabaseDataAction<TOptions, TResult> {
   result: TResult;
 
   get resultIndex(): number {
     return this.source.results.indexOf(this.result);
+  }
+
+  get empty(): boolean {
+    return !this.result.data;
   }
 
   readonly source: IDatabaseDataSource<TOptions, TResult>;
