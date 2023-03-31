@@ -15,6 +15,7 @@ import { PermissionsService } from './PermissionsService';
 import { QuotasService } from './QuotasService';
 import { ServerConfigEventHandler } from './ServerConfigEventHandler';
 import { ServerConfigResource } from './ServerConfigResource';
+import { ServerNodeService } from './ServerNodeService';
 import { ServerService } from './ServerService';
 import { ServerSettingsService } from './ServerSettingsService';
 import { SessionActionService } from './SessionActionService';
@@ -44,6 +45,7 @@ export const manifest: PluginManifest = {
     SessionActionService,
     SessionDataResource,
     SessionExpireService,
+    ServerNodeService,
     SessionResource,
     SessionService,
     SessionSettingsService,
