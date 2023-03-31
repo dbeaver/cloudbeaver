@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -36,10 +36,10 @@ export class AsyncTask {
   private taskInfo: AsyncTaskInfo | null;
   private resolve!: (value: AsyncTaskInfo) => void;
   private reject!: (reason?: any) => void;
-  private innerPromise: Promise<AsyncTaskInfo>;
+  private readonly innerPromise: Promise<AsyncTaskInfo>;
   private updatingAsync: boolean;
-  private init: () => Promise<AsyncTaskInfo>;
-  private cancel: (info: AsyncTaskInfo) => Promise<void>;
+  private readonly init: () => Promise<AsyncTaskInfo>;
+  private readonly cancel: (info: AsyncTaskInfo) => Promise<void>;
   private initPromise: Promise<void> | null;
 
   constructor(
