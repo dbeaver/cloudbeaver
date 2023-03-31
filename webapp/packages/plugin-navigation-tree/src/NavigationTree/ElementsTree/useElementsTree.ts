@@ -161,7 +161,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
             options.folderExplorer.open([], options.baseRoot);
           } else {
             this.exitNodeFolder(preloadedRoot);
-            // options.folderExplorer.open(navNodeInfoResource.getParents(preloadedRoot), preloadedRoot);
           }
           return;
         }
