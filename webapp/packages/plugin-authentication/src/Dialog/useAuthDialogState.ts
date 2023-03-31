@@ -15,7 +15,6 @@ import { useResource, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import { FEDERATED_AUTH } from './FEDERATED_AUTH';
 
