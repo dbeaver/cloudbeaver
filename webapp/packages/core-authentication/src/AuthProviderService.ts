@@ -30,6 +30,7 @@ interface IServiceDescriptionLink extends IServiceDescriptionLinkOptions {
 
 export interface RequestedProvider {
   providerId: string;
+  configurationId?: string;
 }
 
 @injectable()
@@ -56,8 +57,8 @@ export class AuthProviderService {
     });
   }
 
-  async requireProvider(providerId: string): Promise<boolean> {
-    const contexts = await this.requestAuthProvider.execute({ providerId });
+  async requireProvider(providerId: string, configurationId?: string): Promise<boolean> {
+    const contexts = await this.requestAuthProvider.execute({ providerId, configurationId });
     const provider = contexts.getContext(AuthProviderContext);
 
     return provider.get();

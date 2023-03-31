@@ -231,7 +231,7 @@ export class AuthenticationService extends Bootstrap {
     }
 
     if (!this.userInfoResource.hasToken(data.providerId)) {
-      await this.auth(false, { providerId: data.providerId });
+      await this.auth(false, { providerId: data.providerId, configurationId: data.configurationId });
     }
 
     if (this.userInfoResource.hasToken(data.providerId)) {
