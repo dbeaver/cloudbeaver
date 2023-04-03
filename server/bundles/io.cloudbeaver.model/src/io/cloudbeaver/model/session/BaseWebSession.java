@@ -153,14 +153,9 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @Override
     public void close() {
         super.close();
+        sendSystemEvent(new WSSessionExpiredEvent());
         synchronized (sessionEventHandlers) {
-            var sessionExpiredEvent = new WSSessionExpiredEvent();
             for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
-                try {
-                    sessionEventHandler.handeWebSessionEvent(sessionExpiredEvent);
-                } catch (DBException e) {
-                    log.error("Failed to send session expiration event", e);
-                }
                 sessionEventHandler.close();
             }
             sessionEventHandlers.clear();
@@ -188,5 +183,20 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     public void removeSessionProject(@Nullable String projectId) throws DBException {
         userContext.getAccessibleProjectIds().remove(projectId);
+    }
+
+    /**
+     * Tries to send {@code event}, and writes an error to the log on failure.
+     */
+    private void sendSystemEvent(@NotNull WSEvent event) {
+        synchronized (sessionEventHandlers) {
+            for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
+                try {
+                    sessionEventHandler.handeWebSessionEvent(event);
+                } catch (DBException e) {
+                    log.error("Failed to send session expiration event", e);
+                }
+            }
+        }
     }
 }
