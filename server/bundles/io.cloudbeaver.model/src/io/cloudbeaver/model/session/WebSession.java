@@ -142,10 +142,6 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public WebApplication getApplication() {
-        return application;
-    }
-
     @NotNull
     public DBPProject getSingletonProject() {
         return getWorkspace().getActiveProject();

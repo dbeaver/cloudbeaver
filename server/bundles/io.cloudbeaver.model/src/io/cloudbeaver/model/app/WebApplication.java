@@ -60,7 +60,8 @@ public interface WebApplication extends DBPApplication {
 
     DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
-    RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider, @NotNull DBPWorkspace workspace);
+    RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
+                                          @NotNull DBPWorkspace workspace) throws DBException;
 
     String getServerURL();
 
@@ -73,6 +74,12 @@ public interface WebApplication extends DBPApplication {
     }
 
     String getApplicationInstanceId() throws DBException;
+
+    /**
+     * Returns random UUID, new on every launch
+     */
+    @NotNull
+    String getApplicationRunId();
 
     WSEventController getEventController();
 
