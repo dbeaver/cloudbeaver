@@ -7,6 +7,7 @@ enum CBServerEventId {
     cb_config_changed,
 
     cb_session_log_updated,
+
     cb_session_websocket_connected,
     cb_session_expired,
 
