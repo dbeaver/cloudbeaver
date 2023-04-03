@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@ import { PermissionsService } from './PermissionsService';
 import { QuotasService } from './QuotasService';
 import { ServerConfigEventHandler } from './ServerConfigEventHandler';
 import { ServerConfigResource } from './ServerConfigResource';
+import { ServerNodeService } from './ServerNodeService';
 import { ServerService } from './ServerService';
 import { ServerSettingsService } from './ServerSettingsService';
 import { SessionActionService } from './SessionActionService';
@@ -44,6 +45,7 @@ export const manifest: PluginManifest = {
     SessionActionService,
     SessionDataResource,
     SessionExpireService,
+    ServerNodeService,
     SessionResource,
     SessionService,
     SessionSettingsService,

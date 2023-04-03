@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ export class OptionsPanelService {
   private basePanelComponent: (() => React.FC) | null;
 
   constructor(
-    private navigationService: NavigationService
+    private readonly navigationService: NavigationService
   ) {
     makeObservable(this, {
       active: observable,
@@ -76,7 +76,7 @@ export class OptionsPanelService {
     return true;
   }
 
-  private navigationHandler: IExecutorHandler<any> = async (data, contexts) => {
+  private readonly navigationHandler: IExecutorHandler<any> = async (data, contexts) => {
     const state = await this.close();
 
     if (!state) {

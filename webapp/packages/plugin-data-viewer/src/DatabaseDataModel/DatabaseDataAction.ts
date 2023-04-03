@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,15 @@ import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { IDatabaseDataSource } from './IDatabaseDataSource';
 
 export abstract class DatabaseDataAction<TOptions, TResult extends IDatabaseDataResult>
-  implements IDatabaseDataAction<TOptions, TResult> {
+implements IDatabaseDataAction<TOptions, TResult> {
   result: TResult;
 
   get resultIndex(): number {
     return this.source.results.indexOf(this.result);
+  }
+
+  get empty(): boolean {
+    return !this.result.data;
   }
 
   readonly source: IDatabaseDataSource<TOptions, TResult>;

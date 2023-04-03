@@ -127,6 +127,11 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     }
 
     @NotNull
+    public WebApplication getApplication() {
+        return application;
+    }
+
+    @NotNull
     @Override
     public LocalDateTime getSessionStart() {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(createTime), ZoneId.systemDefault());

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,8 +9,8 @@
 import { action, computed, observable, makeObservable } from 'mobx';
 
 export class OrderedMap<K, V> {
-  private indexes = observable.array<K>([], { deep: false });
-  private map: Map<K, V> = new Map<K, V>();
+  private readonly indexes = observable.array<K>([], { deep: false });
+  private readonly map: Map<K, V> = new Map<K, V>();
 
   get keys(): K[] {
     return this.indexes;
@@ -20,7 +20,7 @@ export class OrderedMap<K, V> {
     return this.indexes.map(i => this.map.get(i)!);
   }
 
-  constructor(private toKey?: (val: V) => K) {
+  constructor(private readonly toKey?: (val: V) => K) {
     makeObservable<OrderedMap<K, V>, 'map'>(this, {
       map: observable.shallow,
       keys: computed,
