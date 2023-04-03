@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,7 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
   private readonly subject: WebSocketSubject<ISessionEvent>;
   private readonly oldEventsSubject: Subject<ISessionEvent>;
   private readonly retryTimer: Observable<number>;
+  private disconnected: boolean;
 
   constructor(
     private readonly networkStateService: NetworkStateService,
@@ -66,9 +67,10 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
     this.closeSubject = new Subject();
     this.openSubject = new Subject();
     this.errorSubject = new Subject();
+    this.disconnected = false;
     this.retryTimer = interval(RETRY_INTERVAL)
       .pipe(
-        filter(() => !this.sessionExpireService.expired && networkStateService.state)
+        filter(() => !this.sessionExpireService.expired && networkStateService.state && !this.disconnected)
       );
     this.subject = webSocket({
       url: environmentService.wsEndpoint,
@@ -152,6 +154,10 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
   emit(event: ISessionEvent): this {
     this.subject.next(event);
     return this;
+  }
+
+  disconnect() {
+    this.disconnected = true;
   }
 
   private handleErrors() {

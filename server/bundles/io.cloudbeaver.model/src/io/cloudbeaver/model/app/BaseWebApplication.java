@@ -47,6 +47,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Web application
@@ -59,6 +60,13 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     private static final Log log = Log.getLog(BaseWebApplication.class);
 
+    private final String applicationRunId = UUID.randomUUID().toString();
+
+    @NotNull
+    public String getApplicationRunId() {
+        return applicationRunId;
+    }
+
     @NotNull
     @Override
     public DBPWorkspace createWorkspace(@NotNull DBPPlatform platform, @NotNull IWorkspace eclipseWorkspace) {
@@ -66,7 +74,8 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     @Override
-    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider, @NotNull DBPWorkspace workspace) {
+    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
+                                                 @NotNull DBPWorkspace workspace) throws DBException {
         throw new IllegalStateException("Resource controller is not supported by " + getClass().getSimpleName());
     }
 

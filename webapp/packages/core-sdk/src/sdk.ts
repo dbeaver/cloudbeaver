@@ -202,6 +202,7 @@ export enum CbEventTopic {
   CbDatasourceFolder = 'cb_datasource_folder',
   CbProjects = 'cb_projects',
   CbScripts = 'cb_scripts',
+  CbSession = 'cb_session',
   CbSessionLog = 'cb_session_log'
 }
 
@@ -248,7 +249,8 @@ export enum CbServerEventId {
   CbRmResourceCreated = 'cb_rm_resource_created',
   CbRmResourceDeleted = 'cb_rm_resource_deleted',
   CbRmResourceUpdated = 'cb_rm_resource_updated',
-  CbSessionLogUpdated = 'cb_session_log_updated'
+  CbSessionLogUpdated = 'cb_session_log_updated',
+  CbSessionWebsocketConnected = 'cb_session_websocket_connected'
 }
 
 export interface CbSessionLogEvent extends CbServerEvent {
@@ -1728,6 +1730,12 @@ export interface UserInfo {
   linkedAuthProviders: Array<Scalars['String']>;
   metaParameters: Scalars['Object'];
   userId: Scalars['ID'];
+}
+
+export interface WsSocketConnectedEvent extends CbServerEvent {
+  applicationRunId: Scalars['String'];
+  id: CbServerEventId;
+  topicId?: Maybe<CbEventTopic>;
 }
 
 export interface WebFeatureSet {

@@ -25,11 +25,11 @@ import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.api.WriteCallback;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSSocketConnectedEvent;
 import org.jkiss.dbeaver.model.websocket.event.client.WSUpdateActiveProjectsClientEvent;
 
 import java.io.IOException;
@@ -40,19 +40,20 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
 
     @NotNull
     private final BaseWebSession webSession;
-
     @NotNull
     private final WriteCallback callback;
 
     public CBEventsWebSocket(@NotNull BaseWebSession webSession) {
         this.webSession = webSession;
-        this.callback = new WebSocketPingPongCallback(webSession);
+
+        callback = new WebSocketPingPongCallback(webSession);
     }
 
     @Override
     public void onWebSocketConnect(Session session) {
         super.onWebSocketConnect(session);
         this.webSession.addEventHandler(this);
+        handeWebSessionEvent(new WSSocketConnectedEvent(webSession.getApplication().getApplicationRunId()));
         log.debug("EventWebSocket connected to the " + webSession.getSessionId() + " session");
     }
 
@@ -121,7 +122,11 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
 
     @Override
     public void close() {
-        getSession().close();
+        var session = getSession();
+        // the socket may not be connected to the client
+        if (session != null) {
+            getSession().close();
+        }
     }
 
     @NotNull

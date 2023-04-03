@@ -519,7 +519,8 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     @Override
-    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider, @NotNull DBPWorkspace workspace) {
+    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
+                                                 @NotNull DBPWorkspace workspace) throws DBException {
         return LocalResourceController.builder(credentialsProvider, workspace, this::getSecurityController).build();
     }
 
