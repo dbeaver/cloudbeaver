@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ interface Props {
 export const NestedNode: React.FC<Props> = function NestedNode({ columns, node, depth, className }) {
   const [expanded, setExpanded] = useState(true);
 
-  const expand = useCallback((event: React.MouseEvent<any, MouseEvent>) => {
+  const expand = useCallback((event: React.MouseEvent<any>) => {
     EventContext.set(event, EventTableItemSelectionFlag);
     setExpanded(prev => !prev);
   }, []);

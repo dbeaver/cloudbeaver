@@ -17,6 +17,7 @@
 
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.model.rm.lock.RMLockTest;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBApplicationCE;
 import io.cloudbeaver.utils.WebTestUtils;
@@ -30,7 +31,14 @@ import java.net.http.HttpClient;
 import java.nio.file.Path;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({PlatformTest.class, AuthenticationTest.class, ResourceManagerTest.class })
+@Suite.SuiteClasses(
+    {
+        PlatformTest.class,
+        AuthenticationTest.class,
+        ResourceManagerTest.class,
+        RMLockTest.class
+    }
+)
 public class CEServerTestSuite {
 
     public static final String GQL_API_URL = "http://localhost:18978/api/gql";
@@ -79,6 +87,10 @@ public class CEServerTestSuite {
     @AfterClass
     public static void shutdownServer() {
         testApp.stop();
+    }
+
+    public static CBApplication getTestApp() {
+        return testApp;
     }
 
     public static HttpClient getClient() {

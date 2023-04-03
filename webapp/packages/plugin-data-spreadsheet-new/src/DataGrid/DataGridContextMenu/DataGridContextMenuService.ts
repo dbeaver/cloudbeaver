@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@ import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import type { IDatabaseDataModel, IDataPresentationActions, IDataTableActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
 export interface IDataGridCellMenuContext {
-  model: IDatabaseDataModel<any>;
+  model: IDatabaseDataModel;
   actions: IDataTableActions;
   spreadsheetActions: IDataPresentationActions<IResultSetElementKey>;
   resultIndex: number;
@@ -23,10 +23,10 @@ export interface IDataGridCellMenuContext {
 export class DataGridContextMenuService {
   onRootMenuOpen: IExecutor<IDataGridCellMenuContext>;
   static cellContext = 'data-grid-cell-context-menu';
-  private static menuToken = 'dataGridCell';
+  private static readonly menuToken = 'dataGridCell';
 
   constructor(
-    private contextMenuService: ContextMenuService,
+    private readonly contextMenuService: ContextMenuService,
   ) {
     this.onRootMenuOpen = new Executor();
   }
@@ -36,7 +36,7 @@ export class DataGridContextMenuService {
   }
 
   constructMenuWithContext(
-    model: IDatabaseDataModel<any>,
+    model: IDatabaseDataModel,
     actions: IDataTableActions,
     spreadsheetActions: IDataPresentationActions<IResultSetElementKey>,
     resultIndex: number,
@@ -50,7 +50,7 @@ export class DataGridContextMenuService {
   }
 
   openMenu(
-    model: IDatabaseDataModel<any>,
+    model: IDatabaseDataModel,
     actions: IDataTableActions,
     spreadsheetActions: IDataPresentationActions<IResultSetElementKey>,
     resultIndex: number,
