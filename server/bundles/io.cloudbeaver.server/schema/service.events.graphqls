@@ -99,7 +99,7 @@ type WSSocketConnectedEvent implements CBServerEvent {
     applicationRunId: String!
 }
 
-# WebSocket connected event
+# Session expired event
 type WSSessionExpiredEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
