@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,6 @@ export const NavigationTree = observer(function NavigationTree() {
   const navNodeViewService = useService(NavNodeViewService);
 
   const root = ROOT_NODE_PATH;
-  const { authenticated } = useService(AppAuthService);
   const { handleOpen, handleSelect, handleSelectReset } = useNavigationTree();
 
   const connectionGroupFilter = useMemo(() => navigationTreeConnectionGroupFilter(
@@ -113,10 +112,6 @@ export const NavigationTree = observer(function NavigationTree() {
   );
 
   const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);
-
-  if (!authenticated) {
-    return null;
-  }
 
   return styled(navigationTreeStyles)(
     <CaptureView view={navTreeService}>

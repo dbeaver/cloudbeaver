@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@ import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { Icon } from '../Icon';
+import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
 import { useCombinedHandler } from '../useCombinedHandler';
+import { useStateDelay } from '../useStateDelay';
 import { useStyles } from '../useStyles';
 import { baseFormControlStyles, baseInvalidFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
@@ -37,14 +39,16 @@ const INPUT_FIELD_STYLES = css`
     input-container {
       position: relative;
     }
-    icon-container {
+    loader-container, icon-container {
       position: absolute;
       right: 8px;
       top: 50%;
       transform: translateY(-50%);
-      display: flex;
       width: 24px;
       height: 24px;
+      display: flex;
+    }
+    icon-container {
       cursor: pointer;
       & Icon {
         width: 100%;
@@ -62,6 +66,7 @@ const INPUT_FIELD_STYLES = css`
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'style'> & ILayoutSizeProps & {
   error?: boolean;
+  loading?: boolean;
   description?: string;
   labelTooltip?: string;
   mod?: 'surface';
@@ -107,6 +112,7 @@ export const InputField: InputFieldType = observer(forwardRef(function InputFiel
   children,
   className,
   error,
+  loading,
   description,
   labelTooltip,
   mod,
@@ -130,6 +136,7 @@ export const InputField: InputFieldType = observer(forwardRef(function InputFiel
     style
   );
   const context = useContext(FormContext);
+  loading = useStateDelay(loading ?? false, 300);
 
   const revealPassword = useCallback(() => {
     if (rest.disabled) {
@@ -192,6 +199,13 @@ export const InputField: InputFieldType = observer(forwardRef(function InputFiel
           {...use({ mod })}
           required={required}
         />
+        {loading && (
+          <loader-container
+            title={translate('ui_processing_loading')}
+          >
+            <Loader small />
+          </loader-container>
+        )}
         {showRevealPasswordButton && (
           <icon-container
             title={translate('ui_reveal_password')}

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,6 +9,7 @@
 import React, { ErrorInfo } from 'react';
 import styled, { css } from 'reshadow';
 
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { errorOf, LoadingError } from '@cloudbeaver/core-utils';
 
 import { Button } from './Button';
@@ -23,12 +24,14 @@ const style = css`
 `;
 
 interface Props {
-  onRefresh?: () => any;
   icon?: boolean;
   root?: boolean;
   inline?: boolean;
   remount?: boolean;
   className?: string;
+  styles?: ComponentStyle;
+  onClose?: () => any;
+  onRefresh?: () => any;
 }
 
 interface IErrorData {
@@ -76,7 +79,7 @@ export class ErrorBoundary
   }
 
   render(): React.ReactNode {
-    const { root, inline, icon, children, className } = this.props;
+    const { root, inline, icon, children, styles, className, onClose } = this.props;
 
     for (const errorData of this.state.exceptions) {
       if (root) {
@@ -85,8 +88,10 @@ export class ErrorBoundary
             className={className}
             root={root}
             error={errorData.error}
+            styles={styles}
             errorInfo={errorData.errorInfo}
           >
+            {onClose && <action><Button onClick={onClose}>Close</Button></action>}
             {this.canRefresh && <action><Button onClick={this.refresh}>Refresh</Button></action>}
           </DisplayError>
         );
@@ -97,7 +102,9 @@ export class ErrorBoundary
             icon={icon}
             className={className}
             exception={errorData.error}
+            styles={styles}
             onRetry={this.canRefresh ? this.refresh : undefined}
+            onClose={onClose}
           />
         );
       }

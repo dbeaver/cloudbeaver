@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,7 +10,8 @@
 import { untracked } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { ConnectionFolder, ConnectionFolderProjectKey, ConnectionFolderResource, ConnectionInfoResource, ConnectionsManagerService, CONNECTION_FOLDER_NAME_VALIDATION, createConnectionFolderParam, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConnectionFolderProjectKey, ConnectionFolderResource, ConnectionInfoResource, ConnectionsManagerService, CONNECTION_FOLDER_NAME_VALIDATION, createConnectionFolderParam, createConnectionParam, getConnectionFolderIdFromNodeId, IConnectionFolderParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { getConnectionFolderId } from '@cloudbeaver/core-connections/src/NavTree/getConnectionFolderId';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -18,7 +19,7 @@ import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/cor
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ENodeMoveType, getNodesFromContext, INodeMoveData, NavNode, NavNodeInfoResource, NavNodeManagerService, navNodeMoveContext, NavTreeResource, NAV_NODE_TYPE_FOLDER, nodeDeleteContext, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId, NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, ResourceKeyAlias, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, type IElementsTree } from '@cloudbeaver/plugin-navigation-tree';
@@ -36,7 +37,6 @@ interface ITargetNode {
 
 @injectable()
 export class ConnectionFoldersBootstrap extends Bootstrap {
-
   constructor(
     private readonly localizationService: LocalizationService,
     private readonly userInfoResource: UserInfoResource,
@@ -256,53 +256,59 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           return;
         }
 
-        await this.connectionFolderResource.load(ConnectionFolderProjectKey(targetNode.projectId));
-
-        let parentFolder: ConnectionFolder | undefined;
+        let parentFolderParam: IConnectionFolderParam | undefined;
 
         if (targetNode.folderId) {
-          parentFolder = this.connectionFolderResource.fromNodeId(targetNode.folderId);
-
-          if (!parentFolder) {
-            this.notificationService.logError({ title:'Can\'t create folder', message: 'Folder not found' });
-            return;
-          }
+          parentFolderParam = getConnectionFolderIdFromNodeId(targetNode.folderId);
         }
 
         const result = await this.commonDialogService.open(FolderDialog, {
           value: this.localizationService.translate('ui_folder_new'),
           projectId: targetNode.projectId,
+          folder: parentFolderParam?.folderId,
           title: 'core_view_action_new_folder',
-          subTitle: parentFolder?.id,
           icon: '/icons/folder.svg#root',
           create: true,
           selectProject: targetNode.selectProject,
-          validation: async ({ folder, projectId }, setMessage) => {
-            const trimmed = folder.trim();
+          validation: async ({ name, folder, projectId }, setMessage) => {
+            const trimmed = name.trim();
 
-            if (trimmed.length === 0 || !folder.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
+            if (trimmed.length === 0 || !trimmed.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
               setMessage('connections_connection_folder_validation');
               return false;
             }
 
-            await this.connectionFolderResource.load(ConnectionFolderProjectKey(projectId));
+            let parentKey: ResourceKeyAlias<any, {
+              projectId: string;
+            }> | IConnectionFolderParam = ConnectionFolderProjectKey(projectId);
 
-            return !this.connectionFolderResource.has(createConnectionFolderParam(
-              projectId,
-              createPath(parentFolder?.id, trimmed)
-            ));
+            if (folder) {
+              parentKey = createConnectionFolderParam(
+                projectId,
+                folder
+              );
+            }
+
+            try {
+              await this.connectionFolderResource.load(parentKey);
+
+              return !this.connectionFolderResource.has(createConnectionFolderParam(
+                projectId,
+                createPath(folder, trimmed)
+              ));
+            } catch (exception: any) {
+              setMessage('connections_connection_folder_validation');
+              return false;
+            }
           },
         });
 
         if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
           try {
-            await this.connectionFolderResource.create(createConnectionFolderParam(
-              result.projectId,
-              result.folder
-            ), parentFolder?.id);
+            await this.connectionFolderResource.create(result.projectId, result.name, result.folder);
             this.navTreeResource.markOutdated(
-              targetNode.folderId !== undefined
-                ? targetNode.folderId
+              result.folder
+                ? getConnectionFolderId(createConnectionFolderParam(result.projectId, result.folder))
                 : getProjectNodeId(result.projectId)
             );
           } catch (exception: any) {

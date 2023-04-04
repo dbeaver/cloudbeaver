@@ -20,18 +20,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
-import io.cloudbeaver.model.rm.local.LocalResourceController;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
-import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
-import io.cloudbeaver.service.security.EmbeddedSecurityControllerFactory;
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -44,13 +40,14 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPApplication;
-import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
-import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
+import org.jkiss.dbeaver.model.security.SMConstants;
+import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
@@ -83,7 +80,7 @@ import java.util.stream.Stream;
 /**
  * This class controls all aspects of the application's execution
  */
-public class CBApplication extends BaseWebApplication implements WebAuthApplication {
+public abstract class CBApplication extends BaseWebApplication implements WebAuthApplication {
 
     private static final Log log = Log.getLog(CBApplication.class);
 
@@ -208,26 +205,6 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
 
     public SMAdminController getSecurityController() {
         return securityController;
-    }
-
-    @Override
-    public SMController createSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
-        return new EmbeddedSecurityControllerFactory().createSecurityService(
-            this,
-            databaseConfiguration,
-            credentialsProvider,
-            securityManagerConfiguration
-        );
-    }
-
-    @Override
-    public SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
-        return new EmbeddedSecurityControllerFactory().createSecurityService(
-            this,
-            databaseConfiguration,
-            credentialsProvider,
-            securityManagerConfiguration
-        );
     }
 
     @Override
@@ -481,14 +458,7 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         securityController = createGlobalSecurityController();
     }
 
-    protected SMAdminController createGlobalSecurityController() throws DBException {
-        return new EmbeddedSecurityControllerFactory().createSecurityService(
-            this,
-            databaseConfiguration,
-            new NoAuthCredentialsProvider(),
-            securityManagerConfiguration
-        );
-    }
+    protected abstract SMAdminController createGlobalSecurityController() throws DBException;
 
     @Nullable
     @Override
@@ -516,12 +486,6 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         }
         // Set default preferences
         PrefUtils.setDefaultPreferenceValue(ModelPreferences.getPreferences(), ModelPreferences.UI_DRIVERS_HOME, getDriversLocation());
-    }
-
-    @Override
-    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
-                                                 @NotNull DBPWorkspace workspace) throws DBException {
-        return LocalResourceController.builder(credentialsProvider, workspace, this::getSecurityController).build();
     }
 
     private void parseConfiguration(File configFile) throws DBException {
@@ -755,13 +719,6 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
     }
 
     protected void shutdown() {
-        try {
-            if (securityController instanceof CBEmbeddedSecurityController) {
-                ((CBEmbeddedSecurityController) securityController).shutdown();
-            }
-        } catch (Exception e) {
-            log.error(e);
-        }
         log.debug("Cloudbeaver Server is stopping"); //$NON-NLS-1$
     }
 
@@ -852,15 +809,11 @@ public class CBApplication extends BaseWebApplication implements WebAuthApplicat
         return readConfiguration(runtimeConfigFile);
     }
 
-    protected void finishSecurityServiceConfiguration(
+    protected abstract void finishSecurityServiceConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
         @NotNull List<WebAuthInfo> authInfoList
-    ) throws DBException {
-        if (securityController instanceof CBEmbeddedSecurityController) {
-            ((CBEmbeddedSecurityController) securityController).finishConfiguration(adminName, adminPassword, authInfoList);
-        }
-    }
+    ) throws DBException;
 
     public synchronized void flushConfiguration(SMCredentialsProvider credentialsProvider) throws DBException {
         saveRuntimeConfig(serverName, serverURL, maxSessionIdleTime, appConfiguration, credentialsProvider);

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -73,8 +73,8 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     () => contextRef.context?.tree.isNodeIndeterminateSelected(node.id) || false
   );
 
-  const handleClick = async (leaf: boolean) => await contextRef.context?.onClick?.(node, path, leaf);
-  const handleOpen = async (leaf: boolean) => await contextRef.context?.onOpen?.(node, path, leaf);
+  const handleClick = async (leaf: boolean) => await contextRef.context?.tree.click(node, path, leaf);
+  const handleOpen = async (leaf: boolean) => await contextRef.context?.tree.open(node, path, leaf);
   const handleExpand = async () => await contextRef.context?.tree.expand(node, !expanded);
   const handleSelect = async (
     multiple = false,

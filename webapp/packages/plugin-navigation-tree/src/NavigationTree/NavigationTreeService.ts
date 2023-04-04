@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@ import { ConnectionInfoResource, ConnectionsManagerService, createConnectionPara
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, NavTreeResource, ROOT_NODE_PATH, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeManagerService, NavTreeResource, ROOT_NODE_PATH, EObjectFeature, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { ResourceKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { ACTION_COLLAPSE_ALL, ACTION_FILTER, IActiveView, View } from '@cloudbeaver/core-view';
@@ -36,11 +36,12 @@ export class NavigationTreeService extends View<string> {
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly navNodeExtensionsService: NavNodeExtensionsService,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navTreeResource: NavTreeResource
   ) {
     super();
 
-    this.treeState = new MetadataMap(() => ({
+    this.treeState = new MetadataMap<string, ITreeNodeState>(() => ({
       showInFilter: false,
       expanded: false,
       selected: false,
@@ -97,6 +98,12 @@ export class NavigationTreeService extends View<string> {
 
       if (tryConnect && this.navTreeResource.getException(id)) {
         this.navTreeResource.markOutdated(id);
+      }
+
+      const parents = this.navNodeInfoResource.getParents(id);
+
+      if (parents.length > 0 && !this.navNodeInfoResource.has(id)) {
+        return false;
       }
 
       await this.navTreeResource.load(id);

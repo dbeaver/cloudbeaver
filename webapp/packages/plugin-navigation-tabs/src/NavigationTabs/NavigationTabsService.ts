@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,7 @@ export class NavigationTabsService extends View<ITab> {
     this.onTabClose = new SyncExecutor();
     this.onInit = new SyncExecutor();
     this.onStateUpdate = new SyncExecutor();
-    this.metadata = new MetadataMap(() => ({ restored: false }));
+    this.metadata = new MetadataMap<string, ITabMetadata>(() => ({ restored: false }));
 
     this.navigationTabContext = (): ITabNavigationContext => new TabNavigationContext(this, this.userInfoResource);
     this.registerAction(ACTION_OPEN_IN_TAB);

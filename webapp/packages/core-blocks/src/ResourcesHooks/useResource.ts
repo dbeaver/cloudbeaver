@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@ interface KeyWithIncludes<TKey, TIncludes> {
 }
 
 type ResourceData<
-  TResource extends CachedResource<any, any, any, any>,
+  TResource extends CachedResource<any, any, any, any, any>,
   TKey,
   TIncludes
-> = TResource extends CachedDataResource<any, any, any>
+> = TResource extends CachedDataResource<any, any, any, any>
   ? CachedResourceData<TResource>
   : CachedMapResourceLoader<
   TKey,
@@ -39,11 +39,12 @@ type ResourceData<
 ;
 
 interface IActions<
-  TResource extends CachedResource<any, any, any, any>,
+  TResource extends CachedResource<any, any, any, any, any>,
   TKey,
   TIncludes
 > {
   active?: boolean;
+  forceSuspense?: boolean;
   silent?: boolean;
   onData?: (
     data: ResourceData<TResource, TKey, TIncludes>,
@@ -110,7 +111,7 @@ type TResult<TResource, TKey, TIncludes> = (
 );
 
 export function useResource<
-  TResource extends CachedResource<any, any, any, any>,
+  TResource extends CachedResource<any, any, any, any, any>,
   TKeyArg extends ResourceKey<CachedResourceKey<TResource>>,
   TIncludes extends Readonly<CachedResourceContext<TResource>>
 >(
@@ -121,7 +122,7 @@ export function useResource<
 ): TResult<TResource, TKeyArg, TIncludes>;
 
 export function useResource<
-  TResource extends CachedResource<any, any, any, any>,
+  TResource extends CachedResource<any, any, any, any, any>,
   TKeyArg extends ResourceKey<CachedResourceKey<TResource>>,
   TIncludes extends CachedResourceContext<TResource>
 >(
@@ -467,6 +468,10 @@ export function useResource<
       result.load();
     }
   }, [result.canLoad]);
+
+  if (actions?.forceSuspense) {
+    result.data;
+  }
 
   return result;
 }

@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.service.security.db;
 
+import org.jkiss.code.NotNull;
+
 /**
  * Database configuration
  */
@@ -64,6 +66,10 @@ public class CBDatabaseConfig {
 
     public String getUrl() {
         return url;
+    }
+
+    public void setUrl(@NotNull String url) {
+        this.url = url;
     }
 
     public String getUser() {

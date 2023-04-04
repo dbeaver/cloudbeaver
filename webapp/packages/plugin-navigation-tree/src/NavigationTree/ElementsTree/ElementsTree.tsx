@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@ import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFla
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { type NavNode, ROOT_NODE_PATH, NavTreeResource, NavNodeInfoResource, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { useNavTreeDropBox } from '../useNavTreeDropBox';
@@ -31,6 +30,7 @@ import { elementsTreeLimitFilter } from './NavTreeLimitFilter/elementsTreeLimitF
 import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimitRenderer';
 import { useDropOutside } from './useDropOutside';
 import { IElementsTreeOptions, useElementsTree } from './useElementsTree';
+import { useElementsTreeFolderExplorer } from './useElementsTreeFolderExplorer';
 
 const styles = css`
   box {
@@ -65,7 +65,7 @@ const styles = css`
   }
 
   FolderExplorerPath {
-    padding: 0 12px 8px 12px;
+    padding: 0 4px 8px 4px;
   }
 
   drop-outside {
@@ -133,60 +133,12 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   onSelect,
   onFilter,
 }) {
-  const folderExplorer = useFolderExplorer(baseRoot, {
-    saveState: settings?.saveExpanded,
-  });
   const navTreeResource = useService(NavTreeResource);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const ref = useObjectRef({ settings, getChildren, loadChildren });
   const treeRootRef = useRef<HTMLDivElement>(null);
+  const folderExplorer = useElementsTreeFolderExplorer(baseRoot, settings);
 
   const root = folderExplorer.state.folder;
-
-  function exitFolders(path: string[]) {
-    path = path.filter(nodeId => ref.getChildren(nodeId) !== undefined);
-    if (path.length > 0) {
-      folderExplorer.open(path.slice(0, path.length - 1), path[path.length - 1]);
-    }
-  }
-
-  const autoOpenFolders = useCallback(async function autoOpenFolders(nodeId: string, path: string[]) {
-    path = [...path];
-
-    if (!ref.settings?.foldersTree && !folderExplorer.options.expandFoldersWithSingleElement) {
-      return;
-    }
-
-    while (folderExplorer.options.expandFoldersWithSingleElement) {
-      const children = ref.getChildren(nodeId);
-
-      if (children?.length === 1) {
-        const nextNodeId = children[0];
-        const loaded = await ref.loadChildren(nextNodeId, false);
-
-        if (!loaded) {
-          break;
-        }
-
-        path.push(nodeId);
-        nodeId = nextNodeId;
-      } else {
-        break;
-      }
-    }
-
-    folderExplorer.open(path, nodeId);
-
-  }, [folderExplorer]);
-
-  useResource(ElementsTree, navTreeResource, resourceKeyList(folderExplorer.state.fullPath), {
-    onError: () => {
-      exitFolders(folderExplorer.state.fullPath);
-    },
-    onData: () => {
-      autoOpenFolders(folderExplorer.state.folder, folderExplorer.state.path);
-    },
-  });
 
   const limitFilter = useMemo(() => elementsTreeLimitFilter(
     navTreeResource,
@@ -221,6 +173,8 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
     customSelect,
     onExpand,
     onSelect,
+    onOpen,
+    onClick,
   });
 
   const context = useMemo<IElementsTreeContext>(
@@ -230,24 +184,8 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
       selectionTree,
       control,
       getTreeRoot: () => treeRootRef.current,
-      onOpen: async (node, path, leaf) => {
-        const folder = !leaf && tree.settings?.foldersTree || false;
-
-        await onOpen?.(node, folder);
-
-        if (!leaf && tree.settings?.foldersTree) {
-          const nodeId = node.id;
-          const loaded = await ref.loadChildren(nodeId, true);
-
-          if (loaded) {
-            await autoOpenFolders(nodeId, path);
-            tree.setFilter('');
-          }
-        }
-      },
-      onClick,
     }),
-    [control, folderExplorer, selectionTree, onOpen, onClick, folderExplorer]
+    [tree, folderExplorer, selectionTree, control]
   );
 
   const getName = useCallback(
@@ -281,22 +219,6 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
     tree.resetSelection();
   }
 
-  const foldersTree = settings?.foldersTree; // mobx subscription
-  const filter = settings?.filter;
-
-  useEffect(() => {
-    if (!foldersTree && folderExplorer.state.folder !== baseRoot) {
-      folderExplorer.open([], baseRoot);
-    }
-    if (!filter && tree.filtering) {
-      tree.setFilter('');
-    }
-  });
-
-  const children = tree.getNodeChildren(root);
-  const hasChildren = children.length > 0;
-  const loaderAvailable = !foldersTree || context.folderExplorer.root === root;
-
   return styled(useStyles(TREE_NODE_STYLES, styles, style))(
     <>
       <ElementsTreeTools tree={tree} settingsElements={settingsElements} style={style} />
@@ -319,11 +241,9 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
                   </TreeNodeNested>
                 </drop-outside>
                 <ElementsTreeContentLoader
-                  root={root}
                   context={context}
                   emptyPlaceholder={emptyPlaceholder}
                   childrenState={tree}
-                  hasChildren={hasChildren}
                 >
                   <tree-elements>
                     <NavigationNodeNested
@@ -334,7 +254,6 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
                       root
                     />
                   </tree-elements>
-                  {loaderAvailable && <Loader state={tree} overlay={hasChildren} />}
                 </ElementsTreeContentLoader>
               </tree>
             </FolderExplorer>

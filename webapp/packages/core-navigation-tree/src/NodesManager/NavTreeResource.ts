@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -411,10 +411,11 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       if (!this.navNodeInfoResource.has(nodeId) && nodeId !== ROOT_NODE_PATH) {
         await this.navNodeInfoResource.loadNodeParents(nodeId);
       }
-      const preloaded = await this.preloadNodeParents(this.navNodeInfoResource.getParents(nodeId), nodeId);
+      const parents = this.navNodeInfoResource.getParents(nodeId);
+      const preloaded = await this.preloadNodeParents(parents, nodeId);
 
       if (!preloaded) {
-        const cause = new DetailsError(`Entity not found: ${nodeId}`);
+        const cause = new DetailsError(`Entity not found:\n"${nodeId}"\nPath:\n${parents.map(parent => `"${parent}"`).join('\n')}`);
         const error = new ResourceError(this, key, undefined, 'Entity not found', { cause });
         ExecutorInterrupter.interrupt(contexts);
         throw this.markError(error, key);

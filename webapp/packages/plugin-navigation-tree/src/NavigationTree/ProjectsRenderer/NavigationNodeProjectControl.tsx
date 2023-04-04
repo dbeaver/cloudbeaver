@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,10 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     treeNodeContext.select(event.ctrlKey || event.metaKey);
   }
 
+  function onDbClickHandler(event: React.MouseEvent<HTMLDivElement>) {
+    elementsTreeContext?.tree.open(node, navNodeInfoResource.getParents(node.id), false);
+  }
+
   if (elementsTreeContext?.tree.settings?.projects === false && !isDragging) {
     return null;
   }
@@ -100,6 +104,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     <TreeNodeControl
       ref={ref}
       onClick={onClickHandler}
+      onDoubleClick={onDbClickHandler}
       {...use({ outdated, editing, dragging: dndElement })}
       className={className}
     >

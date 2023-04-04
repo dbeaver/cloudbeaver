@@ -1,100 +1,104 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable, untracked } from 'mobx';
+import { observable, makeAutoObservable, action } from 'mobx';
+
+import { TempMap } from './TempMap';
 
 export type MetadataValueGetter<TKey, TValue> = (key: TKey, metadata: MetadataMap<TKey, any>) => TValue;
 export type DefaultValueGetter<TKey, TValue> = (key: TKey, metadata: MetadataMap<TKey, TValue>) => TValue;
 
-export class MetadataMap<TKey, TValue> {
-  private data: Map<TKey, TValue>;
-  private length: number;
-
+export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
+  get size(): number {
+    return this.temp.size;
+  }
   private syncData: Array<[TKey, TValue]> | null;
+  private readonly temp: TempMap<TKey, TValue>;
+  private readonly data: Map<TKey, TValue>;
 
   constructor(private readonly defaultValueGetter?: DefaultValueGetter<TKey, TValue>) {
-    this.data = observable(new Map());
-    this.length = 0;
     this.syncData = null;
+    this.data = observable(new Map());
+    this.temp = new TempMap<TKey, TValue>(
+      this.data,
+      () => {
+        this.syncData?.splice(0, this.syncData.length, ...this.data.entries());
+      }
+    );
 
-    makeObservable<this, 'data'>(this, {
-      data: observable.ref,
+    makeAutoObservable(this, {
+      sync: action,
     });
   }
 
-  [Symbol.iterator]() {
-    return this.data[Symbol.iterator]();
+  [Symbol.iterator](): IterableIterator<[TKey, TValue]> {
+    return this.temp[Symbol.iterator]();
+  }
+
+  get [Symbol.toStringTag](): string {
+    return 'MetadataMap';
   }
 
   sync(entities: Array<[TKey, TValue]>): void {
-    this.data = observable(new Map(entities));
+    this.temp.clear();
+    this.data.clear();
+    for (const [key, value] of entities) {
+      this.data.set(key, value);
+    }
     this.syncData = entities;
   }
 
+  forEach(callbackfn: (value: TValue, key: TKey, map: Map<TKey, TValue>) => void, thisArg?: any): void {
+    this.temp.forEach(callbackfn, thisArg);
+  }
+
   entries(): IterableIterator<[TKey, TValue]> {
-    return this.data.entries();
+    return this.temp.entries();
   }
 
   keys(): IterableIterator<TKey> {
-    return this.data.keys();
+    return this.temp.keys();
   }
 
   values(): IterableIterator<TValue> {
-    return this.data.values();
-  }
-
-  count(): number {
-    return this.length;
+    return this.temp.values();
   }
 
   has(key: TKey): boolean {
-    return this.data.has(key);
+    return this.temp.has(key);
   }
 
-  set(key: TKey, value: TValue): void {
-    this.data.set(key, value);
-    this.syncData?.push([key, this.data.get(key)!]);
+  set(key: TKey, value: TValue): this {
+    this.temp.set(key, value);
+    return this;
   }
 
   get(key: TKey, defaultValue?: DefaultValueGetter<TKey, TValue>): TValue {
-    if (this.data.has(key)) {
-      return this.data.get(key)!;
+    if (!this.temp.has(key)) {
+      const provider = defaultValue || this.defaultValueGetter;
+
+      if (!provider) {
+        throw new Error('MetadataMap: defaultValue should be provided if defaultValueGetter not set');
+      }
+
+      const value = provider(key, this);
+      this.temp.set(key, observable(value as any));
     }
-
-    const provider = defaultValue || this.defaultValueGetter;
-
-    if (!provider) {
-      throw new Error('MetadataMap: defaultValue should be provided if defaultValueGetter not set');
-    }
-
-    const value = provider(key, this);
-    untracked(() => {
-      this.set(key, observable(value as any));
-      this.length++;
-    });
-    return this.data.get(key)!;
+    return this.temp.get(key)!;
   }
 
-  delete(key: TKey): void {
-    if (this.data.has(key)) {
-      this.data.delete(key);
-
-      const removeIndex = this.syncData?.findIndex(([k]) => k === key) || -1;
-      if (removeIndex > -1) {
-        this.syncData?.splice(removeIndex, 1);
-      }
-      this.length--;
-    }
+  delete(key: TKey): boolean {
+    return this.temp.delete(key);
   }
 
   clear(): void {
     this.data.clear();
-    this.length = 0;
+    this.temp.clear();
     this.syncData?.splice(0, this.syncData.length);
   }
 }

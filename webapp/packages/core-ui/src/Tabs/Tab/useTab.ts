@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -55,14 +55,14 @@ export function useTab(
     getInfo() {
       return this.state.getTabInfo(this.tabId);
     },
-    handleOpen(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    handleOpen(e: React.MouseEvent<HTMLButtonElement>) {
       if (EventContext.has(e, EventStopPropagationFlag)) {
         return;
       }
       refObject.onClick?.(this.tabId);
       this.state.open(this.tabId);
     },
-    handleClose(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    handleClose(e: React.MouseEvent<HTMLDivElement>) {
       EventContext.set(e, EventStopPropagationFlag); // TODO: probably should use special flag
       this.state.close(tabId);
     },

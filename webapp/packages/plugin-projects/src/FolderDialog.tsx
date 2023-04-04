@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,9 +11,10 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, Translate, useFocus, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, Translate, useFocus, useObservableRef, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { throttleAsync } from '@cloudbeaver/core-utils';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { createPath, throttleAsync } from '@cloudbeaver/core-utils';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
 const style = css`
@@ -29,26 +30,30 @@ const style = css`
 interface IFolderDialogState {
   value: string;
   projectId: string;
+  folder?: string;
   message: string | undefined;
   valid: boolean;
   payload: FolderDialogPayload;
+  validationInProgress: boolean;
   validate: () => Promise<void>;
   setMessage: (message: string) => void;
   setProjectId: (projectId: string) => void;
 }
 
 export interface IFolderDialogResult {
-  folder: string;
+  folder?: string;
+  name: string;
   projectId: string;
 }
 
 export interface FolderDialogPayload {
   value: string;
   projectId: string;
+  folder?: string;
+
   selectProject: boolean;
   objectName?: string;
   icon?: string;
-  subTitle?: string;
   bigIcon?: boolean;
   viewBox?: string;
   confirmActionText?: string;
@@ -68,7 +73,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
 
   const {
     icon,
-    subTitle,
+    folder,
     bigIcon,
     viewBox,
     value,
@@ -93,34 +98,55 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
   const state = useObservableRef<IFolderDialogState>(() => ({
     value,
     projectId,
+    folder,
     message: undefined,
     valid: true,
+    validationInProgress: false,
     validate: throttleAsync(async () => {
+      const { folder, value, projectId } = state;
       state.message = undefined;
-      state.valid = (await state.payload.validation?.(
-        { folder:state.value, projectId: state.projectId },
-        state.setMessage.bind(state)
-      )) ?? true;
+      state.validationInProgress = true;
+      let valid: boolean | undefined;
+      try {
+        valid = await state.payload.validation?.(
+          { folder, name: value, projectId },
+          (message: string) => {
+            if (state.folder === folder && state.value === value && state.projectId === projectId) {
+              state.setMessage(message);
+            }
+          }
+        );
+      } catch {}
+
+      if (state.folder === folder && state.value === value && state.projectId === projectId) {
+        state.valid = valid ?? true;
+        state.validationInProgress = false;
+      }
     }, 300),
     setMessage(message) {
       this.message = message;
     },
     setProjectId(projectId) {
       this.projectId = projectId;
+      this.folder = undefined;
     },
   }), {
     value: observable.ref,
     projectId: observable.ref,
+    validationInProgress: observable.ref,
+    folder: observable.ref,
     valid: observable.ref,
     message: observable.ref,
   }, {
     payload,
   });
 
+  const projectInfoLoader = useResource(FolderDialog, ProjectInfoResource, state.projectId);
+
   async function resolveHandler() {
     await state.validate();
     if (state.valid) {
-      resolveDialog({ folder: state.value, projectId: state.projectId });
+      resolveDialog({ folder: state.folder, name: state.value, projectId: state.projectId });
     }
   }
 
@@ -129,6 +155,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
   }, [state.value, state.projectId]);
 
   const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
+  const subTitle = createPath(projectInfoLoader.data?.name ?? state.projectId, state.folder);
 
   return styled(style, BASE_CONTAINERS_STYLES)(
     <CommonDialogWrapper size='small' className={className} fixedWidth>
@@ -154,6 +181,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
               state={state}
               error={!state.valid}
               description={errorMessage}
+              loading={state.validationInProgress}
               onChange={() => state.validate()}
             >
               {translate('ui_name') + ':'}

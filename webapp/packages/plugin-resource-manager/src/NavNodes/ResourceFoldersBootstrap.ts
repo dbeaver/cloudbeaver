@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,13 +11,13 @@ import { CONNECTION_FOLDER_NAME_VALIDATION } from '@cloudbeaver/core-connections
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DialogueStateResult, CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NavTreeResource, NavNodeManagerService, NavNodeInfoResource, type INodeMoveData, navNodeMoveContext, getNodesFromContext, ENodeMoveType, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfo, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { getRmResourceKey, getRmResourcePath, NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey, CachedTreeChildrenKey, getCachedMapResourceLoaderState, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { createPath, getPathParent, isDefined } from '@cloudbeaver/core-utils';
+import { createPath, getPathParent } from '@cloudbeaver/core-utils';
 import { ActionService, MenuService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, DATA_CONTEXT_LOADABLE_STATE } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
@@ -164,18 +164,13 @@ export class ResourceFoldersBootstrap extends Bootstrap {
 
         let path: string | undefined;
 
-        if (!targetNode.folderId) {
-          const project = this.projectInfoResource.get(targetNode.projectId);
-          targetNode.folderId = this.getResourceTypeFolder(project!, resourceTypeId);
-        }
-
         if (targetNode.folderId) {
           const resourceKey = getResourceKeyFromNodeId(targetNode.folderId);
 
           if (resourceKey !== undefined) {
             const key = getRmResourceKey(resourceKey);
             if (key.path) {
-              path = resourceKey;
+              path = key.path;
             }
           }
         }
@@ -183,32 +178,39 @@ export class ResourceFoldersBootstrap extends Bootstrap {
         const result = await this.commonDialogService.open(FolderDialog, {
           value: this.localizationService.translate('ui_folder_new'),
           projectId: targetNode.projectId,
+          folder: path,
           title: 'core_view_action_new_folder',
-          subTitle: path,
           icon: '/icons/folder.svg#root',
           create: true,
           selectProject: targetNode.selectProject,
-          validation: async ({ folder, projectId }, setMessage) => {
-            const trimmed = folder.trim();
+          validation: async ({ name, folder, projectId }, setMessage) => {
+            const trimmed = name.trim();
 
-            if (trimmed.length === 0 || !folder.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
+            if (trimmed.length === 0 || !name.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
               setMessage('connections_connection_folder_validation');
               return false;
             }
 
-            const key = path !== undefined ? path : getRmResourcePath(projectId);
+            const root = this.getResourceTypeFolder(projectId, resourceTypeId);
+            const key = getRmResourcePath(projectId, folder ?? root);
 
-            await this.resourceManagerResource.load(CachedTreeChildrenKey(key));
+            try {
+              await this.resourceManagerResource.load(CachedTreeChildrenKey(key));
 
-            return !this.resourceManagerResource.has(createPath(key, trimmed));
+              return !this.resourceManagerResource.has(createPath(key, trimmed));
+            } catch (exception: any) {
+              setMessage('connections_connection_folder_validation');
+              return false;
+            }
           },
         });
 
         if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
           try {
-            const key = path !== undefined ? path : getRmResourcePath(result.projectId);
+            const root = this.getResourceTypeFolder(result.projectId, resourceTypeId);
+            const key = getRmResourcePath(result.projectId, result.folder ?? root);
             await this.resourceManagerResource.create(
-              createPath(key, result.folder),
+              createPath(key, result.name),
               true
             );
 
@@ -276,18 +278,22 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     };
   }
 
-  private getResourceTypeFolder(project: ProjectInfo, resourceTypeId: string | undefined): string | undefined {
+  private getResourceTypeFolder(projectId: string, resourceTypeId: string | undefined): string | undefined {
     if (!resourceTypeId) {
+      return undefined;
+    }
+    const project = this.projectInfoResource.get(projectId);
+
+    if (!project) {
       return undefined;
     }
 
     const resourceFolder = this.resourceManagerService.getRootFolder(project, resourceTypeId);
-    return createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
+    return resourceFolder;
   }
 
   private syncNavTree() {
     this.navNodeManagerService.onMove.addHandler(this.moveResourceToFolder.bind(this));
-    let syncOutdate = true;
 
     // this.navNodeInfoResource.onItemUpdate.addHandler(executorHandlerFilter(
     //   () => syncOutdate,
@@ -310,31 +316,29 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     //   }
     // ));
 
-    this.navNodeInfoResource.onItemDelete.addHandler(executorHandlerFilter(
-      () => true,
-      key => {
-        const resources = ResourceKeyUtils
-          .mapArray(key, getResourceKeyFromNodeId)
-          .filter(isDefined);
+    // this.navNodeInfoResource.onItemDelete.addHandler(executorHandlerFilter(
+    //   () => true,
+    //   key => {
+    //     const resources = ResourceKeyUtils
+    //       .mapArray(key, getResourceKeyFromNodeId)
+    //       .filter(isDefined);
 
-        this.resourceManagerResource.delete(resourceKeyList(resources));
-      }
-    ));
+    //     this.resourceManagerResource.delete(resourceKeyList(resources));
+    //   }
+    // ));
 
-    this.resourceManagerResource.onItemUpdate.addHandler(executorHandlerFilter(
-      () => syncOutdate,
-      key => {
-        syncOutdate = false;
-        try {
-          const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getResourceNodeId)
-            .map(getPathParent))]);
-          if (!this.navTreeResource.isOutdated(updated)) {
-            this.navTreeResource.markTreeOutdated(updated);
-          }
-        } finally {
-          syncOutdate = true;
-        }
+    this.resourceManagerResource.onItemUpdate.addHandler(key => {
+      const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getResourceNodeId)
+        .map(getPathParent))]);
+      if (!this.navTreeResource.isOutdated(updated)) {
+        this.navTreeResource.markTreeOutdated(updated);
       }
-    ));
+    });
+
+    this.resourceManagerResource.onItemDelete.addHandler(key => {
+      const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getResourceNodeId)
+        .map(getPathParent))]);
+      this.navTreeResource.deleteInNode(updated, ResourceKeyUtils.toArray(key).map(value => [value]));
+    });
   }
 }

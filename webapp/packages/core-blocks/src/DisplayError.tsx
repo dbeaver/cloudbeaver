@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,12 +10,14 @@ import type React from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { ENotificationType } from '@cloudbeaver/core-events';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { AppRefreshButton } from './AppRefreshButton';
 import { NotificationMark } from './Snackbars/NotificationMark';
+import { useStyles } from './useStyles';
 
 const style = css`
-  container {
+  error {
     width: 100%;
     height: 100%;
     display: flex;
@@ -25,7 +27,7 @@ const style = css`
       height: 100vh;
     }
   }
-  container-inner-block {
+  error-inner-block {
     display: flex;
     margin: auto;
     padding: 16px 24px;
@@ -46,6 +48,7 @@ interface Props {
   error?: Error;
   errorInfo?: React.ErrorInfo;
   className?: string;
+  styles?: ComponentStyle;
 }
 
 export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function DisplayError({
@@ -54,12 +57,13 @@ export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function D
   error,
   errorInfo,
   className,
+  styles,
 }) {
   const stack = errorInfo?.componentStack || error?.stack;
 
-  return styled(style)(
-    <container className={className} {...use({ root })}>
-      <container-inner-block>
+  return styled(useStyles(style, styles))(
+    <error className={className} {...use({ root })}>
+      <error-inner-block>
         <NotificationMark type={ENotificationType.Error} />
         <p>Something went wrong.</p>
         {root && <AppRefreshButton />}
@@ -71,7 +75,7 @@ export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function D
             {stack}
           </details>
         )}
-      </container-inner-block>
-    </container>
+      </error-inner-block>
+    </error>
   );
 };
