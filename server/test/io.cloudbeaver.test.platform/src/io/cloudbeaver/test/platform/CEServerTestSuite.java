@@ -19,6 +19,7 @@ package io.cloudbeaver.test.platform;
 
 import io.cloudbeaver.model.rm.lock.RMLockTest;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationCE;
 import io.cloudbeaver.utils.WebTestUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -57,7 +58,7 @@ public class CEServerTestSuite {
             return;
         } else {
             System.out.println("Start CBApplication");
-            testApp = new CBApplication();
+            testApp = new CBApplicationCE();
             thread = new Thread(() -> {
                 testApp.start(null);
             });
