@@ -43,8 +43,8 @@ export class DataValuePanelBootstrap extends Bootstrap {
           return true;
         }
 
-        const data = model.source.getAction(resultIndex, ResultSetDataAction);
-        return data.empty
+        const data = model.source.tryGetAction(resultIndex, ResultSetDataAction);
+        return data?.empty
           || this.dataValuePanelService.getDisplayed({ model, resultIndex, dataFormat }).length === 0;
       },
       getPresentationComponent: () => ValuePanel,
