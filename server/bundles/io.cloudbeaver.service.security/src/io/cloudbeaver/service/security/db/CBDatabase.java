@@ -110,7 +110,8 @@ public class CBDatabase {
         if (CommonUtils.isEmpty(databaseConfiguration.getDriver())) {
             throw new DBException("No database driver configured for CloudBeaver database");
         }
-        DBPDriver driver = DataSourceProviderRegistry.getInstance().findDriver(databaseConfiguration.getDriver());
+        var dataSourceProviderRegistry = DataSourceProviderRegistry.getInstance();
+        DBPDriver driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
         if (driver == null) {
             throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
         }
@@ -144,8 +145,6 @@ public class CBDatabase {
             }
         }
 
-        Driver driverInstance = driver.getDriverInstance(monitor);
-
         SystemVariablesResolver variablesResolver = new SystemVariablesResolver();
         String dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), variablesResolver);
         Properties dbProperties = new Properties();
@@ -155,6 +154,17 @@ public class CBDatabase {
                 dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD, dbPassword);
             }
         }
+
+        var migrator = new H2Migrator(monitor, dataSourceProviderRegistry, databaseConfiguration, dbURL, dbProperties, variablesResolver);
+        migrator.migrateDatabaseIfNeeded();
+
+        // reload the driver and url due to a possible configuration update
+        driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
+        if (driver == null) {
+            throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
+        }
+        Driver driverInstance = driver.getDriverInstance(monitor);
+        dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), variablesResolver);
 
         // Create connection pool with custom connection factory
         log.debug("\tInitiate connection pool with management database (" + driver.getFullName() + "; " + dbURL + ")");
