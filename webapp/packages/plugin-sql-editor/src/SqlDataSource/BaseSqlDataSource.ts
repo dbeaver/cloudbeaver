@@ -15,7 +15,11 @@ import type { IDatabaseDataModel, IDatabaseResultSet } from '@cloudbeaver/plugin
 
 import type { IDataQueryOptions } from '../QueryDataSource';
 import { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
-import type { ISqlDataSource, ISqlDataSourceKey } from './ISqlDataSource';
+import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey } from './ISqlDataSource';
+import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory';
+import { SqlDataSourceHistory } from './SqlDataSourceHistory/SqlDataSourceHistory';
+
+const SOURCE_HISTORY = 'history';
 
 @staticImplements<ISqlDataSourceKey>()
 export abstract class BaseSqlDataSource implements ISqlDataSource {
@@ -39,8 +43,9 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     return [ESqlDataSourceFeatures.script];
   }
 
+  readonly history: ISqlDataSourceHistory;
   readonly onUpdate: ISyncExecutor;
-  readonly onSetScript: ISyncExecutor<string>;
+  readonly onSetScript: ISyncExecutor<ISetScriptData>;
   readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>[]>;
 
   protected outdated: boolean;
@@ -52,12 +57,21 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     this.message = undefined;
     this.outdated = true;
     this.editing = true;
+    this.history = new SqlDataSourceHistory();
     this.onUpdate = new SyncExecutor();
     this.onSetScript = new SyncExecutor();
     this.onDatabaseModelUpdate = new SyncExecutor();
 
     this.onDatabaseModelUpdate.setInitialDataGetter(() => this.databaseModels);
     this.onSetScript.next(this.onUpdate);
+    this.onSetScript.addHandler(({ script, source }) => {
+      if (source === SOURCE_HISTORY) {
+        return;
+      }
+      this.history.add(script);
+    });
+
+    this.history.onNavigate.addHandler(value => this.setScript(value, SOURCE_HISTORY));
 
     makeObservable<this, 'outdated' | 'editing'>(this, {
       databaseModels: observable.ref,
@@ -68,8 +82,8 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     });
   }
 
-  setScript(script: string): void {
-    this.onSetScript.execute(script);
+  setScript(script: string, source?: string): void {
+    this.onSetScript.execute({ script, source });
   }
 
   abstract canRename(name: string | null): boolean;

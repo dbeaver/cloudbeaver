@@ -7,7 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { IActiveView, View } from '@cloudbeaver/core-view';
+import { ACTION_REDO, ACTION_UNDO, IActiveView, View } from '@cloudbeaver/core-view';
 import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 import { ACTION_SQL_EDITOR_EXECUTE } from './actions/ACTION_SQL_EDITOR_EXECUTE';
@@ -27,6 +27,8 @@ export class SqlEditorView extends View<ITab> {
       ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
       ACTION_SQL_EDITOR_EXECUTE,
       ACTION_SQL_EDITOR_FORMAT,
+      ACTION_UNDO,
+      ACTION_REDO,
       ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN
     );
   }
