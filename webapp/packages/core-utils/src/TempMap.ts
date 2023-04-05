@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { cacheValue, ICachedValueObject } from './cacheValue';
 
@@ -44,6 +44,10 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
     this.keysTemp = cacheValue();
     this.entriesTemp = cacheValue();
     this.valuesTemp = cacheValue();
+
+    makeObservable<this, 'deleted'>(this, {
+      deleted: observable.shallow,
+    });
   }
 
   isDeleted(key: TKey): boolean {
@@ -56,6 +60,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
   clear(): void {
     if (this.flushTask) {
       clearTimeout(this.flushTask);
+      this.flushTask = null;
     }
     this.deleted.splice(0, this.deleted.length);
     this.temp.clear();
