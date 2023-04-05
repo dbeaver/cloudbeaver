@@ -531,10 +531,12 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   protected getDefaultMetadata(key: string, metadata: MetadataMap<string, INodeMetadata>): INodeMetadata {
-    return {
-      ...super.getDefaultMetadata(key, metadata),
-      withDetails: false,
-    };
+    return Object.assign(
+      super.getDefaultMetadata(key, metadata),
+      {
+        withDetails: false,
+      }
+    );
   }
 
   protected validateKey(key: string): boolean {
