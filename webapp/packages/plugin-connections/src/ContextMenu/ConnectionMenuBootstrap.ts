@@ -214,7 +214,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
         const connection = context.get(DATA_CONTEXT_CONNECTION);
 
-        if (action === ACTION_CONNECTION_EDIT) {
+        if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
           return state.getState(
             action.id,
             () => getCachedMapResourceLoaderState(this.connectionInfoResource, createConnectionParam(connection), ['includeCredentialsSaved'], true)
