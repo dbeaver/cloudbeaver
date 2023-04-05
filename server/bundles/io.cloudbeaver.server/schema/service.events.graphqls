@@ -9,6 +9,7 @@ enum CBServerEventId {
     cb_session_log_updated,
 
     cb_session_websocket_connected,
+    cb_session_state,
     cb_session_expired,
 
     cb_datasource_created,
@@ -98,6 +99,14 @@ type WSSocketConnectedEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
     applicationRunId: String!
+}
+
+# Session state info event
+type WSSessionStateEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    remainingTime: String
+    isValid: Boolean
 }
 
 # Session expired event

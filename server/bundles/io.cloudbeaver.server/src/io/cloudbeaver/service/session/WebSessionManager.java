@@ -34,14 +34,15 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.dbeaver.model.websocket.event.session.WSSessionStateEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Web session manager
@@ -333,6 +334,20 @@ public class WebSessionManager {
             );
             sessionMap.put(sessionId, headlessSession);
             return headlessSession;
+        }
+    }
+
+    public void sendSessionsStates() throws DBException {
+        long maxSessionIdleTime = getMaxSessionIdleTime();
+        synchronized (sessionMap) {
+            for (var session : sessionMap.values()) {
+                session.getUserContext().refreshPermissions();
+
+                var idleMillis = System.currentTimeMillis() - session.getLastAccessTimeMillis();
+                var remainTime = maxSessionIdleTime - idleMillis;
+                session.addSessionEvent(new WSSessionStateEvent(remainTime));
+            }
+
         }
     }
 }
