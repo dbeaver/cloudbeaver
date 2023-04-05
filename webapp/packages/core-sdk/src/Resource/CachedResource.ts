@@ -10,7 +10,7 @@ import { observable, makeObservable, action, computed, toJS } from 'mobx';
 
 import { Dependency } from '@cloudbeaver/core-di';
 import { ExecutionContext, Executor, ExecutorInterrupter, IExecutor, IExecutorHandler, IExecutionContextProvider, ISyncExecutor, SyncExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
-import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
+import { isPrimitive, MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
 import { isResourceAlias, ResourceAlias, ResourceAliasFactory, ResourceAliasOptions } from './ResourceAlias';
 import { ResourceError } from './ResourceError';
@@ -560,6 +560,16 @@ export abstract class CachedResource<
         this.commitIncludes(metadata, includes);
       }
     });
+    if (isResourceAlias(param)) {
+      param = this.transformToKey(param);
+
+      this.updateMetadata(param, metadata => {
+        metadata.loaded = true;
+        if (includes) {
+          this.commitIncludes(metadata, includes);
+        }
+      });
+    }
   }
 
   markError(exception: Error, key: ResourceKey<TKey>, include?: TInclude): ResourceError {
@@ -744,6 +754,9 @@ export abstract class CachedResource<
    * Can be override to provide static link to complicated keys
    */
   protected getKeyRef(key: TKey): TKey {
+    if (isPrimitive(key)) {
+      return key;
+    }
     return Object.freeze(toJS(key));
   }
 
@@ -751,9 +764,13 @@ export abstract class CachedResource<
    * Can be override to provide static link to complicated keys
    */
   protected getMetadataKeyRef(key: ResourceKeyFlat<TKey>): TKey {
-    if (this.isAlias(key)) {
+    if (isResourceAlias(key)) {
       return this.transformToAlias(key)
         .toString() as TKey;
+    }
+
+    if (isPrimitive(key)) {
+      return key;
     }
 
     const ref = Array.from(this.metadata.keys())
@@ -879,6 +896,9 @@ export abstract class CachedResource<
   }
 
   protected markOutdatedSync(key: ResourceKey<TKey>): void {
+    if (!this.hasMetadata(key)) {
+      return;
+    }
     this.updateMetadata(key, metadata => {
       metadata.outdated = true;
     });

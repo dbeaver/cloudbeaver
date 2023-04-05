@@ -50,7 +50,7 @@ export const Main = observer(function Main() {
           mode={leftBarDisabled ? 'minimize' : splitMainState.mode}
           disable={leftBarDisabled}
         >
-          <Pane main>
+          <Pane basis='250px' main>
             <Loader suspense>
               <SideBarPanel container={leftBarPanelService.tabsContainer} />
             </Loader>
@@ -67,7 +67,7 @@ export const Main = observer(function Main() {
                 <RightArea />
               </Pane>
               <ResizerControls />
-              <Pane main>
+              <Pane basis='250px' main>
                 <Loader suspense>
                   <SideBarPanel container={sideBarPanelService.tabsContainer} />
                 </Loader>

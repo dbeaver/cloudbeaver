@@ -19,10 +19,18 @@ import { useCallback } from 'react';
 import type { IControlledCodeMirror } from 'react-codemirror2';
 
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { throttle } from '@cloudbeaver/core-utils';
 
 import type { ISQLEditorData } from '../ISQLEditorData';
 import type { SQLCodeEditorController } from '../SQLCodeEditor/SQLCodeEditorController';
+
+declare module 'codemirror' {
+  interface ShowHintOptions  {
+    manual: boolean;
+  }
+}
 
 interface ISQLCodeEditorPanelData {
   readonly activeSuggest: boolean;
@@ -41,12 +49,13 @@ interface ISQLCodeEditorPanelDataPrivate extends ISQLCodeEditorPanelData {
   highlightActiveQuery(): void;
 }
 
-const closeCharacters = /[\s()[\]{};:>,=\\*]/;
+const CLOSE_CHARACTERS = /[\s()[\]{};:>,=\\*]/;
 
 export function useSQLCodeEditorPanel(
   data: ISQLEditorData,
   controller: SQLCodeEditorController | null
 ): ISQLCodeEditorPanelData {
+  const localizationService = useService(LocalizationService);
   const editorPanelData = useObservableRef<ISQLCodeEditorPanelDataPrivate>(() => ({
     activeSuggest: true,
     options: {
@@ -68,9 +77,9 @@ export function useSQLCodeEditorPanel(
         // 'Alt-X': () => { editorPanelData.data.executeScript(); },
 
         // Autocomplete
-        'Ctrl-Space': () => { editorPanelData.showHint(false); }, // classic for windows, linux
-        'Shift-Ctrl-Space': () => { editorPanelData.showHint(false); },
-        'Alt-Space': () => { editorPanelData.showHint(false); }, // workaround for binded 'Ctrl-Space' by input switch in macOS
+        'Ctrl-Space': () => { editorPanelData.showHint(true); }, // classic for windows, linux
+        'Shift-Ctrl-Space': () => { editorPanelData.showHint(true); },
+        'Alt-Space': () => { editorPanelData.showHint(true); }, // workaround for binded 'Ctrl-Space' by input switch in macOS
       },
     },
     bindings: {
@@ -138,12 +147,12 @@ export function useSQLCodeEditorPanel(
         if (
           editor.state.completionActive
           || ignoredChanges.includes(origin)
-          || closeCharacters.test(change)) {
+          || editor.state.completionActive?.closeCharacters?.test(change)
+          || CLOSE_CHARACTERS.test(change)) {
           return;
         }
 
-        cursor = nextCursor;
-        this.showHint(true);
+        this.showHint(false);
       });
 
       // TODO: probably should be moved to SQLCodeEditorController
@@ -162,15 +171,15 @@ export function useSQLCodeEditorPanel(
               ? editor.getRange(cursor, from)
               : editor.getRange(from, cursor);
 
-            cursor = from;
 
-            if (closeCharacters.test(ch) || from.line !== cursor.line) {
+            if (CLOSE_CHARACTERS.test(ch) || from.line !== cursor.line) {
               this.closeHint();
             } else {
               editor.state.completionActive.update();
             }
           }
         }
+        cursor = from;
         updateHighlight();
       });
 
@@ -187,45 +196,43 @@ export function useSQLCodeEditorPanel(
       editor.closeHint();
     },
 
-    async showHint(activeSuggest: boolean) {
+    async showHint(manual: boolean) {
       const editor = this.controller?.getEditor();
 
       if (!editor) {
         return;
       }
 
-      if (
-        editor.state.completionActive
-        && editor.state.completionActive.options.completeSingle === !activeSuggest
-      ) {
-        editor.state.completionActive.update();
+      if (editor.state.completionActive && editor.state.completionActive.options.manual === manual) {
         return;
       }
 
       editor.showHint({
-        completeSingle: !activeSuggest,
+        manual,
+        completeSingle: manual,
         updateOnCursorActivity: false,
-        closeCharacters,
-        hint: this.getHandleAutocomplete,
+        closeCharacters: CLOSE_CHARACTERS,
+        hint: this.getHandleAutocomplete.bind(this),
       });
     },
 
-    async getHandleAutocomplete(
-      editor: Editor,
-      options: ShowHintOptions,
-    ): Promise<Hints | undefined> {
-      const cursor = editor.getCursor('from');
-      const [from, to, word] = getWordRange(editor, cursor);
+    async getHandleAutocomplete(editor: Editor, options: ShowHintOptions): Promise<Hints | undefined> {
+      const cursorFrom = editor.getCursor('from');
+      const [from, to, leftWordPart, word] = getWordRange(editor, cursorFrom);
 
-      const position = word.length > 0 ? { ...from, ch: from.ch + 1 } : from;
-      const cursorPosition = getAbsolutePosition(editor, position);
+      const cursorPosition = getAbsolutePosition(editor, cursorFrom);
+      const proposals = await editorPanelData.data.getHintProposals(cursorPosition, leftWordPart, !options.manual);
 
-      const proposals = await editorPanelData.data.getHintProposals(cursorPosition, word, !options.completeSingle);
-
-      const filteredProposals = proposals.filter(({ displayString }) => (word === '*' || (
-        displayString.toLocaleLowerCase() !== word.toLocaleLowerCase()
-        && displayString.toLocaleLowerCase().startsWith(word.toLocaleLowerCase())
-      )));
+      const hasSameName = proposals.some(
+        ({ displayString }) => displayString.toLocaleLowerCase() === word.toLocaleLowerCase()
+      );
+      const filteredProposals = proposals.filter(({ displayString }) => (
+        word === '*'
+        || (
+          displayString.toLocaleLowerCase() !== word.toLocaleLowerCase()
+          && displayString.toLocaleLowerCase().startsWith(leftWordPart.toLocaleLowerCase())
+        )
+      ));
 
       const hints: Hints = {
         from,
@@ -236,15 +243,26 @@ export function useSQLCodeEditorPanel(
         })),
       };
 
-      // fix single completion
-      if (filteredProposals.length === 1 && options.completeSingle) {
-        editor.showHint({
-          completeSingle: true,
-          updateOnCursorActivity: false,
-          closeCharacters,
-          hint: () => hints,
-        });
+      if (hints.list.length === 0 && !hasSameName && options.manual) {
+        hints.list = [{
+          text: word,
+          displayText: localizationService.translate('sql_editor_hint_empty'),
+        }];
 
+        if (options.completeSingle) {
+          editor.showHint({
+            manual: options.manual,
+            completeSingle: false,
+            updateOnCursorActivity: false,
+            closeCharacters: CLOSE_CHARACTERS,
+            hint: this.getHandleAutocomplete.bind(this),
+          });
+          return;
+        }
+      }
+
+      if (hints.list.length === 0) {
+        this.closeHint();
         return;
       }
 
@@ -302,7 +320,7 @@ function getAbsolutePosition(editor: Editor, position: Position) {
   return editor.getRange({ line: 0, ch: 0 }, position).length;
 }
 
-function getWordRange(editor: Editor, position: Position): [Position, Position, string] {
+function getWordRange(editor: Editor, position: Position): [Position, Position, string, string] {
   const line = editor.getLine(position.line);
 
   const leftSubstr = line.substring(0, position.ch);
@@ -322,5 +340,5 @@ function getWordRange(editor: Editor, position: Position): [Position, Position, 
     ch: position.ch + rightWordPart.length,
   };
 
-  return [from, to, leftWordPart + rightWordPart];
+  return [from, to, leftWordPart, leftWordPart + rightWordPart];
 }

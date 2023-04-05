@@ -9,12 +9,16 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
+
 import { Button } from './Button';
+import { Icon } from './Icon';
 import { IconOrImage } from './IconOrImage';
 import { useTranslate } from './localization/useTranslate';
 import { useErrorDetails } from './useErrorDetails';
+import { useStyles } from './useStyles';
 
-const styles = css`
+const style = css`
   error {
     flex: 1;
     display: flex;
@@ -91,6 +95,12 @@ const styles = css`
   error[|icon] {
     padding: 0;
   }
+  error-action-close {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
 `;
 
 interface Props {
@@ -100,11 +110,13 @@ interface Props {
   icon?: boolean;
   inline?: boolean;
   className?: string;
+  styles?: ComponentStyle;
   onRetry?: () => void;
+  onClose?: () => void;
 }
 
 export const ExceptionMessage = observer<Props>(function ExceptionMessage({
-  name, message, exception = null, icon, inline, className, onRetry,
+  name, message, exception = null, icon, inline, className, styles, onRetry, onClose,
 }) {
   const translate = useTranslate();
   const error = useErrorDetails(exception);
@@ -120,28 +132,37 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({
     };
   }
 
-  return styled(styles)(
+  return styled(useStyles(style, styles))(
     <error {...use({ inline, icon })} className={className}>
       <error-icon title={message}>
         <IconOrImage icon={inline ? '/icons/error_icon_sm.svg' : '/icons/error_icon.svg'} />
       </error-icon>
       {!icon && (
-        <error-data>
-          <error-name><span>{name}</span></error-name>
-          <error-message>{message}</error-message>
-          <error-actions>
-            {error.hasDetails && (
-              <Button type='button' mod={['outlined']} disabled={error.isOpen} onClick={error.open}>
-                {translate('ui_errors_details')}
-              </Button>
-            )}
-            {onRetry && (
-              <Button type='button' mod={['unelevated']} onClick={onRetry}>
-                {translate('ui_processing_retry')}
-              </Button>
-            )}
-          </error-actions>
-        </error-data>
+        <>
+          <error-data>
+            <error-name>
+              <span>{name}</span>
+            </error-name>
+            <error-message>{message}</error-message>
+            <error-actions>
+              {error.hasDetails && (
+                <Button type='button' mod={['outlined']} disabled={error.isOpen} onClick={error.open}>
+                  {translate('ui_errors_details')}
+                </Button>
+              )}
+              {onRetry && (
+                <Button type='button' mod={['unelevated']} onClick={onRetry}>
+                  {translate('ui_processing_retry')}
+                </Button>
+              )}
+            </error-actions>
+          </error-data>
+          {onClose && (
+            <error-action-close>
+              <Icon name="cross" viewBox="0 0 16 16" onClick={onClose} />
+            </error-action-close>
+          )}
+        </>
       )}
     </error>
   );

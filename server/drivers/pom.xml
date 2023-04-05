@@ -17,6 +17,7 @@
         <module>db2-jt400</module>
         <module>derby</module>
         <module>h2</module>
+        <module>h2_v2</module>
         <module>jaybird</module>
         <module>mysql</module>
         <module>mariadb</module>

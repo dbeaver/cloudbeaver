@@ -20,7 +20,7 @@ import { Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, cre
 import { ConnectionsManagerService } from '../ConnectionsManagerService';
 import type { IConnectionInfoParams } from '../IConnectionsResource';
 import { getConnectionParentId } from './getConnectionParentId';
-import { getFolderNodeParents } from './getFolderParents';
+import { getFolderNodeParents } from './getFolderNodeParents';
 
 @injectable()
 export class ConnectionNavNodeService extends Dependency {
@@ -57,9 +57,9 @@ export class ConnectionNavNodeService extends Dependency {
         const parents = data.nodePaths.map(nodeId => {
           const parents = getFolderNodeParents(nodeId);
 
-          return parents[parents.length - 2];
+          return parents[parents.length - 1];
         });
-        this.navTreeResource.markTreeOutdated(resourceKeyList(parents));
+        this.navTreeResource.markOutdated(resourceKeyList(parents));
       },
       undefined,
       this.navTreeResource
@@ -70,10 +70,10 @@ export class ConnectionNavNodeService extends Dependency {
         const parents = data.nodePaths.map(nodeId => {
           const parents = getFolderNodeParents(nodeId);
 
-          return parents[parents.length - 2];
+          return parents[parents.length - 1];
         });
 
-        this.navTreeResource.deleteInNode(resourceKeyList(parents), data.nodePaths);
+        this.navTreeResource.deleteInNode(resourceKeyList(parents), data.nodePaths.map(value => [value]));
       },
       undefined,
       this.navTreeResource
