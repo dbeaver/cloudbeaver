@@ -45,7 +45,7 @@
     </extension>
 
     <extension point="org.jkiss.dbeaver.ws.event.handler">
-        <eventHandler class="io.cloudbeaver.server.events.WSConfigurationChangedEventHandler"/>
+         <eventHandler class="io.cloudbeaver.server.events.WSDefaultEventHandler"/>
         <eventHandler class="io.cloudbeaver.server.events.WSDataSourceUpdatedEventHandlerImpl"/>
         <eventHandler class="io.cloudbeaver.server.events.WSFolderUpdatedEventHandlerImpl"/>
         <eventHandler class="io.cloudbeaver.server.events.WSRmResourceUpdatedEventHandlerImpl"/>

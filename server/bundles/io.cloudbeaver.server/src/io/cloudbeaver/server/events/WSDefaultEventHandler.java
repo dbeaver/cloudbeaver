@@ -22,33 +22,31 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
-import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent;
 
 import java.util.Collection;
 
-/**
- * Notify all active user session that configuration has been changed
- */
-public class WSConfigurationChangedEventHandler implements WSEventHandler<WSServerConfigurationChangedEvent> {
-    private static final Log log = Log.getLog(WSConfigurationChangedEventHandler.class);
+public abstract class WSDefaultEventHandler<EVENT extends WSEvent> implements WSEventHandler<EVENT> {
 
-    @NotNull
-    @Override
-    public String getSupportedTopicId() {
-        return WSEventTopic.SERVER_CONFIG.getTopicId();
-    }
+    private static final Log log = Log.getLog(WSDefaultEventHandler.class);
 
     @Override
-    public void handleEvent(@NotNull WSServerConfigurationChangedEvent event) {
-        log.debug(getSupportedTopicId() + " event handled");
+    public void handleEvent(@NotNull EVENT event) {
         Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
-
         for (var activeUserSession : allSessions) {
-            if (WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId())) {
+            if (!validateEvent(activeUserSession, event)) {
+                log.debug(event.getTopicId() + " event '" + event.getId() + "' is not valid");
                 continue;
             }
-            activeUserSession.addSessionEvent(event);
+            log.debug(event.getTopicId() + " event '" + event.getId() + "' handled");
+            updateSessionData(activeUserSession, event);
         }
+    }
+
+    protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull EVENT event) {
+        activeUserSession.addSessionEvent(event);
+    }
+
+    protected boolean validateEvent(@NotNull BaseWebSession activeUserSession, @NotNull EVENT event) {
+        return !WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId()); // skip events from current session
     }
 }

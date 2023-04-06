@@ -55,7 +55,7 @@ public class WSPermissionUpdatedEventHandler implements WSEventHandler<WSObjectP
                 .map(SMObjectPermissionsGrant::getSubjectId)
                 .collect(Collectors.toSet());
 
-            log.debug(getSupportedTopicId() + " event handled");
+            log.debug(event.getTopicId() + " event handled");
 
             Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
             for (var activeUserSession : allSessions) {

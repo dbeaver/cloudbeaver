@@ -25,7 +25,7 @@ import org.jkiss.dbeaver.model.websocket.event.WSProjectEvent;
 /**
  * Notify all active user session that project has been updated
  */
-public abstract class WSAbstractProjectEventHandler<EVENT extends WSProjectEvent> extends WSAbstractEventHandler<EVENT> {
+public abstract class WSAbstractProjectEventHandler<EVENT extends WSProjectEvent> extends WSDefaultEventHandler<EVENT> {
 
     @NotNull
     @Override
