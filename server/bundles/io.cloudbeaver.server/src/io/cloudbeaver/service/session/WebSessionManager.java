@@ -38,11 +38,11 @@ import org.jkiss.dbeaver.model.websocket.event.session.WSSessionStateEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Web session manager
@@ -337,6 +337,9 @@ public class WebSessionManager {
         }
     }
 
+    /**
+     * Send session state with remaining alive time to all cached session
+     */
     public void sendSessionsStates() throws DBException {
         long maxSessionIdleTime = getMaxSessionIdleTime();
         synchronized (sessionMap) {
