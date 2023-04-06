@@ -15,7 +15,7 @@ export function getFolderNodeParents(nodeId: string): string[] {
   if (isFolderNodeId(nodeId)) {
     const parents = getPathParents(nodeId);
 
-    return [getProjectNodeId(parents[0].replace('folder://', '')), ...parents.slice(1)];
+    return [parents[0], getProjectNodeId(parents[1].replace('folder://', '')), ...parents.slice(2)];
   }
 
   return [];

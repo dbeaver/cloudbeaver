@@ -9,7 +9,6 @@
 import { createContext } from 'react';
 
 import type { IFolderExplorerContext } from '@cloudbeaver/core-blocks';
-import type { NavNode } from '@cloudbeaver/core-navigation-tree';
 
 import type { NavTreeControlComponent } from './NavigationNodeComponent';
 import type { IElementsTree } from './useElementsTree';
@@ -20,8 +19,6 @@ export interface IElementsTreeContext {
   selectionTree: boolean;
   control?: NavTreeControlComponent;
   getTreeRoot: () => HTMLDivElement | null;
-  onOpen?: (node: NavNode, path: string[], leaf: boolean) => Promise<void> | void;
-  onClick?: (node: NavNode, path: string[], leaf: boolean) => Promise<void> | void;
 }
 
 export const ElementsTreeContext = createContext<IElementsTreeContext | null>(null);

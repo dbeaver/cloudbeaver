@@ -11,7 +11,6 @@ import React, { useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { ACTION_ICON_BUTTON_STYLES, IconButton, PlaceholderElement, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
-import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
@@ -80,14 +79,13 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
   const translate = useTranslate();
   const [opened, setOpen] = useState(false);
   const styles = useStyles(ACTION_ICON_BUTTON_STYLES, toolsStyles, style);
-  const rootNode = useResource(ElementsTreeTools, NavTreeResource, root);
 
   useCaptureViewContext(context => {
     context?.set(DATA_CONTEXT_NAV_TREE_ROOT, tree.baseRoot);
     context?.set(DATA_CONTEXT_ELEMENTS_TREE, tree);
   });
 
-  const loading = rootNode.isLoading();
+  const loading = tree.isLoading();
 
   return styled(styles)(
     <tools>

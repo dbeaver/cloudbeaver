@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, autorun, entries, IReactionDisposer, keys, observable, ObservableMap, remove, runInAction, set, toJS } from 'mobx';
+import { entries, IReactionDisposer, keys, observable, ObservableMap, reaction, remove, runInAction, set, toJS } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
@@ -213,7 +213,14 @@ class DataStorage<T extends Record<any, any> | Map<any, any>> implements ILocalS
 
   subscribe() {
     this.unsubscribe();
-    this.mobxSub = autorun(() => this.saveState());
+    this.mobxSub = reaction(
+      () => toJS(this.store),
+      () => this.saveState(),
+      {
+        fireImmediately: true,
+        delay: 500,
+      }
+    );
   }
 
   unsubscribe() {
