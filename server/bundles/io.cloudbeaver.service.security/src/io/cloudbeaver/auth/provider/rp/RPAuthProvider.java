@@ -40,13 +40,6 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession> {
     public static final String X_ROLE = "X-Role";
     public static final String AUTH_PROVIDER = "reverseProxy";
 
-
-    @NotNull
-    @Override
-    public Map<String, Object> authExternalUser(@NotNull DBRProgressMonitor monitor, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> authParameters) throws DBException {
-        return authParameters;
-    }
-
     @NotNull
     @Override
     public String validateLocalAuth(@NotNull DBRProgressMonitor monitor,

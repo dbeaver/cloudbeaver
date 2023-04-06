@@ -214,10 +214,14 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
         const connection = context.get(DATA_CONTEXT_CONNECTION);
 
-        return state.getState(
-          action.id,
-          () => getCachedMapResourceLoaderState(this.connectionInfoResource, createConnectionParam(connection), ['includeCredentialsSaved'], true)
-        );
+        if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
+          return state.getState(
+            action.id,
+            () => getCachedMapResourceLoaderState(this.connectionInfoResource, createConnectionParam(connection), ['includeCredentialsSaved'], true)
+          );
+        }
+
+        return [];
       },
       handler: async (context, action) => {
         const connection = context.get(DATA_CONTEXT_CONNECTION);
