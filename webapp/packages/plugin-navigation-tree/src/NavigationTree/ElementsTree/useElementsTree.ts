@@ -9,7 +9,7 @@
 import { action, computed, observable, runInAction } from 'mobx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { IFolderExplorerContext, useExecutor, useResource, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
+import { IFolderExplorerContext, useExecutor, useResource, useObjectRef, useObservableRef, useUserData, getComputed } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -78,6 +78,8 @@ export interface IElementsTreeOptions {
   onFilter?: (value: string) => Promise<void> | void;
   onSelect?: (node: NavNode, state: boolean) => Promise<void> | void;
   onExpand?: (node: NavNode, state: boolean) => Promise<void> | void;
+  onOpen?: (node: NavNode, folder: boolean) => Promise<void> | void;
+  onClick?: (node: NavNode) => Promise<void> | void;
   isGroup?: (node: NavNode) => boolean;
   customSelect?: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void> | void;
   beforeSelect?: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void> | void;
@@ -117,10 +119,13 @@ export interface IElementsTree extends ILoadableState {
   select: (node: NavNode, multiple: boolean, nested: boolean) => Promise<void>;
   resetSelection(): Promise<void>;
   setDnDData: (data: IDNDData, dragging: boolean) => void;
+  open: (node: NavNode, path: string[], leaf: boolean) => Promise<void>;
+  click: (node: NavNode, path: string[], leaf: boolean) => Promise<void>;
   expand: (node: NavNode, state: boolean) => Promise<void>;
   show: (nodeId: string, parents: string[]) => Promise<void>;
   refresh: (nodeId: string) => Promise<void>;
   collapse: () => void;
+  loadPath: (path: string[], lastNode?: string) => Promise<string | undefined>;
 }
 
 export function useElementsTree(options: IOptions): IElementsTree {
@@ -145,50 +150,94 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   const functionsRef = useObjectRef({
     async loadTree(nodeId: string) {
-      await connectionInfoResource.load(ConnectionInfoActiveProjectKey);
-      const preloaded = await navTreeResource.preloadNodeParents(options.folderExplorer.state.fullPath);
+      elementsTree.loading = true;
+      try {
+        await projectInfoResource.load();
+        await connectionInfoResource.load(ConnectionInfoActiveProjectKey);
+        const preloadedRoot = await elementsTree.loadPath(options.folderExplorer.state.fullPath);
 
-      if (!preloaded) {
-        return;
-      }
+        if (preloadedRoot !== options.folderExplorer.state.folder) {
+          if (preloadedRoot === undefined) {
+            options.folderExplorer.open([], options.baseRoot);
+          } else {
+            this.exitNodeFolder(preloadedRoot);
+          }
+          return;
+        }
 
-      let children = [nodeId];
+        let children = [nodeId];
 
-      while (children.length > 0) {
-        const nextChildren: string[] = [];
+        while (children.length > 0) {
+          const nextChildren: string[] = [];
 
-        await Promise.all(children.map(async child => {
-          await navTreeResource.waitLoad();
-          await navNodeInfoResource.waitLoad();
+          await Promise.all(children.map(async child => {
+            await projectInfoResource.waitLoad();
+            await connectionInfoResource.waitLoad();
+            await navTreeResource.waitLoad();
+            await navNodeInfoResource.waitLoad();
 
-          const expanded = elementsTree.isNodeExpanded(child, true);
-          if (!expanded && child !== options.root) {
-            if (navNodeInfoResource.isOutdated(child)) {
+            const expanded = elementsTree.isNodeExpanded(child, true);
+            if (!expanded && child !== options.root) {
+              if (navNodeInfoResource.isOutdated(child)) {
+                const node = navNodeInfoResource.get(child);
+
+                if (node?.parentId !== undefined && !navTreeResource.isOutdated(node.parentId)) {
+                  await navNodeInfoResource.load(child);
+                }
+              }
+              return;
+            }
+
+            const loaded = await options.loadChildren(child, false);
+
+            if (!loaded) {
               const node = navNodeInfoResource.get(child);
 
-              if (node?.parentId !== undefined && !navTreeResource.isOutdated(node.parentId)) {
-                await navNodeInfoResource.load(child);
+              if (node) {
+                await elementsTree.expand(node, false);
+              }
+              return;
+            }
+
+            if (
+              elementsTree.settings?.foldersTree
+              && options.folderExplorer.options.expandFoldersWithSingleElement
+              && child === options.root
+              && elementsTree.getNodeChildren(child).length === 1
+            ) {
+              const nextNode = elementsTree.getNodeChildren(child)[0];
+
+              if (elementsTree.isNodeExpandable(nextNode) || elementsTree.isNodeExpanded(nextNode)) {
+                options.folderExplorer.open(navNodeInfoResource.getParents(nextNode), nextNode);
               }
             }
-            return;
-          }
+            nextChildren.push(...(navTreeResource.get(child) || []));
+          }));
 
-          const loaded = await options.loadChildren(child, false);
-
-          if (!loaded) {
-            const node = navNodeInfoResource.get(child);
-
-            if (node) {
-              await elementsTree.expand(node, false);
-            }
-            return;
-          }
-
-          nextChildren.push(...(navTreeResource.get(child) || []));
-        }));
-
-        children = nextChildren;
+          children = nextChildren;
+        }
+      } finally {
+        elementsTree.loading = false;
       }
+    },
+
+    exitNodeFolder(nodeId: string) {
+      runInAction(() => {
+        const folderExplorer = options.folderExplorer;
+
+        if (folderExplorer.state.fullPath.length === 1 || nodeId === options.baseRoot) {
+          return;
+        }
+
+        const pathIndex = folderExplorer.state.fullPath.indexOf(nodeId);
+
+        if (pathIndex >= 0) {
+          folderExplorer.open(
+            folderExplorer.state.fullPath.slice(0, pathIndex - 1),
+            folderExplorer.state.fullPath[pathIndex - 1]
+          );
+        }
+      });
     },
 
     getNestedChildren(nodeId: string): string[] {
@@ -292,12 +341,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       state.sync(data.nodeState);
 
-      elementsTree.loading = true;
-      try {
-        await functionsRef.loadTree(options.root);
-      } finally {
-        elementsTree.loading = false;
-      }
+      await functionsRef.loadTree(options.root);
     },
     data => (
       typeof data === 'object'
@@ -314,14 +358,14 @@ export function useElementsTree(options: IOptions): IElementsTree {
     get filter(): string {
       return this.userData.filter;
     },
-    get filtering() {
+    get filtering(): boolean {
       return this.filter !== '';
     },
-    isLoading() {
+    isLoading(): boolean {
       return this.loading;
     },
-    isLoaded() {
-      return true;
+    isLoaded(): boolean {
+      return navNodeInfoResource.isLoaded(this.root);
     },
     getNodeState(nodeId: string) {
       return this.state.get(nodeId);
@@ -407,6 +451,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     },
     getNodeChildren(nodeId: string): string[] {
       const node = navNodeInfoResource.get(nodeId);
+      const children = options.getChildren(nodeId) || [];
 
       if (!node) {
         return []; // Maybe filter should accept nodeId, so we be able to apply filters to empty node
@@ -415,7 +460,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       return (options.filters || [])
         .reduce(
           (children, filter) => filter(elementsTree, elementsTree.filter, node, children, this.state),
-          options.getChildren(node.id) || []
+          children
         );
     },
     async setFilter(value: string) {
@@ -443,16 +488,14 @@ export function useElementsTree(options: IOptions): IElementsTree {
       }
     },
     async show(nodeId: string, path: string[]): Promise<void> {
-      const preloaded = await navTreeResource.preloadNodeParents(path, nodeId);
+      const preloaded = await this.loadPath(path, nodeId);
 
-      if (!preloaded) {
+      if (preloaded !== nodeId) {
         notificationService.logError({
           title: 'app_navigationTree_node_not_found',
           message: nodeId,
         });
-      }
-
-      if (preloaded) {
+      } else {
         runInAction(() => {
           for (const parent of path) {
             const state = this.getNodeState(parent);
@@ -469,6 +512,24 @@ export function useElementsTree(options: IOptions): IElementsTree {
           await functionsRef.loadTree(path[0]);
         }
       }
+    },
+    async click(node: NavNode, path: string[], leaf: boolean) {
+      await options.onClick?.(node);
+    },
+    async open(node: NavNode, path: string[], leaf: boolean) {
+      const expandableOrExpanded = this.isNodeExpandable(node.id) || this.isNodeExpanded(node.id);
+      if (!leaf && this.settings?.foldersTree && expandableOrExpanded) {
+        const nodeId = node.id;
+
+        const loaded = await options.loadChildren(node.id, true);
+        if (loaded) {
+          this.setFilter('');
+          options.folderExplorer.open(path, nodeId);
+        }
+      }
+
+      const folder = !leaf && this.settings?.foldersTree || false;
+      await options.onOpen?.(node, folder);
     },
     async expand(node: NavNode, state: boolean) {
       if (!this.isNodeExpandable(node.id)) {
@@ -538,6 +599,26 @@ export function useElementsTree(options: IOptions): IElementsTree {
       }
       await functionsRef.resetSelection();
     },
+    async loadPath(path: string[], lastNode?: string): Promise<string | undefined> {
+      let lastLoadedNode: string | undefined;
+      for (const nodeId of path) {
+        const loaded = await options.loadChildren(nodeId, false);
+
+        if (!loaded) {
+          return lastLoadedNode;
+        }
+        lastLoadedNode = nodeId;
+      }
+
+      if (
+        lastNode !== undefined
+        && lastLoadedNode !== undefined
+        && options.getChildren(lastLoadedNode)?.includes(lastNode)) {
+        return lastNode;
+      }
+
+      return lastLoadedNode;
+    },
     setDnDData(data: IDNDData, dragging: boolean) {
       if (dragging) {
         if (!this.activeDnDData.includes(data)) {
@@ -570,25 +651,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
     userData,
   }, ['isLoading', 'isLoaded']);
 
-  function exitNodeFolder(nodeId: string) {
-    runInAction(() => {
-      const folderExplorer = options.folderExplorer;
-
-      if (folderExplorer.state.fullPath.length === 1 || nodeId === options.baseRoot) {
-        return;
-      }
-
-      const pathIndex = folderExplorer.state.fullPath.indexOf(nodeId);
-
-      if (pathIndex >= 0) {
-        folderExplorer.open(
-          folderExplorer.state.fullPath.slice(0, pathIndex - 1),
-          folderExplorer.state.fullPath[pathIndex - 1]
-        );
-      }
-    });
-  }
-
   useEffect(() => {
     functionsRef.loadTree(options.root);
   }, [options.root]);
@@ -596,6 +658,10 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const loadTreeThreshold = useCallback(throttle(function refreshRoot() {
     functionsRef.loadTree(options.root);
   }, 100), []);
+
+  useResource(useElementsTree, navTreeResource, options.baseRoot, {
+    onData: () => loadTreeThreshold(),
+  });
 
   useResource(useElementsTree, ProjectInfoResource, CachedMapAllKey, {
     onData: () => {
@@ -631,7 +697,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         const children = navTreeResource.get(key);
 
         if (!children) {
-          exitNodeFolder(key);
+          functionsRef.exitNodeFolder(key);
         }
       });
     }],
@@ -657,10 +723,20 @@ export function useElementsTree(options: IOptions): IElementsTree {
         if (node) {
           await elementsTree.expand(node, false);
 
-          exitNodeFolder(key);
+          functionsRef.exitNodeFolder(key);
         }
       });
     }],
+  });
+
+
+  // sync settings
+  const filterDisabled = getComputed(() => !options.settings?.filter && elementsTree.filtering);
+
+  useEffect(() => {
+    if (filterDisabled) {
+      elementsTree.setFilter('');
+    }
   });
 
   return elementsTree;

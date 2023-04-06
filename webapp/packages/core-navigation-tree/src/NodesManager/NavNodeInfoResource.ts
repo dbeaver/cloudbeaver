@@ -14,7 +14,6 @@ import { GraphQLService, CachedMapResource, ResourceKey, NavNodeInfoFragment, Re
 import { getPathParents, MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from './EntityTypes';
-import { NodeManagerUtils } from './NodeManagerUtils';
 
 type NavNodeInfo = NavNodeInfoFragment;
 
@@ -165,10 +164,12 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
   }
 
   protected getDefaultMetadata(key: string, metadata: MetadataMap<string, INodeMetadata>): INodeMetadata {
-    return {
-      ...super.getDefaultMetadata(key, metadata),
-      withDetails: false,
-    };
+    return Object.assign(
+      super.getDefaultMetadata(key, metadata),
+      {
+        withDetails: false,
+      }
+    );
   }
 
   protected dataSet(key: string, value: NavNode): void {

@@ -82,5 +82,5 @@ export function useStyles(
 }
 
 export function joinStyles(...styles: ComponentStyle[]): ComponentStyle {
-  return styles.flat();
+  return styles.flat(2);
 }

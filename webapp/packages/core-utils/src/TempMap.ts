@@ -6,7 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
+
+import { cacheValue, ICachedValueObject } from './cacheValue';
 
 const combine = <T>(a: IterableIterator<T>, b: IterableIterator<T>): IterableIterator<T> => (
   function* () { yield* a; yield* b; }
@@ -28,23 +30,43 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
   private readonly deleted: TKey[];
   private readonly temp: Map<TKey, TValue>;
   private flushTask: NodeJS.Timeout | null;
+  private readonly keysTemp: ICachedValueObject<TKey[]>;
+  private readonly valuesTemp: ICachedValueObject<TValue[]>;
+  private readonly entriesTemp: ICachedValueObject<[TKey, TValue][]>;
 
   constructor(
-    private readonly target: Map<TKey, TValue>
+    private readonly target: Map<TKey, TValue>,
+    private readonly onSync?: () => void,
   ) {
     this.temp = new Map();
     this.flushTask = null;
     this.deleted = [];
+    this.keysTemp = cacheValue();
+    this.entriesTemp = cacheValue();
+    this.valuesTemp = cacheValue();
+
+    makeObservable<this, 'deleted'>(this, {
+      deleted: observable.shallow,
+    });
   }
 
   isDeleted(key: TKey): boolean {
     return this.deleted.includes(key);
   }
 
+  /**
+   * This function will not call clear on target map
+   */
   clear(): void {
+    if (this.flushTask) {
+      clearTimeout(this.flushTask);
+      this.flushTask = null;
+    }
     this.deleted.splice(0, this.deleted.length);
     this.temp.clear();
-    this.target.clear();
+    this.keysTemp.invalidate();
+    this.valuesTemp.invalidate();
+    this.entriesTemp.invalidate();
   }
 
   delete(key: TKey): boolean {
@@ -88,29 +110,39 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
 
   set(key: TKey, value: TValue): this {
     this.temp.set(key, value);
+
+    const indexOfDeleted = this.deleted.indexOf(key);
+    if (indexOfDeleted !== -1) {
+      this.deleted.splice(indexOfDeleted, 1);
+    }
+
     this.scheduleFlush();
     return this;
   }
 
   entries(): IterableIterator<[TKey, TValue]> {
-    return Array.from(this.keys())
-      .map<[TKey, TValue]>(key => [key, this.get(key)!])
+    return this.entriesTemp.value(() => Array.from(this.keys())
+      .map<[TKey, TValue]>(key => [key, this.get(key)!]))
       .values();
   }
 
   keys(): IterableIterator<TKey> {
-    return Array.from(new Set(combine(this.target.keys(), this.temp.keys())))
-      .filter(key => !this.isDeleted(key))
+    return this.keysTemp.value(() => Array.from(new Set(combine(this.target.keys(), this.temp.keys())))
+      .filter(key => !this.isDeleted(key)))
       .values();
   }
 
   values(): IterableIterator<TValue> {
-    return Array.from(this.keys())
-      .map<TValue>(key => this.get(key)!)
+    return this.valuesTemp.value(() => Array.from(this.keys())
+      .map<TValue>(key => this.get(key)!))
       .values();
   }
 
   private scheduleFlush(): void {
+    this.keysTemp.invalidate();
+    this.valuesTemp.invalidate();
+    this.entriesTemp.invalidate();
+
     if (this.flushTask !== null) {
       return;
     }
@@ -124,9 +156,13 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
       for (const [key, value] of this.temp) {
         this.target.set(key, value);
       }
+      this.onSync?.();
       this.temp.clear();
+      this.keysTemp.invalidate();
+      this.valuesTemp.invalidate();
+      this.entriesTemp.invalidate();
 
       this.flushTask = null;
-    }), 0);
+    }), 300);
   }
 }
