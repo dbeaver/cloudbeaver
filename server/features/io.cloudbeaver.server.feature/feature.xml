@@ -45,9 +45,4 @@
     <plugin id="org.jkiss.dbeaver.net.ssh" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="org.jkiss.dbeaver.net.ssh.sshj" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
-    <!-- 3rd party deps -->
-    <plugin id="org.eclipse.jetty.server" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="org.eclipse.jetty.servlet" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="org.eclipse.jetty.util" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-
 </feature>
