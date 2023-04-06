@@ -20,7 +20,6 @@ import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
 import org.jkiss.utils.CommonUtils;
 
@@ -30,12 +29,6 @@ import org.jkiss.utils.CommonUtils;
 public class WSFolderUpdatedEventHandlerImpl extends WSAbstractProjectEventHandler<WSDatasourceFolderEvent> {
 
     private static final Log log = Log.getLog(WSFolderUpdatedEventHandlerImpl.class);
-
-    @NotNull
-    @Override
-    public String getSupportedTopicId() {
-        return WSEventTopic.DATASOURCE_FOLDER.getTopicId();
-    }
 
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSDatasourceFolderEvent event) {
@@ -53,8 +46,8 @@ public class WSFolderUpdatedEventHandlerImpl extends WSAbstractProjectEventHandl
     }
 
     @Override
-    protected boolean validateEvent(@NotNull BaseWebSession activeUserSession, @NotNull WSDatasourceFolderEvent event) {
-        return !CommonUtils.isEmpty(event.getNodePaths()) && super.validateEvent(activeUserSession, event);
+    protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull WSDatasourceFolderEvent event) {
+        return !CommonUtils.isEmpty(event.getNodePaths()) && super.isAcceptableInSession(activeUserSession, event);
     }
 }
 

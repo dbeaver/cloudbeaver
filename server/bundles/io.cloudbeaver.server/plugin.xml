@@ -45,13 +45,27 @@
     </extension>
 
     <extension point="org.jkiss.dbeaver.ws.event.handler">
-         <eventHandler class="io.cloudbeaver.server.events.WSDefaultEventHandler"/>
-        <eventHandler class="io.cloudbeaver.server.events.WSDataSourceUpdatedEventHandlerImpl"/>
-        <eventHandler class="io.cloudbeaver.server.events.WSFolderUpdatedEventHandlerImpl"/>
-        <eventHandler class="io.cloudbeaver.server.events.WSRmResourceUpdatedEventHandlerImpl"/>
-        <eventHandler class="io.cloudbeaver.server.events.WSPermissionUpdatedEventHandler"/>
-        <eventHandler class="io.cloudbeaver.server.events.WSProjectUpdatedEventHandler"/>
-        <eventHandler class="io.cloudbeaver.server.events.WSUserSecretEventHandlerImpl"/>
+        <eventHandler class="io.cloudbeaver.server.events.WSDefaultEventHandler">
+            <topic id="cb_config"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSDataSourceUpdatedEventHandlerImpl">
+            <topic id="cb_datasource"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSFolderUpdatedEventHandlerImpl">
+            <topic id="cb_datasource_folder"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSRmResourceUpdatedEventHandlerImpl">
+            <topic id="cb_scripts"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSPermissionUpdatedEventHandler">
+            <topic id="cb_permissions"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSProjectUpdatedEventHandler">
+            <topic id="cb_projects"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSUserSecretEventHandlerImpl">
+            <topic id="cb_user_secret"/>
+        </eventHandler>
     </extension>
 
 </plugin>

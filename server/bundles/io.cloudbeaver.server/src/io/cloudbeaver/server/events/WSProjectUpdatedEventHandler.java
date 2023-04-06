@@ -21,19 +21,12 @@ import io.cloudbeaver.model.session.BaseWebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
 
 public class WSProjectUpdatedEventHandler extends WSAbstractProjectEventHandler<WSProjectUpdateEvent> {
 
     private static final Log log = Log.getLog(WSProjectUpdatedEventHandler.class);
-
-    @NotNull
-    @Override
-    public String getSupportedTopicId() {
-        return WSEventTopic.PROJECTS.getTopicId();
-    }
 
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSProjectUpdateEvent event) {
@@ -54,8 +47,9 @@ public class WSProjectUpdatedEventHandler extends WSAbstractProjectEventHandler<
     }
 
     @Override
-    protected boolean validateEvent(@NotNull BaseWebSession activeUserSession, @NotNull WSProjectUpdateEvent event) {
-        return event.getId().equals(WSEventType.RM_PROJECT_REMOVED.getEventId()) ||
-            activeUserSession.getUserContext().hasPermission(DBWConstants.PERMISSION_ADMIN);
+    protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull WSProjectUpdateEvent event) {
+        return !WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId()) &&
+            (event.getId().equals(WSEventType.RM_PROJECT_REMOVED.getEventId()) ||
+            activeUserSession.getUserContext().hasPermission(DBWConstants.PERMISSION_ADMIN));
     }
 }

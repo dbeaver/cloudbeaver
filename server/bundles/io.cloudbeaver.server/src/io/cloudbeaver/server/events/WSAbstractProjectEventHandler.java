@@ -18,7 +18,6 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.model.session.BaseWebSession;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSProjectEvent;
 
@@ -27,15 +26,10 @@ import org.jkiss.dbeaver.model.websocket.event.WSProjectEvent;
  */
 public abstract class WSAbstractProjectEventHandler<EVENT extends WSProjectEvent> extends WSDefaultEventHandler<EVENT> {
 
-    @NotNull
     @Override
-    public String getSupportedTopicId() {
-        return WSEventTopic.PROJECTS.getTopicId();
-    }
-
-    @Override
-    protected boolean validateEvent(@NotNull BaseWebSession activeUserSession, @NotNull EVENT event) {
-        return activeUserSession.isProjectAccessible(event.getProjectId()) &&
+    protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull EVENT event) {
+        return super.isAcceptableInSession(activeUserSession, event) &&
+            activeUserSession.isProjectAccessible(event.getProjectId()) &&
             WSEventType.valueById(event.getId()) != null;
     }
 }

@@ -18,16 +18,13 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 import org.jkiss.dbeaver.model.websocket.event.WSUserSecretEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -36,12 +33,6 @@ import java.util.List;
 public class WSUserSecretEventHandlerImpl extends WSDefaultEventHandler<WSUserSecretEvent> {
 
     private static final Log log = Log.getLog(WSUserSecretEventHandlerImpl.class);
-
-    @NotNull
-    @Override
-    public String getSupportedTopicId() {
-        return WSEventTopic.USER_SECRET.getTopicId();
-    }
 
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSUserSecretEvent event) {

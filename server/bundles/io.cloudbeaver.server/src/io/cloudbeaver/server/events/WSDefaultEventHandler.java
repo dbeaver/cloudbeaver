@@ -25,16 +25,18 @@ import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 
 import java.util.Collection;
 
-public abstract class WSDefaultEventHandler<EVENT extends WSEvent> implements WSEventHandler<EVENT> {
+public class WSDefaultEventHandler<EVENT extends WSEvent> implements WSEventHandler<EVENT> {
 
     private static final Log log = Log.getLog(WSDefaultEventHandler.class);
 
     @Override
     public void handleEvent(@NotNull EVENT event) {
+        log.debug(event.getTopicId() + " event handled");
         Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
         for (var activeUserSession : allSessions) {
-            if (!validateEvent(activeUserSession, event)) {
-                log.debug(event.getTopicId() + " event '" + event.getId() + "' is not valid");
+            if (!isAcceptableInSession(activeUserSession, event)) {
+                log.debug("Cannot handle " + event.getTopicId() + " event '" + event.getId() +
+                    "' in session " + activeUserSession.getSessionId());
                 continue;
             }
             log.debug(event.getTopicId() + " event '" + event.getId() + "' handled");
@@ -46,7 +48,7 @@ public abstract class WSDefaultEventHandler<EVENT extends WSEvent> implements WS
         activeUserSession.addSessionEvent(event);
     }
 
-    protected boolean validateEvent(@NotNull BaseWebSession activeUserSession, @NotNull EVENT event) {
+    protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull EVENT event) {
         return !WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId()); // skip events from current session
     }
 }

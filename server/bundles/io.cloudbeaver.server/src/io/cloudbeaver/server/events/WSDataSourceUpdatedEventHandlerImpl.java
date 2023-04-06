@@ -32,12 +32,6 @@ public class WSDataSourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
 
     public static final Log log = Log.getLog(WSDataSourceUpdatedEventHandlerImpl.class);
 
-    @NotNull
-    @Override
-    public String getSupportedTopicId() {
-        return WSEventTopic.DATASOURCE.getTopicId();
-    }
-
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSDataSourceEvent event) {
         var sendEvent = true;
