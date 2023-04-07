@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AdministrationItemContentProps, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { Loader, useResource, ToolsAction, ToolsPanel, useTranslate, useStyles, Translate, Group, Container, ColoredContainer, BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
+import { Loader, useResource, ToolsAction, ToolsPanel, useTranslate, useStyles, Translate, Group, ColoredContainer, BASE_CONTAINERS_STYLES, Container, GroupTitle, GroupItem } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -27,37 +27,12 @@ const loaderStyle = css`
 `;
 
 const styles = css`
-  message-box {
-    padding: 16px 24px;
-  }
-
-  actions {
-    padding: 0 12px;
-    padding-right: 24px;
-  }
-
-  p {
-    line-height: 2;
+  GroupItem {
     white-space: pre-wrap;
-  }
-
-  [|table] {
-    min-height: 140px; /* loader overlay size */
   }
 
   ToolsPanel {
     border-bottom: none;
-  }
-
-  content {
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-    gap: 24px;
-  }
-
-  Group {
-    padding: 0;
   }
 `;
 
@@ -78,67 +53,61 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
   useResource(ConnectionsAdministration, DBDriverResource, CachedMapAllKey);
 
   return styled(style)(
-    <>
-      <ColoredContainer wrap overflow parent gap>
-        <Container gap>
+    <ColoredContainer vertical wrap parent gap>
+      <Group box keepSize>
+        <ToolsPanel>
+          <ToolsAction
+            title={translate('connections_administration_tools_add_tooltip')}
+            icon='add'
+            viewBox="0 0 24 24"
+            disabled={!!sub || controller.isProcessing}
+            onClick={service.create}
+          >
+            {translate('ui_add')}
+          </ToolsAction>
+          <ToolsAction
+            title={translate('connections_administration_tools_refresh_tooltip')}
+            icon="refresh"
+            viewBox="0 0 24 24"
+            disabled={controller.isProcessing}
+            onClick={controller.update}
+          >
+            {translate('ui_refresh')}
+          </ToolsAction>
+          <ToolsAction
+            title={translate('connections_administration_tools_delete_tooltip')}
+            icon="trash"
+            viewBox="0 0 24 24"
+            disabled={!controller.itemsSelected || controller.isProcessing}
+            onClick={controller.delete}
+          >
+            {translate('ui_delete')}
+          </ToolsAction>
+        </ToolsPanel>
+      </Group>
+      <Container overflow gap>
+        {configurationWizard && (
+          <Group gap>
+            <GroupTitle>{translate('connections_administration_configuration_wizard_title')}</GroupTitle>
+            <GroupItem>{translate('connections_administration_configuration_wizard_message')}</GroupItem>
+          </Group>
+        )}
+        {sub && (
           <Group box>
-            <ToolsPanel>
-              <ToolsAction
-                title={translate('connections_administration_tools_add_tooltip')}
-                icon='add'
-                viewBox="0 0 24 24"
-                disabled={!!sub || controller.isProcessing}
-                onClick={service.create}
-              >
-                {translate('ui_add')}
-              </ToolsAction>
-              <ToolsAction
-                title={translate('connections_administration_tools_refresh_tooltip')}
-                icon="refresh"
-                viewBox="0 0 24 24"
-                disabled={controller.isProcessing}
-                onClick={controller.update}
-              >
-                {translate('ui_refresh')}
-              </ToolsAction>
-              <ToolsAction
-                title={translate('connections_administration_tools_delete_tooltip')}
-                icon="trash"
-                viewBox="0 0 24 24"
-                disabled={!controller.itemsSelected || controller.isProcessing}
-                onClick={controller.delete}
-              >
-                {translate('ui_delete')}
-              </ToolsAction>
-            </ToolsPanel>
+            <CreateConnection method={param} configurationWizard={configurationWizard} />
           </Group>
-        </Container>
-        <content>
-          {configurationWizard && (
-            <Group>
-              <message-box>
-                <h3><Translate token='connections_administration_configuration_wizard_title' /></h3>
-                <p><Translate token='connections_administration_configuration_wizard_message' /></p>
-              </message-box>
-            </Group>
-          )}
-          {sub && (
-            <Group>
-              <CreateConnection method={param} configurationWizard={configurationWizard} />
-            </Group>
-          )}
-          <Group>
-            <Loader style={loaderStyle} loading={controller.isProcessing} overlay>
-              <ConnectionsTable
-                keys={controller.keys}
-                connections={controller.connections}
-                selectedItems={controller.selectedItems}
-                expandedItems={controller.expandedItems}
-              />
-            </Loader>
-          </Group>
-        </content>
-      </ColoredContainer>
-    </>
+        )}
+        <Group box='no-overflow'>
+          <Loader style={loaderStyle} loading={controller.isProcessing} overlay>
+            <ConnectionsTable
+              keys={controller.keys}
+              connections={controller.connections}
+              selectedItems={controller.selectedItems}
+              expandedItems={controller.expandedItems}
+            />
+          </Loader>
+        </Group>
+      </Container>
+    </ColoredContainer>
   );
 });

@@ -21,16 +21,6 @@ import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { Connection } from './Connection';
 
-const styles = css`
-    Container {
-      overflow: hidden;
-    }
-    table-container {
-      overflow: auto;
-      max-height: calc(100vh - 152px); /* size for height overflow */
-    }
-  `;
-
 interface Props {
   keys: IConnectionInfoParams[];
   connections: DatabaseConnection[];
@@ -55,7 +45,7 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
     return displayProjects ? (projectsLoader.resource.get(projectId)?.name ?? null) : undefined;
   }
 
-  return styled(styles, BASE_CONTAINERS_STYLES)(
+  return styled(BASE_CONTAINERS_STYLES)(
     <table-container>
       <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
         <TableHeader fixed>
