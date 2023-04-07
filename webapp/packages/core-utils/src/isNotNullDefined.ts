@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function filterUndefined<T>(obj: any): obj is T {
+export function isNotNullDefined<T>(obj: T | undefined | null): obj is T {
   return obj !== null && obj !== undefined;
 }

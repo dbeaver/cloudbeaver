@@ -14,7 +14,7 @@ export * from './cacheValue';
 export * from './clsx';
 export * from './copyToClipboard';
 export * from './declensionOfNumber';
-export * from './filterUndefined';
+export * from './isNotNullDefined';
 export * from './flat';
 export * from './generateFileName';
 export * from './getMIME';
