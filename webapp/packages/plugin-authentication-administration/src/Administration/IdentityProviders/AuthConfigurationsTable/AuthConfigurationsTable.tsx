@@ -37,7 +37,7 @@ export const AuthConfigurationsTable = observer<Props>(function AuthConfiguratio
   return styled(useStyles(styles))(
     <table-container>
       <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
-        <TableHeader>
+        <TableHeader fixed>
           <TableColumnHeader min flex centerContent>
             <TableSelect />
           </TableColumnHeader>

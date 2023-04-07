@@ -58,7 +58,7 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
   return styled(styles, BASE_CONTAINERS_STYLES)(
     <table-container>
       <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
-        <TableHeader>
+        <TableHeader fixed>
           <TableColumnHeader min flex centerContent>
             <TableSelect />
           </TableColumnHeader>

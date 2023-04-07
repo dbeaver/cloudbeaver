@@ -41,7 +41,7 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams, state, se
   return styled(useStyles(styles))(
     <Loader state={state} style={loaderStyle} overlay>
       <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
-        <TableHeader>
+        <TableHeader fixed>
           <TableColumnHeader min flex centerContent>
             <TableSelect />
           </TableColumnHeader>
