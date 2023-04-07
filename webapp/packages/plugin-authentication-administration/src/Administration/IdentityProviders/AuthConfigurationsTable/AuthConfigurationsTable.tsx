@@ -9,16 +9,20 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useTranslate, useStyles, Container, Group } from '@cloudbeaver/core-blocks';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 
 import { AuthConfiguration } from './AuthConfiguration';
 
 const styles = css`
-  Table {
-    width: 100%;
-  }
-`;
+    Container {
+      overflow: hidden;
+    }
+    table-container {
+      overflow: auto;
+      max-height: calc(100vh - 152px); /* size for height overflow */
+    }
+  `;
 
 interface Props {
   configurations: AdminAuthProviderConfiguration[];
@@ -31,24 +35,26 @@ export const AuthConfigurationsTable = observer<Props>(function AuthConfiguratio
   const keys = configurations.map(configuration => configuration.id);
 
   return styled(useStyles(styles))(
-    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
-      <TableHeader>
-        <TableColumnHeader min flex centerContent>
-          <TableSelect />
-        </TableColumnHeader>
-        <TableColumnHeader min />
-        <TableColumnHeader min />
-        <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_name')}</TableColumnHeader>
-        <TableColumnHeader>{translate('administration_identity_providers_provider')}</TableColumnHeader>
-        <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_description')}</TableColumnHeader>
-        <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_disabled')}</TableColumnHeader>
-        <TableColumnHeader />
-      </TableHeader>
-      <TableBody>
-        {configurations.map(configuration => (
-          <AuthConfiguration key={configuration.id} configuration={configuration} />
-        ))}
-      </TableBody>
-    </Table>
+    <table-container>
+      <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
+        <TableHeader>
+          <TableColumnHeader min flex centerContent>
+            <TableSelect />
+          </TableColumnHeader>
+          <TableColumnHeader min />
+          <TableColumnHeader min />
+          <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_name')}</TableColumnHeader>
+          <TableColumnHeader>{translate('administration_identity_providers_provider')}</TableColumnHeader>
+          <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_description')}</TableColumnHeader>
+          <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_disabled')}</TableColumnHeader>
+          <TableColumnHeader />
+        </TableHeader>
+        <TableBody>
+          {configurations.map(configuration => (
+            <AuthConfiguration key={configuration.id} configuration={configuration} />
+          ))}
+        </TableBody>
+      </Table>
+    </table-container>
   );
 });

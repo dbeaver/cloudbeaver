@@ -10,7 +10,9 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useTranslate, getComputed, useResource
+  Table, TableHeader, BASE_CONTAINERS_STYLES,
+  TableColumnHeader, TableBody, TableSelect,
+  useTranslate, getComputed, useResource
 } from '@cloudbeaver/core-blocks';
 import { DatabaseConnection, IConnectionInfoParams, serializeConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -20,12 +22,12 @@ import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { Connection } from './Connection';
 
 const styles = css`
-    Table {
-      width: 100%;
+    Container {
+      overflow: hidden;
     }
-    TableItemSeparator {
-      composes: theme-background-secondary from global;
-      text-align: center;
+    table-container {
+      overflow: auto;
+      max-height: calc(100vh - 152px); /* size for height overflow */
     }
   `;
 
@@ -53,30 +55,32 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
     return displayProjects ? (projectsLoader.resource.get(projectId)?.name ?? null) : undefined;
   }
 
-  return styled(styles)(
-    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
-      <TableHeader>
-        <TableColumnHeader min flex centerContent>
-          <TableSelect />
-        </TableColumnHeader>
-        <TableColumnHeader min />
-        <TableColumnHeader min />
-        <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
-        <TableColumnHeader>{translate('connections_connection_address')}</TableColumnHeader>
-        <TableColumnHeader>{translate('connections_connection_folder')}</TableColumnHeader>
-        {displayProjects && <TableColumnHeader>{translate('connections_connection_project')}</TableColumnHeader>}
-        <TableColumnHeader />
-      </TableHeader>
-      <TableBody>
-        {connections.map((connection, i) => (
-          <Connection
-            key={serializeConnectionParam(keys[i])}
-            connectionKey={keys[i]}
-            connection={connection}
-            projectName={getProjectName(connection.projectId)}
-          />
-        ))}
-      </TableBody>
-    </Table>
+  return styled(styles, BASE_CONTAINERS_STYLES)(
+    <table-container>
+      <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
+        <TableHeader>
+          <TableColumnHeader min flex centerContent>
+            <TableSelect />
+          </TableColumnHeader>
+          <TableColumnHeader min />
+          <TableColumnHeader min />
+          <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
+          <TableColumnHeader>{translate('connections_connection_address')}</TableColumnHeader>
+          <TableColumnHeader>{translate('connections_connection_folder')}</TableColumnHeader>
+          {displayProjects && <TableColumnHeader>{translate('connections_connection_project')}</TableColumnHeader>}
+          <TableColumnHeader />
+        </TableHeader>
+        <TableBody>
+          {connections.map((connection, i) => (
+            <Connection
+              key={serializeConnectionParam(keys[i])}
+              connectionKey={keys[i]}
+              connection={connection}
+              projectName={getProjectName(connection.projectId)}
+            />
+          ))}
+        </TableBody>
+      </Table>
+    </table-container>
   );
 });
