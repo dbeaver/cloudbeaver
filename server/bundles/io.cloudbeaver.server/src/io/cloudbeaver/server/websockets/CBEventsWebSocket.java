@@ -29,8 +29,8 @@ import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSSocketConnectedEvent;
 import org.jkiss.dbeaver.model.websocket.event.client.WSUpdateActiveProjectsClientEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.WSSocketConnectedEvent;
 
 import java.io.IOException;
 
