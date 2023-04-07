@@ -105,7 +105,7 @@ type WSSocketConnectedEvent implements CBServerEvent {
 type WSSessionStateEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
-    remainingTime: String
+    remainingTime: Int!
     isValid: Boolean
 }
 

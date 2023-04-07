@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -48,14 +49,14 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @NotNull
     protected final WebUserContext userContext;
     @NotNull
-    protected final WebApplication application;
+    protected final WebAuthApplication application;
     protected volatile long lastAccessTime;
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new CopyOnWriteArrayList<>();
     private WebSessionEventsFilter eventsFilter = new WebSessionEventsFilter();
     private final WebSessionWorkspace workspace;
 
-    public BaseWebSession(@NotNull String id, @NotNull WebApplication application) throws DBException {
+    public BaseWebSession(@NotNull String id, @NotNull WebAuthApplication application) throws DBException {
         this.id = id;
         this.application = application;
         this.createTime = System.currentTimeMillis();
@@ -188,5 +189,15 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     public void removeSessionProject(@Nullable String projectId) throws DBException {
         userContext.getAccessibleProjectIds().remove(projectId);
+    }
+
+    @Property
+    public boolean isValid() {
+        return getRemainingTime() > 0;
+    }
+
+    @Property
+    public long getRemainingTime() {
+        return application.getMaxSessionIdleTime() + lastAccessTime - System.currentTimeMillis();
     }
 }

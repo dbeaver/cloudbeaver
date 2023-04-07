@@ -26,7 +26,7 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
-import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
@@ -71,14 +71,14 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Web session.
@@ -97,7 +97,6 @@ public class WebSession extends BaseWebSession
 
     private final AtomicInteger taskCount = new AtomicInteger();
 
-    private long maxSessionIdleTime;
     private String lastRemoteAddr;
     private String lastRemoteUserAgent;
 
@@ -121,15 +120,13 @@ public class WebSession extends BaseWebSession
 
     public WebSession(
         @NotNull HttpSession httpSession,
-        @NotNull WebApplication application,
-        @NotNull Map<String, DBWSessionHandler> sessionHandlers,
-        long maxSessionIdleTime
+        @NotNull WebAuthApplication application,
+        @NotNull Map<String, DBWSessionHandler> sessionHandlers
     ) throws DBException {
         super(httpSession.getId(), application);
         this.lastAccessTime = this.createTime;
         setLocale(CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale));
         this.sessionHandlers = sessionHandlers;
-        this.maxSessionIdleTime = maxSessionIdleTime;
     }
 
     @Override
@@ -474,14 +471,12 @@ public class WebSession extends BaseWebSession
 
     public synchronized void updateInfo(
         HttpServletRequest request,
-        HttpServletResponse response,
-        long maxSessionIdleTime
+        HttpServletResponse response
     ) throws DBWebException {
         touchSession();
         HttpSession httpSession = request.getSession();
         this.lastRemoteAddr = request.getRemoteAddr();
         this.lastRemoteUserAgent = request.getHeader("User-Agent");
-        this.maxSessionIdleTime = maxSessionIdleTime;
         this.cacheExpired = false;
         if (!httpSession.isNew()) {
             try {
@@ -986,21 +981,6 @@ public class WebSession extends BaseWebSession
             removeConnection(new WebConnectionInfo(this, c));
         }
     }
-
-    @Property
-    public boolean isValid() {
-        return getSessionActiveTimeLeft() > 0;
-    }
-
-    @Property
-    public long getRemainingTime() {
-        return getSessionActiveTimeLeft();
-    }
-
-    private long getSessionActiveTimeLeft() {
-        return maxSessionIdleTime + lastAccessTime - System.currentTimeMillis();
-    }
-
 
     private class SessionProgressMonitor extends BaseProgressMonitor {
         @Override
