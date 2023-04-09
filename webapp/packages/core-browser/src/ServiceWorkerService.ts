@@ -17,12 +17,12 @@ export class ServiceWorkerService {
   readonly onUpdate: IExecutor;
 
   private readonly workerURL: string;
-  private readonly workbox: Workbox;
+  private workbox: Workbox | null;
 
   constructor() {
     this.onUpdate = new Executor();
-    this.workerURL = GlobalConstants.absoluteRootUrl('/service-worker.js');
-    this.workbox = new Workbox(this.workerURL);
+    this.workerURL = GlobalConstants.absoluteRootUrl('service-worker.js');
+    this.workbox = null;
   }
 
   register(): void | Promise<void> {
@@ -33,7 +33,8 @@ export class ServiceWorkerService {
           .then(registration =>  registration?.unregister())
           .catch();
       } else {
-        this.registerSkipWaitingPrompt();
+        this.workbox = new Workbox(this.workerURL);
+        this.registerSkipWaitingPrompt(this.workbox);
         this.workbox.register();
       }
     }
@@ -46,8 +47,8 @@ export class ServiceWorkerService {
   }
 
 
-  private registerSkipWaitingPrompt(): void {
-    this.workbox.addEventListener('controlling', async () => {
+  private registerSkipWaitingPrompt(workbox: Workbox): void {
+    workbox.addEventListener('controlling', async () => {
       const updateAccepted = await this.requestUpdate();
 
       if (updateAccepted) {
@@ -55,8 +56,8 @@ export class ServiceWorkerService {
       }
     });
 
-    this.workbox.addEventListener('waiting', event => {
-      this.workbox.messageSkipWaiting();
+    workbox.addEventListener('waiting', event => {
+      workbox.messageSkipWaiting();
     });
   }
 }
