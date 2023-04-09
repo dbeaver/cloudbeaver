@@ -1,6 +1,10 @@
 const fs = require('fs');
-const { resolve } = require('path');
+const { resolve, relative } = require('path');
 const paths = [resolve('.')];
+
+function getServiceWorkerSource() {
+  return relative(__dirname, require.resolve('@cloudbeaver/core-browser/src/service-worker.ts'));
+}
 
 function withTimestamp(version) {
   return `${version}.${new Date().toISOString().substr(0, 19).replace('T', '').split(/[-:]+/).join('').slice(0, -2)}`;
@@ -43,6 +47,7 @@ function getAssets(package, to) {
 }
 
 module.exports = {
+  getServiceWorkerSource,
   withTimestamp,
   getAssets,
 };

@@ -100,7 +100,6 @@ export default [
   ['app_root_session_expire_warning_button', '我在'],
   ['app_root_session_expired_title', '会话已过期'],
   ['app_root_session_expired_message', '会话已过期。您想重新加载吗？'],
-  ['app_root_session_expired_reload', '重新加载'],
   ['app_root_quota_exceeded', '超出配额'],
   ['core_eventsLog_dbeaverErrorDetails', '错误详情'],
 ];

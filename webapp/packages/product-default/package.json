@@ -28,6 +28,7 @@
     "@cloudbeaver/plugin-administration": "~0.1.0",
     "@cloudbeaver/plugin-authentication": "~0.1.0",
     "@cloudbeaver/plugin-authentication-administration": "~0.1.0",
+    "@cloudbeaver/plugin-browser": "~0.1.0",
     "@cloudbeaver/plugin-connection-custom": "~0.1.0",
     "@cloudbeaver/plugin-connection-search": "~0.1.0",
     "@cloudbeaver/plugin-connection-template": "~0.1.0",

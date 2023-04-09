@@ -5,6 +5,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 import administration from '@cloudbeaver/plugin-administration';
 import authentication from '@cloudbeaver/plugin-authentication';
 import authenticationAdministration from '@cloudbeaver/plugin-authentication-administration';
+import { browserPlugin } from '@cloudbeaver/plugin-browser';
 import connectionCustom from '@cloudbeaver/plugin-connection-custom';
 import connectionSearch from '@cloudbeaver/plugin-connection-search';
 import connectionTemplate from '@cloudbeaver/plugin-connection-template';
@@ -87,6 +88,7 @@ const PLUGINS: PluginManifest[] = [
   root,
   toolsPanel,
   projects,
+  browserPlugin,
 ];
 
 bootstrap(PLUGINS);
