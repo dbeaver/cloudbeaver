@@ -8,8 +8,11 @@
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 
+import type { ISqlDataSourceHistoryState } from '../SqlDataSourceHistory/ISqlDataSourceHistoryState';
+
 export interface ILocalStorageSqlDataSourceState {
   script: string;
   name?: string;
   executionContext?: IConnectionExecutionContextInfo;
+  history: ISqlDataSourceHistoryState;
 }
