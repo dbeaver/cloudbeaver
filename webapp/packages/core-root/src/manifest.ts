@@ -21,11 +21,13 @@ import { ServerSettingsService } from './ServerSettingsService';
 import { SessionActionService } from './SessionActionService';
 import { SessionDataResource } from './SessionDataResource';
 import { SessionEventSource } from './SessionEventSource';
+import { SessionExpireEventService } from './SessionExpireEventService';
 import { SessionExpireService } from './SessionExpireService';
 import { SessionPermissionsResource } from './SessionPermissionsResource';
 import { SessionResource } from './SessionResource';
 import { SessionService } from './SessionService';
 import { SessionSettingsService } from './SessionSettingsService';
+import { SessionStateService } from './SessionStateService';
 import { WindowEventsService } from './WindowEventsService';
 
 
@@ -45,6 +47,8 @@ export const manifest: PluginManifest = {
     SessionActionService,
     SessionDataResource,
     SessionExpireService,
+    SessionExpireEventService,
+    SessionStateService,
     ServerNodeService,
     SessionResource,
     SessionService,
