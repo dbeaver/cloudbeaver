@@ -13,9 +13,15 @@ import type { IDatabaseDataModel, IDatabaseResultSet } from '@cloudbeaver/plugin
 
 import type { IDataQueryOptions } from '../QueryDataSource';
 import type { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
+import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory';
 
 export interface ISqlDataSourceKey {
   readonly key: string;
+}
+
+export interface ISetScriptData {
+  script: string;
+  source?: string;
 }
 
 export interface ISqlDataSource extends ILoadableState {
@@ -29,9 +35,10 @@ export interface ISqlDataSource extends ILoadableState {
   readonly executionContext?: IConnectionExecutionContextInfo;
   readonly message?: string;
   readonly onUpdate: ISyncExecutor;
-  readonly onSetScript: ISyncExecutor<string>;
+  readonly onSetScript: ISyncExecutor<ISetScriptData>;
   readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>[]>;
   readonly features: ESqlDataSourceFeatures[];
+  readonly history: ISqlDataSourceHistory;
 
   isReadonly(): boolean;
   isEditing(): boolean;
@@ -42,7 +49,7 @@ export interface ISqlDataSource extends ILoadableState {
   canRename(name: string | null): boolean;
   setName(name: string | null): void;
   setProject(projectId: string | null): void;
-  setScript(script: string): void;
+  setScript(script: string, source?: string): void;
   setEditing(state: boolean): void;
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void;
   load(): Promise<void> | void;

@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function filterUndefined<T>(obj: any): obj is T {
-  return obj !== null && obj !== undefined;
+export interface ISqlDataSourceHistoryData {
+  value: string;
+  source?: string;
 }
