@@ -1,0 +1,26 @@
+{
+  "name": "@cloudbeaver/plugin-codemirror6",
+  "sideEffects": false,
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "prebuild": "rimraf --glob lib/*",
+    "build": "webpack --config ../../configs/webpack.plugin.config.js",
+    "postbuild": "tsc",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
+  },
+  "dependencies": {
+    "@cloudbeaver/core-blocks": "~0.1.0",
+    "@codemirror/view": "^6.1.1",
+    "@codemirror/state": "^6.1.1",
+    "@codemirror/commands": "^6.1.1",
+    "codemirror6": "npm:codemirror@6.0.0"
+  },
+  "peerDependencies": {
+  }
+}
