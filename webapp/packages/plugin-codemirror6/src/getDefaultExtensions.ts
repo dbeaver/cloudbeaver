@@ -8,7 +8,9 @@
 
 import { EditorView } from 'codemirror6';
 
+import { history } from '@codemirror/commands';
 import { foldGutter, indentOnInput, syntaxHighlighting, defaultHighlightStyle, bracketMatching } from '@codemirror/language';
+import { highlightSelectionMatches } from '@codemirror/search';
 import { EditorState, Extension } from '@codemirror/state';
 import {
   lineNumbers, highlightActiveLineGutter, highlightSpecialChars, dropCursor,
@@ -25,6 +27,7 @@ export function getDefaultExtensions(options: IDefaultExtensionsOptions): Extens
     EditorView.lineWrapping, lineNumbers(), highlightSpecialChars(), foldGutter(), indentOnInput(),
     syntaxHighlighting(defaultHighlightStyle, { fallback: true }), bracketMatching(),
     highlightActiveLineGutter(), dropCursor(), rectangularSelection(), crosshairCursor(), highlightActiveLine(),
+    history(), highlightSelectionMatches(),
   ];
 
   if (options.editable === false) {

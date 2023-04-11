@@ -7,20 +7,28 @@
  */
 
 import { EditorView } from 'codemirror6';
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useState } from 'react';
 
-import { EditorState } from '@codemirror/state';
+import { EditorState, Annotation } from '@codemirror/state';
+import type { ViewUpdate } from '@codemirror/view';
 
 import { getDefaultExtensions } from './getDefaultExtensions';
+import type { IEditorRef } from './IEditorRef';
 import type { IReactCodeMirrorProps } from './IReactCodemirrorProps';
 
-export const ReactCodemirror: React.FC<IReactCodeMirrorProps> = function ReactCodemirror({
+const External = Annotation.define<boolean>();
+
+export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(function ReactCodemirror({
   value,
   extensions = [],
   readonly,
   editable,
-}) {
-  const [ref, setRef] = useState<HTMLDivElement | null>(null);
+  autoFocus,
+  onChange,
+}, ref) {
+  const [container, setContainer] = useState<HTMLDivElement | null>(null);
+  const [view, setView] = useState<EditorView | null>(null);
+  const [state, setState] = useState<EditorState | null>(null);
 
   const defaultExtensions = getDefaultExtensions({
     readonly,
@@ -34,27 +42,62 @@ export const ReactCodemirror: React.FC<IReactCodeMirrorProps> = function ReactCo
     },
   });
 
+  const updateListener = EditorView.updateListener.of((update: ViewUpdate) => {
+    const doc = update.state.doc;
+    const value = doc.toString();
+
+    onChange?.(value, update);
+  });
+
   useEffect(() => {
-    let view: EditorView | undefined;
-
-    if (ref) {
-      const state = EditorState.create({
+    if (container) {
+      const es = EditorState.create({
         doc: value,
-        extensions: [...defaultExtensions, defaultTheme, ...extensions],
+        extensions: [...defaultExtensions, defaultTheme, updateListener, ...extensions],
       });
 
-      view = new EditorView({
-        parent: ref,
-        state,
+      const ev = new EditorView({
+        parent: container,
+        state: es,
       });
+
+      setState(es);
+      setView(ev);
+
+      return () => {
+        ev.destroy();
+        setState(null);
+        setView(null);
+      };
     }
 
-    return () => {
-      view?.destroy();
-    };
-  }, [ref]);
+    return () => { };
+  }, [container]);
+
+  useEffect(() => {
+    const currentValue = view?.state.doc.toString() ?? '';
+
+    if (view && value !== currentValue) {
+      view.dispatch({
+        changes: { from: 0, to: currentValue.length, insert: value },
+        annotations: [External.of(true)],
+      });
+    }
+  }, [value, view]);
+
+  useLayoutEffect(() => {
+    if (autoFocus && view) {
+      view.focus();
+    }
+  }, [autoFocus, view]);
+
+  useImperativeHandle(ref, () => ({
+    container,
+    view,
+    state,
+  }), [container, view, state]);
 
   return (
-    <div ref={setRef} className='ReactCodemirror' />
+    <div ref={setContainer} className='ReactCodemirror' />
   );
-};
+});
