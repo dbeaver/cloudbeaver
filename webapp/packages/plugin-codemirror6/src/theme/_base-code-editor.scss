@@ -6,11 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { Extension } from '@codemirror/state';
-
-export interface IReactCodeMirrorProps {
-  value: string;
-  extensions?: Extension[];
-  readonly?: boolean;
-  editable?: boolean;
+@mixin base-code-editor() {
+  .editor, .ReactCodemirror {
+    width: 100%;
+    height: 100%;
+  }
 }

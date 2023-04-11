@@ -7,16 +7,15 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import styled from 'reshadow';
 
 import type { IEditorProps } from './IEditorProps';
 import { ReactCodemirror } from './ReactCodemirror';
+import { EDITOR_BASE_STYLES } from './theme';
 
-export const Editor: React.FC<IEditorProps> = observer(function Editor({
-  className,
-  ...props
-}) {
-  return (
-    <wrapper className={className}>
+export const Editor: React.FC<IEditorProps> = observer(function Editor(props) {
+  return styled(EDITOR_BASE_STYLES)(
+    <wrapper className='editor'>
       <ReactCodemirror {...props} />
     </wrapper>
   );

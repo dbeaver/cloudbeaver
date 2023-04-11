@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface ISQLCodeEditorProps {
-  value: string;
-}
+import type { IEditorProps } from '@cloudbeaver/plugin-codemirror6';
+
+export interface ISQLCodeEditorProps extends IEditorProps { }

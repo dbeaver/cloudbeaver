@@ -9,6 +9,7 @@
 import { observer } from 'mobx-react-lite';
 
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
+import { LANG_EXT } from '@cloudbeaver/plugin-codemirror6';
 import type { ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
 
 import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader';
@@ -19,6 +20,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   return (
     <SQLCodeEditorLoader
       value={data.value}
+      extensions={[LANG_EXT.sql()]}
     />
   );
 });

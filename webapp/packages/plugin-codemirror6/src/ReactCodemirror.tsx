@@ -9,20 +9,43 @@
 import { EditorView } from 'codemirror6';
 import { useEffect, useState } from 'react';
 
+import { EditorState } from '@codemirror/state';
+
+import { getDefaultExtensions } from './getDefaultExtensions';
 import type { IReactCodeMirrorProps } from './IReactCodemirrorProps';
 
 export const ReactCodemirror: React.FC<IReactCodeMirrorProps> = function ReactCodemirror({
   value,
+  extensions = [],
+  readonly,
+  editable,
 }) {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
+
+  const defaultExtensions = getDefaultExtensions({
+    readonly,
+    editable,
+  });
+
+  const defaultTheme = EditorView.theme({
+    '&': {
+      width: '100%',
+      height: '100%',
+    },
+  });
 
   useEffect(() => {
     let view: EditorView | undefined;
 
     if (ref) {
+      const state = EditorState.create({
+        doc: value,
+        extensions: [...defaultExtensions, defaultTheme, ...extensions],
+      });
+
       view = new EditorView({
         parent: ref,
-        doc: value,
+        state,
       });
     }
 
@@ -32,6 +55,6 @@ export const ReactCodemirror: React.FC<IReactCodeMirrorProps> = function ReactCo
   }, [ref]);
 
   return (
-    <div ref={setRef} />
+    <div ref={setRef} className='ReactCodemirror' />
   );
 };

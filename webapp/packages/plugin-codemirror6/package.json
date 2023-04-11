@@ -16,11 +16,14 @@
   },
   "dependencies": {
     "@cloudbeaver/core-blocks": "~0.1.0",
-    "@codemirror/view": "^6.1.1",
-    "@codemirror/state": "^6.1.1",
     "@codemirror/commands": "^6.1.1",
+    "@codemirror/lang-javascript": "^6.1.5",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-sql": "^6.4.0",
+    "@codemirror/lang-xml": "^6.0.2",
+    "@codemirror/state": "^6.1.1",
+    "@codemirror/view": "^6.1.1",
     "codemirror6": "npm:codemirror@6.0.0"
   },
-  "peerDependencies": {
-  }
+  "peerDependencies": {}
 }
