@@ -96,6 +96,11 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     getWebConnection(env),
                     env.getArgument("script"),
                     env.getArgument("position"))
+            ).dataFetcher("sqlGenerateGroupingQuery", env ->
+            getService(env).generateGroupByQuery(
+                getSQLContext(env),
+                env.getArgument("resultsId"),
+                env.getArgument("columnNames"))
             )
         ;
 

@@ -38,10 +38,7 @@ import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.sql.SQLDialect;
-import org.jkiss.dbeaver.model.sql.SQLQuery;
-import org.jkiss.dbeaver.model.sql.SQLScriptElement;
-import org.jkiss.dbeaver.model.sql.SQLUtils;
+import org.jkiss.dbeaver.model.sql.*;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
@@ -488,5 +485,28 @@ public class WebServiceSQL implements DBWServiceSQL {
             sqlScript,
             cursorPosition);
         return query == null ? new WebSQLQueryInfo(0, 0) : new WebSQLQueryInfo(query.getOffset(), query.getOffset() + query.getText().length());
+    }
+
+    @Override
+    public String generateGroupByQuery(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull List<String> columnsList
+    ) throws DBWebException {
+        try {
+            WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+            var dataSource = contextInfo.getProcessor().getConnection().getDataSource();
+            var groupingQueryGenerator = new SQLGroupingQueryGenerator(
+                dataSource,
+                resultsInfo.getDataContainer(),
+                getSqlDialectFromConnection(dataSource.getContainer()),
+                contextInfo.getProcessor().getSyntaxManager(),
+                columnsList,
+                List.of(SQLGroupingQueryGenerator.DEFAULT_FUNCTION),
+                false);
+            return groupingQueryGenerator.parseGroupingQuery(resultsInfo.getQueryText());
+        } catch (DBException e) {
+            throw new DBWebException("Error on generating GROUP BY query", e);
+        }
     }
 }
