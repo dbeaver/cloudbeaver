@@ -115,6 +115,8 @@ public class CBDatabase {
         if (driver == null) {
             throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
         }
+        // Use original driver config (ignore user changes here)
+        driver = driver.createOriginalCopy();
 
         LoggingProgressMonitor monitor = new LoggingProgressMonitor(log);
 
