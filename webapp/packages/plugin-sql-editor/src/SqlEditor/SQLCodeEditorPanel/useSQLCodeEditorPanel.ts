@@ -65,6 +65,7 @@ export function useSQLCodeEditorPanel(
       smartIndent: true,
       autofocus: true,
       showHint: true,
+      undoDepth: 0,
       extraKeys: {
         // Execute sql script
         // 'Ctrl-Enter': () => { editorPanelData.data.executeQuery(); },
