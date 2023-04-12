@@ -109,6 +109,8 @@ module.exports = (env, argv) => {
 
   var workboxPlugin = [];
   if (devMode) {
+    // TODO: workbox not working in dev mode
+
     // workboxPlugin = new WorkboxPlugin.InjectManifest({
     //   swSrc: getServiceWorkerSource(),
     //   swDest: 'service-worker.js',
