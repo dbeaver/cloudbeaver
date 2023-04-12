@@ -2319,4 +2319,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         WebAuthConfiguration appConfiguration = application.getAuthConfiguration();
         return appConfiguration.isAuthProviderEnabled(providerId);
     }
+
+    public void clearOldAuthAttemptInfo() throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            JDBCUtils.executeStatement(dbCon,
+                "DELETE FROM CB_AUTH_ATTEMPT_INFO AAI " +
+                "WHERE EXISTS " +
+                "(SELECT 1 FROM CB_AUTH_ATTEMPT AA WHERE AA.AUTH_ID=AAI.AUTH_ID AND AUTH_STATUS='" + SMAuthStatus.EXPIRED +"') " +
+                "AND CREATE_TIME<?",
+                Timestamp.valueOf(LocalDateTime.now().minusMinutes(smConfig.getExpiredAuthAttemptInfoTtl()))
+            );
+        } catch (SQLException e) {
+            throw new DBCException("Error deleting auth attempt info", e);
+        }
+    }
 }

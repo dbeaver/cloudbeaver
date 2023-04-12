@@ -87,4 +87,6 @@ public interface WebApplication extends DBPApplication {
      * Port this server listens on
      */
     int getServerPort();
+
+    boolean isLicenseRequired();
 }
