@@ -519,7 +519,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
   useExecutor({
     executor: data.dataSource?.onSetScript,
-    handlers: [function setScript(script) {
+    handlers: [function setScript({ script }) {
       data.parser.setScript(script);
       data.onUpdate.execute();
     }],
