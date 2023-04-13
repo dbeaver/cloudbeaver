@@ -253,7 +253,16 @@ public class WebSession extends BaseWebSession
                 DBPDataSourceContainer::getId,
                 ds -> new DataSourceDescriptor((DataSourceDescriptor) ds, ds.getRegistry())
             ));
-        registry.refreshConfig(connectionIds);
+        switch (type) {
+            case DATASOURCE_UPDATED:
+            case DATASOURCE_CREATED:
+                registry.refreshConfig(connectionIds);
+                break;
+            case DATASOURCE_DELETED:
+                registry.refreshConfig();
+                sendDataSourceUpdatedEvent = true;
+                break;
+        }
         for (String connectionId : connectionIds) {
             DataSourceDescriptor container = (DataSourceDescriptor) registry.getDataSource(connectionId);
             if (container == null) {
