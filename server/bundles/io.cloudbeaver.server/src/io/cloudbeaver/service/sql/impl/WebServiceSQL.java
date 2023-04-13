@@ -504,7 +504,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                 columnsList,
                 List.of(SQLGroupingQueryGenerator.DEFAULT_FUNCTION),
                 false);
-            return groupingQueryGenerator.parseGroupingQuery(resultsInfo.getQueryText());
+            return groupingQueryGenerator.generateGroupingQuery(resultsInfo.getQueryText());
         } catch (DBException e) {
             throw new DBWebException("Error on generating GROUP BY query", e);
         }
