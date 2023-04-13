@@ -482,6 +482,18 @@ input ConnectionConfig {
     configurationType: DriverConfigurationType
 }
 
+input DriverConfig {
+    providerId: ID!
+    id: ID!
+    name: String!
+    driverClass: String!
+    url: String
+    description: String
+    defaultDatabase: String
+    defaultPort: String
+    defaultUser: String
+}
+
 ####################################################
 # Main API
 ####################################################
@@ -572,6 +584,14 @@ extend type Mutation {
     asyncTaskCancel(id: String!): Boolean
 
     asyncTaskInfo(id: String!, removeOnFinish: Boolean!): AsyncTaskInfo!
+
+
+    # Create new custom driver
+    createDriver(config: DriverConfig!): DriverInfo!
+
+    updateDriver(config: DriverConfig!): DriverInfo!
+
+    deleteDriver(id: ID!): Boolean!
 
 }
 

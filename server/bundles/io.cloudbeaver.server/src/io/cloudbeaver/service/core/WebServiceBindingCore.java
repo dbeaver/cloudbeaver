@@ -55,6 +55,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("serverConfig", env -> getService(env).getServerConfig())
 
             .dataFetcher("driverList", env -> getService(env).getDriverList(getWebSession(env), env.getArgument("id")))
+            .dataFetcher("driverTypeList", env -> getService(env).getDriverTypeList(getWebSession(env)))
             .dataFetcher("authModels", env -> getService(env).getAuthModels(getWebSession(env)))
             .dataFetcher("networkHandlers", env -> getService(env).getNetworkHandlers(getWebSession(env)))
             .dataFetcher("templateDataSources", env -> getService(env).getTemplateDataSources())
@@ -102,6 +103,10 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("refreshSessionConnections", env -> getService(env).refreshSessionConnections(
                 GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
             .dataFetcher("changeSessionLanguage", env -> getService(env).changeSessionLanguage(getWebSession(env), env.getArgument("locale")))
+
+            .dataFetcher("createDriver", env -> getService(env).createDriver(getWebSession(env), getDriverConfig(env)))
+            .dataFetcher("updateDriver", env -> getService(env).updateDriver(getWebSession(env), getDriverConfig(env)))
+            .dataFetcher("deleteDriver", env -> getService(env).deleteDriver(getWebSession(env), env.getArgument("id")))
 
             .dataFetcher("createConnection", env -> getService(env).createConnection(
                 getWebSession(env), getProjectReference(env), getConnectionConfig(env)))
@@ -183,6 +188,10 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
 
     private WebConnectionConfig getConnectionConfig(DataFetchingEnvironment env) {
         return new WebConnectionConfig(env.getArgument("config"));
+    }
+
+    private WebDatabaseDriverConfig getDriverConfig(DataFetchingEnvironment env) {
+        return new WebDatabaseDriverConfig(env.getArgument("config"));
     }
 
 }

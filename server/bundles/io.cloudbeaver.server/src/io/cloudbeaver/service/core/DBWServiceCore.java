@@ -16,12 +16,10 @@
  */
 package io.cloudbeaver.service.core;
 
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebAction;
-import io.cloudbeaver.WebObjectId;
-import io.cloudbeaver.WebProjectAction;
+import io.cloudbeaver.*;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
+ import io.cloudbeaver.model.user.WebDataSourceDescriptorInfo;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -42,7 +40,28 @@ public interface DBWServiceCore extends DBWService {
     WebServerConfig getServerConfig() throws DBWebException;
 
     @WebAction
-    List<WebDatabaseDriverConfig> getDriverList(@NotNull WebSession webSession, String driverId) throws DBWebException;
+    List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) throws DBWebException;
+
+    @WebAction
+    List<WebDataSourceDescriptorInfo> getDriverTypeList(@NotNull WebSession webSession) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    WebDatabaseDriverInfo createDriver(
+        @NotNull WebSession webSession,
+        @NotNull WebDatabaseDriverConfig config
+    ) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    WebDatabaseDriverInfo updateDriver(
+        @NotNull WebSession webSession,
+        @NotNull WebDatabaseDriverConfig config
+    ) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean deleteDriver(
+        @NotNull WebSession session,
+        @NotNull String driverId
+    ) throws DBWebException;
 
     @WebAction
     List<WebDatabaseAuthModel> getAuthModels(@NotNull WebSession webSession);

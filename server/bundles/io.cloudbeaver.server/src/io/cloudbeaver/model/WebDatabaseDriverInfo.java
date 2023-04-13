@@ -41,7 +41,7 @@ import java.util.Map;
 /**
  * Web driver configuration
  */
-public class WebDatabaseDriverConfig {
+public class WebDatabaseDriverInfo {
 
     public static final String URL_SERVER_FIELD = "{server}";
     public static final String URL_DATABASE_FIELD = ".*(?:\\{(?:database|file|folder)}).*";
@@ -49,7 +49,7 @@ public class WebDatabaseDriverConfig {
     private final DBPDriver driver;
     private String id;
 
-    public WebDatabaseDriverConfig(WebSession webSession, DBPDriver driver) {
+    public WebDatabaseDriverInfo(WebSession webSession, DBPDriver driver) {
         this.webSession = webSession;
         this.driver = driver;
         this.id = driver.getFullId();

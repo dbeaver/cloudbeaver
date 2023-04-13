@@ -23,11 +23,13 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.user.WebDataSourceDescriptorInfo;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.core.DBWServiceCore;
+import io.cloudbeaver.service.core.WebDatabaseDriverConfig;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
@@ -42,6 +44,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
@@ -50,11 +53,12 @@ import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHImplementation;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
+import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
@@ -82,14 +86,64 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<WebDatabaseDriverConfig> getDriverList(@NotNull WebSession webSession, String driverId) {
-        List<WebDatabaseDriverConfig> result = new ArrayList<>();
+    public List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) {
+        List<WebDatabaseDriverInfo> result = new ArrayList<>();
         for (DBPDriver driver : CBPlatform.getInstance().getApplicableDrivers()) {
             if (driverId == null || driverId.equals(driver.getFullId())) {
-                result.add(new WebDatabaseDriverConfig(webSession, driver));
+                result.add(new WebDatabaseDriverInfo(webSession, driver));
             }
         }
         return result;
+    }
+
+    @Override
+    public List<WebDataSourceDescriptorInfo> getDriverTypeList(@NotNull WebSession webSession) throws DBWebException {
+        return DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders().stream()
+            .map(WebDataSourceDescriptorInfo::new)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public WebDatabaseDriverInfo createDriver(@NotNull WebSession webSession, @NotNull WebDatabaseDriverConfig config) throws DBWebException {
+        DataSourceProviderDescriptor descriptor = DataSourceProviderRegistry.getInstance().getDataSourceProvider(config.getProviderId());
+        if (descriptor == null) {
+            throw new DBWebException("Data source provider '" + config.getProviderId() + "' is not found");
+        }
+
+        var driver = descriptor.createDriver();
+        WebServiceUtils.setDriverConfiguration(driver, config);
+        DriverDescriptor oldDriver = descriptor.getDriverByName(driver.getCategory(), driver.getName());
+        if (oldDriver != null && oldDriver != driver && !oldDriver.isDisabled() && oldDriver.getReplacedBy() == null) {
+            throw new DBWebException("Driver '" + config.getDriverName() + "' already exists. Change driver name");
+        }
+        if (descriptor.getDriver(driver.getId()) == null) {
+            descriptor.addDriver(driver);
+        }
+        descriptor.getRegistry().saveDrivers();
+        CBPlatform.getInstance().refreshApplicableDrivers();
+        return new WebDatabaseDriverInfo(webSession, driver);
+    }
+
+    @Override
+    public WebDatabaseDriverInfo updateDriver(@NotNull WebSession webSession, @NotNull WebDatabaseDriverConfig config) throws DBWebException {
+        var driver = DataSourceProviderRegistry.getInstance().findDriver(config.getDriverId());
+        if (driver == null) {
+            throw new DBWebException("Data source driver '" + config.getDriverId() + "' is not found");
+        }
+        WebServiceUtils.setDriverConfiguration((DriverDescriptor) driver, config);
+        ((DataSourceProviderDescriptor) driver.getProviderDescriptor()).getRegistry().saveDrivers();
+        return new WebDatabaseDriverInfo(webSession, driver);
+    }
+
+    @Override
+    public boolean deleteDriver(@NotNull WebSession session, @NotNull String driverId) throws DBWebException {
+        DriverDescriptor driver = (DriverDescriptor) DataSourceProviderRegistry.getInstance().findDriver(driverId);
+        if (driver == null) {
+            throw new DBWebException("Data source driver '" + driverId + "' is not found");
+        }
+        driver.getProviderDescriptor().removeDriver(driver);
+        driver.getProviderDescriptor().getRegistry().saveDrivers();
+        return true;
     }
 
     @Override

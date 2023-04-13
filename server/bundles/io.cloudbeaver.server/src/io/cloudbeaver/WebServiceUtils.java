@@ -27,6 +27,7 @@ import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.service.core.WebDatabaseDriverConfig;
 import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
@@ -328,6 +329,18 @@ public class WebServiceUtils extends WebCommonUtils {
             }
         }
         return result;
+    }
+
+
+    public static void setDriverConfiguration(DriverDescriptor driver, WebDatabaseDriverConfig config) {
+        driver.setName(config.getDriverName());
+        driver.setDescription(CommonUtils.notEmpty(config.getDriverDescription()));
+        driver.setDriverClassName(config.getDriverClass());
+        driver.setSampleURL(config.getDriverURL());
+        driver.setDriverDefaultPort(config.getDriverPort());
+        driver.setDriverDefaultDatabase(config.getDriverDatabase());
+        driver.setDriverDefaultUser(config.getDriverUser());
+        driver.setModified(true);
     }
 
 }
