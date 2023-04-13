@@ -9,7 +9,7 @@
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ServerConfigResource, SessionExpireService, SessionResource, SessionStateService } from '@cloudbeaver/core-root';
+import { ServerConfigResource, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { SessionExpireWarningDialog } from './SessionExpireWarningDialog';
@@ -27,7 +27,6 @@ export class SessionExpireWarningDialogService extends Bootstrap {
     private readonly sessionResource: SessionResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly graphQLService: GraphQLService,
-    private readonly sessionStateService: SessionStateService
   ) {
     super();
     this.dialogInternalPromise = null;
@@ -35,7 +34,7 @@ export class SessionExpireWarningDialogService extends Bootstrap {
 
   register(): void {
     this.sessionExpireService.onSessionExpire.addHandler(this.close.bind(this));
-    this.sessionStateService.onSessionStateChange.addHandler((data, contexts) => {
+    this.sessionResource.onStatusUpdate.addHandler((data, contexts) => {
       this.handleStateChange(data.isValid, data.remainingTime);
     });
   }

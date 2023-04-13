@@ -1742,7 +1742,7 @@ export interface WsSessionExpiredEvent extends CbServerEvent {
 export interface WsSessionStateEvent extends CbServerEvent {
   id: CbServerEventId;
   isValid?: Maybe<Scalars['Boolean']>;
-  remainingTime?: Maybe<Scalars['String']>;
+  remainingTime: Scalars['Int'];
   topicId?: Maybe<CbEventTopic>;
 }
 

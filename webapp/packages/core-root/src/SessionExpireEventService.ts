@@ -25,7 +25,6 @@ export class SessionExpireEventService extends Dependency {
   }
 
   private onSessionExpireEvent(): void {
-    this.sessionEventSource.disconnect();
     this.sessionExpireService.sessionExpired();
   }
 }

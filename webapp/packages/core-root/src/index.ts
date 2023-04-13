@@ -22,7 +22,6 @@ export * from './SessionDataResource';
 export * from './SessionSettingsService';
 export * from './SessionExpireService';
 export * from './SessionExpireEventService';
-export * from './SessionStateService';
 export * from './ServerNodeService';
 export * from './WindowEventsService';
 export { manifest as coreRootManifest } from './manifest';
