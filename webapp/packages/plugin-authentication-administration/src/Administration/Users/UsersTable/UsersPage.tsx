@@ -74,31 +74,29 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
   const keys = filters.filteredUsers.map(user => user.userId);
 
   return styled(style)(
-    <>
-      <ColoredContainer wrap gap parent overflow>
-        <Container gap>
-          <Group box>
-            <ToolsPanel>
-              {isLocalProviderAvailable && (
-                <ToolsAction
-                  title={translate('authentication_administration_tools_add_tooltip')}
-                  icon='add'
-                  viewBox="0 0 24 24"
-                  disabled={create && !!createUserService.user}
-                  onClick={createUserService.create}
-                >
-                  {translate('ui_add')}
-                </ToolsAction>
-              )}
-              <ToolsAction
-                title={translate('authentication_administration_tools_refresh_tooltip')}
-                icon='refresh'
-                viewBox="0 0 24 24"
-                onClick={table.update}
-              >
-                {translate('ui_refresh')}
-              </ToolsAction>
-              {/* {isLocalProviderAvailable && (
+    <ColoredContainer vertical wrap gap parent>
+      <Group box keepSize>
+        <ToolsPanel>
+          {isLocalProviderAvailable && (
+            <ToolsAction
+              title={translate('authentication_administration_tools_add_tooltip')}
+              icon='add'
+              viewBox="0 0 24 24"
+              disabled={create && !!createUserService.user}
+              onClick={createUserService.create}
+            >
+              {translate('ui_add')}
+            </ToolsAction>
+          )}
+          <ToolsAction
+            title={translate('authentication_administration_tools_refresh_tooltip')}
+            icon='refresh'
+            viewBox="0 0 24 24"
+            onClick={table.update}
+          >
+            {translate('ui_refresh')}
+          </ToolsAction>
+          {/* {isLocalProviderAvailable && (
               <ToolsAction
                 title={translate('authentication_administration_tools_delete_tooltip')}
                 icon="trash"
@@ -109,31 +107,31 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
                 {translate('ui_delete')}
               </ToolsAction>
             )} */}
-            </ToolsPanel>
-          </Group>
-          <UsersTableFilters filters={filters} />
-        </Container>
+        </ToolsPanel>
+      </Group>
+      <Group box keepSize>
+        <UsersTableFilters filters={filters} />
+      </Group>
 
-        <content>
-          {create && createUserService.user && (
-            <Group>
-              <CreateUser user={createUserService.user} onCancel={createUserService.cancelCreate} />
-            </Group>
-          )}
-
+      <Container overflow gap>
+        {create && createUserService.user && (
           <Group>
-            <Loader style={loaderStyle} state={[usersResource, authRolesResource]} overlay>
-              <UsersTable
-                keys={keys}
-                selectedItems={table.state.selected}
-                expandedItems={table.state.expanded}
-                users={filters.filteredUsers}
-                displayAuthRole={displayAuthRole}
-              />
-            </Loader>
+            <CreateUser user={createUserService.user} onCancel={createUserService.cancelCreate} />
           </Group>
-        </content>
-      </ColoredContainer>
-    </>
+        )}
+
+        <Group box='no-overflow'>
+          <Loader style={loaderStyle} state={[usersResource, authRolesResource]} overlay>
+            <UsersTable
+              keys={keys}
+              selectedItems={table.state.selected}
+              expandedItems={table.state.expanded}
+              users={filters.filteredUsers}
+              displayAuthRole={displayAuthRole}
+            />
+          </Loader>
+        </Group>
+      </Container>
+    </ColoredContainer>
   );
 });

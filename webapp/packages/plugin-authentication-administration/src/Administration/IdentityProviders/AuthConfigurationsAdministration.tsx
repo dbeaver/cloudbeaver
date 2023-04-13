@@ -30,17 +30,6 @@ const styles = css`
   ToolsPanel {
     border-bottom: none;
   }
-
-  content {
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-    gap: 24px;
-  }
-
-  Group {
-    padding: 0;
-  }
 `;
 
 export const AuthConfigurationsAdministration: AdministrationItemContentComponent = observer(function AuthConfigurationsAdministration({
@@ -53,58 +42,54 @@ export const AuthConfigurationsAdministration: AdministrationItemContentComponen
   const table = useConfigurationsTable();
 
   return styled(style)(
-    <>
-      <ColoredContainer wrap gap parent overflow>
-        <Container gap>
+    <ColoredContainer wrap gap parent vertical>
+      <Group box keepSize>
+        <ToolsPanel>
+          <ToolsAction
+            title={translate('administration_identity_providers_add_tooltip')}
+            icon="add"
+            viewBox="0 0 24 24"
+            disabled={!!sub || table.processing}
+            onClick={service.create}
+          >
+            {translate('ui_add')}
+          </ToolsAction>
+          <ToolsAction
+            title={translate('administration_identity_providers_refresh_tooltip')}
+            icon="refresh"
+            viewBox="0 0 24 24"
+            disabled={table.processing}
+            onClick={table.update}
+          >
+            {translate('ui_refresh')}
+          </ToolsAction>
+          <ToolsAction
+            title={translate('administration_identity_providers_delete_tooltip')}
+            icon="trash"
+            viewBox="0 0 24 24"
+            disabled={!table.tableState.itemsSelected || table.processing}
+            onClick={table.delete}
+          >
+            {translate('ui_delete')}
+          </ToolsAction>
+        </ToolsPanel>
+      </Group>
+      <Container overflow gap>
+        {sub && (
           <Group box>
-            <ToolsPanel>
-              <ToolsAction
-                title={translate('administration_identity_providers_add_tooltip')}
-                icon="add"
-                viewBox="0 0 24 24"
-                disabled={!!sub || table.processing}
-                onClick={service.create}
-              >
-                {translate('ui_add')}
-              </ToolsAction>
-              <ToolsAction
-                title={translate('administration_identity_providers_refresh_tooltip')}
-                icon="refresh"
-                viewBox="0 0 24 24"
-                disabled={table.processing}
-                onClick={table.update}
-              >
-                {translate('ui_refresh')}
-              </ToolsAction>
-              <ToolsAction
-                title={translate('administration_identity_providers_delete_tooltip')}
-                icon="trash"
-                viewBox="0 0 24 24"
-                disabled={!table.tableState.itemsSelected || table.processing}
-                onClick={table.delete}
-              >
-                {translate('ui_delete')}
-              </ToolsAction>
-            </ToolsPanel>
+            <CreateAuthConfiguration />
           </Group>
-        </Container>
-        <content>
-          {sub && (
-            <Group>
-              <CreateAuthConfiguration />
-            </Group>
-          )}
-          <Group>
-            <Loader style={loaderStyle} loading={table.processing} overlay>
-              <AuthConfigurationsTable
-                configurations={table.configurations}
-                selectedItems={table.tableState.selected}
-                expandedItems={table.tableState.expanded}
-              />
-            </Loader>
-          </Group>
-        </content>
-      </ColoredContainer>
-    </>
+        )}
+        <Group box='no-overflow'>
+          <Loader style={loaderStyle} loading={table.processing} overlay>
+            <AuthConfigurationsTable
+              configurations={table.configurations}
+              selectedItems={table.tableState.selected}
+              expandedItems={table.tableState.expanded}
+            />
+          </Loader>
+        </Group>
+      </Container>
+    </ColoredContainer>
   );
 });
