@@ -43,7 +43,7 @@ public interface DBWServiceCore extends DBWService {
     List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) throws DBWebException;
 
     @WebAction
-    List<WebDataSourceDescriptorInfo> getDriverTypeList(@NotNull WebSession webSession) throws DBWebException;
+    List<WebDataSourceDescriptorInfo> getDriverProviderList(@NotNull WebSession webSession) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     WebDatabaseDriverInfo createDriver(

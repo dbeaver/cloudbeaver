@@ -97,7 +97,7 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<WebDataSourceDescriptorInfo> getDriverTypeList(@NotNull WebSession webSession) throws DBWebException {
+    public List<WebDataSourceDescriptorInfo> getDriverProviderList(@NotNull WebSession webSession) throws DBWebException {
         return DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders().stream()
             .map(WebDataSourceDescriptorInfo::new)
             .collect(Collectors.toList());

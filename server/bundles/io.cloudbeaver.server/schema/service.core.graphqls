@@ -398,6 +398,11 @@ type LogEntry {
     stackTrace: String
 }
 
+type DriverProviderInfo {
+    name: ID!
+    icon: String!
+}
+
 ####################################################
 # Input types
 ####################################################
@@ -510,6 +515,7 @@ extend type Query {
 
     # Get driver info
     driverList( id: ID ): [ DriverInfo! ]!
+    driverProviderList: [ DriverProviderInfo! ]
     authModels: [DatabaseAuthModel!]!
     networkHandlers: [NetworkHandlerDescriptor!]!
 
