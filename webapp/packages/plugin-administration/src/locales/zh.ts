@@ -23,7 +23,6 @@ export default [
   ['administration_configuration_wizard_configuration_server_info_unsaved_title', '未保存的设置'],
   ['administration_configuration_wizard_configuration_server_info_unsaved_message', '服务器配置页面可以保存设置'],
   ['administration_configuration_wizard_configuration_server_info_unsaved_navigate', '打开'],
-  ['administration_configuration_wizard_configuration_server_session_lifetime', '会话生命周期'],
   ['administration_configuration_wizard_configuration_server_session_lifetime_description', '您可以在此处指定您希望会话在到期前保持空闲的分钟数'],
 
   ['administration_configuration_wizard_configuration_plugins', '配置'],
