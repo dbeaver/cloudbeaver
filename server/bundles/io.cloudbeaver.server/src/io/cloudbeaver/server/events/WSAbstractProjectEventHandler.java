@@ -17,58 +17,19 @@
 package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.model.session.BaseWebSession;
-import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.websocket.WSEventHandler;
-import org.jkiss.dbeaver.model.websocket.event.*;
-
-import java.util.Collection;
+import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.WSProjectEvent;
 
 /**
  * Notify all active user session that project has been updated
  */
-public abstract class WSAbstractProjectEventHandler<Event extends WSProjectEvent> implements WSEventHandler {
-
-    @NotNull
-    @Override
-    public String getSupportedTopicId() {
-        return WSEventTopic.PROJECTS.getTopicId();
-    }
+public abstract class WSAbstractProjectEventHandler<EVENT extends WSProjectEvent> extends WSDefaultEventHandler<EVENT> {
 
     @Override
-    public void handleEvent(@NotNull WSEvent event) {
-        if (!getEventClass().isInstance(event)) {
-            return;
-        }
-        var typedEvent = getEventClass().cast(event);
-        Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
-        for (var activeUserSession : allSessions) {
-            if (WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId())) {
-                continue; // skip events from current session
-            }
-            if (!validateEvent(activeUserSession, typedEvent)) {
-                getLog().debug(getSupportedTopicId() + " event '" + event.getId() + "' is not valid");
-                continue;
-            }
-            getLog().debug(getSupportedTopicId() + " event '" + event.getId() + "' handled");
-            updateSessionData(activeUserSession, typedEvent);
-        }
-    }
-
-    /**
-     * Method to get logger from implementation to display the implementation class name in the log
-     */
-    @NotNull
-    protected abstract Log getLog();
-
-    @NotNull
-    protected abstract Class<Event> getEventClass();
-
-    protected abstract void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull Event event);
-
-    protected boolean validateEvent(@NotNull BaseWebSession activeUserSession, @NotNull Event event) {
-        return activeUserSession.isProjectAccessible(event.getProjectId()) &&
+    protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull EVENT event) {
+        return super.isAcceptableInSession(activeUserSession, event) &&
+            activeUserSession.isProjectAccessible(event.getProjectId()) &&
             WSEventType.valueById(event.getId()) != null;
     }
 }

@@ -26,7 +26,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
 import org.jkiss.dbeaver.model.rm.RMResource;
-import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
 
@@ -40,24 +39,6 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
 
     private static final Log log = Log.getLog(WSRmResourceUpdatedEventHandlerImpl.class);
     private static final Gson gson = new GsonBuilder().create();
-
-    @NotNull
-    @Override
-    public String getSupportedTopicId() {
-        return WSEventTopic.RM_SCRIPTS.getTopicId();
-    }
-
-    @NotNull
-    @Override
-    protected Log getLog() {
-        return log;
-    }
-
-    @NotNull
-    @Override
-    protected Class<WSResourceUpdatedEvent> getEventClass() {
-        return WSResourceUpdatedEvent.class;
-    }
 
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSResourceUpdatedEvent event) {
