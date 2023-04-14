@@ -34,7 +34,6 @@ export const BASE_CONTAINERS_STYLES = css`
 
         & > :global(*) {
           flex-basis: 0 !important;
-          width: 100%;
         }
         & > [keepSize] {
           flex-basis: auto !important;
@@ -108,12 +107,8 @@ export const BASE_CONTAINERS_STYLES = css`
       }
 
       &[box="no-overflow"] {
-        overflow:auto;
-
-        &:only-child {
-          padding: 0;
-          overflow: initial;
-        }
+        padding: 0;
+        overflow: initial;
       }
 
       &[center] {

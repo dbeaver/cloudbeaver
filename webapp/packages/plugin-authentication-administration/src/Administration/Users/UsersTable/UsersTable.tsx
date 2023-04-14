@@ -7,24 +7,13 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
 import {
   Table, TableHeader, BASE_CONTAINERS_STYLES, TableColumnHeader, TableBody, useTranslate } from '@cloudbeaver/core-blocks';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
 import { User } from './User';
-
-
-const styles = css`
-    Container {
-      overflow: hidden;
-    }
-    table-container {
-      overflow: auto;
-      max-height: calc(100vh - 273px); /* size for height overflow */
-    }
-  `;
 
 interface Props {
   keys: string[];
@@ -43,40 +32,38 @@ export const UsersTable = observer<Props>(function UsersTable({
 }) {
   const translate = useTranslate();
 
-  return styled(styles, BASE_CONTAINERS_STYLES)(
-    <table-container>
-      <Table
-        keys={keys}
-        selectedItems={selectedItems}
-        expandedItems={expandedItems}
-        size='big'
-      >
-        <TableHeader fixed>
-          {/* {isLocalProviderAvailable && (
+  return styled(BASE_CONTAINERS_STYLES)(
+    <Table
+      keys={keys}
+      selectedItems={selectedItems}
+      expandedItems={expandedItems}
+      size='big'
+    >
+      <TableHeader fixed>
+        {/* {isLocalProviderAvailable && (
                   <TableColumnHeader min flex centerContent>
                     <TableSelect />
                   </TableColumnHeader>
                 )} */}
-          <TableColumnHeader min />
-          <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
-          {displayAuthRole && (
-            <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>
-          )}
-          <TableColumnHeader>{translate('authentication_user_team')}</TableColumnHeader>
-          <TableColumnHeader>{translate('authentication_user_enabled')}</TableColumnHeader>
-          <TableColumnHeader />
-        </TableHeader>
-        <TableBody>
-          {users.map(user => (
-            <User
-              key={user.userId}
-              user={user}
-              displayAuthRole={displayAuthRole}
-              // selectable={isLocalProviderAvailable}
-            />
-          ))}
-        </TableBody>
-      </Table>
-    </table-container>
+        <TableColumnHeader min />
+        <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
+        {displayAuthRole && (
+          <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>
+        )}
+        <TableColumnHeader>{translate('authentication_user_team')}</TableColumnHeader>
+        <TableColumnHeader>{translate('authentication_user_enabled')}</TableColumnHeader>
+        <TableColumnHeader />
+      </TableHeader>
+      <TableBody>
+        {users.map(user => (
+          <User
+            key={user.userId}
+            user={user}
+            displayAuthRole={displayAuthRole}
+            // selectable={isLocalProviderAvailable}
+          />
+        ))}
+      </TableBody>
+    </Table>
   );
 });

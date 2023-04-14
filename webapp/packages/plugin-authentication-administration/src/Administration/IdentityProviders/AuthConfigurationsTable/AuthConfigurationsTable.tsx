@@ -25,26 +25,24 @@ export const AuthConfigurationsTable = observer<Props>(function AuthConfiguratio
   const keys = configurations.map(configuration => configuration.id);
 
   return styled(BASE_CONTAINERS_STYLES)(
-    <table-container>
-      <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
-        <TableHeader fixed>
-          <TableColumnHeader min flex centerContent>
-            <TableSelect />
-          </TableColumnHeader>
-          <TableColumnHeader min />
-          <TableColumnHeader min />
-          <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_name')}</TableColumnHeader>
-          <TableColumnHeader>{translate('administration_identity_providers_provider')}</TableColumnHeader>
-          <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_description')}</TableColumnHeader>
-          <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_disabled')}</TableColumnHeader>
-          <TableColumnHeader />
-        </TableHeader>
-        <TableBody>
-          {configurations.map(configuration => (
-            <AuthConfiguration key={configuration.id} configuration={configuration} />
-          ))}
-        </TableBody>
-      </Table>
-    </table-container>
+    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
+      <TableHeader fixed>
+        <TableColumnHeader min flex centerContent>
+          <TableSelect />
+        </TableColumnHeader>
+        <TableColumnHeader min />
+        <TableColumnHeader min />
+        <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_name')}</TableColumnHeader>
+        <TableColumnHeader>{translate('administration_identity_providers_provider')}</TableColumnHeader>
+        <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_description')}</TableColumnHeader>
+        <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_disabled')}</TableColumnHeader>
+        <TableColumnHeader />
+      </TableHeader>
+      <TableBody>
+        {configurations.map(configuration => (
+          <AuthConfiguration key={configuration.id} configuration={configuration} />
+        ))}
+      </TableBody>
+    </Table>
   );
 });

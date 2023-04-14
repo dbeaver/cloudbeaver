@@ -33,6 +33,7 @@ const tabsStyles = css`
   }
   TabPanel {
     flex-direction: column;
+    overflow: auto;
   }
 `;
 

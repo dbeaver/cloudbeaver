@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
 import {
   Table, TableHeader, BASE_CONTAINERS_STYLES,
@@ -46,31 +46,29 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
   }
 
   return styled(BASE_CONTAINERS_STYLES)(
-    <table-container>
-      <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
-        <TableHeader fixed>
-          <TableColumnHeader min flex centerContent>
-            <TableSelect />
-          </TableColumnHeader>
-          <TableColumnHeader min />
-          <TableColumnHeader min />
-          <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
-          <TableColumnHeader>{translate('connections_connection_address')}</TableColumnHeader>
-          <TableColumnHeader>{translate('connections_connection_folder')}</TableColumnHeader>
-          {displayProjects && <TableColumnHeader>{translate('connections_connection_project')}</TableColumnHeader>}
-          <TableColumnHeader />
-        </TableHeader>
-        <TableBody>
-          {connections.map((connection, i) => (
-            <Connection
-              key={serializeConnectionParam(keys[i])}
-              connectionKey={keys[i]}
-              connection={connection}
-              projectName={getProjectName(connection.projectId)}
-            />
-          ))}
-        </TableBody>
-      </Table>
-    </table-container>
+    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
+      <TableHeader fixed>
+        <TableColumnHeader min flex centerContent>
+          <TableSelect />
+        </TableColumnHeader>
+        <TableColumnHeader min />
+        <TableColumnHeader min />
+        <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
+        <TableColumnHeader>{translate('connections_connection_address')}</TableColumnHeader>
+        <TableColumnHeader>{translate('connections_connection_folder')}</TableColumnHeader>
+        {displayProjects && <TableColumnHeader>{translate('connections_connection_project')}</TableColumnHeader>}
+        <TableColumnHeader />
+      </TableHeader>
+      <TableBody>
+        {connections.map((connection, i) => (
+          <Connection
+            key={serializeConnectionParam(keys[i])}
+            connectionKey={keys[i]}
+            connection={connection}
+            projectName={getProjectName(connection.projectId)}
+          />
+        ))}
+      </TableBody>
+    </Table>
   );
 });

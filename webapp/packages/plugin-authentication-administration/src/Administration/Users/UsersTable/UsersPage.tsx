@@ -37,17 +37,6 @@ const styles = css`
     border-bottom: none;
     border-radius: inherit;
   }
-
-  content {
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-    gap: 24px;
-  }
-
-  Group {
-    padding: 0;
-  }
 `;
 
 interface Props {
@@ -115,7 +104,7 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
 
       <Container overflow gap>
         {create && createUserService.user && (
-          <Group>
+          <Group box>
             <CreateUser user={createUserService.user} onCancel={createUserService.cancelCreate} />
           </Group>
         )}
