@@ -26,11 +26,23 @@ $mdc-theme-property-values: map-merge($mdc-theme-property-values, $mdc-theme-ext
 
 $theme-class: "theme-#{$theme-name}";
 $theme-form-element-radius: 3px !default;
+$theme-group-element-radius: 4px !default;
+$theme-menu-bar-small-action-radius: 3px !default;
 
 @mixin css-variables {
   .theme-form-element-radius {
     border-radius: $theme-form-element-radius;
   }
+  
+  .theme-group-element-radius {
+    border-radius: $theme-group-element-radius;
+  }
+  
+  .theme-menu-bar-small-action-radius {
+    border-radius: $theme-menu-bar-small-action-radius;
+  }
 
   --theme-form-element-radius: #{$theme-form-element-radius};
+  --theme-group-element-radius: #{$theme-group-element-radius};
+  --theme-menu-bar-small-action-radius: #{$theme-menu-bar-small-action-radius};
 }

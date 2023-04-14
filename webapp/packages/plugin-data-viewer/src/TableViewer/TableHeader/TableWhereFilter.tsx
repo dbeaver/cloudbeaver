@@ -25,10 +25,15 @@ const styles = css`
 
 export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps> = observer(function TableWhereFilter({
   model,
+  simple,
   resultIndex,
 }) {
   const translate = useTranslate();
   const state = useWhereFilter(model, resultIndex);
+
+  if (simple) {
+    return null;
+  }
 
   return styled(styles)(
     <InlineEditor

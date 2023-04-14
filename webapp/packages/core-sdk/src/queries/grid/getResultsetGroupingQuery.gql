@@ -1,0 +1,15 @@
+query getResultsetGroupingQuery(
+  $projectId: ID!
+  $contextId: ID!
+  $connectionId: ID!
+  $resultsId: ID!
+  $columnNames: [ String! ]!
+) {
+  query: sqlGenerateGroupingQuery(
+    projectId: $projectId,
+    contextId: $contextId,
+    connectionId: $connectionId, 
+    resultsId: $resultsId,
+    columnNames: $columnNames
+  )
+}

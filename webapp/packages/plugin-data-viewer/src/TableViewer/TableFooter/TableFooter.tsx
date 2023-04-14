@@ -12,7 +12,7 @@ import styled, { css, use } from 'reshadow';
 
 import { SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-
+import type { IDataContext } from '@cloudbeaver/core-view';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataViewerSettingsService } from '../../DataViewerSettingsService';
@@ -25,6 +25,8 @@ const tableFooterStyles = css`
       flex: 0 0 auto;
       overflow: auto;
       gap: 8px;
+      min-height: 32px;
+      height: initial;
     }
     count input,
     count placeholder {
@@ -68,11 +70,15 @@ const tableFooterStyles = css`
 interface Props {
   resultIndex: number;
   model: IDatabaseDataModel<any, any>;
+  simple: boolean;
+  context?: IDataContext;
 }
 
 export const TableFooter = observer<Props>(function TableFooter({
   resultIndex,
   model,
+  simple,
+  context,
 }) {
   const ref = useRef<HTMLInputElement>(null);
   const [limit, setLimit] = useState(model.countGain + '');
@@ -126,7 +132,7 @@ export const TableFooter = observer<Props>(function TableFooter({
           />
         </SubmittingForm>
       </count>
-      <TableFooterMenu model={model} resultIndex={resultIndex} />
+      <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} context={context} />
       {model.source.requestInfo.requestMessage.length > 0 && (
         <time>
           {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms

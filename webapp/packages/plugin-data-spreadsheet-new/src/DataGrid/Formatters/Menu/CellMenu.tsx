@@ -24,6 +24,7 @@ interface Props {
   spreadsheetActions: IDataPresentationActions<IResultSetElementKey>;
   resultIndex: number;
   cellKey: IResultSetElementKey;
+  simple: boolean;
   onClick?: () => void;
   onStateSwitch?: (state: boolean) => void;
 }
@@ -34,13 +35,14 @@ export const CellMenu = observer<Props>(function CellMenu({
   spreadsheetActions,
   resultIndex,
   cellKey,
+  simple,
   onClick,
   onStateSwitch,
 }) {
   const dataGridContextMenuService = useService(DataGridContextMenuService);
 
   const panel = dataGridContextMenuService.constructMenuWithContext(
-    model, actions, spreadsheetActions, resultIndex, cellKey
+    model, actions, spreadsheetActions, resultIndex, cellKey, simple
   );
 
   if (!panel.menuItems.length || panel.menuItems.every(item => item.isHidden)) {
@@ -48,7 +50,7 @@ export const CellMenu = observer<Props>(function CellMenu({
   }
 
   function handleClick() {
-    dataGridContextMenuService.openMenu(model, actions, spreadsheetActions, resultIndex, cellKey);
+    dataGridContextMenuService.openMenu(model, actions, spreadsheetActions, resultIndex, cellKey, simple);
     onClick?.();
   }
 

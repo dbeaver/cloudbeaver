@@ -31,6 +31,7 @@ implements IDatabaseDataModel<TOptions, TResult> {
     return this.source.supportedDataFormats;
   }
 
+  readonly onDispose: IExecutor;
   readonly onOptionsChange: IExecutor;
   readonly onRequest: IExecutor<IRequestEventData<TOptions, TResult>>;
 
@@ -41,6 +42,7 @@ implements IDatabaseDataModel<TOptions, TResult> {
     this.name = null;
     this.source = source;
     this.countGain = 0;
+    this.onDispose = new Executor();
     this.onOptionsChange = new Executor();
     this.onRequest = new Executor();
     this.currentTask = null;
@@ -169,6 +171,7 @@ implements IDatabaseDataModel<TOptions, TResult> {
   }
 
   async dispose(): Promise<void> {
+    await this.onDispose.execute();
     await this.source.dispose();
   }
 

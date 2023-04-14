@@ -24,9 +24,23 @@ export const VERTICAL_ROTATED_TAB_STYLES = css`
       margin-top: -50%;
       height: 32px;
       border: none;
+      border-radius: var(--theme-group-element-radius);
+
+      &::before {
+        border-radius: var(--theme-group-element-radius);
+      }
+
+      & TabIcon {
+        padding-left: 6px;
+      }
+      & TabTitle {
+        padding: 0 6px;
+      }
     }
   }
   TabList {
+    display: flex;
+    gap: 4px;
     outline: none;
     max-width: 32px;
     flex-direction: column;

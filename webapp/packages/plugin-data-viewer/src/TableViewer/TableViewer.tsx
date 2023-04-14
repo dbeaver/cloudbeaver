@@ -8,12 +8,13 @@
 
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
-import styled, { css } from 'reshadow';
+import { useEffect, forwardRef } from 'react';
+import styled, { css, use } from 'reshadow';
 
 import { getComputed, Loader, Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useObjectRef, useObservableRef, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import type { IDataContext } from '@cloudbeaver/core-view';
 
 import { ResultSetConstraintAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import { DataPresentationService, DataPresentationType } from '../DataPresentationService';
@@ -29,6 +30,10 @@ import { TableViewerStorageService } from './TableViewerStorageService';
 const viewerStyles = css`
     pane-content {
       composes: theme-background-surface theme-text-on-surface from global;
+
+      &[|grid] {
+        border-radius: var(--theme-group-element-radius);
+      }
     }
     table-viewer {
       composes: theme-background-secondary theme-text-on-secondary from global;
@@ -37,12 +42,14 @@ const viewerStyles = css`
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      padding: 0 8px;
     }
     table-content {
       display: flex;
       flex: 1;
       overflow: hidden;
+    }
+    table-data {
+      gap: 8px;
     }
     table-data, Pane, pane-content {
       position: relative;
@@ -51,25 +58,16 @@ const viewerStyles = css`
       flex-direction: column;
       overflow: hidden;
     }
+    Split {
+      gap: 8px;
+    }
     Pane {
       &:first-child {
         position: relative;
-        
-        & pane-content {
-          margin-right: 4px;
-        }
       }
-      &:last-child {
-        & pane-content {
-          margin-left: 4px;
-        }
-      }
-    }
-    Pane:global([data-mode='maximize']) pane-content {
-      margin: 0;
     }
     TablePresentationBar {
-      padding-top: 40px;
+      margin-top: 32px;
       &:first-child {
         margin-right: 4px;
       }
@@ -89,20 +87,24 @@ interface Props {
   resultIndex: number | undefined;
   presentationId: string | undefined;
   valuePresentationId: string | null | undefined;
+  simple?: boolean;
+  context?: IDataContext;
   className?: string;
   onPresentationChange: (id: string) => void;
   onValuePresentationChange: (id: string | null) => void;
 }
 
-export const TableViewer = observer<Props>(function TableViewer({
+export const TableViewer = observer<Props, HTMLDivElement>(forwardRef(function TableViewer({
   tableId,
   resultIndex = 0,
   presentationId,
   valuePresentationId,
+  simple = false,
+  context,
   className,
   onPresentationChange,
   onValuePresentationChange,
-}) {
+}, ref) {
   const dataPresentationService = useService(DataPresentationService);
   const tableViewerStorageService = useService(TableViewerStorageService);
   const dataModel = tableViewerStorageService.get(tableId);
@@ -244,14 +246,17 @@ export const TableViewer = observer<Props>(function TableViewer({
 
   const resultExist = dataModel.source.hasResult(resultIndex);
   const overlay = dataModel.source.results.length > 0 && presentation.dataFormat === dataFormat;
-  const valuePanelDisplayed = valuePresentation
-  && (valuePresentation.dataFormat === undefined
+  const valuePanelDisplayed = (
+    valuePresentation
+    && (valuePresentation.dataFormat === undefined
     || valuePresentation.dataFormat === dataFormat)
-  && overlay
-  && resultExist;
+    && overlay
+    && resultExist
+    && !simple
+  );
 
   return styled(viewerStyles, splitStyles)(
-    <table-viewer className={className}>
+    <table-viewer ref={ref} className={className}>
       <table-content>
         <TablePresentationBar
           type={DataPresentationType.main}
@@ -263,7 +268,7 @@ export const TableViewer = observer<Props>(function TableViewer({
           onPresentationChange={dataTableActions.setPresentation}
         />
         <table-data>
-          <TableHeader model={dataModel} resultIndex={resultIndex} />
+          <TableHeader model={dataModel} resultIndex={resultIndex} simple={simple} />
           <Split
             {...splitState}
             sticky={30}
@@ -272,13 +277,14 @@ export const TableViewer = observer<Props>(function TableViewer({
             keepRatio
           >
             <Pane>
-              <pane-content>
+              <pane-content {...use({ grid:true })}>
                 <TableGrid
                   model={dataModel}
                   actions={dataTableActions}
                   dataFormat={dataFormat}
                   presentation={presentation}
                   resultIndex={resultIndex}
+                  simple={simple}
                 />
                 <TableError model={dataModel} loading={loading} />
                 <Loader
@@ -291,33 +297,37 @@ export const TableViewer = observer<Props>(function TableViewer({
             </Pane>
             <ResizerControls />
             <Pane basis='30%' main>
-              <pane-content>
-                {resultExist && (
-                  <TableToolsPanel
-                    model={dataModel}
-                    actions={dataTableActions}
-                    dataFormat={dataFormat}
-                    presentation={valuePresentation}
-                    resultIndex={resultIndex}
-                  />
-                )}
-              </pane-content>
+              <Loader suspense>
+                <pane-content>
+                  {resultExist && (
+                    <TableToolsPanel
+                      model={dataModel}
+                      actions={dataTableActions}
+                      dataFormat={dataFormat}
+                      presentation={valuePresentation}
+                      resultIndex={resultIndex}
+                      simple={simple}
+                    />
+                  )}
+                </pane-content>
+              </Loader>
             </Pane>
           </Split>
-
         </table-data>
-        <TablePresentationBar
-          type={DataPresentationType.toolsPanel}
-          presentationId={valuePresentationId ?? null}
-          dataFormat={dataFormat}
-          supportedDataFormat={[dataFormat]}
-          model={dataModel}
-          resultIndex={resultIndex}
-          onPresentationChange={dataTableActions.setValuePresentation}
-          onClose={dataTableActions.closeValuePresentation}
-        />
+        {!simple && (
+          <TablePresentationBar
+            type={DataPresentationType.toolsPanel}
+            presentationId={valuePresentationId ?? null}
+            dataFormat={dataFormat}
+            supportedDataFormat={[dataFormat]}
+            model={dataModel}
+            resultIndex={resultIndex}
+            onPresentationChange={dataTableActions.setValuePresentation}
+            onClose={dataTableActions.closeValuePresentation}
+          />
+        )}
       </table-content>
-      <TableFooter model={dataModel} resultIndex={resultIndex} />
+      <TableFooter model={dataModel} resultIndex={resultIndex} simple={simple} context={context} />
     </table-viewer>
   );
-});
+}));

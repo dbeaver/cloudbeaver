@@ -13,8 +13,9 @@ import type { PlaceholderComponent } from '@cloudbeaver/core-blocks';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import { DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL } from './DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL';
-import { DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX } from './DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX';
+import { DATA_CONTEXT_DV_DDM } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
+import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
+import { DATA_CONTEXT_DATA_VIEWER_SIMPLE } from './DATA_CONTEXT_DATA_VIEWER_SIMPLE';
 import { DATA_VIEWER_DATA_MODEL_TOOLS_MENU } from './DATA_VIEWER_DATA_MODEL_TOOLS_MENU';
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService';
 
@@ -77,12 +78,14 @@ const TABLE_HEADER_MENU_BAR_STYLES = css`
 
 export const TableHeaderMenu: PlaceholderComponent<ITableHeaderPlaceholderProps> = observer(function TableHeaderMenu({
   model,
+  simple,
   resultIndex,
 }) {
   const menu = useMenu({ menu: DATA_VIEWER_DATA_MODEL_TOOLS_MENU });
 
-  menu.context.set(DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL, model);
-  menu.context.set(DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX, resultIndex);
+  menu.context.set(DATA_CONTEXT_DV_DDM, model);
+  menu.context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex);
+  menu.context.set(DATA_CONTEXT_DATA_VIEWER_SIMPLE, simple);
 
   return (
     <MenuBar menu={menu} style={TABLE_HEADER_MENU_BAR_STYLES} />

@@ -32,44 +32,51 @@ import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_S
 import { TextValuePresentationService } from './TextValuePresentationService';
 
 const styles = css`
-    Tab {
-      composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
-    }
-    container {
-      display: flex;
-      gap: 16px;
-      flex-direction: column;
-      overflow: auto;
-      flex: 1;
-    }
-    actions {
-      display: flex;
-      justify-content: center;
-      flex: 0;
-      padding: 0 8px;
-      padding-bottom: 16px;
-    }
-    Textarea {
-      flex: 1;
-    }
-    CodeEditorLoader {
-      flex: 1;
-      overflow: auto;
-    }
-    TabList {
-      composes: theme-border-color-background theme-background-background from global;
-      overflow: auto;
-      border-radius: 16px;
+  Tab {
+    composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
+  }
+  container {
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+    overflow: auto;
+    flex: 1;
+  }
+  actions {
+    display: flex;
+    justify-content: center;
+    flex: 0;
+  }
+  CodeEditorLoader {
+    border-radius: var(--theme-group-element-radius);
+  }
+  Textarea {
+    flex: 1;
+  }
+  CodeEditorLoader {
+    flex: 1;
+    overflow: auto;
+  }
+  TabList {
+    composes: theme-border-color-background theme-background-background from global;
+    overflow: auto;
+    border-radius: var(--theme-group-element-radius);
 
-      & Tab {
-        border-bottom: 0;
+    & Tab {
+      border-bottom: 0;
 
-        &:global([aria-selected="false"]) {
-          border-bottom: 0 !important;
-        }
+      &:global([aria-selected="false"]) {
+        border-bottom: 0 !important;
       }
     }
-  `;
+  }
+`;
+
+const textAreaStyles = css`
+  container > Textarea > textarea {
+    border-radius: var(--theme-form-element-radius) !important;
+  }
+`;
 
 export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(function TextValuePresentation({
   model,
@@ -173,7 +180,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   const autoFormat = firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
   const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
 
-  return styled(style)(
+  return styled(style, textAreaStyles)(
     <container>
       <actions>
         <TabsState
@@ -208,6 +215,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           rows={3}
           value={stringValue}
           readOnly={readonly}
+          style={textAreaStyles}
           embedded
           onChange={handleChange}
         />
