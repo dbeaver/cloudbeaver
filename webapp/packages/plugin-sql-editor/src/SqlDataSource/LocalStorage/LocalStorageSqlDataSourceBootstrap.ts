@@ -11,6 +11,8 @@ import { action, makeObservable, observable } from 'mobx';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 
+import { createSqlDataSourceHistoryInitialState } from '../SqlDataSourceHistory/createSqlDataSourceHistoryInitialState';
+import { validateSqlDataSourceHistoryState } from '../SqlDataSourceHistory/validateSqlDataSourceHistoryState';
 import { ISqlDataSourceOptions, SqlDataSourceService } from '../SqlDataSourceService';
 import type { ILocalStorageSqlDataSourceState } from './ILocalStorageSqlDataSourceState';
 import { LocalStorageSqlDataSource } from './LocalStorageSqlDataSource';
@@ -47,6 +49,7 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
             || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.id)
             || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultCatalog)
             || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultSchema)
+            || !validateSqlDataSourceHistoryState(value.history)
           ) {
             map.delete(key);
           }
@@ -80,6 +83,7 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
         name: options?.name,
         script: options?.script ?? '',
         executionContext: options?.executionContext,
+        history: createSqlDataSourceHistoryInitialState(options?.script),
       });
 
       this.dataSourceStateState.set(editorId, state);
