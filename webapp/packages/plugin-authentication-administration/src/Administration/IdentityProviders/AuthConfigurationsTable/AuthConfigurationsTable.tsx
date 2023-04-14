@@ -7,9 +7,8 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useTranslate, BASE_CONTAINERS_STYLES } from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useTranslate } from '@cloudbeaver/core-blocks';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 
 import { AuthConfiguration } from './AuthConfiguration';
@@ -24,7 +23,7 @@ export const AuthConfigurationsTable = observer<Props>(function AuthConfiguratio
   const translate = useTranslate();
   const keys = configurations.map(configuration => configuration.id);
 
-  return styled(BASE_CONTAINERS_STYLES)(
+  return (
     <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
       <TableHeader fixed>
         <TableColumnHeader min flex centerContent>

@@ -7,12 +7,11 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
 import {
-  Table, TableHeader, BASE_CONTAINERS_STYLES,
-  TableColumnHeader, TableBody, TableSelect,
-  useTranslate, getComputed, useResource
+  Table, TableHeader, TableColumnHeader,
+  TableBody, TableSelect, useTranslate,
+  getComputed, useResource
 } from '@cloudbeaver/core-blocks';
 import { DatabaseConnection, IConnectionInfoParams, serializeConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -45,7 +44,7 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({
     return displayProjects ? (projectsLoader.resource.get(projectId)?.name ?? null) : undefined;
   }
 
-  return styled(BASE_CONTAINERS_STYLES)(
+  return (
     <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
       <TableHeader fixed>
         <TableColumnHeader min flex centerContent>

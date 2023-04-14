@@ -7,10 +7,9 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
 import {
-  Table, TableHeader, BASE_CONTAINERS_STYLES, TableColumnHeader, TableBody, useTranslate } from '@cloudbeaver/core-blocks';
+  Table, TableHeader, TableColumnHeader, TableBody, useTranslate } from '@cloudbeaver/core-blocks';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
 import { User } from './User';
@@ -32,7 +31,7 @@ export const UsersTable = observer<Props>(function UsersTable({
 }) {
   const translate = useTranslate();
 
-  return styled(BASE_CONTAINERS_STYLES)(
+  return (
     <Table
       keys={keys}
       selectedItems={selectedItems}
