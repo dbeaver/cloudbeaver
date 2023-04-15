@@ -32,30 +32,16 @@ public class WSDataSourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
 
     public static final Log log = Log.getLog(WSDataSourceUpdatedEventHandlerImpl.class);
 
-    @NotNull
-    @Override
-    public String getSupportedTopicId() {
-        return WSEventTopic.DATASOURCE.getTopicId();
-    }
-
-    @NotNull
-    @Override
-    protected Log getLog() {
-        return log;
-    }
-
-    @NotNull
-    @Override
-    protected Class<WSDataSourceEvent> getEventClass() {
-        return WSDataSourceEvent.class;
-    }
-
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSDataSourceEvent event) {
         var sendEvent = true;
         if (activeUserSession instanceof WebSession) {
             var webSession = (WebSession) activeUserSession;
             WebProjectImpl project = webSession.getProjectById(event.getProjectId());
+            if (project == null) {
+                log.debug("Project " + event.getProjectId() + " is not found in session " + webSession.getSessionId());
+                return;
+            }
             sendEvent = webSession.updateProjectConnection(
                 project,
                 event.getDataSourceIds(),
