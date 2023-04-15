@@ -1,9 +1,8 @@
 const fs = require('fs');
-const { resolve, relative } = require('path');
-const paths = [resolve('.')];
+const { resolve } = require('path');
 
 function getServiceWorkerSource() {
-  return relative(__dirname, require.resolve('@cloudbeaver/core-browser/src/service-worker.ts'));
+  return require.resolve('@cloudbeaver/core-browser/src/service-worker.ts');
 }
 
 function withTimestamp(version) {
