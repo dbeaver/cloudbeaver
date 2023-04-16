@@ -14,6 +14,7 @@ import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DatabaseConnect
 import { injectable, Bootstrap } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { CreateConnectionService } from './CreateConnectionService';
@@ -53,7 +54,8 @@ export class ConnectionsAdministrationService extends Bootstrap {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly dbDriverResource: DBDriverResource,
     private readonly createConnectionService: CreateConnectionService,
-    private readonly commonDialogService: CommonDialogService
+    private readonly commonDialogService: CommonDialogService,
+    private readonly serverConfigResource: ServerConfigResource
   ) {
     super();
   }
@@ -75,6 +77,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
           canDeActivate: this.canDeActivateCreate.bind(this),
         },
       ],
+      isHidden: () => this.serverConfigResource.distributed,
       getContentComponent: () => ConnectionsAdministration,
       getDrawerComponent: () => ConnectionsDrawerItem,
       onActivate: this.loadConnections.bind(this),
