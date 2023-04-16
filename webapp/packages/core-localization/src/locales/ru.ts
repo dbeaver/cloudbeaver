@@ -91,6 +91,7 @@ export default [
   ['ui_no_file_chosen', 'Файл не выбран'],
   ['ui_file_size_exceeds', 'Максимальный размер файла превышен. Размер файла: {arg:size}. Максимальный размер: {arg:maxSize}'],
   ['ui_upload_file', 'Загрузить файл'],
+  ['ui_upload_files', 'Загрузить файлы'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

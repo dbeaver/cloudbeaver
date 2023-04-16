@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import axios, { AxiosProgressEvent } from 'axios';
 import { GraphQLClient, ClientError, resolveRequestDocument } from 'graphql-request';
 import { parseRequestArgs } from 'graphql-request/dist/parseArgs';
 import type { RequestDocument, RequestOptions, Variables } from 'graphql-request/dist/types';
@@ -15,6 +16,8 @@ import { GQLError } from './GQLError';
 import type { IResponseInterceptor } from './IResponseInterceptor';
 import { PlainGQLError } from './PlainGQLError';
 
+export type UploadProgressEvent = AxiosProgressEvent;
+
 export class CustomGraphQLClient extends GraphQLClient {
   get blockReason(): Error | string | null {
     return this.requestsBlockedReason;
@@ -23,6 +26,16 @@ export class CustomGraphQLClient extends GraphQLClient {
   private readonly interceptors: IResponseInterceptor[] = [];
   private isRequestsBlocked = false;
   private requestsBlockedReason: Error | string | null = null;
+
+  async uploadFile(
+    url: string,
+    data: File | FileList,
+    onUploadProgress?: (event: UploadProgressEvent) => void
+  ): Promise<void> {
+    await axios.postForm(url, data, {
+      onUploadProgress,
+    });
+  }
 
   registerInterceptor(interceptor: IResponseInterceptor): void {
     this.interceptors.push(interceptor);
