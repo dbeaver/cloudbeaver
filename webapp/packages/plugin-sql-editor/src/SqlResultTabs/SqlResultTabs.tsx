@@ -43,7 +43,7 @@ const styles = css`
       display: flex;
       overflow: auto;
     }
-    TabList:not([|script]) tab-outer:only-child {
+    TabList:not([|executable]) tab-outer:only-child {
       display: none;
     }
     TextPlaceholder {
@@ -91,11 +91,22 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
     }
   }
 
+  function handleCanClose(tab: ITabData): boolean {
+    const resultTab = state.resultTabs.find(tabState => tabState.tabId === tab.tabId);
+
+    if (resultTab) {
+      const group = state.resultGroups.find(group => group.groupId === resultTab.groupId)!;
+
+      return dataSource?.databaseModels.some(model => model.id === group.modelId) !== true;
+    }
+    return true;
+  }
+
   if (!state.tabs.length) {
     return styled(style)(<TextPlaceholder>{translate(dataSource?.emptyPlaceholder ?? 'sql_editor_placeholder')}</TextPlaceholder>);
   }
 
-  const script = dataSource?.hasFeature(ESqlDataSourceFeatures.script);
+  const executable = dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
   const tabList = orderedTabs.map(tab => tab.id);
 
   return styled(style)(
@@ -103,11 +114,12 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
       <TabsState
         currentTabId={state.currentTabId}
         tabList={tabList}
+        canClose={handleCanClose}
         enabledBaseActions
         onChange={handleSelect}
         onClose={handleClose}
       >
-        <TabList aria-label='SQL Results' {...use({ script })} style={styles}>
+        <TabList aria-label='SQL Results' {...use({ executable })} style={styles}>
           {orderedTabs.map(result => (
             <SqlResultTab
               key={result.id}

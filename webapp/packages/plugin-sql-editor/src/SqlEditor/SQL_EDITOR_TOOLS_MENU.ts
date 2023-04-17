@@ -6,10 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-export enum ESqlDataSourceFeatures {
-  script,
-  query,
-  executable,
-  setName,
-  setProject
-}
+import { createMenu } from '@cloudbeaver/core-view';
+
+export const SQL_EDITOR_TOOLS_MENU = createMenu('sql-editor-tools', '');

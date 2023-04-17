@@ -42,7 +42,7 @@ export const Tab = observer<TabProps>(function Tab({
   const tab = useTab(tabId, onOpen, onClose, onClick);
   const info = tab.getInfo();
 
-  const canClose = getComputed(() => !!onClose || tab.state.closable);
+  const canClose = getComputed(() => !!onClose || (tab.closable && tab.state.closable));
 
   return styled(useStyles(BASE_TAB_STYLES, BASE_TAB_ACTION_STYLES, style))(
     <TabContext.Provider value={tabContext}>

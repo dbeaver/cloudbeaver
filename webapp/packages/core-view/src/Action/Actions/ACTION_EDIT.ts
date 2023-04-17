@@ -6,10 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-export enum ESqlDataSourceFeatures {
-  script,
-  query,
-  executable,
-  setName,
-  setProject
-}
+import { createAction } from '../createAction';
+
+export const ACTION_EDIT = createAction('edit', {
+  label: 'core_view_action_edit_label',
+});
