@@ -15,6 +15,8 @@ export default [
   ['sql_editor_shortcut_show_execution_plan', 'Показать план выполнения'],
   ['sql_editor_shortcut_format', 'Форматировать скрипт'],
   ['sql_editor_shortcut_open_editor_in_new_tab', 'Открыть SQL редактор в новой бразуерной вкладке'],
+  ['sql_editor_shortcut_undo', 'Отменить'],
+  ['sql_editor_shortcut_redo', 'Повторить'],
 
   ['navigation_tree_shortcut_enable_filter', 'Включить фильтрацию'],
 ];
