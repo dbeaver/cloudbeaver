@@ -14,7 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
-import { IEditorRef, LANG_EXT } from '@cloudbeaver/plugin-codemirror6';
+import { classExtension, IEditorRef, LANG_EXT, ViewUpdate } from '@cloudbeaver/plugin-codemirror6';
 import type { ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
 
 import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader';
@@ -79,7 +79,9 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
       <SQLCodeEditorLoader
         ref={setEditorRef}
         value={data.value}
-        extensions={[LANG_EXT.sql()]}
+        extensions={[LANG_EXT.sql(), classExtension]}
+        readonly={data.readonly}
+        editable={!data.readonly}
         autoFocus
       />
     </box>

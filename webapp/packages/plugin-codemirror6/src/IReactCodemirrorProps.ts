@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { EditorState, Extension } from '@codemirror/state';
-import type { EditorView, ViewUpdate } from '@codemirror/view';
+import type { Extension } from '@codemirror/state';
+import type { ViewUpdate } from '@codemirror/view';
 
 export interface IReactCodeMirrorProps {
   value: string;
@@ -16,4 +16,5 @@ export interface IReactCodeMirrorProps {
   editable?: boolean;
   autoFocus?: boolean;
   onChange?: (value: string, update: ViewUpdate) => void;
+  onUpdate?: (update: ViewUpdate) => void;
 }

@@ -9,7 +9,7 @@
 import { EditorView } from 'codemirror6';
 import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useState } from 'react';
 
-import { EditorState, Annotation } from '@codemirror/state';
+import { EditorState, Annotation, StateEffect } from '@codemirror/state';
 import type { ViewUpdate } from '@codemirror/view';
 
 import { getDefaultExtensions } from './getDefaultExtensions';
@@ -25,6 +25,7 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
   editable,
   autoFocus,
   onChange,
+  onUpdate,
 }, ref) {
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const [view, setView] = useState<EditorView | null>(null);
@@ -42,18 +43,29 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
     },
   });
 
-  const updateListener = EditorView.updateListener.of((update: ViewUpdate) => {
-    const doc = update.state.doc;
-    const value = doc.toString();
+  const ext = [...defaultExtensions, defaultTheme, ...extensions];
 
-    onChange?.(value, update);
+  const updateListener = EditorView.updateListener.of((update: ViewUpdate) => {
+    onUpdate?.(update);
+
+    if (update.docChanged) {
+      const doc = update.state.doc;
+      const value = doc.toString();
+
+      onChange?.(value, update);
+    }
   });
+
+  if (onChange || onUpdate) {
+    ext.push(updateListener);
+  }
+
 
   useEffect(() => {
     if (container) {
       const es = EditorState.create({
         doc: value,
-        extensions: [...defaultExtensions, defaultTheme, updateListener, ...extensions],
+        extensions: ext,
       });
 
       const ev = new EditorView({
@@ -84,6 +96,12 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
       });
     }
   }, [value, view]);
+
+  useEffect(() => {
+    if (view) {
+      view.dispatch({ effects: StateEffect.reconfigure.of(ext) });
+    }
+  }, [extensions, readonly, editable, onChange, onUpdate]);
 
   useLayoutEffect(() => {
     if (autoFocus && view) {

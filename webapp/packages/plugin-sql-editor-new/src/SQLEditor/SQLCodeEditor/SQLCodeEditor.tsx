@@ -9,10 +9,8 @@
 import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
 
-import { EditorLoader, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
+import { EditorLoader, IEditorProps, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
 
-import type { ISQLCodeEditorProps } from './ISQLCodeEditorProps';
-
-export const SQLCodeEditor = observer<ISQLCodeEditorProps, IEditorRef>(forwardRef(function SQLCodeEditor(props, ref) {
+export const SQLCodeEditor = observer<IEditorProps, IEditorRef>(forwardRef(function SQLCodeEditor(props, ref) {
   return <EditorLoader {...props} ref={ref} />;
 }));

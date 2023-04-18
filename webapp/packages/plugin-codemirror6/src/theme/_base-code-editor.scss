@@ -11,4 +11,118 @@
     width: 100%;
     height: 100%;
   }
+
+  .editor {
+    @include mdc-theme-prop(background-color, surface, false);
+    @include mdc-theme-prop(color, on-surface, false);
+  }
+
+  .editor .cm-gutters {
+    @include mdc-theme-prop(background, secondary, false);
+    @include mdc-theme-prop(color, on-secondary, false);
+    @include mdc-theme-prop(border-color, background, false);
+  }
+
+  .editor .cm-activeLine {
+    @include mdc-theme-prop(background, background, false);
+  }
+
+  .editor .cm-activeLineGutter {
+    @include mdc-theme-prop(background, background, false);
+  }
+
+  .editor .active-query {
+    @include mdc-theme-prop(background, secondary, false);
+  }
+
+  .editor .cm-content ::selection {
+    color: white;
+  }
+
+  .editor .cm-line::selection,
+  .editor .cm-line > :global(span)::selection,
+  .editor .cm-line > :global(span) > :global(span)::selection {
+    @include mdc-theme-prop(background, primary, false);
+  }
+
+  .editor .cm-line::-moz-selection,
+  .editor .cm-line > :global(span)::-moz-selection,
+  .editor .cm-line > :global(span) > :global(span)::-moz-selection {
+    @include mdc-theme-prop(background, primary, false);
+  }
+
+  .editor .tok-keyword {
+    color: $keyword;
+    font-weight: bold;
+  }
+
+  .editor .tok-operator {
+    color: $operator;
+  }
+
+  .editor .tok-variable-2 {
+    color: $variable-2;
+  }
+
+  .editor .tok-variable-3,
+  .editor .tok-type {
+    color: $variable-3;
+  }
+
+  .editor .tok-builtin {
+    color: $builtin;
+  }
+
+  .editor .tok-atom {
+    color: $atom;
+  }
+
+  .editor .tok-number {
+    color: $number;
+  }
+
+  .editor .tok-def {
+    color: $def;
+  }
+
+  .editor .tok-string {
+    color: $string;
+  }
+
+  .editor .tok-string-2 {
+    color: $string-2;
+  }
+
+  .editor .tok-comment {
+    color: $comment;
+  }
+
+  .editor .tok-variable {
+    color: $variable;
+  }
+
+  .editor .tok-tag {
+    color: $tag;
+  }
+
+  .editor .tok-meta {
+    color: $meta;
+  }
+
+  .editor .tok-attribute {
+    color: $attribute;
+  }
+
+  .editor .tok-property {
+    color: $property;
+  }
+
+  .editor .tok-qualifier {
+    color: $qualifier;
+  }
+
+  .editor .tok-variable-3,
+  .editor .tok-type {
+    color: $variable-3;
+  }
 }
