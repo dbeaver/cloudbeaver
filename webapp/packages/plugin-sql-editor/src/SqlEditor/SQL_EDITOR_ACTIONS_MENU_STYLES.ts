@@ -44,10 +44,6 @@ export const SQL_EDITOR_ACTIONS_MENU_STYLES = css`
     }
 
     & menu-bar-item-label {
-      display: block;
-      text-transform: uppercase;
-      font-weight: 700;
-
       display: none;
     }
 
