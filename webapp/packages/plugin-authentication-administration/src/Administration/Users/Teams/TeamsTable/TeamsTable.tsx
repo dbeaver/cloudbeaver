@@ -7,19 +7,13 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import { css } from 'reshadow';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, Loader, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, Loader, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import { Team } from './Team';
-
-const styles = css`
-  Table {
-    width: 100%;
-  }
-`;
 
 const loaderStyle = css`
   ExceptionMessage {
@@ -38,10 +32,10 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams, state, se
   const translate = useTranslate();
   const keys = teams.map(team => team.teamId);
 
-  return styled(useStyles(styles))(
+  return (
     <Loader state={state} style={loaderStyle} overlay>
       <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
-        <TableHeader>
+        <TableHeader fixed>
           <TableColumnHeader min flex centerContent>
             <TableSelect />
           </TableColumnHeader>

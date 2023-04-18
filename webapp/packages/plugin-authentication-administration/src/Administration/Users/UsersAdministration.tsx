@@ -17,7 +17,7 @@ import { BASE_TAB_STYLES, ITabData, Tab, TabList, TabPanel, TabsState, UNDERLINE
 import { MetaParameters } from './MetaParameters/MetaParameters';
 import { TeamsPage } from './Teams/TeamsPage';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
-import { UsersTable } from './UsersTable/UsersTable';
+import { UsersPage } from './UsersTable/UsersPage';
 
 const tabsStyles = css`
   TabList {
@@ -33,6 +33,7 @@ const tabsStyles = css`
   }
   TabPanel {
     flex-direction: column;
+    overflow: auto;
   }
 `;
 
@@ -71,7 +72,7 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
         </TabList>
       </ToolsPanel>
       <TabPanel tabId={EUsersAdministrationSub.Users}>
-        <UsersTable sub={sub} param={param} />
+        <UsersPage sub={sub} param={param} />
       </TabPanel>
       <TabPanel tabId={EUsersAdministrationSub.Teams}>
         <TeamsPage sub={sub} param={param} />
