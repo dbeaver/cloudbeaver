@@ -17,7 +17,6 @@ import { ResultSetConstraintAction } from '../../DatabaseDataModel/Actions/Resul
 import { DATA_CONTEXT_DV_DDM } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import { DATA_CONTEXT_DATA_VIEWER_SIMPLE } from './DATA_CONTEXT_DATA_VIEWER_SIMPLE';
 import { DATA_VIEWER_DATA_MODEL_TOOLS_MENU } from './DATA_VIEWER_DATA_MODEL_TOOLS_MENU';
 
 export const TableWhereFilter = React.lazy(async () => {
@@ -108,7 +107,6 @@ export class TableHeaderService extends Bootstrap {
     this.menuService.addCreator({
       isApplicable: context => (
         context.get(DATA_CONTEXT_MENU) === DATA_VIEWER_DATA_MODEL_TOOLS_MENU
-        && !context.tryGet(DATA_CONTEXT_DATA_VIEWER_SIMPLE)
       ),
       getItems: (context, items) => [
         ...items,
