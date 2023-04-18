@@ -21,7 +21,9 @@ export function useTableColumnDnD(
   context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex);
   context.set(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY, columnKey);
 
-  const dndData = useDNDData(context);
+  const dndData = useDNDData(context, {
+    canDrag: () => !model.isDisabled(resultIndex),
+  });
 
   return dndData;
 }

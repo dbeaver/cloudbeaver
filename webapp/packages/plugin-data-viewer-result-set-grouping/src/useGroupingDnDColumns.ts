@@ -9,16 +9,12 @@
 import { IDNDBox, useDNDBox } from '@cloudbeaver/core-ui';
 import { DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY, IDatabaseDataModel, IDatabaseResultSet, IResultSetColumnKey, ResultSetDataAction } from '@cloudbeaver/plugin-data-viewer';
 
+import type { IGroupingQueryState } from './IGroupingQueryState';
 import type { IGroupingDataModel } from './useGroupingDataModel';
 
 interface IGroupingQueryResult {
   dndBox: IDNDBox;
   dndThrowBox: IDNDBox;
-}
-
-export interface IGroupingQueryState{
-  columns: string[];
-  query: string | null;
 }
 
 export function useGroupingDnDColumns(

@@ -50,14 +50,13 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
         const model = context.get(DATA_CONTEXT_DV_DDM);
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
 
-        if (!model.source.hasResult(resultIndex)) {
-          return true;
-        }
-
         switch (action) {
           case ACTION_DATA_VIEWER_GROUPING_CLEAR:
             return grouping.getColumns().length === 0;
           case ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN: {
+            if (!model.source.hasResult(resultIndex)) {
+              return true;
+            }
             const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
             const dataAction = model.source.getAction(resultIndex, ResultSetDataAction);
 
@@ -71,7 +70,6 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
               return selectionAction.isElementSelected({ column: key });
             });
           }
-
         }
 
         return false;

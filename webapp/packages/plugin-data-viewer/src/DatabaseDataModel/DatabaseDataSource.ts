@@ -186,6 +186,10 @@ implements IDatabaseDataSource<TOptions, TResult> {
     return this;
   }
 
+  isLoadable(): boolean {
+    return !this.isLoading() && !this.disabled;
+  }
+
   isReadonly(resultIndex: number): boolean {
     return this.access === DatabaseDataAccessMode.Readonly
       || this.results.length > 1

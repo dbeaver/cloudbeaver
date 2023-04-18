@@ -17,9 +17,9 @@ import { CaptureViewContext, useDataContext } from '@cloudbeaver/core-view';
 import { DataPresentationComponent, IDatabaseResultSet, TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
 
 import { DATA_CONTEXT_DV_DDM_RS_GROUPING, IResultSetGroupingData } from './DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING';
+import type { IGroupingQueryState } from './IGroupingQueryState';
 import { useGroupingDataModel } from './useGroupingDataModel';
-import { IGroupingQueryState, useGroupingDnDColumns } from './useGroupingDnDColumns';
-import { useGroupingQuery } from './useGroupingQuery';
+import { useGroupingDnDColumns } from './useGroupingDnDColumns';
 
 const styles = css`
   drop-area {
@@ -102,7 +102,6 @@ export const DVResultSetGroupingPresentation: DataPresentationComponent<any, IDa
   const state = useTabLocalState<IDVResultSetGroupingPresentationState>(() => ({
     presentationId: '',
     columns: [],
-    query: null,
   }));
 
   const viewContext = useContext(CaptureViewContext);
@@ -110,9 +109,8 @@ export const DVResultSetGroupingPresentation: DataPresentationComponent<any, IDa
   const translate = useTranslate();
   const [presentationId, setPresentation] = useState('');
   const [valuePresentationId, setValuePresentation] = useState<string | null>(null);
-  const model = useGroupingDataModel(originalModel, state.query);
+  const model = useGroupingDataModel(originalModel, resultIndex, state);
   const dnd = useGroupingDnDColumns(state, originalModel, model);
-  useGroupingQuery(state, originalModel, resultIndex);
 
   const groupingData = useObservableRef<IPrivateGroupingData>(() => ({
     getColumns() {
@@ -120,12 +118,10 @@ export const DVResultSetGroupingPresentation: DataPresentationComponent<any, IDa
     },
     removeColumn(...columns) {
       this.state.columns = this.state.columns.filter(column => !columns.includes(column));
-      this.state.query = null;
     },
     clear() {
       this.state.presentationId = '';
       this.state.columns = [];
-      this.state.query = null;
     },
   }), {
     clear: action,

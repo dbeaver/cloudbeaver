@@ -6,22 +6,27 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { reaction } from 'mobx';
 import { useEffect } from 'react';
 
 import { useObjectRef, useResource } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { App, useService } from '@cloudbeaver/core-di';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
+import { isObjectsEqual } from '@cloudbeaver/core-utils';
 import { DataViewerSettingsService, DatabaseDataAccessMode, DatabaseDataModel, IDatabaseDataModel, IDatabaseResultSet, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
-import { IDataQueryOptions, QueryDataSource } from '@cloudbeaver/plugin-sql-editor';
+
+import { GroupingDataSource, IDataGroupingOptions } from './GroupingDataSource';
+import type { IGroupingQueryState } from './IGroupingQueryState';
 
 export interface IGroupingDataModel {
-  model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>;
+  model: IDatabaseDataModel<IDataGroupingOptions, IDatabaseResultSet>;
 }
 
 export function useGroupingDataModel(
   sourceModel: IDatabaseDataModel<any, IDatabaseResultSet>,
-  query: string | null
+  sourceResultIndex: number,
+  state: IGroupingQueryState,
 ): IGroupingDataModel {
   const tableViewerStorageService = useService(TableViewerStorageService);
   const app = useService(App);
@@ -41,7 +46,7 @@ export function useGroupingDataModel(
   const connectionInfo = connectionInfoLoader.data;
 
   const model = useObjectRef(() => {
-    const source = new QueryDataSource(
+    const source = new GroupingDataSource(
       app.getServiceInjector(),
       graphQLService,
       asyncTaskInfoService,
@@ -65,46 +70,64 @@ export function useGroupingDataModel(
   }, false, ['dispose']);
 
   useEffect(() => {
-    if (!connectionInfo || !connectionKey) {
-      return;
-    }
-
-    if (query) {
-      model.model
-        .setOptions({
-          query,
-          connectionKey,
-          constraints: [],
-          whereFilter: '',
-        })
-        .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
-        .setSlice(0)
-        .source
-        .setExecutionContext(executionContext)
-        .setSupportedDataFormats(connectionInfo.supportedDataFormats)
-        .setResults([])
-        .setOutdated();
-    } else {
-      model.model
-        .setOptions({
-          query: '',
-          connectionKey,
-          constraints: [],
-          whereFilter: '',
-        })
-        .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
-        .setSlice(0)
-        .source
-        .setExecutionContext(executionContext)
-        .setSupportedDataFormats(connectionInfo.supportedDataFormats)
-        .setResults([]);
-    }
-
     sourceModel.onDispose.addHandler(model.dispose);
     return () => {
       sourceModel.onDispose.removeHandler(model.dispose);
     };
-  }, [sourceModel, executionContext, connectionInfo, query]);
+  }, [sourceModel]);
+
+  useEffect(() => {
+    const sub = reaction(() => {
+      const result = sourceModel.source.hasResult(sourceResultIndex)
+        ? sourceModel.source.getResult(sourceResultIndex)
+        : null;
+
+      return {
+        columns: state.columns,
+        sourceResultId: result?.id,
+      };
+    }, async ({ columns, sourceResultId }) => {
+      if (columns.length !== 0 && sourceResultId) {
+        const executionContext = sourceModel.source.executionContext;
+        model.model.source
+          .setExecutionContext(executionContext)
+          .setSupportedDataFormats(connectionInfo?.supportedDataFormats ?? []);
+
+        if (executionContext?.context) {
+          const connectionKey = createConnectionParam(
+            executionContext.context.projectId,
+            executionContext.context.connectionId
+          );
+
+          model.model
+            .setOptions({
+              query: '',
+              columns,
+              sourceResultId,
+              connectionKey,
+              constraints: [],
+              whereFilter: '',
+            })
+            .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
+            .setSlice(0)
+            .source
+            .setResults([])
+            .setOutdated();
+        }
+      } else {
+        model.model
+          .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
+          .setSlice(0)
+          .source
+          .setExecutionContext(null)
+          .setSupportedDataFormats([])
+          .setResults([]);
+      }
+
+    }, { fireImmediately: true, equals: isObjectsEqual });
+
+    return sub;
+  }, [state, sourceModel, sourceResultIndex]);
 
   useEffect(() => model.dispose, []);
 

@@ -197,6 +197,7 @@ export const TableViewer = observer<Props, HTMLDivElement>(forwardRef(function T
     dataModel?.source.error === null
     && dataModel.source.results.length === 0
     && dataModel.source.outdated
+    && dataModel.source.isLoadable()
   ));
 
   useEffect(() => {
