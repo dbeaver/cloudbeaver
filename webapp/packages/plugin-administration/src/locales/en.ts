@@ -23,7 +23,7 @@ export default [
   ['administration_configuration_wizard_configuration_server_info_unsaved_title', 'Unsaved settings'],
   ['administration_configuration_wizard_configuration_server_info_unsaved_message', 'Settings can be saved on Server configuration page'],
   ['administration_configuration_wizard_configuration_server_info_unsaved_navigate', 'Open'],
-  ['administration_configuration_wizard_configuration_server_session_lifetime', 'Session lifetime'],
+  ['administration_configuration_wizard_configuration_server_session_lifetime', 'Session lifetime, min'],
   ['administration_configuration_wizard_configuration_server_session_lifetime_description', 'Here you may specify the number of minutes that you wish the session to be allowed to remain idle before it expires'],
 
   ['administration_configuration_wizard_configuration_plugins', 'Configuration'],
