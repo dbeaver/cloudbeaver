@@ -110,7 +110,7 @@ export const MetaParameters = observer<Props>(function MetaParameters({ sub, par
             expandedItems={controller.expandedItems}
             size='big'
           >
-            <TableHeader>
+            <TableHeader fixed>
               {isLocalProviderAvailable && (
                 <TableColumnHeader min flex centerContent>
                   <TableSelect />

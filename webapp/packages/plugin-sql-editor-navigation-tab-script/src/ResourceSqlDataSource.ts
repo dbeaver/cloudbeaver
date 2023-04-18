@@ -11,7 +11,7 @@ import { action, computed, makeObservable, observable, runInAction, toJS } from 
 import { ConnectionInfoResource, createConnectionParam, IConnectionExecutionContextInfo, NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
-import { ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath, debounce, getPathName, getPathParent, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
 
@@ -124,7 +124,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.debouncedWrite = debounce(this.debouncedWrite.bind(this), VALUE_SYNC_DELAY);
     this.syncResource = this.syncResource.bind(this);
 
-    resourceManagerResource.onItemUpdate.addHandler(this.syncResource);
+    resourceManagerResource.onDataOutdated.addHandler(this.syncResource);
 
     makeObservable<this, '_script' | 'lastAction' | 'loaded'>(this, {
       script: computed,
@@ -225,7 +225,11 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     }
   }
 
-  syncResource(key: ResourceKeySimple<string>) {
+  syncResource(key: ResourceKey<string>) {
+    if (isResourceAlias(key)) {
+      return;
+    }
+
     const resourceKey = this.resourceKey;
     if (resourceKey && ResourceKeyUtils.some(key, key => resourceKey.startsWith(key))) {
       this.reloadResource();
