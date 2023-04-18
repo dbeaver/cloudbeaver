@@ -23,7 +23,6 @@ export default [
   ['administration_configuration_wizard_configuration_server_info_unsaved_title', 'Impostazioni non salvate'],
   ['administration_configuration_wizard_configuration_server_info_unsaved_message', 'Le impostazioni possono essere salvate sull pagina di Configurazione Server'],
   ['administration_configuration_wizard_configuration_server_info_unsaved_navigate', 'Apri'],
-  ['administration_configuration_wizard_configuration_server_session_lifetime', 'Durata della connessione'],
   ['administration_configuration_wizard_configuration_server_session_lifetime_description', 'Qua puoi specificare il numero di minuti che vorresti permettere alla sessione di rimanere in attesa prima che scadi'],
 
   ['administration_configuration_wizard_configuration_plugins', 'Configurazione'],
