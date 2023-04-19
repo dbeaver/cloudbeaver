@@ -36,6 +36,7 @@ export class ServiceWorkerService {
         this.workbox = new Workbox(this.workerURL);
         this.registerSkipWaitingPrompt(this.workbox);
         this.workbox.register();
+        setInterval(() => this.workbox?.update(), 1000 * 60 * 60);
       }
     }
   }
