@@ -47,13 +47,13 @@ const styles = css`
     justify-content: center;
     flex: 0;
   }
-  CodeEditorLoader {
+  EditorLoader {
     border-radius: var(--theme-group-element-radius);
   }
   Textarea {
     flex: 1;
   }
-  CodeEditorLoader {
+  EditorLoader {
     flex: 1;
     overflow: auto;
   }
@@ -179,6 +179,12 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   const useCodeEditor = state.currentContentType !== 'text/plain';
   const autoFormat = !!firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
   const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
+
+  let mode: LangMode | undefined;
+
+  if (['application/json', 'text/xml', 'text/html'].includes(state.currentContentType)) {
+    mode = state.currentContentType.split('/')[1] as LangMode;
+  }
 
   return styled(style, textAreaStyles)(
     <container>
