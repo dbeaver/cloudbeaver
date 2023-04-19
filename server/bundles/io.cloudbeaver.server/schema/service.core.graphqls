@@ -233,6 +233,20 @@ type DriverInfo {
     applicableNetworkHandlers: [ID]!
 
     configurationTypes: [DriverConfigurationType]!
+
+    driverLibraries: [DriverLibraryInfo!]
+}
+
+type DriverProviderInfo {
+    id: ID!
+    name: String!
+    icon: String!
+}
+
+type DriverLibraryInfo {
+    id: ID!
+    name: String!
+    icon: String!
 }
 
 enum ResultDataFormat {
@@ -396,12 +410,6 @@ type LogEntry {
     type: String!
     message: String
     stackTrace: String
-}
-
-type DriverProviderInfo {
-    id: ID!
-    name: String!
-    icon: String!
 }
 
 ####################################################
@@ -599,6 +607,8 @@ extend type Mutation {
     updateDriver(config: DriverConfig!): DriverInfo!
 
     deleteDriver(id: ID!): Boolean!
+
+    deleteDriverLibraries(driverId: ID!, libraryIds: [ID!]!): Boolean!
 
 }
 

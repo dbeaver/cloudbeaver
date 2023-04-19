@@ -28,6 +28,8 @@ import org.jkiss.dbeaver.model.rm.RMConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +63,20 @@ public interface DBWServiceCore extends DBWService {
     boolean deleteDriver(
         @NotNull WebSession session,
         @NotNull String driverId
+    ) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean addDriverLibraries(
+        @NotNull WebSession session,
+        @NotNull String driverId,
+        @NotNull Collection<Part> requestParts
+    ) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean deleteDriverLibraries(
+        @NotNull WebSession session,
+        @NotNull String driverId,
+        @NotNull List<String> libraryIds
     ) throws DBWebException;
 
     @WebAction

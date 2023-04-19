@@ -259,4 +259,11 @@ public class WebDatabaseDriverInfo {
         }
         return driver.getSampleURL().matches(URL_DATABASE_FIELD);
     }
+
+    @Property
+    public WebDriverLibraryInfo[] getDriverLibraries() {
+        return driver.getDriverLibraries().stream()
+            .map(dbpDriverLibrary -> new WebDriverLibraryInfo(webSession, dbpDriverLibrary))
+            .toArray(WebDriverLibraryInfo[]::new);
+    }
 }
