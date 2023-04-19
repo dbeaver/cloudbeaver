@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { isValidUrl } from './isValidUrl';
 import { pathJoin } from './pathJoin';
 
 declare const _VERSION_: string | undefined;
@@ -39,6 +40,12 @@ export const GlobalConstants = {
     if (_ROOT_URI_ === '{ROOT_URI}') {
       return defaultURI;
     }
+
+    if (_ROOT_URI_ && isValidUrl(_ROOT_URI_)) {
+      const url = new URL(_ROOT_URI_);
+      return url.pathname;
+    }
+
     return pathJoin(_ROOT_URI_ ?? defaultURI, '/');
   },
 
@@ -54,8 +61,12 @@ export const GlobalConstants = {
     return pathJoin(this.serviceURI, ...parts);
   },
 
-  hostServiceUrl(...parts: string[]): string {
-    return pathJoin(this.host, this.absoluteServiceUrl(...parts));
+  absoluteServiceHTTPUrl(...parts: string[]): string {
+    return `${this.protocol}//${pathJoin(this.host, this.absoluteServiceUrl(...parts))}`;
+  },
+
+  absoluteServiceWSUrl(...parts: string[]): string {
+    return `${this.wsProtocol}//${pathJoin(this.host, this.absoluteServiceUrl(...parts))}`;
   },
 
   absoluteUrl(...parts: string[]): string {

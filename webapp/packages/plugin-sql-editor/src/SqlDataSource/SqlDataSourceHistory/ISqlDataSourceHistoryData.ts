@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createDataContext } from '@cloudbeaver/core-view';
-
-export const DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX = createDataContext<number>('data-viewer-database-data-model-result-index');
+export interface ISqlDataSourceHistoryData {
+  value: string;
+  source?: string;
+}

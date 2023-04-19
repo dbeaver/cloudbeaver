@@ -35,6 +35,9 @@ export const BASE_CONTAINERS_STYLES = css`
         & > :global(*) {
           flex-basis: 0 !important;
         }
+        & > [keepSize] {
+          flex-basis: auto !important;
+        }
       }
 
       &[baseline] {
@@ -88,7 +91,7 @@ export const BASE_CONTAINERS_STYLES = css`
       align-content: baseline;
       box-sizing: border-box;
       padding: 24px;
-      border-radius: 4px;
+      border-radius: var(--theme-group-element-radius);
 
       &[dense] {
         padding: 8px;
@@ -100,7 +103,12 @@ export const BASE_CONTAINERS_STYLES = css`
 
       &[box] {
         padding: 0;
-        overflow: hidden;
+          overflow: hidden;
+      }
+
+      &[box="no-overflow"] {
+        padding: 0;
+        overflow: initial;
       }
 
       &[center] {
@@ -191,7 +199,7 @@ export const BASE_CONTAINERS_STYLES = css`
       opacity: 0.9;
     }
 
-    Group[box] GroupTitle {
+    Group[box] > GroupTitle {
       padding: 24px;
     }
 

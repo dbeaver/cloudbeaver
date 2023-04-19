@@ -7,6 +7,7 @@ const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 
 const excludedFromVendor = require('./excludedFromVendor.js');
+const { getServiceWorkerSource } = require('./webpack.product.utils.js');
 // const ESLintPlugin = require('eslint-webpack-plugin');
 
 class IgnoreNotFoundExportPlugin {
@@ -105,6 +106,27 @@ module.exports = (env, argv) => {
       configFile: join(__dirname, 'babel.config.js'),
     },
   };
+
+  var workboxPlugin = [];
+  if (devMode) {
+    // TODO: workbox not working in dev mode
+
+    // workboxPlugin = new WorkboxPlugin.InjectManifest({
+    //   swSrc: getServiceWorkerSource(),
+    //   swDest: 'service-worker.js',
+    // });
+    // Object.defineProperty(workboxPlugin, 'alreadyCalled', {
+    //   get() {
+    //     return false;
+    //   },
+    //   set() {},
+    // });
+  } else {
+    workboxPlugin = [new WorkboxPlugin.InjectManifest({
+      swSrc: getServiceWorkerSource(),
+      swDest: 'service-worker.js',
+    })];
+  }
 
   return {
     // target: !devMode ? "web" : "browserslist",
@@ -269,14 +291,7 @@ module.exports = (env, argv) => {
           }
         },
       }),
-      ...devMode
-        ? []
-        : [
-          new WorkboxPlugin.GenerateSW({
-            clientsClaim: true,
-            skipWaiting: true,
-          }),
-        ],
+      ...workboxPlugin,
     ],
   };
 };

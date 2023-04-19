@@ -28,6 +28,7 @@ export default [
   ['ui_error_message', 'Ошибка:'],
   ['ui_error_close', 'Закрыть'],
   ['ui_clear', 'Очистить'],
+  ['ui_remove', 'Убрать'],
   ['ui_close', 'Закрыть'],
   ['ui_errors_details', 'Информация'],
   ['ui_search', 'Поиск...'],
@@ -100,8 +101,8 @@ export default [
   ['app_root_session_expired_title', 'Сессия истекла'],
   ['app_root_session_expired_message', 'Сессия истекла. Хотите перезагрузить страницу?'],
   ['app_root_session_expired_reload', 'Перезагрузить'],
-  ['app_root_server_node_changed_title', 'Узел сервера изменён'],
-  ['app_root_server_node_changed_message', 'Узел сервера изменён. Необходимо перезагрузить приложение.'],
+  ['app_root_server_node_changed_title', 'Приложение было перезапущено'],
+  ['app_root_server_node_changed_message', 'Приложение было перезапущено. Пожалуйста, перезагрузите страницу.'],
   ['app_root_quota_exceeded', 'Квота превышена'],
   ['core_eventsLog_dbeaverErrorDetails', 'Детали ошибки'],
 ];

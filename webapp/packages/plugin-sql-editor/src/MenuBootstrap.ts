@@ -8,7 +8,7 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { ActionService, KeyBindingService, MenuService, IAction, IDataContextProvider } from '@cloudbeaver/core-view';
+import { ActionService, KeyBindingService, MenuService, IAction, IDataContextProvider, ACTION_UNDO, ACTION_REDO, KEY_BINDING_UNDO, KEY_BINDING_REDO } from '@cloudbeaver/core-view';
 import { DatabaseEditAction, TableFooterMenuService } from '@cloudbeaver/plugin-data-viewer';
 
 import { ACTION_SQL_EDITOR_EXECUTE } from './actions/ACTION_SQL_EDITOR_EXECUTE';
@@ -42,7 +42,14 @@ export class MenuBootstrap extends Bootstrap {
       isActionApplicable: (contexts, action): boolean => {
         const sqlEditorData = contexts.tryGet(DATA_CONTEXT_SQL_EDITOR_DATA);
 
-        if (action === ACTION_SQL_EDITOR_FORMAT && sqlEditorData?.readonly) {
+        if (!sqlEditorData) {
+          return false;
+        }
+
+        if (
+          sqlEditorData.readonly
+          && [ACTION_SQL_EDITOR_FORMAT, ACTION_REDO, ACTION_UNDO].includes(action)
+        ) {
           return false;
         }
 
@@ -52,9 +59,10 @@ export class MenuBootstrap extends Bootstrap {
             ACTION_SQL_EDITOR_EXECUTE_NEW,
             ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
             ACTION_SQL_EDITOR_FORMAT,
+            ACTION_REDO,
+            ACTION_UNDO,
             ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
           ].includes(action)
-          && sqlEditorData !== undefined
         );
       },
       isDisabled: (context, action) => !context.has(DATA_CONTEXT_SQL_EDITOR_DATA),
@@ -86,6 +94,20 @@ export class MenuBootstrap extends Bootstrap {
       id: 'sql-editor-format',
       binding: KEY_BINDING_SQL_EDITOR_FORMAT,
       isBindingApplicable: (contexts, action) => action === ACTION_SQL_EDITOR_FORMAT,
+      handler: this.sqlEditorActionHandler.bind(this),
+    });
+
+    this.keyBindingService.addKeyBindingHandler({
+      id: 'sql-editor-redo',
+      binding: KEY_BINDING_REDO,
+      isBindingApplicable: (contexts, action) => action === ACTION_REDO,
+      handler: this.sqlEditorActionHandler.bind(this),
+    });
+
+    this.keyBindingService.addKeyBindingHandler({
+      id: 'sql-editor-undo',
+      binding: KEY_BINDING_UNDO,
+      isBindingApplicable: (contexts, action) => action === ACTION_UNDO,
       handler: this.sqlEditorActionHandler.bind(this),
     });
 
@@ -163,6 +185,12 @@ export class MenuBootstrap extends Bootstrap {
         }
 
         data.formatScript();
+        break;
+      case ACTION_UNDO:
+        data.dataSource?.history.undo();
+        break;
+      case ACTION_REDO:
+        data.dataSource?.history.redo();
         break;
       case ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN:
         data.showExecutionPlan();

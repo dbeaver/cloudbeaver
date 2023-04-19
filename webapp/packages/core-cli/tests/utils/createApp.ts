@@ -18,7 +18,7 @@ export interface IApplication {
 }
 
 export function createApp(...plugins: PluginManifest[]): IApplication {
-  (globalThis as any)._ROOT_URI_ = 'http://127.0.0.1:8978/';
+  (globalThis as any)._ROOT_URI_ = '{ROOT_URI}';
   (globalThis as any)._VERSION_ = '00.0.0';
   configure({ enforceActions: 'never' });
 
