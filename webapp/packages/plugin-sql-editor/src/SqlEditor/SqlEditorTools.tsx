@@ -15,7 +15,7 @@ import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
 import type { ISQLEditorData } from './ISQLEditorData';
-import { SqlEditorActionsMenu } from './SqlEditorActionsMenu';
+import { SqlEditorToolsMenu } from './SqlEditorToolsMenu';
 import { useTools } from './useTools';
 
 const styles = css`
@@ -73,19 +73,17 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({
 
   return styled(useStyles(style, styles))(
     <tools className={className} onMouseDown={preventFocusHandler}>
-      <SqlEditorActionsMenu state={state} />
+      <SqlEditorToolsMenu state={state} />
       {isScript && (
         <>
-          {!data.readonly && (
-            <button
-              disabled={disabled}
-              title={translate('sql_editor_sql_format_button_tooltip')}
-              hidden={isActiveSegmentMode}
-              onClick={data.formatScript}
-            >
-              <StaticImage icon="/icons/sql_format_sm.svg" />
-            </button>
-          )}
+          <button
+            disabled={disabled || data.readonly}
+            title={translate('sql_editor_sql_format_button_tooltip')}
+            hidden={isActiveSegmentMode}
+            onClick={data.formatScript}
+          >
+            <StaticImage icon="/icons/sql_format_sm.svg" />
+          </button>
           <button
             disabled={scriptEmpty}
             title={translate('sql_editor_download_script_tooltip')}
@@ -94,14 +92,15 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({
           >
             <StaticImage icon='/icons/export.svg' />
           </button>
-          {!isActiveSegmentMode && !data.readonly && (
+          {!isActiveSegmentMode && (
             <UploadArea
               accept='.sql'
               title={translate('sql_editor_upload_script_tooltip')}
+              disabled={data.readonly}
               reset
               onChange={handleScriptUpload}
             >
-              <upload>
+              <upload disabled={data.readonly}>
                 <StaticImage icon='/icons/import.svg' />
               </upload>
             </UploadArea>

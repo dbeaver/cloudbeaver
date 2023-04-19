@@ -87,8 +87,14 @@ export class TabsBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       isApplicable: context => {
+        const tab = context.tryGet(DATA_CONTEXT_TAB_ID);
         const state = context.tryGet(DATA_CONTEXT_TABS_CONTEXT);
-        return !!state?.enabledBaseActions && context.get(DATA_CONTEXT_MENU) === MENU_TAB;
+        return (
+          !!tab
+          && !!state?.enabledBaseActions
+          && context.get(DATA_CONTEXT_MENU) === MENU_TAB
+          && state.canClose(tab)
+        );
       },
       getItems: (context, items) => [
         ...items,
