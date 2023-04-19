@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Group, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { BASE_TAB_STYLES, TabList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
@@ -62,7 +62,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
   onPresentationChange,
   onClose,
 }) {
-  const style = useStyles(styles, BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES);
+  const style = useStyles(styles, BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, BASE_CONTAINERS_STYLES);
   const dataPresentationService = useService(DataPresentationService);
   const presentations = dataPresentationService.getSupportedList(
     type,

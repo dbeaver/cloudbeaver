@@ -27,6 +27,7 @@ export interface IDatabaseDataModel<TOptions = any, TResult extends IDatabaseDat
 
   readonly onOptionsChange: IExecutor;
   readonly onRequest: IExecutor<IRequestEventData<TOptions, TResult>>;
+  readonly onDispose: IExecutor;
 
   setName: (name: string | null) => this;
   isReadonly: (resultIndex: number) => boolean;

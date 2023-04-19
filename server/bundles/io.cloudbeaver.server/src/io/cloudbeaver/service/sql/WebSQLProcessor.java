@@ -95,7 +95,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         return webSession;
     }
 
-    SQLSyntaxManager getSyntaxManager() {
+    public SQLSyntaxManager getSyntaxManager() {
         return syntaxManager;
     }
 
@@ -256,10 +256,12 @@ public class WebSQLProcessor implements WebSessionProvider {
                     WebSQLQueryResults results = new WebSQLQueryResults(webSession, dataFormat);
                     WebSQLQueryResultSet resultSet = dataReceiver.getResultSet();
                     results.setResultSet(resultSet);
+
                     executeInfo.setResults(new WebSQLQueryResults[]{results});
                     setResultFilterText(dataContainer, session.getDataSource(), executeInfo, dataFilter);
                     executeInfo.setFullQuery(statistics.getQueryText());
                     if (resultSet != null && resultSet.getRows() != null) {
+                        resultSet.getResultsInfo().setQueryText(statistics.getQueryText());
                         executeInfo.setStatusMessage(resultSet.getRows().length + " row(s) fetched");
                     }
                 } catch (DBException e) {
@@ -733,6 +735,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
                         readResultSet(dbStat.getSession(), resultSet, webDataFilter, dataReceiver);
                         results.setResultSet(dataReceiver.getResultSet());
+                        dataReceiver.getResultSet().getResultsInfo().setQueryText(resultSet.getSourceStatement().getQueryString());
                     }
                 }
             } else {

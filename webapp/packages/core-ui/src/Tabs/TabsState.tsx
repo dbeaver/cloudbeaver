@@ -100,8 +100,11 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   });
 
   if (
-    !isNull(currentTabId)
-    && !isUndefined(currentTabId)
+    (
+      !isNull(currentTabId)
+      && !isUndefined(currentTabId)
+    )
+    || !autoSelect
   ) {
     state.selectedId = currentTabId;
     dynamic.selectedId = currentTabId;
@@ -113,6 +116,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     && !isUndefined(dynamic.selectedId)
     && !isNull(selectedId)
     && !isUndefined(selectedId)
+    && autoSelect
   ) {
     const tabExists = displayed.includes(dynamic.selectedId);
 
@@ -147,8 +151,11 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
 
   useEffect(() => {
     if (
-      !isNull(currentTabId)
-      && !isUndefined(currentTabId)
+      (
+        !isNull(currentTabId)
+        && !isUndefined(currentTabId)
+      )
+      || !autoSelect
     ) {
       return;
     }
@@ -157,7 +164,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       tabId: state.selectedId!,
       props,
     });
-  }, [currentTabId, state.selectedId]);
+  }, [currentTabId, state.selectedId, autoSelect]);
 
   useEffect(() => {
     if (

@@ -22,7 +22,8 @@ export interface IQueryRequestInfo extends IRequestInfo {
   query: string;
 }
 
-export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IDatabaseResultSet> {
+export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOptions>
+  extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
   currentTask: ITask<SqlExecuteInfo> | null;
   requestInfo: IQueryRequestInfo;
 
@@ -32,8 +33,8 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
 
   constructor(
     readonly serviceInjector: IServiceInjector,
-    private readonly graphQLService: GraphQLService,
-    private readonly asyncTaskInfoService: AsyncTaskInfoService,
+    protected readonly graphQLService: GraphQLService,
+    protected readonly asyncTaskInfoService: AsyncTaskInfoService,
   ) {
     super(serviceInjector);
 
@@ -50,6 +51,10 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
     makeObservable(this, {
       currentTask: observable.ref,
     });
+  }
+
+  isLoadable(): boolean {
+    return super.isLoadable() && !!this.executionContext?.context;
   }
 
   isReadonly(resultIndex: number): boolean {
@@ -125,7 +130,7 @@ export class QueryDataSource extends DatabaseDataSource<IDataQueryOptions, IData
     return prevResults;
   }
 
-  setOptions(options: IDataQueryOptions): this {
+  setOptions(options: TOptions): this {
     this.options = options;
     return this;
   }

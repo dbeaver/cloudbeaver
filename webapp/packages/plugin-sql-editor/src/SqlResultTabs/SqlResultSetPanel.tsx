@@ -8,10 +8,18 @@
 
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
+import styled, { css } from 'reshadow';
 
 import { TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IResultGroup, IResultTab } from '../ISqlEditorTabState';
+
+const styles = css`
+  TableViewerLoader {
+    padding: 8px;
+    padding-bottom: 0;
+  }
+`;
 
 interface Props {
   group: IResultGroup;
@@ -25,7 +33,7 @@ export const SqlResultSetPanel = observer<Props>(function SqlResultSetPanel({
   const [presentationId, setPresentation] = useState('');
   const [valuePresentationId, setValuePresentation] = useState<string | null>(null);
 
-  return (
+  return styled(styles)(
     <TableViewerLoader
       tableId={group.modelId}
       resultIndex={resultTab.indexInResultSet}
