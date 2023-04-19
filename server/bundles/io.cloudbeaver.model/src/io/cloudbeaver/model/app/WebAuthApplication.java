@@ -17,8 +17,14 @@
 
 package io.cloudbeaver.model.app;
 
+import io.cloudbeaver.auth.CBAuthConstants;
+
 public interface WebAuthApplication extends WebApplication {
     WebAuthConfiguration getAuthConfiguration();
 
     String getAuthServiceURL();
+
+    default long getMaxSessionIdleTime() {
+        return CBAuthConstants.MAX_SESSION_IDLE_TIME;
+    }
 }

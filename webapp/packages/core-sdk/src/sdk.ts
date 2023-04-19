@@ -249,7 +249,9 @@ export enum CbServerEventId {
   CbRmResourceCreated = 'cb_rm_resource_created',
   CbRmResourceDeleted = 'cb_rm_resource_deleted',
   CbRmResourceUpdated = 'cb_rm_resource_updated',
+  CbSessionExpired = 'cb_session_expired',
   CbSessionLogUpdated = 'cb_session_log_updated',
+  CbSessionState = 'cb_session_state',
   CbSessionWebsocketConnected = 'cb_session_websocket_connected'
 }
 
@@ -1730,6 +1732,18 @@ export interface UserInfo {
   linkedAuthProviders: Array<Scalars['String']>;
   metaParameters: Scalars['Object'];
   userId: Scalars['ID'];
+}
+
+export interface WsSessionExpiredEvent extends CbServerEvent {
+  id: CbServerEventId;
+  topicId?: Maybe<CbEventTopic>;
+}
+
+export interface WsSessionStateEvent extends CbServerEvent {
+  id: CbServerEventId;
+  isValid?: Maybe<Scalars['Boolean']>;
+  remainingTime: Scalars['Int'];
+  topicId?: Maybe<CbEventTopic>;
 }
 
 export interface WsSocketConnectedEvent extends CbServerEvent {

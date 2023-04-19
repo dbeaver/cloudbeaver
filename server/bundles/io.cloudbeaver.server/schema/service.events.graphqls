@@ -9,6 +9,8 @@ enum CBServerEventId {
     cb_session_log_updated,
 
     cb_session_websocket_connected,
+    cb_session_state,
+    cb_session_expired,
 
     cb_datasource_created,
     cb_datasource_updated,
@@ -97,6 +99,20 @@ type WSSocketConnectedEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
     applicationRunId: String!
+}
+
+# Session state info event
+type WSSessionStateEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    remainingTime: Int!
+    isValid: Boolean
+}
+
+# Session expired event
+type WSSessionExpiredEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
 }
 
 # RM project update event
