@@ -399,7 +399,8 @@ type LogEntry {
 }
 
 type DriverProviderInfo {
-    name: ID!
+    id: ID!
+    name: String!
     icon: String!
 }
 

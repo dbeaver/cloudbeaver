@@ -19,7 +19,7 @@ package io.cloudbeaver.service.core;
 import io.cloudbeaver.*;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
- import io.cloudbeaver.model.user.WebDataSourceDescriptorInfo;
+ import io.cloudbeaver.model.user.WebDataSourceProviderInfo;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -43,7 +43,7 @@ public interface DBWServiceCore extends DBWService {
     List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) throws DBWebException;
 
     @WebAction
-    List<WebDataSourceDescriptorInfo> getDriverProviderList(@NotNull WebSession webSession) throws DBWebException;
+    List<WebDataSourceProviderInfo> getDriverProviderList(@NotNull WebSession webSession) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     WebDatabaseDriverInfo createDriver(

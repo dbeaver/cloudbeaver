@@ -21,22 +21,27 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
 
-public class WebDataSourceDescriptorInfo {
+public class WebDataSourceProviderInfo {
 
     @NotNull
-    private final DBPDataSourceProviderDescriptor descriptor;
+    private final DBPDataSourceProviderDescriptor providerDescriptor;
 
-    public WebDataSourceDescriptorInfo(@NotNull DBPDataSourceProviderDescriptor descriptor) {
-        this.descriptor = descriptor;
+    public WebDataSourceProviderInfo(@NotNull DBPDataSourceProviderDescriptor descriptor) {
+        this.providerDescriptor = descriptor;
+    }
+
+    @Property
+    public String getId() {
+        return providerDescriptor.getId();
     }
 
     @Property
     public String getName() {
-        return descriptor.getName();
+        return providerDescriptor.getName();
     }
 
     @Property
     public String getIcon() {
-        return WebServiceUtils.makeIconId(descriptor.getIcon());
+        return WebServiceUtils.makeIconId(providerDescriptor.getIcon());
     }
 }

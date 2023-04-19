@@ -23,7 +23,7 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebDataSourceDescriptorInfo;
+import io.cloudbeaver.model.user.WebDataSourceProviderInfo;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
@@ -44,7 +44,6 @@ import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
-import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
@@ -97,9 +96,9 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<WebDataSourceDescriptorInfo> getDriverProviderList(@NotNull WebSession webSession) throws DBWebException {
+    public List<WebDataSourceProviderInfo> getDriverProviderList(@NotNull WebSession webSession) throws DBWebException {
         return DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders().stream()
-            .map(WebDataSourceDescriptorInfo::new)
+            .map(WebDataSourceProviderInfo::new)
             .collect(Collectors.toList());
     }
 
