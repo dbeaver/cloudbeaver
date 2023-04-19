@@ -91,7 +91,7 @@ export const BASE_CONTAINERS_STYLES = css`
       align-content: baseline;
       box-sizing: border-box;
       padding: 24px;
-      border-radius: 4px;
+      border-radius: var(--theme-group-element-radius);
 
       &[dense] {
         padding: 8px;
@@ -103,7 +103,7 @@ export const BASE_CONTAINERS_STYLES = css`
 
       &[box] {
         padding: 0;
-        overflow: hidden;
+          overflow: hidden;
       }
 
       &[box="no-overflow"] {

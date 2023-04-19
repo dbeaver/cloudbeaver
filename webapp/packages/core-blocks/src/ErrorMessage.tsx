@@ -18,7 +18,7 @@ const styles = css`
     box-sizing: border-box;
     display: flex;
     align-items: center;
-    border-radius: 4px;
+    border-radius: var(--theme-group-element-radius);
     height: 50px;
     padding: 8px 12px;  
   }

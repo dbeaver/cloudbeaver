@@ -19,7 +19,7 @@ import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@clo
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavResourceNodeService, ResourceManagerService, getResourceKeyFromNodeId } from '@cloudbeaver/plugin-resource-manager';
 import { ResourceManagerScriptsService, SaveScriptDialog, SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, ISqlDataSource, SqlDataSourceService, SqlEditorSettingsService, SQL_EDITOR_ACTIONS_MENU } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, ISqlDataSource, SqlDataSourceService, SqlEditorSettingsService, MemorySqlDataSource, LocalStorageSqlDataSource, SQL_EDITOR_TOOLS_MENU } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { ResourceSqlDataSource } from './ResourceSqlDataSource';
@@ -66,7 +66,12 @@ export class PluginBootstrap extends Bootstrap {
             return false;
           }
 
-          return !(this.sqlDataSourceService.get(state.editorId) instanceof ResourceSqlDataSource);
+          const dataSource = this.sqlDataSourceService.get(state.editorId);
+
+          return (
+            dataSource instanceof MemorySqlDataSource
+            || dataSource instanceof LocalStorageSqlDataSource
+          );
         }
 
         return false;
@@ -182,7 +187,7 @@ export class PluginBootstrap extends Bootstrap {
 
         return (
           this.resourceManagerService.enabled
-          && context.get(DATA_CONTEXT_MENU) === SQL_EDITOR_ACTIONS_MENU
+          && context.get(DATA_CONTEXT_MENU) === SQL_EDITOR_TOOLS_MENU
           && !!dataSource?.hasFeature(ESqlDataSourceFeatures.script)
         );
       },

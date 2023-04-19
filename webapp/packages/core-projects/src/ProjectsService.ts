@@ -11,7 +11,7 @@ import { computed, makeObservable } from 'mobx';
 import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
+import { DataSynchronizationService, ServerConfigResource, ServerEventId } from '@cloudbeaver/core-root';
 import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
@@ -46,7 +46,7 @@ export class ProjectsService extends Dependency {
   get activeProjects(): ProjectInfo[] {
     let activeProjects: ProjectInfo[] = [];
 
-    if (activeProjects.length === 0 && this.activeProjectIds.length > 0) {
+    if (this.activeProjectIds.length > 0) {
       activeProjects = this.projectInfoResource
         .get(resourceKeyList(this.activeProjectIds))
         .filter(Boolean) as ProjectInfo[];
@@ -79,6 +79,10 @@ export class ProjectsService extends Dependency {
   }
 
   get activeProjectIds(): string[] {
+    if (!this.serverConfigResource.distributed) {
+      return [];
+    }
+
     return this.userProjectsSettings.activeProjectIds;
   }
 
@@ -92,6 +96,7 @@ export class ProjectsService extends Dependency {
   readonly getActiveProjectTask: ISyncExecutor;
 
   constructor(
+    private readonly serverConfigResource: ServerConfigResource,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly userDataService: UserDataService,

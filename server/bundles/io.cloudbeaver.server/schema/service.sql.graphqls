@@ -262,6 +262,14 @@ extend type Query {
         script: String!,
         position: Int!
     ): SQLScriptQuery!
+
+    sqlGenerateGroupingQuery(
+        projectId: ID,
+        contextId: ID!,
+        connectionId: ID!,
+        resultsId: ID!,
+        columnNames: [String!]
+    ): String!
 }
 
 extend type Mutation {

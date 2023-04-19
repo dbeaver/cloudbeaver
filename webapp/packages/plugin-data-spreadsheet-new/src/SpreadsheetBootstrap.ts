@@ -61,7 +61,10 @@ export class SpreadsheetBootstrap extends Bootstrap {
           return context.contextType === DataGridContextMenuService.cellContext;
         },
         isHidden(context) {
-          return typeof context.data.actions.valuePresentationId === 'string';
+          return (
+            typeof context.data.actions.valuePresentationId === 'string'
+            || context.data.simple
+          );
         },
         order: 0.5,
         title: 'data_grid_table_open_value_panel',

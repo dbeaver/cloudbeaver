@@ -32,6 +32,7 @@ type Props<T = Record<string, any>> = ExtractContainerProps<T> & React.PropsWith
   autoSelect?: boolean;
   tabList?: string[];
   enabledBaseActions?: boolean;
+  canClose?: (tab: ITabData<T>) => boolean;
   onChange?: (tab: ITabData<T>) => void;
   onClose?: (tab: ITabData<T>) => void;
 }>;
@@ -50,6 +51,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   enabledBaseActions,
   onChange: onOpen,
   onClose,
+  canClose,
   ...rest
 }: Props<T>): React.ReactElement | null {
   const props = useMemo(() => rest as any as T, [...Object.values(rest)]);
@@ -87,6 +89,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   const dynamic = useObjectRef(() => ({
     selectedId: selectedId || currentTabId,
   }), {
+    canClose,
     open: onOpen,
     close: onClose,
     props,
@@ -97,8 +100,11 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   });
 
   if (
-    !isNull(currentTabId)
-    && !isUndefined(currentTabId)
+    (
+      !isNull(currentTabId)
+      && !isUndefined(currentTabId)
+    )
+    || !autoSelect
   ) {
     state.selectedId = currentTabId;
     dynamic.selectedId = currentTabId;
@@ -110,6 +116,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     && !isUndefined(dynamic.selectedId)
     && !isNull(selectedId)
     && !isUndefined(selectedId)
+    && autoSelect
   ) {
     const tabExists = displayed.includes(dynamic.selectedId);
 
@@ -144,8 +151,11 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
 
   useEffect(() => {
     if (
-      !isNull(currentTabId)
-      && !isUndefined(currentTabId)
+      (
+        !isNull(currentTabId)
+        && !isUndefined(currentTabId)
+      )
+      || !autoSelect
     ) {
       return;
     }
@@ -154,7 +164,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       tabId: state.selectedId!,
       props,
     });
-  }, [currentTabId, state.selectedId]);
+  }, [currentTabId, state.selectedId, autoSelect]);
 
   useEffect(() => {
     if (
@@ -169,8 +179,14 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   }, [!isNull(state.selectedId) && !isUndefined(state.selectedId)]);
 
   const value = useObservableRef<ITabsContext<T>>(() => ({
+    canClose(tabId) {
+      return dynamic.canClose?.({
+        tabId,
+        props: dynamic.props,
+      }) ?? true;
+    },
     getTabInfo(tabId: string) {
-      return  dynamic.container?.getTabInfo(tabId);
+      return dynamic.container?.getTabInfo(tabId);
     },
     getTabState(tabId: string, valueGetter?: MetadataValueGetter<string, any>) {
       return dynamic.container?.getTabState(
@@ -193,6 +209,10 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       });
     },
     async close(tabId: string) {
+      if (!this.canClose(tabId)) {
+        return;
+      }
+
       await closeExecutor.execute({
         tabId,
         props: dynamic.props,

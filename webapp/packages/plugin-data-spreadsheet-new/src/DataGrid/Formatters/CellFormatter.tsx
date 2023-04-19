@@ -81,6 +81,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ className,
             actions={context.actions}
             spreadsheetActions={spreadsheetActions}
             resultIndex={context.resultIndex}
+            simple={context.simple}
             onStateSwitch={setMenuVisible}
           />
         </menu-container>

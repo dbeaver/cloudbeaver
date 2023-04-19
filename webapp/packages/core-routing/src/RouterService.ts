@@ -89,9 +89,14 @@ export class RouterService extends Bootstrap {
   }
 
   private configure() {
+    let root = GlobalConstants.rootURI;
+    if (!root.endsWith('/')) {
+      root = root + '/';
+    }
+
     this.router.usePlugin(browserPlugin({
       useHash: true,
-      base: GlobalConstants.rootURI,
+      base: root,
     }));
 
     this.router.subscribe(this.onRouteChange.bind(this));

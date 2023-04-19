@@ -11,6 +11,6 @@ import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 @injectable()
 export class EnvironmentService {
-  readonly gqlEndpoint = GlobalConstants.absoluteServiceUrl('gql');
-  readonly wsEndpoint = `${GlobalConstants.wsProtocol}${GlobalConstants.hostServiceUrl('ws')}`;
+  readonly gqlEndpoint = GlobalConstants.absoluteServiceHTTPUrl('gql');
+  readonly wsEndpoint = GlobalConstants.absoluteServiceWSUrl('ws');
 }

@@ -46,7 +46,7 @@ export const SessionExpiredDialog: DialogComponent<null, null> = observer(functi
           mod={['unelevated']}
           onClick={reload}
         >
-          {translate('app_root_session_expired_reload')}
+          {translate('ui_processing_reload')}
         </Button>
       </CommonDialogFooter>
     </CommonDialogWrapper>

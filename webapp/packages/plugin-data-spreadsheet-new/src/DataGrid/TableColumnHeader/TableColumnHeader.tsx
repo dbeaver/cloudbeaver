@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled, { css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { getComputed, StaticImage } from '@cloudbeaver/core-blocks';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
@@ -18,6 +18,7 @@ import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
 import { TableDataContext } from '../TableDataContext';
 import { OrderButton } from './OrderButton';
+import { useTableColumnDnD } from './useTableColumnDnD';
 
 const headerStyles = css`
   table-header {
@@ -57,6 +58,9 @@ const headerStyles = css`
   OrderButton {
     margin-left: 4px;
   }
+  [|dragging] {
+    opacity: 0.5;
+  }
 `;
 
 export const TableColumnHeader = observer<HeaderRendererProps<any>>(function TableColumnHeader({
@@ -68,6 +72,8 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
 
   const resultIndex = dataGridContext.resultIndex;
   const model = dataGridContext.model;
+
+  const dndData = useTableColumnDnD(model, resultIndex, calculatedColumn.columnDataIndex);
 
   const dataReadonly = getComputed(() => tableDataContext.isReadOnly() || model.isReadonly(resultIndex));
   const sortingDisabled = getComputed(
@@ -107,7 +113,7 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
   }
 
   return styled(headerStyles)(
-    <table-header>
+    <table-header ref={dndData.setTargetRef} {...use({ dragging: dndData.state.isDragging })}>
       <shrink-container as='div' title={columnTooltip} onClick={handleClick}>
         <icon>
           {icon && <StaticImage icon={icon} />}

@@ -7,9 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  ContextMenuService, IMenuContext, IContextMenuItem, IMenuItem
-} from '@cloudbeaver/core-dialogs';
+import { ContextMenuService, IMenuContext, IContextMenuItem, IMenuItem } from '@cloudbeaver/core-dialogs';
 
 import { DatabaseEditAction } from '../../../DatabaseDataModel/Actions/DatabaseEditAction';
 import { DatabaseSelectAction } from '../../../DatabaseDataModel/Actions/DatabaseSelectAction';
@@ -19,6 +17,7 @@ import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDat
 export interface ITableFooterMenuContext {
   model: IDatabaseDataModel;
   resultIndex: number;
+  simple: boolean;
 }
 
 @injectable()
@@ -310,12 +309,12 @@ export class TableFooterMenuService {
     });
   }
 
-  constructMenuWithContext(model: IDatabaseDataModel, resultIndex: number): IMenuItem[] {
+  constructMenuWithContext(model: IDatabaseDataModel, resultIndex: number, simple: boolean): IMenuItem[] {
     const context: IMenuContext<ITableFooterMenuContext> = {
       menuId: this.tableFooterMenuToken,
       contextId: model.id,
       contextType: TableFooterMenuService.nodeContextType,
-      data: { model, resultIndex },
+      data: { model, resultIndex, simple },
     };
     return this.contextMenuService.createContextMenu(context, this.tableFooterMenuToken).menuItems;
   }
