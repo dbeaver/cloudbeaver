@@ -15,7 +15,6 @@ import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { SessionExpireWarningDialog } from './SessionExpireWarningDialog';
 
 const WARN_IN = 5 * 1000 * 60;
-const POLL_INTERVAL = 1 * 1000 * 60;
 
 @injectable()
 export class SessionExpireWarningDialogService extends Bootstrap {
@@ -27,7 +26,7 @@ export class SessionExpireWarningDialogService extends Bootstrap {
     private readonly serverConfigResource: ServerConfigResource,
     private readonly sessionResource: SessionResource,
     private readonly userInfoResource: UserInfoResource,
-    private readonly graphQLService: GraphQLService
+    private readonly graphQLService: GraphQLService,
   ) {
     super();
     this.dialogInternalPromise = null;
@@ -35,50 +34,40 @@ export class SessionExpireWarningDialogService extends Bootstrap {
 
   register(): void {
     this.sessionExpireService.onSessionExpire.addHandler(this.close.bind(this));
+    this.sessionResource.onStatusUpdate.addHandler((data, contexts) => {
+      this.handleStateChange(data.isValid, data.remainingTime);
+    });
   }
 
-  load(): void {
-    this.startSessionPolling();
-  }
+  load(): void { }
 
-  private startSessionPolling() {
-    const checkSessionStatus = async () => {
-      if (
-        !this.serverConfigResource.anonymousAccessEnabled
-        && !this.userInfoResource.data
-        && !this.serverConfigResource.configurationMode
-      ) {
-        return;
-      }
+  private handleStateChange(isValid?: boolean, remainingTime?: number) {
+    if (
+      !this.serverConfigResource.anonymousAccessEnabled
+      && !this.userInfoResource.data
+      && !this.serverConfigResource.configurationMode
+    ) {
+      return;
+    }
 
-      const { sessionState } = await this.graphQLService.sdk.sessionState();
+    if (!isValid) {
+      this.close();
+      this.sessionExpireService.sessionExpired();
+      return;
+    }
 
-      if (!sessionState.valid) {
-        this.close();
-        this.sessionExpireService.sessionExpired();
-        return;
-      }
+    const sessionDuration = this.serverConfigResource.data?.sessionExpireTime;
 
-      const sessionDuration = this.serverConfigResource.data?.sessionExpireTime;
+    if (this.sessionExpireService.expired || !sessionDuration || sessionDuration < WARN_IN) {
+      this.close();
+      return;
+    }
 
-      if (this.sessionExpireService.expired || !sessionDuration || sessionDuration < WARN_IN) {
-        this.close();
-        return;
-      }
-
-      if (sessionState.remainingTime < WARN_IN) {
-        this.open();
-      } else {
-        this.close();
-      }
-    };
-
-    const poll = async () => {
-      await checkSessionStatus();
-      setTimeout(poll, POLL_INTERVAL);
-    };
-
-    setTimeout(poll, POLL_INTERVAL);
+    if (remainingTime !== undefined && remainingTime < WARN_IN) {
+      this.open();
+    } else {
+      this.close();
+    }
   }
 
   private async open(): Promise<void> {
