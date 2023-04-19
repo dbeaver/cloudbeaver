@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -86,6 +87,11 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     private static final Log log = Log.getLog(CBApplication.class);
 
     private static final boolean RECONFIGURATION_ALLOWED = true;
+    /**
+     * In configuration mode sessions expire after a week
+     */
+    private static final long CONFIGURATION_MODE_SESSION_IDLE_TIME = 60 * 60 * 1000 * 24 * 7;
+
 
     static {
         Log.setDefaultDebugStream(System.out);
@@ -120,7 +126,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     // Persistence
     protected SMAdminController securityController;
 
-    private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
+    private long maxSessionIdleTime = CBAuthConstants.MAX_SESSION_IDLE_TIME;
 
     private boolean develMode = false;
     private boolean configurationMode = false;
@@ -180,6 +186,9 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     }
 
     public long getMaxSessionIdleTime() {
+        if (isConfigurationMode()) {
+            return CONFIGURATION_MODE_SESSION_IDLE_TIME;
+        }
         return maxSessionIdleTime;
     }
 

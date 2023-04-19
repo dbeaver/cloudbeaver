@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -28,6 +29,7 @@ import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.WSSessionExpiredEvent;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -47,14 +49,14 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @NotNull
     protected final WebUserContext userContext;
     @NotNull
-    protected final WebApplication application;
+    protected final WebAuthApplication application;
     protected volatile long lastAccessTime;
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new CopyOnWriteArrayList<>();
     private WebSessionEventsFilter eventsFilter = new WebSessionEventsFilter();
     private final WebSessionWorkspace workspace;
 
-    public BaseWebSession(@NotNull String id, @NotNull WebApplication application) throws DBException {
+    public BaseWebSession(@NotNull String id, @NotNull WebAuthApplication application) throws DBException {
         this.id = id;
         this.application = application;
         this.createTime = System.currentTimeMillis();
@@ -152,8 +154,14 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @Override
     public void close() {
         super.close();
+        var sessionExpiredEvent = new WSSessionExpiredEvent();
         synchronized (sessionEventHandlers) {
             for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
+                try {
+                    sessionEventHandler.handeWebSessionEvent(sessionExpiredEvent);
+                } catch (DBException e) {
+                    log.warn("Failed to send session expiration event", e);
+                }
                 sessionEventHandler.close();
             }
             sessionEventHandlers.clear();
@@ -181,5 +189,15 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     public void removeSessionProject(@Nullable String projectId) throws DBException {
         userContext.getAccessibleProjectIds().remove(projectId);
+    }
+
+    @Property
+    public boolean isValid() {
+        return getRemainingTime() > 0;
+    }
+
+    @Property
+    public long getRemainingTime() {
+        return application.getMaxSessionIdleTime() + lastAccessTime - System.currentTimeMillis();
     }
 }
