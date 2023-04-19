@@ -43,6 +43,7 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
   onMouseDown,
   className,
   children,
+  big,
   ...rest
 }, ref) {
   const context = useContext(TreeNodeContext);
