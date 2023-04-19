@@ -25,7 +25,6 @@ import io.cloudbeaver.model.session.WebSessionAuthProcessor;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWSessionHandler;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -34,7 +33,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.model.websocket.event.session.WSSessionStateEvent;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.*;
@@ -49,11 +48,6 @@ import javax.servlet.http.HttpSession;
 public class WebSessionManager {
 
     private static final Log log = Log.getLog(WebSessionManager.class);
-
-    /**
-     * In configuration mode sessions expire after a week
-     */
-    private static final long CONFIGURATION_MODE_SESSION_IDLE_TIME = 60 * 60 * 1000 * 24 * 7;
 
     private final CBApplication application;
     private final Map<String, BaseWebSession> sessionMap = new HashMap<>();
@@ -88,8 +82,7 @@ public class WebSessionManager {
     public boolean touchSession(@NotNull HttpServletRequest request,
                                 @NotNull HttpServletResponse response) throws DBWebException {
         WebSession webSession = getWebSession(request, response, false);
-        long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
-        webSession.updateInfo(request, response, maxSessionIdleTime);
+        webSession.updateInfo(request, response);
         return true;
     }
 
@@ -149,7 +142,7 @@ public class WebSessionManager {
                 if (updateInfo) {
                     // Update only once per request
                     if (!CommonUtils.toBoolean(request.getAttribute("sessionUpdated"))) {
-                        webSession.updateInfo(request, response, application.getMaxSessionIdleTime());
+                        webSession.updateInfo(request, response);
                         request.setAttribute("sessionUpdated", true);
                     }
                 }
@@ -224,7 +217,7 @@ public class WebSessionManager {
 
     @NotNull
     protected WebSession createWebSessionImpl(@NotNull HttpSession httpSession) throws DBException {
-        return new WebSession(httpSession, application, getSessionHandlers(), application.getMaxSessionIdleTime());
+        return new WebSession(httpSession, application, getSessionHandlers());
     }
 
     @NotNull
@@ -264,14 +257,8 @@ public class WebSessionManager {
         return null;
     }
 
-    public long getMaxSessionIdleTime() {
-        return CBApplication.getInstance().isConfigurationMode()
-            ? CONFIGURATION_MODE_SESSION_IDLE_TIME
-            : DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
-    }
-
     public void expireIdleSessions() {
-        long maxSessionIdleTime = getMaxSessionIdleTime();
+        long maxSessionIdleTime = application.getMaxSessionIdleTime();
 
         List<BaseWebSession> expiredList = new ArrayList<>();
         synchronized (sessionMap) {
@@ -333,6 +320,18 @@ public class WebSessionManager {
             );
             sessionMap.put(sessionId, headlessSession);
             return headlessSession;
+        }
+    }
+
+    /**
+     * Send session state with remaining alive time to all cached session
+     */
+    public void sendSessionsStates() throws DBException {
+        synchronized (sessionMap) {
+            for (var session : sessionMap.values()) {
+                session.getUserContext().refreshPermissions();
+                session.addSessionEvent(new WSSessionStateEvent(session.getRemainingTime(), session.isValid()));
+            }
         }
     }
 }

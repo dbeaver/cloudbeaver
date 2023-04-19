@@ -21,7 +21,9 @@ import { ServerSettingsService } from './ServerSettingsService';
 import { SessionActionService } from './SessionActionService';
 import { SessionDataResource } from './SessionDataResource';
 import { SessionEventSource } from './SessionEventSource';
+import { SessionExpireEventService } from './SessionExpireEventService';
 import { SessionExpireService } from './SessionExpireService';
+import { SessionInfoEventHandler } from './SessionInfoEventHandler';
 import { SessionPermissionsResource } from './SessionPermissionsResource';
 import { SessionResource } from './SessionResource';
 import { SessionService } from './SessionService';
@@ -45,6 +47,7 @@ export const manifest: PluginManifest = {
     SessionActionService,
     SessionDataResource,
     SessionExpireService,
+    SessionExpireEventService,
     ServerNodeService,
     SessionResource,
     SessionService,
@@ -53,6 +56,7 @@ export const manifest: PluginManifest = {
     QuotasService,
     ServerConfigEventHandler,
     SessionEventSource,
+    SessionInfoEventHandler,
     DataSynchronizationService,
   ],
 };

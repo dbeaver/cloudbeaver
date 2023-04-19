@@ -186,7 +186,7 @@ public class CBJettyServer {
                 return 1;
             }
         }*/;
-        var maxIdleSeconds = application.getSessionManager().getMaxSessionIdleTime();
+        var maxIdleSeconds = application.getMaxSessionIdleTime();
         int intMaxIdleSeconds;
         if (maxIdleSeconds > Integer.MAX_VALUE) {
             log.warn("Max session idle time value is greater than Integer.MAX_VALUE. Integer.MAX_VALUE will be used instead");
