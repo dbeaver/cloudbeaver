@@ -22,32 +22,33 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 
 import java.util.Collection;
 
-/**
- * Notify all active user session that configuration has been changed
- */
-public class WSConfigurationChangedEventHandler implements WSEventHandler {
-    private static final Log log = Log.getLog(WSConfigurationChangedEventHandler.class);
+public class WSDefaultEventHandler<EVENT extends WSEvent> implements WSEventHandler<EVENT> {
 
-    @NotNull
-    @Override
-    public String getSupportedTopicId() {
-        return WSEventTopic.SERVER_CONFIG.getTopicId();
-    }
+    private static final Log log = Log.getLog(WSDefaultEventHandler.class);
 
     @Override
-    public void handleEvent(@NotNull WSEvent event) {
-        log.debug(getSupportedTopicId() + " event handled");
+    public void handleEvent(@NotNull EVENT event) {
+        log.debug(event.getTopicId() + " event handled");
         Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
-
         for (var activeUserSession : allSessions) {
-            if (WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId())) {
+            if (!isAcceptableInSession(activeUserSession, event)) {
+                log.debug("Cannot handle " + event.getTopicId() + " event '" + event.getId() +
+                    "' in session " + activeUserSession.getSessionId());
                 continue;
             }
-            activeUserSession.addSessionEvent(event);
+            log.debug(event.getTopicId() + " event '" + event.getId() + "' handled");
+            updateSessionData(activeUserSession, event);
         }
+    }
+
+    protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull EVENT event) {
+        activeUserSession.addSessionEvent(event);
+    }
+
+    protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull EVENT event) {
+        return !WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId()); // skip events from current session
     }
 }

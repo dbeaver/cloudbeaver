@@ -97,13 +97,13 @@ interface ICheckboxMarkupProps extends Omit<React.InputHTMLAttributes<HTMLInputE
 }
 
 export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxMarkup({
-  id, label, className, title, mod = ['primary'], ripple = true, style, readOnly, ...rest
+  id, label, indeterminate, className, title, mod = ['primary'], ripple = true, style, readOnly, ...rest
 }) {
   const checkboxRef = useRef<HTMLInputElement>(null);
 
   useLayoutEffect(() => {
     if (checkboxRef.current) {
-      checkboxRef.current.indeterminate = rest.indeterminate || false;
+      checkboxRef.current.indeterminate = indeterminate || false;
     }
   });
 

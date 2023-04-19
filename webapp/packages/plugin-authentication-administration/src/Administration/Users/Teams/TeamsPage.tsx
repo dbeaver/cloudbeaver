@@ -7,10 +7,10 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, BASE_LAYOUT_GRID_STYLES, ToolsAction, ToolsPanel, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ToolsAction, ToolsPanel, useTranslate, useStyles, ColoredContainer, Group, Container } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 
@@ -21,23 +21,8 @@ import { TeamsTable } from './TeamsTable/TeamsTable';
 import { useTeamsTable } from './TeamsTable/useTeamsTable';
 
 const styles = css` 
-    layout-grid {
-      width: 100%;
-      overflow: auto;
-    }
-    layout-grid-inner {
-      min-height: 100%;
-    }
-    layout-grid-cell {
-      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
-      position: relative;
-      border: solid 1px;
-    }
     ToolsPanel {
       border-bottom: none;
-    }
-    [|table] {
-      min-height: 140px; /* loader overlay size */
     }
 `;
 
@@ -51,60 +36,61 @@ export const TeamsPage = observer<Props>(function TeamsPage({
   param,
 }) {
   const translate = useTranslate();
-  const style = useStyles(BASE_LAYOUT_GRID_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES, BASE_CONTAINERS_STYLES);
+  const style = useStyles(BASE_CONTAINERS_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
   const service = useService(CreateTeamService);
 
   const table = useTeamsTable();
   const create = param === 'create';
 
   return styled(style)(
-    <layout-grid>
-      <layout-grid-inner>
-        <layout-grid-cell data-span='12'>
-          <ToolsPanel>
-            <ToolsAction
-              title={translate('administration_teams_add_tooltip')}
-              icon="add"
-              viewBox="0 0 24 24"
-              disabled={create || table.processing}
-              onClick={service.create}
-            >
-              {translate('ui_add')}
-            </ToolsAction>
-            <ToolsAction
-              title={translate('administration_teams_refresh_tooltip')}
-              icon="refresh"
-              viewBox="0 0 24 24"
-              disabled={table.processing}
-              onClick={table.update}
-            >
-              {translate('ui_refresh')}
-            </ToolsAction>
-            <ToolsAction
-              title={translate('administration_teams_delete_tooltip')}
-              icon="trash"
-              viewBox="0 0 24 24"
-              disabled={!table.tableState.itemsSelected || table.processing}
-              onClick={table.delete}
-            >
-              {translate('ui_delete')}
-            </ToolsAction>
-          </ToolsPanel>
-        </layout-grid-cell>
+    <ColoredContainer vertical wrap gap parent>
+      <Group box keepSize>
+        <ToolsPanel>
+          <ToolsAction
+            title={translate('administration_teams_add_tooltip')}
+            icon="add"
+            viewBox="0 0 24 24"
+            disabled={create || table.processing}
+            onClick={service.create}
+          >
+            {translate('ui_add')}
+          </ToolsAction>
+          <ToolsAction
+            title={translate('administration_teams_refresh_tooltip')}
+            icon="refresh"
+            viewBox="0 0 24 24"
+            disabled={table.processing}
+            onClick={table.update}
+          >
+            {translate('ui_refresh')}
+          </ToolsAction>
+          <ToolsAction
+            title={translate('administration_teams_delete_tooltip')}
+            icon="trash"
+            viewBox="0 0 24 24"
+            disabled={!table.tableState.itemsSelected || table.processing}
+            onClick={table.delete}
+          >
+            {translate('ui_delete')}
+          </ToolsAction>
+        </ToolsPanel>
+      </Group>
+
+      <Container overflow gap>
         {create && (
-          <layout-grid-cell data-span='12'>
+          <Group box>
             <CreateTeam />
-          </layout-grid-cell>
+          </Group>
         )}
-        <layout-grid-cell data-span='12' {...use({ table: true })}>
+        <Group box='no-overflow'>
           <TeamsTable
             teams={table.teams}
             state={table.state}
             selectedItems={table.tableState.selected}
             expandedItems={table.tableState.expanded}
           />
-        </layout-grid-cell>
-      </layout-grid-inner>
-    </layout-grid>
+        </Group>
+      </Container>
+    </ColoredContainer>
   );
 });

@@ -25,7 +25,7 @@ export const TeamMetaParameters = observer<IProps>(function TeamMetaParameters({
   const translate = useTranslate();
   const style = useStyles(BASE_CONTAINERS_STYLES);
 
-  if (teamMetaParameters.data.length > 0) {
+  if (teamMetaParameters.data.length === 0) {
     return null;
   }
 

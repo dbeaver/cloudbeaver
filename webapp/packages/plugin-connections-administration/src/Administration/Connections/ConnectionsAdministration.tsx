@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AdministrationItemContentProps, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { Loader, useResource, ToolsAction, ToolsPanel, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles, Translate } from '@cloudbeaver/core-blocks';
+import { Loader, useResource, ToolsAction, ToolsPanel, useTranslate, useStyles, Translate, Group, ColoredContainer, BASE_CONTAINERS_STYLES, Container, GroupTitle, GroupItem } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -20,36 +20,21 @@ import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable';
 import { CreateConnection } from './CreateConnection/CreateConnection';
 import { CreateConnectionService } from './CreateConnectionService';
 
+const loaderStyle = css`
+  ExceptionMessage {
+    padding: 24px;
+  }
+`;
+
 const styles = css`
-    message-box {
-      padding: 16px 24px;
-    }
+  GroupItem {
+    white-space: pre-wrap;
+  }
 
-    layout-grid {
-      overflow: auto;
-      width: 100%;
-    }
-
-    layout-grid-inner {
-      min-height: 100%;
-    }
-
-    layout-grid-cell {
-      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
-      position: relative;
-      border: solid 1px;
-    }
-
-    actions {
-      padding: 0 12px;
-      padding-right: 24px;
-    }
-    
-    p {
-      line-height: 2;
-      white-space: pre-wrap;
-    }
-  `;
+  ToolsPanel {
+    border-bottom: none;
+  }
+`;
 
 export const ConnectionsAdministration = observer<AdministrationItemContentProps>(function ConnectionsAdministration({
   sub,
@@ -59,6 +44,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
   const service = useService(CreateConnectionService);
   const controller = useController(ConnectionsAdministrationController);
   const translate = useTranslate();
+  const style = useStyles(BASE_CONTAINERS_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
 
   useResource(ConnectionsAdministration, ConnectionInfoResource, {
     key: ConnectionInfoActiveProjectKey,
@@ -66,63 +52,62 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
   });
   useResource(ConnectionsAdministration, DBDriverResource, CachedMapAllKey);
 
-  return styled(useStyles(BASE_LAYOUT_GRID_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES))(
-    <>
-      <ToolsPanel>
-        <ToolsAction
-          title={translate('connections_administration_tools_add_tooltip')}
-          icon='add'
-          viewBox="0 0 24 24"
-          disabled={!!sub || controller.isProcessing}
-          onClick={service.create}
-        >
-          {translate('ui_add')}
-        </ToolsAction>
-        <ToolsAction
-          title={translate('connections_administration_tools_refresh_tooltip')}
-          icon="refresh"
-          viewBox="0 0 24 24"
-          disabled={controller.isProcessing}
-          onClick={controller.update}
-        >
-          {translate('ui_refresh')}
-        </ToolsAction>
-        <ToolsAction
-          title={translate('connections_administration_tools_delete_tooltip')}
-          icon="trash"
-          viewBox="0 0 24 24"
-          disabled={!controller.itemsSelected || controller.isProcessing}
-          onClick={controller.delete}
-        >
-          {translate('ui_delete')}
-        </ToolsAction>
-      </ToolsPanel>
-      <layout-grid>
-        <layout-grid-inner>
-          {configurationWizard && (
-            <layout-grid-cell data-span='12'>
-              <message-box>
-                <h3><Translate token='connections_administration_configuration_wizard_title' /></h3>
-                <p><Translate token='connections_administration_configuration_wizard_message' /></p>
-              </message-box>
-            </layout-grid-cell>
-          )}
-          {sub && (
-            <layout-grid-cell data-span='12'>
-              <CreateConnection method={param} configurationWizard={configurationWizard} />
-            </layout-grid-cell>
-          )}
-          <layout-grid-cell data-span='12'>
+  return styled(style)(
+    <ColoredContainer vertical wrap parent gap>
+      <Group box keepSize>
+        <ToolsPanel>
+          <ToolsAction
+            title={translate('connections_administration_tools_add_tooltip')}
+            icon='add'
+            viewBox="0 0 24 24"
+            disabled={!!sub || controller.isProcessing}
+            onClick={service.create}
+          >
+            {translate('ui_add')}
+          </ToolsAction>
+          <ToolsAction
+            title={translate('connections_administration_tools_refresh_tooltip')}
+            icon="refresh"
+            viewBox="0 0 24 24"
+            disabled={controller.isProcessing}
+            onClick={controller.update}
+          >
+            {translate('ui_refresh')}
+          </ToolsAction>
+          <ToolsAction
+            title={translate('connections_administration_tools_delete_tooltip')}
+            icon="trash"
+            viewBox="0 0 24 24"
+            disabled={!controller.itemsSelected || controller.isProcessing}
+            onClick={controller.delete}
+          >
+            {translate('ui_delete')}
+          </ToolsAction>
+        </ToolsPanel>
+      </Group>
+      <Container overflow gap>
+        {configurationWizard && (
+          <Group gap>
+            <GroupTitle>{translate('connections_administration_configuration_wizard_title')}</GroupTitle>
+            <GroupItem>{translate('connections_administration_configuration_wizard_message')}</GroupItem>
+          </Group>
+        )}
+        {sub && (
+          <Group box>
+            <CreateConnection method={param} configurationWizard={configurationWizard} />
+          </Group>
+        )}
+        <Group box='no-overflow'>
+          <Loader style={loaderStyle} loading={controller.isProcessing} overlay>
             <ConnectionsTable
               keys={controller.keys}
               connections={controller.connections}
               selectedItems={controller.selectedItems}
               expandedItems={controller.expandedItems}
             />
-            <Loader loading={controller.isProcessing} overlay />
-          </layout-grid-cell>
-        </layout-grid-inner>
-      </layout-grid>
-    </>
+          </Loader>
+        </Group>
+      </Container>
+    </ColoredContainer>
   );
 });
