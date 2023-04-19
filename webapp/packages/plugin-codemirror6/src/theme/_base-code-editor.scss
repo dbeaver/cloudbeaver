@@ -17,6 +17,10 @@
     @include mdc-theme-prop(color, on-surface, false);
   }
 
+  .editor .cm-lineNumbers {
+    @include mdc-theme-prop(color, on-secondary, false);
+  }
+
   .editor .cm-scroller {
     outline: none;
   }
@@ -53,6 +57,33 @@
   .editor .cm-line > :global(span)::-moz-selection,
   .editor .cm-line > :global(span) > :global(span)::-moz-selection {
     @include mdc-theme-prop(background, primary, false);
+  }
+
+  .editor .cm-gutters .cm-gutterElement {
+    display: flex;
+    align-items: center;
+  }
+
+  .editor .cm-gutters .query-status .cm-gutterElement .running-query-line {
+    display: flex;
+    height: 0;
+    width: 0;
+    padding-right: 4px;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 6px solid;
+    @include mdc-theme-prop(border-left-color, primary, false);
+  }
+
+  .editor .cm-gutters .query-status .cm-gutterElement .running-query-error-line {
+    display: flex;
+    height: 0;
+    width: 0;
+    padding-right: 4px;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 6px solid;
+    @include mdc-theme-prop(border-left-color, negative, false);
   }
 
   .editor .tok-keyword {

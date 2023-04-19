@@ -14,10 +14,13 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
-import { classExtension, IEditorRef, LANG_EXT, ViewUpdate } from '@cloudbeaver/plugin-codemirror6';
+import { classExtension, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
 import type { ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
 
+import { QUERY_GUTTER } from '../QUERY_GUTTER';
 import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader';
+import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor';
+import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel';
 
 const styles = css`
   box {
@@ -34,6 +37,9 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   const navNodeManagerService = useService(NavNodeManagerService);
 
   const [editorRef, setEditorRef] = useState<IEditorRef | null>(null);
+
+  const editor = useSQLCodeEditor(editorRef);
+  const panel = useSQLCodeEditorPanel(data, editor);
 
   const dndBox = useDNDBox({
     canDrop: context => context.has(DATA_CONTEXT_NAV_NODE),
@@ -79,10 +85,12 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
       <SQLCodeEditorLoader
         ref={setEditorRef}
         value={data.value}
-        extensions={[LANG_EXT.sql(), classExtension]}
+        extensions={[classExtension, QUERY_GUTTER]}
         readonly={data.readonly}
         editable={!data.readonly}
         autoFocus
+        onChange={panel.handleQueryChange}
+        onUpdate={panel.onUpdate}
       />
     </box>
   );

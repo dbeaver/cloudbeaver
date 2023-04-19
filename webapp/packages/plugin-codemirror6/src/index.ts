@@ -6,3 +6,4 @@ export * from './classExtension';
 export * from './posToOffset';
 
 export * from '@codemirror/view';
+export * from '@codemirror/state';
