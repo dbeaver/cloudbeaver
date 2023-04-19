@@ -14,7 +14,7 @@ import { ConnectionDialectResource, ConnectionInfoActiveProjectKey, ConnectionIn
 import { MenuBar, MENU_BAR_DEFAULT_STYLES } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
-import { SQLCodeEditorLoader } from '@cloudbeaver/plugin-sql-editor';
+import { SQLCodeEditorLoader } from '@cloudbeaver/plugin-sql-editor-new';
 
 import { TAB_PANEL_STYLES } from '../TAB_PANEL_STYLES';
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from './DATA_CONTEXT_DDL_VIEWER_NODE';
@@ -39,11 +39,8 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
   return styled(style)(
     <wrapper>
       <SQLCodeEditorLoader
-        bindings={{
-          autoCursor: false,
-        }}
-        value={ddlResource.data}
-        dialect={connectionDialectResource.data}
+        value={ddlResource.data ?? ''}
+        editable={false}
         readonly
       />
       <MenuBar menu={menu} style={MENU_BAR_DEFAULT_STYLES} />

@@ -48,7 +48,8 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
   const updateListener = EditorView.updateListener.of((update: ViewUpdate) => {
     onUpdate?.(update);
 
-    if (update.docChanged) {
+    const remote = update.transactions.some(tr => tr.annotation(External));
+    if (update.docChanged && !remote) {
       const doc = update.state.doc;
       const value = doc.toString();
 
@@ -59,7 +60,6 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
   if (onChange || onUpdate) {
     ext.push(updateListener);
   }
-
 
   useEffect(() => {
     if (container) {

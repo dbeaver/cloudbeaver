@@ -11,10 +11,7 @@ import { EditorView } from 'codemirror6';
 import { foldGutter, indentOnInput, syntaxHighlighting, bracketMatching } from '@codemirror/language';
 import { highlightSelectionMatches } from '@codemirror/search';
 import { EditorState, Extension } from '@codemirror/state';
-import {
-  lineNumbers, highlightActiveLineGutter, highlightSpecialChars, dropCursor,
-  rectangularSelection, crosshairCursor, highlightActiveLine,
-} from '@codemirror/view';
+import { lineNumbers, highlightSpecialChars, dropCursor, rectangularSelection, crosshairCursor } from '@codemirror/view';
 import { classHighlighter } from '@lezer/highlight';
 
 export interface IDefaultExtensionsOptions {
@@ -25,9 +22,8 @@ export interface IDefaultExtensionsOptions {
 export function getDefaultExtensions(options: IDefaultExtensionsOptions): Extension[] {
   const extensions: Extension[] = [
     EditorView.lineWrapping, lineNumbers(), highlightSpecialChars(), foldGutter(), indentOnInput(),
-    syntaxHighlighting(classHighlighter), bracketMatching(),
-    highlightActiveLineGutter(), dropCursor(), rectangularSelection(), crosshairCursor(),
-    highlightActiveLine(), highlightSelectionMatches(),
+    syntaxHighlighting(classHighlighter), bracketMatching(), dropCursor(), rectangularSelection(), crosshairCursor(),
+    highlightSelectionMatches(),
   ];
 
   if (options.editable === false) {

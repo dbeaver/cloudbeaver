@@ -17,6 +17,10 @@
     @include mdc-theme-prop(color, on-surface, false);
   }
 
+  .editor .cm-scroller {
+    outline: none;
+  }
+
   .editor .cm-gutters {
     @include mdc-theme-prop(background, secondary, false);
     @include mdc-theme-prop(color, on-secondary, false);
@@ -89,7 +93,7 @@
     color: $string;
   }
 
-  .editor .tok-string-2 {
+  .editor .tok-string2 {
     color: $string-2;
   }
 

@@ -12,13 +12,29 @@ import styled from 'reshadow';
 
 import type { IEditorProps } from './IEditorProps';
 import type { IEditorRef } from './IEditorRef';
+import { LANG_EXT } from './LANG_EXT';
 import { ReactCodemirror } from './ReactCodemirror';
 import { EDITOR_BASE_STYLES } from './theme';
+import { useAutoFormat } from './useAutoFormat';
 
 export const Editor = observer(forwardRef<IEditorRef, IEditorProps>(function Editor(props, ref) {
+  const formatter = useAutoFormat(props.mode);
+
+  let value = props.value;
+
+  if (props.autoFormat) {
+    value = formatter.format(value);
+  }
+
+  const extensions = [...props.extensions ?? []];
+
+  if (props.mode) {
+    extensions.push(LANG_EXT[props.mode]());
+  }
+
   return styled(EDITOR_BASE_STYLES)(
-    <wrapper className='editor'>
-      <ReactCodemirror {...props} ref={ref} />
+    <wrapper className={['editor', props.className].join(' ')}>
+      <ReactCodemirror {...props} ref={ref} extensions={extensions} value={value} />
     </wrapper>
   );
 }));

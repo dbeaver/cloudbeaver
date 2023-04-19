@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { html } from '@codemirror/lang-html';
 import { javascript } from '@codemirror/lang-javascript';
 import { json } from '@codemirror/lang-json';
 import { sql } from '@codemirror/lang-sql';
@@ -16,4 +17,7 @@ export const LANG_EXT = {
   javascript,
   json,
   xml,
+  html,
 };
+
+export type LangMode = keyof typeof LANG_EXT;

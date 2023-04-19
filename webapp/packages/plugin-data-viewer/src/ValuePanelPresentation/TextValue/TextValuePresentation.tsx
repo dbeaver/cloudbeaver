@@ -16,7 +16,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { bytesToSize } from '@cloudbeaver/core-utils';
-import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
+import { EditorLoader, LangMode } from '@cloudbeaver/plugin-codemirror6';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
@@ -52,7 +52,7 @@ const styles = css`
     Textarea {
       flex: 1;
     }
-    CodeEditorLoader {
+    EditorLoader {
       flex: 1;
       overflow: auto;
     }
@@ -170,8 +170,14 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   }
 
   const useCodeEditor = state.currentContentType !== 'text/plain';
-  const autoFormat = firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
+  const autoFormat = !!firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
   const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
+
+  let mode: LangMode | undefined;
+
+  if (['application/json', 'text/xml', 'text/html'].includes(state.currentContentType)) {
+    mode = state.currentContentType.split('/')[1] as LangMode;
+  }
 
   return styled(style)(
     <container>
@@ -186,21 +192,14 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         </TabsState>
       </actions>
       {useCodeEditor ? (
-        <CodeEditorLoader
+        <EditorLoader
           key={readonly ? '1' : '0'}
           value={stringValue}
+          readonly={readonly}
+          editable={!readonly}
           autoFormat={autoFormat}
-          options={{
-            mode: state.currentContentType,
-            theme: 'material',
-            readOnly: readonly,
-            cursorBlinkRate: readonly ? -1 : undefined,
-            lineNumbers: true,
-            indentWithTabs: true,
-            smartIndent: true,
-            lineWrapping: false,
-          }}
-          onBeforeChange={(editor, data, value) => handleChange(value)}
+          mode={mode}
+          onChange={value => handleChange(value)}
         />
       ) : (
         <Textarea
