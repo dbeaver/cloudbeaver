@@ -38,7 +38,7 @@ const MENU_STYLES = css`
     color: inherit;
 
     &::before {
-      border-radius: 3px;
+      border-radius: var(--theme-menu-bar-small-action-radius);
     }
 
     &[use|hidden] {

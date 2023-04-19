@@ -36,7 +36,7 @@ interface IOptions {
   onDragEnd?: () => void;
 }
 
-export function useDNDData(context: IDataContextProvider, options: IOptions): IDNDData {
+export function useDNDData(context: IDataContextProvider, options: IOptions = {}): IDNDData {
   const state = useObservableRef<IState>(() => ({
     isDragging: false,
   }), {

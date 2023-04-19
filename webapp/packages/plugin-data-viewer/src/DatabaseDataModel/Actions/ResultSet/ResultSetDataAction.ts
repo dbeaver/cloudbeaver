@@ -110,6 +110,12 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
     return null;
   }
 
+  findColumnKey(predicate: (column: SqlResultColumn) => boolean): IResultSetColumnKey | undefined {
+    const index = this.columns.findIndex(predicate);
+
+    return index === -1 ? undefined : { index };
+  }
+
   getColumn(key: IResultSetColumnKey): SqlResultColumn | undefined {
     if (key.index >= this.columns.length) {
       return undefined;

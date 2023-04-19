@@ -6,6 +6,9 @@ export * from './DatabaseDataModel/Actions/Document/DocumentDataAction';
 export * from './DatabaseDataModel/Actions/Document/DocumentEditAction';
 export * from './DatabaseDataModel/Actions/Document/IDatabaseDataDocument';
 export * from './DatabaseDataModel/Actions/Document/IDocumentElementKey';
+export * from './DatabaseDataModel/Actions/ResultSet/DataContext/DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY';
+export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
+export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
@@ -48,6 +51,7 @@ export * from './TableViewer/IDataTableActions';
 export * from './TableViewer/IDataPresentationActions';
 
 export * from './TableViewer/TableViewerLoader';
+export * from './TableViewer/TableFooter/TableFooterMenu/DATA_VIEWER_DATA_MODEL_ACTIONS_MENU';
 export * from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
 
 export * from './ContainerDataSource';

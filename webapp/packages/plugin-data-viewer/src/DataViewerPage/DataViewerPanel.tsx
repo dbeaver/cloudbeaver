@@ -8,6 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
+import styled, { css } from 'reshadow';
 
 import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import type { ObjectPagePanelComponent } from '@cloudbeaver/plugin-object-viewer';
@@ -15,6 +16,13 @@ import type { ObjectPagePanelComponent } from '@cloudbeaver/plugin-object-viewer
 import type { IDataViewerPageState } from '../IDataViewerPageState';
 import { TableViewerLoader } from '../TableViewer/TableViewerLoader';
 import { useDataViewerDatabaseDataModel } from './useDataViewerDatabaseDataModel';
+
+const styles = css`
+  TableViewerLoader {
+    padding: 8px;
+    padding-bottom: 0;
+  }
+`;
 
 export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = observer(function DataViewerPanel({
   tab,
@@ -55,7 +63,7 @@ export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = o
     return <TextPlaceholder>Table model not loaded</TextPlaceholder>;
   }
 
-  return (
+  return styled(styles)(
     <Loader state={dataViewerDatabaseDataModel}>
       {tab.handlerState.tableId ? (
         <TableViewerLoader

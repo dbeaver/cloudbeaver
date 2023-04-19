@@ -38,6 +38,7 @@ public class WebSQLResultsInfo {
     @NotNull
     private final String id;
     private DBDAttributeBinding[] attributes;
+    private String queryText;
 
     public WebSQLResultsInfo(@NotNull DBSDataContainer dataContainer, @NotNull String id) {
         this.dataContainer = dataContainer;
@@ -60,6 +61,14 @@ public class WebSQLResultsInfo {
 
     public void setAttributes(DBDAttributeBinding[] attributes) {
         this.attributes = attributes;
+    }
+
+    public String getQueryText() {
+        return queryText;
+    }
+
+    public void setQueryText(String queryText) {
+        this.queryText = queryText;
     }
 
     @Nullable

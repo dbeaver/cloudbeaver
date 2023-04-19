@@ -13,6 +13,7 @@ import connectionAdministration from '@cloudbeaver/plugin-connections-administra
 import dataExport from '@cloudbeaver/plugin-data-export';
 import spreadsheetNew from '@cloudbeaver/plugin-data-spreadsheet-new';
 import dataViewer from '@cloudbeaver/plugin-data-viewer';
+import { dvResultSetGroupingPlugin } from '@cloudbeaver/plugin-data-viewer-result-set-grouping';
 import datasourceContextSwitch from '@cloudbeaver/plugin-datasource-context-switch';
 import ddlViewer from '@cloudbeaver/plugin-ddl-viewer';
 import devTools from '@cloudbeaver/plugin-devtools';
@@ -58,6 +59,7 @@ const PLUGINS: PluginManifest[] = [
   connectionSearch,
   dataExport,
   dataViewer,
+  dvResultSetGroupingPlugin,
   gisViewer,
   ddlViewer,
   objectViewer,
