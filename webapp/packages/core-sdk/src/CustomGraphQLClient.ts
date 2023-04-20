@@ -121,7 +121,8 @@ export class CustomGraphQLClient extends GraphQLClient {
     this.blockRequestsReasonHandler();
     try {
       const { operationName } = resolveRequestDocument(query ?? '');
-      const response = await axios.postForm<GqlResponse>(url, {
+      // TODO: we don't support GQL response right now
+      const response = await axios.postForm/*<GqlResponse>*/<T>(url, {
         operationName,
         query,
         variables,
@@ -131,8 +132,11 @@ export class CustomGraphQLClient extends GraphQLClient {
         responseType: 'json',
       });
 
+      // TODO: we don't support GQL response right now
       // TODO: seems here can be undefined
-      return this.parseGQLResponse(response, query ?? '', variables);
+      // return this.parseGQLResponse(response, query ?? '', variables);
+
+      return response.data;
     } catch (error: any) {
       if (isClientError(error)) {
         if (isObjectError(error)) {
