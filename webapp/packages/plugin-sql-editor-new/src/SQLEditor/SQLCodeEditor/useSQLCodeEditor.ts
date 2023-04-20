@@ -39,6 +39,10 @@ export function useSQLCodeEditor(editorRef: IEditorRef | null) {
         return;
       }
 
+      if (to && this.view && to > this.view.state.doc.length) {
+        return;
+      }
+
       this.view?.dispatch({
         effects: classEffect.of([ACTIVE_QUERY_DECORATION.range(from, to)]),
       });

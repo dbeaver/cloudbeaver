@@ -51,13 +51,6 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         try {
           const pos = view.posAtCoords({ x: mouse.x, y: mouse.y }) ?? 1;
 
-          view.dispatch({
-            selection: {
-              anchor: pos,
-              head: pos,
-            },
-          });
-
           await data.executeQueryAction(data.cursorSegment, async () => {
             const alias: string[] = [];
 
@@ -89,7 +82,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         readonly={data.readonly}
         editable={!data.readonly}
         autoFocus
-        onChange={panel.handleQueryChange}
+        onChange={panel.onQueryChange}
         onUpdate={panel.onUpdate}
       />
     </box>

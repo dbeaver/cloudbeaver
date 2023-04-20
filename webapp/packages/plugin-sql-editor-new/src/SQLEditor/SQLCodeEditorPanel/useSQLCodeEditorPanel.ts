@@ -18,7 +18,7 @@ import type { IEditor } from '../SQLCodeEditor/useSQLCodeEditor';
 
 interface State {
   highlightActiveQuery: () => void;
-  handleQueryChange: (query: string) => void;
+  onQueryChange: (query: string) => void;
   onUpdate: (update: ViewUpdate) => void;
 }
 
@@ -34,7 +34,7 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
         this.editor.highlightActiveQuery(segment.begin, segment.end);
       }
     },
-    handleQueryChange(query: string) {
+    onQueryChange(query: string) {
       this.data.setQuery(query);
     },
     onUpdate(update: ViewUpdate) {
@@ -49,7 +49,7 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
       }
     },
 
-  }), {}, { editor, data }, ['handleQueryChange', 'onUpdate']);
+  }), {}, { editor, data }, ['onQueryChange', 'onUpdate']);
 
   const updateHighlight = useCallback(throttle(() => state.highlightActiveQuery(), 1000), [state]);
 
