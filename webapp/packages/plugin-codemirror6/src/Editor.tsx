@@ -10,31 +10,24 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
 import styled from 'reshadow';
 
+import { getDefaultExtensions } from './getDefaultExtensions';
 import type { IEditorProps } from './IEditorProps';
 import type { IEditorRef } from './IEditorRef';
-import { LANG_EXT } from './LANG_EXT';
 import { ReactCodemirror } from './ReactCodemirror';
 import { EDITOR_BASE_STYLES } from './theme';
-import { useAutoFormat } from './useAutoFormat';
 
 export const Editor = observer(forwardRef<IEditorRef, IEditorProps>(function Editor(props, ref) {
-  const formatter = useAutoFormat(props.mode);
+  const extensions = [];
 
-  let value = props.value;
-
-  if (props.autoFormat) {
-    value = formatter.format(value);
-  }
-
-  const extensions = [...props.extensions ?? []];
-
-  if (props.mode) {
-    extensions.push(LANG_EXT[props.mode]());
+  if (!props.extensions) {
+    extensions.push(getDefaultExtensions());
+  } else {
+    extensions.push(props.extensions);
   }
 
   return styled(EDITOR_BASE_STYLES)(
     <wrapper className={['editor', props.className].join(' ')}>
-      <ReactCodemirror {...props} ref={ref} extensions={extensions} value={value} />
+      <ReactCodemirror {...props} ref={ref} extensions={extensions} />
     </wrapper>
   );
 }));

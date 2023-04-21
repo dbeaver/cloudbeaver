@@ -7,10 +7,7 @@
  */
 
 import type { IReactCodeMirrorProps } from './IReactCodemirrorProps';
-import type { LangMode } from './LANG_EXT';
 
 export interface IEditorProps extends IReactCodeMirrorProps {
   className?: string;
-  mode?: LangMode;
-  autoFormat?: boolean;
 }

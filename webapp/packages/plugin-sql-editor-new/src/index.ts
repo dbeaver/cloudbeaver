@@ -1,5 +1,5 @@
-import { SQL_EDITOR_NEW_PLUGIN } from './manifest';
+import { sqlEditorNewPlugin } from './manifest';
 
-export default SQL_EDITOR_NEW_PLUGIN;
+export default sqlEditorNewPlugin;
 
 export * from './SQLEditor/SQLCodeEditor/SQLCodeEditorLoader';

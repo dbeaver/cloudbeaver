@@ -8,17 +8,15 @@
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 
-import type { LangMode } from './LANG_EXT';
-
-export function useAutoFormat(mode: LangMode | undefined) {
+export function useAutoFormat(type: string) {
   return useObjectRef(() => ({
     format(value: string) {
       try {
-        switch (this.mode) {
-          case 'json':
+        switch (this.type) {
+          case 'application/json':
             return JSON.stringify(JSON.parse(value), null, 2);
-          case 'xml':
-          case 'html':
+          case 'text/xml':
+          case 'text/html':
             return value;
           default:
             return value;
@@ -27,5 +25,5 @@ export function useAutoFormat(mode: LangMode | undefined) {
         return value;
       }
     },
-  }), { mode });
+  }), { type });
 }

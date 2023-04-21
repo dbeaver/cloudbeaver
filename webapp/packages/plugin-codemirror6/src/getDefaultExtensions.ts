@@ -11,29 +11,26 @@ import { EditorView } from 'codemirror6';
 import { history } from '@codemirror/commands';
 import { foldGutter, indentOnInput, syntaxHighlighting, bracketMatching } from '@codemirror/language';
 import { highlightSelectionMatches } from '@codemirror/search';
-import { EditorState, Extension } from '@codemirror/state';
+import type { Extension } from '@codemirror/state';
 import { lineNumbers, highlightSpecialChars, dropCursor, rectangularSelection, crosshairCursor } from '@codemirror/view';
 import { classHighlighter } from '@lezer/highlight';
 
-export interface IDefaultExtensionsOptions {
-  readonly?: boolean;
-  editable?: boolean;
-}
-
-export function getDefaultExtensions(options: IDefaultExtensionsOptions): Extension[] {
+/** Provides the necessary extensions to establish a basic editor */
+export function getDefaultExtensions(): Extension[] {
   const extensions: Extension[] = [
-    EditorView.lineWrapping, lineNumbers(), highlightSpecialChars(), foldGutter(), indentOnInput(),
-    syntaxHighlighting(classHighlighter), bracketMatching(), dropCursor(), rectangularSelection(), crosshairCursor(),
-    highlightSelectionMatches(), history(),
+    EditorView.lineWrapping,
+    lineNumbers(),
+    highlightSpecialChars(),
+    highlightSelectionMatches(),
+    syntaxHighlighting(classHighlighter),
+    bracketMatching(),
+    dropCursor(),
+    crosshairCursor(),
+    foldGutter(),
+    indentOnInput(),
+    rectangularSelection(),
+    history(),
   ];
-
-  if (options.editable === false) {
-    extensions.push(EditorView.editable.of(false));
-  }
-
-  if (options.readonly) {
-    extensions.push(EditorState.readOnly.of(true));
-  }
 
   return extensions;
 }

@@ -1,9 +1,13 @@
 export * from './EditorLoader';
-export * from './LANG_EXT';
 export * from './IEditorProps';
 export * from './IEditorRef';
-export * from './classExtension';
-export * from './posToOffset';
+export * from './getDefaultExtensions';
 
 export * from '@codemirror/view';
 export * from '@codemirror/state';
+
+export { html as HTML_EDITOR } from '@codemirror/lang-html';
+export { javascript as JAVASCRIPT_EDITOR } from '@codemirror/lang-javascript';
+export { json as JSON_EDITOR } from '@codemirror/lang-json';
+export { sql as SQL_EDITOR } from '@codemirror/lang-sql';
+export { xml as XML_EDITOR } from '@codemirror/lang-xml';

@@ -16,7 +16,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { bytesToSize } from '@cloudbeaver/core-utils';
-import { EditorLoader, LangMode } from '@cloudbeaver/plugin-codemirror6';
+import { EditorLoader, getDefaultExtensions } from '@cloudbeaver/plugin-codemirror6';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
@@ -29,7 +29,9 @@ import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResult
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
+import { getTypeExtension } from './getTypeExtension';
 import { TextValuePresentationService } from './TextValuePresentationService';
+import { useAutoFormat } from './useAutoFormat';
 
 const styles = css`
   Tab {
@@ -152,6 +154,8 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     }
   }
 
+  const formatter = useAutoFormat(state.currentContentType);
+
   readonly = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || readonly;
 
   if (contentType !== state.lastContentType) {
@@ -179,12 +183,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   const useCodeEditor = state.currentContentType !== 'text/plain';
   const autoFormat = !!firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
   const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
-
-  let mode: LangMode | undefined;
-
-  if (['application/json', 'text/xml', 'text/html'].includes(state.currentContentType)) {
-    mode = state.currentContentType.split('/')[1] as LangMode;
-  }
+  const typeExtension = getTypeExtension(state.currentContentType);
 
   return styled(style, textAreaStyles)(
     <container>
@@ -201,11 +200,10 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       {useCodeEditor ? (
         <EditorLoader
           key={readonly ? '1' : '0'}
-          value={stringValue}
+          value={autoFormat ? formatter.format(stringValue) : stringValue}
           readonly={readonly}
           editable={!readonly}
-          autoFormat={autoFormat}
-          mode={mode}
+          extensions={typeExtension ? [getDefaultExtensions(), typeExtension] : undefined}
           onChange={value => handleChange(value)}
         />
       ) : (

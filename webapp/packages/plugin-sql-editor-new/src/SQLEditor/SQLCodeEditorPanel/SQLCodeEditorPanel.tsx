@@ -14,10 +14,11 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
-import { classExtension, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
+import type { IEditorRef } from '@cloudbeaver/plugin-codemirror6';
 import type { ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
 
-import { QUERY_GUTTER } from '../QUERY_GUTTER';
+import { ACTIVE_QUERY_EXTENSION } from '../ACTIVE_QUERY_EXTENSION';
+import { QUERY_STATUS_GUTTER_EXTENSION } from '../QUERY_STATUS_GUTTER_EXTENSION';
 import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader';
 import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor';
 import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel';
@@ -78,7 +79,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
       <SQLCodeEditorLoader
         ref={setEditorRef}
         value={data.value}
-        extensions={[classExtension, QUERY_GUTTER]}
+        extensions={[ACTIVE_QUERY_EXTENSION, QUERY_STATUS_GUTTER_EXTENSION]}
         readonly={data.readonly}
         editable={!data.readonly}
         autoFocus

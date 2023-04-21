@@ -11,7 +11,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 import { PluginBootstrap } from './PluginBootstrap';
 import { SQLCodeEditorPanelService } from './SQLEditor/SQLCodeEditorPanel/SQLCodeEditorPanelService';
 
-export const SQL_EDITOR_NEW_PLUGIN: PluginManifest = {
+export const sqlEditorNewPlugin: PluginManifest = {
   info: {
     name: 'Sql Editor New Plugin',
   },

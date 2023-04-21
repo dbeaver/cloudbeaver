@@ -12,7 +12,6 @@ import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useState }
 import { EditorState, Annotation, StateEffect } from '@codemirror/state';
 import type { ViewUpdate } from '@codemirror/view';
 
-import { getDefaultExtensions } from './getDefaultExtensions';
 import type { IEditorRef } from './IEditorRef';
 import type { IReactCodeMirrorProps } from './IReactCodemirrorProps';
 
@@ -20,7 +19,7 @@ const External = Annotation.define<boolean>();
 
 export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(function ReactCodemirror({
   value,
-  extensions = [],
+  extensions,
   readonly,
   editable,
   autoFocus,
@@ -31,11 +30,6 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
   const [view, setView] = useState<EditorView | null>(null);
   const [state, setState] = useState<EditorState | null>(null);
 
-  const defaultExtensions = getDefaultExtensions({
-    readonly,
-    editable,
-  });
-
   const defaultTheme = EditorView.theme({
     '&': {
       width: '100%',
@@ -43,22 +37,34 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
     },
   });
 
-  const ext = [...defaultExtensions, defaultTheme, ...extensions];
+  const ext = [defaultTheme];
 
-  const updateListener = EditorView.updateListener.of((update: ViewUpdate) => {
-    const remote = update.transactions.some(tr => tr.annotation(External));
+  if (editable === false) {
+    ext.push(EditorView.editable.of(false));
+  }
 
-    if (update.docChanged && !remote) {
-      const doc = update.state.doc;
-      const value = doc.toString();
+  if (readonly) {
+    ext.push(EditorState.readOnly.of(true));
+  }
 
-      onChange?.(value, update);
-    }
-
-    onUpdate?.(update);
-  });
+  if (extensions) {
+    ext.push(extensions);
+  }
 
   if (onChange || onUpdate) {
+    const updateListener = EditorView.updateListener.of((update: ViewUpdate) => {
+      const remote = update.transactions.some(tr => tr.annotation(External));
+
+      if (update.docChanged && !remote) {
+        const doc = update.state.doc;
+        const value = doc.toString();
+
+        onChange?.(value, update);
+      }
+
+      onUpdate?.(update);
+    });
+
     ext.push(updateListener);
   }
 

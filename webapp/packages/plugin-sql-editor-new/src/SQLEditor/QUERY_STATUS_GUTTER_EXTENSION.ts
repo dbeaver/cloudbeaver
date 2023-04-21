@@ -67,7 +67,7 @@ export function setGutter(view: EditorView, pos: number, type: QueryGutterEffect
   });
 }
 
-export const QUERY_GUTTER = [
+export const QUERY_STATUS_GUTTER_EXTENSION = [
   gutterExtension,
   gutter({
     class: 'query-status',

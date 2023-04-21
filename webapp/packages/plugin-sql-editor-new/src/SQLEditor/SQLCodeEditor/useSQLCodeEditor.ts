@@ -7,23 +7,20 @@
  */
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
-import { classEffect, clearClassesEffect, Decoration, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
+import type { IEditorRef } from '@cloudbeaver/plugin-codemirror6';
 
-import { setGutter } from '../QUERY_GUTTER';
+import { clearActiveQueryHighlight, highlightActiveQuery } from '../ACTIVE_QUERY_EXTENSION';
+import { setGutter } from '../QUERY_STATUS_GUTTER_EXTENSION';
 
 export interface IEditor {
   readonly view: IEditorRef['view'];
   readonly state: IEditorRef['state'];
-  highlightActiveQuery: (from: number | true, to?: number) => void;
+  highlightActiveQuery: (from: number, to?: number) => void;
+  clearActiveQueryHighlight: () => void;
   highlightExecutingLine: (line: number, state: boolean) => void;
   highlightExecutingErrorLine: (line: number, state: boolean) => void;
   resetLineStateHighlight: () => void;
-  clearClasses: () => void;
 }
-
-const ACTIVE_QUERY_DECORATION = Decoration.mark({
-  class: 'active-query',
-});
 
 export function useSQLCodeEditor(editorRef: IEditorRef | null) {
   const state: IEditor = useObservableRef(() => ({
@@ -33,19 +30,22 @@ export function useSQLCodeEditor(editorRef: IEditorRef | null) {
     get state() {
       return this.editorRef?.state ?? null;
     },
-    highlightActiveQuery(from: number | true, to?: number) {
-      if (from === true) {
-        this.clearClasses();
+    highlightActiveQuery(from: number, to?: number) {
+      if (!this.view) {
         return;
       }
 
-      if (to && this.view && to > this.view.state.doc.length) {
+      // If the 'to' parameter is provided, ensure it doesn't exceed the document length
+      if (to && to > this.view.state.doc.length) {
         return;
       }
 
-      this.view?.dispatch({
-        effects: classEffect.of([ACTIVE_QUERY_DECORATION.range(from, to)]),
-      });
+      highlightActiveQuery(this.view, from, to);
+    },
+    clearActiveQueryHighlight() {
+      if (this.view) {
+        clearActiveQueryHighlight(this.view);
+      }
     },
     highlightExecutingLine(line: number, state: boolean) {
       if (this.view) {
@@ -62,9 +62,6 @@ export function useSQLCodeEditor(editorRef: IEditorRef | null) {
         setGutter(this.view, 0, 'run', false);
         setGutter(this.view, 0, 'error', false);
       }
-    },
-    clearClasses() {
-      this.view?.dispatch({ effects: clearClassesEffect.of(null) });
     },
   }), {}, { editorRef });
 

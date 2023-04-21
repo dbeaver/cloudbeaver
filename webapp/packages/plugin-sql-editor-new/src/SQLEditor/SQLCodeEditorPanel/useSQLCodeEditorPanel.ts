@@ -26,7 +26,7 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
 
   const state: State = useObservableRef(() => ({
     highlightActiveQuery() {
-      this.editor.highlightActiveQuery(true);
+      this.editor.clearActiveQueryHighlight();
 
       const segment = this.data.activeSegment;
 
@@ -38,7 +38,7 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
       this.data.setQuery(query);
     },
     onUpdate(update: ViewUpdate) {
-      const transactions = update.transactions.filter(t => t.isUserEvent('select') || t.isUserEvent('input'));
+      const transactions = update.transactions.filter(t => t.selection !== undefined);
       const lastTransaction = transactions[transactions.length - 1] as Transaction | undefined;
 
       if (lastTransaction) {
