@@ -20,6 +20,7 @@ import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures'
 import { ISqlEditorModeProps, SqlEditorModeService } from '../SqlEditorModeService';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA';
 import type { ISqlEditorProps } from './ISqlEditorProps';
+import { SqlEditorActionsMenu } from './SqlEditorActionsMenu';
 import { SqlEditorTools } from './SqlEditorTools';
 import { useSqlEditor } from './useSqlEditor';
 
@@ -53,7 +54,7 @@ const styles = css`
       user-select: none;
 
       &:empty {
-        display: none;
+        width: initial;
       }
     }
   
@@ -124,10 +125,16 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   const displayedEditors = getComputed(() => sqlEditorModeService.tabsContainer.getDisplayed({ state, data }).length);
 
   useEffect(() => {
-    split.fixate('maximize', displayedEditors === 0);
+    if (displayedEditors === 0) {
+      split.fixate('maximize', true);
+    } else if (split.state.disable) {
+      split.fixate('resize', false);
+      split.state.setSize(-1);
+    }
   });
 
-  const isScript = data.dataSource?.hasFeature(ESqlDataSourceFeatures.script);
+  const isQuery = data.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
+  const isExecutable = data.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
 
   return styled(styles, BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, tabStyles)(
     <TabsState
@@ -142,22 +149,26 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
       <sql-editor className={className}>
         <container>
           <actions onMouseDown={preventFocusHandler}>
-            {isScript && (
+            {isExecutable && (
               <>
-                <button
-                  disabled={disabled}
-                  title={translate('sql_editor_sql_execution_button_tooltip')}
-                  onClick={data.executeQuery}
-                >
-                  <StaticImage icon="/icons/sql_exec.svg" />
-                </button>
-                <button
-                  disabled={disabled}
-                  title={translate('sql_editor_sql_execution_new_tab_button_tooltip')}
-                  onClick={data.executeQueryNewTab}
-                >
-                  <StaticImage icon="/icons/sql_exec_new.svg" />
-                </button>
+                {isQuery && (
+                  <>
+                    <button
+                      disabled={disabled}
+                      title={translate('sql_editor_sql_execution_button_tooltip')}
+                      onClick={data.executeQuery}
+                    >
+                      <StaticImage icon="/icons/sql_exec.svg" />
+                    </button>
+                    <button
+                      disabled={disabled}
+                      title={translate('sql_editor_sql_execution_new_tab_button_tooltip')}
+                      onClick={data.executeQueryNewTab}
+                    >
+                      <StaticImage icon="/icons/sql_exec_new.svg" />
+                    </button>
+                  </>
+                )}
                 <button
                   disabled={disabled}
                   title={translate('sql_editor_sql_execution_script_button_tooltip')}
@@ -166,7 +177,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
                 >
                   <StaticImage icon="/icons/sql_script_exec.svg" />
                 </button>
-                {data.dialect?.supportsExplainExecutionPlan && (
+                {isQuery && data.dialect?.supportsExplainExecutionPlan && (
                   <button
                     disabled={disabled}
                     title={translate('sql_editor_execution_plan_button_tooltip')}
@@ -177,6 +188,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
                 )}
               </>
             )}
+            <SqlEditorActionsMenu state={state} />
           </actions>
           <SqlEditorTools data={data} state={state} style={styles} />
         </container>

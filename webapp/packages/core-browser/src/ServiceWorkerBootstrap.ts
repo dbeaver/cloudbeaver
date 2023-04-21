@@ -7,37 +7,19 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { GlobalConstants } from '@cloudbeaver/core-utils';
+
+import { ServiceWorkerService } from './ServiceWorkerService';
 
 @injectable()
 export class ServiceWorkerBootstrap extends Bootstrap {
-  register(): void | Promise<void> {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        const workerURL = GlobalConstants.absoluteRootUrl('/service-worker.js');
-
-        if (process.env.NODE_ENV === 'development') {
-          navigator.serviceWorker
-            .getRegistration(workerURL)
-            .then(registration => {
-              const unregistered = registration?.unregister() ?? false;
-              if (unregistered) {
-                console.log('SW unregistered.');
-              }
-            })
-            .catch();
-        } else {
-          navigator.serviceWorker
-            .register(workerURL)
-            .then(() => {
-              console.log('SW registered.');
-            }).catch(registrationError => {
-              console.log('SW registration failed: ', registrationError);
-            });
-        }
-      });
-    }
+  constructor(
+    private readonly serviceWorkerService: ServiceWorkerService
+  ) {
+    super();
   }
-  load(): void | Promise<void> { }
+  register(): void | Promise<void> { }
+  load(): void | Promise<void> {
+    this.serviceWorkerService.register();
+  }
 
 }

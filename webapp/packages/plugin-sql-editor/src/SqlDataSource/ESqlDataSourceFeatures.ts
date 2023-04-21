@@ -8,6 +8,8 @@
 
 export enum ESqlDataSourceFeatures {
   script,
+  query,
+  executable,
   setName,
   setProject
 }

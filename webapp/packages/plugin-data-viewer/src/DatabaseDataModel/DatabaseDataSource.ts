@@ -92,6 +92,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
       outdated: observable.ref,
       setResults: action,
       setSupportedDataFormats: action,
+      resetData: action,
     });
   }
 
@@ -184,6 +185,10 @@ implements IDatabaseDataSource<TOptions, TResult> {
     this.actions.updateResults(results);
     this.results = results;
     return this;
+  }
+
+  isLoadable(): boolean {
+    return !this.isLoading() && !this.disabled;
   }
 
   isReadonly(resultIndex: number): boolean {
@@ -332,15 +337,16 @@ implements IDatabaseDataSource<TOptions, TResult> {
     }
   }
 
-  clearError(): void {
+  clearError(): this {
     this.error = null;
+    return this;
   }
 
-  resetData(): void {
-    if (this.activeSave || this.activeRequest) {
-      return;
-    }
+  resetData(): this {
+    this.clearError();
     this.setResults([]);
+    this.setOutdated();
+    return this;
   }
 
   abstract request(prevResults: TResult[]): TResult[] | Promise<TResult[]>;

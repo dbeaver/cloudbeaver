@@ -37,7 +37,7 @@ export class SessionExpiredDialogService extends Bootstrap {
 
     if (state === DialogueStateResult.Rejected) {
       this.notificationService.customNotification(() => ActionSnackbar, {
-        actionText: 'app_root_session_expired_reload',
+        actionText: 'ui_processing_reload',
         onAction: () => this.routerService.reload(),
       }, { title: 'app_root_session_expired_title', persistent: true, type: ENotificationType.Error });
     }

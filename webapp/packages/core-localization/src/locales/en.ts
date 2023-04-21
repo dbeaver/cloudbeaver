@@ -30,6 +30,7 @@ export default [
   ['ui_error_message', 'Error:'],
   ['ui_error_close', 'Close'],
   ['ui_clear', 'Clear'],
+  ['ui_remove', 'Remove'],
   ['ui_close', 'Close'],
   ['ui_errors_details', 'Details'],
   ['ui_search', 'Search...'],

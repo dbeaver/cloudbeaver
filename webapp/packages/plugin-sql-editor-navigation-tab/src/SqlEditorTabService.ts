@@ -27,6 +27,7 @@ import {
   objectSchemaSetter,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { objectNavNodeProvider, NodeManagerUtils, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
@@ -61,7 +62,8 @@ export class SqlEditorTabService extends Bootstrap {
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly connectionsManagerService: ConnectionsManagerService,
-    private readonly containerResource: ContainerResource
+    private readonly containerResource: ContainerResource,
+    private readonly commonDialogService: CommonDialogService,
   ) {
     super();
 
@@ -498,10 +500,32 @@ export class SqlEditorTabService extends Bootstrap {
   private async handleCanTabClose(editorTab: ITab<ISqlEditorTabState>) {
     const canCloseTabs = await this.sqlResultTabsService.canCloseResultTabs(editorTab.handlerState);
 
-    if (canCloseTabs) {
-      const contexts = await this.onCanClose.execute(editorTab);
-      if (ExecutorInterrupter.isInterrupted(contexts)) {
+    if (!canCloseTabs) {
+      return false;
+    }
+
+    const contexts = await this.onCanClose.execute(editorTab);
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return false;
+    }
+
+    const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
+
+    if (dataSource?.isSaved() === false) {
+      const result = await this.commonDialogService.open(ConfirmationDialog, {
+        title: 'plugin_sql_editor_navigation_tab_data_source_save_confirmation_title',
+        subTitle: dataSource.name ?? undefined,
+        message: 'plugin_sql_editor_navigation_tab_data_source_save_confirmation_message',
+        confirmActionText: 'ui_yes',
+        extraStatus: 'no',
+      });
+
+      if (result === DialogueStateResult.Rejected) {
         return false;
+      } else if (result === DialogueStateResult.Resolved) {
+        await dataSource.save();
+      } else {
+        await dataSource.reset();
       }
     }
 

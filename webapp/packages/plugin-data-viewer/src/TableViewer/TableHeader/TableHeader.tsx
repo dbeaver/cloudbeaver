@@ -17,29 +17,34 @@ import { TableHeaderService } from './TableHeaderService';
 
 const styles = css`
   table-header {
-    padding: 8px 0;
     flex: 0 0 auto;
     display: flex;
     align-items: center;
+
+    &:empty {
+      display: none;
+    }
   }
 `;
 
 interface Props {
   model: IDatabaseDataModel<any, any>;
   resultIndex: number;
+  simple: boolean;
   className?: string;
 }
 
 export const TableHeader = observer<Props>(function TableHeader({
   model,
   resultIndex,
+  simple,
   className,
 }) {
   const service = useService(TableHeaderService);
 
   return styled(styles)(
     <table-header className={className}>
-      <Placeholder container={service.tableHeaderPlaceholder} model={model} resultIndex={resultIndex} />
+      <Placeholder container={service.tableHeaderPlaceholder} model={model} resultIndex={resultIndex} simple={simple} />
     </table-header>
   );
 });

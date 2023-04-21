@@ -40,9 +40,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   get features(): ESqlDataSourceFeatures[] {
-    return [ESqlDataSourceFeatures.script];
+    return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable];
   }
 
+  protected saved: boolean;
   readonly history: ISqlDataSourceHistory;
   readonly onUpdate: ISyncExecutor;
   readonly onSetScript: ISyncExecutor<ISetScriptData>;
@@ -57,6 +58,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     this.message = undefined;
     this.outdated = true;
     this.editing = true;
+    this.saved = true;
     this.history = new SqlDataSourceHistory();
     this.onUpdate = new SyncExecutor();
     this.onSetScript = new SyncExecutor();
@@ -83,15 +85,22 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   setScript(script: string, source?: string): void {
+    this.saved = false;
     this.onSetScript.execute({ script, source });
   }
 
   abstract canRename(name: string | null): boolean;
+
   setName(name: string | null): void {
     this.onUpdate.execute();
   }
+
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo | undefined): void {
     this.onUpdate.execute();
+  }
+
+  isSaved(): boolean {
+    return this.saved;
   }
 
   isError(): boolean {
@@ -146,6 +155,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     this.onUpdate.execute();
   }
 
+  save(): Promise<void> | void { }
   load(): Promise<void> | void { }
+  reset(): Promise<void> | void {
+    this.saved = true;
+  }
   dispose(): void | Promise<void> { }
 }

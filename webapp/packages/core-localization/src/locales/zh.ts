@@ -29,6 +29,7 @@ export default [
   ['ui_error_message', '错误：'],
   ['ui_error_close', '关闭'],
   ['ui_clear', 'Clear'],
+  ['ui_remove', 'Remove'],
   ['ui_close', '关闭'],
   ['ui_errors_details', '详情'],
   ['ui_search', '搜索...'],
@@ -100,7 +101,6 @@ export default [
   ['app_root_session_expire_warning_button', '我在'],
   ['app_root_session_expired_title', '会话已过期'],
   ['app_root_session_expired_message', '会话已过期。您想重新加载吗？'],
-  ['app_root_session_expired_reload', '重新加载'],
   ['app_root_quota_exceeded', '超出配额'],
   ['core_eventsLog_dbeaverErrorDetails', '错误详情'],
 ];

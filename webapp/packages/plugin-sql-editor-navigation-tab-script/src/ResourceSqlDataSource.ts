@@ -89,14 +89,18 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   get features():ESqlDataSourceFeatures[] {
     if (this.isReadonly()) {
-      return [ESqlDataSourceFeatures.script];
+      return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable];
     }
 
-    return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.setName];
+    return [
+      ESqlDataSourceFeatures.script,
+      ESqlDataSourceFeatures.query,
+      ESqlDataSourceFeatures.executable,
+      ESqlDataSourceFeatures.setName,
+    ];
   }
 
   private _script: string;
-  private saved: boolean;
   private actions?: IResourceActions;
   private info?: IResourceInfo;
   private lastAction?: () => Promise<void>;
@@ -114,7 +118,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     super();
     this.state = state;
     this._script = '';
-    this.saved = true;
     this.loaded = false;
     this.resourceUseKeyId = null;
     this.scheduler = new TaskScheduler(() => true);
@@ -207,7 +210,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
     this._script = script;
     super.setScript(script);
-    this.saved = false;
 
     if (previous !== script) {
       this.debouncedWrite();
@@ -347,6 +349,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
         this.markUpdated();
         this.loaded = true;
         super.setScript(this.script);
+        this.saved = true;
       } catch (exception: any) {
         this.exception = exception;
       } finally {
@@ -375,6 +378,10 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
         this.message = undefined;
       }
     });
+  }
+
+  async save(): Promise<void> {
+    await this.write();
   }
 
   private async saveProperties() {

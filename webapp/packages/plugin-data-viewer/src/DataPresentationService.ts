@@ -22,6 +22,7 @@ export interface IDataPresentationProps<
   model: IDatabaseDataModel<TOptions, TResult>;
   actions: IDataTableActions;
   resultIndex: number;
+  simple: boolean;
   className?: string;
 }
 

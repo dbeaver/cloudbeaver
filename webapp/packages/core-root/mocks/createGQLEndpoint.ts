@@ -9,5 +9,5 @@
 import { graphql } from 'msw';
 
 export function createGQLEndpoint(): ReturnType<typeof graphql.link> {
-  return graphql.link('http://127.0.0.1:8978/api/gql');
+  return graphql.link('http://localhost/api/gql');
 }
