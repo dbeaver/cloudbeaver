@@ -49,7 +49,11 @@ export class ServiceWorkerService {
 
 
   private registerSkipWaitingPrompt(workbox: Workbox): void {
-    workbox.addEventListener('controlling', async () => {
+    workbox.addEventListener('controlling', async event => {
+      if (!event.isUpdate) {
+        return;
+      }
+
       const updateAccepted = await this.requestUpdate();
 
       if (updateAccepted) {
