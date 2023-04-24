@@ -2327,7 +2327,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 "WHERE EXISTS " +
                 "(SELECT 1 FROM CB_AUTH_ATTEMPT AA " +
                 "LEFT JOIN CB_AUTH_TOKEN CAT ON AA.SESSION_ID = CAT.SESSION_ID " +
-                    "WHERE (CAT.EXPIRATION_TIME < NOW() OR CAT.EXPIRATION_TIME IS NULL) " +
+                    "WHERE (CAT.REFRESH_TOKEN_EXPIRATION_TIME < NOW() OR CAT.EXPIRATION_TIME IS NULL) " +
                     "AND AA.AUTH_ID=AAI.AUTH_ID AND AUTH_STATUS='" + SMAuthStatus.EXPIRED +"') " +
                 "AND CREATE_TIME<?",
                 Timestamp.valueOf(LocalDateTime.now().minusMinutes(smConfig.getExpiredAuthAttemptInfoTtl()))
