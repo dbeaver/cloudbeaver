@@ -38,6 +38,7 @@ export const VersionChecker = observer(function VersionChecker() {
       before={<IconOrImage icon={icon} />}
       description={versionUpdateService.newVersionAvailable ? description : undefined}
       style={style}
+      ripple={false}
     >
       {translate(text)}
     </Cell>
