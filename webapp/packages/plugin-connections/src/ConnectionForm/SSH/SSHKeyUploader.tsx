@@ -53,7 +53,6 @@ export const SSHKeyUploader = observer<Props>(function SSHKeyUploader({ state, s
       </Textarea>
       <GroupItem>
         <UploadArea
-          accept='.txt, .ssh'
           disabled={disabled || readonly}
           reset
           onChange={handleKeyUpload}
