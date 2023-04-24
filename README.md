@@ -22,6 +22,11 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 23.0.3 - 2023-04-24
+
+-  New grouping panel menu was added in the Data Viewer. This panel extracts unique values from the database column for count. Users can drag and drop the column to the grouping panel and get the results immediately. Sorting, filtering and exporting of the results are available on the Grouping panel.
+-  Different bugs have been fixed.
+
 ### CloudBeaver 23.0.2 - 2023-04-10
 
 -  In the SQL editor, when the cursor goes back on the query, the previous hints are displayed.
