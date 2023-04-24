@@ -13,7 +13,6 @@ export interface IReactCodeMirrorProps {
   value: string;
   extensions?: Extension[];
   readonly?: boolean;
-  editable?: boolean;
   autoFocus?: boolean;
   onChange?: (value: string, update: ViewUpdate) => void;
   onUpdate?: (update: ViewUpdate) => void;

@@ -21,7 +21,6 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
   value,
   extensions,
   readonly,
-  editable,
   autoFocus,
   onChange,
   onUpdate,
@@ -39,12 +38,8 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
 
   const ext = [defaultTheme];
 
-  if (editable === false) {
-    ext.push(EditorView.editable.of(false));
-  }
-
   if (readonly) {
-    ext.push(EditorState.readOnly.of(true));
+    ext.push(EditorView.editable.of(false));
   }
 
   if (extensions) {
@@ -70,10 +65,7 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
 
   useEffect(() => {
     if (container) {
-      const es = EditorState.create({
-        doc: value,
-        extensions: ext,
-      });
+      const es = EditorState.create();
 
       const ev = new EditorView({
         parent: container,
@@ -82,6 +74,11 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
 
       setState(es);
       setView(ev);
+
+      ev.dom.addEventListener('keydown', event => {
+        const newEvent = new KeyboardEvent('keydown', event);
+        document.dispatchEvent(newEvent);
+      });
 
       return () => {
         ev.destroy();
@@ -108,7 +105,7 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
     if (view) {
       view.dispatch({ effects: StateEffect.reconfigure.of(ext) });
     }
-  }, [extensions, readonly, editable, onChange, onUpdate]);
+  }, [extensions, view]);
 
   useLayoutEffect(() => {
     if (autoFocus && view) {

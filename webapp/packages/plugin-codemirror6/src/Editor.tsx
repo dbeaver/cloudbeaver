@@ -10,6 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
 import styled from 'reshadow';
 
+import { clsx } from '@cloudbeaver/core-utils';
+
 import { getDefaultExtensions } from './getDefaultExtensions';
 import type { IEditorProps } from './IEditorProps';
 import type { IEditorRef } from './IEditorRef';
@@ -26,7 +28,7 @@ export const Editor = observer(forwardRef<IEditorRef, IEditorProps>(function Edi
   }
 
   return styled(EDITOR_BASE_STYLES)(
-    <wrapper className={['editor', props.className].join(' ')}>
+    <wrapper className={clsx('editor', props.className)}>
       <ReactCodemirror {...props} ref={ref} extensions={extensions} />
     </wrapper>
   );

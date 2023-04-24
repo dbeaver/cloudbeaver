@@ -40,7 +40,6 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
     <wrapper>
       <SQLCodeEditorLoader
         value={ddlResource.data ?? ''}
-        editable={false}
         readonly
       />
       <MenuBar menu={menu} style={MENU_BAR_DEFAULT_STYLES} />

@@ -81,7 +81,6 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         value={data.value}
         extensions={[ACTIVE_QUERY_EXTENSION, QUERY_STATUS_GUTTER_EXTENSION]}
         readonly={data.readonly}
-        editable={!data.readonly}
         autoFocus
         onChange={panel.onQueryChange}
         onUpdate={panel.onUpdate}

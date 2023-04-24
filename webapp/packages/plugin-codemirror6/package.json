@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@cloudbeaver/core-blocks": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0",
     "@codemirror/commands": "^6.1.1",
     "@codemirror/lang-html": "^6.4.3",
     "@codemirror/lang-javascript": "^6.1.5",

@@ -202,7 +202,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           key={readonly ? '1' : '0'}
           value={autoFormat ? formatter.format(stringValue) : stringValue}
           readonly={readonly}
-          editable={!readonly}
           extensions={typeExtension ? [getDefaultExtensions(), typeExtension] : undefined}
           onChange={value => handleChange(value)}
         />

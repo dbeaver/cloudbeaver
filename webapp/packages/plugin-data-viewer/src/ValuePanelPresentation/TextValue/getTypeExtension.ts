@@ -8,6 +8,7 @@
 
 import { HTML_EDITOR, JSON_EDITOR, XML_EDITOR } from '@cloudbeaver/plugin-codemirror6';
 
+// @TODO These imports are quite heavy
 export function getTypeExtension(type: string) {
   switch (type) {
     case 'application/json':
