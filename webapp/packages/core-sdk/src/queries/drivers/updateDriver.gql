@@ -1,0 +1,11 @@
+mutation updateDriver(
+  $config: DriverConfig!,
+
+  $includeProviderProperties: Boolean!,
+  $includeDriverProperties: Boolean!,
+  $includeDriverParameters: Boolean!
+) {
+  driverInfo: updateDriver(config: $config) {
+    ...DatabaseDriver
+  }
+}

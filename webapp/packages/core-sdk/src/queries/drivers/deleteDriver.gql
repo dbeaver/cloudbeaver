@@ -1,0 +1,3 @@
+mutation deleteDriver($id: ID!) {
+  deleteDriver(id: $id)
+}
