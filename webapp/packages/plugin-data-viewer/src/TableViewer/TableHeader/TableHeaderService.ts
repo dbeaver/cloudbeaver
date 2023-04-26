@@ -95,6 +95,10 @@ export class TableHeaderService extends Bootstrap {
         if (action === DATA_VIEWER_CONSTRAINTS_DELETE_ACTION) {
           const constraints = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
 
+          if (model.source.options?.whereFilter) {
+            return false;
+          }
+
           if (constraints) {
             return constraints.filterConstraints.length === 0 && constraints.orderConstraints.length === 0;
           }

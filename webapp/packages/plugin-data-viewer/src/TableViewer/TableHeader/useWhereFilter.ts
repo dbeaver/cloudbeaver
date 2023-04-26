@@ -53,13 +53,12 @@ export function useWhereFilter(
         || this.model.source.options?.whereFilter !== this.model.source.requestInfo.requestFilter;
     },
     set(value: string) {
-      if (this.constraints) {
-        this.constraints.deleteFilters();
+      if (!this.constraints) {
+        return;
       }
 
-      if (this.model.source.options) {
-        this.model.source.options.whereFilter = value;
-      }
+      this.constraints.deleteFilters();
+      this.constraints.setWhereFilter(value);
     },
     async apply() {
       if (!this.applicableFilter || this.model.isLoading() || this.model.isDisabled(this.resultIndex)) {
