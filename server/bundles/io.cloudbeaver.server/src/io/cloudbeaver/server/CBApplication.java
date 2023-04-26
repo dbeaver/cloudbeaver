@@ -29,6 +29,7 @@ import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
+import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -809,6 +810,15 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         String sessionId = null;
         if (credentialsProvider != null && credentialsProvider.getActiveUserCredentials() != null) {
             sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();
+        }
+
+        // Reloading configuration by services
+        for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance().getWebServices(DBWServiceServerConfigurator.class)) {
+            try {
+                wsc.reloadConfiguration(appConfig);
+            } catch (Exception e) {
+                log.warn("Error reloading configuration by web service " + wsc.getClass().getName(), e);
+            }
         }
         eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId, null));
     }

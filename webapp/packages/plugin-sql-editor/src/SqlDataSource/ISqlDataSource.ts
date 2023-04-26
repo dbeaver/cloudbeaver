@@ -40,6 +40,7 @@ export interface ISqlDataSource extends ILoadableState {
   readonly features: ESqlDataSourceFeatures[];
   readonly history: ISqlDataSourceHistory;
 
+  isSaved(): boolean;
   isReadonly(): boolean;
   isEditing(): boolean;
   isOutdated(): boolean;
@@ -52,6 +53,8 @@ export interface ISqlDataSource extends ILoadableState {
   setScript(script: string, source?: string): void;
   setEditing(state: boolean): void;
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void;
+  save(): Promise<void> | void;
   load(): Promise<void> | void;
+  reset(): Promise<void> | void;
   dispose(): Promise<void> | void;
 }

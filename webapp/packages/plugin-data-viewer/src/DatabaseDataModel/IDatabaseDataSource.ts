@@ -91,7 +91,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   refreshData: () => Promise<void> | void;
   saveData: () => Promise<void> | void;
   cancel: () => Promise<void> | void;
-  clearError: () => void;
-  resetData: () => void;
+  clearError: () => this;
+  resetData: () => this;
   dispose: () => Promise<void>;
 }

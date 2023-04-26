@@ -30,7 +30,12 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
   }
 
   get features(): ESqlDataSourceFeatures[] {
-    return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.setName];
+    return [
+      ESqlDataSourceFeatures.script,
+      ESqlDataSourceFeatures.query,
+      ESqlDataSourceFeatures.executable,
+      ESqlDataSourceFeatures.setName,
+    ];
   }
 
   private readonly state: ILocalStorageSqlDataSourceState;
@@ -45,6 +50,10 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
       script: computed,
       executionContext: computed,
     });
+  }
+
+  isSaved(): boolean {
+    return true;
   }
 
   isReadonly(): boolean {

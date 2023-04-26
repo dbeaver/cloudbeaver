@@ -111,8 +111,7 @@ export function useGroupingDataModel(
             .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
             .setSlice(0)
             .source
-            .setResults([])
-            .setOutdated();
+            .resetData();
         }
       } else {
         model.model
@@ -121,6 +120,7 @@ export function useGroupingDataModel(
           .source
           .setExecutionContext(null)
           .setSupportedDataFormats([])
+          .clearError()
           .setResults([]);
       }
 
