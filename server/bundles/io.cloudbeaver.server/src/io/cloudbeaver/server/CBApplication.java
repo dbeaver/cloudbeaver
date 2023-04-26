@@ -485,14 +485,13 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     }
 
     @Override
-    protected void loadConfiguration(String configPath) throws DBException {
+    protected void loadConfiguration(Path configPath) throws DBException {
         log.debug("Using configuration [" + configPath + "]");
 
-        File configFile = new File(configPath);
-        if (!configFile.exists()) {
-            log.error("Configuration file " + configFile.getAbsolutePath() + " doesn't exist. Use defaults.");
+        if (!Files.exists(configPath)) {
+            log.error("Configuration file " + configPath + " doesn't exist. Use defaults.");
         } else {
-            parseConfiguration(configFile);
+            parseConfiguration(configPath.toFile());
         }
         // Set default preferences
         PrefUtils.setDefaultPreferenceValue(ModelPreferences.getPreferences(), ModelPreferences.UI_DRIVERS_HOME, getDriversLocation());

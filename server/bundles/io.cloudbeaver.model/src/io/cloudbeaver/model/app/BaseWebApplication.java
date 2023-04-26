@@ -91,8 +91,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     @Nullable
     protected Path loadServerConfiguration() throws DBException {
-        String configPath = getMainConfigurationPath();
-        Path configFilePath = Path.of(configPath).toAbsolutePath();
+        Path configFilePath = getMainConfigurationFilePath().toAbsolutePath();
         Path configFolder = configFilePath.getParent();
 
         // Configure logging
@@ -108,7 +107,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         // Load config file
         log.debug("Loading configuration from " + configFilePath);
         try {
-            loadConfiguration(configPath);
+            loadConfiguration(configFilePath);
         } catch (Exception e) {
             log.error("Error parsing configuration", e);
             return null;
@@ -133,7 +132,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return null;
     }
 
-    private String getMainConfigurationPath() {
+    private Path getMainConfigurationFilePath() {
         String configPath = DEFAULT_CONFIG_FILE_PATH;
 
         String[] args = Platform.getCommandLineArgs();
@@ -148,9 +147,9 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
         Path customConfigPath = getCustomConfigPath(configFilePath.getParent(), configFilePath.getFileName().toString());
         if (Files.exists(customConfigPath)) {
-            return customConfigPath.toString();
+            return customConfigPath;
         }
-        return configPath;
+        return configFilePath;
     }
 
     @NotNull
@@ -159,7 +158,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return Files.exists(customConfigPath) ? customConfigPath : configPath.resolve(fileName);
     }
 
-    protected abstract void loadConfiguration(String configPath) throws DBException;
+    protected abstract void loadConfiguration(Path configPath) throws DBException;
 
     @Override
     public WebProjectImpl createProjectImpl(
