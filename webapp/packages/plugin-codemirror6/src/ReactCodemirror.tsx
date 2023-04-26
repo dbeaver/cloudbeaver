@@ -27,7 +27,7 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
 }, ref) {
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const [view, setView] = useState<EditorView | null>(null);
-  const [state, setState] = useState<EditorState | null>(null);
+  const [state, setState] = useState<EditorState>(() => EditorState.create());
 
   const defaultTheme = EditorView.theme({
     '&': {
@@ -65,14 +65,11 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
 
   useEffect(() => {
     if (container) {
-      const es = EditorState.create();
-
       const ev = new EditorView({
         parent: container,
-        state: es,
+        state,
       });
 
-      setState(es);
       setView(ev);
 
       ev.dom.addEventListener('keydown', event => {
@@ -82,7 +79,6 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
 
       return () => {
         ev.destroy();
-        setState(null);
         setView(null);
       };
     }
@@ -105,7 +101,7 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
     if (view) {
       view.dispatch({ effects: StateEffect.reconfigure.of(ext) });
     }
-  }, [extensions, view]);
+  });
 
   useLayoutEffect(() => {
     if (autoFocus && view) {

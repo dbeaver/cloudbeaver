@@ -72,5 +72,6 @@ export const QUERY_STATUS_GUTTER_EXTENSION = [
   gutter({
     class: 'query-status',
     markers: view => view.state.field(gutterExtension),
+    initialSpacer: () => RUN_QUERY_MARKER,
   }),
 ];

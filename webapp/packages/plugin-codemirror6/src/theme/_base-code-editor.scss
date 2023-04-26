@@ -25,6 +25,18 @@
     outline: none;
   }
 
+  .editor .cm-content {
+    caret-color: $cursor;
+  }
+
+  .editor .cm-cursor {
+    border-left-color: $cursor;
+  }
+
+  .editor .cm-dropCursor {
+    border-left: 1.2px solid $cursor;
+  }
+
   .editor .cm-gutters {
     @include mdc-theme-prop(background, secondary, false);
     @include mdc-theme-prop(color, on-secondary, false);
