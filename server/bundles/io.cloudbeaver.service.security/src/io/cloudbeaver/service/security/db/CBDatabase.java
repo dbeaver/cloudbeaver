@@ -44,6 +44,7 @@ import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
+import org.jkiss.dbeaver.registry.H2Migrator;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
@@ -72,6 +73,8 @@ public class CBDatabase {
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
+    private static final String V1_DB_NAME = "cb.h2.dat";
+    private static final String V2_DB_NAME = "cb.h2v2.dat";
 
     private final WebApplication application;
     private final CBDatabaseConfig databaseConfiguration;
@@ -156,7 +159,7 @@ public class CBDatabase {
         }
 
         var migrator = new H2Migrator(monitor, dataSourceProviderRegistry, databaseConfiguration, dbURL, dbProperties, variablesResolver);
-        migrator.migrateDatabaseIfNeeded();
+        migrator.migrateDatabaseIfNeeded(V1_DB_NAME, V2_DB_NAME);
 
         // reload the driver and url due to a possible configuration update
         driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
