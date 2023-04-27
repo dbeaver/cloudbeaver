@@ -8,11 +8,17 @@
 
 import { EditorView } from 'codemirror6';
 
+import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { foldGutter, indentOnInput, syntaxHighlighting, bracketMatching } from '@codemirror/language';
 import { highlightSelectionMatches } from '@codemirror/search';
 import type { Extension } from '@codemirror/state';
-import { lineNumbers, highlightSpecialChars, dropCursor, rectangularSelection, crosshairCursor } from '@codemirror/view';
+import { lineNumbers, highlightSpecialChars, dropCursor, rectangularSelection, crosshairCursor, keymap } from '@codemirror/view';
 import { classHighlighter } from '@lezer/highlight';
+
+// @TODO allow to configure bindings outside of the component
+const DEFAULT_KEY_MAP = defaultKeymap.filter(binding => binding.mac !== 'Ctrl-f');
+
+DEFAULT_KEY_MAP.push(indentWithTab);
 
 /** Provides the necessary extensions to establish a basic editor */
 export function getDefaultExtensions(): Extension[] {
@@ -28,6 +34,7 @@ export function getDefaultExtensions(): Extension[] {
     foldGutter(),
     indentOnInput(),
     rectangularSelection(),
+    keymap.of(DEFAULT_KEY_MAP),
   ];
 
   return extensions;

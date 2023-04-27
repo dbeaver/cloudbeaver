@@ -17,6 +17,13 @@ import type { IReactCodeMirrorProps } from './IReactCodemirrorProps';
 
 const External = Annotation.define<boolean>();
 
+const defaultTheme = EditorView.theme({
+  '&': {
+    width: '100%',
+    height: '100%',
+  },
+});
+
 export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(function ReactCodemirror({
   value,
   extensions,
@@ -27,14 +34,7 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
 }, ref) {
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const [view, setView] = useState<EditorView | null>(null);
-  const [state, setState] = useState<EditorState>(() => EditorState.create());
-
-  const defaultTheme = EditorView.theme({
-    '&': {
-      width: '100%',
-      height: '100%',
-    },
-  });
+  const [state] = useState<EditorState>(() => EditorState.create());
 
   const ext = [defaultTheme];
 
