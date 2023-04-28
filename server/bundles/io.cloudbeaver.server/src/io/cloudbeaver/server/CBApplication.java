@@ -1019,6 +1019,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     ////////////////////////////////////////////////////////////////////////
     // License management
 
+    @Override
     public boolean isLicenseRequired() {
         return false;
     }
