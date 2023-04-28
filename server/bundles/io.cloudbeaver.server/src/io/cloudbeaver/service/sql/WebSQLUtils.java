@@ -208,7 +208,7 @@ public class WebSQLUtils {
     public static Object serializeStringValue(Object value) {
         int textPreviewMaxLength = CommonUtils.toInt(
             CBApplication.getInstance().getAppConfiguration().getResourceQuota(
-                WebSQLConstants.QUOTA_PROP_BINARY_PREVIEW_MAX_LENGTH,
+                WebSQLConstants.QUOTA_PROP_TEXT_PREVIEW_MAX_LENGTH,
                 WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH));
         String stringValue = value.toString();
         if (stringValue.length() < textPreviewMaxLength) {
