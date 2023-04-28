@@ -7,7 +7,7 @@
  */
 
 import { EditorView } from 'codemirror6';
-import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useState } from 'react';
+import { forwardRef, useImperativeHandle, useLayoutEffect, useState } from 'react';
 
 import { EditorState, Annotation, StateEffect } from '@codemirror/state';
 import type { ViewUpdate } from '@codemirror/view';
@@ -86,7 +86,7 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
     return () => { };
   }, [container]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const currentValue = view?.state.doc.toString() ?? '';
 
     if (view && value !== currentValue) {
@@ -97,7 +97,7 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
     }
   }, [value, view]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (view) {
       view.dispatch({ effects: StateEffect.reconfigure.of(ext) });
     }
