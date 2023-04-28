@@ -63,7 +63,7 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
     ext.push(updateListener);
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (container) {
       const ev = new EditorView({
         parent: container,

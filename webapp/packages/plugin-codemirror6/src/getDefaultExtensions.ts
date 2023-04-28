@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EditorView } from 'codemirror6';
-
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { foldGutter, indentOnInput, syntaxHighlighting, bracketMatching } from '@codemirror/language';
 import { highlightSelectionMatches } from '@codemirror/search';
@@ -23,7 +21,6 @@ DEFAULT_KEY_MAP.push(indentWithTab);
 /** Provides the necessary extensions to establish a basic editor */
 export function getDefaultExtensions(): Extension[] {
   const extensions: Extension[] = [
-    EditorView.lineWrapping,
     lineNumbers(),
     highlightSpecialChars(),
     highlightSelectionMatches(),
