@@ -36,6 +36,7 @@ import settingsMenuAdministration from '@cloudbeaver/plugin-settings-menu-admini
 import sqlEditor from '@cloudbeaver/plugin-sql-editor';
 import sqlEditorTab from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import sqlEditorResource from '@cloudbeaver/plugin-sql-editor-navigation-tab-script';
+import sqlEditorNew from '@cloudbeaver/plugin-sql-editor-new';
 import sqlEditorScreen from '@cloudbeaver/plugin-sql-editor-screen';
 import theme from '@cloudbeaver/plugin-theme';
 import toolsPanel from '@cloudbeaver/plugin-tools-panel';
@@ -67,6 +68,7 @@ const PLUGINS: PluginManifest[] = [
   sqlEditor,
   sqlEditorTab,
   sqlEditorScreen,
+  sqlEditorNew,
   userProfile,
   userProfileAdministration,
   defaultProductManifest,

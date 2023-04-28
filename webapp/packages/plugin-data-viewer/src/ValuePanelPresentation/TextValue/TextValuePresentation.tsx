@@ -16,7 +16,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { bytesToSize } from '@cloudbeaver/core-utils';
-import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
+import { EditorLoader, getDefaultExtensions } from '@cloudbeaver/plugin-codemirror6';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
@@ -29,7 +29,9 @@ import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResult
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
+import { getTypeExtension } from './getTypeExtension';
 import { TextValuePresentationService } from './TextValuePresentationService';
+import { useAutoFormat } from './useAutoFormat';
 
 const styles = css`
   Tab {
@@ -47,13 +49,13 @@ const styles = css`
     justify-content: center;
     flex: 0;
   }
-  CodeEditorLoader {
+  EditorLoader {
     border-radius: var(--theme-group-element-radius);
   }
   Textarea {
     flex: 1;
   }
-  CodeEditorLoader {
+  EditorLoader {
     flex: 1;
     overflow: auto;
   }
@@ -152,6 +154,8 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     }
   }
 
+  const formatter = useAutoFormat(state.currentContentType);
+
   readonly = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || readonly;
 
   if (contentType !== state.lastContentType) {
@@ -177,8 +181,9 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   }
 
   const useCodeEditor = state.currentContentType !== 'text/plain';
-  const autoFormat = firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
+  const autoFormat = !!firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
   const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
+  const typeExtension = getTypeExtension(state.currentContentType);
 
   return styled(style, textAreaStyles)(
     <container>
@@ -193,21 +198,12 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         </TabsState>
       </actions>
       {useCodeEditor ? (
-        <CodeEditorLoader
+        <EditorLoader
           key={readonly ? '1' : '0'}
-          value={stringValue}
-          autoFormat={autoFormat}
-          options={{
-            mode: state.currentContentType,
-            theme: 'material',
-            readOnly: readonly,
-            cursorBlinkRate: readonly ? -1 : undefined,
-            lineNumbers: true,
-            indentWithTabs: true,
-            smartIndent: true,
-            lineWrapping: false,
-          }}
-          onBeforeChange={(editor, data, value) => handleChange(value)}
+          value={autoFormat ? formatter.format(stringValue) : stringValue}
+          readonly={readonly}
+          extensions={typeExtension ? [getDefaultExtensions(), typeExtension] : undefined}
+          onChange={value => handleChange(value)}
         />
       ) : (
         <Textarea
