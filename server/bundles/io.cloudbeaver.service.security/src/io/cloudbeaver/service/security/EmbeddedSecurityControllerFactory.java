@@ -22,6 +22,7 @@ import com.google.gson.InstanceCreator;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.db.CBDatabaseConfig;
+import io.cloudbeaver.service.security.internal.ClearAuthAttemptInfoJob;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 
@@ -63,6 +64,10 @@ public class EmbeddedSecurityControllerFactory {
             DB_INSTANCE.setAdminSecurityController(securityController);
             DB_INSTANCE.initialize();
             securityController.initializeMetaInformation();
+            if (application.isLicenseRequired()) {
+                // delete expired auth info job in enterprise products
+                new ClearAuthAttemptInfoJob(securityController).schedule();
+            }
         }
         return securityController;
     }
