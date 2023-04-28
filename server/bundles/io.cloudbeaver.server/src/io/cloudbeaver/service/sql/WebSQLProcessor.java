@@ -20,10 +20,12 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
+import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -40,7 +42,9 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
+import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
 import org.jkiss.dbeaver.model.sql.parser.SQLRuleManager;
+import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.ArrayUtils;
@@ -172,8 +176,18 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
 
             final WebSQLDataFilter webDataFilter = filter;
-            final String sqlQueryText = sql;
-            SQLQuery sqlQuery = new SQLQuery(context.getDataSource(), sqlQueryText);
+
+            Document document = new Document();
+            document.set(sql);
+
+            SQLParserContext parserContext = new SQLParserContext(
+                context.getDataSource(),
+                syntaxManager,
+                ruleManager,
+                document);
+
+            SQLQuery sqlQuery = (SQLQuery) SQLScriptParser.extractActiveQuery(parserContext, sql.length(), 0);
+
             DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
                 try (DBCSession session = context.openSession(monitor, resolveQueryPurpose(dataFilter), "Execute SQL")) {
                     AbstractExecutionSource source = new AbstractExecutionSource(
