@@ -278,15 +278,17 @@ export const TableViewer = observer<Props, HTMLDivElement>(forwardRef(function T
             keepRatio
           >
             <Pane>
-              <pane-content {...use({ grid:true })}>
-                <TableGrid
-                  model={dataModel}
-                  actions={dataTableActions}
-                  dataFormat={dataFormat}
-                  presentation={presentation}
-                  resultIndex={resultIndex}
-                  simple={simple}
-                />
+              <pane-content {...use({ grid: true })}>
+                <Loader suspense>
+                  <TableGrid
+                    model={dataModel}
+                    actions={dataTableActions}
+                    dataFormat={dataFormat}
+                    presentation={presentation}
+                    resultIndex={resultIndex}
+                    simple={simple}
+                  />
+                </Loader>
                 <TableError model={dataModel} loading={loading} />
                 <Loader
                   loading={loading}
