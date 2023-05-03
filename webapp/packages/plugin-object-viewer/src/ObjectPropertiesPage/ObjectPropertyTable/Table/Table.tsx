@@ -103,7 +103,7 @@ export const Table = observer<Props>(function Table({
     .sort((a, b) => (b.object?.properties?.length || 0) - (a.object?.properties?.length || 0));
 
   const nodeIds = objects.map(object => object.id);
-  const properties = baseObject[0].object?.properties ?? [];
+  const properties = baseObject[0]?.object?.properties ?? [];
   const measuredCells = getMeasuredCells(properties, objects);
 
   const dataColumns: IDataColumn[] = properties.map((property, index) => ({
