@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib",
+    "composite": true
+  },
+  "include": ["src", "../plugin-codemirror6/src/ReactCodemirror.tsx"],
+  "exclude": ["**/node_modules", "**/.*/"],
+  "references": [{ "path": "../*" }]
+}

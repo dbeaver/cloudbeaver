@@ -54,7 +54,9 @@ import java.util.Map;
 public abstract class BaseWebApplication extends BaseApplicationImpl implements WebApplication {
 
     public static final String DEFAULT_CONFIG_FILE_PATH = "/etc/cloudbeaver.conf";
+    public static final String CUSTOM_CONFIG_FOLDER = "custom";
     public static final String CLI_PARAM_WEB_CONFIG = "-web-config";
+    public static final String LOGBACK_FILE_NAME = "logback.xml";
 
 
     private static final Log log = Log.getLog(BaseWebApplication.class);
@@ -89,6 +91,48 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     @Nullable
     protected Path loadServerConfiguration() throws DBException {
+        Path configFilePath = getMainConfigurationFilePath().toAbsolutePath();
+        Path configFolder = configFilePath.getParent();
+
+        // Configure logging
+        Path logbackConfigPath = getLogbackConfigPath(configFolder);
+
+        if (logbackConfigPath == null) {
+            System.err.println("Can't find slf4j configuration file in " + configFilePath.getParent());
+        } else {
+            System.setProperty("logback.configurationFile", logbackConfigPath.toString());
+        }
+        Log.setLogHandler(new SLF4JLogHandler());
+
+        // Load config file
+        log.debug("Loading configuration from " + configFilePath);
+        try {
+            loadConfiguration(configFilePath);
+        } catch (Exception e) {
+            log.error("Error parsing configuration", e);
+            return null;
+        }
+
+        return configFilePath;
+    }
+
+    @Nullable
+    private Path getLogbackConfigPath(Path path) {
+        // try to find custom logback.xml file
+        Path logbackConfigPath = getCustomConfigPath(path, LOGBACK_FILE_NAME);
+        if (Files.exists(logbackConfigPath)) {
+            return logbackConfigPath;
+        }
+        for (Path confFolder = path; confFolder != null; confFolder = confFolder.getParent()) {
+            Path lbFile = confFolder.resolve(LOGBACK_FILE_NAME);
+            if (Files.exists(lbFile)) {
+                return lbFile;
+            }
+        }
+        return null;
+    }
+
+    private Path getMainConfigurationFilePath() {
         String configPath = DEFAULT_CONFIG_FILE_PATH;
 
         String[] args = Platform.getCommandLineArgs();
@@ -98,38 +142,23 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
                 break;
             }
         }
-        Path path = Path.of(configPath).toAbsolutePath();
+        // try fo find custom config path (it is used mostly for docker volumes)
+        Path configFilePath = Path.of(configPath);
 
-        // Configure logging
-        Path logbackConfigPath = null;
-        for (Path confFolder = path.getParent(); confFolder != null; confFolder = confFolder.getParent()) {
-            Path lbFile = confFolder.resolve("logback.xml");
-            if (Files.exists(lbFile)) {
-                logbackConfigPath = lbFile;
-                break;
-            }
+        Path customConfigPath = getCustomConfigPath(configFilePath.getParent(), configFilePath.getFileName().toString());
+        if (Files.exists(customConfigPath)) {
+            return customConfigPath;
         }
-
-        if (logbackConfigPath == null) {
-            System.err.println("Can't find slf4j configuration file in " + path.getParent());
-        } else {
-            System.setProperty("logback.configurationFile", logbackConfigPath.toString());
-        }
-        Log.setLogHandler(new SLF4JLogHandler());
-
-        // Load config file
-        log.debug("Loading configuration from " + path);
-        try {
-            loadConfiguration(configPath);
-        } catch (Exception e) {
-            log.error("Error parsing configuration", e);
-            return null;
-        }
-
-        return path;
+        return configFilePath;
     }
 
-    protected abstract void loadConfiguration(String configPath) throws DBException;
+    @NotNull
+    private Path getCustomConfigPath(Path configPath, String fileName) {
+        var customConfigPath = configPath.resolve(CUSTOM_CONFIG_FOLDER).resolve(fileName);
+        return Files.exists(customConfigPath) ? customConfigPath : configPath.resolve(fileName);
+    }
+
+    protected abstract void loadConfiguration(Path configPath) throws DBException;
 
     @Override
     public WebProjectImpl createProjectImpl(

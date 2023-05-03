@@ -148,7 +148,7 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
     }
 
     this.deleteFilters();
-    this.source.options.whereFilter = '';
+    this.resetWhereFilter();
   }
 
   deleteData(): void {
@@ -157,7 +157,19 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
     }
 
     this.deleteAll();
-    this.source.options.whereFilter = '';
+    this.resetWhereFilter();
+  }
+
+  setWhereFilter(value: string) {
+    if (!this.source.options) {
+      throw new Error('Options must be provided');
+    }
+
+    this.source.options.whereFilter = value;
+  }
+
+  resetWhereFilter() {
+    this.setWhereFilter('');
   }
 
   setFilter(attributePosition: number, operator: string, value?: any): void {
