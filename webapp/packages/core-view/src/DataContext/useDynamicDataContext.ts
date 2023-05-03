@@ -7,9 +7,8 @@
  */
 
 import { untracked } from 'mobx';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
 
 import { DataContext } from './DataContext';
 import { DynamicDataContext } from './DynamicDataContext';
@@ -19,21 +18,17 @@ export function useDynamicDataContext(
   context: IDataContext | undefined,
   capture: (context: IDataContext) => void
 ): void {
-  const state = useObjectRef(() => ({
-    dynamic: new DynamicDataContext(context || new DataContext()),
-  }));
+  const [state] = useState(() => new DynamicDataContext(context || new DataContext()));
 
   untracked(() => {
     if (context) {
-      state.dynamic.setFallBack(context);
+      state.setFallBack(context);
     }
-
-    state.dynamic.flush();
   });
 
   useEffect(() => {
-    capture(state.dynamic);
+    capture(state);
   });
 
-  useEffect(() => () => state.dynamic.flush(), []);
+  useEffect(() => () => state.flush(), []);
 }
