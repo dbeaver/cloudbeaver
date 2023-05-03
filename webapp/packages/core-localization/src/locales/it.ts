@@ -29,6 +29,7 @@ export default [
   ['ui_error_message', 'Errore:'],
   ['ui_error_close', 'Chiudi'],
   ['ui_clear', 'Clear'],
+  ['ui_remove', 'Remove'],
   ['ui_close', 'Chiudi'],
   ['ui_errors_details', 'Dettagli'],
   ['ui_search', 'Cerca...'],
@@ -87,6 +88,5 @@ export default [
   ['app_root_session_expire_warning_button', 'Sono qua'],
   ['app_root_session_expired_title', 'Sessione scaduta'],
   ['app_root_session_expired_message', 'La sessione è scaduta. Vuoi ricaricare?'],
-  ['app_root_session_expired_reload', 'Ricarica'],
   ['core_eventsLog_dbeaverErrorDetails', 'Dettagli dell\'errore'],
 ];

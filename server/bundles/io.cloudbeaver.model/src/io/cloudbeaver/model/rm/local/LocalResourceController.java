@@ -225,13 +225,17 @@ public class LocalResourceController implements RMController {
     }
 
     @NotNull
-    private Set<RMProjectPermission> getRmProjectPermissions(@NotNull String projectId,
-                                                             SMCredentials activeUserCreds) throws DBException {
-        String[] permissions = getSecurityController().getObjectPermissions(activeUserCreds.getUserId(), projectId, SMObjects.PROJECT)
-            .getPermissions();
-        return Arrays.stream(permissions)
-            .map(RMProjectPermission::fromPermission)
-            .collect(Collectors.toSet());
+    private Set<RMProjectPermission> getRmProjectPermissions(
+        @NotNull String projectId, SMCredentials activeUserCreds
+    ) throws DBException {
+        if (activeUserCreds.getUserId() == null) {
+            return Set.of();
+        }
+        String[] permissions = getSecurityController().getObjectPermissions(activeUserCreds.getUserId(),
+            projectId,
+            SMObjects.PROJECT
+        ).getPermissions();
+        return Arrays.stream(permissions).map(RMProjectPermission::fromPermission).collect(Collectors.toSet());
     }
 
     @NotNull

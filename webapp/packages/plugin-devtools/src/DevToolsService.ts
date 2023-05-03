@@ -15,6 +15,7 @@ import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 interface IDevToolsSettings {
   enabled: boolean;
   distributed: boolean;
+  codemirror: boolean;
 }
 
 const DEVTOOLS = 'devtools';
@@ -27,6 +28,10 @@ export class DevToolsService {
 
   get isDistributed(): boolean {
     return this.settings.distributed;
+  }
+
+  get isCodemirror(): boolean {
+    return this.settings.codemirror;
   }
 
   private readonly settings: IDevToolsSettings;
@@ -54,6 +59,10 @@ export class DevToolsService {
     this.syncDistributedMode();
   }
 
+  setCodemirror(value: boolean) {
+    this.settings.codemirror = value;
+  }
+
   private syncDistributedMode() {
     if (this.isEnabled) {
       if (this.serverConfigResource.data) {
@@ -67,5 +76,6 @@ function getDefaultDevToolsSettings(): IDevToolsSettings {
   return {
     enabled: false,
     distributed: false,
+    codemirror: false,
   };
 }

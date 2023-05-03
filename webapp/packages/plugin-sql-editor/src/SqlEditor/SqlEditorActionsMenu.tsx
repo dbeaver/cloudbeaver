@@ -28,6 +28,6 @@ export const SqlEditorActionsMenu = observer<Props>(function SqlEditorActionsMen
   menu.context.set(DATA_CONTEXT_SQL_EDITOR_STATE, state);
 
   return (
-    <MenuBar style={[SQL_EDITOR_ACTIONS_MENU_STYLES, style]} menu={menu} />
+    <MenuBar style={[SQL_EDITOR_ACTIONS_MENU_STYLES, ...[style].flat(2)]} menu={menu} />
   );
 });

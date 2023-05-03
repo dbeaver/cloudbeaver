@@ -45,6 +45,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly serviceInjector: IServiceInjector;
   readonly outdated: boolean;
 
+  isLoadable: () => boolean;
   isReadonly: (resultIndex: number) => boolean;
   isLoading: () => boolean;
   isDisabled: (resultIndex: number) => boolean;
@@ -90,7 +91,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   refreshData: () => Promise<void> | void;
   saveData: () => Promise<void> | void;
   cancel: () => Promise<void> | void;
-  clearError: () => void;
-  resetData: () => void;
+  clearError: () => this;
+  resetData: () => this;
   dispose: () => Promise<void>;
 }

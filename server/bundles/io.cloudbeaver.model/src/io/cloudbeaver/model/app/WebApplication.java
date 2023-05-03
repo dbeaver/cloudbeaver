@@ -75,16 +75,12 @@ public interface WebApplication extends DBPApplication {
 
     String getApplicationInstanceId() throws DBException;
 
-    /**
-     * Returns random UUID, new on every launch
-     */
-    @NotNull
-    String getApplicationRunId();
-
     WSEventController getEventController();
 
     /**
      * Port this server listens on
      */
     int getServerPort();
+
+    boolean isLicenseRequired();
 }

@@ -14,50 +14,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server;
+package io.cloudbeaver.server.jobs;
 
+import io.cloudbeaver.server.CBPlatform;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.jkiss.dbeaver.Log;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
-/**
- * WebSessionMonitorJob
- */
-class WebSessionMonitorJob extends AbstractJob {
-    private static final Log log = Log.getLog(WebSessionMonitorJob.class);
-    private static final int MONITOR_INTERVAL = 10000; // once per 10 seconds
+public abstract class PeriodicSystemJob extends AbstractJob {
 
-    private final CBPlatform platform;
+    @NotNull
+    protected final CBPlatform platform;
+    private final long periodMs;
 
-    WebSessionMonitorJob(CBPlatform platform) {
-        super("Web session monitor");
+    public PeriodicSystemJob(@NotNull String name, @NotNull CBPlatform platform, long periodMs) {
+        super(name);
+        this.platform = platform;
+        this.periodMs = periodMs;
+
         setUser(false);
         setSystem(true);
-        this.platform = platform;
     }
 
     @Override
-    protected IStatus run(DBRProgressMonitor monitor) {
+    protected IStatus run(@NotNull DBRProgressMonitor monitor) {
         if (platform.isShuttingDown()) {
             return Status.OK_STATUS;
         }
 
-        try {
-            platform.getSessionManager().expireIdleSessions();
-        } catch (Exception e) {
-            log.error("Error on expire idle sessions", e);
-        }
+        doJob(monitor);
 
+        // If the platform is still running after the job is completed, reschedule the job
         if (!platform.isShuttingDown()) {
             scheduleMonitor();
         }
+
         return Status.OK_STATUS;
     }
 
-    void scheduleMonitor() {
-        schedule(MONITOR_INTERVAL);
-    }
+    protected abstract void doJob(@NotNull DBRProgressMonitor monitor);
 
+    public void scheduleMonitor() {
+        schedule(periodMs);
+    }
 }

@@ -52,6 +52,9 @@ export function useTab(
     get selected() {
       return this.state.state.selectedId === this.tabId;
     },
+    get closable() {
+      return this.state.canClose(this.tabId);
+    },
     getInfo() {
       return this.state.getTabInfo(this.tabId);
     },
@@ -68,6 +71,7 @@ export function useTab(
     },
   }), {
     selected: computed,
+    closable: computed,
     state: observable.ref,
     tabId: observable.ref,
   }, {

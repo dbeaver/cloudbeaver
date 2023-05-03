@@ -16,7 +16,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { bytesToSize } from '@cloudbeaver/core-utils';
-import { CodeEditorLoader } from '@cloudbeaver/plugin-codemirror';
+import { EditorLoader, getDefaultExtensions } from '@cloudbeaver/plugin-codemirror6';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
@@ -29,47 +29,56 @@ import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResult
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
+import { getTypeExtension } from './getTypeExtension';
 import { TextValuePresentationService } from './TextValuePresentationService';
+import { useAutoFormat } from './useAutoFormat';
 
 const styles = css`
-    Tab {
-      composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
-    }
-    container {
-      display: flex;
-      gap: 16px;
-      flex-direction: column;
-      overflow: auto;
-      flex: 1;
-    }
-    actions {
-      display: flex;
-      justify-content: center;
-      flex: 0;
-      padding: 0 8px;
-      padding-bottom: 16px;
-    }
-    Textarea {
-      flex: 1;
-    }
-    CodeEditorLoader {
-      flex: 1;
-      overflow: auto;
-    }
-    TabList {
-      composes: theme-border-color-background theme-background-background from global;
-      overflow: auto;
-      border-radius: 16px;
+  Tab {
+    composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
+  }
+  container {
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+    overflow: auto;
+    flex: 1;
+  }
+  actions {
+    display: flex;
+    justify-content: center;
+    flex: 0;
+  }
+  EditorLoader {
+    border-radius: var(--theme-group-element-radius);
+  }
+  Textarea {
+    flex: 1;
+  }
+  EditorLoader {
+    flex: 1;
+    overflow: auto;
+  }
+  TabList {
+    composes: theme-border-color-background theme-background-background from global;
+    overflow: auto;
+    border-radius: var(--theme-group-element-radius);
 
-      & Tab {
-        border-bottom: 0;
+    & Tab {
+      border-bottom: 0;
 
-        &:global([aria-selected="false"]) {
-          border-bottom: 0 !important;
-        }
+      &:global([aria-selected="false"]) {
+        border-bottom: 0 !important;
       }
     }
-  `;
+  }
+`;
+
+const textAreaStyles = css`
+  container > Textarea > textarea {
+    border-radius: var(--theme-form-element-radius) !important;
+  }
+`;
 
 export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(function TextValuePresentation({
   model,
@@ -145,6 +154,8 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     }
   }
 
+  const formatter = useAutoFormat(state.currentContentType);
+
   readonly = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || readonly;
 
   if (contentType !== state.lastContentType) {
@@ -170,10 +181,11 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   }
 
   const useCodeEditor = state.currentContentType !== 'text/plain';
-  const autoFormat = firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
+  const autoFormat = !!firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
   const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
+  const typeExtension = getTypeExtension(state.currentContentType);
 
-  return styled(style)(
+  return styled(style, textAreaStyles)(
     <container>
       <actions>
         <TabsState
@@ -186,21 +198,12 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         </TabsState>
       </actions>
       {useCodeEditor ? (
-        <CodeEditorLoader
+        <EditorLoader
           key={readonly ? '1' : '0'}
-          value={stringValue}
-          autoFormat={autoFormat}
-          options={{
-            mode: state.currentContentType,
-            theme: 'material',
-            readOnly: readonly,
-            cursorBlinkRate: readonly ? -1 : undefined,
-            lineNumbers: true,
-            indentWithTabs: true,
-            smartIndent: true,
-            lineWrapping: false,
-          }}
-          onBeforeChange={(editor, data, value) => handleChange(value)}
+          value={autoFormat ? formatter.format(stringValue) : stringValue}
+          readonly={readonly}
+          extensions={typeExtension ? [getDefaultExtensions(), typeExtension] : undefined}
+          onChange={value => handleChange(value)}
         />
       ) : (
         <Textarea
@@ -208,6 +211,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           rows={3}
           value={stringValue}
           readOnly={readonly}
+          style={textAreaStyles}
           embedded
           onChange={handleChange}
         />

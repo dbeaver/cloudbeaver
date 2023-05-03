@@ -20,6 +20,8 @@ export * from './SqlDataSource/MemorySqlDataSource';
 export * from './SqlEditor/SQLCodeEditor/SQLCodeEditorLoader';
 export * from './SqlEditor/ISQLEditorData';
 export * from './SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA';
+export * from './SqlEditor/SQL_EDITOR_ACTIONS_MENU';
+export * from './SqlEditor/SQL_EDITOR_TOOLS_MENU';
 export * from './SqlEditor/SQLEditorModeContext';
 export * from './SqlResultTabs/DATA_CONTEXT_SQL_EDITOR_RESULT_ID';
 export * from './SqlResultTabs/SqlResultTabsService';
@@ -32,7 +34,6 @@ export * from './SqlEditor';
 export * from './SqlEditorModeService';
 export * from './SqlEditorService';
 export * from './SqlEditorSettingsService';
-export * from './SqlEditor/SQL_EDITOR_ACTIONS_MENU';
 export * from './SqlGenerators/SqlGeneratorsResource';
 export * from './SqlGenerators/SqlGeneratorsBootstrap';
 

@@ -27,6 +27,7 @@ export interface ITabsContext<T = Record<string, any>> {
   closable: boolean;
   tabList?: string[];
   enabledBaseActions?: boolean;
+  canClose: (tabId: string) => boolean;
   getTabInfo: (tabId: string) => ITabInfo<T> | undefined;
   getTabState: <T>(tabId: string, valueGetter?: MetadataValueGetter<string, T>) => T;
   getLocalState: <T>(tabId: string, valueGetter?: MetadataValueGetter<string, T>) => T;

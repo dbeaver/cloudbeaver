@@ -80,7 +80,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
     <ColoredContainer parent overflow>
       <Group box keepSize large>
         <Table selectedItems={controller.selectedConnections} size='big' onSelect={controller.handleConnectionsAccessChange}>
-          <TableHeader>
+          <TableHeader fixed>
             <TableColumnHeader min />
             <TableColumnHeader min />
             <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>

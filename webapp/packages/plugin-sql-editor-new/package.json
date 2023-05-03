@@ -1,0 +1,26 @@
+{
+  "name": "@cloudbeaver/plugin-sql-editor-new",
+  "sideEffects": false,
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "prebuild": "rimraf --glob lib/*",
+    "build": "webpack --config ../../configs/webpack.plugin.config.js",
+    "postbuild": "tsc",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "validate-dependencies": "core-cli-validate-dependencies"
+  },
+  "dependencies": {
+    "@cloudbeaver/plugin-codemirror6": "~0.1.0",
+    "@cloudbeaver/plugin-devtools": "~0.1.0",
+    "@cloudbeaver/plugin-sql-editor": "~0.1.0",
+    "@cloudbeaver/core-blocks": "~0.1.0",
+    "@cloudbeaver/core-di": "~0.1.0"
+  },
+  "peerDependencies": {}
+}

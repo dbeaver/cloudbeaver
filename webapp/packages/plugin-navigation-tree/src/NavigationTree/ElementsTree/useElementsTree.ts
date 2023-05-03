@@ -352,7 +352,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   const elementsTree = useObservableRef<IElementsTree>(() => ({
     actions: new SyncExecutor(),
-    state,
     activeDnDData: [],
     loading: options.settings?.saveExpanded || false,
     get filter(): string {
@@ -629,6 +628,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       }
     },
   }), {
+    state: observable.ref,
     settings: observable.ref,
     isGroup: observable.ref,
     disabled: observable.ref,
@@ -642,6 +642,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     collapse: action.bound,
     userData: observable.ref,
   }, {
+    state,
     isGroup: options.isGroup,
     disabled: options.disabled,
     root: options.root,

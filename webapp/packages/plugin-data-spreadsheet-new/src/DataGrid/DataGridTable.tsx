@@ -49,7 +49,7 @@ function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
 const rowHeight = 25;
 const headerHeight = 28;
 
-export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResultSet>>(function DataGridTable({ model, actions, resultIndex, className }) {
+export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResultSet>>(function DataGridTable({ model, actions, resultIndex, simple, className }) {
   const translate = useTranslate();
 
   const clipboardService = useService(ClipboardService);
@@ -396,11 +396,12 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     actions,
     columnResize,
     resultIndex,
+    simple,
     isGridInFocus,
     getEditorPortal: () => editorRef.current,
     getDataGridApi: () => dataGridRef.current,
     focus: restoreFocus,
-  }), [model, actions, resultIndex, editorRef, dataGridRef, gridContainerRef, restoreFocus]);
+  }), [model, actions, resultIndex, simple, editorRef, dataGridRef, gridContainerRef, restoreFocus]);
 
   if (!tableData.columns.length) {
     return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;

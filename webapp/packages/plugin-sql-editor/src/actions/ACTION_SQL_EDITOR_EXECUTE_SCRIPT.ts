@@ -13,5 +13,6 @@ export const ACTION_SQL_EDITOR_EXECUTE_SCRIPT = createAction(
   {
     icon: '/icons/sql_script_exec.svg',
     label: 'sql_editor_sql_execution_script_button_tooltip',
+    tooltip: 'sql_editor_sql_execution_script_button_tooltip',
   }
 );

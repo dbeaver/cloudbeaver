@@ -14,7 +14,7 @@ import type { IContainerProps } from './IContainerProps';
 interface Props extends IContainerProps {
   form?: boolean;
   center?: boolean;
-  box?: boolean;
+  box?: boolean | 'no-overflow';
 }
 
 export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTMLDivElement>>(function Group({

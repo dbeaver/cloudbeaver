@@ -22,6 +22,7 @@ interface Props {
   dataFormat: ResultDataFormat;
   presentation: IDataPresentationOptions | null;
   resultIndex: number;
+  simple: boolean;
 }
 
 const styles = css`
@@ -37,6 +38,7 @@ export const TableToolsPanel = observer<Props>(function TableToolsPanel({
   dataFormat,
   presentation,
   resultIndex,
+  simple,
 }) {
   const translate = useTranslate();
 
@@ -58,6 +60,6 @@ export const TableToolsPanel = observer<Props>(function TableToolsPanel({
   }
 
   return styled(styles)(
-    <Presentation dataFormat={dataFormat} model={model} actions={actions} resultIndex={resultIndex} />
+    <Presentation dataFormat={dataFormat} model={model} actions={actions} resultIndex={resultIndex} simple={simple} />
   );
 });

@@ -71,7 +71,7 @@ const styles = css`
   drop-outside {
     composes: theme-border-color-background from global;
     border: dashed 2px;
-    border-radius: 3px;
+    border-radius: var(--theme-group-element-radius);
     margin: 12px;
     box-sizing: border-box;
     position: relative;

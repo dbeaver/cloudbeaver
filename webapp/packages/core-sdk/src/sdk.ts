@@ -249,7 +249,9 @@ export enum CbServerEventId {
   CbRmResourceCreated = 'cb_rm_resource_created',
   CbRmResourceDeleted = 'cb_rm_resource_deleted',
   CbRmResourceUpdated = 'cb_rm_resource_updated',
+  CbSessionExpired = 'cb_session_expired',
   CbSessionLogUpdated = 'cb_session_log_updated',
+  CbSessionState = 'cb_session_state',
   CbSessionWebsocketConnected = 'cb_session_websocket_connected'
 }
 
@@ -1105,6 +1107,7 @@ export interface Query {
   sqlEntityQueryGenerators: Array<SqlQueryGenerator>;
   sqlFormatQuery: Scalars['String'];
   sqlGenerateEntityQuery: Scalars['String'];
+  sqlGenerateGroupingQuery: Scalars['String'];
   sqlListContexts: Array<Maybe<SqlContextInfo>>;
   sqlParseQuery: SqlScriptQuery;
   sqlParseScript: SqlScriptInfo;
@@ -1456,6 +1459,15 @@ export interface QuerySqlGenerateEntityQueryArgs {
 }
 
 
+export interface QuerySqlGenerateGroupingQueryArgs {
+  columnNames?: InputMaybe<Array<Scalars['String']>>;
+  connectionId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  projectId?: InputMaybe<Scalars['ID']>;
+  resultsId: Scalars['ID'];
+}
+
+
 export interface QuerySqlListContextsArgs {
   connectionId?: InputMaybe<Scalars['ID']>;
   contextId?: InputMaybe<Scalars['ID']>;
@@ -1781,6 +1793,18 @@ export interface UserInfo {
   linkedAuthProviders: Array<Scalars['String']>;
   metaParameters: Scalars['Object'];
   userId: Scalars['ID'];
+}
+
+export interface WsSessionExpiredEvent extends CbServerEvent {
+  id: CbServerEventId;
+  topicId?: Maybe<CbEventTopic>;
+}
+
+export interface WsSessionStateEvent extends CbServerEvent {
+  id: CbServerEventId;
+  isValid?: Maybe<Scalars['Boolean']>;
+  remainingTime: Scalars['Int'];
+  topicId?: Maybe<CbEventTopic>;
 }
 
 export interface WsSocketConnectedEvent extends CbServerEvent {
@@ -2594,6 +2618,17 @@ export type GetResultsetDataUrlMutationVariables = Exact<{
 
 
 export type GetResultsetDataUrlMutation = { url: string };
+
+export type GetResultsetGroupingQueryQueryVariables = Exact<{
+  projectId: Scalars['ID'];
+  contextId: Scalars['ID'];
+  connectionId: Scalars['ID'];
+  resultsId: Scalars['ID'];
+  columnNames: Array<Scalars['String']> | Scalars['String'];
+}>;
+
+
+export type GetResultsetGroupingQueryQuery = { query: string };
 
 export type GetSqlExecuteTaskResultsMutationVariables = Exact<{
   taskId: Scalars['ID'];
@@ -4160,6 +4195,17 @@ export const GetResultsetDataUrlDocument = `
   )
 }
     `;
+export const GetResultsetGroupingQueryDocument = `
+    query getResultsetGroupingQuery($projectId: ID!, $contextId: ID!, $connectionId: ID!, $resultsId: ID!, $columnNames: [String!]!) {
+  query: sqlGenerateGroupingQuery(
+    projectId: $projectId
+    contextId: $contextId
+    connectionId: $connectionId
+    resultsId: $resultsId
+    columnNames: $columnNames
+  )
+}
+    `;
 export const GetSqlExecuteTaskResultsDocument = `
     mutation getSqlExecuteTaskResults($taskId: ID!) {
   result: asyncSqlExecuteResults(taskId: $taskId) {
@@ -4962,6 +5008,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getResultsetDataURL(variables: GetResultsetDataUrlMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetResultsetDataUrlMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetResultsetDataUrlMutation>(GetResultsetDataUrlDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getResultsetDataURL', 'mutation');
+    },
+    getResultsetGroupingQuery(variables: GetResultsetGroupingQueryQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetResultsetGroupingQueryQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetResultsetGroupingQueryQuery>(GetResultsetGroupingQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getResultsetGroupingQuery', 'query');
     },
     getSqlExecuteTaskResults(variables: GetSqlExecuteTaskResultsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetSqlExecuteTaskResultsMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetSqlExecuteTaskResultsMutation>(GetSqlExecuteTaskResultsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSqlExecuteTaskResults', 'mutation');

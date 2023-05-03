@@ -17,6 +17,8 @@
 
 package io.cloudbeaver.server;
 
+import io.cloudbeaver.server.jobs.SessionStateJob;
+import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
 import io.cloudbeaver.service.session.WebSessionManager;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
@@ -148,7 +150,11 @@ public class CBPlatform extends BasePlatformImpl {
 
         refreshApplicableDrivers();
 
-        new WebSessionMonitorJob(this).scheduleMonitor();
+        new WebSessionMonitorJob(this)
+            .scheduleMonitor();
+
+        new SessionStateJob(this)
+            .scheduleMonitor();
 
         log.info("Web platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
     }

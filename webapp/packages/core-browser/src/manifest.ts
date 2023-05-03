@@ -11,6 +11,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 import { BrowserSettingsService } from './BrowserSettingsService';
 import { CookiesService } from './CookiesService';
 import { ServiceWorkerBootstrap } from './ServiceWorkerBootstrap';
+import { ServiceWorkerService } from './ServiceWorkerService';
 
 export const coreBrowserManifest: PluginManifest = {
   info: {
@@ -21,5 +22,6 @@ export const coreBrowserManifest: PluginManifest = {
     BrowserSettingsService,
     CookiesService,
     ServiceWorkerBootstrap,
+    ServiceWorkerService,
   ],
 };

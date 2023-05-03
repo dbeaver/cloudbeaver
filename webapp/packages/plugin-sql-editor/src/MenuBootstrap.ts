@@ -22,6 +22,7 @@ import { KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT } from './actions/bindings/KEY_BI
 import { KEY_BINDING_SQL_EDITOR_FORMAT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_FORMAT';
 import { KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN';
 import { ScriptPreviewService } from './ScriptPreview/ScriptPreviewService';
+import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA';
 
 @injectable()
@@ -49,6 +50,29 @@ export class MenuBootstrap extends Bootstrap {
         if (
           sqlEditorData.readonly
           && [ACTION_SQL_EDITOR_FORMAT, ACTION_REDO, ACTION_UNDO].includes(action)
+        ) {
+          return false;
+        }
+
+        if (
+          !sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.executable)
+          && [
+            ACTION_SQL_EDITOR_EXECUTE,
+            ACTION_SQL_EDITOR_EXECUTE_NEW,
+            ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
+            ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+          ].includes(action)
+        ) {
+          return false;
+        }
+
+        if (
+          !sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.query)
+          && [
+            ACTION_SQL_EDITOR_EXECUTE,
+            ACTION_SQL_EDITOR_EXECUTE_NEW,
+            ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+          ].includes(action)
         ) {
           return false;
         }
@@ -86,7 +110,13 @@ export class MenuBootstrap extends Bootstrap {
     this.keyBindingService.addKeyBindingHandler({
       id: 'sql-editor-execute-script',
       binding: KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT,
-      isBindingApplicable: (contexts, action) => action === ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
+      isBindingApplicable: (contexts, action) => {
+        const sqlEditorData = contexts.tryGet(DATA_CONTEXT_SQL_EDITOR_DATA);
+        return (
+          action === ACTION_SQL_EDITOR_EXECUTE_SCRIPT
+          && sqlEditorData?.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) === true
+        );
+      },
       handler: this.sqlEditorActionHandler.bind(this),
     });
 

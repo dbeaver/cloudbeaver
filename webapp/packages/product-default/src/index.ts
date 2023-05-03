@@ -5,6 +5,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 import administration from '@cloudbeaver/plugin-administration';
 import authentication from '@cloudbeaver/plugin-authentication';
 import authenticationAdministration from '@cloudbeaver/plugin-authentication-administration';
+import { browserPlugin } from '@cloudbeaver/plugin-browser';
 import connectionCustom from '@cloudbeaver/plugin-connection-custom';
 import connectionSearch from '@cloudbeaver/plugin-connection-search';
 import connectionTemplate from '@cloudbeaver/plugin-connection-template';
@@ -13,6 +14,7 @@ import connectionAdministration from '@cloudbeaver/plugin-connections-administra
 import dataExport from '@cloudbeaver/plugin-data-export';
 import spreadsheetNew from '@cloudbeaver/plugin-data-spreadsheet-new';
 import dataViewer from '@cloudbeaver/plugin-data-viewer';
+import { dvResultSetGroupingPlugin } from '@cloudbeaver/plugin-data-viewer-result-set-grouping';
 import datasourceContextSwitch from '@cloudbeaver/plugin-datasource-context-switch';
 import ddlViewer from '@cloudbeaver/plugin-ddl-viewer';
 import devTools from '@cloudbeaver/plugin-devtools';
@@ -34,6 +36,7 @@ import settingsMenuAdministration from '@cloudbeaver/plugin-settings-menu-admini
 import sqlEditor from '@cloudbeaver/plugin-sql-editor';
 import sqlEditorTab from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import sqlEditorResource from '@cloudbeaver/plugin-sql-editor-navigation-tab-script';
+import sqlEditorNew from '@cloudbeaver/plugin-sql-editor-new';
 import sqlEditorScreen from '@cloudbeaver/plugin-sql-editor-screen';
 import theme from '@cloudbeaver/plugin-theme';
 import toolsPanel from '@cloudbeaver/plugin-tools-panel';
@@ -58,12 +61,14 @@ const PLUGINS: PluginManifest[] = [
   connectionSearch,
   dataExport,
   dataViewer,
+  dvResultSetGroupingPlugin,
   gisViewer,
   ddlViewer,
   objectViewer,
   sqlEditor,
   sqlEditorTab,
   sqlEditorScreen,
+  sqlEditorNew,
   userProfile,
   userProfileAdministration,
   defaultProductManifest,
@@ -87,6 +92,7 @@ const PLUGINS: PluginManifest[] = [
   root,
   toolsPanel,
   projects,
+  browserPlugin,
 ];
 
 bootstrap(PLUGINS);

@@ -8,4 +8,6 @@
 
 import { createDataContext } from '@cloudbeaver/core-view';
 
-export const DATA_CONTEXT_DATA_VIEWER_DATABASE_DATA_MODEL_RESULT_INDEX = createDataContext<number>('data-viewer-database-data-model-result-index');
+import type { IResultSetColumnKey } from '../IResultSetDataKey';
+
+export const DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY = createDataContext<IResultSetColumnKey | null>('data-viewer-database-data-model-result-set-column-key');

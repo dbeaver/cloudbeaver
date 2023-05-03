@@ -7,6 +7,7 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import {
   GraphQLService,
   CachedDataResource,
@@ -14,6 +15,8 @@ import {
 } from '@cloudbeaver/core-sdk';
 
 import { ServerConfigResource } from './ServerConfigResource';
+import { ServerEventId } from './SessionEventSource';
+import { SessionInfoEventHandler } from './SessionInfoEventHandler';
 
 export type SessionState = SessionStateFragment;
 export interface ISessionAction {
@@ -21,16 +24,28 @@ export interface ISessionAction {
   [key: string]: any;
 }
 
+interface SessionStateData {
+  isValid?: boolean;
+  remainingTime: number;
+}
+
 @injectable()
 export class SessionResource extends CachedDataResource<SessionState | null> {
   private action: ISessionAction | null;
   private defaultLocale: string | undefined;
+  readonly onStatusUpdate: ISyncExecutor<SessionStateData>;
 
   constructor(
     private readonly graphQLService: GraphQLService,
+    sessionInfoEventHandler: SessionInfoEventHandler,
     serverConfigResource: ServerConfigResource
   ) {
     super(() => null);
+
+    this.onStatusUpdate = new SyncExecutor();
+    sessionInfoEventHandler.onEvent(ServerEventId.CbSessionState, event => {
+      this.onStatusUpdate.execute(event);
+    }, undefined, this);
 
     this.action = null;
     this.sync(serverConfigResource, () => {}, () => {});

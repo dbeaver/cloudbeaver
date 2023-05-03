@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -28,6 +29,7 @@ import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
+import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -85,6 +87,11 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     private static final Log log = Log.getLog(CBApplication.class);
 
     private static final boolean RECONFIGURATION_ALLOWED = true;
+    /**
+     * In configuration mode sessions expire after a week
+     */
+    private static final long CONFIGURATION_MODE_SESSION_IDLE_TIME = 60 * 60 * 1000 * 24 * 7;
+
 
     static {
         Log.setDefaultDebugStream(System.out);
@@ -119,7 +126,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     // Persistence
     protected SMAdminController securityController;
 
-    private long maxSessionIdleTime = CBConstants.MAX_SESSION_IDLE_TIME;
+    private long maxSessionIdleTime = CBAuthConstants.MAX_SESSION_IDLE_TIME;
 
     private boolean develMode = false;
     private boolean configurationMode = false;
@@ -179,6 +186,9 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     }
 
     public long getMaxSessionIdleTime() {
+        if (isConfigurationMode()) {
+            return CONFIGURATION_MODE_SESSION_IDLE_TIME;
+        }
         return maxSessionIdleTime;
     }
 
@@ -475,14 +485,13 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     }
 
     @Override
-    protected void loadConfiguration(String configPath) throws DBException {
+    protected void loadConfiguration(Path configPath) throws DBException {
         log.debug("Using configuration [" + configPath + "]");
 
-        File configFile = new File(configPath);
-        if (!configFile.exists()) {
-            log.error("Configuration file " + configFile.getAbsolutePath() + " doesn't exist. Use defaults.");
+        if (!Files.exists(configPath)) {
+            log.error("Configuration file " + configPath + " doesn't exist. Use defaults.");
         } else {
-            parseConfiguration(configFile);
+            parseConfiguration(configPath.toFile());
         }
         // Set default preferences
         PrefUtils.setDefaultPreferenceValue(ModelPreferences.getPreferences(), ModelPreferences.UI_DRIVERS_HOME, getDriversLocation());
@@ -801,6 +810,15 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         if (credentialsProvider != null && credentialsProvider.getActiveUserCredentials() != null) {
             sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();
         }
+
+        // Reloading configuration by services
+        for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance().getWebServices(DBWServiceServerConfigurator.class)) {
+            try {
+                wsc.reloadConfiguration(appConfig);
+            } catch (Exception e) {
+                log.warn("Error reloading configuration by web service " + wsc.getClass().getName(), e);
+            }
+        }
         eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId, null));
     }
 
@@ -1000,6 +1018,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     ////////////////////////////////////////////////////////////////////////
     // License management
 
+    @Override
     public boolean isLicenseRequired() {
         return false;
     }

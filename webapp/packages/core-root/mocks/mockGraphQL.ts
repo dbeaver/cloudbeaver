@@ -9,11 +9,16 @@
 import type { GraphQLRequest, RequestHandler } from 'msw';
 import { setupServer } from 'msw/node';
 
+import { createWebsocketEndpoint } from './createWebsocketEndpoint';
+
 export function mockGraphQL(
   ...requestHandlers: RequestHandler<any, GraphQLRequest<any>, any, GraphQLRequest<any>>[]
 ) {
 
-  const server = setupServer(...requestHandlers);
+  const server = setupServer(
+    ...requestHandlers,
+    createWebsocketEndpoint()
+  );
 
   beforeAll(() => server.listen());
   afterEach(() => server.resetHandlers());

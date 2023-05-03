@@ -17,6 +17,7 @@ export interface IDataGridCellMenuContext {
   spreadsheetActions: IDataPresentationActions<IResultSetElementKey>;
   resultIndex: number;
   key: IResultSetElementKey;
+  simple: boolean;
 }
 
 @injectable()
@@ -40,12 +41,13 @@ export class DataGridContextMenuService {
     actions: IDataTableActions,
     spreadsheetActions: IDataPresentationActions<IResultSetElementKey>,
     resultIndex: number,
-    key: IResultSetElementKey
+    key: IResultSetElementKey,
+    simple: boolean
   ): IMenuPanel {
     return this.contextMenuService.createContextMenu<IDataGridCellMenuContext>({
       menuId: this.getMenuToken(),
       contextType: DataGridContextMenuService.cellContext,
-      data: { model, actions, spreadsheetActions, resultIndex, key },
+      data: { model, actions, spreadsheetActions, resultIndex, key, simple },
     }, this.getMenuToken());
   }
 
@@ -54,9 +56,10 @@ export class DataGridContextMenuService {
     actions: IDataTableActions,
     spreadsheetActions: IDataPresentationActions<IResultSetElementKey>,
     resultIndex: number,
-    key: IResultSetElementKey
+    key: IResultSetElementKey,
+    simple: boolean
   ): void {
-    this.onRootMenuOpen.execute({ model, actions, spreadsheetActions, resultIndex, key });
+    this.onRootMenuOpen.execute({ model, actions, spreadsheetActions, resultIndex, key, simple });
   }
 
   add(panelId: string, menuItem: IContextMenuItem<IDataGridCellMenuContext>): void {

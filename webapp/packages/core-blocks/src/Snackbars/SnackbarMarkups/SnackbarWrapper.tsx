@@ -24,7 +24,7 @@ const SNACKBAR_WRAPPER_STYLES = css`
     padding: 16px 16px;
     line-height: 1.5;
     opacity: 0;
-    border-radius: 4px;
+    border-radius: var(--theme-group-element-radius);
     transition: opacity 0.3s ease-in-out, transform 0.5s ease-in-out;
     transform: translateX(-100%);
 

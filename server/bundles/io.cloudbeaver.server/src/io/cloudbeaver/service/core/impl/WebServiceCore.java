@@ -68,6 +68,8 @@ import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -366,6 +368,12 @@ public class WebServiceCore implements DBWServiceCore {
         return webSession;
     }
 
+    /**
+     * Updates the user's permissions
+     *
+     * @deprecated CB-2773. The actual way to get session state is {@code WSSessionStateEvent} which sends periodically via web socket.
+     */
+    @Deprecated
     @Override
     public WebSession getSessionState(@NotNull WebSession webSession) throws DBWebException {
         try {

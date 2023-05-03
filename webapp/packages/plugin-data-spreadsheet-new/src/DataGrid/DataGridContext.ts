@@ -22,6 +22,7 @@ export interface IDataGridContext {
   model: IDatabaseDataModel;
   actions: IDataTableActions;
   resultIndex: number;
+  simple: boolean;
   columnResize: IExecutor<IColumnResizeInfo>;
   isGridInFocus: () => boolean;
   getEditorPortal: () => HTMLDivElement | null;

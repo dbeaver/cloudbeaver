@@ -201,6 +201,9 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const context = useContext(FormContext);
   const menuRef = useRef<HTMLDivElement>(null);
   const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
+
+  const showMenu = items.length > 1;
+
   const menu = useMenuState({
     placement: 'bottom-end',
     currentId: null,
@@ -367,7 +370,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           name={name}
           title={title}
           value={inputValue}
-          disabled={disabled}
+          disabled={disabled || !showMenu}
           readOnly={readOnly || select}
           data-focus={focus}
           data-select={select}
@@ -377,7 +380,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           {...rest}
           {...use({ select, focus })}
         />
-        <MenuButton {...menu} disabled={readOnly || disabled}>
+        <MenuButton {...menu} disabled={readOnly || disabled || !showMenu}>
           <Icon name="arrow" viewBox="0 0 16 16" {...use({ focus })} />
         </MenuButton>
         <Menu

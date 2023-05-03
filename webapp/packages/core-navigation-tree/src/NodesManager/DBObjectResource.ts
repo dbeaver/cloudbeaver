@@ -35,6 +35,15 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     // this.preloadResource(this.navNodeInfoResource);
     this.navNodeInfoResource.outdateResource(this);
     this.navNodeInfoResource.deleteInResource(this);
+
+    this.navTreeResource.onDataUpdate.addHandler(key => {
+      ResourceKeyUtils.forEach(key, nodeId => {
+        if (!isResourceAlias(nodeId)) {
+          this.markOutdated(DBObjectParentKey(nodeId));
+        }
+      });
+    });
+
     this.beforeLoad.addHandler(async (originalKey, context) => {
       await this.navTreeResource.waitLoad();
       if (this.isAlias(originalKey, DBObjectParentKey)) {

@@ -23,6 +23,7 @@ interface Props {
   dataFormat: ResultDataFormat;
   presentation: IDataPresentationOptions;
   resultIndex: number;
+  simple: boolean;
 }
 
 const styles = css`
@@ -38,6 +39,7 @@ export const TableGrid = observer<Props>(function TableGrid({
   dataFormat,
   presentation,
   resultIndex,
+  simple,
 }) {
   if (
     (presentation.dataFormat !== undefined && dataFormat !== presentation.dataFormat)
@@ -60,6 +62,6 @@ export const TableGrid = observer<Props>(function TableGrid({
   }
 
   return styled(styles)(
-    <Presentation dataFormat={dataFormat} model={model} actions={actions} resultIndex={resultIndex} />
+    <Presentation dataFormat={dataFormat} model={model} actions={actions} resultIndex={resultIndex} simple={simple} />
   );
 });

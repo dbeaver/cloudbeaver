@@ -268,6 +268,12 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     },
 
     async executeQuery(): Promise<void> {
+      const isQuery = this.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
+      const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
+
+      if (!isQuery || !isExecutable) {
+        return;
+      }
       const query = this.getSubQuery();
 
       await this.executeQueryAction(
@@ -296,6 +302,12 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     },
 
     async executeQueryNewTab(): Promise<void> {
+      const isQuery = this.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
+      const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
+
+      if (!isQuery || !isExecutable) {
+        return;
+      }
       const query = this.getSubQuery();
 
       await this.executeQueryAction(
@@ -309,7 +321,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     },
 
     async showExecutionPlan(): Promise<void> {
-      if (!this.dialect?.supportsExplainExecutionPlan) {
+      const isQuery = this.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
+      const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
+
+      if (!isQuery || !isExecutable || !this.dialect?.supportsExplainExecutionPlan) {
         return;
       }
 
@@ -329,7 +344,9 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     },
 
     async executeScript(): Promise<void> {
-      if (this.isDisabled || this.isScriptEmpty) {
+      const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
+
+      if (!isExecutable || this.isDisabled || this.isScriptEmpty) {
         return;
       }
 

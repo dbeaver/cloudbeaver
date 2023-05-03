@@ -17,13 +17,11 @@ interface Props {
   before?: React.ReactElement;
   after?: React.ReactElement;
   style?: ComponentStyle;
+  ripple?: boolean;
   className?: string;
 }
 
 const styles = css`
-    cell {
-      composes: theme-ripple from global;
-    } 
     main {
       position: relative;
       display: flex;
@@ -54,8 +52,22 @@ const styles = css`
     }
 `;
 
-export const Cell: React.FC<React.PropsWithChildren<Props>> = function Cell({ before, after, description, style, className, children }) {
-  return styled(useStyles(styles, style))(
+const RIPPLE_STYLES = css`
+  cell {
+    composes: theme-ripple from global;
+  } 
+`;
+
+export const Cell: React.FC<React.PropsWithChildren<Props>> = function Cell({
+  before,
+  after,
+  description,
+  style,
+  className,
+  ripple = true,
+  children,
+}) {
+  return styled(useStyles(styles, style, ripple && RIPPLE_STYLES))(
     <cell className={className}>
       <main>
         <before>{before}</before>

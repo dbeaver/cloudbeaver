@@ -15,7 +15,6 @@ export const BASE_TABLE_STYLES = css`
     text-align: left;
     border-collapse: collapse;
     border-color: var(--theme-background);
-    table-layout: fixed;
 
     & thead {
       &[|fixed] {
