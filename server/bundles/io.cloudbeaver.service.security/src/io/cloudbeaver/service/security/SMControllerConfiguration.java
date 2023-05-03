@@ -21,9 +21,11 @@ public class SMControllerConfiguration {
     //in minutes
     public static final int DEFAULT_ACCESS_TOKEN_TTL = 20;
     public static final int DEFAULT_REFRESH_TOKEN_TTL = 4320; //72h
+    public static final int DEFAULT_EXPIRED_AUTH_ATTEMPT_INFO_TTL = 60; //72h
 
     private int accessTokenTtl = DEFAULT_ACCESS_TOKEN_TTL;
     private int refreshTokenTtl = DEFAULT_REFRESH_TOKEN_TTL;
+    private int expiredAuthAttemptInfoTtl = DEFAULT_EXPIRED_AUTH_ATTEMPT_INFO_TTL;
     private String defaultAuthRole = null;
 
     public int getAccessTokenTtl() {
@@ -48,5 +50,13 @@ public class SMControllerConfiguration {
 
     public void setDefaultAuthRole(String defaultAuthRole) {
         this.defaultAuthRole = defaultAuthRole;
+    }
+
+    public int getExpiredAuthAttemptInfoTtl() {
+        return expiredAuthAttemptInfoTtl;
+    }
+
+    public void setExpiredAuthAttemptInfoTtl(int expiredAuthAttemptInfoTtl) {
+        this.expiredAuthAttemptInfoTtl = expiredAuthAttemptInfoTtl;
     }
 }

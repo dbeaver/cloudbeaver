@@ -15,6 +15,7 @@ import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 import { MENU_USER_PROFILE } from '@cloudbeaver/plugin-user-profile';
 
 import { ACTION_DEVTOOLS } from './actions/ACTION_DEVTOOLS';
+import { ACTION_DEVTOOLS_CODEMIRROR } from './actions/ACTION_DEVTOOLS_CODEMIRROR';
 import { ACTION_DEVTOOLS_MODE_DISTRIBUTED } from './actions/ACTION_DEVTOOLS_MODE_DISTRIBUTED';
 import { DATA_CONTEXT_MENU_SEARCH } from './ContextMenu/DATA_CONTEXT_MENU_SEARCH';
 import { SearchResourceMenuItem } from './ContextMenu/SearchResourceMenuItem';
@@ -111,6 +112,7 @@ export class PluginBootstrap extends Bootstrap {
         return [
           new SearchResourceMenuItem(),
           ACTION_DEVTOOLS_MODE_DISTRIBUTED,
+          ACTION_DEVTOOLS_CODEMIRROR,
           MENU_PLUGINS,
           ...items,
         ];
@@ -123,6 +125,15 @@ export class PluginBootstrap extends Bootstrap {
       isChecked: () => this.devToolsService.isDistributed,
       handler: () => {
         this.devToolsService.setDistributedMode(!this.devToolsService.isDistributed);
+      },
+    });
+
+    this.actionService.addHandler({
+      id: 'devtools-codemirror',
+      isActionApplicable: (context, action) => action === ACTION_DEVTOOLS_CODEMIRROR,
+      isChecked: () => this.devToolsService.isCodemirror,
+      handler: () => {
+        this.devToolsService.setCodemirror(!this.devToolsService.isCodemirror);
       },
     });
 

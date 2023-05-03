@@ -34,7 +34,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   }
 
   const providerList = providers.data.filter<AuthProvider>((provider): provider is AuthProvider => {
-    if (configurationWizard && provider?.configurable) {
+    if (configurationWizard && (provider?.configurable || provider?.private)) {
       return false;
     }
 
