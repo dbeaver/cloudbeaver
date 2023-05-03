@@ -148,8 +148,7 @@ public class CBDatabase {
             }
         }
 
-        SystemVariablesResolver variablesResolver = new SystemVariablesResolver();
-        String dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), variablesResolver);
+        String dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), SystemVariablesResolver.INSTANCE);
         Properties dbProperties = new Properties();
         if (!CommonUtils.isEmpty(dbUser)) {
             dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_USER, dbUser);
@@ -158,7 +157,7 @@ public class CBDatabase {
             }
         }
 
-        var migrator = new H2Migrator(monitor, dataSourceProviderRegistry, databaseConfiguration, dbURL, dbProperties, variablesResolver);
+        var migrator = new H2Migrator(monitor, dataSourceProviderRegistry, databaseConfiguration, dbURL, dbProperties);
         migrator.migrateDatabaseIfNeeded(V1_DB_NAME, V2_DB_NAME);
 
         // reload the driver and url due to a possible configuration update
@@ -167,7 +166,7 @@ public class CBDatabase {
             throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
         }
         Driver driverInstance = driver.getDriverInstance(monitor);
-        dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), variablesResolver);
+        dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), SystemVariablesResolver.INSTANCE);
 
         // Create connection pool with custom connection factory
         log.debug("\tInitiate connection pool with management database (" + driver.getFullName() + "; " + dbURL + ")");
