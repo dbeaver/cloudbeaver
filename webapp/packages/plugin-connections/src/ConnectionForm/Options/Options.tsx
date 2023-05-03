@@ -45,6 +45,7 @@ import { ConnectionFormService } from '../ConnectionFormService';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { ConnectionOptionsTabService } from './ConnectionOptionsTabService';
 import { ParametersForm } from './ParametersForm';
+import { ProviderPropertiesForm } from './ProviderPropertiesForm';
 import { useOptions } from './useOptions';
 
 const PROFILE_AUTH_MODEL_ID = 'profile';
@@ -184,10 +185,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   ) {
     properties = info.authProperties;
   }
-
-  // TODO we need to get these values other way
-  const providerPropertiesWithoutBoolean = driver?.providerProperties.slice().filter(property => property.dataType !== 'Boolean');
-  const booleanProviderProperties = driver?.providerProperties.slice().filter(property => property.dataType === 'Boolean');
 
   return styled(styles, BASE_CONTAINERS_STYLES)(
     <SubmittingForm ref={formRef} disabled={driverMap.isLoading()} onChange={handleFormChange}>
@@ -409,32 +406,13 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               )}
             </Group>
           )}
-          {driver?.providerProperties && driver.providerProperties.length > 0 && (
-            <Group form gap>
-              <GroupTitle>{translate('ui_settings')}</GroupTitle>
-              {booleanProviderProperties && booleanProviderProperties.length > 0 && (
-                <Container gap wrap>
-                  <ObjectPropertyInfoForm
-                    properties={booleanProviderProperties}
-                    state={config.providerProperties}
-                    disabled={disabled}
-                    readOnly={readonly}
-                    keepSize
-                  />
-                </Container>
-              )}
-              {providerPropertiesWithoutBoolean && (
-                <Container wrap gap>
-                  <ObjectPropertyInfoForm
-                    properties={providerPropertiesWithoutBoolean}
-                    state={config.providerProperties}
-                    disabled={disabled}
-                    readOnly={readonly}
-                    tiny
-                  />
-                </Container>
-              )}
-            </Group>
+          {driver?.providerProperties && (
+            <ProviderPropertiesForm
+              config={config}
+              properties={driver.providerProperties}
+              disabled={disabled}
+              readonly={readonly}
+            />
           )}
         </Container>
       </ColoredContainer>

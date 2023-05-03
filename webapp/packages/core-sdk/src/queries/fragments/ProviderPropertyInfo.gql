@@ -1,0 +1,13 @@
+fragment ProviderPropertyInfo on ObjectPropertyInfo {
+  id
+  displayName
+  description
+  category
+  dataType
+  defaultValue
+  validValues
+  length
+  features
+  order
+  supportedConfigurationTypes
+}
