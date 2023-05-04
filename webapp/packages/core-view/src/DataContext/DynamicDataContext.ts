@@ -31,6 +31,10 @@ export class DynamicDataContext implements IDataContext {
   }
 
   setFallBack(fallback: IDataContext): void {
+    if (this.fallback === fallback) {
+      return;
+    }
+    this.flush();
     this.fallback = fallback;
   }
 
