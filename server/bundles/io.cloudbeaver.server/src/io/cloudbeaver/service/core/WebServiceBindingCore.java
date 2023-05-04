@@ -24,16 +24,12 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.DBWBindingContext;
-import io.cloudbeaver.service.DBWServiceBindingServlet;
-import io.cloudbeaver.service.DBWServletContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.core.impl.WebServiceCore;
 import io.cloudbeaver.service.session.WebSessionManager;
-import org.jkiss.dbeaver.DBException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +41,7 @@ import java.util.stream.Collectors;
 /**
  * Web service implementation
  */
-public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore> implements DBWServiceBindingServlet<CBApplication> {
+public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore> {
 
     public WebServiceBindingCore() {
         super(DBWServiceCore.class, new WebServiceCore(), "schema/service.core.graphqls");
@@ -58,8 +54,6 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
         model.getQueryType()
             .dataFetcher("serverConfig", env -> getService(env).getServerConfig())
 
-            .dataFetcher("driverList", env -> getService(env).getDriverList(getWebSession(env), env.getArgument("id")))
-            .dataFetcher("driverProviderList", env -> getService(env).getDriverProviderList(getWebSession(env)))
             .dataFetcher("authModels", env -> getService(env).getAuthModels(getWebSession(env)))
             .dataFetcher("networkHandlers", env -> getService(env).getNetworkHandlers(getWebSession(env)))
             .dataFetcher("templateDataSources", env -> getService(env).getTemplateDataSources())
@@ -107,14 +101,6 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("refreshSessionConnections", env -> getService(env).refreshSessionConnections(
                 GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
             .dataFetcher("changeSessionLanguage", env -> getService(env).changeSessionLanguage(getWebSession(env), env.getArgument("locale")))
-
-            .dataFetcher("createDriver", env -> getService(env).createDriver(getWebSession(env), getDriverConfig(env)))
-            .dataFetcher("updateDriver", env -> getService(env).updateDriver(getWebSession(env), getDriverConfig(env)))
-            .dataFetcher("deleteDriver", env -> getService(env).deleteDriver(getWebSession(env), env.getArgument("id")))
-            .dataFetcher("deleteDriverLibraries", env -> getService(env).deleteDriverLibraries(
-                getWebSession(env),
-                env.getArgument("driverId"),
-                env.getArgument("libraryIds")))
 
             .dataFetcher("createConnection", env -> getService(env).createConnection(
                 getWebSession(env), getProjectReference(env), getConnectionConfig(env)))
@@ -196,18 +182,5 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
 
     private WebConnectionConfig getConnectionConfig(DataFetchingEnvironment env) {
         return new WebConnectionConfig(env.getArgument("config"));
-    }
-
-    private WebDatabaseDriverConfig getDriverConfig(DataFetchingEnvironment env) {
-        return new WebDatabaseDriverConfig(env.getArgument("config"));
-    }
-
-    @Override
-    public void addServlets(CBApplication application, DBWServletContext servletContext) throws DBException {
-        servletContext.addServlet(
-            "fileLoader",
-            new WebFileLoaderServlet(application, getServiceImpl()),
-            application.getServicesURI() + "load/*"
-        );
     }
 }

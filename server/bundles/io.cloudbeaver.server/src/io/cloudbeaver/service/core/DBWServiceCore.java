@@ -42,44 +42,6 @@ public interface DBWServiceCore extends DBWService {
     WebServerConfig getServerConfig() throws DBWebException;
 
     @WebAction
-    List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) throws DBWebException;
-
-    @WebAction
-    List<WebDataSourceProviderInfo> getDriverProviderList(@NotNull WebSession webSession) throws DBWebException;
-
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    WebDatabaseDriverInfo createDriver(
-        @NotNull WebSession webSession,
-        @NotNull WebDatabaseDriverConfig config
-    ) throws DBWebException;
-
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    WebDatabaseDriverInfo updateDriver(
-        @NotNull WebSession webSession,
-        @NotNull WebDatabaseDriverConfig config
-    ) throws DBWebException;
-
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean deleteDriver(
-        @NotNull WebSession session,
-        @NotNull String driverId
-    ) throws DBWebException;
-
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean addDriverLibraries(
-        @NotNull WebSession session,
-        @NotNull String driverId,
-        @NotNull Collection<Part> requestParts
-    ) throws DBWebException;
-
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean deleteDriverLibraries(
-        @NotNull WebSession session,
-        @NotNull String driverId,
-        @NotNull List<String> libraryIds
-    ) throws DBWebException;
-
-    @WebAction
     List<WebDatabaseAuthModel> getAuthModels(@NotNull WebSession webSession);
 
     @WebAction

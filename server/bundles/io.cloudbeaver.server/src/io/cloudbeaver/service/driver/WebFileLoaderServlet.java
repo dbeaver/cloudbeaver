@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.core;
+package io.cloudbeaver.service.driver;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -49,16 +49,18 @@ public class WebFileLoaderServlet extends WebServiceServletBase {
 
     private static final Type MAP_STRING_OBJECT_TYPE = new TypeToken<Map<String, Object>>() {
     }.getType();
+    private static final String REQUEST_PARAM_VARIABLES = "variables";
+    private static final String REQUEST_PARAM_DRIVER_ID = "driverId";
     private static Gson gson = new GsonBuilder()
         .serializeNulls()
         .setPrettyPrinting()
         .create();
 
-    private final DBWServiceCore serviceCore;
+    private final DBWServiceDriver serviceDriver;
 
-    public WebFileLoaderServlet(CBApplication application, DBWServiceCore serviceCore) {
+    public WebFileLoaderServlet(CBApplication application, DBWServiceDriver serviceDriver) {
         super(application);
-        this.serviceCore = serviceCore;
+        this.serviceDriver = serviceDriver;
     }
 
     @Override
@@ -71,12 +73,12 @@ public class WebFileLoaderServlet extends WebServiceServletBase {
             try {
                 request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
                 // for now, we use it only for loading driver files
-                Map<String, Object> variables = gson.fromJson(request.getParameter("variables"), MAP_STRING_OBJECT_TYPE);
-                var driverId = JSONUtils.getString(variables, "driverId");
+                Map<String, Object> variables = gson.fromJson(request.getParameter(REQUEST_PARAM_VARIABLES), MAP_STRING_OBJECT_TYPE);
+                var driverId = JSONUtils.getString(variables, REQUEST_PARAM_DRIVER_ID);
                 if (driverId == null) {
                     throw new DBWebException("Driver id is not found");
                 }
-                serviceCore.addDriverLibraries(session, driverId, request.getParts());
+                serviceDriver.addDriverLibraries(session, driverId, request.getParts());
             } catch (Exception e) {
                 throw new DBWebException("Servlet exception ", e);
             }

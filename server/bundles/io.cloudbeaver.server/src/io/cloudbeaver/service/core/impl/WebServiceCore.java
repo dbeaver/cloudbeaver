@@ -23,13 +23,11 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebDataSourceProviderInfo;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.core.DBWServiceCore;
-import io.cloudbeaver.service.core.WebDatabaseDriverConfig;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
@@ -39,14 +37,12 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
-import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.dbeaver.model.connection.DBPDriverLibrary;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWNetworkHandler;
@@ -57,28 +53,20 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
-import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
-import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 
 /**
  * Web service implementation
@@ -90,139 +78,6 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public WebServerConfig getServerConfig() {
         return new WebServerConfig(CBApplication.getInstance());
-    }
-
-    @Override
-    public List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) {
-        List<WebDatabaseDriverInfo> result = new ArrayList<>();
-        for (DBPDriver driver : CBPlatform.getInstance().getApplicableDrivers()) {
-            if (driverId == null || driverId.equals(driver.getFullId())) {
-                result.add(new WebDatabaseDriverInfo(webSession, driver));
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<WebDataSourceProviderInfo> getDriverProviderList(@NotNull WebSession webSession) throws DBWebException {
-        return DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders().stream()
-            .map(WebDataSourceProviderInfo::new)
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public WebDatabaseDriverInfo createDriver(@NotNull WebSession webSession, @NotNull WebDatabaseDriverConfig config) throws DBWebException {
-        DataSourceProviderDescriptor descriptor = DataSourceProviderRegistry.getInstance().getDataSourceProvider(config.getProviderId());
-        if (descriptor == null) {
-            throw new DBWebException("Data source provider '" + config.getProviderId() + "' is not found");
-        }
-
-        var driver = descriptor.createDriver();
-        WebServiceUtils.setDriverConfiguration(driver, config);
-        DriverDescriptor oldDriver = descriptor.getDriverByName(driver.getCategory(), driver.getName());
-        if (oldDriver != null && oldDriver != driver && !oldDriver.isDisabled() && oldDriver.getReplacedBy() == null) {
-            throw new DBWebException("Driver '" + config.getDriverName() + "' already exists. Change driver name");
-        }
-        if (descriptor.getDriver(driver.getId()) == null) {
-            descriptor.addDriver(driver);
-        }
-        descriptor.getRegistry().saveDrivers();
-        CBPlatform.getInstance().refreshApplicableDrivers();
-        return new WebDatabaseDriverInfo(webSession, driver);
-    }
-
-    @Override
-    public WebDatabaseDriverInfo updateDriver(@NotNull WebSession webSession, @NotNull WebDatabaseDriverConfig config) throws DBWebException {
-        var driver = DataSourceProviderRegistry.getInstance().findDriver(config.getDriverId());
-        if (driver == null) {
-            throw new DBWebException("Data source driver '" + config.getDriverId() + "' is not found");
-        }
-        WebServiceUtils.setDriverConfiguration((DriverDescriptor) driver, config);
-        ((DataSourceProviderDescriptor) driver.getProviderDescriptor()).getRegistry().saveDrivers();
-        return new WebDatabaseDriverInfo(webSession, driver);
-    }
-
-    @Override
-    public boolean deleteDriver(@NotNull WebSession session, @NotNull String driverId) throws DBWebException {
-        DriverDescriptor driver = (DriverDescriptor) DataSourceProviderRegistry.getInstance().findDriver(driverId);
-        if (driver == null) {
-            throw new DBWebException("Data source driver '" + driverId + "' is not found");
-        }
-
-        driver.getProviderDescriptor().removeDriver(driver);
-        driver.getProviderDescriptor().getRegistry().saveDrivers();
-        return true;
-    }
-
-    @Override
-    public boolean addDriverLibraries(
-        @NotNull WebSession session,
-        @NotNull String driverId,
-        @NotNull Collection<Part> requestParts
-    ) throws DBWebException {
-        DriverDescriptor driver = (DriverDescriptor) DataSourceProviderRegistry.getInstance().findDriver(driverId);
-        if (driver == null) {
-            throw new DBWebException("Data source driver '" + driverId + "' is not found");
-        }
-        for (Part part : requestParts) {
-            if (part.getSubmittedFileName() == null) {
-                continue;
-            }
-            String filePath = DBConstants.DEFAULT_DRIVERS_FOLDER + "/" + driver.getId() + "/" + part.getSubmittedFileName();
-            try {
-                // driver descriptor can't seek drivers in local file controller, so we can't use file controller in embedded product
-                if (CBApplication.getInstance().isMultiNode()) {
-                    DBFileController fileController = DBWorkbench.getPlatform().getFileController();
-                    fileController.saveFileData(
-                        DBFileController.TYPE_DATABASE_DRIVER,
-                        filePath,
-                        part.getInputStream().readAllBytes());
-                } else {
-                    Path path = Path.of(CBApplication.getInstance().getDriversLocation()).resolveSibling(filePath);
-                    if (!Files.exists(path.getParent())) {
-                        Files.createDirectories(path.getParent());
-                    }
-                    part.write(path.toString());
-                }
-                driver.addDriverLibrary(filePath, DBPDriverLibrary.FileType.jar);
-            } catch (IOException | DBException e) {
-                throw new DBWebException("IO error while saving driver file", e);
-            }
-        }
-        driver.getProviderDescriptor().getRegistry().saveDrivers();
-        return true;
-    }
-
-    @Override
-    public boolean deleteDriverLibraries(
-        @NotNull WebSession session,
-        @NotNull String driverId,
-        @NotNull List<String> libraryIds
-    ) throws DBWebException {
-        DriverDescriptor driver = (DriverDescriptor) DataSourceProviderRegistry.getInstance().findDriver(driverId);
-        if (driver == null) {
-            throw new DBWebException("Data source driver '" + driverId + "' is not found");
-        }
-        try {
-            // driver descriptor can't seek drivers in local file controller, so we can't use file controller in embedded product
-            for (String libraryId : libraryIds) {
-                if (CBApplication.getInstance().isMultiNode()) {
-                    DBFileController fileController = DBWorkbench.getPlatform().getFileController();
-                    fileController.deleteFile(
-                        DBFileController.TYPE_DATABASE_DRIVER,
-                        libraryId,
-                        false);
-                } else {
-                    Path path = Path.of(CBApplication.getInstance().getDriversLocation()).resolveSibling(libraryId);
-                    Files.deleteIfExists(path);
-                }
-                driver.getDriverLibraries().removeIf(x -> x.getId().equals(libraryId));
-            }
-        } catch (IOException | DBException e) {
-            throw new DBWebException("IO error while deleting driver file", e);
-        }
-        driver.getProviderDescriptor().getRegistry().saveDrivers();
-        return true;
     }
 
     @Override

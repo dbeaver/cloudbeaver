@@ -27,7 +27,7 @@ import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.service.core.WebDatabaseDriverConfig;
+import io.cloudbeaver.service.driver.WebDatabaseDriverConfig;
 import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
