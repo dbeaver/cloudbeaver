@@ -76,14 +76,16 @@ type DriverLibraryInfo {
 }
 
 input DriverConfig {
-    providerId: ID!
-    id: ID!
+    id: ID
     name: String!
-    driverClass: String!
-    url: String
+    providerId: ID!
+    driverClassName: String!
+
     description: String
-    defaultDatabase: String
+    sampleURL: String
+
     defaultPort: String
+    defaultDatabase: String
     defaultUser: String
 }
 
