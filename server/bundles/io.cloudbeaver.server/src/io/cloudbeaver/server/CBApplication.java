@@ -1092,7 +1092,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         return eventController;
     }
 
+    @Nullable
     public String getDefaultAuthRole() {
-        return securityManagerConfiguration.getDefaultAuthRole();
+        return null;
     }
 }
