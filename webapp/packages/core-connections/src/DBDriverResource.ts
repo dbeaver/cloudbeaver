@@ -11,7 +11,7 @@ import { computed, makeObservable } from 'mobx';
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedMapResource, ResourceKey, ResourceKeyUtils, DatabaseDriverFragment, DriverListQueryVariables, CachedMapAllKey,  resourceKeyList, isResourceAlias, DriverConfig, ResourceKeyList } from '@cloudbeaver/core-sdk';
+import { GraphQLService, CachedMapResource, ResourceKey, ResourceKeyUtils, DatabaseDriverFragment, DriverListQueryVariables, CachedMapAllKey, resourceKeyList, isResourceAlias, DriverConfig, ResourceKeyList } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export type DBDriver = DatabaseDriverFragment;
@@ -31,7 +31,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
   ) {
     super();
     appAuthService.requireAuthentication(this);
-    this.sync(this.serverConfigResource, () => {}, () => CachedMapAllKey);
+    this.sync(this.serverConfigResource, () => { }, () => CachedMapAllKey);
 
     makeObservable(this, {
       enabledDrivers: computed<DBDriver[]>({
@@ -83,26 +83,30 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
     return this.data;
   }
 
-  async editDriver(config: DriverConfig): Promise<DBDriver> {
-    await this.performUpdate(config.id, [], async () => {
-      const response = await this.graphQLService.sdk.updateDriver({ config,
-        includeDriverParameters: false,
-        includeDriverProperties: false,
-        includeProviderProperties: false });
-
-      const driverInfo: DBDriver = response.driverInfo;
-
-      this.set(driverInfo.id, driverInfo);
-    });
-
-    return this.get(config.id)!;
-  }
+  /*   async editDriver(config: DriverConfig): Promise<DBDriver> {
+      await this.performUpdate(config.id, [], async () => {
+        const response = await this.graphQLService.sdk.updateDriver({
+          config,
+          includeDriverParameters: false,
+          includeDriverProperties: false,
+          includeProviderProperties: false,
+        });
+  
+        const driverInfo: DBDriver = response.driverInfo;
+  
+        this.set(driverInfo.id, driverInfo);
+      });
+  
+      return this.get(config.id)!;
+    } */
 
   async createDriver(config: DriverConfig): Promise<DBDriver> {
-    const response = await this.graphQLService.sdk.createDriver({ config,
+    const response = await this.graphQLService.sdk.createDriver({
+      config,
       includeDriverParameters: false,
       includeDriverProperties: false,
-      includeProviderProperties: false });
+      includeProviderProperties: false,
+    });
 
     const driverInfo: DBDriver = response.driverInfo;
 

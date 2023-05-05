@@ -13,6 +13,8 @@ fragment DatabaseDriver on DriverInfo {
   requiresServerName
   anonymousAccess
   promotedScore
+  providerId
+  driverClassName
 
   defaultAuthModel
   applicableAuthModels
