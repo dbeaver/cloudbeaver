@@ -39,7 +39,7 @@ public class WebDatabaseDriverConfig {
             this.driverName = JSONUtils.getString(params, "name");
             this.driverClass = JSONUtils.getString(params, "driverClass");
             this.driverURL = JSONUtils.getString(params, "url");
-            this.driverPort = JSONUtils.getString(params, "port");
+            this.driverPort = JSONUtils.getString(params, "defaultPort");
             this.driverDescription = JSONUtils.getString(params, "description");
             this.driverUser = JSONUtils.getString(params, "defaultUser");
             this.driverDatabase = JSONUtils.getString(params, "defaultDatabase");
