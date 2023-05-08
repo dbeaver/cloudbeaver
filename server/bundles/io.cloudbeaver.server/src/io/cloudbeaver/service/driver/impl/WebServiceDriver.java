@@ -134,9 +134,9 @@ public class WebServiceDriver implements DBWServiceDriver {
                         part.getInputStream().readAllBytes());
                 } else {
                     // save file in the local node
-                    Path path = Path.of(CBApplication.getInstance().getDriversLocation()).resolveSibling(libraryPath);
-                    if (!Files.exists(path)) {
-                        Files.createDirectories(path);
+                    Path path = Path.of(CBApplication.getInstance().getDriversLocation()).resolveSibling(filePath);
+                    if (!Files.exists(path.getParent())) {
+                        Files.createDirectories(path.getParent());
                     }
                     part.write(path.toString());
                     fileInfo.setFileCRC(DriverDescriptor.calculateFileCRC(path));
