@@ -16,6 +16,10 @@ import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export type DBDriver = DatabaseDriverFragment;
 
+const NEW_DRIVER_SYMBOL = Symbol('new-driver');
+
+type NewDBDriver = DBDriver & { [NEW_DRIVER_SYMBOL]: boolean; timestamp: number };
+
 @injectable()
 export class DBDriverResource extends CachedMapResource<string, DBDriver, DriverListQueryVariables> {
   get enabledDrivers() {
@@ -83,22 +87,24 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
     return this.data;
   }
 
-  /*   async editDriver(config: DriverConfig): Promise<DBDriver> {
-      await this.performUpdate(config.id, [], async () => {
-        const response = await this.graphQLService.sdk.updateDriver({
-          config,
-          includeDriverParameters: false,
-          includeDriverProperties: false,
-          includeProviderProperties: false,
-        });
-  
-        const driverInfo: DBDriver = response.driverInfo;
-  
-        this.set(driverInfo.id, driverInfo);
+  async editDriver(config: DriverConfig): Promise<DBDriver> {
+    if (!config.id) {
+      throw new Error('Driver id must be provided');
+    }
+
+    await this.performUpdate(config.id, [], async () => {
+      const response = await this.graphQLService.sdk.updateDriver({
+        config,
+        includeDriverParameters: false,
+        includeDriverProperties: false,
+        includeProviderProperties: false,
       });
-  
-      return this.get(config.id)!;
-    } */
+
+      this.set(response.driverInfo.id, response.driverInfo);
+    });
+
+    return this.get(config.id)!;
+  }
 
   async createDriver(config: DriverConfig): Promise<DBDriver> {
     const response = await this.graphQLService.sdk.createDriver({
@@ -108,11 +114,15 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
       includeProviderProperties: false,
     });
 
-    const driverInfo: DBDriver = response.driverInfo;
+    const driver: NewDBDriver = {
+      ...response.driverInfo,
+      [NEW_DRIVER_SYMBOL]: true,
+      timestamp: Date.now(),
+    };
 
-    this.set(driverInfo.id, driverInfo);
+    this.set(driver.id, driver);
 
-    return this.get(driverInfo.id)!;
+    return this.get(driver.id)!;
   }
 
 
@@ -147,7 +157,33 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
     return this.data;
   }
 
+  cleanNewFlags(): void {
+    for (const driver of this.data.values()) {
+      (driver as NewDBDriver)[NEW_DRIVER_SYMBOL] = false;
+    }
+  }
+
   protected validateKey(key: string): boolean {
     return typeof key === 'string';
   }
+}
+
+function isNewDriver(driver: DBDriver | NewDBDriver): driver is NewDBDriver {
+  return (driver as NewDBDriver)[NEW_DRIVER_SYMBOL];
+}
+
+export function compareNewDrivers(a: DBDriver, b: DBDriver): number {
+  if (isNewDriver(a) && isNewDriver(b)) {
+    return b.timestamp - a.timestamp;
+  }
+
+  if (isNewDriver(b)) {
+    return 1;
+  }
+
+  if (isNewDriver(a)) {
+    return -1;
+  }
+
+  return 0;
 }
