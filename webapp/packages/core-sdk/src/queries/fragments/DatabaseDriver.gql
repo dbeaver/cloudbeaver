@@ -15,6 +15,7 @@ fragment DatabaseDriver on DriverInfo {
   promotedScore
   providerId
   driverClassName
+  custom
 
   defaultAuthModel
   applicableAuthModels

@@ -60,7 +60,7 @@ type DriverInfo {
 
     configurationTypes: [DriverConfigurationType]!
 
-    driverLibraries: [DriverLibraryInfo!]
+    driverLibraries: [DriverLibraryInfo!]!
 }
 
 type DriverProviderInfo {
@@ -92,7 +92,7 @@ input DriverConfig {
 extend type Query {
     # Get driver info
     driverList( id: ID ): [ DriverInfo! ]!
-    driverProviderList: [ DriverProviderInfo! ]
+    driverProviderList: [ DriverProviderInfo! ]!
 }
 
 extend type Mutation {

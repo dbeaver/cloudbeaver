@@ -465,7 +465,7 @@ export interface DriverInfo {
   description?: Maybe<Scalars['String']>;
   driverClassName?: Maybe<Scalars['String']>;
   driverInfoURL?: Maybe<Scalars['String']>;
-  driverLibraries?: Maybe<Array<DriverLibraryInfo>>;
+  driverLibraries: Array<DriverLibraryInfo>;
   driverParameters: Scalars['Object'];
   driverProperties: Array<ObjectPropertyInfo>;
   driverPropertiesURL?: Maybe<Scalars['String']>;
@@ -1054,7 +1054,7 @@ export interface Query {
   deleteUser?: Maybe<Scalars['Boolean']>;
   deleteUserMetaParameter: Scalars['Boolean'];
   driverList: Array<DriverInfo>;
-  driverProviderList?: Maybe<Array<DriverProviderInfo>>;
+  driverProviderList: Array<DriverProviderInfo>;
   emptyEvent?: Maybe<Scalars['Boolean']>;
   enableUser?: Maybe<Scalars['Boolean']>;
   getConnectionSubjectAccess: Array<AdminConnectionGrantInfo>;
@@ -2263,7 +2263,12 @@ export type DriverListQueryVariables = Exact<{
 }>;
 
 
-export type DriverListQuery = { drivers: Array<{ id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }> }> };
+export type DriverListQuery = { drivers: Array<{ id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, custom?: boolean, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }> }> };
+
+export type DriverProviderListQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DriverProviderListQuery = { driverProviders: Array<{ id: string, name: string, icon: string }> };
 
 export type ExecutionContextCreateMutationVariables = Exact<{
   projectId: Scalars['ID'];
@@ -2483,7 +2488,7 @@ export type CreateDriverMutationVariables = Exact<{
 }>;
 
 
-export type CreateDriverMutation = { driverInfo: { id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }> } };
+export type CreateDriverMutation = { driverInfo: { id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, custom?: boolean, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }> } };
 
 export type DeleteDriverMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -2500,7 +2505,7 @@ export type UpdateDriverMutationVariables = Exact<{
 }>;
 
 
-export type UpdateDriverMutation = { driverInfo: { id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }> } };
+export type UpdateDriverMutation = { driverInfo: { id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, custom?: boolean, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }> } };
 
 export type AdminObjectGrantInfoFragment = { subjectId: string, subjectType: AdminSubjectType, objectPermissions: { objectId: string, permissions: Array<string> } };
 
@@ -2526,7 +2531,7 @@ export type ConnectionFolderInfoFragment = { id: string, projectId: string, desc
 
 export type DatabaseConnectionFragment = { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, readOnly: boolean, saveCredentials: boolean, credentialsSaved?: boolean, sharedCredentials: boolean, folder?: string, nodePath?: string, configurationType?: DriverConfigurationType, useUrl?: boolean, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties?: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, authNeeded?: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig?: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } };
 
-export type DatabaseDriverFragment = { id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }> };
+export type DatabaseDriverFragment = { id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, custom?: boolean, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }> };
 
 export type ExecutionContextInfoFragment = { id: string, projectId: string, connectionId: string, defaultCatalog?: string, defaultSchema?: string };
 
@@ -3276,6 +3281,7 @@ export const DatabaseDriverFragmentDoc = `
   promotedScore
   providerId
   driverClassName
+  custom
   defaultAuthModel
   applicableAuthModels
   applicableNetworkHandlers
@@ -3841,6 +3847,15 @@ export const DriverListDocument = `
   }
 }
     ${DatabaseDriverFragmentDoc}`;
+export const DriverProviderListDocument = `
+    query driverProviderList {
+  driverProviders: driverProviderList {
+    id
+    name
+    icon
+  }
+}
+    `;
 export const ExecutionContextCreateDocument = `
     mutation executionContextCreate($projectId: ID!, $connectionId: ID!, $defaultCatalog: String, $defaultSchema: String) {
   context: sqlContextCreate(
@@ -4920,6 +4935,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     driverList(variables: DriverListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DriverListQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<DriverListQuery>(DriverListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'driverList', 'query');
+    },
+    driverProviderList(variables?: DriverProviderListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DriverProviderListQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<DriverProviderListQuery>(DriverProviderListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'driverProviderList', 'query');
     },
     executionContextCreate(variables: ExecutionContextCreateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExecutionContextCreateMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<ExecutionContextCreateMutation>(ExecutionContextCreateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'executionContextCreate', 'mutation');
