@@ -161,7 +161,7 @@ export const InputField: InputFieldType = observer(forwardRef(function InputFiel
   }, [state, name, context, onChange]);
 
   const handleBlur = useCombinedHandler(rest.onBlur, capsLock.handleBlur);
-  const handleKeyDown = useCombinedHandler(rest.onKeyDown, capsLock.handleKeyDown);
+  const handleKeyDown = useCombinedHandler(rest.onKeyDown, capsLock.handleKeyDown, context?.keyDown);
 
   if (autoHide && !isControlPresented(name, state, defaultValue)) {
     return null;

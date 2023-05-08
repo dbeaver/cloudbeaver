@@ -1,0 +1,27 @@
+{
+  "name": "CloudBeaver",
+  "short_name": "CB",
+  "start_url": ".",
+  "display": "fullscreen",
+  "background_color": "#fff",
+  "description": "Database management tool.",
+  "icons": [{
+    "src": "favicon.png",
+    "sizes": "48x48",
+    "type": "image/png"
+  }, {
+    "src": "favicon-32x32.png",
+    "sizes": "32x32",
+    "type": "image/png"
+  }, {
+    "src": "favicon.ico",
+    "sizes": "72x72 96x96 128x128 256x256"
+  },
+  {
+    "src": "favicon.svg",
+    "sizes": "512x512"
+  }],
+  "related_applications": [{
+    "platform": "web"
+  }]
+}

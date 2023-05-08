@@ -164,6 +164,7 @@ export * from './useClickEvents';
 export * from './useControlledScroll';
 export * from './useClipboard';
 export * from './useCombinedHandler';
+export * from './useCombinedRef';
 export * from './useExecutor';
 export * from './useFn';
 export * from './useFocus';

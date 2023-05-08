@@ -11,6 +11,7 @@ import { createContext } from 'react';
 import type { IExecutor } from '@cloudbeaver/core-executor';
 
 type ChangeHandler = (value: string | number | boolean | null | undefined, name: string | undefined) => void;
+type KeyHandler = (event: React.KeyboardEvent<HTMLInputElement>) => void;
 
 export interface IChangeData {
   value: string | number | boolean | null | undefined;
@@ -20,6 +21,7 @@ export interface IChangeData {
 export interface IFormContext {
   changeExecutor: IExecutor<IChangeData>;
   change: ChangeHandler;
+  keyDown: KeyHandler;
 }
 
 export const FormContext = createContext<IFormContext | null>(null);

@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
+import { useCombinedRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
@@ -21,6 +22,7 @@ import { ACTIVE_QUERY_EXTENSION } from '../ACTIVE_QUERY_EXTENSION';
 import { QUERY_STATUS_GUTTER_EXTENSION } from '../QUERY_STATUS_GUTTER_EXTENSION';
 import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader';
 import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor';
+import { useSqlDIalectAutocompletion } from '../useSqlDIalectAutocompletion';
 import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel';
 
 const styles = css`
@@ -41,6 +43,8 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
 
   const editor = useSQLCodeEditor(editorRef);
   const panel = useSQLCodeEditorPanel(data, editor);
+  const [autocompletion, setEditor, autocompletionStyles] = useSqlDIalectAutocompletion(data);
+  const combinedRef = useCombinedRef(setEditorRef, setEditor);
 
   const dndBox = useDNDBox({
     canDrop: context => context.has(DATA_CONTEXT_NAV_NODE),
@@ -74,12 +78,12 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
     },
   });
 
-  return styled(styles)(
+  return styled(useStyles(styles, autocompletionStyles))(
     <box ref={dndBox.setRef}>
       <SQLCodeEditorLoader
-        ref={setEditorRef}
+        ref={combinedRef}
         value={data.value}
-        extensions={[ACTIVE_QUERY_EXTENSION, QUERY_STATUS_GUTTER_EXTENSION]}
+        extensions={[ACTIVE_QUERY_EXTENSION, QUERY_STATUS_GUTTER_EXTENSION, autocompletion]}
         readonly={data.readonly}
         autoFocus
         onChange={panel.onQueryChange}

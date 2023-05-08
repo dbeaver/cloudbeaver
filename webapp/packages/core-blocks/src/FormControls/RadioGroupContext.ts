@@ -11,7 +11,7 @@ import { createContext } from 'react';
 export interface IRadioGroupContext {
   value: string | number | undefined;
   name: string;
-  onChange: (value: string| number) => any;
+  onChange: (value: string | number) => any;
 }
 
 export const RadioGroupContext = createContext<IRadioGroupContext | undefined>(undefined);
