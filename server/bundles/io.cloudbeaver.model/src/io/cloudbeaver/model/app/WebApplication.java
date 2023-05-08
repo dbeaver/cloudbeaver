@@ -21,6 +21,7 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
@@ -62,6 +63,8 @@ public interface WebApplication extends DBPApplication {
 
     RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
                                           @NotNull DBPWorkspace workspace) throws DBException;
+
+    DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
     String getServerURL();
 

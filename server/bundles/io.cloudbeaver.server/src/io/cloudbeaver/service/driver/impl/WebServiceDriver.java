@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.Part;
 import java.io.IOException;
@@ -101,6 +102,7 @@ public class WebServiceDriver implements DBWServiceDriver {
 
         driver.getProviderDescriptor().removeDriver(driver);
         driver.getProviderDescriptor().getRegistry().saveDrivers();
+        CBPlatform.getInstance().refreshApplicableDrivers();
         return true;
     }
 
@@ -114,31 +116,39 @@ public class WebServiceDriver implements DBWServiceDriver {
             throw new DBWebException("Data source driver '" + driverId + "' is not found");
         }
         for (Part part : requestParts) {
-            if (part.getSubmittedFileName() == null) {
+            var shortFileName = part.getSubmittedFileName();
+            if (CommonUtils.isEmpty(shortFileName)) {
                 continue;
             }
-            String filePath = DBConstants.DEFAULT_DRIVERS_FOLDER + "/" + driver.getId() + "/" + part.getSubmittedFileName();
+            String libraryPath = DBConstants.DEFAULT_DRIVERS_FOLDER + "/" + driver.getId();
+            String filePath = libraryPath + "/" + shortFileName;
+            DriverDescriptor.DriverFileInfo fileInfo = new DriverDescriptor.DriverFileInfo(
+                shortFileName, null, DBPDriverLibrary.FileType.jar, Path.of(filePath));
             try {
                 // driver descriptor can't seek drivers in local file controller, so we can't use file controller in embedded product
                 if (CBApplication.getInstance().isMultiNode()) {
-                    DBFileController fileController = DBWorkbench.getPlatform().getFileController();
+                    DBFileController fileController = session.getFileController();
                     fileController.saveFileData(
                         DBFileController.TYPE_DATABASE_DRIVER,
                         filePath,
                         part.getInputStream().readAllBytes());
                 } else {
-                    Path path = Path.of(CBApplication.getInstance().getDriversLocation()).resolveSibling(filePath);
-                    if (!Files.exists(path.getParent())) {
-                        Files.createDirectories(path.getParent());
+                    // save file in the local node
+                    Path path = Path.of(CBApplication.getInstance().getDriversLocation()).resolveSibling(libraryPath);
+                    if (!Files.exists(path)) {
+                        Files.createDirectories(path);
                     }
                     part.write(path.toString());
+                    fileInfo.setFileCRC(DriverDescriptor.calculateFileCRC(path));
                 }
-                driver.addDriverLibrary(filePath, DBPDriverLibrary.FileType.jar);
+                // add library to the driver configuration
+                var driverLibrary = driver.addDriverLibrary(libraryPath, DBPDriverLibrary.FileType.jar);
+                driver.addLibraryFile(driverLibrary, fileInfo);
             } catch (IOException | DBException e) {
                 throw new DBWebException("IO error while saving driver file", e);
             }
         }
-        driver.getProviderDescriptor().getRegistry().saveDrivers();
+        DataSourceProviderRegistry.getInstance().saveDrivers();
         return true;
     }
 
@@ -151,25 +161,20 @@ public class WebServiceDriver implements DBWServiceDriver {
         if (driver == null) {
             throw new DBWebException("Data source driver '" + driverId + "' is not found");
         }
-        try {
             // driver descriptor can't seek drivers in local file controller, so we can't use file controller in embedded product
             for (String libraryId : libraryIds) {
-                if (CBApplication.getInstance().isMultiNode()) {
-                    DBFileController fileController = DBWorkbench.getPlatform().getFileController();
-                    fileController.deleteFile(
-                        DBFileController.TYPE_DATABASE_DRIVER,
-                        libraryId,
-                        false);
-                } else {
-                    Path path = Path.of(CBApplication.getInstance().getDriversLocation()).resolveSibling(libraryId);
-                    Files.deleteIfExists(path);
+                var driverLibrary = driver.getDriverLibrary(libraryId);
+                if (driverLibrary == null) {
+                    continue;
                 }
-                driver.getDriverLibraries().removeIf(x -> x.getId().equals(libraryId));
+                try {
+                    WebServiceUtils.deleteDriverLibraryLocalFile(session.getFileController(), driver, driverLibrary);
+                } catch (DBWebException e) {
+                    // remove it after restart
+                    driverLibrary.setDeleteAfterRestart(true);
+                }
             }
-        } catch (IOException | DBException e) {
-            throw new DBWebException("IO error while deleting driver file", e);
-        }
-        driver.getProviderDescriptor().getRegistry().saveDrivers();
+        DataSourceProviderRegistry.getInstance().saveDrivers();
         return true;
     }
 }

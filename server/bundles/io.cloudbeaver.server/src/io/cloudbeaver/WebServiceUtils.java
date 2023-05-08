@@ -33,13 +33,16 @@ import io.cloudbeaver.utils.WebCommonUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.connection.DBPDriverLibrary;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -53,9 +56,14 @@ import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.IOUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -341,6 +349,29 @@ public class WebServiceUtils extends WebCommonUtils {
         driver.setDriverDefaultDatabase(config.getDriverDatabase());
         driver.setDriverDefaultUser(config.getDriverUser());
         driver.setModified(true);
+    }
+
+    public static void deleteDriverLibraryLocalFile(
+        @NotNull DBFileController fileController,
+        @NotNull DriverDescriptor driver,
+        @NotNull DBPDriverLibrary driverLibrary
+    ) throws DBWebException {
+        try {
+            var libraryId = driverLibrary.getId();
+            if (CBApplication.getInstance().isMultiNode()) {
+                for (var file : driver.getLibraryFiles(driverLibrary)) {
+                    fileController.deleteFile(
+                        DBFileController.TYPE_DATABASE_DRIVER,
+                        file.getFile().toString(),
+                        true);
+                }
+            }
+            Path path = Path.of(CBApplication.getInstance().getDriversLocation()).resolveSibling(libraryId);
+            IOUtils.deleteDirectory(path);
+            driver.getDriverLibraries().remove(driverLibrary);
+        } catch (IOException | DBException e) {
+            throw new DBWebException("Error on deleting local driver library file", e);
+        }
     }
 
 }

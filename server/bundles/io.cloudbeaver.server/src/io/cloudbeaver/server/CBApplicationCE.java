@@ -25,6 +25,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.rm.RMController;
@@ -68,6 +69,11 @@ public class CBApplicationCE extends CBApplication {
     public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
                                                  @NotNull DBPWorkspace workspace) throws DBException {
         return LocalResourceController.builder(credentialsProvider, workspace, this::getSecurityController).build();
+    }
+
+    @Override
+    public DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
+        return CBPlatform.getInstance().createFileController();
     }
 
     protected void shutdown() {

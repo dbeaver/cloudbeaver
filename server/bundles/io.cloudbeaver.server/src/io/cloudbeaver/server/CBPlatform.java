@@ -17,6 +17,7 @@
 
 package io.cloudbeaver.server;
 
+import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.server.jobs.SessionStateJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
 import io.cloudbeaver.service.session.WebSessionManager;
@@ -27,6 +28,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
@@ -41,6 +43,8 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
+import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.SecurityProviderUtils;
 import org.jkiss.dbeaver.runtime.qm.QMLogFileWriter;
 import org.jkiss.dbeaver.runtime.qm.QMRegistryImpl;
@@ -147,6 +151,12 @@ public class CBPlatform extends BasePlatformImpl {
             WebPlatformActivator.getInstance().getStateLocation().toFile().toPath().resolve("security"));
 
         super.initialize();
+
+        if (DBWorkbench.isDistributed()) {
+            DataSourceProviderRegistry.getInstance().linkDriverFiles(
+                Path.of(application.getDriversLocation()).getParent()
+            );
+        }
 
         refreshApplicableDrivers();
 
@@ -280,6 +290,7 @@ public class CBPlatform extends BasePlatformImpl {
     public void refreshApplicableDrivers() {
         this.applicableDrivers.clear();
 
+        boolean driverConfigChanged = false;
         for (DBPDataSourceProviderDescriptor dspd : DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders()) {
             for (DBPDriver driver : dspd.getEnabledDrivers()) {
                 List<? extends DBPDriverLibrary> libraries = driver.getDriverLibraries();
@@ -289,6 +300,17 @@ public class CBPlatform extends BasePlatformImpl {
                     }
                     boolean hasAllFiles = true, hasJars = false;
                     for (DBPDriverLibrary lib : libraries) {
+                        if (lib.isDeleteAfterRestart() && lib.getLocalFile() != null) {
+                            try {
+                                log.debug("Deleting driver library local file '" + lib.getDisplayName() + "'");
+                                var fileController = DBWorkbench.getPlatform().getFileController();
+                                WebServiceUtils.deleteDriverLibraryLocalFile(fileController, (DriverDescriptor) driver, lib);
+                                driverConfigChanged = true;
+                                driver.getDriverLibraries().remove(lib);
+                            } catch (DBException e) {
+                                log.error("Cannot delete driver library '" + lib.getDisplayName() + "'");
+                            }
+                        }
                         if (!lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
                             (lib.getLocalFile() == null || !Files.exists(lib.getLocalFile())))
                         {
@@ -306,6 +328,10 @@ public class CBPlatform extends BasePlatformImpl {
                 }
             }
         }
+        if (driverConfigChanged) {
+            DataSourceProviderRegistry.getInstance().saveDrivers();
+        }
+
         log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
     }
 
