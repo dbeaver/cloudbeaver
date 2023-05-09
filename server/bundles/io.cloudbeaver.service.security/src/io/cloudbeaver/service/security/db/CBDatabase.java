@@ -157,8 +157,10 @@ public class CBDatabase {
             }
         }
 
-        var migrator = new H2Migrator(monitor, dataSourceProviderRegistry, databaseConfiguration, dbURL, dbProperties);
-        migrator.migrateDatabaseIfNeeded(V1_DB_NAME, V2_DB_NAME);
+        if (H2Migrator.isH2Database(databaseConfiguration)) {
+            var migrator = new H2Migrator(monitor, dataSourceProviderRegistry, databaseConfiguration, dbURL, dbProperties);
+            migrator.migrateDatabaseIfNeeded(V1_DB_NAME, V2_DB_NAME);
+        }
 
         // reload the driver and url due to a possible configuration update
         driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());

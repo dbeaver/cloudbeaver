@@ -67,6 +67,7 @@ public class CBDatabaseConfig implements InternalDatabaseConfig {
     }
 
     @Override
+    @NotNull
     public String getUrl() {
         return url;
     }
