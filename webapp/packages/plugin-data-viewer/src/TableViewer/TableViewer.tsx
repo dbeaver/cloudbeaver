@@ -132,10 +132,10 @@ export const TableViewer = observer<Props, HTMLDivElement>(forwardRef(function T
           presentation.dataFormat !== undefined
           && presentation.dataFormat !== this.dataModel?.source.dataFormat
         ) {
+          localActions.clearConstraints();
           this.dataModel?.setDataFormat(presentation.dataFormat).reload();
         }
 
-        localActions.clearConstraints();
         this.onPresentationChange(id);
       }
     },
@@ -206,18 +206,19 @@ export const TableViewer = observer<Props, HTMLDivElement>(forwardRef(function T
     }
   }, [needRefresh]);
 
-  useEffect(() => {
-    if (!presentationId || !dataModel) {
-      return;
-    }
+  // TODO: seems this code is not working because of setting dataFormat in presentation change
+  // useEffect(() => {
+  //   if (!presentationId || !dataModel) {
+  //     return;
+  //   }
 
-    const presentation = dataPresentationService.get(presentationId);
+  //   const presentation = dataPresentationService.get(presentationId);
 
-    if (presentation?.dataFormat && !dataModel.supportedDataFormats.includes(presentation.dataFormat)) {
-      localActions.clearConstraints();
-      onPresentationChange(dataFormat);
-    }
-  }, [dataFormat]);
+  //   if (presentation?.dataFormat && !dataModel.supportedDataFormats.includes(presentation.dataFormat)) {
+  //     // localActions.clearConstraints();
+  //     onPresentationChange(dataFormat);
+  //   }
+  // }, [dataFormat]);
 
   if (!dataModel) {
     return <Loader />;
@@ -278,15 +279,17 @@ export const TableViewer = observer<Props, HTMLDivElement>(forwardRef(function T
             keepRatio
           >
             <Pane>
-              <pane-content {...use({ grid:true })}>
-                <TableGrid
-                  model={dataModel}
-                  actions={dataTableActions}
-                  dataFormat={dataFormat}
-                  presentation={presentation}
-                  resultIndex={resultIndex}
-                  simple={simple}
-                />
+              <pane-content {...use({ grid: true })}>
+                <Loader suspense>
+                  <TableGrid
+                    model={dataModel}
+                    actions={dataTableActions}
+                    dataFormat={dataFormat}
+                    presentation={presentation}
+                    resultIndex={resultIndex}
+                    simple={simple}
+                  />
+                </Loader>
                 <TableError model={dataModel} loading={loading} />
                 <Loader
                   loading={loading}
