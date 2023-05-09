@@ -61,7 +61,7 @@ public class RMLockTest {
         thread1.start();
 
         int atLeastWaitCalls = 1;
-        var lockController2 = Mockito.spy(new TestLockController(CEServerTestSuite.getTestApp(), 100));
+        var lockController2 = Mockito.spy(new TestLockController(CEServerTestSuite.getTestApp(), 1000));
         Mockito.doAnswer(new Answer() {
             private int count = 0;
 
