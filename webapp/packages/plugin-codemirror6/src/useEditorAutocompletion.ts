@@ -75,6 +75,7 @@ export function useEditorAutocompletion(config?: Parameters<typeof autocompletio
       autocompletion({
         ...config,
         tooltipClass: (state: EditorState) => clsx(config?.tooltipClass?.(state), 'cm-fix-position'),
+        closeOnBlur: false,
       }),
       keymap.of([
         { key: 'Alt-Space', run: startCompletion, preventDefault: true },

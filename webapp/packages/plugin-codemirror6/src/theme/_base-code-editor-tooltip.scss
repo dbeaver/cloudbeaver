@@ -12,7 +12,7 @@
       @include mdc-theme-prop(background-color, surface, false);
       @include mdc-theme-prop(color, on-surface, false);
       @include mdc-elevation(3);
-      @include mdc-typography(caption);
+      @include mdc-typography(body1);
       border: none;
       border-radius: var(--theme-form-element-radius);
     }

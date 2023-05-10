@@ -13,9 +13,31 @@
         border-radius: var(--theme-form-element-radius);
       }
 
-      :global([aria-selected=true]) {
-        @include mdc-theme-prop(background, primary, true);
-        @include mdc-theme-prop(color, on-primary, true);
+      & :global(li) {
+        display: flex;
+        align-items: center;
+      }
+
+      & .cm-completionIcon {
+        opacity: 1;
+        width: 16px;
+        height: 16px;
+        padding: 0;
+        margin-right: .6em;
+
+        &:not([src]) {
+          opacity: 0;
+        }
+      }
+
+      & :global(li):hover {
+        @include mdc-theme-prop(background, secondary, false);
+        @include mdc-theme-prop(color, on-secondary, false);
+      }
+
+      & :global(li):global([aria-selected=true]) {
+        @include mdc-theme-prop(background, background, false);
+        @include mdc-theme-prop(color, text-primary-on-light, false);
       }
     }
 

@@ -46,8 +46,8 @@ export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(fun
   disabled = disabled || disabledProp || false;
 
   const props = useObjectRef(() => ({
-    handleSubmit(e?: React.FormEvent<HTMLFormElement>) {
-      e?.preventDefault();
+    handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+      e.preventDefault();
 
       setDisabled(true);
       const result = this.onSubmit?.(e);
@@ -74,10 +74,16 @@ export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(fun
       this.changeExecutor.execute({ value, name });
     },
     keyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-      if (event.key === 'Enter' && !props.disableEnterSubmit) {
-        event.preventDefault();
-        if (props.formRef?.reportValidity() && !props.parentContext) {
-          props.handleSubmit();
+      if (event.key === 'Enter') {
+        const form = event.currentTarget.closest('form');
+        if (form) {
+          event.preventDefault();
+          const submitButton = form.querySelector<HTMLButtonElement>(
+            'button[type=submit]'
+          );
+          if (submitButton) {
+            submitButton.click();
+          }
         }
       }
       props.parentContext?.keyDown(event);
