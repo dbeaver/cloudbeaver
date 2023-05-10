@@ -10,7 +10,8 @@
     </extension>
 
     <extension point="org.eclipse.core.runtime.products" id="product">
-        <product application="io.cloudbeaver.product.ce.application" description="Cloudbeaver Web UI Application" name="CloudBeaver CE Server">
+        <product application="io.cloudbeaver.product.ce.application" description="CloudBeaver CE Web UI Application"
+                 name="CloudBeaver CE Server">
             <property name="appName" value="CloudBeaver CE Server"/>
             <property name="versionUpdateURL" value="https://dbeaver.com/product/cloudbeaver-ce-version.json"/>
         </product>
@@ -18,11 +19,11 @@
 
     <extension point="org.jkiss.dbeaver.application">
         <application
-            id="cloudbeaver-ce"
-            family="CB"
-            name="CloudBeaver CE Server"
-            description="CloudBeaver Web UI"
-            server="true"/>
+                id="cloudbeaver-ce"
+                family="CB"
+                name="CloudBeaver CE Server"
+                description="CloudBeaver CE Web UI"
+                server="true"/>
     </extension>
 
 </plugin>
