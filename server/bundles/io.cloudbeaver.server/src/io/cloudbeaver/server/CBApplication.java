@@ -1067,8 +1067,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         return WebDriverRegistry.getInstance();
     }
 
-    public Set<String> getAvailableAuthRoles() {
-        return Set.of();
+    public List<String> getAvailableAuthRoles() {
+        return List.of();
     }
 
     // gets info about patterns from original configuration file and saves it to runtime config
@@ -1092,7 +1092,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         return eventController;
     }
 
-    public SMControllerConfiguration getSecurityManagerConfiguration() {
-        return securityManagerConfiguration;
+    @Nullable
+    public String getDefaultAuthRole() {
+        return null;
     }
 }

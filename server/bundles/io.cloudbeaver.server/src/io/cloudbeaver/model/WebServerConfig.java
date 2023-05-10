@@ -204,6 +204,6 @@ public class WebServerConfig {
 
     @Property
     public String getDefaultAuthRole() {
-        return application.getSecurityManagerConfiguration().getDefaultAuthRole();
+        return application.getDefaultAuthRole();
     }
 }
