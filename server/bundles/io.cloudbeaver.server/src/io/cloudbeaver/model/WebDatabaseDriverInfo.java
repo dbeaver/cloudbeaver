@@ -21,6 +21,7 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.ConfigurationUtils;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
@@ -43,6 +44,7 @@ import java.util.Map;
  */
 public class WebDatabaseDriverInfo {
 
+    private static final Log log = Log.getLog(WebDatabaseDriverInfo.class);
     public static final String URL_SERVER_FIELD = "{server}";
     public static final String URL_DATABASE_FIELD = ".*(?:\\{(?:database|file|folder)}).*";
     private final WebSession webSession;
@@ -191,7 +193,8 @@ public class WebDatabaseDriverInfo {
             return Arrays.stream(properties)
                 .map(p -> new WebPropertyInfo(webSession, p, propertySource)).toArray(WebPropertyInfo[]::new);
         } catch (DBException e) {
-            throw new DBWebException("Error reading driver properties", e);
+            log.error("Error reading driver properties", e);
+            return new WebPropertyInfo[0];
         }
     }
 
