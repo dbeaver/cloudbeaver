@@ -6,30 +6,36 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { useMemo } from 'react';
+
 import { IComplexLoaderData, useComplexLoader } from '@cloudbeaver/core-blocks';
 import { CassandraLoader, Extension, MSSQLLoader, MariaSQLLoader, MySQLLoader, PLSQLLoader, PostgreSQLLoader, SQLDialect, SQL_EDITOR, SQLiteLoader, StandardSQLLoader } from '@cloudbeaver/plugin-codemirror6';
 import type { ISQLEditorData } from '@cloudbeaver/plugin-sql-editor';
 
 export function useSqlDialectExtension(data: ISQLEditorData): Extension {
   const loader = getDialectLoader(data.dialect?.name);
-  let dialect = useComplexLoader(loader);
+  const dialect = useComplexLoader(loader);
 
-  if (data.dialect) {
-    dialect = SQLDialect.define({
-      keywords: data.dialect.reservedWords.join(' ').toLocaleLowerCase(),
-      builtin: data.dialect.functions.join(' '),
-      types: data.dialect.dataTypes.join(' '),
+  return useMemo(() => {
+    let dialectInner = dialect;
 
-      hashComments: data.dialect.singleLineComments.includes('#'),
-      slashComments: data.dialect.singleLineComments.includes('//'),
-      doubleDollarQuotedStrings: data.dialect.quoteStrings.some(v => v.includes('$$')),
-      doubleQuotedStrings: data.dialect.quoteStrings.some(v => v.includes('"')),
+    if (data.dialect) {
+      dialectInner = SQLDialect.define({
+        keywords: data.dialect.reservedWords.join(' ').toLowerCase(),
+        builtin: data.dialect.functions.join(' ').toUpperCase(),
+        types: data.dialect.dataTypes.join(' ').toUpperCase(),
+
+        hashComments: data.dialect.singleLineComments.includes('#'),
+        slashComments: data.dialect.singleLineComments.includes('//'),
+        doubleDollarQuotedStrings: data.dialect.quoteStrings.some(v => v.includes('$$')),
+        doubleQuotedStrings: data.dialect.quoteStrings.some(v => v.includes('"')),
+      });
+    }
+
+    return SQL_EDITOR({
+      dialect: dialectInner,
     });
-  }
-
-  return SQL_EDITOR({
-    dialect,
-  });
+  }, [dialect, data.dialect]);
 }
 
 
