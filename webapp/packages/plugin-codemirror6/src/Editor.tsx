@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 import styled from 'reshadow';
 
 import { clsx } from '@cloudbeaver/core-utils';
@@ -20,9 +20,16 @@ import { EDITOR_BASE_STYLES } from './theme';
 
 export const Editor = observer(forwardRef<IEditorRef, IEditorProps>(function Editor(props, ref) {
   const extensions = [];
+  const defaultExtensions = useMemo(() => {
+    if (!props.extensions) {
+      return getDefaultExtensions();
+    }
+
+    return [];
+  }, [!props.extensions]);
 
   if (!props.extensions) {
-    extensions.push(getDefaultExtensions());
+    extensions.push(...defaultExtensions);
   } else {
     extensions.push(props.extensions);
   }

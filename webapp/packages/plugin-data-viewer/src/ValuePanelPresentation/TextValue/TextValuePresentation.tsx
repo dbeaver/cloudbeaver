@@ -8,6 +8,7 @@
 
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, Button, Textarea, useObservableRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
@@ -183,7 +184,9 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   const useCodeEditor = state.currentContentType !== 'text/plain';
   const autoFormat = !!firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
   const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
-  const typeExtension = getTypeExtension(state.currentContentType);
+  const typeExtension = useMemo(() => getTypeExtension(state.currentContentType) ?? [], [state.currentContentType]);
+
+  const defaultExtensions = useMemo(getDefaultExtensions, []);
 
   return styled(style, textAreaStyles)(
     <container>
@@ -202,7 +205,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           key={readonly ? '1' : '0'}
           value={autoFormat ? formatter.format(stringValue) : stringValue}
           readonly={readonly}
-          extensions={typeExtension ? [getDefaultExtensions(), typeExtension] : undefined}
+          extensions={[...defaultExtensions, typeExtension]}
           onChange={value => handleChange(value)}
         />
       ) : (

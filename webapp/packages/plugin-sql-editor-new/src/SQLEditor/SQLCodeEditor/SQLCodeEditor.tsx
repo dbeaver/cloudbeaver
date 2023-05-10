@@ -7,12 +7,15 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 
-import { EditorLoader, getDefaultExtensions, IEditorProps, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
+import { EditorLoader, Extension, getDefaultExtensions, IEditorProps, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
 
 export const SQLCodeEditor = observer<IEditorProps, IEditorRef>(forwardRef(function SQLCodeEditor(props, ref) {
-  const extensions = [getDefaultExtensions()];
+  const extensions: Extension[] = [];
+  const defaultExtensions = useMemo(getDefaultExtensions, []);
+
+  extensions.push(...defaultExtensions);
 
   if (props.extensions) {
     extensions.push(props.extensions);
