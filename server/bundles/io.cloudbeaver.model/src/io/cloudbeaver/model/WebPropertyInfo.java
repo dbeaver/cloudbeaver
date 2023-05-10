@@ -20,6 +20,8 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.*;
+import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
+import org.jkiss.dbeaver.model.impl.ProviderPropertyDescriptor;
 import org.jkiss.dbeaver.model.meta.IPropertyValueListProvider;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.meta.PropertyLength;
@@ -153,6 +155,16 @@ public class WebPropertyInfo {
     public String[] getFeatures() {
         String[] features = property.getFeatures();
         return features == null ? new String[0] : features;
+    }
+
+    @Property
+    public String[] getSupportedConfigurationTypes() {
+        if (property instanceof ProviderPropertyDescriptor) {
+            return ((ProviderPropertyDescriptor) property).getConfigurationTypes().stream()
+                .map(DBPDriverConfigurationType::toString)
+                .toArray(String[]::new);
+        }
+        return new String[0];
     }
 
     public boolean hasFeature(@NotNull String feature) {
