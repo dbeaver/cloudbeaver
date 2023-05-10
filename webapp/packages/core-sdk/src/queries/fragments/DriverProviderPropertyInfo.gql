@@ -1,4 +1,4 @@
-fragment ProviderPropertyInfo on ObjectPropertyInfo {
+fragment DriverProviderPropertyInfo on ObjectPropertyInfo {
   id
   displayName
   description

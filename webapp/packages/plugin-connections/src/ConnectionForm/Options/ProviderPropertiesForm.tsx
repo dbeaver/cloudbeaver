@@ -10,13 +10,13 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { BASE_CONTAINERS_STYLES, Container, useTranslate, Group, GroupTitle, ObjectPropertyInfoForm } from '@cloudbeaver/core-blocks';
-import type { ConnectionConfig, ProviderPropertyInfoFragment } from '@cloudbeaver/core-sdk';
+import type { ConnectionConfig, DriverProviderPropertyInfoFragment } from '@cloudbeaver/core-sdk';
 
-type ProviderPropertyInfo = ProviderPropertyInfoFragment;
+type DriverProviderPropertyInfo = DriverProviderPropertyInfoFragment;
 
 interface Props {
   config: ConnectionConfig;
-  properties: ProviderPropertyInfo[];
+  properties: DriverProviderPropertyInfo[];
   disabled?: boolean;
   readonly?: boolean;
 }

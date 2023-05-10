@@ -2451,6 +2451,8 @@ export type DatabaseConnectionFragment = { id: string, projectId: string, name: 
 
 export type DatabaseDriverFragment = { id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number, supportedConfigurationTypes?: Array<string> }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }> };
 
+export type DriverProviderPropertyInfoFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number, supportedConfigurationTypes?: Array<string> };
+
 export type ExecutionContextInfoFragment = { id: string, projectId: string, connectionId: string, defaultCatalog?: string, defaultSchema?: string };
 
 export type NavNodeDbObjectInfoFragment = { id: string, object?: { type?: string, features?: Array<string>, properties?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> } };
@@ -2462,8 +2464,6 @@ export type NavNodePropertiesFragment = { id?: string, category?: string, dataTy
 export type ObjectOriginInfoFragment = { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> };
 
 export type ObjectPropertyInfoFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number };
-
-export type ProviderPropertyInfoFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number, supportedConfigurationTypes?: Array<string> };
 
 export type ResourceTypeFragment = { id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string };
 
@@ -3183,8 +3183,8 @@ export const DatabaseConnectionFragmentDoc = `
     ${ObjectOriginInfoFragmentDoc}
 ${UserConnectionAuthPropertiesFragmentDoc}
 ${AllNavigatorSettingsFragmentDoc}`;
-export const ProviderPropertyInfoFragmentDoc = `
-    fragment ProviderPropertyInfo on ObjectPropertyInfo {
+export const DriverProviderPropertyInfoFragmentDoc = `
+    fragment DriverProviderPropertyInfo on ObjectPropertyInfo {
   id
   displayName
   description
@@ -3219,7 +3219,7 @@ export const DatabaseDriverFragmentDoc = `
   applicableNetworkHandlers
   configurationTypes
   providerProperties @include(if: $includeProviderProperties) {
-    ...ProviderPropertyInfo
+    ...DriverProviderPropertyInfo
   }
   driverProperties @include(if: $includeDriverProperties) {
     id
@@ -3232,7 +3232,7 @@ export const DatabaseDriverFragmentDoc = `
   }
   driverParameters @include(if: $includeDriverParameters)
 }
-    ${ProviderPropertyInfoFragmentDoc}`;
+    ${DriverProviderPropertyInfoFragmentDoc}`;
 export const ExecutionContextInfoFragmentDoc = `
     fragment ExecutionContextInfo on SQLContextInfo {
   id
