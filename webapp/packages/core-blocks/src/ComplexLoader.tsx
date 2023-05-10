@@ -8,7 +8,7 @@
 
 import { LoadingError } from '@cloudbeaver/core-utils';
 
-interface IComplexLoaderData<T> {
+export interface IComplexLoaderData<T> {
   promise: Promise<T> | undefined;
   data: T | undefined;
   error: Error | undefined;
@@ -19,6 +19,16 @@ interface IComplexLoaderData<T> {
 export interface ComplexLoaderProps<T> {
   loader: IComplexLoaderData<T>;
   children: (content: T) => JSX.Element;
+}
+
+export function useComplexLoader<T>(loader: IComplexLoaderData<T>): T {
+  if (loader.error) {
+    throw loader.error;
+  }
+  if (loader.data) {
+    return loader.data;
+  }
+  throw loader.loader();
 }
 
 export const ComplexLoader: React.FC<ComplexLoaderProps<any>> = function ComplexLoader(props) {

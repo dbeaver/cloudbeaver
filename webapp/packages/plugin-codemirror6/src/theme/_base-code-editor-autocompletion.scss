@@ -25,7 +25,7 @@
         padding: 0;
         margin-right: .6em;
 
-        &:not([src]) {
+        &:not(:global([src])) {
           opacity: 0;
         }
       }

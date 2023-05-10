@@ -23,6 +23,7 @@ import { QUERY_STATUS_GUTTER_EXTENSION } from '../QUERY_STATUS_GUTTER_EXTENSION'
 import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader';
 import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor';
 import { useSqlDIalectAutocompletion } from '../useSqlDIalectAutocompletion';
+import { useSqlDialectExtension } from '../useSqlDialectExtension';
 import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel';
 
 const styles = css`
@@ -45,6 +46,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   const panel = useSQLCodeEditorPanel(data, editor);
   const [autocompletion, setEditor, autocompletionStyles] = useSqlDIalectAutocompletion(data);
   const combinedRef = useCombinedRef(setEditorRef, setEditor);
+  const sqlDialect = useSqlDialectExtension(data);
 
   const dndBox = useDNDBox({
     canDrop: context => context.has(DATA_CONTEXT_NAV_NODE),
@@ -83,7 +85,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
       <SQLCodeEditorLoader
         ref={combinedRef}
         value={data.value}
-        extensions={[ACTIVE_QUERY_EXTENSION, QUERY_STATUS_GUTTER_EXTENSION, autocompletion]}
+        extensions={[ACTIVE_QUERY_EXTENSION, QUERY_STATUS_GUTTER_EXTENSION, autocompletion, sqlDialect]}
         readonly={data.readonly}
         autoFocus
         onChange={panel.onQueryChange}

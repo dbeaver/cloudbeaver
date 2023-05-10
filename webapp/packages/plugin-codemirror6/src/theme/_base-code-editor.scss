@@ -53,6 +53,7 @@
 
   .editor .active-query {
     @include mdc-theme-prop(background, secondary, false);
+    display: inline-block;
   }
 
   .editor .cm-content ::selection {

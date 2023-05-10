@@ -9,10 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
 
-import { EditorLoader, getDefaultExtensions, IEditorProps, IEditorRef, SQL_EDITOR } from '@cloudbeaver/plugin-codemirror6';
+import { EditorLoader, getDefaultExtensions, IEditorProps, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
 
 export const SQLCodeEditor = observer<IEditorProps, IEditorRef>(forwardRef(function SQLCodeEditor(props, ref) {
-  const extensions = [getDefaultExtensions(), SQL_EDITOR()];
+  const extensions = [getDefaultExtensions()];
 
   if (props.extensions) {
     extensions.push(props.extensions);
