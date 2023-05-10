@@ -155,7 +155,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public Set<String> listAuthRoles() {
+    public List<String> listAuthRoles() {
         return CBApplication.getInstance().getAvailableAuthRoles();
     }
 

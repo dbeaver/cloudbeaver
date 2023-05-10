@@ -63,7 +63,7 @@ public interface DBWServiceAdmin extends DBWService {
     ) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    Set<String> listAuthRoles();
+    List<String> listAuthRoles();
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean deleteUser(@NotNull WebSession webSession, String userName) throws DBWebException;
