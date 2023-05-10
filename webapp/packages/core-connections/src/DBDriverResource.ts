@@ -19,6 +19,7 @@ export type DBDriver = DatabaseDriverFragment;
 const NEW_DRIVER_SYMBOL = Symbol('new-driver');
 
 type NewDBDriver = DBDriver & { [NEW_DRIVER_SYMBOL]: boolean; timestamp: number };
+type DriverResourceIncludes = Omit<DriverListQueryVariables, 'driverId'>;
 
 @injectable()
 export class DBDriverResource extends CachedMapResource<string, DBDriver, DriverListQueryVariables> {
@@ -64,10 +65,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
 
       const { drivers } = await this.graphQLService.sdk.driverList({
         driverId,
-        includeDriverParameters: false,
-        includeDriverProperties: false,
-        includeProviderProperties: false,
-        includeDriverLibraries: false,
+        ...this.getDefaultIncludes(),
         ...this.getIncludesMap(driverId, (all ? this.defaultIncludes : includes)),
       });
 
@@ -96,10 +94,8 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
     await this.performUpdate(config.id, [], async () => {
       const response = await this.graphQLService.sdk.updateDriver({
         config,
-        includeDriverParameters: false,
-        includeDriverProperties: false,
-        includeProviderProperties: false,
-        includeDriverLibraries: false,
+        ...this.getDefaultIncludes(),
+        ...this.getIncludesMap(config.id),
       });
 
       this.set(response.driverInfo.id, response.driverInfo);
@@ -111,10 +107,8 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
   async createDriver(config: DriverConfig): Promise<DBDriver> {
     const response = await this.graphQLService.sdk.createDriver({
       config,
-      includeDriverParameters: false,
-      includeDriverProperties: false,
-      includeProviderProperties: false,
-      includeDriverLibraries: false,
+      ...this.getDefaultIncludes(),
+      ...this.getIncludesMap(config.id),
     });
 
     const driver: NewDBDriver = {
@@ -134,19 +128,16 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
   async deleteDriver(key: ResourceKey<string>): Promise<void> {
     const deleted: string[] = [];
 
-    try {
-      await this.performUpdate(key, undefined, async key => {
-        await ResourceKeyUtils.forEachAsync(this.transformToKey(key), async driverId => {
-          await this.graphQLService.sdk.deleteDriver({ id: driverId });
-
-          deleted.push(driverId);
-        });
+    await this.performUpdate(key, undefined, async key => {
+      await ResourceKeyUtils.forEachAsync(this.transformToKey(key), async driverId => {
+        await this.graphQLService.sdk.deleteDriver({ id: driverId });
+        deleted.push(driverId);
       });
-    } finally {
+
       if (deleted.length > 0) {
         this.delete(resourceKeyList(deleted));
       }
-    }
+    });
   }
 
   async deleteDriverLibraries(driverId: string, libraryIds: string[]) {
@@ -178,6 +169,15 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
     for (const driver of this.data.values()) {
       (driver as NewDBDriver)[NEW_DRIVER_SYMBOL] = false;
     }
+  }
+
+  private getDefaultIncludes(): DriverResourceIncludes {
+    return {
+      includeDriverLibraries: false,
+      includeDriverParameters: false,
+      includeDriverProperties: false,
+      includeProviderProperties: false,
+    };
   }
 
   protected validateKey(key: string): boolean {
