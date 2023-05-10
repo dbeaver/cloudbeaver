@@ -67,6 +67,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
         includeDriverParameters: false,
         includeDriverProperties: false,
         includeProviderProperties: false,
+        includeDriverLibraries: false,
         ...this.getIncludesMap(driverId, (all ? this.defaultIncludes : includes)),
       });
 
@@ -98,6 +99,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
         includeDriverParameters: false,
         includeDriverProperties: false,
         includeProviderProperties: false,
+        includeDriverLibraries: false,
       });
 
       this.set(response.driverInfo.id, response.driverInfo);
@@ -112,6 +114,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
       includeDriverParameters: false,
       includeDriverProperties: false,
       includeProviderProperties: false,
+      includeDriverLibraries: false,
     });
 
     const driver: NewDBDriver = {
@@ -144,6 +147,20 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
         this.delete(resourceKeyList(deleted));
       }
     }
+  }
+
+  async deleteDriverLibraries(driverId: string, libraryIds: string[]) {
+    await this.graphQLService.sdk.deleteDriverLibraries({
+      driverId,
+      libraryIds,
+    });
+
+    await this.refresh(driverId);
+  }
+
+  async addDriverLibraries(driverId: string, files: FileList) {
+    await this.graphQLService.sdk.uploadDriverLibrary(driverId, files);
+    await this.refresh(driverId);
   }
 
   protected dataSet(key: string, value: DBDriver): void {

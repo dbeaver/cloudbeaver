@@ -25,8 +25,9 @@ export function uploadDriverLibraryExtension(client: CustomGraphQLClient): IUplo
       files: FileList,
       onUploadProgress?: (event: UploadProgressEvent) => void
     ): Promise<void> {
+
       return client.uploadFile(
-        GlobalConstants.absoluteServiceUrl('load', 'driverLibrary'),
+        GlobalConstants.absoluteServiceUrl('drivers', 'library'),
         files,
         undefined,
         { driverId },

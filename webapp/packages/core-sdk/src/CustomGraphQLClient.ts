@@ -125,7 +125,7 @@ export class CustomGraphQLClient extends GraphQLClient {
       const response = await axios.postForm/*<GqlResponse>*/<T>(url, {
         operationName,
         query,
-        variables,
+        variables: JSON.stringify(variables),
         'files[]': files,
       }, {
         onUploadProgress,

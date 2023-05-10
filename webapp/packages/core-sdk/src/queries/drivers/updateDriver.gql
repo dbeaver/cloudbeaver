@@ -3,7 +3,8 @@ mutation updateDriver(
 
   $includeProviderProperties: Boolean!,
   $includeDriverProperties: Boolean!,
-  $includeDriverParameters: Boolean!
+  $includeDriverParameters: Boolean!,
+  $includeDriverLibraries: Boolean!,
 ) {
   driverInfo: updateDriver(config: $config) {
     ...DatabaseDriver

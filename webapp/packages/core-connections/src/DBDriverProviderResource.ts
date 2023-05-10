@@ -23,7 +23,6 @@ export class DBDriverProviderResource extends CachedDataResource<DriverProviderI
 
   protected async loader(): Promise<DriverProviderInfo[]> {
     const { driverProviders } = await this.graphQLService.sdk.driverProviderList();
-
     return driverProviders;
   }
 }

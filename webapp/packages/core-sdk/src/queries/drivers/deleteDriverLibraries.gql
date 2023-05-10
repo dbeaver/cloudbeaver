@@ -1,0 +1,3 @@
+mutation deleteDriverLibraries($driverId: ID!, $libraryIds: [ID!]!) {
+  deleteDriverLibraries(driverId: $driverId, libraryIds: $libraryIds)
+}

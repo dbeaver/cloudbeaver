@@ -45,4 +45,10 @@ fragment DatabaseDriver on DriverInfo {
     validValues
   }
   driverParameters @include(if: $includeDriverParameters)
+
+  driverLibraries @include(if: $includeDriverLibraries) {
+    id
+    name
+    icon
+  }
 }

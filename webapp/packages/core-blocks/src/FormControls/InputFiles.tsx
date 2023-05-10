@@ -50,6 +50,7 @@ type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 
   loading?: boolean;
   description?: string;
   labelTooltip?: string;
+  hideTags?: boolean;
   mod?: 'surface';
   ref?: React.Ref<HTMLInputElement>;
   style?: ComponentStyle;
@@ -88,6 +89,7 @@ export const InputFiles: InputFilesType = observer(forwardRef(function InputFile
   loading,
   description,
   labelTooltip,
+  hideTags,
   mod,
   fill,
   small,
@@ -185,11 +187,13 @@ export const InputFiles: InputFilesType = observer(forwardRef(function InputFile
             {translate(rest.multiple ? 'ui_upload_files' : 'ui_upload_file')}
           </Button>
         </UploadArea>
-        <Tags>
-          {files.map((file, i) => (
-            <Tag key={file.name} id={i} label={file.name} onRemove={removeFile} />
-          ))}
-        </Tags>
+        {!hideTags && (
+          <Tags>
+            {files.map((file, i) => (
+              <Tag key={file.name} id={i} label={file.name} onRemove={removeFile} />
+            ))}
+          </Tags>
+        )}
       </input-container>
       {description && (
         <field-description>
