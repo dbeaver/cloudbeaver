@@ -12,7 +12,7 @@ import React from 'react';
 import { DBDriverResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { DriverConfigurationType, NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
@@ -54,9 +54,11 @@ export class ConnectionSSHTabService extends Bootstrap {
       isHidden: (tabId, props) => {
         if (props?.state.config.driverId) {
           const driver = this.dbDriverResource.get(props.state.config.driverId);
+          const urlType = props.state.config.configurationType === DriverConfigurationType.Url;
 
-          return !driver?.applicableNetworkHandlers.includes(SSH_TUNNEL_ID);
+          return urlType || !driver?.applicableNetworkHandlers.includes(SSH_TUNNEL_ID);
         }
+
         return true;
       },
     });
@@ -174,8 +176,9 @@ export class ConnectionSSHTabService extends Bootstrap {
   ) {
     const config = contexts.getContext(connectionConfigContext);
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
+    const urlType = state.config.configurationType === DriverConfigurationType.Url;
 
-    if (!state.config.networkHandlersConfig || state.config.networkHandlersConfig.length === 0) {
+    if (urlType || !state.config.networkHandlersConfig || state.config.networkHandlersConfig.length === 0) {
       return;
     }
 

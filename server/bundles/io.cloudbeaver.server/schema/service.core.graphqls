@@ -32,6 +32,8 @@ type ObjectPropertyInfo {
     features: [ String! ]!
     # Order position
     order: Int!
+    # Supported configuration types (for driver properties)
+    supportedConfigurationTypes: [ String! ]
 }
 
 enum ObjectPropertyLength {
