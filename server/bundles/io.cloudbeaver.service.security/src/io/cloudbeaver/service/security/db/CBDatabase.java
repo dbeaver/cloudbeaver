@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
+import org.jkiss.dbeaver.model.sql.SQLDialect;
 import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
@@ -155,7 +156,14 @@ public class CBDatabase {
             }
         }
 
-        var migrator = new H2Migrator(monitor, dataSourceProviderRegistry, databaseConfiguration, dbURL, dbProperties, variablesResolver);
+        var migrator = new H2Migrator(
+            monitor,
+            dataSourceProviderRegistry,
+            databaseConfiguration,
+            dbURL,
+            dbProperties,
+            variablesResolver
+        );
         migrator.migrateDatabaseIfNeeded();
 
         // reload the driver and url due to a possible configuration update
@@ -166,6 +174,42 @@ public class CBDatabase {
         Driver driverInstance = driver.getDriverInstance(monitor);
         dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), variablesResolver);
 
+        SQLDialect dialect = driver.getScriptDialect().createInstance();
+        this.cbDataSource = createConnectionPool(driver, dbURL, dbProperties, driverInstance);
+
+        try (Connection connection = cbDataSource.getConnection()) {
+            DatabaseMetaData metaData = connection.getMetaData();
+            log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
+
+            SQLSchemaManager schemaManager = new SQLSchemaManager(
+                "CB",
+                new ClassLoaderScriptSource(
+                    CBDatabase.class.getClassLoader(),
+                    SCHEMA_CREATE_SQL_PATH,
+                    SCHEMA_UPDATE_SQL_PATH
+                ),
+                monitor1 -> connection,
+                new CBSchemaVersionManager(),
+                dialect,
+                null,
+                CURRENT_SCHEMA_VERSION,
+                0
+            );
+            schemaManager.updateSchema(monitor);
+
+            validateInstancePersistentState(connection);
+        } catch (Exception e) {
+            throw new DBException("Error updating management database schema", e);
+        }
+        log.debug("\tManagement database connection established");
+    }
+
+    protected PoolingDataSource<PoolableConnection> createConnectionPool(
+        DBPDriver driver,
+        String dbURL,
+        Properties dbProperties,
+        Driver driverInstance
+    ) {
         // Create connection pool with custom connection factory
         log.debug("\tInitiate connection pool with management database (" + driver.getFullName() + "; " + dbURL + ")");
         DriverConnectionFactory conFactory = new DriverConnectionFactory(driverInstance, dbURL, dbProperties);
@@ -178,31 +222,7 @@ public class CBDatabase {
         config.setMaxTotal(databaseConfiguration.getPool().getMaxConnections());
         GenericObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(pcf, config);
         pcf.setPool(connectionPool);
-        cbDataSource = new PoolingDataSource<>(connectionPool);
-
-        try (Connection connection = cbDataSource.getConnection()) {
-            DatabaseMetaData metaData = connection.getMetaData();
-            log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
-
-            SQLSchemaManager schemaManager = new SQLSchemaManager(
-                "CB",
-                new ClassLoaderScriptSource(
-                    CBDatabase.class.getClassLoader(),
-                    SCHEMA_CREATE_SQL_PATH,
-                    SCHEMA_UPDATE_SQL_PATH),
-                monitor1 -> connection,
-                new CBSchemaVersionManager(),
-                driver.getScriptDialect().createInstance(),
-                null,
-                CURRENT_SCHEMA_VERSION,
-                0);
-            schemaManager.updateSchema(monitor);
-
-            validateInstancePersistentState(connection);
-        } catch (Exception e) {
-            throw new DBException("Error updating management database schema", e);
-        }
-        log.debug("\tManagement database connection established");
+        return new PoolingDataSource<>(connectionPool);
     }
 
     //TODO move out
