@@ -73,7 +73,7 @@ tbody > tr {
   &:not([|noHover]):hover,
   &:not([|noHover])[|selected],
   &:not([|noHover])[|expanded] {
-    background-color: var(--theme-secondary);
+    background-color: var(--theme-sub-secondary);
   }
 
   &[|disabled] {

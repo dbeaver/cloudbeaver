@@ -10,6 +10,10 @@ $mdc-theme-primary: #2a7cb4;
 $mdc-theme-on-primary: #ffffff;
 $mdc-theme-secondary: hsl(240deg, 10%, 15%);
 $mdc-theme-on-secondary: #cbcbcb;
+
+$mdc-theme-sub-secondary: hsl(240deg, 10%, 20%);
+$mdc-theme-on-sub-secondary: #cbcbcb;
+
 $mdc-theme-surface: hsl(240deg, 10%, 18%);
 $mdc-theme-on-surface: #ffffff;
 $mdc-theme-background: hsl(240deg, 10%, 26%);
@@ -38,6 +42,7 @@ $mdc-theme-text-colors: (
   dark: (
     primary: white,
     secondary: rgba(white, 0.7),
+    sub-secondary: rgba(white, 0.7),
     hint: rgba(white, 0.45),
     disabled: rgba(white, 0.45),
     icon: rgba(white, 0.45),
@@ -46,6 +51,7 @@ $mdc-theme-text-colors: (
   light: (
     primary: rgba(black, 0.87),
     secondary: rgba(black, 0.45),
+    sub-secondary: rgba(white, 0.7),
     hint: rgba(black, 0.45),
     disabled: rgba(black, 0.2),
     icon: rgba(black, 0.38),
