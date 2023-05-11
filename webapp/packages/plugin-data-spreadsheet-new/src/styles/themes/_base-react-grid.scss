@@ -78,7 +78,7 @@ $deleted-color: rgba(255,51,0,0.3);
       }
 
       .rdg-row:hover {
-        @include stripes-background($mdc-theme-secondary);
+        @include stripes-background($mdc-theme-sub-secondary);
       }
 
       .rdg-cell {
