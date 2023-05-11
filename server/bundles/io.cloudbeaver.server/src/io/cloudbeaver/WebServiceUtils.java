@@ -359,16 +359,22 @@ public class WebServiceUtils extends WebCommonUtils {
         try {
             var libraryId = driverLibrary.getId();
             if (CBApplication.getInstance().isMultiNode()) {
-                for (var file : driver.getLibraryFiles(driverLibrary)) {
-                    fileController.deleteFile(
-                        DBFileController.TYPE_DATABASE_DRIVER,
-                        file.getFile().toString(),
-                        true);
+                var libraryFiles = driver.getLibraryFiles(driverLibrary);
+                if (libraryFiles != null) {
+                    for (var file : libraryFiles) {
+                        fileController.deleteFile(
+                            DBFileController.TYPE_DATABASE_DRIVER,
+                            file.getFile().toString(),
+                            true);
+                    }
+                }
+            } else {
+                Path path = Path.of(CBApplication.getInstance().getDriversLocation()).resolveSibling(libraryId);
+                IOUtils.deleteDirectory(path);
+                if (Files.exists(path)) {
+                    throw new DBWebException("Library '" + libraryId + " is not deleted");
                 }
             }
-            Path path = Path.of(CBApplication.getInstance().getDriversLocation()).resolveSibling(libraryId);
-            IOUtils.deleteDirectory(path);
-            driver.getDriverLibraries().remove(driverLibrary);
         } catch (IOException | DBException e) {
             throw new DBWebException("Error on deleting local driver library file", e);
         }

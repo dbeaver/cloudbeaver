@@ -299,17 +299,11 @@ public class CBPlatform extends BasePlatformImpl {
                         continue;
                     }
                     boolean hasAllFiles = true, hasJars = false;
+                    var removedLibraries = new ArrayList<DBPDriverLibrary>();
                     for (DBPDriverLibrary lib : libraries) {
                         if (lib.isDeleteAfterRestart() && lib.getLocalFile() != null) {
-                            try {
-                                log.debug("Deleting driver library local file '" + lib.getDisplayName() + "'");
-                                var fileController = DBWorkbench.getPlatform().getFileController();
-                                WebServiceUtils.deleteDriverLibraryLocalFile(fileController, (DriverDescriptor) driver, lib);
-                                driverConfigChanged = true;
-                                driver.getDriverLibraries().remove(lib);
-                            } catch (DBException e) {
-                                log.error("Cannot delete driver library '" + lib.getDisplayName() + "'");
-                            }
+                            removedLibraries.add(lib);
+                            driverConfigChanged = true;
                         }
                         if (!lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
                             (lib.getLocalFile() == null || !Files.exists(lib.getLocalFile())))
@@ -325,6 +319,7 @@ public class CBPlatform extends BasePlatformImpl {
                     if (hasAllFiles || hasJars) {
                         applicableDrivers.add(driver);
                     }
+                    deleteDriverLibraries(removedLibraries, driver);
                 }
             }
         }
@@ -335,4 +330,16 @@ public class CBPlatform extends BasePlatformImpl {
         log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
     }
 
+    private void deleteDriverLibraries(List<DBPDriverLibrary> removedLibraries, DBPDriver driver) {
+        for (DBPDriverLibrary lib : removedLibraries) {
+            try {
+                log.debug("Deleting driver library local file '" + lib.getDisplayName() + "'");
+                var fileController = DBWorkbench.getPlatform().getFileController();
+                WebServiceUtils.deleteDriverLibraryLocalFile(fileController, (DriverDescriptor) driver, lib);
+            } catch (DBException e) {
+                log.error("Cannot delete driver library '" + lib.getDisplayName() + "'");
+            }
+            driver.getDriverLibraries().remove(lib);
+        }
+    }
 }

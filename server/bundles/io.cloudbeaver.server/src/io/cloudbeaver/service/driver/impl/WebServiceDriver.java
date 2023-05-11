@@ -23,10 +23,11 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebDataSourceProviderInfo;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.service.driver.WebDatabaseDriverConfig;
 import io.cloudbeaver.service.driver.DBWServiceDriver;
+import io.cloudbeaver.service.driver.WebDatabaseDriverConfig;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
@@ -34,7 +35,6 @@ import org.jkiss.dbeaver.model.connection.DBPDriverLibrary;
 import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
 import javax.servlet.http.Part;
@@ -47,6 +47,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class WebServiceDriver implements DBWServiceDriver {
+
+    private static final Log log = Log.getLog(WebServiceDriver.class);
 
     public List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) {
         List<WebDatabaseDriverInfo> result = new ArrayList<>();
@@ -169,7 +171,9 @@ public class WebServiceDriver implements DBWServiceDriver {
                 }
                 try {
                     WebServiceUtils.deleteDriverLibraryLocalFile(session.getFileController(), driver, driverLibrary);
+                    driver.getDriverLibraries().remove(driverLibrary);
                 } catch (DBWebException e) {
+                    log.debug("Driver library local file is not deleted", e);
                     // remove it after restart
                     driverLibrary.setDeleteAfterRestart(true);
                 }
