@@ -132,6 +132,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     private boolean configurationMode = false;
     private boolean enableSecurityManager = false;
     private String localHostAddress;
+    protected String containerId;
     private final List<InetAddress> localInetAddresses = new ArrayList<>();
 
     protected final WSEventController eventController = new WSEventController();
@@ -1095,5 +1096,12 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     @Nullable
     public String getDefaultAuthRole() {
         return null;
+    }
+
+    public String getContainerId() {
+        if (containerId == null) {
+            containerId = System.getenv("HOSTNAME");
+        }
+        return containerId;
     }
 }

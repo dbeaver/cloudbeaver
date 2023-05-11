@@ -69,8 +69,8 @@ public class WebServerConfig {
     }
 
     @Property
-    public String getHostName() {
-        return CommonUtils.notEmpty(System.getenv("HOSTNAME"));
+    public String getContainerId() {
+        return CommonUtils.notEmpty(application.getContainerId());
     }
 
     @Property
