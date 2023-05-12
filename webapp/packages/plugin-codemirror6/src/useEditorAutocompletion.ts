@@ -16,7 +16,7 @@ const styles = css`
     margin-top: var(--cm-fix-position-top);
     z-index: 100;
   }
-  :global(.cm-fixed-hack) {
+  :global(.cm-fixed-point) {
     position: fixed;
     top: 0;
     left: 0;
@@ -37,11 +37,13 @@ export function useEditorAutocompletion(config?: Parameters<typeof autocompletio
       return;
     }
 
-    let element = container.querySelector<HTMLDivElement>('.cm-fixed-hack');
+    // we need this element to calculate the position of the autocompletion tooltip
+    // because codemirror fixed position is incorrect in case of translated container
+    let element = container.querySelector<HTMLDivElement>('.cm-fixed-point');
 
     if (!element) {
       element = document.createElement('div');
-      element.className = 'cm-fixed-hack';
+      element.className = 'cm-fixed-point';
       container.append(element);
     }
 

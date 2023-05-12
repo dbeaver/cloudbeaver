@@ -22,7 +22,7 @@ import { ACTIVE_QUERY_EXTENSION } from '../ACTIVE_QUERY_EXTENSION';
 import { QUERY_STATUS_GUTTER_EXTENSION } from '../QUERY_STATUS_GUTTER_EXTENSION';
 import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader';
 import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor';
-import { useSqlDIalectAutocompletion } from '../useSqlDIalectAutocompletion';
+import { useSqlDialectAutocompletion } from '../useSqlDialectAutocompletion';
 import { useSqlDialectExtension } from '../useSqlDialectExtension';
 import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel';
 
@@ -44,7 +44,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
 
   const editor = useSQLCodeEditor(editorRef);
   const panel = useSQLCodeEditorPanel(data, editor);
-  const [autocompletion, setEditor, autocompletionStyles] = useSqlDIalectAutocompletion(data);
+  const [autocompletion, setEditor, autocompletionStyles] = useSqlDialectAutocompletion(data);
   const combinedRef = useCombinedRef(setEditorRef, setEditor);
   const sqlDialect = useSqlDialectExtension(data);
 

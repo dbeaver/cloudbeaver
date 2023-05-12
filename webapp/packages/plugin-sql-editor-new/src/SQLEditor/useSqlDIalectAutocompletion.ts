@@ -18,7 +18,7 @@ type SqlCompletion = Completion & {
 
 const CLOSE_CHARACTERS = /[\s()[\]{};:>,=\\*]/;
 
-export function useSqlDIalectAutocompletion(data: ISQLEditorData): UseEditorAutocompletionResult {
+export function useSqlDialectAutocompletion(data: ISQLEditorData): UseEditorAutocompletionResult {
   const localizationService = useService(LocalizationService);
 
   async function completionSource(context: CompletionContext): Promise<CompletionResult | null> {
@@ -35,15 +35,15 @@ export function useSqlDIalectAutocompletion(data: ISQLEditorData): UseEditorAuto
     try {
       const proposals = await data.getHintProposals(context.pos, word.text, !context.explicit);
 
-      const workLowerCase = word.text.toLocaleLowerCase();
+      const wordLowerCase = word.text.toLocaleLowerCase();
       const hasSameName = proposals.some(
-        ({ displayString }) => displayString.toLocaleLowerCase() === workLowerCase
+        ({ displayString }) => displayString.toLocaleLowerCase() === wordLowerCase
       );
       const filteredProposals = proposals.filter(({ displayString }) => (
         word.text === '*'
       || (
-        displayString.toLocaleLowerCase() !== workLowerCase
-        && displayString.toLocaleLowerCase().startsWith(workLowerCase)
+        displayString.toLocaleLowerCase() !== wordLowerCase
+        && displayString.toLocaleLowerCase().startsWith(wordLowerCase)
       )
       ))
         .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
