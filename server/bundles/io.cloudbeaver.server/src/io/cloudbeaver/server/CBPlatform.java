@@ -319,7 +319,7 @@ public class CBPlatform extends BasePlatformImpl {
                     if (hasAllFiles || hasJars) {
                         applicableDrivers.add(driver);
                     }
-                    deleteDriverLibraries(removedLibraries, driver);
+                    deleteDriverLibraries(removedLibraries, (DriverDescriptor) driver);
                 }
             }
         }
@@ -330,16 +330,16 @@ public class CBPlatform extends BasePlatformImpl {
         log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
     }
 
-    private void deleteDriverLibraries(List<DBPDriverLibrary> removedLibraries, DBPDriver driver) {
+    private void deleteDriverLibraries(List<DBPDriverLibrary> removedLibraries, DriverDescriptor driver) {
         for (DBPDriverLibrary lib : removedLibraries) {
             try {
                 log.debug("Deleting driver library local file '" + lib.getDisplayName() + "'");
                 var fileController = DBWorkbench.getPlatform().getFileController();
-                WebServiceUtils.deleteDriverLibraryLocalFile(fileController, (DriverDescriptor) driver, lib);
+                WebServiceUtils.deleteDriverLibraryLocalFile(fileController,  driver, lib);
             } catch (DBException e) {
                 log.error("Cannot delete driver library '" + lib.getDisplayName() + "'");
             }
-            driver.getDriverLibraries().remove(lib);
+            driver.deleteDriverLibrary(lib);
         }
     }
 }

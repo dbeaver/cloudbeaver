@@ -122,36 +122,57 @@ public class WebServiceDriver implements DBWServiceDriver {
             if (CommonUtils.isEmpty(shortFileName)) {
                 continue;
             }
-            String libraryPath = DBConstants.DEFAULT_DRIVERS_FOLDER + "/" + driver.getId();
-            String filePath = libraryPath + "/" + shortFileName;
-            DriverDescriptor.DriverFileInfo fileInfo = new DriverDescriptor.DriverFileInfo(
-                shortFileName, null, DBPDriverLibrary.FileType.jar, Path.of(filePath));
             try {
-                // driver descriptor can't seek drivers in local file controller, so we can't use file controller in embedded product
-                if (CBApplication.getInstance().isMultiNode()) {
-                    DBFileController fileController = session.getFileController();
-                    fileController.saveFileData(
-                        DBFileController.TYPE_DATABASE_DRIVER,
-                        filePath,
-                        part.getInputStream().readAllBytes());
-                } else {
-                    // save file in the local node
-                    Path path = Path.of(CBApplication.getInstance().getDriversLocation()).resolveSibling(filePath);
-                    if (!Files.exists(path.getParent())) {
-                        Files.createDirectories(path.getParent());
-                    }
-                    part.write(path.toString());
-                    fileInfo.setFileCRC(DriverDescriptor.calculateFileCRC(path));
+                String filePath = DBConstants.DEFAULT_DRIVERS_FOLDER + "/" + driver.getId() + "/" + shortFileName;
+                var cachedDriverLibrary = driver.getDriverLibrary(filePath);
+                if (cachedDriverLibrary != null && cachedDriverLibrary.isDeleteAfterRestart()) {
+                    throw new DBWebException("File with the name '" + shortFileName + 
+                        " is already exists and it will be deleted after server restart. Please, rename the file");
                 }
+                DriverDescriptor.DriverFileInfo fileInfo = new DriverDescriptor.DriverFileInfo(
+                    shortFileName,
+                    null,
+                    filePath.endsWith(".jar") || filePath.endsWith(".zip") ? DBPDriverLibrary.FileType.jar : DBPDriverLibrary.FileType.lib,
+                    Path.of(filePath));
+
+                // driver descriptor can't seek drivers in local file controller, so we can't use file controller in embedded product
+                saveDriverFile(session, part, filePath, fileInfo);
                 // add library to the driver configuration
-                var driverLibrary = driver.addDriverLibrary(libraryPath, DBPDriverLibrary.FileType.jar);
+                var driverLibrary = driver.addDriverLibrary(filePath, DBPDriverLibrary.FileType.jar);
                 driver.addLibraryFile(driverLibrary, fileInfo);
             } catch (IOException | DBException e) {
                 throw new DBWebException("IO error while saving driver file", e);
+            } finally {
+                DataSourceProviderRegistry.getInstance().saveDrivers();
             }
         }
-        DataSourceProviderRegistry.getInstance().saveDrivers();
         return true;
+    }
+
+    private void saveDriverFile(
+        @NotNull WebSession session,
+        Part part,
+        String filePath,
+        DriverDescriptor.DriverFileInfo fileInfo
+    ) throws DBException, IOException {
+        if (CBApplication.getInstance().isMultiNode()) {
+            DBFileController fileController = session.getFileController();
+            fileController.saveFileData(
+                DBFileController.TYPE_DATABASE_DRIVER,
+                filePath,
+                part.getInputStream().readAllBytes());
+        } else {
+            // save file in the local node
+            Path path = Path.of(CBApplication.getInstance().getDriversLocation()).resolveSibling(filePath);
+            if (!Files.exists(path.getParent())) {
+                Files.createDirectories(path.getParent());
+            }
+            if (Files.exists(path)) {
+                throw new DBWebException("File with path " + filePath + " already exists. Please, rename the file.");
+            }
+            part.write(path.toString());
+            fileInfo.setFileCRC(DriverDescriptor.calculateFileCRC(path));
+        }
     }
 
     public boolean deleteDriverLibraries(
@@ -171,7 +192,7 @@ public class WebServiceDriver implements DBWServiceDriver {
                 }
                 try {
                     WebServiceUtils.deleteDriverLibraryLocalFile(session.getFileController(), driver, driverLibrary);
-                    driver.getDriverLibraries().remove(driverLibrary);
+                    driver.deleteDriverLibrary(driverLibrary);
                 } catch (DBWebException e) {
                     log.debug("Driver library local file is not deleted", e);
                     // remove it after restart
