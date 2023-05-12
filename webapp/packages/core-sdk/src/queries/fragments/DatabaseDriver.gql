@@ -20,16 +20,7 @@ fragment DatabaseDriver on DriverInfo {
   configurationTypes
 
   providerProperties @include(if: $includeProviderProperties) {
-    id
-    displayName
-    description
-    category
-    dataType
-    defaultValue
-    validValues
-    length
-    features
-    order
+   ...DriverProviderPropertyInfo
   }
 
   driverProperties @include(if: $includeDriverProperties) {

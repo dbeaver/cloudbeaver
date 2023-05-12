@@ -1041,7 +1041,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     smTokens.getSmRefreshToken(),
                     new SMAuthPermissions(null, smSessionId, permissions),
                     Map.of(),
-                    smConfig.getDefaultAuthRole()
+                    null
                 );
             }
         } catch (SQLException e) {
