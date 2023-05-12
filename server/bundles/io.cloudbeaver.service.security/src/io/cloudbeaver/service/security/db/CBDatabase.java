@@ -41,6 +41,7 @@ import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.model.sql.SQLDialect;
+import org.jkiss.dbeaver.model.sql.SQLDialectSchemaController;
 import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
@@ -99,7 +100,12 @@ public class CBDatabase {
         if (exclusiveConnection != null) {
             return exclusiveConnection;
         }
-        return cbDataSource.getConnection();
+        var connection = cbDataSource.getConnection();
+        //FIXME: does not work for all bases, remove this code after we start using the schema name in all queries
+        if (CommonUtils.isNotEmpty(databaseConfiguration.getSchema())) {
+            connection.setSchema(databaseConfiguration.getSchema());
+        }
+        return connection;
     }
 
     public PoolingDataSource<PoolableConnection> getConnectionPool() {
@@ -175,12 +181,32 @@ public class CBDatabase {
         dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), variablesResolver);
 
         SQLDialect dialect = driver.getScriptDialect().createInstance();
-        this.cbDataSource = createConnectionPool(driver, dbURL, dbProperties, driverInstance);
+        try {
+            this.cbDataSource = initConnectionPool(driver, dbURL, dbProperties, driverInstance);
+        } catch (SQLException e) {
+            throw new DBException("Error initializing connection pool");
+        }
 
         try (Connection connection = cbDataSource.getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
             log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
 
+            if (dialect instanceof SQLDialectSchemaController && CommonUtils.isNotEmpty(databaseConfiguration.getSchema())) {
+                var schemaName = databaseConfiguration.getSchema();
+                var dialectSchemaController = (SQLDialectSchemaController) dialect;
+                var schemaExistQuery = dialectSchemaController.getSchemaExistQuery(schemaName);
+                boolean schemaExist = JDBCUtils.executeQuery(connection, schemaExistQuery) != null;
+                if (!schemaExist) {
+                    log.info("Schema " + schemaName + " not exist, create new one");
+                    String createSchemaQuery = dialectSchemaController.getCreateSchemaQuery(
+                        schemaName,
+                        dbUser,
+                        dbPassword
+                    );
+                    JDBCUtils.executeStatement(connection, createSchemaQuery);
+                }
+                connection.setSchema(schemaName);
+            }
             SQLSchemaManager schemaManager = new SQLSchemaManager(
                 "CB",
                 new ClassLoaderScriptSource(
@@ -204,12 +230,12 @@ public class CBDatabase {
         log.debug("\tManagement database connection established");
     }
 
-    protected PoolingDataSource<PoolableConnection> createConnectionPool(
+    protected PoolingDataSource<PoolableConnection> initConnectionPool(
         DBPDriver driver,
         String dbURL,
         Properties dbProperties,
         Driver driverInstance
-    ) {
+    ) throws SQLException, DBException {
         // Create connection pool with custom connection factory
         log.debug("\tInitiate connection pool with management database (" + driver.getFullName() + "; " + dbURL + ")");
         DriverConnectionFactory conFactory = new DriverConnectionFactory(driverInstance, dbURL, dbProperties);

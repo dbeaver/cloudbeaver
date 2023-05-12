@@ -26,9 +26,8 @@ public class CBDatabaseConfig {
     private String url;
     private String user;
     private String password;
+    private String schema;
 
-    private boolean createDatabase = true;
-    private boolean allowPublicAccess = true;
     private String initialDataConfiguration;
 
     private final Pool pool = new Pool();
@@ -80,14 +79,6 @@ public class CBDatabaseConfig {
         return password;
     }
 
-    public boolean isCreateDatabase() {
-        return createDatabase;
-    }
-
-    public boolean isAllowPublicAccess() {
-        return allowPublicAccess;
-    }
-
     public String getInitialDataConfiguration() {
         return initialDataConfiguration;
     }
@@ -96,4 +87,7 @@ public class CBDatabaseConfig {
         return pool;
     }
 
+    public String getSchema() {
+        return schema;
+    }
 }

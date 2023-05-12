@@ -58,8 +58,6 @@ public class DBConfigurationUtils {
             PARAM_DB_PW_CONFIGURATION,
             v -> databaseConfiguration.getPassword()
         );
-        res.put(PARAM_DB_CREATE_DATABASE_CONFIGURATION, databaseConfiguration.isCreateDatabase());
-        res.put(PARAM_DB_ALLOW_PUBLIC_ACCESS_CONFIGURATION, databaseConfiguration.isAllowPublicAccess());
         res.computeIfAbsent(
             PARAM_DB_INITIAL_DATA_CONFIGURATION_CONFIGURATION,
             v -> databaseConfiguration.getInitialDataConfiguration()
