@@ -12,17 +12,19 @@ import styled, { use, css } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { Button } from '../Button';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { useTranslate } from '../localization/useTranslate';
-import { useStateDelay } from '../useStateDelay';
+import { Tag } from '../Tags/Tag';
+import { Tags } from '../Tags/Tags';
+import { UploadArea } from '../UploadArea';
+import { useCombinedHandler } from '../useCombinedHandler';
 import { useRefInherit } from '../useRefInherit';
+import { useStateDelay } from '../useStateDelay';
 import { useStyles } from '../useStyles';
 import { baseFormControlStyles, baseInvalidFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
 import { isControlPresented } from './isControlPresented';
-import { UploadArea } from '../UploadArea';
-
-import { Button, Tag, Tags, useCombinedHandler } from '..';
 
 const INPUT_FIELD_STYLES = css`
     field-label {
@@ -140,8 +142,7 @@ export const InputFiles: InputFilesType = observer(forwardRef(function InputFile
 
     for (let i = 0; i < value.length; i++) {
       const file = value[i];
-      if (index !== i)
-      {
+      if (index !== i) {
         dt.items.add(file);
       }
     }

@@ -86,7 +86,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
     return this.data;
   }
 
-  async editDriver(config: DriverConfig): Promise<DBDriver> {
+  async updateDriver(config: DriverConfig): Promise<DBDriver> {
     if (!config.id) {
       throw new Error('Driver id must be provided');
     }
@@ -123,9 +123,9 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
   }
 
 
-  async deleteDriver(key: string): Promise<void>;
-  async deleteDriver(key: ResourceKeyList<string>): Promise<void>;
-  async deleteDriver(key: ResourceKey<string>): Promise<void> {
+  async deleteDriver(key: string): Promise<string[]>;
+  async deleteDriver(key: ResourceKeyList<string>): Promise<string[]>;
+  async deleteDriver(key: ResourceKey<string>): Promise<string[]> {
     const deleted: string[] = [];
 
     await this.performUpdate(key, undefined, async key => {
@@ -138,6 +138,8 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
         this.delete(resourceKeyList(deleted));
       }
     });
+
+    return deleted;
   }
 
   async deleteDriverLibraries(driverId: string, libraryIds: string[]) {
