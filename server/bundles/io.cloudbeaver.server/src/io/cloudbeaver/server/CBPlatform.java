@@ -17,7 +17,6 @@
 
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.server.jobs.SessionStateJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
 import io.cloudbeaver.service.session.WebSessionManager;
@@ -28,7 +27,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
@@ -43,7 +41,6 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
-import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.SecurityProviderUtils;
 import org.jkiss.dbeaver.runtime.qm.QMLogFileWriter;
@@ -290,7 +287,6 @@ public class CBPlatform extends BasePlatformImpl {
     public void refreshApplicableDrivers() {
         this.applicableDrivers.clear();
 
-        boolean driverConfigChanged = false;
         for (DBPDataSourceProviderDescriptor dspd : DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders()) {
             for (DBPDriver driver : dspd.getEnabledDrivers()) {
                 List<? extends DBPDriverLibrary> libraries = driver.getDriverLibraries();
@@ -299,12 +295,7 @@ public class CBPlatform extends BasePlatformImpl {
                         continue;
                     }
                     boolean hasAllFiles = true, hasJars = false;
-                    var removedLibraries = new ArrayList<DBPDriverLibrary>();
                     for (DBPDriverLibrary lib : libraries) {
-                        if (lib.isDeleteAfterRestart() && lib.getLocalFile() != null) {
-                            removedLibraries.add(lib);
-                            driverConfigChanged = true;
-                        }
                         if (!lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
                             (lib.getLocalFile() == null || !Files.exists(lib.getLocalFile())))
                         {
@@ -319,27 +310,9 @@ public class CBPlatform extends BasePlatformImpl {
                     if (hasAllFiles || hasJars) {
                         applicableDrivers.add(driver);
                     }
-                    deleteDriverLibraries(removedLibraries, (DriverDescriptor) driver);
                 }
             }
         }
-        if (driverConfigChanged) {
-            DataSourceProviderRegistry.getInstance().saveDrivers();
-        }
-
         log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
-    }
-
-    private void deleteDriverLibraries(List<DBPDriverLibrary> removedLibraries, DriverDescriptor driver) {
-        for (DBPDriverLibrary lib : removedLibraries) {
-            try {
-                log.debug("Deleting driver library local file '" + lib.getDisplayName() + "'");
-                var fileController = DBWorkbench.getPlatform().getFileController();
-                WebServiceUtils.deleteDriverLibraryLocalFile(fileController,  driver, lib);
-            } catch (DBException e) {
-                log.error("Cannot delete driver library '" + lib.getDisplayName() + "'");
-            }
-            driver.deleteDriverLibrary(lib);
-        }
     }
 }

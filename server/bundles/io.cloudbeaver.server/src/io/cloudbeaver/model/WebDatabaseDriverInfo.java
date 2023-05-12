@@ -263,7 +263,6 @@ public class WebDatabaseDriverInfo {
     @Property
     public WebDriverLibraryInfo[] getDriverLibraries() {
         return driver.getDriverLibraries().stream()
-            .filter(dbpDriverLibrary -> !dbpDriverLibrary.isDeleteAfterRestart())
             .map(dbpDriverLibrary -> new WebDriverLibraryInfo(webSession, dbpDriverLibrary))
             .toArray(WebDriverLibraryInfo[]::new);
     }

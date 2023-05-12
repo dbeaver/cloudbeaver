@@ -124,8 +124,8 @@ public class WebServiceDriver implements DBWServiceDriver {
             }
             try {
                 String filePath = DBConstants.DEFAULT_DRIVERS_FOLDER + "/" + driver.getId() + "/" + shortFileName;
-                var cachedDriverLibrary = driver.getDriverLibrary(filePath);
-                if (cachedDriverLibrary != null && cachedDriverLibrary.isDeleteAfterRestart()) {
+                var oldDriverLibrary = driver.getDriverLibrary(filePath);
+                if (oldDriverLibrary != null) {
                     throw new DBWebException("File with the name '" + shortFileName + 
                         " is already exists and it will be deleted after server restart. Please, rename the file");
                 }
@@ -184,21 +184,14 @@ public class WebServiceDriver implements DBWServiceDriver {
         if (driver == null) {
             throw new DBWebException("Data source driver '" + driverId + "' is not found");
         }
-            // driver descriptor can't seek drivers in local file controller, so we can't use file controller in embedded product
-            for (String libraryId : libraryIds) {
-                var driverLibrary = driver.getDriverLibrary(libraryId);
-                if (driverLibrary == null) {
-                    continue;
-                }
-                try {
-                    WebServiceUtils.deleteDriverLibraryLocalFile(session.getFileController(), driver, driverLibrary);
-                    driver.deleteDriverLibrary(driverLibrary);
-                } catch (DBWebException e) {
-                    log.debug("Driver library local file is not deleted", e);
-                    // remove it after restart
-                    driverLibrary.setDeleteAfterRestart(true);
-                }
+        // driver descriptor can't seek drivers in local file controller, so we can't use file controller in embedded product
+        for (String libraryId : libraryIds) {
+            var driverLibrary = driver.getDriverLibrary(libraryId);
+            if (driverLibrary == null) {
+                continue;
             }
+            driver.deleteDriverLibrary(driverLibrary);
+        }
         DataSourceProviderRegistry.getInstance().saveDrivers();
         return true;
     }
