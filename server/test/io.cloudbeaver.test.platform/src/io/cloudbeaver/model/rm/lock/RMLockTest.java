@@ -106,6 +106,7 @@ public class RMLockTest {
 
         CountDownLatch thread1CDL = new CountDownLatch(1);
         CountDownLatch thread2CDL = new CountDownLatch(1);
+        CountDownLatch thread2InitCDL = new CountDownLatch(1);
         CountDownLatch globalCountDown = new CountDownLatch(2);
 
         AtomicBoolean isLockedByThread1 = new AtomicBoolean(false);
@@ -114,6 +115,7 @@ public class RMLockTest {
         var thread1 = new Thread(() -> {
             try (var lock = lockController1.lockProject(project1, "testAccessToDifferentProjects1")) {
                 isLockedByThread1.set(true);
+                thread2InitCDL.countDown();
                 thread1CDL.await(1, TimeUnit.MINUTES);
                 Assert.assertTrue("Project2 not locked by thread2", isLockedByThread2.get());
                 thread2CDL.countDown();
@@ -131,6 +133,7 @@ public class RMLockTest {
         var thread2 = new Thread(() -> {
             try {
                 try (var lock = lockController2.lockProject(project2, "testAccessToDifferentProjects2")) {
+                    thread2InitCDL.await();
                     Assert.assertTrue("Project1 not locket by thread1", isLockedByThread1.get());
                     isLockedByThread2.set(true);
                     thread1CDL.countDown();

@@ -327,14 +327,20 @@ export class ConnectionOptionsTabService extends Bootstrap {
       const providerProperties: Record<string, any> = { ...state.config.providerProperties };
 
       for (const providerProperty of driver.providerProperties) {
-        if (providerProperty.defaultValue === null
-          || providerProperty.defaultValue === undefined
-          || !providerProperty.id
-          || providerProperty.id in providerProperties) {
+        if (!providerProperty.id) {
           continue;
         }
 
-        providerProperties[providerProperty.id] = providerProperty.defaultValue;
+        const supported = providerProperty.supportedConfigurationTypes?.some(t => t === tempConfig.configurationType);
+
+        if (!supported) {
+          delete providerProperties[providerProperty.id];
+        } else {
+          const isDefault = providerProperty.defaultValue !== null && providerProperty.defaultValue !== undefined;
+          if (!(providerProperty.id in providerProperties) && isDefault) {
+            providerProperties[providerProperty.id] = providerProperty.defaultValue;
+          }
+        }
       }
 
       tempConfig.providerProperties = providerProperties;
