@@ -339,7 +339,6 @@ public class WebServiceUtils extends WebCommonUtils {
         return result;
     }
 
-
     public static void setDriverConfiguration(DriverDescriptor driver, WebDatabaseDriverConfig config) {
         driver.setName(config.getDriverName());
         driver.setDescription(CommonUtils.notEmpty(config.getDriverDescription()));
@@ -349,35 +348,6 @@ public class WebServiceUtils extends WebCommonUtils {
         driver.setDriverDefaultDatabase(config.getDriverDatabase());
         driver.setDriverDefaultUser(config.getDriverUser());
         driver.setModified(true);
-    }
-
-    public static void deleteDriverLibraryLocalFile(
-        @NotNull DBFileController fileController,
-        @NotNull DriverDescriptor driver,
-        @NotNull DBPDriverLibrary driverLibrary
-    ) throws DBWebException {
-        try {
-            var libraryId = driverLibrary.getId();
-            if (CBApplication.getInstance().isMultiNode()) {
-                var libraryFiles = driver.getLibraryFiles(driverLibrary);
-                if (libraryFiles != null) {
-                    for (var file : libraryFiles) {
-                        fileController.deleteFile(
-                            DBFileController.TYPE_DATABASE_DRIVER,
-                            file.getFile().toString(),
-                            true);
-                    }
-                }
-            } else {
-                Path path = Path.of(CBApplication.getInstance().getDriversLocation()).resolveSibling(libraryId);
-                IOUtils.deleteDirectory(path);
-                if (Files.exists(path)) {
-                    throw new DBWebException("Library '" + libraryId + " is not deleted");
-                }
-            }
-        } catch (IOException | DBException e) {
-            throw new DBWebException("Error on deleting local driver library file", e);
-        }
     }
 
 }

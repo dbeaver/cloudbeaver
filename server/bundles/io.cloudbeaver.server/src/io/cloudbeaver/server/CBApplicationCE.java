@@ -31,6 +31,9 @@ import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.registry.BasePlatformImpl;
+import org.jkiss.dbeaver.registry.LocalFileController;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.util.List;
 
@@ -71,9 +74,10 @@ public class CBApplicationCE extends CBApplication {
         return LocalResourceController.builder(credentialsProvider, workspace, this::getSecurityController).build();
     }
 
+    @NotNull
     @Override
-    public DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
-        return CBPlatform.getInstance().createFileController();
+    public DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider) {
+        return new LocalFileController(DBWorkbench.getPlatform().getWorkspace().getMetadataFolder().resolve(BasePlatformImpl.FILES_FOLDER));
     }
 
     protected void shutdown() {

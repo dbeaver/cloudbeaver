@@ -17,6 +17,7 @@
 
 package io.cloudbeaver.server;
 
+import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.server.jobs.SessionStateJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
 import io.cloudbeaver.service.session.WebSessionManager;
@@ -27,6 +28,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
@@ -314,5 +316,11 @@ public class CBPlatform extends BasePlatformImpl {
             }
         }
         log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
+    }
+
+    @NotNull
+    @Override
+    public DBFileController createFileController() {
+        return getApplication().createFileController(new NoAuthCredentialsProvider());
     }
 }

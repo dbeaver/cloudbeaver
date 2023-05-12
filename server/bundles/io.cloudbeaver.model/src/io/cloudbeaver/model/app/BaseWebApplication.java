@@ -74,8 +74,9 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         throw new IllegalStateException("Resource controller is not supported by " + getClass().getSimpleName());
     }
 
+    @NotNull
     @Override
-    public DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
+    public DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider) {
         throw new IllegalStateException("File controller is not supported by " + getClass().getSimpleName());
     }
 

@@ -64,7 +64,7 @@ public interface WebApplication extends DBPApplication {
     RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
                                           @NotNull DBPWorkspace workspace) throws DBException;
 
-    DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
+    DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider);
 
     String getServerURL();
 
