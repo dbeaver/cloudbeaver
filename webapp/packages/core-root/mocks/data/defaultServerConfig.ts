@@ -19,7 +19,7 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
     'workspaceId': 'D14DGNGYNPI71M',
     'serverURL': 'https://test.ce.cloudbeaver.io',
     'rootURI': '/',
-    'hostName': '931cdabfc0b3',
+    'containerId': '931cdabfc0b3',
     'productConfiguration': productConfiguration,
     'supportsCustomConnections': true,
     'supportsConnectionBrowser': false,

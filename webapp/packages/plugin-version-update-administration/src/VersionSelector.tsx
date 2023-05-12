@@ -62,7 +62,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
         </Combobox>
         {version && Instruction && (
           <GroupItem>
-            <Instruction version={version} hostName={serverConfigResource.data?.hostName} />
+            <Instruction version={version} containerId={serverConfigResource.data?.containerId} />
           </GroupItem>
         )}
       </Group>
