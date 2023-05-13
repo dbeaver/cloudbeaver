@@ -16,12 +16,15 @@ import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { GQLErrorCatcher, SqlDialectInfo } from '@cloudbeaver/core-sdk';
+import { SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
+import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
 
-import { SqlDialectInfoService } from '../SqlDialectInfoService';
-import { SQLCodeEditorLoader } from '../SqlEditor/SQLCodeEditor/SQLCodeEditorLoader';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource';
 
 const styles = css`
+    wrapper {
+      composes: theme-typography--body1 from global;
+    }
     footer-container {
       display: flex;
       width: min-content;
@@ -98,6 +101,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
     dialect: computed,
   }, { connection, sqlDialectInfoService });
 
+  const sqlDialect = useSqlDialectExtension(state.dialect);
   const error = useErrorDetails(state.error.exception);
 
   useEffect(() => {
@@ -128,11 +132,8 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
           <Loader loading={state.loading}>
             {() => styled(styles)(
               <SQLCodeEditorLoader
-                bindings={{
-                  autoCursor: false,
-                }}
                 value={state.query}
-                dialect={state.dialect}
+                extensions={[sqlDialect]}
                 readonly
               />
             )}

@@ -9,33 +9,33 @@
 import { useMemo } from 'react';
 
 import { IComplexLoaderData, useComplexLoader } from '@cloudbeaver/core-blocks';
+import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import { CassandraLoader, Extension, MSSQLLoader, MariaSQLLoader, MySQLLoader, PLSQLLoader, PostgreSQLLoader, SQLDialect, SQL_EDITOR, SQLiteLoader, StandardSQLLoader } from '@cloudbeaver/plugin-codemirror6';
-import type { ISQLEditorData } from '@cloudbeaver/plugin-sql-editor';
 
-export function useSqlDialectExtension(data: ISQLEditorData): Extension {
-  const loader = getDialectLoader(data.dialect?.name);
+export function useSqlDialectExtension(dialectInfo: SqlDialectInfo | undefined): Extension {
+  const loader = getDialectLoader(dialectInfo?.name);
   const dialect = useComplexLoader(loader);
 
   return useMemo(() => {
     let dialectInner = dialect;
 
-    if (data.dialect) {
+    if (dialectInfo) {
       dialectInner = SQLDialect.define({
-        keywords: data.dialect.reservedWords.join(' ').toLowerCase(),
-        builtin: data.dialect.functions.join(' ').toUpperCase(),
-        types: data.dialect.dataTypes.join(' ').toUpperCase(),
+        keywords: dialectInfo.reservedWords.join(' ').toLowerCase(),
+        builtin: dialectInfo.functions.join(' ').toUpperCase(),
+        types: dialectInfo.dataTypes.join(' ').toUpperCase(),
 
-        hashComments: data.dialect.singleLineComments.includes('#'),
-        slashComments: data.dialect.singleLineComments.includes('//'),
-        doubleDollarQuotedStrings: data.dialect.quoteStrings.some(v => v.includes('$$')),
-        doubleQuotedStrings: data.dialect.quoteStrings.some(v => v.includes('"')),
+        hashComments: dialectInfo.singleLineComments.includes('#'),
+        slashComments: dialectInfo.singleLineComments.includes('//'),
+        doubleDollarQuotedStrings: dialectInfo.quoteStrings.some(v => v.includes('$$')),
+        doubleQuotedStrings: dialectInfo.quoteStrings.some(v => v.includes('"')),
       });
     }
 
     return SQL_EDITOR({
       dialect: dialectInner,
     });
-  }, [dialect, data.dialect]);
+  }, [dialect, dialectInfo]);
 }
 
 

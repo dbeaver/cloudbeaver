@@ -14,8 +14,7 @@ import { ConnectionDialectResource, ConnectionExecutionContextService, createCon
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
-
-import { SQLCodeEditorLoader } from '../SqlEditor/SQLCodeEditor/SQLCodeEditorLoader';
+import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
 
 const styles = css`
   wrapper {
@@ -26,6 +25,7 @@ const styles = css`
     overflow: auto;
   }
   SQLCodeEditorLoader {
+    composes: theme-typography--body1 from global;
     height: 100%;
     width: 100%;
   }
@@ -56,6 +56,7 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
     ? createConnectionParam(contextInfo.projectId, contextInfo.connectionId)
     : null
   );
+  const sqlDialect = useSqlDialectExtension(dialect.data);
 
   const apply = async () => {
     await payload.model.save();
@@ -72,11 +73,9 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
       <CommonDialogBody noBodyPadding noOverflow>
         <wrapper>
           <SQLCodeEditorLoader
-            bindings={{
-              autoCursor: false,
-            }}
             value={payload.script}
-            dialect={dialect.data}
+            extensions={[sqlDialect]}
+            lineNumbers
             readonly
           />
         </wrapper>

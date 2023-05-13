@@ -15,8 +15,8 @@ import {
   SqlQueryGenerator,
   ResourceKeyUtils,
   resourceKeyList,
+  isResourceAlias,
 } from '@cloudbeaver/core-sdk';
-import { isResourceAlias } from '@cloudbeaver/core-sdk/src/Resource/ResourceAlias';
 
 export const MAX_GENERATORS_LENGTH = 15;
 

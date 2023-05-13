@@ -7,7 +7,9 @@
  */
 
 @mixin base-code-editor() {
-  .editor, .ReactCodemirror {
+
+  .editor,
+  .ReactCodemirror {
     width: 100%;
     height: 100%;
   }
@@ -17,12 +19,9 @@
     @include mdc-theme-prop(color, on-surface, false);
   }
 
-  .editor .cm-lineNumbers {
-    @include mdc-theme-prop(color, on-secondary, false);
-  }
-
   .editor .cm-scroller {
     outline: none;
+    line-height: unset;
   }
 
   .editor .cm-content {
@@ -38,22 +37,27 @@
   }
 
   .editor .cm-gutters {
-    @include mdc-theme-prop(background, secondary, false);
-    @include mdc-theme-prop(color, on-secondary, false);
+    @include mdc-theme-prop(background-color, surface, false);
+    @include mdc-theme-prop(color, text-hint-on-light, false);
     @include mdc-theme-prop(border-color, background, false);
   }
 
   .editor .cm-activeLine {
-    @include mdc-theme-prop(background, background, false);
+    background: none;
+    box-shadow: 0 0 0 2px $mdc-theme-secondary;
   }
 
   .editor .cm-activeLineGutter {
-    @include mdc-theme-prop(background, background, false);
+    background: none;
+    @include mdc-theme-prop(color, on-surface, false);
   }
 
   .editor .active-query {
-    @include mdc-theme-prop(background, secondary, false);
+    /* disable because look too ugly */
+    /*
     display: inline-block;
+    @include mdc-theme-prop(background, secondary, false);
+    */
   }
 
   .editor .cm-content ::selection {
@@ -61,44 +65,61 @@
   }
 
   .editor .cm-line::selection,
-  .editor .cm-line > :global(span)::selection,
-  .editor .cm-line > :global(span) > :global(span)::selection {
+  .editor .cm-line> :global(span)::selection,
+  .editor .cm-line> :global(span)> :global(span)::selection {
     @include mdc-theme-prop(background, primary, false);
   }
 
   .editor .cm-line::-moz-selection,
-  .editor .cm-line > :global(span)::-moz-selection,
-  .editor .cm-line > :global(span) > :global(span)::-moz-selection {
+  .editor .cm-line> :global(span)::-moz-selection,
+  .editor .cm-line> :global(span)> :global(span)::-moz-selection {
     @include mdc-theme-prop(background, primary, false);
   }
 
-  .editor .cm-gutters .cm-gutterElement {
+  .editor .cm-lineNumbers .cm-gutterElement {
+    min-width: 3ch;
+    box-sizing: content-box;
+  }
+
+  .editor .cm-gutters .cm-foldGutter .cm-gutterElement {
     display: flex;
     align-items: center;
+    cursor: pointer;
+    user-select: none;
   }
 
-  .editor .cm-gutters .query-status .cm-gutterElement .running-query-line {
+  .editor .cm-gutters .cm-foldGutter .cm-gutterElement-icon {
+    padding: 0 3px 0 5px;
+    width: 12px;
+    height: 12px;
     display: flex;
-    height: 0;
-    width: 0;
-    margin-right: 4px;
-    margin-left: 4px;
-    border-top: 6px solid transparent;
-    border-bottom: 6px solid transparent;
-    border-left: 6px solid;
-    @include mdc-theme-prop(border-left-color, primary, false);
+
+    &.cm-foldGutter-folded :global(svg) {
+      transform: rotate(-90deg);
+    }
   }
 
-  .editor .cm-gutters .query-status .cm-gutterElement .running-query-error-line {
+  .editor .cm-gutters .query-status .cm-gutterElement {
     display: flex;
-    height: 0;
-    width: 0;
-    margin-right: 4px;
-    margin-left: 4px;
-    border-top: 6px solid transparent;
-    border-bottom: 6px solid transparent;
-    border-left: 6px solid;
-    @include mdc-theme-prop(border-left-color, negative, false);
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+
+    .running-query-line {
+      display: flex;
+      height: 8px;
+      width: 8px;
+      border-radius: 100%;
+      @include mdc-theme-prop(background, primary, false);
+    }
+
+    .running-query-error-line {
+      display: flex;
+      height: 8px;
+      width: 8px;
+      border-radius: 100%;
+      @include mdc-theme-prop(background, negative, false);
+    }
   }
 
   .editor .tok-keyword {

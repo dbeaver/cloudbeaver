@@ -34,7 +34,5 @@ export * from './SqlEditor';
 export * from './SqlEditorModeService';
 export * from './SqlEditorService';
 export * from './SqlEditorSettingsService';
-export * from './SqlGenerators/SqlGeneratorsResource';
-export * from './SqlGenerators/SqlGeneratorsBootstrap';
 
 export default sqlEditorPluginManifest;

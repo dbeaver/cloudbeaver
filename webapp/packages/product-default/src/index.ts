@@ -38,6 +38,7 @@ import sqlEditorTab from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import sqlEditorResource from '@cloudbeaver/plugin-sql-editor-navigation-tab-script';
 import sqlEditorNew from '@cloudbeaver/plugin-sql-editor-new';
 import sqlEditorScreen from '@cloudbeaver/plugin-sql-editor-screen';
+import { sqlGeneratorPlugin } from '@cloudbeaver/plugin-sql-generator';
 import theme from '@cloudbeaver/plugin-theme';
 import toolsPanel from '@cloudbeaver/plugin-tools-panel';
 import topAppBar from '@cloudbeaver/plugin-top-app-bar';
@@ -69,6 +70,7 @@ const PLUGINS: PluginManifest[] = [
   sqlEditorTab,
   sqlEditorScreen,
   sqlEditorNew,
+  sqlGeneratorPlugin,
   userProfile,
   userProfileAdministration,
   defaultProductManifest,

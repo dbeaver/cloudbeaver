@@ -46,7 +46,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   const panel = useSQLCodeEditorPanel(data, editor);
   const [autocompletion, setEditor, autocompletionStyles] = useSqlDialectAutocompletion(data);
   const combinedRef = useCombinedRef(setEditorRef, setEditor);
-  const sqlDialect = useSqlDialectExtension(data);
+  const sqlDialect = useSqlDialectExtension(data.dialect);
 
   const dndBox = useDNDBox({
     canDrop: context => context.has(DATA_CONTEXT_NAV_NODE),
@@ -88,6 +88,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         extensions={[ACTIVE_QUERY_EXTENSION, QUERY_STATUS_GUTTER_EXTENSION, autocompletion, sqlDialect]}
         readonly={data.readonly}
         autoFocus
+        lineNumbers
         onChange={panel.onQueryChange}
         onUpdate={panel.onUpdate}
       />

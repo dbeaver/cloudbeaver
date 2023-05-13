@@ -7,9 +7,7 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { ActionService, KeyBindingService, MenuService, IAction, IDataContextProvider, ACTION_UNDO, ACTION_REDO, KEY_BINDING_UNDO, KEY_BINDING_REDO } from '@cloudbeaver/core-view';
-import { DatabaseEditAction, TableFooterMenuService } from '@cloudbeaver/plugin-data-viewer';
+import { ActionService, KeyBindingService, IAction, IDataContextProvider, ACTION_UNDO, ACTION_REDO, KEY_BINDING_UNDO, KEY_BINDING_REDO } from '@cloudbeaver/core-view';
 
 import { ACTION_SQL_EDITOR_EXECUTE } from './actions/ACTION_SQL_EDITOR_EXECUTE';
 import { ACTION_SQL_EDITOR_EXECUTE_NEW } from './actions/ACTION_SQL_EDITOR_EXECUTE_NEW';
@@ -21,7 +19,6 @@ import { KEY_BINDING_SQL_EDITOR_EXECUTE_NEW } from './actions/bindings/KEY_BINDI
 import { KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT';
 import { KEY_BINDING_SQL_EDITOR_FORMAT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_FORMAT';
 import { KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN';
-import { ScriptPreviewService } from './ScriptPreview/ScriptPreviewService';
 import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA';
 
@@ -30,9 +27,6 @@ export class MenuBootstrap extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly keyBindingService: KeyBindingService,
-    private readonly scriptPreviewService: ScriptPreviewService,
-    private readonly tableFooterMenuService: TableFooterMenuService,
-    private readonly menuService: MenuService
   ) {
     super();
   }
@@ -158,38 +152,6 @@ export class MenuBootstrap extends Bootstrap {
     //     ...items,
     //   ],
     // });
-
-    this.tableFooterMenuService.registerMenuItem({
-      id: 'script',
-      order: 3,
-      title: 'data_viewer_script_preview',
-      tooltip: 'data_viewer_script_preview',
-      icon: 'sql-script-preview',
-      isPresent(context) {
-        return context.contextType === TableFooterMenuService.nodeContextType;
-      },
-      isHidden(context) {
-        return context.data.model.isReadonly(context.data.resultIndex)
-          || context.data.model.source.getResult(context.data.resultIndex)?.dataFormat !== ResultDataFormat.Resultset;
-      },
-      isDisabled(context) {
-        if (
-          context.data.model.isLoading()
-          || context.data.model.isDisabled(context.data.resultIndex)
-          || !context.data.model.source.hasResult(context.data.resultIndex)
-        ) {
-          return true;
-        }
-        const editor = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseEditAction
-        );
-        return !editor?.isEdited();
-      },
-      onClick: async context => {
-        await this.scriptPreviewService.open(context.data.model, context.data.resultIndex);
-      },
-    });
   }
 
   private sqlEditorActionHandler(context: IDataContextProvider, action: IAction): void {

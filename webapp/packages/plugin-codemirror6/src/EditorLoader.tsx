@@ -10,6 +10,7 @@ import { forwardRef } from 'react';
 
 import { ComplexLoader, createComplexLoader } from '@cloudbeaver/core-blocks';
 
+import type { IDefaultExtensions } from './getDefaultExtensions';
 import type { IEditorProps } from './IEditorProps';
 import type { IEditorRef } from './IEditorRef';
 
@@ -18,7 +19,7 @@ const loader = createComplexLoader(async function loader() {
   return { Editor };
 });
 
-export const EditorLoader = forwardRef<IEditorRef, IEditorProps>(function EditorLoader(props, ref) {
+export const EditorLoader = forwardRef<IEditorRef, IEditorProps & IDefaultExtensions>(function EditorLoader(props, ref) {
   return (
     <ComplexLoader loader={loader}>
       {({ Editor }) => <Editor {...props} ref={ref} />}
