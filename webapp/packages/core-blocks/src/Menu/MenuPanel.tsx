@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { Children } from 'react';
+import { Children, forwardRef } from 'react';
 import { Menu, MenuStateReturn } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
@@ -33,7 +33,7 @@ export interface IMenuPanelProps {
   className?: string;
 }
 
-export const MenuPanel = observer<IMenuPanelProps>(function MenuPanel({
+export const MenuPanel = observer<IMenuPanelProps, HTMLDivElement>(forwardRef(function MenuPanel({
   label,
   menu,
   panelAvailable = true,
@@ -43,7 +43,7 @@ export const MenuPanel = observer<IMenuPanelProps>(function MenuPanel({
   children,
   style,
   className,
-}) {
+}, ref) {
   const styles = useStyles(menuPanelStyles, style);
   const visible = menu.visible;
 
@@ -63,7 +63,7 @@ export const MenuPanel = observer<IMenuPanelProps>(function MenuPanel({
 
   return styled(styles)(
     <ErrorBoundary>
-      <Menu {...menu} aria-label={label} className={className} visible={panelAvailable}>
+      <Menu ref={ref} {...menu} aria-label={label} className={className} visible={panelAvailable}>
         <menu-box dir={rtl ? 'rtl' : undefined} {...use({ hasBindings })}>
           {Children.count(renderedChildren) === 0 && (
             <MenuEmptyItem style={style} />
@@ -73,4 +73,4 @@ export const MenuPanel = observer<IMenuPanelProps>(function MenuPanel({
       </Menu>
     </ErrorBoundary>
   );
-});
+}));

@@ -33,6 +33,7 @@ export * from './Menu/MenuItemElement';
 export * from './Menu/MenuPanel';
 export * from './Menu/menuPanelStyles';
 export * from './Menu/MenuStateContext';
+export * from './Menu/useMouseContextMenu';
 
 export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoForm';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories';

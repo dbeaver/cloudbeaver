@@ -10,8 +10,7 @@ import { action, computed, observable, reaction, toJS, untracked, comparer } fro
 import { useEffect, useContext, useState } from 'react';
 
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
-import { CachedMapResource, CachedMapResourceGetter, CachedMapResourceValue, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter, CachedResourceData, CachedDataResourceGetter, CachedResource, CachedDataResource, CachedResourceKey, CachedResourceContext, ResourceKey } from '@cloudbeaver/core-sdk';
-import type { ResourceKeyListAlias } from '@cloudbeaver/core-sdk/src/Resource/ResourceKeyListAlias';
+import { CachedMapResource, CachedMapResourceGetter, CachedMapResourceValue, CachedMapResourceLoader, ResourceKeyList, CachedMapResourceListGetter, CachedResourceData, CachedDataResourceGetter, CachedResource, CachedDataResource, CachedResourceKey, CachedResourceContext, ResourceKey, ResourceKeyListAlias } from '@cloudbeaver/core-sdk';
 import { ILoadableState, isArraysEqual, isContainsException, LoadingError } from '@cloudbeaver/core-utils';
 
 import { ErrorContext } from '../ErrorContext';

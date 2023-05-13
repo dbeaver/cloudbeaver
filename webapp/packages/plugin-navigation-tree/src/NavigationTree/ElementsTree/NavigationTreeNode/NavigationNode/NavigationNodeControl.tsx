@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext, useDeferredValue, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { ConnectionImageWithMask, getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
+import { ConnectionImageWithMask, getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef, useMouseContextMenu } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource, NavTreeResource, EObjectFeature, type INodeActions } from '@cloudbeaver/core-navigation-tree';
@@ -60,6 +60,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
   dndElement,
   dndPlaceholder,
 }, ref) {
+  const mouseContextMenu = useMouseContextMenu();
   const treeNodeContext = useContext(TreeNodeContext);
   const treeContext = useContext(ElementsTreeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
@@ -105,6 +106,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
       ref={ref}
       {...attributes}
       onClick={onClickHandler}
+      onContextMenu={mouseContextMenu.handleContextMenuOpen}
       {...use({ outdated, editing, dragging: dndElement })}
     >
       {expandable && <TreeNodeExpand filterActive={filterActive} />}
@@ -120,7 +122,12 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
       </TreeNodeName>
       {!editing && !dndPlaceholder && (
         <portal onClick={handlePortalClick}>
-          <TreeNodeMenuLoader node={node} actions={nodeActions} selected={selected} />
+          <TreeNodeMenuLoader
+            mouseContextMenu={mouseContextMenu}
+            node={node}
+            actions={nodeActions}
+            selected={selected}
+          />
         </portal>
       )}
     </TreeNodeControl>

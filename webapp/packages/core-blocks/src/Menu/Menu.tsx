@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React, { forwardRef, useEffect } from 'react';
+import React, { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
 import { MenuButton, MenuInitialState, useMenuState } from 'reakit/Menu';
 import styled from 'reshadow';
 
@@ -19,8 +19,10 @@ import { useStyles } from '../useStyles';
 import { MenuPanel } from './MenuPanel';
 import { menuPanelStyles } from './menuPanelStyles';
 import { IMenuState, MenuStateContext } from './MenuStateContext';
+import type { IMouseContextMenu } from './useMouseContextMenu';
 
 interface IMenuProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
+  mouseContextMenu?: IMouseContextMenu;
   label: string;
   items: React.ReactNode | (() => React.ReactNode);
   menuRef?: React.RefObject<IMenuState | undefined>;
@@ -38,6 +40,7 @@ interface IMenuProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
 }
 
 export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function Menu({
+  mouseContextMenu,
   label,
   items,
   menuRef,
@@ -55,6 +58,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
   rtl,
   ...props
 }, ref) {
+  const menuPanelRef = useRef<HTMLDivElement>(null);
   const propsRef = useObjectRef({ onVisibleSwitch, visible });
   const menu = useMenuState({ modal, placement, visible, rtl });
   const styles = useStyles(menuPanelStyles, style);
@@ -65,6 +69,10 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
   }
 
   useEffect(() => {
+    if (!menu.visible && mouseContextMenu) {
+      mouseContextMenu.position = null;
+    }
+
     propsRef.onVisibleSwitch?.(menu.visible);
   }, [menu.visible]);
 
@@ -74,6 +82,21 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
     menuVisible = false;
   }
 
+  useLayoutEffect(() => {
+    if (mouseContextMenu?.position) {
+      menu.show();
+    }
+  }, [mouseContextMenu?.position]);
+
+  useLayoutEffect(() => {
+    if (mouseContextMenu?.position) {
+      if (menuPanelRef.current) {
+        menuPanelRef.current.style.transform = 'none';
+        menuPanelRef.current.style.left = `${mouseContextMenu.position.x}px`;
+        menuPanelRef.current.style.top = `${mouseContextMenu.position.y}px`;
+      }
+    }
+  });
 
   if (React.isValidElement(children) && disclosure) {
     return styled(styles)(
@@ -83,6 +106,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
             {disclosureProps => React.cloneElement(children, { ...disclosureProps, ...children.props })}
           </MenuButton>
           <MenuPanel
+            ref={menuPanelRef}
             label={label}
             menu={menu}
             style={style}
@@ -106,6 +130,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
           <box>{children}</box>
         </MenuButton>
         <MenuPanel
+          ref={menuPanelRef}
           label={label}
           menu={menu}
           style={style}
