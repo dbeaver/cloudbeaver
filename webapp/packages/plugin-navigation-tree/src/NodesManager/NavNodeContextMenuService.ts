@@ -111,23 +111,19 @@ export class NavNodeContextMenuService extends Bootstrap {
           return node.features.includes(ENodeFeature.canDelete);
         }
 
-        return [
-          ACTION_OPEN,
-          ACTION_REFRESH,
-        ].includes(action);
-      },
-      isHidden: (context, action) => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
-
         if (action === ACTION_OPEN) {
+          // TODO: replace with loader, this call can lead to concurrent calls limit (Executor)
           untracked(() => {
             this.navNodeManagerService.canOpen(node.id, node.parentId); // trigger info
           });
 
-          return !this.navNodeManagerService.getNavNodeCache(node.id).canOpen;
+          return this.navNodeManagerService.getNavNodeCache(node.id).canOpen;
         }
 
-        return false;
+        return [
+          ACTION_OPEN,
+          ACTION_REFRESH,
+        ].includes(action);
       },
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);

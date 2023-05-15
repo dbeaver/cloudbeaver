@@ -24,6 +24,9 @@ export function useMouseContextMenu(): IMouseContextMenu {
   return useObservableRef<IMouseContextMenu>(() => ({
     position: null,
     handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
+      if (!event.currentTarget.contains(event.target as Node)) {
+        return;
+      }
       event.preventDefault();
       event.stopPropagation();
 

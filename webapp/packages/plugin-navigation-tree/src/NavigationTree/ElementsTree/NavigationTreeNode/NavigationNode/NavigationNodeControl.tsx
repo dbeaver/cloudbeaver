@@ -96,6 +96,11 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
     treeNodeContext.select(event.ctrlKey || event.metaKey);
   }
 
+  function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
+    mouseContextMenu.handleContextMenuOpen(event);
+    treeNodeContext.select();
+  }
+
   const expandable = useDeferredValue(getComputed(() => treeContext?.tree.isNodeExpandable(node.id) ?? true));
   const filterActive = useDeferredValue(getComputed(() => treeContext?.tree.filtering));
 
@@ -106,7 +111,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
       ref={ref}
       {...attributes}
       onClick={onClickHandler}
-      onContextMenu={mouseContextMenu.handleContextMenuOpen}
+      onContextMenu={handleContextMenuOpen}
       {...use({ outdated, editing, dragging: dndElement })}
     >
       {expandable && <TreeNodeExpand filterActive={filterActive} />}

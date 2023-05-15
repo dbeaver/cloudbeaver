@@ -20,6 +20,10 @@ export const topMenuStyles = css`
     background-color: #338ecc!important;
     clip-path: inset(0px -16px -16px -16px); /* clip shadow from top edge of menu */
   }
+  Menu:not([submenu]) menu-box {
+    border-top-left-radius: 0!important;
+    border-top-right-radius: 0!important;
+  }
   menu-box menu-panel-item {
     border-color: #ffffff !important;
   }

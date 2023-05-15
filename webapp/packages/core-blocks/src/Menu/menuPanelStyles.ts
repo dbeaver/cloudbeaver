@@ -40,15 +40,15 @@ export const menuPanelStyles = css`
       z-index: 999;
     }
     MenuPanel[submenu] {
-      margin-top: -12px;
+      margin-top: -8px;
     }
     menu-box {
-      composes: theme-typography--body2 theme-elevation-z5 from global;
+      composes: theme-group-element-radius theme-typography--body2 theme-elevation-z5 from global;
       min-width: 140px;
-      padding: 12px 0;
+      padding: 8px 0;
 
       & menu-box {
-        margin-top: -12px;
+        margin-top: -8px;
       }
     }
 
@@ -98,7 +98,7 @@ export const menuPanelStyles = css`
       flex: 1;
       width: 100%;
       display: flex;
-      margin: 4px 0;
+      margin: 6px 0;
       border: none !important;
       border-bottom: 1px solid !important;
 
