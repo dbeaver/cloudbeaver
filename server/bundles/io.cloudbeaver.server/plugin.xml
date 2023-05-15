@@ -23,8 +23,6 @@
         <service id="core" label="Core service" description="Core services" class="io.cloudbeaver.service.core.WebServiceBindingCore">
             <permission id="access" label="Data source access" category="general" scope="datasource"/>
         </service>
-        <service id="driver" label="Driver service" description="Driver services" class="io.cloudbeaver.service.driver.WebServiceBindingDriver">
-        </service>
         <service id="navigator" label="Database navigator" description="Database navigator services"
                  class="io.cloudbeaver.service.navigator.WebServiceBindingNavigator">
             <premission id="navigate" label="Navigate over database metadata"/>
