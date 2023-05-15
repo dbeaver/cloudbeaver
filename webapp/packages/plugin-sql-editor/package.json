@@ -17,7 +17,6 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/plugin-codemirror": "~0.1.0",
     "@cloudbeaver/plugin-data-viewer": "~0.1.0",
     "@cloudbeaver/plugin-datasource-context-switch": "~0.1.0",
     "@cloudbeaver/plugin-navigation-tabs": "~0.1.0",

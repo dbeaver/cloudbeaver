@@ -13,12 +13,9 @@ module.exports = [
   '@emotion',
   'stackblur-canvas',
   'graphlib',
-  '@emotion',
   'svg-tag-names',
   'html-tags',
   'codemirror',
-  'codemirror6',
-  'react-codemirror2',
   'd3',
   'dagre',
 ];

@@ -92,7 +92,6 @@ export class SQLParser {
   }
 
   getQueryAtPos(position: number): ISQLScriptSegment | undefined {
-    this.update();
     const script = this._scripts.find(script => script.begin <= position && script.end > position);
 
     if (script) {
@@ -112,6 +111,7 @@ export class SQLParser {
 
   setScript(script: string): void {
     this.script = script;
+    this.update();
   }
 
   parse(script: string): void {
@@ -119,6 +119,7 @@ export class SQLParser {
   }
 
   setQueries(queries: IQueryInfo[]): this {
+    this.update();
     this._scripts = queries.map<ISQLScriptSegment>(query => ({
       query: this.script.substring(query.start, query.end),
       begin: query.start,

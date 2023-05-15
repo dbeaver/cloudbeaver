@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EditorView } from 'codemirror6';
+import { EditorView } from 'codemirror';
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 

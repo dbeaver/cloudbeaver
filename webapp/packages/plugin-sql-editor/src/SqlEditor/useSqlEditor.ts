@@ -481,11 +481,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     showExecutionPlan: action.bound,
     executeScript: action.bound,
     switchEditing: action.bound,
-    activeSegmentMode: computed({
-      equals: isObjectsEqual,
-    }),
     dialect: computed,
-    activeSegment: computed,
     isLineScriptEmpty: computed,
     isDisabled: computed,
     value: computed,

@@ -9,7 +9,6 @@
 import React from 'react';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { DevToolsService } from '@cloudbeaver/plugin-devtools';
 import { ESqlDataSourceFeatures, SqlEditorModeService } from '@cloudbeaver/plugin-sql-editor';
 
 const SQLCodeEditorPanel = React.lazy(async () => {
@@ -21,16 +20,14 @@ const SQLCodeEditorPanel = React.lazy(async () => {
 export class SQLCodeEditorPanelService {
   constructor(
     private readonly sqlEditorModeService: SqlEditorModeService,
-    private readonly devToolsService: DevToolsService,
   ) { }
 
   registerPanel(): void | Promise<void> {
     this.sqlEditorModeService.tabsContainer.add({
-      key: 'sql-editor-new',
+      key: 'sql-editor',
       icon: '/icons/sql_script_sm.svg',
-      name: 'codemirror6',
-      isHidden: (_, props) => !this.devToolsService.isCodemirror
-        || props?.data.dataSource?.hasFeature(ESqlDataSourceFeatures.script) !== true,
+      name: 'sql_editor_script_editor',
+      isHidden: (_, props) => props?.data.dataSource?.hasFeature(ESqlDataSourceFeatures.script) !== true,
       panel: () => SQLCodeEditorPanel,
     });
   }

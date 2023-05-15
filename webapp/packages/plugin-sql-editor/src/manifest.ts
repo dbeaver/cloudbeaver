@@ -13,7 +13,6 @@ import { MenuBootstrap } from './MenuBootstrap';
 import { LocalStorageSqlDataSourceBootstrap } from './SqlDataSource/LocalStorage/LocalStorageSqlDataSourceBootstrap';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
 import { SqlDialectInfoService } from './SqlDialectInfoService';
-import { SQLCodeEditorPanelBootstrap } from './SqlEditor/SQLCodeEditorPanel/SQLCodeEditorPanelBootstrap';
 import { SqlEditorModeService } from './SqlEditorModeService';
 import { SqlEditorService } from './SqlEditorService';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService';
@@ -38,7 +37,6 @@ export const sqlEditorPluginManifest: PluginManifest = {
     SqlResultTabsService,
     SqlEditorSettingsService,
     SqlEditorModeService,
-    SQLCodeEditorPanelBootstrap,
     SqlEditorView,
     MenuBootstrap,
     SqlDataSourceService,
