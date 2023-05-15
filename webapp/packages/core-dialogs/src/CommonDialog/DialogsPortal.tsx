@@ -43,6 +43,10 @@ export const DialogsPortal = observer(function DialogsPortal() {
       }
     },
     backdropClick(e: React.MouseEvent<HTMLDivElement>) {
+      if (e.target !== e.currentTarget) {
+        return;
+      }
+
       e.preventDefault(); // prevent focus loss
       if (!this.dialog?.options?.persistent && e.currentTarget.isEqualNode(e.target as HTMLElement)) {
         this.reject();
