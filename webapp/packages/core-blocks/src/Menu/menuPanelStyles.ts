@@ -40,15 +40,15 @@ export const menuPanelStyles = css`
       z-index: 999;
     }
     MenuPanel[submenu] {
-      margin-top: -8px;
+      margin-top: -6px;
     }
     menu-box {
       composes: theme-group-element-radius theme-typography--body2 theme-elevation-z5 from global;
       min-width: 140px;
-      padding: 8px 0;
+      padding: 6px 0;
 
       & menu-box {
-        margin-top: -8px;
+        margin-top: -6px;
       }
     }
 
