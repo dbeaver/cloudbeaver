@@ -199,9 +199,7 @@ public class CBDatabase {
                 if (!schemaExist) {
                     log.info("Schema " + schemaName + " not exist, create new one");
                     String createSchemaQuery = dialectSchemaController.getCreateSchemaQuery(
-                        schemaName,
-                        dbUser,
-                        dbPassword
+                        schemaName
                     );
                     JDBCUtils.executeStatement(connection, createSchemaQuery);
                 }
