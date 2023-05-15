@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import { DialogBackdrop } from 'reakit/Dialog';
 import styled from 'reshadow';
 
@@ -23,6 +23,7 @@ import { dialogStyles } from './styles';
 export const DialogsPortal = observer(function DialogsPortal() {
   const styles = useStyles(dialogStyles);
   const commonDialogService = useService(CommonDialogService);
+  const focusedElementRef = useRef<HTMLElement | null>(null);
 
   let activeDialog: DialogInternal<any> | undefined;
 
@@ -42,6 +43,7 @@ export const DialogsPortal = observer(function DialogsPortal() {
       }
     },
     backdropClick(e: React.MouseEvent<HTMLDivElement>) {
+      e.preventDefault(); // prevent focus loss
       if (!this.dialog?.options?.persistent && e.currentTarget.isEqualNode(e.target as HTMLElement)) {
         this.reject();
       }
@@ -49,6 +51,29 @@ export const DialogsPortal = observer(function DialogsPortal() {
   }), {
     dialog: activeDialog,
   }, ['reject', 'resolve', 'backdropClick']);
+
+  useMemo(() => {
+    if (!activeDialog) {
+      return;
+    }
+
+    // capture focused element before dialog open
+    if (document.activeElement instanceof HTMLElement) {
+      focusedElementRef.current = document.activeElement;
+    }
+  }, [activeDialog]);
+
+  useLayoutEffect(() => {
+    if (!activeDialog) {
+      return;
+    }
+
+    return () => {
+      // restore focus after dialog close
+      focusedElementRef.current?.focus();
+      focusedElementRef.current = null;
+    };
+  }, [activeDialog]);
 
   return styled(styles)(
     <Loader suspense overlay>

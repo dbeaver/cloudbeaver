@@ -127,11 +127,10 @@ export function useSQLCodeEditorPanel(
 
         const nextCursor = editor.getCursor('from');
 
-        if (this.data.parser.isEndsWithDelimiter(getAbsolutePosition(cm, nextCursor))) {
-          this.data.updateParserScriptsThrottle();
-        }
-
         resetLineStateHighlight();
+
+        this.data.updateParserScriptsThrottle();
+
         if (!this.activeSuggest) {
           return;
         }
@@ -222,7 +221,7 @@ export function useSQLCodeEditorPanel(
       const [from, to, leftWordPart, word] = getWordRange(editor, cursorFrom);
 
       const cursorPosition = getAbsolutePosition(editor, cursorFrom);
-      const proposals = await editorPanelData.data.getHintProposals(cursorPosition, leftWordPart, !options.manual);
+      const proposals = await editorPanelData.data.getHintProposals(cursorPosition, !options.manual);
 
       const hasSameName = proposals.some(
         ({ displayString }) => displayString.toLocaleLowerCase() === word.toLocaleLowerCase()
@@ -276,10 +275,7 @@ export function useSQLCodeEditorPanel(
       const segment = this.data.activeSegment;
 
       if (segment) {
-        this.controller?.highlightSegment(
-          { line: segment.from, ch: segment.fromPosition },
-          { line: segment.to, ch: segment.toPosition }
-        );
+        this.controller?.highlightSegment(segment.begin, segment.end);
       }
     },
   }), {
@@ -306,10 +302,10 @@ export function useSQLCodeEditorPanel(
   useExecutor({
     executor: data.onSegmentExecute,
     handlers: [function highlightSegment(data) {
-      controller?.highlightExecutingLine(data.segment.from, data.type === 'start');
+      controller?.highlightExecutingLine(data.segment.begin, data.type === 'start');
 
       if (data.type === 'error') {
-        controller?.highlightExecutingErrorLine(data.segment.from, true);
+        controller?.highlightExecutingErrorLine(data.segment.begin, true);
       }
     }],
   });

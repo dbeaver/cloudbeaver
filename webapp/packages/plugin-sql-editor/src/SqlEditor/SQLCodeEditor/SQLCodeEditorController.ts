@@ -8,7 +8,7 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../../../../plugin-codemirror/src/codemirror.meta.d.ts" />
 
-import { Position, Editor, EditorChange, EditorConfiguration, findModeByName, ModeSpec, EditorChangeCancellable, StringStream } from 'codemirror';
+import { Editor, EditorChange, EditorConfiguration, findModeByName, ModeSpec, EditorChangeCancellable, StringStream } from 'codemirror';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/sql-hint';
 import 'codemirror/addon/search/searchcursor';
@@ -170,8 +170,8 @@ export class SQLCodeEditorController {
   }
 
   highlightSegment(clear: true): void;
-  highlightSegment(from: Position, to: Position): void;
-  highlightSegment(from: Position | true, to?: Position): void {
+  highlightSegment(from: number, to: number): void;
+  highlightSegment(from: number | true, to?: number): void {
     if (from === true) {
       const marks = this.editor?.getAllMarks();
 
@@ -186,19 +186,20 @@ export class SQLCodeEditorController {
     }
 
     this.editor?.markText(
-      from,
-      to!,
+      this.editor.posFromIndex(from),
+      this.editor.posFromIndex(to!),
       {
         className: 'active-query',
       }
     );
   }
 
-  highlightExecutingLine(line: number, state: boolean): void {
+  highlightExecutingLine(position: number, state: boolean): void {
+    const pos = this.editor?.posFromIndex(position);
     if (state) {
-      this.editor?.addLineClass(line, 'background', 'running-query');
+      this.editor?.addLineClass(pos?.line, 'background', 'running-query');
     } else {
-      this.editor?.removeLineClass(line, 'background', 'running-query');
+      this.editor?.removeLineClass(pos?.line, 'background', 'running-query');
     }
   }
 

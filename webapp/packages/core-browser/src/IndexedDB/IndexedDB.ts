@@ -6,9 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { EditorView } from '@codemirror/view';
+import IndexedDB, { Table as IndexedDBTable } from 'dexie';
 
-export interface IEditorRef {
-  container: HTMLDivElement | null;
-  view: EditorView | null;
-}
+export { IndexedDB, type IndexedDBTable };

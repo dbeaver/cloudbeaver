@@ -46,7 +46,7 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({
 }) {
   const translate = useTranslate();
   const tools = useTools(state);
-  const scriptEmpty = getComputed(() => !data.value.trim());
+  const scriptEmpty = getComputed(() => data.value.length === 0);
   const disabled = getComputed(() => data.isDisabled || data.isScriptEmpty);
   const isActiveSegmentMode = getComputed(() => data.activeSegmentMode.activeSegmentMode);
 

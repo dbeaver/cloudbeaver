@@ -15,7 +15,11 @@ import { lineNumbers, highlightSpecialChars, dropCursor, rectangularSelection, c
 import { classHighlighter } from '@lezer/highlight';
 
 // @TODO allow to configure bindings outside of the component
-const DEFAULT_KEY_MAP = defaultKeymap.filter(binding => binding.mac !== 'Ctrl-f');
+const DEFAULT_KEY_MAP = defaultKeymap
+  .filter(binding => (
+    binding.mac !== 'Ctrl-f'
+    && binding.key !== 'Mod-Enter'
+  ));
 
 DEFAULT_KEY_MAP.push(indentWithTab);
 

@@ -10,63 +10,98 @@ import { useService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 import { Completion, CompletionContext, CompletionResult, UseEditorAutocompletionResult, closeCompletion, useEditorAutocompletion } from '@cloudbeaver/plugin-codemirror6';
-import type { ISQLEditorData } from '@cloudbeaver/plugin-sql-editor';
+import type { ISQLEditorData, SQLProposal } from '@cloudbeaver/plugin-sql-editor';
 
 type SqlCompletion = Completion & {
   icon?: string;
 };
 
 const CLOSE_CHARACTERS = /[\s()[\]{};:>,=\\*]/;
+const COMPLETION_WORD = /[\w*]*/;
 
 export function useSqlDialectAutocompletion(data: ISQLEditorData): UseEditorAutocompletionResult {
   const localizationService = useService(LocalizationService);
+
+  function getOptionsFromProposals(explicit: boolean, word: string, proposals: SQLProposal[]): SqlCompletion[] {
+    const wordLowerCase = word.toLocaleLowerCase();
+    const hasSameName = proposals.some(
+      ({ replacementString }) => replacementString.toLocaleLowerCase() === wordLowerCase
+    );
+    const filteredProposals = proposals.filter(({ replacementString }) => (
+      word === '*'
+    || (
+      replacementString.toLocaleLowerCase() !== wordLowerCase
+      && replacementString.toLocaleLowerCase().startsWith(wordLowerCase)
+    )
+    ))
+      .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+
+    if (filteredProposals.length === 0 && !hasSameName && explicit) {
+      return [{
+        apply: closeCompletion,
+        label: localizationService.translate('sql_editor_hint_empty'),
+      }];
+    }
+
+    return [
+      ...filteredProposals.map<SqlCompletion>(proposal => ({
+        label: proposal.displayString,
+        apply: proposal.replacementString,
+        boost: proposal.score,
+        icon: proposal.icon,
+      })),
+    ];
+  }
 
   async function completionSource(context: CompletionContext): Promise<CompletionResult | null> {
     if (context.matchBefore(CLOSE_CHARACTERS) && !context.explicit) {
       return null;
     }
 
-    const word = context.matchBefore(/[\w*]*/);
+    const word = context.matchBefore(COMPLETION_WORD);
 
     if (word === null) {
       return null;
     }
 
     try {
-      const proposals = await data.getHintProposals(context.pos, word.text, !context.explicit);
-
-      const wordLowerCase = word.text.toLocaleLowerCase();
-      const hasSameName = proposals.some(
-        ({ displayString }) => displayString.toLocaleLowerCase() === wordLowerCase
-      );
-      const filteredProposals = proposals.filter(({ displayString }) => (
-        word.text === '*'
-      || (
-        displayString.toLocaleLowerCase() !== wordLowerCase
-        && displayString.toLocaleLowerCase().startsWith(wordLowerCase)
-      )
-      ))
-        .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+      const startPos = context.pos;
+      const proposals = await data.getHintProposals(startPos, !context.explicit);
+      const limitIsMet = data.hintsLimitIsMet;
 
       const result: CompletionResult = {
         from: word.from,
-        options: [
-          ...filteredProposals.map<SqlCompletion>(proposal => ({
-            label: proposal.displayString,
-            apply: proposal.replacementString,
-            boost: proposal.score,
-            icon: proposal.icon,
-          })),
-        ],
+        options: getOptionsFromProposals(context.explicit, word.text, proposals),
+        update(current, from, to, context) {
+          if (startPos > context.pos) {
+            return null;
+          }
+
+          if (current.options.some(option => option.apply === closeCompletion)) {
+            return null;
+          }
+
+          if (limitIsMet) {
+            return null;
+          }
+
+          if (context.matchBefore(CLOSE_CHARACTERS) && !context.explicit) {
+            return null;
+          }
+
+          const word = context.matchBefore(COMPLETION_WORD);
+
+          if (word === null) {
+            return null;
+          }
+
+          return {
+            ...current,
+            options: getOptionsFromProposals(context.explicit, word.text, proposals),
+          };
+        },
         filter: false,
       };
-
-      if (result.options.length === 0 && !hasSameName && context.explicit) {
-        result.options = [{
-          apply: closeCompletion,
-          label: localizationService.translate('sql_editor_hint_empty'),
-        }];
-      }
 
       if (result.options.length === 0) {
         return null;

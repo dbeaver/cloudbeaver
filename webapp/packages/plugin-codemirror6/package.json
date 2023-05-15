@@ -25,6 +25,7 @@
     "@codemirror/lang-xml": "^6.0.2",
     "@codemirror/state": "^6.1.1",
     "@codemirror/view": "^6.1.1",
+    "@lezer/common": "^1.0.2",
     "@lezer/highlight": "^1.1.4",
     "codemirror6": "npm:codemirror@6.0.0"
   },

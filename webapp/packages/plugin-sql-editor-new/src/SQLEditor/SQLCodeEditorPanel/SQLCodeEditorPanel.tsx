@@ -10,12 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useCombinedRef, useStyles } from '@cloudbeaver/core-blocks';
+import { useCombinedRef, useExecutor, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
-import type { IEditorRef } from '@cloudbeaver/plugin-codemirror6';
+import { IEditorRef, closeCompletion } from '@cloudbeaver/plugin-codemirror6';
 import type { ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTIVE_QUERY_EXTENSION } from '../ACTIVE_QUERY_EXTENSION';
@@ -80,11 +80,20 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
     },
   });
 
+  useExecutor({
+    executor: data.onExecute,
+    handlers: [function updateHighlight() {
+      if (editor.view) {
+        closeCompletion(editor.view);
+      }
+    }],
+  });
+
   return styled(useStyles(styles, autocompletionStyles))(
     <box ref={dndBox.setRef}>
       <SQLCodeEditorLoader
         ref={combinedRef}
-        value={data.value}
+        getValue={() => data.value}
         extensions={[ACTIVE_QUERY_EXTENSION, QUERY_STATUS_GUTTER_EXTENSION, autocompletion, sqlDialect]}
         readonly={data.readonly}
         autoFocus

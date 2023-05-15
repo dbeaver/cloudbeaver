@@ -16,7 +16,6 @@ export { json as JSON_EDITOR } from '@codemirror/lang-json';
 export { sql as SQL_EDITOR, SQLDialect } from '@codemirror/lang-sql';
 export { xml as XML_EDITOR } from '@codemirror/lang-xml';
 
-
 export const StandardSQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).StandardSQL);
 export const PostgreSQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).PostgreSQL);
 export const MySQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).MySQL);

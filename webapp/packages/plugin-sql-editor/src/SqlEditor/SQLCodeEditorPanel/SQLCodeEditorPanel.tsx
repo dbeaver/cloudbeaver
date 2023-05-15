@@ -86,8 +86,8 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
       const editor = sqlCodeEditorController?.getEditor();
       editor?.replaceRange(
         value,
-        { line: segment.from, ch: segment.fromPosition },
-        { line: segment.to, ch: segment.toPosition }
+        editor.posFromIndex(segment.begin),
+        editor.posFromIndex(segment.end),
       );
     }],
   });

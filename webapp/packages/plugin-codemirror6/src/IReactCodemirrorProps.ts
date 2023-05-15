@@ -10,7 +10,9 @@ import type { Extension } from '@codemirror/state';
 import type { ViewUpdate } from '@codemirror/view';
 
 export interface IReactCodeMirrorProps {
-  value: string;
+  /** in case of using editor in editing mode its better for performance to use getValue instead */
+  value?: string;
+  getValue?: () => string;
   extensions?: Extension[];
   readonly?: boolean;
   autoFocus?: boolean;
