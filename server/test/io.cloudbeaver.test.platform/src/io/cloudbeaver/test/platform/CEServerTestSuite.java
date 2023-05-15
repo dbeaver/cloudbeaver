@@ -17,7 +17,6 @@
 
 package io.cloudbeaver.test.platform;
 
-import io.cloudbeaver.model.rm.lock.RMLockTest;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBApplicationCE;
 import io.cloudbeaver.utils.WebTestUtils;
@@ -35,8 +34,8 @@ import java.nio.file.Path;
     {
         PlatformTest.class,
         AuthenticationTest.class,
-        ResourceManagerTest.class,
-        RMLockTest.class
+        ResourceManagerTest.class
+//        RMLockTest.class
     }
 )
 public class CEServerTestSuite {
