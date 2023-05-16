@@ -6,21 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createComplexLoader, ComplexLoader } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import type { IDataValuePanelProps, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
 
-const loader = createComplexLoader(async function loader() {
-  const { GISValuePresentation } = await import('./GISValuePresentation');
-  return { GISValuePresentation };
-});
+import { GISValuePresentation } from './GISValuePresentation';
 
 export const GISViewer: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = function GISViewer({ model, resultIndex }) {
   return (
-    <ComplexLoader loader={loader}>
-      {({ GISValuePresentation }) => (
-        <GISValuePresentation model={model} resultIndex={resultIndex} />
-      )}
-    </ComplexLoader>
+    <GISValuePresentation model={model} resultIndex={resultIndex} />
   );
 };

@@ -41,6 +41,8 @@ const styles = css`
 
   map {
     flex: 1 1 auto;
+    border-radius: var(--theme-group-element-radius);
+    overflow: hidden;
   }
 
   toolbar {
