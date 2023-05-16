@@ -17,7 +17,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { bytesToSize } from '@cloudbeaver/core-utils';
-import { EditorLoader, getDefaultExtensions } from '@cloudbeaver/plugin-codemirror6';
+import { EditorLoader } from '@cloudbeaver/plugin-codemirror6';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
@@ -176,8 +176,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
   const typeExtension = useMemo(() => getTypeExtension(state.currentContentType) ?? [], [state.currentContentType]);
 
-  const defaultExtensions = useMemo(getDefaultExtensions, []);
-
   return styled(style)(
     <container>
       <actions>
@@ -194,7 +192,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         key={readonly ? '1' : '0'}
         value={autoFormat ? formatter.format(stringValue) : stringValue}
         readonly={readonly}
-        extensions={[...defaultExtensions, typeExtension]}
+        extensions={[typeExtension]}
         onChange={value => handleChange(value)}
       />
       {valueTruncated && <QuotaPlaceholder limit={limit} size={valueSize} />}

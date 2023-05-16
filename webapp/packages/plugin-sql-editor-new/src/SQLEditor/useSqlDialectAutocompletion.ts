@@ -6,11 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { createComplexLoader, useComplexLoader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
-import { Completion, CompletionContext, CompletionResult, UseEditorAutocompletionResult, closeCompletion, useEditorAutocompletion } from '@cloudbeaver/plugin-codemirror6';
+import type { Completion, CompletionContext, CompletionResult, UseEditorAutocompletionResult } from '@cloudbeaver/plugin-codemirror6';
 import type { ISQLEditorData, SQLProposal } from '@cloudbeaver/plugin-sql-editor';
+
+const codemirrorComplexLoader = createComplexLoader(() => import('@cloudbeaver/plugin-codemirror6'));
 
 type SqlCompletion = Completion & {
   icon?: string;
@@ -20,18 +23,19 @@ const CLOSE_CHARACTERS = /[\s()[\]{};:>,=\\*]/;
 const COMPLETION_WORD = /[\w*]*/;
 
 export function useSqlDialectAutocompletion(data: ISQLEditorData): UseEditorAutocompletionResult {
+  const { closeCompletion, useEditorAutocompletion } = useComplexLoader(codemirrorComplexLoader);
   const localizationService = useService(LocalizationService);
 
   function getOptionsFromProposals(explicit: boolean, word: string, proposals: SQLProposal[]): SqlCompletion[] {
     const wordLowerCase = word.toLocaleLowerCase();
     const hasSameName = proposals.some(
-      ({ replacementString }) => replacementString.toLocaleLowerCase() === wordLowerCase
+      ({ displayString }) => displayString.toLocaleLowerCase() === wordLowerCase
     );
-    const filteredProposals = proposals.filter(({ replacementString }) => (
+    const filteredProposals = proposals.filter(({ displayString }) => (
       word === '*'
     || (
-      replacementString.toLocaleLowerCase() !== wordLowerCase
-      && replacementString.toLocaleLowerCase().startsWith(wordLowerCase)
+      displayString.toLocaleLowerCase() !== wordLowerCase
+      && displayString.toLocaleLowerCase().startsWith(wordLowerCase)
     )
     ))
       .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));

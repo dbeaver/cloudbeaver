@@ -8,11 +8,14 @@
 
 import { useMemo } from 'react';
 
-import { IComplexLoaderData, useComplexLoader } from '@cloudbeaver/core-blocks';
+import { type IComplexLoaderData, createComplexLoader, useComplexLoader } from '@cloudbeaver/core-blocks';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
-import { CassandraLoader, Extension, MSSQLLoader, MariaSQLLoader, MySQLLoader, PLSQLLoader, PostgreSQLLoader, SQLDialect, SQL_EDITOR, SQLiteLoader, StandardSQLLoader } from '@cloudbeaver/plugin-codemirror6';
+import { CassandraLoader, type Extension, MSSQLLoader, MariaSQLLoader, MySQLLoader, PLSQLLoader, PostgreSQLLoader, SQLDialect, SQLiteLoader, StandardSQLLoader } from '@cloudbeaver/plugin-codemirror6';
+
+const codemirrorComplexLoader = createComplexLoader(() => import('@cloudbeaver/plugin-codemirror6'));
 
 export function useSqlDialectExtension(dialectInfo: SqlDialectInfo | undefined): Extension {
+  const { SQLDialect, SQL_EDITOR } = useComplexLoader(codemirrorComplexLoader);
   const loader = getDialectLoader(dialectInfo?.name);
   const dialect = useComplexLoader(loader);
 

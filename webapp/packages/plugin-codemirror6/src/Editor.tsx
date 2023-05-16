@@ -7,36 +7,26 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useMemo } from 'react';
+import { forwardRef } from 'react';
 import styled from 'reshadow';
 
 import { clsx } from '@cloudbeaver/core-utils';
 
-import { getDefaultExtensions, IDefaultExtensions } from './getDefaultExtensions';
+import type { IDefaultExtensions } from './getDefaultExtensions';
 import type { IEditorProps } from './IEditorProps';
 import type { IEditorRef } from './IEditorRef';
 import { ReactCodemirror } from './ReactCodemirror';
 import { EDITOR_BASE_STYLES } from './theme';
+import { useEditorDefaultExtensions } from './useDefaultExtensions';
 
 export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(forwardRef(function Editor({
   lineNumbers,
-  extensions,
+  extensions = [],
   ...rest
 }, ref) {
-  const combinedExtensions = [];
-  const defaultExtensions = useMemo(() => {
-    if (!extensions) {
-      return getDefaultExtensions({ lineNumbers });
-    }
-
-    return [];
-  }, [!extensions, lineNumbers]);
-
-  if (!extensions) {
-    combinedExtensions.push(...defaultExtensions);
-  } else {
-    combinedExtensions.push(extensions);
-  }
+  const defaultExtensions = useEditorDefaultExtensions({ lineNumbers });
+  const combinedExtensions = [...defaultExtensions];
+  combinedExtensions.push(...extensions);
 
   return styled(EDITOR_BASE_STYLES)(
     <wrapper className={clsx('editor', rest.className)}>

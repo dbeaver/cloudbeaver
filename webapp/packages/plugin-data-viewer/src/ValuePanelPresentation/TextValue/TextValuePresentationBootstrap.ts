@@ -6,14 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
-import React from 'react';
+import React, { lazy } from 'react';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DataValuePanelService } from '../../TableViewer/ValuePanel/DataValuePanelService';
-import { TextValuePresentation } from './TextValuePresentation';
 import { TextValuePresentationService } from './TextValuePresentationService';
+
+const TextValuePresentation = lazy(async () => {
+  const { TextValuePresentation } = await import('./TextValuePresentation');
+  return { default: TextValuePresentation };
+});
 
 @injectable()
 export class TextValuePresentationBootstrap extends Bootstrap {

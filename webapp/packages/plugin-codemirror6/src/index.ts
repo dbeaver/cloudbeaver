@@ -3,7 +3,7 @@ import { createComplexLoader } from '@cloudbeaver/core-blocks';
 export * from './EditorLoader';
 export * from './IEditorProps';
 export * from './IEditorRef';
-export * from './getDefaultExtensions';
+export type { IDefaultExtensions } from './getDefaultExtensions';
 export * from './useEditorAutocompletion';
 
 export * from '@codemirror/view';

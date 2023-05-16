@@ -28,15 +28,15 @@ export interface IDefaultExtensions {
 }
 
 /** Provides the necessary extensions to establish a basic editor */
-export function getDefaultExtensions(options?: IDefaultExtensions): Extension[] {
-  const extensions: Extension[] = [
-    highlightSpecialChars(),
-    highlightSelectionMatches(),
-    syntaxHighlighting(classHighlighter),
-    bracketMatching(),
-    dropCursor(),
-    crosshairCursor(),
-    foldGutter({
+export function getDefaultExtensions(options?: IDefaultExtensions): Record<string, Extension> {
+  let extensions: Record<string, Extension> = {
+    highlightSpecialChars: highlightSpecialChars(),
+    highlightSelectionMatches: highlightSelectionMatches(),
+    syntaxHighlighting: syntaxHighlighting(classHighlighter),
+    bracketMatching: bracketMatching(),
+    dropCursor: dropCursor(),
+    crosshairCursor: crosshairCursor(),
+    foldGutter: foldGutter({
       markerDOM: (open: boolean) => {
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.setAttributeNS(null, 'viewBox', '0 0 15 8');
@@ -54,15 +54,18 @@ export function getDefaultExtensions(options?: IDefaultExtensions): Extension[] 
         return element;
       },
     }),
-    highlightActiveLineGutter(),
-    highlightActiveLine(),
-    indentOnInput(),
-    rectangularSelection(),
-    keymap.of(DEFAULT_KEY_MAP),
-  ];
+    highlightActiveLineGutter: highlightActiveLineGutter(),
+    highlightActiveLine: highlightActiveLine(),
+    indentOnInput: indentOnInput(),
+    rectangularSelection: rectangularSelection(),
+    keymap: keymap.of(DEFAULT_KEY_MAP),
+  };
 
   if (options?.lineNumbers) {
-    extensions.unshift(lineNumbers());
+    extensions = {
+      lineNumbers: lineNumbers(),
+      ...extensions,
+    };
   }
 
   return extensions;
