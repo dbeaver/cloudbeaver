@@ -6,13 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EditorView } from 'codemirror';
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
-import { Annotation, StateEffect } from '@codemirror/state';
-import type { ViewUpdate } from '@codemirror/view';
+import { Annotation, EditorState, StateEffect } from '@codemirror/state';
+import { ViewUpdate, EditorView } from '@codemirror/view';
 
 import type { IEditorRef } from './IEditorRef';
 import type { IReactCodeMirrorProps } from './IReactCodemirrorProps';
@@ -44,7 +43,9 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(forwa
   const callbackRef = useObjectRef({ onChange, onUpdate });
 
   if (readonly) {
-    ext.push(EditorView.editable.of(false));
+    // can lead to missing state updates
+    ext.push(EditorState.readOnly.of(true));
+    // ext.push(EditorView.editable.of(false));
   }
 
   if (extensions) {

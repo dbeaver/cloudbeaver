@@ -3,7 +3,7 @@ import { useLayoutEffect, useState } from 'react';
 import { css } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { clsx, isSafari } from '@cloudbeaver/core-utils';
+import { clsx } from '@cloudbeaver/core-utils';
 import { autocompletion, startCompletion } from '@codemirror/autocomplete';
 import type { Extension, EditorState } from '@codemirror/state';
 import { keymap } from '@codemirror/view';
@@ -55,11 +55,12 @@ export function useEditorAutocompletion(config?: Parameters<typeof autocompletio
       let top = 0;
       let left = 0;
 
-      if (!isSafari) {
-        const viewportOffset = element.getBoundingClientRect();
-        top = Math.floor(viewportOffset.top);
-        left = Math.floor(viewportOffset.left);
-      }
+      // if (!isSafari) {
+      // seems like it's not working on iPad OS
+      const viewportOffset = element.getBoundingClientRect();
+      top = Math.floor(viewportOffset.top);
+      left = Math.floor(viewportOffset.left);
+      // }
 
       container.style.setProperty('--cm-fix-position-top', `${-top}px`);
       container.style.setProperty('--cm-fix-position-left', `${-left}px`);
