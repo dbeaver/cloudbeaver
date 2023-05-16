@@ -10,7 +10,8 @@ import { css } from 'reshadow';
 
 export const InlineEditorStyles = css`
   input {
-    composes: theme-text-text-primary-on-light from global;
+    composes: theme-typography--body2 theme-text-text-primary-on-light from global;
+    font: inherit;
   }
 
   editor {
@@ -32,6 +33,7 @@ export const InlineEditorStyles = css`
     height: 100%;
     flex: 1;
     display: flex;
+    box-sizing: border-box;
 
     & input, & input[disabled], & input[readonly] {
       border: none;
@@ -52,6 +54,7 @@ export const InlineEditorStyles = css`
     display: flex;
     flex-direction: row;
     border: solid 1px;
+    box-sizing: border-box;
 
     &:empty {
       display: none;
@@ -69,9 +72,11 @@ export const InlineEditorStyles = css`
   editor-actions[|position=inside] {
     position: relative;
     flex: 0 0 auto;
-    bottom: auto;
+    top: 0;
     left: auto;
     border-right: none !important;
+    border-top: none;
+    border-bottom: none;
   }
 
   editor-actions[|position=bottom],

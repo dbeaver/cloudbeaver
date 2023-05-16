@@ -8,12 +8,22 @@
 
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
+import styled, { css } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag, NotificationService } from '@cloudbeaver/core-events';
 import { type NavNode, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { InlineEditor } from '@cloudbeaver/core-ui';
 
+const styles = css`
+  InlineEditor {
+    height: 22px;
+
+    & input {
+      padding: 1px;
+    }
+  }
+`;
 
 interface Props {
   node: NavNode;
@@ -49,19 +59,20 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
     EventContext.set(event, EventStopPropagationFlag);
   }
 
-  return (
+  return styled(styles)(
     <InlineEditor
       value={name}
       disabled={loading}
       controlsPosition='inside'
+      style={styles}
       simple
       autofocus
       onChange={setName}
       onSave={save}
-      onReject={onClose}
-      onBlur={onClose}
-      onClick={stopPropagation}
       onDoubleClick={stopPropagation}
+      onReject={onClose}
+      // onBlur={onClose}
+      onClick={stopPropagation}
     />
   );
 });

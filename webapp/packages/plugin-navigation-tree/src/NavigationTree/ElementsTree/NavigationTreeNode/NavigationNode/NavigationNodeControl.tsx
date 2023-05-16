@@ -41,6 +41,12 @@ const styles = css`
     max-width: 320px;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &[|editing] {
+      padding: 0;
+      overflow: visible;
+      margin-left: 2px;
+    }
   } 
   portal {
     position: relative;
@@ -118,7 +124,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
       <TreeNodeIcon {...use({ connected })}>
         <ConnectionImageWithMask icon={icon} connected={connected} maskId="tree-node-icon" />
       </TreeNodeIcon>
-      <TreeNodeName title={node.name}>
+      <TreeNodeName title={node.name} {...use({ editing })}>
         {editing ? (
           <NavigationNodeEditorLoader node={node} onClose={() => setEditing(false)} />
         ) : (

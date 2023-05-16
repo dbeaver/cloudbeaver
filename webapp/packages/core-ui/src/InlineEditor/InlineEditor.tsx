@@ -15,14 +15,14 @@ import styled, { use } from 'reshadow';
 import { Icon, IconOrImage, Loader, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { EditorDialog } from './EditorDialog';
 import { InlineEditorStyles } from './styles';
 
 export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside';
 
-export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onKeyDown' | 'autoFocus'> {
+export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onKeyDown' | 'autoFocus' | 'style'> {
   value: string;
   controlsPosition?: InlineEditorControls;
   simple?: boolean;
@@ -33,6 +33,7 @@ export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLIn
   autofocus?: boolean;
   active?: boolean;
   loading?: boolean;
+  style?: ComponentStyle;
   onChange: (value: string) => void;
   onSave?: () => void;
   onReject?: () => void;
@@ -54,6 +55,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(forwar
   active,
   loading,
   disabled,
+  style,
   onChange,
   onSave,
   onUndo,
@@ -110,8 +112,8 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(forwar
 
   useImperativeHandle(ref, () => inputRef.current!);
 
-  return styled(useStyles(InlineEditorStyles))(
-    <editor as='div' className={className} {...use({ active })} onClick={onClick} onDoubleClick={onDoubleClick}>
+  return styled(useStyles(InlineEditorStyles, style))(
+    <editor className={className} {...use({ active })} onClick={onClick} onDoubleClick={onDoubleClick}>
       <editor-container>
         <input
           ref={inputRef}
