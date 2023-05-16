@@ -22,9 +22,6 @@ import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin
 import { SqlGeneratorsResource } from './SqlGeneratorsResource';
 
 const styles = css`
-    wrapper {
-      composes: theme-typography--body1 from global;
-    }
     footer-container {
       display: flex;
       width: min-content;

@@ -25,7 +25,6 @@ const styles = css`
     overflow: auto;
   }
   SQLCodeEditorLoader {
-    composes: theme-typography--body1 from global;
     height: 100%;
     width: 100%;
   }
