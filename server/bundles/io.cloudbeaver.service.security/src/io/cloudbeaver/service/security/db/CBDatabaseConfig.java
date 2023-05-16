@@ -17,11 +17,12 @@
 package io.cloudbeaver.service.security.db;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.registry.storage.InternalDatabaseConfig;
 
 /**
  * Database configuration
  */
-public class CBDatabaseConfig {
+public class CBDatabaseConfig implements InternalDatabaseConfig {
     private String driver;
     private String url;
     private String user;
@@ -56,6 +57,7 @@ public class CBDatabaseConfig {
         }
     }
 
+    @Override
     public String getDriver() {
         return driver;
     }
@@ -64,6 +66,8 @@ public class CBDatabaseConfig {
         this.driver = driver;
     }
 
+    @Override
+    @NotNull
     public String getUrl() {
         return url;
     }
@@ -72,10 +76,12 @@ public class CBDatabaseConfig {
         this.url = url;
     }
 
+    @Override
     public String getUser() {
         return user;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
