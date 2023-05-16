@@ -1,7 +1,0 @@
-query driverProviderList {
-  driverProviders: driverProviderList {
-    id
-    name
-    icon
-  }
-}

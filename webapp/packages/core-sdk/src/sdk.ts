@@ -433,18 +433,6 @@ export interface DatabaseStructContainers {
   supportsSchemaChange: Scalars['Boolean'];
 }
 
-export interface DriverConfig {
-  defaultDatabase?: InputMaybe<Scalars['String']>;
-  defaultPort?: InputMaybe<Scalars['String']>;
-  defaultUser?: InputMaybe<Scalars['String']>;
-  description?: InputMaybe<Scalars['String']>;
-  driverClassName: Scalars['String'];
-  id?: InputMaybe<Scalars['ID']>;
-  name: Scalars['String'];
-  providerId: Scalars['ID'];
-  sampleURL?: InputMaybe<Scalars['String']>;
-}
-
 export enum DriverConfigurationType {
   Manual = 'MANUAL',
   Url = 'URL'
@@ -491,12 +479,6 @@ export interface DriverLibraryInfo {
   name: Scalars['String'];
 }
 
-export interface DriverProviderInfo {
-  icon: Scalars['String'];
-  id: Scalars['ID'];
-  name: Scalars['String'];
-}
-
 export interface LogEntry {
   message?: Maybe<Scalars['String']>;
   stackTrace?: Maybe<Scalars['String']>;
@@ -519,11 +501,8 @@ export interface Mutation {
   createConnection: ConnectionInfo;
   createConnectionFolder: ConnectionFolderInfo;
   createConnectionFromTemplate: ConnectionInfo;
-  createDriver: DriverInfo;
   deleteConnection: Scalars['Boolean'];
   deleteConnectionFolder: Scalars['Boolean'];
-  deleteDriver: Scalars['Boolean'];
-  deleteDriverLibraries: Scalars['Boolean'];
   emptyEventMutation?: Maybe<Scalars['Boolean']>;
   initConnection: ConnectionInfo;
   navDeleteNodes?: Maybe<Scalars['Int']>;
@@ -551,7 +530,6 @@ export interface Mutation {
   testNetworkHandler: NetworkEndpointInfo;
   touchSession?: Maybe<Scalars['Boolean']>;
   updateConnection: ConnectionInfo;
-  updateDriver: DriverInfo;
   updateResultsDataBatch: SqlExecuteInfo;
   updateResultsDataBatchScript: Scalars['String'];
 }
@@ -647,11 +625,6 @@ export interface MutationCreateConnectionFromTemplateArgs {
 }
 
 
-export interface MutationCreateDriverArgs {
-  config: DriverConfig;
-}
-
-
 export interface MutationDeleteConnectionArgs {
   id: Scalars['ID'];
   projectId?: InputMaybe<Scalars['ID']>;
@@ -661,17 +634,6 @@ export interface MutationDeleteConnectionArgs {
 export interface MutationDeleteConnectionFolderArgs {
   folderPath: Scalars['ID'];
   projectId?: InputMaybe<Scalars['ID']>;
-}
-
-
-export interface MutationDeleteDriverArgs {
-  id: Scalars['ID'];
-}
-
-
-export interface MutationDeleteDriverLibrariesArgs {
-  driverId: Scalars['ID'];
-  libraryIds: Array<Scalars['ID']>;
 }
 
 
@@ -837,11 +799,6 @@ export interface MutationTestNetworkHandlerArgs {
 export interface MutationUpdateConnectionArgs {
   config: ConnectionConfig;
   projectId?: InputMaybe<Scalars['ID']>;
-}
-
-
-export interface MutationUpdateDriverArgs {
-  config: DriverConfig;
 }
 
 
@@ -1055,7 +1012,6 @@ export interface Query {
   deleteUser?: Maybe<Scalars['Boolean']>;
   deleteUserMetaParameter: Scalars['Boolean'];
   driverList: Array<DriverInfo>;
-  driverProviderList: Array<DriverProviderInfo>;
   emptyEvent?: Maybe<Scalars['Boolean']>;
   enableUser?: Maybe<Scalars['Boolean']>;
   getConnectionSubjectAccess: Array<AdminConnectionGrantInfo>;
@@ -2267,11 +2223,6 @@ export type DriverListQueryVariables = Exact<{
 
 export type DriverListQuery = { drivers: Array<{ id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, custom?: boolean, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number, supportedConfigurationTypes?: Array<string> }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }>, driverLibraries?: Array<{ id: string, name: string, icon: string }> }> };
 
-export type DriverProviderListQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type DriverProviderListQuery = { driverProviders: Array<{ id: string, name: string, icon: string }> };
-
 export type ExecutionContextCreateMutationVariables = Exact<{
   projectId: Scalars['ID'];
   connectionId: Scalars['ID'];
@@ -2481,43 +2432,6 @@ export type NavGetStructContainersQueryVariables = Exact<{
 
 
 export type NavGetStructContainersQuery = { navGetStructContainers: { supportsCatalogChange: boolean, supportsSchemaChange: boolean, catalogList: Array<{ catalog: { id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }, schemaList: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> }>, schemaList: Array<{ id: string, name?: string, hasChildren?: boolean, nodeType?: string, icon?: string, folder?: boolean, inline?: boolean, navigable?: boolean, features?: Array<string>, projectId?: string, object?: { features?: Array<string> }, nodeDetails?: Array<{ id?: string, category?: string, dataType?: string, description?: string, displayName?: string, length: ObjectPropertyLength, features: Array<string>, value?: any, order: number }> }> } };
-
-export type CreateDriverMutationVariables = Exact<{
-  config: DriverConfig;
-  includeProviderProperties: Scalars['Boolean'];
-  includeDriverProperties: Scalars['Boolean'];
-  includeDriverParameters: Scalars['Boolean'];
-  includeDriverLibraries: Scalars['Boolean'];
-}>;
-
-
-export type CreateDriverMutation = { driverInfo: { id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, custom?: boolean, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number, supportedConfigurationTypes?: Array<string> }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }>, driverLibraries?: Array<{ id: string, name: string, icon: string }> } };
-
-export type DeleteDriverMutationVariables = Exact<{
-  id: Scalars['ID'];
-}>;
-
-
-export type DeleteDriverMutation = { deleteDriver: boolean };
-
-export type DeleteDriverLibrariesMutationVariables = Exact<{
-  driverId: Scalars['ID'];
-  libraryIds: Array<Scalars['ID']> | Scalars['ID'];
-}>;
-
-
-export type DeleteDriverLibrariesMutation = { deleteDriverLibraries: boolean };
-
-export type UpdateDriverMutationVariables = Exact<{
-  config: DriverConfig;
-  includeProviderProperties: Scalars['Boolean'];
-  includeDriverProperties: Scalars['Boolean'];
-  includeDriverParameters: Scalars['Boolean'];
-  includeDriverLibraries: Scalars['Boolean'];
-}>;
-
-
-export type UpdateDriverMutation = { driverInfo: { id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, custom?: boolean, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number, supportedConfigurationTypes?: Array<string> }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }>, driverLibraries?: Array<{ id: string, name: string, icon: string }> } };
 
 export type AdminObjectGrantInfoFragment = { subjectId: string, subjectType: AdminSubjectType, objectPermissions: { objectId: string, permissions: Array<string> } };
 
@@ -3872,15 +3786,6 @@ export const DriverListDocument = `
   }
 }
     ${DatabaseDriverFragmentDoc}`;
-export const DriverProviderListDocument = `
-    query driverProviderList {
-  driverProviders: driverProviderList {
-    id
-    name
-    icon
-  }
-}
-    `;
 export const ExecutionContextCreateDocument = `
     mutation executionContextCreate($projectId: ID!, $connectionId: ID!, $defaultCatalog: String, $defaultSchema: String) {
   context: sqlContextCreate(
@@ -4127,30 +4032,6 @@ export const NavGetStructContainersDocument = `
   }
 }
     ${NavNodeInfoFragmentDoc}`;
-export const CreateDriverDocument = `
-    mutation createDriver($config: DriverConfig!, $includeProviderProperties: Boolean!, $includeDriverProperties: Boolean!, $includeDriverParameters: Boolean!, $includeDriverLibraries: Boolean!) {
-  driverInfo: createDriver(config: $config) {
-    ...DatabaseDriver
-  }
-}
-    ${DatabaseDriverFragmentDoc}`;
-export const DeleteDriverDocument = `
-    mutation deleteDriver($id: ID!) {
-  deleteDriver(id: $id)
-}
-    `;
-export const DeleteDriverLibrariesDocument = `
-    mutation deleteDriverLibraries($driverId: ID!, $libraryIds: [ID!]!) {
-  deleteDriverLibraries(driverId: $driverId, libraryIds: $libraryIds)
-}
-    `;
-export const UpdateDriverDocument = `
-    mutation updateDriver($config: DriverConfig!, $includeProviderProperties: Boolean!, $includeDriverProperties: Boolean!, $includeDriverParameters: Boolean!, $includeDriverLibraries: Boolean!) {
-  driverInfo: updateDriver(config: $config) {
-    ...DatabaseDriver
-  }
-}
-    ${DatabaseDriverFragmentDoc}`;
 export const GetAsyncTaskInfoDocument = `
     mutation getAsyncTaskInfo($taskId: String!, $removeOnFinish: Boolean!) {
   taskInfo: asyncTaskInfo(id: $taskId, removeOnFinish: $removeOnFinish) {
@@ -4966,9 +4847,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     driverList(variables: DriverListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DriverListQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<DriverListQuery>(DriverListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'driverList', 'query');
     },
-    driverProviderList(variables?: DriverProviderListQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DriverProviderListQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DriverProviderListQuery>(DriverProviderListDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'driverProviderList', 'query');
-    },
     executionContextCreate(variables: ExecutionContextCreateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExecutionContextCreateMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<ExecutionContextCreateMutation>(ExecutionContextCreateDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'executionContextCreate', 'mutation');
     },
@@ -5028,18 +4906,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     navGetStructContainers(variables: NavGetStructContainersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<NavGetStructContainersQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<NavGetStructContainersQuery>(NavGetStructContainersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'navGetStructContainers', 'query');
-    },
-    createDriver(variables: CreateDriverMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<CreateDriverMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateDriverMutation>(CreateDriverDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createDriver', 'mutation');
-    },
-    deleteDriver(variables: DeleteDriverMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteDriverMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteDriverMutation>(DeleteDriverDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteDriver', 'mutation');
-    },
-    deleteDriverLibraries(variables: DeleteDriverLibrariesMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DeleteDriverLibrariesMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DeleteDriverLibrariesMutation>(DeleteDriverLibrariesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'deleteDriverLibraries', 'mutation');
-    },
-    updateDriver(variables: UpdateDriverMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateDriverMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateDriverMutation>(UpdateDriverDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateDriver', 'mutation');
     },
     getAsyncTaskInfo(variables: GetAsyncTaskInfoMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAsyncTaskInfoMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetAsyncTaskInfoMutation>(GetAsyncTaskInfoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAsyncTaskInfo', 'mutation');
