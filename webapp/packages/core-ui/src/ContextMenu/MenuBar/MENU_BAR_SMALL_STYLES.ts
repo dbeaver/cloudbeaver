@@ -11,6 +11,19 @@ import { css } from 'reshadow';
 export const MENU_BAR_SMALL_STYLES = css`
     menu-bar-item {
       padding: 0 12px;
+
+      & menu-bar-item-icon {
+        display: flex;
+        width: 16px;
+      }
+
+      & menu-bar-item-label {
+        font-size: 12px;
+      }
+
+      & Loader, & IconOrImage {
+        width: 16px;
+      }
     }
     menu-bar {
       height: 32px;

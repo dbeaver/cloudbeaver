@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
-import { MENU_BAR_DEFAULT_STYLES, MenuBar } from '@cloudbeaver/core-ui';
+import { MENU_BAR_DEFAULT_STYLES, MENU_BAR_SMALL_STYLES, MenuBar } from '@cloudbeaver/core-ui';
 import { IDataContext, useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_DV_DDM } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
@@ -33,14 +33,8 @@ const menuStyles = css`
     height: 100%;
   }
   menu-bar-item {
-    padding: 0 8px;
-
-    & menu-bar-item-icon {
-      width: 16px;
-    }
     & menu-bar-item-label {
       font-weight: 700;
-      font-size: 12px;
     }
   }
 `;
@@ -72,7 +66,7 @@ export const TableFooterMenu = observer<Props>(function TableFooterMenu({
       {mainMenuService.constructMenuWithContext(model, resultIndex, simple).map((topItem, i) => (
         <TableFooterMenuItem key={i} menuItem={topItem} />
       ))}
-      <MenuBar menu={menu} style={[MENU_BAR_DEFAULT_STYLES, menuStyles]} />
+      <MenuBar menu={menu} style={[MENU_BAR_DEFAULT_STYLES, MENU_BAR_SMALL_STYLES, menuStyles]} />
     </menu-wrapper>
   );
 });
