@@ -239,12 +239,6 @@ type DriverInfo {
     driverLibraries: [DriverLibraryInfo!]!
 }
 
-type DriverProviderInfo {
-    id: ID!
-    name: String!
-    icon: String!
-}
-
 type DriverLibraryInfo {
     id: ID!
     name: String!
@@ -514,7 +508,6 @@ extend type Query {
 
     # Get driver info
     driverList( id: ID ): [ DriverInfo! ]!
-    driverProviderList: [ DriverProviderInfo! ]
     authModels: [DatabaseAuthModel!]!
     networkHandlers: [NetworkHandlerDescriptor!]!
 

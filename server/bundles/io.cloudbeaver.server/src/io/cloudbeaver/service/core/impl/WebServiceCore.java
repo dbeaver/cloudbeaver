@@ -93,13 +93,6 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<WebDataSourceProviderInfo> getDriverProviderList(@NotNull WebSession webSession) throws DBWebException {
-        return DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders().stream()
-            .map(WebDataSourceProviderInfo::new)
-            .collect(Collectors.toList());
-    }
-
-    @Override
     public List<WebDatabaseAuthModel> getAuthModels(@NotNull WebSession webSession) {
         return DataSourceProviderRegistry.getInstance().getAllAuthModels().stream()
             .map(am -> new WebDatabaseAuthModel(webSession, am)).collect(Collectors.toList());
