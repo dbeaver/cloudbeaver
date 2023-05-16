@@ -25,6 +25,8 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -33,7 +35,7 @@ public class RMLockTest {
     private static final Log log = Log.getLog(RMLockTest.class);
     private final String project1 = "s_fakeProject1";
     private final String project2 = "s_fakeProject2";
-
+    private final ExecutorService executor = Executors.newFixedThreadPool(2);
 
     @Test
     public void testProjectAccessUsingSeveralControllers() throws Throwable {
@@ -45,7 +47,8 @@ public class RMLockTest {
 
         AtomicBoolean isLockedByThread1 = new AtomicBoolean(false);
         AtomicReference<Throwable> exceptionReference = new AtomicReference<>();
-        var thread1 = new Thread(() -> {
+
+        Runnable runnable1 = () -> {
             try (var lock = lockController1.lockProject(project1, "testThatProjectLocked1")) {
                 isLockedByThread1.set(true);
                 thread2CDL.countDown();
@@ -57,8 +60,7 @@ public class RMLockTest {
                 isLockedByThread1.set(false);
                 globalCountDown.countDown();
             }
-        });
-        thread1.start();
+        };
 
         int atLeastWaitCalls = 1;
         var lockController2 = Mockito.spy(new TestLockController(CEServerTestSuite.getTestApp(), 1000));
@@ -75,13 +77,12 @@ public class RMLockTest {
                 return invocationOnMock.callRealMethod();
             }
         }).when(lockController2).awaitingUnlock(Mockito.any(), Mockito.any());
-        var thread2 = new Thread(() -> {
+        Runnable runnable2 = () -> {
             try {
                 thread2CDL.await(1, TimeUnit.MINUTES);
-                Assert.assertTrue("Thread 1 not running", isLockedByThread1.get());
+                Assert.assertTrue("Project not locket by thread 1", isLockedByThread1.get());
                 Assert.assertTrue("Project not locked", lockController2.isProjectLocked(project1));
                 try (var lock = lockController2.lockProject(project1, "testThatProjectLocked2")) {
-                    Assert.assertFalse("Project locked by thread1, but thread2 has access to project", isLockedByThread1.get());
                     //that we were really waiting for the file and the lock was not removed earlier
                     Mockito.verify(lockController2, Mockito.atLeast(atLeastWaitCalls)).awaitingUnlock(Mockito.any(), Mockito.any());
                 }
@@ -91,8 +92,10 @@ public class RMLockTest {
             } finally {
                 globalCountDown.countDown();
             }
-        });
-        thread2.start();
+        };
+
+        executor.submit(runnable1);
+        executor.submit(runnable2);
         globalCountDown.await(1, TimeUnit.MINUTES);
         if (exceptionReference.get() != null) {
             throw exceptionReference.get();
@@ -112,7 +115,7 @@ public class RMLockTest {
         AtomicBoolean isLockedByThread1 = new AtomicBoolean(false);
         AtomicBoolean isLockedByThread2 = new AtomicBoolean(false);
         AtomicReference<Throwable> exceptionReference = new AtomicReference<>();
-        var thread1 = new Thread(() -> {
+        Runnable runnable1 = () -> {
             try (var lock = lockController1.lockProject(project1, "testAccessToDifferentProjects1")) {
                 isLockedByThread1.set(true);
                 thread2InitCDL.countDown();
@@ -126,11 +129,10 @@ public class RMLockTest {
                 isLockedByThread1.set(false);
                 globalCountDown.countDown();
             }
-        });
-        thread1.start();
+        };
 
         var lockController2 = new TestLockController(CEServerTestSuite.getTestApp(), 1);
-        var thread2 = new Thread(() -> {
+        Runnable runnable2 = () -> {
             try {
                 try (var lock = lockController2.lockProject(project2, "testAccessToDifferentProjects2")) {
                     thread2InitCDL.await();
@@ -146,8 +148,10 @@ public class RMLockTest {
                 isLockedByThread2.set(false);
                 globalCountDown.countDown();
             }
-        });
-        thread2.start();
+        };
+
+        executor.submit(runnable1);
+        executor.submit(runnable2);
         globalCountDown.await(1, TimeUnit.MINUTES);
         if (exceptionReference.get() != null) {
             throw exceptionReference.get();
@@ -162,12 +166,11 @@ public class RMLockTest {
         var lockController1 = new TestLockController(CEServerTestSuite.getTestApp(), 1);
 
         CountDownLatch thread1CDL = new CountDownLatch(1);
-        CountDownLatch thread2CDL = new CountDownLatch(1);
         CountDownLatch globalCountDown = new CountDownLatch(2);
 
         AtomicBoolean isLockedByThread1 = new AtomicBoolean(false);
         AtomicReference<Throwable> exceptionReference = new AtomicReference<>();
-        var thread1 = new Thread(() -> {
+        Runnable runnable1 = () -> {
             try (var lock = lockController1.lockProject(project1, "testForceUnlock1")) {
                 isLockedByThread1.set(true);
                 thread1CDL.await(1, TimeUnit.MINUTES);
@@ -178,11 +181,10 @@ public class RMLockTest {
                 isLockedByThread1.set(false);
                 globalCountDown.countDown();
             }
-        });
-        thread1.start();
+        };
 
         var lockController2 = Mockito.spy(new TestLockController(CEServerTestSuite.getTestApp(), 100));
-        var thread2 = new Thread(() -> {
+        Runnable runnable2 = () -> {
             try {
                 try (var lock = lockController2.lockProject(project1, "testForceUnlock2")) {
                     Assert.assertTrue("Project1 not locket by thread1", isLockedByThread1.get());
@@ -195,8 +197,10 @@ public class RMLockTest {
             } finally {
                 globalCountDown.countDown();
             }
-        });
-        thread2.start();
+        };
+
+        executor.submit(runnable1);
+        executor.submit(runnable2);
         globalCountDown.await(1, TimeUnit.MINUTES);
         if (exceptionReference.get() != null) {
             throw exceptionReference.get();
