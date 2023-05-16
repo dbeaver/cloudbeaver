@@ -151,12 +151,6 @@ public class CBPlatform extends BasePlatformImpl {
 
         super.initialize();
 
-        if (DBWorkbench.isDistributed()) {
-            DataSourceProviderRegistry.getInstance().linkDriverFiles(
-                Path.of(application.getDriversLocation()).getParent()
-            );
-        }
-
         refreshApplicableDrivers();
 
         new WebSessionMonitorJob(this)
@@ -298,7 +292,7 @@ public class CBPlatform extends BasePlatformImpl {
                     }
                     boolean hasAllFiles = true, hasJars = false;
                     for (DBPDriverLibrary lib : libraries) {
-                        if (!lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
+                        if (!DBWorkbench.isDistributed() && !lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
                             (lib.getLocalFile() == null || !Files.exists(lib.getLocalFile())))
                         {
                             hasAllFiles = false;

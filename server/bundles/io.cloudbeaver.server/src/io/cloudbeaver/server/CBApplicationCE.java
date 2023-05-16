@@ -77,7 +77,7 @@ public class CBApplicationCE extends CBApplication {
     @NotNull
     @Override
     public DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider) {
-        return new LocalFileController(DBWorkbench.getPlatform().getWorkspace().getMetadataFolder().resolve(BasePlatformImpl.FILES_FOLDER));
+        return new LocalFileController(DBWorkbench.getPlatform().getWorkspace().getAbsolutePath().resolve(DBFileController.DATA_FOLDER));
     }
 
     protected void shutdown() {
