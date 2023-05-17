@@ -32,7 +32,7 @@ export const TREE_NODE_STYLES = css`
 
       & TreeNodeControl {
         box-sizing: border-box;
-        height: 24px;
+        height: 22px;
         display: flex;
         align-items: center;
         padding: 2px 0 2px 0;

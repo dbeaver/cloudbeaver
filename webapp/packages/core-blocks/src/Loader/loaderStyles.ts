@@ -23,6 +23,7 @@ export const loaderStyles = css`
     }
 
     & StaticImage {
+      height: 100%;
       width: 100%;
       display: none;
     }
@@ -78,23 +79,6 @@ export const loaderStyles = css`
     padding-top: 42px;
   }
 
-  loader[|small] {
-    & icon {
-      width: 16px;
-      height: 16px;
-    }
-    & message {
-      display: none;
-    }
-  }
-
-  loader[|fullSize] {
-    & icon {
-      width: 100%;
-      height: 100%;
-    }
-  }
-
   loader[|inline] {
     height: 38px;
     flex-direction: row;
@@ -111,6 +95,25 @@ export const loaderStyles = css`
     }
     & actions {
       padding: 0;
+    }
+  }
+
+  loader[|small] {
+    & icon {
+      width: 16px;
+      height: 16px;
+    }
+    & message {
+      display: none;
+    }
+  }
+
+  loader[|fullSize] {
+    height: 100%;
+
+    & icon {
+      width: 100%;
+      height: 100%;
     }
   }
 

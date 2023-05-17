@@ -16,7 +16,8 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "~0.1.0"
+    "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-browser": "~0.1.0"
   },
   "peerDependencies": {
     "mobx": "~6.x.x"

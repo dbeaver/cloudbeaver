@@ -11,6 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { download, generateFileName } from '@cloudbeaver/core-utils';
 import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
 import { ACTION_SQL_EDITOR_OPEN, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from './DATA_CONTEXT_DDL_VIEWER_NODE';
@@ -82,6 +83,7 @@ export class DDLViewerFooterService {
 
             await this.sqlEditorNavigatorService.openNewEditor({
               name,
+              dataSourceKey: LocalStorageSqlDataSource.key,
               connectionKey: connection && createConnectionParam(connection),
               catalogId: container.catalogId,
               schemaId: container.schemaId,

@@ -6,14 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { RangeSet, StateEffect, StateField } from '@codemirror/state';
-import { EditorView, gutter, GutterMarker } from '@codemirror/view';
+import { GutterMarker, StateEffect, StateField, RangeSet, type EditorView, gutter } from '@cloudbeaver/plugin-codemirror6';
 
 type QueryGutterEffectType = 'run' | 'error';
 
+const QUERY_STATUS_SIZE_MARKER = new class extends GutterMarker { };
+
 const RUN_QUERY_MARKER = new class extends GutterMarker {
   toDOM(): Node {
-    const span = document.createElement('span');
+    const span = document.createElement('div');
     span.className = 'running-query-line';
     return span;
   }
@@ -21,7 +22,7 @@ const RUN_QUERY_MARKER = new class extends GutterMarker {
 
 const ERROR_QUERY_MARKER = new class extends GutterMarker {
   toDOM(): Node {
-    const span = document.createElement('span');
+    const span = document.createElement('div');
     span.className = 'running-query-error-line';
     return span;
   }
@@ -72,6 +73,6 @@ export const QUERY_STATUS_GUTTER_EXTENSION = [
   gutter({
     class: 'query-status',
     markers: view => view.state.field(gutterExtension),
-    initialSpacer: () => RUN_QUERY_MARKER,
+    initialSpacer: () => QUERY_STATUS_SIZE_MARKER,
   }),
 ];

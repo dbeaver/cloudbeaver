@@ -8,6 +8,8 @@
 
 @import "@cloudbeaver/core-theming/src/styles/theme-light";
 @import "base-code-editor";
+@import "base-code-editor-autocompletion";
+@import "base-code-editor-tooltip";
 
 $meta: #ff1717;
 $keyword: #07a;
@@ -35,4 +37,6 @@ $active-query: $color-positive;
 
 :global .#{$theme-class} {
   @include base-code-editor;
+  @include base-code-editor-autocompletion;
+  @include base-code-editor-tooltip;
 }

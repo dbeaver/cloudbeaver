@@ -233,6 +233,14 @@
         }
       }
     ],
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          "@cloudbeaver/*/src/*"
+        ]
+      }
+    ],
     "react/destructuring-assignment": "off",
     "react/require-render-return": "off",
     "react/no-string-refs": "off",

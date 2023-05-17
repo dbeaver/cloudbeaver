@@ -8,6 +8,7 @@
 
 import { entries, IReactionDisposer, keys, observable, ObservableMap, reaction, remove, runInAction, set, toJS } from 'mobx';
 
+import { IndexedDB, IndexedDBService, IndexedDBTable } from '@cloudbeaver/core-browser';
 import { injectable } from '@cloudbeaver/core-di';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
@@ -17,15 +18,10 @@ interface ILocalStorageElement<T extends Record<any, any> | Map<any, any>> {
   defaultValue: () => T;
   remap?: (savedStore: T) => T;
   onUpdate?: () => void;
-  readState: (reset: boolean) => void;
-  saveState: () => void;
-  setStorage(storage: Storage): void;
-
-  subscribe(): void;
-  unsubscribe(): void;
+  setStorage(storage: Storage | LocalStorageIndexedDB): void;
 }
 
-export type LocalStorageType = 'local' | 'session';
+export type LocalStorageType = 'local' | 'session' | 'indexed';
 
 interface IMessage {
   type: 'init' | 'respond';
@@ -42,12 +38,17 @@ export class LocalStorageSaveService {
   private readonly broadcastChannel: BroadcastChannel;
   private readonly storages: Map<string, ILocalStorageElement<any>>;
   private storageType: LocalStorageType;
+  private readonly indexedDBStore: LocalStorageIndexedDB;
 
-  constructor() {
+  constructor(
+    private readonly indexedDBService: IndexedDBService,
+  ) {
     this.storageType = 'local';
     this.broadcastChannel = new BroadcastChannel('local-storage');
     this.storages = new Map();
     this.onStorageChange = new SyncExecutor();
+    this.indexedDBStore = new LocalStorageIndexedDB();
+    this.indexedDBService.register(this.indexedDBStore);
 
     // this.broadcastChannel.addEventListener('message', event => {
     //   const message: IMessage = event.data;
@@ -91,14 +92,15 @@ export class LocalStorageSaveService {
     store: T,
     defaultValue: () => T extends any ? T : never,
     remap?: (savedStore: T) => T,
-    onUpdate?: () => void
+    onUpdate?: () => void,
+    storageType?: LocalStorageType
   ): void {
     if (this.storages.has(storeId)) {
       return;
     }
 
     this.storages.set(storeId, new DataStorage(
-      this.getStorage(),
+      this.getStorage(storageType),
       storeId,
       store,
       defaultValue,
@@ -127,15 +129,59 @@ export class LocalStorageSaveService {
     this.onStorageChange.execute(this.storageType);
   }
 
-  private getStorage(): Storage {
-    if (this.storageType === 'local') {
-      return localStorage;
+  private getStorage(storageType?: LocalStorageType): Storage | LocalStorageIndexedDB {
+    const type = storageType ?? this.storageType;
+
+    switch (type) {
+      case 'local':
+        return localStorage;
+      case 'indexed':
+        return this.indexedDBStore;
+      default:
+        return sessionStorage;
     }
-    return sessionStorage;
   }
 
   private sendMessage(message: IMessage) {
     this.broadcastChannel.postMessage(message);
+  }
+}
+
+interface ILocalStorageIndexedRecord {
+  key: string;
+  data: Map<any, any> | Record<any, any> | string;
+}
+
+class LocalStorageIndexedDB extends IndexedDB {
+  values!: IndexedDBTable<ILocalStorageIndexedRecord>;
+
+  constructor() {
+    super('local-storage');
+    this.version(1).stores({
+      values: 'key',
+    });
+  }
+
+  count(): Promise<number> {
+    return this.values.count();
+  }
+
+  async clear(): Promise<void> {
+    await this.values.clear();
+  }
+
+  async getItem(key: string): Promise<unknown | null> {
+    const record = await this.values.get(key);
+
+    return record?.data ?? null;
+  }
+
+  async removeItem(key: string): Promise<void> {
+    await this.values.delete(key);
+  }
+
+  async setItem(key: string, data: any): Promise<void> {
+    await this.values.put({ key, data });
   }
 }
 
@@ -144,7 +190,7 @@ class DataStorage<T extends Record<any, any> | Map<any, any>> implements ILocalS
   private mobxSub: IReactionDisposer | undefined;
 
   constructor(
-    private storage: Storage,
+    private storage: Storage | LocalStorageIndexedDB,
     readonly storeId: string,
     readonly store: T,
     readonly defaultValue: () => T,
@@ -153,69 +199,83 @@ class DataStorage<T extends Record<any, any> | Map<any, any>> implements ILocalS
   ) {
     this.firstRun = true;
     this.mobxSub = undefined;
+
     this.subscribe();
   }
 
-  setStorage(storage: Storage): void {
+  setStorage(storage: Storage | LocalStorageIndexedDB): void {
     this.storage = storage;
     this.firstRun = true;
-    this.saveState();
+    this.saveState(toJS(this.store), this.firstRun);
   }
 
-  readState(reset: boolean) {
+  private async readState(reset: boolean) {
     try {
-      this.unsubscribe();
-      const state = this.storage.getItem(this.storeId);
+      const state = await this.storage.getItem(this.storeId);
 
       let nextState: T;
 
       if (state && !reset) {
-        nextState = this.parseData(this.store, state, this.remap);
+        nextState = this.deserializeData(this.store, state, this.remap);
       } else {
         nextState = toJS(this.defaultValue());
       }
 
-      const parsed = observable(nextState);
+      const parsed = observable(nextState, undefined, { deep: true });
       const oldKeys = keys(this.store);
       const newKeys = keys(parsed);
 
-      runInAction(() => {
-        for (const oldKey of oldKeys) {
-          if (!newKeys.includes(oldKey)) {
-            remove(this.store, oldKey as any);
+      this.unsubscribe();
+      try {
+        runInAction(() => {
+          for (const oldKey of oldKeys) {
+            if (!newKeys.includes(oldKey)) {
+              remove(this.store, oldKey as any);
+            }
           }
-        }
 
-        for (const [key, value] of entries(parsed)) {
-          set<T>(this.store, key, value);
-        }
-      });
+          for (const [key, value] of entries(parsed)) {
+            set<T>(this.store, key, value);
+          }
+        });
+      } finally {
+        this.subscribe();
+      }
 
       this.onUpdate?.();
     } catch (e: any) {
-      console.log('Error when parsing local storage value', e);
-    } finally {
-      this.subscribe();
+      console.error('Error when parsing local storage value', e);
     }
   }
 
-  saveState(): void {
-    if (this.firstRun) {
-      this.readState(false);
+  private async saveState(store: T, firstRun: boolean): Promise<void> {
+    if (firstRun) {
+      await this.readState(false);
       this.firstRun = false;
+      return;
     }
-
-    this.storage.setItem(
-      this.storeId,
-      this.stringifyData(this.store)
-    );
+    try {
+      if (this.storage instanceof LocalStorageIndexedDB) {
+        await this.storage.setItem(
+          this.storeId,
+          this.serializeData(store)
+        );
+      } else {
+        this.storage.setItem(
+          this.storeId,
+          this.serializeData(store)
+        );
+      }
+    } catch (e: any) {
+      console.error('Error when saving local storage value', e);
+    }
   }
 
-  subscribe() {
+  private subscribe() {
     this.unsubscribe();
     this.mobxSub = reaction(
-      () => toJS(this.store),
-      () => this.saveState(),
+      () => [toJS(this.store), this.firstRun] as const,
+      ([store, firstRun]) => this.saveState(store, firstRun),
       {
         fireImmediately: true,
         delay: 500,
@@ -223,15 +283,15 @@ class DataStorage<T extends Record<any, any> | Map<any, any>> implements ILocalS
     );
   }
 
-  unsubscribe() {
+  private unsubscribe() {
     this.mobxSub?.();
     this.mobxSub = undefined;
   }
 
-  private parseData(store: any, data: any, remap?: (savedStore: any) => any): any {
+  private deserializeData(store: any, data: any, remap?: (savedStore: any) => any): any {
     if (store instanceof ObservableMap) {
       data = this.parseMap(data);
-    } else {
+    } else if (typeof data === 'string') {
       data = JSON.parse(data);
     }
 
@@ -252,19 +312,27 @@ class DataStorage<T extends Record<any, any> | Map<any, any>> implements ILocalS
     return data;
   }
 
-  private stringifyData(store: any): string {
-    if (store instanceof ObservableMap) {
-      return this.stringifyMap(toJS(store));
+  private serializeData(store: any): any {
+    if (this.storage instanceof LocalStorageIndexedDB) {
+      return store;
     }
 
-    return JSON.stringify(toJS(store));
+    if (store instanceof Map) {
+      return this.stringifyMap(store);
+    }
+
+    return JSON.stringify(store);
   }
 
   private stringifyMap(map: Map<any, any>): string {
     return JSON.stringify(Array.from(map.entries()));
   }
 
-  private parseMap(data: string): Map<any, any> {
-    return new Map(JSON.parse(data));
+  private parseMap(data: string | Map<any, any>): Map<any, any> {
+    if (typeof data === 'string') {
+      return new Map(JSON.parse(data));
+    }
+
+    return data;
   }
 }

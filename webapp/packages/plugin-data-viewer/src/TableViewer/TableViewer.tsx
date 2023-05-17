@@ -58,7 +58,7 @@ const viewerStyles = css`
       flex-direction: column;
       overflow: hidden;
     }
-    Split {
+    Split:not([disable]) {
       gap: 8px;
     }
     Pane {

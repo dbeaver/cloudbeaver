@@ -8,15 +8,16 @@
 
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Textarea, useObservableRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Button, useObservableRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { bytesToSize } from '@cloudbeaver/core-utils';
-import { EditorLoader, getDefaultExtensions } from '@cloudbeaver/plugin-codemirror6';
+import { EditorLoader } from '@cloudbeaver/plugin-codemirror6';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
@@ -39,7 +40,7 @@ const styles = css`
   }
   container {
     display: flex;
-    gap: 16px;
+    gap: 8px;
     flex-direction: column;
     overflow: auto;
     flex: 1;
@@ -51,9 +52,6 @@ const styles = css`
   }
   EditorLoader {
     border-radius: var(--theme-group-element-radius);
-  }
-  Textarea {
-    flex: 1;
   }
   EditorLoader {
     flex: 1;
@@ -71,12 +69,6 @@ const styles = css`
         border-bottom: 0 !important;
       }
     }
-  }
-`;
-
-const textAreaStyles = css`
-  container > Textarea > textarea {
-    border-radius: var(--theme-form-element-radius) !important;
   }
 `;
 
@@ -180,12 +172,11 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     }
   }
 
-  const useCodeEditor = state.currentContentType !== 'text/plain';
   const autoFormat = !!firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
   const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
-  const typeExtension = getTypeExtension(state.currentContentType);
+  const typeExtension = useMemo(() => getTypeExtension(state.currentContentType) ?? [], [state.currentContentType]);
 
-  return styled(style, textAreaStyles)(
+  return styled(style)(
     <container>
       <actions>
         <TabsState
@@ -197,25 +188,13 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
         </TabsState>
       </actions>
-      {useCodeEditor ? (
-        <EditorLoader
-          key={readonly ? '1' : '0'}
-          value={autoFormat ? formatter.format(stringValue) : stringValue}
-          readonly={readonly}
-          extensions={typeExtension ? [getDefaultExtensions(), typeExtension] : undefined}
-          onChange={value => handleChange(value)}
-        />
-      ) : (
-        <Textarea
-          name="value"
-          rows={3}
-          value={stringValue}
-          readOnly={readonly}
-          style={textAreaStyles}
-          embedded
-          onChange={handleChange}
-        />
-      )}
+      <EditorLoader
+        key={readonly ? '1' : '0'}
+        value={autoFormat ? formatter.format(stringValue) : stringValue}
+        readonly={readonly}
+        extensions={[typeExtension]}
+        onChange={value => handleChange(value)}
+      />
       {valueTruncated && <QuotaPlaceholder limit={limit} size={valueSize} />}
       {canSave && (
         <tools-container>

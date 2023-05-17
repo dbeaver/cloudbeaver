@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 
@@ -38,15 +38,14 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
     ];
   }
 
-  private readonly state: ILocalStorageSqlDataSourceState;
+  private state!: ILocalStorageSqlDataSourceState;
 
   constructor(state: ILocalStorageSqlDataSourceState) {
     super();
-    this.state = state;
-    this.outdated = false;
-    this.history.restore(state.history);
+    this.bindState(state);
 
-    makeObservable(this, {
+    makeObservable<this, 'state'>(this, {
+      state: observable.ref,
       script: computed,
       executionContext: computed,
     });
@@ -77,5 +76,11 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
     this.state.executionContext = executionContext;
     super.setExecutionContext(executionContext);
+  }
+
+  bindState(state: ILocalStorageSqlDataSourceState): void {
+    this.state = state;
+    this.outdated = false;
+    this.history.restore(state.history);
   }
 }

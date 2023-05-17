@@ -47,7 +47,7 @@ const styles = css`
       display: none;
     }
     TabPanel {
-      padding: 16px;
+      padding-top: 8px;
     }
     TabList, TabPanel {
       composes: theme-background-secondary theme-text-on-secondary from global;

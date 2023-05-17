@@ -131,7 +131,7 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
         <MenuItemElement
           label={item.label}
           icon={IconComponent ? styled(styles)(
-            <Loader suspense small inline fullSize>
+            <Loader suspense inline fullSize>
               <IconComponent
                 item={item}
                 style={joinStyles(menuPanelStyles, style)}

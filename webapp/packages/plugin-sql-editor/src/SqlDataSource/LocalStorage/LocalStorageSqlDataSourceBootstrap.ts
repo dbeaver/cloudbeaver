@@ -32,7 +32,7 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
 
     makeObservable<this, 'dataSourceStateState' | 'createState'>(this, {
       createState: action,
-      dataSourceStateState: observable,
+      dataSourceStateState: observable.deep,
     });
 
     localStorageSaveService.withAutoSave(
@@ -40,9 +40,10 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
       this.dataSourceStateState,
       () => new Map(),
       map => {
-        for (const [key, value] of Array.from(map.entries())) {
-          if (
-            typeof value.script !== 'string'
+        try {
+          for (const [key, value] of Array.from(map.entries())) {
+            if (
+              typeof value.script !== 'string'
             || !['string', 'undefined', 'object'].includes(typeof value.name)
             || !['undefined', 'object'].includes(typeof value.executionContext)
             || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.connectionId)
@@ -50,12 +51,18 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
             || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultCatalog)
             || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultSchema)
             || !validateSqlDataSourceHistoryState(value.history)
-          ) {
-            map.delete(key);
+            ) {
+              map.delete(key);
+            }
           }
+        } catch (e) {
+          map.clear();
+          console.log(e);
         }
         return map;
-      }
+      },
+      this.bindState.bind(this), // we use indexed db, so we don't need to bind state on load
+      'indexed'
     );
   }
 
@@ -90,6 +97,14 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
     }
 
     return state;
+  }
+
+  private bindState(): void {
+    for (const [editorId, datasource] of this.sqlDataSourceService.dataSources) {
+      if (datasource instanceof LocalStorageSqlDataSource) {
+        datasource.bindState(this.createState(editorId));
+      }
+    }
   }
 
   private deleteState(editorId: string): void {

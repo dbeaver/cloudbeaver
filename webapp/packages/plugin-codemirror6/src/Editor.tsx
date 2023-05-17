@@ -12,24 +12,25 @@ import styled from 'reshadow';
 
 import { clsx } from '@cloudbeaver/core-utils';
 
-import { getDefaultExtensions } from './getDefaultExtensions';
+import type { IDefaultExtensions } from './getDefaultExtensions';
 import type { IEditorProps } from './IEditorProps';
 import type { IEditorRef } from './IEditorRef';
 import { ReactCodemirror } from './ReactCodemirror';
 import { EDITOR_BASE_STYLES } from './theme';
+import { useEditorDefaultExtensions } from './useDefaultExtensions';
 
-export const Editor = observer(forwardRef<IEditorRef, IEditorProps>(function Editor(props, ref) {
-  const extensions = [];
-
-  if (!props.extensions) {
-    extensions.push(getDefaultExtensions());
-  } else {
-    extensions.push(props.extensions);
-  }
+export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(forwardRef(function Editor({
+  lineNumbers,
+  extensions = [],
+  ...rest
+}, ref) {
+  const defaultExtensions = useEditorDefaultExtensions({ lineNumbers });
+  const combinedExtensions = [...defaultExtensions];
+  combinedExtensions.push(...extensions);
 
   return styled(EDITOR_BASE_STYLES)(
-    <wrapper className={clsx('editor', props.className)}>
-      <ReactCodemirror {...props} ref={ref} extensions={extensions} />
+    <wrapper className={clsx('editor', rest.className)}>
+      <ReactCodemirror {...rest} ref={ref} extensions={combinedExtensions} />
     </wrapper>
   );
 }));

@@ -3,7 +3,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib",
-    "composite": true
+    "composite": true,
   },
   "include": ["src"],
   "exclude": ["**/node_modules", "**/.*/"],

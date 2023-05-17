@@ -24,7 +24,7 @@ export const tableFooterMenuStyles = css`
     MenuTrigger {
       composes: theme-ripple from global;
       height: 100%;
-      padding: 0 16px;
+      padding: 0 12px;
       display: flex;
       align-items: center;
       cursor: pointer;
@@ -37,7 +37,7 @@ export const tableFooterMenuStyles = css`
     }
     menu-trigger-icon IconOrImage {
       display: block;
-      width: 24px;
+      width: 16px;
     }
     menu-trigger-title {
       display: block;

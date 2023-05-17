@@ -33,6 +33,7 @@ export * from './Menu/MenuItemElement';
 export * from './Menu/MenuPanel';
 export * from './Menu/menuPanelStyles';
 export * from './Menu/MenuStateContext';
+export * from './Menu/useMouseContextMenu';
 
 export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoForm';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories';
@@ -165,6 +166,7 @@ export * from './useClickEvents';
 export * from './useControlledScroll';
 export * from './useClipboard';
 export * from './useCombinedHandler';
+export * from './useCombinedRef';
 export * from './useExecutor';
 export * from './useFn';
 export * from './useFocus';

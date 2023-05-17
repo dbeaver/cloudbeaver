@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@cloudbeaver/plugin-codemirror6": "~0.1.0",
-    "@cloudbeaver/plugin-devtools": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0"
