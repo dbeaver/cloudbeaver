@@ -242,7 +242,7 @@ type DriverInfo {
 type DriverLibraryInfo {
     id: ID!
     name: String!
-    icon: String!
+    icon: String
 }
 
 enum ResultDataFormat {
