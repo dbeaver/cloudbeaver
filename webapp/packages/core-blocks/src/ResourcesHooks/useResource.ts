@@ -250,7 +250,7 @@ export function useResource<
         await this.loadingPromise;
         this.exception = null;
       } catch (exception: any) {
-        if (propertiesRef.errorContext) {
+        if (actions?.silent !== true && propertiesRef.errorContext) {
           if (this.isResourceError()) {
             const errors = Array.isArray(this.resourceException) ? this.resourceException : [this.resourceException];
 
@@ -267,6 +267,7 @@ export function useResource<
             propertiesRef.errorContext.catch(this.exception);
           }
         }
+        actions?.onError?.(exception);
       } finally {
         this.loadingPromise = null;
       }
@@ -439,7 +440,7 @@ export function useResource<
         if (!result.isError()) {
           return;
         }
-        if (propertiesRef.errorContext) {
+        if (actions?.silent !== true && propertiesRef.errorContext) {
           const errors = Array.isArray(exception) ? exception : [exception];
 
           for (const error of errors) {

@@ -46,7 +46,8 @@ export const Body = observer(function Body() {
   const Screen = screenService.screen?.component;
   const { backendVersion } = useAppVersion();
 
-  useResource(Body, ProjectInfoResource, CachedMapAllKey);
+  // TODO: must be loaded in place where it is used
+  useResource(Body, ProjectInfoResource, CachedMapAllKey, { silent: true });
 
   // sync classes from theme with body for popup components and etc
   useLayoutEffect(() => {

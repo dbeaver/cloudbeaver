@@ -8,6 +8,7 @@
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, resourceKeyList, RmResourceType } from '@cloudbeaver/core-sdk';
 
 export type ProjectInfo = SchemaProjectInfo;
@@ -18,12 +19,14 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly userInfoResource: UserInfoResource,
+    serverConfigResource: ServerConfigResource,
     appAuthService: AppAuthService,
   ) {
     super(() => new Map(), []);
 
     this.sync(this.userInfoResource, () => {}, () => CachedMapAllKey);
     appAuthService.requireAuthentication(this);
+    serverConfigResource.requirePublic(this);
     this.userInfoResource.onUserChange.addPostHandler(() => {
       this.clear();
     });
