@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { StateField, StateEffect } from '@codemirror/state';
-import { EditorView, Decoration } from '@codemirror/view';
+import { StateEffect, Decoration, StateField, EditorView, DecorationSet } from '@cloudbeaver/plugin-codemirror6';
+
 
 const ACTIVE_QUERY_EFFECT_ADD = StateEffect.define<{ from: number; to: number | undefined }>({
   map: (val, mapping) => ({
@@ -22,7 +22,7 @@ const ACTIVE_QUERY_DECORATION = Decoration.mark({
   class: 'active-query',
 });
 
-export const ACTIVE_QUERY_EXTENSION = StateField.define({
+export const ACTIVE_QUERY_EXTENSION: StateField<DecorationSet> = StateField.define({
   create() {
     return Decoration.none;
   },

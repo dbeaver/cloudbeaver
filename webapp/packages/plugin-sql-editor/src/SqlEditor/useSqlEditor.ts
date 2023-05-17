@@ -15,7 +15,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlCompletionProposal, SqlDialectInfo } from '@cloudbeaver/core-sdk';
-import { createLastPromiseGetter, LastPromiseGetter, isObjectsEqual, throttleAsync, isArraysEqual } from '@cloudbeaver/core-utils';
+import { createLastPromiseGetter, LastPromiseGetter, isObjectsEqual, throttleAsync } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
@@ -47,8 +47,6 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   state: ISqlEditorTabState;
   reactionDisposer: IReactionDisposer | null;
   hintsLimitIsMet: boolean;
-  hintsLimitKey: any[];
-  hintsLimitOffset: number;
   updateParserScripts(): Promise<void>;
   loadDatabaseDataModels(): Promise<void>;
   getExecutingQuery(script: boolean): ISQLScriptSegment | undefined;
@@ -149,15 +147,12 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     executingScript: false,
     reactionDisposer: null,
     hintsLimitIsMet: false,
-    hintsLimitKey: [],
-    hintsLimitOffset: 0,
 
     init(): void {
       if (this.reactionDisposer) {
         return;
       }
 
-      this.parser.setCustomDelimiters(['\n\n']);
       this.parser.setScript(this.value);
 
       this.reactionDisposer = autorun(() => {
@@ -174,7 +169,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
               this.sqlDialectInfoService
                 .loadSqlDialectInfo(key)
                 .then(async dialect => {
-                  this.parser.setDialect(dialect || null);
                   await this.updateParserScriptsThrottle();
                 });
             });
@@ -200,43 +194,21 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     getHintProposals: throttleAsync(async function getHintProposals(
       this: ISQLEditorDataPrivate,
       position,
-      word,
       simple
     ) {
       if (!this.dataSource?.executionContext) {
         return [];
       }
 
-      let keyPosition = position;
+      const { connectionId, id } = this.dataSource.executionContext;
 
-      if (word.length) {
-        keyPosition -= word.length - 1;
-      }
+      const hints = await this.sqlEditorService.getAutocomplete(
+        connectionId, id, this.value, position, MAX_HINTS_LIMIT, simple
+      );
 
-      const { connectionId, id, defaultSchema, defaultCatalog } = this.dataSource.executionContext;
-      const key = [connectionId, id, defaultSchema, defaultCatalog, keyPosition, simple, word.slice(0, 1)];
-      const reset = position <= this.hintsLimitOffset;
+      this.hintsLimitIsMet = hints.length >= MAX_HINTS_LIMIT;
 
-      if (!isArraysEqual(key, this.hintsLimitKey, undefined, true)) {
-        this.hintsLimitKey = [];
-        this.hintsLimitOffset = 0;
-        this.hintsLimitIsMet = false;
-      }
-
-      return await this.getLastAutocomplete(key, async () => {
-        const suggestionPosition = this.hintsLimitIsMet ? position : keyPosition;
-        const hints = await this.sqlEditorService.getAutocomplete(
-          connectionId, id, this.value, suggestionPosition, MAX_HINTS_LIMIT, simple
-        );
-
-        if (hints.length >= MAX_HINTS_LIMIT) {
-          this.hintsLimitIsMet = true;
-          this.hintsLimitKey = key;
-          this.hintsLimitOffset = suggestionPosition;
-        }
-
-        return hints;
-      }, reset);
+      return hints;
     }, 1000 / 3),
 
     async formatScript(): Promise<void> {
@@ -402,6 +374,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
     setQuery(query: string): void {
       this.sqlEditorService.setQuery(query, this.state);
+      this.updateParserScriptsThrottle().catch(() => {});
     },
 
     updateParserScriptsThrottle: throttleAsync(async function updateParserScriptsThrottle() {
@@ -508,11 +481,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     showExecutionPlan: action.bound,
     executeScript: action.bound,
     switchEditing: action.bound,
-    activeSegmentMode: computed({
-      equals: isObjectsEqual,
-    }),
     dialect: computed,
-    activeSegment: computed,
     isLineScriptEmpty: computed,
     isDisabled: computed,
     value: computed,

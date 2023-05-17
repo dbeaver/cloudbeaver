@@ -17,16 +17,12 @@
   "dependencies": {
     "@cloudbeaver/core-blocks": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
-    "@codemirror/commands": "^6.1.1",
     "@codemirror/lang-html": "^6.4.3",
-    "@codemirror/lang-javascript": "^6.1.5",
+    "@codemirror/lang-javascript": "^6.1.8",
     "@codemirror/lang-json": "^6.0.1",
-    "@codemirror/lang-sql": "^6.4.0",
+    "@codemirror/lang-sql": "^6.5.0",
     "@codemirror/lang-xml": "^6.0.2",
-    "@codemirror/state": "^6.1.1",
-    "@codemirror/view": "^6.1.1",
-    "@lezer/highlight": "^1.1.4",
-    "codemirror6": "npm:codemirror@6.0.0"
+    "codemirror": "^6.0.1"
   },
   "peerDependencies": {}
 }

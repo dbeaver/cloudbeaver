@@ -7,14 +7,14 @@
  */
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
-import type { IEditorRef } from '@cloudbeaver/plugin-codemirror6';
+import type { EditorState, EditorView, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
 
 import { clearActiveQueryHighlight, highlightActiveQuery } from '../ACTIVE_QUERY_EXTENSION';
 import { setGutter } from '../QUERY_STATUS_GUTTER_EXTENSION';
 
 export interface IEditor {
-  readonly view: IEditorRef['view'];
-  readonly state: IEditorRef['state'];
+  readonly view: EditorView | null;
+  readonly state: EditorState | null;
   highlightActiveQuery: (from: number, to?: number) => void;
   clearActiveQueryHighlight: () => void;
   highlightExecutingLine: (line: number, state: boolean) => void;
@@ -28,7 +28,7 @@ export function useSQLCodeEditor(editorRef: IEditorRef | null) {
       return this.editorRef?.view ?? null;
     },
     get state() {
-      return this.editorRef?.state ?? null;
+      return this.editorRef?.view?.state ?? null;
     },
     highlightActiveQuery(from: number, to?: number) {
       if (!this.view) {

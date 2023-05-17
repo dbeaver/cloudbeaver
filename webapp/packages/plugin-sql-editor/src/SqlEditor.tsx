@@ -37,9 +37,6 @@ const viewerStyles = css`
   Pane:first-child {
     flex-direction: column;
   }
-  SqlEditorLoader {
-    composes: theme-typography--body1 from global;
-  }
 `;
 
 interface Props {

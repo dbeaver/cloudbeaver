@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext, useDeferredValue, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { ConnectionImageWithMask, getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef } from '@cloudbeaver/core-blocks';
+import { ConnectionImageWithMask, getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef, useMouseContextMenu, Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource, NavTreeResource, EObjectFeature, type INodeActions } from '@cloudbeaver/core-navigation-tree';
@@ -41,6 +41,12 @@ const styles = css`
     max-width: 320px;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &[|editing] {
+      padding: 0;
+      overflow: visible;
+      margin-left: 2px;
+    }
   } 
   portal {
     position: relative;
@@ -60,6 +66,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
   dndElement,
   dndPlaceholder,
 }, ref) {
+  const mouseContextMenu = useMouseContextMenu();
   const treeNodeContext = useContext(TreeNodeContext);
   const treeContext = useContext(ElementsTreeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
@@ -95,6 +102,11 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
     treeNodeContext.select(event.ctrlKey || event.metaKey);
   }
 
+  function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
+    mouseContextMenu.handleContextMenuOpen(event);
+    treeNodeContext.select();
+  }
+
   const expandable = useDeferredValue(getComputed(() => treeContext?.tree.isNodeExpandable(node.id) ?? true));
   const filterActive = useDeferredValue(getComputed(() => treeContext?.tree.filtering));
 
@@ -105,22 +117,30 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
       ref={ref}
       {...attributes}
       onClick={onClickHandler}
+      onContextMenu={handleContextMenuOpen}
       {...use({ outdated, editing, dragging: dndElement })}
     >
       {expandable && <TreeNodeExpand filterActive={filterActive} />}
       <TreeNodeIcon {...use({ connected })}>
         <ConnectionImageWithMask icon={icon} connected={connected} maskId="tree-node-icon" />
       </TreeNodeIcon>
-      <TreeNodeName title={node.name}>
-        {editing ? (
-          <NavigationNodeEditorLoader node={node} onClose={() => setEditing(false)} />
-        ) : (
-          <name-box>{node.name}</name-box>
-        )}
+      <TreeNodeName title={node.name} {...use({ editing })}>
+        <Loader suspense inline fullSize>
+          {editing ? (
+            <NavigationNodeEditorLoader node={node} onClose={() => setEditing(false)} />
+          ) : (
+            <name-box>{node.name}</name-box>
+          )}
+        </Loader>
       </TreeNodeName>
       {!editing && !dndPlaceholder && (
         <portal onClick={handlePortalClick}>
-          <TreeNodeMenuLoader node={node} actions={nodeActions} selected={selected} />
+          <TreeNodeMenuLoader
+            mouseContextMenu={mouseContextMenu}
+            node={node}
+            actions={nodeActions}
+            selected={selected}
+          />
         </portal>
       )}
     </TreeNodeControl>

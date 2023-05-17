@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { use } from 'reshadow';
 
-import { getComputed, Icon } from '@cloudbeaver/core-blocks';
+import { getComputed, Icon, IMouseContextMenu } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { type NavNode, type INodeActions, DATA_CONTEXT_NAV_NODE } from '@cloudbeaver/core-navigation-tree';
@@ -25,12 +25,16 @@ interface Props {
   node: NavNode;
   actions?: INodeActions;
   selected?: boolean;
+  mouseContextMenu?: IMouseContextMenu;
+  onClose?: () => void;
 }
 
 export const TreeNodeMenu = observer<Props>(function TreeNodeMenu({
   node,
   actions,
   selected,
+  mouseContextMenu,
+  onClose,
 }) {
   const connectionsInfoResource = useService(ConnectionInfoResource);
   const menu = useMenu({ menu: MENU_NAV_TREE });
@@ -43,8 +47,20 @@ export const TreeNodeMenu = observer<Props>(function TreeNodeMenu({
     menu.context.set(DATA_CONTEXT_CONNECTION, connection);
   }
 
+  function handleVisibleSwitch(visible: boolean) {
+    if (!visible) {
+      onClose?.();
+    }
+  }
+
   return styled(treeNodeMenuStyles)(
-    <ContextMenu menu={menu} {...use({ selected })} modal>
+    <ContextMenu
+      menu={menu}
+      mouseContextMenu={mouseContextMenu}
+      onVisibleSwitch={handleVisibleSwitch}
+      {...use({ selected })}
+      modal
+    >
       <Icon name="snack" viewBox="0 0 16 10" />
     </ContextMenu>
   );

@@ -6,11 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { EditorState } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
 
 export interface IEditorRef {
   container: HTMLDivElement | null;
-  state: EditorState | null;
   view: EditorView | null;
 }

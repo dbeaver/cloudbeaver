@@ -43,6 +43,8 @@ export interface ISQLEditorData {
   readonly onFormat: ISyncExecutor<[ISQLScriptSegment, string]>;
   readonly onUpdate: ISyncExecutor;
   readonly onMode: ISyncExecutor<ISQLEditorData>;
+  /** displays if last getHintProposals call ended with limit */
+  readonly hintsLimitIsMet: boolean;
 
   updateParserScriptsThrottle(): Promise<void>;
   setQuery(query: string): void;
@@ -55,11 +57,7 @@ export interface ISQLEditorData {
   showExecutionPlan(): Promise<void>;
   executeScript(): Promise<void>;
   switchEditing(): Promise<void>;
-  getHintProposals(
-    position: number,
-    word: string,
-    simple: boolean
-  ): Promise<SQLProposal[]>;
+  getHintProposals(position: number, simple: boolean): Promise<SQLProposal[]>;
   executeQueryAction<T>(
     segment: ISQLScriptSegment | undefined,
     action: (query: ISQLScriptSegment) => Promise<T>,

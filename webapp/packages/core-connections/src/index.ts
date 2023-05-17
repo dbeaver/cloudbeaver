@@ -36,4 +36,5 @@ export * from './NetworkHandlerResource';
 export * from './useConnectionInfo';
 export * from './useDBDriver';
 export * from './USER_NAME_PROPERTY_ID';
+
 export { manifest as coreConnectionsManifest } from './manifest';

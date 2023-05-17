@@ -200,9 +200,10 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
   subMenuData.context.set(DATA_CONTEXT_SUBMENU_ITEM, item);
 
   const handler = subMenuData.handler;
+  const hideIfEmpty = handler?.hideIfEmpty?.(subMenuData.context) ?? true;
   const hidden = getComputed(() => subMenuData.items.every(item => item.hidden));
 
-  if (hidden) {
+  if (hideIfEmpty && hidden) {
     return null;
   }
 
@@ -210,12 +211,14 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
   const extraProps = handler?.getExtraProps?.() ?? item.getExtraProps?.() as any;
   /** @deprecated must be refactored (#1)*/
   const displayLabel = getComputed(() => handler?.isLabelVisible?.(subMenuData.context, subMenuData.menu) ?? true);
-  const loaded = getComputed(() => !subMenuData.loaders.some(loader => !loader.isLoaded()));
+  // TODO: seems like we don't need this, it's was used in panelAvailable to display > arrow in menu bar
+  //       when menu isn't loaded yet
+  // const loaded = getComputed(() => !subMenuData.loaders.some(loader => !loader.isLoaded()));
   const info = handler?.getInfo?.(subMenuData.context, subMenuData.menu);
   const label = info?.label ?? item.label ?? item.menu.label;
   const icon = info?.icon ?? item.icon ?? item.menu.icon;
   const tooltip = info?.tooltip ?? item.tooltip ?? item.menu.tooltip;
-  const panelAvailable = subMenuData.available || !loaded;
+  const panelAvailable =  subMenuData.itemCreators.length > 0;
 
   return styled(styles)(
     <ContextMenu

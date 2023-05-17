@@ -11,10 +11,15 @@ import { computed, makeObservable } from 'mobx';
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedMapResource, ResourceKey, ResourceKeyUtils, DatabaseDriverFragment, DriverListQueryVariables, CachedMapAllKey,  resourceKeyList, isResourceKeyAlias, isResourceAlias } from '@cloudbeaver/core-sdk';
+import { GraphQLService, CachedMapResource, ResourceKey, ResourceKeyUtils, DatabaseDriverFragment, DriverListQueryVariables, CachedMapAllKey, resourceKeyList, isResourceAlias } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export type DBDriver = DatabaseDriverFragment;
+
+export const NEW_DRIVER_SYMBOL = Symbol('new-driver');
+
+export type NewDBDriver = DBDriver & { [NEW_DRIVER_SYMBOL]: boolean; timestamp: number };
+type DriverResourceIncludes = Omit<DriverListQueryVariables, 'driverId'>;
 
 @injectable()
 export class DBDriverResource extends CachedMapResource<string, DBDriver, DriverListQueryVariables> {
@@ -31,7 +36,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
   ) {
     super();
     appAuthService.requireAuthentication(this);
-    this.sync(this.serverConfigResource, () => {}, () => CachedMapAllKey);
+    this.sync(this.serverConfigResource, () => { }, () => CachedMapAllKey);
 
     makeObservable(this, {
       enabledDrivers: computed<DBDriver[]>({
@@ -60,9 +65,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
 
       const { drivers } = await this.graphQLService.sdk.driverList({
         driverId,
-        includeDriverParameters: false,
-        includeDriverProperties: false,
-        includeProviderProperties: false,
+        ...this.getDefaultIncludes(),
         ...this.getIncludesMap(driverId, (all ? this.defaultIncludes : includes)),
       });
 
@@ -83,12 +86,58 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
     return this.data;
   }
 
+  async addDriverLibraries(driverId: string, files: FileList) {
+    await this.graphQLService.sdk.uploadDriverLibrary(driverId, files);
+    await this.refresh(driverId);
+  }
+
   protected dataSet(key: string, value: DBDriver): void {
     const oldDriver = this.dataGet(key);
     this.data.set(key, { ...oldDriver, ...value });
   }
 
+  async refreshAll(): Promise<Map<string, DBDriver>> {
+    this.resetIncludes();
+    await this.refresh(CachedMapAllKey);
+    return this.data;
+  }
+
+  cleanNewFlags(): void {
+    for (const driver of this.data.values()) {
+      (driver as NewDBDriver)[NEW_DRIVER_SYMBOL] = false;
+    }
+  }
+
+  getDefaultIncludes(): DriverResourceIncludes {
+    return {
+      includeDriverLibraries: false,
+      includeDriverParameters: false,
+      includeDriverProperties: false,
+      includeProviderProperties: false,
+    };
+  }
+
   protected validateKey(key: string): boolean {
     return typeof key === 'string';
   }
+}
+
+function isNewDriver(driver: DBDriver | NewDBDriver): driver is NewDBDriver {
+  return (driver as NewDBDriver)[NEW_DRIVER_SYMBOL];
+}
+
+export function compareNewDrivers(a: DBDriver, b: DBDriver): number {
+  if (isNewDriver(a) && isNewDriver(b)) {
+    return b.timestamp - a.timestamp;
+  }
+
+  if (isNewDriver(b)) {
+    return 1;
+  }
+
+  if (isNewDriver(a)) {
+    return -1;
+  }
+
+  return 0;
 }

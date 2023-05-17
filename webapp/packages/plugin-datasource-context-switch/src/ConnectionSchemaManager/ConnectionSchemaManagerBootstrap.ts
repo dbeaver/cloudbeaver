@@ -71,6 +71,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         };
       },
       iconComponent: () => ConnectionIcon,
+      hideIfEmpty: () => false,
       getExtraProps: () => ({ connectionKey: this.connectionSchemaManagerService.currentConnectionKey, small: true }),
       getLoader: (context, menu) => {
         if (this.isHidden()) {
@@ -99,7 +100,10 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_CONNECTION_SELECTOR],
-      isApplicable: () => this.connectionsManagerService.hasAnyConnection(),
+      isApplicable: () => (
+        this.connectionsManagerService.hasAnyConnection()
+        && this.connectionSchemaManagerService.isConnectionChangeable
+      ),
       getItems: (context, items) => {
         items = [...items];
 
@@ -200,6 +204,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
           () => this.appAuthService.loaders
         );
       },
+      hideIfEmpty: () => false,
       getInfo: (context, menu) => {
         const connectionSchemaManagerService = this.connectionSchemaManagerService;
 
@@ -241,6 +246,10 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_CONNECTION_DATA_CONTAINER_SELECTOR],
+      isApplicable: () => (
+        this.connectionSchemaManagerService.isObjectCatalogChangeable
+        && !!this.connectionSchemaManagerService.objectContainerList
+      ),
       getItems: (context, items) => {
         items = [...items];
 

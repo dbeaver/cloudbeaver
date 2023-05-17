@@ -10,8 +10,7 @@
 import { untracked } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { ConnectionFolderProjectKey, ConnectionFolderResource, ConnectionInfoResource, ConnectionsManagerService, CONNECTION_FOLDER_NAME_VALIDATION, createConnectionFolderParam, createConnectionParam, getConnectionFolderIdFromNodeId, IConnectionFolderParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { getConnectionFolderId } from '@cloudbeaver/core-connections/src/NavTree/getConnectionFolderId';
+import { ConnectionFolderProjectKey, ConnectionFolderResource, ConnectionInfoResource, ConnectionsManagerService, CONNECTION_FOLDER_NAME_VALIDATION, createConnectionFolderParam, createConnectionParam, getConnectionFolderIdFromNodeId, IConnectionFolderParam, IConnectionInfoParams, getConnectionFolderId } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';

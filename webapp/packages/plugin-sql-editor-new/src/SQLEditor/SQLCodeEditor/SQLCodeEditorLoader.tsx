@@ -10,14 +10,14 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
 
 import { ComplexLoader, createComplexLoader } from '@cloudbeaver/core-blocks';
-import type { IEditorProps, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
+import type { IDefaultExtensions, IEditorProps, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
 
 const loader = createComplexLoader(async function loader() {
   const { SQLCodeEditor } = await import('./SQLCodeEditor');
   return { SQLCodeEditor };
 });
 
-export const SQLCodeEditorLoader = observer<IEditorProps, IEditorRef>(forwardRef(function SQLCodeEditorLoader(props, ref) {
+export const SQLCodeEditorLoader = observer<IEditorProps & IDefaultExtensions, IEditorRef>(forwardRef(function SQLCodeEditorLoader(props, ref) {
   return (
     <ComplexLoader loader={loader}>
       {({ SQLCodeEditor }) => <SQLCodeEditor {...props} ref={ref} />}

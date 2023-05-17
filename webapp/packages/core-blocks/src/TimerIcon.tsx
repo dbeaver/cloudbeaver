@@ -17,12 +17,13 @@ import { useStyles } from './useStyles';
 const style = css`
   timer {
     position: relative;
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
+    overflow: hidden;
 
     & > Icon {
-      width: 24px;
-      height: 24px;
+      width: 16px;
+      height: 16px;
     }
 
     & state {
@@ -39,8 +40,10 @@ const style = css`
     right: 0;
     top: 0;
     display: flex;
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
+    justify-content: center;
+    align-items: center;
   }
   timer:hover {
     & state {

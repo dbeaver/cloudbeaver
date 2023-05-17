@@ -16,6 +16,7 @@ const styles = css`
     code-container {
       composes: theme-background-secondary theme-text-on-secondary from global;
       padding: 16px;
+      border-radius: var(--theme-group-element-radius);
     }
 `;
 

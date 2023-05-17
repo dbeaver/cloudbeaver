@@ -10,17 +10,20 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
+import { useCombinedRef, useExecutor, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
-import type { IEditorRef } from '@cloudbeaver/plugin-codemirror6';
+import { IEditorRef, closeCompletion } from '@cloudbeaver/plugin-codemirror6';
 import type { ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTIVE_QUERY_EXTENSION } from '../ACTIVE_QUERY_EXTENSION';
 import { QUERY_STATUS_GUTTER_EXTENSION } from '../QUERY_STATUS_GUTTER_EXTENSION';
 import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader';
 import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor';
+import { useSqlDialectAutocompletion } from '../useSqlDialectAutocompletion';
+import { useSqlDialectExtension } from '../useSqlDialectExtension';
 import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel';
 
 const styles = css`
@@ -41,6 +44,9 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
 
   const editor = useSQLCodeEditor(editorRef);
   const panel = useSQLCodeEditorPanel(data, editor);
+  const [autocompletion, setEditor, autocompletionStyles] = useSqlDialectAutocompletion(data);
+  const combinedRef = useCombinedRef(setEditorRef, setEditor);
+  const sqlDialect = useSqlDialectExtension(data.dialect);
 
   const dndBox = useDNDBox({
     canDrop: context => context.has(DATA_CONTEXT_NAV_NODE),
@@ -74,14 +80,24 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
     },
   });
 
-  return styled(styles)(
+  useExecutor({
+    executor: data.onExecute,
+    handlers: [function updateHighlight() {
+      if (editor.view) {
+        closeCompletion(editor.view);
+      }
+    }],
+  });
+
+  return styled(useStyles(styles, autocompletionStyles))(
     <box ref={dndBox.setRef}>
       <SQLCodeEditorLoader
-        ref={setEditorRef}
-        value={data.value}
-        extensions={[ACTIVE_QUERY_EXTENSION, QUERY_STATUS_GUTTER_EXTENSION]}
+        ref={combinedRef}
+        getValue={() => data.value}
+        extensions={[ACTIVE_QUERY_EXTENSION, QUERY_STATUS_GUTTER_EXTENSION, autocompletion, sqlDialect]}
         readonly={data.readonly}
         autoFocus
+        lineNumbers
         onChange={panel.onQueryChange}
         onUpdate={panel.onUpdate}
       />

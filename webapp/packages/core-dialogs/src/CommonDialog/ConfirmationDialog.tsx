@@ -8,7 +8,7 @@
 
 import styled, { css } from 'reshadow';
 
-import { Button, Translate, useStyles } from '@cloudbeaver/core-blocks';
+import { Button, Translate, useFocus, useStyles } from '@cloudbeaver/core-blocks';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
 import { CommonDialogBody } from './CommonDialog/CommonDialogBody';
@@ -47,10 +47,11 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Dial
   rejectDialog,
   className,
 }) {
+  const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const { icon, title, subTitle, bigIcon, viewBox, message, confirmActionText, cancelActionText } = payload;
 
   return styled(useStyles(style))(
-    <CommonDialogWrapper size='small' className={className} fixedWidth>
+    <CommonDialogWrapper ref={focusedRef} size='small' className={className} fixedWidth>
       <CommonDialogHeader
         title={title}
         subTitle={subTitle}

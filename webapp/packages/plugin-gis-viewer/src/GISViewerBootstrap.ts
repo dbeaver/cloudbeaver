@@ -6,12 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { lazy } from 'react';
+
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DataValuePanelService, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
-import { GISViewer } from './GISViewer';
 import { ResultSetGISAction } from './ResultSetGISAction';
+
+const GISViewer = lazy(async () => {
+  const { GISViewer } = await import('./GISViewer');
+
+  return { default: GISViewer };
+});
 
 @injectable()
 export class GISViewerBootstrap extends Bootstrap {

@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { EditorView } from 'codemirror6';
-import { forwardRef, useImperativeHandle, useLayoutEffect, useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { forwardRef, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { EditorState, Annotation, StateEffect } from '@codemirror/state';
-import type { ViewUpdate } from '@codemirror/view';
+import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { Annotation, EditorState, StateEffect } from '@codemirror/state';
+import { ViewUpdate, EditorView } from '@codemirror/view';
 
 import type { IEditorRef } from './IEditorRef';
 import type { IReactCodeMirrorProps } from './IReactCodemirrorProps';
@@ -24,7 +25,8 @@ const defaultTheme = EditorView.theme({
   },
 });
 
-export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(function ReactCodemirror({
+export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(forwardRef(function ReactCodemirror({
+  getValue,
   value,
   extensions,
   readonly,
@@ -32,42 +34,44 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
   onChange,
   onUpdate,
 }, ref) {
+  value = value ?? getValue?.();
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const [view, setView] = useState<EditorView | null>(null);
-  const [state] = useState<EditorState>(() => EditorState.create());
+  const lastValueUpdate = useRef<string | undefined>(undefined);
 
   const ext = [defaultTheme];
+  const callbackRef = useObjectRef({ onChange, onUpdate });
 
   if (readonly) {
-    ext.push(EditorView.editable.of(false));
+    // can lead to missing state updates
+    ext.push(EditorState.readOnly.of(true));
+    // ext.push(EditorView.editable.of(false));
   }
 
   if (extensions) {
     ext.push(extensions);
   }
 
-  if (onChange || onUpdate) {
-    const updateListener = EditorView.updateListener.of((update: ViewUpdate) => {
-      const remote = update.transactions.some(tr => tr.annotation(External));
+  const updateListener = useMemo(() => EditorView.updateListener.of((update: ViewUpdate) => {
+    const remote = update.transactions.some(tr => tr.annotation(External));
 
-      if (update.docChanged && !remote) {
-        const doc = update.state.doc;
-        const value = doc.toString();
+    if (update.docChanged && !remote) {
+      const doc = update.state.doc;
+      const value = doc.toString();
 
-        onChange?.(value, update);
-      }
+      lastValueUpdate.current = value;
+      callbackRef.onChange?.(value, update);
+    }
 
-      onUpdate?.(update);
-    });
+    callbackRef.onUpdate?.(update);
+  }), []);
 
-    ext.push(updateListener);
-  }
+  ext.push(updateListener);
 
   useLayoutEffect(() => {
     if (container) {
       const ev = new EditorView({
         parent: container,
-        state,
       });
 
       setView(ev);
@@ -87,11 +91,10 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
   }, [container]);
 
   useLayoutEffect(() => {
-    const currentValue = view?.state.doc.toString() ?? '';
-
-    if (view && value !== currentValue) {
+    if (view && value !== lastValueUpdate.current) {
+      lastValueUpdate.current = value;
       view.dispatch({
-        changes: { from: 0, to: currentValue.length, insert: value },
+        changes: { from: 0, to: view.state.doc.length, insert: value },
         annotations: [External.of(true)],
       });
     }
@@ -104,18 +107,17 @@ export const ReactCodemirror = forwardRef<IEditorRef, IReactCodeMirrorProps>(fun
   });
 
   useLayoutEffect(() => {
-    if (autoFocus && view) {
+    if (!readonly && autoFocus && view) {
       view.focus();
     }
-  }, [autoFocus, view]);
+  }, [autoFocus, view, readonly]);
 
   useImperativeHandle(ref, () => ({
     container,
     view,
-    state,
-  }), [container, view, state]);
+  }), [container, view]);
 
   return (
     <div ref={setContainer} className='ReactCodemirror' />
   );
-});
+}));

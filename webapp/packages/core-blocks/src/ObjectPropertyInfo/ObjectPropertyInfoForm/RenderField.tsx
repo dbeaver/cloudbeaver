@@ -15,7 +15,7 @@ import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox';
 import { Combobox } from '../../FormControls/Combobox';
 import { FormFieldDescription } from '../../FormControls/FormFieldDescription';
 import { InputField } from '../../FormControls/InputField';
-import { InputFile } from '../../FormControls/InputFile';
+import { InputFileTextContent } from '../../FormControls/InputFileTextContent';
 import { isControlPresented } from '../../FormControls/isControlPresented';
 import { Textarea } from '../../FormControls/Textarea';
 import { Link } from '../../Link';
@@ -94,7 +94,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
 
   if (controltype === 'file' && state) {
     return (
-      <InputFile
+      <InputFileTextContent
         tooltip={property.description}
         labelTooltip={property.displayName || property.description}
         name={property.id!}
@@ -105,7 +105,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         mapValue={removeMetadataFromBase64}
       >
         {property.displayName}
-      </InputFile>
+      </InputFileTextContent>
     );
   }
 

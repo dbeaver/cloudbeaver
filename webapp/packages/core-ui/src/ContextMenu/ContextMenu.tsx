@@ -11,7 +11,7 @@ import { ButtonHTMLAttributes, forwardRef, useRef, useState } from 'react';
 import type { MenuInitialState } from 'reakit/Menu';
 import styled from 'reshadow';
 
-import { getComputed, IMenuState, Menu, menuPanelStyles, useObjectRef, useTranslate, useStyles, useAutoLoad } from '@cloudbeaver/core-blocks';
+import { getComputed, IMenuState, Menu, menuPanelStyles, useObjectRef, useTranslate, useStyles, useAutoLoad, IMouseContextMenu } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { IMenuData, MenuActionItem } from '@cloudbeaver/core-view';
 
@@ -25,6 +25,7 @@ interface IMenuProps extends React.PropsWithChildren {
 type ContextMenuRenderingChildren = (props: IMenuProps) => React.ReactNode | React.ReactElement;
 
 interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'style' | 'children'> {
+  mouseContextMenu?: IMouseContextMenu;
   menu: IMenuData;
   style?: ComponentStyle;
   disclosure?: boolean;
@@ -37,6 +38,7 @@ interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'style' | 'c
 }
 
 export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(forwardRef(function ContextMenu({
+  mouseContextMenu,
   menu: menuData,
   disclosure,
   children,
@@ -114,6 +116,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(forwar
       menuRef={menu}
       modal={modal}
       visible={visible}
+      mouseContextMenu={mouseContextMenu}
       placement={placement}
       disabled={disabled}
       disclosure={disclosure}

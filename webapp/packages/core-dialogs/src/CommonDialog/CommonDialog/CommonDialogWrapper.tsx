@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect, useRef } from 'react';
+import { forwardRef, useContext, useEffect } from 'react';
 import { Dialog, useDialogState } from 'reakit/Dialog';
 import styled, { use } from 'reshadow';
 
@@ -28,7 +28,7 @@ export interface CommonDialogWrapperProps {
   style?: ComponentStyle;
 }
 
-export const CommonDialogWrapper = observer<CommonDialogWrapperProps>(function CommonDialogWrapper({
+export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivElement>(forwardRef(function CommonDialogWrapper({
   size = 'medium',
   fixedSize,
   fixedWidth,
@@ -36,10 +36,9 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps>(function C
   className,
   children,
   style,
-}) {
+}, ref) {
   const context = useContext(DialogContext);
   const dialogState = useDialogState({ visible: true });
-  const focusedElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!dialogState.visible && !context.dialog.options?.persistent) {
@@ -47,18 +46,15 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps>(function C
     }
   });
 
-  useEffect(() => {
-    if (document.activeElement instanceof HTMLElement) {
-      focusedElementRef.current = document.activeElement;
-    }
-
-    return () => {
-      focusedElementRef.current?.focus();
-    };
-  }, []);
-
   return styled(useStyles(commonDialogThemeStyle, commonDialogBaseStyle, dialogStyles, style))(
-    <Dialog {...dialogState} aria-label={ariaLabel} visible={context.visible} hideOnClickOutside={false} modal={false}>
+    <Dialog
+      {...dialogState}
+      ref={ref}
+      aria-label={ariaLabel}
+      visible={context.visible}
+      hideOnClickOutside={false}
+      modal={false}
+    >
       <dialog className={className} {...use({ size, fixedSize, fixedWidth })}>
         <Loader suspense>
           {children}
@@ -66,4 +62,4 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps>(function C
       </dialog>
     </Dialog>
   );
-});
+}));

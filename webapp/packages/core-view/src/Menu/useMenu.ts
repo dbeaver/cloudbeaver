@@ -56,7 +56,7 @@ export function useMenu(options: IMenuOptions): IMenuData {
       return menuService.getMenuItemCreators(this.context);
     },
     get available() {
-      return this.itemCreators.length > 0;
+      return this.handler?.hideIfEmpty?.(this.context) === false || this.itemCreators.length > 0;
     },
     get items() {
       return menuService.getMenu(this.context, this.itemCreators);

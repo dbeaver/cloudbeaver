@@ -10,19 +10,29 @@ import { injectable } from '@cloudbeaver/core-di';
 
 import { CustomGraphQLClient } from './CustomGraphQLClient';
 import { EnvironmentService } from './EnvironmentService';
+import { uploadDriverLibraryExtension } from './Extensions/uploadDriverLibraryExtension';
 import type { IResponseInterceptor } from './IResponseInterceptor';
 import { getSdk } from './sdk';
 
+function extendedSDK(client: CustomGraphQLClient) {
+  const sdk = getSdk(client);
+
+  return {
+    ...sdk,
+    ...uploadDriverLibraryExtension(client),
+  };
+}
+
 @injectable()
 export class GraphQLService {
-  sdk: ReturnType<typeof getSdk>;
+  sdk: ReturnType<typeof extendedSDK>;
 
   readonly client: CustomGraphQLClient;
 
   constructor(private readonly environmentService: EnvironmentService) {
     const gqlEndpoint = this.environmentService.gqlEndpoint;
     this.client = new CustomGraphQLClient(gqlEndpoint);
-    this.sdk = getSdk(this.client as any);
+    this.sdk = extendedSDK(this.client);
   }
 
   registerInterceptor(interceptor: IResponseInterceptor): void {

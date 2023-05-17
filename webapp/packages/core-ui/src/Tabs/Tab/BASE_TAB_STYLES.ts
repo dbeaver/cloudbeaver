@@ -48,7 +48,10 @@ tab-inner {
 tab-inner[|selected] portal,
 tab-inner portal[|menuOpened],
 tab-inner:hover portal,
-tab-inner:focus-within portal {
+tab-inner:focus-within portal,
+tab-inner[|selected] tab-action,
+tab-inner:hover tab-action,
+tab-inner:focus-within tab-action {
   visibility: visible;
 }
 
@@ -130,6 +133,7 @@ export const BASE_TAB_ACTION_STYLES = css`
     flex-shrink: 0;
     padding: 4px;
     padding-left: 0;
+    visibility: hidden;
 
     &:hover {
       opacity: 0.8;

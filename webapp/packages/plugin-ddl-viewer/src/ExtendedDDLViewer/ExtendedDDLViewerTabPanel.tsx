@@ -14,7 +14,7 @@ import { ConnectionDialectResource, ConnectionInfoActiveProjectKey, ConnectionIn
 import { MenuBar, MENU_BAR_DEFAULT_STYLES } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
-import { SQLCodeEditorLoader } from '@cloudbeaver/plugin-sql-editor';
+import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
 
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from '../DdlViewer/DATA_CONTEXT_DDL_VIEWER_NODE';
 import { DATA_CONTEXT_DDL_VIEWER_VALUE } from '../DdlViewer/DATA_CONTEXT_DDL_VIEWER_VALUE';
@@ -38,6 +38,7 @@ export const ExtendedDDLViewerTabPanel: NavNodeTransformViewComponent = observer
   const connection = connectionInfoResource.resource.getConnectionForNode(nodeId);
   const connectionParam = connection ? createConnectionParam(connection) : null;
   const connectionDialectResource = useResource(ExtendedDDLViewerTabPanel, ConnectionDialectResource, connectionParam);
+  const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
 
   menu.context.set(DATA_CONTEXT_DDL_VIEWER_NODE, nodeId);
   menu.context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, extendedDDLResource.data);
@@ -45,11 +46,8 @@ export const ExtendedDDLViewerTabPanel: NavNodeTransformViewComponent = observer
   return styled(style)(
     <wrapper>
       <SQLCodeEditorLoader
-        bindings={{
-          autoCursor: false,
-        }}
-        value={extendedDDLResource.data}
-        dialect={connectionDialectResource.data}
+        value={extendedDDLResource.data ?? ''}
+        extensions={[sqlDialect]}
         readonly
       />
       <MenuBar menu={menu} style={MENU_BAR_DEFAULT_STYLES} />
