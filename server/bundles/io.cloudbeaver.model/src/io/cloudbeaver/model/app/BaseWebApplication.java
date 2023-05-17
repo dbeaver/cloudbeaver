@@ -253,4 +253,5 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     public WSEventController getEventController() {
         return null;
     }
+
 }

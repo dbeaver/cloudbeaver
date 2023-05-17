@@ -114,7 +114,7 @@ type ServerConfig {
 
     serverURL: String!
     rootURI: String!
-    hostName: String!
+    containerId: String!
     defaultAuthRole: String
 
     anonymousAccessEnabled: Boolean!
