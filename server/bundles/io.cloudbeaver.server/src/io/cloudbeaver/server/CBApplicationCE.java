@@ -25,11 +25,15 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.registry.BasePlatformImpl;
+import org.jkiss.dbeaver.registry.LocalFileController;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.util.List;
 
@@ -68,6 +72,12 @@ public class CBApplicationCE extends CBApplication {
     public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
                                                  @NotNull DBPWorkspace workspace) throws DBException {
         return LocalResourceController.builder(credentialsProvider, workspace, this::getSecurityController).build();
+    }
+
+    @NotNull
+    @Override
+    public DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider) {
+        return new LocalFileController(DBWorkbench.getPlatform().getWorkspace().getAbsolutePath().resolve(DBFileController.DATA_FOLDER));
     }
 
     protected void shutdown() {

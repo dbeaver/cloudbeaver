@@ -16,12 +16,10 @@
  */
 package io.cloudbeaver.service.core;
 
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebAction;
-import io.cloudbeaver.WebObjectId;
-import io.cloudbeaver.WebProjectAction;
+import io.cloudbeaver.*;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
+ import io.cloudbeaver.model.user.WebDataSourceProviderInfo;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -30,6 +28,8 @@ import org.jkiss.dbeaver.model.rm.RMConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +42,7 @@ public interface DBWServiceCore extends DBWService {
     WebServerConfig getServerConfig() throws DBWebException;
 
     @WebAction
-    List<WebDatabaseDriverConfig> getDriverList(@NotNull WebSession webSession, String driverId) throws DBWebException;
+    List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) throws DBWebException;
 
     @WebAction
     List<WebDatabaseAuthModel> getAuthModels(@NotNull WebSession webSession);

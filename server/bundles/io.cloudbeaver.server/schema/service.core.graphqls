@@ -235,6 +235,14 @@ type DriverInfo {
     applicableNetworkHandlers: [ID]!
 
     configurationTypes: [DriverConfigurationType]!
+
+    driverLibraries: [DriverLibraryInfo!]!
+}
+
+type DriverLibraryInfo {
+    id: ID!
+    name: String!
+    icon: String!
 }
 
 enum ResultDataFormat {
@@ -574,6 +582,5 @@ extend type Mutation {
     asyncTaskCancel(id: String!): Boolean
 
     asyncTaskInfo(id: String!, removeOnFinish: Boolean!): AsyncTaskInfo!
-
 }
 

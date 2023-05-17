@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import axios, { AxiosProgressEvent, AxiosResponse } from 'axios';
 import { GraphQLClient, ClientError, resolveRequestDocument } from 'graphql-request';
 import { parseRequestArgs } from 'graphql-request/dist/parseArgs';
 import type { RequestDocument, RequestOptions, Variables } from 'graphql-request/dist/types';
@@ -15,6 +16,15 @@ import { GQLError } from './GQLError';
 import type { IResponseInterceptor } from './IResponseInterceptor';
 import { PlainGQLError } from './PlainGQLError';
 
+export type UploadProgressEvent = AxiosProgressEvent;
+
+type GqlResponse = (
+  { data: object; errors: undefined }[]
+  | { data: object; errors: undefined }
+  | { data: undefined; errors: object }
+  | { data: undefined; errors: object[] }
+);
+
 export class CustomGraphQLClient extends GraphQLClient {
   get blockReason(): Error | string | null {
     return this.requestsBlockedReason;
@@ -23,6 +33,19 @@ export class CustomGraphQLClient extends GraphQLClient {
   private readonly interceptors: IResponseInterceptor[] = [];
   private isRequestsBlocked = false;
   private requestsBlockedReason: Error | string | null = null;
+
+  async uploadFile<T = any, V extends Variables = Variables>(
+    url: string,
+    files: FileList,
+    query?: string,
+    variables?: V,
+    onUploadProgress?: (event: UploadProgressEvent) => void
+  ): Promise<T> {
+    return this.interceptors.reduce(
+      (accumulator, interceptor) => interceptor(accumulator),
+      this.overrideFileUpload<T, V>(url, files, query, variables, onUploadProgress)
+    );
+  }
 
   registerInterceptor(interceptor: IResponseInterceptor): void {
     this.interceptors.push(interceptor);
@@ -85,6 +108,85 @@ export class CustomGraphQLClient extends GraphQLClient {
       }
 
       throw error;
+    }
+  }
+
+  private async overrideFileUpload<T, V extends Variables = Variables>(
+    url: string,
+    files: FileList,
+    query?: string,
+    variables?: V,
+    onUploadProgress?: (event: UploadProgressEvent) => void
+  ): Promise<T> {
+    this.blockRequestsReasonHandler();
+    try {
+      const { operationName } = resolveRequestDocument(query ?? '');
+      // TODO: we don't support GQL response right now
+      const response = await axios.postForm/*<GqlResponse>*/<T>(url, {
+        operationName,
+        query,
+        variables: JSON.stringify(variables),
+        'files[]': files,
+      }, {
+        onUploadProgress,
+        responseType: 'json',
+      });
+
+      // TODO: we don't support GQL response right now
+      // TODO: seems here can be undefined
+      // return this.parseGQLResponse(response, query ?? '', variables);
+
+      return response.data;
+    } catch (error: any) {
+      if (isClientError(error)) {
+        if (isObjectError(error)) {
+          throw new GQLError(error);
+        } else {
+          throw new PlainGQLError(error);
+        }
+      }
+
+      throw error;
+    }
+  }
+
+  private parseGQLResponse<T>(
+    response: AxiosResponse<GqlResponse>,
+    query: string,
+    variables?: Variables,
+  ): T {
+    const result = response.data;
+
+    const successfullyReceivedData = Array.isArray(result)
+      ? !result.some(({ data }) => !data)
+      : Boolean(result.data);
+
+    const successfullyPassedErrorPolicy = Array.isArray(result)
+      || !result.errors
+      || (Array.isArray(result.errors) && !result.errors.length);
+
+    if (response.status === 200 && successfullyPassedErrorPolicy && successfullyReceivedData) {
+      const data = result;
+      const dataEnvelope = data;
+
+      // @ts-expect-error TODO
+      return {
+        ...dataEnvelope,
+        headers: response.headers,
+        status: response.status,
+      };
+    } else {
+      const errorResult
+      = typeof result === 'string'
+        ? {
+          error: result,
+        }
+        : result;
+      throw new ClientError(
+      // @ts-expect-error TODO
+        { ...errorResult, status: response.status, headers: response.headers },
+        { query, variables }
+      );
     }
   }
 }

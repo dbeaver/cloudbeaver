@@ -67,9 +67,11 @@ interface Props<TState> extends ILayoutSizeProps {
   mapValue?: (value: string) => string;
 }
 
-type InputFileType = <TState extends Record<string, any>>(props: Props<TState>) => React.ReactElement<any, any>;
+type InputFileTextContentType = <TState extends Record<string, any>>(
+  props: Props<TState>
+) => React.ReactElement<any, any>;
 
-export const InputFile: InputFileType = observer(function InputFile({
+export const InputFileTextContent: InputFileTextContentType = observer(function InputFileTextContent({
   name,
   state,
   accept,

@@ -35,7 +35,7 @@
       }
 
       .rdg-row:hover {
-        @include stripes-background($mdc-theme-secondary);
+        @include stripes-background($mdc-theme-sub-secondary);
       }
 
       .rdg-cell {

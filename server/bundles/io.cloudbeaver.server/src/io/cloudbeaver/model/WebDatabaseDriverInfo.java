@@ -21,11 +21,9 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.ConfigurationUtils;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
-import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
-import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
+import org.jkiss.dbeaver.model.connection.*;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
@@ -41,15 +39,16 @@ import java.util.Map;
 /**
  * Web driver configuration
  */
-public class WebDatabaseDriverConfig {
+public class WebDatabaseDriverInfo {
 
+    private static final Log log = Log.getLog(WebDatabaseDriverInfo.class);
     public static final String URL_SERVER_FIELD = "{server}";
     public static final String URL_DATABASE_FIELD = ".*(?:\\{(?:database|file|folder)}).*";
     private final WebSession webSession;
     private final DBPDriver driver;
     private String id;
 
-    public WebDatabaseDriverConfig(WebSession webSession, DBPDriver driver) {
+    public WebDatabaseDriverInfo(WebSession webSession, DBPDriver driver) {
         this.webSession = webSession;
         this.driver = driver;
         this.id = driver.getFullId();
@@ -191,7 +190,8 @@ public class WebDatabaseDriverConfig {
             return Arrays.stream(properties)
                 .map(p -> new WebPropertyInfo(webSession, p, propertySource)).toArray(WebPropertyInfo[]::new);
         } catch (DBException e) {
-            throw new DBWebException("Error reading driver properties", e);
+            log.error("Error reading driver properties", e);
+            return new WebPropertyInfo[0];
         }
     }
 
@@ -258,5 +258,12 @@ public class WebDatabaseDriverConfig {
             return false;
         }
         return driver.getSampleURL().matches(URL_DATABASE_FIELD);
+    }
+
+    @Property
+    public WebDriverLibraryInfo[] getDriverLibraries() {
+        return driver.getDriverLibraries().stream()
+            .map(dbpDriverLibrary -> new WebDriverLibraryInfo(webSession, dbpDriverLibrary))
+            .toArray(WebDriverLibraryInfo[]::new);
     }
 }

@@ -23,6 +23,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
@@ -63,6 +64,7 @@ public class WebUserContext implements SMCredentialsProvider {
     private SMAdminController adminSecurityController;
     private DBSSecretController secretController;
     private RMController rmController;
+    private DBFileController fileController;
     private Set<String> accessibleProjectIds = new HashSet<>();
 
     public WebUserContext(WebApplication application, DBPWorkspace workspace) throws DBException {
@@ -70,6 +72,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.workspace = workspace;
         this.securityController = application.createSecurityController(this);
         this.rmController = application.createResourceController(this, workspace);
+        this.fileController = application.createFileController(this);
         setUserPermissions(getDefaultPermissions());
     }
 
@@ -111,6 +114,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.adminSecurityController = application.getAdminSecurityController(this);
         this.secretController = application.getSecretController(this);
         this.rmController = application.createResourceController(this, workspace);
+        this.fileController = application.createFileController(this);
         if (isSessionChanged) {
             this.smSessionId = smAuthPermissions.getSessionId();
             setUser(smAuthPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));
@@ -224,6 +228,10 @@ public class WebUserContext implements SMCredentialsProvider {
 
     public RMController getRmController() {
         return rmController;
+    }
+
+    public DBFileController getFileController() {
+        return fileController;
     }
 
     @NotNull

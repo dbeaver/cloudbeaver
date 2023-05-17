@@ -93,6 +93,7 @@ export default [
   ['ui_no_file_chosen', 'No file chosen'],
   ['ui_file_size_exceeds', 'Max file size exceeds. File size: {arg:size}. Max file size: {arg:maxSize}'],
   ['ui_upload_file', 'Upload file'],
+  ['ui_upload_files', 'Upload files'],
 
   ['root_permission_denied', '您没有权限'],
   ['root_permission_no_permission', '您没有权限执行此操作'],

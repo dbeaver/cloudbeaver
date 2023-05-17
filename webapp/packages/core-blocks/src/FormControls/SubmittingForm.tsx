@@ -12,7 +12,7 @@ import { Executor } from '@cloudbeaver/core-executor';
 
 import { useCombinedRef } from '../useCombinedRef';
 import { useObjectRef } from '../useObjectRef';
-import { FormContext, IChangeData, IFormContext } from './FormContext';
+import { FormChangeHandler, FormContext, IChangeData, IFormContext } from './FormContext';
 
 export interface IFormStateInfo {
   edited: boolean;
@@ -25,7 +25,7 @@ type FormDetailedProps = Omit<React.DetailedHTMLProps<React.FormHTMLAttributes<H
   disabled?: boolean;
   disableEnterSubmit?: boolean;
   onSubmit?: (event?: React.FormEvent<HTMLFormElement>) => Promise<void> | void;
-  onChange?: (value: string | number | boolean | null | undefined, name: string | undefined) => void;
+  onChange?: FormChangeHandler;
 };
 
 export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(function SubmittingForm(

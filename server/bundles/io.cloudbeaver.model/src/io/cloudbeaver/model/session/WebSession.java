@@ -40,6 +40,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
@@ -223,6 +224,10 @@ public class WebSession extends BaseWebSession
 
     public synchronized RMController getRmController() {
         return userContext.getRmController();
+    }
+
+    public synchronized DBFileController getFileController() {
+        return userContext.getFileController();
     }
 
     public synchronized void refreshUserData() {
