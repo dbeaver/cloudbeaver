@@ -13,6 +13,9 @@ fragment DatabaseDriver on DriverInfo {
   requiresServerName
   anonymousAccess
   promotedScore
+  providerId
+  driverClassName
+  custom
 
   defaultAuthModel
   applicableAuthModels
@@ -33,4 +36,10 @@ fragment DatabaseDriver on DriverInfo {
     validValues
   }
   driverParameters @include(if: $includeDriverParameters)
+
+  driverLibraries @include(if: $includeDriverLibraries) {
+    id
+    name
+    icon
+  }
 }

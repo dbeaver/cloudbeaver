@@ -11,8 +11,8 @@ import styled, { css } from 'reshadow';
 
 import { IconOrImage } from '../IconOrImage';
 
-export interface ITag {
-  id: string;
+export interface ITag<T extends string | number = string> {
+  id: T;
   label: string;
   icon?: string;
 }
@@ -53,8 +53,10 @@ const style = css`
       padding: 4px;
       cursor: pointer;
       flex-shrink: 0;
+      opacity: 0.5;
+
       &:hover {
-        opacity: 0.7;
+        opacity: 1;
       }
     }
     IconOrImage {
@@ -63,12 +65,18 @@ const style = css`
     }
   `;
 
-interface Props extends ITag {
-  onRemove: (id: string) => void;
+interface Props<T extends string | number> extends ITag<T> {
+  onRemove: (id: T) => void;
   className?: string;
 }
 
-export const Tag = observer<Props>(function Tag({ id, label, icon, onRemove, className }) {
+export const Tag = observer(function Tag<T extends string | number>({
+  id,
+  label,
+  icon,
+  onRemove,
+  className,
+}: Props<T>) {
   return styled(style)(
     <tag-container as='li' title={label} className={className}>
       {icon && (

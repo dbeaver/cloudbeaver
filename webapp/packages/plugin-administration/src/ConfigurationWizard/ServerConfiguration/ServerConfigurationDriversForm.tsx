@@ -15,8 +15,6 @@ import { Group, GroupTitle, BASE_CONTAINERS_STYLES, useResource, Combobox, Tags,
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey, resourceKeyList, ServerConfigInput } from '@cloudbeaver/core-sdk';
 
-
-
 interface Props {
   serverConfig: ServerConfigInput;
 }

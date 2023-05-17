@@ -10,6 +10,10 @@ $mdc-theme-primary: #2a7cb4; // main menu background
 $mdc-theme-on-primary: #ffffff; // main text color
 $mdc-theme-secondary: #f2f2f2;
 $mdc-theme-on-secondary: #6d6d6d;
+
+$mdc-theme-sub-secondary: #f8f8f8;
+$mdc-theme-on-sub-secondary: #6d6d6d;
+
 $mdc-theme-surface: #ffffff;
 $mdc-theme-on-surface: #353535;
 $mdc-theme-background: #dedede;
@@ -37,6 +41,7 @@ $mdc-theme-text-colors: (
   light: (
     primary: white,
     secondary: rgba(white, 0.7),
+    sub-secondary: rgba(white, 0.7),
     hint: rgba(white, 0.45),
     disabled: rgba(white, 0.45),
     icon: rgba(white, 0.45),
@@ -45,6 +50,7 @@ $mdc-theme-text-colors: (
   dark: (
     primary: rgba(black, 0.87),
     secondary: rgba(black, 0.45),
+    sub-secondary: rgba(black, 0.45),
     hint: rgba(black, 0.45),
     disabled: rgba(black, 0.2),
     icon: rgba(black, 0.38),

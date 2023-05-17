@@ -367,7 +367,7 @@ export abstract class CachedResource<
   }
 
   hasAlias(key: ResourceAlias<TKey, any>): boolean {
-    return this.paramAliases.some(alias =>  alias.id === key.id);
+    return this.paramAliases.some(alias => alias.id === key.id);
   }
 
   isAlias<TOptions extends ResourceAliasOptions = any>(
@@ -783,14 +783,15 @@ export abstract class CachedResource<
     return this.getKeyRef(key);
   }
 
-  protected transformToKey(param: ResourceKey<TKey>): TKey | ResourceKeyList<TKey> {
+  //TODO must be protected
+  transformToKey(param: ResourceKey<TKey>): TKey | ResourceKeyList<TKey> {
     let deep = 0;
 
     while (deep < 10) {
       if (!this.validateResourceKey(param)) {
         let paramString = JSON.stringify(toJS(param));
 
-        if (isResourceKeyList(param))  {
+        if (isResourceKeyList(param)) {
           paramString = param.toString();
         }
         console.warn(this.getActionPrefixedName(`wrong param "${paramString}"`));
@@ -831,7 +832,7 @@ export abstract class CachedResource<
       if (!this.validateResourceKey(key)) {
         let paramString = JSON.stringify(toJS(key));
 
-        if (isResourceKeyList(key) || isResourceAlias(key))  {
+        if (isResourceKeyList(key) || isResourceAlias(key)) {
           paramString = key.toString();
         }
         console.warn(this.getActionPrefixedName(`wrong param "${paramString}"`));
@@ -946,18 +947,19 @@ export abstract class CachedResource<
     refresh: boolean
   ): Promise<TData>;
 
-  protected async performUpdate<T>(
+  //TODO must be protected
+  async performUpdate<T>(
     key: ResourceKey<TKey>,
     include: TInclude | undefined,
     update: (key: ResourceKey<TKey>, context?: ReadonlyArray<string>) => Promise<T>,
   ): Promise<T>;
-  protected async performUpdate<T>(
+  async performUpdate<T>(
     key: ResourceKey<TKey>,
     include: TInclude | undefined,
     update: (key: ResourceKey<TKey>, context?: ReadonlyArray<string>) => Promise<T>,
     exitCheck: (key: ResourceKey<TKey>, context?: ReadonlyArray<string>) => boolean
   ): Promise<T | undefined>;
-  protected async performUpdate<T>(
+  async performUpdate<T>(
     key: ResourceKey<TKey>,
     include: TInclude | undefined,
     update: (key: ResourceKey<TKey>, context?: ReadonlyArray<string>) => Promise<T>,

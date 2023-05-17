@@ -184,5 +184,4 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
     private WebConnectionConfig getConnectionConfig(DataFetchingEnvironment env) {
         return new WebConnectionConfig(env.getArgument("config"));
     }
-
 }

@@ -10,16 +10,17 @@ import { createContext } from 'react';
 
 import type { IExecutor } from '@cloudbeaver/core-executor';
 
-type ChangeHandler = (value: string | number | boolean | null | undefined, name: string | undefined) => void;
+export type FormChangeValues = string | number | boolean | FileList | null | undefined;
+export type FormChangeHandler = (value: FormChangeValues, name: string | undefined) => void;
 
 export interface IChangeData {
-  value: string | number | boolean | null | undefined;
+  value: FormChangeValues;
   name: string | undefined;
 }
 
 export interface IFormContext {
   changeExecutor: IExecutor<IChangeData>;
-  change: ChangeHandler;
+  change: FormChangeHandler;
 }
 
 export const FormContext = createContext<IFormContext | null>(null);

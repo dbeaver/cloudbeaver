@@ -17,6 +17,7 @@
 
 package io.cloudbeaver.server;
 
+import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.server.jobs.SessionStateJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
 import io.cloudbeaver.service.session.WebSessionManager;
@@ -27,6 +28,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
@@ -41,6 +43,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.SecurityProviderUtils;
 import org.jkiss.dbeaver.runtime.qm.QMLogFileWriter;
 import org.jkiss.dbeaver.runtime.qm.QMRegistryImpl;
@@ -289,7 +292,7 @@ public class CBPlatform extends BasePlatformImpl {
                     }
                     boolean hasAllFiles = true, hasJars = false;
                     for (DBPDriverLibrary lib : libraries) {
-                        if (!lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
+                        if (!DBWorkbench.isDistributed() && !lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
                             (lib.getLocalFile() == null || !Files.exists(lib.getLocalFile())))
                         {
                             hasAllFiles = false;
@@ -309,4 +312,9 @@ public class CBPlatform extends BasePlatformImpl {
         log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
     }
 
+    @NotNull
+    @Override
+    public DBFileController createFileController() {
+        return getApplication().createFileController(new NoAuthCredentialsProvider());
+    }
 }

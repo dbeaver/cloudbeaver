@@ -23,6 +23,7 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.user.WebDataSourceProviderInfo;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
@@ -81,11 +82,11 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public List<WebDatabaseDriverConfig> getDriverList(@NotNull WebSession webSession, String driverId) {
-        List<WebDatabaseDriverConfig> result = new ArrayList<>();
+    public List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) {
+        List<WebDatabaseDriverInfo> result = new ArrayList<>();
         for (DBPDriver driver : CBPlatform.getInstance().getApplicableDrivers()) {
             if (driverId == null || driverId.equals(driver.getFullId())) {
-                result.add(new WebDatabaseDriverConfig(webSession, driver));
+                result.add(new WebDatabaseDriverInfo(webSession, driver));
             }
         }
         return result;
