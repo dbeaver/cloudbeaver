@@ -8,11 +8,11 @@
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 
-export function useAutoFormat(type: string) {
+export function useAutoFormat() {
   return useObjectRef(() => ({
-    format(value: string) {
+    format(type: string, value: string) {
       try {
-        switch (this.type) {
+        switch (type) {
           case 'application/json':
             return JSON.stringify(JSON.parse(value), null, 2);
           case 'text/xml':
@@ -25,5 +25,5 @@ export function useAutoFormat(type: string) {
         return value;
       }
     },
-  }), { type });
+  }), false);
 }
