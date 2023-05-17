@@ -6,8 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { RangeSet, StateEffect, StateField } from '@codemirror/state';
-import { EditorView, gutter, GutterMarker } from '@codemirror/view';
+import { GutterMarker, StateEffect, StateField, RangeSet, type EditorView, gutter } from '@cloudbeaver/plugin-codemirror6';
 
 type QueryGutterEffectType = 'run' | 'error';
 
