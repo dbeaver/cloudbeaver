@@ -146,13 +146,13 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     }
   }
 
-  const formatter = useAutoFormat(state.currentContentType);
-
   readonly = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || readonly;
 
   if (contentType !== state.lastContentType) {
     state.setDefaultContentType(contentType);
   }
+
+  const formatter = useAutoFormat();
 
   function handleChange(newValue: string) {
     if (firstSelectedCell && !readonly) {
@@ -176,6 +176,8 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
   const typeExtension = useMemo(() => getTypeExtension(state.currentContentType) ?? [], [state.currentContentType]);
 
+  const value = autoFormat ? formatter.format(state.currentContentType, stringValue) : stringValue;
+
   return styled(style)(
     <container>
       <actions>
@@ -190,7 +192,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       </actions>
       <EditorLoader
         key={readonly ? '1' : '0'}
-        value={autoFormat ? formatter.format(stringValue) : stringValue}
+        value={value}
         readonly={readonly}
         extensions={[typeExtension]}
         onChange={value => handleChange(value)}
