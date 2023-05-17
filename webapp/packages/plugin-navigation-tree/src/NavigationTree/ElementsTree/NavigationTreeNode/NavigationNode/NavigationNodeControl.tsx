@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext, useDeferredValue, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { ConnectionImageWithMask, getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef, useMouseContextMenu } from '@cloudbeaver/core-blocks';
+import { ConnectionImageWithMask, getComputed, TreeNodeContext, TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName, TREE_NODE_STYLES, useObjectRef, useMouseContextMenu, Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource, NavTreeResource, EObjectFeature, type INodeActions } from '@cloudbeaver/core-navigation-tree';
@@ -125,11 +125,13 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
         <ConnectionImageWithMask icon={icon} connected={connected} maskId="tree-node-icon" />
       </TreeNodeIcon>
       <TreeNodeName title={node.name} {...use({ editing })}>
-        {editing ? (
-          <NavigationNodeEditorLoader node={node} onClose={() => setEditing(false)} />
-        ) : (
-          <name-box>{node.name}</name-box>
-        )}
+        <Loader suspense inline fullSize>
+          {editing ? (
+            <NavigationNodeEditorLoader node={node} onClose={() => setEditing(false)} />
+          ) : (
+            <name-box>{node.name}</name-box>
+          )}
+        </Loader>
       </TreeNodeName>
       {!editing && !dndPlaceholder && (
         <portal onClick={handlePortalClick}>

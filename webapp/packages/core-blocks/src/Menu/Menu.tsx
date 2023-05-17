@@ -7,13 +7,14 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React, { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { forwardRef, useLayoutEffect, useRef, useState } from 'react';
 import { MenuButton, MenuInitialState, useMenuState } from 'reakit/Menu';
 import styled from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { ErrorBoundary } from '../ErrorBoundary';
+import { useCombinedRef } from '../useCombinedRef';
 import { useObjectRef } from '../useObjectRef';
 import { useStyles } from '../useStyles';
 import { MenuPanel } from './MenuPanel';
@@ -58,23 +59,24 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
   rtl,
   ...props
 }, ref) {
+  const innerMenuButtonRef = useRef<HTMLButtonElement>(null);
+  const combinedRef = useCombinedRef(ref, innerMenuButtonRef);
+  const [relativePosition, setRelativePosition] = useState<{ x: number; y: number } | null>(null);
+  const menuButtonLinkRef = useRef<HTMLButtonElement>(null);
   const menuPanelRef = useRef<HTMLDivElement>(null);
   const propsRef = useObjectRef({ onVisibleSwitch, visible });
-  const menu = useMenuState({ modal, placement, visible, rtl });
+  const menu = useMenuState({
+    modal,
+    placement,
+    visible,
+    rtl,
+  });
   const styles = useStyles(menuPanelStyles, style);
 
   if (menuRef) {
   //@ts-expect-error Ref mutation
     menuRef.current = menu;
   }
-
-  useEffect(() => {
-    if (!menu.visible && mouseContextMenu) {
-      mouseContextMenu.position = null;
-    }
-
-    propsRef.onVisibleSwitch?.(menu.visible);
-  }, [menu.visible]);
 
   let menuVisible = menu.visible;
 
@@ -83,26 +85,59 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
   }
 
   useLayoutEffect(() => {
-    if (mouseContextMenu?.position) {
-      menu.show();
+    if (!menuVisible) {
+      setRelativePosition(null);
     }
-  }, [mouseContextMenu?.position]);
+
+    propsRef.onVisibleSwitch?.(menuVisible);
+  }, [menuVisible]);
 
   useLayoutEffect(() => {
-    if (mouseContextMenu?.position) {
-      if (menuPanelRef.current) {
-        menuPanelRef.current.style.transform = 'none';
-        menuPanelRef.current.style.left = `${mouseContextMenu.position.x}px`;
-        menuPanelRef.current.style.top = `${mouseContextMenu.position.y}px`;
+    if (!mouseContextMenu?.position) {
+      return;
+    }
+
+    if (menuVisible) {
+      menu.hide();
+      return;
+    }
+
+    if (innerMenuButtonRef.current) {
+      menu.show();
+
+      const boxSize = innerMenuButtonRef.current.getBoundingClientRect();
+      setRelativePosition({
+        x: mouseContextMenu.position.x - boxSize.x,
+        y: mouseContextMenu.position.y - boxSize.y,
+      });
+
+      mouseContextMenu.position = null;
+    }
+  }, [mouseContextMenu?.position, menuVisible]);
+
+  useLayoutEffect(() => {
+    if (relativePosition) {
+      if (menuButtonLinkRef.current) {
+        menuButtonLinkRef.current.style.left = `${relativePosition.x}px`;
+        menuButtonLinkRef.current.style.top = `${relativePosition.y}px`;
       }
     }
   });
+
+  const MenuButtonLink = MenuButton;
 
   if (React.isValidElement(children) && disclosure) {
     return styled(styles)(
       <ErrorBoundary>
         <MenuStateContext.Provider value={menu}>
-          <MenuButton ref={ref} {...menu} visible={menuVisible} {...props} {...children.props}>
+          <MenuButton
+            key={relativePosition ? 'link' : 'main'}
+            ref={combinedRef}
+            {...menu}
+            visible={menuVisible}
+            {...props}
+            {...children.props}
+          >
             {disclosureProps => React.cloneElement(children, { ...disclosureProps, ...children.props })}
           </MenuButton>
           <MenuPanel
@@ -118,6 +153,13 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
           >
             {items}
           </MenuPanel>
+          {relativePosition && (
+            <MenuButtonLink
+              ref={menuButtonLinkRef}
+              {...menu}
+              visible={menuVisible}
+            />
+          )}
         </MenuStateContext.Provider>
       </ErrorBoundary>
     );
@@ -126,7 +168,13 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
   return styled(styles)(
     <ErrorBoundary>
       <MenuStateContext.Provider value={menu}>
-        <MenuButton ref={ref} {...menu} visible={menuVisible} {...props}>
+        <MenuButton
+          key={relativePosition ? 'link' : 'main'}
+          ref={combinedRef}
+          {...menu}
+          visible={menuVisible}
+          {...props}
+        >
           <box>{children}</box>
         </MenuButton>
         <MenuPanel
@@ -142,6 +190,13 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(forwardRef(function 
         >
           {items}
         </MenuPanel>
+        {relativePosition && (
+          <MenuButtonLink
+            ref={menuButtonLinkRef}
+            {...menu}
+            visible={menuVisible}
+          />
+        )}
       </MenuStateContext.Provider>
     </ErrorBoundary>
   );

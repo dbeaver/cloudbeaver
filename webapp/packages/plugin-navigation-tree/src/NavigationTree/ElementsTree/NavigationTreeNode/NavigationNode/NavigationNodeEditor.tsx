@@ -71,7 +71,7 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
       onSave={save}
       onDoubleClick={stopPropagation}
       onReject={onClose}
-      // onBlur={onClose}
+      onBlur={onClose}
       onClick={stopPropagation}
     />
   );

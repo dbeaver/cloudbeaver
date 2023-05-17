@@ -35,6 +35,17 @@ export const menuPanelStyles = css`
         height: inherit;
       }
     }
+    MenuButtonLink {
+      position: absolute;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+      border: none;
+      background: transparent;
+    }
     Menu {
       outline: none;
       z-index: 999;
