@@ -31,12 +31,12 @@
       }
 
       & :global(li):hover {
-        @include mdc-theme-prop(background, secondary, false);
+        @include mdc-theme-prop(background, sub-secondary, false);
         @include mdc-theme-prop(color, on-secondary, false);
       }
 
       & :global(li):global([aria-selected=true]) {
-        @include mdc-theme-prop(background, background, false);
+        @include mdc-theme-prop(background, secondary, false);
         @include mdc-theme-prop(color, text-primary-on-light, false);
       }
     }
