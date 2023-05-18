@@ -56,7 +56,7 @@ public interface DBWServiceAuth extends DBWService {
     @WebAction()
     boolean changeLocalPassword(@NotNull WebSession webSession, @NotNull String oldPassword, @NotNull String newPassword) throws DBWebException;
 
-    @WebAction()
+    @WebAction(authRequired = false)
     WebPropertyInfo[] listUserProfileProperties(@NotNull WebSession webSession);
 
     @WebAction()
