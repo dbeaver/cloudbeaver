@@ -920,7 +920,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             }
             var databaseConfigProperties = new LinkedHashMap<String, Object>();
             Map<String, Object> oldRuntimeDBConfig = JSONUtils.getObject(originServerConfig, CBConstants.PARAM_DB_CONFIGURATION);
-            if (!CommonUtils.isEmpty(databaseConfiguration)) {
+            if (!CommonUtils.isEmpty(databaseConfiguration) && !isDistributed()) {
                 for (Map.Entry<String, Object> mp : databaseConfiguration.entrySet()) {
                     copyConfigValue(oldRuntimeDBConfig, databaseConfigProperties, mp.getKey(), mp.getValue());
                 }
