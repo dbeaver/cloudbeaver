@@ -1,7 +1,7 @@
 {
   "name": "@cloudbeaver/product-default",
   "sideEffects": false,
-  "version": "23.0.4",
+  "version": "23.0.5",
   "description": "",
   "license": "Apache-2.0",
   "main": "lib/index.js",
@@ -58,8 +58,8 @@
     "@cloudbeaver/plugin-sql-editor": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor-navigation-tab-script": "~0.1.0",
-    "@cloudbeaver/plugin-sql-editor-screen": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor-new": "~0.1.0",
+    "@cloudbeaver/plugin-sql-editor-screen": "~0.1.0",
     "@cloudbeaver/plugin-sql-generator": "~0.1.0",
     "@cloudbeaver/plugin-theme": "~0.1.0",
     "@cloudbeaver/plugin-tools-panel": "~0.1.0",
