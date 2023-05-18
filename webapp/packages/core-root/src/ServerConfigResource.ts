@@ -9,7 +9,8 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { GraphQLService, CachedDataResource, ServerConfig, ServerConfigInput, NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { GraphQLService, CachedDataResource, ServerConfig, ServerConfigInput, NavigatorSettingsInput, CachedResource } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { isNavigatorViewSettingsEqual } from './ConnectionNavigatorViewSettings';
@@ -59,6 +60,19 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
         this.dataSynchronizationService.requestSynchronization('server-config', 'Server Configuration')
       );
     }, () => undefined, undefined, this);
+  }
+
+  requirePublic<T>(
+    resource: CachedResource<any, any, T, any, any>,
+    map?: (param: void) => T
+  ): this {
+    resource
+      .preloadResource(this, () => {})
+      .before(ExecutorInterrupter.interrupter(() => this.publicDisabled));
+
+    this.outdateResource<T>(resource, map as any);
+
+    return this;
   }
 
   get redirectOnFederatedAuth(): boolean {
