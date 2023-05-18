@@ -68,6 +68,12 @@ public class WebServerConfig {
         return CommonUtils.notEmpty(application.getRootURI());
     }
 
+    @Deprecated
+    @Property
+    public String getHostName() {
+        return getContainerId();
+    }
+
     @Property
     public String getContainerId() {
         return CommonUtils.notEmpty(application.getContainerId());
