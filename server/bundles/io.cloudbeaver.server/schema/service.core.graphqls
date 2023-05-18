@@ -114,6 +114,7 @@ type ServerConfig {
 
     serverURL: String!
     rootURI: String!
+    hostName: String! @deprecated # use container id instead
     containerId: String!
     defaultAuthRole: String
 
