@@ -44,8 +44,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
 
   const editor = useSQLCodeEditor(editorRef);
   const panel = useSQLCodeEditorPanel(data, editor);
-  const [autocompletion, setEditor, autocompletionStyles] = useSqlDialectAutocompletion(data);
-  const combinedRef = useCombinedRef(setEditorRef, setEditor);
+  const autocompletion = useSqlDialectAutocompletion(data);
   const sqlDialect = useSqlDialectExtension(data.dialect);
 
   const dndBox = useDNDBox({
@@ -89,10 +88,10 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
     }],
   });
 
-  return styled(useStyles(styles, autocompletionStyles))(
+  return styled(useStyles(styles))(
     <box ref={dndBox.setRef}>
       <SQLCodeEditorLoader
-        ref={combinedRef}
+        ref={setEditorRef}
         getValue={() => data.value}
         extensions={[ACTIVE_QUERY_EXTENSION, QUERY_STATUS_GUTTER_EXTENSION, autocompletion, sqlDialect]}
         readonly={data.readonly}

@@ -11,7 +11,7 @@ import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { foldGutter, indentOnInput, syntaxHighlighting, bracketMatching } from '@codemirror/language';
 import { highlightSelectionMatches } from '@codemirror/search';
 import type { Extension } from '@codemirror/state';
-import { lineNumbers, highlightSpecialChars, dropCursor, rectangularSelection, crosshairCursor, keymap, highlightActiveLineGutter, highlightActiveLine } from '@codemirror/view';
+import { tooltips, lineNumbers, highlightSpecialChars, dropCursor, rectangularSelection, crosshairCursor, keymap, highlightActiveLineGutter, highlightActiveLine } from '@codemirror/view';
 import { classHighlighter } from '@lezer/highlight';
 
 // @TODO allow to configure bindings outside of the component
@@ -30,6 +30,9 @@ export interface IDefaultExtensions {
 /** Provides the necessary extensions to establish a basic editor */
 export function getDefaultExtensions(options?: IDefaultExtensions): Record<string, Extension> {
   let extensions: Record<string, Extension> = {
+    tooltips: tooltips({
+      parent: document.body,
+    }),
     highlightSpecialChars: highlightSpecialChars(),
     highlightSelectionMatches: highlightSelectionMatches(),
     syntaxHighlighting: syntaxHighlighting(classHighlighter),
