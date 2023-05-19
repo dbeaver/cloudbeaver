@@ -9,6 +9,7 @@ module.exports = {
   moduleNameMapper: {
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/__mocks__/fileMock.ts',
     '\\.(css|scss|less)$': '<rootDir>/__mocks__/styleMock.ts',
+    '^dexie$': require.resolve('dexie'),
   },
   // collectCoverage: true,
   // collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/types.ts'],
@@ -16,7 +17,7 @@ module.exports = {
   // restoreMocks: true,
   passWithNoTests: true,
   testEnvironment: 'jsdom',
-  setupFiles: ['../tests/setup.ts'],
+  setupFiles: ['fake-indexeddb/auto', '../tests/setup.ts'],
   setupFilesAfterEnv: ['@testing-library/jest-dom'],
   transform: { '\\.[jt]sx?$': ['babel-jest', { configFile: require.resolve('./babel.config.js') }] },
 };
