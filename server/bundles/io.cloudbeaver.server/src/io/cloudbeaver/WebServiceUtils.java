@@ -231,14 +231,12 @@ public class WebServiceUtils extends WebCommonUtils {
                 authProperties = new LinkedHashMap<>();
             }
             authProperties.replace(AuthModelDatabaseNativeCredentials.PROP_USER_PASSWORD, null);
+            dataSourceContainer.resetPassword();
         } else {
             if (authProperties == null) {
                 // No changes
                 return;
             }
-        }
-        if (!saveCredentials) {
-            configuration.setUserPassword(null);
         }
         {
             // Read save credentials
