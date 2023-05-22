@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import axios, { AxiosProgressEvent, AxiosResponse } from 'axios';
+import axios, { AxiosProgressEvent, AxiosResponse, isAxiosError } from 'axios';
 import { GraphQLClient, ClientError, resolveRequestDocument } from 'graphql-request';
 import { parseRequestArgs } from 'graphql-request/dist/parseArgs';
 import type { RequestDocument, RequestOptions, Variables } from 'graphql-request/dist/types';
@@ -15,6 +15,7 @@ import type * as Dom from 'graphql-request/dist/types.dom';
 import { GQLError } from './GQLError';
 import type { IResponseInterceptor } from './IResponseInterceptor';
 import { PlainGQLError } from './PlainGQLError';
+import { ServerInternalError } from './ServerInternalError';
 
 export type UploadProgressEvent = AxiosProgressEvent;
 
@@ -91,7 +92,7 @@ export class CustomGraphQLClient extends GraphQLClient {
   ): Promise<T> {
     this.blockRequestsReasonHandler();
     try {
-      const requestOptions  = parseRequestArgs(documentOrOptions, variables, requestHeaders);
+      const requestOptions = parseRequestArgs(documentOrOptions, variables, requestHeaders);
       const { query, operationName } = resolveRequestDocument(requestOptions.document);
 
       const response = await this.rawRequest<T, V>(query, variables, requestHeaders);
@@ -138,6 +139,10 @@ export class CustomGraphQLClient extends GraphQLClient {
 
       return response.data;
     } catch (error: any) {
+      if (isAxiosError(error) && error.response?.data.message) {
+        throw new ServerInternalError({ ...error, message: error.response.data.message });
+      }
+
       if (isClientError(error)) {
         if (isObjectError(error)) {
           throw new GQLError(error);
