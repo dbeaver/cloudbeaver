@@ -22,9 +22,18 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 23.0.5 - 2023-05-22
+
+- We improved the performance of the SQL-editor - as a result, handling scripts with up to 10 000 lines does not present any challenges.
+- Improvements requested by GitHub users are available:
+  - the URL-configuration for PostgreSQL now correctly displays only a single database;
+  - in the SQL-editor, pressing Tab/Space followed by Enter now causes the cursor to move to a new line;
+  - the CE version now offers the updated sqlite-jdbc driver, version 3.41.2.
+- Different bugs have been fixed.
+
 ### CloudBeaver 23.0.4 - 2023-05-08
 
--  Improvements based on GitHub user requests have been added:
+- Improvements based on GitHub user requests have been added:
   - error when running SQL with semicolon has been fixed;
   - option to increase the maximum size of text files displayed in the value panel (using the sqlTextPreviewMaxLength parameter) has been added;
   - support for custom logging configuration has been added. An external configuration file can be used instead of the default configuration.
@@ -52,7 +61,7 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 Changes since 22.3.0
 
--  Administration menu:
+- Administration menu:
   - the User dialog displays available connections in alphabetical order,
   - the shared project is now selected by default in the Create connection dialog. 
 - Connection dialog:
