@@ -240,6 +240,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
 
         configurationMode = CommonUtils.isEmpty(serverName);
 
+        eventController.setForceSkipEvents(isConfigurationMode()); // do not send events if configuration mode is on
+
         // Determine address for local host
         localHostAddress = System.getenv(CBConstants.VAR_CB_LOCAL_HOST_ADDR);
         if (CommonUtils.isEmpty(localHostAddress)) {
@@ -807,11 +809,6 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
 
         configurationMode = CommonUtils.isEmpty(serverName);
 
-        String sessionId = null;
-        if (credentialsProvider != null && credentialsProvider.getActiveUserCredentials() != null) {
-            sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();
-        }
-
         // Reloading configuration by services
         for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance().getWebServices(DBWServiceServerConfigurator.class)) {
             try {
@@ -820,7 +817,13 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                 log.warn("Error reloading configuration by web service " + wsc.getClass().getName(), e);
             }
         }
+
+        String sessionId = null;
+        if (credentialsProvider != null && credentialsProvider.getActiveUserCredentials() != null) {
+            sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();
+        }
         eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId, null));
+        eventController.setForceSkipEvents(isConfigurationMode());
     }
 
     protected Map<String, Object> readRuntimeConfigurationProperties() throws DBException {
