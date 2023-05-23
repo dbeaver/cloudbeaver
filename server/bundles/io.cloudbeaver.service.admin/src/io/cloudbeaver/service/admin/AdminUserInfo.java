@@ -94,16 +94,16 @@ public class AdminUserInfo {
 
     @Property
     public WebUserOriginInfo[] getOrigins() throws DBWebException {
-        List<WebUserOriginInfo> result = new ArrayList<>();
+        List<AdminOriginInfo> result = new ArrayList<>();
         for (String provider : getUserLinkedProviders()) {
             WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(provider);
             if (authProvider == null) {
                 log.error("Auth provider '" + provider + "' not found");
             } else {
-                result.add(new WebUserOriginInfo(session, user, authProvider, false));
+                result.add(new AdminOriginInfo(session, user, authProvider));
             }
         }
-        return result.toArray(new WebUserOriginInfo[0]);
+        return result.toArray(new AdminOriginInfo[0]);
     }
 
     @Property
