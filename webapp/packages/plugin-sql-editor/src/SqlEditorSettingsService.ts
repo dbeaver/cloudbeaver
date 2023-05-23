@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
-  maxFileSize: 100, // kilobyte
+  maxFileSize: 10 * 1024, // kilobyte
   disabled: false,
 };
 
@@ -23,7 +23,7 @@ export class SqlEditorSettingsService {
   readonly deprecatedSettings: PluginSettings<SqlEditorSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('sql-editor', defaultSettings);
+    this.settings = this.pluginManagerService.getPluginSettings('sql_editor', defaultSettings);
     this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('core.app.sqlEditor', defaultSettings);
   }
 }

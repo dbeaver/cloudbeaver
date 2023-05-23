@@ -135,7 +135,7 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
   }
 
   function validateFileSize(size: number) {
-    const maxFileSizeBytes = maxFileSize * 1000;
+    const maxFileSizeBytes = maxFileSize * 1024;
 
     if (size > maxFileSizeBytes) {
       throw new Error(translate('ui_file_size_exceeds', undefined, {

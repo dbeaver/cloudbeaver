@@ -15,11 +15,13 @@
                 logBatchSize: 1000,
                 maxLogRecords: 2000,
                 maxFailedRequests: 3
-            },
-            sqlEditor: {
-                // max size of the file that can be uploaded to the editor (in kilobytes)
-                maxFileSize: 100
             }
+        }
+    },
+    plugin: {
+        sql_editor: {
+            // max size of the file that can be uploaded to the editor (in kilobytes)
+            maxFileSize: 10240
         }
     },
     plugin_data_spreadsheet_new: {
