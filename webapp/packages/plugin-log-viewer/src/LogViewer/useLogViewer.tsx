@@ -45,7 +45,7 @@ export function useLogViewer() {
       return props.logViewerService.isActive;
     },
     get logItems() {
-      return sessionLogsLoader.data;
+      return sessionLogsLoader.tryGetData;
     },
     clearLog() {
       sessionLogsLoader.resource.clear();

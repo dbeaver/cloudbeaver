@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { BASE_TABLE_STYLES, IconOrImage, Link, TableColumnValue, TableItem, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { isSameDay } from '@cloudbeaver/core-utils';
 
 import type { ILogEntry } from './ILogEntry';
 
@@ -68,6 +69,9 @@ export const LogEntry = observer<Props>(function LogEntry({
   const isError = !!item.stackTrace;
   const message = isError ? item.message || translate('ui_error') : item.message;
   let icon: string | null = null;
+  const time = new Date(item.time);
+  const fullTime = time.toLocaleString();
+  const displayTime = isSameDay(time, new Date()) ? time.toLocaleTimeString() : fullTime;
 
   switch (item.type) {
     case 'ERROR':
@@ -83,7 +87,7 @@ export const LogEntry = observer<Props>(function LogEntry({
       <TableColumnValue title={item.type} centerContent flex {...use({ icon: true })}>
         <icon-box>{icon && <IconOrImage icon={icon} />}</icon-box>
       </TableColumnValue>
-      <TableColumnValue title={item.time} ellipsis>{item.time}</TableColumnValue>
+      <TableColumnValue title={fullTime} ellipsis>{displayTime}</TableColumnValue>
       <TableColumnValue>
         <message-cell>
           <message title={message}>

@@ -35,9 +35,6 @@ const styles = css`
       & message-title {
         flex: 1;
       }
-      & Button {
-        flex-shrink: 0;
-      }
     }
     [|buttons] {
       text-align: right;
@@ -72,17 +69,14 @@ export const LogViewerTable = observer<Props>(function LogViewerTable({ items, s
         <Table {...use({ expanded: !!selectedItem })}>
           <TableHeader fixed>
             <TableColumnHeader min />
-            <TableColumnHeader {...use({ timestamp: true })}>{translate('app_log_view_entry_timestamp')}</TableColumnHeader>
+            <TableColumnHeader {...use({ timestamp: true })}>{translate('plugin_log_viewer_entry_timestamp')}</TableColumnHeader>
             <TableColumnHeader>
               <message-title-box>
-                <message-title>{translate('app_log_view_entry_message')}</message-title>
-                {/* <Button title={translate('app_log_view_clear_log')} onClick={onClear}>
-                  {translate('ui_clear')}
-                </Button> */}
+                <message-title>{translate('plugin_log_viewer_entry_message')}</message-title>
                 <MenuBarSmallItem
                   name='trash'
                   viewBox='0 0 24 24'
-                  title={translate('app_log_view_clear_log')}
+                  title={translate('plugin_log_viewer_clear_log')}
                   onClick={onClear}
                 >
                   {translate('ui_clear')}

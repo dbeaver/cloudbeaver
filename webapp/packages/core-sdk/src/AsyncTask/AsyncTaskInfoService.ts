@@ -13,7 +13,7 @@ import { GraphQLService } from '../GraphQLService';
 import type { AsyncTaskInfo } from '../sdk';
 import { AsyncTask } from './AsyncTask';
 
-const DELAY_BETWEEN_TRIES = 1000;
+const DELAY_BETWEEN_TRIES = 250;
 
 @injectable()
 export class AsyncTaskInfoService {
