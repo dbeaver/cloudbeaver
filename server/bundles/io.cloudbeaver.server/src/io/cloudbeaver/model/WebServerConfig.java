@@ -141,7 +141,7 @@ public class WebServerConfig {
 
     @Property
     public long getSessionExpireTime() {
-        return application.getMaxSessionIdleTime();
+        return application.getConfiguredMaxSessionIdleTime();
     }
 
     @Property

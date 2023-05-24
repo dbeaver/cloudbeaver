@@ -186,10 +186,20 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         return false;
     }
 
+    /**
+     * @return actual max session idle time
+     */
     public long getMaxSessionIdleTime() {
         if (isConfigurationMode()) {
             return CONFIGURATION_MODE_SESSION_IDLE_TIME;
         }
+        return maxSessionIdleTime;
+    }
+
+    /**
+     * @return max session idle time from server configuration, may differ from {@link #getMaxSessionIdleTime()}
+     */
+    public long getConfiguredMaxSessionIdleTime() {
         return maxSessionIdleTime;
     }
 
