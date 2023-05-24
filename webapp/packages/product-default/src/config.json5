@@ -19,7 +19,7 @@
         }
     },
     plugin: {
-        sql_editor: {
+        'sql-editor': {
             // max size of the file that can be uploaded to the editor (in kilobytes)
             maxFileSize: 10240
         }
