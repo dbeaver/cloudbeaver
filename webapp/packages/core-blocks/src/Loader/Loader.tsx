@@ -159,7 +159,12 @@ export const Loader = observer<Props>(function Loader({
         }
 
         if ('reload' in element) {
-          reload = element.reload;
+          const reloadLink = element.reload;
+          const reloadCopy = reload;
+          reload = () => {
+            reloadCopy?.();
+            reloadLink?.();
+          };
         }
       }
     }

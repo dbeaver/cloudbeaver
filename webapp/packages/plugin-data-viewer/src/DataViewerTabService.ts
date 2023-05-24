@@ -10,7 +10,7 @@ import { ConnectionInfoResource, ConnectionsManagerService, IConnectionExecutorD
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { INodeNavigationData, NavigationType, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { INodeNavigationData, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { DBObjectPageService, ObjectPage, ObjectViewerTabService, IObjectViewerTabState, isObjectViewerTab } from '@cloudbeaver/plugin-object-viewer';
@@ -81,10 +81,6 @@ export class DataViewerTabService {
   }
 
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
-    if (data.type !== NavigationType.open) {
-      return;
-    }
-
     try {
       const {
         nodeInfo,

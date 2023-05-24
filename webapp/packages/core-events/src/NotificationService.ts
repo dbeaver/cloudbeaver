@@ -166,10 +166,22 @@ export class NotificationService {
     const errorDetails = errorOf(exception, DetailsError);
 
     if (!silent) {
+      const hasDetails = errorDetails?.hasDetails() ?? false;
+
+      if (hasDetails) {
+        if (!title) {
+          title = exception?.name;
+        }
+
+        if (!message) {
+          message = exception?.message;
+        }
+      }
+
       this.logError({
-        title: title || exception?.name || 'Error',
-        message: message || exception?.message,
-        details: errorDetails?.hasDetails() ? exception : undefined,
+        title: title || 'ui_error',
+        message: message || 'core_blocks_exception_message_error',
+        details: exception,
         isSilent: silent,
       });
     }

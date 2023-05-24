@@ -12,7 +12,7 @@ import { connectionProvider, ConnectionInfoResource, Connection, createConnectio
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, objectNavNodeProvider, type INodeNavigationData, NodeManagerUtils, NavigationType } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeManagerService, objectNavNodeProvider, type INodeNavigationData, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider } from '@cloudbeaver/core-projects';
 import { ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationTabsService, ITab, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
@@ -63,6 +63,7 @@ export class ObjectViewerTabService {
   }
 
   registerTabHandler(): void {
+    this.navNodeManagerService.onCanOpen.addHandler(this.canOpenHandler.bind(this));
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
     this.navNodeManagerService.navigator.addPostHandler(this.navigationPostHandler.bind(this));
     this.connectionInfoResource.onConnectionClose.addHandler(this.closeConnectionInfoTabs.bind(this));
@@ -372,17 +373,20 @@ export class ObjectViewerTabService {
     await this.dbObjectPageService.closePages(tab);
   }
 
+  private canOpenHandler(
+    data: INodeNavigationData,
+    contexts: IExecutionContextProvider<INodeNavigationData>
+  ) {
+    const nodeInfo = contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
+
+    if (NodeManagerUtils.isDatabaseObject(data.nodeId)) {
+      nodeInfo.markOpen();
+    }
+  }
+
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
     try {
-      const { isSupported, nodeInfo, initTab } = await contexts.getContext(this.objectViewerTabContext);
-
-      if (isSupported) {
-        nodeInfo.markOpen();
-      }
-
-      if (data.type !== NavigationType.open) {
-        return;
-      }
+      const { nodeInfo, initTab } = await contexts.getContext(this.objectViewerTabContext);
 
       const tab = initTab();
 
@@ -408,10 +412,6 @@ export class ObjectViewerTabService {
     data: INodeNavigationData,
     contexts: IExecutionContextProvider<INodeNavigationData>
   ) {
-    if (data.type !== NavigationType.open) {
-      return;
-    }
-
     if (!contexts.hasContext(this.objectViewerTabContext)) {
       return;
     }

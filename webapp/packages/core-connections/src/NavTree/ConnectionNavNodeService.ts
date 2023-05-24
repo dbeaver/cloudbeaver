@@ -10,7 +10,7 @@ import { action, makeObservable } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { INodeNavigationData, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { INodeNavigationData, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
 import { ServerEventId } from '@cloudbeaver/core-root';
 import { type ResourceKey, ResourceKeyUtils, resourceKeyList, isResourceAlias, ResourceKeySimple } from '@cloudbeaver/core-sdk';
@@ -237,15 +237,10 @@ export class ConnectionNavNodeService extends Dependency {
 
   private async navigateHandler(
     {
-      type,
       nodeId,
     }: INodeNavigationData,
     contexts: IExecutionContextProvider<INodeNavigationData>
   ): Promise<void> {
-    if (type !== NavigationType.open) {
-      return;
-    }
-
     let connection: Connection | undefined | null = await contexts.getContext(this.navigationNavNodeConnectionContext);
 
     if (NodeManagerUtils.isDatabaseObject(nodeId) && connection) {

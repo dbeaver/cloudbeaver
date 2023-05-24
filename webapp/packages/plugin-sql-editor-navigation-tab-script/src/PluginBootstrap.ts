@@ -10,7 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, NavNodeInfoResource, type INodeNavigationData, NavigationType } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeManagerService, NavNodeInfoResource, type INodeNavigationData } from '@cloudbeaver/core-navigation-tree';
 import { createResourceOfType, isResourceOfType, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -50,6 +50,7 @@ export class PluginBootstrap extends Bootstrap {
   }
 
   register(): void | Promise<void> {
+    this.navNodeManagerService.onCanOpen.addHandler(this.canOpenHandler.bind(this));
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
 
     this.actionService.addHandler({
@@ -200,46 +201,29 @@ export class PluginBootstrap extends Bootstrap {
 
   load(): void | Promise<void> { }
 
+  private canOpenHandler(
+    data: INodeNavigationData,
+    contexts: IExecutionContextProvider<INodeNavigationData>
+  ): void {
+    const nodeInfo = contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
+
+    if (this.canOpen(data, contexts)) {
+      nodeInfo.markOpen();
+    }
+  }
+
   private async navigationHandler(
     data: INodeNavigationData,
     contexts: IExecutionContextProvider<INodeNavigationData>
   ) {
-    if (!this.resourceManagerService.enabled) {
+    if (!this.canOpen(data, contexts)) {
       return;
     }
 
     try {
-      const nodeInfo = contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
-
-      if (!nodeInfo.projectId) {
-        return;
-      }
-
-      const node = this.navNodeInfoResource.get(data.nodeId);
-
-      const project = this.projectInfoResource.get(nodeInfo.projectId);
-      if (!project) {
-        return;
-      }
-
-      const resourceType = this.projectInfoResource.getResourceType(project, SCRIPTS_TYPE_ID);
-      if (!resourceType) {
-        return;
-      }
-
-      if (!node || node.nodeType !== NAV_NODE_TYPE_RM_RESOURCE || !isResourceOfType(resourceType, node.id)) {
-        return;
-      }
-
-      const resourceKey = getResourceKeyFromNodeId(node.id);
+      const resourceKey = getResourceKeyFromNodeId(data.nodeId);
 
       if (!resourceKey) {
-        return;
-      }
-
-      nodeInfo.markOpen();
-
-      if (data.type !== NavigationType.open) {
         return;
       }
 
@@ -284,5 +268,41 @@ export class PluginBootstrap extends Bootstrap {
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_open_script_error');
     }
+  }
+
+  private canOpen(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>): boolean {
+    if (!this.resourceManagerService.enabled) {
+      return false;
+    }
+
+    const nodeInfo = contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
+
+    if (!nodeInfo.projectId) {
+      return false;
+    }
+
+    const node = this.navNodeInfoResource.get(data.nodeId);
+
+    const project = this.projectInfoResource.get(nodeInfo.projectId);
+    if (!project) {
+      return false;
+    }
+
+    const resourceType = this.projectInfoResource.getResourceType(project, SCRIPTS_TYPE_ID);
+    if (!resourceType) {
+      return false;
+    }
+
+    if (!node || node.nodeType !== NAV_NODE_TYPE_RM_RESOURCE || !isResourceOfType(resourceType, node.id)) {
+      return false;
+    }
+
+    const resourceKey = getResourceKeyFromNodeId(node.id);
+
+    if (!resourceKey) {
+      return false;
+    }
+
+    return true;
   }
 }
