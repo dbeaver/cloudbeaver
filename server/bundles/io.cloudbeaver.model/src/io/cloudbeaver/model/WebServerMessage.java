@@ -20,6 +20,9 @@ import io.cloudbeaver.utils.CBModelConstants;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * Web server message
@@ -35,7 +38,7 @@ public class WebServerMessage {
     }
 
     private final MessageType type;
-    private final long time;
+    private final Instant time;
     private final String message;
     private final Throwable error;
 
@@ -50,7 +53,7 @@ public class WebServerMessage {
 
     public WebServerMessage(MessageType type, String message, Throwable error) {
         this.type = type;
-        this.time = System.currentTimeMillis();
+        this.time = Instant.now();
         this.message = message;
         this.error = error;
     }
