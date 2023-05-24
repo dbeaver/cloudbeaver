@@ -66,7 +66,7 @@ public class WebSessionAuthProcessor {
                 case SUCCESS:
                     return finishWebSessionAuthorization(smAuthInfo);
                 case ERROR:
-                    throw new DBException("Authentication failed: " + smAuthInfo.getError());
+                    throw new DBException(smAuthInfo.getError());
                 case IN_PROGRESS:
                     throw new DBException("Authorization didn't complete");
                 default:
