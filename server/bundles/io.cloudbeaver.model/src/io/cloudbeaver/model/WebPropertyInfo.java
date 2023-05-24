@@ -123,7 +123,7 @@ public class WebPropertyInfo {
     public Object getValue() throws DBException {
         Object value = propertySource == null ? null : propertySource.getPropertyValue(session.getProgressMonitor(), property.getId());
         if (property instanceof ObjectPropertyDescriptor) {
-            ObjectPropertyDescriptor opd = (ObjectPropertyDescriptor)property;
+            ObjectPropertyDescriptor opd = (ObjectPropertyDescriptor) property;
             if (!showProtected && opd.isPassword() || opd.isHidden()) {
                 if (value == null || value.toString().isEmpty()) {
                     return "";
