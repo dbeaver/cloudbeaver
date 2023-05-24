@@ -9,11 +9,11 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { UserInfoResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { UsersResource } from '@cloudbeaver/core-authentication';
 import { TextPlaceholder, Loader, ExceptionMessage, BASE_CONTAINERS_STYLES, ColoredContainer, ObjectPropertyInfoForm, Group, useAutoLoad, useObjectRef, IAutoLoadable, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminUserInfo, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { AuthenticationProvider, TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
+import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import { getOriginTabId } from './getOriginTabId';
 import type { IUserFormProps } from './UserFormService';
@@ -38,7 +38,6 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
   const style = useStyles(BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
   const usersResource = useService(UsersResource);
-  const userInfoService = useService(UserInfoResource);
   const state = useTabState<IState>(() => ({
     origin: null,
     properties: [],
@@ -53,9 +52,6 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
   if (!origin) {
     origin = user.origins[0];
   }
-
-  const providerId = origin.subType ?? origin.type;
-  const authorized = userInfoService.hasToken(providerId);
 
   const loadableState = useObjectRef<IInnerState>(() => ({
     get exception(): Error | null {
@@ -109,7 +105,7 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
 
   const { selected } = useTab(tabId);
 
-  useAutoLoad(loadableState, selected && authorized);
+  useAutoLoad(loadableState, selected);
 
   if (!selected) {
     return null;
@@ -130,16 +126,6 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
       <ColoredContainer parent>
         <Group large>
           <ExceptionMessage exception={state.exception} onRetry={() => loadableState.reload?.()} />
-        </Group>
-      </ColoredContainer>
-    );
-  }
-
-  if (!authorized) {
-    return styled(style)(
-      <ColoredContainer parent>
-        <Group large>
-          <AuthenticationProvider providerId={providerId} onAuthenticate={() => loadableState.reload?.()} />
         </Group>
       </ColoredContainer>
     );
