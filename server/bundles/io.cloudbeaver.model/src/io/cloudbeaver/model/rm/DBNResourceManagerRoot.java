@@ -28,6 +28,11 @@ import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.navigator.DBNRoot;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.WSProjectEvent;
+import org.jkiss.dbeaver.model.websocket.event.resource.RMEventListener;
+import org.jkiss.dbeaver.model.websocket.event.resource.RMEventManager;
+import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
 import org.jkiss.utils.ArrayUtils;
 
 import java.util.*;
@@ -119,39 +124,50 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
     }
 
     @Override
-    public void handleRMEvent(RMEvent event) {
-        var action = event.getAction();
+    public void handleRMEvent(WSProjectEvent event) {
+        var action = WSEventType.valueById(event.getId());
         switch (action) {
-            case RESOURCE_DELETE:
-                deleteResourceNode(event.getProject(), event.getResourceTree());
+            case RM_RESOURCE_DELETED:
+                deleteResourceNode(event.getProjectId(), List.of(((WSResourceUpdatedEvent) event).getResourceParsedPath()));
                 break;
-            case RESOURCE_ADD:
-                addResourceNode(event.getProject(), event.getResourceTree());
+            case RM_RESOURCE_CREATED:
+                addResourceNode(event.getProjectId(), List.of(((WSResourceUpdatedEvent) event).getResourceParsedPath()));
                 break;
-            case PROJECT_ADD:
-                addProjectNode(event.getProject());
+            case RM_PROJECT_ADDED:
+                addProjectNode(event.getProjectId());
+                break;
+            case RM_PROJECT_REMOVED:
+                deleteProjectNode(event.getProjectId());
                 break;
         }
     }
 
-    private void deleteResourceNode(RMProject project, List<RMResource> resourcePath) {
-        var projectNode = getProjectNode(project);
+    private void deleteResourceNode(String projectId, List<RMResource> resourcePath) {
+        var projectNode = getProjectNode(projectId);
         projectNode.ifPresent(dbnResourceManagerProject -> dbnResourceManagerProject.removeChildResourceNode(new ArrayDeque<>(resourcePath)));
     }
 
     @NotNull
-    private Optional<DBNResourceManagerProject> getProjectNode(RMProject project) {
+    private Optional<DBNResourceManagerProject> getProjectNode(String projectId) {
         return Arrays.stream(projects)
-            .filter(rmProjectNode -> rmProjectNode.getProject().getId().equals(project.getId()))
+            .filter(rmProjectNode -> rmProjectNode.getProject().getId().equals(projectId))
             .findFirst();
     }
 
-    private void addResourceNode(RMProject project, List<RMResource> resourcePath) {
-        var projectNode = getProjectNode(project);
+    private void addResourceNode(String projectId, List<RMResource> resourcePath) {
+        var projectNode = getProjectNode(projectId);
         projectNode.ifPresent(dbnResourceManagerProject -> dbnResourceManagerProject.addChildResourceNode(new ArrayDeque<>(resourcePath)));
     }
 
-    private void addProjectNode(RMProject project) {
-        projects = ArrayUtils.add(DBNResourceManagerProject.class, projects, new DBNResourceManagerProject(this, project));
+    private void addProjectNode(String projectId) {
+        var rmProject = new RMProject(projectId.split("_")[1]);
+        rmProject.setId(projectId);
+        rmProject.setType(RMProjectType.SHARED);
+        projects = ArrayUtils.add(DBNResourceManagerProject.class, projects, new DBNResourceManagerProject(this, rmProject));
+    }
+
+    private void deleteProjectNode(String projectId) {
+        var projectNode = getProjectNode(projectId);
+        projectNode.ifPresent(project -> ArrayUtils.remove(DBNResourceManagerProject.class, projects, project));
     }
 }

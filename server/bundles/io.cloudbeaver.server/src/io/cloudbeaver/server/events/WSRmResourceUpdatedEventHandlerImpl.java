@@ -24,7 +24,7 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMEvent;
-import org.jkiss.dbeaver.model.rm.RMEventManager;
+import org.jkiss.dbeaver.model.websocket.event.resource.RMEventManager;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
@@ -43,36 +43,8 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSResourceUpdatedEvent event) {
         if (activeUserSession instanceof WebSession) {
-            var parsedResourcePath = event.getResourceParsedPath();
-            var resourceParsedPath = parsedResourcePath instanceof RMResource[]
-                ? (RMResource[]) parsedResourcePath
-                : gson.fromJson(gson.toJson(parsedResourcePath), RMResource[].class);
-            var webSession = (WebSession) activeUserSession;
-            acceptChangesInNavigatorTree(
-                WSEventType.valueById(event.getId()),
-                resourceParsedPath,
-                webSession.getProjectById(event.getProjectId())
-            );
+            RMEventManager.fireEvent(event);
         }
         activeUserSession.addSessionEvent(event);
-    }
-
-    private void acceptChangesInNavigatorTree(WSEventType eventType,
-                                              RMResource[] resourceParsedPath,
-                                              WebProjectImpl project) {
-        List<RMResource> rmResourcePath = Arrays.asList(resourceParsedPath);
-        if (eventType == WSEventType.RM_RESOURCE_CREATED) {
-            RMEventManager.fireEvent(
-                new RMEvent(RMEvent.Action.RESOURCE_ADD,
-                    project.getRmProject(),
-                    rmResourcePath)
-            );
-        } else if (eventType == WSEventType.RM_RESOURCE_DELETED) {
-            RMEventManager.fireEvent(
-                new RMEvent(RMEvent.Action.RESOURCE_DELETE,
-                    project.getRmProject(),
-                    rmResourcePath)
-            );
-        }
     }
 }

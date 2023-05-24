@@ -44,6 +44,10 @@ import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMObjects;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
+import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
+import org.jkiss.dbeaver.model.websocket.event.resource.RMEventManager;
+import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
+import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
 import org.jkiss.dbeaver.registry.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
@@ -305,6 +309,7 @@ public class LocalResourceController implements RMController {
             } catch (IOException e) {
                 throw new DBException("Error deleting project '" + project.getName() + "'", e);
             }
+            fireRmProjectRemoveEvent(project);
         }
     }
 
@@ -470,7 +475,7 @@ public class LocalResourceController implements RMController {
             if (!folderPath.startsWith(projectPath)) {
                 throw new DBException("Invalid folder path");
             }
-            createFolder(folderPath);
+            createFolder(projectId, folderPath);
             return readChildResources(projectId, folderPath, nameMask, readProperties, readHistory, recursive);
         } catch (NoSuchFileException e) {
             throw new DBException("Invalid resource folder " + folder);
@@ -511,7 +516,7 @@ public class LocalResourceController implements RMController {
         if (Files.exists(targetPath)) {
             throw new DBException("Resource '" + resourcePath + "' already exists");
         }
-        createFolder(targetPath.getParent());
+        createFolder(projectId, targetPath.getParent());
         try {
             if (isFolder) {
                 Files.createDirectories(targetPath);
@@ -556,7 +561,7 @@ public class LocalResourceController implements RMController {
             throw new DBException("Unable to move resource properties", e);
         }
 
-        fireRmResourceDeleteEvent(projectId, rmOldResourcePath);
+        fireRmResourceDeleteEvent(projectId, oldResourcePath, rmOldResourcePath);
         fireRmResourceAddEvent(projectId, normalizedNewResourcePath);
         return DEFAULT_CHANGE_ID;
     }
@@ -625,7 +630,7 @@ public class LocalResourceController implements RMController {
         getProjectMetadata(projectId, false)
                 .resetResourcesPropertiesBatch(propertiesToRemove);
         log.debug("Fire resource delete event");
-        fireRmResourceDeleteEvent(projectId, rmResourcePath);
+        fireRmResourceDeleteEvent(projectId, resourcePath, rmResourcePath);
     }
 
     private Collection<String> getPropertiesToRemove(@NotNull String projectId, @NotNull Path targetPath) throws DBException, IOException {
@@ -682,7 +687,7 @@ public class LocalResourceController implements RMController {
         if (!forceOverwrite && Files.exists(targetPath)) {
             throw new DBException("Resource '" + resourcePath + "' exists");
         }
-        createFolder(targetPath.getParent());
+        createFolder(projectId, targetPath.getParent());
         try {
             Files.write(targetPath, data);
         } catch (IOException e) {
@@ -694,13 +699,25 @@ public class LocalResourceController implements RMController {
         return DEFAULT_CHANGE_ID;
     }
 
-    private void createFolder(Path targetPath) throws DBException {
+    private void createFolder(String projectId, Path targetPath) throws DBException {
         if (!Files.exists(targetPath)) {
             try {
                 Files.createDirectories(targetPath);
             } catch (IOException e) {
                 throw new DBException("Error creating folder '" + targetPath + "'");
             }
+            // TODO: use WSEvent instead of RMEvent for navigator node and remove RMEventManager
+            var path = targetPath.getFileName().toString();
+            var event = WSResourceUpdatedEvent.create(
+                null,
+                null,
+                projectId,
+                path,
+                getResourcePath(projectId, path),
+                WSResourceProperty.CONTENT,
+                null);
+            event.setSendForce(true);
+            RMEventManager.fireEvent(event);
         }
     }
 
@@ -921,26 +938,53 @@ public class LocalResourceController implements RMController {
     }
 
     private void fireRmResourceAddEvent(@NotNull String projectId, @NotNull String resourcePath) throws DBException {
+        var credentials = credentialsProvider.getActiveUserCredentials();
         RMEventManager.fireEvent(
-            new RMEvent(RMEvent.Action.RESOURCE_ADD,
-                getProject(projectId, false, false),
-                Arrays.asList(getResourcePath(projectId, resourcePath)))
+            WSResourceUpdatedEvent.create(
+                credentials == null ? null : credentials.getSmSessionId(),
+                credentials == null ? null : credentials.getUserId(),
+                projectId,
+                resourcePath,
+                getResourcePath(projectId, resourcePath),
+                WSResourceProperty.NAME,
+                null
+            )
         );
     }
 
-    private void fireRmResourceDeleteEvent(@NotNull String projectId, @NotNull List<RMResource> resourcePath) throws DBException {
+    private void fireRmResourceDeleteEvent(@NotNull String projectId, @NotNull String resourcePath, @NotNull List<RMResource> rmResourcePath) throws DBException {
+        var credentials = credentialsProvider.getActiveUserCredentials();
         RMEventManager.fireEvent(
-            new RMEvent(RMEvent.Action.RESOURCE_DELETE,
-                makeProjectFromId(projectId, false),
-                resourcePath
+            WSResourceUpdatedEvent.delete(
+                credentials == null ? null : credentials.getSmSessionId(),
+                credentials == null ? null : credentials.getUserId(),
+                projectId,
+                resourcePath,
+                rmResourcePath.toArray(RMResource[]::new),
+                WSResourceProperty.NAME,
+                null
             )
         );
     }
 
     private void fireRmProjectAddEvent(@NotNull RMProject project) throws DBException {
+        var credentials = credentialsProvider.getActiveUserCredentials();
         RMEventManager.fireEvent(
-            new RMEvent(RMEvent.Action.RESOURCE_ADD,
-                project
+            WSProjectUpdateEvent.create(
+                credentials == null ? null : credentials.getSmSessionId(),
+                credentials == null ? null : credentials.getUserId(),
+                project.getId()
+            )
+        );
+    }
+
+    private void fireRmProjectRemoveEvent(@NotNull RMProject project) throws DBException {
+        var credentials = credentialsProvider.getActiveUserCredentials();
+        RMEventManager.fireEvent(
+            WSProjectUpdateEvent.delete(
+                credentials == null ? null : credentials.getSmSessionId(),
+                credentials == null ? null : credentials.getUserId(),
+                project.getId()
             )
         );
     }
