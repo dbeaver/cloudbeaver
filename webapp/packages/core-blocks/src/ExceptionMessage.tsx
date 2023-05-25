@@ -152,9 +152,9 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({
         <>
           <error-data>
             <error-name>
-              <span>{translate('ui_error')}</span>
+              <span>{translate('core_blocks_exception_message_error_title')}</span>
             </error-name>
-            <error-message>{translate('core_blocks_exception_message_error')}</error-message>
+            <error-message>{translate('core_blocks_exception_message_error_message')} {onRetry && translate('ui_please_retry')}</error-message>
             <error-actions>
               <Button type='button' mod={['outlined']} disabled={error.isOpen} onClick={error.open}>
                 {translate('ui_errors_details')}

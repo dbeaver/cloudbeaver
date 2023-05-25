@@ -179,8 +179,8 @@ export class NotificationService {
       }
 
       this.logError({
-        title: title || 'ui_error',
-        message: message || 'core_blocks_exception_message_error',
+        title: title || 'ui_unexpected_error',
+        message: message || 'core_blocks_exception_message_error_message',
         details: exception,
         isSilent: silent,
       });

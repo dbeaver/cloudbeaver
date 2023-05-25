@@ -6,5 +6,6 @@ export default [
   ['core_blocks_properties_table_item_reset', 'Reset to default'],
   ['core_blocks_properties_table_item_remove', 'Remove property'],
   ['combobox_no_results_placeholder', 'No results'],
-  ['core_blocks_exception_message_error', 'An error occurred while processing data from the server. You can use details to report the problem.'],
+  ['core_blocks_exception_message_error_title', 'Unable to display content'],
+  ['core_blocks_exception_message_error_message', 'Something went wrong.'],
 ];
