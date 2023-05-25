@@ -126,14 +126,14 @@ export class AuthenticationService extends Bootstrap {
   }
 
   private async auth(persistent: boolean, options: IAuthOptions) {
-    const contexts = await this.onLogin.execute('before');
-
-    if (ExecutorInterrupter.isInterrupted(contexts)) {
+    if (this.authPromise) {
+      await this.waitAuth();
       return;
     }
 
-    if (this.authPromise) {
-      await this.authPromise;
+    const contexts = await this.onLogin.execute('before');
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
       return;
     }
 
@@ -170,6 +170,8 @@ export class AuthenticationService extends Bootstrap {
   }
 
   private async requireAuthentication() {
+    await this.waitAuth();
+
     const authNeeded = await this.appAuthService.isAuthNeeded();
     if (!authNeeded) {
       return;
@@ -188,6 +190,8 @@ export class AuthenticationService extends Bootstrap {
     this.screenService.routeChange.addHandler(() => this.requireAuthentication());
 
     this.administrationScreenService.ensurePermissions.addHandler(async () => {
+      await this.waitAuth();
+
       const userInfo = await this.userInfoResource.load();
       if (userInfo) {
         return;
@@ -209,14 +213,16 @@ export class AuthenticationService extends Bootstrap {
     if (isAutoLoginSessionAction(data)) {
       const user = await this.userInfoResource.finishFederatedAuthentication(data['auth-id'], false);
 
-      if (user && this.authPromise) {
-        this.authDialogService.closeLoginForm(this.authPromise);
+      if (user) {
+        this.authDialogService.closeLoginForm();
       }
       action.process();
     }
   }
 
   private readonly requestAuthProviderHandler: IExecutorHandler<RequestedProvider> = async (data, contexts) => {
+    await this.waitAuth();
+
     if (data.providerId === AUTH_PROVIDER_LOCAL_ID) {
       const provider = contexts.getContext(AuthProviderContext);
       provider.auth();
@@ -239,4 +245,10 @@ export class AuthenticationService extends Bootstrap {
       provider.auth();
     }
   };
+
+  private async waitAuth() {
+    try {
+      await this.authPromise;
+    } catch {}
+  }
 }
