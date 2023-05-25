@@ -12,6 +12,8 @@ interface IGetWidthOptions {
   text: string[];
 }
 
+const LETTER_SPACING = 0.4;
+
 export const TextTools = {
   getWidth({ font, container, text }: IGetWidthOptions): number[] {
     if (container) {
@@ -28,6 +30,11 @@ export const TextTools = {
     const context = canvas.getContext('2d')!;
     context.font = font;
 
-    return text.map(value => context.measureText(value).width);
+    return text.map(value => {
+      const width = context.measureText(value).width;
+      const spacing = (value.length - 1) * LETTER_SPACING;
+
+      return width + spacing;
+    });
   },
 };

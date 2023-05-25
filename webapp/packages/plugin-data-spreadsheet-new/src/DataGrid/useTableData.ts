@@ -36,6 +36,10 @@ export const indexColumn: Column<IResultSetRowKey, any> = {
   formatter: IndexFormatter,
 };
 
+const COLUMN_HEADER_CONTAINER_WIDTH = 57;
+const COLUMN_NAME_LEFT_MARGIN = 8;
+const FONT = '400 12px Roboto';
+
 export function useTableData(
   model: IDatabaseDataModel<any, IDatabaseResultSet>,
   resultIndex: number,
@@ -66,16 +70,14 @@ export function useTableData(
       const rowStrings = this.format.getLongestCells();
 
       // TODO: seems better to do not measure container size
-      //       for detecting max columns size, better to use configurable variable
+      // for detecting max columns size, better to use configurable variable
       const measuredCells = TextTools.getWidth({
-        font: '400 14px Roboto',
-        text: columnNames.map((cell, i) => {
-          if (cell.length > (rowStrings[i] || '').length) {
-            return cell;
-          }
-          return rowStrings[i];
+        font: FONT,
+        text: columnNames.map((columnName, i) => {
+          const cellString = rowStrings[i] || '';
+          return columnName.length >= cellString.length ? columnName : cellString;
         }),
-      }).map(v => v + 16 + 32 + 20);
+      }).map(v => v + COLUMN_HEADER_CONTAINER_WIDTH + COLUMN_NAME_LEFT_MARGIN);
 
       const columns: Array<Column<IResultSetRowKey, any>> = this.columnKeys.map<Column<IResultSetRowKey, any>>(
         (col, index) => ({
