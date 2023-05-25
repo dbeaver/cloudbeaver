@@ -288,7 +288,10 @@ public class LocalResourceController implements RMController {
             throw new DBException("Project '" + name + "' not created");
         }
         try {
-            Files.createDirectories(getProjectPath(project.getId()));
+            Files.createDirectories(projectPath);
+            if (WebAppUtils.getWebApplication().isMultiNode()) {
+                createResourceTypeFolders(projectPath);
+            }
             fireRmProjectAddEvent(project);
             return project;
         } catch (IOException e) {
