@@ -14,6 +14,7 @@ export const buttonStyles = css`
       display: flex;
       justify-content: center;
       align-content: center;
+      align-items: center;
 
       /* pointer outline */
       &::before {
@@ -42,15 +43,15 @@ export const buttonStyles = css`
       flex-direction: column;
       cursor: ew-resize;
       height: 100%;
-      width: 16px;
-      left: -7px;
+      width: 5px;
+      left: -2px;
 
       &[|mode=minimize] {
-        left: -4px;
+        left: 0;
       }
 
       &[|mode=maximize] {
-        left: -12px;
+        left: -2px;
       }
 
       & button {
@@ -79,15 +80,15 @@ export const buttonStyles = css`
       flex-direction: row;
       cursor: ns-resize;
       width: 100%;
-      height: 16px;
-      top: -7px;
+      height: 5px;
+      top: -2px;
 
       &[|mode=minimize] {
-        top: -4px;
+        top: 0;
       }
 
       &[|mode=maximize] {
-        top: -12px;
+        top: -2px;
       }
 
       & button {

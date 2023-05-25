@@ -46,10 +46,10 @@ export const splitStyles = css`
     ResizerControls:before {
       content: ' ';
       position: absolute;
-      width: 12px;
+      width: 4px;
       height: 100%;
       top: 0;
-      left: -5px;
+      left: -1px;
       cursor: ew-resize;
       box-sizing: border-box;
     }
@@ -72,9 +72,9 @@ export const splitHorizontalStyles = css`
   }
 
   ResizerControls:before {
-    height: 12px;
+    height: 4px;
     width: 100%;
-    top: -5px;
+    top: -1px;
     left: 0;
     cursor: ns-resize;
   }

@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
-  maxFileSize: 100, // kilobyte
+  maxFileSize: 10 * 1024, // kilobyte
   disabled: false,
 };
 
