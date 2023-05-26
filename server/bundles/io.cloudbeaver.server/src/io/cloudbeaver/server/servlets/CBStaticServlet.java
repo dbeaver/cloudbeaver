@@ -54,9 +54,9 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet(urlPatterns = "/")
 public class CBStaticServlet extends DefaultServlet {
-    private static final String AUTO_LOGIN_ACTION = "auto-login";
-    private static final String AUTO_LOGIN_AUTH_ID = "auth-id";
-    private static final String ACTION = "action";
+    public static final String AUTO_LOGIN_ACTION = "auto-login";
+    public static final String AUTO_LOGIN_AUTH_ID = "auth-id";
+    public static final String ACTION = "action";
     public static final int STATIC_CACHE_SECONDS = 60 * 60 * 24 * 3;
 
     private static final Log log = Log.getLog(CBStaticServlet.class);

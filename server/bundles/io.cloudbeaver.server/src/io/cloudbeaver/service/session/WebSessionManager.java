@@ -17,15 +17,15 @@
 package io.cloudbeaver.service.session;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.auth.SMTokenCredentialProvider;
-import io.cloudbeaver.model.session.BaseWebSession;
-import io.cloudbeaver.model.session.WebHeadlessSession;
-import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.session.WebSessionAuthProcessor;
+import io.cloudbeaver.model.session.*;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.service.DBWSessionHandler;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -148,8 +148,33 @@ public class WebSessionManager {
                 }
             }
         }
+        performAutoLoginIfNeeded(request, webSession);
 
         return webSession;
+    }
+
+    private void performAutoLoginIfNeeded(HttpServletRequest request, WebSession webSession) {
+        boolean isAutoLogin = CommonUtils.toBoolean(WebAppUtils.getRequestCookie(request, CBAuthConstants.CB_AUTO_LOGIN_COOKIE_NAME));
+        if (!isAutoLogin) {
+            return;
+        }
+
+        if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
+            log.warn("Auto login failed: user already authorized");
+            return;
+        }
+
+        String authId = WebAppUtils.getRequestCookie(request, CBAuthConstants.CB_AUTH_ID_REQUEST_PARAM);
+        if (CommonUtils.isEmpty(authId)) {
+            log.warn("Auto login failed: authId not found in request");
+            return;
+        }
+        Map<String, Object> authActionParams = Map.of(
+            CBStaticServlet.ACTION, CBStaticServlet.AUTO_LOGIN_ACTION,
+            CBStaticServlet.AUTO_LOGIN_AUTH_ID, authId
+        );
+
+        WebActionParameters.saveToSession(webSession, authActionParams);
     }
 
     /**
