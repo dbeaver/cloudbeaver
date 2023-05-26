@@ -427,7 +427,9 @@ export function useResource<
     const disposeDataUpdate = reaction(
       () => result.tryGetData,
       (data, prev) => {
-        actions?.onData?.(data as any, resource, prev as any);
+        if (result.loaded) {
+          actions?.onData?.(data as any, resource, prev as any);
+        }
       },
       {
         onError: () => {},

@@ -126,6 +126,8 @@ export const TableFooter = observer<Props>(function TableFooter({
             type="number"
             value={limit}
             disabled={disabled}
+            min={dataViewerSettingsService.getMinFetchSize()}
+            max={dataViewerSettingsService.getMaxFetchSize()}
             onChange={e => setLimit(e.target.value)}
             onBlur={handleChange}
             {...use({ mod: 'surface' })}
