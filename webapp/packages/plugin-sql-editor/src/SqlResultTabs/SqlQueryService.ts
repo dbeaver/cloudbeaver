@@ -257,6 +257,8 @@ export class SqlQueryService {
           .setSlice(0)
           .request();
 
+        const cancelled = model.source.cancelled;
+
         statistics.executedQueries++;
         statistics.executeTime += source.requestInfo.requestDuration;
 
@@ -285,7 +287,13 @@ export class SqlQueryService {
 
           model = source = undefined;
         }
+
         options?.onQueryExecuted?.(query, i, true);
+
+        if (cancelled) {
+          break;
+        }
+
       } catch (exception: any) {
         if (model) {
           const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
@@ -331,7 +339,7 @@ export class SqlQueryService {
             DatabaseEditAction
           );
 
-          const edited =  editor?.isEdited() && model.source.executionContext?.context;
+          const edited = editor?.isEdited() && model.source.executionContext?.context;
 
           if (edited && activeGroupId !== tabGroup.groupId) {
             this.sqlQueryResultService.selectResult(

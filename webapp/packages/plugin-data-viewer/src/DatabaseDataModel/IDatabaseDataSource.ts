@@ -42,6 +42,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly error: Error | null;
   readonly executionContext: IConnectionExecutionContext | null;
   readonly canCancel: boolean;
+  readonly cancelled: boolean;
   readonly serviceInjector: IServiceInjector;
   readonly outdated: boolean;
 

@@ -31,6 +31,10 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     return this.currentTask?.cancellable || false;
   }
 
+  get cancelled(): boolean {
+    return this.currentTask?.cancelled || false;
+  }
+
   constructor(
     readonly serviceInjector: IServiceInjector,
     protected readonly graphQLService: GraphQLService,

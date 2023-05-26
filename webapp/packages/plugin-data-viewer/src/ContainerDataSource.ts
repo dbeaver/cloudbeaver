@@ -30,6 +30,10 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     return this.currentTask?.cancellable || false;
   }
 
+  get cancelled(): boolean {
+    return this.currentTask?.cancelled || false;
+  }
+
   constructor(
     readonly serviceInjector: IServiceInjector,
     private readonly graphQLService: GraphQLService,

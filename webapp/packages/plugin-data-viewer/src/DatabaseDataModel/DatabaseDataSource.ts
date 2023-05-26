@@ -36,6 +36,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   outdated: boolean;
 
   abstract get canCancel(): boolean;
+  abstract get cancelled(): boolean;
 
   readonly serviceInjector: IServiceInjector;
   protected disabled: boolean;
