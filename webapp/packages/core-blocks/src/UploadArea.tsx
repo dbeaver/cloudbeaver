@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { forwardRef, useLayoutEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
@@ -31,14 +30,10 @@ const styles = css`
   }
 `;
 
-export const UploadArea = forwardRef<HTMLInputElement, Props>(function UploadArea({
-  id = uuid(),
-  value,
-  reset,
-  children,
-  className,
-  ...rest
-}, refInherit) {
+export const UploadArea = forwardRef<HTMLInputElement, Props>(function UploadArea(
+  { id = uuid(), value, reset, children, className, ...rest },
+  refInherit,
+) {
   const ref = useRefInherit<HTMLInputElement>(refInherit);
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,10 +55,10 @@ export const UploadArea = forwardRef<HTMLInputElement, Props>(function UploadAre
 
   return styled(styles)(
     <>
-      <input ref={ref} {...rest} type='file' id={id} hidden onChange={handleChange} />
+      <input ref={ref} {...rest} type="file" id={id} hidden onChange={handleChange} />
       <label htmlFor={id} {...use({ disabled: rest.disabled })} className={className} title={rest.title}>
         {children}
       </label>
-    </>
+    </>,
   );
 });

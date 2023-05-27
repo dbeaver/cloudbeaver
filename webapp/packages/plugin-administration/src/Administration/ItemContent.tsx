@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 
 import { AdministrationItemService, IAdministrationItemRoute } from '@cloudbeaver/core-administration';
@@ -17,10 +16,7 @@ interface Props {
   configurationWizard: boolean;
 }
 
-export const ItemContent = observer<Props>(function ItemContent({
-  activeScreen,
-  configurationWizard,
-}) {
+export const ItemContent = observer<Props>(function ItemContent({ activeScreen, configurationWizard }) {
   const translate = useTranslate();
   const administrationItemService = useService(AdministrationItemService);
 

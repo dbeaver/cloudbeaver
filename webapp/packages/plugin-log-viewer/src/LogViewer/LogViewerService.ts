@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { makeObservable, computed } from 'mobx';
+import { computed, makeObservable } from 'mobx';
 
 import { UserDataService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
@@ -39,12 +38,10 @@ export class LogViewerService {
     private readonly toolsPanelService: ToolsPanelService,
     private readonly logViewerSettingsService: LogViewerSettingsService,
   ) {
-
     makeObservable<LogViewerService>(this, {
       settings: computed,
       disabled: computed,
     });
-
   }
 
   toggle(): void {

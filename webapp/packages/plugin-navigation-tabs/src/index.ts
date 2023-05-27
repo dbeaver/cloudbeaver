@@ -1,4 +1,5 @@
 import { navigationTabsPlugin } from './manifest';
+
 export * from './NavigationTabs/NavigationTabsService';
 export * from './NavigationTabs/TabNavigationContext';
 export * from './NavigationTabs/ITab';

@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
@@ -38,7 +37,7 @@ export class PluginBootstrap extends Bootstrap {
                 label: 'authentication_login',
                 tooltip: 'authentication_login',
               },
-              { onSelect: () => this.authenticationService.authUser(null, false) }
+              { onSelect: () => this.authenticationService.authUser(null, false) },
             ),
           ];
         }
@@ -52,7 +51,7 @@ export class PluginBootstrap extends Bootstrap {
                 label: 'authentication_logout',
                 tooltip: 'authentication_logout',
               },
-              { onSelect: () => this.authenticationService.logout() }
+              { onSelect: () => this.authenticationService.logout() },
             ),
           ];
         }
@@ -72,5 +71,5 @@ export class PluginBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 }

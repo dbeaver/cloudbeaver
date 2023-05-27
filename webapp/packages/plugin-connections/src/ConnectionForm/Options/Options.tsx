@@ -5,33 +5,32 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AUTH_PROVIDER_LOCAL_ID, EAdminPermission } from '@cloudbeaver/core-authentication';
 import {
-  InputField,
-  SubmittingForm,
-  useResource,
-  ColoredContainer,
   BASE_CONTAINERS_STYLES,
-  Group,
-  GroupTitle,
-  FieldCheckbox,
-  ObjectPropertyInfoForm,
-  Textarea,
+  ColoredContainer,
   Combobox,
   Container,
-  useFormValidator,
+  FieldCheckbox,
+  FormFieldDescription,
   getComputed,
+  Group,
+  GroupTitle,
+  InputField,
+  ObjectPropertyInfoForm,
   Radio,
   RadioGroup,
-  FormFieldDescription,
-  useTranslate,
-  usePermission,
+  SubmittingForm,
+  Textarea,
   useAdministrationSettings,
+  useFormValidator,
+  usePermission,
+  useResource,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -75,21 +74,13 @@ const driverConfiguration: IDriverConfiguration[] = [
   },
 ];
 
-export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({
-  state,
-}) {
+export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ state }) {
   const serverConfigResource = useResource(Options, ServerConfigResource, undefined as void);
   const connectionOptionsTabService = useService(ConnectionOptionsTabService);
   const service = useService(ConnectionFormService);
   const formRef = useRef<HTMLFormElement>(null);
   const translate = useTranslate();
-  const {
-    info,
-    config,
-    availableDrivers,
-    submittingTask: submittingHandlers,
-    disabled,
-  } = state;
+  const { info, config, availableDrivers, submittingTask: submittingHandlers, disabled } = state;
 
   //@TODO it's here until the profile implementation in the CloudBeaver
   const readonly = state.readonly || info?.authModel === PROFILE_AUTH_MODEL_ID;
@@ -118,12 +109,11 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
       onData: (data, resource, prevDriver) => {
         optionsHook.setDefaults(data, prevDriver);
       },
-    }
+    },
   );
 
   const driver = driverMap.data;
-  const configurationTypes = driverConfiguration
-    .filter(conf => driver?.configurationTypes.includes(conf.value));
+  const configurationTypes = driverConfiguration.filter(conf => driver?.configurationTypes.includes(conf.value));
 
   function handleFormChange(value?: unknown, name?: string) {
     if (name !== 'name') {
@@ -148,7 +138,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const { data: applicableAuthModels } = useResource(
     Options,
     DatabaseAuthModelsResource,
-    getComputed(() => driver?.applicableAuthModels ? resourceKeyList(driver.applicableAuthModels) : CachedMapEmptyKey)
+    getComputed(() => (driver?.applicableAuthModels ? resourceKeyList(driver.applicableAuthModels) : CachedMapEmptyKey)),
   );
 
   const { data: authModel } = useResource(
@@ -157,7 +147,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     getComputed(() => config.authModelId || info?.authModel || driver?.defaultAuthModel || null),
     {
       onData: data => optionsHook.setAuthModel(data),
-    }
+    },
   );
 
   const authentication = useAuthenticationAction({
@@ -169,31 +159,26 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const originLocal = !info || isLocalConnection(info);
   const templateAvailable = connectionOptionsTabService.isTemplateAvailable(state);
 
-  const availableAuthModels = applicableAuthModels.filter(model => !!model && (
-    adminPermission
-    || !model.requiresLocalConfiguration
-  ));
-  const drivers = driverMap.resource.enabledDrivers
-    .filter(({ id }) => availableDrivers.includes(id));
+  const availableAuthModels = applicableAuthModels.filter(model => !!model && (adminPermission || !model.requiresLocalConfiguration));
+  const drivers = driverMap.resource.enabledDrivers.filter(({ id }) => availableDrivers.includes(id));
 
   let properties = authModel?.properties;
 
-  if (
-    info?.authProperties
-    && info.authProperties.length > 0
-    && config.authModelId === info.authModel
-  ) {
+  if (info?.authProperties && info.authProperties.length > 0 && config.authModelId === info.authModel) {
     properties = info.authProperties;
   }
 
-  return styled(styles, BASE_CONTAINERS_STYLES)(
+  return styled(
+    styles,
+    BASE_CONTAINERS_STYLES,
+  )(
     <SubmittingForm ref={formRef} disabled={driverMap.isLoading()} onChange={handleFormChange}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
           <Group form gap>
             <Container wrap gap>
               <Combobox
-                name='driverId'
+                name="driverId"
                 state={config}
                 items={drivers}
                 keySelector={driver => driver.id}
@@ -225,16 +210,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 >
                   {translate('connections_connection_configuration')}
               </Combobox>*/}
-                  <FormFieldDescription
-                    label={translate('connections_connection_configuration')}
-                    tiny
-                    fill
-                  >
+                  <FormFieldDescription label={translate('connections_connection_configuration')} tiny fill>
                     <Container gap>
-                      <RadioGroup
-                        name='configurationType'
-                        state={config}
-                      >
+                      <RadioGroup name="configurationType" state={config}>
                         {driverConfiguration.map(conf => (
                           <Radio
                             key={conf.value}
@@ -262,7 +240,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 disabled={disabled}
                 readOnly={readonly}
                 autoComplete={`section-${config.driverId || 'driver'} section-jdbc`}
-                mod='surface'
+                mod="surface"
               >
                 {translate('customConnection_url_JDBC')}
               </InputField>
@@ -286,7 +264,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 state={config}
                 disabled={disabled}
                 readOnly={readonly}
-                mod='surface'
+                mod="surface"
                 required
                 tiny
                 fill
@@ -307,7 +285,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   state={config}
                   disabled={disabled}
                   autoComplete={`section-${config.driverId || 'driver'} section-folder`}
-                  mod='surface'
+                  mod="surface"
                   autoHide
                   readOnly
                   tiny
@@ -324,29 +302,23 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 state={config}
                 disabled={edit || disabled}
                 readOnly={readonly}
-              // autoHide // maybe better to use autoHide
+                // autoHide // maybe better to use autoHide
               >
                 {translate('connections_connection_template')}
               </FieldCheckbox>
             )}
-            <Textarea
-              name="description"
-              rows={3}
-              state={config}
-              disabled={disabled}
-              readOnly={readonly}
-            >
+            <Textarea name="description" rows={3} state={config} disabled={disabled} readOnly={readonly}>
               {translate('connections_connection_description')}
             </Textarea>
           </Group>
         </Container>
         <Container medium gap>
-          {(!driver?.anonymousAccess && (authentication.authorized || !edit)) && (
+          {!driver?.anonymousAccess && (authentication.authorized || !edit) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
               {availableAuthModels.length > 1 && (
                 <Combobox
-                  name='authModelId'
+                  name="authModelId"
                   state={config}
                   items={availableAuthModels}
                   keySelector={model => model!.id}
@@ -364,7 +336,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 <>
                   <Container wrap gap hideEmpty>
                     <ObjectPropertyInfoForm
-                      autofillToken='new-password'
+                      autofillToken="new-password"
                       properties={properties}
                       state={config.credentials}
                       disabled={disabled}
@@ -385,10 +357,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                       >
                         {translate('connections_connection_edit_save_credentials')}
                       </FieldCheckbox>
-                      {(
-                        serverConfigResource.resource.distributed
-                        && connectionOptionsTabService.isProjectShared(state)
-                      ) && (
+                      {serverConfigResource.resource.distributed && connectionOptionsTabService.isProjectShared(state) && (
                         <FieldCheckbox
                           id={config.connectionId + 'isShared'}
                           name="sharedCredentials"
@@ -407,15 +376,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
             </Group>
           )}
           {driver?.providerProperties && (
-            <ProviderPropertiesForm
-              config={config}
-              properties={driver.providerProperties}
-              disabled={disabled}
-              readonly={readonly}
-            />
+            <ProviderPropertiesForm config={config} properties={driver.providerProperties} disabled={disabled} readonly={readonly} />
           )}
         </Container>
       </ColoredContainer>
-    </SubmittingForm>
+    </SubmittingForm>,
   );
 });

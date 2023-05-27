@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
+import type { Extension } from '@codemirror/state';
 import { useState } from 'react';
 
 import { createComplexLoader, useComplexLoader } from '@cloudbeaver/core-blocks';
-import type { Extension } from '@codemirror/state';
 
 import type { IDefaultExtensions } from './getDefaultExtensions';
 

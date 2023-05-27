@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -24,7 +23,8 @@ const styles = css`
     padding: 0 8px;
     cursor: pointer;
 
-    &:hover, &:global([aria-expanded="true"]) {
+    &:hover,
+    &:global([aria-expanded='true']) {
       background: #338ecc;
     }
 
@@ -36,7 +36,7 @@ const styles = css`
       top: 8px;
       right: -1px;
       opacity: 1 !important;
-      content: "";
+      content: '';
     }
   }
   IconOrImage {
@@ -67,9 +67,9 @@ export const UserInfo = observer<Props>(function UserInfo({ info }) {
   return styled(styles)(
     <user title={translate('plugin_user_profile_menu')} onClick={() => userProfileService.open()}>
       <user-icon>
-        <IconOrImage icon='/icons/plugin_user_profile_m.svg' />
+        <IconOrImage icon="/icons/plugin_user_profile_m.svg" />
       </user-icon>
       <user-name>{info.displayName || info.userId}</user-name>
-    </user>
+    </user>,
   );
 });

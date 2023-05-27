@@ -11,10 +11,17 @@ import styled, { css } from 'reshadow';
 import wellknown from 'wellknown';
 
 import { TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
-import { IDatabaseResultSet, ResultSetSelectAction, IResultSetElementKey, IDatabaseDataModel, ResultSetViewAction, ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
+import {
+  IDatabaseDataModel,
+  IDatabaseResultSet,
+  IResultSetElementKey,
+  ResultSetDataKeysUtils,
+  ResultSetSelectAction,
+  ResultSetViewAction,
+} from '@cloudbeaver/plugin-data-viewer';
 
 import { CrsInput } from './CrsInput';
-import { IGeoJSONFeature, IAssociatedValue, LeafletMap, CrsKey } from './LeafletMap';
+import { CrsKey, IAssociatedValue, IGeoJSONFeature, LeafletMap } from './LeafletMap';
 import { ResultSetGISAction } from './ResultSetGISAction';
 
 function getCrsKey(feature?: IGeoJSONFeature): CrsKey {
@@ -56,10 +63,7 @@ interface Props {
   resultIndex: number;
 }
 
-export const GISValuePresentation = observer<Props>(function GISValuePresentation({
-  model,
-  resultIndex,
-}) {
+export const GISValuePresentation = observer<Props>(function GISValuePresentation({ model, resultIndex }) {
   const translate = useTranslate();
 
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
@@ -99,28 +103,30 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
     return result;
   }, [selectedCells, gis]);
 
-  const getAssociatedValues = useCallback((cell: IResultSetElementKey): IAssociatedValue[] => {
-    const values: IAssociatedValue[] = [];
+  const getAssociatedValues = useCallback(
+    (cell: IResultSetElementKey): IAssociatedValue[] => {
+      const values: IAssociatedValue[] = [];
 
-    for (const column of view.columnKeys) {
-      if (ResultSetDataKeysUtils.isEqual(column, cell.column)) {
-        continue;
+      for (const column of view.columnKeys) {
+        if (ResultSetDataKeysUtils.isEqual(column, cell.column)) {
+          continue;
+        }
+
+        const value = view.getCellValue({ ...cell, column });
+        const columnInfo = view.getColumn(column);
+
+        if (value && columnInfo?.name) {
+          values.push({
+            key: columnInfo.name,
+            value,
+          });
+        }
       }
 
-      const value = view.getCellValue({ ...cell, column });
-      const columnInfo = view.getColumn(column);
-
-      if (value && columnInfo?.name) {
-        values.push({
-          key: columnInfo.name,
-          value,
-        });
-      }
-    }
-
-    return values;
-  }, [view]);
-
+      return values;
+    },
+    [view],
+  );
 
   const defaultCrsKey = getCrsKey(parsedGISData[0]);
   const [crsKey, setCrsKey] = useState(defaultCrsKey);
@@ -135,11 +141,8 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
         <LeafletMap key={crsKey} geoJSON={parsedGISData} crsKey={crsKey} getAssociatedValues={getAssociatedValues} />
       </map>
       <toolbar>
-        <CrsInput
-          value={crsKey}
-          onChange={setCrsKey}
-        />
+        <CrsInput value={crsKey} onChange={setCrsKey} />
       </toolbar>
-    </root>
+    </root>,
   );
 });

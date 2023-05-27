@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -44,9 +43,7 @@ const styles = css`
   }
 `;
 
-export const SqlScriptStatisticsPanel = observer<IProps>(function SqlScriptStatisticsPanel({
-  tab,
-}) {
+export const SqlScriptStatisticsPanel = observer<IProps>(function SqlScriptStatisticsPanel({ tab }) {
   const sqlQueryService = useService(SqlQueryService);
   const tableViewerStorageService = useService(TableViewerStorageService);
   const statistics = sqlQueryService.getStatistics(tab.tabId);
@@ -57,25 +54,23 @@ export const SqlScriptStatisticsPanel = observer<IProps>(function SqlScriptStati
   }
 
   const source: QueryDataSource | undefined = statistics.modelId
-    ? tableViewerStorageService.get(statistics.modelId)?.source as QueryDataSource
+    ? (tableViewerStorageService.get(statistics.modelId)?.source as QueryDataSource)
     : undefined;
 
   return styled(styles)(
     <statistics>
-      {translate('sql_editor_sql_execution_executed_queries')} {statistics.executedQueries} / {statistics.queries}<br />
-      {translate('data_viewer_statistics_duration')} {statistics.executeTime} ms<br />
-      {translate('data_viewer_statistics_updated_rows')} {statistics.updatedRows}<br />
+      {translate('sql_editor_sql_execution_executed_queries')} {statistics.executedQueries} / {statistics.queries}
+      <br />
+      {translate('data_viewer_statistics_duration')} {statistics.executeTime} ms
+      <br />
+      {translate('data_viewer_statistics_updated_rows')} {statistics.updatedRows}
+      <br />
       {source && (
         <>
-          <Loader
-            message='sql_editor_sql_execution_executing'
-            cancelDisabled={!source.canCancel}
-            inline
-            onCancel={() => source.cancel()}
-          />
+          <Loader message="sql_editor_sql_execution_executing" cancelDisabled={!source.canCancel} inline onCancel={() => source.cancel()} />
           <pre>{source.options?.query}</pre>
         </>
       )}
-    </statistics>
+    </statistics>,
   );
 });

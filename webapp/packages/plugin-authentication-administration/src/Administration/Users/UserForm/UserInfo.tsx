@@ -5,13 +5,26 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AuthRolesResource, UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, FieldCheckbox, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useResource, useTranslate, useStyles, Combobox } from '@cloudbeaver/core-blocks';
+import {
+  BASE_CONTAINERS_STYLES,
+  ColoredContainer,
+  Combobox,
+  Container,
+  FieldCheckbox,
+  Group,
+  GroupTitle,
+  InputField,
+  Loader,
+  ObjectPropertyInfoForm,
+  useResource,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IUserFormProps } from './UserFormService';
@@ -22,19 +35,15 @@ const styles = css`
   }
 `;
 
-export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(function UserInfo({
-  controller,
-  editing,
-}) {
+export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(function UserInfo({ controller, editing }) {
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
   const translate = useTranslate();
   const userMetaParameters = useResource(UserInfo, UserMetaParametersResource, undefined);
   const authRoles = useResource(UserInfo, AuthRolesResource, undefined);
 
-  const handleTeamChange = useCallback(
-    (teamId: string, value: boolean) => { controller.credentials.teams.set(teamId, value); },
-    []
-  );
+  const handleTeamChange = useCallback((teamId: string, value: boolean) => {
+    controller.credentials.teams.set(teamId, value);
+  }, []);
 
   return styled(style)(
     <ColoredContainer gap overflow>
@@ -42,12 +51,12 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
         <Container gap vertical>
           <GroupTitle keepSize>{translate('authentication_user_credentials')}</GroupTitle>
           <InputField
-            type='text'
-            name='login'
+            type="text"
+            name="login"
             state={controller.credentials}
             disabled={controller.isSaving}
             readOnly={editing}
-            mod='surface'
+            mod="surface"
             keepSize
             tiny
             required
@@ -57,13 +66,13 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
           {controller.local && (
             <>
               <InputField
-                type='password'
-                name='password'
+                type="password"
+                name="password"
                 state={controller.credentials}
-                autoComplete='new-password'
+                autoComplete="new-password"
                 placeholder={editing ? '••••••' : ''}
                 disabled={controller.isSaving}
-                mod='surface'
+                mod="surface"
                 keepSize
                 tiny
                 required
@@ -71,12 +80,12 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
                 {translate('authentication_user_password')}
               </InputField>
               <InputField
-                type='password'
-                name='passwordRepeat'
+                type="password"
+                name="passwordRepeat"
                 state={controller.credentials}
                 placeholder={editing ? '••••••' : ''}
                 disabled={controller.isSaving}
-                mod='surface'
+                mod="surface"
                 keepSize
                 tiny
                 required
@@ -90,7 +99,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
       <Group small gap overflow>
         {authRoles.data.length > 0 && (
           <Combobox
-            name='authRole'
+            name="authRole"
             state={controller.credentials}
             items={authRoles.data}
             keySelector={value => value}
@@ -101,12 +110,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
           </Combobox>
         )}
         <GroupTitle>{translate('authentication_user_status')}</GroupTitle>
-        <FieldCheckbox
-          id={`${controller.user.userId}_user_enabled`}
-          name='enabled'
-          state={controller}
-          disabled={controller.isSaving}
-        >
+        <FieldCheckbox id={`${controller.user.userId}_user_enabled`} name="enabled" state={controller} disabled={controller.isSaving}>
           {translate('authentication_user_enabled')}
         </FieldCheckbox>
         <GroupTitle>{translate('authentication_user_team')}</GroupTitle>
@@ -118,7 +122,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
               key={team.teamId}
               id={`${controller.user.userId}_${team.teamId}`}
               title={tooltip}
-              name='team'
+              name="team"
               checked={!!controller.credentials.teams.get(team.teamId)}
               disabled={controller.isSaving}
               onChange={checked => handleTeamChange(team.teamId, checked)}
@@ -129,19 +133,22 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
         })}
       </Group>
       <Loader state={userMetaParameters} inline>
-        {() => userMetaParameters.data.length > 0 && styled(style)(
-          <Group small gap vertical overflow>
-            <GroupTitle keepSize>{translate('authentication_user_meta_parameters')}</GroupTitle>
-            <ObjectPropertyInfoForm
-              state={controller.credentials.metaParameters}
-              properties={userMetaParameters.data}
-              disabled={controller.isSaving}
-              keepSize
-              tiny
-            />
-          </Group>
-        )}
+        {() =>
+          userMetaParameters.data.length > 0 &&
+          styled(style)(
+            <Group small gap vertical overflow>
+              <GroupTitle keepSize>{translate('authentication_user_meta_parameters')}</GroupTitle>
+              <ObjectPropertyInfoForm
+                state={controller.credentials.metaParameters}
+                properties={userMetaParameters.data}
+                disabled={controller.isSaving}
+                keepSize
+                tiny
+              />
+            </Group>,
+          )
+        }
       </Loader>
-    </ColoredContainer>
+    </ColoredContainer>,
   );
 });

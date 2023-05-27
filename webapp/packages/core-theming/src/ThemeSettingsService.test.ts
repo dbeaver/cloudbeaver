@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import '@testing-library/jest-dom';
 
 import { mockAuthentication } from '@cloudbeaver/core-authentication/mocks/mockAuthentication';
@@ -21,10 +20,7 @@ import { IThemeSettings, ThemeSettingsService } from './ThemeSettingsService';
 const endpoint = createGQLEndpoint();
 const app = createApp();
 
-const server = mockGraphQL(
-  ...mockAppInit(endpoint),
-  ...mockAuthentication(endpoint)
-);
+const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
 
 beforeAll(() => app.init());
 
@@ -57,9 +53,7 @@ test('New settings equal deprecated settings "light"', async () => {
   const settings = app.injector.getServiceByClass(ThemeSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(
-    endpoint.query('serverConfig', mockServerConfig(equalConfigA)),
-  );
+  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigA)));
 
   await config.refresh();
 
@@ -71,9 +65,7 @@ test('New settings equal deprecated settings "dark"', async () => {
   const settings = app.injector.getServiceByClass(ThemeSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(
-    endpoint.query('serverConfig', mockServerConfig(equalConfigB)),
-  );
+  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigB)));
 
   await config.refresh();
 

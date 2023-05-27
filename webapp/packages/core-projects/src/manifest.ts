@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
@@ -18,10 +17,5 @@ export const manifest: PluginManifest = {
     name: 'Core Projects',
   },
 
-  providers: [
-    ProjectInfoResource,
-    ProjectsService,
-    LocaleService,
-    ProjectInfoEventHandler,
-  ],
+  providers: [ProjectInfoResource, ProjectsService, LocaleService, ProjectInfoEventHandler],
 };

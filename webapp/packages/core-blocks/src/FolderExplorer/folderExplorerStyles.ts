@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { css } from 'reshadow';
 
 export const folderExplorerStyles = css`
@@ -33,8 +32,8 @@ export const folderExplorerStyles = css`
     text-overflow: ellipsis;
     padding: 0 4px;
   }
-  
+
   folder-explorer-path-element:first-child folder-explorer-path-element-arrow {
-    display: none
+    display: none;
   }
 `;

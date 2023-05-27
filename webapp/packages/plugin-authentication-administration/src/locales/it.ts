@@ -1,7 +1,7 @@
 export default [
   ['authentication_administration_user_connections_user_add', 'Creazione di Utente'],
   ['authentication_administration_user_connections_user_new', 'Nuovo utente'],
-  ['authentication_administration_user_connections_access_load_fail', 'Errore in fase di caricamento delle connessioni autorizzate all\'utente'],
+  ['authentication_administration_user_connections_access_load_fail', "Errore in fase di caricamento delle connessioni autorizzate all'utente"],
   ['authentication_administration_user_connections_access_connections_load_fail', 'Errore in fase di caricamento delle connessioni'],
   ['authentication_administration_user_connections_access', 'Accesso alle connessioni'],
   ['authentication_administration_user_connections_access_granted_by', 'Permesso da'],
@@ -34,10 +34,13 @@ export default [
   ['administration_configuration_wizard_configuration_admin', 'Credenziali amministrative'],
   ['administration_configuration_wizard_configuration_admin_name', 'Login'],
   ['administration_configuration_wizard_configuration_admin_password', 'Password'],
-  ['administration_configuration_wizard_configuration_anonymous_access', 'Permetti l\'accesso anonimo'],
+  ['administration_configuration_wizard_configuration_anonymous_access', "Permetti l'accesso anonimo"],
   ['administration_configuration_wizard_configuration_anonymous_access_description', 'Permetti di lavorare con CloudBeaver senza autenticazione'],
   ['administration_configuration_wizard_configuration_authentication_group', 'Impostazioni di autenticazione'],
   ['administration_configuration_wizard_configuration_services', 'Servizi'],
-  ['administration_configuration_wizard_configuration_authentication', 'Abilita l\'autenticazione utente'],
-  ['administration_configuration_wizard_configuration_authentication_description', 'Permetti agli utenti di autenticarsi. In alternativa solo l\'accesso anonimo sarà attivo'],
+  ['administration_configuration_wizard_configuration_authentication', "Abilita l'autenticazione utente"],
+  [
+    'administration_configuration_wizard_configuration_authentication_description',
+    "Permetti agli utenti di autenticarsi. In alternativa solo l'accesso anonimo sarà attivo",
+  ],
 ];

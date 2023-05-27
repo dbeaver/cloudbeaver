@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useEffect } from 'react';
 
 import { ILoadableState, isLoadableStateHasException } from '@cloudbeaver/core-utils';
@@ -16,23 +15,15 @@ export interface IAutoLoadable extends ILoadableState {
   load: () => void;
 }
 
-export function useAutoLoad(
-  state: IAutoLoadable | IAutoLoadable[],
-  enabled = true,
-  lazy = false
-) {
+export function useAutoLoad(state: IAutoLoadable | IAutoLoadable[], enabled = true, lazy = false) {
   if (!Array.isArray(state)) {
     state = [state];
   }
 
   for (const loader of state as IAutoLoadable[]) {
-    getComputed( // activate mobx subscriptions
-      () => (
-        (
-          !loader.isLoaded()
-          || loader.isOutdated?.() === true
-        ) && !isLoadableStateHasException(loader)
-      )
+    getComputed(
+      // activate mobx subscriptions
+      () => (!loader.isLoaded() || loader.isOutdated?.() === true) && !isLoadableStateHasException(loader),
     );
   }
 
@@ -42,10 +33,7 @@ export function useAutoLoad(
     }
 
     for (const loader of state as IAutoLoadable[]) {
-      if (
-        isLoadableStateHasException(loader)
-        || (loader.lazy === true && !lazy)
-      ) {
+      if (isLoadableStateHasException(loader) || (loader.lazy === true && !lazy)) {
         continue;
       }
 

@@ -8,7 +8,10 @@ export default [
   ['connections_administration_configuration_wizard_step_title', '数据库连接'],
   ['connections_administration_configuration_wizard_step_description', '添加数据库连接'],
   ['connections_administration_configuration_wizard_title', '添加数据库连接'],
-  ['connections_administration_configuration_wizard_message', '您可以在此处手动创建数据库连接或使用数据库服务器搜索。您可以跳过此步骤并稍后配置连接。'],
+  [
+    'connections_administration_configuration_wizard_message',
+    '您可以在此处手动创建数据库连接或使用数据库服务器搜索。您可以跳过此步骤并稍后配置连接。',
+  ],
   ['connections_administration_connection_no_information', '没有可用信息'],
   ['connections_administration_delete_confirmation', '您将删除这些连接：'],
   ['connections_administration_tools_add_tooltip', '添加新连接'],

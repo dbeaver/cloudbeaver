@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useCallback } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
-import { ROOT_NODE_PATH, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 
 import { NavigationTreeService } from '../NavigationTree/NavigationTreeService';
 import { NavNodeViewService } from './NavNodeView/NavNodeViewService';

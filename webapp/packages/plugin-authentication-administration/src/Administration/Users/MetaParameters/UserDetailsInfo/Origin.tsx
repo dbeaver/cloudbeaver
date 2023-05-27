@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -31,9 +30,7 @@ export const OriginIcon = observer<IOriginIconProps>(function Origin({ origin })
   const icon = isLocal ? '/icons/local_connection.svg' : origin.icon;
   const title = isLocal ? 'Local user' : origin.displayName;
 
-  return styled(USER_DETAILS_STYLES)(
-    <StaticImage key={origin.type + origin.subType} icon={icon} title={title} />
-  );
+  return styled(USER_DETAILS_STYLES)(<StaticImage key={origin.type + origin.subType} icon={icon} title={title} />);
 });
 
 export const Origin: PlaceholderComponent<IUserDetailsInfoProps> = observer(function Origin({ user }) {

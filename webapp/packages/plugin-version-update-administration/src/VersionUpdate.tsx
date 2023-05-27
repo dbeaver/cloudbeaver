@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 import { gte } from 'semver';
@@ -47,6 +46,6 @@ export const VersionUpdate: AdministrationItemContentComponent = observer(functi
         </>
       )}
       <Recommendations />
-    </ColoredContainer>
+    </ColoredContainer>,
   );
 });

@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { NavNodeInfoResource, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { EObjectFeature, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { DDLViewerFooterService } from './DdlViewer/DDLViewerFooterService';
@@ -22,7 +21,7 @@ export class DdlViewerBootstrap extends Bootstrap {
   constructor(
     private readonly navNodeViewService: NavNodeViewService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly ddlViewerFooterService: DDLViewerFooterService
+    private readonly ddlViewerFooterService: DDLViewerFooterService,
   ) {
     super();
   }
@@ -59,12 +58,12 @@ export class DdlViewerBootstrap extends Bootstrap {
           ids.push(NAV_NODE_EXTENDED_DDL_ID);
         }
 
-        return [...children || [], ...ids];
+        return [...(children || []), ...ids];
       },
     });
 
     this.ddlViewerFooterService.register();
   }
 
-  load(): void { }
+  load(): void {}
 }

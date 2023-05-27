@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { DialogBackdrop } from 'reakit/Dialog';
@@ -13,7 +12,6 @@ import styled from 'reshadow';
 
 import { ErrorBoundary, Loader, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-
 
 import { commonDialogContainerStyles } from './CommonDialog/styles';
 import { CommonDialogService, DialogInternal } from './CommonDialogService';
@@ -31,30 +29,34 @@ export const DialogsPortal = observer(function DialogsPortal() {
     activeDialog = commonDialogService.dialogs[commonDialogService.dialogs.length - 1];
   }
 
-  const state = useObjectRef(() => ({
-    reject() {
-      if (this.dialog) {
-        commonDialogService.rejectDialog(this.dialog.promise);
-      }
-    },
-    resolve(result: any) {
-      if (this.dialog) {
-        commonDialogService.resolveDialog(this.dialog.promise, result);
-      }
-    },
-    backdropClick(e: React.MouseEvent<HTMLDivElement>) {
-      if (e.target !== e.currentTarget) {
-        return;
-      }
+  const state = useObjectRef(
+    () => ({
+      reject() {
+        if (this.dialog) {
+          commonDialogService.rejectDialog(this.dialog.promise);
+        }
+      },
+      resolve(result: any) {
+        if (this.dialog) {
+          commonDialogService.resolveDialog(this.dialog.promise, result);
+        }
+      },
+      backdropClick(e: React.MouseEvent<HTMLDivElement>) {
+        if (e.target !== e.currentTarget) {
+          return;
+        }
 
-      e.preventDefault(); // prevent focus loss
-      if (!this.dialog?.options?.persistent && e.currentTarget.isEqualNode(e.target as HTMLElement)) {
-        this.reject();
-      }
+        e.preventDefault(); // prevent focus loss
+        if (!this.dialog?.options?.persistent && e.currentTarget.isEqualNode(e.target as HTMLElement)) {
+          this.reject();
+        }
+      },
+    }),
+    {
+      dialog: activeDialog,
     },
-  }), {
-    dialog: activeDialog,
-  }, ['reject', 'resolve', 'backdropClick']);
+    ['reject', 'resolve', 'backdropClick'],
+  );
 
   useMemo(() => {
     if (!activeDialog) {
@@ -84,12 +86,7 @@ export const DialogsPortal = observer(function DialogsPortal() {
       <DialogBackdrop visible={!!activeDialog} onMouseDown={state.backdropClick}>
         <inner-box>
           {commonDialogService.dialogs.map((dialog, i, arr) => (
-            <ErrorBoundary
-              key={dialog.id}
-              styles={commonDialogContainerStyles}
-              remount
-              onClose={state.reject}
-            >
+            <ErrorBoundary key={dialog.id} styles={commonDialogContainerStyles} remount onClose={state.reject}>
               <NestedDialog
                 key={dialog.id}
                 visible={i === arr.length - 1}
@@ -101,7 +98,7 @@ export const DialogsPortal = observer(function DialogsPortal() {
           ))}
         </inner-box>
       </DialogBackdrop>
-    </Loader>
+    </Loader>,
   );
 });
 
@@ -112,19 +109,17 @@ interface NestedDialogType {
   visible: boolean;
 }
 
-const NestedDialog: React.FC<NestedDialogType> = function NestedDialog({
-  dialog,
-  resolveDialog,
-  rejectDialog,
-  visible,
-}) {
+const NestedDialog: React.FC<NestedDialogType> = function NestedDialog({ dialog, resolveDialog, rejectDialog, visible }) {
   const DialogComponent = dialog.component;
 
-  const context = useMemo<IDialogContext>(() => ({
-    dialog,
-    visible,
-    reject: rejectDialog,
-  }), [dialog, visible, rejectDialog]);
+  const context = useMemo<IDialogContext>(
+    () => ({
+      dialog,
+      visible,
+      reject: rejectDialog,
+    }),
+    [dialog, visible, rejectDialog],
+  );
 
   return (
     <DialogContext.Provider value={context}>

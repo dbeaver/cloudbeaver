@@ -5,10 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ProjectInfoResourceType } from './ProjectInfoResource';
 
 export function isResourceOfType(resourceType: ProjectInfoResourceType, name: string): boolean {
-  return resourceType.fileExtensions
-    .some(type => name.endsWith(`.${type}`));
+  return resourceType.fileExtensions.some(type => name.endsWith(`.${type}`));
 }

@@ -5,14 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { IMenuContext, CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, IMenuContext } from '@cloudbeaver/core-dialogs';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
-import { ActionService, ACTION_EXPORT, DATA_CONTEXT_MENU_NESTED, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_EXPORT, ActionService, DATA_CONTEXT_MENU_NESTED, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
-import { TableFooterMenuService, ITableFooterMenuContext, IDatabaseDataSource, IDataContainerOptions } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataSource, IDataContainerOptions, ITableFooterMenuContext, TableFooterMenuService } from '@cloudbeaver/plugin-data-viewer';
 import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 
 import { DataExportSettingsService } from './DataExportSettingsService';
@@ -26,7 +25,7 @@ export class DataExportMenuService {
     private readonly dataExportSettingsService: DataExportSettingsService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-  ) { }
+  ) {}
 
   register(): void {
     this.tableFooterMenuService.registerMenuItem({
@@ -40,9 +39,11 @@ export class DataExportMenuService {
       },
       isHidden: () => this.isDisabled(),
       isDisabled(context) {
-        return context.data.model.isLoading()
-          || context.data.model.isDisabled(context.data.resultIndex)
-          || !context.data.model.getResult(context.data.resultIndex);
+        return (
+          context.data.model.isLoading() ||
+          context.data.model.isDisabled(context.data.resultIndex) ||
+          !context.data.model.getResult(context.data.resultIndex)
+        );
       },
       onClick: this.exportData.bind(this),
     });
@@ -55,25 +56,14 @@ export class DataExportMenuService {
           return false;
         }
 
-        return (
-          !this.isDisabled()
-          && context.has(DATA_CONTEXT_CONNECTION)
-          && !context.has(DATA_CONTEXT_MENU_NESTED)
-        );
+        return !this.isDisabled() && context.has(DATA_CONTEXT_CONNECTION) && !context.has(DATA_CONTEXT_MENU_NESTED);
       },
-      getItems: (context, items) => [
-        ...items,
-        ACTION_EXPORT,
-      ],
+      getItems: (context, items) => [...items, ACTION_EXPORT],
     });
 
     this.actionService.addHandler({
       id: 'data-export',
-      isActionApplicable: (context, action) => (
-        action === ACTION_EXPORT
-        && context.has(DATA_CONTEXT_CONNECTION)
-        && context.has(DATA_CONTEXT_NAV_NODE)
-      ),
+      isActionApplicable: (context, action) => action === ACTION_EXPORT && context.has(DATA_CONTEXT_CONNECTION) && context.has(DATA_CONTEXT_NAV_NODE),
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
         const connection = context.get(DATA_CONTEXT_CONNECTION);

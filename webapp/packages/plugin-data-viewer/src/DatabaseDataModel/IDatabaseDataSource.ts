@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
@@ -24,7 +23,7 @@ export interface IRequestInfo {
 
 export enum DatabaseDataAccessMode {
   Default,
-  Readonly
+  Readonly,
 }
 
 export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
@@ -55,25 +54,19 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
 
   tryGetAction: (<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
-    action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ) => T | undefined) & (<T extends IDatabaseDataAction<TOptions, TResult>>(
-    result: TResult,
-    action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ) => T | undefined);
-  getAction: (<T extends IDatabaseDataAction<TOptions, TResult>>(
-    resultIndex: number,
-    action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ) => T) & (<T extends IDatabaseDataAction<TOptions, TResult>>(
-    result: TResult,
-    action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ) => T);
+    action: IDatabaseDataActionClass<TOptions, TResult, T>,
+  ) => T | undefined) &
+    (<T extends IDatabaseDataAction<TOptions, TResult>>(result: TResult, action: IDatabaseDataActionClass<TOptions, TResult, T>) => T | undefined);
+  getAction: (<T extends IDatabaseDataAction<TOptions, TResult>>(resultIndex: number, action: IDatabaseDataActionClass<TOptions, TResult, T>) => T) &
+    (<T extends IDatabaseDataAction<TOptions, TResult>>(result: TResult, action: IDatabaseDataActionClass<TOptions, TResult, T>) => T);
   getActionImplementation: (<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
-    action: IDatabaseDataActionInterface<TOptions, TResult, T>
-  ) => T | undefined) & (<T extends IDatabaseDataAction<TOptions, TResult>>(
-    result: TResult,
-    action: IDatabaseDataActionInterface<TOptions, TResult, T>
-  ) => T | undefined);
+    action: IDatabaseDataActionInterface<TOptions, TResult, T>,
+  ) => T | undefined) &
+    (<T extends IDatabaseDataAction<TOptions, TResult>>(
+      result: TResult,
+      action: IDatabaseDataActionInterface<TOptions, TResult, T>,
+    ) => T | undefined);
 
   getResult: (index: number) => TResult | null;
 

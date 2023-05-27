@@ -1,7 +1,7 @@
 export default [
   ['authentication_administration_user_connections_user_add', 'User Creation'],
   ['authentication_administration_user_connections_user_new', 'New user'],
-  ['authentication_administration_user_connections_access_load_fail', 'User\'s granted connections loading failed'],
+  ['authentication_administration_user_connections_access_load_fail', "User's granted connections loading failed"],
   ['authentication_administration_user_connections_access_connections_load_fail', 'Connections loading failed'],
   ['authentication_administration_user_connections_access', 'Connections Access'],
   ['authentication_administration_user_connections_access_granted_by', 'Granted by'],
@@ -39,7 +39,10 @@ export default [
   ['administration_configuration_wizard_configuration_services_group', 'Services'],
   ['administration_configuration_wizard_configuration_services', 'Services'],
   ['administration_configuration_wizard_configuration_authentication', 'Enable users authentication'],
-  ['administration_configuration_wizard_configuration_authentication_description', 'Allows users to authenticate. Otherwise only anonymous access is enabled'],
+  [
+    'administration_configuration_wizard_configuration_authentication_description',
+    'Allows users to authenticate. Otherwise only anonymous access is enabled',
+  ],
 
   ['administration_identity_providers_tab_title', 'Identity Providers'],
   ['administration_identity_providers_provider', 'Provider'],

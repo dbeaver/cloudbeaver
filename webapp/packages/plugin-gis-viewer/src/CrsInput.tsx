@@ -28,23 +28,13 @@ interface Props {
   onChange: (value: CrsKey) => void;
 }
 
-const items: CrsKey[] = [
-  'Simple',
-  'EPSG3395',
-  'EPSG3857',
-  'EPSG4326',
-  'EPSG900913',
-];
+const items: CrsKey[] = ['Simple', 'EPSG3395', 'EPSG3857', 'EPSG4326', 'EPSG900913'];
 
 export function CrsInput(props: Props) {
   return styled(styles)(
     <root>
       <label>CRS:</label>
-      <Combobox
-        items={items}
-        value={props.value}
-        onSelect={props.onChange}
-      />
-    </root>
+      <Combobox items={items} value={props.value} onSelect={props.onChange} />
+    </root>,
   );
 }

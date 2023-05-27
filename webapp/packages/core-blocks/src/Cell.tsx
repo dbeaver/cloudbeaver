@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled, { css } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
@@ -22,40 +21,40 @@ interface Props {
 }
 
 const styles = css`
-    main {
-      position: relative;
-      display: flex;
-      align-items: center;
-      padding: 8px;
-    }
-    before {
-      margin-right: 16px;
-      width: 24px;
-      height: 24px;
-      flex-shrink: 0;
-    }
-    after {
-      margin-left: 16px;
-      flex-shrink: 0;
-    }
-    info {
-      composes: theme-typography--body2 from global;
-      flex: 1;
-      line-height: 1.4;
-      display: flex;
-      flex-direction: column;
-      font-weight: 500;
-    }
-    description {
-      composes: theme-typography--caption from global;
-      line-height: 1.2;
-    }
+  main {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+  }
+  before {
+    margin-right: 16px;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+  after {
+    margin-left: 16px;
+    flex-shrink: 0;
+  }
+  info {
+    composes: theme-typography--body2 from global;
+    flex: 1;
+    line-height: 1.4;
+    display: flex;
+    flex-direction: column;
+    font-weight: 500;
+  }
+  description {
+    composes: theme-typography--caption from global;
+    line-height: 1.2;
+  }
 `;
 
 const RIPPLE_STYLES = css`
   cell {
     composes: theme-ripple from global;
-  } 
+  }
 `;
 
 export const Cell: React.FC<React.PropsWithChildren<Props>> = function Cell({
@@ -77,6 +76,6 @@ export const Cell: React.FC<React.PropsWithChildren<Props>> = function Cell({
         </info>
         <after>{after}</after>
       </main>
-    </cell>
+    </cell>,
   );
 };

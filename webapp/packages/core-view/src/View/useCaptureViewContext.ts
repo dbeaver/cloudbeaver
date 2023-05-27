@@ -5,16 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useContext } from 'react';
 
 import type { IDataContext } from '../DataContext/IDataContext';
 import { useDynamicDataContext } from '../DataContext/useDynamicDataContext';
 import { CaptureViewContext } from './CaptureViewContext';
 
-export function useCaptureViewContext(
-  capture: (context: IDataContext | undefined) => void
-): void {
+export function useCaptureViewContext(capture: (context: IDataContext | undefined) => void): void {
   const context = useContext(CaptureViewContext);
   useDynamicDataContext(context, capture);
 }

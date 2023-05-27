@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React from 'react';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { getOriginTabId } from './getOriginTabId';
 import { UserFormService } from './UserFormService';
@@ -29,9 +28,7 @@ const UserInfo = React.lazy(async () => {
 
 @injectable()
 export class UserFormBaseBootstrap extends Bootstrap {
-  constructor(
-    private readonly userFormService: UserFormService,
-  ) {
+  constructor(private readonly userFormService: UserFormService) {
     super();
   }
 
@@ -61,5 +58,5 @@ export class UserFormBaseBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 }

@@ -5,14 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { TextPlaceholder, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { NavTreeResource, DBObjectResource, type DBObject, DBObjectParentKey } from '@cloudbeaver/core-navigation-tree';
+import { type DBObject, DBObjectParentKey, DBObjectResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { TableLoader } from './Table/TableLoader';
@@ -31,10 +30,7 @@ interface ObjectPropertyTableProps {
   parentId?: string;
 }
 
-export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function ObjectPropertyTable({
-  objectId,
-  parentId,
-}) {
+export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function ObjectPropertyTable({ objectId, parentId }) {
   const translate = useTranslate();
   const navNodeViewService = useService(NavNodeViewService);
   const children = useResource(ObjectPropertyTable, NavTreeResource, parentId ?? null);
@@ -65,6 +61,6 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
           <TableLoader objects={objects} truncated={limited.truncated > 0} />
         </div>
       )}
-    </>
+    </>,
   );
 });

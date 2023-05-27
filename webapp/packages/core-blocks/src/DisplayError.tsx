@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type React from 'react';
 import styled, { css, use } from 'reshadow';
 
@@ -51,14 +50,7 @@ interface Props {
   styles?: ComponentStyle;
 }
 
-export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function DisplayError({
-  root,
-  children,
-  error,
-  errorInfo,
-  className,
-  styles,
-}) {
+export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function DisplayError({ root, children, error, errorInfo, className, styles }) {
   const stack = errorInfo?.componentStack || error?.stack;
 
   return styled(useStyles(style, styles))(
@@ -76,6 +68,6 @@ export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function D
           </details>
         )}
       </error-inner-block>
-    </error>
+    </error>,
   );
 };

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
@@ -26,9 +25,10 @@ export const CustomConnection = observer(function CustomConnection() {
   const connectionManualService = useService(ConnectionManualService);
   const dbDriverResource = useResource(CustomConnection, DBDriverResource, CachedMapAllKey);
 
-  const drivers = useMemo(() => computed(() => (
-    dbDriverResource.resource.enabledDrivers.slice().sort(dbDriverResource.resource.compare)
-  )), [dbDriverResource]);
+  const drivers = useMemo(
+    () => computed(() => dbDriverResource.resource.enabledDrivers.slice().sort(dbDriverResource.resource.compare)),
+    [dbDriverResource],
+  );
 
   useResource(CustomConnection, ProjectInfoResource, CachedMapAllKey);
 

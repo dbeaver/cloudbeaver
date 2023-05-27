@@ -5,14 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./react-leaflet.d.ts" />
-
 import type geojson from 'geojson';
 import leaflet from 'leaflet';
 import { useCallback, useEffect, useState } from 'react';
-import { MapContainer, GeoJSON, LayersControl, TileLayer } from 'react-leaflet';
+import { GeoJSON, LayersControl, MapContainer, TileLayer } from 'react-leaflet';
 import type { TileLayerProps } from 'react-leaflet';
 import styled, { css } from 'reshadow';
 
@@ -60,9 +58,10 @@ const baseTiles: Record<'street' | 'topography', IBaseTile> = {
   },
   topography: {
     name: 'gis_presentation_base_tile_topography_name',
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>,'
-    + ' &copy; <a href="http://viewfinderpanoramas.org" target="_blank">SRTM</a>,'
-    + ' &copy; <a href="https://opentopomap.org" target="_blank">OpenTopoMap</a>',
+    attribution:
+      '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>,' +
+      ' &copy; <a href="http://viewfinderpanoramas.org" target="_blank">SRTM</a>,' +
+      ' &copy; <a href="https://opentopomap.org" target="_blank">OpenTopoMap</a>',
     url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
     maxZoom: 17,
   },
@@ -122,25 +121,28 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
 
   const crs = getCRS(crsKey);
 
-  const onEachFeature = useCallback((feature: IGeoJSONFeature, layer: leaflet.Layer) => {
-    const associatedValues = getAssociatedValues(feature.properties.associatedCell);
-    if (associatedValues.length > 0) {
-      let popupContent = '';
+  const onEachFeature = useCallback(
+    (feature: IGeoJSONFeature, layer: leaflet.Layer) => {
+      const associatedValues = getAssociatedValues(feature.properties.associatedCell);
+      if (associatedValues.length > 0) {
+        let popupContent = '';
 
-      popupContent += '<table>';
-      for (let i = 0; i < associatedValues.length; i++) {
-        const { key, value } = associatedValues[i];
+        popupContent += '<table>';
+        for (let i = 0; i < associatedValues.length; i++) {
+          const { key, value } = associatedValues[i];
 
-        if (value === undefined || typeof value === 'object') {
-          continue;
+          if (value === undefined || typeof value === 'object') {
+            continue;
+          }
+
+          popupContent += '<tr><td>' + key + '</td><td>' + value + '</td></tr>';
         }
-
-        popupContent += '<tr><td>' + key + '</td><td>' + value + '</td></tr>';
+        popupContent += '</table>';
+        layer.bindPopup(popupContent, popupOption);
       }
-      popupContent += '</table>';
-      layer.bindPopup(popupContent, popupOption);
-    }
-  }, [getAssociatedValues]);
+    },
+    [getAssociatedValues],
+  );
 
   useEffect(() => {
     if (geoJSONLayerRef && mapRef) {
@@ -182,7 +184,10 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
     }
   }, [split.state.isResizing, split.state.mode, crs, mapRef]);
 
-  return styled(styles, baseStyles)(
+  return styled(
+    styles,
+    baseStyles,
+  )(
     <MapContainer ref={setMapRef} crs={crs} zoom={12}>
       <GeoJSON
         // data is not optional property, see react-leaflet.d.ts
@@ -194,10 +199,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
       />
       {crs !== leaflet.CRS.Simple && (
         <LayersControl>
-          <LayersControl.BaseLayer
-            name={translate(baseTiles.street.name)}
-            checked={baseTiles.street.checked}
-          >
+          <LayersControl.BaseLayer name={translate(baseTiles.street.name)} checked={baseTiles.street.checked}>
             <TileLayer
               attribution={baseTiles.street.attribution}
               url={baseTiles.street.url}
@@ -205,10 +207,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
               id={baseTiles.street.id}
             />
           </LayersControl.BaseLayer>
-          <LayersControl.BaseLayer
-            name={translate(baseTiles.topography.name)}
-            checked={baseTiles.topography.checked}
-          >
+          <LayersControl.BaseLayer name={translate(baseTiles.topography.name)} checked={baseTiles.topography.checked}>
             <TileLayer
               attribution={baseTiles.topography.attribution}
               url={baseTiles.topography.url}
@@ -218,6 +217,6 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
           </LayersControl.BaseLayer>
         </LayersControl>
       )}
-    </MapContainer>
+    </MapContainer>,
   );
 };

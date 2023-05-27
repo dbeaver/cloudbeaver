@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled, { css, use } from 'reshadow';
 
 const styles = css`
@@ -26,8 +25,8 @@ interface Props {
 
 export const FormBoxElement: React.FC<React.PropsWithChildren<Props>> = function FormBoxElement({ children, className, max }) {
   return styled(styles)(
-    <box-element as='div' className={className} {...use({ max })}>
+    <box-element as="div" className={className} {...use({ max })}>
       {children}
-    </box-element>
+    </box-element>,
   );
 };

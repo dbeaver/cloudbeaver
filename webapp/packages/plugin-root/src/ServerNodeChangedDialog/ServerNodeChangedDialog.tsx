@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -25,9 +24,7 @@ const styles = css`
   }
 `;
 
-export const ServerNodeChangedDialog: DialogComponent<null, null> = observer(function ServerNodeChangedDialog({
-  rejectDialog,
-}) {
+export const ServerNodeChangedDialog: DialogComponent<null, null> = observer(function ServerNodeChangedDialog({ rejectDialog }) {
   const routerService = useService(RouterService);
   const translate = useTranslate();
   function reload() {
@@ -35,27 +32,19 @@ export const ServerNodeChangedDialog: DialogComponent<null, null> = observer(fun
   }
 
   return styled(styles)(
-    <CommonDialogWrapper size='small' fixedSize>
+    <CommonDialogWrapper size="small" fixedSize>
       <CommonDialogHeader title="app_root_server_node_changed_title" onReject={rejectDialog} />
       <CommonDialogBody noOverflow>
         <p>{translate('app_root_server_node_changed_message')}</p>
       </CommonDialogBody>
       <CommonDialogFooter>
-        <Button
-          type="button"
-          mod={['outlined']}
-          onClick={rejectDialog}
-        >
+        <Button type="button" mod={['outlined']} onClick={rejectDialog}>
           {translate('ui_processing_cancel')}
         </Button>
-        <Button
-          type="button"
-          mod={['unelevated']}
-          onClick={reload}
-        >
+        <Button type="button" mod={['unelevated']} onClick={reload}>
           {translate('ui_processing_reload')}
         </Button>
       </CommonDialogFooter>
-    </CommonDialogWrapper>
+    </CommonDialogWrapper>,
   );
 });

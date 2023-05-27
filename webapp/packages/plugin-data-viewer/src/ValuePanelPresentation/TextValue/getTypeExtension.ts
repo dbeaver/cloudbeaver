@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { HTML_EDITOR, JSON_EDITOR, XML_EDITOR } from '@cloudbeaver/plugin-codemirror6';
 
 // @TODO These imports are quite heavy

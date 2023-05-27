@@ -21,7 +21,7 @@ export enum ENotificationType {
   Error = 'Error',
   Success = 'Success',
   Loading = 'Loading',
-  Custom = ' Custom'
+  Custom = ' Custom',
 }
 
 export interface INotificationExtraProps<T = never> {
@@ -36,15 +36,13 @@ export interface IProcessNotificationContainer<TProps extends INotificationExtra
   notification: INotification<TProps>;
 }
 
-export type NotificationComponentProps<
-  TProps extends INotificationExtraProps<any> = INotificationExtraProps
-> = TProps & {
+export type NotificationComponentProps<TProps extends INotificationExtraProps<any> = INotificationExtraProps> = TProps & {
   notification: INotification<TProps>;
 };
 
-export type NotificationComponent<
-  TProps extends INotificationExtraProps<any> = INotificationExtraProps,
-> = React.FunctionComponent<NotificationComponentProps<TProps>>;
+export type NotificationComponent<TProps extends INotificationExtraProps<any> = INotificationExtraProps> = React.FunctionComponent<
+  NotificationComponentProps<TProps>
+>;
 
 export interface INotification<TProps extends INotificationExtraProps<any> = INotificationExtraProps> {
   readonly id: number;

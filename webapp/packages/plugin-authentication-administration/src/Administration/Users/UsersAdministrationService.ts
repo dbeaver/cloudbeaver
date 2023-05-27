@@ -5,13 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React from 'react';
 
 import { AdministrationItemService } from '@cloudbeaver/core-administration';
 import { AdminUser, TeamsResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { CreateTeamService } from './Teams/CreateTeamService';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
@@ -78,7 +77,7 @@ export class UsersAdministrationService extends Bootstrap {
     this.userDetailsInfoPlaceholder.add(Origin, 0);
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 
   private async cancelCreate(param: string | null) {
     if (param === 'create') {

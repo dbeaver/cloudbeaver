@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState } from 'react';
 import styled, { css, use } from 'reshadow';
@@ -51,10 +50,10 @@ const filterStyles = css`
 `;
 
 const toggleModeButtonStyle = css`
-    IconButton {
-      composes: theme-background-primary theme-text-on-primary from global;
-      cursor: pointer;
-    }
+  IconButton {
+    composes: theme-background-primary theme-text-on-primary from global;
+    cursor: pointer;
+  }
 `;
 
 const innerInputStyle = css`
@@ -108,17 +107,20 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   const [inputRef, ref] = useFocus<HTMLInputElement>({});
   const [toggled, setToggled] = useState(!toggleMode);
 
-  const filter = useCallback((value: string | number, name?: string) => {
-    value = String(value);
+  const filter = useCallback(
+    (value: string | number, name?: string) => {
+      value = String(value);
 
-    if (state && name) {
-      state[name] = value;
-    }
+      if (state && name) {
+        state[name] = value;
+      }
 
-    if (onFilter) {
-      onFilter(value, name);
-    }
-  }, [onFilter, state]);
+      if (onFilter) {
+        onFilter(value, name);
+      }
+    },
+    [onFilter, state],
+  );
 
   const toggle = useCallback(() => {
     if (!toggleMode) {
@@ -161,12 +163,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
         onKeyDown={onKeyDown}
         {...use({ toggled, max })}
       />
-      <IconButton
-        name='search'
-        disabled={disabled}
-        onClick={toggle}
-        {...use({ toggled })}
-      />
-    </filter-container>
+      <IconButton name="search" disabled={disabled} onClick={toggle} {...use({ toggled })} />
+    </filter-container>,
   );
 });

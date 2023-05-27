@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled, { css } from 'reshadow';
 
 import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
@@ -42,10 +41,8 @@ export const FormFieldDescription: React.FC<React.PropsWithChildren<Props>> = fu
 
   return styled(styles)(
     <field title={title} className={className} {...rest}>
-      {label && <field-label as='label'>{label}</field-label>}
-      <field-description>
-        {children}
-      </field-description>
-    </field>
+      {label && <field-label as="label">{label}</field-label>}
+      <field-description>{children}</field-description>
+    </field>,
   );
 };

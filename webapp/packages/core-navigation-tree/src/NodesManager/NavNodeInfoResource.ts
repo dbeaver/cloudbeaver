@@ -5,12 +5,21 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable, observable, runInAction } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { GraphQLService, CachedMapResource, ResourceKey, NavNodeInfoFragment, ResourceKeyUtils, ICachedResourceMetadata, ResourceKeyList, resourceKeyList, ResourceKeySimple } from '@cloudbeaver/core-sdk';
+import {
+  CachedMapResource,
+  GraphQLService,
+  ICachedResourceMetadata,
+  NavNodeInfoFragment,
+  ResourceKey,
+  ResourceKeyList,
+  resourceKeyList,
+  ResourceKeySimple,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-sdk';
 import { getPathParents, MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from './EntityTypes';
@@ -25,10 +34,7 @@ interface INodeMetadata extends ICachedResourceMetadata {
 
 @injectable()
 export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Record<string, unknown>, INodeMetadata> {
-  constructor(
-    private readonly graphQLService: GraphQLService,
-    appAuthService: AppAuthService,
-  ) {
+  constructor(private readonly graphQLService: GraphQLService, appAuthService: AppAuthService) {
     super();
 
     makeObservable(this, {
@@ -149,27 +155,21 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
     return runInAction(() => {
       const navNode = this.navNodeInfoToNavNode(node, parents[0]?.id);
 
-      this.set(
-        resourceKeyList([...parents.map(node => node.id), navNode.id]),
-        [
-          ...parents.reduce((list, node, index, array) => {
-            list.push(this.navNodeInfoToNavNode(node, array[index + 1]?.id));
-            return list;
-          }, [] as NavNode[]),
-          navNode,
-        ]
-      );
+      this.set(resourceKeyList([...parents.map(node => node.id), navNode.id]), [
+        ...parents.reduce((list, node, index, array) => {
+          list.push(this.navNodeInfoToNavNode(node, array[index + 1]?.id));
+          return list;
+        }, [] as NavNode[]),
+        navNode,
+      ]);
       return navNode;
     });
   }
 
   protected getDefaultMetadata(key: string, metadata: MetadataMap<string, INodeMetadata>): INodeMetadata {
-    return Object.assign(
-      super.getDefaultMetadata(key, metadata),
-      {
-        withDetails: false,
-      }
-    );
+    return Object.assign(super.getDefaultMetadata(key, metadata), {
+      withDetails: false,
+    });
   }
 
   protected dataSet(key: string, value: NavNode): void {

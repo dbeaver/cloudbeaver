@@ -5,12 +5,21 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { AppAuthService, AuthInfoService, AuthProviderContext, AuthProviderService, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, IUserAuthConfiguration, RequestedProvider, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import {
+  AppAuthService,
+  AUTH_PROVIDER_LOCAL_ID,
+  AuthInfoService,
+  AuthProviderContext,
+  AuthProviderService,
+  AuthProvidersResource,
+  IUserAuthConfiguration,
+  RequestedProvider,
+  UserInfoResource,
+} from '@cloudbeaver/core-authentication';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider, IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -85,8 +94,9 @@ export class AuthenticationService extends Bootstrap {
     let userAuthConfiguration: IUserAuthConfiguration | undefined = undefined;
 
     if (providerId) {
-      userAuthConfiguration = this.authInfoService.userAuthConfigurations
-        .find(c => c.providerId === providerId && c.configuration.id === configurationId);
+      userAuthConfiguration = this.authInfoService.userAuthConfigurations.find(
+        c => c.providerId === providerId && c.configuration.id === configurationId,
+      );
     } else if (this.authInfoService.userAuthConfigurations.length > 0) {
       userAuthConfiguration = this.authInfoService.userAuthConfigurations[0];
     }
@@ -104,7 +114,7 @@ export class AuthenticationService extends Bootstrap {
 
       await this.onLogout.execute('after');
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Can\'t logout');
+      this.notificationService.logException(exception, "Can't logout");
     }
   }
 
@@ -139,7 +149,8 @@ export class AuthenticationService extends Bootstrap {
 
     options = observable(options);
 
-    this.authPromise = this.authDialogService.showLoginForm(persistent, options)
+    this.authPromise = this.authDialogService
+      .showLoginForm(persistent, options)
       .then(async state => {
         await this.onLogin.execute('after');
         return state;
@@ -151,8 +162,7 @@ export class AuthenticationService extends Bootstrap {
     if (this.serverConfigResource.redirectOnFederatedAuth) {
       await this.authProvidersResource.load(CachedMapAllKey);
 
-      const providers = this.authProvidersResource
-        .getEnabledProviders();
+      const providers = this.authProvidersResource.getEnabledProviders();
 
       if (providers.length === 1) {
         const configurableProvider = providers.find(provider => provider.configurable);
@@ -186,7 +196,9 @@ export class AuthenticationService extends Bootstrap {
     // );
 
     this.sessionActionService.onAction.addHandler(this.authSessionAction.bind(this));
-    this.sessionDataResource.onDataUpdate.addPostHandler(() => { this.requireAuthentication(); });
+    this.sessionDataResource.onDataUpdate.addPostHandler(() => {
+      this.requireAuthentication();
+    });
     this.screenService.routeChange.addHandler(() => this.requireAuthentication());
 
     this.administrationScreenService.ensurePermissions.addHandler(async () => {
@@ -202,12 +214,9 @@ export class AuthenticationService extends Bootstrap {
     this.authProviderService.requestAuthProvider.addHandler(this.requestAuthProviderHandler);
   }
 
-  load(): void { }
+  load(): void {}
 
-  private async authSessionAction(
-    data: ISessionAction | null,
-    contexts: IExecutionContextProvider<ISessionAction | null>
-  ) {
+  private async authSessionAction(data: ISessionAction | null, contexts: IExecutionContextProvider<ISessionAction | null>) {
     const action = contexts.getContext(sessionActionContext);
 
     if (isAutoLoginSessionAction(data)) {

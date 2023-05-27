@@ -5,22 +5,29 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable, runInAction } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { GraphQLService, CachedMapResource, resourceKeyList, ResourceKey, ResourceKeyUtils, SqlContextInfo, CachedMapAllKey, resourceKeyAliasFactory, ResourceKeySimple, isResourceAlias } from '@cloudbeaver/core-sdk';
+import {
+  CachedMapAllKey,
+  CachedMapResource,
+  GraphQLService,
+  isResourceAlias,
+  ResourceKey,
+  resourceKeyAliasFactory,
+  resourceKeyList,
+  ResourceKeySimple,
+  ResourceKeyUtils,
+  SqlContextInfo,
+} from '@cloudbeaver/core-sdk';
 import { flat } from '@cloudbeaver/core-utils';
 
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '../ConnectionInfoResource';
 import type { IConnectionInfoParams } from '../IConnectionsResource';
 import type { IConnectionExecutionContextInfo } from './IConnectionExecutionContextInfo';
 
-export const ConnectionExecutionContextProjectKey = resourceKeyAliasFactory(
-  '@connection-folder/project',
-  (projectId: string) => ({ projectId })
-);
+export const ConnectionExecutionContextProjectKey = resourceKeyAliasFactory('@connection-folder/project', (projectId: string) => ({ projectId }));
 
 export const NOT_INITIALIZED_CONTEXT_ID = '-1';
 
@@ -32,15 +39,18 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     appAuthService: AppAuthService,
   ) {
     super();
-    this.sync(connectionInfoResource, () => ConnectionInfoActiveProjectKey, () => CachedMapAllKey);
+    this.sync(
+      connectionInfoResource,
+      () => ConnectionInfoActiveProjectKey,
+      () => CachedMapAllKey,
+    );
 
-    this.addAlias(
-      ConnectionExecutionContextProjectKey,
-      param => resourceKeyList(
+    this.addAlias(ConnectionExecutionContextProjectKey, param =>
+      resourceKeyList(
         Array.from(this.data.entries())
           .filter(([key, context]) => context.projectId === param.options.projectId)
-          .map(([key]) => key)
-      )
+          .map(([key]) => key),
+      ),
     );
 
     appAuthService.requireAuthentication(this);
@@ -54,11 +64,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     });
   }
 
-  async create(
-    key: IConnectionInfoParams,
-    defaultCatalog?: string,
-    defaultSchema?: string
-  ): Promise<IConnectionExecutionContextInfo> {
+  async create(key: IConnectionInfoParams, defaultCatalog?: string, defaultSchema?: string): Promise<IConnectionExecutionContextInfo> {
     return await this.performUpdate(getContextBaseId(key, ''), [], async () => {
       const { context } = await this.graphQLService.sdk.executionContextCreate({
         ...key,
@@ -77,11 +83,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     });
   }
 
-  async update(
-    contextId: string,
-    defaultCatalog?: string,
-    defaultSchema?: string
-  ): Promise<IConnectionExecutionContextInfo> {
+  async update(contextId: string, defaultCatalog?: string, defaultSchema?: string): Promise<IConnectionExecutionContextInfo> {
     const context = this.get(contextId);
 
     if (!context) {
@@ -137,9 +139,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     this.markOutdated(CachedMapAllKey);
   }
 
-  protected async loader(
-    originalKey: ResourceKey<string>
-  ): Promise<Map<string, IConnectionExecutionContextInfo>> {
+  protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, IConnectionExecutionContextInfo>> {
     const contextsList: IConnectionExecutionContextInfo[] = [];
     let projectId: string | undefined;
     const all = this.isAlias(originalKey, CachedMapAllKey);
@@ -148,27 +148,25 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
       projectId = originalKey.options.projectId;
     }
 
-    await ResourceKeyUtils.forEachAsync(
-      originalKey,
-      async key => {
-        let contextId: string | undefined;
-        let connectionId: string | undefined;
+    await ResourceKeyUtils.forEachAsync(originalKey, async key => {
+      let contextId: string | undefined;
+      let connectionId: string | undefined;
 
-        if (!isResourceAlias(key)) {
-          const context = this.get(key);
-          contextId = key;
-          projectId = context?.projectId;
-          connectionId = context?.connectionId;
-        }
+      if (!isResourceAlias(key)) {
+        const context = this.get(key);
+        contextId = key;
+        projectId = context?.projectId;
+        connectionId = context?.connectionId;
+      }
 
-        const { contexts } = await this.graphQLService.sdk.executionContextList({
-          projectId,
-          connectionId,
-          contextId,
-        });
-
-        contextsList.push(...contexts);
+      const { contexts } = await this.graphQLService.sdk.executionContextList({
+        projectId,
+        connectionId,
+        contextId,
       });
+
+      contextsList.push(...contexts);
+    });
 
     runInAction(() => {
       const key = resourceKeyList(contextsList.map(context => context.id));
@@ -185,32 +183,27 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   private updateConnectionContexts(key: ResourceKeySimple<IConnectionInfoParams>): void {
     this.delete(
       resourceKeyList(
-        flat(ResourceKeyUtils.map(
-          key,
-          key => this.values.filter(context => {
-            const connection = this.connectionInfoResource.get(key);
-            return (
-              context.connectionId === key.connectionId
-              && context.projectId === key.projectId
-              && !connection?.connected
-            );
-          })
-        )).map(context => context.id)
-      )
+        flat(
+          ResourceKeyUtils.map(key, key =>
+            this.values.filter(context => {
+              const connection = this.connectionInfoResource.get(key);
+              return context.connectionId === key.connectionId && context.projectId === key.projectId && !connection?.connected;
+            }),
+          ),
+        ).map(context => context.id),
+      ),
     );
   }
 
   private deleteConnectionContexts(key: ResourceKeySimple<IConnectionInfoParams>): void {
     this.delete(
       resourceKeyList(
-        flat(ResourceKeyUtils.map(
-          key,
-          key => this.values.filter(context => (
-            context.connectionId === key.connectionId
-            && context.projectId === key.projectId
-          ))
-        )).map(context => context.id)
-      )
+        flat(
+          ResourceKeyUtils.map(key, key =>
+            this.values.filter(context => context.connectionId === key.connectionId && context.projectId === key.projectId),
+          ),
+        ).map(context => context.id),
+      ),
     );
   }
 

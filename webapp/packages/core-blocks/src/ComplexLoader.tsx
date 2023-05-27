@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { LoadingError } from '@cloudbeaver/core-utils';
 
 export interface IComplexLoaderData<T> {
@@ -65,7 +64,7 @@ export function createComplexLoader<T>(loader: () => Promise<T>): IComplexLoader
         this.data = await this.promise;
         return this.data;
       } catch (cause: any) {
-        this.error = new LoadingError(() => this.refresh(), 'Can\'t load element', { cause });
+        this.error = new LoadingError(() => this.refresh(), "Can't load element", { cause });
         throw this.error;
       }
     },

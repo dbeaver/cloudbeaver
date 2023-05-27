@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { ISessionEvent, SessionEventId, SessionEventSource, SessionEventTopic, TopicEventHandler } from '@cloudbeaver/core-root';
 import type { CbDatasourceEvent as IConnectionInfoEvent } from '@cloudbeaver/core-sdk';
@@ -13,11 +12,8 @@ import type { CbDatasourceEvent as IConnectionInfoEvent } from '@cloudbeaver/cor
 export { IConnectionInfoEvent };
 
 @injectable()
-export class ConnectionInfoEventHandler
-  extends TopicEventHandler<IConnectionInfoEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
-  constructor(
-    sessionEventSource: SessionEventSource
-  ) {
+export class ConnectionInfoEventHandler extends TopicEventHandler<IConnectionInfoEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
+  constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbDatasource, sessionEventSource);
   }
 

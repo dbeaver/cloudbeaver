@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable, observable } from 'mobx';
 
 import type { TeamInfo, TeamsResource } from '@cloudbeaver/core-authentication';
@@ -52,10 +51,7 @@ export class TeamFormState implements ITeamFormState {
   private readonly loadTeamTask: IExecutor<ITeamFormState>;
   private readonly formStateTask: IExecutor<ITeamFormState>;
 
-  constructor(
-    service: TeamFormService,
-    resource: TeamsResource
-  ) {
+  constructor(service: TeamFormService, resource: TeamsResource) {
     this.resource = resource;
     this.config = {
       teamId: '',
@@ -85,9 +81,7 @@ export class TeamFormState implements ITeamFormState {
     this.loadInfo = this.loadInfo.bind(this);
     this.updateFormState = this.updateFormState.bind(this);
 
-    this.formStateTask
-      .addCollection(service.formStateTask)
-      .addPostHandler(this.updateFormState);
+    this.formStateTask.addCollection(service.formStateTask).addPostHandler(this.updateFormState);
 
     this.loadTeamTask
       .before(service.configureTask)
@@ -103,7 +97,7 @@ export class TeamFormState implements ITeamFormState {
       .next(this.formStateTask);
   }
 
-  async load(): Promise<void> { }
+  async load(): Promise<void> {}
 
   async loadTeamInfo(): Promise<TeamInfo | undefined> {
     await this.loadTeamTask.execute(this);
@@ -111,9 +105,7 @@ export class TeamFormState implements ITeamFormState {
     return this.info;
   }
 
-  setOptions(
-    mode: TeamFormMode,
-  ): this {
+  setOptions(mode: TeamFormMode): this {
     this.mode = mode;
     return this;
   }
@@ -128,14 +120,11 @@ export class TeamFormState implements ITeamFormState {
       {
         state: this,
       },
-      this.service.formSubmittingTask
+      this.service.formSubmittingTask,
     );
   }
 
-  private updateFormState(
-    data: ITeamFormState,
-    contexts: IExecutionContextProvider<ITeamFormState>
-  ): void {
+  private updateFormState(data: ITeamFormState, contexts: IExecutionContextProvider<ITeamFormState>): void {
     const context = contexts.getContext(teamFormStateContext);
 
     this.statusMessage = context.statusMessage;
@@ -144,10 +133,7 @@ export class TeamFormState implements ITeamFormState {
     this.configured = true;
   }
 
-  private async loadInfo(
-    data: ITeamFormState,
-    contexts: IExecutionContextProvider<ITeamFormState>
-  ) {
+  private async loadInfo(data: ITeamFormState, contexts: IExecutionContextProvider<ITeamFormState>) {
     if (!data.config.teamId) {
       return;
     }

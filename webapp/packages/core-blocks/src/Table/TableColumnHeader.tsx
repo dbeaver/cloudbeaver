@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled, { use } from 'reshadow';
 
 import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
@@ -19,15 +18,16 @@ interface Props {
 }
 
 export const TableColumnHeader: React.FC<React.PropsWithChildren<Props>> = function TableColumnHeader({
-  title, min, flex, centerContent, className, children,
+  title,
+  min,
+  flex,
+  centerContent,
+  className,
+  children,
 }) {
   return styled(BASE_TABLE_STYLES)(
-    <th
-      title={title}
-      className={className}
-      {...use({ min, centerContent })}
-    >
+    <th title={title} className={className} {...use({ min, centerContent })}>
       {flex ? <th-flex className={className}>{children}</th-flex> : children}
-    </th>
+    </th>,
   );
 };

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useLayoutEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
@@ -37,55 +36,55 @@ const checkboxStyles = css`
   checkbox-ripple {
     composes: theme-checkbox__ripple from global;
   }
-    checkbox-container {
-      display: flex;
-      align-items: center;
-    }
-    checkbox-label {
-      composes: theme-typography--body2 from global;
-      cursor: pointer;
-    }
-  `;
+  checkbox-container {
+    display: flex;
+    align-items: center;
+  }
+  checkbox-label {
+    composes: theme-typography--body2 from global;
+    cursor: pointer;
+  }
+`;
 
 const checkboxMod: Record<CheckboxMod, any> = {
   primary: css`
-      checkbox {
-        composes: theme-checkbox_primary from global;
-      }
-    `,
+    checkbox {
+      composes: theme-checkbox_primary from global;
+    }
+  `,
   surface: css`
-      checkbox {
-        composes: theme-checkbox_surface from global;
-      }
-    `,
+    checkbox {
+      composes: theme-checkbox_surface from global;
+    }
+  `,
   small: css`
-      checkbox {
-        composes: theme-checkbox_small from global;
+    checkbox {
+      composes: theme-checkbox_small from global;
+    }
+    checkbox-container {
+      & checkbox {
+        width: 14px;
+        height: 14px;
       }
-      checkbox-container {
-        & checkbox {
-          width: 14px;
-          height: 14px;
-        }
-        & checkbox-background {
-          width: 14px;
-          height: 14px;
-        }
+      & checkbox-background {
+        width: 14px;
+        height: 14px;
       }
-    `,
+    }
+  `,
 };
 
 const checkboxState = {
   disabled: css`
-      checkbox {
-        composes: theme-checkbox--disabled from global;
-      }
-    `,
+    checkbox {
+      composes: theme-checkbox--disabled from global;
+    }
+  `,
   checked: css`
-      checkbox {
-        composes: theme-checkbox--checked from global;
-      }
-    `,
+    checkbox {
+      composes: theme-checkbox--checked from global;
+    }
+  `,
 };
 
 interface ICheckboxMarkupProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'style'> {
@@ -97,7 +96,16 @@ interface ICheckboxMarkupProps extends Omit<React.InputHTMLAttributes<HTMLInputE
 }
 
 export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxMarkup({
-  id, label, indeterminate, className, title, mod = ['primary'], ripple = true, style, readOnly, ...rest
+  id,
+  label,
+  indeterminate,
+  className,
+  title,
+  mod = ['primary'],
+  ripple = true,
+  style,
+  readOnly,
+  ...rest
 }) {
   const checkboxRef = useRef<HTMLInputElement>(null);
 
@@ -113,30 +121,25 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
       ...(mod || []).map(mod => checkboxMod[mod]),
       rest.disabled && checkboxState.disabled,
       rest.checked && checkboxState.checked,
-      style
-    )
+      style,
+    ),
   )(
     <checkbox-container className={className} title={title}>
       <checkbox>
-        <checkbox-input
-          ref={checkboxRef}
-          as='input'
-          type='checkbox'
-          {...rest}
-          disabled={rest.disabled || readOnly}
-          id={id || rest.name}
-        />
+        <checkbox-input ref={checkboxRef} as="input" type="checkbox" {...rest} disabled={rest.disabled || readOnly} id={id || rest.name} />
         <checkbox-background>
-          <checkbox-checkmark as='svg' viewBox='0 0 24 24'>
-            <checkbox-checkmark-path as='path' fill='none' d='M1.73,12.91 8.1,19.28 22.79,4.59' />
+          <checkbox-checkmark as="svg" viewBox="0 0 24 24">
+            <checkbox-checkmark-path as="path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59" />
           </checkbox-checkmark>
           <checkbox-mixedmark />
         </checkbox-background>
-        {ripple && (
-          <checkbox-ripple />
-        )}
+        {ripple && <checkbox-ripple />}
       </checkbox>
-      {label && (id || rest.name) && <checkbox-label as='label' htmlFor={id || rest.name}>{label}</checkbox-label>}
-    </checkbox-container>
+      {label && (id || rest.name) && (
+        <checkbox-label as="label" htmlFor={id || rest.name}>
+          {label}
+        </checkbox-label>
+      )}
+    </checkbox-container>,
   );
 };

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
@@ -112,7 +111,9 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   if (controltype === 'link') {
     return (
       <FormFieldDescription label={property.displayName} className={className}>
-        <Link href={state?.[property.id!]} target='_blank' rel='noopener noreferrer'>{property.description}</Link>
+        <Link href={state?.[property.id!]} target="_blank" rel="noopener noreferrer">
+          {property.description}
+        </Link>
       </FormFieldDescription>
     );
   }
@@ -206,7 +207,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           state={state}
           disabled={disabled}
           readOnly={readOnly}
-          mod='surface'
+          mod="surface"
           className={className}
         >
           {property.displayName ?? ''}
@@ -222,7 +223,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         value={value}
         disabled={disabled}
         readOnly={readOnly}
-        mod='surface'
+        mod="surface"
         className={className}
       >
         {property.displayName ?? ''}
@@ -244,7 +245,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         readOnly={readOnly}
         autoHide={autoHide}
         autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
-        mod='surface'
+        mod="surface"
         className={className}
         onFocus={onFocus}
       >
@@ -265,7 +266,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       disabled={disabled}
       readOnly={readOnly}
       autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
-      mod='surface'
+      mod="surface"
       className={className}
       onFocus={onFocus}
     >

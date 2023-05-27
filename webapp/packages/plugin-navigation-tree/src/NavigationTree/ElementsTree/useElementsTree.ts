@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, observable, runInAction } from 'mobx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { IFolderExplorerContext, useExecutor, useResource, useObjectRef, useObservableRef, useUserData, getComputed } from '@cloudbeaver/core-blocks';
+import { getComputed, IFolderExplorerContext, useExecutor, useObjectRef, useObservableRef, useResource, useUserData } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -30,18 +29,14 @@ export interface IElementsTreeNodeExpandedInfo {
   expandable?: boolean;
 }
 
-export type IElementsTreeNodeExpandInfoGetter = (
-  tree: IElementsTree,
-  nodeId: string,
-  state: ITreeNodeState
-) => IElementsTreeNodeExpandedInfo | null;
+export type IElementsTreeNodeExpandInfoGetter = (tree: IElementsTree, nodeId: string, state: ITreeNodeState) => IElementsTreeNodeExpandedInfo | null;
 
 export type IElementsTreeFilter = (
   tree: IElementsTree,
   filter: string,
   node: NavNode,
   children: string[],
-  state: MetadataMap<string, ITreeNodeState>
+  state: MetadataMap<string, ITreeNodeState>,
 ) => string[];
 
 export interface ITreeNodeState {
@@ -136,11 +131,14 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const navTreeResource = useService(NavTreeResource);
   const connectionInfoResource = useService(ConnectionInfoResource);
 
-  const [localTreeNodesState] = useState(() => new MetadataMap<string, ITreeNodeState>(() => ({
-    selected: false,
-    expanded: false,
-    showInFilter: false,
-  })));
+  const [localTreeNodesState] = useState(
+    () =>
+      new MetadataMap<string, ITreeNodeState>(() => ({
+        selected: false,
+        expanded: false,
+        showInFilter: false,
+      })),
+  );
 
   options = useObjectRef(options);
   options.renderers = useMemo(() => options.renderers || [], [...(options.renderers || [])]);
@@ -170,49 +168,51 @@ export function useElementsTree(options: IOptions): IElementsTree {
         while (children.length > 0) {
           const nextChildren: string[] = [];
 
-          await Promise.all(children.map(async child => {
-            await projectInfoResource.waitLoad();
-            await connectionInfoResource.waitLoad();
-            await navTreeResource.waitLoad();
-            await navNodeInfoResource.waitLoad();
+          await Promise.all(
+            children.map(async child => {
+              await projectInfoResource.waitLoad();
+              await connectionInfoResource.waitLoad();
+              await navTreeResource.waitLoad();
+              await navNodeInfoResource.waitLoad();
 
-            const expanded = elementsTree.isNodeExpanded(child, true);
-            if (!expanded && child !== options.root) {
-              if (navNodeInfoResource.isOutdated(child)) {
+              const expanded = elementsTree.isNodeExpanded(child, true);
+              if (!expanded && child !== options.root) {
+                if (navNodeInfoResource.isOutdated(child)) {
+                  const node = navNodeInfoResource.get(child);
+
+                  if (node?.parentId !== undefined && !navTreeResource.isOutdated(node.parentId)) {
+                    await navNodeInfoResource.load(child);
+                  }
+                }
+                return;
+              }
+
+              const loaded = await options.loadChildren(child, false);
+
+              if (!loaded) {
                 const node = navNodeInfoResource.get(child);
 
-                if (node?.parentId !== undefined && !navTreeResource.isOutdated(node.parentId)) {
-                  await navNodeInfoResource.load(child);
+                if (node) {
+                  await elementsTree.expand(node, false);
+                }
+                return;
+              }
+
+              if (
+                elementsTree.settings?.foldersTree &&
+                options.folderExplorer.options.expandFoldersWithSingleElement &&
+                child === options.root &&
+                elementsTree.getNodeChildren(child).length === 1
+              ) {
+                const nextNode = elementsTree.getNodeChildren(child)[0];
+
+                if (elementsTree.isNodeExpandable(nextNode) || elementsTree.isNodeExpanded(nextNode)) {
+                  options.folderExplorer.open(navNodeInfoResource.getParents(nextNode), nextNode);
                 }
               }
-              return;
-            }
-
-            const loaded = await options.loadChildren(child, false);
-
-            if (!loaded) {
-              const node = navNodeInfoResource.get(child);
-
-              if (node) {
-                await elementsTree.expand(node, false);
-              }
-              return;
-            }
-
-            if (
-              elementsTree.settings?.foldersTree
-              && options.folderExplorer.options.expandFoldersWithSingleElement
-              && child === options.root
-              && elementsTree.getNodeChildren(child).length === 1
-            ) {
-              const nextNode = elementsTree.getNodeChildren(child)[0];
-
-              if (elementsTree.isNodeExpandable(nextNode) || elementsTree.isNodeExpanded(nextNode)) {
-                options.folderExplorer.open(navNodeInfoResource.getParents(nextNode), nextNode);
-              }
-            }
-            nextChildren.push(...(navTreeResource.get(child) || []));
-          }));
+              nextChildren.push(...(navTreeResource.get(child) || []));
+            }),
+          );
 
           children = nextChildren;
         }
@@ -232,10 +232,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         const pathIndex = folderExplorer.state.fullPath.indexOf(nodeId);
 
         if (pathIndex >= 0) {
-          folderExplorer.open(
-            folderExplorer.state.fullPath.slice(0, pathIndex - 1),
-            folderExplorer.state.fullPath[pathIndex - 1]
-          );
+          folderExplorer.open(folderExplorer.state.fullPath.slice(0, pathIndex - 1), folderExplorer.state.fullPath[pathIndex - 1]);
         }
       });
     },
@@ -274,9 +271,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     async clearSelection(nodeId: string) {
       const node = navNodeInfoResource.get(nodeId);
 
-      const ignore = node && options.isGroup?.(node)
-        ? this.getNestedChildren(nodeId)
-        : [];
+      const ignore = node && options.isGroup?.(node) ? this.getNestedChildren(nodeId) : [];
 
       for (const [id, nodeState] of state) {
         if (nodeState.selected && id !== nodeId && !ignore.includes(id)) {
@@ -326,10 +321,11 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   const userData = useUserData<IElementsTreeUserState>(
     `elements-tree-${options.baseRoot}`,
-    () => observable<IElementsTreeUserState>({
-      nodeState: [],
-      filter: '',
-    }),
+    () =>
+      observable<IElementsTreeUserState>({
+        nodeState: [],
+        filter: '',
+      }),
     async data => {
       if (!options.settings?.saveFilter) {
         data.filter = '';
@@ -343,322 +339,321 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       await functionsRef.loadTree(options.root);
     },
-    data => (
-      typeof data === 'object'
-      && typeof data.filter === 'string'
-      && Array.isArray(data.nodeState)
-    )
+    data => typeof data === 'object' && typeof data.filter === 'string' && Array.isArray(data.nodeState),
   );
 
-  const elementsTree = useObservableRef<IElementsTree>(() => ({
-    actions: new SyncExecutor(),
-    activeDnDData: [],
-    loading: options.settings?.saveExpanded || false,
-    get filter(): string {
-      return this.userData.filter;
-    },
-    get filtering(): boolean {
-      return this.filter !== '';
-    },
-    isLoading(): boolean {
-      return this.loading;
-    },
-    isLoaded(): boolean {
-      return navNodeInfoResource.isLoaded(this.root);
-    },
-    getNodeState(nodeId: string) {
-      return this.state.get(nodeId);
-    },
-    isNodeExpanded(nodeId: string, ignoreFilter?: boolean): boolean {
-      if (nodeId === this.root) {
-        return true;
-      }
+  const elementsTree = useObservableRef<IElementsTree>(
+    () => ({
+      actions: new SyncExecutor(),
+      activeDnDData: [],
+      loading: options.settings?.saveExpanded || false,
+      get filter(): string {
+        return this.userData.filter;
+      },
+      get filtering(): boolean {
+        return this.filter !== '';
+      },
+      isLoading(): boolean {
+        return this.loading;
+      },
+      isLoaded(): boolean {
+        return navNodeInfoResource.isLoaded(this.root);
+      },
+      getNodeState(nodeId: string) {
+        return this.state.get(nodeId);
+      },
+      isNodeExpanded(nodeId: string, ignoreFilter?: boolean): boolean {
+        if (nodeId === this.root) {
+          return true;
+        }
 
-      if (this.filtering && this.settings?.filterAll && !ignoreFilter) {
-        return this.getNodeChildren(nodeId).length > 0;
-      }
+        if (this.filtering && this.settings?.filterAll && !ignoreFilter) {
+          return this.getNodeChildren(nodeId).length > 0;
+        }
 
-      const nodeState = this.getNodeState(nodeId);
-      const expanded = nodeState.expanded || nodeState.showInFilter;
-
-      if (!expanded && options.expandStateGetters?.length) {
-        return options
-          .expandStateGetters
-          .map(getExpandState => getExpandState(this, nodeId, nodeState))
-          .filter(stateInfo => stateInfo !== null)
-          .some(stateInfo => stateInfo?.expanded);
-      }
-
-      return expanded;
-    },
-    isNodeExpandable(nodeId: string): boolean {
-      if (nodeId === this.root) {
-        return true;
-      }
-
-      if (options.expandStateGetters?.length) {
         const nodeState = this.getNodeState(nodeId);
+        const expanded = nodeState.expanded || nodeState.showInFilter;
 
-        return options
-          .expandStateGetters
-          .map(getExpandState => getExpandState(this, nodeId, nodeState))
-          .filter(stateInfo => stateInfo !== null)
-          .every(stateInfo => stateInfo?.expandable !== false);
-      }
+        if (!expanded && options.expandStateGetters?.length) {
+          return options.expandStateGetters
+            .map(getExpandState => getExpandState(this, nodeId, nodeState))
+            .filter(stateInfo => stateInfo !== null)
+            .some(stateInfo => stateInfo?.expanded);
+        }
 
-      return true;
-    },
-    getExpanded(): string[] {
-      return Array.from(this.state).filter(([key, state]) => state.expanded).map(([key]) => key);
-    },
-    getSelected(): string[] {
-      return Array.from(this.state).filter(([key, state]) => state.selected).map(([key]) => key);
-    },
-    isNodeSelected(nodeId: string): boolean {
-      const node = navNodeInfoResource.get(nodeId);
+        return expanded;
+      },
+      isNodeExpandable(nodeId: string): boolean {
+        if (nodeId === this.root) {
+          return true;
+        }
 
-      if (node && elementsTree.isGroup?.(node)) {
-        const children = this.getNodeChildren(nodeId);
+        if (options.expandStateGetters?.length) {
+          const nodeState = this.getNodeState(nodeId);
 
-        if (children.length > 0) {
-          return children.every(child => this.isNodeSelected(child));
+          return options.expandStateGetters
+            .map(getExpandState => getExpandState(this, nodeId, nodeState))
+            .filter(stateInfo => stateInfo !== null)
+            .every(stateInfo => stateInfo?.expandable !== false);
+        }
+
+        return true;
+      },
+      getExpanded(): string[] {
+        return Array.from(this.state)
+          .filter(([key, state]) => state.expanded)
+          .map(([key]) => key);
+      },
+      getSelected(): string[] {
+        return Array.from(this.state)
+          .filter(([key, state]) => state.selected)
+          .map(([key]) => key);
+      },
+      isNodeSelected(nodeId: string): boolean {
+        const node = navNodeInfoResource.get(nodeId);
+
+        if (node && elementsTree.isGroup?.(node)) {
+          const children = this.getNodeChildren(nodeId);
+
+          if (children.length > 0) {
+            return children.every(child => this.isNodeSelected(child));
+          }
+
+          return false;
+        }
+
+        return this.getNodeState(nodeId).selected;
+      },
+      isNodeIndeterminateSelected(nodeId: string): boolean {
+        if (this.isNodeSelected(nodeId)) {
+          return false;
+        }
+
+        const node = navNodeInfoResource.get(nodeId);
+
+        if (node && elementsTree.isGroup?.(node)) {
+          const children = options.getChildren(nodeId) || [];
+
+          if (children.length > 0) {
+            return children.some(child => this.isNodeSelected(child) || this.isNodeIndeterminateSelected(child));
+          }
+
+          return false;
         }
 
         return false;
-      }
-
-      return this.getNodeState(nodeId).selected;
-    },
-    isNodeIndeterminateSelected(nodeId: string): boolean {
-      if (this.isNodeSelected(nodeId)) {
-        return false;
-      }
-
-      const node = navNodeInfoResource.get(nodeId);
-
-      if (node && elementsTree.isGroup?.(node)) {
+      },
+      getNodeChildren(nodeId: string): string[] {
+        const node = navNodeInfoResource.get(nodeId);
         const children = options.getChildren(nodeId) || [];
 
-        if (children.length > 0) {
-          return children.some(child => this.isNodeSelected(child) || this.isNodeIndeterminateSelected(child));
+        if (!node) {
+          return []; // Maybe filter should accept nodeId, so we be able to apply filters to empty node
         }
 
-        return false;
-      }
-
-      return false;
-    },
-    getNodeChildren(nodeId: string): string[] {
-      const node = navNodeInfoResource.get(nodeId);
-      const children = options.getChildren(nodeId) || [];
-
-      if (!node) {
-        return []; // Maybe filter should accept nodeId, so we be able to apply filters to empty node
-      }
-
-      return (options.filters || [])
-        .reduce(
-          (children, filter) => filter(elementsTree, elementsTree.filter, node, children, this.state),
-          children
-        );
-    },
-    async setFilter(value: string) {
-      runInAction(() => {
-        this.userData.filter = value;
-
-        for (const nodeState of this.state.values()) {
-          nodeState.showInFilter = false;
-        }
-      });
-
-      await options.onFilter?.(value);
-    },
-    collapse() {
-      for (const state of this.state.values()) {
-        state.expanded = false;
-        state.showInFilter = false;
-      }
-    },
-    async refresh(nodeId: string): Promise<void> {
-      try {
-        await navTreeResource.refreshTree(nodeId);
-      } catch (exception: any) {
-        notificationService.logException(exception, 'app_navigationTree_refresh_error');
-      }
-    },
-    async show(nodeId: string, path: string[]): Promise<void> {
-      const preloaded = await this.loadPath(path, nodeId);
-
-      if (preloaded !== nodeId) {
-        notificationService.logError({
-          title: 'app_navigationTree_node_not_found',
-          message: nodeId,
-        });
-      } else {
+        return (options.filters || []).reduce((children, filter) => filter(elementsTree, elementsTree.filter, node, children, this.state), children);
+      },
+      async setFilter(value: string) {
         runInAction(() => {
-          for (const parent of path) {
-            const state = this.getNodeState(parent);
-            state.expanded = true;
+          this.userData.filter = value;
+
+          for (const nodeState of this.state.values()) {
+            nodeState.showInFilter = false;
           }
-
-          const node = navNodeInfoResource.get(nodeId)!;
-
-          this.select(node, false, false);
-          this.actions.execute({ type: 'show', nodeId });
         });
 
-        if (path.length > 0) {
-          await functionsRef.loadTree(path[0]);
+        await options.onFilter?.(value);
+      },
+      collapse() {
+        for (const state of this.state.values()) {
+          state.expanded = false;
+          state.showInFilter = false;
         }
-      }
-    },
-    async click(node: NavNode, path: string[], leaf: boolean) {
-      await options.onClick?.(node);
-    },
-    async open(node: NavNode, path: string[], leaf: boolean) {
-      const expandableOrExpanded = this.isNodeExpandable(node.id) || this.isNodeExpanded(node.id);
-      if (!leaf && this.settings?.foldersTree && expandableOrExpanded) {
-        const nodeId = node.id;
-
-        const loaded = await options.loadChildren(node.id, true);
-        if (loaded) {
-          this.setFilter('');
-          options.folderExplorer.open(path, nodeId);
+      },
+      async refresh(nodeId: string): Promise<void> {
+        try {
+          await navTreeResource.refreshTree(nodeId);
+        } catch (exception: any) {
+          notificationService.logException(exception, 'app_navigationTree_refresh_error');
         }
-      }
+      },
+      async show(nodeId: string, path: string[]): Promise<void> {
+        const preloaded = await this.loadPath(path, nodeId);
 
-      const folder = !leaf && this.settings?.foldersTree || false;
-      await options.onOpen?.(node, folder);
-    },
-    async expand(node: NavNode, state: boolean) {
-      if (!this.isNodeExpandable(node.id)) {
-        return;
-      }
-
-      const treeNodeState = this.state.get(node.id);
-
-      try {
-        if (state || (this.filtering && !treeNodeState.showInFilter)) {
-          state = await options.loadChildren(node.id, true);
-        }
-
-        if (this.filtering) {
-          treeNodeState.showInFilter = !treeNodeState.showInFilter && state;
-
-          if (!treeNodeState.showInFilter) {
-            const nested = functionsRef.getNestedChildren(node.id);
-
-            for (const nodeId of nested) {
-              const treeNodeState = this.state.get(nodeId);
-              treeNodeState.showInFilter = false;
-            }
-          }
+        if (preloaded !== nodeId) {
+          notificationService.logError({
+            title: 'app_navigationTree_node_not_found',
+            message: nodeId,
+          });
         } else {
-          await options.onExpand?.(node, state);
-          treeNodeState.expanded = state && this.getNodeChildren(node.id).length > 0;
+          runInAction(() => {
+            for (const parent of path) {
+              const state = this.getNodeState(parent);
+              state.expanded = true;
+            }
+
+            const node = navNodeInfoResource.get(nodeId)!;
+
+            this.select(node, false, false);
+            this.actions.execute({ type: 'show', nodeId });
+          });
+
+          if (path.length > 0) {
+            await functionsRef.loadTree(path[0]);
+          }
+        }
+      },
+      async click(node: NavNode, path: string[], leaf: boolean) {
+        await options.onClick?.(node);
+      },
+      async open(node: NavNode, path: string[], leaf: boolean) {
+        const expandableOrExpanded = this.isNodeExpandable(node.id) || this.isNodeExpanded(node.id);
+        if (!leaf && this.settings?.foldersTree && expandableOrExpanded) {
+          const nodeId = node.id;
+
+          const loaded = await options.loadChildren(node.id, true);
+          if (loaded) {
+            this.setFilter('');
+            options.folderExplorer.open(path, nodeId);
+          }
         }
 
-        if (state) {
-          await functionsRef.loadTree(node.id);
-        }
-      } catch {
-        treeNodeState.expanded = false;
-
-        if (this.filtering) {
-          treeNodeState.showInFilter = false;
-        }
-      }
-    },
-    async select(node: NavNode, multiple: boolean, nested: boolean) {
-      if (options.customSelect) {
-        await options.customSelect(node, multiple, nested);
-        return;
-      }
-
-      if (options.beforeSelect) {
-        await options.beforeSelect(node, multiple, nested);
-      }
-
-      const selected = this.isNodeSelected(node.id);
-
-      if (!multiple) {
-        await functionsRef.clearSelection(node.id);
-
-        if (selected) {
+        const folder = (!leaf && this.settings?.foldersTree) || false;
+        await options.onOpen?.(node, folder);
+      },
+      async expand(node: NavNode, state: boolean) {
+        if (!this.isNodeExpandable(node.id)) {
           return;
         }
-      }
 
-      await functionsRef.setSelection(node.id, !selected);
-    },
-    async resetSelection(): Promise<void> {
-      if (options.customSelectReset) {
-        await options.customSelectReset();
-        return;
-      }
-      await functionsRef.resetSelection();
-    },
-    async loadPath(path: string[], lastNode?: string): Promise<string | undefined> {
-      let lastLoadedNode: string | undefined;
-      for (const nodeId of path) {
-        const loaded = await options.loadChildren(nodeId, false);
+        const treeNodeState = this.state.get(node.id);
 
-        if (!loaded) {
-          return lastLoadedNode;
+        try {
+          if (state || (this.filtering && !treeNodeState.showInFilter)) {
+            state = await options.loadChildren(node.id, true);
+          }
+
+          if (this.filtering) {
+            treeNodeState.showInFilter = !treeNodeState.showInFilter && state;
+
+            if (!treeNodeState.showInFilter) {
+              const nested = functionsRef.getNestedChildren(node.id);
+
+              for (const nodeId of nested) {
+                const treeNodeState = this.state.get(nodeId);
+                treeNodeState.showInFilter = false;
+              }
+            }
+          } else {
+            await options.onExpand?.(node, state);
+            treeNodeState.expanded = state && this.getNodeChildren(node.id).length > 0;
+          }
+
+          if (state) {
+            await functionsRef.loadTree(node.id);
+          }
+        } catch {
+          treeNodeState.expanded = false;
+
+          if (this.filtering) {
+            treeNodeState.showInFilter = false;
+          }
         }
-        lastLoadedNode = nodeId;
-      }
-
-      if (
-        lastNode !== undefined
-        && lastLoadedNode !== undefined
-        && options.getChildren(lastLoadedNode)?.includes(lastNode)) {
-        return lastNode;
-      }
-
-      return lastLoadedNode;
-    },
-    setDnDData(data: IDNDData, dragging: boolean) {
-      if (dragging) {
-        if (!this.activeDnDData.includes(data)) {
-          this.activeDnDData.push(data);
+      },
+      async select(node: NavNode, multiple: boolean, nested: boolean) {
+        if (options.customSelect) {
+          await options.customSelect(node, multiple, nested);
+          return;
         }
-      } else {
-        this.activeDnDData = this.activeDnDData.filter(d => d !== data);
-      }
+
+        if (options.beforeSelect) {
+          await options.beforeSelect(node, multiple, nested);
+        }
+
+        const selected = this.isNodeSelected(node.id);
+
+        if (!multiple) {
+          await functionsRef.clearSelection(node.id);
+
+          if (selected) {
+            return;
+          }
+        }
+
+        await functionsRef.setSelection(node.id, !selected);
+      },
+      async resetSelection(): Promise<void> {
+        if (options.customSelectReset) {
+          await options.customSelectReset();
+          return;
+        }
+        await functionsRef.resetSelection();
+      },
+      async loadPath(path: string[], lastNode?: string): Promise<string | undefined> {
+        let lastLoadedNode: string | undefined;
+        for (const nodeId of path) {
+          const loaded = await options.loadChildren(nodeId, false);
+
+          if (!loaded) {
+            return lastLoadedNode;
+          }
+          lastLoadedNode = nodeId;
+        }
+
+        if (lastNode !== undefined && lastLoadedNode !== undefined && options.getChildren(lastLoadedNode)?.includes(lastNode)) {
+          return lastNode;
+        }
+
+        return lastLoadedNode;
+      },
+      setDnDData(data: IDNDData, dragging: boolean) {
+        if (dragging) {
+          if (!this.activeDnDData.includes(data)) {
+            this.activeDnDData.push(data);
+          }
+        } else {
+          this.activeDnDData = this.activeDnDData.filter(d => d !== data);
+        }
+      },
+    }),
+    {
+      state: observable.ref,
+      settings: observable.ref,
+      isGroup: observable.ref,
+      disabled: observable.ref,
+      activeDnDData: observable.shallow,
+      root: observable.ref,
+      filter: computed,
+      filtering: computed,
+      loading: observable.ref,
+      renderers: observable.ref,
+      baseRoot: observable.ref,
+      collapse: action.bound,
+      userData: observable.ref,
     },
-  }), {
-    state: observable.ref,
-    settings: observable.ref,
-    isGroup: observable.ref,
-    disabled: observable.ref,
-    activeDnDData: observable.shallow,
-    root: observable.ref,
-    filter: computed,
-    filtering: computed,
-    loading: observable.ref,
-    renderers: observable.ref,
-    baseRoot: observable.ref,
-    collapse: action.bound,
-    userData: observable.ref,
-  }, {
-    state,
-    isGroup: options.isGroup,
-    disabled: options.disabled,
-    root: options.root,
-    settings: options.settings,
-    baseRoot: options.baseRoot,
-    renderers: options.renderers,
-    userData,
-  }, ['isLoading', 'isLoaded']);
+    {
+      state,
+      isGroup: options.isGroup,
+      disabled: options.disabled,
+      root: options.root,
+      settings: options.settings,
+      baseRoot: options.baseRoot,
+      renderers: options.renderers,
+      userData,
+    },
+    ['isLoading', 'isLoaded'],
+  );
 
   useEffect(() => {
     functionsRef.loadTree(options.root);
   }, [options.root]);
 
-  const loadTreeThreshold = useCallback(throttle(function refreshRoot() {
-    functionsRef.loadTree(options.root);
-  }, 100), []);
+  const loadTreeThreshold = useCallback(
+    throttle(function refreshRoot() {
+      functionsRef.loadTree(options.root);
+    }, 100),
+    [],
+  );
 
   useResource(useElementsTree, navTreeResource, options.baseRoot, {
     onData: () => loadTreeThreshold(),
@@ -679,11 +674,13 @@ export function useElementsTree(options: IOptions): IElementsTree {
   //       we want to have abstraction
   useExecutor({
     executor: projectsService.onActiveProjectChange,
-    handlers: [data => {
-      if (data.type === 'after') {
-        loadTreeThreshold();
-      }
-    }],
+    handlers: [
+      data => {
+        if (data.type === 'after') {
+          loadTreeThreshold();
+        }
+      },
+    ],
   });
 
   useExecutor({
@@ -693,43 +690,48 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   useExecutor({
     executor: navTreeResource.onItemUpdate,
-    handlers: [function exitFolder(key) {
-      ResourceKeyUtils.forEach(key, key => {
-        const children = navTreeResource.get(key);
+    handlers: [
+      function exitFolder(key) {
+        ResourceKeyUtils.forEach(key, key => {
+          const children = navTreeResource.get(key);
 
-        if (!children) {
-          functionsRef.exitNodeFolder(key);
-        }
-      });
-    }],
+          if (!children) {
+            functionsRef.exitNodeFolder(key);
+          }
+        });
+      },
+    ],
   });
 
   useExecutor({
     executor: navNodeInfoResource.onItemDelete,
-    handlers: [function deleteNodeState(key) {
-      runInAction(() => {
-        ResourceKeyUtils.forEach(key, key => {
-          state.delete(key);
+    handlers: [
+      function deleteNodeState(key) {
+        runInAction(() => {
+          ResourceKeyUtils.forEach(key, key => {
+            state.delete(key);
+          });
         });
-      });
-    }],
+      },
+    ],
   });
 
   useExecutor({
     executor: navTreeResource.onItemDelete,
-    handlers: [async function collapseDeletedTree(key) {
-      await ResourceKeyUtils.forEachAsync(key, async key => {
-        const node = navNodeInfoResource.get(key);
+    handlers: [
+      async function collapseDeletedTree(key) {
+        await ResourceKeyUtils.forEachAsync(key, async key => {
+          const node = navNodeInfoResource.get(key);
 
-        if (node) {
-          await elementsTree.expand(node, false);
+          if (node) {
+            await elementsTree.expand(node, false);
 
-          functionsRef.exitNodeFolder(key);
-        }
-      });
-    }],
+            functionsRef.exitNodeFolder(key);
+          }
+        });
+      },
+    ],
   });
-
 
   // sync settings
   const filterDisabled = getComputed(() => !options.settings?.filter && elementsTree.filtering);

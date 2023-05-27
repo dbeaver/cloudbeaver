@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
@@ -15,20 +14,14 @@ import { ToolsPanelService } from './ToolsPanel/ToolsPanelService';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
-  constructor(
-    private readonly menuService: MenuService,
-    private readonly toolsPanelService: ToolsPanelService,
-  ) {
+  constructor(private readonly menuService: MenuService, private readonly toolsPanelService: ToolsPanelService) {
     super();
   }
 
   register(): void {
     this.menuService.addCreator({
       menus: [MENU_APP_ACTIONS],
-      getItems: (context, items) => [
-        ...items,
-        MENU_TOOLS,
-      ],
+      getItems: (context, items) => [...items, MENU_TOOLS],
     });
     this.menuService.setHandler({
       id: 'tools-menu-base',
@@ -38,5 +31,5 @@ export class PluginBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 }

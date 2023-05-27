@@ -11,5 +11,5 @@ export enum ESqlDataSourceFeatures {
   query,
   executable,
   setName,
-  setProject
+  setProject,
 }
