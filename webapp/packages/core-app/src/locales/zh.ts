@@ -11,9 +11,4 @@ export default [
   ],
   ['app_shared_sql_generators_panel_title', '生成SQL'],
   ['app_shared_sql_generators_dialog_title', '生成的SQL'],
-  ['app_log_view_clear_log', '清除日志'],
-  ['app_log_view_entry_type', '类型'],
-  ['app_log_view_entry_timestamp', '时间戳'],
-  ['app_log_view_entry_message', '消息'],
-  ['app_log_view_entry_details', '详情'],
 ];

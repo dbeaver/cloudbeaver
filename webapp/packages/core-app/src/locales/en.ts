@@ -11,9 +11,4 @@ export default [
   ],
   ['app_shared_sql_generators_panel_title', 'Generate SQL'],
   ['app_shared_sql_generators_dialog_title', 'Generated SQL'],
-  ['app_log_view_clear_log', 'Clear logs'],
-  ['app_log_view_entry_type', 'Type'],
-  ['app_log_view_entry_timestamp', 'Timestamp'],
-  ['app_log_view_entry_message', 'Message'],
-  ['app_log_view_entry_details', 'Details'],
 ];

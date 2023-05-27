@@ -137,7 +137,7 @@ export function useResource<
   const errorContext = useContext(ErrorContext);
   let key: ResourceKey<TKeyArg> | null = keyObj as ResourceKey<TKeyArg>;
   let includes: TIncludes = [] as unknown as TIncludes;
-  const [loadFunctionName] = useState(`${component.name}.useResource(${resource.getName()}).load`);
+  const [loadFunctionName] = useState(`${component.name}.useResource(${resource.getName()}).load` as const);
 
   if (isKeyWithIncludes<TKeyArg, TIncludes>(keyObj)) {
     key = keyObj.key;
@@ -204,21 +204,21 @@ export function useResource<
   const refObj = useObservableRef(() => ({
     loadingPromise: null as (Promise<void> | null),
     exception: null as Error | null,
-    useRef: [null, ''] as [TKeyArg | null, string],
-    get resourceException() {
+    useRef: [null, ''] as [ResourceKey<TKeyArg> | null, string],
+    get resourceException(): Error | null {
       if (propertiesRef.key === null) {
         return null;
       }
 
       return propertiesRef.resource.getException(propertiesRef.key);
     },
-    isResourceError() {
+    isResourceError(): boolean {
       return isContainsException(this.resourceException);
     },
-    use(key: TKeyArg | null) {
+    use(key: ResourceKey<TKeyArg> | null): void {
       key = toJS(key);
 
-      if (this.useRef[0] !== null) {
+      if (this.useRef[0] !== null && propertiesRef.resource.hasUseId(this.useRef[1])) {
         if (key !== null && propertiesRef.resource.isIntersect(key, this.useRef[0])) {
           return;
         }
@@ -227,7 +227,7 @@ export function useResource<
       }
       this.useRef = [key, key === null ? '' : propertiesRef.resource.use(key)];
     },
-    async [loadFunctionName](refresh?: boolean) {
+    async [loadFunctionName](refresh?: boolean): Promise<void> {
       const { key, includes, resource } = propertiesRef;
 
       if (refresh) {
@@ -236,7 +236,7 @@ export function useResource<
 
       await resource.load(key, includes as any);
     },
-    async load(refresh?: boolean) {
+    async load(refresh?: boolean): Promise<void> {
       if (this.loadingPromise) {
         return this.loadingPromise;
       }
@@ -246,7 +246,7 @@ export function useResource<
       }
 
       try {
-        this.loadingPromise = this[loadFunctionName](refresh);
+        this.loadingPromise = (this[loadFunctionName] as (refresh?: boolean) => Promise<void>)(refresh);
         await this.loadingPromise;
         this.exception = null;
       } catch (exception: any) {
@@ -285,7 +285,7 @@ export function useResource<
   ) & IResourcePrivateState
   >(() => ({
       preloaded,
-      get canLoad() {
+      get canLoad(): boolean {
         return (
           propertiesRef.key !== null
           && this.preloaded
@@ -399,24 +399,26 @@ export function useResource<
           return comparer.default(a, b);
         },
       }),
-      tryGetData: computed<any>({
-        equals: (a, b) => {
-          if (Array.isArray(a) && Array.isArray(b)) {
-            return isArraysEqual(a, b, undefined, true);
-          }
+      // TODO: in case when array is mutated, but not replaced, it will not be updated
+      // tryGetData: computed<any>({
+      //   equals: (a, b) => {
+      //     console.log(a, b, isArraysEqual(a, b, undefined, true));
+      //     if (Array.isArray(a) && Array.isArray(b)) {
+      //       return isArraysEqual(a, b, undefined, true);
+      //     }
 
-          return comparer.default(a, b);
-        },
-      }),
-      data: computed<any>({
-        equals: (a, b) => {
-          if (Array.isArray(a) && Array.isArray(b)) {
-            return isArraysEqual(a, b, undefined, true);
-          }
+      //     return comparer.default(a, b);
+      //   },
+      // }),
+      // data: computed<any>({
+      //   equals: (a, b) => {
+      //     if (Array.isArray(a) && Array.isArray(b)) {
+      //       return isArraysEqual(a, b, undefined, true);
+      //     }
 
-          return comparer.default(a, b);
-        },
-      }),
+      //     return comparer.default(a, b);
+      //   },
+      // }),
       outdated: computed,
       loaded: computed,
       loading: computed,

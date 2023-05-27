@@ -29,6 +29,7 @@ export * from './isArraysEqual';
 export * from './isPrimitive';
 export * from './isPropertiesEqual';
 export * from './isSafari';
+export * from './isSameDay';
 export * from './isValuesEqual';
 export * from './md5';
 export * from './MetadataMap';
