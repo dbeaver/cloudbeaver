@@ -5,9 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
-import { GraphQLService, CachedMapResource, ResourceKey, ResourceKeyUtils, AdminTeamInfoFragment, AdminConnectionGrantInfo, CachedMapAllKey, GetTeamsListQueryVariables, ResourceKeySimple, resourceKeyList, isResourceAlias } from '@cloudbeaver/core-sdk';
+import {
+  AdminConnectionGrantInfo,
+  AdminTeamInfoFragment,
+  CachedMapAllKey,
+  CachedMapResource,
+  GetTeamsListQueryVariables,
+  GraphQLService,
+  isResourceAlias,
+  ResourceKey,
+  resourceKeyList,
+  ResourceKeySimple,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 const NEW_TEAM_SYMBOL = Symbol('new-team');
@@ -23,13 +34,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     super();
   }
 
-  async createTeam({
-    teamId,
-    teamPermissions,
-    teamName,
-    description,
-    metaParameters,
-  }: TeamInfo): Promise<TeamInfo> {
+  async createTeam({ teamId, teamPermissions, teamName, description, metaParameters }: TeamInfo): Promise<TeamInfo> {
     const response = await this.graphQLService.sdk.createTeam({
       teamId,
       teamName,
@@ -52,13 +57,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     return this.get(teamId)!;
   }
 
-  async updateTeam({
-    teamId,
-    teamPermissions,
-    teamName,
-    description,
-    metaParameters,
-  }: TeamInfo): Promise<TeamInfo> {
+  async updateTeam({ teamId, teamPermissions, teamName, description, metaParameters }: TeamInfo): Promise<TeamInfo> {
     const { team } = await this.graphQLService.sdk.updateTeam({
       teamId,
       teamName,
@@ -105,9 +104,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
       return;
     }
 
-    const {
-      permissions: newPermissions,
-    } = await this.graphQLService.sdk.setSubjectPermissions({ subjectId, permissions });
+    const { permissions: newPermissions } = await this.graphQLService.sdk.setSubjectPermissions({ subjectId, permissions });
 
     if (team) {
       team.teamPermissions = newPermissions.map(permission => permission.id);
@@ -121,10 +118,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     await this.graphQLService.sdk.saveTeamMetaParameters({ teamId, parameters });
   }
 
-  protected async loader(
-    originalKey: ResourceKey<string>,
-    includes?: string[]
-  ): Promise<Map<string, TeamInfo>> {
+  protected async loader(originalKey: ResourceKey<string>, includes?: string[]): Promise<Map<string, TeamInfo>> {
     const all = this.isAlias(originalKey, CachedMapAllKey);
     const teamsList: TeamInfo[] = [];
 

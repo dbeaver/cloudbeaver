@@ -5,25 +5,24 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
-  GraphQLService,
-  CachedMapResource,
-  ResourceKey,
   AdminConnectionGrantInfo,
-  AdminUserInfoFragment,
   AdminUserInfo,
-  ResourceKeyUtils,
-  GetUsersListQueryVariables,
+  AdminUserInfoFragment,
   CachedMapAllKey,
-  resourceKeyList,
+  CachedMapResource,
+  GetUsersListQueryVariables,
+  GraphQLService,
+  isResourceAlias,
   isResourceKeyAlias,
+  ResourceKey,
+  resourceKeyList,
   ResourceKeySimple,
-  isResourceAlias
+  ResourceKeyUtils,
 } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
@@ -56,13 +55,11 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     private readonly serverConfigResource: ServerConfigResource,
     private readonly authProviderService: AuthProviderService,
     private readonly authInfoService: AuthInfoService,
-    sessionPermissionsResource: SessionPermissionsResource
+    sessionPermissionsResource: SessionPermissionsResource,
   ) {
     super();
 
-    sessionPermissionsResource
-      .require(this, EAdminPermission.admin)
-      .outdateResource(this);
+    sessionPermissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
   }
 
   isNew(id: string): boolean {
@@ -79,10 +76,12 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       grantedConnections: [],
       configurationParameters: {},
       metaParameters: {},
-      origins: [{
-        type: AUTH_PROVIDER_LOCAL_ID,
-        displayName: 'Local',
-      }],
+      origins: [
+        {
+          type: AUTH_PROVIDER_LOCAL_ID,
+          displayName: 'Local',
+        },
+      ],
       linkedAuthProviders: [AUTH_PROVIDER_LOCAL_ID],
       enabled: true,
       authRole: this.serverConfigResource.data?.defaultAuthRole ?? undefined,
@@ -103,15 +102,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     await this.graphQLService.sdk.saveUserMetaParameters({ userId, parameters });
   }
 
-  async create({
-    userId,
-    teams,
-    credentials,
-    metaParameters,
-    grantedConnections,
-    enabled,
-    authRole,
-  }: UserCreateOptions): Promise<AdminUser> {
+  async create({ userId, teams, credentials, metaParameters, grantedConnections, enabled, authRole }: UserCreateOptions): Promise<AdminUser> {
     const { user } = await this.graphQLService.sdk.createUser({
       userId,
       enabled,
@@ -129,7 +120,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
       await this.setConnections(userId, grantedConnections);
       await this.setMetaParameters(userId, metaParameters);
-      const user = await this.refresh(userId) as unknown as AdminUserNew;
+      const user = (await this.refresh(userId)) as unknown as AdminUserNew;
       user[NEW_USER_SYMBOL] = true;
     } catch (exception: any) {
       this.delete(userId);
@@ -191,7 +182,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   async delete(key: ResourceKeySimple<string>): Promise<void> {
     await ResourceKeyUtils.forEachAsync(key, async key => {
       if (this.isActiveUser(key)) {
-        throw new Error('You can\'t delete current logged user');
+        throw new Error("You can't delete current logged user");
       }
       await this.graphQLService.sdk.deleteUser({ userId: key });
       super.delete(key);
@@ -214,10 +205,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     return this.authInfoService.userInfo?.userId === userId;
   }
 
-  protected async loader(
-    originalKey: ResourceKey<string>,
-    includes?: string[]
-  ): Promise<Map<string, AdminUser>> {
+  protected async loader(originalKey: ResourceKey<string>, includes?: string[]): Promise<Map<string, AdminUser>> {
     const all = this.isAlias(originalKey, CachedMapAllKey);
     const usersList: AdminUser[] = [];
 

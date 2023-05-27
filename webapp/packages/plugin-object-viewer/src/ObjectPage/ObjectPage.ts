@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, makeObservable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
@@ -29,10 +28,7 @@ export type ObjectPagePanelComponent<T = unknown> = React.FunctionComponent<Obje
 
 export type ObjectPageCloseCallback<T> = (tab: ITab<IObjectViewerTabState>, pageState: T) => Promise<boolean> | boolean;
 export type ObjectPageCallback<T> = (tab: ITab<IObjectViewerTabState>, pageState: T) => void;
-export type ObjectPageRestoreCallback<T> = (
-  tab: ITab<IObjectViewerTabState>,
-  pageState: T
-) => Promise<boolean> | boolean;
+export type ObjectPageRestoreCallback<T> = (tab: ITab<IObjectViewerTabState>, pageState: T) => Promise<boolean> | boolean;
 
 export interface ObjectPageOptions<T = unknown> {
   key: string;

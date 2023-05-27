@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled, { css } from 'reshadow';
 
 import { Translate } from '@cloudbeaver/core-blocks';
@@ -19,6 +18,8 @@ const styles = css`
 
 export function ConfigurationWizardTitle() {
   return styled(styles)(
-    <wizard-title as='div'><Translate token='administration_configuration_wizard_title' /></wizard-title>
+    <wizard-title as="div">
+      <Translate token="administration_configuration_wizard_title" />
+    </wizard-title>,
   );
 }

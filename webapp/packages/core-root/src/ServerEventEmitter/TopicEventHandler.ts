@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Connectable, connectable, filter, map, merge, Observable, Subject } from 'rxjs';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
@@ -23,9 +22,9 @@ export abstract class TopicEventHandler<
   TEvent extends IBaseServerEvent<TEventID, TTopic>,
   SourceEvent extends IBaseServerEvent<TEventID, TTopic>,
   TEventID extends string = string,
-  TTopic extends string = string
->
-implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
+  TTopic extends string = string,
+> implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic>
+{
   readonly onInit: ISyncExecutor;
   readonly eventsSubject: Connectable<TEvent>;
 
@@ -34,35 +33,23 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
   private readonly subscribedResources: Map<CachedResource<any, any, any, any, any>, ISubscribedResourceInfo>;
   private readonly serverSubject?: Observable<TEvent>;
   private readonly subject: Subject<TEvent>;
-  constructor(
-    private readonly topic: string,
-    private readonly emitter: IServerEventEmitter<SourceEvent>
-  ) {
+  constructor(private readonly topic: string, private readonly emitter: IServerEventEmitter<SourceEvent>) {
     this.onInit = new SyncExecutor();
     this.subject = new Subject();
     this.activeResources = [];
     this.subscribedResources = new Map();
     this.subscription = null;
     this.serverSubject = this.emitter.multiplex(topic, this.map);
-    this.eventsSubject = connectable(
-      merge(this.subject, this.serverSubject),
-      {
-        connector: () => new Subject(),
-        resetOnDisconnect: false, // used because subscribers won't receive events after reconnect otherwise
-      }
-    );
+    this.eventsSubject = connectable(merge(this.subject, this.serverSubject), {
+      connector: () => new Subject(),
+      resetOnDisconnect: false, // used because subscribers won't receive events after reconnect otherwise
+    });
 
     this.emitter.onInit.next(this.onInit);
   }
 
-  multiplex<T = TEvent>(
-    topicId: TTopic,
-    mapTo: ((event: TEvent) => T) = event => event as unknown as T,
-  ): Observable<T> {
-    return this.emitter.multiplex(
-      topicId,
-      compose(mapTo, this.map) as unknown as (event: SourceEvent) => T
-    );
+  multiplex<T = TEvent>(topicId: TTopic, mapTo: (event: TEvent) => T = event => event as unknown as T): Observable<T> {
+    return this.emitter.multiplex(topicId, compose(mapTo, this.map) as unknown as (event: SourceEvent) => T);
   }
 
   onEvent<T = TEvent>(
@@ -76,7 +63,10 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
     }
 
     const sub = this.eventsSubject
-      .pipe(filter(e => e.id === id), map(mapTo))
+      .pipe(
+        filter(e => e.id === id),
+        map(mapTo),
+      )
       .subscribe(callback);
 
     return () => {
@@ -94,14 +84,11 @@ implements IServerEventEmitter<TEvent, SourceEvent, TEventID, TTopic> {
     filterFn: (param: TEvent) => boolean = () => true,
     resource?: CachedResource<any, any, any, any, any>,
   ): Subscription {
-
     if (resource) {
       this.registerResource(resource);
     }
 
-    const sub = this.eventsSubject
-      .pipe(filter(filterFn), map(mapTo))
-      .subscribe(callback);
+    const sub = this.eventsSubject.pipe(filter(filterFn), map(mapTo)).subscribe(callback);
 
     return () => {
       sub.unsubscribe();

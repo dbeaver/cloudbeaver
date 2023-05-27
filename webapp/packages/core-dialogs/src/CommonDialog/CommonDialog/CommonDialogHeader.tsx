@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { use } from 'reshadow';
 
-import { Icon, IconOrImage, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { Icon, IconOrImage, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { dialogStyles } from '../styles';
@@ -40,9 +39,7 @@ export const CommonDialogHeader = observer<Props>(function CommonDialogHeader({
 
   return styled(useStyles(commonDialogThemeStyle, commonDialogBaseStyle, dialogStyles, style))(
     <header className={className}>
-      <icon-container>
-        {icon && <IconOrImage {...use({ bigIcon })} icon={icon} viewBox={viewBox} />}
-      </icon-container>
+      <icon-container>{icon && <IconOrImage {...use({ bigIcon })} icon={icon} viewBox={viewBox} />}</icon-container>
       <header-title>
         <h3>{translate(title)}</h3>
         {onReject && (
@@ -52,6 +49,6 @@ export const CommonDialogHeader = observer<Props>(function CommonDialogHeader({
         )}
       </header-title>
       {subTitle && <sub-title>{typeof subTitle === 'string' ? translate(subTitle) : subTitle}</sub-title>}
-    </header>
+    </header>,
   );
 });

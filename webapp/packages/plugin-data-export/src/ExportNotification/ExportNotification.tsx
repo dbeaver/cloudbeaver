@@ -5,13 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import {
-  Button, SnackbarWrapper, SnackbarStatus, SnackbarContent, SnackbarBody, SnackbarFooter, useTranslate
-} from '@cloudbeaver/core-blocks';
+import { Button, SnackbarBody, SnackbarContent, SnackbarFooter, SnackbarStatus, SnackbarWrapper, useTranslate } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationComponentProps } from '@cloudbeaver/core-events';
 import { EDeferredState } from '@cloudbeaver/core-utils';
@@ -45,9 +42,7 @@ type Props = NotificationComponentProps<{
   source: string;
 }>;
 
-export const ExportNotification = observer<Props>(function ExportNotification({
-  notification,
-}) {
+export const ExportNotification = observer<Props>(function ExportNotification({ notification }) {
   const controller = useController(ExportNotificationController, notification);
   const translate = useTranslate();
   const { title, status, message } = controller.status;
@@ -60,41 +55,22 @@ export const ExportNotification = observer<Props>(function ExportNotification({
           {message && <message>{message}</message>}
           <source-name>
             {controller.sourceName}
-            {controller.task?.context.sourceName && (
-              <pre title={controller.task.context.sourceName}>
-                {controller.task.context.sourceName}
-              </pre>
-            )}
+            {controller.task?.context.sourceName && <pre title={controller.task.context.sourceName}>{controller.task.context.sourceName}</pre>}
           </source-name>
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
           {status === ENotificationType.Info && controller.downloadUrl && (
             <>
-              <Button
-                type="button"
-                mod={['outlined']}
-                onClick={controller.delete}
-              >
+              <Button type="button" mod={['outlined']} onClick={controller.delete}>
                 {translate('data_transfer_notification_delete')}
               </Button>
-              <Button
-                tag='a'
-                href={controller.downloadUrl}
-                mod={['unelevated']}
-                download
-                onClick={controller.download}
-              >
+              <Button tag="a" href={controller.downloadUrl} mod={['unelevated']} download onClick={controller.download}>
                 {translate('data_transfer_notification_download')}
               </Button>
             </>
           )}
           {status === ENotificationType.Error && (
-            <Button
-              type="button"
-              mod={['outlined']}
-              disabled={controller.isDetailsDialogOpen}
-              onClick={controller.showDetails}
-            >
+            <Button type="button" mod={['outlined']} disabled={controller.isDetailsDialogOpen} onClick={controller.showDetails}>
               {translate('ui_errors_details')}
             </Button>
           )}
@@ -110,7 +86,6 @@ export const ExportNotification = observer<Props>(function ExportNotification({
           )}
         </SnackbarFooter>
       </SnackbarContent>
-    </SnackbarWrapper>
-
+    </SnackbarWrapper>,
   );
 });

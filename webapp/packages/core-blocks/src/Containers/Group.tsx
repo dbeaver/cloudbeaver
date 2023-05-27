@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { forwardRef } from 'react';
 
 import { filterContainerFakeProps } from './filterContainerFakeProps';
@@ -17,12 +16,7 @@ interface Props extends IContainerProps {
   box?: boolean | 'no-overflow';
 }
 
-export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTMLDivElement>>(function Group({
-  form,
-  center,
-  box,
-  ...rest
-}, ref) {
+export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTMLDivElement>>(function Group({ form, center, box, ...rest }, ref) {
   const divProps = filterContainerFakeProps(rest);
 
   return <div ref={ref} {...divProps} />;

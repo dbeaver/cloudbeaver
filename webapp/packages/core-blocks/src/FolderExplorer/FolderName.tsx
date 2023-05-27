@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled from 'reshadow';
@@ -36,14 +35,7 @@ interface ShortProps extends BaseProps {
   short: boolean;
 }
 
-export const FolderName = observer<FolderProps | ShortProps>(function FolderName({
-  folder,
-  path,
-  title,
-  short,
-  last,
-  getName,
-}) {
+export const FolderName = observer<FolderProps | ShortProps>(function FolderName({ folder, path, title, short, last, getName }) {
   const context = useContext(FolderExplorerContext);
 
   if (!context) {
@@ -71,10 +63,8 @@ export const FolderName = observer<FolderProps | ShortProps>(function FolderName
         <Icon name="arrow" viewBox="0 0 16 16" />
       </folder-explorer-path-element-arrow>
       <folder-explorer-path-element-name>
-        {last
-          ? name
-          : <Link onClick={() => context.open(path, folder!)}>{name}</Link>}
+        {last ? name : <Link onClick={() => context.open(path, folder!)}>{name}</Link>}
       </folder-explorer-path-element-name>
-    </folder-explorer-path-element>
+    </folder-explorer-path-element>,
   );
 });

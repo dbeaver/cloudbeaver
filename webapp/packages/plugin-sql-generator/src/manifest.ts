@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { GeneratorMenuBootstrap } from './GeneratorMenuBootstrap';
@@ -19,11 +18,5 @@ export const sqlGeneratorPlugin: PluginManifest = {
     name: 'Sql Editor Generator plugin',
   },
 
-  providers: [
-    LocaleService,
-    SqlGeneratorsBootstrap,
-    SqlGeneratorsResource,
-    ScriptPreviewService,
-    GeneratorMenuBootstrap,
-  ],
+  providers: [LocaleService, SqlGeneratorsBootstrap, SqlGeneratorsResource, ScriptPreviewService, GeneratorMenuBootstrap],
 };

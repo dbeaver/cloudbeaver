@@ -11,9 +11,5 @@ interface Props {
 }
 
 export const SlideElement: React.FC<React.PropsWithChildren<Props>> = function SlideElement({ children, className }) {
-  return (
-    <div className={className}>
-      {children}
-    </div>
-  );
+  return <div className={className}>{children}</div>;
 };

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable, observable } from 'mobx';
 
 import type { ITask } from './ITask';
@@ -15,10 +14,7 @@ export class Task<TValue> implements ITask<TValue> {
   executing: boolean;
 
   get cancellable(): boolean {
-    if (
-      this.cancelled
-      || (this.externalCancel === undefined && this.executing)
-    ) {
+    if (this.cancelled || (this.externalCancel === undefined && this.executing)) {
       return false;
     }
 
@@ -42,10 +38,7 @@ export class Task<TValue> implements ITask<TValue> {
     return 'Task';
   }
 
-  constructor(
-    readonly task: () => Promise<TValue>,
-    private readonly externalCancel?: () => Promise<void> | void
-  ) {
+  constructor(readonly task: () => Promise<TValue>, private readonly externalCancel?: () => Promise<void> | void) {
     this.innerPromise = new Promise((resolve, reject) => {
       this.reject = reject;
       this.resolve = resolve;
@@ -64,51 +57,58 @@ export class Task<TValue> implements ITask<TValue> {
 
   then<TResult1 = TValue, TResult2 = never>(
     onfulfilled?: ((value: TValue) => TResult1 | PromiseLike<TResult1>) | null,
-    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
+    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null,
   ): ITask<TResult1 | TResult2> {
     let cancel = this.cancel.bind(this);
 
-    return new Task(async () => {
-      const value = await this.innerPromise;
+    return new Task(
+      async () => {
+        const value = await this.innerPromise;
 
-      const task = onfulfilled?.(value);
+        const task = onfulfilled?.(value);
 
-      if (task instanceof Task) {
-        cancel = async () => {
-          await task.cancel();
-          await this.cancel();
-        };
-      }
+        if (task instanceof Task) {
+          cancel = async () => {
+            await task.cancel();
+            await this.cancel();
+          };
+        }
 
-      return await task as TResult1;
-    }, () => cancel())
+        return (await task) as TResult1;
+      },
+      () => cancel(),
+    )
       .run()
       .catch(onrejected);
   }
 
-  catch<TResult = never>(
-    onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null
-  ): ITask<TValue | TResult> {
-    return new Task(async () => {
-      try {
-        return await this.innerPromise;
-      } catch (exception: any) {
-        if (onrejected) {
-          return await onrejected(exception);
+  catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null): ITask<TValue | TResult> {
+    return new Task(
+      async () => {
+        try {
+          return await this.innerPromise;
+        } catch (exception: any) {
+          if (onrejected) {
+            return await onrejected(exception);
+          }
+          throw exception;
         }
-        throw exception;
-      }
-    }, () => this.cancel()).run();
+      },
+      () => this.cancel(),
+    ).run();
   }
 
   finally(onfinally?: (() => void) | null): ITask<TValue> {
-    return new Task(async () => {
-      try {
-        return await this.innerPromise;
-      } finally {
-        onfinally?.();
-      }
-    }, () => this.cancel()).run();
+    return new Task(
+      async () => {
+        try {
+          return await this.innerPromise;
+        } finally {
+          onfinally?.();
+        }
+      },
+      () => this.cancel(),
+    ).run();
   }
 
   run(): this {

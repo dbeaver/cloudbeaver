@@ -5,13 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React from 'react';
 
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { AuthConfigurationsResource, AuthProviderService, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AdminAuthProviderConfiguration, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
@@ -44,7 +43,7 @@ export class AuthConfigurationsAdministrationService extends Bootstrap {
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly authConfigurationsResource: AuthConfigurationsResource,
     private readonly createConfigurationService: CreateAuthConfigurationService,
-    private readonly authProviderService: AuthProviderService
+    private readonly authProviderService: AuthProviderService,
   ) {
     super();
   }
@@ -79,7 +78,7 @@ export class AuthConfigurationsAdministrationService extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 
   private async loadConfigurations() {
     try {

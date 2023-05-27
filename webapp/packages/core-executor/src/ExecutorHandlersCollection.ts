@@ -5,15 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { makeObservable, observable } from 'mobx';
 
-import type { IContextLoader, ISyncContextLoader, IAsyncContextLoader } from './IExecutionContext';
+import type { IAsyncContextLoader, IContextLoader, ISyncContextLoader } from './IExecutionContext';
 import type { IExecutorHandler } from './IExecutorHandler';
 import type { ExecutorDataFilter, ExecutorDataMap, IChainLink, IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 
-export class ExecutorHandlersCollection<T = unknown, TResult = any | Promise<any>>
-implements IExecutorHandlersCollection<T, TResult> {
+export class ExecutorHandlersCollection<T = unknown, TResult = any | Promise<any>> implements IExecutorHandlersCollection<T, TResult> {
   handlers: Array<IExecutorHandler<T, TResult>> = [];
   postHandlers: Array<IExecutorHandler<T, TResult>> = [];
   chain: Array<IChainLink<T, TResult>> = [];
@@ -37,18 +35,9 @@ implements IExecutorHandlersCollection<T, TResult> {
     });
   }
 
-  addContextCreator<TContext>(
-    context: ISyncContextLoader<TContext, T>,
-    creator: ISyncContextLoader<TContext, T>
-  ): this;
-  addContextCreator<TContext>(
-    context: IAsyncContextLoader<TContext, T>,
-    creator: IAsyncContextLoader<TContext, T>
-  ): this;
-  addContextCreator<TContext>(
-    context: IContextLoader<TContext, T>,
-    creator: IContextLoader<TContext, T>
-  ): this {
+  addContextCreator<TContext>(context: ISyncContextLoader<TContext, T>, creator: ISyncContextLoader<TContext, T>): this;
+  addContextCreator<TContext>(context: IAsyncContextLoader<TContext, T>, creator: IAsyncContextLoader<TContext, T>): this;
+  addContextCreator<TContext>(context: IContextLoader<TContext, T>, creator: IContextLoader<TContext, T>): this {
     this.contextCreators.set(context, creator);
     return this;
   }
@@ -71,17 +60,11 @@ implements IExecutorHandlersCollection<T, TResult> {
     return this.links.get(link)!;
   }
 
-  getLinkHandlers(
-    link: IExecutorHandlersCollection<any, TResult>
-  ): IExecutorHandlersCollection<T, TResult> | undefined {
+  getLinkHandlers(link: IExecutorHandlersCollection<any, TResult>): IExecutorHandlersCollection<T, TResult> | undefined {
     return this.links.get(link);
   }
 
-  before<TNext>(
-    executor: IExecutorHandlersCollection<TNext, TResult>,
-    map?: ExecutorDataMap<T, TNext>,
-    filter?: ExecutorDataFilter<T>
-  ): this {
+  before<TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>, filter?: ExecutorDataFilter<T>): this {
     this.chain.push({
       executor,
       map,
@@ -91,11 +74,7 @@ implements IExecutorHandlersCollection<T, TResult> {
     return this;
   }
 
-  next<TNext>(
-    executor: IExecutorHandlersCollection<TNext, TResult>,
-    map?: ExecutorDataMap<T, TNext>,
-    filter?: ExecutorDataFilter<T>
-  ): this {
+  next<TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>, filter?: ExecutorDataFilter<T>): this {
     this.chain.push({
       executor,
       map,

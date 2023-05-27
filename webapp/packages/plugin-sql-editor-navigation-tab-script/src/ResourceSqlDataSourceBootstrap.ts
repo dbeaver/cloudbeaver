@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable, observable, untracked } from 'mobx';
 
 import { ConnectionInfoResource, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
@@ -68,18 +67,18 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       map => {
         for (const [key, value] of Array.from(map.entries())) {
           if (
-            !['string', 'undefined'].includes(typeof value.resourceKey)
-            || !['undefined', 'object'].includes(typeof value.executionContext)
-            || !['string', 'undefined'].includes(typeof value.executionContext?.connectionId)
-            || !['string', 'undefined'].includes(typeof value.executionContext?.id)
-            || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultCatalog)
-            || !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultSchema)
+            !['string', 'undefined'].includes(typeof value.resourceKey) ||
+            !['undefined', 'object'].includes(typeof value.executionContext) ||
+            !['string', 'undefined'].includes(typeof value.executionContext?.connectionId) ||
+            !['string', 'undefined'].includes(typeof value.executionContext?.id) ||
+            !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultCatalog) ||
+            !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultSchema)
           ) {
             map.delete(key);
           }
         }
         return map;
-      }
+      },
     );
   }
 
@@ -91,13 +90,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     this.sqlDataSourceService.register({
       key: ResourceSqlDataSource.key,
       getDataSource: (editorId, options) => {
-        const dataSource = new ResourceSqlDataSource(
-          this.connectionInfoResource,
-          this.resourceManagerResource,
-          this.createState(
-            editorId,
-          )
-        );
+        const dataSource = new ResourceSqlDataSource(this.connectionInfoResource, this.resourceManagerResource, this.createState(editorId));
 
         if (options?.executionContext) {
           dataSource.setExecutionContext(options.executionContext);
@@ -170,12 +163,9 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 
-  private createState(
-    editorId: string,
-    resourceKey?: string
-  ): IResourceSqlDataSourceState {
+  private createState(editorId: string, resourceKey?: string): IResourceSqlDataSourceState {
     let state = this.dataSourceStateState.get(editorId);
 
     if (!state) {
@@ -200,10 +190,8 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
     if (focused) {
       const dataSources = this.sqlDataSourceService.dataSources
-        .filter(([, dataSource]) => (
-          dataSource instanceof ResourceSqlDataSource
-        ))
-        .map(([,dataSource]) => dataSource as ResourceSqlDataSource);
+        .filter(([, dataSource]) => dataSource instanceof ResourceSqlDataSource)
+        .map(([, dataSource]) => dataSource as ResourceSqlDataSource);
 
       for (const dataSource of dataSources) {
         dataSource.markOutdated();
@@ -217,10 +205,8 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     }
 
     const dataSource = this.sqlDataSourceService.dataSources
-      .filter(([, dataSource]) => (
-        dataSource instanceof ResourceSqlDataSource
-      ))
-      .map(([,dataSource]) => dataSource as ResourceSqlDataSource)
+      .filter(([, dataSource]) => dataSource instanceof ResourceSqlDataSource)
+      .map(([, dataSource]) => dataSource as ResourceSqlDataSource)
       .find(ds => ds.resourceKey && ds.resourceKey === data.from);
 
     dataSource?.setResourceKey(data.to);
@@ -244,11 +230,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     this.navigationTabsService.closeTabSilent(resourceKeyList(tabs), true);
   }
 
-  private async rename(
-    dataSource: ResourceSqlDataSource,
-    resourceKey: string,
-    newResourceKey: string
-  ): Promise<string> {
+  private async rename(dataSource: ResourceSqlDataSource, resourceKey: string, newResourceKey: string): Promise<string> {
     if (!this.resourceManagerService.enabled) {
       throw new Error('Resource Manager disabled');
     }
@@ -262,17 +244,12 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     }
   }
 
-  private async write(
-    dataSource: ResourceSqlDataSource,
-    resourceKey: string,
-    value: string
-  ): Promise<void> {
+  private async write(dataSource: ResourceSqlDataSource, resourceKey: string, value: string): Promise<void> {
     if (!this.resourceManagerService.enabled) {
       return;
     }
 
     try {
-
       await this.navResourceNodeService.write(resourceKey, value);
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_update_script_error');
@@ -280,10 +257,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     }
   }
 
-  private async getProperties(
-    dataSource: ResourceSqlDataSource,
-    resourceKey: string
-  ): Promise<IConnectionExecutionContextInfo | undefined> {
+  private async getProperties(dataSource: ResourceSqlDataSource, resourceKey: string): Promise<IConnectionExecutionContextInfo | undefined> {
     try {
       return await this.resourceManagerScriptsService.getExecutionContextInfo(resourceKey);
     } catch (exception) {
@@ -295,13 +269,10 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
   private async setProperties(
     dataSource: ResourceSqlDataSource,
     resourceKey: string,
-    executionContext: IConnectionExecutionContextInfo | undefined
+    executionContext: IConnectionExecutionContextInfo | undefined,
   ): Promise<IConnectionExecutionContextInfo | undefined> {
     try {
-      return await this.resourceManagerScriptsService.setExecutionContextInfo(
-        resourceKey,
-        executionContext
-      );
+      return await this.resourceManagerScriptsService.setExecutionContextInfo(resourceKey, executionContext);
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_update_script_error');
       throw exception;

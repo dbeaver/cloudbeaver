@@ -7,12 +7,7 @@
  */
 
 export function isPropertiesEqual<T>(first: T, second: T): boolean {
-  if (
-    first === null
-    || second === null
-    || typeof first !== 'object'
-    || typeof second !== 'object'
-  ) {
+  if (first === null || second === null || typeof first !== 'object' || typeof second !== 'object') {
     return false;
   }
 

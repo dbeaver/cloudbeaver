@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { DetailsError, GQLError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
@@ -22,9 +21,7 @@ export interface IErrorModelOptions {
 export class ErrorModel {
   errors: IErrorInfo[] = [];
   get textToCopy(): string {
-    return this.errors
-      .map(error => `${error.message}\n${error.stackTrace}`)
-      .join('------------------\n');
+    return this.errors.map(error => `${error.message}\n${error.stackTrace}`).join('------------------\n');
   }
 
   constructor({ error }: IErrorModelOptions) {
@@ -32,12 +29,14 @@ export class ErrorModel {
     const detailsError = errorOf(error, DetailsError);
     // text error
     if (typeof error === 'string') {
-      this.errors = [{
-        message: error,
-      }];
-    } else if (gqlError) { // GQL Error
-      this.errors = (gqlError.response.errors || [])
-        .map<IErrorInfo>(error => ({
+      this.errors = [
+        {
+          message: error,
+        },
+      ];
+    } else if (gqlError) {
+      // GQL Error
+      this.errors = (gqlError.response.errors || []).map<IErrorInfo>(error => ({
         message: error.message,
         stackTrace: error.extensions.stackTrace || '',
       }));

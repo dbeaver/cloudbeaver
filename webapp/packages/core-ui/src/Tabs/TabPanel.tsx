@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
 import { TabPanel as BaseTabPanel, TabStateReturn } from 'reakit/Tab';
@@ -16,12 +15,7 @@ import { TabContext } from './TabContext';
 import type { TabPanelProps } from './TabPanelProps';
 import { TabsContext } from './TabsContext';
 
-export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({
-  tabId,
-  children,
-  className,
-  lazy,
-}) {
+export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ tabId, children, className, lazy }) {
   const state = useContext(TabsContext);
 
   if (!state) {
@@ -39,9 +33,7 @@ export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({
     return (
       <TabContext.Provider value={tabContext}>
         <BaseTabPanel {...state.state} tabId={tabId} className={className}>
-          <Loader suspense>
-            {(children as (state: TabStateReturn) => React.ReactNode)(state.state)}
-          </Loader>
+          <Loader suspense>{(children as (state: TabStateReturn) => React.ReactNode)(state.state)}</Loader>
         </BaseTabPanel>
       </TabContext.Provider>
     );
@@ -50,9 +42,7 @@ export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({
   return (
     <TabContext.Provider value={tabContext}>
       <BaseTabPanel {...state.state} tabId={tabId} className={className}>
-        <Loader suspense>
-          {children}
-        </Loader>
+        <Loader suspense>{children}</Loader>
       </BaseTabPanel>
     </TabContext.Provider>
   );

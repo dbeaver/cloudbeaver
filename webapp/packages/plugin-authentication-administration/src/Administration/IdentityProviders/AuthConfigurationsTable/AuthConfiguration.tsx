@@ -5,14 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import {
-  TableItem, TableColumnValue, TableItemSelect, TableItemExpand,
-  Placeholder, StaticImage, useResource, FieldCheckbox, Loader
+  FieldCheckbox,
+  Loader,
+  Placeholder,
+  StaticImage,
+  TableColumnValue,
+  TableItem,
+  TableItemExpand,
+  TableItemSelect,
+  useResource,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
@@ -58,9 +64,13 @@ export const AuthConfiguration = observer<Props>(function AuthConfiguration({ co
       <TableColumnValue centerContent flex expand>
         <StaticImage icon={icon} title={`${configuration.displayName} icon`} />
       </TableColumnValue>
-      <TableColumnValue title={configuration.displayName} expand ellipsis>{configuration.displayName}</TableColumnValue>
+      <TableColumnValue title={configuration.displayName} expand ellipsis>
+        {configuration.displayName}
+      </TableColumnValue>
       <TableColumnValue>{configuration.providerId}</TableColumnValue>
-      <TableColumnValue title={configuration.description} ellipsis>{configuration.description || ''}</TableColumnValue>
+      <TableColumnValue title={configuration.description} ellipsis>
+        {configuration.description || ''}
+      </TableColumnValue>
       <TableColumnValue>
         <FieldCheckbox checked={configuration.disabled} disabled />
       </TableColumnValue>
@@ -69,6 +79,6 @@ export const AuthConfiguration = observer<Props>(function AuthConfiguration({ co
           <Placeholder container={service.configurationDetailsPlaceholder} configuration={configuration} />
         </Loader>
       </TableColumnValue>
-    </TableItem>
+    </TableItem>,
   );
 });

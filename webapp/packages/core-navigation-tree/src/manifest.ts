@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { NavTreeSettingsService } from './NavTreeSettingsService';
@@ -20,12 +19,5 @@ export const coreNavigationTree: PluginManifest = {
     name: 'Core Navigation Tree',
   },
 
-  providers: [
-    NavTreeSettingsService,
-    NavNodeManagerService,
-    DBObjectResource,
-    NavNodeInfoResource,
-    NavTreeResource,
-    ProjectsNavNodeService,
-  ],
+  providers: [NavTreeSettingsService, NavNodeManagerService, DBObjectResource, NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService],
 };

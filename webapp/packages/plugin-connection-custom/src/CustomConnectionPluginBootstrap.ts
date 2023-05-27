@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -34,17 +33,12 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
   register(): void | Promise<void> {
     this.menuService.addCreator({
       menus: [MENU_CONNECTIONS],
-      getItems: (context, items) => [
-        ...items,
-        ACTION_CONNECTION_CUSTOM,
-      ],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_CUSTOM],
     });
 
     this.actionService.addHandler({
       id: 'connection-custom',
-      isActionApplicable: (context, action) => [
-        ACTION_CONNECTION_CUSTOM,
-      ].includes(action),
+      isActionApplicable: (context, action) => [ACTION_CONNECTION_CUSTOM].includes(action),
       isHidden: (context, action) => {
         if (this.connectionsManagerService.createConnectionProjects.length === 0) {
           return true;
@@ -59,10 +53,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
       getLoader: (context, action) => {
         const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
 
-        return state.getState(
-          action.id,
-          () => getCachedMapResourceLoaderState(this.projectInfoResource, CachedMapAllKey)
-        );
+        return state.getState(action.id, () => getCachedMapResourceLoaderState(this.projectInfoResource, CachedMapAllKey));
       },
       handler: async (context, action) => {
         switch (action) {
@@ -75,7 +66,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 
   private async openConnectionsDialog() {
     await this.commonDialogService.open(CustomConnectionDialog, null);

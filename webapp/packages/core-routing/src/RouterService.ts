@@ -5,15 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, makeObservable, runInAction } from 'mobx';
-import createRouter, {
-  State, Router, SubscribeFn, SubscribeState
-} from 'router5';
+import { makeObservable, observable, runInAction } from 'mobx';
+import createRouter, { Router, State, SubscribeFn, SubscribeState } from 'router5';
 import browserPlugin from 'router5-plugin-browser';
 import type { DoneFn } from 'router5/dist/types/base';
 
-import { injectable, Bootstrap, App } from '@cloudbeaver/core-di';
+import { App, Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
@@ -46,9 +43,7 @@ export class RouterService extends Bootstrap {
   private currentRoute = '';
   private currentParams: Record<string, any> = {};
 
-  constructor(
-    private readonly app: App
-  ) {
+  constructor(private readonly app: App) {
     super();
 
     this.transitionTask = new Executor();
@@ -72,7 +67,7 @@ export class RouterService extends Bootstrap {
     return this.router.subscribe(subscriber);
   }
 
-  register(): void | Promise<void> { }
+  register(): void | Promise<void> {}
   load(): void | Promise<void> {
     this.start();
   }
@@ -94,17 +89,15 @@ export class RouterService extends Bootstrap {
       root = root + '/';
     }
 
-    this.router.usePlugin(browserPlugin({
-      useHash: true,
-      base: root,
-    }));
+    this.router.usePlugin(
+      browserPlugin({
+        useHash: true,
+        base: root,
+      }),
+    );
 
     this.router.subscribe(this.onRouteChange.bind(this));
-    this.router.useMiddleware(() => async (
-      fromState,
-      toState,
-      done
-    ) => {
+    this.router.useMiddleware(() => async (fromState, toState, done) => {
       const contexts = await this.transitionTask.execute({ fromState: toState, toState: fromState, done });
 
       if (ExecutorInterrupter.isInterrupted(contexts)) {
@@ -113,8 +106,7 @@ export class RouterService extends Bootstrap {
       }
 
       return Promise.resolve();
-    }
-    );
+    });
   }
 
   private onRouteChange(state: SubscribeState) {

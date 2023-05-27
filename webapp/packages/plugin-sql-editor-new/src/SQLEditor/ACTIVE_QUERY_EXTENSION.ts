@@ -5,9 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { StateEffect, Decoration, StateField, EditorView, DecorationSet } from '@cloudbeaver/plugin-codemirror6';
-
+import { Decoration, DecorationSet, EditorView, StateEffect, StateField } from '@cloudbeaver/plugin-codemirror6';
 
 const ACTIVE_QUERY_EFFECT_ADD = StateEffect.define<{ from: number; to: number | undefined }>({
   map: (val, mapping) => ({

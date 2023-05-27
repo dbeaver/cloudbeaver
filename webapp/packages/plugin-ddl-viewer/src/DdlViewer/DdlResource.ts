@@ -5,17 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { CachedMapResource, ResourceKey, ResourceKeyUtils, isResourceAlias, GraphQLService } from '@cloudbeaver/core-sdk';
+import { CachedMapResource, GraphQLService, isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class DdlResource extends CachedMapResource<string, string> {
-  constructor(
-    private readonly graphQLService: GraphQLService,
-    private readonly navNodeInfoResource: NavNodeInfoResource,
-  ) {
+  constructor(private readonly graphQLService: GraphQLService, private readonly navNodeInfoResource: NavNodeInfoResource) {
     super();
 
     this.navNodeInfoResource.outdateResource(this);

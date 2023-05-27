@@ -5,24 +5,37 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeName, TREE_NODE_STYLES, useObjectRef, useMouseContextMenu } from '@cloudbeaver/core-blocks';
+import {
+  getComputed,
+  TREE_NODE_STYLES,
+  TreeNodeContext,
+  TreeNodeControl,
+  TreeNodeName,
+  useMouseContextMenu,
+  useObjectRef,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { NavNodeInfoResource, type INodeActions } from '@cloudbeaver/core-navigation-tree';
+import { type INodeActions, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
-import { ElementsTreeContext, isDraggingInsideProject, NavigationNodeEditorLoader, NavTreeControlComponent, NavTreeControlProps, TreeNodeMenuLoader } from '@cloudbeaver/plugin-navigation-tree';
+import {
+  ElementsTreeContext,
+  isDraggingInsideProject,
+  NavigationNodeEditorLoader,
+  NavTreeControlComponent,
+  NavTreeControlProps,
+  TreeNodeMenuLoader,
+} from '@cloudbeaver/plugin-navigation-tree';
 
 import { getRmProjectNodeId } from '../../NavNodes/getRmProjectNodeId';
 import { ResourceManagerService } from '../../ResourceManagerService';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
-
 
 const styles = css`
   TreeNodeControl {
@@ -33,8 +46,8 @@ const styles = css`
       opacity: 0.5;
     }
   }
-  TreeNodeControl:hover > portal, 
-  TreeNodeControl:global([aria-selected=true]) > portal,
+  TreeNodeControl:hover > portal,
+  TreeNodeControl:global([aria-selected='true']) > portal,
   portal:focus-within {
     visibility: visible;
   }
@@ -44,7 +57,7 @@ const styles = css`
     max-width: 250px;
     overflow: hidden;
     text-overflow: ellipsis;
-  } 
+  }
   portal {
     position: relative;
     box-sizing: border-box;
@@ -58,105 +71,96 @@ const styles = css`
   }
 `;
 
-export const NavigationNodeProjectControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(forwardRef(function NavigationNodeProjectControl({
-  node,
-  dndElement,
-  dndPlaceholder,
-  className,
-}, ref) {
-  const mouseContextMenu = useMouseContextMenu();
-  const viewContext = useContext(CaptureViewContext);
-  const elementsTreeContext = useContext(ElementsTreeContext);
-  const treeNodeContext = useContext(TreeNodeContext);
+export const NavigationNodeProjectControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(
+  forwardRef(function NavigationNodeProjectControl({ node, dndElement, dndPlaceholder, className }, ref) {
+    const mouseContextMenu = useMouseContextMenu();
+    const viewContext = useContext(CaptureViewContext);
+    const elementsTreeContext = useContext(ElementsTreeContext);
+    const treeNodeContext = useContext(TreeNodeContext);
 
-  const projectInfoResource = useService(ProjectInfoResource);
-  const navNodeInfoResource = useService(NavNodeInfoResource);
-  const resourceManagerService = useService(ResourceManagerService);
+    const projectInfoResource = useService(ProjectInfoResource);
+    const navNodeInfoResource = useService(NavNodeInfoResource);
+    const resourceManagerService = useService(ResourceManagerService);
 
-  const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
-  const selected = treeNodeContext.selected;
-  const resourceType = viewContext?.tryGet(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
+    const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
+    const selected = treeNodeContext.selected;
+    const resourceType = viewContext?.tryGet(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
 
-  const isDragging = getComputed(() => {
-    if (!node.projectId || !elementsTreeContext?.tree.activeDnDData) {
-      return false;
+    const isDragging = getComputed(() => {
+      if (!node.projectId || !elementsTreeContext?.tree.activeDnDData) {
+        return false;
+      }
+
+      return isDraggingInsideProject(node.projectId, elementsTreeContext.tree.activeDnDData);
+    });
+
+    const [editing, setEditing] = useState(false);
+    let name = node.name;
+
+    const nodeActions = useObjectRef<INodeActions>({
+      rename: () => {
+        setEditing(true);
+      },
+    });
+
+    function handlePortalClick(event: React.MouseEvent<HTMLDivElement>) {
+      EventContext.set(event, EventStopPropagationFlag);
+      treeNodeContext.select();
     }
 
-    return isDraggingInsideProject(node.projectId, elementsTreeContext.tree.activeDnDData);
-  });
+    function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
+      mouseContextMenu.handleContextMenuOpen(event);
+      treeNodeContext.select();
+    }
 
-  const [editing, setEditing] = useState(false);
-  let name = node.name;
+    function handleClick(event: React.MouseEvent<HTMLDivElement>) {
+      treeNodeContext.select(event.ctrlKey || event.metaKey);
+    }
 
-  const nodeActions = useObjectRef<INodeActions>({
-    rename: () => {
-      setEditing(true);
-    },
-  });
+    if (node.projectId && resourceType !== undefined) {
+      if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT) {
+        const project = projectInfoResource.get(node.projectId);
+        if (project) {
+          const resourceFolder = resourceManagerService.getRootFolder(project, resourceType);
 
-  function handlePortalClick(event: React.MouseEvent<HTMLDivElement>) {
-    EventContext.set(event, EventStopPropagationFlag);
-    treeNodeContext.select();
-  }
+          if (resourceFolder !== undefined) {
+            return null;
+          }
+        }
+      } else {
+        const project = getRmProjectNodeId(node.projectId);
+        const projectName = navNodeInfoResource.get(project)?.name;
 
-  function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
-    mouseContextMenu.handleContextMenuOpen(event);
-    treeNodeContext.select();
-  }
-
-  function handleClick(event: React.MouseEvent<HTMLDivElement>) {
-    treeNodeContext.select(event.ctrlKey || event.metaKey);
-  }
-
-  if (node.projectId && resourceType !== undefined) {
-    if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT) {
-      const project = projectInfoResource.get(node.projectId);
-      if (project) {
-        const resourceFolder = resourceManagerService.getRootFolder(project, resourceType);
-
-        if (resourceFolder !== undefined) {
-          return null;
+        if (projectName) {
+          name = projectName;
         }
       }
-    } else {
-      const project = getRmProjectNodeId(node.projectId);
-      const projectName = navNodeInfoResource.get(project)?.name;
-
-      if (projectName) {
-        name = projectName;
-      }
     }
-  }
 
-  if (elementsTreeContext?.tree.settings?.projects === false && !isDragging) {
-    return null;
-  }
+    if (elementsTreeContext?.tree.settings?.projects === false && !isDragging) {
+      return null;
+    }
 
-  return styled(TREE_NODE_STYLES, styles)(
-    <TreeNodeControl
-      ref={ref}
-      onClick={handleClick}
-      onContextMenu={handleContextMenuOpen}
-      {...use({ outdated, editing, dragging: dndElement })}
-      className={className}
-    >
-      <TreeNodeName title={name}>
-        {editing ? (
-          <NavigationNodeEditorLoader node={node} onClose={() => setEditing(false)} />
-        ) : (
-          <name-box>{name}</name-box>
+    return styled(
+      TREE_NODE_STYLES,
+      styles,
+    )(
+      <TreeNodeControl
+        ref={ref}
+        onClick={handleClick}
+        onContextMenu={handleContextMenuOpen}
+        {...use({ outdated, editing, dragging: dndElement })}
+        className={className}
+      >
+        <TreeNodeName title={name}>
+          {editing ? <NavigationNodeEditorLoader node={node} onClose={() => setEditing(false)} /> : <name-box>{name}</name-box>}
+        </TreeNodeName>
+        {!editing && !dndPlaceholder && (
+          <portal onClick={handlePortalClick}>
+            <TreeNodeMenuLoader mouseContextMenu={mouseContextMenu} node={node} actions={nodeActions} selected={selected} />
+          </portal>
         )}
-      </TreeNodeName>
-      {!editing && !dndPlaceholder && (
-        <portal onClick={handlePortalClick}>
-          <TreeNodeMenuLoader
-            mouseContextMenu={mouseContextMenu}
-            node={node}
-            actions={nodeActions}
-            selected={selected}
-          />
-        </portal>
-      )}
-    </TreeNodeControl>
-  );
-}));
+      </TreeNodeControl>,
+    );
+  }),
+);

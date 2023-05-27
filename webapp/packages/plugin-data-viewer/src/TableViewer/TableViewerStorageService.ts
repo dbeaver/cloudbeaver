@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, makeObservable, computed } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
@@ -45,9 +44,7 @@ export class TableViewerStorageService {
     return this.tableModelMap.get(tableId) as any;
   }
 
-  add<TOptions, TResult extends IDatabaseDataResult>(
-    model: IDatabaseDataModel<TOptions, TResult>
-  ): IDatabaseDataModel<TOptions, TResult> {
+  add<TOptions, TResult extends IDatabaseDataResult>(model: IDatabaseDataModel<TOptions, TResult>): IDatabaseDataModel<TOptions, TResult> {
     if (this.tableModelMap.has(model.id)) {
       return model;
     }

@@ -5,33 +5,35 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { GraphQLService, CachedMapResource, ResourceKey, resourceKeyList, ResourceKeyUtils, DetailsError, isResourceAlias, resourceKeyListAliasFactory } from '@cloudbeaver/core-sdk';
+import {
+  CachedMapResource,
+  DetailsError,
+  GraphQLService,
+  isResourceAlias,
+  ResourceKey,
+  resourceKeyList,
+  resourceKeyListAliasFactory,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-sdk';
 
 import type { DBObject } from './EntityTypes';
 import { NavNodeInfoResource } from './NavNodeInfoResource';
 import { NavTreeResource } from './NavTreeResource';
 
-export const DBObjectParentKey = resourceKeyListAliasFactory(
-  '@db-object/parent',
-  (parentId: string) => ({ parentId })
-);
+export const DBObjectParentKey = resourceKeyListAliasFactory('@db-object/parent', (parentId: string) => ({ parentId }));
 
 @injectable()
 export class DBObjectResource extends CachedMapResource<string, DBObject> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly navTreeResource: NavTreeResource
+    private readonly navTreeResource: NavTreeResource,
   ) {
     super();
 
-    this.addAlias(
-      DBObjectParentKey,
-      param => resourceKeyList(navTreeResource.get(param.options.parentId) || [])
-    );
+    this.addAlias(DBObjectParentKey, param => resourceKeyList(navTreeResource.get(param.options.parentId) || []));
     // this.preloadResource(this.navNodeInfoResource);
     this.navNodeInfoResource.outdateResource(this);
     this.navNodeInfoResource.deleteInResource(this);
@@ -52,10 +54,11 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
       }
 
       const key = ResourceKeyUtils.toList(this.transformToKey(originalKey));
-      const parents = [...new Set(
-        key.map(nodeId => this.navNodeInfoResource.get(nodeId)?.parentId)
-          .filter<string>((nodeId): nodeId is string => nodeId !== undefined)
-      )];
+      const parents = [
+        ...new Set(
+          key.map(nodeId => this.navNodeInfoResource.get(nodeId)?.parentId).filter<string>((nodeId): nodeId is string => nodeId !== undefined),
+        ),
+      ];
 
       await this.navTreeResource.load(resourceKeyList(parents));
 

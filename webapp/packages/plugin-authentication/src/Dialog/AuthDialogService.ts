@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
@@ -21,9 +20,7 @@ export class AuthDialogService {
   private persistent: boolean;
   private dialog: Promise<DialogueStateResult | null> | null;
 
-  constructor(
-    private readonly commonDialogService: CommonDialogService
-  ) {
+  constructor(private readonly commonDialogService: CommonDialogService) {
     this.persistent = false;
     this.dialog = null;
   }
@@ -32,7 +29,7 @@ export class AuthDialogService {
     persistent = false,
     options: IAuthOptions = {
       providerId: null,
-    }
+    },
   ): Promise<DialogueStateResult | null> {
     if (this.dialog) {
       return this.dialog;

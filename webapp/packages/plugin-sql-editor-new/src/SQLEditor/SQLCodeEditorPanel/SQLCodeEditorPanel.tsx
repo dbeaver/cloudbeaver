@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
@@ -15,7 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
-import { IEditorRef, closeCompletion } from '@cloudbeaver/plugin-codemirror6';
+import { closeCompletion, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
 import type { ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTIVE_QUERY_EXTENSION } from '../ACTIVE_QUERY_EXTENSION';
@@ -34,9 +33,7 @@ const styles = css`
   }
 `;
 
-export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps> = observer(function SQLCodeEditorPanel({
-  data,
-}) {
+export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps> = observer(function SQLCodeEditorPanel({ data }) {
   const notificationService = useService(NotificationService);
   const navNodeManagerService = useService(NavNodeManagerService);
 
@@ -57,21 +54,26 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         try {
           const pos = view.posAtCoords({ x: mouse.x, y: mouse.y }) ?? 1;
 
-          await data.executeQueryAction(data.cursorSegment, async () => {
-            const alias: string[] = [];
+          await data.executeQueryAction(
+            data.cursorSegment,
+            async () => {
+              const alias: string[] = [];
 
-            for (const node of nodes) {
-              alias.push(await navNodeManagerService.getNodeDatabaseAlias(node.id));
-            }
+              for (const node of nodes) {
+                alias.push(await navNodeManagerService.getNodeDatabaseAlias(node.id));
+              }
 
-            const replacement = alias.join(', ');
-            if (replacement) {
-              view.dispatch({
-                changes: { from: pos, to: pos, insert: replacement },
-                selection: { anchor: pos, head: pos + replacement.length },
-              });
-            }
-          }, true, true);
+              const replacement = alias.join(', ');
+              if (replacement) {
+                view.dispatch({
+                  changes: { from: pos, to: pos, insert: replacement },
+                  selection: { anchor: pos, head: pos + replacement.length },
+                });
+              }
+            },
+            true,
+            true,
+          );
         } catch (exception: any) {
           notificationService.logException(exception, 'sql_editor_alias_loading_error');
         }
@@ -81,11 +83,13 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
 
   useExecutor({
     executor: data.onExecute,
-    handlers: [function updateHighlight() {
-      if (editor.view) {
-        closeCompletion(editor.view);
-      }
-    }],
+    handlers: [
+      function updateHighlight() {
+        if (editor.view) {
+          closeCompletion(editor.view);
+        }
+      },
+    ],
   });
 
   return styled(useStyles(styles))(
@@ -100,6 +104,6 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         onChange={panel.onQueryChange}
         onUpdate={panel.onUpdate}
       />
-    </box>
+    </box>,
   );
 });

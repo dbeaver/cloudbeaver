@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 
 import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
@@ -47,9 +46,7 @@ export class ProjectsService extends Dependency {
     let activeProjects: ProjectInfo[] = [];
 
     if (this.activeProjectIds.length > 0) {
-      activeProjects = this.projectInfoResource
-        .get(resourceKeyList(this.activeProjectIds))
-        .filter(Boolean) as ProjectInfo[];
+      activeProjects = this.projectInfoResource.get(resourceKeyList(this.activeProjectIds)).filter(Boolean) as ProjectInfo[];
     }
 
     if (activeProjects.length === 0) {
@@ -87,9 +84,13 @@ export class ProjectsService extends Dependency {
   }
 
   get userProjectsSettings(): IProjectsUserSettings {
-    return this.userDataService.getUserData('projects-settings', () => ({
-      activeProjectIds: [],
-    }), data => Array.isArray(data.activeProjectIds));
+    return this.userDataService.getUserData(
+      'projects-settings',
+      () => ({
+        activeProjectIds: [],
+      }),
+      data => Array.isArray(data.activeProjectIds),
+    );
   }
 
   readonly onActiveProjectChange: IExecutor<IActiveProjectData>;
@@ -102,7 +103,7 @@ export class ProjectsService extends Dependency {
     private readonly userDataService: UserDataService,
     private readonly projectInfoEventHandler: ProjectInfoEventHandler,
     private readonly dataSynchronizationService: DataSynchronizationService,
-    navigationService: NavigationService
+    navigationService: NavigationService,
   ) {
     super();
     this.getActiveProjectTask = new SyncExecutor();
@@ -142,25 +143,33 @@ export class ProjectsService extends Dependency {
       }
     });
 
-    this.projectInfoEventHandler.onEvent<IProjectInfoEvent>(ServerEventId.CbRmProjectAdded, () => {
-      this.projectInfoResource.markOutdated();
-    }, undefined, this.projectInfoResource);
+    this.projectInfoEventHandler.onEvent<IProjectInfoEvent>(
+      ServerEventId.CbRmProjectAdded,
+      () => {
+        this.projectInfoResource.markOutdated();
+      },
+      undefined,
+      this.projectInfoResource,
+    );
 
-    this.projectInfoEventHandler.onEvent<IProjectInfoEvent>(ServerEventId.CbRmProjectRemoved, key => {
-      if (this.activeProjectIds.includes(key.projectId)) {
-        const project = this.projectInfoResource.get(key.projectId);
+    this.projectInfoEventHandler.onEvent<IProjectInfoEvent>(
+      ServerEventId.CbRmProjectRemoved,
+      key => {
+        if (this.activeProjectIds.includes(key.projectId)) {
+          const project = this.projectInfoResource.get(key.projectId);
 
-        this.dataSynchronizationService
-          .requestSynchronization('project', project?.name ?? '')
-          .then(state => {
+          this.dataSynchronizationService.requestSynchronization('project', project?.name ?? '').then(state => {
             if (state) {
               this.projectInfoResource.delete(key.projectId);
             }
           });
-      } else {
-        this.projectInfoResource.delete(key.projectId);
-      }
-    }, undefined, this.projectInfoResource);
+        } else {
+          this.projectInfoResource.delete(key.projectId);
+        }
+      },
+      undefined,
+      this.projectInfoResource,
+    );
 
     makeObservable(this, {
       userProject: computed,

@@ -5,16 +5,22 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
-import { AuthProvidersResource, AuthRolesResource, AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
+import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, AuthRolesResource, UsersResource } from '@cloudbeaver/core-authentication';
 import {
-  useResource, ToolsAction,
-  ToolsPanel, Loader, useTranslate, useStyles,
-  BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group
+  BASE_CONTAINERS_STYLES,
+  ColoredContainer,
+  Container,
+  Group,
+  Loader,
+  ToolsAction,
+  ToolsPanel,
+  useResource,
+  useStyles,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -69,7 +75,7 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
           {isLocalProviderAvailable && (
             <ToolsAction
               title={translate('authentication_administration_tools_add_tooltip')}
-              icon='add'
+              icon="add"
               viewBox="0 0 24 24"
               disabled={create && !!createUserService.user}
               onClick={createUserService.create}
@@ -79,7 +85,7 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
           )}
           <ToolsAction
             title={translate('authentication_administration_tools_refresh_tooltip')}
-            icon='refresh'
+            icon="refresh"
             viewBox="0 0 24 24"
             onClick={table.update}
           >
@@ -109,7 +115,7 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
           </Group>
         )}
 
-        <Group box='no-overflow'>
+        <Group box="no-overflow">
           <Loader style={loaderStyle} state={[usersResource, authRolesResource]} overlay>
             <UsersTable
               keys={keys}
@@ -121,6 +127,6 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
           </Loader>
         </Group>
       </Container>
-    </ColoredContainer>
+    </ColoredContainer>,
   );
 });

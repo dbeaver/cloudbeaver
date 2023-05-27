@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import type { ButtonHTMLAttributes } from 'react';
 import styled, { css, use } from 'reshadow';
@@ -18,39 +17,36 @@ type Props = ButtonHTMLAttributes<any> & {
 };
 
 const style = css`
-    Menu {
-      composes: theme-text-on-surface from global;
-    }
-    MenuTrigger {
-      composes: theme-ripple from global;
-      height: 100%;
-      padding: 0 16px;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      &[|hidden] {
-        display: none;
-      }
-    }
-    ToolsAction[|hidden] {
+  Menu {
+    composes: theme-text-on-surface from global;
+  }
+  MenuTrigger {
+    composes: theme-ripple from global;
+    height: 100%;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    &[|hidden] {
       display: none;
     }
-    menu-trigger-icon IconOrImage {
-      display: block;
-      width: 24px;
-    }
-    menu-trigger-title {
-      display: block;
-    }
-    menu-trigger-icon + menu-trigger-title {
-      padding-left: 8px;
-    }
-  `;
+  }
+  ToolsAction[|hidden] {
+    display: none;
+  }
+  menu-trigger-icon IconOrImage {
+    display: block;
+    width: 24px;
+  }
+  menu-trigger-title {
+    display: block;
+  }
+  menu-trigger-icon + menu-trigger-title {
+    padding-left: 8px;
+  }
+`;
 
-export const ObjectPropertyTableFooterItem = observer<Props>(function ObjectPropertyTableFooterItem({
-  menuItem,
-  ...props
-}) {
+export const ObjectPropertyTableFooterItem = observer<Props>(function ObjectPropertyTableFooterItem({ menuItem, ...props }) {
   const translate = useTranslate();
 
   if (!menuItem.panel) {
@@ -65,7 +61,7 @@ export const ObjectPropertyTableFooterItem = observer<Props>(function ObjectProp
         onClick={() => menuItem.onClick?.()}
       >
         {translate(menuItem.title)}
-      </ToolsAction>
+      </ToolsAction>,
     );
   }
 
@@ -85,6 +81,6 @@ export const ObjectPropertyTableFooterItem = observer<Props>(function ObjectProp
         </menu-trigger-icon>
       )}
       {menuItem.title && <menu-trigger-title>{translate(menuItem.title)}</menu-trigger-title>}
-    </MenuTrigger>
+    </MenuTrigger>,
   );
 });

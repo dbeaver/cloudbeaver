@@ -5,12 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { Button, useTranslate } from '@cloudbeaver/core-blocks';
-
 
 const styles = css`
   footer-container {
@@ -45,14 +43,9 @@ export const DBAuthDialogFooter = observer<React.PropsWithChildren<Props>>(funct
   return styled(styles)(
     <footer-container className={className}>
       {children}
-      <Button
-        type="button"
-        mod={['unelevated']}
-        disabled={isAuthenticating}
-        onClick={onLogin}
-      >
+      <Button type="button" mod={['unelevated']} disabled={isAuthenticating} onClick={onLogin}>
         {translate('authentication_login')}
       </Button>
-    </footer-container>
+    </footer-container>,
   );
 });

@@ -5,5 +5,8 @@ export default [
   ['plugin_sql_editor_navigation_tab_resource_update_script_error', 'Failed to update the script'],
   ['plugin_sql_editor_navigation_tab_resource_sync_script_error', "Failed to sync editor's query"],
   ['plugin_sql_editor_navigation_tab_resource_save_script_error_confirmation_title', 'Unable to save the script'],
-  ['plugin_sql_editor_navigation_tab_resource_save_script_error_confirmation_message', 'Error occurred while trying to save the script. Close the tab anyway?'],
+  [
+    'plugin_sql_editor_navigation_tab_resource_save_script_error_confirmation_message',
+    'Error occurred while trying to save the script. Close the tab anyway?',
+  ],
 ];

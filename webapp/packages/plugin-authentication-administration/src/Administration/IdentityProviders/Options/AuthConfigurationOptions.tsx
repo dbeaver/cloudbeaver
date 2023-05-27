@@ -5,16 +5,28 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AuthConfigurationParametersResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES, ColoredContainer, Combobox, FieldCheckbox, Group, GroupTitle,
-  InputField, Link, ObjectPropertyInfoForm, SubmittingForm,
-  Textarea, useClipboard, useResource, useObjectPropertyCategories, useStyles, useTranslate
+  BASE_CONTAINERS_STYLES,
+  ColoredContainer,
+  Combobox,
+  FieldCheckbox,
+  Group,
+  GroupTitle,
+  InputField,
+  Link,
+  ObjectPropertyInfoForm,
+  SubmittingForm,
+  Textarea,
+  useClipboard,
+  useObjectPropertyCategories,
+  useResource,
+  useStyles,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { AuthProviderConfigurationParametersFragment, CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
@@ -40,11 +52,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
 
   const providers = useResource(AuthConfigurationOptions, AuthProvidersResource, CachedMapAllKey);
-  const parameters = useResource(
-    AuthConfigurationOptions,
-    AuthConfigurationParametersResource,
-    state.config.providerId || null,
-  );
+  const parameters = useResource(AuthConfigurationOptions, AuthConfigurationParametersResource, state.config.providerId || null);
 
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(parameters.data ?? emptyArray);
 
@@ -59,7 +67,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
       <ColoredContainer parent gap overflow>
         <Group small gap>
           <Combobox
-            name='providerId'
+            name="providerId"
             state={state.config}
             items={providers.resource.configurable}
             keySelector={provider => provider.id}
@@ -76,48 +84,21 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
           >
             {translate('administration_identity_providers_provider')}
           </Combobox>
-          <InputField
-            name='id'
-            state={state.config}
-            readOnly={state.readonly || edit}
-            disabled={state.disabled}
-            required
-            tiny
-            fill
-          >
+          <InputField name="id" state={state.config} readOnly={state.readonly || edit} disabled={state.disabled} required tiny fill>
             {translate('administration_identity_providers_provider_id')}
           </InputField>
-          <InputField
-            name='displayName'
-            state={state.config}
-            minLength={1}
-            disabled={state.disabled}
-            readOnly={state.readonly}
-            required
-            tiny
-            fill
-          >
+          <InputField name="displayName" state={state.config} minLength={1} disabled={state.disabled} readOnly={state.readonly} required tiny fill>
             {translate('administration_identity_providers_provider_configuration_name')}
           </InputField>
-          <Textarea
-            name='description'
-            state={state.config}
-            disabled={state.disabled}
-            readOnly={state.readonly}
-          >
+          <Textarea name="description" state={state.config} disabled={state.disabled} readOnly={state.readonly}>
             {translate('administration_identity_providers_provider_configuration_description')}
           </Textarea>
-          <InputField
-            name='iconURL'
-            state={state.config}
-            disabled={state.disabled}
-            readOnly={state.readonly}
-          >
+          <InputField name="iconURL" state={state.config} disabled={state.disabled} readOnly={state.readonly}>
             {translate('administration_identity_providers_provider_configuration_icon_url')}
           </InputField>
           <FieldCheckbox
             id={edit ? state.config.id : 'AuthConfigurationDisabled'}
-            name='disabled'
+            name="disabled"
             state={state.config}
             disabled={state.disabled}
             readOnly={state.readonly}
@@ -158,7 +139,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
           <Group small gap>
             <GroupTitle>{translate('administration_identity_providers_provider_configuration_links')}</GroupTitle>
             <InputField
-              name='signInLink'
+              name="signInLink"
               state={state.config}
               title={state.config.signInLink}
               disabled={state.disabled}
@@ -169,7 +150,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
               Sign in
             </InputField>
             <InputField
-              name='signOutLink'
+              name="signOutLink"
               state={state.config}
               title={state.config.signOutLink}
               disabled={state.disabled}
@@ -180,7 +161,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
               Sign out
             </InputField>
             <InputField
-              name='redirectLink'
+              name="redirectLink"
               state={state.config}
               title={state.config.redirectLink}
               disabled={state.disabled}
@@ -191,17 +172,13 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
               Redirect
             </InputField>
             {state.config.metadataLink && (
-              <Link
-                href={state.config.metadataLink}
-                target='_blank'
-                rel='noopener noreferrer'
-              >
+              <Link href={state.config.metadataLink} target="_blank" rel="noopener noreferrer">
                 {translate('administration_identity_providers_provider_configuration_links_metadata')}
               </Link>
             )}
           </Group>
         )}
       </ColoredContainer>
-    </SubmittingForm>
+    </SubmittingForm>,
   );
 });

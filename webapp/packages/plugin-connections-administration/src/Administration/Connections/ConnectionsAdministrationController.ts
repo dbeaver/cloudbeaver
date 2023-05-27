@@ -5,15 +5,23 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { computed, makeObservable, observable } from 'mobx';
 
-import { observable, computed, makeObservable } from 'mobx';
-
-import { compareConnectionsInfo, compareNewConnectionsInfo, Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import {
+  compareConnectionsInfo,
+  compareNewConnectionsInfo,
+  Connection,
+  ConnectionInfoActiveProjectKey,
+  ConnectionInfoResource,
+  createConnectionParam,
+  DatabaseConnection,
+  IConnectionInfoParams,
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { isSharedProject, isGlobalProject, ProjectInfoResource, projectInfoSortByName } from '@cloudbeaver/core-projects';
+import { isGlobalProject, isSharedProject, ProjectInfoResource, projectInfoSortByName } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { isArraysEqual, isDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
 
@@ -66,7 +74,7 @@ export class ConnectionsAdministrationController {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly localizationService: LocalizationService,
-    private readonly projectInfoResource: ProjectInfoResource
+    private readonly projectInfoResource: ProjectInfoResource,
   ) {
     makeObservable(this, {
       isProcessing: observable,
@@ -97,8 +105,7 @@ export class ConnectionsAdministrationController {
       return;
     }
 
-    const deletionList = Array
-      .from(this.selectedItems)
+    const deletionList = Array.from(this.selectedItems)
       .filter(([_, value]) => value)
       .map(([connectionId]) => connectionId);
 
@@ -108,7 +115,9 @@ export class ConnectionsAdministrationController {
 
     const connectionNames = deletionList.map(id => this.connectionInfoResource.get(id)?.name).filter(Boolean);
     const nameList = connectionNames.map(name => `"${name}"`).join(', ');
-    const message = `${this.localizationService.translate('connections_administration_delete_confirmation')}${nameList}. ${this.localizationService.translate('ui_are_you_sure')}`;
+    const message = `${this.localizationService.translate(
+      'connections_administration_delete_confirmation',
+    )}${nameList}. ${this.localizationService.translate('ui_are_you_sure')}`;
 
     const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
       title: 'ui_data_delete_confirmation',

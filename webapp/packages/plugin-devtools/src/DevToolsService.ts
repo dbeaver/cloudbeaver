@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -31,10 +30,7 @@ export class DevToolsService {
 
   private readonly settings: IDevToolsSettings;
 
-  constructor(
-    private readonly serverConfigResource: ServerConfigResource,
-    private readonly autoSaveService: LocalStorageSaveService,
-  ) {
+  constructor(private readonly serverConfigResource: ServerConfigResource, private readonly autoSaveService: LocalStorageSaveService) {
     this.settings = getDefaultDevToolsSettings();
 
     makeObservable<this, 'settings'>(this, {

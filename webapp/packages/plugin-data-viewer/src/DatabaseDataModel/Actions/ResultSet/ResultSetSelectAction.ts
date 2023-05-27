@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, IReactionDisposer, makeObservable, observable, reaction, toJS } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
@@ -46,7 +45,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     result: IDatabaseResultSet,
     view: ResultSetViewAction,
     edit: ResultSetEditAction,
-    data: ResultSetDataAction
+    data: ResultSetDataAction,
   ) {
     super(source, result);
     this.view = view;
@@ -65,46 +64,49 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
       clear: action,
     });
 
-    this.validationDisposer = reaction(() => this.view.rowKeys, (current, previous) => {
-      if (this.focusedElement) {
-        const focus = this.focusedElement;
-        const currentIndex = current.findIndex(key => ResultSetDataKeysUtils.isEqual(key, focus.row));
+    this.validationDisposer = reaction(
+      () => this.view.rowKeys,
+      (current, previous) => {
+        if (this.focusedElement) {
+          const focus = this.focusedElement;
+          const currentIndex = current.findIndex(key => ResultSetDataKeysUtils.isEqual(key, focus.row));
 
-        const focusIndex = previous.findIndex(key => ResultSetDataKeysUtils.isEqual(key, focus.row));
+          const focusIndex = previous.findIndex(key => ResultSetDataKeysUtils.isEqual(key, focus.row));
 
-        if (currentIndex >= 0 && focusIndex === -1) {
-          return;
-        }
-
-        if (focusIndex === -1 || current.length === 0) {
-          this.focus(null);
-          return;
-        }
-
-        if (!current.some(key => ResultSetDataKeysUtils.isEqual(key, focus.row))) {
-          for (let index = focusIndex; index >= 0; index--) {
-            const previousElement = previous[index];
-            const row = current.find(key => ResultSetDataKeysUtils.isEqual(key, previousElement));
-
-            if (row) {
-              this.focus({ ...this.focusedElement, row });
-              return;
-            }
-          }
-          for (let index = focusIndex; index <= previous.length; index++) {
-            const nextElement = previous[index];
-            const row = current.find(key => ResultSetDataKeysUtils.isEqual(key, nextElement));
-
-            if (row) {
-              this.focus({ ...this.focusedElement, row });
-              return;
-            }
+          if (currentIndex >= 0 && focusIndex === -1) {
+            return;
           }
 
-          this.focus({ ...this.focusedElement, row: current[current.length - 1] });
+          if (focusIndex === -1 || current.length === 0) {
+            this.focus(null);
+            return;
+          }
+
+          if (!current.some(key => ResultSetDataKeysUtils.isEqual(key, focus.row))) {
+            for (let index = focusIndex; index >= 0; index--) {
+              const previousElement = previous[index];
+              const row = current.find(key => ResultSetDataKeysUtils.isEqual(key, previousElement));
+
+              if (row) {
+                this.focus({ ...this.focusedElement, row });
+                return;
+              }
+            }
+            for (let index = focusIndex; index <= previous.length; index++) {
+              const nextElement = previous[index];
+              const row = current.find(key => ResultSetDataKeysUtils.isEqual(key, nextElement));
+
+              if (row) {
+                this.focus({ ...this.focusedElement, row });
+                return;
+              }
+            }
+
+            this.focus({ ...this.focusedElement, row: current[current.length - 1] });
+          }
         }
-      }
-    });
+      },
+    );
 
     this.edit.action.addHandler(this.syncFocus.bind(this));
     this.edit.applyAction.addHandler(this.syncFocusOnUpdate.bind(this));
@@ -118,10 +120,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     if (!this.focusedElement) {
       return false;
     }
-    return (
-      ResultSetDataKeysUtils.isEqual(key.column, this.focusedElement.column)
-      && ResultSetDataKeysUtils.isEqual(key.row, this.focusedElement.row)
-    );
+    return ResultSetDataKeysUtils.isEqual(key.column, this.focusedElement.column) && ResultSetDataKeysUtils.isEqual(key.row, this.focusedElement.row);
   }
 
   isElementSelected(key: IResultSetPartialKey): boolean {
@@ -270,10 +269,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
       key = null;
     }
 
-    if (
-      (key && this.isFocused(key))
-      || key === this.focusedElement
-    ) {
+    if ((key && this.isFocused(key)) || key === this.focusedElement) {
       return;
     }
 

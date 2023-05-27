@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, observable } from 'mobx';
 
 import type { AdminUser } from '@cloudbeaver/core-authentication';
@@ -16,7 +15,7 @@ import { isArraysEqual } from '@cloudbeaver/core-utils';
 export enum EUserStatus {
   ENABLED = 'ENABLED',
   DISABLED = 'DISABLED',
-  ALL = 'ALL'
+  ALL = 'ALL',
 }
 
 interface IStatus {
@@ -52,39 +51,42 @@ export interface IUserFilters {
 }
 
 export function useUsersTableFilters(users: AdminUser[]) {
-  const filters: IUserFilters = useObservableRef(() => ({
-    search: '',
-    role: USER_ROLE_ALL,
-    status: EUserStatus.ENABLED,
-    get filteredUsers() {
-      return this.users.filter(user => {
-        const matchSearch = user.userId.toLowerCase().includes(this.search.trim().toLowerCase());
-        const matchStatus = this.status === EUserStatus.ALL
-          || (this.status === EUserStatus.ENABLED ? user.enabled : !user.enabled);
-        const matchRole = this.role === USER_ROLE_ALL || this.role === user.authRole;
+  const filters: IUserFilters = useObservableRef(
+    () => ({
+      search: '',
+      role: USER_ROLE_ALL,
+      status: EUserStatus.ENABLED,
+      get filteredUsers() {
+        return this.users.filter(user => {
+          const matchSearch = user.userId.toLowerCase().includes(this.search.trim().toLowerCase());
+          const matchStatus = this.status === EUserStatus.ALL || (this.status === EUserStatus.ENABLED ? user.enabled : !user.enabled);
+          const matchRole = this.role === USER_ROLE_ALL || this.role === user.authRole;
 
-        return matchSearch && matchStatus && matchRole;
-      });
+          return matchSearch && matchStatus && matchRole;
+        });
+      },
+      setSearch(value: string) {
+        this.search = value;
+      },
+      setRole(role: string) {
+        this.role = role;
+      },
+      setStatus(status: EUserStatus) {
+        this.status = status;
+      },
+    }),
+    {
+      search: observable.ref,
+      role: observable.ref,
+      status: observable.ref,
+      users: observable.ref,
+      filteredUsers: computed<AdminUser[]>({ equals: (first, second) => isArraysEqual(first, second, undefined, true) }),
+      setSearch: action.bound,
+      setRole: action.bound,
+      setStatus: action.bound,
     },
-    setSearch(value: string) {
-      this.search = value;
-    },
-    setRole(role: string) {
-      this.role = role;
-    },
-    setStatus(status: EUserStatus) {
-      this.status = status;
-    },
-  }), {
-    search: observable.ref,
-    role: observable.ref,
-    status: observable.ref,
-    users: observable.ref,
-    filteredUsers: computed<AdminUser[]>({ equals: (first, second) => isArraysEqual(first, second, undefined, true) }),
-    setSearch: action.bound,
-    setRole: action.bound,
-    setStatus: action.bound,
-  }, { users });
+    { users },
+  );
 
   return filters;
 }

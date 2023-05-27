@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -19,9 +18,9 @@ import {
   INotification,
   INotificationExtraProps,
   INotificationOptions,
-  NotificationComponent,
   INotificationProcessExtraProps,
-  IProcessNotificationContainer
+  IProcessNotificationContainer,
+  NotificationComponent,
 } from './INotification';
 import { ProcessNotificationController } from './ProcessNotificationController';
 
@@ -38,16 +37,15 @@ export class NotificationService {
     return this.notificationList.values.filter(notification => !notification.isSilent);
   }
 
-  constructor(
-    private readonly settings: EventsSettingsService
-  ) {
+  constructor(private readonly settings: EventsSettingsService) {
     this.notificationList = new OrderedMap<number, INotification<any>>(({ id }) => id);
     this.closeTask = new Executor();
     this.notificationNextId = 0;
   }
 
   notify<TProps extends INotificationExtraProps<any> = INotificationExtraProps>(
-    options: INotificationOptions<TProps>, type: ENotificationType
+    options: INotificationOptions<TProps>,
+    type: ENotificationType,
   ): INotification<TProps> {
     if (options.persistent) {
       const persistentNotifications = this.notificationList.values.filter(value => value.persistent);
@@ -79,7 +77,7 @@ export class NotificationService {
       details: options.details,
       isSilent: !!options.isSilent,
       customComponent: options.customComponent,
-      extraProps: options.extraProps || {} as TProps,
+      extraProps: options.extraProps || ({} as TProps),
       autoClose: options.autoClose,
       persistent: options.persistent,
       state: observable({ deleteDelay: 0 }),
@@ -111,35 +109,38 @@ export class NotificationService {
     return notification;
   }
 
-  customNotification<
-    TProps extends INotificationExtraProps<any> = INotificationExtraProps
-  >(
+  customNotification<TProps extends INotificationExtraProps<any> = INotificationExtraProps>(
     component: () => NotificationComponent<TProps>,
     props?: TProps extends any ? TProps : never, // some magic
-    options?: INotificationOptions<TProps> & { type?: ENotificationType }
+    options?: INotificationOptions<TProps> & { type?: ENotificationType },
   ): INotification<TProps> {
-    return this.notify({
-      title: '',
-      ...options,
-      customComponent: component,
-      extraProps: props || {} as TProps,
-    }, options?.type ?? ENotificationType.Custom);
+    return this.notify(
+      {
+        title: '',
+        ...options,
+        customComponent: component,
+        extraProps: props || ({} as TProps),
+      },
+      options?.type ?? ENotificationType.Custom,
+    );
   }
 
-  processNotification<
-    TProps extends INotificationProcessExtraProps<any> = INotificationExtraProps>(
+  processNotification<TProps extends INotificationProcessExtraProps<any> = INotificationExtraProps>(
     component: () => NotificationComponent<TProps>,
     props?: TProps extends any ? TProps : never, // some magic,
-    options?: INotificationOptions<TProps>
+    options?: INotificationOptions<TProps>,
   ): IProcessNotificationContainer<TProps> {
     const processController = props?.state || new ProcessNotificationController();
 
-    const notification = this.notify({
-      title: '',
-      ...options,
-      extraProps: { ...props, state: processController } as TProps,
-      customComponent: component,
-    }, ENotificationType.Custom);
+    const notification = this.notify(
+      {
+        title: '',
+        ...options,
+        extraProps: { ...props, state: processController } as TProps,
+        customComponent: component,
+      },
+      ENotificationType.Custom,
+    );
 
     processController.init(notification.title, notification.message);
     return { controller: processController, notification };
@@ -157,12 +158,7 @@ export class NotificationService {
     return this.notify(notification, ENotificationType.Error);
   }
 
-  logException(
-    exception: Error | GQLError | undefined | null,
-    title?: string,
-    message?: string,
-    silent?: boolean
-  ): void {
+  logException(exception: Error | GQLError | undefined | null, title?: string, message?: string, silent?: boolean): void {
     const errorDetails = errorOf(exception, DetailsError);
 
     if (!silent) {

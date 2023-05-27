@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
@@ -58,12 +57,7 @@ const style = css`
   }
 `;
 
-export const LogEntry = observer<Props>(function LogEntry({
-  item,
-  onSelect,
-  selected = false,
-  className,
-}) {
+export const LogEntry = observer<Props>(function LogEntry({ item, onSelect, selected = false, className }) {
   const translate = useTranslate();
 
   const isError = !!item.stackTrace;
@@ -87,18 +81,14 @@ export const LogEntry = observer<Props>(function LogEntry({
       <TableColumnValue title={item.type} centerContent flex {...use({ icon: true })}>
         <icon-box>{icon && <IconOrImage icon={icon} />}</icon-box>
       </TableColumnValue>
-      <TableColumnValue title={fullTime} ellipsis>{displayTime}</TableColumnValue>
+      <TableColumnValue title={fullTime} ellipsis>
+        {displayTime}
+      </TableColumnValue>
       <TableColumnValue>
         <message-cell>
-          <message title={message}>
-            {isError ? (
-              <Link onClick={() => onSelect(item)}>
-                {message}
-              </Link>
-            ) : message}
-          </message>
+          <message title={message}>{isError ? <Link onClick={() => onSelect(item)}>{message}</Link> : message}</message>
         </message-cell>
       </TableColumnValue>
-    </TableItem>
+    </TableItem>,
   );
 });

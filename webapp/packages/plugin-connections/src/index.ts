@@ -1,4 +1,5 @@
 import { connectionPlugin } from './manifest';
+
 export * from './ConnectionAuthentication/IConnectionAuthenticationConfig';
 export * from './ConnectionAuthentication/ConnectionAuthenticationFormLoader';
 export * from './ConnectionForm/Options/ConnectionOptionsTabService';

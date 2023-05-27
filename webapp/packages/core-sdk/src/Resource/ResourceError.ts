@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { LoadingError } from '@cloudbeaver/core-utils';
 
 import type { CachedResource } from './CachedResource';
@@ -16,14 +15,14 @@ export class ResourceError extends LoadingError {
     private readonly key: any,
     private readonly context: any,
     message?: string,
-    options?: ErrorOptions
+    options?: ErrorOptions,
   ) {
     super(
       () => {
         this.resource.markOutdated(this.key);
       },
       message,
-      options
+      options,
     );
     this.name = 'Resource Error';
   }

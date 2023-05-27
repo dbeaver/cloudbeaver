@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, computed, makeObservable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import { IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -14,7 +13,7 @@ import { ENotificationType, INotification } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { ServerInternalError, ServerErrorType } from '@cloudbeaver/core-sdk';
+import { ServerErrorType, ServerInternalError } from '@cloudbeaver/core-sdk';
 import { Deferred, EDeferredState, errorOf } from '@cloudbeaver/core-utils';
 
 import { DataExportProcessService, ExportProcess } from '../DataExportProcessService';
@@ -100,7 +99,7 @@ export class ExportNotificationController implements IInitializableController {
     private readonly commonDialogService: CommonDialogService,
     private readonly dataExportProcessService: DataExportProcessService,
     private readonly navNodeManagerService: NavNodeManagerService,
-    private readonly localization: LocalizationService
+    private readonly localization: LocalizationService,
   ) {
     makeObservable(this, {
       isDetailsDialogOpen: observable,

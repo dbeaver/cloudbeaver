@@ -5,14 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-
-import { useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { VERTICAL_ROTATED_TAB_STYLES, Tab, TabIcon, TabTitle, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, Tab, TabIcon, TabTitle, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDataPresentationOptions } from '../../DataPresentationService';
@@ -26,13 +24,7 @@ interface Props {
   onClick: (tabId: string) => void;
 }
 
-export const PresentationTab = observer<Props>(function PresentationTab({
-  model,
-  presentation,
-  className,
-  style,
-  onClick,
-}) {
+export const PresentationTab = observer<Props>(function PresentationTab({ model, presentation, className, style, onClick }) {
   const translate = useTranslate();
   const styles = useStyles(BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, style);
 
@@ -53,14 +45,9 @@ export const PresentationTab = observer<Props>(function PresentationTab({
   }
 
   return styled(styles)(
-    <Tab
-      tabId={presentation.id}
-      style={[BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, style]}
-      disabled={model.isLoading()}
-      onClick={onClick}
-    >
+    <Tab tabId={presentation.id} style={[BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, style]} disabled={model.isLoading()} onClick={onClick}>
       {presentation.icon && <TabIcon icon={presentation.icon} />}
       {presentation.title && <TabTitle>{translate(presentation.title)}</TabTitle>}
-    </Tab>
+    </Tab>,
   );
 });

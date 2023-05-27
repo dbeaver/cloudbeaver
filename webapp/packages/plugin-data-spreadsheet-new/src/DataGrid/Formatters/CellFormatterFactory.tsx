@@ -5,13 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext, useRef } from 'react';
 
 import { IResultSetRowKey, isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
 import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
-
 
 import { CellContext } from '../CellRenderer/CellContext';
 import { TableDataContext } from '../TableDataContext';

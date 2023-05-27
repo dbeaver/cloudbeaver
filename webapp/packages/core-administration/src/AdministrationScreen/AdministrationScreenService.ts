@@ -5,15 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { computed, observable, makeObservable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { IExecutor, Executor } from '@cloudbeaver/core-executor';
-import { SessionPermissionsResource, PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
-import { ScreenService, RouterState } from '@cloudbeaver/core-routing';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { PermissionsService, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { RouterState, ScreenService } from '@cloudbeaver/core-routing';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
@@ -73,7 +72,7 @@ export class AdministrationScreenService {
     private readonly administrationItemService: AdministrationItemService,
     private readonly autoSaveService: LocalStorageSaveService,
     private readonly serverConfigResource: ServerConfigResource,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
   ) {
     this.info = getDefaultAdministrationScreenInfo();
     this.itemState = new Map();
@@ -146,27 +145,17 @@ export class AdministrationScreenService {
       this.getRouteName(itemName, item?.defaultSub, item?.defaultParam),
       itemName,
       item?.defaultSub,
-      item?.defaultParam
+      item?.defaultParam,
     );
   }
 
   navigateToItemSub(item: string, sub: string, param?: string): void {
-    this.screenService.navigateToScreen(
-      this.getRouteName(item, sub, param),
-      item,
-      sub,
-      param
-    );
+    this.screenService.navigateToScreen(this.getRouteName(item, sub, param), item, sub, param);
   }
 
   getItemState<T>(name: string): T | undefined;
   getItemState<T>(name: string, defaultState: () => T, update?: boolean, validate?: (state: T) => boolean): T;
-  getItemState<T>(
-    name: string,
-    defaultState?: () => T,
-    update?: boolean,
-    validate?: (state: T) => boolean
-  ): T | undefined {
+  getItemState<T>(name: string, defaultState?: () => T, update?: boolean, validate?: (state: T) => boolean): T | undefined {
     if (!this.serverConfigResource.isLoaded()) {
       throw new Error('Administration screen getItemState can be used only after server configuration loaded');
     }
@@ -193,8 +182,8 @@ export class AdministrationScreenService {
 
   isAdministrationRouteActive(routeName: string): boolean {
     return (
-      this.screenService.isActive(routeName, AdministrationScreenService.screenName)
-      || this.screenService.isActive(routeName, AdministrationScreenService.setupName)
+      this.screenService.isActive(routeName, AdministrationScreenService.screenName) ||
+      this.screenService.isActive(routeName, AdministrationScreenService.setupName)
     );
   }
 
@@ -207,16 +196,10 @@ export class AdministrationScreenService {
     const screen = this.getScreen(state);
 
     if (screen) {
-      await this.administrationItemService.deActivate(
-        screen,
-        this.isConfigurationMode,
-        screen.item !== toScreen?.item,
-        toScreen === null
-      );
+      await this.administrationItemService.deActivate(screen, this.isConfigurationMode, screen.item !== toScreen?.item, toScreen === null);
     }
 
-    if (this.isConfigurationMode
-      && !this.screenService.isActive(nextState.name, AdministrationScreenService.setupName)) {
+    if (this.isConfigurationMode && !this.screenService.isActive(nextState.name, AdministrationScreenService.setupName)) {
       this.navigateToRoot();
     }
   }
@@ -233,12 +216,7 @@ export class AdministrationScreenService {
       return true;
     }
 
-    return this.administrationItemService.canDeActivate(
-      screen,
-      toScreen,
-      this.isConfigurationMode,
-      screen.item !== toScreen?.item
-    );
+    return this.administrationItemService.canDeActivate(screen, toScreen, this.isConfigurationMode, screen.item !== toScreen?.item);
   }
 
   async handleCanActivate(toState: RouterState, fromState: RouterState): Promise<boolean> {
@@ -252,11 +230,7 @@ export class AdministrationScreenService {
       return false;
     }
 
-    return this.administrationItemService.canActivate(
-      screen,
-      this.isConfigurationMode,
-      screen.item !== fromScreen?.item
-    );
+    return this.administrationItemService.canActivate(screen, this.isConfigurationMode, screen.item !== fromScreen?.item);
   }
 
   async handleActivate(state: RouterState, prevState?: RouterState): Promise<void> {
@@ -269,21 +243,16 @@ export class AdministrationScreenService {
     const screen = this.getScreen(state);
     const fromScreen = this.getScreen(prevState);
     if (screen) {
-      await this.administrationItemService.activate(
-        screen,
-        this.isConfigurationMode,
-        screen.item !== fromScreen?.item,
-        fromScreen === null
-      );
+      await this.administrationItemService.activate(screen, this.isConfigurationMode, screen.item !== fromScreen?.item, fromScreen === null);
     }
   }
 
   private validateState() {
     if (
-      this.info.workspaceId !== this.serverConfigResource.workspaceId
-      || this.info.configurationMode !== this.isConfigurationMode
-      || this.info.serverVersion !== this.serverConfigResource.serverVersion
-      || this.info.version !== GlobalConstants.version
+      this.info.workspaceId !== this.serverConfigResource.workspaceId ||
+      this.info.configurationMode !== this.isConfigurationMode ||
+      this.info.serverVersion !== this.serverConfigResource.serverVersion ||
+      this.info.version !== GlobalConstants.version
     ) {
       this.clearItemsState();
       this.info.workspaceId = this.serverConfigResource.workspaceId;

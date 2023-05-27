@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled, { use } from 'reshadow';
 
 import { useObjectRef } from '../useObjectRef';
@@ -31,22 +30,26 @@ export const SplitControls: React.FC = function SplitControls() {
     }
   }
 
-  const handlers = useObjectRef(() => ({
-    handleCollapse(event: React.SyntheticEvent<HTMLButtonElement>) {
-      if (this.mode === 'maximize') {
-        this.setMode('resize');
-      } else {
-        this.setMode('minimize');
-      }
-    },
-    handleExpand(event: React.SyntheticEvent<HTMLButtonElement>) {
-      if (this.mode === 'minimize') {
-        this.setMode('resize');
-      } else {
-        this.setMode('maximize');
-      }
-    },
-  }), { mode: split.state.mode, setMode: split.state.setMode }, ['handleCollapse', 'handleExpand']);
+  const handlers = useObjectRef(
+    () => ({
+      handleCollapse(event: React.SyntheticEvent<HTMLButtonElement>) {
+        if (this.mode === 'maximize') {
+          this.setMode('resize');
+        } else {
+          this.setMode('minimize');
+        }
+      },
+      handleExpand(event: React.SyntheticEvent<HTMLButtonElement>) {
+        if (this.mode === 'minimize') {
+          this.setMode('resize');
+        } else {
+          this.setMode('maximize');
+        }
+      },
+    }),
+    { mode: split.state.mode, setMode: split.state.setMode },
+    ['handleCollapse', 'handleExpand'],
+  );
 
   return styled(buttonStyles)(
     <container
@@ -58,23 +61,15 @@ export const SplitControls: React.FC = function SplitControls() {
       {...use({ split: split.state.split, inverse, mode: inverseMode })}
     >
       {split.state.mode !== 'minimize' && (
-        <button
-          type="button"
-          {...use({ isPrimary: !inverse })}
-          onClick={handlers.handleCollapse}
-        >
+        <button type="button" {...use({ isPrimary: !inverse })} onClick={handlers.handleCollapse}>
           <ripple />
         </button>
       )}
       {split.state.mode !== 'maximize' && (
-        <button
-          type="button"
-          {...use({ isPrimary: inverse })}
-          onClick={handlers.handleExpand}
-        >
+        <button type="button" {...use({ isPrimary: inverse })} onClick={handlers.handleExpand}>
           <ripple />
         </button>
       )}
-    </container>
+    </container>,
   );
 };

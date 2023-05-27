@@ -5,14 +5,27 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, makeObservable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
-import { AsyncTaskInfoService, GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
-import { DatabaseDataSource, DocumentEditAction, IDatabaseDataOptions, IDatabaseResultSet, IRequestInfo, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
+import {
+  AsyncTaskInfoService,
+  GraphQLService,
+  ResultDataFormat,
+  SqlExecuteInfo,
+  SqlQueryResults,
+  UpdateResultsDataBatchMutationVariables,
+} from '@cloudbeaver/core-sdk';
+import {
+  DatabaseDataSource,
+  DocumentEditAction,
+  IDatabaseDataOptions,
+  IDatabaseResultSet,
+  IRequestInfo,
+  ResultSetEditAction,
+} from '@cloudbeaver/plugin-data-viewer';
 
 export interface IDataQueryOptions extends IDatabaseDataOptions {
   query: string;
@@ -22,8 +35,7 @@ export interface IQueryRequestInfo extends IRequestInfo {
   query: string;
 }
 
-export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOptions>
-  extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
+export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
   currentTask: ITask<SqlExecuteInfo> | null;
   requestInfo: IQueryRequestInfo;
 
@@ -66,10 +78,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
   }
 
   isDisabled(resultIndex: number): boolean {
-    return (
-      (!this.getResult(resultIndex)?.data && this.error === null)
-      || !this.executionContext?.context
-    );
+    return (!this.getResult(resultIndex)?.data && this.error === null) || !this.executionContext?.context;
   }
 
   async cancel(): Promise<void> {
@@ -78,9 +87,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     }
   }
 
-  async save(
-    prevResults: IDatabaseResultSet[]
-  ): Promise<IDatabaseResultSet[]> {
+  async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
     if (!this.options || !this.executionContext?.context) {
       return prevResults;
     }
@@ -118,8 +125,9 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
         };
 
         if (editor) {
-          const responseResult = this.transformResults(executionContextInfo, response.result.results, 0)
-            .find(newResult => newResult.id === result.id);
+          const responseResult = this.transformResults(executionContextInfo, response.result.results, 0).find(
+            newResult => newResult.id === result.id,
+          );
 
           if (responseResult) {
             editor.applyUpdate(responseResult);
@@ -139,11 +147,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     return this;
   }
 
-  getResults(
-    executionContextInfo: IConnectionExecutionContextInfo,
-    response: SqlExecuteInfo,
-    limit: number
-  ): IDatabaseResultSet[] | null {
+  getResults(executionContextInfo: IConnectionExecutionContextInfo, response: SqlExecuteInfo, limit: number): IDatabaseResultSet[] | null {
     this.requestInfo = {
       originalQuery: response.fullQuery || this.options?.query || '',
       requestDuration: response.duration || 0,
@@ -160,9 +164,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     return this.transformResults(executionContextInfo, response.results, limit);
   }
 
-  async request(
-    prevResults: IDatabaseResultSet[]
-  ): Promise<IDatabaseResultSet[]> {
+  async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
     const options = this.options;
     const executionContext = this.executionContext;
     const executionContextInfo = this.executionContext?.context;
@@ -175,11 +177,11 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     let firstResultId: string | undefined;
 
     if (
-      prevResults.length === 1
-      && prevResults[0].contextId === executionContext.context!.id
-      && prevResults[0].connectionId === executionContext.context?.connectionId
-      && prevResults[0].id !== null
-      && this.requestInfo.query === this.options?.query
+      prevResults.length === 1 &&
+      prevResults[0].contextId === executionContext.context!.id &&
+      prevResults[0].connectionId === executionContext.context?.connectionId &&
+      prevResults[0].id !== null &&
+      this.requestInfo.query === this.options?.query
     ) {
       firstResultId = prevResults[0].id;
     }
@@ -210,7 +212,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
         return result;
       },
       () => this.asyncTaskInfoService.cancel(task.id),
-      () => this.asyncTaskInfoService.remove(task.id)
+      () => this.asyncTaskInfoService.remove(task.id),
     );
 
     try {
@@ -253,11 +255,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     }
   }
 
-  private transformResults(
-    executionContextInfo: IConnectionExecutionContextInfo,
-    results: SqlQueryResults[],
-    limit: number
-  ): IDatabaseResultSet[] {
+  private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
     return results.map<IDatabaseResultSet>(result => ({
       id: result.resultSet?.id || null,
       uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${result.resultSet?.id || '0'}`,

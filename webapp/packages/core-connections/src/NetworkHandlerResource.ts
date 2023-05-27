@@ -5,11 +5,17 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { NetworkHandlerDescriptor, GraphQLService, CachedMapResource, resourceKeyList, NetworkHandlerConfigInput, CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import {
+  CachedMapAllKey,
+  CachedMapResource,
+  GraphQLService,
+  NetworkHandlerConfigInput,
+  NetworkHandlerDescriptor,
+  resourceKeyList,
+} from '@cloudbeaver/core-sdk';
 
 export const SSH_TUNNEL_ID = 'ssh_tunnel';
 
@@ -18,10 +24,14 @@ export class NetworkHandlerResource extends CachedMapResource<string, NetworkHan
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly notificationService: NotificationService,
-    serverConfigResource: ServerConfigResource
+    serverConfigResource: ServerConfigResource,
   ) {
     super();
-    this.sync(serverConfigResource, () => {}, () => CachedMapAllKey);
+    this.sync(
+      serverConfigResource,
+      () => {},
+      () => CachedMapAllKey,
+    );
   }
 
   async test(config: NetworkHandlerConfigInput): Promise<void> {

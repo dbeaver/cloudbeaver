@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable, observable } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
@@ -41,24 +40,26 @@ export class PublicConnectionFormService {
     private readonly userInfoResource: UserInfoResource,
     private readonly authenticationService: AuthenticationService,
     private readonly projectsService: ProjectsService,
-    private readonly projectInfoResource: ProjectInfoResource
+    private readonly projectInfoResource: ProjectInfoResource,
   ) {
     this.formState = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
     this.connectionInfoResource.onDataUpdate.addPostHandler(this.closeRemoved);
     this.connectionInfoResource.onItemDelete.addPostHandler(this.closeDeleted);
 
-    this.authenticationService.onLogin.addHandler(executorHandlerFilter(
-      () => !!this.formState && this.optionsPanelService.isOpen(formGetter),
-      async (event, context) => {
-        if (event === 'before' && this.userInfoResource.data === null) {
-          const confirmed = await this.showUnsavedChangesDialog();
-          if (!confirmed) {
-            ExecutorInterrupter.interrupt(context);
+    this.authenticationService.onLogin.addHandler(
+      executorHandlerFilter(
+        () => !!this.formState && this.optionsPanelService.isOpen(formGetter),
+        async (event, context) => {
+          if (event === 'before' && this.userInfoResource.data === null) {
+            const confirmed = await this.showUnsavedChangesDialog();
+            if (!confirmed) {
+              ExecutorInterrupter.interrupt(context);
+            }
           }
-        }
-      }
-    ));
+        },
+      ),
+    );
 
     makeObservable(this, {
       formState: observable.shallow,
@@ -78,17 +79,14 @@ export class PublicConnectionFormService {
         this.projectsService,
         this.projectInfoResource,
         this.connectionFormService,
-        this.connectionInfoResource
+        this.connectionInfoResource,
       );
 
       this.formState.closeTask.addHandler(this.close.bind(this, true));
     }
 
     this.formState
-      .setOptions(
-        config.connectionId ? 'edit' : 'create',
-        'public'
-      )
+      .setOptions(config.connectionId ? 'edit' : 'create', 'public')
       .setConfig(projectId, config)
       .setAvailableDrivers(availableDrivers || []);
 
@@ -124,14 +122,10 @@ export class PublicConnectionFormService {
   }
 
   async save(): Promise<void> {
-    const key = (
-      (this.formState && this.formState.config.connectionId && this.formState.projectId !== null)
-        ? createConnectionParam(
-          this.formState.projectId,
-          this.formState.config.connectionId
-        )
-        : null
-    );
+    const key =
+      this.formState && this.formState.config.connectionId && this.formState.projectId !== null
+        ? createConnectionParam(this.formState.projectId, this.formState.config.connectionId)
+        : null;
 
     await this.close(true);
 
@@ -145,10 +139,7 @@ export class PublicConnectionFormService {
       return;
     }
 
-    if (!this.connectionInfoResource.has(createConnectionParam(
-      this.formState.projectId,
-      this.formState.config.connectionId
-    ))) {
+    if (!this.connectionInfoResource.has(createConnectionParam(this.formState.projectId, this.formState.config.connectionId))) {
       this.close(true);
     }
   };
@@ -158,10 +149,7 @@ export class PublicConnectionFormService {
       return;
     }
 
-    if (this.connectionInfoResource.isIntersect(data, createConnectionParam(
-      this.formState.projectId,
-      this.formState.config.connectionId
-    ))) {
+    if (this.connectionInfoResource.isIntersect(data, createConnectionParam(this.formState.projectId, this.formState.config.connectionId))) {
       this.close(true);
     }
   };
@@ -176,16 +164,11 @@ export class PublicConnectionFormService {
 
   private async showUnsavedChangesDialog(): Promise<boolean> {
     if (
-      !this.formState
-      || !this.optionsPanelService.isOpen(formGetter)
-      || (
-        this.formState.config.connectionId
-        && this.formState.projectId !== null
-        && !this.connectionInfoResource.has(createConnectionParam(
-          this.formState.projectId,
-          this.formState.config.connectionId
-        ))
-      )
+      !this.formState ||
+      !this.optionsPanelService.isOpen(formGetter) ||
+      (this.formState.config.connectionId &&
+        this.formState.projectId !== null &&
+        !this.connectionInfoResource.has(createConnectionParam(this.formState.projectId, this.formState.config.connectionId)))
     ) {
       return true;
     }

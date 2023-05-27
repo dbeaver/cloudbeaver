@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled from 'reshadow';
@@ -23,10 +22,7 @@ interface Props extends React.PropsWithChildren {
   style?: ComponentStyle;
 }
 
-export const TabPanelList = observer<Props>(function TabPanelList({
-  style,
-  children,
-}) {
+export const TabPanelList = observer<Props>(function TabPanelList({ style, children }) {
   const state = useContext(TabsContext);
   const styles = useStyles(BASE_TAB_STYLES, style);
 
@@ -47,18 +43,19 @@ export const TabPanelList = observer<Props>(function TabPanelList({
 
   return styled(styles)(
     <>
-      {displayed.map(generateTabElement(
-        (tabInfo, key) => (
-          <TabPanel
-            key={key}
-            tabId={key}
-          >
-            {renderPanel(tabInfo, key)}
-          </TabPanel>
-        ),
-        state.props,
-      )).flat()}
+      {displayed
+        .map(
+          generateTabElement(
+            (tabInfo, key) => (
+              <TabPanel key={key} tabId={key}>
+                {renderPanel(tabInfo, key)}
+              </TabPanel>
+            ),
+            state.props,
+          ),
+        )
+        .flat()}
       {children}
-    </>
+    </>,
   );
 });

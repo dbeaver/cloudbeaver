@@ -5,23 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 
 export enum EUsersAdministrationSub {
   Users = 'users',
   Teams = 'teams',
-  MetaProperties = 'metaProperties'
+  MetaProperties = 'metaProperties',
 }
 
 @injectable()
 export class UsersAdministrationNavigationService {
   static ItemName = 'users';
 
-  constructor(
-    private readonly administrationScreenService: AdministrationScreenService
-  ) {
+  constructor(private readonly administrationScreenService: AdministrationScreenService) {
     this.navToRoot = this.navToRoot.bind(this);
   }
 
@@ -34,10 +31,6 @@ export class UsersAdministrationNavigationService {
   }
 
   navToSub(sub: EUsersAdministrationSub, param?: string): void {
-    this.administrationScreenService.navigateToItemSub(
-      UsersAdministrationNavigationService.ItemName,
-      sub,
-      param
-    );
+    this.administrationScreenService.navigateToItemSub(UsersAdministrationNavigationService.ItemName, sub, param);
   }
 }

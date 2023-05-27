@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -25,7 +24,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly screenService: ScreenService,
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly administrationTopAppBarService: AdministrationTopAppBarService,
-    private readonly menuService: MenuService
+    private readonly menuService: MenuService,
   ) {
     super();
   }
@@ -48,7 +47,7 @@ export class PluginBootstrap extends Bootstrap {
                 label: 'administration_menu_enter',
                 tooltip: 'administration_menu_enter',
               },
-              { onSelect: () => this.administrationScreenService.navigateToRoot() }
+              { onSelect: () => this.administrationScreenService.navigateToRoot() },
             ),
           ];
         }
@@ -62,7 +61,7 @@ export class PluginBootstrap extends Bootstrap {
                 label: 'administration_menu_back',
                 tooltip: 'administration_menu_back',
               },
-              { onSelect: () => this.screenService.navigateToRoot() }
+              { onSelect: () => this.screenService.navigateToRoot() },
             ),
           ];
         }
@@ -82,5 +81,5 @@ export class PluginBootstrap extends Bootstrap {
     });
   }
 
-  load(): void { }
+  load(): void {}
 }

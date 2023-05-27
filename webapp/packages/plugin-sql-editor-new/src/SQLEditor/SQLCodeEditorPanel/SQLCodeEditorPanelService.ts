@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React from 'react';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -18,9 +17,7 @@ const SQLCodeEditorPanel = React.lazy(async () => {
 
 @injectable()
 export class SQLCodeEditorPanelService {
-  constructor(
-    private readonly sqlEditorModeService: SqlEditorModeService,
-  ) { }
+  constructor(private readonly sqlEditorModeService: SqlEditorModeService) {}
 
   registerPanel(): void | Promise<void> {
     this.sqlEditorModeService.tabsContainer.add({

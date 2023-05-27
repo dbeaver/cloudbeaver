@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
@@ -29,7 +28,8 @@ const styles = css`
     position: relative;
     overflow: auto;
 
-    &[|active]::after, &[|negative]::after {
+    &[|active]::after,
+    &[|negative]::after {
       position: absolute;
       top: 0;
       left: 0;
@@ -54,7 +54,7 @@ const styles = css`
       display: flex;
       height: 100%;
       width: 100%;
-  
+
       & message {
         box-sizing: border-box;
         padding: 24px;
@@ -66,7 +66,7 @@ const styles = css`
   }
   throw-box {
     position: fixed;
-    
+
     &:not([|showDropOutside]) {
       left: 0;
       top: 0;
@@ -112,20 +112,24 @@ export const DVResultSetGroupingPresentation: DataPresentationComponent<any, IDa
   const model = useGroupingDataModel(originalModel, resultIndex, state);
   const dnd = useGroupingDnDColumns(state, originalModel, model);
 
-  const groupingData = useObservableRef<IPrivateGroupingData>(() => ({
-    getColumns() {
-      return this.state.columns;
+  const groupingData = useObservableRef<IPrivateGroupingData>(
+    () => ({
+      getColumns() {
+        return this.state.columns;
+      },
+      removeColumn(...columns) {
+        this.state.columns = this.state.columns.filter(column => !columns.includes(column));
+      },
+      clear() {
+        this.state.presentationId = '';
+        this.state.columns = [];
+      },
+    }),
+    {
+      clear: action,
     },
-    removeColumn(...columns) {
-      this.state.columns = this.state.columns.filter(column => !columns.includes(column));
-    },
-    clear() {
-      this.state.presentationId = '';
-      this.state.columns = [];
-    },
-  }), {
-    clear: action,
-  }, { state });
+    { state },
+  );
 
   context.set(DATA_CONTEXT_DV_DDM_RS_GROUPING, groupingData);
 
@@ -148,9 +152,7 @@ export const DVResultSetGroupingPresentation: DataPresentationComponent<any, IDa
       >
         {state.columns.length === 0 ? (
           <placeholder>
-            <message>
-              {translate('plugin_data_viewer_result_set_grouping_placeholder')}
-            </message>
+            <message>{translate('plugin_data_viewer_result_set_grouping_placeholder')}</message>
           </placeholder>
         ) : (
           <TableViewerLoader
@@ -165,6 +167,6 @@ export const DVResultSetGroupingPresentation: DataPresentationComponent<any, IDa
           />
         )}
       </drop-area>
-    </>
+    </>,
   );
 });

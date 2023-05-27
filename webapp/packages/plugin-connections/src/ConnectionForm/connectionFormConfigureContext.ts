@@ -5,17 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { DatabaseConnection } from '@cloudbeaver/core-connections';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { CachedResourceIncludeArgs, GetUserConnectionsQueryVariables } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionFormState } from './IConnectionFormProps';
 
-export type ConnectionFormInfoIncludes = CachedResourceIncludeArgs<
-DatabaseConnection,
-GetUserConnectionsQueryVariables
->;
+export type ConnectionFormInfoIncludes = CachedResourceIncludeArgs<DatabaseConnection, GetUserConnectionsQueryVariables>;
 
 export interface IConnectionFormConfigureContext {
   readonly driverId: string | undefined;
@@ -27,7 +23,7 @@ export interface IConnectionFormConfigureContext {
 
 export function connectionFormConfigureContext(
   contexts: IExecutionContextProvider<IConnectionFormState>,
-  state: IConnectionFormState
+  state: IConnectionFormState,
 ): IConnectionFormConfigureContext {
   return {
     info: state.info,

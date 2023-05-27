@@ -5,20 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 
 import { SessionPermissionsResource } from './SessionPermissionsResource';
 
-export enum EPermission {
-}
+export enum EPermission {}
 
 @injectable()
 export class PermissionsService {
-  constructor(
-    private readonly permissions: SessionPermissionsResource
-  ) {
-  }
+  constructor(private readonly permissions: SessionPermissionsResource) {}
 
   has(id: string): boolean {
     return this.permissions.has(id);

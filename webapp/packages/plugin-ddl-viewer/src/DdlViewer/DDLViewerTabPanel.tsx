@@ -5,13 +5,17 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { useResource, useStyles } from '@cloudbeaver/core-blocks';
-import { ConnectionDialectResource, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
-import { MenuBar, MENU_BAR_DEFAULT_STYLES } from '@cloudbeaver/core-ui';
+import {
+  ConnectionDialectResource,
+  ConnectionInfoActiveProjectKey,
+  ConnectionInfoResource,
+  createConnectionParam,
+} from '@cloudbeaver/core-connections';
+import { MENU_BAR_DEFAULT_STYLES, MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
@@ -39,12 +43,8 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
 
   return styled(style)(
     <wrapper>
-      <SQLCodeEditorLoader
-        value={ddlResource.data ?? ''}
-        extensions={[sqlDialect]}
-        readonly
-      />
+      <SQLCodeEditorLoader value={ddlResource.data ?? ''} extensions={[sqlDialect]} readonly />
       <MenuBar menu={menu} style={MENU_BAR_DEFAULT_STYLES} />
-    </wrapper>
+    </wrapper>,
   );
 });

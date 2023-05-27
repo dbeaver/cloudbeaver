@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { cancellableTimeout } from '@cloudbeaver/core-utils';
 
@@ -19,9 +18,7 @@ const DELAY_BETWEEN_TRIES = 250;
 export class AsyncTaskInfoService {
   private readonly tasks: Map<string, AsyncTask>;
 
-  constructor(
-    private readonly graphQLService: GraphQLService,
-  ) {
+  constructor(private readonly graphQLService: GraphQLService) {
     this.tasks = new Map();
   }
 

@@ -5,13 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
 import { MenuBarSmallItem, Textarea, useClipboard, useTranslate } from '@cloudbeaver/core-blocks';
-
 
 import type { ILogEntry } from './ILogEntry';
 
@@ -50,12 +48,13 @@ const styles = css`
     min-height: 40px;
     max-height: 96px;
   }
-  type, message {
+  type,
+  message {
     margin-bottom: 12px;
   }
   Textarea {
     flex: 1;
-  } 
+  }
 `;
 
 interface Props {
@@ -64,11 +63,7 @@ interface Props {
   className?: string;
 }
 
-export const LogViewerInfoPanel = observer<Props>(function LogViewerInfoPanel({
-  selectedItem,
-  onClose,
-  className,
-}) {
+export const LogViewerInfoPanel = observer<Props>(function LogViewerInfoPanel({ selectedItem, onClose, className }) {
   const translate = useTranslate();
   const copy = useClipboard();
 
@@ -81,30 +76,18 @@ export const LogViewerInfoPanel = observer<Props>(function LogViewerInfoPanel({
   return styled(styles)(
     <panel-wrapper className={className}>
       <buttons>
-        <MenuBarSmallItem
-          title={translate('ui_copy_to_clipboard')}
-          onClick={copyMessage}
-        >
+        <MenuBarSmallItem title={translate('ui_copy_to_clipboard')} onClick={copyMessage}>
           {translate('ui_copy_to_clipboard')}
         </MenuBarSmallItem>
-        <MenuBarSmallItem
-          title={translate('ui_close')}
-          onClick={onClose}
-        >
+        <MenuBarSmallItem title={translate('ui_close')} onClick={onClose}>
           {translate('ui_close')}
         </MenuBarSmallItem>
       </buttons>
       <content-wrapper>
-        <type as='h2'>{typeInfo}</type>
+        <type as="h2">{typeInfo}</type>
         <message title={selectedItem.message}>{selectedItem.message}</message>
-        <Textarea
-          name="value"
-          rows={3}
-          value={selectedItem.stackTrace}
-          readOnly
-          embedded
-        />
+        <Textarea name="value" rows={3} value={selectedItem.stackTrace} readOnly embedded />
       </content-wrapper>
-    </panel-wrapper>
+    </panel-wrapper>,
   );
 });

@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { Tab } from '@cloudbeaver/core-ui';
 
@@ -18,14 +17,13 @@ interface Props {
   style?: ComponentStyle;
 }
 
-export const UserInfoTab = observer<Props>(function UserInfoTab({
-  className,
-  style,
-}) {
+export const UserInfoTab = observer<Props>(function UserInfoTab({ className, style }) {
   const translate = useTranslate();
   const styles = useStyles(style);
 
   return styled(styles)(
-    <Tab tabId='info' style={style} className={className}>{translate('plugin_user_profile_info')}</Tab>
+    <Tab tabId="info" style={style} className={className}>
+      {translate('plugin_user_profile_info')}
+    </Tab>,
   );
 });

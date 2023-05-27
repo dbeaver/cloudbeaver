@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { DataSynchronizationService } from './DataSynchronization/DataSynchronizationService';
@@ -29,7 +28,6 @@ import { SessionResource } from './SessionResource';
 import { SessionService } from './SessionService';
 import { SessionSettingsService } from './SessionSettingsService';
 import { WindowEventsService } from './WindowEventsService';
-
 
 export const manifest: PluginManifest = {
   info: {
