@@ -4,12 +4,12 @@
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",
-  "main": "lib/index.js",
-  "module": "lib/index.js",
+  "main": "lib/core-di.js",
+  "module": "lib/core-di.js",
   "types": "src/index.ts",
   "scripts": {
     "prebuild": "rimraf --glob lib/*",
-    "build": "webpack --config ../../configs/webpack.plugin.config.js",
+    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
     "postbuild": "tsc",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
@@ -17,11 +17,11 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-executor": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
     "inversify": "~6.0.1"
   },
   "peerDependencies": {
+    "@cloudbeaver/core-executor": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0",
     "react": "~18.x.x"
   }
 }
