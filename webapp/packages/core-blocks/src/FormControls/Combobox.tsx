@@ -193,7 +193,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   iconSelector,
   titleSelector,
   isDisabled,
-  onChange = () => {},
+  onChange = () => { },
   onSelect,
   onSwitch,
   ...rest
@@ -203,8 +203,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const context = useContext(FormContext);
   const menuRef = useRef<HTMLDivElement>(null);
   const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
-
-  const showMenu = items.length > 1;
 
   const menu = useMenuState({
     placement: 'bottom-end',
@@ -241,6 +239,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
   if (searchValue !== null && selectedItem && valueSelector(selectedItem) !== searchValue) {
     inputValue = searchValue;
   }
+
+  const hideMenu = items.length === 1 && (!!selectedItem || isDisabled?.(items[0]) === true);
 
   function handleClick() {
     if (!searchable) {
@@ -381,7 +381,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           name={name}
           title={title}
           value={inputValue}
-          disabled={disabled || !showMenu}
+          disabled={disabled || hideMenu}
           readOnly={readOnly || select}
           data-focus={focus}
           data-select={select}
@@ -391,7 +391,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           {...rest}
           {...use({ select, focus })}
         />
-        <MenuButton {...menu} disabled={readOnly || disabled || !showMenu}>
+        <MenuButton {...menu} disabled={readOnly || disabled || hideMenu}>
           <Icon name="arrow" viewBox="0 0 16 16" {...use({ focus })} />
         </MenuButton>
         <Menu
