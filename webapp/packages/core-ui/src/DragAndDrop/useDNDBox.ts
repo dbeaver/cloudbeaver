@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable, runInAction } from 'mobx';
 import React, { useRef } from 'react';
 import { useDrop } from 'react-dnd';
@@ -49,49 +48,60 @@ export function useDNDBox(options: IOptions): IDNDBox {
 
   const ref = useRef<React.ReactElement | Element | null>(null);
 
-  const state = useObservableRef<IState>(() => ({
-    isOver: false,
-    isOverCurrent: false,
-    canDrop: false,
-    context: null,
-  }), {
-    isOver: observable.ref,
-    isOverCurrent: observable.ref,
-    canDrop: observable.ref,
-    context: observable.ref,
-  }, false);
+  const state = useObservableRef<IState>(
+    () => ({
+      isOver: false,
+      isOverCurrent: false,
+      canDrop: false,
+      context: null,
+    }),
+    {
+      isOver: observable.ref,
+      isOverCurrent: observable.ref,
+      canDrop: observable.ref,
+      context: observable.ref,
+    },
+    false,
+  );
 
-  const [, setTargetRef] = useDrop<IDataContextProvider, void, void>(() => ({
-    accept: options.type as string | string[],
-    drop: (item, monitor) => {
-      if (monitor.didDrop() || !monitor.isOver({ shallow: true })) {
-        return;
-      }
+  const [, setTargetRef] = useDrop<IDataContextProvider, void, void>(
+    () => ({
+      accept: options.type as string | string[],
+      drop: (item, monitor) => {
+        if (monitor.didDrop() || !monitor.isOver({ shallow: true })) {
+          return;
+        }
 
-      options.onDrop?.(item, monitor.getClientOffset());
-    },
-    hover: (item, monitor) => {
-      if (monitor.canDrop()) {
-        options.onHover?.(item, monitor.getClientOffset());
-      }
-    },
-    canDrop: (context, monitor) => (options.canDrop?.(context, monitor.isOver({ shallow: true })) ?? true),
-    collect: monitor => {
-      runInAction(() => {
-        state.isOver = monitor.isOver();
-        state.isOverCurrent = monitor.isOver({ shallow: true });
-        state.canDrop = monitor.canDrop();
-        state.context = monitor.getItem();
-      });
-    },
-  }), [options]);
+        options.onDrop?.(item, monitor.getClientOffset());
+      },
+      hover: (item, monitor) => {
+        if (monitor.canDrop()) {
+          options.onHover?.(item, monitor.getClientOffset());
+        }
+      },
+      canDrop: (context, monitor) => options.canDrop?.(context, monitor.isOver({ shallow: true })) ?? true,
+      collect: monitor => {
+        runInAction(() => {
+          state.isOver = monitor.isOver();
+          state.isOverCurrent = monitor.isOver({ shallow: true });
+          state.canDrop = monitor.canDrop();
+          state.context = monitor.getItem();
+        });
+      },
+    }),
+    [options],
+  );
 
-  return useObjectRef(() => ({
-    ref,
-    state,
-    setRef(element: React.ReactElement | Element | null) {
-      this.setTargetRef(element);
-      ref.current = element;
-    },
-  }), { setTargetRef }, ['setRef']);
+  return useObjectRef(
+    () => ({
+      ref,
+      state,
+      setRef(element: React.ReactElement | Element | null) {
+        this.setTargetRef(element);
+        ref.current = element;
+      },
+    }),
+    { setTargetRef },
+    ['setRef'],
+  );
 }

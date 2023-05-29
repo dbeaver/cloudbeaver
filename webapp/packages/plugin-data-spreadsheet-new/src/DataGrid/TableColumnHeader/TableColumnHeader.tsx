@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled, { css, use } from 'reshadow';
@@ -63,9 +62,7 @@ const headerStyles = css`
   }
 `;
 
-export const TableColumnHeader = observer<HeaderRendererProps<any>>(function TableColumnHeader({
-  column: calculatedColumn,
-}) {
+export const TableColumnHeader = observer<HeaderRendererProps<any>>(function TableColumnHeader({ column: calculatedColumn }) {
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const gridSelectionContext = useContext(DataGridSelectionContext);
@@ -76,9 +73,7 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
   const dndData = useTableColumnDnD(model, resultIndex, calculatedColumn.columnDataIndex);
 
   const dataReadonly = getComputed(() => tableDataContext.isReadOnly() || model.isReadonly(resultIndex));
-  const sortingDisabled = getComputed(
-    () => !tableDataContext.constraints.supported || !model.source.executionContext?.context
-  );
+  const sortingDisabled = getComputed(() => !tableDataContext.constraints.supported || !model.source.executionContext?.context);
 
   let resultColumn: SqlResultColumn | undefined;
   let icon = calculatedColumn.icon;
@@ -114,20 +109,14 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
 
   return styled(headerStyles)(
     <table-header ref={dndData.setTargetRef} {...use({ dragging: dndData.state.isDragging })}>
-      <shrink-container as='div' title={columnTooltip} onClick={handleClick}>
+      <shrink-container as="div" title={columnTooltip} onClick={handleClick}>
         <icon>
           {icon && <StaticImage icon={icon} />}
-          {!dataReadonly && columnReadOnly && <readonly-status className='rdg-table-header__readonly-status' />}
+          {!dataReadonly && columnReadOnly && <readonly-status className="rdg-table-header__readonly-status" />}
         </icon>
         <name>{columnName}</name>
       </shrink-container>
-      {!sortingDisabled && resultColumn && (
-        <OrderButton
-          model={model}
-          resultIndex={resultIndex}
-          attributePosition={resultColumn.position}
-        />
-      )}
-    </table-header>
+      {!sortingDisabled && resultColumn && <OrderButton model={model} resultIndex={resultIndex} attributePosition={resultColumn.position} />}
+    </table-header>,
   );
 });

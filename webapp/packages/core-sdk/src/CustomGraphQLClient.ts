@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import axios, { AxiosProgressEvent, AxiosResponse } from 'axios';
-import { GraphQLClient, ClientError, resolveRequestDocument } from 'graphql-request';
+import axios, { AxiosProgressEvent, AxiosResponse, isAxiosError } from 'axios';
+import { ClientError, GraphQLClient, resolveRequestDocument } from 'graphql-request';
 import { parseRequestArgs } from 'graphql-request/dist/parseArgs';
 import type { RequestDocument, RequestOptions, Variables } from 'graphql-request/dist/types';
 import type * as Dom from 'graphql-request/dist/types.dom';
@@ -15,15 +14,15 @@ import type * as Dom from 'graphql-request/dist/types.dom';
 import { GQLError } from './GQLError';
 import type { IResponseInterceptor } from './IResponseInterceptor';
 import { PlainGQLError } from './PlainGQLError';
+import { ServerInternalError } from './ServerInternalError';
 
 export type UploadProgressEvent = AxiosProgressEvent;
 
-type GqlResponse = (
-  { data: object; errors: undefined }[]
+type GqlResponse =
+  | { data: object; errors: undefined }[]
   | { data: object; errors: undefined }
   | { data: undefined; errors: object }
-  | { data: undefined; errors: object[] }
-);
+  | { data: undefined; errors: object[] };
 
 export class CustomGraphQLClient extends GraphQLClient {
   get blockReason(): Error | string | null {
@@ -39,11 +38,11 @@ export class CustomGraphQLClient extends GraphQLClient {
     files: FileList,
     query?: string,
     variables?: V,
-    onUploadProgress?: (event: UploadProgressEvent) => void
+    onUploadProgress?: (event: UploadProgressEvent) => void,
   ): Promise<T> {
     return this.interceptors.reduce(
       (accumulator, interceptor) => interceptor(accumulator),
-      this.overrideFileUpload<T, V>(url, files, query, variables, onUploadProgress)
+      this.overrideFileUpload<T, V>(url, files, query, variables, onUploadProgress),
     );
   }
 
@@ -56,11 +55,11 @@ export class CustomGraphQLClient extends GraphQLClient {
   request<T = any, V extends Variables = Variables>(
     document: RequestDocument | RequestOptions<V>,
     variables?: V,
-    requestHeaders?: Dom.RequestInit['headers']
+    requestHeaders?: Dom.RequestInit['headers'],
   ): Promise<T> {
     return this.interceptors.reduce(
       (accumulator, interceptor) => interceptor(accumulator),
-      this.overrideRequest<T, V>(document, variables, requestHeaders)
+      this.overrideRequest<T, V>(document, variables, requestHeaders),
     );
   }
 
@@ -87,11 +86,11 @@ export class CustomGraphQLClient extends GraphQLClient {
   private async overrideRequest<T, V extends Variables = Variables>(
     documentOrOptions: RequestDocument | RequestOptions<V>,
     variables?: V,
-    requestHeaders?: Dom.RequestInit['headers']
+    requestHeaders?: Dom.RequestInit['headers'],
   ): Promise<T> {
     this.blockRequestsReasonHandler();
     try {
-      const requestOptions  = parseRequestArgs(documentOrOptions, variables, requestHeaders);
+      const requestOptions = parseRequestArgs(documentOrOptions, variables, requestHeaders);
       const { query, operationName } = resolveRequestDocument(requestOptions.document);
 
       const response = await this.rawRequest<T, V>(query, variables, requestHeaders);
@@ -116,21 +115,25 @@ export class CustomGraphQLClient extends GraphQLClient {
     files: FileList,
     query?: string,
     variables?: V,
-    onUploadProgress?: (event: UploadProgressEvent) => void
+    onUploadProgress?: (event: UploadProgressEvent) => void,
   ): Promise<T> {
     this.blockRequestsReasonHandler();
     try {
       const { operationName } = resolveRequestDocument(query ?? '');
       // TODO: we don't support GQL response right now
-      const response = await axios.postForm/*<GqlResponse>*/<T>(url, {
-        operationName,
-        query,
-        variables: JSON.stringify(variables),
-        'files[]': files,
-      }, {
-        onUploadProgress,
-        responseType: 'json',
-      });
+      const response = await axios.postForm/*<GqlResponse>*/ <T>(
+        url,
+        {
+          operationName,
+          query,
+          variables: JSON.stringify(variables),
+          'files[]': files,
+        },
+        {
+          onUploadProgress,
+          responseType: 'json',
+        },
+      );
 
       // TODO: we don't support GQL response right now
       // TODO: seems here can be undefined
@@ -138,6 +141,10 @@ export class CustomGraphQLClient extends GraphQLClient {
 
       return response.data;
     } catch (error: any) {
+      if (isAxiosError(error) && error.response?.data.message) {
+        throw new ServerInternalError({ ...error, message: error.response.data.message });
+      }
+
       if (isClientError(error)) {
         if (isObjectError(error)) {
           throw new GQLError(error);
@@ -150,20 +157,12 @@ export class CustomGraphQLClient extends GraphQLClient {
     }
   }
 
-  private parseGQLResponse<T>(
-    response: AxiosResponse<GqlResponse>,
-    query: string,
-    variables?: Variables,
-  ): T {
+  private parseGQLResponse<T>(response: AxiosResponse<GqlResponse>, query: string, variables?: Variables): T {
     const result = response.data;
 
-    const successfullyReceivedData = Array.isArray(result)
-      ? !result.some(({ data }) => !data)
-      : Boolean(result.data);
+    const successfullyReceivedData = Array.isArray(result) ? !result.some(({ data }) => !data) : Boolean(result.data);
 
-    const successfullyPassedErrorPolicy = Array.isArray(result)
-      || !result.errors
-      || (Array.isArray(result.errors) && !result.errors.length);
+    const successfullyPassedErrorPolicy = Array.isArray(result) || !result.errors || (Array.isArray(result.errors) && !result.errors.length);
 
     if (response.status === 200 && successfullyPassedErrorPolicy && successfullyReceivedData) {
       const data = result;
@@ -176,16 +175,16 @@ export class CustomGraphQLClient extends GraphQLClient {
         status: response.status,
       };
     } else {
-      const errorResult
-      = typeof result === 'string'
-        ? {
-          error: result,
-        }
-        : result;
+      const errorResult =
+        typeof result === 'string'
+          ? {
+              error: result,
+            }
+          : result;
       throw new ClientError(
-      // @ts-expect-error TODO
+        // @ts-expect-error TODO
         { ...errorResult, status: response.status, headers: response.headers },
-        { query, variables }
+        { query, variables },
       );
     }
   }

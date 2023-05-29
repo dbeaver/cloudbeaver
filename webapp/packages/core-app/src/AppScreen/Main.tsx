@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { splitStyles, Split, ResizerControls, Pane, useSplitUserState, useStyles, Loader, getComputed } from '@cloudbeaver/core-blocks';
+import { getComputed, Loader, Pane, ResizerControls, Split, splitStyles, useSplitUserState, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { LeftBarPanelService, SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
 
@@ -44,30 +43,20 @@ export const Main = observer(function Main() {
   return styled(styles)(
     <Loader suspense>
       <space as="main">
-        <Split
-          {...splitMainState}
-          sticky={30}
-          mode={leftBarDisabled ? 'minimize' : splitMainState.mode}
-          disable={leftBarDisabled}
-        >
-          <Pane basis='250px' main>
+        <Split {...splitMainState} sticky={30} mode={leftBarDisabled ? 'minimize' : splitMainState.mode} disable={leftBarDisabled}>
+          <Pane basis="250px" main>
             <Loader suspense>
               <SideBarPanel container={leftBarPanelService.tabsContainer} />
             </Loader>
           </Pane>
           <ResizerControls />
           <Pane>
-            <Split
-              {...splitRightState}
-              mode={sideBarDisabled ? 'minimize' : splitRightState.mode}
-              disable={sideBarDisabled}
-              sticky={30}
-            >
+            <Split {...splitRightState} mode={sideBarDisabled ? 'minimize' : splitRightState.mode} disable={sideBarDisabled} sticky={30}>
               <Pane>
                 <RightArea />
               </Pane>
               <ResizerControls />
-              <Pane basis='250px' main>
+              <Pane basis="250px" main>
                 <Loader suspense>
                   <SideBarPanel container={sideBarPanelService.tabsContainer} />
                 </Loader>
@@ -76,6 +65,6 @@ export const Main = observer(function Main() {
           </Pane>
         </Split>
       </space>
-    </Loader>
+    </Loader>,
   );
 });

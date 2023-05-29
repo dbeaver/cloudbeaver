@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled, { css } from 'reshadow';
 
 import { Button, Translate, useFocus, useStyles } from '@cloudbeaver/core-blocks';
@@ -51,44 +50,25 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Dial
   const { icon, title, subTitle, bigIcon, viewBox, message, confirmActionText, cancelActionText } = payload;
 
   return styled(useStyles(style))(
-    <CommonDialogWrapper ref={focusedRef} size='small' className={className} fixedWidth>
-      <CommonDialogHeader
-        title={title}
-        subTitle={subTitle}
-        icon={icon}
-        viewBox={viewBox}
-        bigIcon={bigIcon}
-        onReject={rejectDialog}
-      />
+    <CommonDialogWrapper ref={focusedRef} size="small" className={className} fixedWidth>
+      <CommonDialogHeader title={title} subTitle={subTitle} icon={icon} viewBox={viewBox} bigIcon={bigIcon} onReject={rejectDialog} />
       <CommonDialogBody>
         <Translate token={message} />
       </CommonDialogBody>
       <CommonDialogFooter>
-        <Button
-          type="button"
-          mod={['outlined']}
-          onClick={rejectDialog}
-        >
+        <Button type="button" mod={['outlined']} onClick={rejectDialog}>
           <Translate token={cancelActionText || 'ui_processing_cancel'} />
         </Button>
         <fill />
         {payload.extraStatus !== undefined && (
-          <Button
-            type="button"
-            mod={['outlined']}
-            onClick={() => resolveDialog(payload.extraStatus)}
-          >
+          <Button type="button" mod={['outlined']} onClick={() => resolveDialog(payload.extraStatus)}>
             <Translate token={cancelActionText || 'ui_no'} />
           </Button>
         )}
-        <Button
-          type="button"
-          mod={['unelevated']}
-          onClick={() => resolveDialog()}
-        >
+        <Button type="button" mod={['unelevated']} onClick={() => resolveDialog()}>
           <Translate token={confirmActionText || 'ui_processing_ok'} />
         </Button>
       </CommonDialogFooter>
-    </CommonDialogWrapper>
+    </CommonDialogWrapper>,
   );
 };

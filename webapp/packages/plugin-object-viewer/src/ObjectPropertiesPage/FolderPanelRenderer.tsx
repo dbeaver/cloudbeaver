@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 
 import { useService } from '@cloudbeaver/core-di';
@@ -21,12 +20,7 @@ interface IFolderPanelRendererProps {
   style?: ComponentStyle;
 }
 
-export const FolderPanelRenderer = observer<IFolderPanelRendererProps>(function FolderPanelRenderer({
-  nodeId,
-  folderId,
-  parents,
-  style,
-}) {
+export const FolderPanelRenderer = observer<IFolderPanelRendererProps>(function FolderPanelRenderer({ nodeId, folderId, parents, style }) {
   const navNodeViewService = useService(NavNodeViewService);
 
   for (const panel of navNodeViewService.panels) {

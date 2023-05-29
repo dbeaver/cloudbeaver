@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
@@ -15,7 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
-import { IEditorRef, closeCompletion } from '@cloudbeaver/plugin-codemirror6';
+import { closeCompletion, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
 import type { ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTIVE_QUERY_EXTENSION } from '../ACTIVE_QUERY_EXTENSION';
@@ -34,9 +33,7 @@ const styles = css`
   }
 `;
 
-export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps> = observer(function SQLCodeEditorPanel({
-  data,
-}) {
+export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps> = observer(function SQLCodeEditorPanel({ data }) {
   const notificationService = useService(NotificationService);
   const navNodeManagerService = useService(NavNodeManagerService);
 
@@ -44,8 +41,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
 
   const editor = useSQLCodeEditor(editorRef);
   const panel = useSQLCodeEditorPanel(data, editor);
-  const [autocompletion, setEditor, autocompletionStyles] = useSqlDialectAutocompletion(data);
-  const combinedRef = useCombinedRef(setEditorRef, setEditor);
+  const autocompletion = useSqlDialectAutocompletion(data);
   const sqlDialect = useSqlDialectExtension(data.dialect);
 
   const dndBox = useDNDBox({
@@ -58,21 +54,26 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         try {
           const pos = view.posAtCoords({ x: mouse.x, y: mouse.y }) ?? 1;
 
-          await data.executeQueryAction(data.cursorSegment, async () => {
-            const alias: string[] = [];
+          await data.executeQueryAction(
+            data.cursorSegment,
+            async () => {
+              const alias: string[] = [];
 
-            for (const node of nodes) {
-              alias.push(await navNodeManagerService.getNodeDatabaseAlias(node.id));
-            }
+              for (const node of nodes) {
+                alias.push(await navNodeManagerService.getNodeDatabaseAlias(node.id));
+              }
 
-            const replacement = alias.join(', ');
-            if (replacement) {
-              view.dispatch({
-                changes: { from: pos, to: pos, insert: replacement },
-                selection: { anchor: pos, head: pos + replacement.length },
-              });
-            }
-          }, true, true);
+              const replacement = alias.join(', ');
+              if (replacement) {
+                view.dispatch({
+                  changes: { from: pos, to: pos, insert: replacement },
+                  selection: { anchor: pos, head: pos + replacement.length },
+                });
+              }
+            },
+            true,
+            true,
+          );
         } catch (exception: any) {
           notificationService.logException(exception, 'sql_editor_alias_loading_error');
         }
@@ -82,17 +83,19 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
 
   useExecutor({
     executor: data.onExecute,
-    handlers: [function updateHighlight() {
-      if (editor.view) {
-        closeCompletion(editor.view);
-      }
-    }],
+    handlers: [
+      function updateHighlight() {
+        if (editor.view) {
+          closeCompletion(editor.view);
+        }
+      },
+    ],
   });
 
-  return styled(useStyles(styles, autocompletionStyles))(
+  return styled(useStyles(styles))(
     <box ref={dndBox.setRef}>
       <SQLCodeEditorLoader
-        ref={combinedRef}
+        ref={setEditorRef}
         getValue={() => data.value}
         extensions={[ACTIVE_QUERY_EXTENSION, QUERY_STATUS_GUTTER_EXTENSION, autocompletion, sqlDialect]}
         readonly={data.readonly}
@@ -101,6 +104,6 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         onChange={panel.onQueryChange}
         onUpdate={panel.onUpdate}
       />
-    </box>
+    </box>,
   );
 });

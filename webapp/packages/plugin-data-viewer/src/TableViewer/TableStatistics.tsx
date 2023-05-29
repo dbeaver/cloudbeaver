@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -29,21 +28,21 @@ const styles = css`
   }
 `;
 
-export const TableStatistics = observer<Props>(function TableStatistics({
-  model,
-  resultIndex,
-}) {
+export const TableStatistics = observer<Props>(function TableStatistics({ model, resultIndex }) {
   const translate = useTranslate();
   const source = model.source;
   const result = model.getResult(resultIndex);
 
   return styled(styles)(
     <statistics>
-      {translate('data_viewer_statistics_status')} {source.requestInfo.requestMessage}<br />
-      {translate('data_viewer_statistics_duration')} {source.requestInfo.requestDuration} ms<br />
-      {translate('data_viewer_statistics_updated_rows')} {result?.updateRowCount || 0}<br />
+      {translate('data_viewer_statistics_status')} {source.requestInfo.requestMessage}
+      <br />
+      {translate('data_viewer_statistics_duration')} {source.requestInfo.requestDuration} ms
+      <br />
+      {translate('data_viewer_statistics_updated_rows')} {result?.updateRowCount || 0}
+      <br />
       <br />
       <pre>{source.requestInfo.source}</pre>
-    </statistics>
+    </statistics>,
   );
 });

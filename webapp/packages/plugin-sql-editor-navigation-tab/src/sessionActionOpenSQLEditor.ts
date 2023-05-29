@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ISessionAction } from '@cloudbeaver/core-root';
 
 import { SESSION_ACTION_OPEN_SQL_EDITOR } from './SESSION_ACTION_OPEN_SQL_EDITOR';

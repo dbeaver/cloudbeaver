@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, makeObservable, action } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
@@ -38,7 +37,7 @@ export class CreateConnectionService {
     private readonly connectionFormService: ConnectionFormService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly projectsService: ProjectsService,
-    private readonly projectInfoResource: ProjectInfoResource
+    private readonly projectInfoResource: ProjectInfoResource,
   ) {
     this.data = null;
     this.tabsContainer = new TabsContainer('Connection Creation mode');
@@ -110,12 +109,7 @@ export class CreateConnectionService {
   }
 
   setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]): void {
-    this.data = new ConnectionFormState(
-      this.projectsService,
-      this.projectInfoResource,
-      this.connectionFormService,
-      this.connectionInfoResource
-    );
+    this.data = new ConnectionFormState(this.projectsService, this.projectInfoResource, this.connectionFormService, this.connectionInfoResource);
 
     this.data.closeTask.addHandler(this.cancelCreate.bind(this));
 

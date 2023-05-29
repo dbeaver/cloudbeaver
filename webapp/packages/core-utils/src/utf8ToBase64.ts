@@ -9,8 +9,12 @@
 export function utf8ToBase64(data: string): string {
   /*  first we use encodeURIComponent to get percent-encoded UTF-8,
    then we convert the percent encodings into raw bytes which can be fed into btoa. */
-  return window.btoa(decodeURIComponent(encodeURIComponent(data).replace(/%([0-9A-F]{2})/g, (match, p1) => {
-    const c = String.fromCharCode(parseInt(`0x${p1}`, 16));
-    return c === '%' ? '%25' : c;
-  })));
+  return window.btoa(
+    decodeURIComponent(
+      encodeURIComponent(data).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+        const c = String.fromCharCode(parseInt(`0x${p1}`, 16));
+        return c === '%' ? '%25' : c;
+      }),
+    ),
+  );
 }

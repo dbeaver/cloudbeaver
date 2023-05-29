@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { css } from 'reshadow';
 
@@ -20,74 +19,70 @@ import { DATA_VIEWER_DATA_MODEL_TOOLS_MENU } from './DATA_VIEWER_DATA_MODEL_TOOL
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService';
 
 const TABLE_HEADER_MENU_BAR_STYLES = css`
-    menu-bar {
-      composes: theme-border-color-background theme-background-surface theme-text-on-surface theme-typography--body2 from global;
-      display: flex;
-      margin-left: 8px;
-      box-sizing: border-box;
-      border: 1px solid;
-      height: 24px;
+  menu-bar {
+    composes: theme-border-color-background theme-background-surface theme-text-on-surface theme-typography--body2 from global;
+    display: flex;
+    margin-left: 8px;
+    box-sizing: border-box;
+    border: 1px solid;
+    height: 24px;
+  }
+
+  menu-bar-item {
+    composes: theme-ripple from global;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    background: transparent;
+    outline: none;
+    color: inherit;
+
+    &[use|hidden] {
+      display: none;
     }
 
-    menu-bar-item {
-      composes: theme-ripple from global;
-      padding: 4px;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      background: transparent;
-      outline: none;
-      color: inherit;
-
-      &[use|hidden] {
-        display: none;
-      }
-
-      & IconOrImage {
-          display: block;
-          width: 16px;
-      }
-
-      & Loader {
-          width: 16px;
-      }
-
-      & menu-bar-item-label {
-          display: block;
-          text-transform: uppercase;
-          font-weight: 700;
-      }
-
-      & IconOrImage + menu-bar-item-label, & Loader + menu-bar-item-label {
-          padding-left: 8px
-      }
+    & IconOrImage {
+      display: block;
+      width: 16px;
     }
-    
-    MenuSeparator {
-      composes: theme-border-color-background from global;
-      height: 100%;
-      margin: 0;
-      border: 0 !important;
-      border-right: 1px solid !important;
 
-      &:first-child, &:last-child {
-        display: none;
-      }
+    & Loader {
+      width: 16px;
     }
-  `;
 
-export const TableHeaderMenu: PlaceholderComponent<ITableHeaderPlaceholderProps> = observer(function TableHeaderMenu({
-  model,
-  simple,
-  resultIndex,
-}) {
+    & menu-bar-item-label {
+      display: block;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    & IconOrImage + menu-bar-item-label,
+    & Loader + menu-bar-item-label {
+      padding-left: 8px;
+    }
+  }
+
+  MenuSeparator {
+    composes: theme-border-color-background from global;
+    height: 100%;
+    margin: 0;
+    border: 0 !important;
+    border-right: 1px solid !important;
+
+    &:first-child,
+    &:last-child {
+      display: none;
+    }
+  }
+`;
+
+export const TableHeaderMenu: PlaceholderComponent<ITableHeaderPlaceholderProps> = observer(function TableHeaderMenu({ model, simple, resultIndex }) {
   const menu = useMenu({ menu: DATA_VIEWER_DATA_MODEL_TOOLS_MENU });
 
   menu.context.set(DATA_CONTEXT_DV_DDM, model);
   menu.context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex);
   menu.context.set(DATA_CONTEXT_DATA_VIEWER_SIMPLE, simple);
 
-  return (
-    <MenuBar menu={menu} style={TABLE_HEADER_MENU_BAR_STYLES} />
-  );
+  return <MenuBar menu={menu} style={TABLE_HEADER_MENU_BAR_STYLES} />;
 });

@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, InputField, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, InputField, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
@@ -22,11 +21,7 @@ interface Props {
   style?: ComponentStyle;
 }
 
-export const MetaParametersForm = observer<Props>(function MetaParametersForm({
-  user,
-  className,
-  style,
-}) {
+export const MetaParametersForm = observer<Props>(function MetaParametersForm({ user, className, style }) {
   const styles = useStyles(style, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
 
@@ -35,32 +30,10 @@ export const MetaParametersForm = observer<Props>(function MetaParametersForm({
       <Container medium gap>
         <Group form gap>
           <Container wrap gap>
-            <InputField
-              type="text"
-              name="userId"
-              minLength={1}
-              state={user}
-              mod='surface'
-              disabled
-              readOnly
-              required
-              tiny
-              fill
-            >
+            <InputField type="text" name="userId" minLength={1} state={user} mod="surface" disabled readOnly required tiny fill>
               {translate('plugin_user_profile_info_id')}
             </InputField>
-            <InputField
-              type="text"
-              name="displayName"
-              minLength={1}
-              state={user}
-              mod='surface'
-              disabled
-              readOnly
-              required
-              tiny
-              fill
-            >
+            <InputField type="text" name="displayName" minLength={1} state={user} mod="surface" disabled readOnly required tiny fill>
               {translate('plugin_user_profile_info_displayName')}
             </InputField>
           </Container>
@@ -70,7 +43,6 @@ export const MetaParametersForm = observer<Props>(function MetaParametersForm({
           <AuthProvidersList user={user} providers={user.linkedAuthProviders} />
         </Group>
       </Container>
-
-    </ColoredContainer>
+    </ColoredContainer>,
   );
 });

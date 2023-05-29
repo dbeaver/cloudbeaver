@@ -1,3 +1,5 @@
+import { topAppBarPlugin } from './manifest';
+
 export * from './TopNavBar/AppStateMenu/AppStateMenu';
 export * from './TopNavBar/AppStateMenu/MENU_APP_STATE';
 export * from './TopNavBar/MainMenu/MENU_APP_ACTIONS';
@@ -8,7 +10,5 @@ export * from './TopNavBar/shared/topMenuStyles';
 export * from './TopNavBar/Logo';
 export * from './TopNavBar/TopNavBar';
 export * from './TopNavBar/styles';
-
-import { topAppBarPlugin } from './manifest';
 
 export default topAppBarPlugin;

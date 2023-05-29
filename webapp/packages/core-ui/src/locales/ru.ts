@@ -1,3 +1,1 @@
-export default [
-  ['core_ui_empty', 'Пусто'],
-];
+export default [['core_ui_empty', 'Пусто']];

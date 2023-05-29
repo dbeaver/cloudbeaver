@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { ConnectionExecutionContextService, Connection, createConnectionParam } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { App, injectable } from '@cloudbeaver/core-di';
 import { EObjectFeature, NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
@@ -31,7 +30,7 @@ export class DataViewerTableService {
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly dataViewerService: DataViewerService,
     private readonly dataViewerSettingsService: DataViewerSettingsService,
-  ) { }
+  ) {}
 
   has(tableId: string): boolean {
     return this.tableViewerStorageService.has(tableId);
@@ -50,12 +49,8 @@ export class DataViewerTableService {
     }
   }
 
-  create(
-    connection: Connection,
-    node: NavNode | undefined
-  ): IDatabaseDataModel<IDataContainerOptions, IDatabaseResultSet> {
-    const nodeInfo = this.navNodeManagerService
-      .getNodeContainerInfo(node?.id ?? '');
+  create(connection: Connection, node: NavNode | undefined): IDatabaseDataModel<IDataContainerOptions, IDatabaseResultSet> {
+    const nodeInfo = this.navNodeManagerService.getNodeContainerInfo(node?.id ?? '');
 
     const source = new ContainerDataSource(
       this.app.getServiceInjector(),
@@ -77,7 +72,8 @@ export class DataViewerTableService {
       .setConstraintsAvailable(node?.objectFeatures.includes(EObjectFeature.supportsDataFilter) ?? true);
 
     const editable = this.dataViewerService.isDataEditable(connection);
-    const dataModel = this.tableViewerStorageService.add(new DatabaseDataModel(source))
+    const dataModel = this.tableViewerStorageService
+      .add(new DatabaseDataModel(source))
       .setCountGain(this.dataViewerSettingsService.getDefaultRowsCount())
       .setSlice(0)
       .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly);

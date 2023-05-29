@@ -5,13 +5,23 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, Translate, useFocus, useObservableRef, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  BASE_CONTAINERS_STYLES,
+  Button,
+  Container,
+  InputField,
+  SubmittingForm,
+  Translate,
+  useFocus,
+  useObservableRef,
+  useResource,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { createPath, throttleAsync } from '@cloudbeaver/core-utils';
@@ -71,18 +81,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
-  const {
-    icon,
-    folder,
-    bigIcon,
-    viewBox,
-    value,
-    projectId,
-    selectProject,
-    objectName,
-    create,
-    confirmActionText,
-  } = payload;
+  const { icon, folder, bigIcon, viewBox, value, projectId, selectProject, objectName, create, confirmActionText } = payload;
   let { title } = payload;
 
   if (!title) {
@@ -95,51 +94,52 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
     title += ` ${translate(objectName)}`;
   }
 
-  const state = useObservableRef<IFolderDialogState>(() => ({
-    value,
-    projectId,
-    folder,
-    message: undefined,
-    valid: true,
-    validationInProgress: false,
-    validate: throttleAsync(async () => {
-      const { folder, value, projectId } = state;
-      state.message = undefined;
-      state.validationInProgress = true;
-      let valid: boolean | undefined;
-      try {
-        valid = await state.payload.validation?.(
-          { folder, name: value, projectId },
-          (message: string) => {
+  const state = useObservableRef<IFolderDialogState>(
+    () => ({
+      value,
+      projectId,
+      folder,
+      message: undefined,
+      valid: true,
+      validationInProgress: false,
+      validate: throttleAsync(async () => {
+        const { folder, value, projectId } = state;
+        state.message = undefined;
+        state.validationInProgress = true;
+        let valid: boolean | undefined;
+        try {
+          valid = await state.payload.validation?.({ folder, name: value, projectId }, (message: string) => {
             if (state.folder === folder && state.value === value && state.projectId === projectId) {
               state.setMessage(message);
             }
-          }
-        );
-      } catch {}
+          });
+        } catch {}
 
-      if (state.folder === folder && state.value === value && state.projectId === projectId) {
-        state.valid = valid ?? true;
-        state.validationInProgress = false;
-      }
-    }, 300),
-    setMessage(message) {
-      this.message = message;
+        if (state.folder === folder && state.value === value && state.projectId === projectId) {
+          state.valid = valid ?? true;
+          state.validationInProgress = false;
+        }
+      }, 300),
+      setMessage(message) {
+        this.message = message;
+      },
+      setProjectId(projectId) {
+        this.projectId = projectId;
+        this.folder = undefined;
+      },
+    }),
+    {
+      value: observable.ref,
+      projectId: observable.ref,
+      validationInProgress: observable.ref,
+      folder: observable.ref,
+      valid: observable.ref,
+      message: observable.ref,
     },
-    setProjectId(projectId) {
-      this.projectId = projectId;
-      this.folder = undefined;
+    {
+      payload,
     },
-  }), {
-    value: observable.ref,
-    projectId: observable.ref,
-    validationInProgress: observable.ref,
-    folder: observable.ref,
-    valid: observable.ref,
-    message: observable.ref,
-  }, {
-    payload,
-  });
+  );
 
   const projectInfoLoader = useResource(FolderDialog, ProjectInfoResource, state.projectId);
 
@@ -157,27 +157,18 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
   const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
   const subTitle = createPath(projectInfoLoader.data?.name ?? state.projectId, state.folder);
 
-  return styled(style, BASE_CONTAINERS_STYLES)(
-    <CommonDialogWrapper size='small' className={className} fixedWidth>
-      <CommonDialogHeader
-        subTitle={subTitle}
-        title={title}
-        icon={icon}
-        viewBox={viewBox}
-        bigIcon={bigIcon}
-        onReject={rejectDialog}
-      />
+  return styled(
+    style,
+    BASE_CONTAINERS_STYLES,
+  )(
+    <CommonDialogWrapper size="small" className={className} fixedWidth>
+      <CommonDialogHeader subTitle={subTitle} title={title} icon={icon} viewBox={viewBox} bigIcon={bigIcon} onReject={rejectDialog} />
       <CommonDialogBody>
         <SubmittingForm ref={focusedRef} onSubmit={resolveHandler}>
           <Container center gap>
-            {selectProject && (
-              <ProjectSelect
-                value={state.projectId}
-                onChange={projectId => state.setProjectId(projectId)}
-              />
-            )}
+            {selectProject && <ProjectSelect value={state.projectId} onChange={projectId => state.setProjectId(projectId)} />}
             <InputField
-              name='value'
+              name="value"
               state={state}
               error={!state.valid}
               description={errorMessage}
@@ -190,23 +181,14 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
         </SubmittingForm>
       </CommonDialogBody>
       <CommonDialogFooter>
-        <Button
-          type="button"
-          mod={['outlined']}
-          onClick={rejectDialog}
-        >
-          <Translate token='ui_processing_cancel' />
+        <Button type="button" mod={['outlined']} onClick={rejectDialog}>
+          <Translate token="ui_processing_cancel" />
         </Button>
         <fill />
-        <Button
-          type="button"
-          mod={['unelevated']}
-          disabled={!state.valid}
-          onClick={resolveHandler}
-        >
+        <Button type="button" mod={['unelevated']} disabled={!state.valid} onClick={resolveHandler}>
           <Translate token={confirmActionText || (create ? 'ui_create' : 'ui_rename')} />
         </Button>
       </CommonDialogFooter>
-    </CommonDialogWrapper>
+    </CommonDialogWrapper>,
   );
 });

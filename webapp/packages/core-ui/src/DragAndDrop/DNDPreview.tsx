@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { ConnectDragPreview, DragPreviewImage } from 'react-dnd';
 
@@ -17,6 +16,5 @@ interface Props {
 }
 
 export const DNDPreview = observer<Props>(function DNDPreview({ src, data }) {
-
-  return (<DragPreviewImage connect={data.setPreviewRef as ConnectDragPreview} src={src} />);
+  return <DragPreviewImage connect={data.setPreviewRef as ConnectDragPreview} src={src} />;
 });

@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { use } from 'reshadow';
 
-import { Checkbox, Icon, IconOrImage, Loader, Radio, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { Checkbox, Icon, IconOrImage, Loader, Radio, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { IMenuItem } from '../IMenuPanel';
@@ -20,10 +19,7 @@ interface MenuPanelItemProps {
   style?: ComponentStyle;
 }
 
-export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem({
-  menuItem,
-  style = [],
-}) {
+export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem({ menuItem, style = [] }) {
   const translate = useTranslate();
 
   const title = translate(menuItem.title);
@@ -37,20 +33,11 @@ export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem
 
   return styled(useStyles(menuPanelStyles, style))(
     <menu-panel-item {...use({ separator: menuItem.separator })}>
+      <menu-item-content>{menuItem.icon ? <IconOrImage icon={menuItem.icon} /> : control}</menu-item-content>
+      <menu-item-text title={title}>{title}</menu-item-text>
       <menu-item-content>
-        {menuItem.icon ? (
-          <IconOrImage icon={menuItem.icon} />
-        ) : control}
+        {menuItem.panel && (menuItem.isProcessing ? <Loader small fullSize /> : <Icon name="arrow" viewBox="0 0 16 16" />)}
       </menu-item-content>
-      <menu-item-text title={title}>
-        {title}
-      </menu-item-text>
-      <menu-item-content>
-        {menuItem.panel && (
-          menuItem.isProcessing ? <Loader small fullSize /> : <Icon name="arrow" viewBox="0 0 16 16" />
-        )}
-      </menu-item-content>
-    </menu-panel-item>
-
+    </menu-panel-item>,
   );
 });

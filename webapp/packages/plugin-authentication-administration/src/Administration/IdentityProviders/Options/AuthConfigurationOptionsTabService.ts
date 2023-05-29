@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React from 'react';
 
 import { AuthConfigurationsResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
@@ -16,7 +15,11 @@ import { getUniqueName } from '@cloudbeaver/core-utils';
 
 import { AuthConfigurationFormService } from '../AuthConfigurationFormService';
 import { authConfigurationContext } from '../Contexts/authConfigurationContext';
-import type { IAuthConfigurationFormFillConfigData, IAuthConfigurationFormState, IAuthConfigurationFormSubmitData } from '../IAuthConfigurationFormProps';
+import type {
+  IAuthConfigurationFormFillConfigData,
+  IAuthConfigurationFormState,
+  IAuthConfigurationFormSubmitData,
+} from '../IAuthConfigurationFormProps';
 
 const AuthConfigurationOptions = React.lazy(async () => {
   const { AuthConfigurationOptions } = await import('./AuthConfigurationOptions');
@@ -41,27 +44,18 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
       panel: () => AuthConfigurationOptions,
     });
 
-    this.authConfigurationFormService.prepareConfigTask
-      .addHandler(this.prepareConfig.bind(this));
+    this.authConfigurationFormService.prepareConfigTask.addHandler(this.prepareConfig.bind(this));
 
-    this.authConfigurationFormService.formValidationTask
-      .addHandler(this.validate.bind(this));
+    this.authConfigurationFormService.formValidationTask.addHandler(this.validate.bind(this));
 
-    this.authConfigurationFormService.formSubmittingTask
-      .addHandler(this.save.bind(this));
+    this.authConfigurationFormService.formSubmittingTask.addHandler(this.save.bind(this));
 
-    this.authConfigurationFormService.fillConfigTask
-      .addHandler(this.fillConfig.bind(this));
+    this.authConfigurationFormService.fillConfigTask.addHandler(this.fillConfig.bind(this));
   }
 
-  load(): void { }
+  load(): void {}
 
-  private async prepareConfig(
-    {
-      state,
-    }: IAuthConfigurationFormSubmitData,
-    contexts: IExecutionContextProvider<IAuthConfigurationFormSubmitData>
-  ) {
+  private async prepareConfig({ state }: IAuthConfigurationFormSubmitData, contexts: IExecutionContextProvider<IAuthConfigurationFormSubmitData>) {
     const config = contexts.getContext(authConfigurationContext);
 
     config.id = state.config.id;
@@ -87,12 +81,7 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
     }
   }
 
-  private async validate(
-    {
-      state,
-    }: IAuthConfigurationFormSubmitData,
-    contexts: IExecutionContextProvider<IAuthConfigurationFormSubmitData>
-  ) {
+  private async validate({ state }: IAuthConfigurationFormSubmitData, contexts: IExecutionContextProvider<IAuthConfigurationFormSubmitData>) {
     const validation = contexts.getContext(this.authConfigurationFormService.configurationValidationContext);
 
     if (!state.config.displayName.trim()) {
@@ -114,12 +103,7 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
     }
   }
 
-  private async save(
-    {
-      state,
-    }: IAuthConfigurationFormSubmitData,
-    contexts: IExecutionContextProvider<IAuthConfigurationFormSubmitData>
-  ) {
+  private async save({ state }: IAuthConfigurationFormSubmitData, contexts: IExecutionContextProvider<IAuthConfigurationFormSubmitData>) {
     const status = contexts.getContext(this.authConfigurationFormService.configurationStatusContext);
     const config = contexts.getContext(authConfigurationContext);
 
@@ -149,7 +133,7 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
 
   private async fillConfig(
     { state, updated }: IAuthConfigurationFormFillConfigData,
-    contexts: IExecutionContextProvider<IAuthConfigurationFormFillConfigData>
+    contexts: IExecutionContextProvider<IAuthConfigurationFormFillConfigData>,
   ) {
     if (!updated) {
       return;

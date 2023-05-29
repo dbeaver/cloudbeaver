@@ -5,12 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useObjectRef } from './useObjectRef';
 
-export function useCombinedHandler<T extends any[]>(
-  ...handlers: Array<((...args: T) => any) | undefined>
-): (...args: T) => void  {
+export function useCombinedHandler<T extends any[]>(...handlers: Array<((...args: T) => any) | undefined>): (...args: T) => void {
   const optionsRef = useObjectRef({ handlers });
   const state = useObjectRef(
     () => ({

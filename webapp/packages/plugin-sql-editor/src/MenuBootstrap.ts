@@ -5,9 +5,17 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ActionService, KeyBindingService, IAction, IDataContextProvider, ACTION_UNDO, ACTION_REDO, KEY_BINDING_UNDO, KEY_BINDING_REDO } from '@cloudbeaver/core-view';
+import {
+  ACTION_REDO,
+  ACTION_UNDO,
+  ActionService,
+  IAction,
+  IDataContextProvider,
+  KEY_BINDING_REDO,
+  KEY_BINDING_UNDO,
+  KeyBindingService,
+} from '@cloudbeaver/core-view';
 
 import { ACTION_SQL_EDITOR_EXECUTE } from './actions/ACTION_SQL_EDITOR_EXECUTE';
 import { ACTION_SQL_EDITOR_EXECUTE_NEW } from './actions/ACTION_SQL_EDITOR_EXECUTE_NEW';
@@ -24,10 +32,7 @@ import { DATA_CONTEXT_SQL_EDITOR_DATA } from './SqlEditor/DATA_CONTEXT_SQL_EDITO
 
 @injectable()
 export class MenuBootstrap extends Bootstrap {
-  constructor(
-    private readonly actionService: ActionService,
-    private readonly keyBindingService: KeyBindingService,
-  ) {
+  constructor(private readonly actionService: ActionService, private readonly keyBindingService: KeyBindingService) {
     super();
   }
 
@@ -41,47 +46,38 @@ export class MenuBootstrap extends Bootstrap {
           return false;
         }
 
-        if (
-          sqlEditorData.readonly
-          && [ACTION_SQL_EDITOR_FORMAT, ACTION_REDO, ACTION_UNDO].includes(action)
-        ) {
+        if (sqlEditorData.readonly && [ACTION_SQL_EDITOR_FORMAT, ACTION_REDO, ACTION_UNDO].includes(action)) {
           return false;
         }
 
         if (
-          !sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.executable)
-          && [
-            ACTION_SQL_EDITOR_EXECUTE,
-            ACTION_SQL_EDITOR_EXECUTE_NEW,
-            ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
-            ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
-          ].includes(action)
-        ) {
-          return false;
-        }
-
-        if (
-          !sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.query)
-          && [
-            ACTION_SQL_EDITOR_EXECUTE,
-            ACTION_SQL_EDITOR_EXECUTE_NEW,
-            ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
-          ].includes(action)
-        ) {
-          return false;
-        }
-
-        return (
+          !sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) &&
           [
             ACTION_SQL_EDITOR_EXECUTE,
             ACTION_SQL_EDITOR_EXECUTE_NEW,
             ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
-            ACTION_SQL_EDITOR_FORMAT,
-            ACTION_REDO,
-            ACTION_UNDO,
             ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
           ].includes(action)
-        );
+        ) {
+          return false;
+        }
+
+        if (
+          !sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.query) &&
+          [ACTION_SQL_EDITOR_EXECUTE, ACTION_SQL_EDITOR_EXECUTE_NEW, ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN].includes(action)
+        ) {
+          return false;
+        }
+
+        return [
+          ACTION_SQL_EDITOR_EXECUTE,
+          ACTION_SQL_EDITOR_EXECUTE_NEW,
+          ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
+          ACTION_SQL_EDITOR_FORMAT,
+          ACTION_REDO,
+          ACTION_UNDO,
+          ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+        ].includes(action);
       },
       isDisabled: (context, action) => !context.has(DATA_CONTEXT_SQL_EDITOR_DATA),
       handler: this.sqlEditorActionHandler.bind(this),
@@ -106,10 +102,7 @@ export class MenuBootstrap extends Bootstrap {
       binding: KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT,
       isBindingApplicable: (contexts, action) => {
         const sqlEditorData = contexts.tryGet(DATA_CONTEXT_SQL_EDITOR_DATA);
-        return (
-          action === ACTION_SQL_EDITOR_EXECUTE_SCRIPT
-          && sqlEditorData?.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) === true
-        );
+        return action === ACTION_SQL_EDITOR_EXECUTE_SCRIPT && sqlEditorData?.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) === true;
       },
       handler: this.sqlEditorActionHandler.bind(this),
     });
@@ -190,5 +183,5 @@ export class MenuBootstrap extends Bootstrap {
     }
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 }

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 
 import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
@@ -16,7 +15,7 @@ import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-exec
 import { ProjectInfo, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-import { ConnectionInfoResource, Connection, createConnectionParam, isConnectionInfoParamEqual } from './ConnectionInfoResource';
+import { Connection, ConnectionInfoResource, createConnectionParam, isConnectionInfoParamEqual } from './ConnectionInfoResource';
 import { ContainerResource, IStructContainers, ObjectContainer } from './ContainerResource';
 import type { IConnectionInfoParams } from './IConnectionsResource';
 
@@ -28,13 +27,10 @@ export interface IConnectionExecutorData {
 @injectable()
 export class ConnectionsManagerService {
   get projectConnections(): Connection[] {
-    return this.connectionInfo.values
-      .filter(connection => this.projectsService.activeProjects.some(project => project.id === connection.projectId));
+    return this.connectionInfo.values.filter(connection => this.projectsService.activeProjects.some(project => project.id === connection.projectId));
   }
   get createConnectionProjects(): ProjectInfo[] {
-    return this.projectsService.activeProjects
-      .filter(project => project.canEditDataSources)
-      .sort(projectInfoSortByName);
+    return this.projectsService.activeProjects.filter(project => project.canEditDataSources).sort(projectInfoSortByName);
   }
   readonly connectionExecutor: IExecutor<IConnectionInfoParams>;
   readonly onDisconnect: IExecutor<IConnectionExecutorData>;
@@ -83,11 +79,7 @@ export class ConnectionsManagerService {
     this.connectionInfo.add(connection);
   }
 
-  getObjectContainerById(
-    connectionKey: IConnectionInfoParams,
-    objectCatalogId?: string,
-    objectSchemaId?: string
-  ): ObjectContainer | undefined {
+  getObjectContainerById(connectionKey: IConnectionInfoParams, objectCatalogId?: string, objectSchemaId?: string): ObjectContainer | undefined {
     if (objectCatalogId) {
       const objectContainers = this.containerContainers.getCatalogData(connectionKey, objectCatalogId);
 
@@ -99,9 +91,7 @@ export class ConnectionsManagerService {
         return objectContainers.catalog;
       }
 
-      return objectContainers.schemaList.find(
-        objectContainer => objectContainer.name === objectSchemaId
-      );
+      return objectContainers.schemaList.find(objectContainer => objectContainer.name === objectSchemaId);
     }
 
     if (objectSchemaId) {
@@ -153,7 +143,7 @@ export class ConnectionsManagerService {
 
   connectionContext() {
     return {
-      connection: null as (Connection | null),
+      connection: null as Connection | null,
     };
   }
 

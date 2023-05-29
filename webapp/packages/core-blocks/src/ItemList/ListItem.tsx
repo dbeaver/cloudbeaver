@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useContext } from 'react';
 import styled from 'reshadow';
 
@@ -17,16 +16,12 @@ interface Props {
   className?: string;
 }
 
-export const ListItem: React.FC<React.PropsWithChildren<Props>> = function ListItem({
-  children,
-  onClick,
-  className,
-}) {
+export const ListItem: React.FC<React.PropsWithChildren<Props>> = function ListItem({ children, onClick, className }) {
   const styles = useContext(Styles);
 
   return styled(useStyles(styles))(
     <list-item as="div" className={className} onClick={onClick}>
       {children}
-    </list-item>
+    </list-item>,
   );
 };

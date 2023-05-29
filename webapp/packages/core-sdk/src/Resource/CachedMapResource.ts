@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, makeObservable } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
@@ -20,29 +19,14 @@ import { ResourceKeyListAlias, resourceKeyListAlias } from './ResourceKeyListAli
 import { ResourceKeyUtils } from './ResourceKeyUtils';
 
 export type CachedMapResourceKey<TResource> = CachedResourceKey<TResource>;
-export type CachedMapResourceValue<TResource> = TResource extends CachedResource<Map<any, infer T>, any, any, any, any>
-  ? T
-  : never;
-export type CachedMapResourceArguments<TResource> = TResource extends CachedMapResource<any, any, infer T, any>
-  ? T
-  : never;
+export type CachedMapResourceValue<TResource> = TResource extends CachedResource<Map<any, infer T>, any, any, any, any> ? T : never;
+export type CachedMapResourceArguments<TResource> = TResource extends CachedMapResource<any, any, infer T, any> ? T : never;
 
-export type CachedMapResourceListGetter<
-  TValue,
-  TIncludes
-> = Array<CachedMapResourceGetter<TValue, TIncludes>>;
+export type CachedMapResourceListGetter<TValue, TIncludes> = Array<CachedMapResourceGetter<TValue, TIncludes>>;
 
-export type CachedMapResourceGetter<
-  TValue,
-  TIncludes
-> = CachedResourceValueIncludes<TValue, TIncludes> | undefined;
+export type CachedMapResourceGetter<TValue, TIncludes> = CachedResourceValueIncludes<TValue, TIncludes> | undefined;
 
-export type CachedMapResourceLoader<
-  TRealKey,
-  TKey,
-  TValue,
-  TIncludes
-> = TRealKey extends ResourceKeyList<TKey>
+export type CachedMapResourceLoader<TRealKey, TKey, TValue, TIncludes> = TRealKey extends ResourceKeyList<TKey>
   ? Array<CachedResourceValueIncludes<TValue, TIncludes>>
   : CachedResourceValueIncludes<TValue, TIncludes>;
 
@@ -54,13 +38,7 @@ export abstract class CachedMapResource<
   TValue,
   TContext extends Record<string, any> = Record<string, never>,
   TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata,
-> extends CachedResource<
-  Map<TKey, TValue>,
-  TValue,
-  TKey,
-  CachedResourceIncludeArgs<TValue, TContext>,
-  TMetadata
-  > {
+> extends CachedResource<Map<TKey, TValue>, TValue, TKey, CachedResourceIncludeArgs<TValue, TContext>, TMetadata> {
   readonly onItemUpdate: ISyncExecutor<ResourceKeySimple<TKey>>;
   readonly onItemDelete: ISyncExecutor<ResourceKeySimple<TKey>>;
 
@@ -72,10 +50,7 @@ export abstract class CachedMapResource<
     return Array.from(this.data.keys());
   }
 
-  constructor(
-    defaultValue?: () => Map<TKey, TValue>,
-    defaultIncludes?: CachedResourceIncludeArgs<TValue, TContext>
-  ) {
+  constructor(defaultValue?: () => Map<TKey, TValue>, defaultIncludes?: CachedResourceIncludeArgs<TValue, TContext>) {
     super(CachedMapAllKey, defaultValue || (() => new Map()), defaultIncludes);
     this.onItemUpdate = new SyncExecutor<ResourceKeySimple<TKey>>(null);
     this.onItemDelete = new SyncExecutor<ResourceKeySimple<TKey>>(null);
@@ -97,10 +72,7 @@ export abstract class CachedMapResource<
     });
   }
 
-  deleteInResource<T = TKey>(
-    resource: CachedMapResource<T, any, any>,
-    map?: (key: ResourceKey<TKey>) => ResourceKey<T>
-  ): this {
+  deleteInResource<T = TKey>(resource: CachedMapResource<T, any, any>, map?: (key: ResourceKey<TKey>) => ResourceKey<T>): this {
     this.onItemDelete.addHandler(param => {
       try {
         if (this.logActivity) {
@@ -123,10 +95,7 @@ export abstract class CachedMapResource<
   }
 
   has(key: ResourceKey<TKey>): boolean {
-    if (
-      this.isAlias(key)
-       && (!this.hasMetadata(key) || this.isLoaded(key))
-    ) {
+    if (this.isAlias(key) && (!this.hasMetadata(key) || this.isLoaded(key))) {
       return false;
     }
 
@@ -188,19 +157,19 @@ export abstract class CachedMapResource<
 
   async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: TKey | ResourceKeyAlias<TKey, any>,
-    includes?: T
+    includes?: T,
   ): Promise<CachedResourceValueIncludes<TValue, T>>;
   async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKeyList<TKey> | ResourceKeyListAlias<TKey, any> | void,
-    includes?: T
+    includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>>>;
   async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<TKey>,
-    includes?: T
+    includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>>;
   async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKey<TKey> | void,
-    includes?: T
+    includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
     if (key === undefined) {
       key = CachedMapAllKey;
@@ -211,19 +180,19 @@ export abstract class CachedMapResource<
 
   async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: TKey | ResourceKeyAlias<TKey, any>,
-    includes?: T
+    includes?: T,
   ): Promise<CachedResourceValueIncludes<TValue, T>>;
   async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKeyList<TKey> | ResourceKeyListAlias<TKey, any> | void,
-    includes?: T
+    includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>>>;
   async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<TKey>,
-    includes?: T
+    includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>>;
   async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKey<TKey> | void,
-    includes?: T
+    includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
     if (key === undefined) {
       key = CachedMapAllKey;
@@ -287,15 +256,11 @@ export abstract class CachedMapResource<
   }
 }
 
-export function getCachedMapResourceLoaderState<
-  TKey,
-  TValue,
-  TContext extends Record<string, any> = Record<string, never>
->(
+export function getCachedMapResourceLoaderState<TKey, TValue, TContext extends Record<string, any> = Record<string, never>>(
   resource: CachedMapResource<TKey, TValue, TContext>,
   key: ResourceKey<TKey>,
   includes?: CachedResourceIncludeArgs<TValue, TContext> | undefined,
-  lazy?: boolean
+  lazy?: boolean,
 ): ILoadableState {
   return {
     lazy,

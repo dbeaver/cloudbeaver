@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
@@ -65,146 +64,149 @@ const styles = css`
     & Tab {
       border-bottom: 0;
 
-      &:global([aria-selected="false"]) {
+      &:global([aria-selected='false']) {
         border-bottom: 0 !important;
       }
     }
   }
 `;
 
-export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(function TextValuePresentation({
-  model,
-  resultIndex,
-}) {
-  const translate = useTranslate();
-  const notificationService = useService(NotificationService);
-  const quotasService = useService(QuotasService);
-  const textValuePresentationService = useService(TextValuePresentationService);
-  const style = useStyles(styles, BASE_CONTAINERS_STYLES, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
+export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
+  function TextValuePresentation({ model, resultIndex }) {
+    const translate = useTranslate();
+    const notificationService = useService(NotificationService);
+    const quotasService = useService(QuotasService);
+    const textValuePresentationService = useService(TextValuePresentationService);
+    const style = useStyles(styles, BASE_CONTAINERS_STYLES, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
 
-  const state = useObservableRef(() => ({
-    currentContentType: 'text/plain',
-    lastContentType: 'text/plain',
+    const state = useObservableRef(
+      () => ({
+        currentContentType: 'text/plain',
+        lastContentType: 'text/plain',
 
-    setContentType(type: string) {
-      this.currentContentType = type;
-    },
-    setDefaultContentType(type: string) {
-      this.currentContentType = type;
-      this.lastContentType = type;
-    },
-  }), {
-    currentContentType: observable.ref,
-    lastContentType: observable.ref,
-  }, false, ['setContentType', 'setDefaultContentType']);
+        setContentType(type: string) {
+          this.currentContentType = type;
+        },
+        setDefaultContentType(type: string) {
+          this.currentContentType = type;
+          this.lastContentType = type;
+        },
+      }),
+      {
+        currentContentType: observable.ref,
+        lastContentType: observable.ref,
+      },
+      false,
+      ['setContentType', 'setDefaultContentType'],
+    );
 
-  const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
-  const editor = model.source.getAction(resultIndex, ResultSetEditAction);
-  const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
+    const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
+    const editor = model.source.getAction(resultIndex, ResultSetEditAction);
+    const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
 
-  const focusCell = selection.getFocusedElement();
+    const focusCell = selection.getFocusedElement();
 
-  let stringValue = '';
-  let contentType = 'text/plain';
-  let firstSelectedCell: IResultSetElementKey | undefined;
-  let readonly = true;
-  let valueTruncated = false;
-  let limit: string | undefined;
-  let valueSize: string | undefined;
+    let stringValue = '';
+    let contentType = 'text/plain';
+    let firstSelectedCell: IResultSetElementKey | undefined;
+    let readonly = true;
+    let valueTruncated = false;
+    let limit: string | undefined;
+    let valueSize: string | undefined;
 
-  if (selection.elements.length > 0 || focusCell) {
-    const view = model.source.getAction(resultIndex, ResultSetViewAction);
-    const format = model.source.getAction(resultIndex, ResultSetFormatAction);
+    if (selection.elements.length > 0 || focusCell) {
+      const view = model.source.getAction(resultIndex, ResultSetViewAction);
+      const format = model.source.getAction(resultIndex, ResultSetFormatAction);
 
-    firstSelectedCell = selection.elements[0] || focusCell;
+      firstSelectedCell = selection.elements[0] || focusCell;
 
-    const value = view.getCellValue(firstSelectedCell) ?? '';
+      const value = view.getCellValue(firstSelectedCell) ?? '';
 
-    stringValue = format.getText(value) ?? '';
-    readonly = format.isReadOnly(firstSelectedCell);
+      stringValue = format.getText(value) ?? '';
+      readonly = format.isReadOnly(firstSelectedCell);
 
+      if (isResultSetContentValue(value)) {
+        valueTruncated = content.isContentTruncated(value);
 
-    if (isResultSetContentValue(value)) {
-      valueTruncated = content.isContentTruncated(value);
-
-      if (valueTruncated) {
-        limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
-        valueSize = bytesToSize(value.contentLength ?? 0);
-      }
-
-      if (value.contentType) {
-        contentType = value.contentType;
-
-        if (contentType === 'text/json') {
-          contentType = 'application/json';
+        if (valueTruncated) {
+          limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
+          valueSize = bytesToSize(value.contentLength ?? 0);
         }
 
-        if (!textValuePresentationService.tabs.has(contentType)) {
-          contentType = 'text/plain';
+        if (value.contentType) {
+          contentType = value.contentType;
+
+          if (contentType === 'text/json') {
+            contentType = 'application/json';
+          }
+
+          if (!textValuePresentationService.tabs.has(contentType)) {
+            contentType = 'text/plain';
+          }
         }
       }
     }
-  }
 
-  readonly = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || readonly;
+    readonly = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || readonly;
 
-  if (contentType !== state.lastContentType) {
-    state.setDefaultContentType(contentType);
-  }
-
-  const formatter = useAutoFormat();
-
-  function handleChange(newValue: string) {
-    if (firstSelectedCell && !readonly) {
-      editor.set(firstSelectedCell, newValue);
-    }
-  }
-
-  async function save() {
-    if (!firstSelectedCell) {
-      return;
+    if (contentType !== state.lastContentType) {
+      state.setDefaultContentType(contentType);
     }
 
-    try {
-      await content.downloadFileData(firstSelectedCell);
-    } catch (exception) {
-      notificationService.logException(exception as any, 'data_viewer_presentation_value_content_download_error');
+    const formatter = useAutoFormat();
+
+    function handleChange(newValue: string) {
+      if (firstSelectedCell && !readonly) {
+        editor.set(firstSelectedCell, newValue);
+      }
     }
-  }
 
-  const autoFormat = !!firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
-  const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
-  const typeExtension = useMemo(() => getTypeExtension(state.currentContentType) ?? [], [state.currentContentType]);
+    async function save() {
+      if (!firstSelectedCell) {
+        return;
+      }
 
-  const value = autoFormat ? formatter.format(state.currentContentType, stringValue) : stringValue;
+      try {
+        await content.downloadFileData(firstSelectedCell);
+      } catch (exception) {
+        notificationService.logException(exception as any, 'data_viewer_presentation_value_content_download_error');
+      }
+    }
 
-  return styled(style)(
-    <container>
-      <actions>
-        <TabsState
-          container={textValuePresentationService.tabs}
-          currentTabId={state.currentContentType}
-          lazy
-          onChange={tab => state.setContentType(tab.tabId)}
-        >
-          <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
-        </TabsState>
-      </actions>
-      <EditorLoader
-        key={readonly ? '1' : '0'}
-        value={value}
-        readonly={readonly}
-        extensions={[typeExtension]}
-        onChange={value => handleChange(value)}
-      />
-      {valueTruncated && <QuotaPlaceholder limit={limit} size={valueSize} />}
-      {canSave && (
-        <tools-container>
-          <Button disabled={model.isLoading()} onClick={save}>
-            {translate('ui_download')}
-          </Button>
-        </tools-container>
-      )}
-    </container>
-  );
-});
+    const autoFormat = !!firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
+    const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
+    const typeExtension = useMemo(() => getTypeExtension(state.currentContentType) ?? [], [state.currentContentType]);
+
+    const value = autoFormat ? formatter.format(state.currentContentType, stringValue) : stringValue;
+
+    return styled(style)(
+      <container>
+        <actions>
+          <TabsState
+            container={textValuePresentationService.tabs}
+            currentTabId={state.currentContentType}
+            lazy
+            onChange={tab => state.setContentType(tab.tabId)}
+          >
+            <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
+          </TabsState>
+        </actions>
+        <EditorLoader
+          key={readonly ? '1' : '0'}
+          value={value}
+          readonly={readonly}
+          extensions={[typeExtension]}
+          onChange={value => handleChange(value)}
+        />
+        {valueTruncated && <QuotaPlaceholder limit={limit} size={valueSize} />}
+        {canSave && (
+          <tools-container>
+            <Button disabled={model.isLoading()} onClick={save}>
+              {translate('ui_download')}
+            </Button>
+          </tools-container>
+        )}
+      </container>,
+    );
+  },
+);

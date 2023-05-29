@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable, observable } from 'mobx';
 
 import type { DataContextGetter } from './DataContextGetter';
@@ -60,11 +59,11 @@ export class DynamicDataContext implements IDataContext {
     return this.fallback.has(context);
   }
 
-  get <T>(context: DataContextGetter<T>): T {
+  get<T>(context: DataContextGetter<T>): T {
     return this.fallback.get(context);
   }
 
-  hasValue <T>(context: DataContextGetter<T>, value: T): boolean {
+  hasValue<T>(context: DataContextGetter<T>, value: T): boolean {
     return this.fallback.hasValue(context, value);
   }
 
@@ -72,7 +71,7 @@ export class DynamicDataContext implements IDataContext {
     return this.fallback.find(context, predicate);
   }
 
-  tryGet <T>(context: DataContextGetter<T>): T | undefined {
+  tryGet<T>(context: DataContextGetter<T>): T | undefined {
     return this.fallback.tryGet(context);
   }
 

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { MenuItem, MenuItemCheckbox, MenuItemRadio } from 'reakit/Menu';
@@ -20,12 +19,7 @@ interface IMenuActionElementProps extends IContextMenuItemProps {
   item: IMenuActionItem;
 }
 
-export const MenuActionElement = observer<IMenuActionElementProps>(function MenuActionElement({
-  item,
-  menu,
-  style,
-  onClick,
-}) {
+export const MenuActionElement = observer<IMenuActionElementProps>(function MenuActionElement({ item, menu, style, onClick }) {
   const styles = useStyles(menuPanelStyles, style);
   const actionInfo = item.action.actionInfo;
   const loading = item.action.isLoading();
@@ -56,7 +50,7 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
           loading={loading}
           style={style}
         />
-      </MenuItemRadio>
+      </MenuItemRadio>,
     );
   }
 
@@ -81,19 +75,12 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
           loading={loading}
           style={style}
         />
-      </MenuItemCheckbox>
+      </MenuItemCheckbox>,
     );
   }
 
   return styled(styles)(
-    <MenuItem
-      {...menu}
-      {...use({ hidden: item.hidden })}
-      id={item.id}
-      aria-label={actionInfo.label}
-      disabled={item.disabled}
-      onClick={handleClick}
-    >
+    <MenuItem {...menu} {...use({ hidden: item.hidden })} id={item.id} aria-label={actionInfo.label} disabled={item.disabled} onClick={handleClick}>
       <MenuItemElement
         label={actionInfo.label}
         icon={actionInfo.icon}
@@ -102,6 +89,6 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
         loading={loading}
         style={style}
       />
-    </MenuItem>
+    </MenuItem>,
   );
 });

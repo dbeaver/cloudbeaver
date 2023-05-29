@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Button, ButtonProps } from 'reakit/Button';
 import styled, { css } from 'reshadow';
 
@@ -27,7 +26,8 @@ const styles = css`
     height: 16px;
     width: 16px;
 
-    & Icon, & StaticImage {
+    & Icon,
+    & StaticImage {
       width: 100%;
       height: 100%;
     }
@@ -46,6 +46,6 @@ export function IconButton({ name, img, viewBox, style, ...rest }: Props & Butto
     <Button {...rest}>
       {img && <StaticImage icon={name} />}
       {!img && <Icon name={name} viewBox={viewBox} />}
-    </Button>
+    </Button>,
   );
 }

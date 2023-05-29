@@ -5,27 +5,24 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { Tab } from '@cloudbeaver/core-ui';
 
-
 interface Props {
   className?: string;
   style?: ComponentStyle;
 }
 
-export const UserAuthProvidersTab = observer<Props>(function UserAuthProvidersTab({
-  className,
-  style,
-}) {
+export const UserAuthProvidersTab = observer<Props>(function UserAuthProvidersTab({ className, style }) {
   const translate = useTranslate();
   const styles = useStyles(style);
 
   return styled(styles)(
-    <Tab tabId='auth-providers' style={style} className={className}>{translate('plugin_user_profile_auth_providers')}</Tab>
+    <Tab tabId="auth-providers" style={style} className={className}>
+      {translate('plugin_user_profile_auth_providers')}
+    </Tab>,
   );
 });

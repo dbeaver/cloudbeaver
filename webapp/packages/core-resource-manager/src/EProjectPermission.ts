@@ -10,5 +10,5 @@ export enum EProjectPermission {
   ConnectionRead = 'project-datasource-view',
   ConnectionEdit = 'project-datasource-edit',
   ResourceRead = 'project-resource-view',
-  ResourceEdit = 'project-resource-edit'
+  ResourceEdit = 'project-resource-edit',
 }

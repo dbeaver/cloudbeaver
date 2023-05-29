@@ -5,20 +5,17 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, GroupTitle, Switch, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Group, GroupTitle, Switch, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 
 interface Props {
   serverConfig: ServerConfigInput;
 }
 
-export const ServerConfigurationSecurityForm = observer<Props>(function ServerConfigurationSecurityForm({
-  serverConfig,
-}) {
+export const ServerConfigurationSecurityForm = observer<Props>(function ServerConfigurationSecurityForm({ serverConfig }) {
   const translate = useTranslate();
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <Group form gap>
@@ -44,6 +41,6 @@ export const ServerConfigurationSecurityForm = observer<Props>(function ServerCo
       >
         {translate('administration_configuration_wizard_configuration_security_public_credentials')}
       </Switch>
-    </Group>
+    </Group>,
   );
 });

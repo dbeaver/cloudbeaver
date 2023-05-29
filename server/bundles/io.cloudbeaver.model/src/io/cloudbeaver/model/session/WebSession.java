@@ -73,6 +73,7 @@ import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -147,12 +148,12 @@ public class WebSession extends BaseWebSession
 
     @Property
     public String getCreateTime() {
-        return CBModelConstants.ISO_DATE_FORMAT.format(createTime);
+        return CBModelConstants.ISO_DATE_FORMAT.format(Instant.ofEpochMilli(createTime));
     }
 
     @Property
     public synchronized String getLastAccessTime() {
-        return CBModelConstants.ISO_DATE_FORMAT.format(lastAccessTime);
+        return CBModelConstants.ISO_DATE_FORMAT.format(Instant.ofEpochMilli(lastAccessTime));
     }
 
     public String getLastRemoteAddr() {

@@ -5,21 +5,27 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { GlobalConstants, clsx } from '@cloudbeaver/core-utils';
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
-import { foldGutter, indentOnInput, syntaxHighlighting, bracketMatching } from '@codemirror/language';
+import { bracketMatching, foldGutter, indentOnInput, syntaxHighlighting } from '@codemirror/language';
 import { highlightSelectionMatches } from '@codemirror/search';
 import type { Extension } from '@codemirror/state';
-import { lineNumbers, highlightSpecialChars, dropCursor, rectangularSelection, crosshairCursor, keymap, highlightActiveLineGutter, highlightActiveLine } from '@codemirror/view';
+import {
+  crosshairCursor,
+  dropCursor,
+  highlightActiveLine,
+  highlightActiveLineGutter,
+  highlightSpecialChars,
+  keymap,
+  lineNumbers,
+  rectangularSelection,
+  tooltips,
+} from '@codemirror/view';
 import { classHighlighter } from '@lezer/highlight';
 
+import { clsx, GlobalConstants } from '@cloudbeaver/core-utils';
+
 // @TODO allow to configure bindings outside of the component
-const DEFAULT_KEY_MAP = defaultKeymap
-  .filter(binding => (
-    binding.mac !== 'Ctrl-f'
-    && binding.key !== 'Mod-Enter'
-  ));
+const DEFAULT_KEY_MAP = defaultKeymap.filter(binding => binding.mac !== 'Ctrl-f' && binding.key !== 'Mod-Enter');
 
 DEFAULT_KEY_MAP.push(indentWithTab);
 
@@ -30,6 +36,9 @@ export interface IDefaultExtensions {
 /** Provides the necessary extensions to establish a basic editor */
 export function getDefaultExtensions(options?: IDefaultExtensions): Record<string, Extension> {
   let extensions: Record<string, Extension> = {
+    tooltips: tooltips({
+      parent: document.body,
+    }),
     highlightSpecialChars: highlightSpecialChars(),
     highlightSelectionMatches: highlightSelectionMatches(),
     syntaxHighlighting: syntaxHighlighting(classHighlighter),

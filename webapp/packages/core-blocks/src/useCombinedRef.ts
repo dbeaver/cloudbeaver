@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useCallback } from 'react';
 
 export function useCombinedRef<T>(...refs: React.ForwardedRef<T>[]) {

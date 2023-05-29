@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import type { CbConfigEvent as IServerConfigEvent } from '@cloudbeaver/core-sdk';
 
@@ -16,9 +15,7 @@ export { type IServerConfigEvent };
 
 @injectable()
 export class ServerConfigEventHandler extends TopicEventHandler<IServerConfigEvent, ISessionEvent> {
-  constructor(
-    sessionEventSource: SessionEventSource
-  ) {
+  constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbConfig, sessionEventSource);
   }
 

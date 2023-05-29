@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, makeObservable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
@@ -16,8 +15,7 @@ import type { IDatabaseDataModel, IRequestEventData } from './IDatabaseDataModel
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
-export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult>
-implements IDatabaseDataModel<TOptions, TResult> {
+export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult> implements IDatabaseDataModel<TOptions, TResult> {
   id: string;
   name: string | null;
   source: IDatabaseDataSource<TOptions, TResult>;
@@ -147,18 +145,12 @@ implements IDatabaseDataModel<TOptions, TResult> {
   }
 
   async reload(): Promise<void> {
-    await this.requestDataAction(() => this.source
-      .setSlice(0, this.countGain)
-      .requestData()
-    );
+    await this.requestDataAction(() => this.source.setSlice(0, this.countGain).requestData());
   }
 
   async requestDataPortion(offset: number, count: number): Promise<void> {
     if (!this.isDataAvailable(offset, count)) {
-      await this.requestDataAction(() => this.source
-        .setSlice(offset, count)
-        .requestData()
-      );
+      await this.requestDataAction(() => this.source.setSlice(offset, count).requestData());
     }
   }
 

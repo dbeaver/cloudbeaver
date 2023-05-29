@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
@@ -24,12 +23,12 @@ export const AuthenticationPanel = observer<Props>(function AuthenticationPanel(
   const styles = useStyles(BASE_TAB_STYLES, style, BASE_CONTAINERS_STYLES);
 
   return styled(styles)(
-    <TabPanel tabId='authentication' className={className}>
+    <TabPanel tabId="authentication" className={className}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
           <ChangePassword />
         </Container>
       </ColoredContainer>
-    </TabPanel>
+    </TabPanel>,
   );
 });

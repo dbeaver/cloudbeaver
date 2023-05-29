@@ -231,19 +231,23 @@ public class WebServiceUtils extends WebCommonUtils {
                 authProperties = new LinkedHashMap<>();
             }
             authProperties.replace(AuthModelDatabaseNativeCredentials.PROP_USER_PASSWORD, null);
+            dataSourceContainer.resetPassword();
         } else {
             if (authProperties == null) {
                 // No changes
                 return;
             }
         }
-        if (!saveCredentials) {
-            configuration.setUserPassword(null);
-        }
         {
             // Read save credentials
             DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
 
+            var currentAuthProps = new HashMap<String, String>();
+            for (Map.Entry<String, Object> stringObjectEntry : authProperties.entrySet()) {
+                var value = stringObjectEntry.getValue() == null ? null : stringObjectEntry.getValue().toString();
+                currentAuthProps.put(stringObjectEntry.getKey(), value);
+            }
+            configuration.setAuthProperties(currentAuthProps);
             if (!authProperties.isEmpty()) {
 
                 // Make new Gson parser with type adapters to deserialize into existing credentials

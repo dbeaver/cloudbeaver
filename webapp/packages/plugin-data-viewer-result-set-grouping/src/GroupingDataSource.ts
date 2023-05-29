@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
 import { IDataQueryOptions, QueryDataSource } from '@cloudbeaver/plugin-sql-editor';
 

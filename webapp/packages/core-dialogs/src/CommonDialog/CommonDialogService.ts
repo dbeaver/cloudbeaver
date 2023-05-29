@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -24,13 +23,11 @@ export interface DialogComponentProps<TPayload, TResult = DialogueStateResult> {
   className?: string;
 }
 
-export type DialogComponent<TPayload, TResult = DialogueStateResult> = React.FC<
-DialogComponentProps<TPayload, TResult>
->;
+export type DialogComponent<TPayload, TResult = DialogueStateResult> = React.FC<DialogComponentProps<TPayload, TResult>>;
 
 export enum DialogueStateResult {
   Resolved,
-  Rejected
+  Rejected,
 }
 
 export interface DialogInternal<TResult> {
@@ -50,7 +47,7 @@ export class CommonDialogService {
   open<TPayload, TResult>(
     component: DialogComponent<TPayload, TResult>,
     payload: TPayload,
-    options?: DialogOptions
+    options?: DialogOptions,
   ): Promise<TResult | DialogueStateResult> {
     let _resolve: (value: TResult | DialogueStateResult) => void;
     let _reject: (reason?: any) => void;

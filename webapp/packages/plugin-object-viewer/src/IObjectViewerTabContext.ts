@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { INodeNavigationContext } from '@cloudbeaver/core-navigation-tree';
-import type { ITabNavigationContext, ITab } from '@cloudbeaver/plugin-navigation-tabs';
+import type { ITab, ITabNavigationContext } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
 import type { ObjectPage } from './ObjectPage/ObjectPage';

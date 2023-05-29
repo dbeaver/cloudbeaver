@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
@@ -50,22 +49,13 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
 
   return styled(useStyles(menuPanelStyles, style))(
     <menu-panel-item title={tooltip ? translate(tooltip) : title}>
-      <menu-item-icon>
-        {typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}
-      </menu-item-icon>
-      {displayLabel ? (
-        <menu-item-text title={title}>
-          {title}
-        </menu-item-text>
-      ) : (<padding />)}
-      <menu-item-binding title={binding}>
-        {binding}
-      </menu-item-binding>
+      <menu-item-icon>{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</menu-item-icon>
+      {displayLabel ? <menu-item-text title={title}>{title}</menu-item-text> : <padding />}
+      <menu-item-binding title={binding}>{binding}</menu-item-binding>
       <menu-item-content>
         {loading && <Loader small fullSize />}
         {panelAvailable !== false && menu && !loading && <Icon name="context-menu-submenu" viewBox="0 0 6 7" />}
       </menu-item-content>
-    </menu-panel-item>
-
+    </menu-panel-item>,
   );
 });

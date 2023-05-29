@@ -8,7 +8,7 @@
 
 export enum EOrder {
   'asc' = 'asc',
-  'desc' = 'desc'
+  'desc' = 'desc',
 }
 
 export type Order = EOrder | null;

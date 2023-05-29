@@ -5,10 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import {
-  useState, useCallback, useContext, useRef
-} from 'react';
+import { useCallback, useContext, useRef, useState } from 'react';
 import styled, { use } from 'reshadow';
 
 import { IconButton } from '../IconButton';
@@ -25,21 +22,22 @@ interface IProps {
   className?: string;
 }
 
-export const ItemListSearch: React.FC<IProps> = function ItemListSearch({
-  value, placeholder, disabled, onChange, onSearch, className,
-}) {
+export const ItemListSearch: React.FC<IProps> = function ItemListSearch({ value, placeholder, disabled, onChange, onSearch, className }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const styles = useContext(Styles);
   const [search, setSearch] = useState(value ?? '');
   const translate = useTranslate();
-  const changeHandler = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    if (value === undefined) {
-      setSearch(event.target.value);
-    }
-    if (onChange) {
-      onChange(event.target.value);
-    }
-  }, [value, onChange]);
+  const changeHandler = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (value === undefined) {
+        setSearch(event.target.value);
+      }
+      if (onChange) {
+        onChange(event.target.value);
+      }
+    },
+    [value, onChange],
+  );
 
   const searchHandler = useCallback(() => {
     if (!inputRef.current) {
@@ -61,7 +59,7 @@ export const ItemListSearch: React.FC<IProps> = function ItemListSearch({
       <input-box>
         <input
           ref={inputRef}
-          name='search'
+          name="search"
           placeholder={translate(placeholder || 'ui_search')}
           value={value ?? search}
           autoComplete="off"
@@ -69,8 +67,10 @@ export const ItemListSearch: React.FC<IProps> = function ItemListSearch({
           onChange={changeHandler}
           {...use({ mod: 'surface' })}
         />
-        <search-button as='div' onClick={searchHandler}><ListSearchButton name='search' /></search-button>
+        <search-button as="div" onClick={searchHandler}>
+          <ListSearchButton name="search" />
+        </search-button>
       </input-box>
-    </list-search>
+    </list-search>,
   );
 };

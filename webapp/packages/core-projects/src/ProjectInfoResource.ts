@@ -5,11 +5,17 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, resourceKeyList, RmResourceType } from '@cloudbeaver/core-sdk';
+import {
+  CachedMapAllKey,
+  CachedMapResource,
+  GraphQLService,
+  resourceKeyList,
+  RmResourceType,
+  ProjectInfo as SchemaProjectInfo,
+} from '@cloudbeaver/core-sdk';
 
 export type ProjectInfo = SchemaProjectInfo;
 export type ProjectInfoResourceType = RmResourceType;
@@ -24,7 +30,11 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
   ) {
     super(() => new Map(), []);
 
-    this.sync(this.userInfoResource, () => {}, () => CachedMapAllKey);
+    this.sync(
+      this.userInfoResource,
+      () => {},
+      () => CachedMapAllKey,
+    );
     appAuthService.requireAuthentication(this);
     serverConfigResource.requirePublic(this);
     this.userInfoResource.onUserChange.addPostHandler(() => {

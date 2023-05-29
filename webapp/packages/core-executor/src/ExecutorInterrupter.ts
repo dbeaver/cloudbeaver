@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IExecutionContextProvider } from './IExecutionContext';
 
 export interface IExecutorInterrupter {
@@ -39,7 +38,7 @@ export const ExecutorInterrupter = {
     return async (data: T, contexts: IExecutionContextProvider<T>): Promise<void> => {
       const interrupt = contexts.getContext(ExecutorInterrupter.interruptContext);
 
-      if ((await flag(data, contexts))) {
+      if (await flag(data, contexts)) {
         interrupt.interrupt();
       }
     };

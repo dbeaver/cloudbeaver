@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled, { css } from 'reshadow';
@@ -42,10 +41,7 @@ export const TableIndexColumnHeader = observer<HeaderRendererProps<any>>(functio
     throw new Error('Contexts required');
   }
 
-  const readonly = getComputed(() => (
-    tableDataContext.isReadOnly()
-    || dataGridContext.model.isReadonly(dataGridContext.resultIndex)
-  ));
+  const readonly = getComputed(() => tableDataContext.isReadOnly() || dataGridContext.model.isReadonly(dataGridContext.resultIndex));
 
   function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
     selectionContext.selectTable();
@@ -54,8 +50,8 @@ export const TableIndexColumnHeader = observer<HeaderRendererProps<any>>(functio
 
   return styled(styles)(
     <container title={translate('data_grid_table_index_column_tooltip')} onClick={handleClick}>
-      {readonly && <IconOrImage title={translate('data_grid_table_readonly_tooltip')} icon='/icons/lock.png' />}
+      {readonly && <IconOrImage title={translate('data_grid_table_readonly_tooltip')} icon="/icons/lock.png" />}
       {props.column.name}
-    </container>
+    </container>,
   );
 });

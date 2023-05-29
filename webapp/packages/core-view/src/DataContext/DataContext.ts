@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable, observable } from 'mobx';
 
 import { MetadataMap } from '@cloudbeaver/core-utils';
@@ -117,7 +116,7 @@ export class DataContext implements IDataContext {
         return this.fallback.get(context);
       }
 
-      throw new Error('Context doesn\'t exists');
+      throw new Error("Context doesn't exists");
     }
 
     return this.map.get(context);

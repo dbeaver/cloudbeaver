@@ -6,10 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export type Executor<T> = (
-  resolve: (value: T | PromiseLike<T>) => void,
-  reject: (reason?: any) => void
-) => void;
+export type Executor<T> = (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void;
 
 /**
  * Creates promise that can be resolved or rejected externally by calling resolve and reject methods

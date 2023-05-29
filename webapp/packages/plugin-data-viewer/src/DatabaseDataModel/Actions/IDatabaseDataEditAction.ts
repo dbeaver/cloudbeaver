@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { IDatabaseDataAction } from '../IDatabaseDataAction';
@@ -15,7 +14,7 @@ import type { IDatabaseDataResult } from '../IDatabaseDataResult';
 export enum DatabaseEditChangeType {
   update,
   add,
-  delete
+  delete,
 }
 
 export interface IDatabaseDataEditActionValue<TKey, TValue> {
@@ -43,8 +42,7 @@ export interface IDatabaseDataEditActionData<TKey, TValue> {
   value?: Array<IDatabaseDataEditActionValue<TKey, TValue>>;
 }
 
-export interface IDatabaseDataEditAction<TKey, TValue, TResult extends IDatabaseDataResult>
-  extends IDatabaseDataAction<any, TResult> {
+export interface IDatabaseDataEditAction<TKey, TValue, TResult extends IDatabaseDataResult> extends IDatabaseDataAction<any, TResult> {
   readonly action: ISyncExecutor<IDatabaseDataEditActionData<TKey, TValue>>;
   readonly applyAction: ISyncExecutor<IDatabaseDataEditApplyActionData<any>>;
   isEdited: () => boolean;

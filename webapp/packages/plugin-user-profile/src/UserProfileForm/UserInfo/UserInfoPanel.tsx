@@ -5,12 +5,23 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupTitle, InputField, Loader, ObjectPropertyInfoForm, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  BASE_CONTAINERS_STYLES,
+  ColoredContainer,
+  Container,
+  Group,
+  GroupTitle,
+  InputField,
+  Loader,
+  ObjectPropertyInfoForm,
+  useResource,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { BASE_TAB_STYLES, TabPanel } from '@cloudbeaver/core-ui';
@@ -23,73 +34,37 @@ interface Props {
   style?: ComponentStyle;
 }
 
-export const UserInfoPanel = observer<Props>(function UserInfoPanel({
-  user,
-  className,
-  style,
-}) {
+export const UserInfoPanel = observer<Props>(function UserInfoPanel({ user, className, style }) {
   const userMetaParameters = useResource(UserInfoPanel, UserMetaParametersResource, undefined);
   const styles = useStyles(BASE_TAB_STYLES, style, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
 
   return styled(styles)(
-    <TabPanel tabId='info' className={className}>
+    <TabPanel tabId="info" className={className}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
           <Group form gap>
             <GroupTitle>{translate('plugin_user_profile_info')}</GroupTitle>
             <Container wrap gap>
-              <InputField
-                type='text'
-                name='userId'
-                minLength={1}
-                state={user}
-                mod='surface'
-                readOnly
-                required
-                tiny
-                fill
-              >
+              <InputField type="text" name="userId" minLength={1} state={user} mod="surface" readOnly required tiny fill>
                 {translate('plugin_user_profile_info_id')}
               </InputField>
-              <InputField
-                type='text'
-                name='displayName'
-                minLength={1}
-                state={user}
-                mod='surface'
-                readOnly
-                required
-                tiny
-                fill
-              >
+              <InputField type="text" name="displayName" minLength={1} state={user} mod="surface" readOnly required tiny fill>
                 {translate('plugin_user_profile_info_displayName')}
               </InputField>
-              <InputField
-                type='text'
-                name='authRole'
-                mod='surface'
-                state={user}
-                autoHide
-                readOnly
-                tiny
-                fill
-              >
+              <InputField type="text" name="authRole" mod="surface" state={user} autoHide readOnly tiny fill>
                 {translate('authentication_user_role')}
               </InputField>
             </Container>
             <Loader state={userMetaParameters} inline>
-              {() => userMetaParameters.data.length > 0 && styled(styles)(
-                <Container wrap gap>
-                  <ObjectPropertyInfoForm
-                    state={user.metaParameters}
-                    properties={userMetaParameters.data}
-                    readOnly
-                    tiny
-                    fill
-                  />
-                </Container>
-              )}
+              {() =>
+                userMetaParameters.data.length > 0 &&
+                styled(styles)(
+                  <Container wrap gap>
+                    <ObjectPropertyInfoForm state={user.metaParameters} properties={userMetaParameters.data} readOnly tiny fill />
+                  </Container>,
+                )
+              }
             </Loader>
           </Group>
           <Group box medium overflow>
@@ -98,6 +73,6 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({
           </Group>
         </Container>
       </ColoredContainer>
-    </TabPanel>
+    </TabPanel>,
   );
 });

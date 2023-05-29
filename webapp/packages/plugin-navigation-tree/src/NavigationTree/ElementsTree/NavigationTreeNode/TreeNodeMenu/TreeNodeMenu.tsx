@@ -5,14 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { use } from 'reshadow';
 
 import { getComputed, Icon, IMouseContextMenu } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { type NavNode, type INodeActions, DATA_CONTEXT_NAV_NODE } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, type INodeActions, type NavNode } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
@@ -29,13 +28,7 @@ interface Props {
   onClose?: () => void;
 }
 
-export const TreeNodeMenu = observer<Props>(function TreeNodeMenu({
-  node,
-  actions,
-  selected,
-  mouseContextMenu,
-  onClose,
-}) {
+export const TreeNodeMenu = observer<Props>(function TreeNodeMenu({ node, actions, selected, mouseContextMenu, onClose }) {
   const connectionsInfoResource = useService(ConnectionInfoResource);
   const menu = useMenu({ menu: MENU_NAV_TREE });
   menu.context.set(DATA_CONTEXT_NAV_NODE, node);
@@ -54,14 +47,8 @@ export const TreeNodeMenu = observer<Props>(function TreeNodeMenu({
   }
 
   return styled(treeNodeMenuStyles)(
-    <ContextMenu
-      menu={menu}
-      mouseContextMenu={mouseContextMenu}
-      onVisibleSwitch={handleVisibleSwitch}
-      {...use({ selected })}
-      modal
-    >
+    <ContextMenu menu={menu} mouseContextMenu={mouseContextMenu} onVisibleSwitch={handleVisibleSwitch} {...use({ selected })} modal>
       <Icon name="snack" viewBox="0 0 16 10" />
-    </ContextMenu>
+    </ContextMenu>,
   );
 });

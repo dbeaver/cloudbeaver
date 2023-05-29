@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
@@ -14,13 +13,11 @@ import { VersionUpdateDrawerItem } from './VersionUpdateDrawerItem';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
-  constructor(
-    private readonly administrationItemService: AdministrationItemService
-  ) {
+  constructor(private readonly administrationItemService: AdministrationItemService) {
     super();
   }
 
-  async load(): Promise<void> { }
+  async load(): Promise<void> {}
 
   register(): void {
     this.administrationItemService.create({

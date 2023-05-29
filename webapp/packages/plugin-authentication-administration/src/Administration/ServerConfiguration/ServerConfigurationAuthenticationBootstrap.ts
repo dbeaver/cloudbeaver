@@ -5,15 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
+import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { ILoadConfigData, IServerConfigSaveData, ServerConfigurationService, serverConfigValidationContext } from '@cloudbeaver/plugin-administration';
+import {
+  ILoadConfigData,
+  IServerConfigSaveData,
+  ServerConfigurationService,
+  serverConfigValidationContext,
+} from '@cloudbeaver/plugin-administration';
 
 @injectable()
 export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
@@ -32,7 +36,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
     this.serverConfigurationService.loadConfigTask.addHandler(this.loadServerConfig);
   }
 
-  load(): void { }
+  load(): void {}
 
   private readonly loadServerConfig: IExecutorHandler<ILoadConfigData> = async (data, contexts) => {
     if (!data.reset) {
@@ -62,7 +66,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
       data.state.serverConfig.enabledFeatures = [...config.enabledFeatures];
     } catch (exception: any) {
       ExecutorInterrupter.interrupt(contexts);
-      this.notificationService.logException(exception, 'Can\'t load server configuration');
+      this.notificationService.logException(exception, "Can't load server configuration");
     }
   };
 
@@ -76,10 +80,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
 
     const validation = contexts.getContext(serverConfigValidationContext);
 
-    if (!data.state.serverConfig.adminName
-        || data.state.serverConfig.adminName.length < 6
-        || !data.state.serverConfig.adminPassword
-    ) {
+    if (!data.state.serverConfig.adminName || data.state.serverConfig.adminName.length < 6 || !data.state.serverConfig.adminPassword) {
       validation.invalidate();
     }
   };

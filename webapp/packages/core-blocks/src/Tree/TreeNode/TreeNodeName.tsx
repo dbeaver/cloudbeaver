@@ -10,10 +10,10 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-export const TreeNodeName: React.FC<Props> = function TreeNodeName({
-  className,
-  children,
-  ...rest
-}) {
-  return <div className={className} {...rest}>{children}</div>;
+export const TreeNodeName: React.FC<Props> = function TreeNodeName({ className, children, ...rest }) {
+  return (
+    <div className={className} {...rest}>
+      {children}
+    </div>
+  );
 };

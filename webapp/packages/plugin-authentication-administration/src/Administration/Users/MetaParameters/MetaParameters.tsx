@@ -5,16 +5,26 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import type { IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useResource, ToolsPanel, ToolsAction, Loader, BASE_LAYOUT_GRID_STYLES, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import {
+  BASE_LAYOUT_GRID_STYLES,
+  Loader,
+  Table,
+  TableBody,
+  TableColumnHeader,
+  TableHeader,
+  TableSelect,
+  ToolsAction,
+  ToolsPanel,
+  useResource,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
-
-
 
 import { CreateMetaParameter } from './CreateMetaParameter';
 import { CreateMetaParameterService } from './CreateMetaParameterService';
@@ -22,21 +32,21 @@ import { MetadataParam } from './MetadataParam';
 import { MetaParametersController } from './MetaParametersController';
 
 const layoutStyles = css`
-    layout-grid {
-      width: 100%;
-      overflow: auto;
-    }
+  layout-grid {
+    width: 100%;
+    overflow: auto;
+  }
 
-    layout-grid-inner {
-      min-height: 100%;
-    }
+  layout-grid-inner {
+    min-height: 100%;
+  }
 
-    layout-grid-cell {
-      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
-      position: relative;
-      border: solid 1px;
-    }
-  `;
+  layout-grid-cell {
+    composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+    position: relative;
+    border: solid 1px;
+  }
+`;
 
 const styles = css`
   Table {
@@ -60,7 +70,7 @@ export const MetaParameters = observer<Props>(function MetaParameters({ sub, par
   return styled(useStyles(BASE_LAYOUT_GRID_STYLES, styles, layoutStyles))(
     <layout-grid>
       <layout-grid-inner>
-        <layout-grid-cell data-span='12'>
+        <layout-grid-cell data-span="12">
           <ToolsPanel>
             {isLocalProviderAvailable && (
               <ToolsAction
@@ -96,20 +106,12 @@ export const MetaParameters = observer<Props>(function MetaParameters({ sub, par
         </layout-grid-cell>
 
         {param === 'create' && createMetaParameterService.user && (
-          <layout-grid-cell data-span='12'>
-            <CreateMetaParameter
-              user={createMetaParameterService.user}
-              onCancel={createMetaParameterService.cancelCreate}
-            />
+          <layout-grid-cell data-span="12">
+            <CreateMetaParameter user={createMetaParameterService.user} onCancel={createMetaParameterService.cancelCreate} />
           </layout-grid-cell>
         )}
-        <layout-grid-cell data-span='12'>
-          <Table
-            keys={keys}
-            selectedItems={controller.selectedItems}
-            expandedItems={controller.expandedItems}
-            size='big'
-          >
+        <layout-grid-cell data-span="12">
+          <Table keys={keys} selectedItems={controller.selectedItems} expandedItems={controller.expandedItems} size="big">
             <TableHeader fixed>
               {isLocalProviderAvailable && (
                 <TableColumnHeader min flex centerContent>
@@ -123,17 +125,13 @@ export const MetaParameters = observer<Props>(function MetaParameters({ sub, par
             </TableHeader>
             <TableBody>
               {userMetaParametersResource.data.map(param => (
-                <MetadataParam
-                  key={param.id}
-                  param={param}
-                  selectable={isLocalProviderAvailable}
-                />
+                <MetadataParam key={param.id} param={param} selectable={isLocalProviderAvailable} />
               ))}
             </TableBody>
           </Table>
           <Loader state={userMetaParametersResource} overlay />
         </layout-grid-cell>
       </layout-grid-inner>
-    </layout-grid>
+    </layout-grid>,
   );
 });

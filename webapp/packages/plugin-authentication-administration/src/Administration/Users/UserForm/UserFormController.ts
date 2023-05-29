@@ -5,19 +5,24 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, computed, makeObservable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import { AdminUser, AuthRolesResource, compareTeams, isLocalUser, TeamInfo, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { compareConnectionsInfo, ConnectionInfoProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
-import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
+import {
+  compareConnectionsInfo,
+  ConnectionInfoProjectKey,
+  ConnectionInfoResource,
+  DatabaseConnection,
+  DBDriverResource,
+} from '@cloudbeaver/core-connections';
+import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { GQLErrorCatcher, AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo, CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { AdminConnectionGrantInfo, AdminSubjectType, AdminUserInfo, CachedMapAllKey, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { IUserFormState, UserFormService } from './UserFormService';
@@ -164,13 +169,10 @@ export class UserFormController implements IInitializableController, IDestructib
         this.notificationService.logSuccess({ title: 'authentication_administration_user_created' });
       } else {
         if (this.credentials.password) {
-          await this.usersResource.updateCredentials(
-            this.user.userId,
-            {
-              profile: '0',
-              credentials: { password: this.credentials.password },
-            }
-          );
+          await this.usersResource.updateCredentials(this.user.userId, {
+            profile: '0',
+            credentials: { password: this.credentials.password },
+          });
         }
         await this.updateTeams();
         await this.saveUserRole();
@@ -219,7 +221,9 @@ export class UserFormController implements IInitializableController, IDestructib
     }
   };
 
-  handleConnectionsAccessChange = () => { this.connectionAccessChanged = true; };
+  handleConnectionsAccessChange = () => {
+    this.connectionAccessChanged = true;
+  };
 
   loadConnectionsAccess = async () => {
     if (this.isLoading || this.connectionAccessLoaded) {
@@ -308,14 +312,10 @@ export class UserFormController implements IInitializableController, IDestructib
   }
 
   private getGrantedConnections() {
-    return Array.from(this.selectedConnections.keys())
-      .filter(connectionId => {
-        const connectionPermission = this.grantedConnections.find(
-          connectionPermission => connectionPermission.dataSourceId === connectionId
-        );
-        return this.selectedConnections.get(connectionId)
-          && connectionPermission?.subjectType !== AdminSubjectType.Team;
-      });
+    return Array.from(this.selectedConnections.keys()).filter(connectionId => {
+      const connectionPermission = this.grantedConnections.find(connectionPermission => connectionPermission.dataSourceId === connectionId);
+      return this.selectedConnections.get(connectionId) && connectionPermission?.subjectType !== AdminSubjectType.Team;
+    });
   }
 
   private async saveMetaParameters() {
@@ -351,7 +351,7 @@ export class UserFormController implements IInitializableController, IDestructib
       await this.teamsResource.load(CachedMapAllKey);
       await this.loadUser();
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Can\'t load teams');
+      this.notificationService.logException(exception, "Can't load teams");
     } finally {
       this.isLoading = false;
     }
@@ -361,11 +361,11 @@ export class UserFormController implements IInitializableController, IDestructib
     try {
       this.credentials.metaParameters = this.user.metaParameters;
       this.credentials.login = this.user.userId;
-      this.credentials.teams = new Map(this.user.grantedTeams.map(teamId => ([teamId, true])));
+      this.credentials.teams = new Map(this.user.grantedTeams.map(teamId => [teamId, true]));
       this.credentials.authRole = this.user.authRole;
       this.enabled = this.user.enabled;
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Can\'t load user');
+      this.notificationService.logException(exception, "Can't load user");
     }
   }
 
@@ -374,11 +374,7 @@ export class UserFormController implements IInitializableController, IDestructib
       await this.dbDriverResource.load(CachedMapAllKey);
       const projects = await this.projectInfoResource.load(CachedMapAllKey);
 
-      await this.connectionInfoResource.load(ConnectionInfoProjectKey(
-        ...projects
-          .filter(isGlobalProject)
-          .map(project => project.id)
-      ));
+      await this.connectionInfoResource.load(ConnectionInfoProjectKey(...projects.filter(isGlobalProject).map(project => project.id)));
     } catch (exception: any) {
       this.setStatusMessage('authentication_administration_user_connections_access_connections_load_fail', ENotificationType.Error);
     }

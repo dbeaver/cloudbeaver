@@ -5,15 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef } from 'react';
-import {
-  useMenuState,
-  Menu,
-  MenuItem,
-  MenuButton
-} from 'reakit/Menu';
+import { Menu, MenuButton, MenuItem, useMenuState } from 'reakit/Menu';
 import styled, { css } from 'reshadow';
 
 import { BASE_DROPDOWN_STYLES } from '../FormControls/BASE_DROPDOWN_STYLES';
@@ -56,7 +50,7 @@ export const PropertyValueSelector = observer<React.PropsWithChildren<Props>>(fu
       menu.hide();
       onSelect(event.currentTarget.id);
     },
-    [menu, onSelect]
+    [menu, onSelect],
   );
   useEffect(() => onSwitch(menu.visible), [menu.visible]);
 
@@ -69,7 +63,7 @@ export const PropertyValueSelector = observer<React.PropsWithChildren<Props>>(fu
       const containerSize = container.getBoundingClientRect();
       if (menuRef.current && containerSize !== undefined) {
         // 1px offset of MenuButton
-        menuRef.current.style.width = (containerSize.width - 1) + 'px';
+        menuRef.current.style.width = containerSize.width - 1 + 'px';
       }
     });
 
@@ -82,16 +76,22 @@ export const PropertyValueSelector = observer<React.PropsWithChildren<Props>>(fu
 
   const visible = menu.visible;
 
-  return styled(BASE_DROPDOWN_STYLES, styles)(
+  return styled(
+    BASE_DROPDOWN_STYLES,
+    styles,
+  )(
     <>
-      <MenuButton {...menu} className={className} visible={visible}>{children}</MenuButton>
+      <MenuButton {...menu} className={className} visible={visible}>
+        {children}
+      </MenuButton>
       <Menu {...menu} ref={menuRef} visible={visible} aria-label={propertyName} modal>
-        {visible && values.map(value => (
-          <MenuItem key={value} id={value} type='button' {...menu} onClick={handleMenuSelect}>
-            {value}
-          </MenuItem>
-        ))}
+        {visible &&
+          values.map(value => (
+            <MenuItem key={value} id={value} type="button" {...menu} onClick={handleMenuSelect}>
+              {value}
+            </MenuItem>
+          ))}
       </Menu>
-    </>
+    </>,
   );
 });

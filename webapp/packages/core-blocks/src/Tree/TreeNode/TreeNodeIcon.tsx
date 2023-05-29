@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled, { css } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
@@ -25,16 +24,11 @@ interface Props {
   className?: string;
 }
 
-export const TreeNodeIcon: React.FC<React.PropsWithChildren<Props>> = function TreeNodeIcon({
-  icon,
-  style,
-  className,
-  children,
-}) {
+export const TreeNodeIcon: React.FC<React.PropsWithChildren<Props>> = function TreeNodeIcon({ icon, style, className, children }) {
   return styled(useStyles(styles, style))(
     <icon className={className}>
       {icon && <StaticImage icon={icon} />}
       {children}
-    </icon>
+    </icon>,
   );
 };

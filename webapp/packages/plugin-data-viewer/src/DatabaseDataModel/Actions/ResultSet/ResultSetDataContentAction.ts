@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { makeObservable, observable } from 'mobx';
 
 import { QuotasService } from '@cloudbeaver/core-root';
@@ -28,8 +27,7 @@ import { ResultSetViewAction } from './ResultSetViewAction';
 const RESULT_VALUE_PATH = 'sql-result-value';
 
 @databaseDataAction()
-export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IResultSetDataContentAction {
+export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IResultSetDataContentAction {
   static dataFormat = [ResultDataFormat.Resultset];
 
   private readonly view: ResultSetViewAction;
@@ -83,17 +81,15 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
       throw new Error('Failed to get value metadata information');
     }
 
-    const url = await this.source.runTask(
-      async () => {
-        try {
-          this.activeElement = element;
-          const fileName = await this.loadFileName(this.result, column.position, row);
-          return this.generateFileDataUrl(fileName);
-        } finally {
-          this.activeElement = null;
-        }
+    const url = await this.source.runTask(async () => {
+      try {
+        this.activeElement = element;
+        const fileName = await this.loadFileName(this.result, column.position, row);
+        return this.generateFileDataUrl(fileName);
+      } finally {
+        this.activeElement = null;
       }
-    );
+    });
 
     return url;
   }

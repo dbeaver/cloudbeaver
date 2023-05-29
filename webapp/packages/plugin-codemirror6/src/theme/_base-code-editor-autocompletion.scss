@@ -7,42 +7,40 @@
  */
 
 @mixin base-code-editor-autocompletion() {
-  .editor {
-    .cm-tooltip.cm-tooltip-autocomplete {
-      &>:global(ul) {
-        border-radius: var(--theme-form-element-radius);
-      }
+  .cm-tooltip.cm-tooltip-autocomplete {
+    &>:global(ul) {
+      border-radius: var(--theme-form-element-radius);
+    }
 
-      & :global(li) {
-        display: flex;
-        align-items: center;
-      }
+    & :global(li) {
+      display: flex;
+      align-items: center;
+    }
 
-      & .cm-completionIcon {
-        opacity: 1;
-        width: 16px;
-        height: 16px;
-        padding: 0;
-        margin-right: .6em;
+    & .cm-completionIcon {
+      opacity: 1;
+      width: 16px;
+      height: 16px;
+      padding: 0;
+      margin-right: .6em;
 
-        &:not(:global([src])) {
-          opacity: 0;
-        }
-      }
-
-      & :global(li):hover {
-        @include mdc-theme-prop(background, sub-secondary, false);
-        @include mdc-theme-prop(color, on-secondary, false);
-      }
-
-      & :global(li):global([aria-selected=true]) {
-        @include mdc-theme-prop(background, secondary, false);
-        @include mdc-theme-prop(color, text-primary-on-light, false);
+      &:not(:global([src])) {
+        opacity: 0;
       }
     }
 
-    .cm-tooltip.cm-completionInfo {
-      margin-left: 8px;
+    & :global(li):hover {
+      @include mdc-theme-prop(background, sub-secondary, false);
+      @include mdc-theme-prop(color, on-secondary, false);
     }
+
+    & :global(li):global([aria-selected=true]) {
+      @include mdc-theme-prop(background, secondary, false);
+      @include mdc-theme-prop(color, text-primary-on-light, false);
+    }
+  }
+
+  .cm-tooltip.cm-completionInfo {
+    margin-left: 8px;
   }
 }

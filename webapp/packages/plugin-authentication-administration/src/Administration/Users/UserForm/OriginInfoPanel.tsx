@@ -5,15 +5,27 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { UserInfoResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { TextPlaceholder, Loader, ExceptionMessage, BASE_CONTAINERS_STYLES, ColoredContainer, ObjectPropertyInfoForm, Group, useAutoLoad, useObjectRef, IAutoLoadable, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { UsersResource } from '@cloudbeaver/core-authentication';
+import {
+  BASE_CONTAINERS_STYLES,
+  ColoredContainer,
+  ExceptionMessage,
+  Group,
+  IAutoLoadable,
+  Loader,
+  ObjectPropertyInfoForm,
+  TextPlaceholder,
+  useAutoLoad,
+  useObjectRef,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminUserInfo, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { AuthenticationProvider, TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
+import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import { getOriginTabId } from './getOriginTabId';
 import type { IUserFormProps } from './UserFormService';
@@ -31,14 +43,10 @@ interface IState {
   exception: Error | null;
 }
 
-export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = observer(function OriginInfoPanel({
-  tabId,
-  user,
-}) {
+export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = observer(function OriginInfoPanel({ tabId, user }) {
   const style = useStyles(BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
   const usersResource = useService(UsersResource);
-  const userInfoService = useService(UserInfoResource);
   const state = useTabState<IState>(() => ({
     origin: null,
     properties: [],
@@ -54,62 +62,63 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
     origin = user.origins[0];
   }
 
-  const providerId = origin.subType ?? origin.type;
-  const authorized = userInfoService.hasToken(providerId);
-
-  const loadableState = useObjectRef<IInnerState>(() => ({
-    get exception(): Error | null {
-      return this.state.exception;
-    },
-    isLoaded(): boolean {
-      return this.state.loaded;
-    },
-    isLoading(): boolean {
-      return this.state.loading;
-    },
-    async load(reload = false) {
-      if ((this.state.loaded && !reload) || this.state.loading) {
-        return;
-      }
-
-      this.state.loading = true;
-      this.state.exception = null;
-
-      try {
-        usersResource.markOutdated(this.user.userId);
-        const userOrigin = await usersResource.load(this.user.userId, ['customIncludeOriginDetails']);
-
-        let origin = userOrigin.origins.find(origin => getOriginTabId('origin', origin) === tabId);
-
-        if (!origin) {
-          origin = user.origins[0];
+  const loadableState = useObjectRef<IInnerState>(
+    () => ({
+      get exception(): Error | null {
+        return this.state.exception;
+      },
+      isLoaded(): boolean {
+        return this.state.loaded;
+      },
+      isLoading(): boolean {
+        return this.state.loading;
+      },
+      async load(reload = false) {
+        if ((this.state.loaded && !reload) || this.state.loading) {
+          return;
         }
 
-        const propertiesState = {} as Record<string, any>;
+        this.state.loading = true;
+        this.state.exception = null;
 
-        for (const property of origin.details!) {
-          propertiesState[property.id!] = property.value;
+        try {
+          usersResource.markOutdated(this.user.userId);
+          const userOrigin = await usersResource.load(this.user.userId, ['customIncludeOriginDetails']);
+
+          let origin = userOrigin.origins.find(origin => getOriginTabId('origin', origin) === tabId);
+
+          if (!origin) {
+            origin = user.origins[0];
+          }
+
+          const propertiesState = {} as Record<string, any>;
+
+          for (const property of origin.details!) {
+            propertiesState[property.id!] = property.value;
+          }
+          this.state.properties = origin.details!;
+          this.state.state = propertiesState;
+          this.state.loaded = true;
+        } catch (error: any) {
+          this.state.exception = error;
+        } finally {
+          this.state.loading = false;
         }
-        this.state.properties = origin.details!;
-        this.state.state = propertiesState;
-        this.state.loaded = true;
-      } catch (error: any) {
-        this.state.exception = error;
-      } finally {
-        this.state.loading = false;
-      }
+      },
+      async reload() {
+        await this.load();
+      },
+    }),
+    {
+      state,
+      user,
     },
-    async reload() {
-      await this.load();
-    },
-  }), {
-    state,
-    user,
-  }, ['reload', 'load', 'isLoaded', 'isLoading']);
+    ['reload', 'load', 'isLoaded', 'isLoading'],
+  );
 
   const { selected } = useTab(tabId);
 
-  useAutoLoad(loadableState, selected && authorized);
+  useAutoLoad(loadableState, selected);
 
   if (!selected) {
     return null;
@@ -121,7 +130,7 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
         <Group large>
           <Loader key="static" />
         </Group>
-      </ColoredContainer>
+      </ColoredContainer>,
     );
   }
 
@@ -131,17 +140,7 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
         <Group large>
           <ExceptionMessage exception={state.exception} onRetry={() => loadableState.reload?.()} />
         </Group>
-      </ColoredContainer>
-    );
-  }
-
-  if (!authorized) {
-    return styled(style)(
-      <ColoredContainer parent>
-        <Group large>
-          <AuthenticationProvider providerId={providerId} onAuthenticate={() => loadableState.reload?.()} />
-        </Group>
-      </ColoredContainer>
+      </ColoredContainer>,
     );
   }
 
@@ -151,21 +150,15 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
         <Group large>
           <TextPlaceholder>{translate('authentication_administration_user_origin_empty')}</TextPlaceholder>
         </Group>
-      </ColoredContainer>
+      </ColoredContainer>,
     );
   }
 
   return styled(style)(
     <ColoredContainer parent>
       <Group gap large>
-        <ObjectPropertyInfoForm
-          properties={state.properties}
-          state={state.state}
-          readOnly
-          small
-          autoHide
-        />
+        <ObjectPropertyInfoForm properties={state.properties} state={state.state} readOnly small autoHide />
       </Group>
-    </ColoredContainer>
+    </ColoredContainer>,
   );
 });

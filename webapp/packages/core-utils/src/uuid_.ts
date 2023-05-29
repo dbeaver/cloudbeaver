@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { v4 as uuidv4 } from 'uuid';
 
 export type OutputBuffer = ArrayLike<number>;

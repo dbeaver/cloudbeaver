@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useMemo, useRef, useState } from 'react';
 import { create } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
-import { ComponentStyle, BaseStyles, Style, ThemeService } from '@cloudbeaver/core-theming';
+import { BaseStyles, ComponentStyle, Style, ThemeService } from '@cloudbeaver/core-theming';
 import { flat } from '@cloudbeaver/core-utils';
 
 import { useExecutor } from './useExecutor';
@@ -20,9 +19,7 @@ import { useExecutor } from './useExecutor';
  *
  * @param componentStyles styles array
  */
-export function useStyles(
-  ...componentStyles: ComponentStyle[]
-): Record<string, any> {
+export function useStyles(...componentStyles: ComponentStyle[]): Record<string, any> {
   // todo do you understand that we store ALL STYLES in each component that uses this hook?
 
   const stylesRef = useRef<ComponentStyle[]>([]);
@@ -36,11 +33,13 @@ export function useStyles(
 
   useExecutor({
     executor: themeService.onChange,
-    handlers: [function updateThemeId(theme) {
-      if (currentThemeId !== themeService.currentThemeId && trackTheme) {
-        setCurrentThemeId(theme.id);
-      }
-    }],
+    handlers: [
+      function updateThemeId(theme) {
+        if (currentThemeId !== themeService.currentThemeId && trackTheme) {
+          setCurrentThemeId(theme.id);
+        }
+      },
+    ],
   });
 
   let changed = lastThemeRef.current !== currentThemeId || filteredStyles.length !== stylesRef.current.length;
@@ -66,13 +65,10 @@ export function useStyles(
     loadedStyles.current = flat(staticStyles);
 
     if (themedStyles.length > 0) {
-      Promise
-        .all(themedStyles)
-        .then(styles => {
-          loadedStyles.current = flat([staticStyles, flat(styles)])
-            .filter(Boolean) as BaseStyles[];
-          forceUpdate(patch + 1);
-        });
+      Promise.all(themedStyles).then(styles => {
+        loadedStyles.current = flat([staticStyles, flat(styles)]).filter(Boolean) as BaseStyles[];
+        forceUpdate(patch + 1);
+      });
     }
   }
 

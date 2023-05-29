@@ -8,5 +8,5 @@
 
 export enum EServerErrorCode {
   'sessionExpired' = 'sessionExpired',
-  'licenseRequired' = 'licenseRequired'
+  'licenseRequired' = 'licenseRequired',
 }

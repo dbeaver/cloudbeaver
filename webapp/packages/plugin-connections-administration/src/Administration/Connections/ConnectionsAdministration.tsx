@@ -5,12 +5,25 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { AdministrationItemContentProps, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { Loader, useResource, ToolsAction, ToolsPanel, useTranslate, useStyles, Translate, Group, ColoredContainer, BASE_CONTAINERS_STYLES, Container, GroupTitle, GroupItem } from '@cloudbeaver/core-blocks';
+import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentProps } from '@cloudbeaver/core-administration';
+import {
+  BASE_CONTAINERS_STYLES,
+  ColoredContainer,
+  Container,
+  Group,
+  GroupItem,
+  GroupTitle,
+  Loader,
+  ToolsAction,
+  ToolsPanel,
+  Translate,
+  useResource,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -58,7 +71,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
         <ToolsPanel>
           <ToolsAction
             title={translate('connections_administration_tools_add_tooltip')}
-            icon='add'
+            icon="add"
             viewBox="0 0 24 24"
             disabled={!!sub || controller.isProcessing}
             onClick={service.create}
@@ -97,7 +110,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
             <CreateConnection method={param} configurationWizard={configurationWizard} />
           </Group>
         )}
-        <Group box='no-overflow'>
+        <Group box="no-overflow">
           <Loader style={loaderStyle} loading={controller.isProcessing} overlay>
             <ConnectionsTable
               keys={controller.keys}
@@ -108,6 +121,6 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
           </Loader>
         </Group>
       </Container>
-    </ColoredContainer>
+    </ColoredContainer>,
   );
 });

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
@@ -17,9 +16,5 @@ export const userProfilePlugin: PluginManifest = {
     name: 'User profile plugin',
   },
 
-  providers: [
-    PluginBootstrap,
-    LocaleService,
-    UserProfileService,
-  ],
+  providers: [PluginBootstrap, LocaleService, UserProfileService],
 };

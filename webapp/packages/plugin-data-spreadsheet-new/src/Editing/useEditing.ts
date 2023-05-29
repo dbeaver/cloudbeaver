@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 import { useState } from 'react';
 
@@ -29,13 +28,17 @@ interface IEditingOptions {
 }
 
 export function useEditing(options: IEditingOptions): IEditingContext {
-  const state = useObservableRef(() => ({
-    editingCells: new MetadataMap<string, IEditingState>(() => ({ editing: false })),
-    editorOpened: false,
-  }), {
-    editorOpened: observable.ref,
-    readonly: observable.ref,
-  }, { options, readonly: !!options.readonly });
+  const state = useObservableRef(
+    () => ({
+      editingCells: new MetadataMap<string, IEditingState>(() => ({ editing: false })),
+      editorOpened: false,
+    }),
+    {
+      editorOpened: observable.ref,
+      readonly: observable.ref,
+    },
+    { options, readonly: !!options.readonly },
+  );
 
   const [context] = useState<IEditingContext>({
     get readonly() {
@@ -75,9 +78,7 @@ export function useEditing(options: IEditingOptions): IEditingContext {
       return state.editorOpened;
     },
     isEditing(position: CellPosition) {
-      return state.editingCells
-        .get(getPositionHash(position))
-        .editing;
+      return state.editingCells.get(getPositionHash(position)).editing;
     },
   });
 

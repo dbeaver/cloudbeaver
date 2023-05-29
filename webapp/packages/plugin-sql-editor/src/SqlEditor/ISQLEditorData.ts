@@ -5,13 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
 import type { ISqlDataSource } from '../SqlDataSource/ISqlDataSource';
 import type { SQLProposal } from '../SqlEditorService';
-import type { SQLParser, ISQLScriptSegment } from '../SQLParser';
+import type { ISQLScriptSegment, SQLParser } from '../SQLParser';
 import type { ISQLEditorMode } from './SQLEditorModeContext';
 
 export interface ISegmentExecutionData {
@@ -62,6 +61,6 @@ export interface ISQLEditorData {
     segment: ISQLScriptSegment | undefined,
     action: (query: ISQLScriptSegment) => Promise<T>,
     passEmpty?: boolean,
-    passDisabled?: boolean
+    passDisabled?: boolean,
   ): Promise<T | undefined>;
 }

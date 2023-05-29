@@ -5,13 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
 import { AdministrationItemService, AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { EAdminPermission } from '@cloudbeaver/core-authentication';
-import { Translate, useResource, usePermission } from '@cloudbeaver/core-blocks';
+import { Translate, usePermission, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 
@@ -29,21 +28,17 @@ export const ConfigurationWizardScreen = observer(function ConfigurationWizardSc
       const route = administrationItemService.getItem(item, true)?.configurationWizardOptions?.defaultRoute;
       administrationScreenService.navigateTo(item, route);
     },
-    [administrationItemService, administrationScreenService]
+    [administrationItemService, administrationScreenService],
   );
 
   if (!usePermission(EAdminPermission.admin)) {
-    return <Translate token='root_permission_denied' />;
+    return <Translate token="root_permission_denied" />;
   }
 
   return (
     <>
       <WizardTopAppBar />
-      <Administration
-        activeScreen={administrationScreenService.activeScreen}
-        configurationWizard
-        onItemSelect={handleSelect}
-      >
+      <Administration activeScreen={administrationScreenService.activeScreen} configurationWizard onItemSelect={handleSelect}>
         <WizardStepper />
       </Administration>
     </>

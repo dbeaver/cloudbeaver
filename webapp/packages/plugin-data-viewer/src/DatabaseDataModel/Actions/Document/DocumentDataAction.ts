@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
@@ -18,8 +17,7 @@ import type { IDatabaseDataResultAction } from '../IDatabaseDataResultAction';
 import type { IDatabaseDataDocument } from './IDatabaseDataDocument';
 
 @databaseDataAction()
-export class DocumentDataAction extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IDatabaseDataResultAction<IDatabaseResultSet> {
+export class DocumentDataAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IDatabaseDataResultAction<IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Document];
 
   get documents(): IDatabaseDataDocument[] {

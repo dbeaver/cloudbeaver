@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { App, Bootstrap, DIService, injectable, IServiceConstructor } from '@cloudbeaver/core-di';
 import { PermissionsService } from '@cloudbeaver/core-root';
@@ -35,7 +34,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
     private readonly devToolsService: DevToolsService,
-    private readonly permissionsService: PermissionsService
+    private readonly permissionsService: PermissionsService,
   ) {
     super();
   }
@@ -48,12 +47,8 @@ export class PluginBootstrap extends Bootstrap {
         }
         return context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU;
       },
-      getItems: (context, items) => [
-        ACTION_DEVTOOLS,
-        ...items,
-      ],
+      getItems: (context, items) => [ACTION_DEVTOOLS, ...items],
     });
-
 
     // this.actionService.addHandler({
     //   id: 'devtools',
@@ -87,10 +82,7 @@ export class PluginBootstrap extends Bootstrap {
         }
         return context.get(DATA_CONTEXT_MENU) === MENU_USER_PROFILE;
       },
-      getItems: (context, items) => [
-        MENU_DEVTOOLS,
-        ...items,
-      ],
+      getItems: (context, items) => [MENU_DEVTOOLS, ...items],
     });
 
     this.menuService.addCreator({
@@ -99,21 +91,13 @@ export class PluginBootstrap extends Bootstrap {
         const search = context.tryGet(DATA_CONTEXT_MENU_SEARCH);
 
         if (search) {
-
           return [
             new SearchResourceMenuItem(),
-            ...this.getResources(this.app
-              .getServices()
-              .filter(service => service.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()))),
+            ...this.getResources(this.app.getServices().filter(service => service.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()))),
           ];
         }
 
-        return [
-          new SearchResourceMenuItem(),
-          ACTION_DEVTOOLS_MODE_DISTRIBUTED,
-          MENU_PLUGINS,
-          ...items,
-        ];
+        return [new SearchResourceMenuItem(), ACTION_DEVTOOLS_MODE_DISTRIBUTED, MENU_PLUGINS, ...items];
       },
     });
 
@@ -150,17 +134,11 @@ export class PluginBootstrap extends Bootstrap {
 
         return false;
       },
-      getItems: (_, items) => [
-        MENU_RESOURCES,
-        ...items,
-      ],
+      getItems: (_, items) => [MENU_RESOURCES, ...items],
     });
 
     this.menuService.addCreator({
-      isApplicable: context => (
-        context.get(DATA_CONTEXT_MENU) === MENU_RESOURCES
-        && context.has(DATA_CONTEXT_SUBMENU_ITEM)
-      ),
+      isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_RESOURCES && context.has(DATA_CONTEXT_SUBMENU_ITEM),
       getItems: (context, items) => {
         const item = context.find(DATA_CONTEXT_SUBMENU_ITEM, item => item instanceof PluginSubMenuItem);
 
@@ -168,26 +146,19 @@ export class PluginBootstrap extends Bootstrap {
           return items;
         }
 
-        const plugin = this.app
-          .getPlugins()
-          .find(plugin => plugin.info.name === item.id);
+        const plugin = this.app.getPlugins().find(plugin => plugin.info.name === item.id);
 
         if (!plugin) {
           return items;
         }
 
-        return [
-          ...this.getResources(plugin.providers),
-          ...items,
-        ];
+        return [...this.getResources(plugin.providers), ...items];
       },
     });
 
     this.menuService.addCreator({
-      isApplicable: context => (
-        context.get(DATA_CONTEXT_MENU) === MENU_RESOURCE
-        && context.get(DATA_CONTEXT_SUBMENU_ITEM) instanceof ResourceSubMenuItem
-      ),
+      isApplicable: context =>
+        context.get(DATA_CONTEXT_MENU) === MENU_RESOURCE && context.get(DATA_CONTEXT_SUBMENU_ITEM) instanceof ResourceSubMenuItem,
       getItems: (context, items) => {
         const item = context.get(DATA_CONTEXT_SUBMENU_ITEM) as ResourceSubMenuItem;
 
@@ -200,13 +171,10 @@ export class PluginBootstrap extends Bootstrap {
             },
             {
               onSelect: () => {
-                const instance = this.diService.serviceInjector
-                  .getServiceByClass<CachedResource<any, any, any, any, any>>(
-                  item.resource
-                );
+                const instance = this.diService.serviceInjector.getServiceByClass<CachedResource<any, any, any, any, any>>(item.resource);
                 instance.markOutdated(undefined);
               },
-            }
+            },
           ),
           ...items,
         ];
@@ -214,8 +182,7 @@ export class PluginBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> {
-  }
+  load(): void | Promise<void> {}
 
   private getResources(providers: IServiceConstructor<any>[]): ResourceSubMenuItem[] {
     return providers
