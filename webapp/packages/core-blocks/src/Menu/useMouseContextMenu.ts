@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 
 import { useObservableRef } from '../useObservableRef';
@@ -21,19 +20,24 @@ export interface IMouseContextMenu {
 }
 
 export function useMouseContextMenu(): IMouseContextMenu {
-  return useObservableRef<IMouseContextMenu>(() => ({
-    position: null,
-    handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
-      if (!event.currentTarget.contains(event.target as Node)) {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
+  return useObservableRef<IMouseContextMenu>(
+    () => ({
+      position: null,
+      handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
+        if (!event.currentTarget.contains(event.target as Node)) {
+          return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
 
-      this.position = {
-        x: event.clientX,
-        y: event.clientY,
-      };
-    },
-  }), { position: observable.ref }, false, ['handleContextMenuOpen']);
+        this.position = {
+          x: event.clientX,
+          y: event.clientY,
+        };
+      },
+    }),
+    { position: observable.ref },
+    false,
+    ['handleContextMenuOpen'],
+  );
 }

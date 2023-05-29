@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import type { ButtonHTMLAttributes } from 'react';
 import styled from 'reshadow';
 
-import { useTranslate, useStyles, joinStyles } from '@cloudbeaver/core-blocks';
+import { joinStyles, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { IMenuItem, MenuTrigger } from '@cloudbeaver/core-dialogs';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
@@ -29,14 +28,7 @@ export const TopMenuItem = observer<IProps>(function TopMenuItem({ menuItem, sty
   const title = translate(menuItem.title);
 
   if (!menuItem.panel) {
-    return (
-      <TopNavButton
-        {...props}
-        title={title}
-        disabled={menuItem.isDisabled}
-        onClick={() => menuItem.onClick?.()}
-      />
-    );
+    return <TopNavButton {...props} title={title} disabled={menuItem.isDisabled} onClick={() => menuItem.onClick?.()} />;
   }
 
   return styled(styles)(
@@ -50,11 +42,7 @@ export const TopMenuItem = observer<IProps>(function TopMenuItem({ menuItem, sty
       disclosure
       onClick={() => menuItem.onClick?.()}
     >
-      <TopNavButton
-        title={title}
-        icon={menuItem.icon}
-        style={style}
-      />
-    </MenuTrigger>
+      <TopNavButton title={title} icon={menuItem.icon} style={style} />
+    </MenuTrigger>,
   );
 });

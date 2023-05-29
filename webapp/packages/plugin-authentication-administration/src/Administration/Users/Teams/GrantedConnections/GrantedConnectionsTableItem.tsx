@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -30,22 +29,27 @@ const style = css`
 `;
 
 export const GrantedConnectionsTableItem = observer<Props>(function GrantedConnectionsTableItem({
-  id, name, host, icon, iconTooltip, tooltip, disabled, className,
+  id,
+  name,
+  host,
+  icon,
+  iconTooltip,
+  tooltip,
+  disabled,
+  className,
 }) {
   return styled(style)(
-    <TableItem
-      item={id}
-      title={tooltip}
-      disabled={disabled}
-      selectDisabled={disabled}
-      className={className}
-    >
+    <TableItem item={id} title={tooltip} disabled={disabled} selectDisabled={disabled} className={className}>
       <TableColumnValue centerContent flex>
         <TableItemSelect disabled={disabled} />
       </TableColumnValue>
-      <TableColumnValue flex centerContent>{icon && <StaticImage icon={icon} title={iconTooltip} />}</TableColumnValue>
-      <TableColumnValue title={name} ellipsis>{name}</TableColumnValue>
+      <TableColumnValue flex centerContent>
+        {icon && <StaticImage icon={icon} title={iconTooltip} />}
+      </TableColumnValue>
+      <TableColumnValue title={name} ellipsis>
+        {name}
+      </TableColumnValue>
       <TableColumnValue>{host && host}</TableColumnValue>
-    </TableItem>
+    </TableItem>,
   );
 });

@@ -5,13 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React, { useContext, useEffect, useRef } from 'react';
 
 import { getComputed, useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
-import { type NavNode, NavNodeInfoResource, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { EObjectFeature, type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { IDNDData } from '@cloudbeaver/core-ui';
 
@@ -21,7 +20,6 @@ import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { IElementsTreeAction } from '../IElementsTreeAction';
 import type { NavTreeControlComponent } from '../NavigationNodeComponent';
 import type { IElementsTree } from '../useElementsTree';
-
 
 export interface INavigationNode {
   ref: React.RefObject<HTMLDivElement>;
@@ -66,32 +64,28 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   const control = getComputed(() => contextRef.context?.control);
   const disabled = getComputed(() => contextRef.context?.tree.disabled || false);
   const selected = getComputed(() => contextRef.context?.tree.isNodeSelected(node.id) || false);
-  const getSelected = () => navNodeInfoResource
-    .get(resourceKeyList(contextRef.context?.tree.getSelected() || []))
-    .filter(Boolean) as NavNode[];
-  const indeterminateSelected = getComputed(
-    () => contextRef.context?.tree.isNodeIndeterminateSelected(node.id) || false
-  );
+  const getSelected = () => navNodeInfoResource.get(resourceKeyList(contextRef.context?.tree.getSelected() || [])).filter(Boolean) as NavNode[];
+  const indeterminateSelected = getComputed(() => contextRef.context?.tree.isNodeIndeterminateSelected(node.id) || false);
 
   const handleClick = async (leaf: boolean) => await contextRef.context?.tree.click(node, path, leaf);
   const handleOpen = async (leaf: boolean) => await contextRef.context?.tree.open(node, path, leaf);
   const handleExpand = async () => await contextRef.context?.tree.expand(node, !expanded);
-  const handleSelect = async (
-    multiple = false,
-    nested = false
-  ) => await contextRef.context?.tree.select(node, multiple, nested);
+  const handleSelect = async (multiple = false, nested = false) => await contextRef.context?.tree.select(node, multiple, nested);
 
   function setDnDState(data: IDNDData, dragging: boolean): void {
     contextRef.context?.tree.setDnDData(data, dragging);
   }
 
-  useEffect(() => () => {
-    if (!contextRef.context?.selectionTree) {
-      if (contextRef.context?.tree.isNodeSelected(node.id)) {
-        contextRef.context.tree.select(node, true, false);
+  useEffect(
+    () => () => {
+      if (!contextRef.context?.selectionTree) {
+        if (contextRef.context?.tree.isNodeSelected(node.id)) {
+          contextRef.context.tree.select(node, true, false);
+        }
       }
-    }
-  }, [node]);
+    },
+    [node],
+  );
 
   useEffect(() => {
     if (contextRef.context?.tree.isNodeSelected(node.id)) {
@@ -101,11 +95,13 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
 
   useExecutor({
     executor: contextRef.context?.tree.actions || new SyncExecutor<IElementsTreeAction>(),
-    handlers: [function refreshRoot({ type, nodeId }) {
-      if (type === 'show' && nodeId === node.id) {
-        elementRef.current?.scrollIntoView();
-      }
-    }],
+    handlers: [
+      function refreshRoot({ type, nodeId }) {
+        if (type === 'show' && nodeId === node.id) {
+          elementRef.current?.scrollIntoView();
+        }
+      },
+    ],
   });
 
   return useObjectRef({
@@ -131,19 +127,10 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   });
 }
 
-export function isLeaf(
-  node: NavNode,
-  children: string[] | undefined,
-  tree: IElementsTree | undefined,
-  outdated: boolean
-): boolean {
+export function isLeaf(node: NavNode, children: string[] | undefined, tree: IElementsTree | undefined, outdated: boolean): boolean {
   if (node.folder && tree?.settings?.foldersTree) {
     return false;
   }
 
-  return (
-    node.objectFeatures.includes(EObjectFeature.entity)
-    || !node.hasChildren
-    || (children?.length === 0 && !outdated)
-  );
+  return node.objectFeatures.includes(EObjectFeature.entity) || !node.hasChildren || (children?.length === 0 && !outdated);
 }

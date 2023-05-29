@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { TableItem, TableColumnValue, TableItemExpand, useStyles } from '@cloudbeaver/core-blocks';
+import { TableColumnValue, TableItem, TableItemExpand, useStyles } from '@cloudbeaver/core-blocks';
 import type { IVersion } from '@cloudbeaver/core-version';
 
 import { VersionInfo } from './VersionInfo';
@@ -35,6 +34,6 @@ export const Version = observer<Props>(function Version({ version }) {
       </TableColumnValue>
       <TableColumnValue expand>{version.number}</TableColumnValue>
       <TableColumnValue>{version.date}</TableColumnValue>
-    </TableItem>
+    </TableItem>,
   );
 });

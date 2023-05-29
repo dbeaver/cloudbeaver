@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
@@ -63,7 +62,7 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
     <InlineEditor
       value={name}
       disabled={loading}
-      controlsPosition='inside'
+      controlsPosition="inside"
       style={styles}
       simple
       autofocus
@@ -73,6 +72,6 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
       onReject={onClose}
       onBlur={onClose}
       onClick={stopPropagation}
-    />
+    />,
   );
 });

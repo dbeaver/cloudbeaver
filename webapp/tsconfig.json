@@ -52,10 +52,5 @@
       "node",
       "jest"
     ],
-  },
-  "references": [
-    {
-      "path": "./packages/*"
     }
-  ]
 }

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable } from 'mobx';
 import React from 'react';
 
@@ -32,10 +31,7 @@ export const SSHPanel = React.lazy(async () => {
 
 @injectable()
 export class ConnectionSSHTabService extends Bootstrap {
-  constructor(
-    private readonly connectionFormService: ConnectionFormService,
-    private readonly dbDriverResource: DBDriverResource
-  ) {
+  constructor(private readonly connectionFormService: ConnectionFormService, private readonly dbDriverResource: DBDriverResource) {
     super();
 
     makeObservable<this, 'fillConfig' | 'prepareConfig'>(this, {
@@ -63,28 +59,20 @@ export class ConnectionSSHTabService extends Bootstrap {
       },
     });
 
-    this.connectionFormService.prepareConfigTask
-      .addHandler(this.prepareConfig.bind(this));
+    this.connectionFormService.prepareConfigTask.addHandler(this.prepareConfig.bind(this));
 
-    this.connectionFormService.formValidationTask
-      .addHandler(this.validate.bind(this));
+    this.connectionFormService.formValidationTask.addHandler(this.validate.bind(this));
 
-    this.connectionFormService.formStateTask
-      .addHandler(this.formState.bind(this));
+    this.connectionFormService.formStateTask.addHandler(this.formState.bind(this));
 
-    this.connectionFormService.configureTask
-      .addHandler(this.configure.bind(this));
+    this.connectionFormService.configureTask.addHandler(this.configure.bind(this));
 
-    this.connectionFormService.fillConfigTask
-      .addHandler(this.fillConfig.bind(this));
+    this.connectionFormService.fillConfigTask.addHandler(this.fillConfig.bind(this));
   }
 
-  load(): void { }
+  load(): void {}
 
-  private fillConfig(
-    { state, updated }: IConnectionFormFillConfigData,
-    contexts: IExecutionContextProvider<IConnectionFormFillConfigData>
-  ) {
+  private fillConfig({ state, updated }: IConnectionFormFillConfigData, contexts: IExecutionContextProvider<IConnectionFormFillConfigData>) {
     if (!updated) {
       return;
     }
@@ -121,15 +109,7 @@ export class ConnectionSSHTabService extends Bootstrap {
     configuration.include('includeNetworkHandlersConfig');
   }
 
-  private validate(
-    {
-      state: {
-        config,
-        info,
-      },
-    }: IConnectionFormSubmitData,
-    contexts: IExecutionContextProvider<IConnectionFormSubmitData>
-  ) {
+  private validate({ state: { config, info } }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
     const validation = contexts.getContext(this.connectionFormService.connectionValidationContext);
 
     if (!config.networkHandlersConfig) {
@@ -168,12 +148,7 @@ export class ConnectionSSHTabService extends Bootstrap {
     }
   }
 
-  private prepareConfig(
-    {
-      state,
-    }: IConnectionFormSubmitData,
-    contexts: IExecutionContextProvider<IConnectionFormSubmitData>
-  ) {
+  private prepareConfig({ state }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
     const config = contexts.getContext(connectionConfigContext);
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
     const urlType = state.config.configurationType === DriverConfigurationType.Url;
@@ -206,10 +181,7 @@ export class ConnectionSSHTabService extends Bootstrap {
     }
   }
 
-  private formState(
-    data: IConnectionFormState,
-    contexts: IExecutionContextProvider<IConnectionFormState>
-  ) {
+  private formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const config = contexts.getContext(connectionConfigContext);
     if (config.networkHandlersConfig !== undefined) {
       const stateContext = contexts.getContext(connectionFormStateContext);
@@ -226,14 +198,16 @@ export class ConnectionSSHTabService extends Bootstrap {
     const port = Number(initial?.properties?.port);
     const formPort = Number(handler.properties?.port);
 
-    if (handler.enabled !== initial?.enabled
-      || handler.authType !== initial?.authType
-      || handler.savePassword !== initial?.savePassword
-      || handler.userName !== initial?.userName
-      || handler.properties?.host !== initial?.properties?.host
-      || port !== formPort
-      || handler.properties?.aliveInterval !== initial?.properties?.aliveInterval
-      || handler.properties?.sshConnectTimeout !== initial?.properties?.sshConnectTimeout) {
+    if (
+      handler.enabled !== initial?.enabled ||
+      handler.authType !== initial?.authType ||
+      handler.savePassword !== initial?.savePassword ||
+      handler.userName !== initial?.userName ||
+      handler.properties?.host !== initial?.properties?.host ||
+      port !== formPort ||
+      handler.properties?.aliveInterval !== initial?.properties?.aliveInterval ||
+      handler.properties?.sshConnectTimeout !== initial?.properties?.sshConnectTimeout
+    ) {
       return true;
     }
 
@@ -246,8 +220,8 @@ export class ConnectionSSHTabService extends Bootstrap {
     }
 
     return (
-      (((initial?.password === null && handler.password !== null) || initial?.password === '') && handler.password !== '')
-      || !!handler.password?.length
+      (((initial?.password === null && handler.password !== null) || initial?.password === '') && handler.password !== '') ||
+      !!handler.password?.length
     );
   }
 
@@ -256,9 +230,6 @@ export class ConnectionSSHTabService extends Bootstrap {
       return false;
     }
 
-    return (
-      (((initial?.key === null && handler.key !== null) || initial?.key === '') && handler.key !== '')
-      || !!handler.key?.length
-    );
+    return (((initial?.key === null && handler.key !== null) || initial?.key === '') && handler.key !== '') || !!handler.key?.length;
   }
 }

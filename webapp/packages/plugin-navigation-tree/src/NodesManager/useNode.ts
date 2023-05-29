@@ -5,11 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-
 
 interface IUseNodeHook {
   navNodeId: string;
@@ -25,20 +23,24 @@ export function useNode(navNodeId: string): IUseNodeHook {
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const node = navNodeInfoResource.get(navNodeId);
 
-  return useObjectRef<IUseNodeHook>(() => ({
-    navNodeId,
-    node,
-    isLoading() {
-      return navNodeInfoResource.isLoading(this.navNodeId);
+  return useObjectRef<IUseNodeHook>(
+    () => ({
+      navNodeId,
+      node,
+      isLoading() {
+        return navNodeInfoResource.isLoading(this.navNodeId);
+      },
+      isLoaded() {
+        return navNodeInfoResource.isLoaded(this.navNodeId);
+      },
+      isOutdated() {
+        return navNodeInfoResource.isOutdated(this.navNodeId);
+      },
+    }),
+    {
+      navNodeId,
+      node,
     },
-    isLoaded() {
-      return navNodeInfoResource.isLoaded(this.navNodeId);
-    },
-    isOutdated() {
-      return navNodeInfoResource.isOutdated(this.navNodeId);
-    },
-  }), {
-    navNodeId,
-    node,
-  }, bindActions);
+    bindActions,
+  );
 }

@@ -5,64 +5,63 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useLayoutEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AdministrationItemService, filterOnlyActive, IAdministrationItemRoute } from '@cloudbeaver/core-administration';
-import { SlideBox, SlideElement, ErrorBoundary, SlideOverlay, slideBoxStyles, useStyles, Loader } from '@cloudbeaver/core-blocks';
+import { ErrorBoundary, Loader, SlideBox, slideBoxStyles, SlideElement, SlideOverlay, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { TabsState, TabList, verticalTabStyles, BASE_TAB_STYLES, OptionsPanelService } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, OptionsPanelService, TabList, TabsState, verticalTabStyles } from '@cloudbeaver/core-ui';
 
 import { DrawerItem } from './DrawerItem';
 import { ItemContent } from './ItemContent';
 
 const tabsStyles = css`
-    TabList {
-      composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
-    }
-    Tab {
-      composes: theme-ripple theme-background-background theme-ripple-selectable from global;
-      color: inherit;
-    }
-  `;
+  TabList {
+    composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+  }
+  Tab {
+    composes: theme-ripple theme-background-background theme-ripple-selectable from global;
+    color: inherit;
+  }
+`;
 
 const administrationStyles = css`
-    SlideElement {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-    container {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-      display: flex;
-      flex-direction: row;
-      flex: 1;
-      overflow: hidden;
-    }
-    TabList {
-      width: 240px;
-      padding-top: 16px;
-      border-right: 2px solid;
-    }
-    content-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: auto;
-    }
-    SlideBox {
-      flex: 1;
-    }
-    content {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      overflow: auto;
-    }
-    Loader {
-      height: 100%;
-    }
-  `;
+  SlideElement {
+    composes: theme-background-secondary theme-text-on-secondary from global;
+  }
+  container {
+    composes: theme-background-secondary theme-text-on-secondary from global;
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    overflow: hidden;
+  }
+  TabList {
+    width: 240px;
+    padding-top: 16px;
+    border-right: 2px solid;
+  }
+  content-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
+  SlideBox {
+    flex: 1;
+  }
+  content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
+  Loader {
+    height: 100%;
+  }
+`;
 
 interface Props {
   configurationWizard: boolean;
@@ -71,7 +70,10 @@ interface Props {
 }
 
 export const Administration = observer<React.PropsWithChildren<Props>>(function Administration({
-  configurationWizard, activeScreen, onItemSelect, children,
+  configurationWizard,
+  activeScreen,
+  onItemSelect,
+  children,
 }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const administrationItemService = useService(AdministrationItemService);
@@ -87,7 +89,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
 
   return styled(useStyles(BASE_TAB_STYLES, verticalTabStyles, administrationStyles, tabsStyles, slideBoxStyles))(
     <container>
-      <TabsState currentTabId={activeScreen?.item} orientation='vertical'>
+      <TabsState currentTabId={activeScreen?.item} orientation="vertical">
         <TabList aria-label="Administration items">
           {items.map(item => (
             <DrawerItem
@@ -95,15 +97,12 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
               item={item}
               configurationWizard={configurationWizard}
               style={[BASE_TAB_STYLES, verticalTabStyles, tabsStyles]}
-              disabled={(
-                onlyActiveItem
-                && onlyActiveItem.filterOnlyActive?.(configurationWizard, item) !== true
-              ) ? true : false}
+              disabled={onlyActiveItem && onlyActiveItem.filterOnlyActive?.(configurationWizard, item) !== true ? true : false}
               onSelect={onItemSelect}
             />
           ))}
         </TabList>
-        <content-container ref={contentRef} as='div'>
+        <content-container ref={contentRef} as="div">
           {children}
           <SlideBox open={optionsPanelService.active}>
             <SlideElement>
@@ -124,6 +123,6 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
           </SlideBox>
         </content-container>
       </TabsState>
-    </container>
+    </container>,
   );
 });

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -20,7 +19,7 @@ const styles = css`
     align-items: center;
     border-radius: var(--theme-group-element-radius);
     height: 50px;
-    padding: 8px 12px;  
+    padding: 8px 12px;
   }
 
   IconOrImage {
@@ -52,27 +51,20 @@ interface Props {
   onShowDetails?: () => void;
 }
 
-export const ErrorMessage = observer<Props>(function ErrorMessage({
-  text,
-  className,
-  hasDetails,
-  onShowDetails,
-}) {
+export const ErrorMessage = observer<Props>(function ErrorMessage({ text, className, hasDetails, onShowDetails }) {
   const translate = useTranslate();
 
   return styled(styles)(
     <message className={className}>
       <IconOrImage icon="/icons/error_icon_sm.svg" />
-      <message-body title={text}>
-        {text}
-      </message-body>
+      <message-body title={text}>{text}</message-body>
       <message-actions>
         {hasDetails && (
-          <Button type='button' mod={['outlined']} onClick={onShowDetails}>
+          <Button type="button" mod={['outlined']} onClick={onShowDetails}>
             {translate('ui_errors_details')}
           </Button>
         )}
       </message-actions>
-    </message>
+    </message>,
   );
 });

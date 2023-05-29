@@ -46,8 +46,8 @@ export function applyComposes(mixed: Array<Composes | ClassCollection>) {
 
   return [
     ...styles,
-    ...composes.map(compose => Object.entries(compose.composes).reduce<ClassCollection>(
-      (map, [key, value]) => {
+    ...composes.map(compose =>
+      Object.entries(compose.composes).reduce<ClassCollection>((map, [key, value]) => {
         const classes = value.split(' ');
         const classnames: string[] = [];
 
@@ -66,8 +66,7 @@ export function applyComposes(mixed: Array<Composes | ClassCollection>) {
         // eslint-disable-next-line no-param-reassign
         map[key] = classnames.join(' ');
         return map;
-      },
-      {}
-    )),
+      }, {}),
+    ),
   ];
 }

@@ -5,17 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ServiceDescriptionComponent } from '@cloudbeaver/core-authentication';
 import { Link, Translate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-
 import { AuthConfigurationsAdministrationNavService } from './AuthConfigurationsAdministrationNavService';
 
-export const IdentityProvidersServiceLink: ServiceDescriptionComponent = function IdentityProvidersServiceLink({
-  configurationWizard,
-}) {
+export const IdentityProvidersServiceLink: ServiceDescriptionComponent = function IdentityProvidersServiceLink({ configurationWizard }) {
   const authConfigurationsAdministrationNavService = useService(AuthConfigurationsAdministrationNavService);
 
   if (configurationWizard) {

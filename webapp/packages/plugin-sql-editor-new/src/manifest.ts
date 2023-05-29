@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { PluginBootstrap } from './PluginBootstrap';
@@ -16,8 +15,5 @@ export const sqlEditorNewPlugin: PluginManifest = {
     name: 'Sql Editor New Plugin',
   },
 
-  providers: [
-    PluginBootstrap,
-    SQLCodeEditorPanelService,
-  ],
+  providers: [PluginBootstrap, SQLCodeEditorPanelService],
 };

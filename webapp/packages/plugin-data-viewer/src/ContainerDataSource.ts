@@ -5,13 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable, observable } from 'mobx';
 
 import type { ConnectionExecutionContextService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
-import { AsyncTaskInfoService, GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
+import {
+  AsyncTaskInfoService,
+  GraphQLService,
+  ResultDataFormat,
+  SqlExecuteInfo,
+  SqlQueryResults,
+  UpdateResultsDataBatchMutationVariables,
+} from '@cloudbeaver/core-sdk';
 
 import { DocumentEditAction } from './DatabaseDataModel/Actions/Document/DocumentEditAction';
 import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
@@ -28,6 +34,10 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
   get canCancel(): boolean {
     return this.currentTask?.cancellable || false;
+  }
+
+  get cancelled(): boolean {
+    return this.currentTask?.cancelled || false;
   }
 
   constructor(
@@ -61,9 +71,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     }
   }
 
-  async request(
-    prevResults: IDatabaseResultSet[]
-  ): Promise<IDatabaseResultSet[]> {
+  async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
     const options = this.options;
 
     if (!options) {
@@ -77,10 +85,10 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     let firstResultId: string | undefined;
 
     if (
-      prevResults.length === 1
-      && prevResults[0].contextId === executionContext.context!.id
-      && prevResults[0].connectionId === executionContext.context?.connectionId
-      && prevResults[0].id !== null
+      prevResults.length === 1 &&
+      prevResults[0].contextId === executionContext.context!.id &&
+      prevResults[0].connectionId === executionContext.context?.connectionId &&
+      prevResults[0].id !== null
     ) {
       firstResultId = prevResults[0].id;
     }
@@ -111,7 +119,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
         return result;
       },
       () => this.asyncTaskInfoService.cancel(task.id),
-      () => this.asyncTaskInfoService.remove(task.id)
+      () => this.asyncTaskInfoService.remove(task.id),
     );
 
     try {
@@ -136,9 +144,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     }
   }
 
-  async save(
-    prevResults: IDatabaseResultSet[]
-  ): Promise<IDatabaseResultSet[]> {
+  async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
     const executionContext = await this.ensureContextCreated();
 
     try {
@@ -173,8 +179,9 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
         };
 
         if (editor) {
-          const responseResult = this.transformResults(executionContextInfo, response.result.results, 0)
-            .find(newResult => newResult.id === result.id);
+          const responseResult = this.transformResults(executionContextInfo, response.result.results, 0).find(
+            newResult => newResult.id === result.id,
+          );
 
           if (responseResult) {
             editor.applyUpdate(responseResult);
@@ -218,11 +225,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     }
   }
 
-  private transformResults(
-    executionContextInfo: IConnectionExecutionContextInfo,
-    results: SqlQueryResults[],
-    limit: number
-  ): IDatabaseResultSet[] {
+  private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
     return results.map<IDatabaseResultSet>(result => ({
       id: result.resultSet?.id || '0',
       uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${result.resultSet?.id || '0'}`,
@@ -246,7 +249,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       const executionContext = await this.connectionExecutionContextService.create(
         this.options.connectionKey,
         this.options.catalog,
-        this.options.schema
+        this.options.schema,
       );
 
       this.setExecutionContext(executionContext);

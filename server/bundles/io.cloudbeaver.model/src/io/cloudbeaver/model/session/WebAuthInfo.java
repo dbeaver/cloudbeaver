@@ -80,7 +80,7 @@ public class WebAuthInfo implements SMSessionPrincipal {
 
     @Property
     public WebUserOriginInfo getOrigin() {
-        return new WebUserOriginInfo(session, user, authProvider, true);
+        return new WebUserOriginInfo(session, user, authProvider);
     }
 
     @Property

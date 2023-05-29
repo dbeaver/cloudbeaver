@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, IContextMenuItem, IMenuPanel } from '@cloudbeaver/core-dialogs';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
@@ -26,9 +25,7 @@ export class DataGridContextMenuService {
   static cellContext = 'data-grid-cell-context-menu';
   private static readonly menuToken = 'dataGridCell';
 
-  constructor(
-    private readonly contextMenuService: ContextMenuService,
-  ) {
+  constructor(private readonly contextMenuService: ContextMenuService) {
     this.onRootMenuOpen = new Executor();
   }
 
@@ -42,13 +39,16 @@ export class DataGridContextMenuService {
     spreadsheetActions: IDataPresentationActions<IResultSetElementKey>,
     resultIndex: number,
     key: IResultSetElementKey,
-    simple: boolean
+    simple: boolean,
   ): IMenuPanel {
-    return this.contextMenuService.createContextMenu<IDataGridCellMenuContext>({
-      menuId: this.getMenuToken(),
-      contextType: DataGridContextMenuService.cellContext,
-      data: { model, actions, spreadsheetActions, resultIndex, key, simple },
-    }, this.getMenuToken());
+    return this.contextMenuService.createContextMenu<IDataGridCellMenuContext>(
+      {
+        menuId: this.getMenuToken(),
+        contextType: DataGridContextMenuService.cellContext,
+        data: { model, actions, spreadsheetActions, resultIndex, key, simple },
+      },
+      this.getMenuToken(),
+    );
   }
 
   openMenu(
@@ -57,7 +57,7 @@ export class DataGridContextMenuService {
     spreadsheetActions: IDataPresentationActions<IResultSetElementKey>,
     resultIndex: number,
     key: IResultSetElementKey,
-    simple: boolean
+    simple: boolean,
   ): void {
     this.onRootMenuOpen.execute({ model, actions, spreadsheetActions, resultIndex, key, simple });
   }
@@ -66,5 +66,5 @@ export class DataGridContextMenuService {
     this.contextMenuService.addMenuItem(panelId, menuItem);
   }
 
-  register(): void { }
+  register(): void {}
 }

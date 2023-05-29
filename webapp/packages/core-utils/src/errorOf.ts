@@ -6,10 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function errorOf<T extends abstract new (...args: any) => Error>(
-  error: any,
-  constructor: T
-): InstanceType<T> | undefined {
+export function errorOf<T extends abstract new (...args: any) => Error>(error: any, constructor: T): InstanceType<T> | undefined {
   if (error instanceof constructor) {
     return error as InstanceType<T>;
   }

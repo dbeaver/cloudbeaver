@@ -5,10 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 
-import { Table, TableHeader, TableColumnHeader, TableBody, TableSelect, useTranslate } from '@cloudbeaver/core-blocks';
+import { Table, TableBody, TableColumnHeader, TableHeader, TableSelect, useTranslate } from '@cloudbeaver/core-blocks';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 
 import { AuthConfiguration } from './AuthConfiguration';
@@ -24,7 +23,7 @@ export const AuthConfigurationsTable = observer<Props>(function AuthConfiguratio
   const keys = configurations.map(configuration => configuration.id);
 
   return (
-    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size='big'>
+    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size="big">
       <TableHeader fixed>
         <TableColumnHeader min flex centerContent>
           <TableSelect />

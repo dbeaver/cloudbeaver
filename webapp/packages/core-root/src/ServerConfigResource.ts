@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { GraphQLService, CachedDataResource, ServerConfig, ServerConfigInput, NavigatorSettingsInput, CachedResource } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, CachedResource, GraphQLService, NavigatorSettingsInput, ServerConfig, ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { isNavigatorViewSettingsEqual } from './ConnectionNavigatorViewSettings';
@@ -55,20 +54,18 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
       syncUpdateData: action,
     });
 
-    serverConfigEventHandler.on(() => {
-      this.syncQueue.add(
-        this.dataSynchronizationService.requestSynchronization('server-config', 'Server Configuration')
-      );
-    }, () => undefined, undefined, this);
+    serverConfigEventHandler.on(
+      () => {
+        this.syncQueue.add(this.dataSynchronizationService.requestSynchronization('server-config', 'Server Configuration'));
+      },
+      () => undefined,
+      undefined,
+      this,
+    );
   }
 
-  requirePublic<T>(
-    resource: CachedResource<any, any, T, any, any>,
-    map?: (param: void) => T
-  ): this {
-    resource
-      .preloadResource(this, () => {})
-      .before(ExecutorInterrupter.interrupter(() => this.publicDisabled));
+  requirePublic<T>(resource: CachedResource<any, any, T, any, any>, map?: (param: void) => T): this {
+    resource.preloadResource(this, () => {}).before(ExecutorInterrupter.interrupter(() => this.publicDisabled));
 
     this.outdateResource<T>(resource, map as any);
 
@@ -104,10 +101,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
   }
 
   get publicDisabled(): boolean {
-    if (
-      this.configurationMode
-      || (this.data?.licenseRequired && !this.data.licenseValid)
-    ) {
+    if (this.configurationMode || (this.data?.licenseRequired && !this.data.licenseValid)) {
       return true;
     }
 
@@ -171,21 +165,17 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     }
 
     return (
-      this.update.serverName !== this.data.name
-      || this.update.serverURL !== this.data.serverURL
-      || this.update.sessionExpireTime !== this.data.sessionExpireTime
-
-      || this.update.anonymousAccessEnabled !== this.data.anonymousAccessEnabled
-
-      || this.update.resourceManagerEnabled !== this.data.resourceManagerEnabled
-
-      || this.update.adminCredentialsSaveEnabled !== this.data.adminCredentialsSaveEnabled
-      || this.update.publicCredentialsSaveEnabled !== this.data.publicCredentialsSaveEnabled
-
-      || this.update.customConnectionsEnabled !== this.data.supportsCustomConnections
-      || !isArraysEqual(this.update.enabledAuthProviders || [], this.data.enabledAuthProviders)
-      || !isArraysEqual(this.update.enabledFeatures || [], this.data.enabledFeatures)
-      || !isArraysEqual(this.update.disabledDrivers || [], this.data.disabledDrivers)
+      this.update.serverName !== this.data.name ||
+      this.update.serverURL !== this.data.serverURL ||
+      this.update.sessionExpireTime !== this.data.sessionExpireTime ||
+      this.update.anonymousAccessEnabled !== this.data.anonymousAccessEnabled ||
+      this.update.resourceManagerEnabled !== this.data.resourceManagerEnabled ||
+      this.update.adminCredentialsSaveEnabled !== this.data.adminCredentialsSaveEnabled ||
+      this.update.publicCredentialsSaveEnabled !== this.data.publicCredentialsSaveEnabled ||
+      this.update.customConnectionsEnabled !== this.data.supportsCustomConnections ||
+      !isArraysEqual(this.update.enabledAuthProviders || [], this.data.enabledAuthProviders) ||
+      !isArraysEqual(this.update.enabledFeatures || [], this.data.enabledFeatures) ||
+      !isArraysEqual(this.update.disabledDrivers || [], this.data.disabledDrivers)
     );
   }
 
@@ -230,34 +220,44 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
   }
 
   async save(skipConfigUpdate = false): Promise<void> {
-    await this.performUpdate(undefined, undefined, async () => {
-      if (this.isNavigatorSettingsChanged()) {
-        await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings: this.navigatorSettingsUpdate });
+    await this.performUpdate(
+      undefined,
+      undefined,
+      async () => {
+        if (this.isNavigatorSettingsChanged()) {
+          await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings: this.navigatorSettingsUpdate });
 
-        if (this.data) {
-          this.data.defaultNavigatorSettings = { ...this.navigatorSettingsUpdate };
-        } else {
+          if (this.data) {
+            this.data.defaultNavigatorSettings = { ...this.navigatorSettingsUpdate };
+          } else {
+            this.setData(await this.loader());
+          }
+        }
+
+        if (this.isChanged() && !skipConfigUpdate) {
+          await this.graphQLService.sdk.configureServer({
+            configuration: this.update,
+          });
           this.setData(await this.loader());
         }
-      }
-
-      if (this.isChanged() && !skipConfigUpdate) {
-        await this.graphQLService.sdk.configureServer({
-          configuration: this.update,
-        });
-        this.setData(await this.loader());
-      }
-    }, () => !this.isNavigatorSettingsChanged() && (!this.isChanged() || skipConfigUpdate));
+      },
+      () => !this.isNavigatorSettingsChanged() && (!this.isChanged() || skipConfigUpdate),
+    );
   }
 
   async finishConfiguration(onlyRestart = false): Promise<void> {
-    await this.performUpdate(undefined, undefined, async () => {
-      await this.graphQLService.sdk.configureServer({
-        configuration: !this.isChanged() && onlyRestart ? {} : this.update,
-      });
+    await this.performUpdate(
+      undefined,
+      undefined,
+      async () => {
+        await this.graphQLService.sdk.configureServer({
+          configuration: !this.isChanged() && onlyRestart ? {} : this.update,
+        });
 
-      this.setData(await this.loader());
-    }, () => !this.isChanged() && !onlyRestart);
+        this.setData(await this.loader());
+      },
+      () => !this.isChanged() && !onlyRestart,
+    );
   }
 
   protected async loader(): Promise<ServerConfig> {

@@ -9,10 +9,5 @@ export const connectionSearchPlugin: PluginManifest = {
   info: {
     name: 'Search connection plugin',
   },
-  providers: [
-    SearchConnectionPluginBootstrap,
-    ConnectionSearchService,
-    LocaleService,
-    ConnectionSearchSettingsService,
-  ],
+  providers: [SearchConnectionPluginBootstrap, ConnectionSearchService, LocaleService, ConnectionSearchSettingsService],
 };

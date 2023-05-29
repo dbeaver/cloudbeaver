@@ -5,13 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { getComputed, TextPlaceholder, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ITabData, TabsState, TabList, TabPanel, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, ITabData, TabList, TabPanel, TabsState } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
@@ -21,35 +20,35 @@ import { SqlResultTab } from './SqlResultTab';
 import { SqlResultTabsService } from './SqlResultTabsService';
 
 const styles = css`
-    Tab {
-      composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
-    }
-    TabIcon {
-      composes: theme-text-surface from global;
-    }
-    wrapper {
-      overflow: auto;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      height: 100%;
-      position: relative;
-    }
-    TabsBox {
-      height: 100%;
-    }
-    TabList {
-      composes: theme-background-background theme-text-text-primary-on-light from global;
-      display: flex;
-      overflow: auto;
-    }
-    TabList:not([|executable]) tab-outer:only-child {
-      display: none;
-    }
-    TextPlaceholder {
-      padding: 24px;
-    }
-  `;
+  Tab {
+    composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
+  }
+  TabIcon {
+    composes: theme-text-surface from global;
+  }
+  wrapper {
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+    position: relative;
+  }
+  TabsBox {
+    height: 100%;
+  }
+  TabList {
+    composes: theme-background-background theme-text-text-primary-on-light from global;
+    display: flex;
+    overflow: auto;
+  }
+  TabList:not([|executable]) tab-outer:only-child {
+    display: none;
+  }
+  TextPlaceholder {
+    padding: 24px;
+  }
+`;
 
 interface Props {
   state: ISqlEditorTabState;
@@ -64,18 +63,16 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
   const sqlDataSourceService = useService(SqlDataSourceService);
   const dataSource = getComputed(() => sqlDataSourceService.get(state.editorId));
 
-  const orderedTabs = state.tabs
-    .slice()
-    .sort((tabA, tabB) => {
-      const resultTabA = state.resultTabs.find(tab => tab.tabId === tabA.id);
-      const resultTabB = state.resultTabs.find(tab => tab.tabId === tabB.id);
+  const orderedTabs = state.tabs.slice().sort((tabA, tabB) => {
+    const resultTabA = state.resultTabs.find(tab => tab.tabId === tabA.id);
+    const resultTabB = state.resultTabs.find(tab => tab.tabId === tabB.id);
 
-      if (resultTabA && resultTabB && tabA.order === tabB.order) {
-        return resultTabA.indexInResultSet - resultTabB.indexInResultSet;
-      }
+    if (resultTabA && resultTabB && tabA.order === tabB.order) {
+      return resultTabA.indexInResultSet - resultTabB.indexInResultSet;
+    }
 
-      return tabA.order - tabB.order;
-    });
+    return tabA.order - tabB.order;
+  });
 
   function handleSelect(tab: ITabData) {
     sqlResultTabsService.selectResultTab(state, tab.tabId);
@@ -119,13 +116,9 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
         onChange={handleSelect}
         onClose={handleClose}
       >
-        <TabList aria-label='SQL Results' {...use({ executable })} style={styles}>
+        <TabList aria-label="SQL Results" {...use({ executable })} style={styles}>
           {orderedTabs.map(result => (
-            <SqlResultTab
-              key={result.id}
-              result={result}
-              style={styles}
-            />
+            <SqlResultTab key={result.id} result={result} style={styles} />
           ))}
         </TabList>
         {orderedTabs.map(result => (
@@ -134,6 +127,6 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
           </TabPanel>
         ))}
       </TabsState>
-    </wrapper>
+    </wrapper>,
   );
 });

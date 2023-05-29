@@ -5,14 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 export const DNDProvider: React.FC<React.PropsWithChildren> = function DNDProvider({ children }) {
-  return (
-    <DndProvider backend={HTML5Backend}>
-      {children}
-    </DndProvider>
-  );
+  return <DndProvider backend={HTML5Backend}>{children}</DndProvider>;
 };

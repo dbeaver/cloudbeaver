@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 
 import type { ENotificationType } from '@cloudbeaver/core-events';
@@ -53,17 +52,10 @@ export const Snackbar = observer<SnackbarProps>(function Snackbar({
       <Loader suspense>
         <SnackbarStatus status={type} />
         <SnackbarContent>
-          <SnackbarBody title={translate(title)}>
-            {message && translate(message)}
-          </SnackbarBody>
+          <SnackbarBody title={translate(title)}>{message && translate(message)}</SnackbarBody>
           <SnackbarFooter timestamp={time}>
             {onShowDetails && (
-              <Button
-                type="button"
-                mod={['outlined']}
-                disabled={disableShowDetails}
-                onClick={onShowDetails}
-              >
+              <Button type="button" mod={['outlined']} disabled={disableShowDetails} onClick={onShowDetails}>
                 {translate('ui_errors_details')}
               </Button>
             )}

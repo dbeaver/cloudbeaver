@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import '@testing-library/jest-dom';
 
 import { mockAuthentication } from '@cloudbeaver/core-authentication/mocks/mockAuthentication';
@@ -27,13 +26,10 @@ const app = createApp(
   // topAppBarPlugin,
   datasourceContextSwitchPlugin,
   navigationTabsPlugin,
-  navigationTreePlugin
+  navigationTreePlugin,
 );
 
-mockGraphQL(
-  ...mockAppInit(endpoint),
-  ...mockAuthentication(endpoint)
-);
+mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
 
 beforeAll(() => app.init());
 

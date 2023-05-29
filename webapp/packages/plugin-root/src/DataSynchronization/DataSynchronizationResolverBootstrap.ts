@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, INotification, NotificationService } from '@cloudbeaver/core-events';
 import { DataSynchronizationService, ServerConfigResource } from '@cloudbeaver/core-root';
@@ -19,7 +18,7 @@ export class DataSynchronizationResolverBootstrap extends Bootstrap {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly serverConfigResource: ServerConfigResource,
-    private readonly dataSynchronizationService: DataSynchronizationService
+    private readonly dataSynchronizationService: DataSynchronizationService,
   ) {
     super();
     this.activeNotification = null;
@@ -29,21 +28,25 @@ export class DataSynchronizationResolverBootstrap extends Bootstrap {
     this.dataSynchronizationService.onSynchronizationRequest.addHandler(this.handleNetworkStateChange.bind(this));
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 
   private handleNetworkStateChange(): void {
     if (this.activeNotification || this.serverConfigResource.configurationMode) {
       return;
     }
 
-    this.activeNotification = this.notificationService.customNotification(() => DataSynchronizationNotification, {}, {
-      title: 'plugin_root_data_sync_title',
-      message: 'plugin_root_data_sync_message',
-      type: ENotificationType.Info,
-      onClose: () => {
-        this.dataSynchronizationService.resolveAll(false);
-        this.activeNotification = null;
+    this.activeNotification = this.notificationService.customNotification(
+      () => DataSynchronizationNotification,
+      {},
+      {
+        title: 'plugin_root_data_sync_title',
+        message: 'plugin_root_data_sync_message',
+        type: ENotificationType.Info,
+        onClose: () => {
+          this.dataSynchronizationService.resolveAll(false);
+          this.activeNotification = null;
+        },
       },
-    });
+    );
   }
 }

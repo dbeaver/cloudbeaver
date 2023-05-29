@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, makeObservable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import { TeamsResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
@@ -24,7 +23,7 @@ export class CreateTeamService {
   constructor(
     private readonly teamsAdministrationNavService: TeamsAdministrationNavService,
     private readonly teamFormService: TeamFormService,
-    private readonly teamsResource: TeamsResource
+    private readonly teamsResource: TeamsResource,
   ) {
     this.data = null;
 
@@ -42,10 +41,7 @@ export class CreateTeamService {
   }
 
   fillData(): void {
-    this.data = new TeamFormState(
-      this.teamFormService,
-      this.teamsResource
-    );
+    this.data = new TeamFormState(this.teamFormService, this.teamsResource);
   }
 
   create(): void {

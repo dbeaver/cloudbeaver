@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React from 'react';
 
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
@@ -49,9 +48,7 @@ export class TeamFormService {
   readonly afterFormSubmittingTask: IExecutorHandlersCollection<ITeamFormSubmitData>;
   readonly formStateTask: IExecutorHandlersCollection<ITeamFormState>;
 
-  constructor(
-    private readonly notificationService: NotificationService,
-  ) {
+  constructor(private readonly notificationService: NotificationService) {
     this.tabsContainer = new TabsContainer('Team settings');
     this.actionsContainer = new PlaceholderContainer();
     this.configureTask = new ExecutorHandlersCollection();
@@ -62,13 +59,9 @@ export class TeamFormService {
     this.formValidationTask = new ExecutorHandlersCollection();
     this.formStateTask = new ExecutorHandlersCollection();
 
-    this.formSubmittingTask
-      .before(this.formValidationTask)
-      .before(this.prepareConfigTask)
-      .next(this.afterFormSubmittingTask);
+    this.formSubmittingTask.before(this.formValidationTask).before(this.prepareConfigTask).next(this.afterFormSubmittingTask);
 
-    this.formStateTask
-      .before<ITeamFormSubmitData>(this.prepareConfigTask, state => ({ state, submitType: 'submit' }));
+    this.formStateTask.before<ITeamFormSubmitData>(this.prepareConfigTask, state => ({ state, submitType: 'submit' }));
 
     this.formSubmittingTask.addPostHandler(this.showSubmittingStatusMessage);
     this.formValidationTask.addPostHandler(this.ensureValidation);
@@ -113,16 +106,15 @@ export class TeamFormService {
 
     if (status.messages.length > 0) {
       if (status.exception) {
-        this.notificationService.logException(
-          status.exception,
-          status.messages[0],
-          status.messages.slice(1).join('\n')
-        );
+        this.notificationService.logException(status.exception, status.messages[0], status.messages.slice(1).join('\n'));
       } else {
-        this.notificationService.notify({
-          title: status.messages[0],
-          message: status.messages.slice(1).join('\n'),
-        }, status.saved ? ENotificationType.Success : ENotificationType.Error);
+        this.notificationService.notify(
+          {
+            title: status.messages[0],
+            message: status.messages.slice(1).join('\n'),
+          },
+          status.saved ? ENotificationType.Success : ENotificationType.Error,
+        );
       }
     }
   };
@@ -135,12 +127,16 @@ export class TeamFormService {
     }
 
     if (validation.messages.length > 0) {
-      this.notificationService.notify({
-        title: data.state.mode === 'edit'
-          ? 'administration_identity_providers_provider_save_error'
-          : 'administration_identity_providers_provider_create_error',
-        message: validation.messages.join('\n'),
-      }, validation.valid ? ENotificationType.Info : ENotificationType.Error);
+      this.notificationService.notify(
+        {
+          title:
+            data.state.mode === 'edit'
+              ? 'administration_identity_providers_provider_save_error'
+              : 'administration_identity_providers_provider_create_error',
+          message: validation.messages.join('\n'),
+        },
+        validation.valid ? ENotificationType.Info : ENotificationType.Error,
+      );
     }
   };
 }

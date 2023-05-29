@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 
@@ -19,7 +18,7 @@ export class AppLocaleService extends Bootstrap {
     this.localizationService.addProvider(this.provider.bind(this));
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 
   private async provider(locale: string) {
     switch (locale) {

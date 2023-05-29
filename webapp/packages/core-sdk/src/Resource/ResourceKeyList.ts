@@ -11,23 +11,11 @@ export class ResourceKeyList<TKey> extends Array<TKey> {
     return Array;
   }
 
-  includes(
-    key: TKey,
-    fromIndex?: number
-  ): boolean;
+  includes(key: TKey, fromIndex?: number): boolean;
   includes(key: TKey | ResourceKeyList<TKey>): boolean;
-  includes(
-    key: TKey | ResourceKeyList<TKey>,
-    isEqual: (keyA: TKey, keyB: TKey) => boolean
-  ): boolean;
-  includes(
-    key: TKey | ResourceKeyList<TKey>,
-    dynamic?: number | ((keyA: TKey, keyB: TKey) => boolean)
-  ): boolean;
-  includes(
-    key: TKey | ResourceKeyList<TKey>,
-    dynamic?: number | ((keyA: TKey, keyB: TKey) => boolean)
-  ): boolean {
+  includes(key: TKey | ResourceKeyList<TKey>, isEqual: (keyA: TKey, keyB: TKey) => boolean): boolean;
+  includes(key: TKey | ResourceKeyList<TKey>, dynamic?: number | ((keyA: TKey, keyB: TKey) => boolean)): boolean;
+  includes(key: TKey | ResourceKeyList<TKey>, dynamic?: number | ((keyA: TKey, keyB: TKey) => boolean)): boolean {
     let fromIndex = 0;
     let isEqual = (keyA: TKey, keyB: TKey) => keyA === keyB;
 
@@ -44,7 +32,7 @@ export class ResourceKeyList<TKey> extends Array<TKey> {
       return key.some(key => this.includes(key, dynamic));
     }
 
-    return this.some((current, index) => (index >= fromIndex && isEqual(current, key)));
+    return this.some((current, index) => index >= fromIndex && isEqual(current, key));
   }
 
   exclude(key: TKey | ResourceKeyList<TKey>): ResourceKeyList<TKey> {

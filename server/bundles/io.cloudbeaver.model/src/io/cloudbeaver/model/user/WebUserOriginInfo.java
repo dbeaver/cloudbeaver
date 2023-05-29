@@ -20,7 +20,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.model.WebObjectOrigin;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.utils.WebCommonUtils;
@@ -28,13 +27,12 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
-import org.jkiss.dbeaver.model.auth.SMSession;
+import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.runtime.properties.PropertySourceMap;
+import org.jkiss.utils.CommonUtils;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
 
@@ -45,23 +43,21 @@ public class WebUserOriginInfo implements WebObjectOrigin {
 
     private static final Log log = Log.getLog(WebUserOriginInfo.class);
 
-    private final WebSession session;
-    private final WebUser user;
+    protected final WebSession session;
+    protected final WebUser user;
     @NotNull
-    private final WebAuthProviderDescriptor authProvider;
-    private boolean selfIdentity;
+    protected final WebAuthProviderDescriptor authProviderDescriptor;
 
-    public WebUserOriginInfo(WebSession session, WebUser user, @NotNull WebAuthProviderDescriptor authProvider, boolean selfIdentity) {
+    public WebUserOriginInfo(WebSession session, WebUser user, @NotNull WebAuthProviderDescriptor authProvider) {
         this.session = session;
         this.user = user;
-        this.authProvider = authProvider;
-        this.selfIdentity = selfIdentity;
+        this.authProviderDescriptor = authProvider;
     }
 
     @NotNull
     @Override
     public String getType() {
-        return authProvider.getId();
+        return authProviderDescriptor.getId();
     }
 
     @Nullable
@@ -73,13 +69,13 @@ public class WebUserOriginInfo implements WebObjectOrigin {
     @NotNull
     @Override
     public String getDisplayName() {
-        return authProvider.getLabel();
+        return authProviderDescriptor.getLabel();
     }
 
     @Nullable
     @Override
     public String getIcon() {
-        return WebCommonUtils.makeIconId(authProvider.getIcon());
+        return WebCommonUtils.makeIconId(authProviderDescriptor.getIcon());
     }
 
     @NotNull
@@ -95,25 +91,12 @@ public class WebUserOriginInfo implements WebObjectOrigin {
             return new WebPropertyInfo[0];
         }
         try {
-            WebAuthInfo authInfo = session.getAuthInfo(authProvider.getId());
-            if (authInfo == null) {
-                throw new DBException("Session not authorized in auth provider '" + authProvider.getId() + "'");
-            }
-            SMSession authSession = authInfo.getAuthSession();
-            SMAuthProvider<?> authProvider = this.authProvider.getInstance();
-            if (authSession != null && authProvider instanceof SMAuthProviderExternal) {
-                if (!isValidSessionType(authSession, authProvider)) {
-                    return new WebPropertyInfo[0];
-                }
-                DBPObject userDetails = ((SMAuthProviderExternal) authProvider).getUserDetails(
-                    session.getProgressMonitor(),
-                    session,
-                    authSession,
-                    user,
-                    selfIdentity);
-                if (userDetails != null) {
-                    return WebCommonUtils.getObjectProperties(session, userDetails);
-                }
+            SMAuthProvider<?> authProvider = this.authProviderDescriptor.getInstance();
+            if (authProvider instanceof SMAuthProviderExternal) {
+                // read user's info from credentials, previously we tried to read data from external service using
+                // SMAuthProviderExternal#getUserDetails
+                var creds = loadCredentials();
+                return mapCredsToProperties(session, creds);
             }
         } catch (Exception e) {
             log.error(e);
@@ -121,16 +104,32 @@ public class WebUserOriginInfo implements WebObjectOrigin {
         return new WebPropertyInfo[0];
     }
 
-    private static boolean isValidSessionType(SMSession authSession, SMAuthProvider<?> authProvider) {
-        Type providerSuperClass = authProvider.getClass().getGenericSuperclass();
-        if (providerSuperClass instanceof ParameterizedType) {
-            Type[] typeArguments = ((ParameterizedType) providerSuperClass).getActualTypeArguments();
-            if (typeArguments.length == 1 && typeArguments[0] instanceof Class) {
-                // Wrong session type for this auth provider
-                return ((Class<?>) typeArguments[0]).isInstance(authSession);
-            }
+    protected Map<String, Object> loadCredentials() throws DBException {
+        return session.getSecurityController().getCurrentUserCredentials(this.authProviderDescriptor.getId());
+    }
+
+    private static WebPropertyInfo[] mapCredsToProperties(
+        WebSession session, Map<String, Object> creds
+    ) {
+        if (CommonUtils.isEmpty(creds)) {
+            return new WebPropertyInfo[0];
         }
-        return true;
+        var propSource = new PropertySourceMap(creds);
+        return creds.entrySet()
+            .stream()
+            .map(entry -> new PropertyDescriptor(
+                    null,
+                    entry.getKey(),
+                    entry.getKey(),
+                    null,
+                    true,
+                    entry.getValue().getClass(),
+                    null,
+                    new Object[0]
+                )
+            )
+            .map(propDescriptor -> new WebPropertyInfo(session, propDescriptor, propSource))
+            .toArray(WebPropertyInfo[]::new);
     }
 
 }

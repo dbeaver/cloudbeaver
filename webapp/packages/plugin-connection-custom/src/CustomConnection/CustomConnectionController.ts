@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, computed, makeObservable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import { ConnectionsManagerService, DBDriver, DBDriverResource } from '@cloudbeaver/core-connections';
-import { injectable, IInitializableController } from '@cloudbeaver/core-di';
+import { IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
@@ -30,7 +29,7 @@ export class CustomConnectionController implements IInitializableController {
     private readonly notificationService: NotificationService,
     private readonly projectsService: ProjectsService,
     private readonly publicConnectionFormService: PublicConnectionFormService,
-    private readonly connectionsManagerService: ConnectionsManagerService
+    private readonly connectionsManagerService: ConnectionsManagerService,
   ) {
     this.isLoading = true;
 
@@ -60,7 +59,7 @@ export class CustomConnectionController implements IInitializableController {
     const state = await this.publicConnectionFormService.open(
       projects[0].id,
       { driverId },
-      this.drivers.map(driver => driver.id)
+      this.drivers.map(driver => driver.id),
     );
 
     if (state) {
@@ -72,7 +71,7 @@ export class CustomConnectionController implements IInitializableController {
     try {
       await this.dbDriverResource.load(CachedMapAllKey);
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Can\'t load database drivers');
+      this.notificationService.logException(exception, "Can't load database drivers");
     } finally {
       this.isLoading = false;
     }

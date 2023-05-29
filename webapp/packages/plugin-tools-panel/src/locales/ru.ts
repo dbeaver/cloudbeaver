@@ -1,3 +1,1 @@
-export default [
-  ['plugin_tools_panel_menu_title', 'Инструменты'],
-];
+export default [['plugin_tools_panel_menu_title', 'Инструменты']];

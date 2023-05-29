@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ITabInfo } from './TabsContainer/ITabsContainer';
 
 export function generateTabElement<TProps = void>(
@@ -14,9 +13,7 @@ export function generateTabElement<TProps = void>(
 ): (tabInfo: ITabInfo<TProps>) => JSX.Element[] {
   return tabInfo => {
     if (tabInfo.generator) {
-      return tabInfo
-        .generator(tabInfo.key, props)
-        .map(key => generator(tabInfo, key));
+      return tabInfo.generator(tabInfo.key, props).map(key => generator(tabInfo, key));
     }
 
     return [generator(tabInfo, tabInfo.key)];

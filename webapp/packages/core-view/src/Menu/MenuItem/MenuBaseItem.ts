@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import type { MenuBaseItemIconComponent, IMenuBaseItem, IMenuBaseItemOptions } from './IMenuBaseItem';
+import type { IMenuBaseItem, IMenuBaseItemOptions, MenuBaseItemIconComponent } from './IMenuBaseItem';
 import type { IMenuItemEvents } from './IMenuItem';
 import { MenuItem } from './MenuItem';
 
@@ -30,11 +29,7 @@ export class MenuBaseItem<TExtraProps = unknown> extends MenuItem implements IMe
     return this.isDisabled?.() ?? false;
   }
 
-  constructor(
-    options: IMenuBaseItemOptions<TExtraProps>,
-    events?: IMenuItemEvents,
-    getters?: IMenuBaseItemPropertyGetters<TExtraProps>,
-  ) {
+  constructor(options: IMenuBaseItemOptions<TExtraProps>, events?: IMenuItemEvents, getters?: IMenuBaseItemPropertyGetters<TExtraProps>) {
     super(options.id, events);
     this.label = options.label;
     this.icon = options.icon;

@@ -5,29 +5,27 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  Table,
-  TableBody,
-  TableItem,
-  TableColumnValue,
   BASE_CONTAINERS_STYLES,
-  Group,
   Button,
-  useObjectRef,
   getComputed,
   getSelectedItems,
-  useTranslate,
+  Group,
+  Table,
+  TableBody,
+  TableColumnValue,
+  TableItem,
+  useObjectRef,
   useStyles,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { Connection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-
 
 import { getFilteredConnections } from './getFilteredConnections';
 import { GrantedConnectionsTableHeader, IFilterState } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader';
@@ -35,28 +33,30 @@ import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHea
 import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem';
 
 const styles = css`
-    Group {
-      position: relative;
-    }
-    Group, container, table-container {
-      height: 100%;
-    }
-    container {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-    }
-    table-container {
-      overflow: auto;
-    }
-    GrantedConnectionsTableHeader {
-      flex: 0 0 auto;
-    }
-    Table {
-      composes: theme-background-surface theme-text-on-surface from global;
-      width: 100%;
-    }
-  `;
+  Group {
+    position: relative;
+  }
+  Group,
+  container,
+  table-container {
+    height: 100%;
+  }
+  container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  table-container {
+    overflow: auto;
+  }
+  GrantedConnectionsTableHeader {
+    flex: 0 0 auto;
+  }
+  Table {
+    composes: theme-background-surface theme-text-on-surface from global;
+    width: 100%;
+  }
+`;
 
 interface Props {
   connectionList: Connection[];
@@ -65,12 +65,7 @@ interface Props {
   onGrant: (subjectIds: string[]) => void;
 }
 
-export const ConnectionList = observer<Props>(function ConnectionList({
-  connectionList,
-  grantedSubjects,
-  disabled,
-  onGrant,
-}) {
+export const ConnectionList = observer<Props>(function ConnectionList({ connectionList, grantedSubjects, disabled, onGrant }) {
   const props = useObjectRef({ onGrant });
   const style = useStyles(styles, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
@@ -94,22 +89,17 @@ export const ConnectionList = observer<Props>(function ConnectionList({
     <Group box medium overflow>
       <container>
         <GrantedConnectionsTableHeader filterState={filterState} disabled={disabled}>
-          <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>{translate('ui_add')}</Button>
+          <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>
+            {translate('ui_add')}
+          </Button>
         </GrantedConnectionsTableHeader>
         <table-container>
-          <Table
-            keys={keys}
-            selectedItems={selectedSubjects}
-            isItemSelectable={item => !grantedSubjects.includes(item)}
-            size='big'
-          >
+          <Table keys={keys} selectedItems={selectedSubjects} isItemSelectable={item => !grantedSubjects.includes(item)} size="big">
             <GrantedConnectionsTableInnerHeader disabled={disabled} />
             <TableBody>
               {!connections.length && filterState.filterValue && (
-                <TableItem item='tableInfo' selectDisabled>
-                  <TableColumnValue colSpan={5}>
-                    {translate('ui_search_no_result_placeholder')}
-                  </TableColumnValue>
+                <TableItem item="tableInfo" selectDisabled>
+                  <TableColumnValue colSpan={5}>{translate('ui_search_no_result_placeholder')}</TableColumnValue>
                 </TableItem>
               )}
               {connections.map(connection => {
@@ -130,6 +120,6 @@ export const ConnectionList = observer<Props>(function ConnectionList({
           </Table>
         </table-container>
       </container>
-    </Group>
+    </Group>,
   );
 });

@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { interfaces, Container } from 'inversify';
+import { Container, interfaces } from 'inversify';
 
 import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
 import type { InjectionToken } from './InjectionToken';
@@ -27,12 +26,10 @@ function logger(planAndResolve: interfaces.Next): interfaces.Next {
         throw exception;
       }
 
-      let serviceName = (
-        typeof args.serviceIdentifier === 'function'
-        && 'name' in args.serviceIdentifier
+      let serviceName =
+        typeof args.serviceIdentifier === 'function' && 'name' in args.serviceIdentifier
           ? args.serviceIdentifier.name
-          : args.serviceIdentifier.toString()
-      );
+          : args.serviceIdentifier.toString();
 
       let notFoundElement = dep;
 
@@ -44,21 +41,20 @@ function logger(planAndResolve: interfaces.Next): interfaces.Next {
         index = metadata.indexOf(notFoundElement);
       }
 
-
       function getName(element: any | (() => void)) {
-        return (
-          typeof element === 'function'
-          && 'name' in element
-            ? element.name
-            : String(element)
-        );
+        return typeof element === 'function' && 'name' in element ? element.name : String(element);
       }
 
       const notFoundServiceName = getName(notFoundElement);
 
       const dependenciesList = metadata.map((value, i) => `${i} - ${getName(value)}`);
 
-      throw new Error(`Can't find dependency ${notFoundServiceName}(${index}) \n\rin ${serviceName}(\n\r  ${dependenciesList.join(', \n\r  ')}\n\r)\r\n${exception.message}`, { cause: exception });
+      throw new Error(
+        `Can't find dependency ${notFoundServiceName}(${index}) \n\rin ${serviceName}(\n\r  ${dependenciesList.join(', \n\r  ')}\n\r)\r\n${
+          exception.message
+        }`,
+        { cause: exception },
+      );
     }
   };
 }
@@ -116,9 +112,7 @@ export class DIContainer implements IServiceInjector, IServiceCollection {
     }
   }
 
-  addServiceByToken<T extends Record<string, any>>(
-    token: InjectionToken<T>, value: T | IServiceConstructor<T>
-  ): void {
+  addServiceByToken<T extends Record<string, any>>(token: InjectionToken<T>, value: T | IServiceConstructor<T>): void {
     if (isConstructor(value)) {
       this.container.bind(token).to(value as IServiceConstructor<T>);
     } else {

@@ -1,17 +1,19 @@
 const { resolve } = require('path');
-var PeerDepsExternalsPlugin = require('peer-deps-externals-webpack-plugin');
+const PeerDepsExternalsPlugin = require('peer-deps-externals-webpack-plugin');
 const { merge } = require('webpack-merge');
 
 const commonConfig = require('./webpack.config.js');
 
-var main = resolve('src/index.ts');
-var outputDir = resolve('lib');
-var package = require(resolve('package.json'));
+const main = resolve('src/index.ts');
+const outputDir = resolve('lib');
+const package = require(resolve('package.json'));
 
 module.exports = (env, argv) => merge(commonConfig(env, argv), {
-  entry: main,
+  entry: {
+    [package.name.replace('@cloudbeaver/', '')]: main,
+  },
   output: {
-    filename: 'index.[contenthash].js',
+    filename: '[name].js',
     chunkFilename: '[name].[contenthash].bundle.js',
     library: package.name,
     libraryTarget: 'commonjs',

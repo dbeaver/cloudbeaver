@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { splitStyles, Split, ResizerControls, Pane, splitHorizontalStyles, useSplitUserState, Loader, useStyles } from '@cloudbeaver/core-blocks';
+import { Loader, Pane, ResizerControls, Split, splitHorizontalStyles, splitStyles, useSplitUserState, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CaptureView } from '@cloudbeaver/core-view';
 
@@ -60,7 +59,7 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
             <SqlEditorLoader state={state} />
           </Pane>
           <ResizerControls />
-          <Pane basis='50%' main>
+          <Pane basis="50%" main>
             <Loader suspense>
               <SqlResultTabs state={state} />
             </Loader>
@@ -69,6 +68,6 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
         <SqlEditorOverlay state={state} />
         <SqlEditorStatusBar dataSource={dataSource} />
       </CaptureView>
-    </Loader>
+    </Loader>,
   );
 });

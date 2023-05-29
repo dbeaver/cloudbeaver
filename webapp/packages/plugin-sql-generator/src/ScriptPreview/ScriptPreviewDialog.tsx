@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -41,19 +40,17 @@ interface Payload {
   model: IDatabaseDataModel;
 }
 
-export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(function ScriptPreviewDialog({
-  rejectDialog,
-  payload,
-}) {
+export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(function ScriptPreviewDialog({ rejectDialog, payload }) {
   const translate = useTranslate();
   const copy = useClipboard();
 
   const connectionExecutionContextService = useService(ConnectionExecutionContextService);
   const context = connectionExecutionContextService.get(payload.model.source.executionContext?.context?.id ?? '');
   const contextInfo = context?.context;
-  const dialect = useResource(ScriptPreviewDialog, ConnectionDialectResource, contextInfo
-    ? createConnectionParam(contextInfo.projectId, contextInfo.connectionId)
-    : null
+  const dialect = useResource(
+    ScriptPreviewDialog,
+    ConnectionDialectResource,
+    contextInfo ? createConnectionParam(contextInfo.projectId, contextInfo.connectionId) : null,
   );
   const sqlDialect = useSqlDialectExtension(dialect.data);
 
@@ -63,28 +60,25 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
   };
 
   return styled(styles)(
-    <CommonDialogWrapper size='large'>
-      <CommonDialogHeader
-        title="data_viewer_script_preview_dialog_title"
-        icon='sql-script'
-        onReject={rejectDialog}
-      />
+    <CommonDialogWrapper size="large">
+      <CommonDialogHeader title="data_viewer_script_preview_dialog_title" icon="sql-script" onReject={rejectDialog} />
       <CommonDialogBody noBodyPadding noOverflow>
         <wrapper>
-          <SQLCodeEditorLoader
-            value={payload.script}
-            extensions={[sqlDialect]}
-            lineNumbers
-            readonly
-          />
+          <SQLCodeEditorLoader value={payload.script} extensions={[sqlDialect]} lineNumbers readonly />
         </wrapper>
       </CommonDialogBody>
       <CommonDialogFooter>
-        <Button mod={['unelevated']} onClick={apply}>{translate('ui_apply')}</Button>
+        <Button mod={['unelevated']} onClick={apply}>
+          {translate('ui_apply')}
+        </Button>
         <fill />
-        <Button mod={['outlined']} onClick={() => copy(payload.script, true)}>{translate('ui_copy_to_clipboard')}</Button>
-        <Button mod={['unelevated']} onClick={rejectDialog}>{translate('ui_close')}</Button>
+        <Button mod={['outlined']} onClick={() => copy(payload.script, true)}>
+          {translate('ui_copy_to_clipboard')}
+        </Button>
+        <Button mod={['unelevated']} onClick={rejectDialog}>
+          {translate('ui_close')}
+        </Button>
       </CommonDialogFooter>
-    </CommonDialogWrapper>
+    </CommonDialogWrapper>,
   );
 });

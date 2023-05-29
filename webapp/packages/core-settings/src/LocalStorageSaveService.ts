@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { entries, IReactionDisposer, keys, observable, ObservableMap, reaction, remove, runInAction, set, toJS } from 'mobx';
 
 import { IndexedDB, IndexedDBService, IndexedDBTable } from '@cloudbeaver/core-browser';
@@ -40,9 +39,7 @@ export class LocalStorageSaveService {
   private storageType: LocalStorageType;
   private readonly indexedDBStore: LocalStorageIndexedDB;
 
-  constructor(
-    private readonly indexedDBService: IndexedDBService,
-  ) {
+  constructor(private readonly indexedDBService: IndexedDBService) {
     this.storageType = 'local';
     this.broadcastChannel = new BroadcastChannel('local-storage');
     this.storages = new Map();
@@ -93,20 +90,13 @@ export class LocalStorageSaveService {
     defaultValue: () => T extends any ? T : never,
     remap?: (savedStore: T) => T,
     onUpdate?: () => void,
-    storageType?: LocalStorageType
+    storageType?: LocalStorageType,
   ): void {
     if (this.storages.has(storeId)) {
       return;
     }
 
-    this.storages.set(storeId, new DataStorage(
-      this.getStorage(storageType),
-      storeId,
-      store,
-      defaultValue,
-      remap,
-      onUpdate
-    ));
+    this.storages.set(storeId, new DataStorage(this.getStorage(storageType), storeId, store, defaultValue, remap, onUpdate));
   }
 
   updateStorage(storageType: LocalStorageType): void {
@@ -195,7 +185,7 @@ class DataStorage<T extends Record<any, any> | Map<any, any>> implements ILocalS
     readonly store: T,
     readonly defaultValue: () => T,
     readonly remap?: (savedStore: T) => T,
-    readonly onUpdate?: () => void
+    readonly onUpdate?: () => void,
   ) {
     this.firstRun = true;
     this.mobxSub = undefined;
@@ -256,15 +246,9 @@ class DataStorage<T extends Record<any, any> | Map<any, any>> implements ILocalS
     }
     try {
       if (this.storage instanceof LocalStorageIndexedDB) {
-        await this.storage.setItem(
-          this.storeId,
-          this.serializeData(store)
-        );
+        await this.storage.setItem(this.storeId, this.serializeData(store));
       } else {
-        this.storage.setItem(
-          this.storeId,
-          this.serializeData(store)
-        );
+        this.storage.setItem(this.storeId, this.serializeData(store));
       }
     } catch (e: any) {
       console.error('Error when saving local storage value', e);
@@ -279,7 +263,7 @@ class DataStorage<T extends Record<any, any> | Map<any, any>> implements ILocalS
       {
         fireImmediately: true,
         delay: 500,
-      }
+      },
     );
   }
 
@@ -300,8 +284,7 @@ class DataStorage<T extends Record<any, any> | Map<any, any>> implements ILocalS
     }
 
     if (store instanceof ObservableMap) {
-      data = Array.from((data as Map<any, any>).entries())
-        .reduce<{
+      data = Array.from((data as Map<any, any>).entries()).reduce<{
         [key: string]: any;
       }>((obj, [key, value]) => {
         obj[key] = value;

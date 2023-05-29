@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Workbox } from 'workbox-window';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -30,7 +29,7 @@ export class ServiceWorkerService {
       if (process.env.NODE_ENV === 'development') {
         navigator.serviceWorker
           .getRegistration(this.workerURL)
-          .then(registration =>  registration?.unregister())
+          .then(registration => registration?.unregister())
           .catch();
       } else {
         this.workbox = new Workbox(this.workerURL);
@@ -46,7 +45,6 @@ export class ServiceWorkerService {
 
     return !ExecutorInterrupter.isInterrupted(contexts);
   }
-
 
   private registerSkipWaitingPrompt(workbox: Workbox): void {
     workbox.addEventListener('controlling', async event => {

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
@@ -24,40 +23,43 @@ const styles = css`
   }
 `;
 
-export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = observer(function DataViewerPanel({
-  tab,
-  page,
-}) {
+export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = observer(function DataViewerPanel({ tab, page }) {
   const dataViewerDatabaseDataModel = useDataViewerDatabaseDataModel(tab);
   const pageState = page.getState(tab);
 
-  const handlePresentationChange = useCallback((presentationId: string) => {
-    const pageState = page.getState(tab);
+  const handlePresentationChange = useCallback(
+    (presentationId: string) => {
+      const pageState = page.getState(tab);
 
-    if (!pageState) {
-      page.setState(tab, {
-        presentationId,
-        resultIndex: 0,
-        valuePresentationId: null,
-      });
-    } else {
-      pageState.presentationId = presentationId;
-    }
-  }, [page, tab]);
+      if (!pageState) {
+        page.setState(tab, {
+          presentationId,
+          resultIndex: 0,
+          valuePresentationId: null,
+        });
+      } else {
+        pageState.presentationId = presentationId;
+      }
+    },
+    [page, tab],
+  );
 
-  const handleValuePresentationChange = useCallback((valuePresentationId: string | null) => {
-    const pageState = page.getState(tab);
+  const handleValuePresentationChange = useCallback(
+    (valuePresentationId: string | null) => {
+      const pageState = page.getState(tab);
 
-    if (!pageState) {
-      page.setState(tab, {
-        presentationId: '',
-        resultIndex: 0,
-        valuePresentationId,
-      });
-    } else {
-      pageState.valuePresentationId = valuePresentationId;
-    }
-  }, [page, tab]);
+      if (!pageState) {
+        page.setState(tab, {
+          presentationId: '',
+          resultIndex: 0,
+          valuePresentationId,
+        });
+      } else {
+        pageState.valuePresentationId = valuePresentationId;
+      }
+    },
+    [page, tab],
+  );
 
   if (!tab.handlerState.tableId) {
     return <TextPlaceholder>Table model not loaded</TextPlaceholder>;
@@ -77,6 +79,6 @@ export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = o
       ) : (
         <TextPlaceholder>Table model not loaded</TextPlaceholder>
       )}
-    </Loader>
+    </Loader>,
   );
 });

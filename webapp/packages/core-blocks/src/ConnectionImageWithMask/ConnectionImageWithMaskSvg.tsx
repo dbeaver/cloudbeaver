@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { GlobalConstants, isValidUrl } from '@cloudbeaver/core-utils';
 
 interface Props {
@@ -18,9 +17,7 @@ interface Props {
   className?: string;
 }
 
-export const ConnectionImageWithMaskSvg: React.FC<Props> = (
-  { icon, connected, maskId, size = 16, markerRadius = 4, paddingSize = 0, className }
-) => {
+export const ConnectionImageWithMaskSvg: React.FC<Props> = ({ icon, connected, maskId, size = 16, markerRadius = 4, paddingSize = 0, className }) => {
   if (!icon) {
     return null;
   }
@@ -42,7 +39,14 @@ export const ConnectionImageWithMaskSvg: React.FC<Props> = (
       <mask id={maskId}>
         <rect fill="#fff" x="0" y="0" width={size} height={size} />
         <circle fill="#000" cx={circleParams.coordinate} cy={circleParams.coordinate} r={circleParams.radius} />
-        <rect fill="#000" x={rectParams.coordinate} y={rectParams.coordinate} width={rectParams.size} height={rectParams.size} mask={`url(#${maskId})`} />
+        <rect
+          fill="#000"
+          x={rectParams.coordinate}
+          y={rectParams.coordinate}
+          width={rectParams.size}
+          height={rectParams.size}
+          mask={`url(#${maskId})`}
+        />
       </mask>
       <image xlinkHref={url} width={size} height={size} mask={connected ? `url(#${maskId})` : undefined} />
     </svg>

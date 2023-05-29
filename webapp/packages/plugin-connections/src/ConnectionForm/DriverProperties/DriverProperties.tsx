@@ -5,13 +5,21 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, IProperty, Loader, PropertiesTable, useResource, useStyles } from '@cloudbeaver/core-blocks';
+import {
+  BASE_CONTAINERS_STYLES,
+  ColoredContainer,
+  Group,
+  IProperty,
+  Loader,
+  PropertiesTable,
+  useResource,
+  useStyles,
+} from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
@@ -33,10 +41,7 @@ const styles = css`
   }
 `;
 
-export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> = observer(function DriverProperties({
-  tabId,
-  state: formState,
-}) {
+export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> = observer(function DriverProperties({ tabId, state: formState }) {
   const style = useStyles(styles, BASE_CONTAINERS_STYLES);
   const { selected } = useTab(tabId);
 
@@ -60,19 +65,15 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
     return { propertiesList, add, remove };
   });
 
-  const driver = useResource(
-    DriverProperties,
-    DBDriverResource,
-    { key: (selected && formState.config.driverId) || null, includes: ['includeDriverProperties'] as const },
-  );
+  const driver = useResource(DriverProperties, DBDriverResource, {
+    key: (selected && formState.config.driverId) || null,
+    includes: ['includeDriverProperties'] as const,
+  });
 
   runInAction(() => {
     if (driver.data) {
       for (const key of Object.keys(formState.config.properties)) {
-        if (
-          driver.data.driverProperties.some(property => property.id === key)
-          || state.propertiesList.some(property => property.key === key)
-        ) {
+        if (driver.data.driverProperties.some(property => property.id === key) || state.propertiesList.some(property => property.key === key)) {
           continue;
         }
 
@@ -81,21 +82,25 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
     }
   });
 
-  const joinedProperties = useMemo(() => computed<IProperty[]>(() => ([
-    ...state.propertiesList,
-    ...(driver.data?.driverProperties
-      ? driver.data.driverProperties.map<IProperty>(property => ({
-        id: property.id!,
-        key: property.id!,
-        keyPlaceholder: property.id,
-        displayName: property.displayName,
-        valuePlaceholder: property.defaultValue,
-        defaultValue: property.defaultValue,
-        description: property.description,
-        validValues: property.validValues,
-      }))
-      : []),
-  ])), [driver.data]);
+  const joinedProperties = useMemo(
+    () =>
+      computed<IProperty[]>(() => [
+        ...state.propertiesList,
+        ...(driver.data?.driverProperties
+          ? driver.data.driverProperties.map<IProperty>(property => ({
+              id: property.id!,
+              key: property.id!,
+              keyPlaceholder: property.id,
+              displayName: property.displayName,
+              valuePlaceholder: property.defaultValue,
+              defaultValue: property.defaultValue,
+              description: property.description,
+              validValues: property.validValues,
+            }))
+          : []),
+      ]),
+    [driver.data],
+  );
 
   return styled(style)(
     <ColoredContainer parent>
@@ -109,6 +114,6 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
           onRemove={state.remove}
         />
       </Group>
-    </ColoredContainer>
+    </ColoredContainer>,
   );
 });

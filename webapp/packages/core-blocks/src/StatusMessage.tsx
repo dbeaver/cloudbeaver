@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -29,7 +28,8 @@ const styles = css`
     height: 24px;
     width: 24px;
   }
-  message, Link {
+  message,
+  Link {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -47,13 +47,7 @@ interface Props {
   className?: string;
 }
 
-export const StatusMessage = observer<Props>(function StatusMessage({
-  status,
-  message,
-  exception = null,
-  onShowDetails,
-  className,
-}) {
+export const StatusMessage = observer<Props>(function StatusMessage({ status, message, exception = null, onShowDetails, className }) {
   const translate = useTranslate();
   const errorDetails = useErrorDetails(exception);
 
@@ -84,6 +78,6 @@ export const StatusMessage = observer<Props>(function StatusMessage({
           <message title={message}>{onShowDetails ? <Link onClick={onShowDetails}>{message}</Link> : message}</message>
         </>
       )}
-    </status-message>
+    </status-message>,
   );
 });

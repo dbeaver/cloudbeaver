@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { flat } from '@cloudbeaver/core-utils';
 
@@ -64,8 +63,7 @@ export class App {
   private registerServices(): void {
     this.diWrapper.collection.unbindAll();
 
-    this.getServiceCollection()
-      .addServiceByClass(App, this);
+    this.getServiceCollection().addServiceByClass(App, this);
 
     for (const service of this.getServices()) {
       // console.log('provider', provider.name);

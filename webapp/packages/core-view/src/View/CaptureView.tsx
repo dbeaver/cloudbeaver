@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -32,23 +31,17 @@ interface Props {
   className?: string;
 }
 
-export const CaptureView = observer<React.PropsWithChildren<Props>>(function CaptureView({
-  view,
-  children,
-  className,
-}) {
+export const CaptureView = observer<React.PropsWithChildren<Props>>(function CaptureView({ view, children, className }) {
   const parentContext = useContext(CaptureViewContext);
   const viewContext = useViewContext(view, parentContext);
   const actionService = useService(ActionService);
   const activeView = useActiveView(view);
   const [ref, state] = useFocus<HTMLDivElement>({ onFocus: activeView.focusView, onBlur: activeView.blurView });
 
-  const actionItems = (
-    view.actions
-      .map(action => actionService.getAction(viewContext, action))
-      .filter(action => action?.binding && !action.isDisabled())
-      .filter(Boolean) as IActionItem[]
-  );
+  const actionItems = view.actions
+    .map(action => actionService.getAction(viewContext, action))
+    .filter(action => action?.binding && !action.isDisabled())
+    .filter(Boolean) as IActionItem[];
 
   let keys = actionItems
     .map(item => item.binding?.binding.keys)
@@ -59,31 +52,32 @@ export const CaptureView = observer<React.PropsWithChildren<Props>>(function Cap
     keys = '*';
   }
 
-  useHotkeys(keys, (event, handler) => {
-    if (!state.reference?.contains(document.activeElement)) {
-      return;
-    }
+  useHotkeys(
+    keys,
+    (event, handler) => {
+      if (!state.reference?.contains(document.activeElement)) {
+        return;
+      }
 
-    const action = actionItems.find(action => (
-      action.binding?.binding.keys === handler.key
-      || action.binding?.binding.keys.includes(handler.key)
-    ));
+      const action = actionItems.find(action => action.binding?.binding.keys === handler.key || action.binding?.binding.keys.includes(handler.key));
 
-    if (action?.binding?.binding.preventDefault) {
-      event.preventDefault();
-    }
+      if (action?.binding?.binding.preventDefault) {
+        event.preventDefault();
+      }
 
-    action?.activate(true);
-  }, {
-    enabled: keys !== '*',
-    enableOnTags: ['INPUT', 'SELECT', 'TEXTAREA'],
-  });
+      action?.activate(true);
+    },
+    {
+      enabled: keys !== '*',
+      enableOnTags: ['INPUT', 'SELECT', 'TEXTAREA'],
+    },
+  );
 
   return styled(styles)(
     <CaptureViewContext.Provider value={viewContext}>
       <div ref={ref} className={className} tabIndex={0}>
         {children}
       </div>
-    </CaptureViewContext.Provider>
+    </CaptureViewContext.Provider>,
   );
 });

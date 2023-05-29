@@ -13,7 +13,6 @@
   "parserOptions": {
     "ecmaVersion": 2019,
     "sourceType": "module",
-    "project": "tsconfig.eslint.json",
     "ecmaFeatures": {
       "jsx": true
     }

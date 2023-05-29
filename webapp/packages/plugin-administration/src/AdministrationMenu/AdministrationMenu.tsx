@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
@@ -32,6 +31,6 @@ export const AdministrationMenu = observer(function AdministrationMenu() {
         style={[topMenuStyles, MENU_BAR_ITEM_STYLES, topMenuStyles, MENU_BAR_DISABLE_EFFECT_STYLES]}
         nestedMenuSettings={{ modal: true }}
       />
-    </menu-wrapper>
+    </menu-wrapper>,
   );
 });

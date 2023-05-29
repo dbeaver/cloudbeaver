@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader } from '@cloudbeaver/core-blocks';
@@ -16,26 +15,24 @@ import { useService } from '@cloudbeaver/core-di';
 import { ConnectionFormLoader, useConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 const styles = css`
-    box {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-      box-sizing: border-box;
-      padding-bottom: 24px;
-      display: flex;
-      flex-direction: column;
-      height: 740px;
-    }
-    Loader {
-      height: 100%;
-    }
-  `;
+  box {
+    composes: theme-background-secondary theme-text-on-secondary from global;
+    box-sizing: border-box;
+    padding-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    height: 740px;
+  }
+  Loader {
+    height: 100%;
+  }
+`;
 
 interface Props {
   item: IConnectionInfoParams;
 }
 
-export const ConnectionEdit = observer<Props>(function ConnectionEditNew({
-  item,
-}) {
+export const ConnectionEdit = observer<Props>(function ConnectionEditNew({ item }) {
   const connectionInfoResource = useService(ConnectionInfoResource);
   const boxRef = useRef<HTMLDivElement>(null);
   // const tableContext = useContext(TableContext);
@@ -48,10 +45,7 @@ export const ConnectionEdit = observer<Props>(function ConnectionEditNew({
     });
   }, []);
 
-  const data = useConnectionFormState(
-    connectionInfoResource,
-    state => state.setOptions('edit', 'admin')
-  );
+  const data = useConnectionFormState(connectionInfoResource, state => state.setOptions('edit', 'admin'));
 
   data.config.connectionId = item.connectionId;
   data.projectId = item.projectId;
@@ -65,6 +59,6 @@ export const ConnectionEdit = observer<Props>(function ConnectionEditNew({
           // onSave={collapse}
         />
       </Loader>
-    </box>
+    </box>,
   );
 });

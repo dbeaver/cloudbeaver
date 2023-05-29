@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { computed, observable, makeObservable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import type { ITask } from './ITask';
 import { Task } from './Task';
@@ -71,11 +70,7 @@ export class TaskScheduler<TIdentifier = void> {
     }
   }
 
-  schedule<T>(
-    id: TIdentifier,
-    promise: () => Promise<T>,
-    options?: IScheduleOptions,
-  ): ITask<T> {
+  schedule<T>(id: TIdentifier, promise: () => Promise<T>, options?: IScheduleOptions): ITask<T> {
     if (this.queue.length > queueLimit) {
       throw new Error('Execution queue limit is reached');
     }
@@ -120,11 +115,7 @@ export class TaskScheduler<TIdentifier = void> {
 
   private async execute<T>(container: ITaskContainer<TIdentifier, T>) {
     if (this.isBlocked) {
-      const queueList = this.queue.filter(
-        active =>
-          active !== container
-            && this.isBlocked!(active.id, container.id)
-      );
+      const queueList = this.queue.filter(active => active !== container && this.isBlocked!(active.id, container.id));
 
       for (const _container of queueList) {
         if (container.task.cancelled) {

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React from 'react';
 
 import { isLocalConnection } from '@cloudbeaver/core-connections';
@@ -31,9 +30,7 @@ export const OriginInfoTab = React.lazy(async () => {
 
 @injectable()
 export class ConnectionOriginInfoTabService extends Bootstrap {
-  constructor(
-    private readonly connectionFormService: ConnectionFormService,
-  ) {
+  constructor(private readonly connectionFormService: ConnectionFormService) {
     super();
   }
 
@@ -44,17 +41,15 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
       tab: () => OriginInfoTab,
       panel: () => OriginInfo,
       stateGetter: () => () => ({}),
-      isHidden: (tabId, props) => props?.state.info ? isLocalConnection(props.state.info) : true,
+      isHidden: (tabId, props) => (props?.state.info ? isLocalConnection(props.state.info) : true),
     });
 
-    this.connectionFormService.configureTask
-      .addHandler(this.configure.bind(this));
+    this.connectionFormService.configureTask.addHandler(this.configure.bind(this));
 
-    this.connectionFormService.actionsContainer
-      .add(ConnectionFormAuthenticationAction, 0);
+    this.connectionFormService.actionsContainer.add(ConnectionFormAuthenticationAction, 0);
   }
 
-  load(): void { }
+  load(): void {}
 
   private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const configuration = contexts.getContext(connectionFormConfigureContext);
