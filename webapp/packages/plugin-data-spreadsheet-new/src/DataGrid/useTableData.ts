@@ -78,15 +78,15 @@ export function useTableData(
         const columnNames = this.format.getHeaders();
         const rowStrings = this.format.getLongestCells();
 
-        // TODO: seems better to do not measure container size
-        // for detecting max columns size, better to use configurable variable
-        const measuredCells = TextTools.getWidth({
+        const columnsWidth = TextTools.getWidth({
           font: FONT,
-          text: columnNames.map((columnName, i) => {
-            const cellString = rowStrings[i] || '';
-            return columnName.length >= cellString.length ? columnName : cellString;
-          }),
-        }).map(v => v + COLUMN_HEADER_CONTAINER_WIDTH + COLUMN_NAME_LEFT_MARGIN);
+          text: columnNames,
+        }).map(width => width + COLUMN_HEADER_CONTAINER_WIDTH + COLUMN_NAME_LEFT_MARGIN);
+
+        const cellsWidth = TextTools.getWidth({
+          font: FONT,
+          text: rowStrings,
+        }).map(width => width + CELL_VALUE_PADDING + CELL_VALUE_BORDER);
 
         const columns: Array<Column<IResultSetRowKey, any>> = this.columnKeys.map<Column<IResultSetRowKey, any>>((col, index) => ({
           // key: uuid(),
@@ -94,7 +94,7 @@ export function useTableData(
           columnDataIndex: { index },
           name: this.getColumnInfo(col)?.label || '?',
           editable: true,
-          width: Math.min(300, widthData[index]),
+          width: Math.min(300, Math.max(columnsWidth[index], cellsWidth[index] ?? 0)),
           headerRenderer: TableColumnHeader,
           editorOptions: {
             onCellKeyDown,

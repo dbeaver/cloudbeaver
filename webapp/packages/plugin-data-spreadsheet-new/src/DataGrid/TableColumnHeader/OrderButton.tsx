@@ -18,7 +18,7 @@ const styles = css`
     justify-content: center;
     flex-shrink: 0;
     height: 28px;
-    width: 14px;
+    width: 16px;
     box-sizing: border-box;
     cursor: pointer;
     background: transparent;
@@ -26,9 +26,6 @@ const styles = css`
     color: inherit;
     padding: 0;
     margin-left: 8px;
-  }
-  order-button:hover > IconOrImage {
-    opacity: 0.8;
   }
 `;
 

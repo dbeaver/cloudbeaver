@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import "@cloudbeaver/core-theming/src/styles/branding";
+@import '@cloudbeaver/core-theming/src/styles/branding';
 
-$edited-color: rgba(255,153,0,0.3);
-$added-color: rgba(145,255,0,0.3);
-$deleted-color: rgba(255,51,0,0.3);
+$edited-color: rgba(255, 153, 0, 0.3);
+$added-color: rgba(145, 255, 0, 0.3);
+$deleted-color: rgba(255, 51, 0, 0.3);
 
 @mixin base-react-grid() {
   :global {
@@ -26,7 +26,7 @@ $deleted-color: rgba(255,51,0,0.3);
         background-color: rgba(0, 145, 234, 0.2);
       }
 
-      .rdg-cell:global([aria-selected=true]) {
+      .rdg-cell:global([aria-selected='true']) {
         box-shadow: inset 0 0 0 1px #0091ea;
       }
 
@@ -61,6 +61,10 @@ $deleted-color: rgba(255,51,0,0.3);
 
       .rdg-table-header__order-button_unordered {
         color: #c4c4c4;
+
+        &:hover {
+          color: $mdc-theme-primary;
+        }
       }
 
       .rdg-header-row {
@@ -87,8 +91,8 @@ $deleted-color: rgba(255,51,0,0.3);
         &:focus {
           outline: 0;
         }
-        
-        &:global([aria-selected=true]) {
+
+        &:global([aria-selected='true']) {
           outline: 0;
           box-shadow: inset 0 0 0 1px #808080;
         }
@@ -103,7 +107,7 @@ $deleted-color: rgba(255,51,0,0.3);
       }
 
       .rdg-cell-custom-selected::before {
-        content: "";
+        content: '';
         position: absolute;
         left: 0;
         top: 0;
