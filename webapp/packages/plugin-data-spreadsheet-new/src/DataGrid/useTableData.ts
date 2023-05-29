@@ -42,9 +42,12 @@ export const indexColumn: Column<IResultSetRowKey, any> = {
   formatter: IndexFormatter,
 };
 
-const COLUMN_HEADER_CONTAINER_WIDTH = 56;
-const COLUMN_NAME_LEFT_MARGIN = 8;
-const CELL_VALUE_PADDING = 16;
+const COLUMN_PADDING = 16;
+const COLUMN_HEADER_ICON_WIDTH = 16;
+const COLUMN_HEADER_TEXT_PADDING = 8;
+const COLUMN_HEADER_ORDER_PADDING = 8;
+const COLUMN_HEADER_ORDER_WIDTH = 16;
+
 const CELL_VALUE_BORDER = 2;
 const FONT = '400 12px Roboto';
 
@@ -81,12 +84,15 @@ export function useTableData(
         const columnsWidth = TextTools.getWidth({
           font: FONT,
           text: columnNames,
-        }).map(width => width + COLUMN_HEADER_CONTAINER_WIDTH + COLUMN_NAME_LEFT_MARGIN);
+        }).map(
+          width =>
+            width + COLUMN_PADDING + COLUMN_HEADER_ICON_WIDTH + COLUMN_HEADER_TEXT_PADDING + COLUMN_HEADER_ORDER_PADDING + COLUMN_HEADER_ORDER_WIDTH,
+        );
 
         const cellsWidth = TextTools.getWidth({
           font: FONT,
           text: rowStrings,
-        }).map(width => width + CELL_VALUE_PADDING + CELL_VALUE_BORDER);
+        }).map(width => width + COLUMN_PADDING + CELL_VALUE_BORDER);
 
         const columns: Array<Column<IResultSetRowKey, any>> = this.columnKeys.map<Column<IResultSetRowKey, any>>((col, index) => ({
           // key: uuid(),
