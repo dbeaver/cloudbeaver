@@ -5,9 +5,10 @@
     "clear": true
   },
   "options": {
+    "cwd": "${workspaceFolder}/webapp",
     "env": {
-      "cwd": "${workspaceFolder}/webapp",
-      "NODE_OPTIONS": "--max-old-space-size=8192"
+      "NODE_OPTIONS": "--max-old-space-size=8192",
+      "MAVEN_OPTS": "-Xmx8192m"
     }
   },
   "tasks": [
