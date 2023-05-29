@@ -430,7 +430,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
                 className={`cb-react-grid-theme ${className}`}
                 columns={tableData.columns}
                 defaultColumnOptions={{
-                  minWidth: 50,
+                  minWidth: 80,
                   resizable: true,
                   formatter: CellFormatter,
                 }}
