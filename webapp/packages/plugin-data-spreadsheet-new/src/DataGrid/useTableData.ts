@@ -42,8 +42,10 @@ export const indexColumn: Column<IResultSetRowKey, any> = {
   formatter: IndexFormatter,
 };
 
-const COLUMN_HEADER_CONTAINER_WIDTH = 57;
+const COLUMN_HEADER_CONTAINER_WIDTH = 56;
 const COLUMN_NAME_LEFT_MARGIN = 8;
+const CELL_VALUE_PADDING = 16;
+const CELL_VALUE_BORDER = 2;
 const FONT = '400 12px Roboto';
 
 export function useTableData(
@@ -92,7 +94,7 @@ export function useTableData(
           columnDataIndex: { index },
           name: this.getColumnInfo(col)?.label || '?',
           editable: true,
-          width: Math.min(300, measuredCells[index]),
+          width: Math.min(300, widthData[index]),
           headerRenderer: TableColumnHeader,
           editorOptions: {
             onCellKeyDown,
