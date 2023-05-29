@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, type INodeNavigationData } from '@cloudbeaver/core-navigation-tree';
+import { type INodeNavigationData, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 
 import { DBObjectPageService } from '../ObjectPage/DBObjectPageService';
 import type { ObjectPage } from '../ObjectPage/ObjectPage';
@@ -25,9 +24,8 @@ export class ObjectPropertiesPageService {
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly notificationService: NotificationService,
     private readonly objectViewerTabService: ObjectViewerTabService,
-    private readonly dbObjectPageService: DBObjectPageService
-  ) {
-  }
+    private readonly dbObjectPageService: DBObjectPageService,
+  ) {}
 
   registerDBObjectPage(): void {
     this.page = this.dbObjectPageService.register({
@@ -41,7 +39,8 @@ export class ObjectPropertiesPageService {
   }
 
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
-    if (!this.page) { // TODO: it will be never true, because navHandler registers after page creation
+    if (!this.page) {
+      // TODO: it will be never true, because navHandler registers after page creation
       return;
     }
 

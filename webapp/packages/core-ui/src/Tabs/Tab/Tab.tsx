@@ -5,13 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 import { Tab as BaseTab } from 'reakit/Tab';
 import styled, { use } from 'reshadow';
 
-import { getComputed, Icon, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { getComputed, Icon, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { IDataContext, useMenu } from '@cloudbeaver/core-view';
 
@@ -25,18 +24,7 @@ import { MENU_TAB } from './MENU_TAB';
 import type { TabProps } from './TabProps';
 import { useTab } from './useTab';
 
-export const Tab = observer<TabProps>(function Tab({
-  tabId,
-  title,
-  menuContext,
-  disabled,
-  className,
-  children,
-  style,
-  onOpen,
-  onClose,
-  onClick,
-}) {
+export const Tab = observer<TabProps>(function Tab({ tabId, title, menuContext, disabled, className, children, style, onOpen, onClose, onClick }) {
   const translate = useTranslate();
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
   const tab = useTab(tabId, onOpen, onClose, onClick);
@@ -54,12 +42,7 @@ export const Tab = observer<TabProps>(function Tab({
                 <Icon name="cross-bold" viewBox="0 0 7 8" />
               </tab-action>
             )}
-            <TabMenu
-              tabId={tabId}
-              state={tab.state}
-              menuContext={menuContext}
-              style={style}
-            />
+            <TabMenu tabId={tabId} state={tab.state} menuContext={menuContext} style={style} />
           </tab-actions>
           <BaseTab
             {...tab.state.state}
@@ -70,13 +53,11 @@ export const Tab = observer<TabProps>(function Tab({
             disabled={disabled}
             onClick={tab.handleOpen}
           >
-            <tab-container>
-              {children}
-            </tab-container>
+            <tab-container>{children}</tab-container>
           </BaseTab>
         </tab-inner>
       </tab-outer>
-    </TabContext.Provider>
+    </TabContext.Provider>,
   );
 });
 
@@ -87,12 +68,7 @@ interface TabMenuProps {
   style?: ComponentStyle;
 }
 
-const TabMenu = observer<TabMenuProps>(function TabMenu({
-  tabId,
-  state,
-  menuContext,
-  style,
-}) {
+const TabMenu = observer<TabMenuProps>(function TabMenu({ tabId, state, menuContext, style }) {
   const styles = useStyles(BASE_TAB_STYLES, BASE_TAB_ACTION_STYLES, style);
 
   const [menuOpened, switchState] = useState(false);
@@ -112,11 +88,11 @@ const TabMenu = observer<TabMenuProps>(function TabMenu({
 
   return styled(styles)(
     <portal {...use({ menuOpened })}>
-      <ContextMenu menu={menu} placement='bottom-start' modal disclosure onVisibleSwitch={switchState}>
+      <ContextMenu menu={menu} placement="bottom-start" modal disclosure onVisibleSwitch={switchState}>
         <tab-action>
           <Icon name="dots" viewBox="0 0 32 32" />
         </tab-action>
       </ContextMenu>
-    </portal>
+    </portal>,
   );
 });

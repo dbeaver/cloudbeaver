@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 
@@ -21,10 +20,7 @@ export class ConnectionManualService {
     this.createConnectionService.disabled = value;
   }
 
-  constructor(
-    private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly createConnectionService: CreateConnectionService
-  ) {
+  constructor(private readonly connectionInfoResource: ConnectionInfoResource, private readonly createConnectionService: CreateConnectionService) {
     this.select = this.select.bind(this);
   }
 
@@ -35,7 +31,7 @@ export class ConnectionManualService {
         ...this.connectionInfoResource.getEmptyConfig(),
         driverId,
       },
-      [driverId]
+      [driverId],
     );
   }
 }

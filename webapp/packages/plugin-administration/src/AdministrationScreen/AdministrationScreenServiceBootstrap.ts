@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
@@ -19,14 +18,13 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
   constructor(
     private readonly screenService: ScreenService,
     private readonly administrationScreenService: AdministrationScreenService,
-    private readonly serverConfigResource: ServerConfigResource
+    private readonly serverConfigResource: ServerConfigResource,
   ) {
     super();
   }
 
   register(): void {
-    const canActivate
-      = () => this.administrationScreenService.handleCanActivate.bind(this.administrationScreenService);
+    const canActivate = () => this.administrationScreenService.handleCanActivate.bind(this.administrationScreenService);
 
     this.screenService.create({
       name: AdministrationScreenService.screenName,
@@ -92,8 +90,10 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
   async load(): Promise<void> {
     await this.serverConfigResource.load();
 
-    if (this.administrationScreenService.isConfigurationMode
-      && !this.screenService.isActive(this.screenService.routerService.route, AdministrationScreenService.setupName)) {
+    if (
+      this.administrationScreenService.isConfigurationMode &&
+      !this.screenService.isActive(this.screenService.routerService.route, AdministrationScreenService.setupName)
+    ) {
       this.administrationScreenService.navigateToRoot();
     }
   }

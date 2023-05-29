@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
@@ -48,11 +47,14 @@ export const TabsBoxFromArray = observer<IProps>(function TabsBoxFromArray({
   return styled(useStyles(BASE_TAB_STYLES, style))(
     <TabsBox
       currentTabId={currentTabId}
-      tabs={!hideTabs && tabIdList.map(tabId => (
-        <Tab key={tabId} tabId={tabId} onOpen={onOpen} onClose={onClose}>
-          <TabData tabId={tabId} />
-        </Tab>
-      ))}
+      tabs={
+        !hideTabs &&
+        tabIdList.map(tabId => (
+          <Tab key={tabId} tabId={tabId} onOpen={onOpen} onClose={onClose}>
+            <TabData tabId={tabId} />
+          </Tab>
+        ))
+      }
       className={className}
       style={style}
     >
@@ -61,6 +63,6 @@ export const TabsBoxFromArray = observer<IProps>(function TabsBoxFromArray({
           <PanelData tabId={tabId} />
         </TabPanel>
       ))}
-    </TabsBox>
+    </TabsBox>,
   );
 });

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { PluginBootstrap } from './PluginBootstrap';
@@ -16,9 +15,5 @@ export const topAppBarPlugin: PluginManifest = {
   info: {
     name: 'Top App Bar plugin',
   },
-  providers: [
-    PluginBootstrap,
-    TopNavService,
-    AdministrationTopAppBarBootstrapService,
-  ],
+  providers: [PluginBootstrap, TopNavService, AdministrationTopAppBarBootstrapService],
 };

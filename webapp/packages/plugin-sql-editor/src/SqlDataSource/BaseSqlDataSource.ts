@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
@@ -132,11 +131,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   isLoaded(): boolean {
-    if (
-      Array.isArray(this.exception)
-        ? this.exception.some(Boolean)
-        : !!this.exception
-    ) {
+    if (Array.isArray(this.exception) ? this.exception.some(Boolean) : !!this.exception) {
       return false;
     }
 
@@ -155,10 +150,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     this.onUpdate.execute();
   }
 
-  save(): Promise<void> | void { }
-  load(): Promise<void> | void { }
+  save(): Promise<void> | void {}
+  load(): Promise<void> | void {}
   reset(): Promise<void> | void {
     this.saved = true;
   }
-  dispose(): void | Promise<void> { }
+  dispose(): void | Promise<void> {}
 }

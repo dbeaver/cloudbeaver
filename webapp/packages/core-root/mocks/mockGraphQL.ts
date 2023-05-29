@@ -5,20 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { GraphQLRequest, RequestHandler } from 'msw';
 import { setupServer } from 'msw/node';
 
 import { createWebsocketEndpoint } from './createWebsocketEndpoint';
 
-export function mockGraphQL(
-  ...requestHandlers: RequestHandler<any, GraphQLRequest<any>, any, GraphQLRequest<any>>[]
-) {
-
-  const server = setupServer(
-    ...requestHandlers,
-    createWebsocketEndpoint()
-  );
+export function mockGraphQL(...requestHandlers: RequestHandler<any, GraphQLRequest<any>, any, GraphQLRequest<any>>[]) {
+  const server = setupServer(...requestHandlers, createWebsocketEndpoint());
 
   beforeAll(() => server.listen());
   afterEach(() => server.resetHandlers());

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css, use } from 'reshadow';
@@ -77,11 +76,8 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
           onFilter={filters.setSearch}
         />
         <actions>
-          <button
-            {...use({ active: open })}
-            onClick={() => setOpen(!open)}
-          >
-            <IconOrImage icon='filter' />
+          <button {...use({ active: open })} onClick={() => setOpen(!open)}>
+            <IconOrImage icon="filter" />
           </button>
         </actions>
       </filter-container>
@@ -99,17 +95,12 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
             {translate('authentication_user_status')}
           </Combobox>
           {!!authRolesResource.data.length && (
-            <Combobox
-              items={[...authRolesResource.data, USER_ROLE_ALL]}
-              value={filters.role}
-              keepSize
-              onSelect={filters.setRole}
-            >
+            <Combobox items={[...authRolesResource.data, USER_ROLE_ALL]} value={filters.role} keepSize onSelect={filters.setRole}>
               {translate('authentication_user_role')}
             </Combobox>
           )}
         </Group>
       )}
-    </Group>
+    </Group>,
   );
 });

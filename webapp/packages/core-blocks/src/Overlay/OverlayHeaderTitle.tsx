@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled from 'reshadow';
 
 import { OVERLAY_BASE_STYLES } from './OVERLAY_BASE_STYLES';
@@ -18,6 +17,6 @@ export const OverlayHeaderTitle: React.FC<React.PropsWithChildren<Props>> = func
   return styled(OVERLAY_BASE_STYLES)(
     <header-title className={className}>
       <h3>{children}</h3>
-    </header-title>
+    </header-title>,
   );
 };

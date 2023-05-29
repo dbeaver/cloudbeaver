@@ -1,4 +1,3 @@
-
 /*
  * CloudBeaver - Cloud Database Manager
  * Copyright (C) 2020-2023 DBeaver Corp and others

@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Container, useTranslate, Group, GroupTitle, ObjectPropertyInfoForm } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Container, Group, GroupTitle, ObjectPropertyInfoForm, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ConnectionConfig, DriverProviderPropertyInfoFragment } from '@cloudbeaver/core-sdk';
 
 type DriverProviderPropertyInfo = DriverProviderPropertyInfoFragment;
@@ -21,17 +20,10 @@ interface Props {
   readonly?: boolean;
 }
 
-export const ProviderPropertiesForm = observer<Props>(function ProviderPropertiesForm({
-  config,
-  properties,
-  disabled,
-  readonly,
-}) {
+export const ProviderPropertiesForm = observer<Props>(function ProviderPropertiesForm({ config, properties, disabled, readonly }) {
   const translate = useTranslate();
 
-  const supportedProperties = properties.filter(
-    property => property.supportedConfigurationTypes?.some(type => type === config.configurationType)
-  );
+  const supportedProperties = properties.filter(property => property.supportedConfigurationTypes?.some(type => type === config.configurationType));
 
   if (!supportedProperties.length) {
     return null;
@@ -67,6 +59,6 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
           />
         </Container>
       )}
-    </Group>
+    </Group>,
   );
 });

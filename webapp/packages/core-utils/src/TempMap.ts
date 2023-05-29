@@ -5,14 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable, observable } from 'mobx';
 
 import { cacheValue, ICachedValueObject } from './cacheValue';
 
-const combine = <T>(a: IterableIterator<T>, b: IterableIterator<T>): IterableIterator<T> => (
-  function* () { yield* a; yield* b; }
-)();
+const combine = <T>(a: IterableIterator<T>, b: IterableIterator<T>): IterableIterator<T> =>
+  (function* () {
+    yield* a;
+    yield* b;
+  })();
 
 export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
   get size(): number {
@@ -34,10 +35,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
   private readonly valuesTemp: ICachedValueObject<TValue[]>;
   private readonly entriesTemp: ICachedValueObject<[TKey, TValue][]>;
 
-  constructor(
-    private readonly target: Map<TKey, TValue>,
-    private readonly onSync?: () => void,
-  ) {
+  constructor(private readonly target: Map<TKey, TValue>, private readonly onSync?: () => void) {
     this.temp = new Map();
     this.flushTask = null;
     this.deleted = [];
@@ -121,21 +119,15 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
   }
 
   entries(): IterableIterator<[TKey, TValue]> {
-    return this.entriesTemp.value(() => Array.from(this.keys())
-      .map<[TKey, TValue]>(key => [key, this.get(key)!]))
-      .values();
+    return this.entriesTemp.value(() => Array.from(this.keys()).map<[TKey, TValue]>(key => [key, this.get(key)!])).values();
   }
 
   keys(): IterableIterator<TKey> {
-    return this.keysTemp.value(() => Array.from(new Set(combine(this.target.keys(), this.temp.keys())))
-      .filter(key => !this.isDeleted(key)))
-      .values();
+    return this.keysTemp.value(() => Array.from(new Set(combine(this.target.keys(), this.temp.keys()))).filter(key => !this.isDeleted(key))).values();
   }
 
   values(): IterableIterator<TValue> {
-    return this.valuesTemp.value(() => Array.from(this.keys())
-      .map<TValue>(key => this.get(key)!))
-      .values();
+    return this.valuesTemp.value(() => Array.from(this.keys()).map<TValue>(key => this.get(key)!)).values();
   }
 
   private scheduleFlush(): void {
@@ -147,22 +139,25 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
       return;
     }
 
-    this.flushTask = setTimeout(action(() => {
-      for (const deleted of this.deleted) {
-        this.target.delete(deleted);
-      }
-      this.deleted.splice(0, this.deleted.length);
+    this.flushTask = setTimeout(
+      action(() => {
+        for (const deleted of this.deleted) {
+          this.target.delete(deleted);
+        }
+        this.deleted.splice(0, this.deleted.length);
 
-      for (const [key, value] of this.temp) {
-        this.target.set(key, value);
-      }
-      this.onSync?.();
-      this.temp.clear();
-      this.keysTemp.invalidate();
-      this.valuesTemp.invalidate();
-      this.entriesTemp.invalidate();
+        for (const [key, value] of this.temp) {
+          this.target.set(key, value);
+        }
+        this.onSync?.();
+        this.temp.clear();
+        this.keysTemp.invalidate();
+        this.valuesTemp.invalidate();
+        this.entriesTemp.invalidate();
 
-      this.flushTask = null;
-    }), 300);
+        this.flushTask = null;
+      }),
+      300,
+    );
   }
 }

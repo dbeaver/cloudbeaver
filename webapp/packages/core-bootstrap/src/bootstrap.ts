@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { configure } from 'mobx';
 
 import { App, PluginManifest } from '@cloudbeaver/core-di';
@@ -32,8 +31,6 @@ export function bootstrap(plugins: PluginManifest[]): App {
     }
   });
 
-  app
-    .start()
-    .catch();
+  app.start().catch();
   return app;
 }

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import styled, { css } from 'reshadow';
@@ -18,47 +17,44 @@ import type { DataPresentationComponent } from '../../DataPresentationService';
 import { DataValuePanelService } from './DataValuePanelService';
 
 const styles = css`
-    table-left-bar {
-      display: flex;
-    }
-    Tab {
-      composes: theme-ripple from theme-typography--body2 from global;
-      text-transform: uppercase;
-      font-weight: normal;
+  table-left-bar {
+    display: flex;
+  }
+  Tab {
+    composes: theme-ripple from theme-typography--body2 from global;
+    text-transform: uppercase;
+    font-weight: normal;
 
-      &:global([aria-selected=true]) {
-        font-weight: normal !important;
-      }
+    &:global([aria-selected='true']) {
+      font-weight: normal !important;
     }
-    TabList {
-      composes: theme-border-color-background from global;
-      position: relative;
-      
-      &:before {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        border-bottom: solid 2px;
-        border-color: inherit;
-      }
-    }
-    TabList tab-outer:only-child {
-      display: none;
-    }
-    TabPanel {
-      padding-top: 8px;
-    }
-    TabList, TabPanel {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-  `;
+  }
+  TabList {
+    composes: theme-border-color-background from global;
+    position: relative;
 
-export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = observer(function ValuePanel({
-  dataFormat,
-  model,
-  resultIndex,
-}) {
+    &:before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      border-bottom: solid 2px;
+      border-color: inherit;
+    }
+  }
+  TabList tab-outer:only-child {
+    display: none;
+  }
+  TabPanel {
+    padding-top: 8px;
+  }
+  TabList,
+  TabPanel {
+    composes: theme-background-secondary theme-text-on-secondary from global;
+  }
+`;
+
+export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = observer(function ValuePanel({ dataFormat, model, resultIndex }) {
   const service = useService(DataValuePanelService);
   const [currentTabId, setCurrentTabId] = useState('');
   const lastTabId = useRef('');
@@ -73,7 +69,11 @@ export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = ob
     }
   }
 
-  return styled(BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES)(
+  return styled(
+    BASE_TAB_STYLES,
+    styles,
+    UNDERLINE_TAB_STYLES,
+  )(
     <TabsState
       currentTabId={currentTabId}
       container={service.tabs}
@@ -85,6 +85,6 @@ export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = ob
     >
       <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
       <TabPanelList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
-    </TabsState>
+    </TabsState>,
   );
 });

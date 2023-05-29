@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -27,9 +26,7 @@ export class ClipboardService {
     return 'prompt';
   }
 
-  constructor(
-    private readonly notificationService: NotificationService
-  ) {
+  constructor(private readonly notificationService: NotificationService) {
     makeObservable<ClipboardService, 'permissionUpdate'>(this, {
       clipboardValue: observable,
       permissionUpdate: observable,

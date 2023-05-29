@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo, useState } from 'react';
@@ -40,11 +39,16 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
 
   const [filterValue, setFilterValue] = useState('');
 
-  const sortedProperties = useMemo(() => computed(() => propsRef.properties
-    .slice()
-    .sort((a, b) => (a.displayName ?? '').localeCompare(b.displayName ?? ''))
-    .filter(p => p.new || p.key.toLocaleLowerCase().includes(filterValue.toLocaleLowerCase()))
-  ), [propsRef.properties, filterValue]);
+  const sortedProperties = useMemo(
+    () =>
+      computed(() =>
+        propsRef.properties
+          .slice()
+          .sort((a, b) => (a.displayName ?? '').localeCompare(b.displayName ?? ''))
+          .filter(p => p.new || p.key.toLocaleLowerCase().includes(filterValue.toLocaleLowerCase())),
+      ),
+    [propsRef.properties, filterValue],
+  );
 
   const changeName = useCallback((id: string, key: string) => {
     const { properties, propertiesState, onKeyChange } = propsRef;
@@ -109,40 +113,23 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
     }
   }, []);
 
-  const isKeyUnique = useCallback(
-    (key: string) => propsRef.properties.filter(property => property.key === key).length === 1,
-    []
-  );
+  const isKeyUnique = useCallback((key: string) => propsRef.properties.filter(property => property.key === key).length === 1, []);
 
   return styled(PROPERTIES_TABLE_STYLES)(
     <properties className={className}>
       <properties-header>
         <properties-header-name>
-          <div>
-            {translate('core_block_properties_table_name')}
-          </div>
+          <div>{translate('core_block_properties_table_name')}</div>
           {props.filterable ? (
-            <ShadowInput
-              value={filterValue}
-              placeholder={translate('core_block_properties_table_filter_name')}
-              onChange={setFilterValue}
-            />
+            <ShadowInput value={filterValue} placeholder={translate('core_block_properties_table_filter_name')} onChange={setFilterValue} />
           ) : null}
         </properties-header-name>
-        <properties-header-value>
-          {translate('core_block_properties_table_value')}
-        </properties-header-value>
+        <properties-header-value>{translate('core_block_properties_table_value')}</properties-header-value>
       </properties-header>
       <properties-list>
         {onAdd && !readOnly && (
           <properties-header-add>
-            <Button
-              icon='add_sm'
-              viewBox="0 0 18 18"
-              type='button'
-              styles={PROPERTIES_TABLE_ADD_STYLES}
-              onClick={() => onAdd()}
-            >
+            <Button icon="add_sm" viewBox="0 0 18 18" type="button" styles={PROPERTIES_TABLE_ADD_STYLES} onClick={() => onAdd()}>
               {translate('core_block_properties_table_add')}
             </Button>
           </properties-header-add>
@@ -161,6 +148,6 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
         ))}
         <properties-list-overflow />
       </properties-list>
-    </properties>
+    </properties>,
   );
 });

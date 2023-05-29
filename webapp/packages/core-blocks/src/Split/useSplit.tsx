@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { ISplitState, SplitContext, SplitterMode } from 'go-split';
 import { useContext } from 'react';
 
@@ -17,18 +16,22 @@ interface ISplit {
 }
 
 export function useSplit(): ISplit {
-  return useObjectRef<ISplit>(() => ({
-    fixate(mode, state) {
-      if (state) {
-        if (this.state.mode !== mode || !this.state.disable) {
-          this.state.setDisable(true);
-          this.state.setMode(mode);
+  return useObjectRef<ISplit>(
+    () => ({
+      fixate(mode, state) {
+        if (state) {
+          if (this.state.mode !== mode || !this.state.disable) {
+            this.state.setDisable(true);
+            this.state.setMode(mode);
+          }
+        } else if (this.state.disable) {
+          this.state.setDisable(false);
         }
-      } else if (this.state.disable) {
-        this.state.setDisable(false);
-      }
+      },
+    }),
+    {
+      state: useContext(SplitContext),
     },
-  }), {
-    state: useContext(SplitContext),
-  }, ['fixate']);
+    ['fixate'],
+  );
 }

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IAction } from './IAction';
 import type { IActionInfo } from './IActionInfo';
 
@@ -23,9 +22,5 @@ export function createAction(id: string, info: IActionInfo): IAction {
 }
 
 export function isAction(obj: any): obj is IAction {
-  return (
-    obj
-    && typeof obj === 'object'
-    && actionSymbol in obj
-  );
+  return obj && typeof obj === 'object' && actionSymbol in obj;
 }

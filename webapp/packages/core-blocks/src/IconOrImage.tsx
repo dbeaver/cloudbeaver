@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useMemo } from 'react';
 
 import { isValidUrl } from '@cloudbeaver/core-utils';
@@ -22,10 +21,7 @@ export interface IconOrImageProps {
 }
 
 export const IconOrImage: React.FC<IconOrImageProps> = function IconOrImage({ icon, className, title, onClick, viewBox }) {
-  const isStaticIcon = useMemo(
-    () => icon && (icon.startsWith('platform:') || icon.startsWith('/')),
-    [icon]
-  );
+  const isStaticIcon = useMemo(() => icon && (icon.startsWith('platform:') || icon.startsWith('/')), [icon]);
 
   if (isStaticIcon || isValidUrl(icon)) {
     return <StaticImage title={title} icon={icon} className={className} onClick={onClick} />;

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { createContext } from 'react';
 import type { TabStateReturn } from 'reakit/Tab';
 
@@ -38,6 +37,4 @@ export interface ITabsContext<T = Record<string, any>> {
   closeOthers: (tabId: string) => Promise<void>;
 }
 
-export const TabsContext = createContext<ITabsContext<any> | undefined>(
-  undefined
-);
+export const TabsContext = createContext<ITabsContext<any> | undefined>(undefined);

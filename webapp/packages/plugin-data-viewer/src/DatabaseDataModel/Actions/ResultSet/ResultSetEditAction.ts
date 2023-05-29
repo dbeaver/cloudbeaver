@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
@@ -16,7 +15,13 @@ import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import { DatabaseEditAction } from '../DatabaseEditAction';
-import { DatabaseEditChangeType, IDatabaseDataEditActionData, IDatabaseDataEditActionValue, IDatabaseDataEditApplyActionData, IDatabaseDataEditApplyActionUpdate } from '../IDatabaseDataEditAction';
+import {
+  DatabaseEditChangeType,
+  IDatabaseDataEditActionData,
+  IDatabaseDataEditActionValue,
+  IDatabaseDataEditApplyActionData,
+  IDatabaseDataEditApplyActionUpdate,
+} from '../IDatabaseDataEditAction';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
@@ -33,19 +38,14 @@ export interface IResultSetUpdate {
 export type IResultSetEditActionData = IDatabaseDataEditActionData<IResultSetElementKey, IResultSetValue>;
 
 @databaseDataAction()
-export class ResultSetEditAction
-  extends DatabaseEditAction<IResultSetElementKey, IResultSetValue, IDatabaseResultSet> {
+export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey, IResultSetValue, IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Resultset];
 
   readonly applyAction: ISyncExecutor<IDatabaseDataEditApplyActionData<IResultSetRowKey>>;
   private readonly editorData: Map<string, IResultSetUpdate>;
   private readonly data: ResultSetDataAction;
 
-  constructor(
-    source: IDatabaseDataSource<any, IDatabaseResultSet>,
-    result: IDatabaseResultSet,
-    data: ResultSetDataAction
-  ) {
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet, data: ResultSetDataAction) {
     super(source, result);
     this.applyAction = new SyncExecutor();
     this.editorData = new Map();
@@ -77,22 +77,21 @@ export class ResultSetEditAction
   }
 
   get updates(): IResultSetUpdate[] {
-    return Array.from(this.editorData.values())
-      .sort((a, b) => {
-        if (a.type !== b.type) {
-          if (a.type === DatabaseEditChangeType.update) {
-            return -1;
-          }
-
-          if (b.type === DatabaseEditChangeType.update) {
-            return 1;
-          }
-
-          return a.type - b.type;
+    return Array.from(this.editorData.values()).sort((a, b) => {
+      if (a.type !== b.type) {
+        if (a.type === DatabaseEditChangeType.update) {
+          return -1;
         }
 
-        return a.row.index - b.row.index;
-      });
+        if (b.type === DatabaseEditChangeType.update) {
+          return 1;
+        }
+
+        return a.type - b.type;
+      }
+
+      return a.row.index - b.row.index;
+    });
   }
 
   isEdited(): boolean {
@@ -142,9 +141,7 @@ export class ResultSetEditAction
   }
 
   get(key: IResultSetElementKey): IResultSetValue | undefined {
-    return this.editorData
-      .get(ResultSetDataKeysUtils.serialize(key.row))
-      ?.update[key.column.index];
+    return this.editorData.get(ResultSetDataKeysUtils.serialize(key.row))?.update[key.column.index];
   }
 
   set(key: IResultSetElementKey, value: IResultSetValue): void {
@@ -167,11 +164,13 @@ export class ResultSetEditAction
       resultId: this.result.id,
       type: update.type,
       revert: false,
-      value: [{
-        key,
-        prevValue,
-        value,
-      }],
+      value: [
+        {
+          key,
+          prevValue,
+          value,
+        },
+      ],
     });
 
     this.removeEmptyUpdate(update);
@@ -205,9 +204,11 @@ export class ResultSetEditAction
         resultId: this.result.id,
         type: update.type,
         revert: false,
-        value: [{
-          key: { column, row },
-        }],
+        value: [
+          {
+            key: { column, row },
+          },
+        ],
       });
     }
   }
@@ -232,8 +233,7 @@ export class ResultSetEditAction
     for (const row of rows) {
       let value = this.data.getRowValue(row);
 
-      const editedValue = this.editorData
-        .get(ResultSetDataKeysUtils.serialize(row));
+      const editedValue = this.editorData.get(ResultSetDataKeysUtils.serialize(row));
 
       if (editedValue) {
         value = editedValue.update;
@@ -299,9 +299,11 @@ export class ResultSetEditAction
           resultId: this.result.id,
           type: update.type,
           revert: false,
-          value: [{
-            key: { column, row: key },
-          }],
+          value: [
+            {
+              key: { column, row: key },
+            },
+          ],
         });
       }
     } else if (!silent) {
@@ -309,9 +311,11 @@ export class ResultSetEditAction
         resultId: this.result.id,
         type: update.type,
         revert: true,
-        value: [{
-          key: { column, row: key },
-        }],
+        value: [
+          {
+            key: { column, row: key },
+          },
+        ],
       });
     }
   }
@@ -517,18 +521,12 @@ export class ResultSetEditAction
       return;
     }
 
-    if (update.source && !update.source.some(
-      (value, i) => !this.compareCellValue(value, update.update[i])
-    )) {
+    if (update.source && !update.source.some((value, i) => !this.compareCellValue(value, update.update[i]))) {
       this.editorData.delete(ResultSetDataKeysUtils.serialize(update.row));
     }
   }
 
-  private getOrCreateUpdate(
-    row: IResultSetRowKey,
-    type: DatabaseEditChangeType,
-    update?: IResultSetValue[]
-  ): [IResultSetUpdate, boolean] {
+  private getOrCreateUpdate(row: IResultSetRowKey, type: DatabaseEditChangeType, update?: IResultSetValue[]): [IResultSetUpdate, boolean] {
     const key = ResultSetDataKeysUtils.serialize(row);
     let created = false;
 
@@ -538,14 +536,14 @@ export class ResultSetEditAction
       if (type !== DatabaseEditChangeType.add) {
         source = this.data.getRowValue(row);
       } else {
-        source = [...update || []];
+        source = [...(update || [])];
       }
 
       this.editorData.set(key, {
         row,
         type,
         source,
-        update: observable([...source || update || []]),
+        update: observable([...(source || update || [])]),
       });
       created = true;
     }

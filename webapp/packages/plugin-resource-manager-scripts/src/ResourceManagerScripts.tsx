@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -32,6 +31,6 @@ export const ResourceManagerScripts: TabContainerPanelComponent = observer(funct
       <ResourceManagerTree resourceTypeId={SCRIPTS_TYPE_ID}>
         {translate('plugin_resource_manager_scripts_no_resources_placeholder')}
       </ResourceManagerTree>
-    </container>
+    </container>,
   );
 });

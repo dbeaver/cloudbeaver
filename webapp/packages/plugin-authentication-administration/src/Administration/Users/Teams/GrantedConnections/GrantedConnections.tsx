@@ -5,14 +5,23 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  BASE_CONTAINERS_STYLES, ColoredContainer, Container, getComputed, Group,
-  InfoItem, Loader, TextPlaceholder, useAutoLoad, useResource, useStyles, useTranslate
+  BASE_CONTAINERS_STYLES,
+  ColoredContainer,
+  Container,
+  getComputed,
+  Group,
+  InfoItem,
+  Loader,
+  TextPlaceholder,
+  useAutoLoad,
+  useResource,
+  useStyles,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { Connection, ConnectionInfoProjectKey, ConnectionInfoResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
@@ -41,10 +50,7 @@ const styles = css`
   }
 `;
 
-export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = observer(function GrantedConnections({
-  tabId,
-  state: formState,
-}) {
+export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = observer(function GrantedConnections({ tabId, state: formState }) {
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
   const translate = useTranslate();
 
@@ -55,30 +61,16 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
   const projects = useResource(GrantedConnections, ProjectInfoResource, CachedMapAllKey);
 
   const globalConnectionsKey = ConnectionInfoProjectKey(
-    ...(projects.data as Array<ProjectInfo | undefined>)
-      .filter(isGlobalProject)
-      .map(project => project.id)
+    ...(projects.data as Array<ProjectInfo | undefined>).filter(isGlobalProject).map(project => project.id),
   );
 
-  useResource(
-    GrantedConnections,
-    DBDriverResource,
-    CachedMapAllKey,
-    { active: selected }
-  );
+  useResource(GrantedConnections, DBDriverResource, CachedMapAllKey, { active: selected });
 
-  const connectionsLoader = useResource(
-    GrantedConnections,
-    ConnectionInfoResource,
-    globalConnectionsKey,
-    { active: selected }
-  );
+  const connectionsLoader = useResource(GrantedConnections, ConnectionInfoResource, globalConnectionsKey, { active: selected });
 
   const connections = connectionsLoader.data as Connection[];
 
-  const grantedConnections = getComputed(() => connections
-    .filter(connection => state.state.grantedSubjects.includes(connection.id))
-  );
+  const grantedConnections = getComputed(() => connections.filter(connection => state.state.grantedSubjects.includes(connection.id)));
 
   useAutoLoad(state, selected && !loaded);
 
@@ -100,35 +92,37 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
 
   return styled(style)(
     <Loader state={[state.state]}>
-      {() => styled(style)(
-        <ColoredContainer parent gap vertical>
-          {!connections.length ? (
-            <Group large>
-              <TextPlaceholder>{translate('administration_teams_team_granted_connections_empty')}</TextPlaceholder>
-            </Group>
-          ) : (
-            <>
-              {info && <InfoItem info={info} />}
-              <Container gap overflow>
-                <GrantedConnectionList
-                  grantedConnections={grantedConnections}
-                  disabled={formState.disabled}
-                  onEdit={state.edit}
-                  onRevoke={state.revoke}
-                />
-                {state.state.editing && (
-                  <ConnectionList
-                    connectionList={connections}
-                    grantedSubjects={state.state.grantedSubjects}
+      {() =>
+        styled(style)(
+          <ColoredContainer parent gap vertical>
+            {!connections.length ? (
+              <Group large>
+                <TextPlaceholder>{translate('administration_teams_team_granted_connections_empty')}</TextPlaceholder>
+              </Group>
+            ) : (
+              <>
+                {info && <InfoItem info={info} />}
+                <Container gap overflow>
+                  <GrantedConnectionList
+                    grantedConnections={grantedConnections}
                     disabled={formState.disabled}
-                    onGrant={state.grant}
+                    onEdit={state.edit}
+                    onRevoke={state.revoke}
                   />
-                )}
-              </Container>
-            </>
-          )}
-        </ColoredContainer>
-      )}
-    </Loader>
+                  {state.state.editing && (
+                    <ConnectionList
+                      connectionList={connections}
+                      grantedSubjects={state.state.grantedSubjects}
+                      disabled={formState.disabled}
+                      onGrant={state.grant}
+                    />
+                  )}
+                </Container>
+              </>
+            )}
+          </ColoredContainer>,
+        )
+      }
+    </Loader>,
   );
 });

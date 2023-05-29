@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 
-import { Table, TableHeader, TableColumnHeader, TableBody, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
+import { Table, TableBody, TableColumnHeader, TableHeader, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo, SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
 
 import { isVisibleProperty } from '../useExecutionPlanTreeState';
@@ -25,26 +24,30 @@ interface Props {
 export const PropertiesPanel = observer<Props>(function PropertiesPanel({ selectedNode, nodeList, className }) {
   const translate = useTranslate();
 
-  const { general, details } = useMemo(() => computed(() => {
-    const general: ObjectPropertyInfo[] = [];
-    const details: ObjectPropertyInfo[] = [];
+  const { general, details } = useMemo(
+    () =>
+      computed(() => {
+        const general: ObjectPropertyInfo[] = [];
+        const details: ObjectPropertyInfo[] = [];
 
-    const node = nodeList.find(node => node.id === selectedNode);
+        const node = nodeList.find(node => node.id === selectedNode);
 
-    if (!node) {
-      return { general, details };
-    }
+        if (!node) {
+          return { general, details };
+        }
 
-    for (const property of node.properties) {
-      if (isVisibleProperty(property)) {
-        general.push(property);
-      } else {
-        details.push(property);
-      }
-    }
+        for (const property of node.properties) {
+          if (isVisibleProperty(property)) {
+            general.push(property);
+          } else {
+            details.push(property);
+          }
+        }
 
-    return { general, details };
-  }), [selectedNode, nodeList]).get();
+        return { general, details };
+      }),
+    [selectedNode, nodeList],
+  ).get();
 
   if (!general.length && !details.length) {
     return <TextPlaceholder>{translate('sql_execution_plan_properties_panel_placeholder')}</TextPlaceholder>;
@@ -56,12 +59,8 @@ export const PropertiesPanel = observer<Props>(function PropertiesPanel({ select
   return (
     <Table className={className}>
       <TableHeader fixed>
-        <TableColumnHeader title={nameColumnTitle}>
-          {nameColumnTitle}
-        </TableColumnHeader>
-        <TableColumnHeader title={valueColumnTitle}>
-          {valueColumnTitle}
-        </TableColumnHeader>
+        <TableColumnHeader title={nameColumnTitle}>{nameColumnTitle}</TableColumnHeader>
+        <TableColumnHeader title={valueColumnTitle}>{valueColumnTitle}</TableColumnHeader>
       </TableHeader>
       <TableBody>
         {!!general.length && <PropertiesPanelItemsGroup properties={general} name={translate('sql_execution_plan_properties_panel_general')} />}

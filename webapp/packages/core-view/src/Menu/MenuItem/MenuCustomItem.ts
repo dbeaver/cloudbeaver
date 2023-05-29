@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ICustomMenuItemComponent, IMenuCustomItem, IMenuCustomItemOptions } from './IMenuCustomItem';
 import type { IMenuItemEvents } from './IMenuItem';
 import { MenuItem } from './MenuItem';
@@ -26,11 +25,7 @@ export class MenuCustomItem<TExtraProps = unknown> extends MenuItem implements I
     return this.isDisabled?.() ?? false;
   }
 
-  constructor(
-    options: IMenuCustomItemOptions<TExtraProps>,
-    events?: IMenuItemEvents,
-    getters?: IMenuCustomItemPropertyGetters<TExtraProps>,
-  ) {
+  constructor(options: IMenuCustomItemOptions<TExtraProps>, events?: IMenuItemEvents, getters?: IMenuCustomItemPropertyGetters<TExtraProps>) {
     super(options.id, events);
     this.getComponent = options.getComponent;
     this.isDisabled = getters?.isDisabled;

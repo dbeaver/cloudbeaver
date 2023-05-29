@@ -61,7 +61,7 @@ public class WebSQLUtils {
             return cellValue;
         }
         if (cellValue instanceof Date) {
-            return CBModelConstants.ISO_DATE_FORMAT.format(cellValue);
+            return CBModelConstants.ISO_DATE_FORMAT.format(((Date) cellValue).toInstant());
         } else if (cellValue instanceof Number) {
             if (cellValue instanceof Double) {
                 return CommonUtils.niceFormatDouble((Double) cellValue);

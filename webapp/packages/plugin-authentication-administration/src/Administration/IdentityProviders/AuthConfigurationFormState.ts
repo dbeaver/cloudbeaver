@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable, observable } from 'mobx';
 
 import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
@@ -42,11 +41,7 @@ export class AuthConfigurationFormState implements IAuthConfigurationFormState {
     return false;
   }
 
-  readonly resource: CachedMapResource<
-  string,
-  AdminAuthProviderConfiguration,
-  GetAuthProviderConfigurationsQueryVariables
-  >;
+  readonly resource: CachedMapResource<string, AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables>;
 
   readonly service: AuthConfigurationFormService;
   readonly submittingTask: IExecutor<IAuthConfigurationFormSubmitData>;
@@ -57,7 +52,7 @@ export class AuthConfigurationFormState implements IAuthConfigurationFormState {
 
   constructor(
     service: AuthConfigurationFormService,
-    resource: CachedMapResource<string, AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables>
+    resource: CachedMapResource<string, AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables>,
   ) {
     this.resource = resource;
     this.config = {
@@ -91,9 +86,7 @@ export class AuthConfigurationFormState implements IAuthConfigurationFormState {
     this.loadInfo = this.loadInfo.bind(this);
     this.updateFormState = this.updateFormState.bind(this);
 
-    this.formStateTask
-      .addCollection(service.formStateTask)
-      .addPostHandler(this.updateFormState);
+    this.formStateTask.addCollection(service.formStateTask).addPostHandler(this.updateFormState);
 
     this.loadConfigurationTask
       .before(service.configureTask)
@@ -103,15 +96,13 @@ export class AuthConfigurationFormState implements IAuthConfigurationFormState {
 
         return {
           state,
-          updated: state.info !== configuration.info
-            || state.config.providerId !== configuration.providerId
-            || !this.configured,
+          updated: state.info !== configuration.info || state.config.providerId !== configuration.providerId || !this.configured,
         };
       })
       .next(this.formStateTask);
   }
 
-  async load(): Promise<void> { }
+  async load(): Promise<void> {}
 
   async loadConfigurationInfo(): Promise<AdminAuthProviderConfiguration | undefined> {
     await this.loadConfigurationTask.execute(this);
@@ -119,9 +110,7 @@ export class AuthConfigurationFormState implements IAuthConfigurationFormState {
     return this.info;
   }
 
-  setOptions(
-    mode: AuthConfigurationFormMode,
-  ): this {
+  setOptions(mode: AuthConfigurationFormMode): this {
     this.mode = mode;
     return this;
   }
@@ -136,14 +125,11 @@ export class AuthConfigurationFormState implements IAuthConfigurationFormState {
       {
         state: this,
       },
-      this.service.formSubmittingTask
+      this.service.formSubmittingTask,
     );
   }
 
-  private updateFormState(
-    data: IAuthConfigurationFormState,
-    contexts: IExecutionContextProvider<IAuthConfigurationFormState>
-  ): void {
+  private updateFormState(data: IAuthConfigurationFormState, contexts: IExecutionContextProvider<IAuthConfigurationFormState>): void {
     const context = contexts.getContext(authConfigurationFormStateContext);
 
     this.statusMessage = context.statusMessage;
@@ -152,10 +138,7 @@ export class AuthConfigurationFormState implements IAuthConfigurationFormState {
     this.configured = true;
   }
 
-  private async loadInfo(
-    data: IAuthConfigurationFormState,
-    contexts: IExecutionContextProvider<IAuthConfigurationFormState>
-  ) {
+  private async loadInfo(data: IAuthConfigurationFormState, contexts: IExecutionContextProvider<IAuthConfigurationFormState>) {
     if (!data.config.id) {
       return;
     }

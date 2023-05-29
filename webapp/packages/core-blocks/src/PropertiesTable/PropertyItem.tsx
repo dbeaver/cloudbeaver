@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useCallback, useRef, useState, useLayoutEffect } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { ShadowInput } from '../FormControls/ShadowInput';
@@ -18,92 +17,100 @@ import type { IProperty } from './IProperty';
 import { PropertyValueSelector } from './PropertyValueSelector';
 
 const styles = css`
-    [|error] {
-      composes: theme-text-error from global;
-    }
-    property-item, button {
-      composes: theme-ripple from global;
-    }
-    property-item {
-      box-sizing: border-box;
-      display: inline-flex;
-      padding: 0px 1px;
-    }
-    property-name, property-value {
-      composes: theme-typography--caption from global;
-      position: relative;
-      display: flex;
-      align-items: center;
-      box-sizing: border-box;
-      flex: 1;
-      padding: 4px 0;
+  [|error] {
+    composes: theme-text-error from global;
+  }
+  property-item,
+  button {
+    composes: theme-ripple from global;
+  }
+  property-item {
+    box-sizing: border-box;
+    display: inline-flex;
+    padding: 0px 1px;
+  }
+  property-name,
+  property-value {
+    composes: theme-typography--caption from global;
+    position: relative;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    flex: 1;
+    padding: 4px 0;
 
-      & ShadowInput {
-        height: 24px;
-        padding: 0 36px 0 12px;
-      }
+    & ShadowInput {
+      height: 24px;
+      padding: 0 36px 0 12px;
     }
-    property-value, property-name {
-      margin-left: 24px;
-    }
-    property-name {
-      flex: 0 0 auto;
-      width: 276px;
-    }
-    property-remove {
-      position: relative;
-      flex: 0 0 auto;
-      align-items: center;
-      display: flex;
-      opacity: 0;
-    }
-    property-select {
-      flex: 0 0 auto;
-      align-items: center;
-      display: flex;
-    }
-    property-item:hover property-remove {
-      opacity: 1;
-    }
-    ShadowInput {
-      composes: theme-background-surface from global;
-    }
-    property-name ShadowInput, property-value ShadowInput {
-      box-sizing: border-box;
-      font: inherit;
-      color: inherit;
-      width: 100%;
-      outline: none;
+  }
+  property-value,
+  property-name {
+    margin-left: 24px;
+  }
+  property-name {
+    flex: 0 0 auto;
+    width: 276px;
+  }
+  property-remove {
+    position: relative;
+    flex: 0 0 auto;
+    align-items: center;
+    display: flex;
+    opacity: 0;
+  }
+  property-select {
+    flex: 0 0 auto;
+    align-items: center;
+    display: flex;
+  }
+  property-item:hover property-remove {
+    opacity: 1;
+  }
+  ShadowInput {
+    composes: theme-background-surface from global;
+  }
+  property-name ShadowInput,
+  property-value ShadowInput {
+    box-sizing: border-box;
+    font: inherit;
+    color: inherit;
+    width: 100%;
+    outline: none;
 
-      &[|edited] {
-        font-weight: 600;
-      }
-      &:global([readonly]), &:not(:focus):not([|focus]) {
-        background: transparent !important;
-        border: solid 2px transparent !important;
-      }
+    &[|edited] {
+      font-weight: 600;
     }
-    Icon, IconOrImage {
-      height: 16px;
-      display: block;
+    &:global([readonly]),
+    &:not(:focus):not([|focus]) {
+      background: transparent !important;
+      border: solid 2px transparent !important;
     }
-    property-select Icon, property-select IconOrImage {
-      &[|focus] {
-        transform: rotate(180deg);
-      }
+  }
+  Icon,
+  IconOrImage {
+    height: 16px;
+    display: block;
+  }
+  property-select Icon,
+  property-select IconOrImage {
+    &[|focus] {
+      transform: rotate(180deg);
     }
-    button {
-      background: transparent;
-      outline: none;
-      padding: 4px;
-      cursor: pointer;
-    }
-    button, PropertyValueSelector {
-      composes: theme-form-element-radius from global;
-      margin: 2px;
-      overflow: hidden;
-    }
-  `;
+  }
+  button {
+    background: transparent;
+    outline: none;
+    padding: 4px;
+    cursor: pointer;
+  }
+  button,
+  PropertyValueSelector {
+    composes: theme-form-element-radius from global;
+    margin: 2px;
+    overflow: hidden;
+  }
+`;
 
 interface Props {
   property: IProperty;
@@ -115,15 +122,7 @@ interface Props {
   readOnly?: boolean;
 }
 
-export const PropertyItem = observer<Props>(function PropertyItem({
-  property,
-  value,
-  onNameChange,
-  onValueChange,
-  onRemove,
-  error,
-  readOnly,
-}) {
+export const PropertyItem = observer<Props>(function PropertyItem({ property, value, onNameChange, onValueChange, onRemove, error, readOnly }) {
   const translate = useTranslate();
   const isDeletable = !readOnly && !property.displayName;
   const edited = value !== undefined && value !== property.defaultValue;
@@ -133,22 +132,14 @@ export const PropertyItem = observer<Props>(function PropertyItem({
   const [valueRef, setValueRef] = useState<HTMLDivElement | null>(null);
 
   const handleKeyChange = useCallback((key: string) => onNameChange(property.id, key), [property]);
-  const handleValueChange = useCallback(
-    (value: string) => onValueChange(property.id, value),
-    [property]
-  );
+  const handleValueChange = useCallback((value: string) => onValueChange(property.id, value), [property]);
   const handleRemove = useCallback(() => onRemove(property.id), [property]);
   function handleRevert() {
     onValueChange(property.id, property.defaultValue ?? null);
   }
 
   useLayoutEffect(() => {
-    if (
-      keyInputRef.current
-      && isDeletable
-      && property.new
-      && !(document.activeElement instanceof HTMLInputElement)
-    ) {
+    if (keyInputRef.current && isDeletable && property.new && !(document.activeElement instanceof HTMLInputElement)) {
       keyInputRef.current.focus();
     }
   }, [property]);
@@ -160,11 +151,11 @@ export const PropertyItem = observer<Props>(function PropertyItem({
       <property-name title={property.description} {...use({ error })}>
         <ShadowInput
           ref={keyInputRef}
-          type='text'
+          type="text"
           name={property.id}
           placeholder={property.keyPlaceholder}
           readOnly={!isDeletable}
-          autoComplete='none'
+          autoComplete="none"
           onChange={handleKeyChange}
         >
           {property.displayName || property.key}
@@ -172,10 +163,10 @@ export const PropertyItem = observer<Props>(function PropertyItem({
       </property-name>
       <property-value ref={setValueRef} title={propertyValue}>
         <ShadowInput
-          type='text'
+          type="text"
           name={`${property.id}_value`}
           placeholder={property.valuePlaceholder}
-          autoComplete='none'
+          autoComplete="none"
           readOnly={readOnly}
           data-focus={focus}
           onChange={handleValueChange}
@@ -197,7 +188,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({
             </button>
           </property-remove>
         )}
-        {(!readOnly && property.validValues && property.validValues.length > 0) && (
+        {!readOnly && property.validValues && property.validValues.length > 0 && (
           <property-select>
             <PropertyValueSelector
               propertyName={property.id}
@@ -211,6 +202,6 @@ export const PropertyItem = observer<Props>(function PropertyItem({
           </property-select>
         )}
       </property-value>
-    </property-item>
+    </property-item>,
   );
 });

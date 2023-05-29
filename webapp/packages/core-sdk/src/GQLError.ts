@@ -5,10 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="types.d.ts" />
-
 import type { ClientError, GraphQLRequestContext, GraphQLResponse } from 'graphql-request/dist/types';
 
 import { DetailsError } from './DetailsError';
@@ -25,9 +23,7 @@ export class GQLError extends DetailsError {
     if (typeof clientError.response.error === 'string') {
       message = clientError.response.error;
     } else if (clientError.response.errors && clientError.response.errors.length > 0) {
-      message = clientError.response.errors
-        .map(e => e.message)
-        .join('\n');
+      message = clientError.response.errors.map(e => e.message).join('\n');
     } else {
       message = 'Unknown error';
     }

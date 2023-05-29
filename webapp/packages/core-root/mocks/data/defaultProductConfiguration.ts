@@ -7,30 +7,30 @@
  */
 
 export const defaultProductConfiguration: Record<string, any> = {
-  'core_events': {
-    'notificationsPool': 5.0,
+  core_events: {
+    notificationsPool: 5.0,
   },
-  'core': {
-    'user': {
-      'defaultTheme': 'light',
-      'defaultLanguage': 'en',
+  core: {
+    user: {
+      defaultTheme: 'light',
+      defaultLanguage: 'en',
     },
-    'app': {
-      'logViewer': {
-        'refreshTimeout': 3000.0,
-        'logBatchSize': 1000.0,
-        'maxLogRecords': 2000.0,
-        'maxFailedRequests': 3.0,
+    app: {
+      logViewer: {
+        refreshTimeout: 3000.0,
+        logBatchSize: 1000.0,
+        maxLogRecords: 2000.0,
+        maxFailedRequests: 3.0,
       },
     },
-    'authentication': {
-      'primaryAuthProvider': 'local',
+    authentication: {
+      primaryAuthProvider: 'local',
     },
   },
-  'plugin_data_export': {
-    'disabled': false,
+  plugin_data_export: {
+    disabled: false,
   },
-  'plugin_data_spreadsheet_new': {
-    'hidden': false,
+  plugin_data_spreadsheet_new: {
+    hidden: false,
   },
 };

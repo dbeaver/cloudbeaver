@@ -17,5 +17,5 @@ export enum ENodeFeature {
   'leaf' = 'leaf',
   'canDelete' = 'canDelete',
   'canRename' = 'canRename',
-  'shared' = 'shared'
+  'shared' = 'shared',
 }

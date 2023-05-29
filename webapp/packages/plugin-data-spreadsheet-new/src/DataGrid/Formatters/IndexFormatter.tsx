@@ -5,12 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useContext } from 'react';
 
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
-
 
 import { CellContext } from '../CellRenderer/CellContext';
 

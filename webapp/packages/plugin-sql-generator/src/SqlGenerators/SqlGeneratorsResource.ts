@@ -5,37 +5,30 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import {
-  GraphQLService,
   CachedMapResource,
-  ResourceKey,
-  SqlQueryGenerator,
-  ResourceKeyUtils,
-  resourceKeyList,
+  GraphQLService,
   isResourceAlias,
+  ResourceKey,
+  resourceKeyList,
+  ResourceKeyUtils,
+  SqlQueryGenerator,
 } from '@cloudbeaver/core-sdk';
 
 export const MAX_GENERATORS_LENGTH = 15;
 
 @injectable()
 export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGenerator[]> {
-  constructor(
-    private readonly graphQLService: GraphQLService,
-    private readonly navNodeInfoResource: NavNodeInfoResource
-  ) {
+  constructor(private readonly graphQLService: GraphQLService, private readonly navNodeInfoResource: NavNodeInfoResource) {
     super();
 
     this.navNodeInfoResource.outdateResource(this);
     this.navNodeInfoResource.deleteInResource(this);
   }
 
-  async generateEntityQuery(
-    generatorId: string,
-    nodePathList: string | string[],
-  ): Promise<string> {
+  async generateEntityQuery(generatorId: string, nodePathList: string | string[]): Promise<string> {
     const result = await this.graphQLService.sdk.sqlGenerateEntityQuery({
       generatorId,
       nodePathList,
@@ -52,9 +45,9 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
     const values = new Map();
 
     await ResourceKeyUtils.forEachAsync(key, async key => {
-      const { generators } = await this.graphQLService.sdk.sqlEntityQueryGenerators(({
+      const { generators } = await this.graphQLService.sdk.sqlEntityQueryGenerators({
         nodePathList: key,
-      }));
+      });
       values.set(key, generators);
     });
 

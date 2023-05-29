@@ -5,19 +5,18 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import {  SessionDataResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedDataResource, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { SessionDataResource } from '@cloudbeaver/core-root';
+import { CachedDataResource, GraphQLService, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class TemplateConnectionsResource extends CachedDataResource<Connection[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
     connectionInfoResource: ConnectionInfoResource,
-    sessionDataResource:SessionDataResource,
+    sessionDataResource: SessionDataResource,
     appAuthService: AppAuthService,
   ) {
     super(() => []);
@@ -32,9 +31,7 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
       }
     });
     connectionInfoResource.onItemDelete.addHandler(list => {
-      const isAnyTemplate = connectionInfoResource
-        .get(ResourceKeyUtils.toList(list))
-        .some(connection => connection?.template);
+      const isAnyTemplate = connectionInfoResource.get(ResourceKeyUtils.toList(list)).some(connection => connection?.template);
 
       if (isAnyTemplate) {
         this.markOutdated();

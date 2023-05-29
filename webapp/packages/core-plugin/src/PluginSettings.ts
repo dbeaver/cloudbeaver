@@ -5,15 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { ISettingsSource, SettingsResolverSource } from '@cloudbeaver/core-settings';
 
 export class PluginSettings<T> extends SettingsResolverSource implements ISettingsSource {
-  constructor(
-    private readonly source: ISettingsSource,
-    private readonly scope: string,
-    private readonly defaults: T
-  ) {
+  constructor(private readonly source: ISettingsSource, private readonly scope: string, private readonly defaults: T) {
     super();
   }
 

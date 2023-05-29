@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { makeObservable, observable } from 'mobx';
 
 import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections';
@@ -32,7 +31,7 @@ export class SqlExecutionPlanService {
     private readonly notificationService: NotificationService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
-    private readonly sqlDataSourceService: SqlDataSourceService
+    private readonly sqlDataSourceService: SqlDataSourceService,
   ) {
     this.data = new Map();
 
@@ -41,10 +40,7 @@ export class SqlExecutionPlanService {
     });
   }
 
-  async executeExecutionPlan(
-    editorState: ISqlEditorTabState,
-    query: string,
-  ): Promise<void> {
+  async executeExecutionPlan(editorState: ISqlEditorTabState, query: string): Promise<void> {
     const dataSource = this.sqlDataSourceService.get(editorState.editorId);
     const contextInfo = dataSource?.executionContext;
 
@@ -77,7 +73,7 @@ export class SqlExecutionPlanService {
         return result;
       },
       () => this.asyncTaskInfoService.cancel(asyncTask.id),
-      () => this.asyncTaskInfoService.remove(asyncTask.id)
+      () => this.asyncTaskInfoService.remove(asyncTask.id),
     );
 
     this.data.set(tabId, {
@@ -90,7 +86,8 @@ export class SqlExecutionPlanService {
 
       const tab = editorState.tabs.find(tab => tab.id === tabId);
 
-      if (!tab) { // tab can be closed before we get result
+      if (!tab) {
+        // tab can be closed before we get result
         return;
       }
 

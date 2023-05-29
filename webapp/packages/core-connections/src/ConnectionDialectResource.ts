@@ -5,14 +5,27 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { GraphQLService, CachedMapResource, ResourceKey, ResourceKeyUtils, CachedMapAllKey, resourceKeyList, SqlDialectInfo, isResourceKeyList } from '@cloudbeaver/core-sdk';
+import {
+  CachedMapAllKey,
+  CachedMapResource,
+  GraphQLService,
+  isResourceKeyList,
+  ResourceKey,
+  resourceKeyList,
+  ResourceKeyUtils,
+  SqlDialectInfo,
+} from '@cloudbeaver/core-sdk';
 
 import type { IConnectionExecutionContextInfo } from './ConnectionExecutionContext/IConnectionExecutionContextInfo';
-import { ConnectionInfoActiveProjectKey, ConnectionInfoProjectKey, ConnectionInfoResource, isConnectionInfoParamEqual } from './ConnectionInfoResource';
+import {
+  ConnectionInfoActiveProjectKey,
+  ConnectionInfoProjectKey,
+  ConnectionInfoResource,
+  isConnectionInfoParamEqual,
+} from './ConnectionInfoResource';
 import type { IConnectionInfoParams } from './IConnectionsResource';
 
 export type ConnectionDialect = SqlDialectInfo;
@@ -26,18 +39,12 @@ export class ConnectionDialectResource extends CachedMapResource<IConnectionInfo
   ) {
     super();
     this.sync(connectionInfoResource);
-    this.addAlias(
-      ConnectionInfoProjectKey,
-      param => resourceKeyList(
-        connectionInfoResource.keys.filter(key => param.options.projectIds.includes(key.projectId))
-      )
+    this.addAlias(ConnectionInfoProjectKey, param =>
+      resourceKeyList(connectionInfoResource.keys.filter(key => param.options.projectIds.includes(key.projectId))),
     );
 
-    this.addAlias(
-      ConnectionInfoActiveProjectKey,
-      () => resourceKeyList(
-        connectionInfoResource.keys.filter(key => projectsService.activeProjects.some(({ id }) => id === key.projectId))
-      )
+    this.addAlias(ConnectionInfoActiveProjectKey, () =>
+      resourceKeyList(connectionInfoResource.keys.filter(key => projectsService.activeProjects.some(({ id }) => id === key.projectId))),
     );
     this.replaceAlias(CachedMapAllKey, () => resourceKeyList(connectionInfoResource.keys));
     this.before(ExecutorInterrupter.interrupter(key => !connectionInfoResource.isConnected(key)));
@@ -55,7 +62,7 @@ export class ConnectionDialectResource extends CachedMapResource<IConnectionInfo
 
   protected async loader(
     originalKey: ResourceKey<IConnectionInfoParams>,
-    includes: string[]
+    includes: string[],
   ): Promise<Map<IConnectionInfoParams, ConnectionDialect>> {
     const dialects: ConnectionDialect[] = [];
     const keys = ResourceKeyUtils.toList(this.transformToKey(originalKey));
@@ -83,10 +90,6 @@ export class ConnectionDialectResource extends CachedMapResource<IConnectionInfo
   }
 
   protected validateKey(key: IConnectionInfoParams): boolean {
-    return (
-      typeof key === 'object'
-      && typeof key.projectId === 'string'
-      && ['string'].includes(typeof key.connectionId)
-    );
+    return typeof key === 'object' && typeof key.projectId === 'string' && ['string'].includes(typeof key.connectionId);
   }
 }

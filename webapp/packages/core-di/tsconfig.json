@@ -3,9 +3,11 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib",
-    "composite": true
+    "declarationMap": true,
+    "composite": true,
+    "declaration": true
   },
   "include": ["src"],
   "exclude": ["**/node_modules", "**/.*/"],
-  "references": [{ "path": "../*" }]
+  "references": [{ "path": "../core-executor" }, { "path": "../core-utils" }]
 }

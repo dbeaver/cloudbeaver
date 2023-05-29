@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React from 'react';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -21,10 +20,7 @@ const ConnectionAccess = React.lazy(async () => {
 
 @injectable()
 export class ConnectionAccessTabBootstrap extends Bootstrap {
-  constructor(
-    private readonly userFormService: UserFormService,
-    private readonly projectInfoResource: ProjectInfoResource,
-  ) {
+  constructor(private readonly userFormService: UserFormService, private readonly projectInfoResource: ProjectInfoResource) {
     super();
   }
 
@@ -42,5 +38,5 @@ export class ConnectionAccessTabBootstrap extends Bootstrap {
     this.userFormService.onFormInit.addHandler(() => this.projectInfoResource.load(CachedMapAllKey));
   }
 
-  load(): void { }
+  load(): void {}
 }

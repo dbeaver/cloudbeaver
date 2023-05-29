@@ -1,4 +1,3 @@
-
 /*
  * CloudBeaver - Cloud Database Manager
  * Copyright (C) 2020-2023 DBeaver Corp and others
@@ -6,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { Group, GroupTitle, BASE_CONTAINERS_STYLES, InputField, useTranslate, useStyles, useResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Group, GroupTitle, InputField, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState';
@@ -19,22 +17,13 @@ interface Props {
   state: IServerConfigurationPageState;
 }
 
-export const ServerConfigurationInfoForm = observer<Props>(function ServerConfigurationInfoForm({
-  state,
-}) {
+export const ServerConfigurationInfoForm = observer<Props>(function ServerConfigurationInfoForm({ state }) {
   const serverConfigLoader = useResource(ServerConfigurationInfoForm, ServerConfigResource, undefined);
   const translate = useTranslate();
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <Group form gap>
       <GroupTitle>{translate('administration_configuration_wizard_configuration_server_info')}</GroupTitle>
-      <InputField
-        type="text"
-        name="serverName"
-        state={state.serverConfig}
-        mod='surface'
-        required
-        medium
-      >
+      <InputField type="text" name="serverName" state={state.serverConfig} mod="surface" required medium>
         {translate('administration_configuration_wizard_configuration_server_name')}
       </InputField>
       <InputField
@@ -43,7 +32,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         name="serverURL"
         state={state.serverConfig}
         readOnly={serverConfigLoader.resource.distributed}
-        mod='surface'
+        mod="surface"
         required
         medium
       >
@@ -54,7 +43,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         type="number"
         name="sessionExpireTime"
         state={state.serverConfig}
-        mod='surface'
+        mod="surface"
         min={1}
         mapState={v => (v === 0 ? 60000 : v ?? 1800000) / 1000 / 60}
         mapValue={v => (v === undefined ? 30 : Number(v) || 1) * 1000 * 60}
@@ -63,6 +52,6 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
       >
         {translate('administration_configuration_wizard_configuration_server_session_lifetime')}
       </InputField>
-    </Group>
+    </Group>,
   );
 });

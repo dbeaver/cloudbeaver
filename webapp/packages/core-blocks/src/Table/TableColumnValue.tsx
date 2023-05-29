@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useCallback, useContext } from 'react';
 import styled, { use } from 'reshadow';
@@ -30,57 +29,51 @@ type Props = {
   onDoubleClick?: () => void;
 } & React.DetailedHTMLProps<React.TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement>;
 
-export const TableColumnValue = observer<Props, HTMLTableCellElement>(forwardRef(function TableColumnValue({
-  align,
-  children,
-  centerContent,
-  ellipsis,
-  flex,
-  expand,
-  className,
-  onClick,
-  onDoubleClick,
-  ...rest
-}, ref) {
-  const tableContext = useContext(TableContext);
-  const context = useContext(TableItemContext);
-  const props = useObjectRef({ onClick, onDoubleClick });
+export const TableColumnValue = observer<Props, HTMLTableCellElement>(
+  forwardRef(function TableColumnValue({ align, children, centerContent, ellipsis, flex, expand, className, onClick, onDoubleClick, ...rest }, ref) {
+    const tableContext = useContext(TableContext);
+    const context = useContext(TableItemContext);
+    const props = useObjectRef({ onClick, onDoubleClick });
 
-  const handleClick = useCallback((event: React.MouseEvent<HTMLTableCellElement>) => {
+    const handleClick = useCallback(
+      (event: React.MouseEvent<HTMLTableCellElement>) => {
+        if (!context) {
+          return;
+        }
+
+        if (expand && !EventContext.has(event, EventTableItemExpandFlag)) {
+          const state = !context.isExpanded();
+          EventContext.set(event, EventTableItemExpandFlag, state);
+          EventContext.set(event, EventTableItemSelectionFlag);
+          tableContext?.setItemExpand(context.item, state);
+        }
+
+        props.onClick?.();
+      },
+      [tableContext, context, expand],
+    );
+
+    const handleDoubleClick = useCallback((event: React.MouseEvent<HTMLTableCellElement>) => {
+      props.onDoubleClick?.();
+    }, []);
+
     if (!context) {
-      return;
+      return null;
     }
 
-    if (expand && !EventContext.has(event, EventTableItemExpandFlag)) {
-      const state = !context.isExpanded();
-      EventContext.set(event, EventTableItemExpandFlag, state);
-      EventContext.set(event, EventTableItemSelectionFlag);
-      tableContext?.setItemExpand(context.item, state);
-    }
-
-    props.onClick?.();
-  }, [tableContext, context, expand]);
-
-  const handleDoubleClick = useCallback((event: React.MouseEvent<HTMLTableCellElement>) => {
-    props.onDoubleClick?.();
-  }, []);
-
-  if (!context) {
-    return null;
-  }
-
-  return styled(BASE_TABLE_STYLES)(
-    <td
-      align={align}
-      className={className}
-      {...use({ centerContent, ellipsis })}
-      ref={ref}
-      onClick={handleClick}
-      onDoubleClick={handleDoubleClick}
-      {...rest}
-    >
-      {flex && <td-flex className={className}>{children}</td-flex>}
-      {!flex && children}
-    </td>
-  );
-}));
+    return styled(BASE_TABLE_STYLES)(
+      <td
+        align={align}
+        className={className}
+        {...use({ centerContent, ellipsis })}
+        ref={ref}
+        onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
+        {...rest}
+      >
+        {flex && <td-flex className={className}>{children}</td-flex>}
+        {!flex && children}
+      </td>,
+    );
+  }),
+);

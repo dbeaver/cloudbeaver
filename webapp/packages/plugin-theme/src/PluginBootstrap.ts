@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ThemeService } from '@cloudbeaver/core-theming';
 import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
@@ -15,24 +14,15 @@ import { THEME_MENU } from './THEME_MENU';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
-  constructor(
-    private readonly menuService: MenuService,
-    private readonly themeService: ThemeService
-  ) {
+  constructor(private readonly menuService: MenuService, private readonly themeService: ThemeService) {
     super();
   }
 
   register(): void | Promise<void> {
     this.menuService.addCreator({
-      isApplicable: context => (
-        context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU
-        && this.themeService.themes.length > 0
-      ),
+      isApplicable: context => context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU && this.themeService.themes.length > 0,
       getItems(context, items) {
-        return [
-          ...items,
-          THEME_MENU,
-        ];
+        return [...items, THEME_MENU];
       },
     });
 
@@ -41,27 +31,27 @@ export class PluginBootstrap extends Bootstrap {
         return context.get(DATA_CONTEXT_MENU) === THEME_MENU;
       },
       getItems: (context, items) => {
-        const themes = this.themeService.themes.map(theme => new MenuBaseItem(
-          {
-            id: theme.id,
-            label: theme.name,
-            tooltip: theme.name,
-          },
-          {
-            onSelect: () => this.themeService.changeTheme(theme.id),
-          },
-          {
-            isDisabled: () => this.themeService.currentThemeId === theme.id,
-          }
-        ));
+        const themes = this.themeService.themes.map(
+          theme =>
+            new MenuBaseItem(
+              {
+                id: theme.id,
+                label: theme.name,
+                tooltip: theme.name,
+              },
+              {
+                onSelect: () => this.themeService.changeTheme(theme.id),
+              },
+              {
+                isDisabled: () => this.themeService.currentThemeId === theme.id,
+              },
+            ),
+        );
 
-        return [
-          ...items,
-          ...themes,
-        ];
+        return [...items, ...themes];
       },
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 }

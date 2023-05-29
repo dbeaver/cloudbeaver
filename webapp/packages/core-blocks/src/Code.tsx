@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled, { css } from 'reshadow';
 
 interface Props {
@@ -13,19 +12,17 @@ interface Props {
 }
 
 const styles = css`
-    code-container {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-      padding: 16px;
-      border-radius: var(--theme-group-element-radius);
-    }
+  code-container {
+    composes: theme-background-secondary theme-text-on-secondary from global;
+    padding: 16px;
+    border-radius: var(--theme-group-element-radius);
+  }
 `;
 
 export const Code: React.FC<React.PropsWithChildren<Props>> = function Code({ children, className }) {
   return styled(styles)(
     <code-container className={className}>
-      <code>
-        {children}
-      </code>
-    </code-container>
+      <code>{children}</code>
+    </code-container>,
   );
 };

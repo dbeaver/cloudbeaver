@@ -5,16 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { NAV_NODE_TYPE_PROJECT } from '@cloudbeaver/core-projects';
 
 import { elementsTreeNameFilterNode } from '../ElementsTree/elementsTreeNameFilter';
-import { type NavNodeFilterCompareFn, EEquality } from '../ElementsTree/NavNodeFilterCompareFn';
+import { EEquality, type NavNodeFilterCompareFn } from '../ElementsTree/NavNodeFilterCompareFn';
 
-export const navigationTreeProjectSearchCompare: NavNodeFilterCompareFn = function navigationTreeProjectSearchCompare(
-  node,
-  filter
-) {
+export const navigationTreeProjectSearchCompare: NavNodeFilterCompareFn = function navigationTreeProjectSearchCompare(node, filter) {
   if (node.nodeType === NAV_NODE_TYPE_PROJECT) {
     return EEquality.none;
   }

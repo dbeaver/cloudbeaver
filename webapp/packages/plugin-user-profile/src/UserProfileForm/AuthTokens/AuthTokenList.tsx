@@ -5,41 +5,40 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AuthProviderConfiguration, AuthProvidersResource } from '@cloudbeaver/core-authentication';
-import { IconOrImage, Link, Cell, useResource, Loader, Button, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Cell, IconOrImage, Link, Loader, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, UserInfo } from '@cloudbeaver/core-sdk';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 const styles = css`
-    container {
-      display: flex;
-      flex-direction: column;
-      overflow: auto;
-    }
-    list {
-      overflow: auto;
-    }
-    Cell {
-      composes: theme-border-color-secondary from global;
-      border-bottom: 1px solid;
-      padding: 0 16px;
-    }
-    IconOrImage {
-      width: 100%;
-      height: 100%;
-    }
-    provider-login-icon {
-      width: 24px;
-      height: 24px;
-    }
-    time {
-      composes: theme-typography--caption from global;
-    }
+  container {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
+  list {
+    overflow: auto;
+  }
+  Cell {
+    composes: theme-border-color-secondary from global;
+    border-bottom: 1px solid;
+    padding: 0 16px;
+  }
+  IconOrImage {
+    width: 100%;
+    height: 100%;
+  }
+  provider-login-icon {
+    width: 24px;
+    height: 24px;
+  }
+  time {
+    composes: theme-typography--caption from global;
+  }
 `;
 
 interface Props {
@@ -70,9 +69,7 @@ export const AuthTokenList = observer<Props>(function AuthTokenList({ user, clas
             let icon = provider.icon;
 
             if (token.authConfiguration) {
-              configuration = provider.configurations?.find(
-                configuration => configuration.id === token.authConfiguration
-              );
+              configuration = provider.configurations?.find(configuration => configuration.id === token.authConfiguration);
 
               if (configuration) {
                 name = configuration.displayName;
@@ -88,21 +85,14 @@ export const AuthTokenList = observer<Props>(function AuthTokenList({ user, clas
             const title = `${name}\n${description || ''}`;
 
             return (
-              <Link
-                key={provider.id + '_' + token.authConfiguration}
-                title={title}
-                wrapper
-              >
+              <Link key={provider.id + '_' + token.authConfiguration} title={title} wrapper>
                 <Cell
                   before={icon ? <IconOrImage icon={icon} /> : undefined}
-                  after={(
-                    <Button
-                      mod={['outlined']}
-                      onClick={() => authenticationService.logout(provider.id, configuration?.id)}
-                    >
+                  after={
+                    <Button mod={['outlined']} onClick={() => authenticationService.logout(provider.id, configuration?.id)}>
                       {translate('authentication_logout')}
                     </Button>
-                  )}
+                  }
                   // after={activeProviders.includes(provider.id) && false ? (
                   //   <provider-login-icon>
                   //     <IconOrImage
@@ -111,13 +101,19 @@ export const AuthTokenList = observer<Props>(function AuthTokenList({ user, clas
                   //     />
                   //   </provider-login-icon>
                   // ) : undefined}
-                  description={(
+                  description={
                     <>
-                      {description}<br />
-                      {token.userId && (<>{token.userId}<br /></>)}
+                      {description}
+                      <br />
+                      {token.userId && (
+                        <>
+                          {token.userId}
+                          <br />
+                        </>
+                      )}
                       {date ? <time dateTime={date.toLocaleString()}>{date.toLocaleString()}</time> : undefined}
                     </>
-                  )}
+                  }
                 >
                   {name}
                 </Cell>
@@ -126,6 +122,6 @@ export const AuthTokenList = observer<Props>(function AuthTokenList({ user, clas
           })}
         </list>
       </Loader>
-    </container>
+    </container>,
   );
 });

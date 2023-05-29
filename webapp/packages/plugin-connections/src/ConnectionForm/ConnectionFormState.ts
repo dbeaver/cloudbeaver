@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import type { IFormStateInfo } from '@cloudbeaver/core-blocks';
@@ -18,7 +17,7 @@ import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 import { connectionFormConfigureContext } from './connectionFormConfigureContext';
 import type { ConnectionFormService } from './ConnectionFormService';
 import { connectionFormStateContext } from './Contexts/connectionFormStateContext';
-import type { IConnectionFormState, ConnectionFormMode, ConnectionFormType, IConnectionFormSubmitData } from './IConnectionFormProps';
+import type { ConnectionFormMode, ConnectionFormType, IConnectionFormState, IConnectionFormSubmitData } from './IConnectionFormProps';
 
 export class ConnectionFormState implements IConnectionFormState {
   mode: ConnectionFormMode;
@@ -96,7 +95,7 @@ export class ConnectionFormState implements IConnectionFormState {
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
     service: ConnectionFormService,
-    resource: ConnectionInfoResource
+    resource: ConnectionInfoResource,
   ) {
     this._id = uuid();
     this.initError = null;
@@ -117,7 +116,6 @@ export class ConnectionFormState implements IConnectionFormState {
     this.mode = 'create';
     this.type = 'public';
 
-
     this.syncProject = this.syncProject.bind(this);
     this.syncInfo = this.syncInfo.bind(this);
     this.test = this.test.bind(this);
@@ -126,18 +124,13 @@ export class ConnectionFormState implements IConnectionFormState {
     this.loadInfo = this.loadInfo.bind(this);
     this.updateFormState = this.updateFormState.bind(this);
 
-    this.formStateTask
-      .addCollection(service.formStateTask)
-      .addPostHandler(this.updateFormState);
+    this.formStateTask.addCollection(service.formStateTask).addPostHandler(this.updateFormState);
 
-    this.resource.onItemUpdate
-      .addHandler(this.syncInfo);
+    this.resource.onItemUpdate.addHandler(this.syncInfo);
 
-    this.projectInfoResource.onDataUpdate
-      .addHandler(this.syncProject);
+    this.projectInfoResource.onDataUpdate.addHandler(this.syncProject);
 
-    this.projectsService.onActiveProjectChange
-      .addHandler(this.syncProject);
+    this.projectsService.onActiveProjectChange.addHandler(this.syncProject);
 
     this.submittingTask.addPostHandler(async (data, contexts) => {
       const status = contexts.getContext(service.connectionStatusContext);
@@ -159,9 +152,7 @@ export class ConnectionFormState implements IConnectionFormState {
 
         return {
           state,
-          updated: state.info !== configuration.info
-            || state.config.driverId !== configuration.driverId
-            || !this.configured,
+          updated: state.info !== configuration.info || state.config.driverId !== configuration.driverId || !this.configured,
         };
       })
       .next(this.formStateTask);
@@ -214,10 +205,7 @@ export class ConnectionFormState implements IConnectionFormState {
     return this;
   }
 
-  setOptions(
-    mode: ConnectionFormMode,
-    type: ConnectionFormType
-  ): this {
+  setOptions(mode: ConnectionFormMode, type: ConnectionFormType): this {
     this.mode = mode;
     this.type = type;
     return this;
@@ -247,7 +235,7 @@ export class ConnectionFormState implements IConnectionFormState {
         state: this,
         submitType: 'submit',
       },
-      this.service.formSubmittingTask
+      this.service.formSubmittingTask,
     );
   }
 
@@ -257,7 +245,7 @@ export class ConnectionFormState implements IConnectionFormState {
         state: this,
         submitType: 'test',
       },
-      this.service.formSubmittingTask
+      this.service.formSubmittingTask,
     );
   }
 
@@ -267,12 +255,9 @@ export class ConnectionFormState implements IConnectionFormState {
   }
 
   dispose(): void {
-    this.resource.onItemUpdate
-      .removeHandler(this.syncInfo);
-    this.projectInfoResource.onDataUpdate
-      .removeHandler(this.syncProject);
-    this.projectsService.onActiveProjectChange
-      .removeHandler(this.syncProject);
+    this.resource.onItemUpdate.removeHandler(this.syncInfo);
+    this.projectInfoResource.onDataUpdate.removeHandler(this.syncProject);
+    this.projectsService.onActiveProjectChange.removeHandler(this.syncProject);
   }
 
   async close(): Promise<void> {
@@ -300,9 +285,9 @@ export class ConnectionFormState implements IConnectionFormState {
 
   private syncInfo(key: ResourceKeySimple<IConnectionInfoParams>) {
     if (
-      !this.config.connectionId
-      || this.projectId === null
-      || !this.resource.isIntersect(key, createConnectionParam(this.projectId, this.config.connectionId))
+      !this.config.connectionId ||
+      this.projectId === null ||
+      !this.resource.isIntersect(key, createConnectionParam(this.projectId, this.config.connectionId))
     ) {
       return;
     }

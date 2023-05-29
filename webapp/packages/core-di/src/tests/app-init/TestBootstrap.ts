@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap } from '../../Bootstrap';
 import { injectable } from '../../injectable';
 import { TestService } from './TestService';
@@ -16,9 +15,7 @@ export class TestBootstrap extends Bootstrap {
   registered: boolean;
   sum: number;
 
-  constructor(
-    readonly testService: TestService
-  ) {
+  constructor(readonly testService: TestService) {
     super();
     this.loaded = false;
     this.registered = false;
@@ -38,5 +35,4 @@ export class TestBootstrap extends Bootstrap {
       }, 5);
     });
   }
-
 }

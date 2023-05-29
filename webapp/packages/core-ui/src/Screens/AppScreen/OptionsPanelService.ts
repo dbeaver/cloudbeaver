@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -21,9 +20,7 @@ export class OptionsPanelService {
   panelComponent: (() => React.FC) | null;
   private basePanelComponent: (() => React.FC) | null;
 
-  constructor(
-    private readonly navigationService: NavigationService
-  ) {
+  constructor(private readonly navigationService: NavigationService) {
     makeObservable(this, {
       active: observable,
       panelComponent: observable,

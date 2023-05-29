@@ -5,8 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
 
 import { getConnectionFolderId } from './getConnectionFolderId';
@@ -17,5 +15,4 @@ export function getConnectionParentId(projectId: string, folderId?: string): str
   }
 
   return getConnectionFolderId({ projectId, folderId });
-
 }

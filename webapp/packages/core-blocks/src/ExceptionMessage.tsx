@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
@@ -98,7 +97,7 @@ const style = css`
     width: 100%;
     max-height: 24px;
     max-width: 24px;
-    
+
     & error-icon {
       display: flex;
       align-items: center;
@@ -128,9 +127,7 @@ interface Props {
   onClose?: () => void;
 }
 
-export const ExceptionMessage = observer<Props>(function ExceptionMessage({
-  exception = null, icon, inline, className, styles, onRetry, onClose,
-}) {
+export const ExceptionMessage = observer<Props>(function ExceptionMessage({ exception = null, icon, inline, className, styles, onRetry, onClose }) {
   const translate = useTranslate();
   const error = useErrorDetails(exception);
 
@@ -146,7 +143,7 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({
   return styled(useStyles(style, styles))(
     <error {...use({ inline, icon })} className={className}>
       <error-icon title={error.message}>
-        <IconOrImage icon={(inline || icon) ? '/icons/error_icon_sm.svg' : '/icons/error_icon.svg'} />
+        <IconOrImage icon={inline || icon ? '/icons/error_icon_sm.svg' : '/icons/error_icon.svg'} />
       </error-icon>
       {!icon && (
         <>
@@ -154,13 +151,15 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({
             <error-name>
               <span>{translate('core_blocks_exception_message_error_title')}</span>
             </error-name>
-            <error-message>{translate('core_blocks_exception_message_error_message')} {onRetry && translate('ui_please_retry')}</error-message>
+            <error-message>
+              {translate('core_blocks_exception_message_error_message')} {onRetry && translate('ui_please_retry')}
+            </error-message>
             <error-actions>
-              <Button type='button' mod={['outlined']} disabled={error.isOpen} onClick={error.open}>
+              <Button type="button" mod={['outlined']} disabled={error.isOpen} onClick={error.open}>
                 {translate('ui_errors_details')}
               </Button>
               {onRetry && (
-                <Button type='button' mod={['unelevated']} onClick={onRetry}>
+                <Button type="button" mod={['unelevated']} onClick={onRetry}>
                   {translate('ui_processing_retry')}
                 </Button>
               )}
@@ -173,6 +172,6 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({
           )}
         </>
       )}
-    </error>
+    </error>,
   );
 });

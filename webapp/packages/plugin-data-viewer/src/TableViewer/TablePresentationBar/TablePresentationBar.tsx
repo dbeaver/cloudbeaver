@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
@@ -19,25 +18,25 @@ import { DataPresentationService, DataPresentationType } from '../../DataPresent
 import { PresentationTab } from './PresentationTab';
 
 const styles = css`
-    table-left-bar {
-      display: flex;
-    }
-    Tab {
-      composes: theme-ripple theme-background-background theme-text-text-primary-on-light theme-typography--body2 from global;
-      text-transform: uppercase;
-      font-weight: normal;
+  table-left-bar {
+    display: flex;
+  }
+  Tab {
+    composes: theme-ripple theme-background-background theme-text-text-primary-on-light theme-typography--body2 from global;
+    text-transform: uppercase;
+    font-weight: normal;
 
-      &:global([aria-selected=true]) {
-        font-weight: normal !important;
-      }
+    &:global([aria-selected='true']) {
+      font-weight: normal !important;
     }
-    TabList {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-    TabList[|flexible] tab-outer:only-child {
-      display: none;
-    }
-  `;
+  }
+  TabList {
+    composes: theme-background-secondary theme-text-on-secondary from global;
+  }
+  TabList[|flexible] tab-outer:only-child {
+    display: none;
+  }
+`;
 
 interface Props {
   type: DataPresentationType;
@@ -64,13 +63,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
 }) {
   const style = useStyles(styles, BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, BASE_CONTAINERS_STYLES);
   const dataPresentationService = useService(DataPresentationService);
-  const presentations = dataPresentationService.getSupportedList(
-    type,
-    supportedDataFormat,
-    dataFormat,
-    model,
-    resultIndex
-  );
+  const presentations = dataPresentationService.getSupportedList(type, supportedDataFormat, dataFormat, model, resultIndex);
   const Tab = PresentationTab; // alias for styles matching
   const handleClick = (tabId: string) => {
     if (tabId === presentationId) {
@@ -89,19 +82,12 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
   return styled(style)(
     <table-left-bar className={className}>
       <TabsState currentTabId={presentationId} autoSelect={main}>
-        <TabList aria-label='Data Presentations' {...use({ flexible: main })}>
+        <TabList aria-label="Data Presentations" {...use({ flexible: main })}>
           {presentations.map(presentation => (
-            <Tab
-              key={presentation.id}
-              presentation={presentation}
-              model={model}
-              resultIndex={resultIndex}
-              style={styles}
-              onClick={handleClick}
-            />
+            <Tab key={presentation.id} presentation={presentation} model={model} resultIndex={resultIndex} style={styles} onClick={handleClick} />
           ))}
         </TabList>
       </TabsState>
-    </table-left-bar>
+    </table-left-bar>,
   );
 });

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useCallback } from 'react';
 import { MenuInitialState, MenuSeparator } from 'reakit';
@@ -13,7 +12,18 @@ import styled, { use } from 'reshadow';
 
 import { getComputed, Loader, useAutoLoad, useStyles } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { DATA_CONTEXT_MENU_NESTED, DATA_CONTEXT_SUBMENU_ITEM, IMenuActionItem, IMenuData, IMenuItem, MenuActionItem, MenuBaseItem, MenuSeparatorItem, MenuSubMenuItem, useMenu } from '@cloudbeaver/core-view';
+import {
+  DATA_CONTEXT_MENU_NESTED,
+  DATA_CONTEXT_SUBMENU_ITEM,
+  IMenuActionItem,
+  IMenuData,
+  IMenuItem,
+  MenuActionItem,
+  MenuBaseItem,
+  MenuSeparatorItem,
+  MenuSubMenuItem,
+  useMenu,
+} from '@cloudbeaver/core-view';
 
 import { ContextMenu } from '../ContextMenu';
 import { MenuBarItem } from './MenuBarItem';
@@ -29,36 +39,25 @@ interface IMenuBarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'styl
   rtl?: boolean;
 }
 
-export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(forwardRef(function MenuBar({
-  menu,
-  nestedMenuSettings,
-  style,
-  rtl,
-  ...props
-}, ref) {
-  const styles = useStyles(style);
-  const items = menu.items;
-  useAutoLoad(menu.loaders);
+export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(
+  forwardRef(function MenuBar({ menu, nestedMenuSettings, style, rtl, ...props }, ref) {
+    const styles = useStyles(style);
+    const items = menu.items;
+    useAutoLoad(menu.loaders);
 
-  if (!items.length) {
-    return null;
-  }
+    if (!items.length) {
+      return null;
+    }
 
-  return styled(styles)(
-    <menu-bar ref={ref} as='div' {...props}>
-      {items.map(item => (
-        <MenuBarElement
-          key={item.id}
-          item={item}
-          menuData={menu}
-          nestedMenuSettings={nestedMenuSettings}
-          rtl={rtl}
-          style={style}
-        />
-      ))}
-    </menu-bar>
-  );
-}));
+    return styled(styles)(
+      <menu-bar ref={ref} as="div" {...props}>
+        {items.map(item => (
+          <MenuBarElement key={item.id} item={item} menuData={menu} nestedMenuSettings={nestedMenuSettings} rtl={rtl} style={style} />
+        ))}
+      </menu-bar>,
+    );
+  }),
+);
 
 interface IMenuBarElementProps {
   item: IMenuItem;
@@ -69,14 +68,7 @@ interface IMenuBarElementProps {
   style?: ComponentStyle;
 }
 
-const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
-  item,
-  menuData,
-  nestedMenuSettings,
-  className,
-  rtl,
-  style,
-}) {
+const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({ item, menuData, nestedMenuSettings, className, rtl, style }) {
   const styles = useStyles(style);
 
   const onClick = useCallback(() => {
@@ -89,32 +81,16 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
 
   if (item instanceof MenuSubMenuItem) {
     return styled(styles)(
-      <SubMenuItem
-        item={item}
-        menuData={menuData}
-        style={style}
-        className={className}
-        rtl={rtl}
-        nestedMenuSettings={nestedMenuSettings}
-      />
+      <SubMenuItem item={item} menuData={menuData} style={style} className={className} rtl={rtl} nestedMenuSettings={nestedMenuSettings} />,
     );
   }
 
   if (item instanceof MenuSeparatorItem) {
-    return styled(styles)(
-      <MenuSeparator className={className} />
-    );
+    return styled(styles)(<MenuSeparator className={className} />);
   }
 
   if (item instanceof MenuActionItem) {
-    return styled(styles)(
-      <MenuBarAction
-        item={item}
-        style={style}
-        className={className}
-        onClick={onClick}
-      />
-    );
+    return styled(styles)(<MenuBarAction item={item} style={style} className={className} onClick={onClick} />);
   }
 
   if (item instanceof MenuBaseItem) {
@@ -130,7 +106,7 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({
         className={className}
         onClick={onClick}
         {...use({ hidden: item.hidden })}
-      />
+      />,
     );
   }
 
@@ -172,7 +148,7 @@ const MenuBarAction = observer<IMenuBarActionProps>(function MenuBarAction({ ite
       className={className}
       onClick={handleClick}
       {...use({ hidden: item.hidden })}
-    />
+    />,
   );
 });
 
@@ -185,14 +161,7 @@ interface ISubMenuItemProps {
   style?: ComponentStyle;
 }
 
-const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
-  item,
-  menuData,
-  nestedMenuSettings,
-  className,
-  rtl,
-  style,
-}) {
+const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({ item, menuData, nestedMenuSettings, className, rtl, style }) {
   const styles = useStyles(style);
   const subMenuData = useMenu({ menu: item.menu, context: menuData.context });
 
@@ -208,7 +177,7 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
   }
 
   const IconComponent = handler?.iconComponent?.() ?? item.iconComponent?.();
-  const extraProps = handler?.getExtraProps?.() ?? item.getExtraProps?.() as any;
+  const extraProps = handler?.getExtraProps?.() ?? (item.getExtraProps?.() as any);
   /** @deprecated must be refactored (#1)*/
   const displayLabel = getComputed(() => handler?.isLabelVisible?.(subMenuData.context, subMenuData.menu) ?? true);
   // TODO: seems like we don't need this, it's was used in panelAvailable to display > arrow in menu bar
@@ -218,32 +187,25 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
   const label = info?.label ?? item.label ?? item.menu.label;
   const icon = info?.icon ?? item.icon ?? item.menu.icon;
   const tooltip = info?.tooltip ?? item.tooltip ?? item.menu.tooltip;
-  const panelAvailable =  subMenuData.itemCreators.length > 0;
+  const panelAvailable = subMenuData.itemCreators.length > 0;
 
   return styled(styles)(
-    <ContextMenu
-      menu={subMenuData}
-      style={style}
-      className={className}
-      rtl={rtl}
-      disclosure
-      {...nestedMenuSettings}
-    >
+    <ContextMenu menu={subMenuData} style={style} className={className} rtl={rtl} disclosure {...nestedMenuSettings}>
       {({ loading, disabled }) => (
         <MenuBarItem
           id={item.id}
           aria-label={item.menu.label}
           label={label}
           displayLabel={displayLabel}
-          icon={IconComponent ? styled(styles)(
-            <Loader suspense small fullSize>
-              <IconComponent
-                item={item}
-                style={style}
-                {...extraProps}
-              />
-            </Loader>
-          ) : icon}
+          icon={
+            IconComponent
+              ? styled(styles)(
+                  <Loader suspense small fullSize>
+                    <IconComponent item={item} style={style} {...extraProps} />
+                  </Loader>,
+                )
+              : icon
+          }
           title={tooltip}
           loading={loading}
           disabled={disabled}
@@ -252,6 +214,6 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({
           {...use({ hidden: item.hidden })}
         />
       )}
-    </ContextMenu>
+    </ContextMenu>,
   );
 });

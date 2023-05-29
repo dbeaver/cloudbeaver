@@ -5,13 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useEffect, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { IconButton } from '../../IconButton';
 
-const SNACKBAR_WRAPPER_STYLES = css` 
+const SNACKBAR_WRAPPER_STYLES = css`
   notification {
     composes: theme-background-surface theme-text-on-surface theme-elevation-z5 from global;
     position: relative;
@@ -45,7 +44,8 @@ const SNACKBAR_WRAPPER_STYLES = css`
     &:hover {
       opacity: 0.7;
     }
-  }`;
+  }
+`;
 
 interface Props {
   closing?: boolean;
@@ -55,7 +55,11 @@ interface Props {
 }
 
 export const SnackbarWrapper: React.FC<React.PropsWithChildren<Props>> = function SnackbarWrapper({
-  closing = false, persistent, onClose, children, className,
+  closing = false,
+  persistent,
+  onClose,
+  children,
+  className,
 }) {
   const [mounted, setMounted] = useState(false);
 
@@ -66,9 +70,7 @@ export const SnackbarWrapper: React.FC<React.PropsWithChildren<Props>> = functio
   return styled(SNACKBAR_WRAPPER_STYLES)(
     <notification as="div" className={className} {...use({ mounted, closing })}>
       {children}
-      {!persistent && onClose && (
-        <IconButton name="cross" viewBox="0 0 16 16" onClick={onClose} />
-      )}
-    </notification>
+      {!persistent && onClose && <IconButton name="cross" viewBox="0 0 16 16" onClick={onClose} />}
+    </notification>,
   );
 };

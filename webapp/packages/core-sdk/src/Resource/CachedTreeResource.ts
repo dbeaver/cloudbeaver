@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
@@ -28,47 +27,38 @@ export interface ICachedTreeElement<TValue, TMetadata extends ICachedResourceMet
   children: Record<string, ICachedTreeElement<TValue, TMetadata> | undefined>;
 }
 
-export type ICachedTreeData<
-  TValue,
-  TMetadata extends ICachedResourceMetadata
-> = ICachedTreeElement<TValue, TMetadata>;
+export type ICachedTreeData<TValue, TMetadata extends ICachedResourceMetadata> = ICachedTreeElement<TValue, TMetadata>;
 
 export const CachedTreeRootValueKey = resourceKeyAlias('@cached-tree-resource/root-value');
 export const CachedTreeRootChildrenKey = resourceKeyListAlias('@cached-tree-resource/root-children');
-export const CachedTreeChildrenKey = resourceKeyListAliasFactory(
-  '@cached-tree-resource/children',
-  (path: string) => ({ path })
-);
+export const CachedTreeChildrenKey = resourceKeyListAliasFactory('@cached-tree-resource/children', (path: string) => ({ path }));
 
 export abstract class CachedTreeResource<
   TValue,
   TContext extends Record<string, any> = Record<string, never>,
   TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata,
-> extends CachedResource<
-  ICachedTreeData<TValue, TMetadata>,
-  TValue,
-  string,
-  CachedResourceIncludeArgs<TValue, TContext>,
-  TMetadata
-  > {
+> extends CachedResource<ICachedTreeData<TValue, TMetadata>, TValue, string, CachedResourceIncludeArgs<TValue, TContext>, TMetadata> {
   readonly onItemUpdate: ISyncExecutor<ResourceKeySimple<string>>;
   readonly onItemDelete: ISyncExecutor<ResourceKeySimple<string>>;
 
-  constructor(
-    defaultValue?: () => ICachedTreeData<TValue, TMetadata>,
-    defaultIncludes?: CachedResourceIncludeArgs<TValue, TContext>
-  ) {
-    super(CachedTreeRootChildrenKey, defaultValue || (() => ({
-      children:{},
-      metadata: {
-        dependencies: [],
-        exception: null,
-        includes: [],
-        loaded: false,
-        loading: false,
-        outdated: false,
-      },
-    }) as any as ICachedTreeData<TValue, TMetadata>), defaultIncludes);
+  constructor(defaultValue?: () => ICachedTreeData<TValue, TMetadata>, defaultIncludes?: CachedResourceIncludeArgs<TValue, TContext>) {
+    super(
+      CachedTreeRootChildrenKey,
+      defaultValue ||
+        (() =>
+          ({
+            children: {},
+            metadata: {
+              dependencies: [],
+              exception: null,
+              includes: [],
+              loaded: false,
+              loading: false,
+              outdated: false,
+            },
+          } as any as ICachedTreeData<TValue, TMetadata>)),
+      defaultIncludes,
+    );
     this.onItemUpdate = new SyncExecutor<ResourceKeySimple<string>>(null);
     this.onItemDelete = new SyncExecutor<ResourceKeySimple<string>>(null);
 
@@ -84,10 +74,7 @@ export abstract class CachedTreeResource<
     });
   }
 
-  deleteInResource(
-    resource: CachedTreeResource<string, any, any>,
-    map?: (key: ResourceKey<string>) => ResourceKey<string>
-  ): this {
+  deleteInResource(resource: CachedTreeResource<string, any, any>, map?: (key: ResourceKey<string>) => ResourceKey<string>): this {
     this.onItemDelete.addHandler(param => {
       try {
         if (this.logActivity) {
@@ -110,8 +97,7 @@ export abstract class CachedTreeResource<
   }
 
   use(param: ResourceKey<string>, id = uuid()): string {
-    const transformedList = resourceKeyList(flat(ResourceKeyUtils.toList(this.transformToKey(param))
-      .map(getPathParents)));
+    const transformedList = resourceKeyList(flat(ResourceKeyUtils.toList(this.transformToKey(param)).map(getPathParents)));
 
     this.updateMetadata(transformedList, metadata => {
       metadata.dependencies.push(id);
@@ -121,8 +107,7 @@ export abstract class CachedTreeResource<
   }
 
   free(param: ResourceKey<string>, id: string): void {
-    const transformedList = resourceKeyList(flat(ResourceKeyUtils.toList(this.transformToKey(param))
-      .map(getPathParents)));
+    const transformedList = resourceKeyList(flat(ResourceKeyUtils.toList(this.transformToKey(param)).map(getPathParents)));
     this.updateMetadata(transformedList, metadata => {
       if (metadata.dependencies.length > 0) {
         metadata.dependencies = metadata.dependencies.filter(v => v !== id);
@@ -132,10 +117,7 @@ export abstract class CachedTreeResource<
   }
 
   has(key: ResourceKey<string>): boolean {
-    if (
-      this.isAlias(key)
-       && (!this.hasMetadata(key) || this.isLoaded(key))
-    ) {
+    if (this.isAlias(key) && (!this.hasMetadata(key) || this.isLoaded(key))) {
       return false;
     }
 
@@ -155,11 +137,8 @@ export abstract class CachedTreeResource<
   set(key: ResourceKeyList<string> | ResourceKeyListAlias<string, any>, value: TValue[]): void;
   set(key: ResourceKey<string>, value: TValue | TValue[]): void;
   set(originalKey: ResourceKey<string>, value: TValue | TValue[]): void {
-    if (
-      this.isAlias(originalKey, CachedTreeChildrenKey)
-      || this.isAlias(originalKey, CachedTreeRootChildrenKey)
-    ) {
-      throw new Error('Children can\'t be set with alias');
+    if (this.isAlias(originalKey, CachedTreeChildrenKey) || this.isAlias(originalKey, CachedTreeRootChildrenKey)) {
+      throw new Error("Children can't be set with alias");
     }
     const key = this.transformToKey(originalKey);
 
@@ -213,11 +192,7 @@ export abstract class CachedTreeResource<
    */
 
   getAllMetadata(): TMetadata[] {
-    return [
-      ...this.metadata.values(),
-      ...getAllValues(this.data)
-        .map(value => value.metadata),
-    ];
+    return [...this.metadata.values(), ...getAllValues(this.data).map(value => value.metadata)];
   }
 
   /**
@@ -256,19 +231,19 @@ export abstract class CachedTreeResource<
 
   async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: string | ResourceKeyAlias<string, any>,
-    includes?: T
+    includes?: T,
   ): Promise<CachedResourceValueIncludes<TValue, T>>;
   async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKeyList<string> | ResourceKeyListAlias<string, any> | void,
-    includes?: T
+    includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>>>;
   async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<string>,
-    includes?: T
+    includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>>;
   async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKey<string> | void,
-    includes?: T
+    includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
     if (key === undefined) {
       key = CachedTreeRootChildrenKey;
@@ -279,19 +254,19 @@ export abstract class CachedTreeResource<
 
   async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: string | ResourceKeyAlias<string, any>,
-    includes?: T
+    includes?: T,
   ): Promise<CachedResourceValueIncludes<TValue, T>>;
   async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKeyList<string> | ResourceKeyListAlias<string, any> | void,
-    includes?: T
+    includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>>>;
   async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<string>,
-    includes?: T
+    includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>>;
   async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKey<string> | void,
-    includes?: T
+    includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
     if (key === undefined) {
       key = CachedTreeRootChildrenKey;
@@ -400,7 +375,7 @@ export abstract class CachedTreeResource<
 }
 
 function getAllValues<TValue, TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata>(
-  data: ICachedTreeElement<TValue, TMetadata>
+  data: ICachedTreeElement<TValue, TMetadata>,
 ): ICachedTreeElement<TValue, TMetadata>[] {
   const elementsToScan = [data];
   const values: ICachedTreeElement<TValue, TMetadata>[] = [];
@@ -408,7 +383,7 @@ function getAllValues<TValue, TMetadata extends ICachedResourceMetadata = ICache
   while (elementsToScan.length) {
     const current = elementsToScan.shift()!;
     values.push(current);
-    elementsToScan.push(...Object.values(current.children).filter(Boolean) as any);
+    elementsToScan.push(...(Object.values(current.children).filter(Boolean) as any));
   }
 
   return values;
@@ -417,7 +392,7 @@ function getAllValues<TValue, TMetadata extends ICachedResourceMetadata = ICache
 function getValue<TValue, TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata>(
   data: ICachedTreeElement<TValue, TMetadata>,
   path: string,
-  getDefault: (path: string) => ICachedTreeElement<TValue, TMetadata>
+  getDefault: (path: string) => ICachedTreeElement<TValue, TMetadata>,
 ): ICachedTreeElement<TValue, TMetadata>;
 function getValue<TValue, TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata>(
   data: ICachedTreeElement<TValue, TMetadata>,
@@ -426,7 +401,7 @@ function getValue<TValue, TMetadata extends ICachedResourceMetadata = ICachedRes
 function getValue<TValue, TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata>(
   data: ICachedTreeElement<TValue, TMetadata>,
   path: string,
-  getDefault?: (path: string) => ICachedTreeElement<TValue, TMetadata>
+  getDefault?: (path: string) => ICachedTreeElement<TValue, TMetadata>,
 ): ICachedTreeElement<TValue, TMetadata> | undefined {
   if (!path) {
     return data;
@@ -475,13 +450,10 @@ function deleteValue<TValue, TMetadata extends ICachedResourceMetadata = ICached
   delete current.children[paths[paths.length - 1]];
 }
 
-export function getCachedTreeResourceLoaderState<
-  TValue,
-  TContext extends Record<string, any> = Record<string, never>
->(
+export function getCachedTreeResourceLoaderState<TValue, TContext extends Record<string, any> = Record<string, never>>(
   resource: CachedTreeResource<TValue, TContext>,
   key: ResourceKey<string>,
-  includes?: CachedResourceIncludeArgs<TValue, TContext> | undefined
+  includes?: CachedResourceIncludeArgs<TValue, TContext> | undefined,
 ): ILoadableState {
   return {
     get exception() {

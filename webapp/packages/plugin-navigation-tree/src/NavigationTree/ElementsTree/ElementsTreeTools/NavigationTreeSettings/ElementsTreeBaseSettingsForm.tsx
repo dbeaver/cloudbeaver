@@ -5,15 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { type PlaceholderComponent, BASE_CONTAINERS_STYLES, GroupTitle, Switch, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, GroupTitle, type PlaceholderComponent, Switch, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IElementsTreeSettingsProps } from './ElementsTreeSettingsService';
 
-export const ElementsTreeBaseSettingsForm: PlaceholderComponent<IElementsTreeSettingsProps>  = observer(function ElementsTreeBaseSettingsForm({
+export const ElementsTreeBaseSettingsForm: PlaceholderComponent<IElementsTreeSettingsProps> = observer(function ElementsTreeBaseSettingsForm({
   tree: { root, settings },
   style,
 }) {
@@ -71,6 +70,6 @@ export const ElementsTreeBaseSettingsForm: PlaceholderComponent<IElementsTreeSet
       >
         {translate('app_navigationTree_settings_folders_title')}
       </Switch>
-    </>
+    </>,
   );
 });

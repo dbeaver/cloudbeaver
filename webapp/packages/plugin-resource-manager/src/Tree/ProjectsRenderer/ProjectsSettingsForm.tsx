@@ -5,15 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { type PlaceholderComponent, BASE_CONTAINERS_STYLES, Switch, PlaceholderElement, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, type PlaceholderComponent, PlaceholderElement, Switch, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import type { IElementsTreeSettingsProps } from '@cloudbeaver/plugin-navigation-tree';
-
 
 export const ProjectsSettingsForm: PlaceholderComponent<IElementsTreeSettingsProps> = observer(function ProjectsSettingsForm({
   tree: { root, settings },
@@ -40,7 +38,7 @@ export const ProjectsSettingsForm: PlaceholderComponent<IElementsTreeSettingsPro
       >
         {translate('plugin_navigation_tree_settings_projects_title')}
       </Switch>
-    </>
+    </>,
   );
 });
 

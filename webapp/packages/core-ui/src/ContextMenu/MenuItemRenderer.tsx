@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import React, { useCallback } from 'react';
 import { MenuItem, MenuItemCheckbox, MenuSeparator, MenuStateReturn } from 'reakit/Menu';
@@ -13,11 +12,19 @@ import styled, { use } from 'reshadow';
 
 import { Checkbox, joinStyles, Loader, MenuItemElement, menuPanelStyles, useStyles } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { IMenuItem, IMenuData, MenuSubMenuItem, MenuSeparatorItem, MenuActionItem, MenuBaseItem, MenuCustomItem, MenuCheckboxItem } from '@cloudbeaver/core-view';
+import {
+  IMenuData,
+  IMenuItem,
+  MenuActionItem,
+  MenuBaseItem,
+  MenuCheckboxItem,
+  MenuCustomItem,
+  MenuSeparatorItem,
+  MenuSubMenuItem,
+} from '@cloudbeaver/core-view';
 
 import { MenuActionElement } from './MenuActionElement';
 import { SubMenuElement } from './SubMenuElement';
-
 
 export interface IMenuItemRendererProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
   item: IMenuItem;
@@ -29,30 +36,23 @@ export interface IMenuItemRendererProps extends Omit<React.ButtonHTMLAttributes<
   style?: ComponentStyle;
 }
 
-export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuItemRenderer({
-  item, modal, rtl, menuData, menu, onItemClose, style,
-}) {
+export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuItemRenderer({ item, modal, rtl, menuData, menu, onItemClose, style }) {
   const styles = useStyles(menuPanelStyles, style);
-  const onClick = useCallback((keepMenuOpen = true) => {
-    item.events?.onSelect?.();
+  const onClick = useCallback(
+    (keepMenuOpen = true) => {
+      item.events?.onSelect?.();
 
-    if (!(item instanceof MenuSubMenuItem) && keepMenuOpen) {
-      onItemClose?.();
-    }
-  }, [item, onItemClose]);
+      if (!(item instanceof MenuSubMenuItem) && keepMenuOpen) {
+        onItemClose?.();
+      }
+    },
+    [item, onItemClose],
+  );
 
   if (item instanceof MenuCustomItem) {
     const CustomMenuItem = item.getComponent();
 
-    return styled(styles)(
-      <CustomMenuItem
-        item={item}
-        menu={menu}
-        menuData={menuData}
-        style={style}
-        onClick={onClick}
-      />
-    );
+    return styled(styles)(<CustomMenuItem item={item} menu={menu} menuData={menuData} style={style} onClick={onClick} />);
   }
 
   if (item instanceof MenuSubMenuItem) {
@@ -71,7 +71,7 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
         style={style}
         onItemClose={onItemClose}
         onClick={() => onClick()}
-      />
+      />,
     );
   }
 
@@ -80,15 +80,7 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
   }
 
   if (item instanceof MenuActionItem) {
-    return (
-      <MenuActionElement
-        item={item}
-        menu={menu}
-        menuData={menuData}
-        style={style}
-        onClick={onClick}
-      />
-    );
+    return <MenuActionElement item={item} menu={menu} menuData={menuData} style={style} onClick={onClick} />;
   }
 
   if (item instanceof MenuCheckboxItem) {
@@ -110,7 +102,7 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
           tooltip={item.tooltip}
           style={style}
         />
-      </MenuItemCheckbox>
+      </MenuItemCheckbox>,
     );
   }
 
@@ -130,19 +122,19 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
       >
         <MenuItemElement
           label={item.label}
-          icon={IconComponent ? styled(styles)(
-            <Loader suspense inline fullSize>
-              <IconComponent
-                item={item}
-                style={joinStyles(menuPanelStyles, style)}
-                {...extraProps}
-              />
-            </Loader>
-          ) : item.icon}
+          icon={
+            IconComponent
+              ? styled(styles)(
+                  <Loader suspense inline fullSize>
+                    <IconComponent item={item} style={joinStyles(menuPanelStyles, style)} {...extraProps} />
+                  </Loader>,
+                )
+              : item.icon
+          }
           tooltip={item.tooltip}
           style={style}
         />
-      </MenuItem>
+      </MenuItem>,
     );
   }
 

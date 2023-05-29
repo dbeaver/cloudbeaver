@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
@@ -46,7 +45,7 @@ const styles = css`
     flex: 1;
     flex-direction: column;
   }
-  
+
   image {
     flex: 1;
     display: flex;
@@ -73,150 +72,142 @@ const Tools = observer<IToolsProps>(function Tools({ loading, stretch, onToggleS
       )}
       {onToggleStretch && (
         <tools>
-          <tools-action
-            as='button'
-            title={translate('data_viewer_presentation_value_image_fit')}
-            disabled={stretch}
-            onClick={onToggleStretch}
-          >
-            <IconOrImage icon='img-fit-size' />
+          <tools-action as="button" title={translate('data_viewer_presentation_value_image_fit')} disabled={stretch} onClick={onToggleStretch}>
+            <IconOrImage icon="img-fit-size" />
           </tools-action>
           <tools-action
-            as='button'
+            as="button"
             title={translate('data_viewer_presentation_value_image_original_size')}
             disabled={!stretch}
             onClick={onToggleStretch}
           >
-            <IconOrImage icon='img-original-size' />
+            <IconOrImage icon="img-original-size" />
           </tools-action>
         </tools>
       )}
-    </tools-container>
+    </tools-container>,
   );
 });
 
-export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(function ImageValuePresentation({
-  model,
-  resultIndex,
-}) {
-  const translate = useTranslate();
-  const notificationService = useService(NotificationService);
-  const quotasService = useService(QuotasService);
-  const style = useStyles(styles);
+export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
+  function ImageValuePresentation({ model, resultIndex }) {
+    const translate = useTranslate();
+    const notificationService = useService(NotificationService);
+    const quotasService = useService(QuotasService);
+    const style = useStyles(styles);
 
-  const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
+    const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
 
-  const state = useObservableRef(() => ({
-    get selectedCell() {
-      const selection = this.model.source.getAction(this.resultIndex, ResultSetSelectAction);
-      const focusCell = selection.getFocusedElement();
+    const state = useObservableRef(
+      () => ({
+        get selectedCell() {
+          const selection = this.model.source.getAction(this.resultIndex, ResultSetSelectAction);
+          const focusCell = selection.getFocusedElement();
 
-      return selection.elements[0] || focusCell;
-    },
-    get cellValue() {
-      const view = this.model.source.getAction(this.resultIndex, ResultSetViewAction);
-      const cellValue = view.getCellValue(this.selectedCell);
+          return selection.elements[0] || focusCell;
+        },
+        get cellValue() {
+          const view = this.model.source.getAction(this.resultIndex, ResultSetViewAction);
+          const cellValue = view.getCellValue(this.selectedCell);
 
-      return cellValue;
-    },
-    get src() {
-      if (this.savedSrc) {
-        return this.savedSrc;
-      }
+          return cellValue;
+        },
+        get src() {
+          if (this.savedSrc) {
+            return this.savedSrc;
+          }
 
-      if (isResultSetContentValue(this.cellValue) && this.cellValue.binary) {
-        return `data:${getMIME(this.cellValue.binary)};base64,${this.cellValue.binary}`;
-      } else if (typeof this.cellValue === 'string' && isValidUrl(this.cellValue) && isImageFormat(this.cellValue)) {
-        return this.cellValue;
-      }
+          if (isResultSetContentValue(this.cellValue) && this.cellValue.binary) {
+            return `data:${getMIME(this.cellValue.binary)};base64,${this.cellValue.binary}`;
+          } else if (typeof this.cellValue === 'string' && isValidUrl(this.cellValue) && isImageFormat(this.cellValue)) {
+            return this.cellValue;
+          }
 
-      return '';
-    },
-    get savedSrc() {
-      return content.retrieveFileDataUrlFromCache(this.selectedCell);
-    },
-    get canSave() {
-      if (this.truncated) {
-        return content.isDownloadable(this.selectedCell);
-      }
+          return '';
+        },
+        get savedSrc() {
+          return content.retrieveFileDataUrlFromCache(this.selectedCell);
+        },
+        get canSave() {
+          if (this.truncated) {
+            return content.isDownloadable(this.selectedCell);
+          }
 
-      return !!this.src;
-    },
-    get truncated() {
-      return isResultSetContentValue(this.cellValue) && content.isContentTruncated(this.cellValue);
-    },
-    stretch: false,
-    toggleStretch() {
-      this.stretch = !this.stretch;
-    },
-    async save() {
-      try {
-        if (this.truncated) {
-          await content.downloadFileData(this.selectedCell);
-        } else {
-          download(this.src, '', true);
+          return !!this.src;
+        },
+        get truncated() {
+          return isResultSetContentValue(this.cellValue) && content.isContentTruncated(this.cellValue);
+        },
+        stretch: false,
+        toggleStretch() {
+          this.stretch = !this.stretch;
+        },
+        async save() {
+          try {
+            if (this.truncated) {
+              await content.downloadFileData(this.selectedCell);
+            } else {
+              download(this.src, '', true);
+            }
+          } catch (exception: any) {
+            this.notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
+          }
+        },
+      }),
+      {
+        selectedCell: computed,
+        cellValue: computed,
+        src: computed,
+        savedSrc: computed,
+        canSave: computed,
+        truncated: computed,
+        stretch: observable.ref,
+        toggleStretch: action.bound,
+        save: action.bound,
+      },
+      { model, resultIndex, notificationService },
+    );
+
+    const save = state.canSave ? state.save : undefined;
+    const loading = model.isLoading();
+
+    if (state.truncated && !state.savedSrc) {
+      const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
+      const valueSize = bytesToSize((state.cellValue as unknown as IResultSetContentValue).contentLength ?? 0);
+
+      const load = async () => {
+        try {
+          await content.resolveFileDataUrl(state.selectedCell);
+        } catch (exception: any) {
+          notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
         }
-      } catch (exception: any) {
-        this.notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
-      }
-    },
-  }), {
-    selectedCell: computed,
-    cellValue: computed,
-    src: computed,
-    savedSrc: computed,
-    canSave: computed,
-    truncated: computed,
-    stretch: observable.ref,
-    toggleStretch: action.bound,
-    save: action.bound,
-  }, { model, resultIndex, notificationService });
+      };
 
-  const save = state.canSave ? state.save : undefined;
-  const loading = model.isLoading();
-
-  if (state.truncated && !state.savedSrc) {
-    const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
-    const valueSize = bytesToSize((state.cellValue as unknown as IResultSetContentValue).contentLength ?? 0);
-
-    const load = async () => {
-      try {
-        await content.resolveFileDataUrl(state.selectedCell);
-      } catch (exception: any) {
-        notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
-      }
-    };
+      return styled(style)(
+        <container>
+          <QuotaPlaceholder limit={limit} size={valueSize}>
+            {content.isDownloadable(state.selectedCell) && (
+              <Button
+                disabled={loading}
+                loading={!!content.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(content.activeElement, state.selectedCell)}
+                onClick={load}
+              >
+                {translate('ui_view')}
+              </Button>
+            )}
+          </QuotaPlaceholder>
+          <Tools loading={loading} onSave={save} />
+        </container>,
+      );
+    }
 
     return styled(style)(
       <container>
-        <QuotaPlaceholder limit={limit} size={valueSize}>
-          {content.isDownloadable(state.selectedCell) && (
-            <Button
-              disabled={loading}
-              loading={!!content.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(
-                content.activeElement, state.selectedCell)}
-              onClick={load}
-            >
-              {translate('ui_view')}
-            </Button>
-          )}
-        </QuotaPlaceholder>
-        <Tools loading={loading} onSave={save} />
-      </container>
+        <image>
+          <img src={state.src} {...use({ stretch: state.stretch })} />
+        </image>
+        <Tools loading={loading} stretch={state.stretch} onToggleStretch={state.toggleStretch} onSave={save} />
+      </container>,
     );
-  }
-
-  return styled(style)(
-    <container>
-      <image>
-        <img src={state.src} {...use({ stretch: state.stretch })} />
-      </image>
-      <Tools
-        loading={loading}
-        stretch={state.stretch}
-        onToggleStretch={state.toggleStretch}
-        onSave={save}
-      />
-    </container>
-  );
-});
+  },
+);

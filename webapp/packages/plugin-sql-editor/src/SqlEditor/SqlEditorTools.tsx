@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -24,7 +23,7 @@ const styles = css`
     display: flex;
     flex-direction: column;
     align-items: center;
-    
+
     &:empty {
       display: none;
     }
@@ -38,12 +37,7 @@ interface Props {
   className?: string;
 }
 
-export const SqlEditorTools = observer<Props>(function SqlEditorTools({
-  data,
-  state,
-  style,
-  className,
-}) {
+export const SqlEditorTools = observer<Props>(function SqlEditorTools({ data, state, style, className }) {
   const translate = useTranslate();
   const tools = useTools(state);
   const scriptEmpty = getComputed(() => data.value.length === 0);
@@ -90,18 +84,18 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({
             hidden={isActiveSegmentMode}
             onClick={downloadScriptHandler}
           >
-            <StaticImage icon='/icons/export.svg' />
+            <StaticImage icon="/icons/export.svg" />
           </button>
           {!isActiveSegmentMode && (
             <UploadArea
-              accept='.sql'
+              accept=".sql"
               title={translate('sql_editor_upload_script_tooltip')}
               disabled={data.readonly}
               reset
               onChange={handleScriptUpload}
             >
               <upload disabled={data.readonly}>
-                <StaticImage icon='/icons/import.svg' />
+                <StaticImage icon="/icons/import.svg" />
               </upload>
             </UploadArea>
           )}
@@ -114,6 +108,6 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({
             </button>*/}
         </>
       )}
-    </tools>
+    </tools>,
   );
 });

@@ -1,4 +1,3 @@
-
 /*
  * CloudBeaver - Cloud Database Manager
  * Copyright (C) 2020-2023 DBeaver Corp and others
@@ -6,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Group, GroupTitle, BASE_CONTAINERS_STYLES, useResource, Combobox, Tags, ITag, Tag, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Combobox, Group, GroupTitle, ITag, Tag, Tags, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey, resourceKeyList, ServerConfigInput } from '@cloudbeaver/core-sdk';
 
@@ -26,15 +24,14 @@ const style = css`
   }
 `;
 
-export const ServerConfigurationDriversForm = observer<Props>(function ServerConfigurationDriversForm({
-  serverConfig,
-}) {
+export const ServerConfigurationDriversForm = observer<Props>(function ServerConfigurationDriversForm({ serverConfig }) {
   const translate = useTranslate();
   const driversResource = useResource(ServerConfigurationDriversForm, DBDriverResource, CachedMapAllKey);
 
   const drivers = driversResource.resource.values.slice().sort(driversResource.resource.compare);
 
-  const tags: ITag[] = driversResource.resource.get(resourceKeyList(serverConfig.disabledDrivers || []))
+  const tags: ITag[] = driversResource.resource
+    .get(resourceKeyList(serverConfig.disabledDrivers || []))
     .filter(Boolean)
     .map(driver => ({
       id: driver!.id,
@@ -78,6 +75,6 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
           <Tag key={tag.id} id={tag.id} label={tag.label} icon={tag.icon} onRemove={handleRemove} />
         ))}
       </Tags>
-    </Group>
+    </Group>,
   );
 });

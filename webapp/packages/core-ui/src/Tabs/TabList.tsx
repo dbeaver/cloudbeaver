@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import { TabList as BaseTabList, TabListOptions, TabStateReturn } from 'reakit/Tab';
@@ -22,12 +21,7 @@ interface Props extends Omit<TabListOptions, keyof TabStateReturn> {
   childrenFirst?: boolean;
 }
 
-export const TabList = observer<React.PropsWithChildren<Props>>(function TabList({
-  style,
-  children,
-  childrenFirst,
-  ...props
-}) {
+export const TabList = observer<React.PropsWithChildren<Props>>(function TabList({ style, children, childrenFirst, ...props }) {
   const state = useContext(TabsContext);
 
   if (!state) {
@@ -39,28 +33,36 @@ export const TabList = observer<React.PropsWithChildren<Props>>(function TabList
     return (
       <BaseTabList {...props} {...state.state} area-label={props['aria-label'] ?? state.container.areaLabel}>
         {childrenFirst && children}
-        {displayed.map(generateTabElement(
-          (tabInfo, key) => (
-            <TabDefault
-              key={key}
-              tabId={key}
-              name={tabInfo.name}
-              icon={tabInfo.icon}
-              component={tabInfo.tab?.()}
-              {...state.props}
-              style={style}
-              aria-label={tabInfo.name}
-              disabled={props.disabled || tabInfo.isDisabled?.(tabInfo.key, state.props)}
-              onOpen={tabInfo.onOpen}
-              onClose={tabInfo.onClose}
-            />
-          ),
-          state.props,
-        )).flat()}
+        {displayed
+          .map(
+            generateTabElement(
+              (tabInfo, key) => (
+                <TabDefault
+                  key={key}
+                  tabId={key}
+                  name={tabInfo.name}
+                  icon={tabInfo.icon}
+                  component={tabInfo.tab?.()}
+                  {...state.props}
+                  style={style}
+                  aria-label={tabInfo.name}
+                  disabled={props.disabled || tabInfo.isDisabled?.(tabInfo.key, state.props)}
+                  onOpen={tabInfo.onOpen}
+                  onClose={tabInfo.onClose}
+                />
+              ),
+              state.props,
+            ),
+          )
+          .flat()}
         {!childrenFirst && children}
       </BaseTabList>
     );
   }
 
-  return <BaseTabList {...props} {...state.state}>{children}</BaseTabList>;
+  return (
+    <BaseTabList {...props} {...state.state}>
+      {children}
+    </BaseTabList>
+  );
 });

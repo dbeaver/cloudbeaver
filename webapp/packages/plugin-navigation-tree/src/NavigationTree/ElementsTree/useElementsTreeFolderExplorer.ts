@@ -5,17 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useEffect } from 'react';
 
 import { getComputed, useFolderExplorer } from '@cloudbeaver/core-blocks';
 
 import type { IElementsTreeSettings } from './useElementsTree';
 
-export function useElementsTreeFolderExplorer(
-  baseRoot: string,
-  settings: IElementsTreeSettings | undefined
-) {
+export function useElementsTreeFolderExplorer(baseRoot: string, settings: IElementsTreeSettings | undefined) {
   const folderExplorer = useFolderExplorer(baseRoot, {
     saveState: settings?.saveExpanded,
   });

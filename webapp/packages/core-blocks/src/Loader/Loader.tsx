@@ -5,10 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useState, useEffect, useContext, useRef, Suspense } from 'react';
+import { Suspense, useContext, useEffect, useRef, useState } from 'react';
 import styled, { use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
@@ -23,9 +22,11 @@ import { useStyles } from '../useStyles';
 import { ILoaderContext, LoaderContext } from './LoaderContext';
 import { loaderStyles, overlayStyles } from './loaderStyles';
 
-type LoaderState = ILoadableState | {
-  loading: boolean;
-};
+type LoaderState =
+  | ILoadableState
+  | {
+      loading: boolean;
+    };
 
 interface Props {
   /** if false, nothing will be rendered, by default true */
@@ -105,11 +106,7 @@ export const Loader = observer<Props>(function Loader({
     for (let i = 0; i < state.length; i++) {
       const element = state[i];
 
-      if (
-        'isLoaded' in element
-        && 'isLoading' in element
-      ) {
-
+      if ('isLoaded' in element && 'isLoading' in element) {
         if (i === 0 && loadingUndefined) {
           loaded = element.isLoaded();
           loading = element.isLoading();
@@ -204,11 +201,14 @@ export const Loader = observer<Props>(function Loader({
     }
   });
 
-  useEffect(() => () => {
-    if (context) {
-      context.state.delete(loaderId);
-    }
-  }, []);
+  useEffect(
+    () => () => {
+      if (context) {
+        context.state.delete(loaderId);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     if (loaderRef.current) {
@@ -221,7 +221,7 @@ export const Loader = observer<Props>(function Loader({
       <LoaderContext.Provider value={contextState}>
         <ErrorBoundary icon={small} inline={inline} remount>
           <Suspense
-            fallback={(
+            fallback={
               <Loader
                 message={message}
                 hideMessage={hideMessage}
@@ -234,7 +234,7 @@ export const Loader = observer<Props>(function Loader({
                 inlineException={inlineException}
                 style={style}
               />
-            )}
+            }
           >
             {typeof children === 'function' ? children() : children}
           </Suspense>
@@ -251,14 +251,7 @@ export const Loader = observer<Props>(function Loader({
     if (hideException) {
       return null;
     }
-    return styled(style)(
-      <ExceptionMessage
-        exception={exception}
-        inline={inline || inlineException}
-        className={className}
-        onRetry={reload}
-      />
-    );
+    return styled(style)(<ExceptionMessage exception={exception} inline={inline || inlineException} className={className} onRetry={reload} />);
   }
 
   if (children && (!loader || !loading) && !overlay) {
@@ -292,21 +285,20 @@ export const Loader = observer<Props>(function Loader({
             <StaticImage icon={spinnerType.secondary} {...use({ secondaryIcon: true })} />
             <StaticImage icon={spinnerType.secondarySmall} {...use({ secondarySmallIcon: true })} />
           </icon>
-          {!hideMessage && <message><Translate token={message || 'ui_processing_loading'} /></message>}
+          {!hideMessage && (
+            <message>
+              <Translate token={message || 'ui_processing_loading'} />
+            </message>
+          )}
           {onCancel && (
             <actions>
-              <Button
-                type="button"
-                mod={['unelevated']}
-                disabled={cancelDisabled}
-                onClick={onCancel}
-              >
-                <Translate token='ui_processing_cancel' />
+              <Button type="button" mod={['unelevated']} disabled={cancelDisabled} onClick={onCancel}>
+                <Translate token="ui_processing_cancel" />
               </Button>
             </actions>
           )}
         </loader>
       </>
-    </LoaderContext.Provider>
+    </LoaderContext.Provider>,
   );
 });

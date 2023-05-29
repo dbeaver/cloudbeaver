@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { download, generateFileName } from '@cloudbeaver/core-utils';
-import { ActionService, ACTION_SAVE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_SAVE, ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
 import { ACTION_SQL_EDITOR_OPEN, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
@@ -25,8 +24,8 @@ export class DDLViewerFooterService {
     private readonly actionsService: ActionService,
     private readonly menuService: MenuService,
     private readonly sqlEditorNavigatorService: SqlEditorNavigatorService,
-    private readonly connectionInfoResource: ConnectionInfoResource
-  ) { }
+    private readonly connectionInfoResource: ConnectionInfoResource,
+  ) {}
 
   register(): void {
     this.actionsService.addHandler({
@@ -103,11 +102,7 @@ export class DDLViewerFooterService {
 
     this.menuService.addCreator({
       isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_DDL_VIEWER_FOOTER,
-      getItems: (context, items) => [
-        ...items,
-        ACTION_SAVE,
-        ACTION_SQL_EDITOR_OPEN,
-      ],
+      getItems: (context, items) => [...items, ACTION_SAVE, ACTION_SQL_EDITOR_OPEN],
     });
   }
 }

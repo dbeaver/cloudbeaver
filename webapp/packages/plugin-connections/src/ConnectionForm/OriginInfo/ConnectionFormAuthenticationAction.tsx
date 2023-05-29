@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
@@ -15,21 +14,15 @@ import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 
-export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormAuthenticationAction({
-  state,
-}) {
+export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormAuthenticationAction({ state }) {
   const translate = useTranslate();
-  const driverMap = useResource(
-    ConnectionFormAuthenticationAction,
-    DBDriverResource,
-    state.config.driverId || null
-  );
+  const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, state.config.driverId || null);
 
   const driver = driverMap.data;
   const { data: authModel } = useResource(
     ConnectionFormAuthenticationAction,
     DatabaseAuthModelsResource,
-    getComputed(() => state.config.authModelId || state.info?.authModel || driver?.defaultAuthModel || null)
+    getComputed(() => state.config.authModelId || state.info?.authModel || driver?.defaultAuthModel || null),
   );
 
   const authentication = useAuthenticationAction({
@@ -42,12 +35,7 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
   }
 
   return (
-    <Button
-      type="button"
-      disabled={state.disabled}
-      mod={['outlined']}
-      onClick={authentication.auth}
-    >
+    <Button type="button" disabled={state.disabled} mod={['outlined']} onClick={authentication.auth}>
       {translate('authentication_authenticate')}
     </Button>
   );
@@ -56,17 +44,13 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
 export const ConnectionFormAuthenticationAction: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormAuthenticationAction({
   state,
 }) {
-  const driverMap = useResource(
-    ConnectionFormAuthenticationAction,
-    DBDriverResource,
-    state.config.driverId || null
-  );
+  const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, state.config.driverId || null);
 
   const driver = driverMap.data;
   const { data: authModel } = useResource(
     ConnectionFormAuthenticationAction,
     DatabaseAuthModelsResource,
-    getComputed(() => state.config.authModelId || state.info?.authModel || driver?.defaultAuthModel || null)
+    getComputed(() => state.config.authModelId || state.info?.authModel || driver?.defaultAuthModel || null),
   );
 
   if (!authModel?.requiredAuth && !state.info?.requiredAuth) {

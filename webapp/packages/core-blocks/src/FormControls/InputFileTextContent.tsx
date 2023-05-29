@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { ReactNode, useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
@@ -67,9 +66,7 @@ interface Props<TState> extends ILayoutSizeProps {
   mapValue?: (value: string) => string;
 }
 
-type InputFileTextContentType = <TState extends Record<string, any>>(
-  props: Props<TState>
-) => React.ReactElement<any, any>;
+type InputFileTextContentType = <TState extends Record<string, any>>(props: Props<TState>) => React.ReactElement<any, any>;
 
 export const InputFileTextContent: InputFileTextContentType = observer(function InputFileTextContent({
   name,
@@ -97,12 +94,7 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
   const [selected, setSelected] = useState<File | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
-  const styles = useStyles(
-    INPUT_FILE_FIELD_STYLES,
-    baseFormControlStyles,
-    style,
-    error ? baseInvalidFormControlStyles : baseValidFormControlStyles
-  );
+  const styles = useStyles(INPUT_FILE_FIELD_STYLES, baseFormControlStyles, style, error ? baseInvalidFormControlStyles : baseValidFormControlStyles);
 
   const savedExternally = !!fileName && state[name] !== '';
   const saved = savedExternally || !!state[name];
@@ -135,13 +127,15 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
   }
 
   function validateFileSize(size: number) {
-    const maxFileSizeBytes = maxFileSize * 1000;
+    const maxFileSizeBytes = maxFileSize * 1024;
 
     if (size > maxFileSizeBytes) {
-      throw new Error(translate('ui_file_size_exceeds', undefined, {
-        size: bytesToSize(size),
-        maxSize: bytesToSize(maxFileSizeBytes),
-      }));
+      throw new Error(
+        translate('ui_file_size_exceeds', undefined, {
+          size: bytesToSize(size),
+          maxSize: bytesToSize(maxFileSizeBytes),
+        }),
+      );
     }
   }
 
@@ -170,21 +164,19 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
 
   return styled(styles)(
     <field className={className} {...use({ small, medium, large, tiny })}>
-      <field-label title={labelTooltip}>{children}{required && ' *'}</field-label>
+      <field-label title={labelTooltip}>
+        {children}
+        {required && ' *'}
+      </field-label>
       <UploadArea title={tooltip} disabled={disabled} accept={accept} reset onChange={handleChange}>
-        <Button
-          icon='/icons/import.svg'
-          tag='div'
-          mod={['outlined']}
-          disabled={disabled}
-        >
+        <Button icon="/icons/import.svg" tag="div" mod={['outlined']} disabled={disabled}>
           {translate('ui_upload_file')}
         </Button>
       </UploadArea>
       <field-description>
         {description}
-        {(selected || saved) && <IconButton disabled={disabled} name='cross' onClick={removeFile} />}
+        {(selected || saved) && <IconButton disabled={disabled} name="cross" onClick={removeFile} />}
       </field-description>
-    </field>
+    </field>,
   );
 });

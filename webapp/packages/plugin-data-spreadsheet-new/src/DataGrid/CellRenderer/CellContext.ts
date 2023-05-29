@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { createContext } from 'react';
 
 import type { IMouseHook } from '@cloudbeaver/core-blocks';
-import type { IResultSetElementKey, DatabaseEditChangeType } from '@cloudbeaver/plugin-data-viewer';
+import type { DatabaseEditChangeType, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
 import type { CellPosition } from '../../Editing/EditingContext';
 

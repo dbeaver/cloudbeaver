@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useRef } from 'react';
 
 import { getComputed, useMouse, useStateDelay } from '@cloudbeaver/core-blocks';
@@ -19,10 +18,7 @@ export function useDropOutside(dndBox: IDNDBox) {
     state: false,
     bottom: false,
   });
-  let showDropOutside = getComputed(() => (
-    !!dndBox.state.context
-    && dndBox.state.canDrop
-  ));
+  let showDropOutside = getComputed(() => !!dndBox.state.context && dndBox.state.canDrop);
   let bottom = false;
 
   const box = nestedRef.current?.getBoundingClientRect();

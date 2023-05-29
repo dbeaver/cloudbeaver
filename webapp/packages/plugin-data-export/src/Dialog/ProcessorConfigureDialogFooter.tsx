@@ -5,12 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { Button, useTranslate } from '@cloudbeaver/core-blocks';
-
 
 const styles = css`
   controls {
@@ -51,43 +49,22 @@ export const ProcessorConfigureDialogFooter = observer<Props>(function Processor
 
   return styled(styles)(
     <controls as="div">
-      <Button
-        type="button"
-        mod={['outlined']}
-        disabled={isExporting}
-        onClick={onBack}
-      >
+      <Button type="button" mod={['outlined']} disabled={isExporting} onClick={onBack}>
         {translate('ui_stepper_back')}
       </Button>
       <fill as="div" />
-      <Button
-        type="button"
-        mod={['outlined']}
-        disabled={isExporting}
-        onClick={onCancel}
-      >
+      <Button type="button" mod={['outlined']} disabled={isExporting} onClick={onCancel}>
         {translate('ui_processing_cancel')}
       </Button>
       {isFinalStep ? (
-        <Button
-          type="button"
-          mod={['unelevated']}
-          disabled={isExporting}
-          onClick={onExport}
-        >
+        <Button type="button" mod={['unelevated']} disabled={isExporting} onClick={onExport}>
           {translate('data_transfer_dialog_export')}
         </Button>
       ) : (
-        <Button
-          type="button"
-          mod={['unelevated']}
-          disabled={isExporting}
-          onClick={onNext}
-        >
+        <Button type="button" mod={['unelevated']} disabled={isExporting} onClick={onNext}>
           {translate('ui_stepper_next')}
         </Button>
       )}
-    </controls>
+    </controls>,
   );
-}
-);
+});

@@ -5,11 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_VIEWER_DATA_MODEL_ACTIONS_MENU, DataPresentationService, DataPresentationType, ResultSetDataAction, ResultSetSelectAction, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
+import {
+  DATA_CONTEXT_DV_DDM,
+  DATA_CONTEXT_DV_DDM_RESULT_INDEX,
+  DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
+  DataPresentationService,
+  DataPresentationType,
+  ResultSetDataAction,
+  ResultSetSelectAction,
+  ResultSetViewAction,
+} from '@cloudbeaver/plugin-data-viewer';
 
 import { ACTION_DATA_VIEWER_GROUPING_CLEAR } from './Actions/ACTION_DATA_VIEWER_GROUPING_CLEAR';
 import { ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN } from './Actions/ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN';
@@ -21,7 +29,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
   constructor(
     private readonly dataPresentationService: DataPresentationService,
     private readonly menuService: MenuService,
-    private readonly actionService: ActionService
+    private readonly actionService: ActionService,
   ) {
     super();
   }
@@ -31,7 +39,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
     this.registerActions();
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 
   private registerActions(): void {
     this.actionService.addHandler({
@@ -108,11 +116,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
         return context.has(DATA_CONTEXT_DV_DDM_RS_GROUPING);
       },
       getItems(context, items) {
-        return [
-          ...items,
-          ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN,
-          ACTION_DATA_VIEWER_GROUPING_CLEAR,
-        ];
+        return [...items, ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN, ACTION_DATA_VIEWER_GROUPING_CLEAR];
       },
     });
   }
@@ -124,11 +128,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
       title: 'plugin_data_viewer_result_set_grouping_title',
       icon: '/icons/plugin_data_viewer_result_set_grouping_m.svg',
       dataFormat: ResultDataFormat.Resultset,
-      hidden: (
-        dataFormat,
-        model,
-        resultIndex
-      ) => {
+      hidden: (dataFormat, model, resultIndex) => {
         if (!model.source.hasResult(resultIndex)) {
           return true;
         }
@@ -139,5 +139,4 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
       getPresentationComponent: () => DVResultSetGroupingPresentation,
     });
   }
-
 }

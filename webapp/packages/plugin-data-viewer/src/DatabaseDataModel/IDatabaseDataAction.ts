@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
@@ -14,18 +13,10 @@ import type { IDatabaseDataSource } from './IDatabaseDataSource';
 type AbstractConstructorFunction<
   TOptions,
   TResult extends IDatabaseDataResult,
-  TAction extends IDatabaseDataAction<TOptions, TResult>
-> = abstract new (
-  source: IDatabaseDataSource<TOptions, TResult>,
-  result: TResult,
-  ...actions: any[]
-) => TAction;
+  TAction extends IDatabaseDataAction<TOptions, TResult>,
+> = abstract new (source: IDatabaseDataSource<TOptions, TResult>, result: TResult, ...actions: any[]) => TAction;
 
-type ConstructorFunction<
-  TOptions,
-  TResult extends IDatabaseDataResult,
-  TAction extends IDatabaseDataAction<TOptions, TResult>
-> = new (
+type ConstructorFunction<TOptions, TResult extends IDatabaseDataResult, TAction extends IDatabaseDataAction<TOptions, TResult>> = new (
   source: IDatabaseDataSource<TOptions, TResult>,
   result: TResult,
   ...actions: any[]
@@ -34,7 +25,7 @@ type ConstructorFunction<
 export type IDatabaseDataActionInterface<
   TOptions,
   TResult extends IDatabaseDataResult,
-  TAction extends IDatabaseDataAction<TOptions, TResult>
+  TAction extends IDatabaseDataAction<TOptions, TResult>,
 > = AbstractConstructorFunction<TOptions, TResult, TAction> & {
   dataFormat: ResultDataFormat[] | null;
   prototype: TAction;
@@ -43,7 +34,7 @@ export type IDatabaseDataActionInterface<
 export type IDatabaseDataActionClass<
   TOptions,
   TResult extends IDatabaseDataResult,
-  TAction extends IDatabaseDataAction<TOptions, TResult>
+  TAction extends IDatabaseDataAction<TOptions, TResult>,
 > = ConstructorFunction<TOptions, TResult, TAction> & {
   dataFormat: ResultDataFormat[] | null;
   prototype: TAction;
@@ -57,14 +48,10 @@ export interface IDatabaseDataAction<TOptions, TResult extends IDatabaseDataResu
   updateResult: (result: TResult) => void;
   updateResults: (results: TResult[]) => void;
   afterResultUpdate: () => void;
-  tryGetAction: <T extends IDatabaseDataAction<TOptions, TResult>>(
-    action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ) => T | undefined;
-  getAction: <T extends IDatabaseDataAction<TOptions, TResult>>(
-    action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ) => T;
+  tryGetAction: <T extends IDatabaseDataAction<TOptions, TResult>>(action: IDatabaseDataActionClass<TOptions, TResult, T>) => T | undefined;
+  getAction: <T extends IDatabaseDataAction<TOptions, TResult>>(action: IDatabaseDataActionClass<TOptions, TResult, T>) => T;
   getActionImplementation: <T extends IDatabaseDataAction<TOptions, TResult>>(
-    action: IDatabaseDataActionInterface<TOptions, TResult, T>
+    action: IDatabaseDataActionInterface<TOptions, TResult, T>,
   ) => T | undefined;
   dispose: () => void;
 }

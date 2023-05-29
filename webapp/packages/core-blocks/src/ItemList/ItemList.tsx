@@ -5,29 +5,24 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { useStyles } from '../useStyles';
-import { Styles, ITEM_LIST_STYLES } from './styles';
+import { ITEM_LIST_STYLES, Styles } from './styles';
 
 interface Props {
   className?: string;
   styles?: ComponentStyle;
 }
 
-export const ItemList: React.FC<React.PropsWithChildren<Props>> = function ItemList({
-  children, className, styles,
-}) {
+export const ItemList: React.FC<React.PropsWithChildren<Props>> = function ItemList({ children, className, styles }) {
   return styled(useStyles(styles || ITEM_LIST_STYLES))(
     <item-list className={className}>
       <item-list-overflow-top />
-      <Styles.Provider value={styles || ITEM_LIST_STYLES}>
-        {children}
-      </Styles.Provider>
+      <Styles.Provider value={styles || ITEM_LIST_STYLES}>{children}</Styles.Provider>
       <item-list-overflow />
-    </item-list>
+    </item-list>,
   );
 };

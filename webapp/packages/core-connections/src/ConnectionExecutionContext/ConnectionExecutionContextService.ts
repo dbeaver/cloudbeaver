@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
@@ -20,17 +19,11 @@ export class ConnectionExecutionContextService {
   private readonly contexts: MetadataMap<string, ConnectionExecutionContext>;
   protected scheduler: TaskScheduler<string>;
 
-  constructor(
-    readonly connectionExecutionContextResource: ConnectionExecutionContextResource
-  ) {
-    this.contexts = new MetadataMap(contextId => new ConnectionExecutionContext(
-      this.scheduler,
-      this.connectionExecutionContextResource,
-      contextId
-    ));
+  constructor(readonly connectionExecutionContextResource: ConnectionExecutionContextResource) {
+    this.contexts = new MetadataMap(contextId => new ConnectionExecutionContext(this.scheduler, this.connectionExecutionContextResource, contextId));
     this.scheduler = new TaskScheduler((a, b) => a === b);
-    this.connectionExecutionContextResource.onItemDelete.addHandler(
-      key => ResourceKeyUtils.forEach(key, contextId => this.contexts.delete(contextId))
+    this.connectionExecutionContextResource.onItemDelete.addHandler(key =>
+      ResourceKeyUtils.forEach(key, contextId => this.contexts.delete(contextId)),
     );
   }
 
@@ -45,11 +38,7 @@ export class ConnectionExecutionContextService {
     await this.connectionExecutionContextResource.load(CachedMapAllKey);
   }
 
-  async create(
-    connectionKey: IConnectionInfoParams,
-    defaultCatalog?: string,
-    defaultSchema?: string
-  ): Promise<ConnectionExecutionContext> {
+  async create(connectionKey: IConnectionInfoParams, defaultCatalog?: string, defaultSchema?: string): Promise<ConnectionExecutionContext> {
     const context = await this.connectionExecutionContextResource.create(connectionKey, defaultCatalog, defaultSchema);
 
     return this.contexts.get(context.id);

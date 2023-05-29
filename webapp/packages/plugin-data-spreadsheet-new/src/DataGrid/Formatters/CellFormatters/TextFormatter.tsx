@@ -5,10 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useEffect, useRef } from 'react';
-
 
 import { getComputed, IconOrImage } from '@cloudbeaver/core-blocks';
 import { clsx, isValidUrl } from '@cloudbeaver/core-utils';
@@ -52,12 +50,7 @@ export const TextFormatter = observer<FormatterProps<IResultSetRowKey>>(function
   if (cellContext.isEditing) {
     return (
       <div className={classes}>
-        <CellEditor
-          ref={editorRef}
-          row={row}
-          column={column}
-          onClose={handleClose}
-        />
+        <CellEditor ref={editorRef} row={row} column={column} onClose={handleClose} />
       </div>
     );
   }
@@ -67,11 +60,11 @@ export const TextFormatter = observer<FormatterProps<IResultSetRowKey>>(function
   return (
     <div title={value} className={classes}>
       {isUrl && (
-        <a href={rawValue as string} target='_blank' rel='noreferrer' draggable={false}>
-          <IconOrImage icon='external-link' viewBox='0 0 24 24' />
+        <a href={rawValue as string} target="_blank" rel="noreferrer" draggable={false}>
+          <IconOrImage icon="external-link" viewBox="0 0 24 24" />
         </a>
       )}
-      <div className='text-formatter__value'>{value}</div>
+      <div className="text-formatter__value">{value}</div>
     </div>
   );
 });

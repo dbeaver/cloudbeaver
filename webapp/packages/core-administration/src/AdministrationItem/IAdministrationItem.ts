@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { IRouteParams } from './IRouteParams';
@@ -13,7 +12,7 @@ import type { IRouteParams } from './IRouteParams';
 export enum AdministrationItemType {
   Default,
   Administration,
-  ConfigurationWizard
+  ConfigurationWizard,
 }
 
 export interface IAdministrationItemReplaceOptions {
@@ -44,29 +43,15 @@ export type AdministrationItemSubContentProps = AdministrationItemContentProps &
 };
 export type AdministrationItemSubContentComponent = React.FunctionComponent<AdministrationItemSubContentProps>;
 
-export type AdministrationItemEvent = (
-  configurationWizard: boolean,
-  outside: boolean,
-  outsideAdminPage: boolean
-) => Promise<void> | void;
-export type AdministrationItemCanActivateEvent = (
-  configurationWizard: boolean,
-  administration: boolean,
-) => Promise<boolean> | boolean;
+export type AdministrationItemEvent = (configurationWizard: boolean, outside: boolean, outsideAdminPage: boolean) => Promise<void> | void;
+export type AdministrationItemCanActivateEvent = (configurationWizard: boolean, administration: boolean) => Promise<boolean> | boolean;
 export type AdministrationItemCanDeActivateEvent = (
   configurationWizard: boolean,
   administration: boolean,
   nextAdministrationItem: IAdministrationItem | null,
 ) => Promise<boolean> | boolean;
-export type AdministrationItemSubEvent = (
-  param: string | null,
-  configurationWizard: boolean,
-  outside: boolean
-) => Promise<void> | void;
-export type AdministrationItemSubCanActivateEvent = (
-  param: string | null,
-  configurationWizard: boolean
-) => Promise<boolean> | boolean;
+export type AdministrationItemSubEvent = (param: string | null, configurationWizard: boolean, outside: boolean) => Promise<void> | void;
+export type AdministrationItemSubCanActivateEvent = (param: string | null, configurationWizard: boolean) => Promise<boolean> | boolean;
 
 export interface IAdministrationItemSubItem {
   name: string;
