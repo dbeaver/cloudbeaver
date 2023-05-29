@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import type { WsSessionExpiredEvent } from '@cloudbeaver/core-sdk';
 
@@ -14,10 +13,7 @@ import { SessionExpireService } from './SessionExpireService';
 
 @injectable()
 export class SessionExpireEventService extends Dependency {
-  constructor(
-    private readonly sessionEventSource: SessionEventSource,
-    private readonly sessionExpireService: SessionExpireService,
-  ) {
+  constructor(private readonly sessionEventSource: SessionEventSource, private readonly sessionExpireService: SessionExpireService) {
     super();
     this.sessionEventSource.onEvent<WsSessionExpiredEvent>(ServerEventId.CbSessionExpired, () => {
       this.onSessionExpireEvent();

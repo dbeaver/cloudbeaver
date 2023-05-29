@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlResultColumn } from '@cloudbeaver/core-sdk';
@@ -21,8 +20,7 @@ import { isResultSetContentValue } from './isResultSetContentValue';
 import type { IResultSetValue } from './ResultSetFormatAction';
 
 @databaseDataAction()
-export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IDatabaseDataResultAction<IDatabaseResultSet> {
+export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IDatabaseDataResultAction<IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Resultset];
 
   get rows(): IResultSetValue[][] {
@@ -88,12 +86,7 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
   }
 
   getCellValue(cell: IResultSetElementKey): IResultSetValue | undefined {
-    if (
-      cell.row === undefined
-      || cell.column === undefined
-      || cell.row.index >= this.rows.length
-      || cell.column.index >= this.columns.length
-    ) {
+    if (cell.row === undefined || cell.column === undefined || cell.row.index >= this.rows.length || cell.column.index >= this.columns.length) {
       return undefined;
     }
 
@@ -131,7 +124,6 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
       return [];
     }
 
-    return column.supportedOperations
-      .filter(operation => operation.argumentCount === 1 || operation.argumentCount === 0);
+    return column.supportedOperations.filter(operation => operation.argumentCount === 1 || operation.argumentCount === 0);
   }
 }

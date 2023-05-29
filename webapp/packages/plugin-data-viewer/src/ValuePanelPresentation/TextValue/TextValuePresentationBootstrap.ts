@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React, { lazy } from 'react';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -23,7 +22,7 @@ const TextValuePresentation = lazy(async () => {
 export class TextValuePresentationBootstrap extends Bootstrap {
   constructor(
     private readonly textValuePresentationService: TextValuePresentationService,
-    private readonly dataValuePanelService: DataValuePanelService
+    private readonly dataValuePanelService: DataValuePanelService,
   ) {
     super();
   }
@@ -63,5 +62,5 @@ export class TextValuePresentationBootstrap extends Bootstrap {
     });
   }
 
-  load(): void { }
+  load(): void {}
 }

@@ -1,7 +1,7 @@
 export default [
   ['data_grid_table_editing', 'Modifca'],
   ['data_grid_table_editing_set_to_null', 'Imposta a NULL'],
-  ['data_grid_table_editing_open_inline_editor', 'Apri l\'editor contestuale'],
+  ['data_grid_table_editing_open_inline_editor', "Apri l'editor contestuale"],
   ['data_grid_table_order', 'Ordinamento'],
   ['data_grid_table_open_value_panel', 'Mostra nel pannello dei valori'],
   ['data_grid_table_filter', 'Filtri'],
@@ -10,7 +10,7 @@ export default [
   ['data_grid_table_filter_reset_all_filters', 'Reimposta tutti i filtri'],
   ['data_grid_table_disable_order', 'Disabilitato'],
   ['data_grid_table_disable_all_orders', 'Disabilita tutto'],
-  ['data_grid_table_delete_filters_and_orders', 'Reimposta i filtri / l\'ordinamento'],
+  ['data_grid_table_delete_filters_and_orders', "Reimposta i filtri / l'ordinamento"],
   ['data_grid_table_tooltip_column_header_order', 'Ordina per colonna'],
   ['data_grid_table_context_menu_filter_dialog_title', 'Modifica valore'],
   ['data_grid_table_context_menu_filter_clipboard_permission', 'Dai accesso agli appunti'],

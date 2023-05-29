@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
@@ -43,39 +42,44 @@ export function useMenu(options: IMenuOptions): IMenuData {
 
   context.set(DATA_CONTEXT_MENU_LOCAL, options.local);
 
-  const state = useObservableRef<IMenuData>(() => ({
-    context,
-    get loaders(): ILoadableState[] {
-      return [
-        ...menuService.getMenuItemLoaders(this.context, this.itemCreators),
-        ...flat([this.handler?.getLoader?.(this.context, this.menu)])
-          .filter<ILoadableState>((item => !!item) as ((obj: any) => obj is ILoadableState)),
-      ];
+  const state = useObservableRef<IMenuData>(
+    () => ({
+      context,
+      get loaders(): ILoadableState[] {
+        return [
+          ...menuService.getMenuItemLoaders(this.context, this.itemCreators),
+          ...flat([this.handler?.getLoader?.(this.context, this.menu)]).filter<ILoadableState>(
+            (item => !!item) as (obj: any) => obj is ILoadableState,
+          ),
+        ];
+      },
+      get itemCreators() {
+        return menuService.getMenuItemCreators(this.context);
+      },
+      get available() {
+        return this.handler?.hideIfEmpty?.(this.context) === false || this.itemCreators.length > 0;
+      },
+      get items() {
+        return menuService.getMenu(this.context, this.itemCreators);
+      },
+      get handler() {
+        return menuService.getHandler(this.context);
+      },
+    }),
+    {
+      loaders: computed,
+      available: computed,
+      itemCreators: computed,
+      items: computed,
+      handler: computed,
+      menu: observable.ref,
+      context: observable.ref,
     },
-    get itemCreators() {
-      return menuService.getMenuItemCreators(this.context);
+    {
+      menu: options.menu,
+      context,
     },
-    get available() {
-      return this.handler?.hideIfEmpty?.(this.context) === false || this.itemCreators.length > 0;
-    },
-    get items() {
-      return menuService.getMenu(this.context, this.itemCreators);
-    },
-    get handler() {
-      return menuService.getHandler(this.context);
-    },
-  }), {
-    loaders: computed,
-    available: computed,
-    itemCreators: computed,
-    items: computed,
-    handler: computed,
-    menu: observable.ref,
-    context: observable.ref,
-  }, {
-    menu: options.menu,
-    context,
-  });
+  );
 
   return state;
 }

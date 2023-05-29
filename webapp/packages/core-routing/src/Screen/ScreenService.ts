@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 import type { SubscribeState } from 'router5';
 
@@ -26,9 +25,7 @@ export class ScreenService {
   private readonly screens: Map<string, IScreen<any>>;
   private readonly routeScreenMap: Map<string, string>;
 
-  constructor(
-    readonly routerService: RouterService
-  ) {
+  constructor(readonly routerService: RouterService) {
     this.routeChange = new Executor();
     this.screens = new Map<string, IScreen<any>>();
     this.routeScreenMap = new Map<string, string>();
@@ -41,8 +38,7 @@ export class ScreenService {
   }
 
   navigateToRoot(): void {
-    const screen = Array.from(this.screens.values())
-      .find(screen => screen.root);
+    const screen = Array.from(this.screens.values()).find(screen => screen.root);
 
     if (screen) {
       this.routerService.router.navigate(screen.name);
@@ -97,10 +93,7 @@ export class ScreenService {
     return this.screens.get(screen);
   }
 
-  private async routeTransition(
-    data: RouterTransitionData,
-    contexts: IExecutionContextProvider<RouterTransitionData>
-  ): Promise<void> {
+  private async routeTransition(data: RouterTransitionData, contexts: IExecutionContextProvider<RouterTransitionData>): Promise<void> {
     if (!data.fromState) {
       return;
     }

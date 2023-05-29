@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -46,19 +45,19 @@ const MENU_STYLES = css`
     }
 
     & IconOrImage {
-        display: block;
-        width: 16px;
+      display: block;
+      width: 16px;
     }
 
     & menu-bar-item-label {
-        display: none;
+      display: none;
     }
 
     & Loader {
-        width: 16px;
+      width: 16px;
     }
   }
-  
+
   MenuSeparator {
     composes: theme-border-color-background from global;
     height: 100%;
@@ -66,7 +65,8 @@ const MENU_STYLES = css`
     border: 0 !important;
     border-right: 1px solid !important;
 
-    &:first-child, &:last-child {
+    &:first-child,
+    &:last-child {
       display: none;
     }
   }
@@ -92,6 +92,6 @@ export const ElementsTreeToolsMenu = observer<Props>(function ElementsTreeToolsM
   return styled(style)(
     <menu-wrapper className={className}>
       <MenuBar menu={menu} style={[MENU_STYLES]} />
-    </menu-wrapper>
+    </menu-wrapper>,
   );
 });

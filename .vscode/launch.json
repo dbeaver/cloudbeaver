@@ -1,0 +1,88 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Debug CE",
+      "url": "http://127.0.0.1:3100",
+      "webRoot": "${workspaceFolder}/webapp/packages/product-default",
+    },
+    {
+      "type": "java",
+      "name": "CloudBeaver CE",
+      "request": "launch",
+      "mainClass": "org.eclipse.equinox.launcher.Main",
+      "cwd": "${env:DBEAVER_DEVEL_ECLIPSE_PATH}/opt/cbce",
+      "windows": {
+        "type": "java",
+        "name": "CloudBeaver CE",
+        "request": "launch",
+        "mainClass": "org.eclipse.equinox.launcher.Main",
+        "classPaths": [
+          "${env:DBEAVER_DEVEL_ECLIPSE_PATH}/plugins/org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar"
+        ],
+        "args": [
+          "-product",
+          "io.cloudbeaver.product.ce.product",
+          "-configuration",
+          "file:${env:DBEAVER_DEVEL_ECLIPSE_WORKSPACE_PATH}/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/",
+          "-dev",
+          "file:${env:DBEAVER_DEVEL_ECLIPSE_WORKSPACE_PATH}/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/dev.properties",
+          "-os",
+          "win32",
+          "-ws",
+          "win32",
+          "-arch",
+          "x86_64",
+          "-nl",
+          "en",
+          "-showsplash",
+          "-web-config",
+          "conf/cloudbeaver.conf"
+        ],
+        "vmArgs": [
+          "-XX:+IgnoreUnrecognizedVMOptions",
+          "--add-modules=ALL-SYSTEM",
+          "-Xms64m",
+          "-Xmx1024m",
+          "-Declipse.pde.launch=true"
+        ]
+      },
+      "osx": {
+        "type": "java",
+        "name": "CloudBeaver CE",
+        "request": "launch",
+        "mainClass": "org.eclipse.equinox.launcher.Main",
+        "classPaths": [
+          "${env:DBEAVER_DEVEL_ECLIPSE_PATH}/plugins/org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar"
+        ],
+        "args": [
+          "-product",
+          "io.cloudbeaver.product.ce.product",
+          "-configuration",
+          "file:${env:DBEAVER_DEVEL_ECLIPSE_WORKSPACE_PATH}/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/",
+          "-dev",
+          "file:${env:DBEAVER_DEVEL_ECLIPSE_WORKSPACE_PATH}/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/dev.properties",
+          "-os",
+          "macosx",
+          "-ws",
+          "cocoa",
+          "-arch",
+          "aarch64",
+          "-nl",
+          "en_US",
+          "-showsplash"
+        ],
+        "vmArgs": [
+          "-XX:+IgnoreUnrecognizedVMOptions",
+          "--add-modules=ALL-SYSTEM",
+          "-Xms64m",
+          "-Xmx1024m",
+          "-Declipse.pde.launch=true",
+          "-XstartOnFirstThread"
+        ]
+      }
+    }
+  ]
+}

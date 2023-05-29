@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { md5, uuid } from '@cloudbeaver/core-utils';
@@ -39,9 +38,7 @@ export class AuthProviderService {
 
   private readonly serviceDescriptionLinker: IServiceDescriptionLink[]; // TODO: probably should be replaced by PlaceholderContainer
 
-  constructor(
-    private readonly authProvidersResource: AuthProvidersResource
-  ) {
+  constructor(private readonly authProvidersResource: AuthProvidersResource) {
     this.requestAuthProvider = new Executor();
     this.serviceDescriptionLinker = [];
   }

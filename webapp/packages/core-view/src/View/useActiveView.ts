@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useEffect } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
@@ -22,15 +21,19 @@ interface IViewController {
 export function useActiveView<T>(view: IView<T>): IViewController {
   const activeViewService = useService(ViewService);
 
-  const controller = useObjectRef(() => ({
-    view,
-    focusView() {
-      activeViewService.setPrimaryView(this.view);
-    },
-    blurView() {
-      activeViewService.blur(this.view);
-    },
-  }), false, ['focusView', 'blurView']);
+  const controller = useObjectRef(
+    () => ({
+      view,
+      focusView() {
+        activeViewService.setPrimaryView(this.view);
+      },
+      blurView() {
+        activeViewService.blur(this.view);
+      },
+    }),
+    false,
+    ['focusView', 'blurView'],
+  );
 
   useEffect(() => {
     activeViewService.addActiveView(view);

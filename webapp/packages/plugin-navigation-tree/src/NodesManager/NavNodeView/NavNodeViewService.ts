@@ -5,14 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { untracked } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
-import type { NavNodeTransformView, INavNodeFolderTransform, NavNodeFolderTransformFn } from './IFolderTransform';
+import type { INavNodeFolderTransform, NavNodeFolderTransformFn, NavNodeTransformView } from './IFolderTransform';
 
 export interface INodeDuplicateList {
   nodes: string[];
@@ -41,18 +40,13 @@ export class NavNodeViewService {
   }
 
   get transformations(): NavNodeFolderTransformFn[] {
-    return this.transformers
-      .sort(sortTransformations)
-      .map(transform => transform.transformer);
+    return this.transformers.sort(sortTransformations).map(transform => transform.transformer);
   }
 
   private readonly transformers: INavNodeFolderTransform[];
   private readonly duplicationNotify: Set<string>;
 
-  constructor(
-    private readonly navTreeResource: NavTreeResource,
-    private readonly notificationService: NotificationService
-  ) {
+  constructor(private readonly navTreeResource: NavTreeResource, private readonly notificationService: NotificationService) {
     this.transformers = [];
     this.duplicationNotify = new Set();
 
@@ -81,10 +75,7 @@ export class NavNodeViewService {
 
     const limited = this.limit(children);
 
-    return this.transformations.reduce(
-      (children, transform) => transform(nodeId, children),
-      limited.nodes as string[] | undefined
-    );
+    return this.transformations.reduce((children, transform) => transform(nodeId, children), limited.nodes as string[] | undefined);
   }
 
   addTransform(transform: INavNodeFolderTransform): void {
@@ -142,10 +133,7 @@ export class NavNodeViewService {
   }
 }
 
-function sortTransformations(
-  { order: orderA }: INavNodeFolderTransform,
-  { order: orderB }: INavNodeFolderTransform
-): number {
+function sortTransformations({ order: orderA }: INavNodeFolderTransform, { order: orderB }: INavNodeFolderTransform): number {
   if (orderA === orderB) {
     return 0;
   }

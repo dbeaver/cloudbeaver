@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 
@@ -14,21 +13,17 @@ import { RESOURCES_NODE_PATH } from './RESOURCES_NODE_PATH';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
-  constructor(
-    private readonly projectsNavNodeService: ProjectsNavNodeService
-  ) {
+  constructor(private readonly projectsNavNodeService: ProjectsNavNodeService) {
     super();
   }
 
   register(): void | Promise<void> {
     this.addRmProjectIds();
   }
-  load(): void | Promise<void> {
-  }
+  load(): void | Promise<void> {}
 
   private addRmProjectIds() {
     this.projectsNavNodeService.addProjectType(NAV_NODE_TYPE_RM_PROJECT);
     this.projectsNavNodeService.addProjectPrefix(RESOURCES_NODE_PATH + '/');
   }
-
 }

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useCallback, useEffect } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
@@ -23,7 +22,7 @@ interface IMousePosition {
 type DraggingCallback = (
   startPosition: IDraggingPosition,
   currentPosition: IDraggingPosition,
-  event: React.MouseEvent<HTMLDivElement> | MouseEvent
+  event: React.MouseEvent<HTMLDivElement> | MouseEvent,
 ) => void;
 
 interface IDraggingState {
@@ -35,10 +34,7 @@ interface IDraggingState {
 }
 
 interface IDraggingCallbacks {
-  onDragStart?: (
-    startPosition: IDraggingPosition,
-    event: React.MouseEvent<HTMLDivElement> | MouseEvent
-  ) => void;
+  onDragStart?: (startPosition: IDraggingPosition, event: React.MouseEvent<HTMLDivElement> | MouseEvent) => void;
   onDragOver?: DraggingCallback;
   onDragEnd?: DraggingCallback;
 }
@@ -88,13 +84,16 @@ function isDraggingStarted(delta: number | null, threshold: number) {
 export function useGridDragging(props: IDraggingCallbacks) {
   const callbacks = useObjectRef(props);
 
-  const state = useObjectRef<IDraggingState>(() => ({
-    startDraggingCell: null,
-    currentDraggingCell: null,
-    startMousePosition: null,
-    dragging: false,
-    mouseDown: false,
-  }), false);
+  const state = useObjectRef<IDraggingState>(
+    () => ({
+      startDraggingCell: null,
+      currentDraggingCell: null,
+      startMousePosition: null,
+      dragging: false,
+      mouseDown: false,
+    }),
+    false,
+  );
 
   const onMouseDownHandler = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     const position = getCellPositionFromEvent(event);
@@ -134,8 +133,7 @@ export function useGridDragging(props: IDraggingCallbacks) {
     }
 
     // check if the new cell is equal to the previous cell
-    if (position.rowIdx === state.currentDraggingCell?.rowIdx
-      && position.colIdx === state.currentDraggingCell.colIdx) {
+    if (position.rowIdx === state.currentDraggingCell?.rowIdx && position.colIdx === state.currentDraggingCell.colIdx) {
       return;
     }
 
@@ -151,7 +149,8 @@ export function useGridDragging(props: IDraggingCallbacks) {
           colIdx: position.colIdx,
           rowIdx: position.rowIdx,
         },
-        event);
+        event,
+      );
     }
   }, []);
 
@@ -173,7 +172,8 @@ export function useGridDragging(props: IDraggingCallbacks) {
           colIdx: state.currentDraggingCell.colIdx,
           rowIdx: state.currentDraggingCell.rowIdx,
         },
-        event);
+        event,
+      );
     }
 
     state.dragging = false;

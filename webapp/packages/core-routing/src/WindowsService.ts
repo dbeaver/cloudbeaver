@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { IWindowOptions, openCenteredPopup } from '@cloudbeaver/core-utils';
 
@@ -25,11 +24,7 @@ export class WindowsService {
     this.windows = new Map();
   }
 
-  open(
-    id: string,
-    options: IWindowOptions,
-    onClose?: () => void
-  ): Window | null {
+  open(id: string, options: IWindowOptions, onClose?: () => void): Window | null {
     const current = this.windows.get(id);
 
     if (current) {
@@ -61,15 +56,13 @@ export class WindowsService {
   }
 
   close(window: Window) {
-    const current = Array.from(this.windows.values())
-      .find(info => info.window === window);
+    const current = Array.from(this.windows.values()).find(info => info.window === window);
 
     current?.window.close();
   }
 
   async waitWindowsClose(window: Window): Promise<void> {
-    const current = Array.from(this.windows.values())
-      .find(info => info.window === window);
+    const current = Array.from(this.windows.values()).find(info => info.window === window);
 
     await current?.promise;
   }
@@ -78,8 +71,7 @@ export class WindowsService {
     if (this.windows.size > 0) {
       if (!this.trackWindowClose) {
         this.trackWindowClose = setInterval(() => {
-          const closedWindows = Array.from(this.windows.values())
-            .filter(info => info.window.closed);
+          const closedWindows = Array.from(this.windows.values()).filter(info => info.window.closed);
 
           for (const info of closedWindows) {
             info.onClose?.();

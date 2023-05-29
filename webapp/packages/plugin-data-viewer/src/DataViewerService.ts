@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 
@@ -13,9 +12,7 @@ import { DataViewerSettingsService } from './DataViewerSettingsService';
 
 @injectable()
 export class DataViewerService {
-  constructor(
-    private readonly dataViewerSettingsService: DataViewerSettingsService,
-  ) { }
+  constructor(private readonly dataViewerSettingsService: DataViewerSettingsService) {}
 
   isDataEditable(connection: Connection) {
     const disabled = this.dataViewerSettingsService.settings.isValueDefault('disableEdit')

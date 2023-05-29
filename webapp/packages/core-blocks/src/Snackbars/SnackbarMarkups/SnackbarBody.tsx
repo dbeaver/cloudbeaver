@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled, { css } from 'reshadow';
 
 const SNACKBAR_BODY_STYLES = css`
@@ -46,17 +45,15 @@ interface Props {
   className?: string;
 }
 
-export const SnackbarBody: React.FC<React.PropsWithChildren<Props>> = function SnackbarBody({
-  title, className, children,
-}) {
+export const SnackbarBody: React.FC<React.PropsWithChildren<Props>> = function SnackbarBody({ title, className, children }) {
   return styled(SNACKBAR_BODY_STYLES)(
     <notification-body as="div" className={className}>
-      <body-text-block as='div'>
-        <text-block-title title={title} as='h2'>{title}</text-block-title>
-        <message as="div">
-          {children}
-        </message>
+      <body-text-block as="div">
+        <text-block-title title={title} as="h2">
+          {title}
+        </text-block-title>
+        <message as="div">{children}</message>
       </body-text-block>
-    </notification-body>
+    </notification-body>,
   );
 };

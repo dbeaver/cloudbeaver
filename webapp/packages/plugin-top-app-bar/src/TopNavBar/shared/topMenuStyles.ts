@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { css } from 'reshadow';
 
 export const topMenuStyles = css`
@@ -17,12 +16,12 @@ export const topMenuStyles = css`
   }
   menu-box {
     composes: theme-text-on-primary from global;
-    background-color: #338ecc!important;
+    background-color: #338ecc !important;
     clip-path: inset(0px -16px -16px -16px); /* clip shadow from top edge of menu */
   }
   Menu:not([submenu]) menu-box {
-    border-top-left-radius: 0!important;
-    border-top-right-radius: 0!important;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
   }
   menu-box menu-panel-item {
     border-color: #ffffff !important;
@@ -30,7 +29,8 @@ export const topMenuStyles = css`
   Loader {
     composes: secondary from global;
   }
-  MenuButton, MenuBarElement {
+  MenuButton,
+  MenuBarElement {
     composes: theme-ripple from global;
     background: none;
     border: none;
@@ -38,7 +38,9 @@ export const topMenuStyles = css`
     color: inherit;
     cursor: pointer;
   }
-  MenuTrigger, Button, MenuBarElement {
+  MenuTrigger,
+  Button,
+  MenuBarElement {
     height: 100%;
     padding: 0 8px !important;
     margin-right: 1px;
@@ -51,7 +53,7 @@ export const topMenuStyles = css`
       top: 8px;
       right: -1px;
       opacity: 1 !important;
-      content: "";
+      content: '';
     }
 
     & box > div {
@@ -95,7 +97,8 @@ export const topMenuStyles = css`
     & menu-bar-item-mark {
       padding-left: 0 !important;
     }
-    & menu-trigger-text, & menu-bar-item-label {
+    & menu-trigger-text,
+    & menu-bar-item-label {
       white-space: nowrap;
       max-width: 240px;
       overflow-x: hidden;
@@ -126,20 +129,25 @@ export const topMenuStyles = css`
   MenuItem,
   MenuItemCheckbox,
   MenuItemRadio {
-    &:hover, &:global([aria-expanded="true"]) {
-      background: #236EA0;
+    &:hover,
+    &:global([aria-expanded='true']) {
+      background: #236ea0;
     }
     &:before {
       display: none;
     }
   }
   MenuBarElement {
-    &:hover, &:global([aria-expanded="true"]) {
+    &:hover,
+    &:global([aria-expanded='true']) {
       background: #338ecc;
     }
   }
   @media only screen and (max-width: 1200px) {
-    MenuButton, MenuBarElement, MenuTrigger, Button {
+    MenuButton,
+    MenuBarElement,
+    MenuTrigger,
+    Button {
       padding: 0 8px !important;
     }
   }

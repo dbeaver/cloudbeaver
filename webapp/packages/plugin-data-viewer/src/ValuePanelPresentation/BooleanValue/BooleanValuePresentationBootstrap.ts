@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
@@ -57,5 +56,5 @@ export class BooleanValuePresentationBootstrap extends Bootstrap {
     });
   }
 
-  load(): void { }
+  load(): void {}
 }

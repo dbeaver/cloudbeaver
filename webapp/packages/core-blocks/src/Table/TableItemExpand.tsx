@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useContext, useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import styled, { use } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
@@ -26,36 +25,35 @@ interface Props {
   disabled?: boolean;
 }
 
-export const TableItemExpand = observer<Props>(function TableItemExpand({
-  onExpand,
-  className,
-  disabled,
-}) {
+export const TableItemExpand = observer<Props>(function TableItemExpand({ onExpand, className, disabled }) {
   const translate = useTranslate();
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
   if (!context) {
     throw new Error('TableContext must be provided');
   }
-  const handleClick = useCallback((event: React.MouseEvent<HTMLInputElement>) => {
-    if (disabled) {
-      return;
-    }
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLInputElement>) => {
+      if (disabled) {
+        return;
+      }
 
-    const state = !context.isExpanded();
+      const state = !context.isExpanded();
 
-    EventContext.set(event, EventTableItemExpandFlag, state);
-    EventContext.set(event, EventTableItemSelectionFlag);
-    tableContext?.setItemExpand(context.item, state);
+      EventContext.set(event, EventTableItemExpandFlag, state);
+      EventContext.set(event, EventTableItemSelectionFlag);
+      tableContext?.setItemExpand(context.item, state);
 
-    if (onExpand) {
-      onExpand(context.item, state);
-    }
-  }, [tableContext, context, onExpand, disabled]);
+      if (onExpand) {
+        onExpand(context.item, state);
+      }
+    },
+    [tableContext, context, onExpand, disabled],
+  );
 
   return styled(BASE_TABLE_STYLES)(
     <table-item-expand-box className={className} title={translate('ui_expand')} onClick={handleClick}>
       <Icon name="angle" viewBox="0 0 15 8" {...use({ expanded: context.isExpanded() })} />
-    </table-item-expand-box>
+    </table-item-expand-box>,
   );
 });

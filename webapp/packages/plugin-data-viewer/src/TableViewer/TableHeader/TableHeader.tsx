@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -34,17 +33,12 @@ interface Props {
   className?: string;
 }
 
-export const TableHeader = observer<Props>(function TableHeader({
-  model,
-  resultIndex,
-  simple,
-  className,
-}) {
+export const TableHeader = observer<Props>(function TableHeader({ model, resultIndex, simple, className }) {
   const service = useService(TableHeaderService);
 
   return styled(styles)(
     <table-header className={className}>
       <Placeholder container={service.tableHeaderPlaceholder} model={model} resultIndex={resultIndex} simple={simple} />
-    </table-header>
+    </table-header>,
   );
 });

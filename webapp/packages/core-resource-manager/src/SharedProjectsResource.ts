@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { runInAction } from 'mobx';
 
 import type { AdminObjectGrantInfo } from '@cloudbeaver/core-administration';
@@ -13,7 +12,19 @@ import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmProject, ResourceKeyList, RmProjectPermissions, RmSubjectProjectPermissions, isResourceKeyAlias } from '@cloudbeaver/core-sdk';
+import {
+  CachedMapAllKey,
+  CachedMapResource,
+  GraphQLService,
+  isResourceKeyAlias,
+  ResourceKey,
+  resourceKeyList,
+  ResourceKeyList,
+  ResourceKeyUtils,
+  RmProject,
+  RmProjectPermissions,
+  RmSubjectProjectPermissions,
+} from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 const newSymbol = Symbol('new-project');
@@ -38,8 +49,7 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
   ) {
     super(() => new Map(), []);
 
-    sessionPermissionsResource
-      .require(this, EAdminPermission.admin);
+    sessionPermissionsResource.require(this, EAdminPermission.admin);
     this.sync(sessionPermissionsResource, () => {});
 
     this.connect(projectInfoResource);
@@ -165,9 +175,9 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
 
 export function isEqualSharedProjectGrantInfo(a: AdminObjectGrantInfo, b: AdminObjectGrantInfo): boolean {
   return (
-    a.subjectId === b.subjectId
-    && a.subjectType === b.subjectType
-    && a.objectPermissions.objectId === b.objectPermissions.objectId
-    && isArraysEqual(a.objectPermissions.permissions, b.objectPermissions.permissions)
+    a.subjectId === b.subjectId &&
+    a.subjectType === b.subjectType &&
+    a.objectPermissions.objectId === b.objectPermissions.objectId &&
+    isArraysEqual(a.objectPermissions.permissions, b.objectPermissions.permissions)
   );
 }

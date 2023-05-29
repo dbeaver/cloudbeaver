@@ -5,13 +5,34 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Overlay, OverlayMessage, OverlayActions, Button, useResource, getComputed, OverlayHeader, OverlayHeaderIcon, OverlayHeaderTitle, OverlayHeaderSubTitle, useSplitUserState, Loader, useStyles, useTranslate, useExecutor } from '@cloudbeaver/core-blocks';
-import { ConnectionExecutionContextResource, ConnectionInfoResource, createConnectionParam, DBDriverResource, getRealExecutionContextId } from '@cloudbeaver/core-connections';
+import {
+  Button,
+  getComputed,
+  Loader,
+  Overlay,
+  OverlayActions,
+  OverlayHeader,
+  OverlayHeaderIcon,
+  OverlayHeaderSubTitle,
+  OverlayHeaderTitle,
+  OverlayMessage,
+  useExecutor,
+  useResource,
+  useSplitUserState,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
+import {
+  ConnectionExecutionContextResource,
+  ConnectionInfoResource,
+  createConnectionParam,
+  DBDriverResource,
+  getRealExecutionContextId,
+} from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 
@@ -41,32 +62,20 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
   const connection = useResource(
     SqlEditorOverlay,
     ConnectionInfoResource,
-    dataSource?.executionContext
-      ? createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId)
-      : null
+    dataSource?.executionContext ? createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId) : null,
   );
   const driver = useResource(SqlEditorOverlay, DBDriverResource, connection.tryGetData?.driverId ?? null);
 
   const connected = getComputed(() => connection.tryGetData?.connected ?? false);
 
-  const context = useResource(
-    SqlEditorOverlay,
-    ConnectionExecutionContextResource,
-    getRealExecutionContextId(executionContextId),
-    {
-      active: connected,
-    }
-  );
+  const context = useResource(SqlEditorOverlay, ConnectionExecutionContextResource, getRealExecutionContextId(executionContextId), {
+    active: connected,
+  });
 
-  const initializingContext = getComputed(() => (
-    connection.isLoading()
-    || context.isLoading()
-  ));
-  const initExecutionContext = getComputed(() => (
-    context.tryGetData === undefined
-    && connection.tryGetData !== undefined
-    && dataSource?.isLoading() === false
-  ));
+  const initializingContext = getComputed(() => connection.isLoading() || context.isLoading());
+  const initExecutionContext = getComputed(
+    () => context.tryGetData === undefined && connection.tryGetData !== undefined && dataSource?.isLoading() === false,
+  );
 
   async function cancelConnection() {
     await sqlEditorService.resetExecutionContext(state);
@@ -76,10 +85,9 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
     await sqlEditorService.initEditorConnection(state);
   }
 
-  const dataContainer = getComputed(() => NodeManagerUtils.concatSchemaAndCatalog(
-    dataSource?.executionContext?.defaultCatalog,
-    dataSource?.executionContext?.defaultSchema
-  ));
+  const dataContainer = getComputed(() =>
+    NodeManagerUtils.concatSchemaAndCatalog(dataSource?.executionContext?.defaultCatalog, dataSource?.executionContext?.defaultSchema),
+  );
 
   useEffect(() => {
     if (initExecutionContext && connected) {
@@ -96,24 +104,13 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
       </OverlayHeader>
       <OverlayMessage>{translate('sql_editor_restore_message')}</OverlayMessage>
       <OverlayActions>
-        <Button
-          type="button"
-          mod={['outlined']}
-          loader
-          onClick={cancelConnection}
-        >
+        <Button type="button" mod={['outlined']} loader onClick={cancelConnection}>
           {translate('ui_processing_cancel')}
         </Button>
-        <Button
-          type="button"
-          mod={['unelevated']}
-          loading={initializingContext}
-          loader
-          onClick={init}
-        >
+        <Button type="button" mod={['unelevated']} loading={initializingContext} loader onClick={init}>
           {translate('sql_editor_restore')}
         </Button>
       </OverlayActions>
-    </Overlay>
+    </Overlay>,
   );
 });

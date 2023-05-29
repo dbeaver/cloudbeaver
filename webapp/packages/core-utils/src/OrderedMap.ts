@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { action, computed, observable, makeObservable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 export class OrderedMap<K, V> {
   private readonly indexes = observable.array<K>([], { deep: false });
@@ -84,9 +83,7 @@ export class OrderedMap<K, V> {
   }
 
   sort(comparator: (a: V, B: V) => number): void {
-    const sorted = this.indexes
-      .slice()
-      .sort((a, b) => comparator(this.map.get(a)!, this.map.get(b)!));
+    const sorted = this.indexes.slice().sort((a, b) => comparator(this.map.get(a)!, this.map.get(b)!));
     this.indexes.replace(sorted);
   }
 }

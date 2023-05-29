@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 import { useEffect, useState } from 'react';
 
@@ -39,15 +38,21 @@ export interface IMouseHook<T> {
 export function useMouse<T extends HTMLElement>(options: IOptions = {}): IMouseHook<T> {
   const handlersRef = useObjectRef(options);
   const [reference, setReference] = useState<T | null>(null);
-  const state = useObservableRef<IState>(() => ({
-    mouseEnter: false,
-    position: null,
-  }), {
-    mouseEnter: observable.ref,
-    position: observable,
-  }, false, 'useMouse');
+  const state = useObservableRef<IState>(
+    () => ({
+      mouseEnter: false,
+      position: null,
+    }),
+    {
+      mouseEnter: observable.ref,
+      position: observable,
+    },
+    false,
+    'useMouse',
+  );
 
-  useEffect(() => { // performance heavy
+  useEffect(() => {
+    // performance heavy
     state.mouseEnter = false;
 
     if (!reference) {

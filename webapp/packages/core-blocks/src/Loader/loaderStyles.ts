@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { css } from 'reshadow';
 
 export const loaderStyles = css`
@@ -16,7 +15,7 @@ export const loaderStyles = css`
     justify-content: center;
     align-items: center;
     opacity: 0;
-    transition: opacity cubic-bezier(0.4, 0.0, 0.2, 1) 0.3s;
+    transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
 
     &:global(.animate) {
       opacity: 1;
@@ -84,7 +83,7 @@ export const loaderStyles = css`
     flex-direction: row;
     margin: 0;
     justify-content: left;
-    
+
     & icon {
       width: 24px;
       height: 24px;
@@ -119,21 +118,21 @@ export const loaderStyles = css`
 
   @keyframes rotation {
     from {
-        transform: rotate(0deg);
+      transform: rotate(0deg);
     }
     to {
-        transform: rotate(359deg);
+      transform: rotate(359deg);
     }
   }
 `;
 export const overlayStyles = css`
-    loader {
-      composes: theme-text-on-primary from global;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.4);
-    }
-  `;
+  loader {
+    composes: theme-text-on-primary from global;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+`;

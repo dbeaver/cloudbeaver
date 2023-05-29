@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 export type ResourceAliasOptionsKey = string | number;
@@ -24,12 +23,9 @@ export abstract class ResourceAlias<TKey, TOptions extends ResourceAliasOptions>
     this.options = options;
   }
 
-  isEqual(key: ResourceAlias<TKey, any>): boolean  {
+  isEqual(key: ResourceAlias<TKey, any>): boolean {
     if (isResourceAlias(key)) {
-      return (
-        key.id === this.id
-        && isObjectsEqual(this.options, key.options)
-      );
+      return key.id === this.id && isObjectsEqual(this.options, key.options);
     }
 
     return true;
@@ -47,24 +43,22 @@ export interface ResourceAliasFactory<TKey, TOptions extends ResourceAliasOption
   readonly [options]: TOptions;
 }
 
+export function isResourceAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(data: any): data is ResourceAlias<TKey, TOptions>;
 export function isResourceAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(
   data: any,
+  id: string,
 ): data is ResourceAlias<TKey, TOptions>;
 export function isResourceAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(
   data: any,
-  id: string
+  alias: ResourceAlias<TKey, TOptions>,
 ): data is ResourceAlias<TKey, TOptions>;
 export function isResourceAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(
   data: any,
-  alias: ResourceAlias<TKey, TOptions>
+  factory: ResourceAliasFactory<TKey, TOptions>,
 ): data is ResourceAlias<TKey, TOptions>;
 export function isResourceAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(
   data: any,
-  factory: ResourceAliasFactory<TKey, TOptions>
-): data is ResourceAlias<TKey, TOptions>;
-export function isResourceAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(
-  data: any,
-  id?: ResourceAlias<TKey, TOptions> | ResourceAliasFactory<TKey, TOptions> | string
+  id?: ResourceAlias<TKey, TOptions> | ResourceAliasFactory<TKey, TOptions> | string,
 ): data is ResourceAlias<TKey, TOptions> {
   if (!id || typeof id === 'string') {
     return data instanceof ResourceAlias && (!id || data.id === id);

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import styled, { css, use } from 'reshadow';
@@ -23,45 +22,48 @@ import type { IElementsTreeSettingsProps } from './NavigationTreeSettings/Elemen
 import { NavigationTreeSettings } from './NavigationTreeSettings/NavigationTreeSettings';
 
 const toolsStyles = css`
-    [|primary] {
-      composes: theme-text-primary from global;
+  [|primary] {
+    composes: theme-text-primary from global;
+  }
+  tools {
+    composes: theme-background-surface from global;
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  actions {
+    display: flex;
+    flex-direction: row;
+  }
+  fill {
+    flex: 1;
+  }
+  IconButton {
+    & Icon,
+    & StaticImage {
+      transition: transform 0.3s ease-in-out;
     }
-    tools {
-      composes: theme-background-surface from global;
-      display: block;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-    actions {
-      display: flex;
-      flex-direction: row;
-    }
-    fill {
-      flex: 1;
-    }
-    IconButton {
-      & Icon, & StaticImage {
-        transition: transform .3s ease-in-out;
-      }
 
-      &[|opened] Icon, &[|opened] StaticImage {
-        transform: rotate(180deg);
-      }
+    &[|opened] Icon,
+    &[|opened] StaticImage {
+      transform: rotate(180deg);
+    }
 
-      &[|loading] Icon, &[|loading] StaticImage {
-        animation: rotating 1.5s linear infinite;
-      }
+    &[|loading] Icon,
+    &[|loading] StaticImage {
+      animation: rotating 1.5s linear infinite;
     }
-    @keyframes rotating {
-      from {
-        transform: rotate(0deg);
-      }
-      to {
-        transform: rotate(360deg);
-      }
+  }
+  @keyframes rotating {
+    from {
+      transform: rotate(0deg);
     }
-  `;
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
 
 interface Props {
   tree: IElementsTree;
@@ -69,12 +71,7 @@ interface Props {
   style?: ComponentStyle;
 }
 
-export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(function ElementsTreeTools({
-  tree,
-  settingsElements,
-  style,
-  children,
-}) {
+export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(function ElementsTreeTools({ tree, settingsElements, style, children }) {
   const root = tree.root;
   const translate = useTranslate();
   const [opened, setOpen] = useState(false);
@@ -92,7 +89,7 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
       <actions>
         {tree.settings?.configurable && (
           <IconButton
-            name='/icons/settings_cog_sm.svg'
+            name="/icons/settings_cog_sm.svg"
             title={translate('ui_settings')}
             style={toolsStyles}
             img
@@ -103,7 +100,7 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
         <fill />
         <ElementsTreeToolsMenu tree={tree} />
         <IconButton
-          name='/icons/refresh_sm.svg#root'
+          name="/icons/refresh_sm.svg#root"
           title={translate('app_navigationTree_refresh')}
           style={toolsStyles}
           disabled={loading}
@@ -112,11 +109,9 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
           {...use({ primary: true, loading })}
         />
       </actions>
-      {tree.settings && opened && (
-        <NavigationTreeSettings tree={tree} elements={settingsElements} style={style} />
-      )}
+      {tree.settings && opened && <NavigationTreeSettings tree={tree} elements={settingsElements} style={style} />}
       <ElementsTreeFilter tree={tree} style={style} />
       {children}
-    </tools>
+    </tools>,
   );
 });

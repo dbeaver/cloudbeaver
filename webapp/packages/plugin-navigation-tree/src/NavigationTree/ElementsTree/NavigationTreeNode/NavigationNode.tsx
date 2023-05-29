@@ -5,14 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useDeferredValue, useEffect } from 'react';
-import styled, { use, css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import { getComputed, TreeNode, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { NavNodeManagerService, DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { useDNDData } from '@cloudbeaver/core-ui';
 import { useDataContext } from '@cloudbeaver/core-view';
 
@@ -85,9 +84,12 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   const hasNodes = getComputed(() => !!dndBox.state.context && dndBox.state.canDrop && dndBox.state.isOverCurrent);
   const expanded = useDeferredValue(navNode.expanded || externalExpanded);
 
-  useEffect(() => () => {
-    navNode.setDnDState(dndData, false);
-  }, []);
+  useEffect(
+    () => () => {
+      navNode.setDnDState(dndData, false);
+    },
+    [],
+  );
 
   return styled(useStyles(style, styles))(
     <TreeNode
@@ -117,13 +119,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
         style={style}
         node={node}
       />
-      {expanded && (
-        <NavigationNodeNested
-          nodeId={node.id}
-          path={path}
-          component={component}
-        />
-      )}
-    </TreeNode>
+      {expanded && <NavigationNodeNested nodeId={node.id} path={path} component={component} />}
+    </TreeNode>,
   );
 });

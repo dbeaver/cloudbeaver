@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IMenu } from '../IMenu';
-import type { IMenuSubMenuItemOptions, IMenuSubMenuEvents, IMenuSubMenuItem, MenuSubMenuItemIconComponent } from './IMenuSubMenuItem';
+import type { IMenuSubMenuEvents, IMenuSubMenuItem, IMenuSubMenuItemOptions, MenuSubMenuItemIconComponent } from './IMenuSubMenuItem';
 import { MenuItem } from './MenuItem';
 
 export class MenuSubMenuItem<TExtraProps = unknown> extends MenuItem implements IMenuSubMenuItem<TExtraProps> {
@@ -20,10 +19,7 @@ export class MenuSubMenuItem<TExtraProps = unknown> extends MenuItem implements 
   readonly getExtraProps?: () => TExtraProps;
   readonly iconComponent?: () => MenuSubMenuItemIconComponent<TExtraProps>;
 
-  constructor(
-    options: IMenuSubMenuItemOptions<TExtraProps>,
-    events?: IMenuSubMenuEvents
-  ) {
+  constructor(options: IMenuSubMenuItemOptions<TExtraProps>, events?: IMenuSubMenuEvents) {
     super(options.menu.id);
     this.menu = options.menu;
     this.label = options.label;

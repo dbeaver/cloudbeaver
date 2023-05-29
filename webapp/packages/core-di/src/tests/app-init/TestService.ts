@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '../../injectable';
 
 @injectable()
 export class TestService {
-  sum(a:number, b:number): number {
+  sum(a: number, b: number): number {
     return a + b;
   }
 }

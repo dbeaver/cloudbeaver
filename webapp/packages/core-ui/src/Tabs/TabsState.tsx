@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState } from 'react';
@@ -16,26 +15,27 @@ import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { isNull, isUndefined, MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import type { ITabData, ITabsContainer } from './TabsContainer/ITabsContainer';
-import { TabsContext, ITabsContext } from './TabsContext';
+import { ITabsContext, TabsContext } from './TabsContext';
 import type { TabDirection } from './TabsContext';
 
 type ExtractContainerProps<T> = T extends void ? Record<string, any> : T;
 
-type Props<T = Record<string, any>> = ExtractContainerProps<T> & React.PropsWithChildren<{
-  selectedId?: string;
-  orientation?: 'horizontal' | 'vertical';
-  currentTabId?: string | null;
-  container?: ITabsContainer<T, any>;
-  localState?: MetadataMap<string, any>;
-  lazy?: boolean;
-  manual?: boolean;
-  autoSelect?: boolean;
-  tabList?: string[];
-  enabledBaseActions?: boolean;
-  canClose?: (tab: ITabData<T>) => boolean;
-  onChange?: (tab: ITabData<T>) => void;
-  onClose?: (tab: ITabData<T>) => void;
-}>;
+type Props<T = Record<string, any>> = ExtractContainerProps<T> &
+  React.PropsWithChildren<{
+    selectedId?: string;
+    orientation?: 'horizontal' | 'vertical';
+    currentTabId?: string | null;
+    container?: ITabsContainer<T, any>;
+    localState?: MetadataMap<string, any>;
+    lazy?: boolean;
+    manual?: boolean;
+    autoSelect?: boolean;
+    tabList?: string[];
+    enabledBaseActions?: boolean;
+    canClose?: (tab: ITabData<T>) => boolean;
+    onChange?: (tab: ITabData<T>) => void;
+    onClose?: (tab: ITabData<T>) => void;
+  }>;
 
 export const TabsState = observer(function TabsState<T = Record<string, any>>({
   selectedId,
@@ -63,11 +63,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     displayed = tabList;
   }
 
-  if (
-    !selectedId
-    && (currentTabId === undefined || currentTabId === null)
-    && autoSelect
-  ) {
+  if (!selectedId && (currentTabId === undefined || currentTabId === null) && autoSelect) {
     if (displayed.length > 0) {
       selectedId = displayed[0];
     }
@@ -86,37 +82,34 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     manual,
   });
 
-  const dynamic = useObjectRef(() => ({
-    selectedId: selectedId || currentTabId,
-  }), {
-    canClose,
-    open: onOpen,
-    close: onClose,
-    props,
-    tabsState,
-    container,
-    state,
-    tabList,
-  });
+  const dynamic = useObjectRef(
+    () => ({
+      selectedId: selectedId || currentTabId,
+    }),
+    {
+      canClose,
+      open: onOpen,
+      close: onClose,
+      props,
+      tabsState,
+      container,
+      state,
+      tabList,
+    },
+  );
 
-  if (
-    (
-      !isNull(currentTabId)
-      && !isUndefined(currentTabId)
-    )
-    || !autoSelect
-  ) {
+  if ((!isNull(currentTabId) && !isUndefined(currentTabId)) || !autoSelect) {
     state.selectedId = currentTabId;
     dynamic.selectedId = currentTabId;
   }
 
   if (
-    displayed.length > 0
-    && !isNull(dynamic.selectedId)
-    && !isUndefined(dynamic.selectedId)
-    && !isNull(selectedId)
-    && !isUndefined(selectedId)
-    && autoSelect
+    displayed.length > 0 &&
+    !isNull(dynamic.selectedId) &&
+    !isUndefined(dynamic.selectedId) &&
+    !isNull(selectedId) &&
+    !isUndefined(selectedId) &&
+    autoSelect
   ) {
     const tabExists = displayed.includes(dynamic.selectedId);
 
@@ -131,32 +124,30 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
 
   useExecutor({
     executor: openExecutor,
-    handlers: [function openHandler(data, contexts) {
-      dynamic.open?.(data);
-      if (dynamic.selectedId === data.tabId) {
-        ExecutorInterrupter.interrupt(contexts);
-        return;
-      }
-      dynamic.selectedId = data.tabId;
-      dynamic.state.setSelectedId(data.tabId);
-    }],
+    handlers: [
+      function openHandler(data, contexts) {
+        dynamic.open?.(data);
+        if (dynamic.selectedId === data.tabId) {
+          ExecutorInterrupter.interrupt(contexts);
+          return;
+        }
+        dynamic.selectedId = data.tabId;
+        dynamic.state.setSelectedId(data.tabId);
+      },
+    ],
   });
 
   useExecutor({
     executor: closeExecutor,
-    handlers: [function closeHandler(data) {
-      dynamic.close?.(data);
-    }],
+    handlers: [
+      function closeHandler(data) {
+        dynamic.close?.(data);
+      },
+    ],
   });
 
   useEffect(() => {
-    if (
-      (
-        !isNull(currentTabId)
-        && !isUndefined(currentTabId)
-      )
-      || !autoSelect
-    ) {
+    if ((!isNull(currentTabId) && !isUndefined(currentTabId)) || !autoSelect) {
       return;
     }
 
@@ -167,10 +158,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   }, [currentTabId, state.selectedId, autoSelect]);
 
   useEffect(() => {
-    if (
-      !isNull(state.selectedId)
-      && !isUndefined(state.selectedId)
-    ) {
+    if (!isNull(state.selectedId) && !isUndefined(state.selectedId)) {
       openExecutor.execute({
         tabId: state.selectedId,
         props,
@@ -178,111 +166,105 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     }
   }, [!isNull(state.selectedId) && !isUndefined(state.selectedId)]);
 
-  const value = useObservableRef<ITabsContext<T>>(() => ({
-    canClose(tabId) {
-      return dynamic.canClose?.({
-        tabId,
-        props: dynamic.props,
-      }) ?? true;
-    },
-    getTabInfo(tabId: string) {
-      return dynamic.container?.getTabInfo(tabId);
-    },
-    getTabState(tabId: string, valueGetter?: MetadataValueGetter<string, any>) {
-      return dynamic.container?.getTabState(
-        dynamic.tabsState,
-        tabId,
-        dynamic.props,
-        valueGetter
-      );
-    },
-    getLocalState(tabId: string, valueGetter?: MetadataValueGetter<string, any>) {
-      return dynamic.tabsState.get(
-        tabId,
-        valueGetter
-      );
-    },
-    async open(tabId: string) {
-      await openExecutor.execute({
-        tabId,
-        props: dynamic.props,
-      });
-    },
-    async close(tabId: string) {
-      if (!this.canClose(tabId)) {
-        return;
-      }
-
-      await closeExecutor.execute({
-        tabId,
-        props: dynamic.props,
-      });
-    },
-    async closeAll() {
-      if (dynamic.tabList) {
-        for (const tab of dynamic.tabList.slice()) {
-          await this.close(tab);
-        }
-      }
-    },
-    async closeAllToTheDirection(tabId: string, direction: TabDirection) {
-      if (dynamic.tabList) {
-        const index = dynamic.tabList.indexOf(tabId);
-
-        if (index === -1) {
+  const value = useObservableRef<ITabsContext<T>>(
+    () => ({
+      canClose(tabId) {
+        return (
+          dynamic.canClose?.({
+            tabId,
+            props: dynamic.props,
+          }) ?? true
+        );
+      },
+      getTabInfo(tabId: string) {
+        return dynamic.container?.getTabInfo(tabId);
+      },
+      getTabState(tabId: string, valueGetter?: MetadataValueGetter<string, any>) {
+        return dynamic.container?.getTabState(dynamic.tabsState, tabId, dynamic.props, valueGetter);
+      },
+      getLocalState(tabId: string, valueGetter?: MetadataValueGetter<string, any>) {
+        return dynamic.tabsState.get(tabId, valueGetter);
+      },
+      async open(tabId: string) {
+        await openExecutor.execute({
+          tabId,
+          props: dynamic.props,
+        });
+      },
+      async close(tabId: string) {
+        if (!this.canClose(tabId)) {
           return;
         }
 
-        const tabs = direction === 'left' ? dynamic.tabList.slice(0, index) : dynamic.tabList.slice(index + 1);
-
-        for (const tab of tabs) {
-          await this.close(tab);
+        await closeExecutor.execute({
+          tabId,
+          props: dynamic.props,
+        });
+      },
+      async closeAll() {
+        if (dynamic.tabList) {
+          for (const tab of dynamic.tabList.slice()) {
+            await this.close(tab);
+          }
         }
-      }
-    },
-    async closeOthers(tabId: string) {
-      if (dynamic.tabList) {
-        const tabs = dynamic.tabList.filter(tab => tab !== tabId);
-        for (const tab of tabs) {
-          await this.close(tab);
-        }
-      }
-    },
-  }), {
-    state: observable.ref,
-    tabsState: observable.ref,
-    props: observable.ref,
-    container: observable.ref,
-    openExecutor: observable.ref,
-    closeExecutor: observable.ref,
-    lazy: observable.ref,
-    closable: observable.ref,
-    tabList: observable.ref,
-    enabledBaseActions: observable.ref,
-    getTabInfo: action.bound,
-    getTabState: action.bound,
-    getLocalState: action.bound,
-    open: action.bound,
-    close: action.bound,
-    closeAll: action.bound,
-    closeAllToTheDirection: action.bound,
-    closeOthers: action.bound,
-  }, {
-    state,
-    tabsState,
-    props,
-    container,
-    openExecutor,
-    closeExecutor,
-    lazy,
-    closable,
-    tabList,
-    enabledBaseActions,
-  });
+      },
+      async closeAllToTheDirection(tabId: string, direction: TabDirection) {
+        if (dynamic.tabList) {
+          const index = dynamic.tabList.indexOf(tabId);
 
-  return (
-    <TabsContext.Provider value={value}>
-      {children}
-    </TabsContext.Provider>
+          if (index === -1) {
+            return;
+          }
+
+          const tabs = direction === 'left' ? dynamic.tabList.slice(0, index) : dynamic.tabList.slice(index + 1);
+
+          for (const tab of tabs) {
+            await this.close(tab);
+          }
+        }
+      },
+      async closeOthers(tabId: string) {
+        if (dynamic.tabList) {
+          const tabs = dynamic.tabList.filter(tab => tab !== tabId);
+          for (const tab of tabs) {
+            await this.close(tab);
+          }
+        }
+      },
+    }),
+    {
+      state: observable.ref,
+      tabsState: observable.ref,
+      props: observable.ref,
+      container: observable.ref,
+      openExecutor: observable.ref,
+      closeExecutor: observable.ref,
+      lazy: observable.ref,
+      closable: observable.ref,
+      tabList: observable.ref,
+      enabledBaseActions: observable.ref,
+      getTabInfo: action.bound,
+      getTabState: action.bound,
+      getLocalState: action.bound,
+      open: action.bound,
+      close: action.bound,
+      closeAll: action.bound,
+      closeAllToTheDirection: action.bound,
+      closeOthers: action.bound,
+    },
+    {
+      state,
+      tabsState,
+      props,
+      container,
+      openExecutor,
+      closeExecutor,
+      lazy,
+      closable,
+      tabList,
+      enabledBaseActions,
+    },
   );
+
+  return <TabsContext.Provider value={value}>{children}</TabsContext.Provider>;
 });

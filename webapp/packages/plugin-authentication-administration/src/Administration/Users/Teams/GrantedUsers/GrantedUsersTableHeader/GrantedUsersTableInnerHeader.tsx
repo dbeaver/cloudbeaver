@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 
 import { TableColumnHeader, TableHeader, TableSelect, useTranslate } from '@cloudbeaver/core-blocks';
@@ -21,7 +20,7 @@ export const GrantedUsersTableInnerHeader = observer<Props>(function GrantedUser
   return (
     <TableHeader className={className} fixed>
       <TableColumnHeader min>
-        <TableSelect id='selectUsers' disabled={disabled} />
+        <TableSelect id="selectUsers" disabled={disabled} />
       </TableColumnHeader>
       <TableColumnHeader min />
       <TableColumnHeader>{translate('administration_teams_team_granted_users_user_id')}</TableColumnHeader>

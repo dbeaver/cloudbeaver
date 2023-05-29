@@ -5,16 +5,30 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES, ConfigurationWizardService } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, GroupItem, GroupTitle, ToolsAction, Loader, Placeholder, SubmittingForm, useFocus, useFormValidator, ToolsPanel, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentComponent, ConfigurationWizardService } from '@cloudbeaver/core-administration';
+import {
+  BASE_CONTAINERS_STYLES,
+  ColoredContainer,
+  Container,
+  Group,
+  GroupItem,
+  GroupTitle,
+  Loader,
+  Placeholder,
+  SubmittingForm,
+  ToolsAction,
+  ToolsPanel,
+  useFocus,
+  useFormValidator,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-
 
 import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm';
 import { ServerConfigurationFeaturesForm } from './Form/ServerConfigurationFeaturesForm';
@@ -42,9 +56,7 @@ const styles = css`
   }
 `;
 
-export const ServerConfigurationPage: AdministrationItemContentComponent = observer(function ServerConfigurationPage({
-  configurationWizard,
-}) {
+export const ServerConfigurationPage: AdministrationItemContentComponent = observer(function ServerConfigurationPage({ configurationWizard }) {
   const translate = useTranslate();
   const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES, BASE_CONTAINERS_STYLES);
   const [focusedRef, state] = useFocus<HTMLFormElement>({ focusFirstChild: true });
@@ -86,7 +98,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   }
 
   return styled(style)(
-    <SubmittingForm ref={focusedRef} name='server_config' onChange={handleChange}>
+    <SubmittingForm ref={focusedRef} name="server_config" onChange={handleChange}>
       {!configurationWizard && (
         <ToolsPanel>
           <ToolsAction
@@ -121,33 +133,27 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
           </Group>
         )}
         <Loader state={service}>
-          {() => styled(style)(
-            <Loader suspense>
-              <Container wrap gap grid medium>
-                <ServerConfigurationInfoForm state={service.state} />
-                <Group form gap>
-                  <GroupTitle>{translate('administration_configuration_wizard_configuration_plugins')}</GroupTitle>
-                  <ServerConfigurationConfigurationForm serverConfig={service.state.serverConfig} />
-                  <ServerConfigurationNavigatorViewForm configs={service.state} />
-                  <ServerConfigurationFeaturesForm state={service.state} configurationWizard={configurationWizard} />
-                  <Placeholder
-                    container={service.pluginsContainer}
-                    configurationWizard={configurationWizard}
-                    state={service.state}
-                  />
-                </Group>
-                <Placeholder
-                  container={service.configurationContainer}
-                  configurationWizard={configurationWizard}
-                  state={service.state}
-                />
-                <ServerConfigurationSecurityForm serverConfig={service.state.serverConfig} />
-                <ServerConfigurationDriversForm serverConfig={service.state.serverConfig} />
-              </Container>
-            </Loader>
-          )}
+          {() =>
+            styled(style)(
+              <Loader suspense>
+                <Container wrap gap grid medium>
+                  <ServerConfigurationInfoForm state={service.state} />
+                  <Group form gap>
+                    <GroupTitle>{translate('administration_configuration_wizard_configuration_plugins')}</GroupTitle>
+                    <ServerConfigurationConfigurationForm serverConfig={service.state.serverConfig} />
+                    <ServerConfigurationNavigatorViewForm configs={service.state} />
+                    <ServerConfigurationFeaturesForm state={service.state} configurationWizard={configurationWizard} />
+                    <Placeholder container={service.pluginsContainer} configurationWizard={configurationWizard} state={service.state} />
+                  </Group>
+                  <Placeholder container={service.configurationContainer} configurationWizard={configurationWizard} state={service.state} />
+                  <ServerConfigurationSecurityForm serverConfig={service.state.serverConfig} />
+                  <ServerConfigurationDriversForm serverConfig={service.state.serverConfig} />
+                </Container>
+              </Loader>,
+            )
+          }
         </Loader>
       </ColoredContainer>
-    </SubmittingForm>
+    </SubmittingForm>,
   );
 });

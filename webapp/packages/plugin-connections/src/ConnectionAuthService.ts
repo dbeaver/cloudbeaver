@@ -5,9 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { AuthProviderService } from '@cloudbeaver/core-authentication';
-import { Connection, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import {
+  Connection,
+  ConnectionInfoResource,
+  ConnectionsManagerService,
+  createConnectionParam,
+  IConnectionInfoParams,
+} from '@cloudbeaver/core-connections';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -30,17 +35,12 @@ export class ConnectionAuthService extends Dependency {
 
     connectionsManagerService.connectionExecutor.addHandler(this.connectionDialog.bind(this));
     this.authenticationService.onLogout.before(connectionsManagerService.onDisconnect, state => ({
-      connections: connectionInfoResource.values
-        .filter(connection => connection.connected)
-        .map(createConnectionParam),
+      connections: connectionInfoResource.values.filter(connection => connection.connected).map(createConnectionParam),
       state,
     }));
   }
 
-  private async connectionDialog(
-    connectionKey: IConnectionInfoParams,
-    context: IExecutionContextProvider<IConnectionInfoParams | null>
-  ) {
+  private async connectionDialog(connectionKey: IConnectionInfoParams, context: IExecutionContextProvider<IConnectionInfoParams | null>) {
     const connection = context.getContext(this.connectionsManagerService.connectionContext);
 
     try {
@@ -84,8 +84,8 @@ export class ConnectionAuthService extends Dependency {
 
     connection = await this.connectionInfoResource.load(key, ['includeAuthNeeded', 'includeNetworkHandlersConfig', 'includeCredentialsSaved']);
 
-    const networkHandlers = connection.networkHandlersConfig!
-      .filter(handler => handler.enabled && (!handler.savePassword || resetCredentials))
+    const networkHandlers = connection
+      .networkHandlersConfig!.filter(handler => handler.enabled && (!handler.savePassword || resetCredentials))
       .map(handler => handler.id);
 
     if (connection.authNeeded || (connection.credentialsSaved && resetCredentials) || networkHandlers.length > 0) {

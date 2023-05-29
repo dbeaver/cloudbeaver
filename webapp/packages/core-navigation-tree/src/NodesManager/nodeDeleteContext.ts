@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { ResourceKey } from '@cloudbeaver/core-sdk';
 
@@ -14,10 +13,7 @@ export interface INodeDeleteContext {
   confirm(): void;
 }
 
-export function nodeDeleteContext(
-  contexts: IExecutionContextProvider<ResourceKey<string>>,
-  data: ResourceKey<string>
-): INodeDeleteContext {
+export function nodeDeleteContext(contexts: IExecutionContextProvider<ResourceKey<string>>, data: ResourceKey<string>): INodeDeleteContext {
   return {
     confirmed: false,
     confirm() {

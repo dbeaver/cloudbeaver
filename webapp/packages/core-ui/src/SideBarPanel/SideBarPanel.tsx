@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -27,7 +26,7 @@ const tabsStyles = css`
     overflow: auto;
   }
   Tab {
-    height: 36px!important;
+    height: 36px !important;
     font-weight: 500 !important;
   }
   TabPanel {
@@ -74,6 +73,6 @@ export const SideBarPanel = observer<Props>(function SideBarPanel({ container })
           <TabPanelList style={tabStyle} />
         </content-box>
       </box>
-    </TabsState>
+    </TabsState>,
   );
 });

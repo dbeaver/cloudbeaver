@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { GraphQLService, WsSocketConnectedEvent } from '@cloudbeaver/core-sdk';
@@ -17,10 +16,7 @@ import { ServerEventId, SessionEventSource } from './SessionEventSource';
 export class ServerNodeService extends Dependency {
   private applicationRunId: string | null;
   onApplicationRunIdChange: IExecutor;
-  constructor(
-    private readonly graphQLService: GraphQLService,
-    private readonly sessionEventSource: SessionEventSource
-  ) {
+  constructor(private readonly graphQLService: GraphQLService, private readonly sessionEventSource: SessionEventSource) {
     super();
     this.onApplicationRunIdChange = new Executor();
     this.applicationRunId = null;

@@ -5,14 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import {
-  ListItem, ListItemIcon, StaticImage, ListItemName, ListItemDescription
-} from '@cloudbeaver/core-blocks';
+import { ListItem, ListItemDescription, ListItemIcon, ListItemName, StaticImage } from '@cloudbeaver/core-blocks';
 import type { DBDriver } from '@cloudbeaver/core-connections';
 
 const styles = css`
@@ -33,9 +30,11 @@ export const Driver = observer<Props>(function Driver({ driver, onSelect }) {
 
   return styled(styles)(
     <ListItem onClick={select}>
-      <ListItemIcon><StaticImage icon={driver.icon} /></ListItemIcon>
+      <ListItemIcon>
+        <StaticImage icon={driver.icon} />
+      </ListItemIcon>
       <ListItemName>{driver.name}</ListItemName>
       <ListItemDescription title={driver.description}>{driver.description}</ListItemDescription>
-    </ListItem>
+    </ListItem>,
   );
 });

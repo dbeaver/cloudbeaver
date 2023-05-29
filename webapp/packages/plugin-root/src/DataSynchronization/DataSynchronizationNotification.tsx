@@ -5,13 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import {
-  Button, SnackbarWrapper, SnackbarStatus, SnackbarContent, SnackbarBody, SnackbarFooter, useTranslate
-} from '@cloudbeaver/core-blocks';
+import { Button, SnackbarBody, SnackbarContent, SnackbarFooter, SnackbarStatus, SnackbarWrapper, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationComponentProps } from '@cloudbeaver/core-events';
 import { DataSynchronizationService } from '@cloudbeaver/core-root';
@@ -29,7 +26,7 @@ const styles = css`
     flex-direction: column;
     gap: 8px;
 
-    &> div {
+    & > div {
       word-break: break-word;
       white-space: pre-line;
     }
@@ -40,15 +37,10 @@ const styles = css`
   }
 `;
 
-export const DataSynchronizationNotification = observer<NotificationComponentProps>(function DataSynchronizationNotification({
-  notification,
-}) {
+export const DataSynchronizationNotification = observer<NotificationComponentProps>(function DataSynchronizationNotification({ notification }) {
   const dataSynchronizationService = useService(DataSynchronizationService);
   const translate = useTranslate();
-  const groups = objectValues(groupBy(
-    Array.from(dataSynchronizationService.queue.values()),
-    message => message.label
-  ));
+  const groups = objectValues(groupBy(Array.from(dataSynchronizationService.queue.values()), message => message.label));
 
   function applyChanges() {
     dataSynchronizationService.resolveAll(true);
@@ -75,7 +67,6 @@ export const DataSynchronizationNotification = observer<NotificationComponentPro
           </Button>
         </SnackbarFooter>
       </SnackbarContent>
-    </SnackbarWrapper>
-
+    </SnackbarWrapper>,
   );
 });

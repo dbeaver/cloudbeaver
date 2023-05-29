@@ -5,15 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 
 import { TeamsResource } from './TeamsResource';
 
 @injectable()
 export class TeamsManagerService {
-  constructor(
-    readonly teams: TeamsResource
-  ) {
-  }
+  constructor(readonly teams: TeamsResource) {}
 }

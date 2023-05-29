@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
-import styled, { use, css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
@@ -47,16 +46,12 @@ export const BooleanFormatter = observer<FormatterProps<IResultSetRowKey>>(funct
   const formatter = tableDataContext.format;
   const rawValue = useMemo(
     () => computed(() => formatter.get(tableDataContext.getCellValue(cellContext!.cell!)!)),
-    [tableDataContext, cellContext.cell, formatter]
+    [tableDataContext, cellContext.cell, formatter],
   ).get();
   const value = typeof rawValue === 'string' ? rawValue.toLowerCase() === 'true' : rawValue;
   const stringifiedValue = formatter.toDisplayString(value);
   const valueRepresentation = value === null ? stringifiedValue : `[${value ? 'v' : ' '}]`;
-  const disabled = (
-    !column.editable
-    || editingContext.readonly
-    || formatter.isReadOnly(cellContext.cell)
-  );
+  const disabled = !column.editable || editingContext.readonly || formatter.isReadOnly(cellContext.cell);
 
   function toggleValue() {
     if (disabled || !tableDataContext || !cellContext.cell) {
@@ -76,12 +71,12 @@ export const BooleanFormatter = observer<FormatterProps<IResultSetRowKey>>(funct
   return styled(styles)(
     <boolean-formatter
       className={value === null ? 'cell-null' : undefined}
-      as='span'
+      as="span"
       title={stringifiedValue}
       onClick={toggleValue}
       {...use({ disabled, boolean: value !== null })}
     >
       {valueRepresentation}
-    </boolean-formatter>
+    </boolean-formatter>,
   );
 });

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
@@ -13,22 +12,21 @@ import styled, { css } from 'reshadow';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import {
-  Table,
-  TableBody,
-  TableItem,
-  TableColumnValue,
   BASE_CONTAINERS_STYLES,
-  Group,
   Button,
-  useObjectRef,
   getComputed,
   getSelectedItems,
-  useTranslate,
+  Group,
+  Table,
+  TableBody,
+  TableColumnValue,
+  TableItem,
+  useObjectRef,
   useStyles,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
-
 
 import { getFilteredUsers } from './getFilteredUsers';
 import { GrantedUsersTableHeader, IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader';
@@ -36,27 +34,29 @@ import { GrantedUsersTableInnerHeader } from './GrantedUsersTableHeader/GrantedU
 import { GrantedUsersTableItem } from './GrantedUsersTableItem';
 
 const styles = css`
-    Table {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-    Group {
-      position: relative;
-    }
-    Group, container, table-container {
-      height: 100%;
-    }
-    container {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-    }
-    table-container {
-      overflow: auto;
-    }
-    GrantedUsersTableHeader {
-      flex: 0 0 auto;
-    }
-  `;
+  Table {
+    composes: theme-background-surface theme-text-on-surface from global;
+  }
+  Group {
+    position: relative;
+  }
+  Group,
+  container,
+  table-container {
+    height: 100%;
+  }
+  container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  table-container {
+    overflow: auto;
+  }
+  GrantedUsersTableHeader {
+    flex: 0 0 auto;
+  }
+`;
 
 interface Props {
   userList: AdminUserInfoFragment[];
@@ -65,12 +65,7 @@ interface Props {
   onGrant: (subjectIds: string[]) => void;
 }
 
-export const UserList = observer<Props>(function UserList({
-  userList,
-  grantedUsers,
-  disabled,
-  onGrant,
-}) {
+export const UserList = observer<Props>(function UserList({ userList, grantedUsers, disabled, onGrant }) {
   const props = useObjectRef({ onGrant });
   const style = useStyles(styles, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
@@ -94,7 +89,9 @@ export const UserList = observer<Props>(function UserList({
     <Group box medium overflow>
       <container>
         <GrantedUsersTableHeader filterState={filterState} disabled={disabled}>
-          <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>{translate('ui_add')}</Button>
+          <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>
+            {translate('ui_add')}
+          </Button>
         </GrantedUsersTableHeader>
         <table-container>
           <Table
@@ -105,10 +102,8 @@ export const UserList = observer<Props>(function UserList({
             <GrantedUsersTableInnerHeader disabled={disabled} />
             <TableBody>
               {!users.length && filterState.filterValue && (
-                <TableItem item='tableInfo' selectDisabled>
-                  <TableColumnValue colSpan={5}>
-                    {translate('ui_search_no_result_placeholder')}
-                  </TableColumnValue>
+                <TableItem item="tableInfo" selectDisabled>
+                  <TableColumnValue colSpan={5}>{translate('ui_search_no_result_placeholder')}</TableColumnValue>
                 </TableItem>
               )}
               {users.map(user => {
@@ -119,7 +114,7 @@ export const UserList = observer<Props>(function UserList({
                     id={user.userId}
                     name={`${user.userId}${activeUser ? ' (you)' : ''}`}
                     tooltip={activeUser ? translate('administration_teams_team_granted_users_permission_denied') : user.userId}
-                    icon='/icons/user.svg'
+                    icon="/icons/user.svg"
                     iconTooltip={translate('authentication_user_icon_tooltip')}
                     disabled={disabled}
                   />
@@ -129,6 +124,6 @@ export const UserList = observer<Props>(function UserList({
           </Table>
         </table-container>
       </container>
-    </Group>
+    </Group>,
   );
 });

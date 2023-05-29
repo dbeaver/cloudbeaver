@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
 import styled, { css } from 'reshadow';
@@ -51,11 +50,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ className,
   const editingContext = useContext(EditingContext);
   const [menuVisible, setMenuVisible] = useState(false);
   const isEditing = cellContext.isEditing;
-  const showCellMenu = getComputed(() => !isEditing && (
-    rest.isCellSelected
-    || cellContext.mouse.state.mouseEnter
-    || menuVisible
-  ));
+  const showCellMenu = getComputed(() => !isEditing && (rest.isCellSelected || cellContext.mouse.state.mouseEnter || menuVisible));
 
   const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
     edit(position) {
@@ -73,7 +68,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ className,
       <formatter-container>
         <CellFormatterFactory {...rest} isEditing={isEditing} />
       </formatter-container>
-      {showCellMenu && cellContext.cell && !rest.isScrolling  && (
+      {showCellMenu && cellContext.cell && !rest.isScrolling && (
         <menu-container>
           <CellMenu
             cellKey={cellContext.cell}
@@ -86,6 +81,6 @@ export const CellFormatter = observer<Props>(function CellFormatter({ className,
           />
         </menu-container>
       )}
-    </formatter-wrapper>
+    </formatter-wrapper>,
   );
 });

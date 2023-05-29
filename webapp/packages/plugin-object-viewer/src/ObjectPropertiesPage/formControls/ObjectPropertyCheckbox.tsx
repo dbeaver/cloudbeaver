@@ -5,12 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { Checkbox, useStyles } from '@cloudbeaver/core-blocks';
-
 
 import { additionalProps, getValue, matchType } from '../helpers';
 import type { ObjectPropertyProps } from './ObjectPropertyProps';
@@ -44,9 +42,7 @@ const styles = css`
   }
 `;
 
-export const ObjectPropertyCheckbox = observer<ObjectPropertyProps>(function ObjectPropertyCheckbox({
-  objectProperty,
-}) {
+export const ObjectPropertyCheckbox = observer<ObjectPropertyProps>(function ObjectPropertyCheckbox({ objectProperty }) {
   const style = useStyles(styles);
   if (!objectProperty) {
     return null;
@@ -55,15 +51,13 @@ export const ObjectPropertyCheckbox = observer<ObjectPropertyProps>(function Obj
   return styled(style)(
     <form-checkbox as="div">
       <label-wrapper as="div">
-        <label htmlFor={objectProperty.id} title={objectProperty.displayName}>{objectProperty.displayName}</label>
+        <label htmlFor={objectProperty.id} title={objectProperty.displayName}>
+          {objectProperty.displayName}
+        </label>
       </label-wrapper>
       <input-wrapper as="div">
         {matchType(objectProperty.dataType) === 'checkbox' ? (
-          <Checkbox
-            value={getValue(objectProperty.value as any)}
-            {...additionalProps(objectProperty)}
-            readOnly
-          />
+          <Checkbox value={getValue(objectProperty.value as any)} {...additionalProps(objectProperty)} readOnly />
         ) : (
           <input
             type={matchType(objectProperty.dataType)}
@@ -73,6 +67,6 @@ export const ObjectPropertyCheckbox = observer<ObjectPropertyProps>(function Obj
           />
         )}
       </input-wrapper>
-    </form-checkbox>
+    </form-checkbox>,
   );
 });

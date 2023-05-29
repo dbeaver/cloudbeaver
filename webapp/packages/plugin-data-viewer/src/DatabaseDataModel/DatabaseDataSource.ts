@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, makeObservable, action, toJS } from 'mobx';
+import { action, makeObservable, observable, toJS } from 'mobx';
 
 import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
@@ -18,8 +17,7 @@ import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
-export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult>
-implements IDatabaseDataSource<TOptions, TResult> {
+export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult> implements IDatabaseDataSource<TOptions, TResult> {
   access: DatabaseDataAccessMode;
   dataFormat: ResultDataFormat;
   supportedDataFormats: ResultDataFormat[];
@@ -36,6 +34,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   outdated: boolean;
 
   abstract get canCancel(): boolean;
+  abstract get cancelled(): boolean;
 
   readonly serviceInjector: IServiceInjector;
   protected disabled: boolean;
@@ -98,15 +97,15 @@ implements IDatabaseDataSource<TOptions, TResult> {
 
   tryGetAction<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
-    action: IDatabaseDataActionClass<TOptions, TResult, T>
+    action: IDatabaseDataActionClass<TOptions, TResult, T>,
   ): T | undefined;
   tryGetAction<T extends IDatabaseDataAction<TOptions, TResult>>(
     result: TResult,
-    action: IDatabaseDataActionClass<TOptions, TResult, T>
+    action: IDatabaseDataActionClass<TOptions, TResult, T>,
   ): T | undefined;
   tryGetAction<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number | TResult,
-    action: IDatabaseDataActionClass<TOptions, TResult, T>
+    action: IDatabaseDataActionClass<TOptions, TResult, T>,
   ): T | undefined {
     if (typeof resultIndex === 'number') {
       if (!this.hasResult(resultIndex)) {
@@ -118,17 +117,11 @@ implements IDatabaseDataSource<TOptions, TResult> {
     return this.actions.tryGet(resultIndex, action);
   }
 
-  getAction<T extends IDatabaseDataAction<TOptions, TResult>>(
-    resultIndex: number,
-    action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ): T;
-  getAction<T extends IDatabaseDataAction<TOptions, TResult>>(
-    result: TResult,
-    action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ): T;
+  getAction<T extends IDatabaseDataAction<TOptions, TResult>>(resultIndex: number, action: IDatabaseDataActionClass<TOptions, TResult, T>): T;
+  getAction<T extends IDatabaseDataAction<TOptions, TResult>>(result: TResult, action: IDatabaseDataActionClass<TOptions, TResult, T>): T;
   getAction<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number | TResult,
-    action: IDatabaseDataActionClass<TOptions, TResult, T>
+    action: IDatabaseDataActionClass<TOptions, TResult, T>,
   ): T {
     if (typeof resultIndex === 'number') {
       if (!this.hasResult(resultIndex)) {
@@ -142,15 +135,15 @@ implements IDatabaseDataSource<TOptions, TResult> {
 
   getActionImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number,
-    action: IDatabaseDataActionInterface<TOptions, TResult, T>
+    action: IDatabaseDataActionInterface<TOptions, TResult, T>,
   ): T | undefined;
   getActionImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
     result: TResult,
-    action: IDatabaseDataActionInterface<TOptions, TResult, T>
+    action: IDatabaseDataActionInterface<TOptions, TResult, T>,
   ): T | undefined;
   getActionImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
     resultIndex: number | TResult,
-    action: IDatabaseDataActionInterface<TOptions, TResult, T>
+    action: IDatabaseDataActionInterface<TOptions, TResult, T>,
   ): T | undefined {
     if (typeof resultIndex === 'number') {
       if (!this.hasResult(resultIndex)) {
@@ -192,10 +185,7 @@ implements IDatabaseDataSource<TOptions, TResult> {
   }
 
   isReadonly(resultIndex: number): boolean {
-    return this.access === DatabaseDataAccessMode.Readonly
-      || this.results.length > 1
-      || !this.executionContext?.context
-      || this.disabled;
+    return this.access === DatabaseDataAccessMode.Readonly || this.results.length > 1 || !this.executionContext?.context || this.disabled;
   }
 
   isLoading(): boolean {
@@ -254,19 +244,19 @@ implements IDatabaseDataSource<TOptions, TResult> {
     if (this.activeTask) {
       try {
         await this.activeTask;
-      } catch { }
+      } catch {}
     }
 
     if (this.activeSave) {
       try {
         await this.activeSave;
-      } catch { }
+      } catch {}
     }
 
     if (this.activeRequest) {
       try {
         await this.activeRequest;
-      } catch { }
+      } catch {}
     }
 
     this.activeTask = task();
@@ -282,7 +272,8 @@ implements IDatabaseDataSource<TOptions, TResult> {
     if (this.activeSave) {
       try {
         await this.activeSave;
-      } finally { }
+      } finally {
+      }
     }
 
     if (this.activeRequest) {
@@ -316,7 +307,8 @@ implements IDatabaseDataSource<TOptions, TResult> {
     if (this.activeRequest) {
       try {
         await this.activeRequest;
-      } finally { }
+      } finally {
+      }
     }
 
     if (this.activeSave) {

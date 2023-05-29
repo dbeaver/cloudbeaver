@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
@@ -41,9 +40,7 @@ export const CellMenu = observer<Props>(function CellMenu({
 }) {
   const dataGridContextMenuService = useService(DataGridContextMenuService);
 
-  const panel = dataGridContextMenuService.constructMenuWithContext(
-    model, actions, spreadsheetActions, resultIndex, cellKey, simple
-  );
+  const panel = dataGridContextMenuService.constructMenuWithContext(model, actions, spreadsheetActions, resultIndex, cellKey, simple);
 
   if (!panel.menuItems.length || panel.menuItems.every(item => item.isHidden)) {
     return null;
@@ -63,20 +60,10 @@ export const CellMenu = observer<Props>(function CellMenu({
   }
 
   return styled(cellMenuStyles)(
-    <cell-menu
-      as='div'
-      onMouseUp={markStopPropagation}
-      onDoubleClick={stopPropagation}
-    >
-      <MenuTrigger
-        panel={panel}
-        style={[cellMenuStyles]}
-        modal
-        onClick={handleClick}
-        onVisibleSwitch={onStateSwitch}
-      >
+    <cell-menu as="div" onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
+      <MenuTrigger panel={panel} style={[cellMenuStyles]} modal onClick={handleClick} onVisibleSwitch={onStateSwitch}>
         <Icon name="snack" viewBox="0 0 16 10" />
       </MenuTrigger>
-    </cell-menu>
+    </cell-menu>,
   );
 });

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
@@ -44,11 +43,14 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
   hideEmptyPlaceholder,
   onFocus,
 }) {
-  const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
-    if (onFocus) {
-      onFocus(e.target.name);
-    }
-  }, [onFocus]);
+  const handleFocus = useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      if (onFocus) {
+        onFocus(e.target.name);
+      }
+    },
+    [onFocus],
+  );
 
   if (properties.length === 0 && !hideEmptyPlaceholder) {
     return <TextPlaceholder>Properties empty</TextPlaceholder>;

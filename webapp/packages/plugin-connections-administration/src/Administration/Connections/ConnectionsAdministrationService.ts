@@ -5,13 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React from 'react';
 
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
@@ -55,7 +54,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
     private readonly dbDriverResource: DBDriverResource,
     private readonly createConnectionService: CreateConnectionService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly serverConfigResource: ServerConfigResource
+    private readonly serverConfigResource: ServerConfigResource,
   ) {
     super();
   }
@@ -88,13 +87,9 @@ export class ConnectionsAdministrationService extends Bootstrap {
     this.connectionDetailsPlaceholder.add(SSH, 2);
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 
-  private async refreshUserConnections(
-    configuration: boolean,
-    outside: boolean,
-    outsideAdminPage: boolean
-  ): Promise<void> {
+  private async refreshUserConnections(configuration: boolean, outside: boolean, outsideAdminPage: boolean): Promise<void> {
     // TODO: we have to track users' leaving the page
     if (outside) {
       this.connectionInfoResource.cleanNewFlags();

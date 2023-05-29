@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -20,7 +19,7 @@ export class DataViewerDataChangeConfirmationService {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly dataViewerTableService: TableViewerStorageService,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
   ) {
     this.checkUnsavedData = this.checkUnsavedData.bind(this);
   }
@@ -33,12 +32,7 @@ export class DataViewerDataChangeConfirmationService {
     }
   }
 
-  private async checkUnsavedData({
-    type,
-    model,
-  }: IRequestEventData<any, any>,
-  contexts: IExecutionContextProvider<IRequestEventData<any, any>>
-  ) {
+  private async checkUnsavedData({ type, model }: IRequestEventData<any, any>, contexts: IExecutionContextProvider<IRequestEventData<any, any>>) {
     if (type === 'before') {
       const confirmationContext = contexts.getContext(SaveConfirmedContext);
 
@@ -50,10 +44,7 @@ export class DataViewerDataChangeConfirmationService {
 
       try {
         for (let resultIndex = 0; resultIndex < results.length; resultIndex++) {
-          const editor = model.source.getActionImplementation(
-            resultIndex,
-            DatabaseEditAction
-          );
+          const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
 
           if (editor?.isEdited() && model.source.executionContext?.context) {
             if (confirmationContext.confirmed) {
@@ -85,7 +76,7 @@ export class DataViewerDataChangeConfirmationService {
   }
 }
 
-interface ISaveConfirmedContext{
+interface ISaveConfirmedContext {
   confirmed: boolean | null;
   setConfirmed: (state: boolean) => void;
 }

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { css } from 'reshadow';
 
 export const InlineEditorStyles = css`
@@ -24,7 +23,8 @@ export const InlineEditorStyles = css`
     border: solid 1px;
   }
 
-  editor:focus-within, editor[|active] {
+  editor:focus-within,
+  editor[|active] {
     border-color: #52c41a !important;
   }
 
@@ -35,7 +35,9 @@ export const InlineEditorStyles = css`
     display: flex;
     box-sizing: border-box;
 
-    & input, & input[disabled], & input[readonly] {
+    & input,
+    & input[disabled],
+    & input[readonly] {
       border: none;
       border-radius: unset;
       width: 100%;
@@ -44,7 +46,7 @@ export const InlineEditorStyles = css`
       padding: 0 8px;
     }
   }
-  
+
   editor-actions {
     composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
     position: absolute;
@@ -61,15 +63,16 @@ export const InlineEditorStyles = css`
     }
   }
 
-  editor:focus-within, editor[|active] {
+  editor:focus-within,
+  editor[|active] {
     & editor-actions {
-      border-top-color:  #52c41a !important;
+      border-top-color: #52c41a !important;
       border-right-color: #52c41a !important;
       border-bottom-color: #52c41a !important;
     }
   }
 
-  editor-actions[|position=inside] {
+  editor-actions[|position='inside'] {
     position: relative;
     flex: 0 0 auto;
     top: 0;
@@ -79,24 +82,25 @@ export const InlineEditorStyles = css`
     border-bottom: none;
   }
 
-  editor-actions[|position=bottom],
-  editor-actions[|position=top] {
+  editor-actions[|position='bottom'],
+  editor-actions[|position='top'] {
     right: -1px;
     left: auto;
   }
 
-  editor:focus-within, editor[|active] {
-    & editor-actions[|position=bottom],
-    & editor-actions[|position=top] {
+  editor:focus-within,
+  editor[|active] {
+    & editor-actions[|position='bottom'],
+    & editor-actions[|position='top'] {
       border-left-color: #52c41a !important;
     }
   }
 
-  editor-actions[|position=bottom] {
+  editor-actions[|position='bottom'] {
     top: 100%;
   }
 
-  editor-actions[|position=top] {
+  editor-actions[|position='top'] {
     bottom: 100%;
     top: auto;
   }

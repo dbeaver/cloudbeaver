@@ -5,23 +5,31 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionDataResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedMapResource, CachedMapAllKey, AdminPermissionInfoFragment, AdminObjectGrantInfoFragment, ResourceKey, resourceKeyList } from '@cloudbeaver/core-sdk';
+import {
+  AdminObjectGrantInfoFragment,
+  AdminPermissionInfoFragment,
+  CachedMapAllKey,
+  CachedMapResource,
+  GraphQLService,
+  ResourceKey,
+  resourceKeyList,
+} from '@cloudbeaver/core-sdk';
 
 export type PermissionInfo = AdminPermissionInfoFragment;
 export type AdminObjectGrantInfo = AdminObjectGrantInfoFragment;
 
 @injectable()
 export class PermissionsResource extends CachedMapResource<string, PermissionInfo> {
-  constructor(
-    private readonly graphQLService: GraphQLService,
-    sessionDataResource: SessionDataResource
-  ) {
+  constructor(private readonly graphQLService: GraphQLService, sessionDataResource: SessionDataResource) {
     super();
 
-    this.sync(sessionDataResource, () => {}, () => CachedMapAllKey);
+    this.sync(
+      sessionDataResource,
+      () => {},
+      () => CachedMapAllKey,
+    );
   }
 
   protected async loader(): Promise<Map<string, PermissionInfo>> {

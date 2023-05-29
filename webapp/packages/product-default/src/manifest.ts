@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { ProductBootstrap } from './ProductBootstrap';
@@ -16,8 +15,5 @@ export const defaultProductManifest: PluginManifest = {
     name: 'Default Product',
   },
 
-  providers: [
-    ProductBootstrap,
-    ProductConfigService,
-  ],
+  providers: [ProductBootstrap, ProductConfigService],
 };

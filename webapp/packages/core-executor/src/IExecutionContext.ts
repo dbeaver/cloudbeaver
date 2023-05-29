@@ -21,19 +21,11 @@ export interface IExecutionContext<TData> extends IExecutionContextProvider<TDat
   readonly contexts: Map<IContextLoader<any, TData>, any>;
   readonly contextCreators: Map<IContextLoader<any, TData>, IContextLoader<any, TData>>;
 
-  addContextCreators(
-    creators: [IContextLoader<any, TData>, IContextLoader<any, TData>][]
-  ): void;
+  addContextCreators(creators: [IContextLoader<any, TData>, IContextLoader<any, TData>][]): void;
 }
 
-export type IAsyncContextLoader<T = any, TData = any> = (
-  contexts: IExecutionContextProvider<TData>,
-  data: TData
-) => Promise<T>;
+export type IAsyncContextLoader<T = any, TData = any> = (contexts: IExecutionContextProvider<TData>, data: TData) => Promise<T>;
 
-export type ISyncContextLoader<T = any, TData = any> = (
-  contexts: IExecutionContextProvider<TData>,
-  data: TData
-) => T;
+export type ISyncContextLoader<T = any, TData = any> = (contexts: IExecutionContextProvider<TData>, data: TData) => T;
 
 export type IContextLoader<T = any, TData = any> = IAsyncContextLoader<T, TData> | ISyncContextLoader<T, TData>;

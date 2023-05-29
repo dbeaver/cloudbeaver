@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled, { css } from 'reshadow';
@@ -37,7 +36,10 @@ export const TableSelect = observer<Props>(function TableSelect({ id, disabled, 
     throw new Error('Context must be provided');
   }
 
-  return styled(BASE_TABLE_STYLES, styles)(
+  return styled(
+    BASE_TABLE_STYLES,
+    styles,
+  )(
     <Checkbox
       id={id}
       className={className}
@@ -45,6 +47,6 @@ export const TableSelect = observer<Props>(function TableSelect({ id, disabled, 
       disabled={disabled || !tableContext.state.selectableItems.length}
       checked={tableContext.state.tableSelected}
       onClick={tableContext.state.selectTable}
-    />
+    />,
   );
 });

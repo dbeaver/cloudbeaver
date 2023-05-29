@@ -5,25 +5,31 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ToolsAction, ToolsPanel, useTranslate, useStyles, ColoredContainer, Group, Container } from '@cloudbeaver/core-blocks';
+import {
+  BASE_CONTAINERS_STYLES,
+  ColoredContainer,
+  Container,
+  Group,
+  ToolsAction,
+  ToolsPanel,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-
-
 
 import { CreateTeam } from './CreateTeam';
 import { CreateTeamService } from './CreateTeamService';
 import { TeamsTable } from './TeamsTable/TeamsTable';
 import { useTeamsTable } from './TeamsTable/useTeamsTable';
 
-const styles = css` 
-    ToolsPanel {
-      border-bottom: none;
-    }
+const styles = css`
+  ToolsPanel {
+    border-bottom: none;
+  }
 `;
 
 interface Props {
@@ -31,10 +37,7 @@ interface Props {
   param?: string | null;
 }
 
-export const TeamsPage = observer<Props>(function TeamsPage({
-  sub,
-  param,
-}) {
+export const TeamsPage = observer<Props>(function TeamsPage({ sub, param }) {
   const translate = useTranslate();
   const style = useStyles(BASE_CONTAINERS_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
   const service = useService(CreateTeamService);
@@ -82,15 +85,10 @@ export const TeamsPage = observer<Props>(function TeamsPage({
             <CreateTeam />
           </Group>
         )}
-        <Group box='no-overflow'>
-          <TeamsTable
-            teams={table.teams}
-            state={table.state}
-            selectedItems={table.tableState.selected}
-            expandedItems={table.tableState.expanded}
-          />
+        <Group box="no-overflow">
+          <TeamsTable teams={table.teams} state={table.state} selectedItems={table.tableState.selected} expandedItems={table.tableState.expanded} />
         </Group>
       </Container>
-    </ColoredContainer>
+    </ColoredContainer>,
   );
 });

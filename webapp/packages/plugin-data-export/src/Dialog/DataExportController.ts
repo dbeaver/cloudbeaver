@@ -5,15 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, computed, makeObservable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import type { IProperty } from '@cloudbeaver/core-blocks';
-import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
+import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { DataTransferOutputSettings, DataTransferProcessorInfo, GQLErrorCatcher, ObjectPropertyInfo, ObjectPropertyLength } from '@cloudbeaver/core-sdk';
+import {
+  DataTransferOutputSettings,
+  DataTransferProcessorInfo,
+  GQLErrorCatcher,
+  ObjectPropertyInfo,
+  ObjectPropertyLength,
+} from '@cloudbeaver/core-sdk';
 
 import { DataExportService } from '../DataExportService';
 import type { IExportContext } from '../IExportContext';
@@ -21,7 +26,7 @@ import { DefaultExportOutputSettingsResource } from './DefaultExportOutputSettin
 
 export enum DataExportStep {
   DataTransferProcessor,
-  Configure
+  Configure,
 }
 
 @injectable()
@@ -35,11 +40,7 @@ export class DataExportController implements IInitializableController, IDestruct
   processor: DataTransferProcessorInfo | null = null;
 
   get processors(): DataTransferProcessorInfo[] {
-    return Array
-      .from(
-        this.dataExportService.processors.data.values()
-      )
-      .sort(sortProcessors);
+    return Array.from(this.dataExportService.processors.data.values()).sort(sortProcessors);
   }
 
   processorProperties: any = {};
@@ -88,19 +89,16 @@ export class DataExportController implements IInitializableController, IDestruct
     this.isExporting = true;
 
     try {
-      await this.dataExportService.exportData(
-        this.context,
-        {
-          processorId: this.processor.id,
-          processorProperties: this.processorProperties,
-          filter: this.context.filter,
-          outputSettings: this.outputSettings,
-        }
-      );
+      await this.dataExportService.exportData(this.context, {
+        processorId: this.processor.id,
+        processorProperties: this.processorProperties,
+        filter: this.context.filter,
+        outputSettings: this.outputSettings,
+      });
       this.close();
     } catch (exception: any) {
       if (!this.error.catch(exception) || this.isDistructed) {
-        this.notificationService.logException(exception, 'Can\'t export');
+        this.notificationService.logException(exception, "Can't export");
       }
     } finally {
       this.isExporting = false;
@@ -113,20 +111,18 @@ export class DataExportController implements IInitializableController, IDestruct
   };
 
   selectProcessor = (processorId: string) => {
-    this.processor = this.dataExportService
-      .processors
-      .data
-      .get(processorId)!;
+    this.processor = this.dataExportService.processors.data.get(processorId)!;
 
-    this.properties = this.processor.properties?.map<IProperty>(property => ({
-      id: property.id!,
-      key: property.id!,
-      displayName: property.displayName,
-      description: property.description,
-      validValues: property.validValues,
-      defaultValue: property.defaultValue,
-      valuePlaceholder: property.defaultValue,
-    })) || [];
+    this.properties =
+      this.processor.properties?.map<IProperty>(property => ({
+        id: property.id!,
+        key: property.id!,
+        displayName: property.displayName,
+        description: property.description,
+        validValues: property.validValues,
+        defaultValue: property.defaultValue,
+        valuePlaceholder: property.defaultValue,
+      })) || [];
 
     this.processorProperties = {};
 
@@ -144,7 +140,7 @@ export class DataExportController implements IInitializableController, IDestruct
     try {
       await this.dataExportService.processors.load();
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Can\'t load data export processors');
+      this.notificationService.logException(exception, "Can't load data export processors");
     }
   }
 
@@ -155,14 +151,14 @@ export class DataExportController implements IInitializableController, IDestruct
         Object.assign(this.outputSettings, data.outputSettings);
       }
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Can\'t load output settings');
+      this.notificationService.logException(exception, "Can't load output settings");
     }
   }
 }
 
 function sortProcessors(processorA: DataTransferProcessorInfo, processorB: DataTransferProcessorInfo): number {
   if (processorA.order === processorB.order) {
-    return (processorA.name || '').localeCompare((processorB.name || ''));
+    return (processorA.name || '').localeCompare(processorB.name || '');
   }
 
   return processorA.order - processorB.order;
