@@ -5,12 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { makeObservable, observable } from 'mobx';
+import { action } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutionContextProvider, IExecutor, ISyncContextLoader } from '@cloudbeaver/core-executor';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { Executor, IExecutionContextProvider, IExecutor, ISyncContextLoader, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { IDataContextProvider } from '@cloudbeaver/core-view';
 
 import { ENodeFeature } from './ENodeFeature';
@@ -21,11 +22,6 @@ import { navNodeMoveContext } from './navNodeMoveContext';
 import { NavTreeResource } from './NavTreeResource';
 import { NodeManagerUtils } from './NodeManagerUtils';
 import { ProjectsNavNodeService } from './ProjectsNavNodeService';
-
-export enum NavigationType {
-  open,
-  canOpen,
-}
 
 export interface NavNodeKey {
   nodeId: string;
@@ -66,7 +62,6 @@ export interface INavNodeId {
 }
 
 export interface INodeNavigationContext {
-  type: NavigationType;
   projectId: string | undefined;
   nodeId: string;
   parentId?: string;
@@ -81,7 +76,6 @@ export interface INodeNavigationContext {
 }
 
 export interface INodeNavigationData {
-  type: NavigationType;
   projectId?: string;
   nodeId: string;
   parentId?: string;
@@ -106,10 +100,10 @@ export interface INavNodeCache {
 
 @injectable()
 export class NavNodeManagerService extends Bootstrap {
-  readonly syncNodeInfoCache: Map<string, INavNodeCache>;
-
+  readonly onCanOpen: ISyncExecutor<INodeNavigationData>;
   readonly navigator: IExecutor<INodeNavigationData>;
   readonly onMove: IExecutor<INodeMoveData>;
+  private readonly syncNodeInfoCache: MetadataMap<string, INavNodeCache>;
 
   constructor(
     readonly navTree: NavTreeResource,
@@ -118,22 +112,29 @@ export class NavNodeManagerService extends Bootstrap {
     navigationService: NavigationService,
   ) {
     super();
-    this.syncNodeInfoCache = new Map();
+    this.syncNodeInfoCache = new MetadataMap(() => ({ canOpen: false, canMove: false }));
     this.onMove = new Executor<INodeMoveData>(null, (current, next) => current.type === next.type && current.targetNode === next.targetNode);
+    this.onCanOpen = new SyncExecutor<INodeNavigationData>({
+      nodeId: ROOT_NODE_PATH,
+      parentId: ROOT_NODE_PATH,
+    });
     this.navigator = new Executor<INodeNavigationData>(
       {
-        type: NavigationType.open,
         nodeId: ROOT_NODE_PATH,
         parentId: ROOT_NODE_PATH,
       },
-      (active, current) => active.projectId === current.projectId && active.nodeId === current.nodeId && active.type === current.type,
+      (active, current) => active.projectId === current.projectId && active.nodeId === current.nodeId,
     )
-      .before(navigationService.navigationTask, undefined, data => data.type === NavigationType.open)
+      .before(navigationService.navigationTask)
       .addHandler(this.navigateHandler.bind(this));
 
-    makeObservable(this, {
-      syncNodeInfoCache: observable,
-    });
+    this.navNodeInfoResource.onItemDelete.addHandler(
+      action(key => {
+        ResourceKeyUtils.forEach(key, key => {
+          this.syncNodeInfoCache.delete(key);
+        });
+      }),
+    );
   }
 
   register(): void {}
@@ -141,7 +142,7 @@ export class NavNodeManagerService extends Bootstrap {
   load(): void {}
 
   getNavNodeCache(nodeId: string): INavNodeCache {
-    return this.syncNodeInfoCache.get(nodeId) || { canOpen: false, canMove: false };
+    return this.syncNodeInfoCache.get(nodeId);
   }
 
   async canMove(targetNode: NavNode, moveContexts: IDataContextProvider): Promise<boolean> {
@@ -153,25 +154,18 @@ export class NavNodeManagerService extends Bootstrap {
 
     const move = contexts.getContext(navNodeMoveContext);
 
-    let cache = this.syncNodeInfoCache.get(targetNode.id);
-
-    if (!cache) {
-      cache = observable<INavNodeCache>({ canOpen: false, canMove: move.canMove });
-      this.syncNodeInfoCache.set(targetNode.id, cache);
-    }
-
+    const cache = this.syncNodeInfoCache.get(targetNode.id);
     cache.canMove = move.canMove;
 
     return move.canMove;
   }
 
-  async canOpen(nodeId: string, parentId?: string, folderId?: string): Promise<boolean> {
+  canOpen(nodeId: string, parentId?: string, folderId?: string): boolean {
     if (!this.navNodeInfoResource.has(nodeId)) {
       return false;
     }
 
-    const contexts = await this.navigator.execute({
-      type: NavigationType.canOpen,
+    const contexts = this.onCanOpen.execute({
       nodeId,
       parentId,
       folderId,
@@ -179,13 +173,7 @@ export class NavNodeManagerService extends Bootstrap {
 
     const data = contexts.getContext(this.navigationNavNodeContext);
 
-    let cache = this.syncNodeInfoCache.get(nodeId);
-
-    if (!cache) {
-      cache = observable<INavNodeCache>({ canOpen: data.canOpen, canMove: false });
-      this.syncNodeInfoCache.set(nodeId, cache);
-    }
-
+    const cache = this.syncNodeInfoCache.get(nodeId);
     cache.canOpen = data.canOpen;
 
     return data.canOpen;
@@ -193,7 +181,6 @@ export class NavNodeManagerService extends Bootstrap {
 
   async navToNode(nodeId: string, parentId?: string, folderId?: string): Promise<void> {
     await this.navigator.execute({
-      type: NavigationType.open,
       nodeId,
       parentId,
       folderId,
@@ -385,7 +372,6 @@ export class NavNodeManagerService extends Bootstrap {
         return canOpen;
       },
 
-      type: data.type,
       projectId,
       nodeId,
       parentId,
@@ -403,11 +389,7 @@ export class NavNodeManagerService extends Bootstrap {
     data: INodeNavigationData,
     contexts: IExecutionContextProvider<INodeNavigationData>,
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  ): Promise<void> {
-    if (data.type !== NavigationType.open) {
-      return;
-    }
-  }
+  ): Promise<void> {}
 }
 
 export function parseNodeParentId(nodeId: string): string {

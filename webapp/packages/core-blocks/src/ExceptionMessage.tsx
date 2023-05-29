@@ -93,6 +93,21 @@ const style = css`
   }
   error[|icon] {
     padding: 0;
+    height: 100%;
+    width: 100%;
+    max-height: 24px;
+    max-width: 24px;
+
+    & error-icon {
+      display: flex;
+      align-items: center;
+      align-content: center;
+
+      & IconOrImage {
+        height: 100%;
+        width: 100%;
+      }
+    }
   }
   error-action-close {
     cursor: pointer;
@@ -103,8 +118,6 @@ const style = css`
 `;
 
 interface Props {
-  name?: string;
-  message?: string;
   exception?: Error;
   icon?: boolean;
   inline?: boolean;
@@ -114,21 +127,9 @@ interface Props {
   onClose?: () => void;
 }
 
-export const ExceptionMessage = observer<Props>(function ExceptionMessage({
-  name,
-  message,
-  exception = null,
-  icon,
-  inline,
-  className,
-  styles,
-  onRetry,
-  onClose,
-}) {
+export const ExceptionMessage = observer<Props>(function ExceptionMessage({ exception = null, icon, inline, className, styles, onRetry, onClose }) {
   const translate = useTranslate();
   const error = useErrorDetails(exception);
-  name = name || error.name;
-  message = message || error.message;
 
   if (error.refresh) {
     const retry = onRetry;
@@ -141,22 +142,22 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({
 
   return styled(useStyles(style, styles))(
     <error {...use({ inline, icon })} className={className}>
-      <error-icon title={message}>
-        <IconOrImage icon={inline ? '/icons/error_icon_sm.svg' : '/icons/error_icon.svg'} />
+      <error-icon title={error.message}>
+        <IconOrImage icon={inline || icon ? '/icons/error_icon_sm.svg' : '/icons/error_icon.svg'} />
       </error-icon>
       {!icon && (
         <>
           <error-data>
             <error-name>
-              <span>{name}</span>
+              <span>{translate('core_blocks_exception_message_error_title')}</span>
             </error-name>
-            <error-message>{message}</error-message>
+            <error-message>
+              {translate('core_blocks_exception_message_error_message')} {onRetry && translate('ui_please_retry')}
+            </error-message>
             <error-actions>
-              {error.hasDetails && (
-                <Button type="button" mod={['outlined']} disabled={error.isOpen} onClick={error.open}>
-                  {translate('ui_errors_details')}
-                </Button>
-              )}
+              <Button type="button" mod={['outlined']} disabled={error.isOpen} onClick={error.open}>
+                {translate('ui_errors_details')}
+              </Button>
               {onRetry && (
                 <Button type="button" mod={['unelevated']} onClick={onRetry}>
                   {translate('ui_processing_retry')}

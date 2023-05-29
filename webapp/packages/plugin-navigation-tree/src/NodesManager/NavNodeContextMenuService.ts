@@ -130,12 +130,7 @@ export class NavNodeContextMenuService extends Bootstrap {
         }
 
         if (action === ACTION_OPEN) {
-          // TODO: replace with loader, this call can lead to concurrent calls limit (Executor)
-          untracked(() => {
-            this.navNodeManagerService.canOpen(node.id, node.parentId); // trigger info
-          });
-
-          return this.navNodeManagerService.getNavNodeCache(node.id).canOpen;
+          return this.navNodeManagerService.canOpen(node.id, node.parentId);
         }
 
         return [ACTION_OPEN, ACTION_REFRESH].includes(action);

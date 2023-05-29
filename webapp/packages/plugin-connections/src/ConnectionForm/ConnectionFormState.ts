@@ -181,8 +181,8 @@ export class ConnectionFormState implements IConnectionFormState {
 
   async loadConnectionInfo(): Promise<DatabaseConnection | undefined> {
     try {
-      await this.loadConnectionTask.execute(this);
       this.initError = null;
+      await this.loadConnectionTask.execute(this);
 
       return this.info;
     } catch (exception: any) {
