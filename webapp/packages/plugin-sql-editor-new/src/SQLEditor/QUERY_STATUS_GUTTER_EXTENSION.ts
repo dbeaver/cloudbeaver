@@ -5,28 +5,27 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { GutterMarker, StateEffect, StateField, RangeSet, type EditorView, gutter } from '@cloudbeaver/plugin-codemirror6';
+import { type EditorView, gutter, GutterMarker, RangeSet, StateEffect, StateField } from '@cloudbeaver/plugin-codemirror6';
 
 type QueryGutterEffectType = 'run' | 'error';
 
-const QUERY_STATUS_SIZE_MARKER = new class extends GutterMarker { };
+const QUERY_STATUS_SIZE_MARKER = new (class extends GutterMarker {})();
 
-const RUN_QUERY_MARKER = new class extends GutterMarker {
+const RUN_QUERY_MARKER = new (class extends GutterMarker {
   toDOM(): Node {
     const span = document.createElement('div');
     span.className = 'running-query-line';
     return span;
   }
-};
+})();
 
-const ERROR_QUERY_MARKER = new class extends GutterMarker {
+const ERROR_QUERY_MARKER = new (class extends GutterMarker {
   toDOM(): Node {
     const span = document.createElement('div');
     span.className = 'running-query-error-line';
     return span;
   }
-};
+})();
 
 const QUERY_GUTTER_EFFECT = StateEffect.define<{ pos: number; on: boolean; type: QueryGutterEffectType }>({
   map: (val, mapping) => ({ pos: mapping.mapPos(val.pos), on: val.on, type: val.type }),

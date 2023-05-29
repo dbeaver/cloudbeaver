@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import '@testing-library/jest-dom';
 
 import { mockAuthentication } from '@cloudbeaver/core-authentication/mocks/mockAuthentication';
@@ -16,15 +15,12 @@ import { mockAppInit } from '@cloudbeaver/core-root/mocks/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/mocks/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/mocks/resolvers/mockServerConfig';
 
-import { CookiesSettings, DeprecatedCookiesSettings, BrowserSettingsService } from './BrowserSettingsService';
+import { BrowserSettingsService, CookiesSettings, DeprecatedCookiesSettings } from './BrowserSettingsService';
 
 const endpoint = createGQLEndpoint();
 const app = createApp();
 
-const server = mockGraphQL(
-  ...mockAppInit(endpoint),
-  ...mockAuthentication(endpoint)
-);
+const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
 
 beforeAll(() => app.init());
 
@@ -59,9 +55,7 @@ test.skip('New settings equal deprecated settings A', async () => {
   const settings = app.injector.getServiceByClass(BrowserSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(
-    endpoint.query('serverConfig', mockServerConfig(equalConfigA)),
-  );
+  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigA)));
 
   await config.refresh();
 
@@ -73,9 +67,7 @@ test.skip('New settings equal deprecated settings B', async () => {
   const settings = app.injector.getServiceByClass(BrowserSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(
-    endpoint.query('serverConfig', mockServerConfig(equalConfigB)),
-  );
+  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigB)));
 
   await config.refresh();
 

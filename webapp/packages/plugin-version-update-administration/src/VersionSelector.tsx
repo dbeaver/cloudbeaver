@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
@@ -47,7 +46,10 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
   const version = versions.find(v => v.number === selected);
   const Instruction = versionUpdateService.instructionGetter?.();
 
-  return styled(BASE_CONTAINERS_STYLES, style)(
+  return styled(
+    BASE_CONTAINERS_STYLES,
+    style,
+  )(
     <Container gap>
       <Group gap large>
         <Combobox
@@ -67,6 +69,6 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
         )}
       </Group>
       {version && <VersionInfo item={version.number} />}
-    </Container>
+    </Container>,
   );
 });

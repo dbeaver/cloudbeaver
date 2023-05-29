@@ -5,14 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { runInAction } from 'mobx';
 
 import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerEventId, SessionDataResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedDataResource, LogEntry } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, GraphQLService, LogEntry } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { LogViewerSettingsService } from './LogViewer/LogViewerSettingsService';
@@ -33,16 +32,25 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
     sessionLogsEventHandler: SessionLogsEventHandler,
   ) {
     super(() => []);
-    this.sync(sessionDataResource, () => { }, () => { });
+    this.sync(
+      sessionDataResource,
+      () => {},
+      () => {},
+    );
     sessionDataResource.onDataUpdate.addHandler(() => {
       this.clear();
     });
 
     appAuthService.requireAuthentication(this);
 
-    sessionLogsEventHandler.onEvent(ServerEventId.CbSessionLogUpdated, () => {
-      this.markOutdated();
-    }, undefined, this);
+    sessionLogsEventHandler.onEvent(
+      ServerEventId.CbSessionLogUpdated,
+      () => {
+        this.markOutdated();
+      },
+      undefined,
+      this,
+    );
   }
 
   protected async loader(): Promise<ILogEntry[]> {

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { use } from 'reshadow';
 
@@ -17,21 +16,14 @@ interface Props {
   className?: string;
 }
 
-export const Overlay = observer<React.PropsWithChildren<Props>>(function Overlay({
-  active,
-  fill,
-  className,
-  children,
-}) {
+export const Overlay = observer<React.PropsWithChildren<Props>>(function Overlay({ active, fill, className, children }) {
   if (!active) {
     return null;
   }
 
   return styled(OVERLAY_BASE_STYLES)(
     <overlay className={className} {...use({ active, fill })}>
-      <box>
-        {children}
-      </box>
-    </overlay>
+      <box>{children}</box>
+    </overlay>,
   );
 });

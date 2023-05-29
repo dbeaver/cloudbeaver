@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
@@ -22,15 +21,11 @@ interface Props {
   style?: ComponentStyle;
 }
 
-export const UserAuthProviderPanel = observer<Props>(function UserAuthProviderPanel({
-  user,
-  className,
-  style,
-}) {
+export const UserAuthProviderPanel = observer<Props>(function UserAuthProviderPanel({ user, className, style }) {
   const styles = useStyles(BASE_TAB_STYLES, style, BASE_CONTAINERS_STYLES);
 
   return styled(styles)(
-    <TabPanel tabId='auth-providers' className={className}>
+    <TabPanel tabId="auth-providers" className={className}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
           <Group box medium overflow>
@@ -38,6 +33,6 @@ export const UserAuthProviderPanel = observer<Props>(function UserAuthProviderPa
           </Group>
         </Container>
       </ColoredContainer>
-    </TabPanel>
+    </TabPanel>,
   );
 });

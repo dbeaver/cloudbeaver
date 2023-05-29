@@ -5,12 +5,22 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useMemo } from 'react';
 
-import { type IComplexLoaderData, createComplexLoader, useComplexLoader } from '@cloudbeaver/core-blocks';
+import { createComplexLoader, type IComplexLoaderData, useComplexLoader } from '@cloudbeaver/core-blocks';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
-import { CassandraLoader, type Extension, MSSQLLoader, MariaSQLLoader, MySQLLoader, PLSQLLoader, PostgreSQLLoader, SQLDialect, SQLiteLoader, StandardSQLLoader } from '@cloudbeaver/plugin-codemirror6';
+import {
+  CassandraLoader,
+  type Extension,
+  MariaSQLLoader,
+  MSSQLLoader,
+  MySQLLoader,
+  PLSQLLoader,
+  PostgreSQLLoader,
+  SQLDialect,
+  SQLiteLoader,
+  StandardSQLLoader,
+} from '@cloudbeaver/plugin-codemirror6';
 
 const codemirrorComplexLoader = createComplexLoader(() => import('@cloudbeaver/plugin-codemirror6'));
 
@@ -41,16 +51,23 @@ export function useSqlDialectExtension(dialectInfo: SqlDialectInfo | undefined):
   }, [dialect, dialectInfo]);
 }
 
-
 function getDialectLoader(name?: string): IComplexLoaderData<SQLDialect> {
   switch (name) {
-    case 'PostgreSQL': return PostgreSQLLoader;
-    case 'MySQL': return MySQLLoader;
-    case 'MariaSQL': return MariaSQLLoader;
-    case 'SQLServer': return MSSQLLoader;
-    case 'SQLite': return SQLiteLoader;
-    case 'CQL': return CassandraLoader;
-    case 'PLSQL': return PLSQLLoader;
-    default: return StandardSQLLoader;
+    case 'PostgreSQL':
+      return PostgreSQLLoader;
+    case 'MySQL':
+      return MySQLLoader;
+    case 'MariaSQL':
+      return MariaSQLLoader;
+    case 'SQLServer':
+      return MSSQLLoader;
+    case 'SQLite':
+      return SQLiteLoader;
+    case 'CQL':
+      return CassandraLoader;
+    case 'PLSQL':
+      return PLSQLLoader;
+    default:
+      return StandardSQLLoader;
   }
 }

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { use } from 'reshadow';
 
@@ -30,6 +29,6 @@ export const TableItemSeparator = observer<React.PropsWithChildren<Props>>(funct
       <td colSpan={colSpan} {...use({ expandArea: true })}>
         {children}
       </td>
-    </tr>
+    </tr>,
   );
 });

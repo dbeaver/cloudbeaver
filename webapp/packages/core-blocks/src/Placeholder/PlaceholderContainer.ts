@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 
 import { uuid } from '@cloudbeaver/core-utils';
@@ -41,8 +40,7 @@ export class PlaceholderContainer<T extends Record<string, any> = Record<string,
   }
 
   private findPosition(order: number) {
-    const position = this.placeholders
-      .findIndex(placeholder => placeholder.order === undefined || order <= placeholder.order);
+    const position = this.placeholders.findIndex(placeholder => placeholder.order === undefined || order <= placeholder.order);
 
     if (position === -1) {
       return this.placeholders.length;

@@ -1,3 +1,5 @@
+import { navigationTreePlugin } from './manifest';
+
 export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings';
 export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT';
 export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/KEY_BINDING_ENABLE_FILTER';
@@ -39,8 +41,6 @@ export * from './NodesManager/useChildren';
 export * from './NodesManager/NodeLinkLoader';
 
 export * from './NavigationTreeSettingsService';
-
-import { navigationTreePlugin } from './manifest';
 
 export { navigationTreePlugin };
 export default navigationTreePlugin;

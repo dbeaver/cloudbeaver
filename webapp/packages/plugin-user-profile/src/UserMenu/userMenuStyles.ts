@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { css } from 'reshadow';
 
 export const userMenuStyles = css`
@@ -18,10 +17,10 @@ export const userMenuStyles = css`
     border: none;
     outline: none !important;
     & Icon {
-        background: #47a0dd;
-        width: 16px;
-        height: 100%;
-        padding: 0 16px;
+      background: #47a0dd;
+      width: 16px;
+      height: 100%;
+      padding: 0 16px;
     }
   }
 `;

@@ -5,15 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { NotificationService } from '@cloudbeaver/core-events';
-import {
-  AsyncTaskInfo, GraphQLService, ServerInternalError, DataTransferParameters
-} from '@cloudbeaver/core-sdk';
-import {
-  CancellablePromise, cancellableTimeout, Deferred, EDeferredState
-} from '@cloudbeaver/core-utils';
+import { AsyncTaskInfo, DataTransferParameters, GraphQLService, ServerInternalError } from '@cloudbeaver/core-sdk';
+import { CancellablePromise, cancellableTimeout, Deferred, EDeferredState } from '@cloudbeaver/core-utils';
 
 const DELAY_BETWEEN_TRIES = 1000;
 
@@ -23,16 +18,11 @@ export class ExportFromContainerProcess extends Deferred<string> {
   private timeout?: CancellablePromise<void>;
   private isCancelConfirmed = false; // true when server successfully executed cancelQueryAsync
 
-  constructor(private readonly graphQLService: GraphQLService,
-    private readonly notificationService: NotificationService) {
+  constructor(private readonly graphQLService: GraphQLService, private readonly notificationService: NotificationService) {
     super();
   }
 
-  async start(
-    connectionKey: IConnectionInfoParams,
-    containerNodePath: string,
-    parameters: DataTransferParameters
-  ): Promise<string> {
+  async start(connectionKey: IConnectionInfoParams, containerNodePath: string, parameters: DataTransferParameters): Promise<string> {
     // start async task
     try {
       const { taskInfo } = await this.graphQLService.sdk.exportDataFromContainer({
@@ -96,7 +86,7 @@ export class ExportFromContainerProcess extends Deferred<string> {
       try {
         this.timeout = cancellableTimeout(DELAY_BETWEEN_TRIES);
         await this.timeout;
-      } catch { }
+      } catch {}
     }
   }
 

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable } from 'mobx';
 
 import { DBDriverResource } from '@cloudbeaver/core-connections';
@@ -17,15 +16,12 @@ import { connectionFormConfigureContext } from '../connectionFormConfigureContex
 import { ConnectionFormService } from '../ConnectionFormService';
 import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
-import type { IConnectionFormFillConfigData, IConnectionFormSubmitData, IConnectionFormState } from '../IConnectionFormProps';
+import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
 import { DriverPropertiesLoader } from './DriverPropertiesLoader';
 
 @injectable()
 export class ConnectionDriverPropertiesTabService extends Bootstrap {
-  constructor(
-    private readonly connectionFormService: ConnectionFormService,
-    private readonly dbDriverResource: DBDriverResource,
-  ) {
+  constructor(private readonly connectionFormService: ConnectionFormService, private readonly dbDriverResource: DBDriverResource) {
     super();
 
     makeObservable<this, 'fillConfig'>(this, {
@@ -48,20 +44,16 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
       },
     });
 
-    this.connectionFormService.prepareConfigTask
-      .addHandler(this.prepareConfig.bind(this));
+    this.connectionFormService.prepareConfigTask.addHandler(this.prepareConfig.bind(this));
 
-    this.connectionFormService.formStateTask
-      .addHandler(this.formState.bind(this));
+    this.connectionFormService.formStateTask.addHandler(this.formState.bind(this));
 
-    this.connectionFormService.fillConfigTask
-      .addHandler(this.fillConfig.bind(this));
+    this.connectionFormService.fillConfigTask.addHandler(this.fillConfig.bind(this));
 
-    this.connectionFormService.configureTask
-      .addHandler(this.configure.bind(this));
+    this.connectionFormService.configureTask.addHandler(this.configure.bind(this));
   }
 
-  load(): void { }
+  load(): void {}
 
   private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const configuration = contexts.getContext(connectionFormConfigureContext);
@@ -69,10 +61,7 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
     configuration.include('includeProperties', 'includeProviderProperties');
   }
 
-  private fillConfig(
-    { state, updated }: IConnectionFormFillConfigData,
-    contexts: IExecutionContextProvider<IConnectionFormFillConfigData>
-  ) {
+  private fillConfig({ state, updated }: IConnectionFormFillConfigData, contexts: IExecutionContextProvider<IConnectionFormFillConfigData>) {
     if (!updated) {
       return;
     }
@@ -87,21 +76,13 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
     state.config.properties = { ...state.info.properties };
   }
 
-  private prepareConfig(
-    {
-      state,
-    }: IConnectionFormSubmitData,
-    contexts: IExecutionContextProvider<IConnectionFormSubmitData>
-  ) {
+  private prepareConfig({ state }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
     const config = contexts.getContext(connectionConfigContext);
 
     config.properties = { ...state.config.properties };
   }
 
-  private formState(
-    data: IConnectionFormState,
-    contexts: IExecutionContextProvider<IConnectionFormState>
-  ) {
+  private formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     if (!data.info || !data.config.driverId) {
       return;
     }

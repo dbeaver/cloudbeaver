@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -22,14 +21,15 @@ const style = css`
 
 export const Recommendations = observer(function Recommendations() {
   const translate = useTranslate();
-  return styled(BASE_CONTAINERS_STYLES, style)(
+  return styled(
+    BASE_CONTAINERS_STYLES,
+    style,
+  )(
     <Group gap large>
       <GroupTitle>{translate('version_update_recommendations')}</GroupTitle>
       <GroupItem>
-        <h4>
-          We highly recommend avoiding product downgrade. We cannot guarantee the proper work of the application after this procedure.
-        </h4>
+        <h4>We highly recommend avoiding product downgrade. We cannot guarantee the proper work of the application after this procedure.</h4>
       </GroupItem>
-    </Group>
+    </Group>,
   );
 });

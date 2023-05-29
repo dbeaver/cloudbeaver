@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 
@@ -14,20 +13,20 @@ import { Icon } from './Icon';
 test('icons.svg#name', () => {
   (globalThis as any)._ROOT_URI_ = undefined;
 
-  render(<Icon name='test' />);
+  render(<Icon name="test" />);
   expect(screen.getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/icons/icons.svg#test');
 });
 
 test('/image.jpg', () => {
   (globalThis as any)._ROOT_URI_ = undefined;
 
-  render(<Icon name='/image.jpg' />);
+  render(<Icon name="/image.jpg" />);
   expect(screen.getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/image.jpg');
 });
 
 test('{_ROOT_URI_}/icons.svg#name', () => {
   (globalThis as any)._ROOT_URI_ = '/path/';
 
-  render(<Icon name='test' />);
+  render(<Icon name="test" />);
   expect(screen.getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/path/icons/icons.svg#test');
 });

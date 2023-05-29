@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { AnnotationsMap, makeObservable, runInAction, untracked } from 'mobx';
 import { useState } from 'react';
 
@@ -13,41 +12,41 @@ export function useObservableRef<T extends Record<any, any>>(
   init: () => T & ThisType<T>,
   observed: AnnotationsMap<T, never>,
   update: false,
-  name?: string
+  name?: string,
 ): T;
 export function useObservableRef<T extends Record<any, any>>(
   init: () => T & ThisType<T>,
   observed: AnnotationsMap<T, never>,
   update: false,
   bind?: Array<keyof T>,
-  name?: string
+  name?: string,
 ): T;
 export function useObservableRef<T extends Record<any, any>, U extends Record<any, any>>(
   init: () => T & ThisType<T & U>,
   observed: AnnotationsMap<T & U, never>,
   update: U & ThisType<T & U>,
   bind?: Array<keyof (T & U)>,
-  name?: string
+  name?: string,
 ): T & U;
 export function useObservableRef<T extends Record<any, any>>(
   init: T & ThisType<T>,
   observed: AnnotationsMap<T, never>,
   bind?: Array<keyof T>,
-  name?: string
+  name?: string,
 ): T;
 export function useObservableRef<T extends Record<any, any>>(
   init: () => Partial<T> & ThisType<T>,
   observed: AnnotationsMap<T, never>,
   update: Partial<T> & ThisType<T>,
   bind?: Array<keyof T>,
-  name?: string
+  name?: string,
 ): T;
 export function useObservableRef<T extends Record<any, any>>(
   init: T | (() => T),
   observed: AnnotationsMap<T, never>,
   update?: Array<keyof T> | T | false,
   bind?: Array<keyof T> | string,
-  name?: string
+  name?: string,
 ): T {
   if (typeof bind === 'string') {
     name = bind;

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useEffect, useRef } from 'react';
 
 import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
@@ -18,7 +17,7 @@ export function useUserData<T extends Record<any, any>>(
   key: string,
   defaultValue: () => T,
   onUpdate?: (data: T) => void,
-  validate?: (data: T) => boolean
+  validate?: (data: T) => boolean,
 ): T {
   const optionsRef = useObjectRef({ defaultValue, onUpdate, validate });
   useResource(useUserData, UserInfoResource, undefined);

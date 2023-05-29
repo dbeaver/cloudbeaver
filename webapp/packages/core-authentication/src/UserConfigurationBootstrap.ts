@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { SessionResource } from '@cloudbeaver/core-root';
@@ -18,12 +17,11 @@ const USER_APP_LANGUAGE = 'app.language';
 
 @injectable()
 export class UserConfigurationBootstrap extends Bootstrap {
-
   constructor(
     private readonly userInfoResource: UserInfoResource,
     private readonly themeService: ThemeService,
     private readonly localizationService: LocalizationService,
-    private readonly sessionResource: SessionResource
+    private readonly sessionResource: SessionResource,
   ) {
     super();
     this.userInfoResource.onDataUpdate.addHandler(() => {
@@ -58,10 +56,9 @@ export class UserConfigurationBootstrap extends Bootstrap {
     });
   }
 
-  register(): void {  }
+  register(): void {}
 
   async load(): Promise<void> {
     await this.userInfoResource.load();
   }
-
 }

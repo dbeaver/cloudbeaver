@@ -5,17 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, TextPlaceholder, Button, useResource, useObservableRef, getComputed, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { Button, getComputed, Loader, TextPlaceholder, useObservableRef, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { TabsBox, TabPanel, useTabLocalState, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, TabPanel, TabsBox, useTabLocalState } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { TabHandlerPanelComponent } from '@cloudbeaver/plugin-navigation-tabs';
 
@@ -36,9 +35,7 @@ const styles = css`
   }
 `;
 
-export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> = observer(function ObjectViewerPanel({
-  tab,
-}) {
+export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> = observer(function ObjectViewerPanel({ tab }) {
   const translate = useTranslate();
   const style = useStyles(BASE_TAB_STYLES, styles);
   const dbObjectPagesService = useService(DBObjectPageService);
@@ -49,13 +46,17 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   const objectId = tab.handlerState.objectId;
   const connectionKey = tab.handlerState.connectionKey || null;
 
-  const state = useObservableRef(() => ({
-    connecting: false,
-    notFound: false,
-  }), {
-    connecting: observable.ref,
-    notFound: observable.ref,
-  }, false);
+  const state = useObservableRef(
+    () => ({
+      connecting: false,
+      notFound: false,
+    }),
+    {
+      connecting: observable.ref,
+      notFound: observable.ref,
+    },
+    false,
+  );
 
   const connection = useResource(ObjectViewerPanel, ConnectionInfoResource, connectionKey);
   const connected = getComputed(() => connection.data?.connected || false);
@@ -100,7 +101,9 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
 
     return (
       <TextPlaceholder>
-        <Button type="button" mod={['unelevated']} onClick={handleConnect}>{translate('connections_connection_connect')}</Button>
+        <Button type="button" mod={['unelevated']} onClick={handleConnect}>
+          {translate('connections_connection_connect')}
+        </Button>
       </TextPlaceholder>
     );
   }
@@ -115,13 +118,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
         <TabsBox
           currentTabId={tab.handlerState.pageId}
           tabs={pages.map(page => (
-            <DBObjectPageTab
-              key={page.key}
-              tab={tab}
-              page={page}
-              style={styles}
-              onSelect={dbObjectPagesService.selectPage}
-            />
+            <DBObjectPageTab key={page.key} tab={tab} page={page} style={styles} onSelect={dbObjectPagesService.selectPage} />
           ))}
           localState={innerTabState}
           style={styles}
@@ -135,6 +132,6 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
       ) : (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       )}
-    </>
+    </>,
   );
 });

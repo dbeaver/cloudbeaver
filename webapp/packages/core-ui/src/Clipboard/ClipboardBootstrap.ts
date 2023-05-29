@@ -5,20 +5,17 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { ClipboardService } from './ClipboardService';
 
 @injectable()
 export class ClipboardBootstrap extends Bootstrap {
-  constructor(
-    private readonly clipboardService: ClipboardService,
-  ) {
+  constructor(private readonly clipboardService: ClipboardService) {
     super();
   }
 
-  register(): void { }
+  register(): void {}
 
   async load(): Promise<void> {
     await this.clipboardService.tryActivateClipboard();

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled, { css } from 'reshadow';
 
 import { useStyles } from '../../useStyles';
@@ -30,7 +29,7 @@ const style = css`
     }
   }
   field-label {
-      composes: theme-typography--body2 from global;
+    composes: theme-typography--body2 from global;
   }
   Checkbox[disabled] + field-label {
     cursor: auto;
@@ -51,13 +50,9 @@ export const FieldCheckbox: CheckboxType = function FieldCheckbox({
   return styled(styles)(
     <field className={className}>
       <Checkbox {...(rest as CheckboxBaseProps & ICheckboxControlledProps)} />
-      <field-label
-        htmlFor={rest.id || rest.name}
-        title={rest.title}
-        as="label"
-      >
+      <field-label htmlFor={rest.id || rest.name} title={rest.title} as="label">
         {children}
       </field-label>
-    </field>
+    </field>,
   );
 };

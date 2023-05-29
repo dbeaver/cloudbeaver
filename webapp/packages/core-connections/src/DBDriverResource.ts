@@ -5,13 +5,22 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedMapResource, ResourceKey, ResourceKeyUtils, DatabaseDriverFragment, DriverListQueryVariables, CachedMapAllKey, resourceKeyList, isResourceAlias } from '@cloudbeaver/core-sdk';
+import {
+  CachedMapAllKey,
+  CachedMapResource,
+  DatabaseDriverFragment,
+  DriverListQueryVariables,
+  GraphQLService,
+  isResourceAlias,
+  ResourceKey,
+  resourceKeyList,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export type DBDriver = DatabaseDriverFragment;
@@ -24,9 +33,7 @@ type DriverResourceIncludes = Omit<DriverListQueryVariables, 'driverId'>;
 @injectable()
 export class DBDriverResource extends CachedMapResource<string, DBDriver, DriverListQueryVariables> {
   get enabledDrivers() {
-    return this.values
-      .filter(driver => driver.enabled)
-      .sort(this.compare);
+    return this.values.filter(driver => driver.enabled).sort(this.compare);
   }
 
   constructor(
@@ -36,7 +43,11 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
   ) {
     super();
     appAuthService.requireAuthentication(this);
-    this.sync(this.serverConfigResource, () => { }, () => CachedMapAllKey);
+    this.sync(
+      this.serverConfigResource,
+      () => {},
+      () => CachedMapAllKey,
+    );
 
     makeObservable(this, {
       enabledDrivers: computed<DBDriver[]>({
@@ -47,16 +58,13 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
 
   compare(driverA: DBDriver, driverB: DBDriver): number {
     if (driverA.promotedScore === driverB.promotedScore) {
-      return (driverA.name || '').localeCompare((driverB.name || ''));
+      return (driverA.name || '').localeCompare(driverB.name || '');
     }
 
     return (driverB.promotedScore || 0) - (driverA.promotedScore || 0);
   }
 
-  protected async loader(
-    originalKey: ResourceKey<string>,
-    includes?: ReadonlyArray<string>
-  ): Promise<Map<string, DBDriver>> {
+  protected async loader(originalKey: ResourceKey<string>, includes?: ReadonlyArray<string>): Promise<Map<string, DBDriver>> {
     const driversList: DBDriver[] = [];
     const all = this.isAlias(originalKey, CachedMapAllKey);
 
@@ -66,7 +74,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
       const { drivers } = await this.graphQLService.sdk.driverList({
         driverId,
         ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(driverId, (all ? this.defaultIncludes : includes)),
+        ...this.getIncludesMap(driverId, all ? this.defaultIncludes : includes),
       });
 
       if (driverId && !drivers.some(driver => driver.id === driverId)) {

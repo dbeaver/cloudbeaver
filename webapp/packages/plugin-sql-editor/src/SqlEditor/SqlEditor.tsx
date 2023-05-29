@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
@@ -25,58 +24,60 @@ import { SqlEditorTools } from './SqlEditorTools';
 import { useSqlEditor } from './useSqlEditor';
 
 const styles = css`
-    button, upload {
-      composes: theme-ripple from global;
-    }
-    sql-editor {
-      position: relative;
-      z-index: 0;
-      flex: 1 auto;
-      height: 100%;
-      display: flex;
-      overflow: auto;
-    }
+  button,
+  upload {
+    composes: theme-ripple from global;
+  }
+  sql-editor {
+    position: relative;
+    z-index: 0;
+    flex: 1 auto;
+    height: 100%;
+    display: flex;
+    overflow: auto;
+  }
 
-    container {
-      composes: theme-border-color-background from global;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: auto;
-      border-right: solid 1px;
-    }
-  
-    actions {
-      width: 32px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      user-select: none;
+  container {
+    composes: theme-border-color-background from global;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: auto;
+    border-right: solid 1px;
+  }
 
-      &:empty {
-        width: initial;
-      }
+  actions {
+    width: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+
+    &:empty {
+      width: initial;
     }
-  
-    button, upload {
-      background: none;
-      padding: 0;
-      margin: 0;
-      height: 32px;
-      width: 32px;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-shrink: 0;
-    }
-  
-    StaticImage {
-      height: 16px;
-      width: 16px;
-      cursor: pointer;
-    }
-  `;
+  }
+
+  button,
+  upload {
+    background: none;
+    padding: 0;
+    margin: 0;
+    height: 32px;
+    width: 32px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  StaticImage {
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+  }
+`;
 
 const tabStyles = css`
   tabs {
@@ -88,7 +89,7 @@ const tabStyles = css`
     text-transform: uppercase;
     font-weight: normal;
 
-    &:global([aria-selected=true]) {
+    &:global([aria-selected='true']) {
       font-weight: normal !important;
     }
   }
@@ -136,7 +137,12 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   const isQuery = data.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
   const isExecutable = data.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
 
-  return styled(styles, BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, tabStyles)(
+  return styled(
+    styles,
+    BASE_TAB_STYLES,
+    VERTICAL_ROTATED_TAB_STYLES,
+    tabStyles,
+  )(
     <TabsState
       currentTabId={state.currentModeId}
       container={sqlEditorModeService.tabsContainer}
@@ -153,11 +159,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
               <>
                 {isQuery && (
                   <>
-                    <button
-                      disabled={disabled}
-                      title={translate('sql_editor_sql_execution_button_tooltip')}
-                      onClick={data.executeQuery}
-                    >
+                    <button disabled={disabled} title={translate('sql_editor_sql_execution_button_tooltip')} onClick={data.executeQuery}>
                       <StaticImage icon="/icons/sql_exec.svg" />
                     </button>
                     <button
@@ -178,11 +180,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
                   <StaticImage icon="/icons/sql_script_exec.svg" />
                 </button>
                 {isQuery && data.dialect?.supportsExplainExecutionPlan && (
-                  <button
-                    disabled={disabled}
-                    title={translate('sql_editor_execution_plan_button_tooltip')}
-                    onClick={data.showExecutionPlan}
-                  >
+                  <button disabled={disabled} title={translate('sql_editor_execution_plan_button_tooltip')} onClick={data.showExecutionPlan}>
                     <StaticImage icon="/icons/sql_execution_plan.svg" />
                   </button>
                 )}
@@ -199,6 +197,6 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
           </tabs>
         ) : null}
       </sql-editor>
-    </TabsState>
+    </TabsState>,
   );
 });

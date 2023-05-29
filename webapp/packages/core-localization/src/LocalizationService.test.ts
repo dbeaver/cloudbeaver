@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import '@testing-library/jest-dom';
 
 import { mockAuthentication } from '@cloudbeaver/core-authentication/mocks/mockAuthentication';
@@ -21,10 +20,7 @@ import { ILocalizationSettings, LocalizationService } from './LocalizationServic
 const endpoint = createGQLEndpoint();
 const app = createApp();
 
-const server = mockGraphQL(
-  ...mockAppInit(endpoint),
-  ...mockAuthentication(endpoint)
-);
+const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
 
 beforeAll(() => app.init());
 
@@ -45,9 +41,7 @@ test('New settings equal deprecated settings', async () => {
   const settings = app.injector.getServiceByClass(LocalizationService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(
-    endpoint.query('serverConfig', mockServerConfig(equalConfig)),
-  );
+  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfig)));
 
   await config.refresh();
 

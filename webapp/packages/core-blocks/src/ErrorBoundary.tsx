@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React, { ErrorInfo } from 'react';
 import styled, { css } from 'reshadow';
 
@@ -43,15 +42,9 @@ interface IState {
   exceptions: IErrorData[];
 }
 
-export class ErrorBoundary
-  extends React.Component<React.PropsWithChildren<Props>, IState>
-  implements IExceptionContext {
+export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props>, IState> implements IExceptionContext {
   get canRefresh(): boolean {
-    return (
-      !!this.props.remount
-      || !!this.props.onRefresh
-      || this.state.exceptions.some(error => errorOf(error.error, LoadingError))
-    );
+    return !!this.props.remount || !!this.props.onRefresh || this.state.exceptions.some(error => errorOf(error.error, LoadingError));
   }
   constructor(props: Props) {
     super(props);
@@ -69,12 +62,15 @@ export class ErrorBoundary
       if (state.exceptions.some(data => data.error === error)) {
         return state;
       }
-      return ({
-        exceptions: [...state.exceptions, {
-          error,
-          errorInfo,
-        }],
-      });
+      return {
+        exceptions: [
+          ...state.exceptions,
+          {
+            error,
+            errorInfo,
+          },
+        ],
+      };
     });
   }
 
@@ -84,16 +80,18 @@ export class ErrorBoundary
     for (const errorData of this.state.exceptions) {
       if (root) {
         return styled(style)(
-          <DisplayError
-            className={className}
-            root={root}
-            error={errorData.error}
-            styles={styles}
-            errorInfo={errorData.errorInfo}
-          >
-            {onClose && <action><Button onClick={onClose}>Close</Button></action>}
-            {this.canRefresh && <action><Button onClick={this.refresh}>Refresh</Button></action>}
-          </DisplayError>
+          <DisplayError className={className} root={root} error={errorData.error} styles={styles} errorInfo={errorData.errorInfo}>
+            {onClose && (
+              <action>
+                <Button onClick={onClose}>Close</Button>
+              </action>
+            )}
+            {this.canRefresh && (
+              <action>
+                <Button onClick={this.refresh}>Refresh</Button>
+              </action>
+            )}
+          </DisplayError>,
         );
       } else {
         return (
@@ -110,11 +108,7 @@ export class ErrorBoundary
       }
     }
 
-    return (
-      <ErrorContext.Provider value={this}>
-        {children}
-      </ErrorContext.Provider>
-    );
+    return <ErrorContext.Provider value={this}>{children}</ErrorContext.Provider>;
   }
 
   private refresh() {

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { ActionSnackbar } from '@cloudbeaver/core-blocks';
 import { ServiceWorkerService } from '@cloudbeaver/core-browser';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -33,15 +32,18 @@ export class PluginBrowserBootstrap extends Bootstrap {
         return;
       }
 
-      this.notificationService.customNotification(() => ActionSnackbar, {
-        actionText: 'ui_processing_reload',
-        onAction: () => window.location.reload(),
-      }, { title: 'plugin_browser_update_dialog_title', persistent: true, type: ENotificationType.Info });
+      this.notificationService.customNotification(
+        () => ActionSnackbar,
+        {
+          actionText: 'ui_processing_reload',
+          onAction: () => window.location.reload(),
+        },
+        { title: 'plugin_browser_update_dialog_title', persistent: true, type: ENotificationType.Info },
+      );
 
       ExecutorInterrupter.interrupt(context);
     });
   }
 
-  load(): void | Promise<void> {
-  }
+  load(): void | Promise<void> {}
 }

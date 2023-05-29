@@ -5,10 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { KEY_BINDING_OPEN_IN_TAB, KEY_BINDING_REDO, KEY_BINDING_UNDO } from '@cloudbeaver/core-view';
-import { KEY_BINDING_ENABLE_FILTER, KEY_BINDING_COLLAPSE_ALL, KEY_BINDING_LINK_OBJECT } from '@cloudbeaver/plugin-navigation-tree';
-import { KEY_BINDING_SQL_EDITOR_EXECUTE, KEY_BINDING_SQL_EDITOR_EXECUTE_NEW, KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT, KEY_BINDING_SQL_EDITOR_FORMAT, KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN } from '@cloudbeaver/plugin-sql-editor';
+import { KEY_BINDING_COLLAPSE_ALL, KEY_BINDING_ENABLE_FILTER, KEY_BINDING_LINK_OBJECT } from '@cloudbeaver/plugin-navigation-tree';
+import {
+  KEY_BINDING_SQL_EDITOR_EXECUTE,
+  KEY_BINDING_SQL_EDITOR_EXECUTE_NEW,
+  KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT,
+  KEY_BINDING_SQL_EDITOR_FORMAT,
+  KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+} from '@cloudbeaver/plugin-sql-editor';
 
 import type { IShortcut } from './IShortcut';
 
@@ -98,5 +103,5 @@ function transformKeys(keys: string | string[]): string[] {
     keys = [keys];
   }
 
-  return keys.map(key => key.toLocaleUpperCase().replace(/\+/ig, ' + '));
+  return keys.map(key => key.toLocaleUpperCase().replace(/\+/gi, ' + '));
 }

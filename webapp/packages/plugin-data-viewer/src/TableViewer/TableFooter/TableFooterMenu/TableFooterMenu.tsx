@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -47,13 +46,7 @@ interface Props {
   className?: string;
 }
 
-export const TableFooterMenu = observer<Props>(function TableFooterMenu({
-  resultIndex,
-  model,
-  simple,
-  context,
-  className,
-}) {
+export const TableFooterMenu = observer<Props>(function TableFooterMenu({ resultIndex, model, simple, context, className }) {
   const mainMenuService = useService(TableFooterMenuService);
   const menu = useMenu({ menu: DATA_VIEWER_DATA_MODEL_ACTIONS_MENU, context });
 
@@ -67,6 +60,6 @@ export const TableFooterMenu = observer<Props>(function TableFooterMenu({
         <TableFooterMenuItem key={i} menuItem={topItem} />
       ))}
       <MenuBar menu={menu} style={[MENU_BAR_DEFAULT_STYLES, MENU_BAR_SMALL_STYLES, menuStyles]} />
-    </menu-wrapper>
+    </menu-wrapper>,
   );
 });

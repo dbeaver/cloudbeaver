@@ -5,14 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import {
-  GraphQLService,
-  CachedDataResource,
-  SessionStateFragment
-} from '@cloudbeaver/core-sdk';
+import { CachedDataResource, GraphQLService, SessionStateFragment } from '@cloudbeaver/core-sdk';
 
 import { ServerConfigResource } from './ServerConfigResource';
 import { ServerEventId } from './SessionEventSource';
@@ -38,17 +33,26 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
   constructor(
     private readonly graphQLService: GraphQLService,
     sessionInfoEventHandler: SessionInfoEventHandler,
-    serverConfigResource: ServerConfigResource
+    serverConfigResource: ServerConfigResource,
   ) {
     super(() => null);
 
     this.onStatusUpdate = new SyncExecutor();
-    sessionInfoEventHandler.onEvent(ServerEventId.CbSessionState, event => {
-      this.onStatusUpdate.execute(event);
-    }, undefined, this);
+    sessionInfoEventHandler.onEvent(
+      ServerEventId.CbSessionState,
+      event => {
+        this.onStatusUpdate.execute(event);
+      },
+      undefined,
+      this,
+    );
 
     this.action = null;
-    this.sync(serverConfigResource, () => {}, () => {});
+    this.sync(
+      serverConfigResource,
+      () => {},
+      () => {},
+    );
   }
 
   processAction(): ISessionAction | null {

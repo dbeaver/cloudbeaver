@@ -5,12 +5,18 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable, runInAction, toJS } from 'mobx';
 import React from 'react';
 
-import { AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, EAdminPermission, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { ConnectionInfoProjectKey, createConnectionParam, DatabaseAuthModelsResource, DatabaseConnection, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
+import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, EAdminPermission, UserInfoResource } from '@cloudbeaver/core-authentication';
+import {
+  ConnectionInfoProjectKey,
+  createConnectionParam,
+  DatabaseAuthModelsResource,
+  DatabaseConnection,
+  DBDriverResource,
+  isLocalConnection,
+} from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
@@ -24,7 +30,7 @@ import { ConnectionFormService } from '../ConnectionFormService';
 import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
 import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
-import type { IConnectionFormSubmitData, IConnectionFormFillConfigData, IConnectionFormState } from '../IConnectionFormProps';
+import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
 
 export const Options = React.lazy(async () => {
   const { Options } = await import('./Options');
@@ -42,7 +48,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     private readonly localizationService: LocalizationService,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
-    private readonly permissionsService: PermissionsService
+    private readonly permissionsService: PermissionsService,
   ) {
     super();
 
@@ -59,27 +65,20 @@ export class ConnectionOptionsTabService extends Bootstrap {
       panel: () => Options,
     });
 
-    this.connectionFormService.prepareConfigTask
-      .addHandler(this.prepareConfig.bind(this));
+    this.connectionFormService.prepareConfigTask.addHandler(this.prepareConfig.bind(this));
 
-    this.connectionFormService.formValidationTask
-      .addHandler(this.validate.bind(this));
+    this.connectionFormService.formValidationTask.addHandler(this.validate.bind(this));
 
-    this.connectionFormService.formSubmittingTask
-      .addHandler(this.save.bind(this));
+    this.connectionFormService.formSubmittingTask.addHandler(this.save.bind(this));
 
-    this.connectionFormService.formStateTask
-      .addHandler(this.formState.bind(this))
-      .addHandler(this.formAuthState.bind(this));
+    this.connectionFormService.formStateTask.addHandler(this.formState.bind(this)).addHandler(this.formAuthState.bind(this));
 
-    this.connectionFormService.configureTask
-      .addHandler(this.configure.bind(this));
+    this.connectionFormService.configureTask.addHandler(this.configure.bind(this));
 
-    this.connectionFormService.fillConfigTask
-      .addHandler(this.fillConfig.bind(this));
+    this.connectionFormService.fillConfigTask.addHandler(this.fillConfig.bind(this));
   }
 
-  load(): void { }
+  load(): void {}
 
   isProjectShared(state: IConnectionFormState): boolean {
     if (state.projectId === null) {
@@ -103,13 +102,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     return adminPermission && originLocal && isProjectShared && !this.serverConfigResource.distributed;
   }
 
-  private async save(
-    {
-      state,
-      submitType,
-    }: IConnectionFormSubmitData,
-    contexts: IExecutionContextProvider<IConnectionFormSubmitData>
-  ) {
+  private async save({ state, submitType }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
     const status = contexts.getContext(this.connectionFormService.connectionStatusContext);
     const config = contexts.getContext(connectionConfigContext);
 
@@ -121,10 +114,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     try {
       if (submitType === 'submit') {
         if (state.mode === 'edit') {
-          const connection = await state.resource.update(
-            createConnectionParam(state.projectId, config.connectionId!),
-            config
-          );
+          const connection = await state.resource.update(createConnectionParam(state.projectId, config.connectionId!), config);
           status.info('Connection was updated');
           status.info(connection.name);
         } else {
@@ -149,19 +139,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
   }
 
-  private async validate(
-    {
-      state,
-    }: IConnectionFormSubmitData,
-    contexts: IExecutionContextProvider<IConnectionFormSubmitData>
-  ) {
+  private async validate({ state }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
     const validation = contexts.getContext(this.connectionFormService.connectionValidationContext);
 
-    if (
-      state.config.configurationType === DriverConfigurationType.Manual
-       && state.config.host?.length === 0
-       && state.config.driverId
-    ) {
+    if (state.config.configurationType === DriverConfigurationType.Manual && state.config.host?.length === 0 && state.config.driverId) {
       const driver = await this.dbDriverResource.load(state.config.driverId);
       if (!driver.embedded) {
         validation.error('plugin_connections_connection_form_host_invalid');
@@ -193,10 +174,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     // }
   }
 
-  private fillConfig(
-    { state, updated }: IConnectionFormFillConfigData,
-    contexts: IExecutionContextProvider<IConnectionFormFillConfigData>
-  ) {
+  private fillConfig({ state, updated }: IConnectionFormFillConfigData, contexts: IExecutionContextProvider<IConnectionFormFillConfigData>) {
     if (!updated) {
       return;
     }
@@ -229,7 +207,6 @@ export class ConnectionOptionsTabService extends Bootstrap {
     state.config.url = state.info.url;
     state.config.folder = state.info.folder;
 
-
     state.config.authModelId = state.info.authModel;
     state.config.saveCredentials = state.info.credentialsSaved;
     state.config.sharedCredentials = state.info.sharedCredentials;
@@ -253,10 +230,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     configuration.include('includeOrigin', 'includeAuthProperties', 'includeCredentialsSaved', 'customIncludeOptions');
   }
 
-  private async prepareConfig(
-    { state }: IConnectionFormSubmitData,
-    contexts: IExecutionContextProvider<IConnectionFormSubmitData>
-  ) {
+  private async prepareConfig({ state }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
     const config = contexts.getContext(connectionConfigContext);
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
 
@@ -276,9 +250,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     tempConfig.name = state.config.name?.trim();
 
     if (tempConfig.name && state.mode === 'create') {
-      const connections = await state.resource.load(
-        ConnectionInfoProjectKey(state.projectId)
-      );
+      const connections = await state.resource.load(ConnectionInfoProjectKey(state.projectId));
       const connectionNames = connections.map(connection => connection.name);
 
       tempConfig.name = getUniqueName(tempConfig.name, connectionNames);
@@ -351,17 +323,12 @@ export class ConnectionOptionsTabService extends Bootstrap {
     });
   }
 
-  private async formAuthState(
-    data: IConnectionFormState,
-    contexts: IExecutionContextProvider<IConnectionFormState>
-  ) {
+  private async formAuthState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const config = contexts.getContext(connectionConfigContext);
     const stateContext = contexts.getContext(connectionFormStateContext);
 
     const driver = await this.dbDriverResource.load(config.driverId!, ['includeProviderProperties']);
-    const authModel = await this.databaseAuthModelsResource.load(
-      config.authModelId ?? data.info?.authModel ?? driver.defaultAuthModel
-    );
+    const authModel = await this.databaseAuthModelsResource.load(config.authModelId ?? data.info?.authModel ?? driver.defaultAuthModel);
 
     const providerId = authModel.requiredAuth ?? data.info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
 
@@ -369,16 +336,15 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     if (!this.userInfoResource.hasToken(providerId)) {
       const provider = await this.authProvidersResource.load(providerId);
-      const message = this.localizationService.translate('connections_public_connection_cloud_auth_required', undefined, { providerLabel: provider.label });
+      const message = this.localizationService.translate('connections_public_connection_cloud_auth_required', undefined, {
+        providerLabel: provider.label,
+      });
       stateContext.setStatusMessage(message);
       stateContext.readonly = data.mode === 'edit';
     }
   }
 
-  private async formState(
-    data: IConnectionFormState,
-    contexts: IExecutionContextProvider<IConnectionFormState>
-  ) {
+  private async formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     if (!data.info) {
       return;
     }
@@ -388,38 +354,29 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const driver = await this.dbDriverResource.load(data.config.driverId!, ['includeProviderProperties']);
 
     if (
-      !isValuesEqual(config.name, data.info.name, '')
-      || !isValuesEqual(config.configurationType, data.info.configurationType, DriverConfigurationType.Manual)
-      || !isValuesEqual(config.description, data.info.description, '')
-      || !isValuesEqual(config.template, data.info.template, true)
-      || !isValuesEqual(config.folder, data.info.folder, undefined)
-      || !isValuesEqual(config.driverId, data.info.driverId, '')
-      || (config.url !== undefined && !isValuesEqual(config.url, data.info.url, ''))
-      || (config.host !== undefined && !isValuesEqual(config.host, data.info.host, ''))
-      || (config.port !== undefined && !isValuesEqual(config.port, data.info.port, ''))
-      || (config.serverName !== undefined && !isValuesEqual(config.serverName, data.info.serverName, ''))
-      || (config.databaseName !== undefined && !isValuesEqual(config.databaseName, data.info.databaseName, ''))
-      || config.credentials !== undefined
-      || (config.authModelId !== undefined && !isValuesEqual(config.authModelId, data.info.authModel, ''))
-      || (config.saveCredentials !== undefined && config.saveCredentials !== data.info.credentialsSaved)
-      || (config.sharedCredentials !== undefined && config.sharedCredentials !== data.info.sharedCredentials)
-      || (
-        config.providerProperties !== undefined
-        && !isObjectPropertyInfoStateEqual(
-          driver.providerProperties,
-          config.providerProperties,
-          data.info.providerProperties
-        )
-      )
+      !isValuesEqual(config.name, data.info.name, '') ||
+      !isValuesEqual(config.configurationType, data.info.configurationType, DriverConfigurationType.Manual) ||
+      !isValuesEqual(config.description, data.info.description, '') ||
+      !isValuesEqual(config.template, data.info.template, true) ||
+      !isValuesEqual(config.folder, data.info.folder, undefined) ||
+      !isValuesEqual(config.driverId, data.info.driverId, '') ||
+      (config.url !== undefined && !isValuesEqual(config.url, data.info.url, '')) ||
+      (config.host !== undefined && !isValuesEqual(config.host, data.info.host, '')) ||
+      (config.port !== undefined && !isValuesEqual(config.port, data.info.port, '')) ||
+      (config.serverName !== undefined && !isValuesEqual(config.serverName, data.info.serverName, '')) ||
+      (config.databaseName !== undefined && !isValuesEqual(config.databaseName, data.info.databaseName, '')) ||
+      config.credentials !== undefined ||
+      (config.authModelId !== undefined && !isValuesEqual(config.authModelId, data.info.authModel, '')) ||
+      (config.saveCredentials !== undefined && config.saveCredentials !== data.info.credentialsSaved) ||
+      (config.sharedCredentials !== undefined && config.sharedCredentials !== data.info.sharedCredentials) ||
+      (config.providerProperties !== undefined &&
+        !isObjectPropertyInfoStateEqual(driver.providerProperties, config.providerProperties, data.info.providerProperties))
     ) {
       stateContext.markEdited();
     }
   }
 
-  private isCredentialsChanged(
-    authProperties: ObjectPropertyInfo[],
-    credentials: Record<string, any>
-  ) {
+  private isCredentialsChanged(authProperties: ObjectPropertyInfo[], credentials: Record<string, any>) {
     for (const property of authProperties) {
       const value = credentials[property.id!];
 
@@ -434,10 +391,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     return false;
   }
 
-  private async getConnectionAuthModelProperties(
-    authModelId: string,
-    connectionInfo?: DatabaseConnection
-  ): Promise<ObjectPropertyInfo[]> {
+  private async getConnectionAuthModelProperties(authModelId: string, connectionInfo?: DatabaseConnection): Promise<ObjectPropertyInfo[]> {
     const authModel = await this.databaseAuthModelsResource.load(authModelId);
 
     let properties = authModel.properties;

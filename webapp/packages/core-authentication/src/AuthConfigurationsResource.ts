@@ -5,12 +5,23 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { AdminAuthProviderConfiguration, CachedMapAllKey, CachedMapResource, GetAuthProviderConfigurationsQueryVariables, GraphQLService, isResourceAlias, ResourceKey, ResourceKeyList, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import {
+  AdminAuthProviderConfiguration,
+  CachedMapAllKey,
+  CachedMapResource,
+  GetAuthProviderConfigurationsQueryVariables,
+  GraphQLService,
+  isResourceAlias,
+  ResourceKey,
+  ResourceKeyList,
+  resourceKeyList,
+  ResourceKeySimple,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-sdk';
 
 import type { AuthProviderConfiguration } from './AuthProvidersResource';
 import { EAdminPermission } from './EAdminPermission';
@@ -22,17 +33,11 @@ export type AuthConfiguration = AdminAuthProviderConfiguration;
 type NewConfiguration = AuthConfiguration & { [NEW_CONFIGURATION_SYMBOL]: boolean; timestamp: number };
 
 @injectable()
-export class AuthConfigurationsResource
-  extends CachedMapResource<string, AuthConfiguration, GetAuthProviderConfigurationsQueryVariables> {
-  constructor(
-    private readonly graphQLService: GraphQLService,
-    permissionsResource: SessionPermissionsResource,
-  ) {
+export class AuthConfigurationsResource extends CachedMapResource<string, AuthConfiguration, GetAuthProviderConfigurationsQueryVariables> {
+  constructor(private readonly graphQLService: GraphQLService, permissionsResource: SessionPermissionsResource) {
     super(() => new Map(), []);
 
-    permissionsResource
-      .require(this, EAdminPermission.admin)
-      .outdateResource(this);
+    permissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
   }
 
   async saveConfiguration(config: AuthConfiguration): Promise<AuthConfiguration> {
@@ -111,15 +116,11 @@ export class AuthConfigurationsResource
   }
 }
 
-function isNewConfiguration(
-  configuration: AuthConfiguration | NewConfiguration
-): configuration is NewConfiguration {
+function isNewConfiguration(configuration: AuthConfiguration | NewConfiguration): configuration is NewConfiguration {
   return (configuration as NewConfiguration)[NEW_CONFIGURATION_SYMBOL];
 }
 
-export function compareAuthConfigurations(
-  a: AuthConfiguration, b: AuthConfiguration
-): number {
+export function compareAuthConfigurations(a: AuthConfiguration, b: AuthConfiguration): number {
   if (isNewConfiguration(a) && isNewConfiguration(b)) {
     return b.timestamp - a.timestamp;
   }

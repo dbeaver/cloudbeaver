@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable, observable } from 'mobx';
 
 import { uuid } from '@cloudbeaver/core-utils';
@@ -42,10 +41,7 @@ export class AsyncTask {
   private readonly cancel: (info: AsyncTaskInfo) => Promise<void>;
   private initPromise: Promise<void> | null;
 
-  constructor(
-    init: () => Promise<AsyncTaskInfo>,
-    cancel: (info: AsyncTaskInfo) => Promise<void>
-  ) {
+  constructor(init: () => Promise<AsyncTaskInfo>, cancel: (info: AsyncTaskInfo) => Promise<void>) {
     this.id = uuid();
     this.init = init;
     this.cancel = cancel;
@@ -107,7 +103,7 @@ export class AsyncTask {
     }
 
     if (!this.pending) {
-      throw new Error('Can\'t cancel finished task');
+      throw new Error("Can't cancel finished task");
     }
 
     this._cancelled = true;

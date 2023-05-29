@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
@@ -22,16 +21,12 @@ interface Props {
   style?: ComponentStyle;
 }
 
-export const MetaParameterInfoPanel = observer<Props>(function MetaParameterInfoPanel({
-  user,
-  className,
-  style,
-}) {
+export const MetaParameterInfoPanel = observer<Props>(function MetaParameterInfoPanel({ user, className, style }) {
   const styles = useStyles(style);
 
   return styled(styles)(
-    <TabPanel tabId='info' className={className}>
+    <TabPanel tabId="info" className={className}>
       <MetaParametersForm user={user} />
-    </TabPanel>
+    </TabPanel>,
   );
 });

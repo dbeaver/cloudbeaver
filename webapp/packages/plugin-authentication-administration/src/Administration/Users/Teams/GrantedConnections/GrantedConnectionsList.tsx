@@ -5,30 +5,28 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
+  BASE_CONTAINERS_STYLES,
+  Button,
+  getComputed,
+  getSelectedItems,
+  Group,
   Table,
   TableBody,
-  TableItem,
   TableColumnValue,
-  BASE_CONTAINERS_STYLES,
-  Group,
-  Button,
+  TableItem,
   useObjectRef,
-  getSelectedItems,
-  getComputed,
+  useStyles,
   useTranslate,
-  useStyles
 } from '@cloudbeaver/core-blocks';
 import { Connection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
-
 
 import { getFilteredConnections } from './getFilteredConnections';
 import { GrantedConnectionsTableHeader, IFilterState } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader';
@@ -36,28 +34,30 @@ import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHea
 import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem';
 
 const styles = css`
-    Group {
-      position: relative;
-    }
-    Group, container, table-container {
-      height: 100%;
-    }
-    container {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-    }
-    GrantedConnectionsTableHeader {
-      flex: 0 0 auto;
-    }
-    table-container {
-      overflow: auto;
-    }
-    Table {
-      composes: theme-background-surface theme-text-on-surface from global;
-      width: 100%;
-    }
-  `;
+  Group {
+    position: relative;
+  }
+  Group,
+  container,
+  table-container {
+    height: 100%;
+  }
+  container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  GrantedConnectionsTableHeader {
+    flex: 0 0 auto;
+  }
+  table-container {
+    overflow: auto;
+  }
+  Table {
+    composes: theme-background-surface theme-text-on-surface from global;
+    width: 100%;
+  }
+`;
 
 interface Props {
   grantedConnections: Connection[];
@@ -66,12 +66,7 @@ interface Props {
   onEdit: () => void;
 }
 
-export const GrantedConnectionList = observer<Props>(function GrantedConnectionList({
-  grantedConnections,
-  disabled,
-  onRevoke,
-  onEdit,
-}) {
+export const GrantedConnectionList = observer<Props>(function GrantedConnectionList({ grantedConnections, disabled, onRevoke, onEdit }) {
   const props = useObjectRef({ onRevoke, onEdit });
   const style = useStyles(styles, BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
@@ -104,18 +99,20 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
     <Group box medium overflow>
       <container>
         <GrantedConnectionsTableHeader filterState={filterState} disabled={disabled}>
-          <Button disabled={disabled || !selected} mod={['outlined']} onClick={revoke}>{translate('ui_delete')}</Button>
-          <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>{translate('ui_edit')}</Button>
+          <Button disabled={disabled || !selected} mod={['outlined']} onClick={revoke}>
+            {translate('ui_delete')}
+          </Button>
+          <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>
+            {translate('ui_edit')}
+          </Button>
         </GrantedConnectionsTableHeader>
         <table-container>
-          <Table keys={keys} selectedItems={selectedSubjects} size='big'>
+          <Table keys={keys} selectedItems={selectedSubjects} size="big">
             <GrantedConnectionsTableInnerHeader disabled={disabled} />
             <TableBody>
               {tableInfoText && (
-                <TableItem item='tableInfo' selectDisabled>
-                  <TableColumnValue colSpan={5}>
-                    {translate(tableInfoText)}
-                  </TableColumnValue>
+                <TableItem item="tableInfo" selectDisabled>
+                  <TableColumnValue colSpan={5}>{translate(tableInfoText)}</TableColumnValue>
                 </TableItem>
               )}
               {connections.map(connection => {
@@ -136,6 +133,6 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
           </Table>
         </table-container>
       </container>
-    </Group>
+    </Group>,
   );
 });

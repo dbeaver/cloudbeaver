@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { createDataContext } from '@cloudbeaver/core-view';
 
 export const DATA_CONTEXT_DV_DDM_RESULT_INDEX = createDataContext<number>('data-viewer-database-data-model-result-index');

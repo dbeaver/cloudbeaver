@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
@@ -27,7 +26,5 @@ export const SqlEditorActionsMenu = observer<Props>(function SqlEditorActionsMen
   const menu = useMenu({ menu: SQL_EDITOR_ACTIONS_MENU, context });
   menu.context.set(DATA_CONTEXT_SQL_EDITOR_STATE, state);
 
-  return (
-    <MenuBar style={[SQL_EDITOR_ACTIONS_MENU_STYLES, ...[style].flat(2)]} menu={menu} />
-  );
+  return <MenuBar style={[SQL_EDITOR_ACTIONS_MENU_STYLES, ...[style].flat(2)]} menu={menu} />;
 });

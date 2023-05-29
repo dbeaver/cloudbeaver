@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IExecutorHandlersCollection, ISyncContextLoader } from '@cloudbeaver/core-executor';
 
 import { App } from './App';
@@ -19,15 +18,12 @@ export class DIService {
     return this.app.getServiceInjector();
   }
 
-  constructor(
-    private readonly app: App
-  ) { }
+  constructor(private readonly app: App) {}
 
   addDIContext(context: IExecutorHandlersCollection<any>): void {
     context.addContextCreator(dependencyInjectorContext, this.dependencyInjectorContext);
   }
 
-  private readonly dependencyInjectorContext: ISyncContextLoader<<T>(ctor: IServiceConstructor<T>) => T> = (
-    () => this.serviceInjector.getServiceByClass.bind(this)
-  );
+  private readonly dependencyInjectorContext: ISyncContextLoader<<T>(ctor: IServiceConstructor<T>) => T> = () =>
+    this.serviceInjector.getServiceByClass.bind(this);
 }

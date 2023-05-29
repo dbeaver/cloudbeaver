@@ -1,0 +1,92 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "env": {
+      "cwd": "${workspaceFolder}/webapp",
+      "NODE_OPTIONS": "--max-old-space-size=8192"
+    }
+  },
+  "tasks": [
+    {
+      "label": "Run Tests",
+      "type": "shell",
+      "command": "yarn",
+      "group": "test",
+      "args": [
+        "lerna",
+        "run",
+        "test",
+        "--no-bail",
+        "--stream",
+        "--"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "clear": true
+      }
+    },
+    {
+      "label": "DevServer",
+      "type": "shell",
+      "command": "yarn",
+      "args": [
+        "dev",
+        "--",
+        "--env",
+        "server=${input:stage.ce}",
+        "--host",
+        "0.0.0.0"
+      ],
+      "problemMatcher": [],
+      "options": {
+        "cwd": "${workspaceFolder}/webapp/packages/product-default"
+      },
+      "presentation": {
+        "clear": true
+      }
+    },
+    {
+      "label": "Yarn Install",
+      "type": "shell",
+      "command": "yarn",
+      "args": [],
+      "problemMatcher": [],
+      "presentation": {
+        "clear": true
+      }
+    },
+    {
+      "label": "Lerna Bootstrap",
+      "type": "shell",
+      "command": "yarn",
+      "args": [
+        "lerna",
+        "bootstrap"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "clear": true
+      }
+    },
+    {
+      "label": "Bootstrap",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Yarn Install",
+        "Lerna Bootstrap"
+      ],
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "type": "pickString",
+      "id": "stage.ce",
+      "description": "CE Stage servers",
+      "default": "http://127.0.0.1:8978/",
+      "options": [
+        "http://127.0.0.1:8978/",
+      ]
+    }
+  ]
+}

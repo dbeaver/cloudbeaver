@@ -5,12 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ISyncContextLoader } from '@cloudbeaver/core-executor';
 
 import type { ISQLScriptSegment } from '../SQLParser';
 import type { ISQLEditorData } from './ISQLEditorData';
-
 
 export interface ISQLEditorMode {
   activeSegment: ISQLScriptSegment | undefined;

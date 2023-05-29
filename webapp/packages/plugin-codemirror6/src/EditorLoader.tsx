@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { forwardRef } from 'react';
 
 import { ComplexLoader, createComplexLoader } from '@cloudbeaver/core-blocks';
@@ -20,9 +19,5 @@ const loader = createComplexLoader(async function loader() {
 });
 
 export const EditorLoader = forwardRef<IEditorRef, IEditorProps & IDefaultExtensions>(function EditorLoader(props, ref) {
-  return (
-    <ComplexLoader loader={loader}>
-      {({ Editor }) => <Editor {...props} ref={ref} />}
-    </ComplexLoader>
-  );
+  return <ComplexLoader loader={loader}>{({ Editor }) => <Editor {...props} ref={ref} />}</ComplexLoader>;
 });

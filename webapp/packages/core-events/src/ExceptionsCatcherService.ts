@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { NotificationService } from './NotificationService';
@@ -36,13 +35,7 @@ export class ExceptionsCatcherService extends Bootstrap {
     this.ignored.push(message);
   }
 
-  private readonly catcher = (
-    event: Event | string,
-    source?: string,
-    lineno?: number,
-    colno?: number,
-    _error?: Error
-  ) => {
+  private readonly catcher = (event: Event | string, source?: string, lineno?: number, colno?: number, _error?: Error) => {
     if (_error) {
       this.notificationService.logException(_error, this.messageTitle);
     } else {

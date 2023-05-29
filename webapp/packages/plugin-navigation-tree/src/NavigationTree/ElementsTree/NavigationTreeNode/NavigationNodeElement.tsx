@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled from 'reshadow';
 
-import { Translate, TreeNodeNestedMessage, TREE_NODE_STYLES } from '@cloudbeaver/core-blocks';
+import { Translate, TREE_NODE_STYLES, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 
@@ -18,13 +17,7 @@ import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { NavTreeNodeComponent } from '../NavigationNodeComponent';
 import { NavigationNodeRendererLoader } from './NavigationNodeRendererLoader';
 
-export const NavigationNodeElement: NavTreeNodeComponent = observer(function NavigationNodeElement({
-  nodeId,
-  path,
-  expanded,
-  dragging,
-  className,
-}) {
+export const NavigationNodeElement: NavTreeNodeComponent = observer(function NavigationNodeElement({ nodeId, path, expanded, dragging, className }) {
   const context = useContext(ElementsTreeContext);
   const navNodeInfoResource = useService(NavNodeInfoResource);
 
@@ -52,8 +45,8 @@ export const NavigationNodeElement: NavTreeNodeComponent = observer(function Nav
   if (!node) {
     return styled(TREE_NODE_STYLES)(
       <TreeNodeNestedMessage>
-        <Translate token='app_navigationTree_node_not_found' />
-      </TreeNodeNestedMessage>
+        <Translate token="app_navigationTree_node_not_found" />
+      </TreeNodeNestedMessage>,
     );
   }
 

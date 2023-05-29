@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -49,22 +48,13 @@ interface Props {
   onClose: () => void;
 }
 
-export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDialog({
-  context,
-  processors,
-  isLoading,
-  onSelect,
-  onClose,
-}) {
+export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDialog({ context, processors, isLoading, onSelect, onClose }) {
   const translate = useTranslate();
   const { node } = useNode(context.containerNodePath || '');
 
   return styled(styles)(
-    <CommonDialogWrapper size='large' fixedSize>
-      <CommonDialogHeader
-        title="data_transfer_dialog_title"
-        onReject={onClose}
-      />
+    <CommonDialogWrapper size="large" fixedSize>
+      <CommonDialogHeader title="data_transfer_dialog_title" onReject={onClose} />
       <CommonDialogBody noBodyPadding noOverflow>
         <export-object>
           {!context.sourceName && `${translate('data_transfer_exporting_table')} ${node?.name}`}
@@ -73,7 +63,6 @@ export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDia
         {isLoading && <Loader />}
         {!isLoading && <ExportProcessorList processors={processors} onSelect={onSelect} />}
       </CommonDialogBody>
-    </CommonDialogWrapper>
+    </CommonDialogWrapper>,
   );
-}
-);
+});

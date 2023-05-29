@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React from 'react';
 
 import { TeamsResource } from '@cloudbeaver/core-authentication';
@@ -28,7 +27,7 @@ export class TeamOptionsTabService extends Bootstrap {
   constructor(
     private readonly teamFormService: TeamFormService,
     private readonly teamResource: TeamsResource,
-    private readonly localizationService: LocalizationService
+    private readonly localizationService: LocalizationService,
   ) {
     super();
   }
@@ -41,27 +40,18 @@ export class TeamOptionsTabService extends Bootstrap {
       panel: () => TeamOptions,
     });
 
-    this.teamFormService.prepareConfigTask
-      .addHandler(this.prepareConfig.bind(this));
+    this.teamFormService.prepareConfigTask.addHandler(this.prepareConfig.bind(this));
 
-    this.teamFormService.formValidationTask
-      .addHandler(this.validate.bind(this));
+    this.teamFormService.formValidationTask.addHandler(this.validate.bind(this));
 
-    this.teamFormService.formSubmittingTask
-      .addHandler(this.save.bind(this));
+    this.teamFormService.formSubmittingTask.addHandler(this.save.bind(this));
 
-    this.teamFormService.fillConfigTask
-      .addHandler(this.fillConfig.bind(this));
+    this.teamFormService.fillConfigTask.addHandler(this.fillConfig.bind(this));
   }
 
-  load(): void { }
+  load(): void {}
 
-  private async prepareConfig(
-    {
-      state,
-    }: ITeamFormSubmitData,
-    contexts: IExecutionContextProvider<ITeamFormSubmitData>
-  ) {
+  private async prepareConfig({ state }: ITeamFormSubmitData, contexts: IExecutionContextProvider<ITeamFormSubmitData>) {
     const config = contexts.getContext(teamContext);
 
     config.teamId = state.config.teamId;
@@ -86,12 +76,7 @@ export class TeamOptionsTabService extends Bootstrap {
     config.teamPermissions = [...state.config.teamPermissions];
   }
 
-  private async validate(
-    {
-      state,
-    }: ITeamFormSubmitData,
-    contexts: IExecutionContextProvider<ITeamFormSubmitData>
-  ) {
+  private async validate({ state }: ITeamFormSubmitData, contexts: IExecutionContextProvider<ITeamFormSubmitData>) {
     const validation = contexts.getContext(this.teamFormService.configurationValidationContext);
 
     if (state.mode === 'create') {
@@ -100,19 +85,16 @@ export class TeamOptionsTabService extends Bootstrap {
       }
 
       if (this.teamResource.has(state.config.teamId)) {
-        validation.error(this.localizationService.translate('administration_teams_team_info_exists', undefined, {
-          teamId: state.config.teamId,
-        }));
+        validation.error(
+          this.localizationService.translate('administration_teams_team_info_exists', undefined, {
+            teamId: state.config.teamId,
+          }),
+        );
       }
     }
   }
 
-  private async save(
-    {
-      state,
-    }: ITeamFormSubmitData,
-    contexts: IExecutionContextProvider<ITeamFormSubmitData>
-  ) {
+  private async save({ state }: ITeamFormSubmitData, contexts: IExecutionContextProvider<ITeamFormSubmitData>) {
     const status = contexts.getContext(this.teamFormService.configurationStatusContext);
     const config = contexts.getContext(teamContext);
 
@@ -138,10 +120,7 @@ export class TeamOptionsTabService extends Bootstrap {
     }
   }
 
-  private fillConfig(
-    { state, updated }: ITeamFormFillConfigData,
-    contexts: IExecutionContextProvider<ITeamFormFillConfigData>
-  ) {
+  private fillConfig({ state, updated }: ITeamFormFillConfigData, contexts: IExecutionContextProvider<ITeamFormFillConfigData>) {
     if (!updated) {
       return;
     }

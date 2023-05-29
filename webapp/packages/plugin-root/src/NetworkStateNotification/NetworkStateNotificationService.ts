@@ -5,20 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { INotification, NotificationService } from '@cloudbeaver/core-events';
 import { NetworkStateService } from '@cloudbeaver/core-root';
-
 
 @injectable()
 export class NetworkStateNotificationService extends Bootstrap {
   private activeNotification: INotification | null;
 
-  constructor(
-    private readonly notificationService: NotificationService,
-    private readonly networkStateService: NetworkStateService
-  ) {
+  constructor(private readonly notificationService: NotificationService, private readonly networkStateService: NetworkStateService) {
     super();
     this.activeNotification = null;
   }
@@ -27,7 +22,7 @@ export class NetworkStateNotificationService extends Bootstrap {
     this.networkStateService.networkStateExecutor.addHandler(this.handleNetworkStateChange.bind(this));
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 
   private handleNetworkStateChange(state: boolean): void {
     if (!state) {

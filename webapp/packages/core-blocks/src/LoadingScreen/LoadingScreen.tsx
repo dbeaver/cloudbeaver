@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useEffect, useRef } from 'react';
 import styled from 'reshadow';
 
@@ -24,12 +23,12 @@ function LoadingScreen() {
       setTimeout(() => (loadingNode as any).classList.add(styles.fadeIn));
       setTimeout(() => appContainer.removeChild(loadingNode), FADE_IN_DELAY);
     },
-    []
+    [],
   );
 
   return styled(styles)(
     <div ref={ref}>
       <Icon name="logo" viewBox="0 0 1755.6533 681.13202" />
-    </div>
+    </div>,
   );
 }

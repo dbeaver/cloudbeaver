@@ -14,13 +14,7 @@ export interface IWindowOptions {
   features?: string;
 }
 
-export function openCenteredPopup({
-  url,
-  target,
-  width = 500,
-  height = 500,
-  features,
-}: IWindowOptions): Window | null {
+export function openCenteredPopup({ url, target, width = 500, height = 500, features }: IWindowOptions): Window | null {
   if (window.top === null) {
     return null;
   }

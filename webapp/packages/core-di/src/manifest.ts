@@ -5,8 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-
 import { DIService } from './DIService';
 import type { PluginManifest } from './PluginManifest';
 
@@ -15,7 +13,5 @@ export const manifest: PluginManifest = {
     name: 'Core DI',
   },
 
-  providers: [
-    DIService,
-  ],
+  providers: [DIService],
 };

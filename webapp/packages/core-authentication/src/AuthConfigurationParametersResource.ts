@@ -5,20 +5,26 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
-import { AuthProviderConfigurationParametersFragment, CachedMapResource, GetAuthProviderConfigurationParametersQueryVariables, GraphQLService, isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { SessionDataResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
+import {
+  AuthProviderConfigurationParametersFragment,
+  CachedMapResource,
+  GetAuthProviderConfigurationParametersQueryVariables,
+  GraphQLService,
+  isResourceAlias,
+  ResourceKey,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-sdk';
 
 import { EAdminPermission } from './EAdminPermission';
 
 @injectable()
-export class AuthConfigurationParametersResource
-  extends CachedMapResource<
+export class AuthConfigurationParametersResource extends CachedMapResource<
   string,
   AuthProviderConfigurationParametersFragment[],
   GetAuthProviderConfigurationParametersQueryVariables
-  > {
+> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly sessionDataResource: SessionDataResource,
@@ -30,9 +36,7 @@ export class AuthConfigurationParametersResource
     permissionsResource.require(this, EAdminPermission.admin);
   }
 
-  protected async loader(
-    key: ResourceKey<string>
-  ): Promise<Map<string, AuthProviderConfigurationParametersFragment[]>> {
+  protected async loader(key: ResourceKey<string>): Promise<Map<string, AuthProviderConfigurationParametersFragment[]>> {
     if (isResourceAlias(key)) {
       throw new Error('Aliases not supported by this resource.');
     }

@@ -21,14 +21,22 @@ export function pathJoin(...segments: string[]): string {
   for (const part of parts) {
     // Remove leading and trailing slashes
     // Also remove "." segments
-    if (!part || part === '.') {continue;}
+    if (!part || part === '.') {
+      continue;
+    }
     // Interpret ".." to pop the last segment
-    if (part === '..') {newParts.pop();}
+    if (part === '..') {
+      newParts.pop();
+    }
     // Push new path segments.
-    else {newParts.push(part);}
+    else {
+      newParts.push(part);
+    }
   }
   // Preserve the initial slash if there was one.
-  if (parts[0] === '') {newParts.unshift('');}
+  if (parts[0] === '') {
+    newParts.unshift('');
+  }
   // Turn back into a single string path.
   return newParts.join('/') || (newParts.length ? '/' : '.');
 }

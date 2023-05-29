@@ -34,11 +34,17 @@ export default [
   ['administration_configuration_wizard_configuration_admin_name', 'Логин'],
   ['administration_configuration_wizard_configuration_admin_password', 'Пароль'],
   ['administration_configuration_wizard_configuration_anonymous_access', 'Разрешить анонимный доступ'],
-  ['administration_configuration_wizard_configuration_anonymous_access_description', 'Позволяет работать с CloudBeaver без пользовательской аутентификации'],
+  [
+    'administration_configuration_wizard_configuration_anonymous_access_description',
+    'Позволяет работать с CloudBeaver без пользовательской аутентификации',
+  ],
   ['administration_configuration_wizard_configuration_authentication_group', 'Настройки аутентификации'],
   ['administration_configuration_wizard_configuration_services_group', 'Сервисы'],
   ['administration_configuration_wizard_configuration_authentication', 'Включить пользовательскую аутентификацию'],
-  ['administration_configuration_wizard_configuration_authentication_description', 'Позволяет пользователям аутентифицироваться. Иначе будет включен анонимный доступ'],
+  [
+    'administration_configuration_wizard_configuration_authentication_description',
+    'Позволяет пользователям аутентифицироваться. Иначе будет включен анонимный доступ',
+  ],
 
   ['administration_identity_providers_tab_title', 'Провайдеры идентификации'],
   ['administration_identity_providers_provider', 'Провайдер'],

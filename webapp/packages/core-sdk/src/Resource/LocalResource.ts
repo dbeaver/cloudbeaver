@@ -5,15 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, makeObservable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import { Executor, IExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
 
-export abstract class LocalResource<
-  TData,
-  TParam,
-> {
+export abstract class LocalResource<TData, TParam> {
   data: TData;
 
   readonly onDataOutdated: IExecutor<TParam>;
@@ -90,21 +86,10 @@ export abstract class LocalResource<
 
   protected abstract loader(param: TParam): Promise<TData>;
 
-  protected async performUpdate<T>(
-    param: TParam,
-    update: (param: TParam) => Promise<T>,
-  ): Promise<T>;
-  protected async performUpdate<T>(
-    param: TParam,
-    update: (param: TParam) => Promise<T>,
-    exitCheck: () => boolean
-  ): Promise<T | undefined>;
+  protected async performUpdate<T>(param: TParam, update: (param: TParam) => Promise<T>): Promise<T>;
+  protected async performUpdate<T>(param: TParam, update: (param: TParam) => Promise<T>, exitCheck: () => boolean): Promise<T | undefined>;
 
-  protected async performUpdate<T>(
-    param: TParam,
-    update: (param: TParam) => Promise<T>,
-    exitCheck?: () => boolean
-  ): Promise<T | undefined> {
+  protected async performUpdate<T>(param: TParam, update: (param: TParam) => Promise<T>, exitCheck?: () => boolean): Promise<T | undefined> {
     if (exitCheck?.()) {
       return;
     }

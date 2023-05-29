@@ -5,15 +5,22 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, ToolsAction, Loader, ToolsPanel, useTranslate, useStyles, Group, Container, ColoredContainer } from '@cloudbeaver/core-blocks';
+import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
+import {
+  BASE_CONTAINERS_STYLES,
+  ColoredContainer,
+  Container,
+  Group,
+  Loader,
+  ToolsAction,
+  ToolsPanel,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-
-
 
 import { AuthConfigurationsTable } from './AuthConfigurationsTable/AuthConfigurationsTable';
 import { useConfigurationsTable } from './AuthConfigurationsTable/useConfigurationsTable';
@@ -32,9 +39,7 @@ const styles = css`
   }
 `;
 
-export const AuthConfigurationsAdministration: AdministrationItemContentComponent = observer(function AuthConfigurationsAdministration({
-  sub,
-}) {
+export const AuthConfigurationsAdministration: AdministrationItemContentComponent = observer(function AuthConfigurationsAdministration({ sub }) {
   const translate = useTranslate();
   const style = useStyles(BASE_CONTAINERS_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
   const service = useService(CreateAuthConfigurationService);
@@ -80,7 +85,7 @@ export const AuthConfigurationsAdministration: AdministrationItemContentComponen
             <CreateAuthConfiguration />
           </Group>
         )}
-        <Group box='no-overflow'>
+        <Group box="no-overflow">
           <Loader style={loaderStyle} loading={table.processing} overlay>
             <AuthConfigurationsTable
               configurations={table.configurations}
@@ -90,6 +95,6 @@ export const AuthConfigurationsAdministration: AdministrationItemContentComponen
           </Loader>
         </Group>
       </Container>
-    </ColoredContainer>
+    </ColoredContainer>,
   );
 });

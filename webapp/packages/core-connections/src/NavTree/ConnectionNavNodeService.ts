@@ -5,15 +5,21 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { INodeNavigationData, NavigationType, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import {
+  INodeNavigationData,
+  NavigationType,
+  NavNodeInfoResource,
+  NavNodeManagerService,
+  NavTreeResource,
+  NodeManagerUtils,
+} from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
 import { ServerEventId } from '@cloudbeaver/core-root';
-import { type ResourceKey, ResourceKeyUtils, resourceKeyList, isResourceAlias, ResourceKeySimple } from '@cloudbeaver/core-sdk';
+import { isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
 import { ConnectionFolderEventHandler, IConnectionFolderEvent } from '../ConnectionFolderEventHandler';
 import { Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
@@ -62,7 +68,7 @@ export class ConnectionNavNodeService extends Dependency {
         this.navTreeResource.markOutdated(resourceKeyList(parents));
       },
       undefined,
-      this.navTreeResource
+      this.navTreeResource,
     );
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderDeleted,
@@ -73,10 +79,13 @@ export class ConnectionNavNodeService extends Dependency {
           return parents[parents.length - 1];
         });
 
-        this.navTreeResource.deleteInNode(resourceKeyList(parents), data.nodePaths.map(value => [value]));
+        this.navTreeResource.deleteInNode(
+          resourceKeyList(parents),
+          data.nodePaths.map(value => [value]),
+        );
       },
       undefined,
-      this.navTreeResource
+      this.navTreeResource,
     );
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderUpdated,
@@ -84,26 +93,18 @@ export class ConnectionNavNodeService extends Dependency {
         this.navTreeResource.markOutdated(resourceKeyList(data.nodePaths));
       },
       undefined,
-      this.navTreeResource
+      this.navTreeResource,
     );
   }
 
-  navigationNavNodeConnectionContext: IAsyncContextLoader<Connection | undefined, INodeNavigationData> = async (
-    context,
-    {
-      nodeId,
-    }
-  ) => {
+  navigationNavNodeConnectionContext: IAsyncContextLoader<Connection | undefined, INodeNavigationData> = async (context, { nodeId }) => {
     await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
     const connection = this.connectionInfoResource.getConnectionForNode(nodeId);
 
     return connection;
   };
 
-  private async preloadConnectionInfo(
-    key: ResourceKey<string>,
-    context: IExecutionContextProvider<ResourceKey<string>>
-  ) {
+  private async preloadConnectionInfo(key: ResourceKey<string>, context: IExecutionContextProvider<ResourceKey<string>>) {
     if (isResourceAlias(key)) {
       return;
     }
@@ -132,7 +133,6 @@ export class ConnectionNavNodeService extends Dependency {
 
     connectionInfos = Array.isArray(connectionInfos) ? connectionInfos : [connectionInfos];
     for (const connectionInfo of connectionInfos) {
-
       if (!connectionInfo?.nodePath || connectionInfo.template) {
         return;
       }
@@ -181,10 +181,7 @@ export class ConnectionNavNodeService extends Dependency {
       const nodePath = connectionInfo.nodePath ?? NodeManagerUtils.connectionIdToConnectionNodeId(key.connectionId);
 
       const node = this.navNodeInfoResource.get(nodePath);
-      const folder = (
-        node?.parentId
-        ?? getProjectNodeId(key.projectId)
-      );
+      const folder = node?.parentId ?? getProjectNodeId(key.projectId);
 
       if (nodePath) {
         this.navTreeResource.deleteInNode(folder, [nodePath]);
@@ -235,13 +232,7 @@ export class ConnectionNavNodeService extends Dependency {
     this.navTreeResource.insertToNode(parentId, insertIndex, connection.nodePath);
   }
 
-  private async navigateHandler(
-    {
-      type,
-      nodeId,
-    }: INodeNavigationData,
-    contexts: IExecutionContextProvider<INodeNavigationData>
-  ): Promise<void> {
+  private async navigateHandler({ type, nodeId }: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>): Promise<void> {
     if (type !== NavigationType.open) {
       return;
     }
@@ -249,9 +240,7 @@ export class ConnectionNavNodeService extends Dependency {
     let connection: Connection | undefined | null = await contexts.getContext(this.navigationNavNodeConnectionContext);
 
     if (NodeManagerUtils.isDatabaseObject(nodeId) && connection) {
-      connection = await this.connectionsManagerService.requireConnection(
-        createConnectionParam(connection)
-      );
+      connection = await this.connectionsManagerService.requireConnection(createConnectionParam(connection));
 
       if (!connection?.connected) {
         throw new Error('Connection not established');

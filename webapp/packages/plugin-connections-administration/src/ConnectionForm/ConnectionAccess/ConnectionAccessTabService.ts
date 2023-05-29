@@ -15,7 +15,14 @@ import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/c
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { PermissionsService } from '@cloudbeaver/core-root';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
-import { connectionConfigContext, ConnectionFormService, connectionFormStateContext, IConnectionFormProps, IConnectionFormState, IConnectionFormSubmitData } from '@cloudbeaver/plugin-connections';
+import {
+  connectionConfigContext,
+  ConnectionFormService,
+  connectionFormStateContext,
+  IConnectionFormProps,
+  IConnectionFormState,
+  IConnectionFormSubmitData,
+} from '@cloudbeaver/plugin-connections';
 
 import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
 
@@ -46,35 +53,23 @@ export class ConnectionAccessTabService extends Bootstrap {
       title: 'connections_connection_edit_access',
       order: 4,
       stateGetter: context => this.stateGetter(context),
-      isHidden: (_, context) => (
-        !context
-        || !this.isAccessTabActive(context.state)
-      ),
-      isDisabled: (tabId, props) => !props?.state.config.driverId
-        || this.administrationScreenService.isConfigurationMode,
+      isHidden: (_, context) => !context || !this.isAccessTabActive(context.state),
+      isDisabled: (tabId, props) => !props?.state.config.driverId || this.administrationScreenService.isConfigurationMode,
       panel: () => ConnectionAccess,
     });
 
-    this.connectionFormService.formSubmittingTask
-      .addHandler(executorHandlerFilter(
-        data => this.isAccessTabActive(data.state),
-        this.save.bind(this)
-      ));
+    this.connectionFormService.formSubmittingTask.addHandler(executorHandlerFilter(data => this.isAccessTabActive(data.state), this.save.bind(this)));
 
-    this.connectionFormService.formStateTask
-      .addHandler(executorHandlerFilter(
-        this.isAccessTabActive.bind(this),
-        this.formState.bind(this)
-      ));
+    this.connectionFormService.formStateTask.addHandler(executorHandlerFilter(this.isAccessTabActive.bind(this), this.formState.bind(this)));
   }
 
-  load(): void { }
+  load(): void {}
 
   private isAccessTabActive(state: IConnectionFormState): boolean {
     return (
-      state.projectId !== null
-      && isGlobalProject(this.projectInfoResource.get(state.projectId))
-      && this.permissionsResource.has(EAdminPermission.admin)
+      state.projectId !== null &&
+      isGlobalProject(this.projectInfoResource.get(state.projectId)) &&
+      this.permissionsResource.has(EAdminPermission.admin)
     );
   }
 
@@ -88,14 +83,8 @@ export class ConnectionAccessTabService extends Bootstrap {
     });
   }
 
-  private async save(
-    data: IConnectionFormSubmitData,
-    contexts: IExecutionContextProvider<IConnectionFormSubmitData>
-  ) {
-    if (
-      data.submitType === 'test'
-      || !data.state.projectId
-    ) {
+  private async save(data: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
+    if (data.submitType === 'test' || !data.state.projectId) {
       return;
     }
     const status = contexts.getContext(this.connectionFormService.connectionStatusContext);
@@ -105,11 +94,9 @@ export class ConnectionAccessTabService extends Bootstrap {
     }
 
     const config = contexts.getContext(connectionConfigContext);
-    const state = this.connectionFormService.tabsContainer.getTabState<IConnectionAccessTabState>(
-      data.state.partsState,
-      this.key,
-      { state: data.state }
-    );
+    const state = this.connectionFormService.tabsContainer.getTabState<IConnectionAccessTabState>(data.state.partsState, this.key, {
+      state: data.state,
+    });
 
     if (!config.connectionId || !state.loaded) {
       return;
@@ -120,24 +107,14 @@ export class ConnectionAccessTabService extends Bootstrap {
     const changed = await this.isChanged(key, state.grantedSubjects);
 
     if (changed) {
-      await this.connectionInfoResource.setAccessSubjects(
-        key,
-        state.grantedSubjects
-      );
+      await this.connectionInfoResource.setAccessSubjects(key, state.grantedSubjects);
       state.initialGrantedSubjects = state.grantedSubjects.slice();
     }
   }
 
-  private async formState(
-    data: IConnectionFormState,
-    contexts: IExecutionContextProvider<IConnectionFormState>
-  ) {
+  private async formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const config = contexts.getContext(connectionConfigContext);
-    const state = this.connectionFormService.tabsContainer.getTabState<IConnectionAccessTabState>(
-      data.partsState,
-      this.key,
-      { state: data }
-    );
+    const state = this.connectionFormService.tabsContainer.getTabState<IConnectionAccessTabState>(data.partsState, this.key, { state: data });
 
     if (!config.connectionId || !data.projectId || !state.loaded) {
       return;

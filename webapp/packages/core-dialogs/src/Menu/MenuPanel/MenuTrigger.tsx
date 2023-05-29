@@ -5,22 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { ButtonHTMLAttributes, forwardRef, useCallback, useEffect, useMemo } from 'react';
-import {
-  MenuButton, Menu, MenuItem, MenuStateReturn, useMenuState,
-  MenuItemCheckbox, MenuItemRadio, MenuInitialState
-} from 'reakit/Menu';
+import { Menu, MenuButton, MenuInitialState, MenuItem, MenuItemCheckbox, MenuItemRadio, MenuStateReturn, useMenuState } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
 import { useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
-import type {
-  IMenuItem, IMenuPanel
-} from '../IMenuPanel';
+import type { IMenuItem, IMenuPanel } from '../IMenuPanel';
 import { MenuPanelItem } from './MenuPanelItem';
 import { menuPanelStyles } from './menuPanelStyles';
 
@@ -51,20 +45,10 @@ interface IMenuTriggerProps extends IMenuTriggerBaseProps {
   getPanel?: () => IMenuPanel;
 }
 
-export const MenuTrigger = React.forwardRef<ButtonHTMLAttributes<any>, IMenuTriggerProps | IMenuTriggerLazyProps>(function MenuTrigger({
-  panel,
-  menuRef,
-  getPanel,
-  disclosure,
-  children,
-  style,
-  placement,
-  visible,
-  onVisibleSwitch,
-  modal,
-  rtl,
-  ...props
-}, ref) {
+export const MenuTrigger = React.forwardRef<ButtonHTMLAttributes<any>, IMenuTriggerProps | IMenuTriggerLazyProps>(function MenuTrigger(
+  { panel, menuRef, getPanel, disclosure, children, style, placement, visible, onVisibleSwitch, modal, rtl, ...props },
+  ref,
+) {
   const propsRef = useObjectRef({ onVisibleSwitch, visible });
   const menu = useMenuState({ modal, placement, visible, rtl });
   const styles = useStyles(menuPanelStyles, style);
@@ -103,7 +87,7 @@ export const MenuTrigger = React.forwardRef<ButtonHTMLAttributes<any>, IMenuTrig
         <box>{children}</box>
       </MenuButton>
       {panel && <MenuPanel panel={panel} menu={menu} style={style} rtl={rtl} onItemClose={handleItemClose} />}
-    </>
+    </>,
   );
 });
 
@@ -120,14 +104,7 @@ interface MenuPanelProps {
   style?: ComponentStyle;
 }
 
-const MenuPanel = observer<MenuPanelProps>(function MenuPanel({
-  panel,
-  menu,
-  panelAvailable,
-  rtl,
-  onItemClose,
-  style,
-}) {
+const MenuPanel = observer<MenuPanelProps>(function MenuPanel({ panel, menu, panelAvailable, rtl, onItemClose, style }) {
   const styles = useStyles(menuPanelStyles, style);
 
   if (!menu.visible) {
@@ -141,7 +118,7 @@ const MenuPanel = observer<MenuPanelProps>(function MenuPanel({
           <MenuPanelElement key={item.id} item={item} menu={menu} style={style} onItemClose={onItemClose} />
         ))}
       </menu-box>
-    </Menu>
+    </Menu>,
   );
 });
 
@@ -156,9 +133,7 @@ interface IMenuPanelElementProps extends Omit<React.ButtonHTMLAttributes<any>, '
   style?: ComponentStyle;
 }
 
-const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElement({
-  item, menu, onItemClose, style,
-}) {
+const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElement({ item, menu, onItemClose, style }) {
   const styles = useStyles(menuPanelStyles, style);
   const onClick = useCallback(() => {
     if (item.onClick) {
@@ -169,9 +144,7 @@ const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElem
     }
   }, [item, menu, onItemClose]);
 
-  const hidden = useMemo(() => computed(
-    () => item.panel?.menuItems.every(item => item.isHidden)
-  ), [item.panel]);
+  const hidden = useMemo(() => computed(() => item.panel?.menuItems.every(item => item.isHidden)), [item.panel]);
 
   if (hidden.get() && item.isPanelAvailable === undefined) {
     return null;
@@ -189,7 +162,7 @@ const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElem
         onItemClose={onItemClose}
         onClick={onClick}
         {...{ as: MenuInnerTrigger }}
-      />
+      />,
     );
   }
 
@@ -206,8 +179,7 @@ const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElem
         onClick={onClick}
       >
         <MenuPanelItem menuItem={item} style={style} />
-      </MenuItemRadio>
-
+      </MenuItemRadio>,
     );
   }
 
@@ -224,20 +196,14 @@ const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElem
         onClick={onClick}
       >
         <MenuPanelItem menuItem={item} style={style} />
-      </MenuItemCheckbox>
+      </MenuItemCheckbox>,
     );
   }
 
   return styled(styles)(
-    <MenuItem
-      {...menu}
-      {...use({ hidden: item.isHidden })}
-      aria-label={item.id}
-      disabled={item.isDisabled}
-      onClick={onClick}
-    >
+    <MenuItem {...menu} {...use({ hidden: item.isHidden })} aria-label={item.id} disabled={item.isDisabled} onClick={onClick}>
       <MenuPanelItem menuItem={item} style={style} />
-    </MenuItem>
+    </MenuItem>,
   );
 });
 
@@ -251,11 +217,8 @@ interface IMenuInnerTriggerProps extends Omit<React.ButtonHTMLAttributes<any>, '
   style?: ComponentStyle;
 }
 
-export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonElement>(forwardRef(
-  function MenuInnerTrigger(
-    props,
-    ref
-  ) {
+export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonElement>(
+  forwardRef(function MenuInnerTrigger(props, ref) {
     const { menuItem, style, onItemClose, ...rest } = props;
     const menu = useMenuState();
 
@@ -277,13 +240,8 @@ export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonEleme
             </box>
           </MenuButton>
         </menu-panel-button-wrapper>
-        <MenuPanel
-          panel={menuItem.panel!}
-          menu={menu}
-          style={style}
-          panelAvailable={menuItem.isPanelAvailable}
-          onItemClose={handleItemClose}
-        />
-      </>
+        <MenuPanel panel={menuItem.panel!} menu={menu} style={style} panelAvailable={menuItem.isPanelAvailable} onItemClose={handleItemClose} />
+      </>,
     );
-  }));
+  }),
+);

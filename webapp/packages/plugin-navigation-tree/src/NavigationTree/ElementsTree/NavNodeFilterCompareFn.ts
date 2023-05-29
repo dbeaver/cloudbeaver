@@ -5,14 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { NavNode } from '@cloudbeaver/core-navigation-tree';
-
 
 export enum EEquality {
   none,
   partially,
-  full
+  full,
 }
 
-export type NavNodeFilterCompareFn = (node: NavNode, filter: string)=> EEquality;
+export type NavNodeFilterCompareFn = (node: NavNode, filter: string) => EEquality;

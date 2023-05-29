@@ -5,50 +5,37 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ResourceKey } from './ResourceKey';
-import { type ResourceKeyList, isResourceKeyList, resourceKeyList } from './ResourceKeyList';
+import { isResourceKeyList, type ResourceKeyList, resourceKeyList } from './ResourceKeyList';
 
 interface MapFnc {
   <TKey, TValue>(key: TKey | ResourceKeyList<TKey>, selector: (key: TKey, index: number) => TValue): TValue | TValue[];
   <TKey, TValue>(key: ResourceKeyList<TKey>, selector: (key: TKey, index: number) => TValue): TValue[];
-  <TKey, TValue>(
-    key: TKey,
-    selector: (key: TKey, index: number) => TValue
-  ): TValue;
+  <TKey, TValue>(key: TKey, selector: (key: TKey, index: number) => TValue): TValue;
 }
 
 export interface ResourceKeyUtils {
-  forEach: <TKey extends ResourceKey<unknown>>(
-    key: TKey,
-    action: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => any
-  ) => void;
+  forEach: <TKey extends ResourceKey<unknown>>(key: TKey, action: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => any) => void;
   forEachAsync: <TKey extends ResourceKey<unknown>>(
     key: TKey,
-    action: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => Promise<any>
+    action: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => Promise<any>,
   ) => Promise<void>;
   some: <TKey extends ResourceKey<unknown>>(
     key: TKey,
-    predicate: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => boolean
+    predicate: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => boolean,
   ) => boolean;
   every: <TKey extends ResourceKey<unknown>>(
     key: TKey,
-    predicate: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => boolean
+    predicate: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => boolean,
   ) => boolean;
   map: MapFnc;
   filter: <TKey>(key: TKey | ResourceKeyList<TKey>, filter: (key: TKey) => boolean) => TKey[];
-  mapKey: <TKey, TValue>(
-    key: TKey | ResourceKeyList<TKey>,
-    selector: (key: TKey, index: number) => TValue
-  ) => ResourceKey<TValue>;
-  mapArray: <TKey, TValue>(
-    key: TKey | ResourceKeyList<TKey>,
-    selector: (key: TKey, index: number) => TValue
-  ) => TValue[];
+  mapKey: <TKey, TValue>(key: TKey | ResourceKeyList<TKey>, selector: (key: TKey, index: number) => TValue) => ResourceKey<TValue>;
+  mapArray: <TKey, TValue>(key: TKey | ResourceKeyList<TKey>, selector: (key: TKey, index: number) => TValue) => TValue[];
   isIntersect: <TKey>(
     first: TKey | ResourceKeyList<TKey>,
     second: TKey | ResourceKeyList<TKey>,
-    isEqual?: (keyA: TKey, keyB: TKey) => boolean
+    isEqual?: (keyA: TKey, keyB: TKey) => boolean,
   ) => boolean;
   join: <TKey>(...keys: Array<TKey | ResourceKeyList<TKey>>) => ResourceKeyList<TKey>;
   toArray: <TKey>(key: TKey | ResourceKeyList<TKey>) => TKey[];
@@ -59,7 +46,7 @@ export interface ResourceKeyUtils {
 export const ResourceKeyUtils: ResourceKeyUtils = {
   forEach<TKey extends ResourceKey<unknown>>(
     key: TKey,
-    action: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => any | Promise<any>
+    action: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => any | Promise<any>,
   ): void {
     if (isResourceKeyList(key)) {
       for (let i = 0; i < key.length; i++) {
@@ -71,7 +58,7 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
   },
   async forEachAsync<TKey extends ResourceKey<unknown>>(
     key: TKey,
-    action: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => any | Promise<any>
+    action: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => any | Promise<any>,
   ): Promise<void> {
     if (isResourceKeyList(key)) {
       for (let i = 0; i < key.length; i++) {
@@ -81,20 +68,14 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
       await action(key as Exclude<TKey, ResourceKeyList<unknown>>, -1);
     }
   },
-  some<TKey extends ResourceKey<unknown>>(
-    key: TKey,
-    predicate: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => boolean
-  ): boolean {
+  some<TKey extends ResourceKey<unknown>>(key: TKey, predicate: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => boolean): boolean {
     if (isResourceKeyList<Exclude<TKey, ResourceKeyList<unknown>>>(key)) {
       return key.some(predicate);
     } else {
       return predicate(key as Exclude<TKey, ResourceKeyList<unknown>>, -1);
     }
   },
-  every<TKey extends ResourceKey<unknown>>(
-    key: TKey,
-    predicate: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => boolean
-  ): boolean {
+  every<TKey extends ResourceKey<unknown>>(key: TKey, predicate: (key: Exclude<TKey, ResourceKeyList<unknown>>, index: number) => boolean): boolean {
     if (isResourceKeyList<Exclude<TKey, ResourceKeyList<unknown>>>(key)) {
       return key.every(predicate);
     } else {
@@ -104,30 +85,21 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
   filter<TKey>(key: TKey | ResourceKeyList<TKey>, filter: (key: TKey) => boolean): TKey[] {
     return this.toArray(key).filter(filter);
   },
-  mapKey<TKey, TValue>(
-    key: TKey | ResourceKeyList<TKey>,
-    selector: (key: TKey, index: number) => TValue
-  ): ResourceKey<TValue> {
+  mapKey<TKey, TValue>(key: TKey | ResourceKeyList<TKey>, selector: (key: TKey, index: number) => TValue): ResourceKey<TValue> {
     if (isResourceKeyList(key)) {
       return resourceKeyList(key.map(selector));
     } else {
       return selector(key, -1);
     }
   },
-  map<TKey, TValue>(
-    key: TKey | ResourceKeyList<TKey>,
-    selector: (key: TKey, index: number) => TValue
-  ): TValue | TValue[] {
+  map<TKey, TValue>(key: TKey | ResourceKeyList<TKey>, selector: (key: TKey, index: number) => TValue): TValue | TValue[] {
     if (isResourceKeyList(key)) {
       return key.map(selector);
     } else {
       return selector(key, -1);
     }
   },
-  mapArray<TKey, TValue>(
-    key: TKey | ResourceKeyList<TKey>,
-    selector: (key: TKey, index: number) => TValue
-  ): TValue[] {
+  mapArray<TKey, TValue>(key: TKey | ResourceKeyList<TKey>, selector: (key: TKey, index: number) => TValue): TValue[] {
     if (isResourceKeyList(key)) {
       return key.map(selector);
     } else {
@@ -137,7 +109,7 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
   isIntersect<TKey>(
     param: TKey | ResourceKeyList<TKey>,
     key: TKey | ResourceKeyList<TKey>,
-    isEqual = (keyA: TKey, keyB: TKey) => keyA === keyB
+    isEqual = (keyA: TKey, keyB: TKey) => keyA === keyB,
   ): boolean {
     if (param === key) {
       return true;

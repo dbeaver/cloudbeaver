@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled from 'reshadow';
 
 import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
@@ -15,9 +14,5 @@ interface Props {
 }
 
 export const TableBody: React.FC<React.PropsWithChildren<Props>> = function TableBody({ children, className }) {
-  return styled(BASE_TABLE_STYLES)(
-    <tbody className={className}>
-      {children}
-    </tbody>
-  );
+  return styled(BASE_TABLE_STYLES)(<tbody className={className}>{children}</tbody>);
 };

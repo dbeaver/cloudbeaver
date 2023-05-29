@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, makeObservable, observable } from 'mobx';
 
 export interface IQueryInfo {
@@ -29,7 +28,6 @@ export interface ISQLScriptLine {
 }
 
 export class SQLParser {
-
   get scripts(): ISQLScriptSegment[] {
     this.update();
     return this._scripts;
@@ -98,9 +96,7 @@ export class SQLParser {
       return script;
     }
 
-    const closestScripts = this._scripts.filter(
-      script => script.begin <= position
-    );
+    const closestScripts = this._scripts.filter(script => script.begin <= position);
 
     if (closestScripts.length > 0) {
       return closestScripts[closestScripts.length - 1];

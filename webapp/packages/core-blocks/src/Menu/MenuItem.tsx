@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import React, { useContext } from 'react';
 import { MenuItem as ReakitMenuItem } from 'reakit/Menu';
@@ -18,7 +17,6 @@ import { useStyles } from '../useStyles';
 import { menuPanelStyles } from './menuPanelStyles';
 import { MenuStateContext } from './MenuStateContext';
 
-
 export interface IMenuItemProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
   label: string;
   hidden?: boolean;
@@ -27,16 +25,7 @@ export interface IMenuItemProps extends Omit<React.ButtonHTMLAttributes<any>, 's
   style?: ComponentStyle;
 }
 
-export const MenuItem = observer<IMenuItemProps>(function MenuItem({
-  label,
-  children,
-  hidden,
-  selected,
-  close,
-  style,
-  onClick,
-  ...rest
-}) {
+export const MenuItem = observer<IMenuItemProps>(function MenuItem({ label, children, hidden, selected, close, style, onClick, ...rest }) {
   const menu = useContext(MenuStateContext);
   const styles = useStyles(menuPanelStyles, style);
 
@@ -59,6 +48,6 @@ export const MenuItem = observer<IMenuItemProps>(function MenuItem({
       onClick={handleClick}
     >
       {children}
-    </MenuItem>
+    </MenuItem>,
   );
 });

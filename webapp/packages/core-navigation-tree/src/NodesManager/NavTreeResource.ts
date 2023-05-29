@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, makeObservable, runInAction } from 'mobx';
 
 import { CoreSettingsService } from '@cloudbeaver/core-app';
@@ -14,7 +13,21 @@ import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutionContext, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { SessionDataResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList, ResourceKeyList, resourceKeyList, NavNodeChildrenQuery as fake, ResourceKeyUtils, ICachedResourceMetadata, CachedMapAllKey, ResourceError, DetailsError, ResourceKeySimple } from '@cloudbeaver/core-sdk';
+import {
+  CachedMapAllKey,
+  CachedMapResource,
+  DetailsError,
+  NavNodeChildrenQuery as fake,
+  GraphQLService,
+  ICachedResourceMetadata,
+  isResourceKeyList,
+  ResourceError,
+  ResourceKey,
+  ResourceKeyList,
+  resourceKeyList,
+  ResourceKeySimple,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-sdk';
 import { flat, isDefined, isUndefined, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { NavTreeSettingsService } from '../NavTreeSettingsService';
@@ -51,11 +64,9 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   readonly onNodeMove: IExecutor<INavNodeMoveData>;
 
   get childrenLimit(): number {
-    return (
-      this.navTreeSettingsService.settings.isValueDefault('childrenLimit')
-        ? this.coreSettingsService.settings.getValue('app.navigationTree.childrenLimit')
-        : this.navTreeSettingsService.settings.getValue('childrenLimit')
-    );
+    return this.navTreeSettingsService.settings.isValueDefault('childrenLimit')
+      ? this.coreSettingsService.settings.getValue('app.navigationTree.childrenLimit')
+      : this.navTreeSettingsService.settings.getValue('childrenLimit');
   }
 
   constructor(
@@ -93,18 +104,21 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     navNodeInfoResource.connect(this);
     this.outdateResource(navNodeInfoResource);
     this.updateResource(navNodeInfoResource);
-    this.sync(this.projectInfoResource, () => CachedMapAllKey, () => CachedMapAllKey);
+    this.sync(
+      this.projectInfoResource,
+      () => CachedMapAllKey,
+      () => CachedMapAllKey,
+    );
     this.sessionDataResource.onDataOutdated.addHandler(() => this.markTreeOutdated(resourceKeyList(this.keys)));
-    this.userInfoResource.onUserChange.addHandler(action(() => {
-      this.clear();
-      this.navNodeInfoResource.clear(); // TODO: need more convenient way
-    }));
+    this.userInfoResource.onUserChange.addHandler(
+      action(() => {
+        this.clear();
+        this.navNodeInfoResource.clear(); // TODO: need more convenient way
+      }),
+    );
   }
 
-  async preloadNodeParents(
-    parents: string[],
-    nextNode?: string
-  ): Promise<boolean> {
+  async preloadNodeParents(parents: string[], nextNode?: string): Promise<boolean> {
     if (parents.length === 0) {
       return true;
     }
@@ -212,11 +226,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   async moveTo(key: ResourceKeySimple<string>, target: string): Promise<void> {
-    const parents = Array.from(new Set(
-      ResourceKeyUtils
-        .mapArray(key, key => this.navNodeInfoResource.get(key)?.parentId)
-        .filter(isDefined)
-    ));
+    const parents = Array.from(new Set(ResourceKeyUtils.mapArray(key, key => this.navNodeInfoResource.get(key)?.parentId).filter(isDefined)));
 
     await this.performUpdate(resourceKeyList(parents), [], async () => {
       this.markLoading(target, true);
@@ -368,10 +378,9 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       children.push(...flat(valueObject));
 
       const oldChildren = flat(this.get(keyObject));
-      childrenToRemove.push(...oldChildren.filter<string>((navNodeId): navNodeId is string => (
-        navNodeId !== undefined
-        && !children.includes(navNodeId)
-      )));
+      childrenToRemove.push(
+        ...oldChildren.filter<string>((navNodeId): navNodeId is string => navNodeId !== undefined && !children.includes(navNodeId)),
+      );
     } else {
       valueObject = valueObject as string[];
       children.push(...valueObject);
@@ -399,10 +408,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     this.navNodeInfoResource.delete(items.exclude(key));
   }
 
-  protected async preLoadData(
-    key: ResourceKey<string>,
-    contexts: IExecutionContext<ResourceKey<string>>
-  ): Promise<void> {
+  protected async preLoadData(key: ResourceKey<string>, contexts: IExecutionContext<ResourceKey<string>>): Promise<void> {
     await ResourceKeyUtils.forEachAsync(key, async nodeId => {
       if (this.isAlias(nodeId)) {
         return;
@@ -469,56 +475,39 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       for (const node of data) {
         const metadata = this.metadata.get(node.parentPath);
 
-        this.setDetails(resourceKeyList([
-          node.navNodeInfo.id,
-          ...node.navNodeChildren.map(node => node.id),
-        ]), metadata.withDetails);
+        this.setDetails(resourceKeyList([node.navNodeInfo.id, ...node.navNodeChildren.map(node => node.id)]), metadata.withDetails);
       }
 
       this.navNodeInfoResource.set(
-        resourceKeyList([
-          ...data.map(data => data.parentPath),
-          ...data.map(data => data.navNodeChildren.map(node => node.id)).flat(),
-        ]), [
+        resourceKeyList([...data.map(data => data.parentPath), ...data.map(data => data.navNodeChildren.map(node => node.id)).flat()]),
+        [
           ...data.map(data => this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo)).flat(),
-          ...data.map(
-            data => data.navNodeChildren.map(
-              node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)
-            )
-          ).flat(),
-        ]);
+          ...data.map(data => data.navNodeChildren.map(node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath))).flat(),
+        ],
+      );
 
       this.set(
         resourceKeyList(data.map(data => data.parentPath)),
-        data.map(data => data.navNodeChildren.map(node => node.id))
+        data.map(data => data.navNodeChildren.map(node => node.id)),
       );
     } else {
       const metadata = this.metadata.get(data.parentPath);
 
-      this.setDetails(resourceKeyList([
-        data.navNodeInfo.id,
-        ...data.navNodeChildren.map(node => node.id),
-      ]), metadata.withDetails);
+      this.setDetails(resourceKeyList([data.navNodeInfo.id, ...data.navNodeChildren.map(node => node.id)]), metadata.withDetails);
 
-      this.navNodeInfoResource.set(
-        resourceKeyList([
-          data.parentPath,
-          ...data.navNodeChildren.map(node => node.id),
-        ]), [
-          this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo),
-          ...data.navNodeChildren.map(node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)),
-        ]
+      this.navNodeInfoResource.set(resourceKeyList([data.parentPath, ...data.navNodeChildren.map(node => node.id)]), [
+        this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo),
+        ...data.navNodeChildren.map(node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)),
+      ]);
+
+      this.set(
+        data.parentPath,
+        data.navNodeChildren.map(node => node.id),
       );
-
-      this.set(data.parentPath, data.navNodeChildren.map(node => node.id));
     }
   }
 
-  private async loadNodeChildren(
-    parentPath: string,
-    offset: number,
-    limit: number
-  ): Promise<NavNodeChildrenQuery> {
+  private async loadNodeChildren(parentPath: string, offset: number, limit: number): Promise<NavNodeChildrenQuery> {
     const metadata = this.metadata.get(parentPath);
     const { navNodeChildren, navNodeInfo } = await this.graphQLService.sdk.navNodeChildren({
       parentPath,
@@ -531,12 +520,9 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   protected getDefaultMetadata(key: string, metadata: MetadataMap<string, INodeMetadata>): INodeMetadata {
-    return Object.assign(
-      super.getDefaultMetadata(key, metadata),
-      {
-        withDetails: false,
-      }
-    );
+    return Object.assign(super.getDefaultMetadata(key, metadata), {
+      withDetails: false,
+    });
   }
 
   protected validateKey(key: string): boolean {

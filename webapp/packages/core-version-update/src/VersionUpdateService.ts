@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 import { compare } from 'semver';
 
@@ -32,10 +31,7 @@ export class VersionUpdateService {
     return compare(this.versionResource.latest.number, this.versionService.current) === 1;
   }
 
-  constructor(
-    private readonly versionService: VersionService,
-    private readonly versionResource: VersionResource,
-  ) {
+  constructor(private readonly versionService: VersionService, private readonly versionResource: VersionResource) {
     this.instructionGetter = null;
 
     makeObservable(this, {

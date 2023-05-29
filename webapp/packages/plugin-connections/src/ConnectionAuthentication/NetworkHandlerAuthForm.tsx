@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, FieldCheckbox, GroupTitle, InputField, useResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, FieldCheckbox, GroupTitle, InputField, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
@@ -39,27 +38,19 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
 
   const state = networkHandlersConfig.find(state => state.id === id)!;
   const keyAuth = state.authType === NetworkHandlerAuthType.PublicKey;
-  const passwordLabel = keyAuth ? 'Passphrase' : translate(`connections_network_handler_${id}_password`, 'connections_network_handler_default_password');
+  const passwordLabel = keyAuth
+    ? 'Passphrase'
+    : translate(`connections_network_handler_${id}_password`, 'connections_network_handler_default_password');
 
   return styled(useStyles(BASE_CONTAINERS_STYLES))(
     <>
-      <GroupTitle>{handler.data?.label || translate(`connections_network_handler_${id}_title`, 'connections_network_handler_default_title')}</GroupTitle>
-      <InputField
-        type="text"
-        name="userName"
-        state={state}
-        disabled={disabled}
-        mod='surface'
-      >
+      <GroupTitle>
+        {handler.data?.label || translate(`connections_network_handler_${id}_title`, 'connections_network_handler_default_title')}
+      </GroupTitle>
+      <InputField type="text" name="userName" state={state} disabled={disabled} mod="surface">
         {translate(`connections_network_handler_${id}_user`, 'connections_network_handler_default_user')}
       </InputField>
-      <InputField
-        type="password"
-        name="password"
-        state={state}
-        disabled={disabled}
-        mod='surface'
-      >
+      <InputField type="password" name="password" state={state} disabled={disabled} mod="surface">
         {passwordLabel}
       </InputField>
       {keyAuth && <SSHKeyUploader state={state} disabled={disabled} />}
@@ -72,6 +63,6 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
           disabled={disabled}
         />
       )}
-    </>
+    </>,
   );
 });

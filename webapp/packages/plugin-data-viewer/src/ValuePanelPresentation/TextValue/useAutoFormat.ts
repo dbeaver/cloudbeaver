@@ -5,25 +5,27 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 
 export function useAutoFormat() {
-  return useObjectRef(() => ({
-    format(type: string, value: string) {
-      try {
-        switch (type) {
-          case 'application/json':
-            return JSON.stringify(JSON.parse(value), null, 2);
-          case 'text/xml':
-          case 'text/html':
-            return value;
-          default:
-            return value;
+  return useObjectRef(
+    () => ({
+      format(type: string, value: string) {
+        try {
+          switch (type) {
+            case 'application/json':
+              return JSON.stringify(JSON.parse(value), null, 2);
+            case 'text/xml':
+            case 'text/html':
+              return value;
+            default:
+              return value;
+          }
+        } catch {
+          return value;
         }
-      } catch {
-        return value;
-      }
-    },
-  }), false);
+      },
+    }),
+    false,
+  );
 }

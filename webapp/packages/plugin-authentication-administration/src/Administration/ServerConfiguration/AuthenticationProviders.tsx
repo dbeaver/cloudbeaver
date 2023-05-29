@@ -5,13 +5,30 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import React, { useContext } from 'react';
 import styled from 'reshadow';
 
-import { AuthProvider, AuthProviderService, AuthProvidersResource, AuthSettingsService, AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, FormContext, Group, GroupTitle, Loader, PlaceholderComponent, Switch, useExecutor, useResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import {
+  AUTH_PROVIDER_LOCAL_ID,
+  AuthProvider,
+  AuthProviderService,
+  AuthProvidersResource,
+  AuthSettingsService,
+} from '@cloudbeaver/core-authentication';
+import {
+  BASE_CONTAINERS_STYLES,
+  FormContext,
+  Group,
+  GroupTitle,
+  Loader,
+  PlaceholderComponent,
+  Switch,
+  useExecutor,
+  useResource,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
@@ -49,23 +66,25 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
 
   useExecutor({
     executor: formContext.changeExecutor,
-    handlers: [function switchControls() {
-      if (serverConfig.enabledAuthProviders?.length === 0) {
-        if (localProvider && !isAnonymousAccessDisabled) {
-          serverConfig.anonymousAccessEnabled = true;
-        } else if (primaryProvider) {
-          serverConfig.enabledAuthProviders.push(primaryProvider.id);
+    handlers: [
+      function switchControls() {
+        if (serverConfig.enabledAuthProviders?.length === 0) {
+          if (localProvider && !isAnonymousAccessDisabled) {
+            serverConfig.anonymousAccessEnabled = true;
+          } else if (primaryProvider) {
+            serverConfig.enabledAuthProviders.push(primaryProvider.id);
+          }
         }
-      }
 
-      if (serverConfig.enabledAuthProviders?.length) {
-        serverConfig.enabledAuthProviders = serverConfig.enabledAuthProviders.filter(providerId => {
-          const provider = providers.resource.get(providerId)!;
+        if (serverConfig.enabledAuthProviders?.length) {
+          serverConfig.enabledAuthProviders = serverConfig.enabledAuthProviders.filter(providerId => {
+            const provider = providers.resource.get(providerId)!;
 
-          return !provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
-        });
-      }
-    }],
+            return !provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
+          });
+        }
+      },
+    ],
   });
 
   if (externalAuthentication) {
@@ -74,7 +93,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
 
   return styled(styles)(
     <React.Fragment>
-      <Group key='authentication' form gap>
+      <Group key="authentication" form gap>
         <GroupTitle>{translate('administration_configuration_wizard_configuration_authentication_group')}</GroupTitle>
         {localProvider && !isAnonymousAccessDisabled ? (
           <Switch
@@ -96,10 +115,10 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
           const tooltip = disabled ? `Following services need to be enabled: "${provider.requiredFeatures.join(', ')}"` : '';
 
           if (
-            !localProvider
-                  && primaryProvider?.id === provider.id
-                  && serverConfig.enabledAuthProviders?.length === 1
-                  && serverConfig.enabledAuthProviders.includes(provider.id)
+            !localProvider &&
+            primaryProvider?.id === provider.id &&
+            serverConfig.enabledAuthProviders?.length === 1 &&
+            serverConfig.enabledAuthProviders.includes(provider.id)
           ) {
             disabled = true;
           }
@@ -116,7 +135,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
               value={provider.id}
               name="enabledAuthProviders"
               state={serverConfig}
-              description={(
+              description={
                 <>
                   {provider.description}
                   {links.map(link => {
@@ -124,7 +143,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
                     return <Description key={link.id} configurationWizard={configurationWizard} />;
                   })}
                 </>
-              )}
+              }
               mod={['primary']}
               disabled={disabled}
               small
@@ -135,9 +154,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
           );
         })}
       </Group>
-      {configurationWizard && localProvider && (
-        <ServerConfigurationAdminForm serverConfig={serverConfig} />
-      )}
-    </React.Fragment>
+      {configurationWizard && localProvider && <ServerConfigurationAdminForm serverConfig={serverConfig} />}
+    </React.Fragment>,
   );
 });

@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, makeObservable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import { AuthConfigurationsResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
@@ -24,7 +23,7 @@ export class CreateAuthConfigurationService {
   constructor(
     private readonly authConfigurationsAdministrationNavService: AuthConfigurationsAdministrationNavService,
     private readonly authConfigurationFormService: AuthConfigurationFormService,
-    private readonly authConfigurationsResource: AuthConfigurationsResource
+    private readonly authConfigurationsResource: AuthConfigurationsResource,
   ) {
     this.data = null;
 
@@ -42,10 +41,7 @@ export class CreateAuthConfigurationService {
   }
 
   fillData(): void {
-    this.data = new AuthConfigurationFormState(
-      this.authConfigurationFormService,
-      this.authConfigurationsResource
-    );
+    this.data = new AuthConfigurationFormState(this.authConfigurationFormService, this.authConfigurationsResource);
   }
 
   create(): void {

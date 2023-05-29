@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { ItemList, ItemListSearch } from '@cloudbeaver/core-blocks';
-import type { DBDriver, Connection } from '@cloudbeaver/core-connections';
+import type { Connection, DBDriver } from '@cloudbeaver/core-connections';
 
 import { TemplateConnectionItem } from './TemplateConnectionItem';
 
@@ -40,12 +39,7 @@ export const TemplateConnectionSelector = observer<Props>(function TemplateConne
       <ItemListSearch onChange={setSearch} />
       <ItemList className={className}>
         {filteredTemplateConnections.map(template => (
-          <TemplateConnectionItem
-            key={template.id}
-            template={template}
-            dbDriver={dbDrivers.get(template.driverId)}
-            onSelect={onSelect}
-          />
+          <TemplateConnectionItem key={template.id} template={template} dbDriver={dbDrivers.get(template.driverId)} onSelect={onSelect} />
         ))}
       </ItemList>
     </>

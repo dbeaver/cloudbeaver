@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
@@ -39,6 +38,6 @@ export const UserProfileForm = observer(function UserProfileForm() {
   return styled(style)(
     <Loader state={userInfo}>
       {() => userInfo.data && <UserForm user={userInfo.data} state={userProfileService.formState!} onClose={close} />}
-    </Loader>
+    </Loader>,
   );
 });

@@ -5,11 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { makeObservable, observable } from 'mobx';
 
-import { observable, makeObservable } from 'mobx';
-
-import { ConnectionInfoResource, ConnectionInitConfig, DBDriverResource, IConnectionInfoParams, USER_NAME_PROPERTY_ID } from '@cloudbeaver/core-connections';
-import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
+import {
+  ConnectionInfoResource,
+  ConnectionInitConfig,
+  DBDriverResource,
+  IConnectionInfoParams,
+  USER_NAME_PROPERTY_ID,
+} from '@cloudbeaver/core-connections';
+import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
@@ -38,7 +43,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     private readonly notificationService: NotificationService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly commonDialogService: CommonDialogService,
-    private readonly dbDriverResource: DBDriverResource
+    private readonly dbDriverResource: DBDriverResource,
   ) {
     makeObservable(this, {
       isAuthenticating: observable.ref,
@@ -108,7 +113,9 @@ export class DBAuthDialogController implements IInitializableController, IDestru
   private async loadAuthModel() {
     try {
       const connection = await this.connectionInfoResource.load(this.connectionKey, [
-        'includeAuthProperties', 'includeNetworkHandlersConfig', 'includeAuthNeeded',
+        'includeAuthProperties',
+        'includeNetworkHandlersConfig',
+        'includeAuthNeeded',
       ]);
 
       if (connection.authNeeded) {
@@ -133,7 +140,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
         }
       }
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Can\'t load auth model');
+      this.notificationService.logException(exception, "Can't load auth model");
     }
   }
 
@@ -141,7 +148,7 @@ export class DBAuthDialogController implements IInitializableController, IDestru
     try {
       await this.dbDriverResource.load(CachedMapAllKey);
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Can\'t load database drivers', '', true);
+      this.notificationService.logException(exception, "Can't load database drivers", '', true);
     }
   }
 }

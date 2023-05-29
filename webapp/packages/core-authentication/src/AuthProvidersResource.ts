@@ -5,12 +5,21 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedMapResource, ResourceKey, resourceKeyList, ResourceKeyUtils, CachedMapAllKey, AuthProviderInfoFragment, AuthProviderConfigurationInfoFragment, ResourceKeySimple } from '@cloudbeaver/core-sdk';
+import {
+  AuthProviderConfigurationInfoFragment,
+  AuthProviderInfoFragment,
+  CachedMapAllKey,
+  CachedMapResource,
+  GraphQLService,
+  ResourceKey,
+  resourceKeyList,
+  ResourceKeySimple,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-sdk';
 
 import { AuthConfigurationsResource } from './AuthConfigurationsResource';
 import { AuthSettingsService } from './AuthSettingsService';
@@ -28,11 +37,15 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     private readonly authSettingsService: AuthSettingsService,
     private readonly graphQLService: GraphQLService,
     private readonly serverConfigResource: ServerConfigResource,
-    private readonly authConfigurationsResource: AuthConfigurationsResource
+    private readonly authConfigurationsResource: AuthConfigurationsResource,
   ) {
     super();
 
-    this.sync(serverConfigResource, () => {}, () => CachedMapAllKey);
+    this.sync(
+      serverConfigResource,
+      () => {},
+      () => CachedMapAllKey,
+    );
 
     this.authConfigurationsResource.onItemUpdate.addHandler(this.updateConfigurations.bind(this));
     this.authConfigurationsResource.onItemDelete.addHandler(this.deleteConfigurations.bind(this));
@@ -42,7 +55,7 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     });
   }
 
-  getConfiguration(providerId: string, configurationId: string): AuthProviderConfiguration | undefined  {
+  getConfiguration(providerId: string, configurationId: string): AuthProviderConfiguration | undefined {
     const provider = this.get(providerId);
 
     if (provider) {
@@ -108,9 +121,7 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   private updateConfigurations(key: ResourceKeySimple<string>) {
     const configurations = this.authConfigurationsResource.get(ResourceKeyUtils.toList(key));
 
-    const providerIds = resourceKeyList(
-      configurations.filter(Boolean).map(configuration => configuration!.providerId)
-    );
+    const providerIds = resourceKeyList(configurations.filter(Boolean).map(configuration => configuration!.providerId));
 
     this.markOutdated(providerIds);
   }

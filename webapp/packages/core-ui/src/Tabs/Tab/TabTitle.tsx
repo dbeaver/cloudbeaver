@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled from 'reshadow';
 
 import { BASE_TAB_STYLES } from './BASE_TAB_STYLES';
@@ -15,9 +14,5 @@ interface IProps {
 }
 
 export const TabTitle: React.FC<React.PropsWithChildren<IProps>> = function TabTitle({ children, className }) {
-  return styled(BASE_TAB_STYLES)(
-    <tab-title className={className}>
-      {children || <placeholder />}
-    </tab-title>
-  );
+  return styled(BASE_TAB_STYLES)(<tab-title className={className}>{children || <placeholder />}</tab-title>);
 };

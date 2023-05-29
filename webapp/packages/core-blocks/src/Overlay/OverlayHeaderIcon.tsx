@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled from 'reshadow';
 
 import { IconOrImage } from '../IconOrImage';
@@ -26,6 +25,6 @@ export const OverlayHeaderIcon: React.FC<React.PropsWithChildren<Props>> = funct
     <icon-container className={className}>
       {icon && <IconOrImage icon={icon} viewBox={viewBox} />}
       {children}
-    </icon-container>
+    </icon-container>,
   );
 };

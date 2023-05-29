@@ -18,7 +18,8 @@
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
   ],
   "settings": {
     "react": {
@@ -40,12 +41,7 @@
     "space-after-keywords": "off",
     "no-inner-declarations": "off",
     "no-constant-condition": "off",
-    "no-trailing-spaces": "error",
     "space-before-blocks": "error",
-    "@typescript-eslint/indent": [
-      "error",
-      2
-    ],
     "@typescript-eslint/no-invalid-void-type": "off",
     "@typescript-eslint/dot-notation": "off",
     "@typescript-eslint/no-throw-literal": "off",
@@ -136,28 +132,7 @@
       "warn"
     ],
     "@typescript-eslint/no-confusing-void-expression": "off",
-    "@typescript-eslint/no-unnecessary-boolean-literal-compare": [
-      "warn"
-    ],
-    "@typescript-eslint/no-unnecessary-condition": [
-      "warn",
-      {
-        "allowConstantLoopConditions": true
-      }
-    ],
-    "@typescript-eslint/no-unnecessary-type-arguments": [
-      "warn"
-    ],
-    "@typescript-eslint/non-nullable-type-assertion-style": [
-      "warn"
-    ],
     "@typescript-eslint/prefer-function-type": [
-      "warn"
-    ],
-    "@typescript-eslint/prefer-includes": [
-      "warn"
-    ],
-    "@typescript-eslint/prefer-readonly": [
       "warn"
     ],
     "arrow-spacing": "error",
@@ -206,7 +181,7 @@
     "max-len": [
       "error",
       {
-        "code": 120,
+        "code": 150,
         "ignoreTrailingComments": true,
         "ignoreStrings": true,
         "ignoreTemplateLiterals": true,

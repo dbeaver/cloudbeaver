@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
 import styled, { css, use } from 'reshadow';
@@ -25,7 +24,7 @@ const styles = css`
     height: 100%;
     display: flex;
     flex-direction: column;
-    
+
     & textarea {
       border-radius: 0 !important;
       height: 100%;
@@ -44,13 +43,14 @@ const styles = css`
   }
 `;
 
-type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'style'> & ILayoutSizeProps & {
-  description?: string;
-  labelTooltip?: string;
-  mod?: 'surface';
-  style?: ComponentStyle;
-  embedded?: boolean;
-};
+type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'style'> &
+  ILayoutSizeProps & {
+    description?: string;
+    labelTooltip?: string;
+    mod?: 'surface';
+    style?: ComponentStyle;
+    embedded?: boolean;
+  };
 
 type ControlledProps = BaseProps & {
   name?: string;
@@ -88,45 +88,36 @@ export const Textarea: TextareaType = observer(function Textarea({
   labelTooltip,
   mod,
   embedded,
-  onChange = () => { },
+  onChange = () => {},
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
   const context = useContext(FormContext);
 
-  const handleChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (state) {
-      state[name] = event.target.value;
-    }
-    if (onChange) {
-      onChange(event.target.value, name);
-    }
-    if (context) {
-      context.change(event.target.value, name);
-    }
-  }, [state, name, onChange]);
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      if (state) {
+        state[name] = event.target.value;
+      }
+      if (onChange) {
+        onChange(event.target.value, name);
+      }
+      if (context) {
+        context.change(event.target.value, name);
+      }
+    },
+    [state, name, onChange],
+  );
 
   const value = state ? state[name] : controlledValue;
 
   return styled(useStyles(baseFormControlStyles, baseValidFormControlStyles, styles, style))(
     <field className={className} {...use({ tiny, small, medium, large, embedded })}>
-      <field-label
-        title={labelTooltip || rest.title}
-      >
-        {children}{required && ' *'}
+      <field-label title={labelTooltip || rest.title}>
+        {children}
+        {required && ' *'}
       </field-label>
-      <textarea
-        {...rest}
-        value={value ?? ''}
-        name={name}
-        data-embedded={embedded}
-        onChange={handleChange}
-        {...use({ mod })}
-      />
-      {description && (
-        <field-description>
-          {description}
-        </field-description>
-      )}
-    </field>
+      <textarea {...rest} value={value ?? ''} name={name} data-embedded={embedded} onChange={handleChange} {...use({ mod })} />
+      {description && <field-description>{description}</field-description>}
+    </field>,
   );
 });

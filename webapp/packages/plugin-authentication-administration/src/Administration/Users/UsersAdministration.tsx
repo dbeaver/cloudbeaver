@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { ToolsPanel, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
+import { ToolsPanel, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, ITabData, Tab, TabList, TabPanel, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
@@ -27,7 +26,7 @@ const tabsStyles = css`
     height: 33px;
   }
   Tab {
-    height: 32px!important;
+    height: 32px !important;
     text-transform: uppercase;
     font-weight: 500 !important;
   }
@@ -37,9 +36,7 @@ const tabsStyles = css`
   }
 `;
 
-export const UsersAdministration: AdministrationItemContentComponent = observer(function UsersAdministration({
-  sub, param,
-}) {
+export const UsersAdministration: AdministrationItemContentComponent = observer(function UsersAdministration({ sub, param }) {
   const translate = useTranslate();
   const usersAdministrationNavigationService = useService(UsersAdministrationNavigationService);
   const subName = sub?.name || EUsersAdministrationSub.Users;
@@ -60,9 +57,13 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
   return styled(style)(
     <TabsState selectedId={subName} lazy onChange={openSub}>
       <ToolsPanel>
-        <TabList aria-label='User Administration pages' style={style}>
-          <Tab tabId={EUsersAdministrationSub.Users} style={style}>{translate('authentication_administration_item_users')}</Tab>
-          <Tab tabId={EUsersAdministrationSub.Teams} style={style}>{translate('administration_teams_tab_title')}</Tab>
+        <TabList aria-label="User Administration pages" style={style}>
+          <Tab tabId={EUsersAdministrationSub.Users} style={style}>
+            {translate('authentication_administration_item_users')}
+          </Tab>
+          <Tab tabId={EUsersAdministrationSub.Teams} style={style}>
+            {translate('administration_teams_tab_title')}
+          </Tab>
           {/* <Tab
             tabId={EUsersAdministrationSub.MetaProperties}
             style={style}
@@ -80,6 +81,6 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
       <TabPanel tabId={EUsersAdministrationSub.MetaProperties}>
         <MetaParameters />
       </TabPanel>
-    </TabsState>
+    </TabsState>,
   );
 });

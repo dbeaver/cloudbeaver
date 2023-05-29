@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { GlobalConstants, isValidUrl } from '@cloudbeaver/core-utils';
 
 interface Props {
@@ -15,9 +14,7 @@ interface Props {
   onClick?: (e: React.MouseEvent) => void;
 }
 
-export const StaticImage: React.FC<Props> = function StaticImage({
-  icon, className, title, onClick,
-}) {
+export const StaticImage: React.FC<Props> = function StaticImage({ icon, className, title, onClick }) {
   if (!icon) {
     return null;
   }
