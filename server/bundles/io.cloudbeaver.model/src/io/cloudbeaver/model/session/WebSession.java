@@ -694,6 +694,10 @@ public class WebSession extends BaseWebSession
         addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.INFO, message));
     }
 
+    public void addWarningMessage(String message) {
+        addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.WARNING, message));
+    }
+
     public List<WebServerMessage> readLog(Integer maxEntries, Boolean clearLog) {
         synchronized (sessionMessages) {
             List<WebServerMessage> messages = new ArrayList<>();

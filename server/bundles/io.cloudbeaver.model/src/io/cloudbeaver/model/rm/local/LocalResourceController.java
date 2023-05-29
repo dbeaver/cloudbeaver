@@ -169,6 +169,11 @@ public class LocalResourceController implements RMController {
                 projects.add(0, userProject);
             }
         }
+        if (WebAppUtils.getWebApplication().isMultiNode()) {
+            for (RMProject rmProject : projects) {
+                createResourceTypeFolders(getProjectPath(rmProject.getId()));
+            }
+        }
 
         projects.sort(Comparator.comparing(RMProject::getDisplayName));
         return projects.toArray(new RMProject[0]);
@@ -283,7 +288,10 @@ public class LocalResourceController implements RMController {
             throw new DBException("Project '" + name + "' not created");
         }
         try {
-            Files.createDirectories(getProjectPath(project.getId()));
+            Files.createDirectories(projectPath);
+            if (WebAppUtils.getWebApplication().isMultiNode()) {
+                createResourceTypeFolders(projectPath);
+            }
             fireRmProjectAddEvent(project);
             return project;
         } catch (IOException e) {
@@ -813,6 +821,25 @@ public class LocalResourceController implements RMController {
             .toArray(RMResourceType[]::new));
 
         return project;
+    }
+
+    private void createResourceTypeFolders(Path path) {
+        // FIXME: do not create folders by force!!!
+        var resourceTypes = ResourceTypeRegistry.getInstance().getResourceTypes();
+        for (var resourceType : resourceTypes) {
+            var defaultRoot = resourceType.getDefaultRoot(null);
+            if (defaultRoot == null) {
+                continue;
+            }
+            var typeFolder = path.resolve(defaultRoot);
+            try {
+                if (!Files.exists(typeFolder)) {
+                    createFolder(typeFolder);
+                }
+            } catch (Exception e) {
+                log.error("Resource folder " + typeFolder + " is not created", e);
+            }
+        }
     }
 
     private Path getProjectPath(String projectId) throws DBException {

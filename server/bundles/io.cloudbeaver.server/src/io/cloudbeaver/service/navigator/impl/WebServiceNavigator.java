@@ -21,6 +21,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
@@ -58,6 +59,7 @@ import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -104,6 +106,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 return EMPTY_NODE_LIST;
             }
             List<WebNavigatorNodeInfo> result = new ArrayList<>();
+            Set<String> nodeIds = new HashSet<>(); // filter duplicate node ids
 
             for (DBNNode node : nodeChildren) {
                 if (node instanceof DBNDatabaseFolder && CommonUtils.isEmpty(((DBNDatabaseFolder) node).getMeta().getChildren(null))) {
@@ -118,6 +121,16 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                             continue;
                         }
                     }
+                    var nodeId = node.getNodeItemPath();
+                    if (nodeIds.contains(nodeId)) {
+                        session.addWarningMessage(
+                            MessageFormat.format("Duplicate child node ''{0}'' was found in parent node ''{1}''",
+                                nodeId,
+                                parentPath)
+                        );
+                        continue;
+                    }
+                    nodeIds.add(node.getNodeItemPath());
                     result.add(new WebNavigatorNodeInfo(session, node));
                 }
             }
