@@ -1,5 +1,9 @@
 {
   "version": "2.0.0",
+  "problemMatcher": [],
+  "presentation": {
+    "clear": true
+  },
   "options": {
     "env": {
       "cwd": "${workspaceFolder}/webapp",
@@ -12,21 +16,10 @@
       "type": "shell",
       "command": "yarn",
       "group": "test",
-      "args": [
-        "lerna",
-        "run",
-        "test",
-        "--no-bail",
-        "--stream",
-        "--"
-      ],
-      "problemMatcher": [],
-      "presentation": {
-        "clear": true
-      }
+      "args": ["lerna", "run", "test", "--no-bail", "--stream", "--"]
     },
     {
-      "label": "DevServer",
+      "label": "Run DevServer CE",
       "type": "shell",
       "command": "yarn",
       "args": [
@@ -37,45 +30,39 @@
         "--host",
         "0.0.0.0"
       ],
-      "problemMatcher": [],
+      "isBackground": true,
       "options": {
         "cwd": "${workspaceFolder}/webapp/packages/product-default"
+      }
+    },
+    {
+      "label": "Build CE",
+      "type": "shell",
+      "command": "./build-sqlite.bat",
+      "options": {
+        "cwd": "${workspaceFolder}/deploy"
       },
-      "presentation": {
-        "clear": true
+      "group": {
+        "kind": "build",
+        "isDefault": true
       }
     },
     {
       "label": "Yarn Install",
       "type": "shell",
       "command": "yarn",
-      "args": [],
-      "problemMatcher": [],
-      "presentation": {
-        "clear": true
-      }
+      "args": []
     },
     {
       "label": "Lerna Bootstrap",
       "type": "shell",
       "command": "yarn",
-      "args": [
-        "lerna",
-        "bootstrap"
-      ],
-      "problemMatcher": [],
-      "presentation": {
-        "clear": true
-      }
+      "args": ["lerna", "bootstrap"]
     },
     {
       "label": "Bootstrap",
       "dependsOrder": "sequence",
-      "dependsOn": [
-        "Yarn Install",
-        "Lerna Bootstrap"
-      ],
-      "problemMatcher": []
+      "dependsOn": ["Yarn Install", "Lerna Bootstrap"]
     }
   ],
   "inputs": [
@@ -84,9 +71,7 @@
       "id": "stage.ce",
       "description": "CE Stage servers",
       "default": "http://127.0.0.1:8978/",
-      "options": [
-        "http://127.0.0.1:8978/",
-      ]
+      "options": ["http://127.0.0.1:8978/"]
     }
   ]
 }
