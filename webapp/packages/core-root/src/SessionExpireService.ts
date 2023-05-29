@@ -5,10 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { GQLError, GraphQLService, EServerErrorCode } from '@cloudbeaver/core-sdk';
+import { EServerErrorCode, GQLError, GraphQLService } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
 import { SessionError } from './SessionError';
@@ -18,9 +17,7 @@ export class SessionExpireService extends Bootstrap {
   expired = false;
 
   onSessionExpire: IExecutor;
-  constructor(
-    private readonly graphQLService: GraphQLService,
-  ) {
+  constructor(private readonly graphQLService: GraphQLService) {
     super();
     this.onSessionExpire = new Executor();
   }
@@ -29,7 +26,7 @@ export class SessionExpireService extends Bootstrap {
     this.graphQLService.registerInterceptor(this.sessionExpiredInterceptor.bind(this));
   }
 
-  load(): void { }
+  load(): void {}
 
   sessionExpired(): void {
     if (this.expired) {

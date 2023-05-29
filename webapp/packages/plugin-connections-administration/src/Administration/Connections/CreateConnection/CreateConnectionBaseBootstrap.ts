@@ -5,10 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React from 'react';
 
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { CreateConnectionService } from '../CreateConnectionService';
 
@@ -19,9 +18,7 @@ const CustomConnection = React.lazy(async () => {
 
 @injectable()
 export class CreateConnectionBaseBootstrap extends Bootstrap {
-  constructor(
-    private readonly createConnectionService: CreateConnectionService,
-  ) {
+  constructor(private readonly createConnectionService: CreateConnectionService) {
     super();
   }
 
@@ -34,5 +31,5 @@ export class CreateConnectionBaseBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 }

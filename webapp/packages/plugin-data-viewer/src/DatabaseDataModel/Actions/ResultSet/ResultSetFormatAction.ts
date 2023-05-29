@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { removeLineBreak } from '@cloudbeaver/core-utils';
 
@@ -20,12 +19,13 @@ import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetEditAction } from './ResultSetEditAction';
 import { ResultSetViewAction } from './ResultSetViewAction';
 
-export type IResultSetValue =
-  string | number | boolean | Record<string, string | number | Record<string, any> | null> | null;
+export type IResultSetValue = string | number | boolean | Record<string, string | number | Record<string, any> | null> | null;
 
 @databaseDataAction()
-export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IDatabaseDataFormatAction<IResultSetElementKey, IDatabaseResultSet> {
+export class ResultSetFormatAction
+  extends DatabaseDataAction<any, IDatabaseResultSet>
+  implements IDatabaseDataFormatAction<IResultSetElementKey, IDatabaseResultSet>
+{
   static dataFormat = [ResultDataFormat.Resultset];
 
   private readonly view: ResultSetViewAction;
@@ -35,7 +35,7 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
     source: IDatabaseDataSource<any, IDatabaseResultSet>,
     result: IDatabaseResultSet,
     view: ResultSetViewAction,
-    edit: ResultSetEditAction
+    edit: ResultSetEditAction,
   ) {
     super(source, result);
     this.view = view;
@@ -84,10 +84,7 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
         const value = this.view.getCellValue(key as IResultSetElementKey);
 
         if (isResultSetContentValue(value)) {
-          readonly = (
-            value.binary !== undefined
-            || value.contentLength !== value.text?.length
-          );
+          readonly = value.binary !== undefined || value.contentLength !== value.text?.length;
         } else if (value !== null && typeof value === 'object') {
           readonly = true;
         }
@@ -136,7 +133,12 @@ export class ResultSetFormatAction extends DatabaseDataAction<any, IDatabaseResu
     }
 
     if (typeof value === 'string' && value.length > 1000) {
-      return removeLineBreak(value.split('').map(v => (v.charCodeAt(0) < 32 ? ' ' : v)).join(''));
+      return removeLineBreak(
+        value
+          .split('')
+          .map(v => (v.charCodeAt(0) < 32 ? ' ' : v))
+          .join(''),
+      );
     }
 
     return removeLineBreak(String(value));

@@ -5,20 +5,43 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { CONNECTION_FOLDER_NAME_VALIDATION } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { DialogueStateResult, CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { NavTreeResource, NavNodeManagerService, NavNodeInfoResource, type INodeMoveData, navNodeMoveContext, getNodesFromContext, ENodeMoveType, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
+import {
+  ENodeMoveType,
+  getNodesFromContext,
+  type INodeMoveData,
+  NavNodeInfoResource,
+  NavNodeManagerService,
+  navNodeMoveContext,
+  NavTreeResource,
+  ProjectsNavNodeService,
+} from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfo, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { getRmResourceKey, getRmResourcePath, NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
+import {
+  getRmResourceKey,
+  getRmResourcePath,
+  NAV_NODE_TYPE_RM_PROJECT,
+  NAV_NODE_TYPE_RM_RESOURCE,
+  ResourceManagerResource,
+  RESOURCES_NODE_PATH,
+} from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey, CachedTreeChildrenKey, getCachedMapResourceLoaderState, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
-import { ActionService, MenuService, ACTION_NEW_FOLDER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, DATA_CONTEXT_LOADABLE_STATE } from '@cloudbeaver/core-view';
+import {
+  ACTION_NEW_FOLDER,
+  ActionService,
+  DATA_CONTEXT_LOADABLE_STATE,
+  DATA_CONTEXT_MENU,
+  IAction,
+  IDataContextProvider,
+  MenuService,
+} from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
@@ -37,7 +60,6 @@ interface ITargetNode {
 
 @injectable()
 export class ResourceFoldersBootstrap extends Bootstrap {
-
   constructor(
     private readonly localizationService: LocalizationService,
     private readonly navTreeResource: NavTreeResource,
@@ -65,11 +87,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       isActionApplicable: (context, action) => {
         const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
 
-        if (
-          ![ACTION_NEW_FOLDER].includes(action)
-          || !tree?.baseRoot.startsWith(RESOURCES_NODE_PATH)
-          || !this.userInfoResource.data
-        ) {
+        if (![ACTION_NEW_FOLDER].includes(action) || !tree?.baseRoot.startsWith(RESOURCES_NODE_PATH) || !this.userInfoResource.data) {
           return false;
         }
 
@@ -78,10 +96,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       getLoader: (context, action) => {
         const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
 
-        return state.getState(
-          action.id,
-          () => getCachedMapResourceLoaderState(this.projectInfoResource, CachedMapAllKey)
-        );
+        return state.getState(action.id, () => getCachedMapResourceLoaderState(this.projectInfoResource, CachedMapAllKey));
       },
       isDisabled: context => this.getTargetNode(context) === undefined,
       handler: this.elementsTreeActionHandler.bind(this),
@@ -91,10 +106,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_ELEMENTS_TREE_TOOLS,
       getItems: (context, items) => {
         if (!items.includes(ACTION_NEW_FOLDER)) {
-          return [
-            ...items,
-            ACTION_NEW_FOLDER,
-          ];
+          return [...items, ACTION_NEW_FOLDER];
         }
 
         return items;
@@ -102,16 +114,9 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 
-  private async moveResourceToFolder(
-    {
-      type,
-      targetNode,
-      moveContexts,
-    }: INodeMoveData,
-    contexts: IExecutionContextProvider<INodeMoveData>
-  ) {
+  private async moveResourceToFolder({ type, targetNode, moveContexts }: INodeMoveData, contexts: IExecutionContextProvider<INodeMoveData>) {
     const move = contexts.getContext(navNodeMoveContext);
     const nodes = getNodesFromContext(moveContexts);
     const nodeIdList = nodes.map(node => node.id);
@@ -124,10 +129,10 @@ export class ResourceFoldersBootstrap extends Bootstrap {
 
     const supported = nodes.every(node => {
       if (
-        ![NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE].includes(node.nodeType!)
-        || targetProject !== this.projectsNavNodeService.getProject(node.id)
-        || children.includes(node.id)
-        || targetNode.id === node.id
+        ![NAV_NODE_TYPE_RM_PROJECT, NAV_NODE_TYPE_RM_RESOURCE].includes(node.nodeType!) ||
+        targetProject !== this.projectsNavNodeService.getProject(node.id) ||
+        children.includes(node.id) ||
+        targetNode.id === node.id
       ) {
         return false;
       }
@@ -150,7 +155,6 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       }
     }
   }
-
 
   private async elementsTreeActionHandler(contexts: IDataContextProvider, action: IAction) {
     const resourceTypeId = contexts.tryGet(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
@@ -209,10 +213,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
           try {
             const root = this.getResourceTypeFolder(result.projectId, resourceTypeId);
             const key = getRmResourcePath(result.projectId, result.folder ?? root);
-            await this.resourceManagerResource.create(
-              createPath(key, result.name),
-              true
-            );
+            await this.resourceManagerResource.create(createPath(key, result.name), true);
 
             this.navTreeResource.refreshTree(getRmProjectNodeId(result.projectId));
           } catch (exception: any) {
@@ -257,7 +258,6 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     if (!projectNode) {
       return;
     }
-
 
     const project = this.projectsNavNodeService.getByNodeId(projectNode.id);
 
@@ -328,17 +328,18 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     // ));
 
     this.resourceManagerResource.onItemUpdate.addHandler(key => {
-      const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getResourceNodeId)
-        .map(getPathParent))]);
+      const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getResourceNodeId).map(getPathParent))]);
       if (!this.navTreeResource.isOutdated(updated)) {
         this.navTreeResource.markTreeOutdated(updated);
       }
     });
 
     this.resourceManagerResource.onItemDelete.addHandler(key => {
-      const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getResourceNodeId)
-        .map(getPathParent))]);
-      this.navTreeResource.deleteInNode(updated, ResourceKeyUtils.toArray(key).map(value => [value]));
+      const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getResourceNodeId).map(getPathParent))]);
+      this.navTreeResource.deleteInNode(
+        updated,
+        ResourceKeyUtils.toArray(key).map(value => [value]),
+      );
     });
   }
 }

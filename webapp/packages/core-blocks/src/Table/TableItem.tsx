@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useContext, useCallback, useMemo, Children } from 'react';
+import { Children, useCallback, useContext, useMemo } from 'react';
 import styled, { use } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
@@ -17,7 +16,7 @@ import { useObjectRef } from '../useObjectRef';
 import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
 import { TableContext } from './TableContext';
-import { TableItemContext, ITableItemContext } from './TableItemContext';
+import { ITableItemContext, TableItemContext } from './TableItemContext';
 
 interface ExpandProps {
   item: any;
@@ -54,42 +53,49 @@ export const TableItem = observer<React.PropsWithChildren<Props>>(function Table
     throw new Error('TableContext must be provided');
   }
 
-  const selectionDisabled = selectDisabled || getComputed(() => (!!context.state.isItemSelectable && ((
-    context.state.selectableItems.length > 0 && !context.state.selectableItems.includes(item)
-  ) || !context.state.isItemSelectable(item))));
+  const selectionDisabled =
+    selectDisabled ||
+    getComputed(
+      () =>
+        !!context.state.isItemSelectable &&
+        ((context.state.selectableItems.length > 0 && !context.state.selectableItems.includes(item)) || !context.state.isItemSelectable(item)),
+    );
 
-  const itemContext = useMemo<ITableItemContext>(() => ({
-    item,
-    selectDisabled: selectionDisabled,
-    isSelected: () => !!context.selectedItems.get(item),
-    isExpanded: () => !!context.expandedItems.get(item),
-  }), [item, selectionDisabled]);
+  const itemContext = useMemo<ITableItemContext>(
+    () => ({
+      item,
+      selectDisabled: selectionDisabled,
+      isSelected: () => !!context.selectedItems.get(item),
+      isExpanded: () => !!context.expandedItems.get(item),
+    }),
+    [item, selectionDisabled],
+  );
 
   const isSelected = itemContext.isSelected();
   const isExpanded = itemContext.isExpanded();
 
   const ref = useObjectRef({ isSelected, itemContext, context, onClick });
 
-  const handleClick = useCallback(
-    (event: React.MouseEvent<HTMLTableRowElement>) => {
-      const { isSelected, itemContext, context, onClick } = ref;
+  const handleClick = useCallback((event: React.MouseEvent<HTMLTableRowElement>) => {
+    const { isSelected, itemContext, context, onClick } = ref;
 
-      if (props.selectOnItem && !itemContext.selectDisabled && !EventContext.has(event, EventTableItemSelectionFlag)) {
-        context.setItemSelect(itemContext.item, !isSelected);
-      }
+    if (props.selectOnItem && !itemContext.selectDisabled && !EventContext.has(event, EventTableItemSelectionFlag)) {
+      context.setItemSelect(itemContext.item, !isSelected);
+    }
 
-      if (onClick) {
-        onClick();
+    if (onClick) {
+      onClick();
+    }
+  }, []);
+
+  const handleDoubleClick = useCallback(
+    (e: React.MouseEvent<HTMLTableRowElement>) => {
+      if (onDoubleClick) {
+        onDoubleClick();
       }
     },
-    []
+    [onDoubleClick],
   );
-
-  const handleDoubleClick = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
-    if (onDoubleClick) {
-      onDoubleClick();
-    }
-  }, [onDoubleClick]);
 
   const ExpandElement = expandElement;
 
@@ -111,6 +117,6 @@ export const TableItem = observer<React.PropsWithChildren<Props>>(function Table
           </td>
         </tr>
       )}
-    </TableItemContext.Provider>
+    </TableItemContext.Provider>,
   );
 });

@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, makeAutoObservable, action } from 'mobx';
+import { action, makeAutoObservable, observable } from 'mobx';
 
 import { TempMap } from './TempMap';
 
@@ -24,12 +23,9 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
   constructor(private readonly defaultValueGetter?: DefaultValueGetter<TKey, TValue>) {
     this.syncData = null;
     this.data = observable(new Map());
-    this.temp = new TempMap<TKey, TValue>(
-      this.data,
-      () => {
-        this.syncData?.splice(0, this.syncData.length, ...this.data.entries());
-      }
-    );
+    this.temp = new TempMap<TKey, TValue>(this.data, () => {
+      this.syncData?.splice(0, this.syncData.length, ...this.data.entries());
+    });
 
     makeAutoObservable(this, {
       sync: action,

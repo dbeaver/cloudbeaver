@@ -5,28 +5,26 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { GraphQLService, CachedDataResource, CachedResource } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, CachedResource, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { SessionDataResource } from './SessionDataResource';
 
 @injectable()
 export class SessionPermissionsResource extends CachedDataResource<Set<string>> {
-  constructor(
-    private readonly graphQLService: GraphQLService,
-    sessionDataResource: SessionDataResource
-  ) {
+  constructor(private readonly graphQLService: GraphQLService, sessionDataResource: SessionDataResource) {
     super(() => new Set());
 
-    this.sync(sessionDataResource, () => {}, () => {});
+    this.sync(
+      sessionDataResource,
+      () => {},
+      () => {},
+    );
   }
 
   require(resource: CachedResource<any, any, any, any, any>, ...permissions: string[]): this {
-    resource
-      .preloadResource(this, () => undefined)
-      .before(ExecutorInterrupter.interrupter(() => !this.has(...permissions)));
+    resource.preloadResource(this, () => undefined).before(ExecutorInterrupter.interrupter(() => !this.has(...permissions)));
 
     return this;
   }

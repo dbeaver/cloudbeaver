@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
 
 export type NavigatorView = 'simple' | 'advanced';
@@ -30,9 +29,6 @@ export const CONNECTION_NAVIGATOR_VIEW_SETTINGS: Record<NavigatorView, Navigator
   },
 };
 
-export function isNavigatorViewSettingsEqual(
-  settings: NavigatorSettingsInput, settingsToCompare: NavigatorViewSettings
-): boolean {
-  return !(Object.keys(settingsToCompare) as Array<keyof NavigatorSettingsInput>)
-    .some(key => settings[key] !== settingsToCompare[key]);
+export function isNavigatorViewSettingsEqual(settings: NavigatorSettingsInput, settingsToCompare: NavigatorViewSettings): boolean {
+  return !(Object.keys(settingsToCompare) as Array<keyof NavigatorSettingsInput>).some(key => settings[key] !== settingsToCompare[key]);
 }

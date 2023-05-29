@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
@@ -21,7 +20,10 @@ import { NavNodeViewService } from '../NodesManager/NavNodeView/NavNodeViewServi
 import { navigationTreeConnectionGroupFilter } from './ConnectionGroup/navigationTreeConnectionGroupFilter';
 import { navigationTreeConnectionGroupRenderer } from './ConnectionGroup/navigationTreeConnectionGroupRenderer';
 import { ElementsTree } from './ElementsTree/ElementsTree';
-import { createElementsTreeSettings, validateElementsTreeSettings } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings';
+import {
+  createElementsTreeSettings,
+  validateElementsTreeSettings,
+} from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings';
 import type { IElementsTreeSettings } from './ElementsTree/useElementsTree';
 import { getNavigationTreeUserSettingsId } from './getNavigationTreeUserSettingsId';
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter';
@@ -66,14 +68,14 @@ const navigationTreeStyles = css`
 `;
 
 const elementsTreeStyles = css`
-    tools {
-      composes: theme-border-color-background from global;
-    }
-    tools > *:last-child:not(:first-child) {
-      border-bottom: solid 1px;
-      border-color: inherit;
-    }
-  `;
+  tools {
+    composes: theme-border-color-background from global;
+  }
+  tools > *:last-child:not(:first-child) {
+    border-bottom: solid 1px;
+    border-color: inherit;
+  }
+`;
 
 export const NavigationTree = observer(function NavigationTree() {
   const projectsNavNodeService = useService(ProjectsNavNodeService);
@@ -86,32 +88,27 @@ export const NavigationTree = observer(function NavigationTree() {
   const root = ROOT_NODE_PATH;
   const { handleOpen, handleSelect, handleSelectReset } = useNavigationTree();
 
-  const connectionGroupFilter = useMemo(() => navigationTreeConnectionGroupFilter(
-    navNodeInfoResource
-  ), [navNodeInfoResource]);
+  const connectionGroupFilter = useMemo(() => navigationTreeConnectionGroupFilter(navNodeInfoResource), [navNodeInfoResource]);
 
   const settings = useUserData<IElementsTreeSettings>(
     getNavigationTreeUserSettingsId(root),
     createElementsTreeSettings,
-    () => { },
-    validateElementsTreeSettings
+    () => {},
+    validateElementsTreeSettings,
   );
 
   const duplicateFilter = useMemo(() => navigationTreeDuplicateFilter(navNodeViewService), [navNodeViewService]);
-  const projectsRendererRenderer = useMemo(
-    () => navigationTreeProjectsRendererRenderer(navNodeInfoResource),
-    [navNodeInfoResource]
-  );
+  const projectsRendererRenderer = useMemo(() => navigationTreeProjectsRendererRenderer(navNodeInfoResource), [navNodeInfoResource]);
   const projectsExpandStateGetter = useMemo(
     () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource, projectsService, projectsNavNodeService),
-    [navNodeInfoResource, projectsService, projectsNavNodeService]
+    [navNodeInfoResource, projectsService, projectsNavNodeService],
   );
   const projectFilter = useMemo(
     () => navigationTreeProjectFilter(projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource),
-    [projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource]
+    [projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource],
   );
 
-  const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);
+  const settingsElements = useMemo(() => [ProjectsSettingsPlaceholderElement], []);
 
   return styled(navigationTreeStyles)(
     <CaptureView view={navTreeService}>
@@ -123,13 +120,15 @@ export const NavigationTree = observer(function NavigationTree() {
         navNodeFilterCompare={navigationTreeProjectSearchCompare}
         expandStateGetters={[projectsExpandStateGetter]}
         settingsElements={settingsElements}
-        emptyPlaceholder={() => styled(navigationTreeStyles)(
-          <center>
-            <message>
-              <Translate token='app_navigationTree_empty_placeholder' />
-            </message>
-          </center>
-        )}
+        emptyPlaceholder={() =>
+          styled(navigationTreeStyles)(
+            <center>
+              <message>
+                <Translate token="app_navigationTree_empty_placeholder" />
+              </message>
+            </center>,
+          )
+        }
         customSelect={handleSelect}
         customSelectReset={handleSelectReset}
         settings={settings}
@@ -138,6 +137,6 @@ export const NavigationTree = observer(function NavigationTree() {
         loadChildren={navTreeService.loadNestedNodes}
         onOpen={handleOpen}
       />
-    </CaptureView>
+    </CaptureView>,
   );
 });

@@ -5,10 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, makeObservable, observable, runInAction, toJS } from 'mobx';
 
-import { ConnectionInfoResource, createConnectionParam, IConnectionExecutionContextInfo, NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
+import {
+  ConnectionInfoResource,
+  createConnectionParam,
+  IConnectionExecutionContextInfo,
+  NOT_INITIALIZED_CONTEXT_ID,
+} from '@cloudbeaver/core-connections';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
@@ -22,21 +26,14 @@ interface IResourceInfo {
 }
 
 interface IResourceActions {
-  rename(
-    dataSource: ResourceSqlDataSource,
-    key: string,
-    newKey: string
-  ): Promise<string>;
+  rename(dataSource: ResourceSqlDataSource, key: string, newKey: string): Promise<string>;
   read(dataSource: ResourceSqlDataSource, key: string): Promise<string>;
   write(dataSource: ResourceSqlDataSource, key: string, value: string): Promise<void>;
-  getProperties(
-    dataSource: ResourceSqlDataSource,
-    key: string
-  ): Promise<IConnectionExecutionContextInfo | undefined>;
+  getProperties(dataSource: ResourceSqlDataSource, key: string): Promise<IConnectionExecutionContextInfo | undefined>;
   setProperties(
     dataSource: ResourceSqlDataSource,
     key: string,
-    executionContext: IConnectionExecutionContextInfo | undefined
+    executionContext: IConnectionExecutionContextInfo | undefined,
   ): Promise<IConnectionExecutionContextInfo | undefined>;
 }
 
@@ -69,11 +66,9 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   get executionContext(): IConnectionExecutionContextInfo | undefined {
     if (
-      this.state.executionContext
-      && !this.connectionInfoResource.has(createConnectionParam(
-        this.state.executionContext.projectId,
-        this.state.executionContext.connectionId
-      ))) {
+      this.state.executionContext &&
+      !this.connectionInfoResource.has(createConnectionParam(this.state.executionContext.projectId, this.state.executionContext.connectionId))
+    ) {
       return undefined;
     }
     return this.state.executionContext;
@@ -87,17 +82,12 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     return this.lastAction;
   }
 
-  get features():ESqlDataSourceFeatures[] {
+  get features(): ESqlDataSourceFeatures[] {
     if (this.isReadonly()) {
       return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable];
     }
 
-    return [
-      ESqlDataSourceFeatures.script,
-      ESqlDataSourceFeatures.query,
-      ESqlDataSourceFeatures.executable,
-      ESqlDataSourceFeatures.setName,
-    ];
+    return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable, ESqlDataSourceFeatures.setName];
   }
 
   private _script: string;
@@ -113,7 +103,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly resourceManagerResource: ResourceManagerResource,
-    state: IResourceSqlDataSourceState
+    state: IResourceSqlDataSourceState,
   ) {
     super();
     this.state = state;
@@ -197,12 +187,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
     name = name.trim();
 
-    return (
-      !!this.actions
-      && !!this.resourceKey
-      && this.saved
-      && name.length > 0
-    );
+    return !!this.actions && !!this.resourceKey && this.saved && name.length > 0;
   }
 
   setScript(script: string): void {
@@ -250,22 +235,15 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
-    if (
-      this.resourceKey
-      && executionContext?.projectId
-      && getRmResourceKey(this.resourceKey).projectId !== executionContext.projectId
-    ) {
+    if (this.resourceKey && executionContext?.projectId && getRmResourceKey(this.resourceKey).projectId !== executionContext.projectId) {
       throw new Error('Resource SQL Data Source and Execution context projects don\t match');
     }
 
-    if (
-      !isObjectsEqual(toJS(this.state.executionContext), toJS(executionContext))
-    ) {
-      const initNew = (
-        !isValuesEqual(executionContext?.connectionId, this.executionContext?.connectionId, undefined)
-        || !isValuesEqual(executionContext?.defaultCatalog, this.executionContext?.defaultCatalog, undefined)
-        || !isValuesEqual(executionContext?.defaultSchema, this.executionContext?.defaultSchema, undefined)
-      );
+    if (!isObjectsEqual(toJS(this.state.executionContext), toJS(executionContext))) {
+      const initNew =
+        !isValuesEqual(executionContext?.connectionId, this.executionContext?.connectionId, undefined) ||
+        !isValuesEqual(executionContext?.defaultCatalog, this.executionContext?.defaultCatalog, undefined) ||
+        !isValuesEqual(executionContext?.defaultSchema, this.executionContext?.defaultSchema, undefined);
 
       if (executionContext) {
         if (initNew) {
@@ -284,19 +262,13 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
       this.saveProperties();
     }
-
   }
 
   async rename(name: string | null) {
     await this.write();
 
     await this.scheduler.schedule(undefined, async () => {
-      if (
-        !this.actions
-      || !this.resourceKey
-      || !this.saved
-      || !name?.trim()
-      ) {
+      if (!this.actions || !this.resourceKey || !this.saved || !name?.trim()) {
         return;
       }
 
@@ -310,11 +282,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
       try {
         this.exception = null;
-        this.setResourceKey(await this.actions.rename(
-          this,
-          this.resourceKey,
-          createPath(getPathParent(this.resourceKey), name))
-        );
+        this.setResourceKey(await this.actions.rename(this, this.resourceKey, createPath(getPathParent(this.resourceKey), name)));
       } catch (exception: any) {
         this.exception = exception;
       } finally {
@@ -397,11 +365,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
         this.exception = null;
 
         if (!this.isReadonly()) {
-          const executionContext = await this.actions.setProperties(
-            this,
-            this.resourceKey,
-            this.executionContext
-          );
+          const executionContext = await this.actions.setProperties(this, this.resourceKey, this.executionContext);
 
           if (executionContext) {
             this.setExecutionContext(executionContext);

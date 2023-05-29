@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { reaction } from 'mobx';
 import { useEffect } from 'react';
 
@@ -14,7 +13,14 @@ import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core
 import { App, useService } from '@cloudbeaver/core-di';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
-import { DataViewerSettingsService, DatabaseDataAccessMode, DatabaseDataModel, IDatabaseDataModel, IDatabaseResultSet, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import {
+  DatabaseDataAccessMode,
+  DatabaseDataModel,
+  DataViewerSettingsService,
+  IDatabaseDataModel,
+  IDatabaseResultSet,
+  TableViewerStorageService,
+} from '@cloudbeaver/plugin-data-viewer';
 
 import { GroupingDataSource, IDataGroupingOptions } from './GroupingDataSource';
 import type { IGroupingQueryState } from './IGroupingQueryState';
@@ -38,36 +44,29 @@ export function useGroupingDataModel(
   const contextInfo = executionContext?.context;
   const connectionKey = contextInfo ? createConnectionParam(contextInfo.projectId, contextInfo.connectionId) : null;
 
-  const connectionInfoLoader = useResource(
-    useGroupingDataModel,
-    ConnectionInfoResource,
-    connectionKey
-  );
+  const connectionInfoLoader = useResource(useGroupingDataModel, ConnectionInfoResource, connectionKey);
   const connectionInfo = connectionInfoLoader.data;
 
-  const model = useObjectRef(() => {
-    const source = new GroupingDataSource(
-      app.getServiceInjector(),
-      graphQLService,
-      asyncTaskInfoService,
-    );
+  const model = useObjectRef(
+    () => {
+      const source = new GroupingDataSource(app.getServiceInjector(), graphQLService, asyncTaskInfoService);
 
-    const model = tableViewerStorageService.add(new DatabaseDataModel(source));
+      const model = tableViewerStorageService.add(new DatabaseDataModel(source));
 
-    model
-      .setAccess(DatabaseDataAccessMode.Readonly)
-      .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
-      .setSlice(0);
+      model.setAccess(DatabaseDataAccessMode.Readonly).setCountGain(dataViewerSettingsService.getDefaultRowsCount()).setSlice(0);
 
-    return {
-      source,
-      model,
-      dispose() {
-        this.model.dispose();
-        tableViewerStorageService.remove(this.model.id);
-      },
-    };
-  }, false, ['dispose']);
+      return {
+        source,
+        model,
+        dispose() {
+          this.model.dispose();
+          tableViewerStorageService.remove(this.model.id);
+        },
+      };
+    },
+    false,
+    ['dispose'],
+  );
 
   useEffect(() => {
     sourceModel.onDispose.addHandler(model.dispose);
@@ -77,54 +76,48 @@ export function useGroupingDataModel(
   }, [sourceModel]);
 
   useEffect(() => {
-    const sub = reaction(() => {
-      const result = sourceModel.source.hasResult(sourceResultIndex)
-        ? sourceModel.source.getResult(sourceResultIndex)
-        : null;
+    const sub = reaction(
+      () => {
+        const result = sourceModel.source.hasResult(sourceResultIndex) ? sourceModel.source.getResult(sourceResultIndex) : null;
 
-      return {
-        columns: state.columns,
-        sourceResultId: result?.id,
-      };
-    }, async ({ columns, sourceResultId }) => {
-      if (columns.length !== 0 && sourceResultId) {
-        const executionContext = sourceModel.source.executionContext;
-        model.model.source
-          .setExecutionContext(executionContext)
-          .setSupportedDataFormats(connectionInfo?.supportedDataFormats ?? []);
+        return {
+          columns: state.columns,
+          sourceResultId: result?.id,
+        };
+      },
+      async ({ columns, sourceResultId }) => {
+        if (columns.length !== 0 && sourceResultId) {
+          const executionContext = sourceModel.source.executionContext;
+          model.model.source.setExecutionContext(executionContext).setSupportedDataFormats(connectionInfo?.supportedDataFormats ?? []);
 
-        if (executionContext?.context) {
-          const connectionKey = createConnectionParam(
-            executionContext.context.projectId,
-            executionContext.context.connectionId
-          );
+          if (executionContext?.context) {
+            const connectionKey = createConnectionParam(executionContext.context.projectId, executionContext.context.connectionId);
 
+            model.model
+              .setOptions({
+                query: '',
+                columns,
+                sourceResultId,
+                connectionKey,
+                constraints: [],
+                whereFilter: '',
+              })
+              .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
+              .setSlice(0)
+              .source.resetData();
+          }
+        } else {
           model.model
-            .setOptions({
-              query: '',
-              columns,
-              sourceResultId,
-              connectionKey,
-              constraints: [],
-              whereFilter: '',
-            })
             .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
             .setSlice(0)
-            .source
-            .resetData();
+            .source.setExecutionContext(null)
+            .setSupportedDataFormats([])
+            .clearError()
+            .setResults([]);
         }
-      } else {
-        model.model
-          .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
-          .setSlice(0)
-          .source
-          .setExecutionContext(null)
-          .setSupportedDataFormats([])
-          .clearError()
-          .setResults([]);
-      }
-
-    }, { fireImmediately: true, equals: isObjectsEqual });
+      },
+      { fireImmediately: true, equals: isObjectsEqual },
+    );
 
     return sub;
   }, [state, sourceModel, sourceResultIndex]);

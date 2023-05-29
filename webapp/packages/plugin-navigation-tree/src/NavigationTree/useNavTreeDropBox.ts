@@ -5,16 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useCallback, useEffect } from 'react';
 
 import { useStateDelay } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { type NavNode, NavNodeManagerService, ENodeMoveType } from '@cloudbeaver/core-navigation-tree';
+import { ENodeMoveType, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { IDNDBox, useDNDBox } from '@cloudbeaver/core-ui';
 import { throttleAsync } from '@cloudbeaver/core-utils';
 import type { IDataContextProvider } from '@cloudbeaver/core-view';
-
 
 interface INodeState {
   expanded: boolean;
@@ -22,13 +20,10 @@ interface INodeState {
 }
 
 export function useNavTreeDropBox(targetNode: NavNode | undefined, nodeState?: INodeState): IDNDBox {
-  const updateCanMove = useCallback(throttleAsync(
-    (targetNode: NavNode, moveContexts: IDataContextProvider) => navNodeManagerService.canMove(
-      targetNode,
-      moveContexts,
-    ),
-    300
-  ), []);
+  const updateCanMove = useCallback(
+    throttleAsync((targetNode: NavNode, moveContexts: IDataContextProvider) => navNodeManagerService.canMove(targetNode, moveContexts), 300),
+    [],
+  );
   const navNodeManagerService = useService(NavNodeManagerService);
   const dndBox = useDNDBox({
     canDrop(moveContexts) {
@@ -36,8 +31,7 @@ export function useNavTreeDropBox(targetNode: NavNode | undefined, nodeState?: I
         return false;
       }
 
-      updateCanMove(targetNode, moveContexts)
-        .catch(() => {});
+      updateCanMove(targetNode, moveContexts).catch(() => {});
 
       return navNodeManagerService.getNavNodeCache(targetNode.id).canMove;
     },

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Suspense } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import styled from 'reshadow';
@@ -46,8 +45,8 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
       }
     },
     renderApp() {
-      this.initRoot()
-        .render(styled`
+      this.initRoot().render(
+        styled`
           Loader {
             height: 100vh;
           }
@@ -58,16 +57,16 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
                 <Body />
               </Suspense>
             </ErrorBoundary>
-          </AppContext>
-        ));
+          </AppContext>,
+        ),
+      );
     },
     renderError(exception?: any) {
-      this.initRoot()
-        .render(
-          <AppContext app={serviceInjector}>
-            <DisplayError error={exception} root />
-          </AppContext>
-        );
+      this.initRoot().render(
+        <AppContext app={serviceInjector}>
+          <DisplayError error={exception} root />
+        </AppContext>,
+      );
     },
   };
 }

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useState } from 'react';
 
 import { createComplexLoader, useComplexLoader, useObjectRef } from '@cloudbeaver/core-blocks';
@@ -32,23 +31,21 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): Extension[] {
   const [config] = useState<CompletionConfig>(() => {
     function getOptionsFromProposals(explicit: boolean, word: string, proposals: SQLProposal[]): SqlCompletion[] {
       const wordLowerCase = word.toLocaleLowerCase();
-      const hasSameName = proposals.some(
-        ({ displayString }) => displayString.toLocaleLowerCase() === wordLowerCase
-      );
-      const filteredProposals = proposals.filter(({ displayString }) => (
-        word === '*'
-      || (
-        displayString.toLocaleLowerCase() !== wordLowerCase
-        && displayString.toLocaleLowerCase().startsWith(wordLowerCase)
-      )
-      ))
+      const hasSameName = proposals.some(({ displayString }) => displayString.toLocaleLowerCase() === wordLowerCase);
+      const filteredProposals = proposals
+        .filter(
+          ({ displayString }) =>
+            word === '*' || (displayString.toLocaleLowerCase() !== wordLowerCase && displayString.toLocaleLowerCase().startsWith(wordLowerCase)),
+        )
         .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
       if (filteredProposals.length === 0 && !hasSameName && explicit) {
-        return [{
-          apply: closeCompletion,
-          label: localizationService.translate('sql_editor_hint_empty'),
-        }];
+        return [
+          {
+            apply: closeCompletion,
+            label: localizationService.translate('sql_editor_hint_empty'),
+          },
+        ];
       }
 
       return [
@@ -123,20 +120,22 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): Extension[] {
 
     return {
       override: [completionSource],
-      addToOptions: [{
-        render(completion: SqlCompletion) {
-          const icon = document.createElement('img');
-          icon.classList.add('cm-completionIcon');
-          icon.setAttribute('aria-hidden', 'true');
+      addToOptions: [
+        {
+          render(completion: SqlCompletion) {
+            const icon = document.createElement('img');
+            icon.classList.add('cm-completionIcon');
+            icon.setAttribute('aria-hidden', 'true');
 
-          if (completion.icon) {
-            icon.setAttribute('src', GlobalConstants.absoluteUrl(completion.icon));
-          }
+            if (completion.icon) {
+              icon.setAttribute('src', GlobalConstants.absoluteUrl(completion.icon));
+            }
 
-          return icon;
+            return icon;
+          },
+          position: 20,
         },
-        position: 20,
-      }],
+      ],
       icons: false, // disable native symbol based icons
     };
   });

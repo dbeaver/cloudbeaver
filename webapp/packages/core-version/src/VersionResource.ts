@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -31,13 +30,11 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
     return this.values.find(v => v.number === this.latestVersionNumber);
   }
 
-  constructor(
-    private readonly serverConfigResource: ServerConfigResource,
-  ) {
+  constructor(private readonly serverConfigResource: ServerConfigResource) {
     super();
 
     this.latestVersionNumber = null;
-    this.preloadResource(this.serverConfigResource, () => { });
+    this.preloadResource(this.serverConfigResource, () => {});
 
     makeObservable<this, 'latestVersionNumber'>(this, {
       latestVersionNumber: observable.ref,
@@ -56,7 +53,7 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
         cache: 'no-cache',
       });
 
-      const json = await response.json() as IVersions;
+      const json = (await response.json()) as IVersions;
 
       if (json.latestVersion) {
         this.latestVersionNumber = json.latestVersion;
@@ -67,7 +64,6 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
       }
 
       this.replace(resourceKeyList(json.versions.map(version => version.number)), json.versions);
-
     } catch (exception: any) {
       throw new Error('versions_load_fail', { cause: exception });
     }

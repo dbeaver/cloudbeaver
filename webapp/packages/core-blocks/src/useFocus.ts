@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, observable } from 'mobx';
 import { useEffect } from 'react';
 
@@ -29,12 +28,7 @@ interface IState<T extends HTMLElement> {
   restoreFocus: () => void;
 }
 
-export function useFocus<T extends HTMLElement>({
-  autofocus,
-  focusFirstChild,
-  onFocus,
-  onBlur,
-}: FocusOptions): [(obj: T | null) => void, IState<T>] {
+export function useFocus<T extends HTMLElement>({ autofocus, focusFirstChild, onFocus, onBlur }: FocusOptions): [(obj: T | null) => void, IState<T>] {
   const optionsRef = useObjectRef({ autofocus, focusFirstChild, onFocus, onBlur });
   const state = useObservableRef<IState<T>>(
     () => ({
@@ -51,9 +45,9 @@ export function useFocus<T extends HTMLElement>({
       updateFocus() {
         if (this.reference) {
           if (
-            document.activeElement instanceof HTMLElement
-            && document.activeElement !== this.reference
-            && (optionsRef.autofocus || optionsRef.focusFirstChild)
+            document.activeElement instanceof HTMLElement &&
+            document.activeElement !== this.reference &&
+            (optionsRef.autofocus || optionsRef.focusFirstChild)
           ) {
             this.lastFocus = document.activeElement;
           }
@@ -69,8 +63,7 @@ export function useFocus<T extends HTMLElement>({
       },
       focusFirstChild() {
         if (this.reference !== null && optionsRef.focusFirstChild) {
-          const firstFocusable = this.reference
-            .querySelectorAll<T>(`
+          const firstFocusable = this.reference.querySelectorAll<T>(`
             button:not([disabled=disabled]), 
             [href], 
             input:not([disabled=disabled]):not([readonly=readonly]), 
@@ -112,7 +105,7 @@ export function useFocus<T extends HTMLElement>({
     },
     false,
     undefined,
-    'useFocus'
+    'useFocus',
   );
 
   useEffect(() => {
@@ -147,9 +140,12 @@ export function useFocus<T extends HTMLElement>({
     };
   }, [state.reference]);
 
-  useEffect(() => () => {
-    state.restoreFocus();
-  }, []);
+  useEffect(
+    () => () => {
+      state.restoreFocus();
+    },
+    [],
+  );
 
   return [state.setRef, state];
 }

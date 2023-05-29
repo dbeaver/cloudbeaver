@@ -1,14 +1,17 @@
 export default [
   ['connections_administration_item', 'Gestione delle connessioni'],
   ['connections_administration_connection_create', 'Aggiungi Database'],
-  ['connections_administration_search_database_tip', 'Digita gli hosts qui, p.e. \'localhost host1.myhost.com 192.168.0.1\' e premi Invio'],
+  ['connections_administration_search_database_tip', "Digita gli hosts qui, p.e. 'localhost host1.myhost.com 192.168.0.1' e premi Invio"],
   ['connections_administration_new_connection', 'Nuova Connessione'],
   ['connections_administration_connection_create_error', 'Errore di creazione connessione'],
   ['connections_administration_connection_save_error', 'Errore di salvataggio connessione'],
   ['connections_administration_configuration_wizard_step_title', 'Connessioni ai Database'],
   ['connections_administration_configuration_wizard_step_description', 'Aggiungi connessione al database'],
   ['connections_administration_configuration_wizard_title', 'Aggiungi connessione al database'],
-  ['connections_administration_configuration_wizard_message', 'Qui puoi creare connessioni ai database manualmente oppure usando una ricerca di un database server.\nPuoi saltare questo step e configurare le connessioni dopo.'],
+  [
+    'connections_administration_configuration_wizard_message',
+    'Qui puoi creare connessioni ai database manualmente oppure usando una ricerca di un database server.\nPuoi saltare questo step e configurare le connessioni dopo.',
+  ],
   ['connections_administration_connection_no_information', 'Nessuna informazione disponibile'],
   ['connections_administration_tools_add_tooltip', 'Aggiungi una nuova connessione'],
   ['connections_administration_tools_refresh_tooltip', 'Ricarica la lista di connessioni'],
@@ -27,7 +30,7 @@ export default [
   ['connections_connection_credentials_provisioning_description', 'Devi compilare o confermare le credenziali per provare questa connessione'],
   ['connections_connection_edit_authentication', 'Autenticazione'],
   ['connections_connection_edit_access', 'Accesso'],
-  ['connections_connection_edit_access_load_failed', 'Errore al recupero dell\'accesso alla connessione'],
+  ['connections_connection_edit_access_load_failed', "Errore al recupero dell'accesso alla connessione"],
   ['connections_connection_edit_search', 'Cerca'],
   ['connections_connection_edit_search_hosts', 'Host names'],
   ['connections_connection_address', 'Indirizzo'],
@@ -69,5 +72,8 @@ export default [
   ['connections_driver_search_placeholder', 'Digita il nome del driver...'],
   ['connections_not_found', 'Nessuna connessione al database trovata'],
 
-  ['cloud_connections_access_placeholder', 'Connessioni Cloud sono visibili a tutti gli utenti. Il gestore degli accessi può essere configurato in "AWS Management Console".'],
+  [
+    'cloud_connections_access_placeholder',
+    'Connessioni Cloud sono visibili a tutti gli utenti. Il gestore degli accessi può essere configurato in "AWS Management Console".',
+  ],
 ];

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { AutoRunningTask } from './TaskScheduler/AutoRunningTask';
 import type { ITask } from './TaskScheduler/ITask';
 import { Task } from './TaskScheduler/Task';
@@ -14,7 +13,7 @@ export function whileTask<T>(
   callback: (value: T) => Promise<boolean> | boolean,
   task: () => Promise<T>,
   interval: number,
-  cancelMessage?: string
+  cancelMessage?: string,
 ): ITask<T> {
   let resolve: (value: T | PromiseLike<T>) => void;
   let reject: (reason?: any) => void;
@@ -68,6 +67,6 @@ export function whileTask<T>(
       runTask();
       return lockPromise;
     },
-    () => cancelTask(new Error(cancelMessage ?? 'Task was cancelled'))
+    () => cancelTask(new Error(cancelMessage ?? 'Task was cancelled')),
   );
 }

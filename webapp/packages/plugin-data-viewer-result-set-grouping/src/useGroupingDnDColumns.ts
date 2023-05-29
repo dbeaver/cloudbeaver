@@ -5,9 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { IDNDBox, useDNDBox } from '@cloudbeaver/core-ui';
-import { DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY, IDatabaseDataModel, IDatabaseResultSet, IResultSetColumnKey, ResultSetDataAction } from '@cloudbeaver/plugin-data-viewer';
+import {
+  DATA_CONTEXT_DV_DDM,
+  DATA_CONTEXT_DV_DDM_RESULT_INDEX,
+  DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY,
+  IDatabaseDataModel,
+  IDatabaseResultSet,
+  IResultSetColumnKey,
+  ResultSetDataAction,
+} from '@cloudbeaver/plugin-data-viewer';
 
 import type { IGroupingQueryState } from './IGroupingQueryState';
 import type { IGroupingDataModel } from './useGroupingDataModel';
@@ -20,14 +27,13 @@ interface IGroupingQueryResult {
 export function useGroupingDnDColumns(
   state: IGroupingQueryState,
   sourceModel: IDatabaseDataModel<any, IDatabaseResultSet>,
-  groupingModel: IGroupingDataModel
+  groupingModel: IGroupingDataModel,
 ): IGroupingQueryResult {
-
   async function dropItem(
     model: IDatabaseDataModel<any, IDatabaseResultSet>,
     resultIndex: number,
     columnKey: IResultSetColumnKey | null,
-    outside: boolean
+    outside: boolean,
   ) {
     if (!columnKey) {
       return;
@@ -48,19 +54,14 @@ export function useGroupingDnDColumns(
       }
 
       state.columns = columnNames;
-    } catch (e) {
-
-    }
+    } catch (e) {}
   }
 
   const dndBox = useDNDBox({
     canDrop: context => {
       const model = context.tryGet(DATA_CONTEXT_DV_DDM);
 
-      return (
-        context.has(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY)
-        && model === sourceModel
-      );
+      return context.has(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY) && model === sourceModel;
     },
     onDrop: async context => {
       const model = context.get(DATA_CONTEXT_DV_DDM);
@@ -75,10 +76,7 @@ export function useGroupingDnDColumns(
     canDrop: context => {
       const model = context.tryGet(DATA_CONTEXT_DV_DDM);
 
-      return (
-        context.has(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY)
-        && model?.id === groupingModel.model.id
-      );
+      return context.has(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY) && model?.id === groupingModel.model.id;
     },
     onDrop: async context => {
       const model = context.get(DATA_CONTEXT_DV_DDM);

@@ -12,5 +12,5 @@ export enum EConnectionFeature {
   temporary = 'temporary',
   readOnly = 'readOnly',
   provided = 'provided',
-  manageable = 'manageable'
+  manageable = 'manageable',
 }

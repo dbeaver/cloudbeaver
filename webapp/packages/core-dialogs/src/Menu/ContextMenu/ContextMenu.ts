@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { uuid } from '@cloudbeaver/core-utils';
 
@@ -41,10 +40,7 @@ export class ContextMenu {
     return this.constructMenuPanelWithContext(panelId, context);
   }
 
-  private constructMenuItemWithContext<T>(
-    params: IContextMenuItem<T>,
-    context: IMenuContext<T>
-  ): ComputedMenuItemModel {
+  private constructMenuItemWithContext<T>(params: IContextMenuItem<T>, context: IMenuContext<T>): ComputedMenuItemModel {
     // depends on context
     const modelOptions = new ComputedMenuItemOptionsWithContext(params, context);
     const model = new ComputedMenuItemModel(modelOptions);
@@ -53,30 +49,20 @@ export class ContextMenu {
       model.panel = this.constructMenuPanelWithContext<T>(params.id, context);
     } else if (params.panel instanceof ComputedContextMenuModel) {
       const basePanel = params.panel;
-      model.panel = new ContextMenuPanel(
-        `${params.panel.id}-${context.contextId!}-panel`,
-        () => this.constructMenuItems(basePanel.options.menuItemsGetter(context), context),
+      model.panel = new ContextMenuPanel(`${params.panel.id}-${context.contextId!}-panel`, () =>
+        this.constructMenuItems(basePanel.options.menuItemsGetter(context), context),
       );
     }
 
     return model;
   }
 
-  private constructMenuPanelWithContext<T>(
-    panelId: string,
-    context: IMenuContext<T>
-  ): IMenuPanel {
+  private constructMenuPanelWithContext<T>(panelId: string, context: IMenuContext<T>): IMenuPanel {
     const panel = this.menuStore.getPanel(panelId);
-    return new ContextMenuPanel(
-      `${panelId}-${context.contextId!}-panel`,
-      () => this.constructMenuItems(panel.menuItems.values, context)
-    );
+    return new ContextMenuPanel(`${panelId}-${context.contextId!}-panel`, () => this.constructMenuItems(panel.menuItems.values, context));
   }
 
-  private constructMenuItems<T>(
-    menuItems: Array<IContextMenuItem<any>>,
-    context: IMenuContext<T>
-  ): ComputedMenuItemModel[] {
+  private constructMenuItems<T>(menuItems: Array<IContextMenuItem<any>>, context: IMenuContext<T>): ComputedMenuItemModel[] {
     return menuItems
       .filter(item => item.isPresent(context)) // show menu items based on context
       .map(item => this.constructMenuItemWithContext(item, context));
@@ -107,8 +93,7 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
   keepMenuOpen?: boolean;
   iconGetter?: () => string | undefined;
 
-  constructor(private readonly options: IContextMenuItem<T>,
-    private readonly context: IMenuContext<T>) {
+  constructor(private readonly options: IContextMenuItem<T>, private readonly context: IMenuContext<T>) {
     // doesn't depend on context
     this.title = options.title;
     this.tooltip = options.tooltip;
@@ -158,7 +143,5 @@ class ContextMenuPanel implements IMenuPanel {
 
   private items?: ComputedMenuItemModel[];
 
-  constructor(public id: string,
-    private readonly itemsGetter: () => ComputedMenuItemModel[]) {
-  }
+  constructor(public id: string, private readonly itemsGetter: () => ComputedMenuItemModel[]) {}
 }

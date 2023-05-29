@@ -5,12 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type React from 'react';
 
 import type { NavNode } from '@cloudbeaver/core-navigation-tree';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
 
 export type NavTreeNodeComponent = React.FC<{
   nodeId: string;

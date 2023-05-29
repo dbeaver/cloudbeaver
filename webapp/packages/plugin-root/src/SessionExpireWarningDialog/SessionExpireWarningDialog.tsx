@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -22,26 +21,20 @@ const styles = css`
   }
 `;
 
-export const SessionExpireWarningDialog: DialogComponent<null, null> = observer(function SessionExpireWarningDialog({
-  rejectDialog,
-}) {
+export const SessionExpireWarningDialog: DialogComponent<null, null> = observer(function SessionExpireWarningDialog({ rejectDialog }) {
   const translate = useTranslate();
 
   return styled(styles)(
-    <CommonDialogWrapper size='small' fixedSize>
+    <CommonDialogWrapper size="small" fixedSize>
       <CommonDialogHeader title="app_root_session_expire_warning_title" onReject={rejectDialog} />
       <CommonDialogBody noOverflow>
         <p>{translate('app_root_session_expire_warning_message')}</p>
       </CommonDialogBody>
       <CommonDialogFooter>
-        <Button
-          type="button"
-          mod={['unelevated']}
-          onClick={rejectDialog}
-        >
+        <Button type="button" mod={['unelevated']} onClick={rejectDialog}>
           {translate('app_root_session_expire_warning_button')}
         </Button>
       </CommonDialogFooter>
-    </CommonDialogWrapper>
+    </CommonDialogWrapper>,
   );
 });

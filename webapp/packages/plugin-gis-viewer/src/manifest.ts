@@ -7,8 +7,5 @@ export const manifest: PluginManifest = {
   info: {
     name: 'GIS Viewer plugin',
   },
-  providers: [
-    GISViewerBootstrap,
-    LocaleService,
-  ],
+  providers: [GISViewerBootstrap, LocaleService],
 };

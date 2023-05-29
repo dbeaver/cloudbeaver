@@ -5,9 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { databaseDataAction, IResultSetElementKey, type IDatabaseResultSet, DatabaseDataAction, type IDatabaseDataSource, ResultSetViewAction } from '@cloudbeaver/plugin-data-viewer';
+import {
+  databaseDataAction,
+  DatabaseDataAction,
+  type IDatabaseDataSource,
+  type IDatabaseResultSet,
+  IResultSetElementKey,
+  ResultSetViewAction,
+} from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDatabaseDataGISAction } from './IDatabaseDataGISAction';
 
@@ -19,8 +25,10 @@ export interface IGISType {
   properties: Record<string, any> | null;
 }
 @databaseDataAction()
-export class ResultSetGISAction extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IDatabaseDataGISAction<IResultSetElementKey, IDatabaseResultSet> {
+export class ResultSetGISAction
+  extends DatabaseDataAction<any, IDatabaseResultSet>
+  implements IDatabaseDataGISAction<IResultSetElementKey, IDatabaseResultSet>
+{
   private readonly GISValueType = 'geometry';
 
   static dataFormat = [ResultDataFormat.Resultset];
@@ -35,11 +43,7 @@ export class ResultSetGISAction extends DatabaseDataAction<any, IDatabaseResultS
   isGISFormat(cell: IResultSetElementKey): boolean {
     const value = this.view.getCellValue(cell);
 
-    if (
-      value !== null
-      && typeof value === 'object'
-      && '$type' in value
-    ) {
+    if (value !== null && typeof value === 'object' && '$type' in value) {
       return value.$type === this.GISValueType;
     }
 

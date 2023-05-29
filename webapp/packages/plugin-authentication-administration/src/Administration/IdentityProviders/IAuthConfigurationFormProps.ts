@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import type { AdminAuthProviderConfiguration, CachedMapResource, GetAuthProviderConfigurationsQueryVariables } from '@cloudbeaver/core-sdk';
 
@@ -22,18 +21,12 @@ export interface IAuthConfigurationFormState {
   readonly loading: boolean;
 
   readonly submittingTask: IExecutorHandlersCollection<IAuthConfigurationFormSubmitData>;
-  readonly resource: CachedMapResource<
-  string,
-  AdminAuthProviderConfiguration,
-  GetAuthProviderConfigurationsQueryVariables
-  >;
+  readonly resource: CachedMapResource<string, AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables>;
 
   readonly load: () => Promise<void>;
   readonly loadConfigurationInfo: () => Promise<AdminAuthProviderConfiguration | undefined>;
   readonly save: () => Promise<void>;
-  readonly setOptions: (
-    mode: AuthConfigurationFormMode,
-  ) => this;
+  readonly setOptions: (mode: AuthConfigurationFormMode) => this;
 }
 
 export interface IAuthConfigurationFormProps {

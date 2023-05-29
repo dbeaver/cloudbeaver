@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { DetailsError } from './DetailsError';
 import type { ServerError } from './sdk';
 
 export enum ServerErrorType {
-  'QUOTE_EXCEEDED' = 'quotaExceeded'
+  'QUOTE_EXCEEDED' = 'quotaExceeded',
 }
 
 export class ServerInternalError extends DetailsError implements ServerError {
@@ -28,10 +27,6 @@ export class ServerInternalError extends DetailsError implements ServerError {
   }
 
   hasDetails(): boolean {
-    return (
-      this.stack !== undefined
-      && this.stack.length > 0
-      && this.errorType !== ServerErrorType.QUOTE_EXCEEDED
-    );
+    return this.stack !== undefined && this.stack.length > 0 && this.errorType !== ServerErrorType.QUOTE_EXCEEDED;
   }
 }

@@ -5,21 +5,18 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, makeObservable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import type { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import type { ITabInfo, ITabInfoOptions, ITabsContainer } from './ITabsContainer';
 
-export class TabsContainer<TProps = void, TOptions extends Record<string, any> = never>
-implements ITabsContainer<TProps, TOptions> {
+export class TabsContainer<TProps = void, TOptions extends Record<string, any> = never> implements ITabsContainer<TProps, TOptions> {
   readonly areaLabel: string;
   readonly tabInfoMap: Map<string, ITabInfo<TProps, TOptions>>;
 
   get tabInfoList(): Array<ITabInfo<TProps, TOptions>> {
-    return Array.from(this.tabInfoMap.values())
-      .sort((a, b) => a.order - b.order);
+    return Array.from(this.tabInfoMap.values()).sort((a, b) => a.order - b.order);
   }
 
   get selectedId(): string | null {
@@ -67,12 +64,7 @@ implements ITabsContainer<TProps, TOptions> {
     return this.tabInfoMap.get(tabId);
   }
 
-  getTabState<T>(
-    state: MetadataMap<string, any>,
-    tabId: string,
-    props: TProps,
-    valueGetter?: MetadataValueGetter<string, T>
-  ): T {
+  getTabState<T>(state: MetadataMap<string, any>, tabId: string, props: TProps, valueGetter?: MetadataValueGetter<string, T>): T {
     const tabInfo = this.getTabInfo(tabId);
 
     return state.get(tabId, valueGetter || tabInfo?.stateGetter?.(props));

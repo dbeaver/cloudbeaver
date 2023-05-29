@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-blocks';
@@ -14,10 +13,7 @@ import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigati
 
 import { VirtualFolderUtils } from './VirtualFolderUtils';
 
-export const VirtualFolderTab: NavNodeTransformViewComponent = function VirtualFolderTab({
-  folderId,
-  style,
-}) {
+export const VirtualFolderTab: NavNodeTransformViewComponent = function VirtualFolderTab({ folderId, style }) {
   const nodeType = VirtualFolderUtils.getNodeType(folderId);
   const styles = useStyles(style);
   const icon = 'platform:/plugin/org.jkiss.dbeaver.model/icons/tree/folder.png';
@@ -26,6 +22,6 @@ export const VirtualFolderTab: NavNodeTransformViewComponent = function VirtualF
     <Tab tabId={folderId} title={nodeType}>
       <TabIcon icon={icon} />
       <TabTitle>{nodeType}</TabTitle>
-    </Tab>
+    </Tab>,
   );
 };

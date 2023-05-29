@@ -5,13 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Filter, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
-
-
+import { Filter, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 
 export interface IFilterState {
   filterValue: string;
@@ -24,38 +21,41 @@ interface Props {
 }
 
 const styles = css`
-    buttons {
-      display: flex;
-      gap: 16px;
-    }
-    header {
-      composes: theme-border-color-background theme-background-surface theme-text-on-surface from global;
-      overflow: hidden;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px;
-      gap: 16px;
-      border-bottom: 1px solid;
-    }
-  `;
+  buttons {
+    display: flex;
+    gap: 16px;
+  }
+  header {
+    composes: theme-border-color-background theme-background-surface theme-text-on-surface from global;
+    overflow: hidden;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    gap: 16px;
+    border-bottom: 1px solid;
+  }
+`;
 
-export const ConnectionAccessTableHeader = observer<React.PropsWithChildren<Props>>(function ConnectionAccessTableHeader({ filterState, disabled, className, children }) {
+export const ConnectionAccessTableHeader = observer<React.PropsWithChildren<Props>>(function ConnectionAccessTableHeader({
+  filterState,
+  disabled,
+  className,
+  children,
+}) {
   const translate = useTranslate();
   return styled(useStyles(styles))(
     <header className={className}>
       <Filter
         disabled={disabled}
         placeholder={translate('connections_connection_access_filter_placeholder')}
-        name='filterValue'
+        name="filterValue"
         state={filterState}
       />
-      <buttons>
-        {children}
-      </buttons>
-    </header>
+      <buttons>{children}</buttons>
+    </header>,
   );
 });

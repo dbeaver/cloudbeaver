@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable, observable } from 'mobx';
 
 import type { ITask, TaskScheduler } from '@cloudbeaver/core-executor';
@@ -32,7 +31,7 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
   constructor(
     private readonly scheduler: TaskScheduler<string>,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
-    private readonly contextId: string
+    private readonly contextId: string,
   ) {
     this.currentTask = null;
     makeObservable<this, 'currentTask'>(this, {
@@ -43,11 +42,7 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
     });
   }
 
-  run<T>(
-    task: () => Promise<T>,
-    cancel?: () => Promise<any> | void,
-    end?: () => Promise<any> | void
-  ): ITask<T> {
+  run<T>(task: () => Promise<T>, cancel?: () => Promise<any> | void, end?: () => Promise<any> | void): ITask<T> {
     if (!this.context) {
       throw new Error('Execution Context not found');
     }
@@ -75,10 +70,7 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
     await this.connectionExecutionContextResource.destroy(this.contextId);
   }
 
-  async update(
-    defaultCatalog?: string,
-    defaultSchema?: string
-  ): Promise<IConnectionExecutionContextInfo> {
+  async update(defaultCatalog?: string, defaultSchema?: string): Promise<IConnectionExecutionContextInfo> {
     if (!this.context) {
       throw new Error('Execution Context not found');
     }

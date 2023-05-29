@@ -7,5 +7,5 @@
  */
 
 export enum EAdminPermission {
-  admin = 'admin'
+  admin = 'admin',
 }

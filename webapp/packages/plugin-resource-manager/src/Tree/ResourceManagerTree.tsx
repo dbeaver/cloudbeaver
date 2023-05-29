@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
@@ -18,7 +17,14 @@ import { getRmResourcePath, ResourceManagerResource, RESOURCES_NODE_PATH } from 
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
-import { NavigationTreeService, ElementsTreeLoader, IElementsTreeSettings, createElementsTreeSettings, validateElementsTreeSettings, getNavigationTreeUserSettingsId } from '@cloudbeaver/plugin-navigation-tree';
+import {
+  createElementsTreeSettings,
+  ElementsTreeLoader,
+  getNavigationTreeUserSettingsId,
+  IElementsTreeSettings,
+  NavigationTreeService,
+  validateElementsTreeSettings,
+} from '@cloudbeaver/plugin-navigation-tree';
 
 import { ResourceManagerService } from '../ResourceManagerService';
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';
@@ -66,10 +72,7 @@ interface Props extends React.PropsWithChildren {
   resourceTypeId?: string;
 }
 
-export const ResourceManagerTree: React.FC<Props> = observer(function ResourceManagerTree({
-  resourceTypeId,
-  children,
-}) {
+export const ResourceManagerTree: React.FC<Props> = observer(function ResourceManagerTree({ resourceTypeId, children }) {
   const root = RESOURCES_NODE_PATH;
 
   const projectsNavNodeService = useService(ProjectsNavNodeService);
@@ -80,96 +83,48 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
   const resourceManagerService = useService(ResourceManagerService);
   const navTreeResource = useService(NavTreeResource);
 
-  const key = getComputed<string[]>(
-    () => projectsService.activeProjects.map(project => getRmResourcePath(project.id)),
-    isArraysEqual
-  );
+  const key = getComputed<string[]>(() => projectsService.activeProjects.map(project => getRmResourcePath(project.id)), isArraysEqual);
   useResource(ResourceManagerTree, ResourceManagerResource, resourceKeyList(key));
-
 
   const settings = useUserData<IElementsTreeSettings>(
     getNavigationTreeUserSettingsId(root),
     createElementsTreeSettings,
-    () => { },
-    validateElementsTreeSettings
+    () => {},
+    validateElementsTreeSettings,
   );
 
   const projectsRendererRenderer = useMemo(
-    () => navigationTreeProjectsRendererRenderer(
-      navNodeInfoResource,
-      resourceManagerService,
-      projectsNavNodeService,
-      resourceTypeId,
-    ),
-    [
-      navNodeInfoResource,
-      resourceManagerService,
-      projectsNavNodeService,
-      resourceTypeId,
-    ]
+    () => navigationTreeProjectsRendererRenderer(navNodeInfoResource, resourceManagerService, projectsNavNodeService, resourceTypeId),
+    [navNodeInfoResource, resourceManagerService, projectsNavNodeService, resourceTypeId],
   );
 
   const resourceExpandStateGetter = useMemo(
-    () => navigationTreeResourceExpandStateGetter(
-      navNodeInfoResource,
-      resourceManagerService,
-      projectsNavNodeService,
-      resourceTypeId
-    ),
-    [
-      navNodeInfoResource,
-      resourceManagerService,
-      projectsNavNodeService,
-      resourceTypeId,
-    ]
+    () => navigationTreeResourceExpandStateGetter(navNodeInfoResource, resourceManagerService, projectsNavNodeService, resourceTypeId),
+    [navNodeInfoResource, resourceManagerService, projectsNavNodeService, resourceTypeId],
   );
 
   const projectsExpandStateGetter = useMemo(
-    () => navigationTreeProjectsExpandStateGetter(
-      navNodeInfoResource,
-      projectsService,
-      projectsNavNodeService
-    ),
-    [
-      navNodeInfoResource,
-      projectsService,
-      projectsNavNodeService,
-    ]
+    () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource, projectsService, projectsNavNodeService),
+    [navNodeInfoResource, projectsService, projectsNavNodeService],
   );
   const projectFilter = useMemo(
-    () => navigationTreeProjectFilter(
-      projectsNavNodeService,
-      projectsService,
-      navNodeInfoResource,
-      navTreeResource,
-      resourceManagerService,
-      resourceTypeId,
-    ),
-    [
-      projectsNavNodeService,
-      projectsService,
-      navNodeInfoResource,
-      navTreeResource,
-      resourceManagerService,
-      resourceTypeId,
-    ]
+    () =>
+      navigationTreeProjectFilter(
+        projectsNavNodeService,
+        projectsService,
+        navNodeInfoResource,
+        navTreeResource,
+        resourceManagerService,
+        resourceTypeId,
+      ),
+    [projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource, resourceManagerService, resourceTypeId],
   );
   const resourceTypeFilter = useMemo(
-    () => navigationTreeResourceTypeFilter(
-      navNodeInfoResource,
-      projectsNavNodeService,
-      projectInfoResource,
-      resourceTypeId
-    ),
-    [
-      navNodeInfoResource,
-      projectsNavNodeService,
-      projectInfoResource,
-      resourceTypeId,
-    ]
+    () => navigationTreeResourceTypeFilter(navNodeInfoResource, projectsNavNodeService, projectInfoResource, resourceTypeId),
+    [navNodeInfoResource, projectsNavNodeService, projectInfoResource, resourceTypeId],
   );
 
-  const settingsElements = useMemo(() => ([ProjectsSettingsPlaceholderElement]), []);
+  const settingsElements = useMemo(() => [ProjectsSettingsPlaceholderElement], []);
 
   return styled(styles)(
     <CaptureView view={navTreeService}>
@@ -184,15 +139,15 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
         expandStateGetters={[projectsExpandStateGetter, resourceExpandStateGetter]}
         navNodeFilterCompare={navigationTreeProjectSearchCompare}
         settingsElements={settingsElements}
-        emptyPlaceholder={() => styled(styles)(
-          <center>
-            <message>
-              {children}
-            </message>
-          </center>
-        )}
+        emptyPlaceholder={() =>
+          styled(styles)(
+            <center>
+              <message>{children}</message>
+            </center>,
+          )
+        }
         onOpen={node => navTreeService.navToNode(node.id, node.parentId)}
       />
-    </CaptureView>
+    </CaptureView>,
   );
 });

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
@@ -22,8 +21,10 @@ export const IS_NULL_ID = 'IS_NULL';
 export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
 
 @databaseDataAction()
-export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataOptions, IDatabaseResultSet>
-  implements IDatabaseDataConstraintAction<IDatabaseResultSet> {
+export class ResultSetConstraintAction
+  extends DatabaseDataAction<IDatabaseDataOptions, IDatabaseResultSet>
+  implements IDatabaseDataConstraintAction<IDatabaseResultSet>
+{
   static dataFormat = [ResultDataFormat.Resultset, ResultDataFormat.Document];
 
   get supported(): boolean {
@@ -59,8 +60,7 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
       return;
     }
 
-    this.source.options.constraints = this.source.options.constraints
-      .filter(constraint => constraint.attributePosition !== attributePosition);
+    this.source.options.constraints = this.source.options.constraints.filter(constraint => constraint.attributePosition !== attributePosition);
   }
 
   private deleteEmptyConstraint(attributePosition: number) {
@@ -72,8 +72,7 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
   }
 
   private getMaxOrderPosition() {
-    return Math.max(0, ...this.orderConstraints
-      .map(constraint => constraint.orderPosition !== undefined ? constraint.orderPosition + 1 : -1));
+    return Math.max(0, ...this.orderConstraints.map(constraint => (constraint.orderPosition !== undefined ? constraint.orderPosition + 1 : -1)));
   }
 
   get(attributePosition: number): SqlDataFilterConstraint | undefined {
@@ -274,8 +273,9 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
       }
 
       if (column && prevColumn.position !== column.position) {
-        const prevConstraint = this.source.prevOptions?.constraints
-          .find(prevConstraint => prevConstraint.attributePosition === constraint.attributePosition);
+        const prevConstraint = this.source.prevOptions?.constraints.find(
+          prevConstraint => prevConstraint.attributePosition === constraint.attributePosition,
+        );
 
         constraint.attributePosition = column.position;
 

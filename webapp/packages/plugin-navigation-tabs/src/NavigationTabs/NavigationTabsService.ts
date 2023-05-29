@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, action, computed, makeObservable, runInAction } from 'mobx';
+import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
@@ -20,8 +19,8 @@ import { isArraysEqual, MetadataMap, TempMap } from '@cloudbeaver/core-utils';
 import { ACTION_OPEN_IN_TAB, IActiveView, View } from '@cloudbeaver/core-view';
 
 import type { ITab, ITabMetadata } from './ITab';
-import { TabHandler, TabHandlerOptions, TabHandlerEvent, TabSyncHandlerEvent } from './TabHandler';
-import { TabNavigationContext, ITabNavigationContext } from './TabNavigationContext';
+import { TabHandler, TabHandlerEvent, TabHandlerOptions, TabSyncHandlerEvent } from './TabHandler';
+import { ITabNavigationContext, TabNavigationContext } from './TabNavigationContext';
 
 interface INavigatorHistory {
   history: string[];
@@ -38,7 +37,6 @@ const NAVIGATION_TABS_BASE_KEY = 'navigation_tabs';
 
 @injectable()
 export class NavigationTabsService extends View<ITab> {
-
   get currentTab(): ITab | undefined {
     if (this.currentTabId) {
       return this.getTab(this.currentTabId);
@@ -47,10 +45,7 @@ export class NavigationTabsService extends View<ITab> {
   }
 
   get currentTabId(): string | null {
-    if (
-      this.history.currentId !== null
-      && this.tabIdList.includes(this.history.currentId)
-    ) {
+    if (this.history.currentId !== null && this.tabIdList.includes(this.history.currentId)) {
       return this.history.currentId;
     }
 
@@ -59,14 +54,12 @@ export class NavigationTabsService extends View<ITab> {
 
   get tabIdList(): string[] {
     return Array.from(this.tabsMap.values())
-      .filter(tab => (
-        this.getTabMetadata(tab.id).restored
-        && tab.userId === this.userInfoResource.getId()
-        && (
-          tab.projectId === null
-          || this.projectsService.activeProjects.some(project => project.id === tab.projectId)
-        )
-      ))
+      .filter(
+        tab =>
+          this.getTabMetadata(tab.id).restored &&
+          tab.userId === this.userInfoResource.getId() &&
+          (tab.projectId === null || this.projectsService.activeProjects.some(project => project.id === tab.projectId)),
+      )
       .map(tab => tab.id);
   }
 
@@ -78,10 +71,13 @@ export class NavigationTabsService extends View<ITab> {
     }
 
     if (!this.tempHistoryState.has(projectId)) {
-      this.tempHistoryState.set(projectId, observable({
-        history: [],
-        currentId: null,
-      }));
+      this.tempHistoryState.set(
+        projectId,
+        observable({
+          history: [],
+          currentId: null,
+        }),
+      );
     }
 
     return this.tempHistoryState.get(projectId)!;
@@ -118,7 +114,7 @@ export class NavigationTabsService extends View<ITab> {
     private readonly userInfoResource: UserInfoResource,
     private readonly projectsService: ProjectsService,
     private readonly administrationScreenService: AdministrationScreenService,
-    private readonly appAuthService: AppAuthService
+    private readonly appAuthService: AppAuthService,
   ) {
     super();
 
@@ -163,16 +159,16 @@ export class NavigationTabsService extends View<ITab> {
       map => {
         for (const [key, value] of Array.from(map.entries())) {
           if (
-            typeof value.id !== 'string'
-            || typeof value.handlerId !== 'string'
-            || typeof value.userId !== 'string'
-            || !['object', 'string'].includes(typeof value.projectId)
+            typeof value.id !== 'string' ||
+            typeof value.handlerId !== 'string' ||
+            typeof value.userId !== 'string' ||
+            !['object', 'string'].includes(typeof value.projectId)
           ) {
             map.delete(key);
           }
         }
         return map;
-      }
+      },
     );
 
     this.autoSaveService.withAutoSave(
@@ -181,15 +177,12 @@ export class NavigationTabsService extends View<ITab> {
       () => new Map(),
       map => {
         for (const [key, value] of Array.from(map.entries())) {
-          if (
-            !['object', 'string'].includes(typeof value.currentId)
-            || !Array.isArray(value.history)
-          ) {
+          if (!['object', 'string'].includes(typeof value.currentId) || !Array.isArray(value.history)) {
             map.delete(key);
           }
         }
         return map;
-      }
+      },
     );
 
     this.autoSaveService.withAutoSave(
@@ -198,14 +191,12 @@ export class NavigationTabsService extends View<ITab> {
       () => new Map(),
       map => {
         for (const [key, value] of Array.from(map.entries())) {
-          if (
-            !Array.isArray(value.tabs)
-          ) {
+          if (!Array.isArray(value.tabs)) {
             map.delete(key);
           }
         }
         return map;
-      }
+      },
     );
 
     this.userInfoResource.onUserChange.addHandler(this.unloadTabs.bind(this));
@@ -233,10 +224,7 @@ export class NavigationTabsService extends View<ITab> {
       return;
     }
 
-    if (
-      !this.userTabsState.tabs.includes(tabId)
-      || !this.tabIdList.includes(tabId)
-    ) {
+    if (!this.userTabsState.tabs.includes(tabId) || !this.tabIdList.includes(tabId)) {
       return;
     }
 
@@ -364,11 +352,7 @@ export class NavigationTabsService extends View<ITab> {
   findTab(predicate: (tab: ITab) => boolean): ITab | null;
   findTab(predicate: (tab: ITab) => boolean): ITab | null {
     for (const tab of this.tabsMap.values()) {
-      if (
-        this.getTabMetadata(tab.id).restored
-        && tab.userId === this.userInfoResource.getId()
-        && predicate(tab)
-      ) {
+      if (this.getTabMetadata(tab.id).restored && tab.userId === this.userInfoResource.getId() && predicate(tab)) {
         return tab;
       }
     }
@@ -377,13 +361,9 @@ export class NavigationTabsService extends View<ITab> {
 
   findTabs(predicate: (tab: ITab) => boolean): Generator<ITab>;
   findTabs<S>(predicate: (tab: ITab) => tab is ITab<S>): Generator<ITab<S>>;
-  * findTabs(predicate: (tab: ITab) => boolean): Generator<ITab> {
+  *findTabs(predicate: (tab: ITab) => boolean): Generator<ITab> {
     for (const tab of this.tabsMap.values()) {
-      if (
-        this.getTabMetadata(tab.id).restored
-        && tab.userId === this.userInfoResource.getId()
-        && predicate(tab)
-      ) {
+      if (this.getTabMetadata(tab.id).restored && tab.userId === this.userInfoResource.getId() && predicate(tab)) {
         yield tab;
       }
     }

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable, observable } from 'mobx';
 
 import type { ISettingsResolverSource } from './ISettingsResolverSource';
@@ -53,8 +52,7 @@ export abstract class SettingsResolverSource implements ISettingsResolverSource 
   }
 
   getValue(key: any): any {
-    return this.resolvers.find(r => r.has(key))
-      ?.getValue(key);
+    return this.resolvers.find(r => r.has(key))?.getValue(key);
   }
 
   setValue(key: any, value: any): void {

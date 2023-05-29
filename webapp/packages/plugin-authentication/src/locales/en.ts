@@ -22,7 +22,7 @@ export default [
   ['authentication_user_team', 'User team'],
   ['authentication_user_status', 'User status'],
   ['authentication_user_enabled', 'Enabled'],
-  ['authentication_user_login_not_set', 'Login can\'t be empty'],
+  ['authentication_user_login_not_set', "Login can't be empty"],
   ['authentication_user_team_not_set', 'At least one team must be selected'],
   ['authentication_user_role_not_set', '{alias:authentication_user_role} is required'],
   ['authentication_user_password_not_set', '{alias:authentication_user_password} is required'],

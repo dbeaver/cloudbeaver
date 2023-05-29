@@ -5,11 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IMenuPanel } from '../IMenuPanel';
-import {
-  ComputedMenuItemModel, IComputedMenuItemOptions
-} from '../models/ComputedMenuItemModel';
+import { ComputedMenuItemModel, IComputedMenuItemOptions } from '../models/ComputedMenuItemModel';
 import { ComputedMenuPanelModel } from '../models/ComputedMenuPanelModel';
 import { MenuOptionsStore } from '../models/MenuOptionsStore';
 

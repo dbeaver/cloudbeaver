@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -34,12 +33,7 @@ interface Props extends IElementsTreeSettingsProps {
   className?: string;
 }
 
-export const NavigationTreeSettings = observer<Props>(function NavigationTreeSettings({
-  elements,
-  tree,
-  style,
-  className,
-}) {
+export const NavigationTreeSettings = observer<Props>(function NavigationTreeSettings({ elements, tree, style, className }) {
   const styles = useStyles(BASE_CONTAINERS_STYLES, expandStyles, style);
   const elementsTreeSettingsService = useService(ElementsTreeSettingsService);
 
@@ -47,14 +41,9 @@ export const NavigationTreeSettings = observer<Props>(function NavigationTreeSet
     <settings className={className}>
       <Group keepSize form gap dense>
         <Loader suspense>
-          <Placeholder
-            container={elementsTreeSettingsService.placeholder}
-            elements={elements}
-            tree={tree}
-            style={style}
-          />
+          <Placeholder container={elementsTreeSettingsService.placeholder} elements={elements} tree={tree} style={style} />
         </Loader>
       </Group>
-    </settings>
+    </settings>,
   );
 });

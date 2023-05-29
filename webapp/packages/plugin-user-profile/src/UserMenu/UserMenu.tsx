@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
@@ -36,6 +35,6 @@ export const UserMenu = observer(function UserMenu() {
       <ContextMenu menu={menu} style={[topMenuStyles]} rtl modal>
         <Icon name="angle" viewBox="0 0 15 8" />
       </ContextMenu>
-    </Loader>
+    </Loader>,
   );
 });

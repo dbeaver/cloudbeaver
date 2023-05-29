@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
@@ -20,11 +19,7 @@ interface Props {
   style?: ComponentStyle;
 }
 
-export const MetaParameterInfoForm = observer<Props>(function MetaParameterInfoForm({
-  user,
-  className,
-  style,
-}) {
+export const MetaParameterInfoForm = observer<Props>(function MetaParameterInfoForm({ user, className, style }) {
   const userMetaParameters = useResource(MetaParameterInfoForm, UserMetaParametersResource, undefined);
   const styles = useStyles(style, BASE_CONTAINERS_STYLES);
 
@@ -34,13 +29,7 @@ export const MetaParameterInfoForm = observer<Props>(function MetaParameterInfoF
 
   return styled(styles)(
     <Container className={className} wrap gap>
-      <ObjectPropertyInfoForm
-        state={user.metaParameters}
-        properties={userMetaParameters.data}
-        category={null}
-        disabled
-        readOnly
-      />
-    </Container>
+      <ObjectPropertyInfoForm state={user.metaParameters} properties={userMetaParameters.data} category={null} disabled readOnly />
+    </Container>,
   );
 });

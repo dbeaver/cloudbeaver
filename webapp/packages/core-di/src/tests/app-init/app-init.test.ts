@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { App } from '../../App';
 import { manifest } from './manifest';
 import { TestBootstrap } from './TestBootstrap';
@@ -34,5 +33,4 @@ test('App Initialization', async () => {
   await (app as any).loadServices();
   expect(bootstrap.loaded).toBe(true);
   expect(bootstrap.sum).toBe(3);
-
 });

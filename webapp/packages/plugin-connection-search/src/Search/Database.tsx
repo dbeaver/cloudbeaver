@@ -5,41 +5,37 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import {
-  ListItem, ListItemIcon, StaticImage, ListItemName
-} from '@cloudbeaver/core-blocks';
+import { ListItem, ListItemIcon, ListItemName, StaticImage } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 
-
 const styles = css`
-    ListItemIcon {
-      position: relative;
-      min-width: 80px;
-      justify-content: flex-end;
-    }
+  ListItemIcon {
+    position: relative;
+    min-width: 80px;
+    justify-content: flex-end;
+  }
 
-    StaticImage {
-      composes: theme-background-surface theme-border-color-surface from global;
-      box-sizing: border-box;
-      width: 32px;
-      border-radius: 50%;
-      border: solid 2px;
+  StaticImage {
+    composes: theme-background-surface theme-border-color-surface from global;
+    box-sizing: border-box;
+    width: 32px;
+    border-radius: 50%;
+    border: solid 2px;
 
-      &:hover {
-        z-index: 1;
-      }
-      &:not(:first-child) {
-        margin-left: -20px;
-      }
+    &:hover {
+      z-index: 1;
     }
-  `;
+    &:not(:first-child) {
+      margin-left: -20px;
+    }
+  }
+`;
 
 interface Props {
   database: AdminConnectionSearchInfo;
@@ -49,10 +45,9 @@ interface Props {
 export const Database = observer<Props>(function Database({ database, onSelect }) {
   const drivers = useService(DBDriverResource);
   const select = useCallback(() => onSelect(database), [database]);
-  const orderedDrivers = useMemo(() => (
-    database.possibleDrivers
-      .slice()
-      .sort((a, b) => {
+  const orderedDrivers = useMemo(
+    () =>
+      database.possibleDrivers.slice().sort((a, b) => {
         if (a === database.defaultDriver) {
           return 1;
         }
@@ -60,8 +55,9 @@ export const Database = observer<Props>(function Database({ database, onSelect }
           return -1;
         }
         return a.localeCompare(b);
-      })
-  ), [database]);
+      }),
+    [database],
+  );
 
   const host = database.host + ':' + database.port;
   const name = database.displayName !== database.host ? database.displayName + ' (' + host + ')' : host;
@@ -69,9 +65,11 @@ export const Database = observer<Props>(function Database({ database, onSelect }
   return styled(styles)(
     <ListItem onClick={select}>
       <ListItemIcon>
-        {orderedDrivers.map(driverId => <StaticImage key={driverId} icon={drivers.get(driverId)?.icon} />)}
+        {orderedDrivers.map(driverId => (
+          <StaticImage key={driverId} icon={drivers.get(driverId)?.icon} />
+        ))}
       </ListItemIcon>
       <ListItemName>{name}</ListItemName>
-    </ListItem>
+    </ListItem>,
   );
 });

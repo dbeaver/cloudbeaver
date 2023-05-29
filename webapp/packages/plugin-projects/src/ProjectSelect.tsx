@@ -37,20 +37,13 @@ export const ProjectSelect = observer(function ProjectSelect({
 
   const projectsService = useService(ProjectsService);
 
-  const projects = projectsService.activeProjects
-    .slice()
-    .sort(projectInfoSortByName);
+  const projects = projectsService.activeProjects.slice().sort(projectInfoSortByName);
 
-  const possibleOptions = projects
-    .filter(filter)
-    .map(project => project.id);
+  const possibleOptions = projects.filter(filter).map(project => project.id);
 
   const projectsLoader = useResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey, {
     onData: () => {
-      if (
-        (!value && possibleOptions.length > 0)
-        || (value && !possibleOptions.includes(value))
-      ) {
+      if ((!value && possibleOptions.length > 0) || (value && !possibleOptions.includes(value))) {
         onChange(possibleOptions[0]);
       }
     },
@@ -70,7 +63,7 @@ export const ProjectSelect = observer(function ProjectSelect({
 
   return (
     <Combobox
-      name='projectId'
+      name="projectId"
       value={value ?? ''}
       items={projects}
       keySelector={project => project.id}

@@ -5,12 +5,22 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
-import { CachedResourceIncludeArgs, CachedTreeChildrenKey, CachedTreeResource, DetailsError, GetResourceListQueryVariables, GraphQLService, ResourceKey, resourceKeyList, ResourceKeyUtils, RmResource } from '@cloudbeaver/core-sdk';
+import {
+  CachedResourceIncludeArgs,
+  CachedTreeChildrenKey,
+  CachedTreeResource,
+  DetailsError,
+  GetResourceListQueryVariables,
+  GraphQLService,
+  ResourceKey,
+  resourceKeyList,
+  ResourceKeyUtils,
+  RmResource,
+} from '@cloudbeaver/core-sdk';
 import { createPath, getPathParent, getPathParts } from '@cloudbeaver/core-utils';
 
 import { ResourceManagerEventHandler } from './ResourceManagerEventHandler';
@@ -48,13 +58,11 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
         const parent = getPathParent(key);
 
         if (this.isInUse(key)) {
-          dataSynchronizationService
-            .requestSynchronization('resource', key)
-            .then(async state => {
-              if (state && !this.isOutdated(parent)) {
-                await this.load(key);
-              }
-            });
+          dataSynchronizationService.requestSynchronization('resource', key).then(async state => {
+            if (state && !this.isOutdated(parent)) {
+              await this.load(key);
+            }
+          });
         } else {
           if (!this.isOutdated(parent)) {
             await this.load(key);
@@ -62,49 +70,45 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
         }
       },
       data => getRmResourcePath(data.projectId, data.resourcePath),
-      this
+      this,
     );
 
     resourceManagerEventHandler.onEvent<string>(
       ServerEventId.CbRmResourceUpdated,
       key => {
         if (this.isInUse(key)) {
-          dataSynchronizationService
-            .requestSynchronization('resource', key)
-            .then(state => {
-              if (state) {
-                this.onDataUpdate.execute(key);
-                this.markOutdated(key);
-              }
-            });
+          dataSynchronizationService.requestSynchronization('resource', key).then(state => {
+            if (state) {
+              this.onDataUpdate.execute(key);
+              this.markOutdated(key);
+            }
+          });
         } else {
           this.onDataUpdate.execute(key);
           this.markOutdated(key);
         }
       },
       data => getRmResourcePath(data.projectId, data.resourcePath),
-      this
+      this,
     );
 
     resourceManagerEventHandler.onEvent<string>(
       ServerEventId.CbRmResourceDeleted,
       key => {
         if (this.isInUse(key)) {
-          dataSynchronizationService
-            .requestSynchronization('resource', key)
-            .then(state => {
-              if (state) {
-                this.delete(key);
-                this.onDataUpdate.execute(key);
-              }
-            });
+          dataSynchronizationService.requestSynchronization('resource', key).then(state => {
+            if (state) {
+              this.delete(key);
+              this.onDataUpdate.execute(key);
+            }
+          });
         } else {
           this.delete(key);
           this.onDataUpdate.execute(key);
         }
       },
       data => getRmResourcePath(data.projectId, data.resourcePath),
-      this
+      this,
     );
   }
 
@@ -125,10 +129,7 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
     await this.load(to);
   }
 
-  async setProperties(
-    key: string,
-    diff: Record<string, any>
-  ): Promise<Record<string, any>> {
+  async setProperties(key: string, diff: Record<string, any>): Promise<Record<string, any>> {
     const propertiesPatch: Record<string, any> = {};
     const elements = await this.load(key, ['includeProperties']);
     const properties = elements.properties;
@@ -136,10 +137,7 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
 
     await this.performUpdate(key, undefined, async () => {
       for (const [name, value] of Object.entries(diff)) {
-        if (
-          properties[name] === value
-        || (value === null && !(name in properties))
-        ) {
+        if (properties[name] === value || (value === null && !(name in properties))) {
           continue;
         }
 
@@ -208,10 +206,7 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
     });
   }
 
-  protected async loader(
-    key: ResourceKey<string>,
-    includes: CachedResourceIncludeArgs<RmResourceInfo, ResourceInfoIncludes>
-  ) {
+  protected async loader(key: ResourceKey<string>, includes: CachedResourceIncludeArgs<RmResourceInfo, ResourceInfoIncludes>) {
     const resourcesList = new Map<string, RmResourceInfo>();
 
     await ResourceKeyUtils.forEachAsync(key, async key => {
@@ -251,7 +246,6 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
 
         resourcesList.set(key, resources[0]);
       }
-
     });
 
     this.set(resourceKeyList([...resourcesList.keys()]), [...resourcesList.values()]);

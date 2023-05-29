@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 
@@ -18,7 +17,7 @@ export interface IAuthConfigurationFormConfigureContext {
 
 export function authConfigurationFormConfigureContext(
   contexts: IExecutionContextProvider<IAuthConfigurationFormState>,
-  state: IAuthConfigurationFormState
+  state: IAuthConfigurationFormState,
 ): IAuthConfigurationFormConfigureContext {
   return {
     info: state.info,

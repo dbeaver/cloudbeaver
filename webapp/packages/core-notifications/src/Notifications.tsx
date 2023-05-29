@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { Portal } from 'reakit/Portal';
 import styled, { css } from 'reshadow';
@@ -13,18 +12,17 @@ import styled, { css } from 'reshadow';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-
 import { NotificationsItem } from './NotificationsItem/NotificationsItem';
 
 const styles = css`
-    notifications {
-      composes: theme-typography from global;
-      position: absolute;
-      bottom:0;
-      left: 0;
-      z-index: 1000; /* modal dialogs is 999, but more correct way is place notifications after dialogs in the dom */
-    }
- `;
+  notifications {
+    composes: theme-typography from global;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 1000; /* modal dialogs is 999, but more correct way is place notifications after dialogs in the dom */
+  }
+`;
 
 export const Notifications = observer(function Notifications() {
   const notificationService = useService(NotificationService);
@@ -36,6 +34,6 @@ export const Notifications = observer(function Notifications() {
           <NotificationsItem key={notification.id} notification={notification} />
         ))}
       </notifications>
-    </Portal>
+    </Portal>,
   );
 });

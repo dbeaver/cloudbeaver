@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React, { forwardRef, useContext, useState } from 'react';
 
 import { Executor } from '@cloudbeaver/core-executor';
@@ -29,15 +28,8 @@ type FormDetailedProps = Omit<React.DetailedHTMLProps<React.FormHTMLAttributes<H
 };
 
 export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(function SubmittingForm(
-  {
-    disabled: disabledProp,
-    disableEnterSubmit,
-    children,
-    onSubmit,
-    onChange = () => {},
-    ...rest
-  },
-  ref
+  { disabled: disabledProp, disableEnterSubmit, children, onSubmit, onChange = () => {}, ...rest },
+  ref,
 ) {
   const [formRef, setFormInnerRef] = useState<HTMLFormElement | null>(null);
   const setFormRef = useCombinedRef<HTMLFormElement>(setFormInnerRef, ref);
@@ -45,57 +37,63 @@ export const SubmittingForm = forwardRef<HTMLFormElement, FormDetailedProps>(fun
 
   disabled = disabled || disabledProp || false;
 
-  const props = useObjectRef(() => ({
-    handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-      e.preventDefault();
+  const props = useObjectRef(
+    () => ({
+      handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
 
-      setDisabled(true);
-      const result = this.onSubmit?.(e);
+        setDisabled(true);
+        const result = this.onSubmit?.(e);
 
-      if (result instanceof Promise) {
-        result.finally(() => { setDisabled(false); });
-      } else {
-        setDisabled(false);
-      }
+        if (result instanceof Promise) {
+          result.finally(() => {
+            setDisabled(false);
+          });
+        } else {
+          setDisabled(false);
+        }
+      },
+    }),
+    {
+      formRef,
+      disableEnterSubmit,
+      parentContext: useContext(FormContext),
+      onChange,
+      onSubmit,
     },
-  }), {
-    formRef,
-    disableEnterSubmit,
-    parentContext: useContext(FormContext),
-    onChange,
-    onSubmit,
-  }, ['handleSubmit']);
+    ['handleSubmit'],
+  );
 
-  const context = useObjectRef<IFormContext>(() => ({
-    changeExecutor: new Executor<IChangeData>(),
-    change(value, name) {
-      props.onChange(value, name);
-      props.parentContext?.change(value, name);
-      this.changeExecutor.execute({ value, name });
-    },
-    keyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-      if (event.key === 'Enter') {
-        const form = event.currentTarget.closest('form');
-        if (form) {
-          event.preventDefault();
-          const submitButton = form.querySelector<HTMLButtonElement>(
-            'button[type=submit]'
-          );
-          if (submitButton) {
-            submitButton.click();
+  const context = useObjectRef<IFormContext>(
+    () => ({
+      changeExecutor: new Executor<IChangeData>(),
+      change(value, name) {
+        props.onChange(value, name);
+        props.parentContext?.change(value, name);
+        this.changeExecutor.execute({ value, name });
+      },
+      keyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+        if (event.key === 'Enter') {
+          const form = event.currentTarget.closest('form');
+          if (form) {
+            event.preventDefault();
+            const submitButton = form.querySelector<HTMLButtonElement>('button[type=submit]');
+            if (submitButton) {
+              submitButton.click();
+            }
           }
         }
-      }
-      props.parentContext?.keyDown(event);
-    },
-  }), false, ['change', 'keyDown']);
+        props.parentContext?.keyDown(event);
+      },
+    }),
+    false,
+    ['change', 'keyDown'],
+  );
 
   return (
     <form {...rest} ref={setFormRef} onSubmit={e => props.handleSubmit(e)}>
       <fieldset disabled={disabled} className={rest.className}>
-        <FormContext.Provider value={context}>
-          {children}
-        </FormContext.Provider>
+        <FormContext.Provider value={context}>{children}</FormContext.Provider>
       </fieldset>
       <button type="submit" disabled={disableEnterSubmit} aria-hidden={disableEnterSubmit} hidden />
     </form>

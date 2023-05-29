@@ -5,28 +5,24 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import {
-  ItemListSearch, ItemList, SubmittingForm, TextPlaceholder, useFocus, useTranslate
-} from '@cloudbeaver/core-blocks';
+import { ItemList, ItemListSearch, SubmittingForm, TextPlaceholder, useFocus, useTranslate } from '@cloudbeaver/core-blocks';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
-
 
 import { Database } from './Database';
 
 const styles = css`
-    SubmittingForm {
-      composes: theme-background-surface theme-text-on-surface from global;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: auto;
-    }
-  `;
+  SubmittingForm {
+    composes: theme-background-surface theme-text-on-surface from global;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
+`;
 
 interface Props {
   databases: AdminConnectionSearchInfo[];
@@ -38,9 +34,7 @@ interface Props {
   onSearch?: () => Promise<void>;
 }
 
-export const DatabaseList = observer<Props>(function DatabaseList({
-  databases, hosts, disabled, className, onSelect, onChange, onSearch,
-}) {
+export const DatabaseList = observer<Props>(function DatabaseList({ databases, hosts, disabled, className, onSelect, onChange, onSearch }) {
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const translate = useTranslate();
   const [isSearched, setIsSearched] = useState(false);
@@ -57,13 +51,19 @@ export const DatabaseList = observer<Props>(function DatabaseList({
 
   return styled(styles)(
     <SubmittingForm ref={focusedRef} className={className} onSubmit={onSearch}>
-      <ItemListSearch value={hosts} placeholder={translate('connections_administration_search_database_tip')} disabled={disabled} onChange={onChange} onSearch={searchHandler} />
+      <ItemListSearch
+        value={hosts}
+        placeholder={translate('connections_administration_search_database_tip')}
+        disabled={disabled}
+        onChange={onChange}
+        onSearch={searchHandler}
+      />
       <ItemList>
         {databases.map(database => (
           <Database key={database.host + database.port} database={database} onSelect={onSelect} />
         ))}
       </ItemList>
       {!databases.length && <TextPlaceholder>{translate(placeholderMessage)}</TextPlaceholder>}
-    </SubmittingForm>
+    </SubmittingForm>,
   );
 });

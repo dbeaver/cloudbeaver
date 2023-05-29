@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { SharedProjectsResource } from '@cloudbeaver/core-resource-manager';
-import { GraphQLService, CachedDataResource, RmProject } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, GraphQLService, RmProject } from '@cloudbeaver/core-sdk';
 
 export type Project = Omit<RmProject, 'creator' | 'createTime' | 'canEditConnection' | 'canEditResource'>;
 

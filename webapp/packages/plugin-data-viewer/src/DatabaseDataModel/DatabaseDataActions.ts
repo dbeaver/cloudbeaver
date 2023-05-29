@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable, observable, runInAction } from 'mobx';
 
 import { getDependingDataActions } from './Actions/DatabaseDataActionDecorator';
@@ -17,8 +16,7 @@ import type { IDatabaseDataSource } from './IDatabaseDataSource';
 
 type ActionsList<TOptions, TResult extends IDatabaseDataResult> = Array<IDatabaseDataAction<TOptions, TResult>>;
 
-export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
-implements IDatabaseDataActions<TOptions, TResult> {
+export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> implements IDatabaseDataActions<TOptions, TResult> {
   private readonly actions: Map<string, ActionsList<TOptions, TResult>>;
   private readonly source: IDatabaseDataSource<TOptions, TResult>;
 
@@ -33,10 +31,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
     });
   }
 
-  tryGet<T extends IDatabaseDataAction<TOptions, TResult>>(
-    result: TResult,
-    Action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ): T | undefined {
+  tryGet<T extends IDatabaseDataAction<TOptions, TResult>>(result: TResult, Action: IDatabaseDataActionClass<TOptions, TResult, T>): T | undefined {
     if (Action.dataFormat && !Action.dataFormat.includes(result.dataFormat)) {
       return undefined;
     }
@@ -44,10 +39,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
     return this.get(result, Action);
   }
 
-  get<T extends IDatabaseDataAction<TOptions, TResult>>(
-    result: TResult,
-    Action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ): T {
+  get<T extends IDatabaseDataAction<TOptions, TResult>>(result: TResult, Action: IDatabaseDataActionClass<TOptions, TResult, T>): T {
     if (Action.dataFormat && !Action.dataFormat.includes(result.dataFormat)) {
       throw new Error('DataFormat unsupported');
     }
@@ -58,8 +50,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
       let action = actions.find(action => action instanceof Action);
 
       if (!action) {
-        const allDeps = getDependingDataActions(Action)
-          .slice(2); // skip source and result arguments
+        const allDeps = getDependingDataActions(Action).slice(2); // skip source and result arguments
 
         const depends: any[] = [];
 
@@ -84,7 +75,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
 
   getImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
     result: TResult,
-    Action: IDatabaseDataActionInterface<TOptions, TResult, T>
+    Action: IDatabaseDataActionInterface<TOptions, TResult, T>,
   ): T | undefined {
     const actions = this.getActionsList(result.uniqueResultId);
     const action = actions?.find(action => action instanceof Action);
@@ -122,11 +113,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
     }
   }
 
-  private addActionToList(
-    resultId: string,
-    actions: ActionsList<TOptions, TResult>,
-    action: IDatabaseDataAction<TOptions, TResult>
-  ) {
+  private addActionToList(resultId: string, actions: ActionsList<TOptions, TResult>, action: IDatabaseDataAction<TOptions, TResult>) {
     actions.push(action);
   }
 

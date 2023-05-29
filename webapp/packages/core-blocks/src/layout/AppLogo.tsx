@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled, { css, use } from 'reshadow';
 
 import { IconOrImage } from '../IconOrImage';
@@ -50,6 +49,6 @@ export const AppLogo: React.FC<Props> = function AppLogo({ title, onClick }) {
     <logo title={title} onClick={onClick}>
       <IconOrImage icon="/icons/logo.svg" {...use({ primary: true })} />
       <IconOrImage icon="/icons/logo_sm.svg" {...use({ small: true })} />
-    </logo>
+    </logo>,
   );
 };

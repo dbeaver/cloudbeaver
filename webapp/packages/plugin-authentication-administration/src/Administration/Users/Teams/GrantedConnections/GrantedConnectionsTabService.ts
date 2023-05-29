@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React from 'react';
 
 import { TeamsResource } from '@cloudbeaver/core-authentication';
@@ -35,7 +34,7 @@ export class GrantedConnectionsTabService extends Bootstrap {
     private readonly teamsResource: TeamsResource,
     private readonly graphQLService: GraphQLService,
     private readonly notificationService: NotificationService,
-    private readonly projectInfoResource: ProjectInfoResource
+    private readonly projectInfoResource: ProjectInfoResource,
   ) {
     super();
     this.key = 'granted-connections';
@@ -52,15 +51,12 @@ export class GrantedConnectionsTabService extends Bootstrap {
       panel: () => GrantedConnections,
     });
 
-    this.teamFormService.afterFormSubmittingTask.addHandler(executorHandlerFilter(
-      () => this.isEnabled(),
-      this.save.bind(this)
-    ));
+    this.teamFormService.afterFormSubmittingTask.addHandler(executorHandlerFilter(() => this.isEnabled(), this.save.bind(this)));
 
     this.teamFormService.configureTask.addHandler(() => this.projectInfoResource.load(CachedMapAllKey));
   }
 
-  load(): Promise<void> | void { }
+  load(): Promise<void> | void {}
 
   private isEnabled(): boolean {
     return this.projectInfoResource.values.some(isGlobalProject);
@@ -76,10 +72,7 @@ export class GrantedConnectionsTabService extends Bootstrap {
     });
   }
 
-  private async save(
-    data: ITeamFormSubmitData,
-    contexts: IExecutionContextProvider<ITeamFormSubmitData>
-  ) {
+  private async save(data: ITeamFormSubmitData, contexts: IExecutionContextProvider<ITeamFormSubmitData>) {
     const config = contexts.getContext(teamContext);
     const status = contexts.getContext(this.teamFormService.configurationStatusContext);
 
@@ -87,11 +80,7 @@ export class GrantedConnectionsTabService extends Bootstrap {
       return;
     }
 
-    const state = this.teamFormService.tabsContainer.getTabState<IGrantedConnectionsTabState>(
-      data.state.partsState,
-      this.key,
-      { state: data.state }
-    );
+    const state = this.teamFormService.tabsContainer.getTabState<IGrantedConnectionsTabState>(data.state.partsState, this.key, { state: data.state });
 
     if (!config.teamId || !state.loaded) {
       return;

@@ -5,19 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, computed, makeObservable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
-import {
-  injectable, IInitializableController, IDestructibleController
-} from '@cloudbeaver/core-di';
+import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GQLErrorCatcher, AdminUserInfo, ResourceKeyUtils, ResourceKey, ResourceKeySimple } from '@cloudbeaver/core-sdk';
+import { AdminUserInfo, GQLErrorCatcher, ResourceKey, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class UserEditController
-implements IInitializableController, IDestructibleController {
+export class UserEditController implements IInitializableController, IDestructibleController {
   isLoading = true;
   user: AdminUserInfo | null = null;
 
@@ -29,10 +25,7 @@ implements IInitializableController, IDestructibleController {
 
   readonly error = new GQLErrorCatcher();
 
-  constructor(
-    private readonly notificationService: NotificationService,
-    private readonly usersResource: UsersResource
-  ) {
+  constructor(private readonly notificationService: NotificationService, private readonly usersResource: UsersResource) {
     makeObservable(this, {
       isLoading: observable,
       user: observable,

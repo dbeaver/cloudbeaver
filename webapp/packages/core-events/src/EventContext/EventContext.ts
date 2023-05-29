@@ -24,24 +24,14 @@ interface IEventWithContext {
 }
 
 interface IEventContext {
-  set: <TEvent, TContext= void>(
-    event: TEvent | IEventWithContext,
-    flag: IEventFlag<TContext>,
-    context?: TContext
-  ) => IEventContext;
-  has: <TEvent>(
-    event: TEvent | IEventWithContext,
-    ...flags: Array<IEventFlag<any>>
-  ) => boolean;
-  get: <TEvent, TContext>(
-    event: TEvent | IEventWithContext,
-    flag: IEventFlag<TContext>
-  ) => TContext | undefined;
+  set: <TEvent, TContext = void>(event: TEvent | IEventWithContext, flag: IEventFlag<TContext>, context?: TContext) => IEventContext;
+  has: <TEvent>(event: TEvent | IEventWithContext, ...flags: Array<IEventFlag<any>>) => boolean;
+  get: <TEvent, TContext>(event: TEvent | IEventWithContext, flag: IEventFlag<TContext>) => TContext | undefined;
   create: <T = void>(name: string) => IEventFlag<T>;
 }
 
 export const EventContext: IEventContext = {
-  set<TEvent, TContext= void>(event: TEvent | IEventWithContext, flag: IEventFlag<TContext>, context: TContext) {
+  set<TEvent, TContext = void>(event: TEvent | IEventWithContext, flag: IEventFlag<TContext>, context: TContext) {
     event = addContextToEvent(event);
 
     const mark = event[eventContext].find(mark => mark.flag === flag);

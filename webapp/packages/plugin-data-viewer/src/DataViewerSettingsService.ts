@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
@@ -29,15 +28,31 @@ export class DataViewerSettingsService {
     this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('core.app.dataViewer', defaultSettings);
   }
 
+  getMaxFetchSize(): number {
+    if (this.settings.isValueDefault('fetchMax')) {
+      return this.deprecatedSettings.getValue('fetchMax');
+    }
+    return this.settings.getValue('fetchMax');
+  }
+
+  getMinFetchSize(): number {
+    if (this.settings.isValueDefault('fetchMin')) {
+      return this.deprecatedSettings.getValue('fetchMin');
+    }
+    return this.settings.getValue('fetchMin');
+  }
+
+  getDefaultFetchSize(): number {
+    if (this.settings.isValueDefault('fetchDefault')) {
+      return this.deprecatedSettings.getValue('fetchDefault');
+    }
+    return this.settings.getValue('fetchDefault');
+  }
+
   getDefaultRowsCount(count?: number): number {
     if (typeof count === 'number' && Number.isNaN(count)) {
       count = 0;
     }
-    return count !== undefined
-      ? Math.max(
-        this.settings.getValue('fetchMin'),
-        Math.min(count, this.settings.getValue('fetchMax'))
-      )
-      : this.settings.getValue('fetchDefault');
+    return count !== undefined ? Math.max(this.getMinFetchSize(), Math.min(count, this.getMaxFetchSize())) : this.getDefaultFetchSize();
   }
 }

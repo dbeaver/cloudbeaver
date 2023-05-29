@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
@@ -15,16 +14,13 @@ import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigati
 
 import { NAV_NODE_DDL_ID } from '../NAV_NODE_DDL_ID';
 
-export const DDLViewerTab: NavNodeTransformViewComponent = observer(function DDLViewerTab({
-  folderId,
-  style,
-}) {
+export const DDLViewerTab: NavNodeTransformViewComponent = observer(function DDLViewerTab({ folderId, style }) {
   const title = folderId.startsWith(NAV_NODE_DDL_ID) ? 'DDL' : 'Body';
 
   return styled(useStyles(style))(
     <Tab tabId={folderId} title={title}>
       <TabIcon icon="/icons/DDL.svg" />
       <TabTitle>{title}</TabTitle>
-    </Tab>
+    </Tab>,
   );
 });

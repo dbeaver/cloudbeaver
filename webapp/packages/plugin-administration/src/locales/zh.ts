@@ -5,13 +5,19 @@ export default [
   ['administration_configuration_wizard_welcome', '欢迎'],
   ['administration_configuration_wizard_welcome_step_description', '欢迎来到CloudBeaver'],
   ['administration_configuration_wizard_welcome_title', '欢迎来到CloudBeaver，云数据库管理系统！'],
-  ['administration_configuration_wizard_welcome_message', '简单配置向导将引导您通过几个简单的步骤来设置CloudBeaver服务器。您将需要设置服务器信息和管理员凭据。您还可以在此处添加第一个数据库连接。'],
+  [
+    'administration_configuration_wizard_welcome_message',
+    '简单配置向导将引导您通过几个简单的步骤来设置CloudBeaver服务器。您将需要设置服务器信息和管理员凭据。您还可以在此处添加第一个数据库连接。',
+  ],
   ['administration_configuration_wizard_welcome_note', '注意：稍后您能够在管理面板更改这些配置参数。'],
 
   ['administration_configuration_wizard_configuration', '服务器配置'],
   ['administration_configuration_wizard_configuration_step_description', '主要的服务器配置'],
   ['administration_configuration_wizard_configuration_title', '您可以在这里配置主要的服务器参数'],
-  ['administration_configuration_wizard_configuration_message', '管理员是一个超级用户，可以配置服务器、设置数据库连接、管理其他用户等等。请记住输入的密码。无法自动恢复管理员密码。'],
+  [
+    'administration_configuration_wizard_configuration_message',
+    '管理员是一个超级用户，可以配置服务器、设置数据库连接、管理其他用户等等。请记住输入的密码。无法自动恢复管理员密码。',
+  ],
 
   ['administration_configuration_tools_save_tooltip', '保存配置'],
   ['administration_configuration_tools_cancel_tooltip', '重置更改'],
@@ -49,7 +55,10 @@ export default [
   ['administration_configuration_wizard_finish', '确认'],
   ['administration_configuration_wizard_finish_step_description', '确认'],
   ['administration_configuration_wizard_finish_title', '差不多就这样。'],
-  ['administration_configuration_wizard_finish_message', '按完成按钮完成服务器配置。如果您想更改或添加某些内容，可以返回到前面的页面。\n配置完成后，所有输入的设置都将应用于您的CloudBeaver服务器。您将被重定向到主页面开始工作。\n您可以随时以管理员身份登录系统以更改服务器设置。'],
+  [
+    'administration_configuration_wizard_finish_message',
+    '按完成按钮完成服务器配置。如果您想更改或添加某些内容，可以返回到前面的页面。\n配置完成后，所有输入的设置都将应用于您的CloudBeaver服务器。您将被重定向到主页面开始工作。\n您可以随时以管理员身份登录系统以更改服务器设置。',
+  ],
 
   ['administration_disabled_drivers_title', 'Disabled drivers'],
   ['administration_disabled_drivers_search_placeholder', 'Search for the driver...'],

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlResultColumn } from '@cloudbeaver/core-sdk';
@@ -24,15 +23,11 @@ import { ResultSetEditAction } from './ResultSetEditAction';
 import type { IResultSetValue } from './ResultSetFormatAction';
 
 @databaseDataAction()
-export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IDatabaseDataResultAction<IDatabaseResultSet> {
+export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IDatabaseDataResultAction<IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Resultset];
 
   get rowKeys(): IResultSetRowKey[] {
-    return [
-      ...this.editor.addRows,
-      ...this.data.rows.map((c, index) => ({ index })),
-    ].sort((a, b) => a.index - b.index);
+    return [...this.editor.addRows, ...this.data.rows.map((c, index) => ({ index }))].sort((a, b) => a.index - b.index);
   }
 
   get columnKeys(): IResultSetColumnKey[] {
@@ -54,7 +49,7 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     source: IDatabaseDataSource<any, IDatabaseResultSet>,
     result: IDatabaseResultSet,
     data: ResultSetDataAction,
-    editor: ResultSetEditAction
+    editor: ResultSetEditAction,
   ) {
     super(source, result);
     this.data = data;
@@ -128,10 +123,7 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
       return edited;
     }
 
-    if (
-      cell.row.index >= this.rows.length
-      || cell.column.index >= this.columns.length
-    ) {
+    if (cell.row.index >= this.rows.length || cell.column.index >= this.columns.length) {
       return undefined;
     }
 
@@ -163,7 +155,6 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
       return [];
     }
 
-    return column.supportedOperations
-      .filter(operation => operation.argumentCount === 1 || operation.argumentCount === 0);
+    return column.supportedOperations.filter(operation => operation.argumentCount === 1 || operation.argumentCount === 0);
   }
 }

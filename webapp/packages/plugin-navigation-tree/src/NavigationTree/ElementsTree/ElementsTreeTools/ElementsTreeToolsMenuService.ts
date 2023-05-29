@@ -5,11 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { UserDataService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { ActionService, ACTION_COLLAPSE_ALL, ACTION_FILTER, DATA_CONTEXT_MENU, IAction, IDataContextProvider, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
+import {
+  ACTION_COLLAPSE_ALL,
+  ACTION_FILTER,
+  ActionService,
+  DATA_CONTEXT_MENU,
+  IAction,
+  IDataContextProvider,
+  KeyBindingService,
+  MenuService,
+} from '@cloudbeaver/core-view';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 
 import { getNavigationTreeUserSettingsId } from '../../getNavigationTreeUserSettingsId';
@@ -31,7 +39,7 @@ export class ElementsTreeToolsMenuService {
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
     private readonly menuService: MenuService,
     private readonly localizationService: LocalizationService,
-  ) { }
+  ) {}
 
   register() {
     this.actionService.addHandler({
@@ -85,11 +93,7 @@ export class ElementsTreeToolsMenuService {
 
     this.menuService.addCreator({
       isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_ELEMENTS_TREE_TOOLS,
-      getItems: (context, items) => [
-        ...items,
-        ACTION_LINK_OBJECT,
-        ACTION_COLLAPSE_ALL,
-      ],
+      getItems: (context, items) => [...items, ACTION_LINK_OBJECT, ACTION_COLLAPSE_ALL],
     });
 
     this.registerBindings();
@@ -98,10 +102,7 @@ export class ElementsTreeToolsMenuService {
   private registerBindings() {
     this.actionService.addHandler({
       id: 'nav-tree-filter',
-      isActionApplicable: (contexts, action) => (
-        action === ACTION_FILTER
-        && contexts.has(DATA_CONTEXT_NAV_TREE_ROOT)
-      ),
+      isActionApplicable: (contexts, action) => action === ACTION_FILTER && contexts.has(DATA_CONTEXT_NAV_TREE_ROOT),
       handler: this.switchFilter.bind(this),
     });
 
@@ -155,7 +156,7 @@ export class ElementsTreeToolsMenuService {
     const state = this.userDataService.getUserData(
       getNavigationTreeUserSettingsId(context),
       createElementsTreeSettings,
-      validateElementsTreeSettings
+      validateElementsTreeSettings,
     );
 
     state.filter = !state.filter;

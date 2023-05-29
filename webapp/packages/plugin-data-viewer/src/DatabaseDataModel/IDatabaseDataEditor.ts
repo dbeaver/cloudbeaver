@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IExecutor } from '@cloudbeaver/core-executor';
 
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
@@ -13,7 +12,7 @@ import type { IDatabaseDataResult } from './IDatabaseDataResult';
 export enum DataUpdateType {
   delete,
   update,
-  add
+  add,
 }
 
 export interface IResultEditingDiff {

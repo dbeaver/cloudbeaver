@@ -5,15 +5,25 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Placeholder, useObjectRef, useExecutor, BASE_CONTAINERS_STYLES, IconOrImage, Loader, ErrorMessage, useErrorDetails, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import {
+  BASE_CONTAINERS_STYLES,
+  ErrorMessage,
+  IconOrImage,
+  Loader,
+  Placeholder,
+  useErrorDetails,
+  useExecutor,
+  useObjectRef,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import { TabsState, TabList, UNDERLINE_TAB_STYLES, TabPanelList, BASE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormService } from './ConnectionFormService';
 import { connectionConfigContext } from './Contexts/connectionConfigContext';
@@ -26,78 +36,78 @@ const tabsStyles = css`
     align-items: center;
   }
   Tab {
-    height: 46px!important;
+    height: 46px !important;
     text-transform: uppercase;
     font-weight: 500 !important;
   }
 `;
 
 const topBarStyles = css`
-    connection-top-bar {
-      composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
-    }
-    connection-top-bar {
-      position: relative;
-      display: flex;
-      padding-top: 16px;
+  connection-top-bar {
+    composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
+  }
+  connection-top-bar {
+    position: relative;
+    display: flex;
+    padding-top: 16px;
 
-      &:before {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        border-bottom: solid 2px;
-        border-color: inherit;
-      }
+    &:before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      border-bottom: solid 2px;
+      border-color: inherit;
     }
-    connection-top-bar-tabs {
-      flex: 1;
-    }
+  }
+  connection-top-bar-tabs {
+    flex: 1;
+  }
 
-    connection-top-bar-actions {
-      display: flex;
-      align-items: center;
-      padding: 0 24px;
-      gap: 16px;
-    }
+  connection-top-bar-actions {
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 16px;
+  }
 
-    /*Button:not(:first-child) {
+  /*Button:not(:first-child) {
       margin-right: 24px;
     }*/
 
-    connection-status-message {
-      composes: theme-typography--caption from global;
-      height: 24px;
-      padding: 0 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+  connection-status-message {
+    composes: theme-typography--caption from global;
+    height: 24px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 
-      & IconOrImage {
-        height: 24px;
-        width: 24px;
-      }
+    & IconOrImage {
+      height: 24px;
+      width: 24px;
     }
-  `;
+  }
+`;
 
 const formStyles = css`
-    box {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      height: 100%;
-      overflow: auto;
-    }
-    content-box {
-      composes: theme-background-secondary theme-border-color-background from global;
-      position: relative;
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      overflow: auto;
-    }
-  `;
+  box {
+    composes: theme-background-secondary theme-text-on-secondary from global;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+    overflow: auto;
+  }
+  content-box {
+    composes: theme-background-secondary theme-border-color-background from global;
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    overflow: auto;
+  }
+`;
 
 interface Props {
   state: IConnectionFormState;
@@ -106,12 +116,7 @@ interface Props {
   className?: string;
 }
 
-export const ConnectionForm = observer<Props>(function ConnectionForm({
-  state,
-  onCancel,
-  onSave = () => { },
-  className,
-}) {
+export const ConnectionForm = observer<Props>(function ConnectionForm({ state, onCancel, onSave = () => {}, className }) {
   const translate = useTranslate();
   const props = useObjectRef({ onSave });
   const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
@@ -121,15 +126,17 @@ export const ConnectionForm = observer<Props>(function ConnectionForm({
 
   useExecutor({
     executor: state.submittingTask,
-    postHandlers: [function save(data, contexts) {
-      const validation = contexts.getContext(service.connectionValidationContext);
-      const state = contexts.getContext(service.connectionStatusContext);
-      const config = contexts.getContext(connectionConfigContext);
+    postHandlers: [
+      function save(data, contexts) {
+        const validation = contexts.getContext(service.connectionValidationContext);
+        const state = contexts.getContext(service.connectionStatusContext);
+        const config = contexts.getContext(connectionConfigContext);
 
-      if (validation.valid && state.saved && data.submitType === 'submit') {
-        props.onSave(config);
-      }
-    }],
+        if (validation.valid && state.saved && data.submitType === 'submit') {
+          props.onSave(config);
+        }
+      },
+    ],
   });
 
   useEffect(() => {
@@ -137,37 +144,26 @@ export const ConnectionForm = observer<Props>(function ConnectionForm({
   }, [state]);
 
   if (error.name) {
-    return styled(styles)(
-      <ErrorMessage
-        text={error.message || error.name}
-        hasDetails={error.hasDetails}
-        onShowDetails={error.open}
-      />
-    );
+    return styled(styles)(<ErrorMessage text={error.message || error.name} hasDetails={error.hasDetails} onShowDetails={error.open} />);
   }
 
   if (!state.configured) {
     return styled(styles)(
       <box className={className}>
         <Loader />
-      </box>
+      </box>,
     );
   }
 
   return styled(styles)(
-    <TabsState
-      container={service.tabsContainer}
-      localState={state.partsState}
-      state={state}
-      onCancel={onCancel}
-    >
+    <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
       <box className={className}>
         <connection-top-bar>
           <connection-top-bar-tabs>
             <connection-status-message>
               {state.statusMessage && (
                 <>
-                  <IconOrImage icon='/icons/info_icon.svg' />
+                  <IconOrImage icon="/icons/info_icon.svg" />
                   {translate(state.statusMessage)}
                 </>
               )}
@@ -184,6 +180,6 @@ export const ConnectionForm = observer<Props>(function ConnectionForm({
           <TabPanelList style={style} />
         </content-box>
       </box>
-    </TabsState>
+    </TabsState>,
   );
 });

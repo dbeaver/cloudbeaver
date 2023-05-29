@@ -4,10 +4,8 @@ const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
-const WorkboxPlugin = require('workbox-webpack-plugin');
 
 const excludedFromVendor = require('./excludedFromVendor.js');
-const { getServiceWorkerSource } = require('./webpack.product.utils.js');
 // const ESLintPlugin = require('eslint-webpack-plugin');
 
 class IgnoreNotFoundExportPlugin {
@@ -63,10 +61,7 @@ module.exports = (env, argv) => {
       modules = false;
     }
 
-    const postCssPlugins = [
-      require('postcss-preset-env')({ stage: 0 }),
-      require('@reshadow/postcss')({ scopeBehaviour: moduleScope }),
-    ];
+    const postCssPlugins = [require('postcss-preset-env')({ stage: 0 }), require('@reshadow/postcss')({ scopeBehaviour: moduleScope })];
 
     return [
       ...getBaseStyleLoaders(),
@@ -106,27 +101,6 @@ module.exports = (env, argv) => {
       configFile: join(__dirname, 'babel.config.js'),
     },
   };
-
-  var workboxPlugin = [];
-  if (devMode) {
-    // TODO: workbox not working in dev mode
-
-    // workboxPlugin = new WorkboxPlugin.InjectManifest({
-    //   swSrc: getServiceWorkerSource(),
-    //   swDest: 'service-worker.js',
-    // });
-    // Object.defineProperty(workboxPlugin, 'alreadyCalled', {
-    //   get() {
-    //     return false;
-    //   },
-    //   set() {},
-    // });
-  } else {
-    workboxPlugin = [new WorkboxPlugin.InjectManifest({
-      swSrc: getServiceWorkerSource(),
-      swDest: 'service-worker.js',
-    })];
-  }
 
   return {
     // target: !devMode ? "web" : "browserslist",
@@ -206,15 +180,11 @@ module.exports = (env, argv) => {
       fallback: {
         // path: require.resolve('path-browserify'),
       },
-      plugins: [
-        PnpWebpackPlugin,
-      ],
+      plugins: [PnpWebpackPlugin],
     },
     resolveLoader: {
       modules: nodeModules,
-      plugins: [
-        PnpWebpackPlugin.moduleLoader(module),
-      ],
+      plugins: [PnpWebpackPlugin.moduleLoader(module)],
     },
     module: {
       rules: [
@@ -226,10 +196,7 @@ module.exports = (env, argv) => {
         {
           test: /\.(ts|js)x?$/,
           exclude: /node_modules/,
-          use: [
-            'thread-loader',
-            babelLoader,
-          ],
+          use: ['thread-loader', babelLoader],
         },
         {
           test: /\.(css|s[ac]ss)$/,
@@ -240,11 +207,7 @@ module.exports = (env, argv) => {
             },
             {
               include: /node_modules/,
-              use: [
-                ...getBaseStyleLoaders(),
-                'css-loader',
-                'sass-loader',
-              ],
+              use: [...getBaseStyleLoaders(), 'css-loader', 'sass-loader'],
             },
             {
               test: /\.(theme|pure)\.(css|s[ac]ss)$/,
@@ -291,7 +254,6 @@ module.exports = (env, argv) => {
           }
         },
       }),
-      ...workboxPlugin,
     ],
   };
 };

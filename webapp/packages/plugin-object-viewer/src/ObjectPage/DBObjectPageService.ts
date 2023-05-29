@@ -5,14 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, action, computed, makeObservable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
-import { ObjectPage, ObjectPageOptions, ObjectPageCallback } from './ObjectPage';
+import { ObjectPage, ObjectPageCallback, ObjectPageOptions } from './ObjectPage';
 
 @injectable()
 export class DBObjectPageService {
@@ -28,8 +27,7 @@ export class DBObjectPageService {
   }
 
   get orderedPages(): Array<ObjectPage<any>> {
-    return Array.from(this.pages.values())
-      .sort(this.comparePages.bind(this));
+    return Array.from(this.pages.values()).sort(this.comparePages.bind(this));
   }
 
   register<T>(options: ObjectPageOptions<T>): ObjectPage<T> {
@@ -102,10 +100,7 @@ export class DBObjectPageService {
     await this.callHandlerCallback(tab, page => page.onClose);
   }
 
-  private async callHandlerCallback<T>(
-    tab: ITab<IObjectViewerTabState>,
-    selector: (page: ObjectPage<T>) => ObjectPageCallback<T> | undefined
-  ) {
+  private async callHandlerCallback<T>(tab: ITab<IObjectViewerTabState>, selector: (page: ObjectPage<T>) => ObjectPageCallback<T> | undefined) {
     for (const page of this.pages.values()) {
       const callback = selector(page);
       if (callback) {

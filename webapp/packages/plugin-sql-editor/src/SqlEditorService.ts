@@ -5,10 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 
-import { Connection, ConnectionExecutionContextProjectKey, ConnectionExecutionContextResource, ConnectionExecutionContextService, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionExecutionContext, IConnectionExecutionContextInfo, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import {
+  Connection,
+  ConnectionExecutionContextProjectKey,
+  ConnectionExecutionContextResource,
+  ConnectionExecutionContextService,
+  ConnectionInfoResource,
+  ConnectionsManagerService,
+  createConnectionParam,
+  IConnectionExecutionContext,
+  IConnectionExecutionContextInfo,
+  IConnectionInfoParams,
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
@@ -38,17 +48,12 @@ export class SqlEditorService {
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly sqlDataSourceService: SqlDataSourceService
+    private readonly sqlDataSourceService: SqlDataSourceService,
   ) {
     this.onQueryChange = new SyncExecutor();
   }
 
-  getState(
-    editorId: string,
-    datasourceKey: string,
-    order: number,
-    source?: string,
-  ): ISqlEditorTabState {
+  getState(editorId: string, datasourceKey: string, order: number, source?: string): ISqlEditorTabState {
     return observable({
       editorId,
       datasourceKey,
@@ -64,10 +69,7 @@ export class SqlEditorService {
     });
   }
 
-  async parseSQLScript(
-    connectionId: string,
-    script: string
-  ): Promise<SqlScriptInfoFragment> {
+  async parseSQLScript(connectionId: string, script: string): Promise<SqlScriptInfoFragment> {
     const result = await this.graphQLService.sdk.parseSQLScript({
       connectionId,
       script,
@@ -76,11 +78,7 @@ export class SqlEditorService {
     return result.scriptInfo;
   }
 
-  async parseSQLQuery(
-    connectionId: string,
-    script: string,
-    position: number,
-  ) {
+  async parseSQLQuery(connectionId: string, script: string, position: number) {
     const result = await this.graphQLService.sdk.parseSQLQuery({
       connectionId,
       script,
@@ -153,12 +151,7 @@ export class SqlEditorService {
     }
   }
 
-  async setConnection(
-    state: ISqlEditorTabState,
-    connectionKey: IConnectionInfoParams,
-    catalogId?: string,
-    schemaId?: string
-  ): Promise<boolean> {
+  async setConnection(state: ISqlEditorTabState, connectionKey: IConnectionInfoParams, catalogId?: string, schemaId?: string): Promise<boolean> {
     try {
       const executionContext = await this.initContext(connectionKey, catalogId, schemaId);
       const dataSource = this.sqlDataSourceService.get(state.editorId);
@@ -190,21 +183,16 @@ export class SqlEditorService {
           return;
         }
 
-        await this.connectionExecutionContextResource.load(
-          ConnectionExecutionContextProjectKey(dataSource.executionContext.projectId)
-        );
+        await this.connectionExecutionContextResource.load(ConnectionExecutionContextProjectKey(dataSource.executionContext.projectId));
 
         if (this.connectionExecutionContextResource.has(dataSource.executionContext.id)) {
           return this.connectionExecutionContextService.get(dataSource.executionContext.id);
         }
 
         const context = await this.initContext(
-          createConnectionParam(
-            dataSource.executionContext.projectId,
-            dataSource.executionContext.connectionId
-          ),
+          createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId),
           dataSource.executionContext.defaultCatalog,
-          dataSource.executionContext.defaultSchema
+          dataSource.executionContext.defaultSchema,
         );
 
         if (!context?.context) {
@@ -218,9 +206,8 @@ export class SqlEditorService {
       },
       () => {
         console.error('executeEditorQuery executionContext is not provided');
-      }
+      },
     );
-
   }
 
   async canDestroy(state: ISqlEditorTabState): Promise<boolean> {
@@ -231,11 +218,7 @@ export class SqlEditorService {
     await this.sqlDataSourceService.destroy(state.editorId);
   }
 
-  async initContext(
-    connectionKey: IConnectionInfoParams,
-    catalogId?: string,
-    schemaId?: string
-  ): Promise<IConnectionExecutionContext | null> {
+  async initContext(connectionKey: IConnectionInfoParams, catalogId?: string, schemaId?: string): Promise<IConnectionExecutionContext | null> {
     const connection = await this.connectionsManagerService.requireConnection(connectionKey);
 
     if (!connection) {
@@ -245,10 +228,7 @@ export class SqlEditorService {
     try {
       return await this.connectionExecutionContextService.create(connectionKey, catalogId, schemaId);
     } catch (exception: any) {
-      this.notificationService.logException(
-        exception,
-        `Failed to create context for ${connection.name} connection`,
-      );
+      this.notificationService.logException(exception, `Failed to create context for ${connection.name} connection`);
       return null;
     }
   }
