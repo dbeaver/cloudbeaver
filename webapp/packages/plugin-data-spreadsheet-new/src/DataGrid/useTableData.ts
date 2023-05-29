@@ -5,16 +5,22 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, observable } from 'mobx';
-
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { TextTools } from '@cloudbeaver/core-utils';
 import {
-  IDatabaseDataModel, IDatabaseResultSet, IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey,
-  ResultSetConstraintAction, ResultSetDataAction, ResultSetDataKeysUtils,
-  ResultSetEditAction, ResultSetFormatAction, ResultSetViewAction
+  IDatabaseDataModel,
+  IDatabaseResultSet,
+  IResultSetColumnKey,
+  IResultSetElementKey,
+  IResultSetRowKey,
+  ResultSetConstraintAction,
+  ResultSetDataAction,
+  ResultSetDataKeysUtils,
+  ResultSetEditAction,
+  ResultSetFormatAction,
+  ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 import type { Column } from '@cloudbeaver/plugin-react-data-grid';
 
@@ -44,7 +50,7 @@ export function useTableData(
   model: IDatabaseDataModel<any, IDatabaseResultSet>,
   resultIndex: number,
   gridDIVElement: React.RefObject<HTMLDivElement | null>,
-  onCellKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void
+  onCellKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void,
 ): ITableData {
   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
   const data = model.source.getAction(resultIndex, ResultSetDataAction);
@@ -52,35 +58,35 @@ export function useTableData(
   const view = model.source.getAction(resultIndex, ResultSetViewAction);
   const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
-  return useObservableRef<ITableData & { gridDIVElement: React.RefObject<HTMLDivElement | null> }>(() => ({
-    get gridDiv(): HTMLDivElement | null {
-      return this.gridDIVElement.current;
-    },
-    get columnKeys(): IResultSetColumnKey[] {
-      return this.view.columnKeys;
-    },
-    get rows(): IResultSetRowKey[] {
-      return this.view.rowKeys;
-    },
-    get columns() {
-      if (this.columnKeys.length === 0) {
-        return [];
-      }
-      const columnNames = this.format.getHeaders();
-      const rowStrings = this.format.getLongestCells();
+  return useObservableRef<ITableData & { gridDIVElement: React.RefObject<HTMLDivElement | null> }>(
+    () => ({
+      get gridDiv(): HTMLDivElement | null {
+        return this.gridDIVElement.current;
+      },
+      get columnKeys(): IResultSetColumnKey[] {
+        return this.view.columnKeys;
+      },
+      get rows(): IResultSetRowKey[] {
+        return this.view.rowKeys;
+      },
+      get columns() {
+        if (this.columnKeys.length === 0) {
+          return [];
+        }
+        const columnNames = this.format.getHeaders();
+        const rowStrings = this.format.getLongestCells();
 
-      // TODO: seems better to do not measure container size
-      // for detecting max columns size, better to use configurable variable
-      const measuredCells = TextTools.getWidth({
-        font: FONT,
-        text: columnNames.map((columnName, i) => {
-          const cellString = rowStrings[i] || '';
-          return columnName.length >= cellString.length ? columnName : cellString;
-        }),
-      }).map(v => v + COLUMN_HEADER_CONTAINER_WIDTH + COLUMN_NAME_LEFT_MARGIN);
+        // TODO: seems better to do not measure container size
+        // for detecting max columns size, better to use configurable variable
+        const measuredCells = TextTools.getWidth({
+          font: FONT,
+          text: columnNames.map((columnName, i) => {
+            const cellString = rowStrings[i] || '';
+            return columnName.length >= cellString.length ? columnName : cellString;
+          }),
+        }).map(v => v + COLUMN_HEADER_CONTAINER_WIDTH + COLUMN_NAME_LEFT_MARGIN);
 
-      const columns: Array<Column<IResultSetRowKey, any>> = this.columnKeys.map<Column<IResultSetRowKey, any>>(
-        (col, index) => ({
+        const columns: Array<Column<IResultSetRowKey, any>> = this.columnKeys.map<Column<IResultSetRowKey, any>>((col, index) => ({
           // key: uuid(),
           key: ResultSetDataKeysUtils.serialize(col),
           columnDataIndex: { index },
@@ -92,115 +98,108 @@ export function useTableData(
             onCellKeyDown,
           },
         }));
-      columns.unshift(indexColumn);
+        columns.unshift(indexColumn);
 
-      return columns;
-    },
-    getMetrics(columnIndex) {
-      if (columnIndex < 0 || columnIndex > this.columns.length) {
-        return undefined;
-      }
+        return columns;
+      },
+      getMetrics(columnIndex) {
+        if (columnIndex < 0 || columnIndex > this.columns.length) {
+          return undefined;
+        }
 
-      let left = 0;
-      for (let i = 0; i < columnIndex; i++) {
-        const column = this.columns[i];
-        left += column.width as number;
-      }
+        let left = 0;
+        for (let i = 0; i < columnIndex; i++) {
+          const column = this.columns[i];
+          left += column.width as number;
+        }
 
-      const column = this.getColumn(columnIndex)!;
+        const column = this.getColumn(columnIndex)!;
 
-      return {
-        left,
-        right: left + (column.width as number),
-        width: column.width as number,
-      };
-    },
-    getRow(rowIndex) {
-      return this.rows[rowIndex];
-    },
-    getColumn(columnIndex) {
-      return this.columns[columnIndex];
-    },
-    getColumnByDataIndex(key) {
-      return this.columns.find(column => (
-        column.columnDataIndex !== null
-        && ResultSetDataKeysUtils.isEqual(column.columnDataIndex, key)
-      ))!;
-    },
-    getColumnInfo(key) {
-      return this.data.getColumn(key);
-    },
-    getCellValue(key) {
-      return this.view.getCellValue(key);
-    },
-    getColumnIndexFromKey(key) {
-      return this.columns.findIndex(column => column.key === key);
-    },
-    getColumnIndexFromColumnKey(columnKey) {
-      return this.columns
-        .findIndex(column => (
-          column.columnDataIndex !== null
-          && ResultSetDataKeysUtils.isEqual(columnKey, column.columnDataIndex)
-        ));
-    },
-    getRowIndexFromKey(rowKey) {
-      return this.rows.findIndex(row => ResultSetDataKeysUtils.isEqual(rowKey, row));
-    },
-    getColumnsInRange(startIndex, endIndex) {
-      if (startIndex === endIndex) {
-        return [this.columns[startIndex]];
-      }
+        return {
+          left,
+          right: left + (column.width as number),
+          width: column.width as number,
+        };
+      },
+      getRow(rowIndex) {
+        return this.rows[rowIndex];
+      },
+      getColumn(columnIndex) {
+        return this.columns[columnIndex];
+      },
+      getColumnByDataIndex(key) {
+        return this.columns.find(column => column.columnDataIndex !== null && ResultSetDataKeysUtils.isEqual(column.columnDataIndex, key))!;
+      },
+      getColumnInfo(key) {
+        return this.data.getColumn(key);
+      },
+      getCellValue(key) {
+        return this.view.getCellValue(key);
+      },
+      getColumnIndexFromKey(key) {
+        return this.columns.findIndex(column => column.key === key);
+      },
+      getColumnIndexFromColumnKey(columnKey) {
+        return this.columns.findIndex(column => column.columnDataIndex !== null && ResultSetDataKeysUtils.isEqual(columnKey, column.columnDataIndex));
+      },
+      getRowIndexFromKey(rowKey) {
+        return this.rows.findIndex(row => ResultSetDataKeysUtils.isEqual(rowKey, row));
+      },
+      getColumnsInRange(startIndex, endIndex) {
+        if (startIndex === endIndex) {
+          return [this.columns[startIndex]];
+        }
 
-      const firstIndex = Math.min(startIndex, endIndex);
-      const lastIndex = Math.max(startIndex, endIndex);
-      return this.columns.slice(firstIndex, lastIndex + 1);
-    },
-    getEditionState(key) {
-      return this.editor.getElementState(key);
-    },
-    inBounds(position) {
-      return this.view.has(position);
-    },
-    isCellEdited(key) {
-      return this.editor.isElementEdited(key);
-    },
-    isIndexColumn(columnKey) {
-      return columnKey === indexColumn.key;
-    },
-    isIndexColumnInRange(columnsRange) {
-      return columnsRange.some(column => this.isIndexColumn(column.key));
-    },
-    isReadOnly() {
-      return this.columnKeys.every(column => this.getColumnInfo(column)?.readOnly);
-    },
-    isCellReadonly(key: Partial<IResultSetElementKey>) {
-      if (!key.column) {
-        return true;
-      }
+        const firstIndex = Math.min(startIndex, endIndex);
+        const lastIndex = Math.max(startIndex, endIndex);
+        return this.columns.slice(firstIndex, lastIndex + 1);
+      },
+      getEditionState(key) {
+        return this.editor.getElementState(key);
+      },
+      inBounds(position) {
+        return this.view.has(position);
+      },
+      isCellEdited(key) {
+        return this.editor.isElementEdited(key);
+      },
+      isIndexColumn(columnKey) {
+        return columnKey === indexColumn.key;
+      },
+      isIndexColumnInRange(columnsRange) {
+        return columnsRange.some(column => this.isIndexColumn(column.key));
+      },
+      isReadOnly() {
+        return this.columnKeys.every(column => this.getColumnInfo(column)?.readOnly);
+      },
+      isCellReadonly(key: Partial<IResultSetElementKey>) {
+        if (!key.column) {
+          return true;
+        }
 
-      const column = this.getColumnByDataIndex(key.column);
+        const column = this.getColumnByDataIndex(key.column);
 
-      return (
-        !column.editable
-        || this.format.isReadOnly(key)
-      );
+        return !column.editable || this.format.isReadOnly(key);
+      },
+    }),
+    {
+      columns: computed,
+      rows: computed,
+      columnKeys: computed,
+      format: observable.ref,
+      data: observable.ref,
+      editor: observable.ref,
+      view: observable.ref,
+      constraints: observable.ref,
+      gridDIVElement: observable.ref,
     },
-  }), {
-    columns: computed,
-    rows: computed,
-    columnKeys: computed,
-    format: observable.ref,
-    data: observable.ref,
-    editor: observable.ref,
-    view: observable.ref,
-    constraints: observable.ref,
-    gridDIVElement: observable.ref,
-  }, {
-    format,
-    data,
-    editor,
-    view,
-    constraints,
-    gridDIVElement,
-  });
+    {
+      format,
+      data,
+      editor,
+      view,
+      constraints,
+      gridDIVElement,
+    },
+  );
 }

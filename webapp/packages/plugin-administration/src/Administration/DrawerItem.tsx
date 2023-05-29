@@ -5,15 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 
 import { type AdministrationItemDrawerProps, ConfigurationWizardService, filterOnlyActive } from '@cloudbeaver/core-administration';
 import { useService } from '@cloudbeaver/core-di';
 
-export const DrawerItem = observer<AdministrationItemDrawerProps>(function DrawerItem({
-  item, onSelect, style, configurationWizard, disabled,
-}) {
+export const DrawerItem = observer<AdministrationItemDrawerProps>(function DrawerItem({ item, onSelect, style, configurationWizard, disabled }) {
   const configurationWizardService = useService(ConfigurationWizardService);
   const Component = item.getDrawerComponent();
 
@@ -23,13 +20,5 @@ export const DrawerItem = observer<AdministrationItemDrawerProps>(function Drawe
 
   const onlyActive = filterOnlyActive(configurationWizard)(item) ? false : disabled;
 
-  return (
-    <Component
-      item={item}
-      configurationWizard={configurationWizard}
-      style={style}
-      disabled={onlyActive}
-      onSelect={onSelect}
-    />
-  );
+  return <Component item={item} configurationWizard={configurationWizard} style={style} disabled={onlyActive} onSelect={onSelect} />;
 });

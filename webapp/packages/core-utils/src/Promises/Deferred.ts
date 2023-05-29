@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { action, computed, observable, makeObservable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import { errorOf } from '../errorOf';
 import { PromiseCancelledError } from './PromiseCancelledError';
@@ -31,18 +30,21 @@ export class Deferred<T> {
   private readonly promiseExecutor = new PromiseExecutor<T>();
 
   constructor() {
-    makeObservable<Deferred<T>, 'payload' | 'rejectionReason' | 'state' | 'toResolved' | 'toRejected' | 'toCancelled' | 'toCancelling' | 'toPending'>(this, {
-      payload: observable,
-      rejectionReason: observable,
-      state: observable,
-      isInProgress: computed,
-      isFinished: computed,
-      toResolved: action,
-      toRejected: action,
-      toCancelled: action,
-      toCancelling: action,
-      toPending: action,
-    });
+    makeObservable<Deferred<T>, 'payload' | 'rejectionReason' | 'state' | 'toResolved' | 'toRejected' | 'toCancelled' | 'toCancelling' | 'toPending'>(
+      this,
+      {
+        payload: observable,
+        rejectionReason: observable,
+        state: observable,
+        isInProgress: computed,
+        isFinished: computed,
+        toResolved: action,
+        toRejected: action,
+        toCancelled: action,
+        toCancelling: action,
+        toPending: action,
+      },
+    );
   }
 
   get promise(): Promise<T> {
@@ -119,7 +121,7 @@ export class DeferredFromPromise<T> extends Deferred<T> {
         } else {
           this.toRejected(err);
         }
-      }
+      },
     );
   }
 }

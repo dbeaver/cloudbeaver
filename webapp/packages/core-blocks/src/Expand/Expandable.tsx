@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { forwardRef, ReactNode, useImperativeHandle } from 'react';
 import { Disclosure, DisclosureContent, DisclosureStateReturn, useDisclosureState } from 'reakit';
@@ -60,28 +59,24 @@ const styles = css`
   }
 `;
 
-export const Expandable = observer<Props, ExpandableState>(forwardRef(function Expandable({
-  label,
-  defaultExpanded,
-  disabled,
-  children,
-  style,
-}, ref) {
-  const disclosure = useDisclosureState({ visible: defaultExpanded ?? false });
+export const Expandable = observer<Props, ExpandableState>(
+  forwardRef(function Expandable({ label, defaultExpanded, disabled, children, style }, ref) {
+    const disclosure = useDisclosureState({ visible: defaultExpanded ?? false });
 
-  useImperativeHandle(ref, () => disclosure);
+    useImperativeHandle(ref, () => disclosure);
 
-  return styled(useStyles(styles, style))(
-    <>
-      <Disclosure {...disclosure} disabled={disabled}>
-        <expand-icon {...use({ expanded: disclosure.visible })}>
-          <IconOrImage icon='arrow' />
-        </expand-icon>
-        <expand-label as='h2'>{label}</expand-label>
-      </Disclosure>
-      <DisclosureContent {...disclosure}>
-        <>{children}</>
-      </DisclosureContent>
-    </>
-  );
-}));
+    return styled(useStyles(styles, style))(
+      <>
+        <Disclosure {...disclosure} disabled={disabled}>
+          <expand-icon {...use({ expanded: disclosure.visible })}>
+            <IconOrImage icon="arrow" />
+          </expand-icon>
+          <expand-label as="h2">{label}</expand-label>
+        </Disclosure>
+        <DisclosureContent {...disclosure}>
+          <>{children}</>
+        </DisclosureContent>
+      </>,
+    );
+  }),
+);

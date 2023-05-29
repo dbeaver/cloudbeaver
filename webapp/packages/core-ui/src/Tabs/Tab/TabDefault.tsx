@@ -5,10 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useMemo } from 'react';
 import styled from 'reshadow';
-
 
 import { Translate, useStyles } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
@@ -67,7 +65,11 @@ export function TabDefault<T = Record<string, any>>({
   return styled(styles)(
     <Tab tabId={tabId} className={className} style={style} disabled={disabled} onOpen={onOpen} onClose={onClose}>
       {icon && <TabIcon icon={icon} />}
-      {name && <TabTitle><Translate token={name} /></TabTitle>}
-    </Tab>
+      {name && (
+        <TabTitle>
+          <Translate token={name} />
+        </TabTitle>
+      )}
+    </Tab>,
   );
 }

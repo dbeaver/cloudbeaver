@@ -5,18 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
-  constructor(
-  ) {
+  constructor() {
     super();
   }
 
-  async load(): Promise<void> { }
+  async load(): Promise<void> {}
 
-  register(): void {
-  }
+  register(): void {}
 }

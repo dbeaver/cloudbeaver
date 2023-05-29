@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 
 import { UserDataService } from '@cloudbeaver/core-authentication';
@@ -71,24 +70,15 @@ export class ResourceManagerScriptsService {
     return this.serverConfigResource.distributed ? scriptType?.rootFolder : undefined;
   }
 
-  async createScript(
-    resourceKey: string,
-    executionContext?: IConnectionExecutionContextInfo,
-    script = ''
-  ) {
-
-    await this.resourceManagerResource.writeText(
-      resourceKey,
-      script,
-      false
-    );
+  async createScript(resourceKey: string, executionContext?: IConnectionExecutionContextInfo, script = '') {
+    await this.resourceManagerResource.writeText(resourceKey, script, false);
 
     await this.setExecutionContextInfo(resourceKey, executionContext);
   }
 
   async setExecutionContextInfo(
     path: string,
-    executionContext: IConnectionExecutionContextInfo | undefined
+    executionContext: IConnectionExecutionContextInfo | undefined,
   ): Promise<IConnectionExecutionContextInfo | undefined> {
     if (!this.enabled) {
       return undefined;
@@ -114,9 +104,7 @@ export class ResourceManagerScriptsService {
     };
   }
 
-  async getExecutionContextInfo(
-    path: string
-  ): Promise<IConnectionExecutionContextInfo | undefined> {
+  async getExecutionContextInfo(path: string): Promise<IConnectionExecutionContextInfo | undefined> {
     const resourcesInfo = await this.resourceManagerResource.load(path, ['includeProperties']);
     const properties: IResourceProperties = resourcesInfo.properties;
     const resourceKey = getRmResourceKey(path);

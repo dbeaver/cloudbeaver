@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { action, observable, makeObservable, computed } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -66,7 +65,7 @@ export class LocalizationService extends Bootstrap {
     private readonly sessionResource: SessionResource,
     private readonly pluginManagerService: PluginManagerService,
     private readonly serverConfigResource: ServerConfigResource,
-    private readonly settingsService: SettingsService
+    private readonly settingsService: SettingsService,
   ) {
     super();
 
@@ -93,29 +92,21 @@ export class LocalizationService extends Bootstrap {
     this.localeProviders.push(provider);
   }
 
-  readonly translate = <T extends TLocalizationToken | undefined>(
-    token: T,
-    fallback?: T,
-    args: Record<string | number, any> = {}
-  ): T => {
+  readonly translate = <T extends TLocalizationToken | undefined>(token: T, fallback?: T, args: Record<string | number, any> = {}): T => {
     if (token === undefined) {
       return undefined as T;
     }
 
-    let translation = this.localeMap
-      .get(this.currentLanguage)
-      ?.get(token as TLocalizationToken);
+    let translation = this.localeMap.get(this.currentLanguage)?.get(token as TLocalizationToken);
 
     if (!translation) {
-      translation = this.localeMap
-        .get(DEFAULT_LOCALE_NAME)
-        ?.get(token as TLocalizationToken);
+      translation = this.localeMap.get(DEFAULT_LOCALE_NAME)?.get(token as TLocalizationToken);
     }
 
     if (typeof translation === 'string') {
       translation = Object.entries(args).reduce<string>(
         (translation, [key, value]) => translation.replace(`{arg:${key}}`, value),
-        translation
+        translation,
       ) as string;
 
       translation = translation.replace(/({alias:(\w*?)})/g, (substr, group1, group2) => this.translate(group2));
@@ -137,11 +128,7 @@ export class LocalizationService extends Bootstrap {
   async load(): Promise<void> {
     await this.serverConfigResource.load();
     this.setCurrentLocale(this.defaultLanguage); // set default app locale
-    this.settingsService.registerSettings(
-      LANG_SETTINGS_KEY,
-      this.settings,
-      getDefaultLocalizationSettings
-    ); // load user state locale
+    this.settingsService.registerSettings(LANG_SETTINGS_KEY, this.settings, getDefaultLocalizationSettings); // load user state locale
     this.sessionResource.setDefaultLocale(this.currentLanguage);
     await this.loadLocaleAsync(DEFAULT_LOCALE_NAME);
     await this.loadLocaleAsync(this.currentLanguage);
@@ -184,7 +171,7 @@ export class LocalizationService extends Bootstrap {
     const config = await this.serverConfigResource.load();
 
     if (!config) {
-      throw new Error('Can\'t get server settings');
+      throw new Error("Can't get server settings");
     }
 
     if (!config.supportedLanguages.some(lang => lang.isoCode === key)) {
@@ -208,10 +195,7 @@ export class LocalizationService extends Bootstrap {
           locale.set(key, value);
         }
       }
-      this.localeMap.set(
-        localeKey,
-        locale
-      );
+      this.localeMap.set(localeKey, locale);
     } catch (error: any) {
       this.notificationService.logException(error, 'Locale is not found', '', true);
     }

@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useContext, useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import styled, { css } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
@@ -35,27 +34,33 @@ const checkboxStyles = css`
 export const TableItemSelect = observer<Props>(function TableItemSelect({ checked, disabled, tooltip, className }) {
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
-  const handleClick = useCallback((event: React.MouseEvent<HTMLInputElement>) => {
-    if (!context) {
-      return;
-    }
-    const state = !context.isSelected();
-    EventContext.set(event, EventTableItemSelectionFlag, state);
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLInputElement>) => {
+      if (!context) {
+        return;
+      }
+      const state = !context.isSelected();
+      EventContext.set(event, EventTableItemSelectionFlag, state);
 
-    tableContext?.setItemSelect(context.item, state);
-  }, [tableContext, context]);
+      tableContext?.setItemSelect(context.item, state);
+    },
+    [tableContext, context],
+  );
 
   if (!context) {
     return null;
   }
 
-  return styled(BASE_TABLE_STYLES, checkboxStyles)(
+  return styled(
+    BASE_TABLE_STYLES,
+    checkboxStyles,
+  )(
     <Checkbox
       className={className}
       title={tooltip}
       disabled={context.selectDisabled || disabled}
       checked={checked || context.isSelected()}
       onClick={handleClick}
-    />
+    />,
   );
 });

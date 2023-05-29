@@ -1,10 +1,10 @@
+import { clientsClaim } from 'workbox-core';
+import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
+
 /// <reference lib="WebWorker" />
 
 declare const self: ServiceWorkerGlobalScope;
 const manifest = self.__WB_MANIFEST;
-
-import { clientsClaim } from 'workbox-core';
-import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
 
 clientsClaim();
 cleanupOutdatedCaches();

@@ -7,11 +7,7 @@
  */
 
 export class LoadingError extends Error {
-  constructor(
-    private readonly onRefresh: () => void,
-    message?: string,
-    options?: ErrorOptions
-  ) {
+  constructor(private readonly onRefresh: () => void, message?: string, options?: ErrorOptions) {
     super(message, options);
     this.name = 'Loading Error';
     this.refresh = this.refresh.bind(this);

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled, { css, use } from 'reshadow';
 
 import { IconOrImage } from './IconOrImage';
@@ -25,7 +24,10 @@ const styles = css`
     cursor: pointer;
   }
   a[|wrapper] {
-    &, &:hover, &:focus, &:active {
+    &,
+    &:hover,
+    &:focus,
+    &:active {
       color: inherit;
       text-decoration: none !important;
       outline: none;
@@ -38,23 +40,13 @@ const styles = css`
   }
 `;
 
-export const Link: React.FC<Props> = function Link({
-  inline,
-  wrapper,
-  indicator,
-  className,
-  children,
-  ...rest
-}) {
+export const Link: React.FC<Props> = function Link({ inline, wrapper, indicator, className, children, ...rest }) {
   return styled(styles)(
     <div className={className} {...use({ inline })}>
-      <a
-        {...use({ wrapper })}
-        {...rest}
-      >
-        {indicator && <IconOrImage icon='external-link' />}
+      <a {...use({ wrapper })} {...rest}>
+        {indicator && <IconOrImage icon="external-link" />}
         {children}
       </a>
-    </div>
+    </div>,
   );
 };

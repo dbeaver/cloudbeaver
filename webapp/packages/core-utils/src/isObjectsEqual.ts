@@ -5,12 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import isEqual from 'fast-deep-equal';
 
-export function isObjectsEqual(
-  a: any,
-  b: any
-): boolean {
+export function isObjectsEqual(a: any, b: any): boolean {
   return isEqual(a, b);
 }

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
@@ -72,13 +71,7 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   const children = useResource(ObjectFolders, NavTreeResource, nodeId);
 
   const folders = navNodeViewService.getFolders(nodeId, children.data) || [];
-  const wrongFolder = (
-    !folders.includes(folderId)
-    && folders.length > 0
-    && children.isLoaded()
-    && !children.isLoading()
-    && !children.isOutdated()
-  );
+  const wrongFolder = !folders.includes(folderId) && folders.length > 0 && children.isLoaded() && !children.isLoading() && !children.isOutdated();
 
   if (wrongFolder) {
     folderId = folders[0];
@@ -101,28 +94,16 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   return styled(style)(
     <>
       {folders.length > 0 ? (
-        <TabsState currentTabId={folderId} orientation='vertical' localState={innerTabState} lazy onChange={openFolder}>
+        <TabsState currentTabId={folderId} orientation="vertical" localState={innerTabState} lazy onChange={openFolder}>
           <vertical-tabs>
             <TabList aria-label="Object folders">
               {folders.map(folderId => (
-                <FolderTabRenderer
-                  key={folderId}
-                  nodeId={nodeId}
-                  folderId={folderId}
-                  parents={parents}
-                  style={tabStyles}
-                />
+                <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} style={tabStyles} />
               ))}
             </TabList>
             {folders.map(folderId => (
               <TabPanel key={folderId} tabId={folderId}>
-                <FolderPanelRenderer
-                  key={folderId}
-                  nodeId={nodeId}
-                  folderId={folderId}
-                  parents={parents}
-                  style={tabStyles}
-                />
+                <FolderPanelRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} style={tabStyles} />
               </TabPanel>
             ))}
           </vertical-tabs>
@@ -130,6 +111,6 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
       ) : (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       )}
-    </>
+    </>,
   );
 });

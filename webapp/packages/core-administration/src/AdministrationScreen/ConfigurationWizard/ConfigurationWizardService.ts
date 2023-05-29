@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -20,11 +19,9 @@ import { AdministrationScreenService } from '../AdministrationScreenService';
 @injectable()
 export class ConfigurationWizardService {
   get steps(): IAdministrationItem[] {
-    return this.administrationItemService.getUniqueItems(true)
-      .filter(item =>
-        filterConfigurationWizard(true)(item)
-        && filterHiddenAdministrationItem(true)(item)
-      )
+    return this.administrationItemService
+      .getUniqueItems(true)
+      .filter(item => filterConfigurationWizard(true)(item) && filterHiddenAdministrationItem(true)(item))
       .sort(orderAdministrationItems(true));
   }
 
@@ -33,9 +30,7 @@ export class ConfigurationWizardService {
   }
 
   get finishedSteps(): IAdministrationItem[] {
-    return this.steps.filter(step => (
-      step.configurationWizardOptions?.isDone && step.configurationWizardOptions.isDone()
-    ));
+    return this.steps.filter(step => step.configurationWizardOptions?.isDone && step.configurationWizardOptions.isDone());
   }
 
   get currentStepIndex(): number {
@@ -48,8 +43,7 @@ export class ConfigurationWizardService {
 
   get canFinish(): boolean {
     return this.steps.every(step => {
-      if (step.configurationWizardOptions?.isDone
-          && !step.configurationWizardOptions?.isDone()) {
+      if (step.configurationWizardOptions?.isDone && !step.configurationWizardOptions?.isDone()) {
         return false;
       }
 
@@ -78,7 +72,7 @@ export class ConfigurationWizardService {
   constructor(
     private administrationItemService: AdministrationItemService,
     private administrationScreenService: AdministrationScreenService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
   ) {
     makeObservable(this, {
       steps: computed,
@@ -144,10 +138,7 @@ export class ConfigurationWizardService {
 
     if (this.currentStepIndex + 1 < this.steps.length) {
       if (this.nextStep) {
-        this.administrationScreenService.navigateTo(
-          this.nextStep.name,
-          this.nextStep.configurationWizardOptions?.defaultRoute
-        );
+        this.administrationScreenService.navigateTo(this.nextStep.name, this.nextStep.configurationWizardOptions?.defaultRoute);
       }
     } else {
       await this.finish();
@@ -166,8 +157,7 @@ export class ConfigurationWizardService {
   }
 
   private getStep(name: string) {
-    return this.administrationItemService.getUniqueItems(true)
-      .find(step => filterConfigurationWizard(true)(step) && step.name === name);
+    return this.administrationItemService.getUniqueItems(true).find(step => filterConfigurationWizard(true)(step) && step.name === name);
   }
 
   private async finish() {

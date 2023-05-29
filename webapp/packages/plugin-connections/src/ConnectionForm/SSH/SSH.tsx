@@ -5,15 +5,28 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  Group, SubmittingForm, useResource, Button, ColoredContainer, InputField,
-  FieldCheckbox, BASE_CONTAINERS_STYLES, Switch, GroupItem, Container,
-  Combobox, Expandable, EXPANDABLE_FORM_STYLES, useTranslate, useStyles, useAdministrationSettings
+  BASE_CONTAINERS_STYLES,
+  Button,
+  ColoredContainer,
+  Combobox,
+  Container,
+  Expandable,
+  EXPANDABLE_FORM_STYLES,
+  FieldCheckbox,
+  Group,
+  GroupItem,
+  InputField,
+  SubmittingForm,
+  Switch,
+  useAdministrationSettings,
+  useResource,
+  useStyles,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
@@ -36,15 +49,8 @@ interface Props extends IConnectionFormProps {
   handlerState: NetworkHandlerConfigInput;
 }
 
-export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
-  state: formState,
-  handlerState,
-}) {
-  const {
-    info,
-    readonly,
-    disabled: formDisabled,
-  } = formState;
+export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ state: formState, handlerState }) {
+  const { info, readonly, disabled: formDisabled } = formState;
   const [loading, setLoading] = useState(false);
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
@@ -90,12 +96,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
     <SubmittingForm>
       <ColoredContainer parent>
         <Group form gap keepSize large>
-          <Switch
-            name="enabled"
-            state={handlerState}
-            mod={['primary']}
-            disabled={disabled || readonly}
-          >
+          <Switch name="enabled" state={handlerState} mod={['primary']} disabled={disabled || readonly}>
             {translate('connections_network_handler_ssh_tunnel_enable')}
           </Switch>
           <Combobox
@@ -117,7 +118,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
               state={handlerState.properties}
               disabled={disabled || !enabled}
               readOnly={readonly}
-              mod='surface'
+              mod="surface"
               required
               small
             >
@@ -129,7 +130,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
               state={handlerState.properties}
               disabled={disabled || !enabled}
               readOnly={readonly}
-              mod='surface'
+              mod="surface"
               required
               tiny
             >
@@ -143,7 +144,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
               state={handlerState}
               disabled={disabled || !enabled}
               readOnly={readonly}
-              mod='surface'
+              mod="surface"
               required={handlerState.savePassword}
               tiny
             >
@@ -152,25 +153,18 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
             <InputField
               type="password"
               name="password"
-              autoComplete='new-password'
+              autoComplete="new-password"
               state={handlerState}
               disabled={disabled || !enabled}
               readOnly={readonly}
-              mod='surface'
+              mod="surface"
               required={!keyAuth && handlerState.savePassword}
               description={passwordSaved ? translate('ui_processing_saved') : undefined}
               tiny
             >
               {passwordLabel}
             </InputField>
-            {keyAuth && (
-              <SSHKeyUploader
-                state={handlerState}
-                saved={keySaved}
-                disabled={disabled || !enabled}
-                readonly={readonly}
-              />
-            )}
+            {keyAuth && <SSHKeyUploader state={handlerState} saved={keySaved} disabled={disabled || !enabled} readonly={readonly} />}
           </Container>
           {credentialsSavingEnabled && (
             <FieldCheckbox
@@ -183,31 +177,28 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
             </FieldCheckbox>
           )}
           <Container gap>
-            <Expandable
-              style={EXPANDABLE_FORM_STYLES}
-              label={translate('connections_network_handler_ssh_tunnel_advanced_settings')}
-            >
+            <Expandable style={EXPANDABLE_FORM_STYLES} label={translate('connections_network_handler_ssh_tunnel_advanced_settings')}>
               <Container gap>
                 <InputField
-                  type='number'
-                  name='aliveInterval'
+                  type="number"
+                  name="aliveInterval"
                   state={handlerState.properties}
                   disabled={disabled || !enabled}
                   readOnly={readonly}
                   labelTooltip={aliveIntervalLabel}
-                  mod='surface'
+                  mod="surface"
                   tiny
                 >
                   {aliveIntervalLabel}
                 </InputField>
                 <InputField
-                  type='number'
-                  name='sshConnectTimeout'
+                  type="number"
+                  name="sshConnectTimeout"
                   state={handlerState.properties}
                   disabled={disabled || !enabled}
                   readOnly={readonly}
                   labelTooltip={connectTimeoutLabel}
-                  mod='surface'
+                  mod="surface"
                   tiny
                 >
                   {connectTimeoutLabel}
@@ -216,18 +207,12 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({
             </Expandable>
           </Container>
           <GroupItem>
-            <Button
-              type='button'
-              mod={['unelevated']}
-              disabled={disabled || !enabled || !testAvailable}
-              loader
-              onClick={testConnection}
-            >
+            <Button type="button" mod={['unelevated']} disabled={disabled || !enabled || !testAvailable} loader onClick={testConnection}>
               {translate('connections_network_handler_test')}
             </Button>
           </GroupItem>
         </Group>
       </ColoredContainer>
-    </SubmittingForm>
+    </SubmittingForm>,
   );
 });

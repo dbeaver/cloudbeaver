@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
-import { ContextMenuService, IMenuContext, IContextMenuItem, IMenuItem } from '@cloudbeaver/core-dialogs';
+import { ContextMenuService, IContextMenuItem, IMenuContext, IMenuItem } from '@cloudbeaver/core-dialogs';
 
 import { DatabaseEditAction } from '../../../DatabaseDataModel/Actions/DatabaseEditAction';
 import { DatabaseSelectAction } from '../../../DatabaseDataModel/Actions/DatabaseSelectAction';
@@ -25,9 +24,7 @@ export class TableFooterMenuService {
   static nodeContextType = 'NodeWithParent';
   private readonly tableFooterMenuToken = 'tableFooterMenu';
 
-  constructor(
-    private readonly contextMenuService: ContextMenuService,
-  ) {
+  constructor(private readonly contextMenuService: ContextMenuService) {
     this.contextMenuService.addPanel(this.tableFooterMenuToken);
 
     this.registerMenuItem({
@@ -43,34 +40,25 @@ export class TableFooterMenuService {
           return true;
         }
 
-        const editor = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseEditAction
-        );
+        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
 
         return !editor?.hasFeature('add');
       },
       isDisabled(context) {
         return (
-          context.data.model.isLoading()
-          || context.data.model.isDisabled(context.data.resultIndex)
-          || !context.data.model.source.hasResult(context.data.resultIndex)
+          context.data.model.isLoading() ||
+          context.data.model.isDisabled(context.data.resultIndex) ||
+          !context.data.model.source.hasResult(context.data.resultIndex)
         );
       },
       onClick(context) {
-        const editor = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseEditAction
-        );
+        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
 
         if (!editor) {
           return;
         }
 
-        const select = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseSelectAction
-        );
+        const select = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseSelectAction);
 
         editor.add(select?.getFocusedElement());
       },
@@ -88,18 +76,15 @@ export class TableFooterMenuService {
           return true;
         }
 
-        const editor = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseEditAction
-        );
+        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
 
         return !editor?.hasFeature('add');
       },
       isDisabled(context) {
         if (
-          context.data.model.isLoading()
-          || context.data.model.isDisabled(context.data.resultIndex)
-          || !context.data.model.source.hasResult(context.data.resultIndex)
+          context.data.model.isLoading() ||
+          context.data.model.isDisabled(context.data.resultIndex) ||
+          !context.data.model.source.hasResult(context.data.resultIndex)
         ) {
           return true;
         }
@@ -109,10 +94,7 @@ export class TableFooterMenuService {
         return selectedElements.length === 0;
       },
       onClick(context) {
-        const editor = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseEditAction
-        );
+        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
 
         if (!editor) {
           return;
@@ -136,26 +118,20 @@ export class TableFooterMenuService {
           return true;
         }
 
-        const editor = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseEditAction
-        );
+        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
 
         return !editor?.hasFeature('delete');
       },
       isDisabled(context) {
         if (
-          context.data.model.isLoading()
-          || context.data.model.isDisabled(context.data.resultIndex)
-          || !context.data.model.source.hasResult(context.data.resultIndex)
+          context.data.model.isLoading() ||
+          context.data.model.isDisabled(context.data.resultIndex) ||
+          !context.data.model.source.hasResult(context.data.resultIndex)
         ) {
           return true;
         }
 
-        const editor = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseEditAction
-        );
+        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
 
         if (!editor) {
           return true;
@@ -170,10 +146,7 @@ export class TableFooterMenuService {
         return !selectedElements.some(key => editor.getElementState(key) !== DatabaseEditChangeType.delete);
       },
       onClick(context) {
-        const editor = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseEditAction
-        );
+        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
 
         const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
 
@@ -193,33 +166,27 @@ export class TableFooterMenuService {
           return true;
         }
 
-        const editor = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseEditAction
-        );
+        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
 
         return !editor;
       },
       isDisabled(context) {
         if (
-          context.data.model.isLoading()
-          || context.data.model.isDisabled(context.data.resultIndex)
-          || !context.data.model.source.hasResult(context.data.resultIndex)
+          context.data.model.isLoading() ||
+          context.data.model.isDisabled(context.data.resultIndex) ||
+          !context.data.model.source.hasResult(context.data.resultIndex)
         ) {
           return true;
         }
 
-        const editor = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseEditAction
-        );
+        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
 
         const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
 
         return (
-          !editor
-          || selectedElements.length === 0
-          || !selectedElements.some(key => {
+          !editor ||
+          selectedElements.length === 0 ||
+          !selectedElements.some(key => {
             const state = editor.getElementState(key);
 
             if (state === DatabaseEditChangeType.add) {
@@ -231,10 +198,7 @@ export class TableFooterMenuService {
         );
       },
       onClick(context) {
-        const editor = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseEditAction
-        );
+        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
 
         const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
 
@@ -254,17 +218,14 @@ export class TableFooterMenuService {
       },
       isDisabled(context) {
         if (
-          context.data.model.isLoading()
-          || context.data.model.isDisabled(context.data.resultIndex)
-          || !context.data.model.source.hasResult(context.data.resultIndex)
+          context.data.model.isLoading() ||
+          context.data.model.isDisabled(context.data.resultIndex) ||
+          !context.data.model.source.hasResult(context.data.resultIndex)
         ) {
           return true;
         }
 
-        const editor = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseEditAction
-        );
+        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
 
         return !editor?.isEdited();
       },
@@ -285,25 +246,19 @@ export class TableFooterMenuService {
       },
       isDisabled(context) {
         if (
-          context.data.model.isLoading()
-          || context.data.model.isDisabled(context.data.resultIndex)
-          || !context.data.model.source.hasResult(context.data.resultIndex)
+          context.data.model.isLoading() ||
+          context.data.model.isDisabled(context.data.resultIndex) ||
+          !context.data.model.source.hasResult(context.data.resultIndex)
         ) {
           return true;
         }
 
-        const editor = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseEditAction
-        );
+        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
 
         return !editor?.isEdited();
       },
       onClick: context => {
-        const editor = context.data.model.source.getActionImplementation(
-          context.data.resultIndex,
-          DatabaseEditAction
-        );
+        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
         editor?.clear();
       },
     });
@@ -325,10 +280,7 @@ export class TableFooterMenuService {
 }
 
 function getActiveElements(model: IDatabaseDataModel, resultIndex: number): unknown[] {
-  const select = model.source.getActionImplementation(
-    resultIndex,
-    DatabaseSelectAction
-  );
+  const select = model.source.getActionImplementation(resultIndex, DatabaseSelectAction);
 
   return select?.getActiveElements() ?? [];
 }

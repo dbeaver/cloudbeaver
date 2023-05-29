@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useCallback } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
@@ -26,13 +25,9 @@ function getCellCopyValue(tableData: ITableData, key: IResultSetElementKey): str
   return cellValue ?? '';
 }
 
-function getSelectedCellsValue(
-  tableData: ITableData,
-  selectedCells: Map<string, IResultSetElementKey[]>
-) {
+function getSelectedCellsValue(tableData: ITableData, selectedCells: Map<string, IResultSetElementKey[]>) {
   const orderedSelectedCells = new Map<string, IResultSetElementKey[]>(
-    [...selectedCells]
-      .sort((a, b) => tableData.getRowIndexFromKey(a[1][0].row) - tableData.getRowIndexFromKey(b[1][0].row))
+    [...selectedCells].sort((a, b) => tableData.getRowIndexFromKey(a[1][0].row) - tableData.getRowIndexFromKey(b[1][0].row)),
   );
 
   const selectedColumns: IResultSetColumnKey[] = [];
@@ -46,9 +41,7 @@ function getSelectedCellsValue(
   for (const rowSelection of orderedSelectedCells.values()) {
     const rowCellsValues: string[] = [];
     for (const column of tableData.view.columnKeys) {
-      if (
-        !selectedColumns.some(columnKey => ResultSetDataKeysUtils.isEqual(columnKey, column))
-      ) {
+      if (!selectedColumns.some(columnKey => ResultSetDataKeysUtils.isEqual(columnKey, column))) {
         continue;
       }
 
@@ -69,7 +62,7 @@ function getSelectedCellsValue(
 export function useGridSelectedCellsCopy(
   tableData: ITableData,
   resultSetSelectAction: ResultSetSelectAction,
-  selectionContext: IDataGridSelectionContext
+  selectionContext: IDataGridSelectionContext,
 ) {
   const props = useObjectRef({ tableData, selectionContext, resultSetSelectAction });
 
@@ -81,10 +74,7 @@ export function useGridSelectedCellsCopy(
       let value: string | null = null;
 
       if (Array.from(props.selectionContext.selectedCells.keys()).length > 0) {
-        value = getSelectedCellsValue(
-          props.tableData,
-          props.selectionContext.selectedCells
-        );
+        value = getSelectedCellsValue(props.tableData, props.selectionContext.selectedCells);
       } else if (focusedElement) {
         value = getCellCopyValue(tableData, focusedElement);
       }

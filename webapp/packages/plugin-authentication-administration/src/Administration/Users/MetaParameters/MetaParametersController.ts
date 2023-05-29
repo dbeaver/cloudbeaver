@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { computed, makeObservable, observable } from 'mobx';
 
-import { observable, computed, makeObservable } from 'mobx';
-
-import { AdminUser, AuthProvidersResource, AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
-import { injectable, IInitializableController } from '@cloudbeaver/core-di';
+import { AdminUser, AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
@@ -17,24 +16,22 @@ import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { CachedMapAllKey, GQLErrorCatcher, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class MetaParametersController
-implements IInitializableController {
+export class MetaParametersController implements IInitializableController {
   isDeleting = false;
   readonly selectedItems = observable<string, boolean>(new Map());
   readonly expandedItems = observable<string, boolean>(new Map());
   readonly error = new GQLErrorCatcher();
 
   get users(): AdminUser[] {
-    return Array.from(this.usersResource.data.values())
-      .sort((a, b) => {
-        if (this.usersResource.isNew(a.userId) === this.usersResource.isNew(b.userId)) {
-          return a.userId.localeCompare(b.userId);
-        }
-        if (this.usersResource.isNew(a.userId)) {
-          return -1;
-        }
-        return 1;
-      });
+    return Array.from(this.usersResource.data.values()).sort((a, b) => {
+      if (this.usersResource.isNew(a.userId) === this.usersResource.isNew(b.userId)) {
+        return a.userId.localeCompare(b.userId);
+      }
+      if (this.usersResource.isNew(a.userId)) {
+        return -1;
+      }
+      return 1;
+    });
   }
 
   get isProvidersLoading(): boolean {
@@ -58,7 +55,7 @@ implements IInitializableController {
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly usersResource: UsersResource,
     private readonly commonDialogService: CommonDialogService,
-    private readonly localizationService: LocalizationService
+    private readonly localizationService: LocalizationService,
   ) {
     makeObservable(this, {
       isDeleting: observable,
@@ -87,8 +84,7 @@ implements IInitializableController {
       return;
     }
 
-    const deletionList = Array
-      .from(this.selectedItems)
+    const deletionList = Array.from(this.selectedItems)
       .filter(([_, value]) => value)
       .map(([userId]) => userId);
     if (deletionList.length === 0) {
@@ -96,7 +92,9 @@ implements IInitializableController {
     }
 
     const userNames = deletionList.map(name => `"${name}"`).join(', ');
-    const message = `${this.localizationService.translate('authentication_administration_users_delete_confirmation')}${userNames}. ${this.localizationService.translate('ui_are_you_sure')}`;
+    const message = `${this.localizationService.translate(
+      'authentication_administration_users_delete_confirmation',
+    )}${userNames}. ${this.localizationService.translate('ui_are_you_sure')}`;
 
     const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
       title: 'ui_data_delete_confirmation',

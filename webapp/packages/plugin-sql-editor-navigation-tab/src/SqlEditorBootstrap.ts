@@ -5,8 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { Connection, ConnectionInfoResource, createConnectionParam, IConnectionInfoParams, isConnectionProvider, isObjectCatalogProvider, isObjectSchemaProvider } from '@cloudbeaver/core-connections';
+import {
+  Connection,
+  ConnectionInfoResource,
+  createConnectionParam,
+  IConnectionInfoParams,
+  isConnectionProvider,
+  isObjectCatalogProvider,
+  isObjectSchemaProvider,
+} from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import type { IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -14,10 +21,18 @@ import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
-import { ActionService, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
+import { ACTION_RENAME, ActionService, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, getSqlEditorName, LocalStorageSqlDataSource, SqlDataSourceService, SqlEditorService, SqlEditorSettingsService } from '@cloudbeaver/plugin-sql-editor';
+import {
+  DATA_CONTEXT_SQL_EDITOR_STATE,
+  ESqlDataSourceFeatures,
+  getSqlEditorName,
+  LocalStorageSqlDataSource,
+  SqlDataSourceService,
+  SqlEditorService,
+  SqlEditorSettingsService,
+} from '@cloudbeaver/plugin-sql-editor';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ACTION_SQL_EDITOR_NEW } from './ACTION_SQL_EDITOR_NEW';
@@ -59,14 +74,9 @@ export class SqlEditorBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       isApplicable: context => context.has(DATA_CONTEXT_SQL_EDITOR_STATE) && context.has(DATA_CONTEXT_SQL_EDITOR_TAB),
-      getItems: (context, items) => [
-        ...items,
-        ACTION_RENAME,
-      ],
+      getItems: (context, items) => [...items, ACTION_RENAME],
       orderItems: (context, items) => {
-        const actions = menuExtractItems(items, [
-          ACTION_RENAME,
-        ]);
+        const actions = menuExtractItems(items, [ACTION_RENAME]);
 
         if (actions.length > 0) {
           items.unshift(...actions);
@@ -90,10 +100,7 @@ export class SqlEditorBootstrap extends Bootstrap {
 
         return !context.has(DATA_CONTEXT_MENU_NESTED);
       },
-      getItems: (context, items) => [
-        ...items,
-        ACTION_SQL_EDITOR_OPEN,
-      ],
+      getItems: (context, items) => [...items, ACTION_SQL_EDITOR_OPEN],
     });
 
     this.actionService.addHandler({
@@ -110,10 +117,7 @@ export class SqlEditorBootstrap extends Bootstrap {
 
           return dataSource?.hasFeature(ESqlDataSourceFeatures.setName) ?? false;
         }
-        return (
-          action === ACTION_SQL_EDITOR_OPEN
-          && context.has(DATA_CONTEXT_CONNECTION)
-        );
+        return action === ACTION_SQL_EDITOR_OPEN && context.has(DATA_CONTEXT_CONNECTION);
       },
       handler: async (context, action) => {
         switch (action) {
@@ -135,19 +139,16 @@ export class SqlEditorBootstrap extends Bootstrap {
             }
 
             const name = getSqlEditorName(state, dataSource, connection);
-            const regexp = /^(.*?)(\.\w+)$/ig.exec(name);
+            const regexp = /^(.*?)(\.\w+)$/gi.exec(name);
 
             const result = await this.commonDialogService.open(RenameDialog, {
               value: regexp?.[1] ?? name,
               objectName: name,
               icon: '/icons/sql_script_m.svg',
-              validation: name => (
-                !this.sqlEditorTabService.sqlEditorTabs.some(tab => (
-                  tab.handlerState.order !== state.order
-                  && this.sqlEditorService.getName(tab.handlerState) === name.trim()
-                ))
-                && dataSource.canRename(name)
-              ),
+              validation: name =>
+                !this.sqlEditorTabService.sqlEditorTabs.some(
+                  tab => tab.handlerState.order !== state.order && this.sqlEditorService.getName(tab.handlerState) === name.trim(),
+                ) && dataSource.canRename(name),
             });
 
             if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
@@ -177,21 +178,16 @@ export class SqlEditorBootstrap extends Bootstrap {
     });
   }
 
-  load(): void { }
+  load(): void {}
 
   private registerTopAppBarItem() {
     this.menuService.addCreator({
       menus: [MENU_APP_ACTIONS],
-      getItems: (context, items) => [
-        ...items,
-        ACTION_SQL_EDITOR_NEW,
-      ],
+      getItems: (context, items) => [...items, ACTION_SQL_EDITOR_NEW],
       orderItems: (context, items) => {
         let placeIndex = items.indexOf(ACTION_SQL_EDITOR_NEW);
 
-        const actionsOpen = menuExtractItems(items, [
-          ACTION_SQL_EDITOR_NEW,
-        ]);
+        const actionsOpen = menuExtractItems(items, [ACTION_SQL_EDITOR_NEW]);
 
         const connectionsIndex = items.indexOf(MENU_CONNECTIONS);
 
@@ -207,16 +203,11 @@ export class SqlEditorBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'sql-editor-new',
-      isActionApplicable: (context, action) => [
-        ACTION_SQL_EDITOR_NEW,
-      ].includes(action),
+      isActionApplicable: (context, action) => [ACTION_SQL_EDITOR_NEW].includes(action),
       isLabelVisible: () => false,
       getActionInfo: (context, action) => {
         const connectionContext = this.getActiveConnectionContext();
-        const schemaAndCatalog = NodeManagerUtils.concatSchemaAndCatalog(
-          connectionContext.catalogId,
-          connectionContext.schemaId
-        );
+        const schemaAndCatalog = NodeManagerUtils.concatSchemaAndCatalog(connectionContext.catalogId, connectionContext.schemaId);
 
         let tooltip = action.info.tooltip;
 
@@ -229,7 +220,7 @@ export class SqlEditorBootstrap extends Bootstrap {
               'plugin_sql_editor_navigation_tab_action_sql_editor_new_tooltip',
               {
                 connection: `${connectionInfo.name}${schemaAndCatalog ? ' ' + schemaAndCatalog : ''}`,
-              }
+              },
             );
           }
         }
@@ -264,9 +255,15 @@ export class SqlEditorBootstrap extends Bootstrap {
 
     for (const activeView of this.viewService.activeViews) {
       ExtensionUtils.from(activeView.extensions)
-        .on(isConnectionProvider, extension => { connectionKey = extension(activeView.context); })
-        .on(isObjectCatalogProvider, extension => { catalogId = extension(activeView.context); })
-        .on(isObjectSchemaProvider, extension => { schemaId = extension(activeView.context); });
+        .on(isConnectionProvider, extension => {
+          connectionKey = extension(activeView.context);
+        })
+        .on(isObjectCatalogProvider, extension => {
+          catalogId = extension(activeView.context);
+        })
+        .on(isObjectSchemaProvider, extension => {
+          schemaId = extension(activeView.context);
+        });
 
       if (connectionKey) {
         break;

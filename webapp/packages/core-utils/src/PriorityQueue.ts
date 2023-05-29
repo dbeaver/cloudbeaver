@@ -11,10 +11,10 @@ function parent(i: number): number {
   return ((i + 1) >>> 1) - 1;
 }
 function left(i: number): number {
-  return  (i << 1) + 1;
+  return (i << 1) + 1;
 }
 function right(i: number): number {
-  return  (i + 1) << 1;
+  return (i + 1) << 1;
 }
 
 type Comparator<T> = (a: T, b: T) => boolean;
@@ -86,11 +86,8 @@ export class PriorityQueue<T = number> {
 
   private siftDown() {
     let node = top;
-    while (
-      (left(node) < this.size() && this.greater(left(node), node))
-      || (right(node) < this.size() && this.greater(right(node), node))
-    ) {
-      const maxChild = (right(node) < this.size() && this.greater(right(node), left(node))) ? right(node) : left(node);
+    while ((left(node) < this.size() && this.greater(left(node), node)) || (right(node) < this.size() && this.greater(right(node), node))) {
+      const maxChild = right(node) < this.size() && this.greater(right(node), left(node)) ? right(node) : left(node);
       this.swap(node, maxChild);
       node = maxChild;
     }

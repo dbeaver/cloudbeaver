@@ -5,19 +5,18 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { catchError, debounceTime, filter, interval, map, merge, Observable, repeat, retry, share, Subject, throwError } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import {
-  GraphQLService,
-  EnvironmentService,
-  CbEventTopic as SessionEventTopic,
-  CbServerEventId as ServerEventId,
   CbClientEventId as ClientEventId,
+  EnvironmentService,
+  GraphQLService,
+  CbServerEventId as ServerEventId,
   ServiceError,
+  CbEventTopic as SessionEventTopic,
 } from '@cloudbeaver/core-sdk';
 
 import { NetworkStateService } from './NetworkStateService';
@@ -42,11 +41,9 @@ export interface ITopicSubEvent extends ISessionEvent {
 const RETRY_INTERVAL = 30 * 1000;
 
 @injectable()
-export class SessionEventSource
-implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
+export class SessionEventSource implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   readonly eventsSubject: Observable<ISessionEvent>;
   readonly onInit: ISyncExecutor;
-
 
   private readonly closeSubject: Subject<CloseEvent>;
   private readonly openSubject: Subject<Event>;
@@ -60,7 +57,7 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
     private readonly networkStateService: NetworkStateService,
     private readonly sessionExpireService: SessionExpireService,
     private readonly environmentService: EnvironmentService,
-    private readonly graphQLService: GraphQLService
+    private readonly graphQLService: GraphQLService,
   ) {
     this.onInit = new SyncExecutor();
     this.oldEventsSubject = new Subject();
@@ -68,10 +65,9 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
     this.openSubject = new Subject();
     this.errorSubject = new Subject();
     this.disconnected = false;
-    this.retryTimer = interval(RETRY_INTERVAL)
-      .pipe(
-        filter(() => !this.sessionExpireService.expired && networkStateService.state && !this.disconnected)
-      );
+    this.retryTimer = interval(RETRY_INTERVAL).pipe(
+      filter(() => !this.sessionExpireService.expired && networkStateService.state && !this.disconnected),
+    );
     this.subject = webSocket({
       url: environmentService.wsEndpoint,
       closeObserver: this.closeSubject,
@@ -88,25 +84,19 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
 
     this.eventsSubject = merge(this.oldEventsSubject, this.subject);
 
-    this.errorSubject
-      .pipe(debounceTime(1000))
-      .subscribe(error => {
-        console.error(error);
-      });
+    this.errorSubject.pipe(debounceTime(1000)).subscribe(error => {
+      console.error(error);
+    });
 
     this.errorHandler = this.errorHandler.bind(this);
   }
 
-  onEvent<T = ISessionEvent>(
-    id: SessionEventId,
-    callback: IServerEventCallback<T>,
-    mapTo: (event: ISessionEvent) => T = e => e as T,
-  ): Subscription {
+  onEvent<T = ISessionEvent>(id: SessionEventId, callback: IServerEventCallback<T>, mapTo: (event: ISessionEvent) => T = e => e as T): Subscription {
     const sub = this.eventsSubject
       .pipe(
         this.handleErrors(),
         filter(event => event.id === id),
-        map(mapTo)
+        map(mapTo),
       )
       .subscribe(callback);
 
@@ -120,35 +110,22 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
     mapTo: (event: ISessionEvent) => T = e => e as T,
     filterFn: (event: ISessionEvent) => boolean = () => true,
   ): Subscription {
-    const sub = this.eventsSubject
-      .pipe(
-        this.handleErrors(),
-        filter(filterFn),
-        map(mapTo)
-      )
-      .subscribe(callback);
+    const sub = this.eventsSubject.pipe(this.handleErrors(), filter(filterFn), map(mapTo)).subscribe(callback);
 
     return () => {
       sub.unsubscribe();
     };
   }
 
-  multiplex<T = ISessionEvent>(
-    topicId: SessionEventTopic,
-    mapTo: ((event: ISessionEvent) => T)  = e => e as T
-  ): Observable<T> {
+  multiplex<T = ISessionEvent>(topicId: SessionEventTopic, mapTo: (event: ISessionEvent) => T = e => e as T): Observable<T> {
     return merge(
       this.subject.multiplex(
         () => ({ id: ClientEventId.CbClientTopicSubscribe, topicId } as ITopicSubEvent),
         () => ({ id: ClientEventId.CbClientTopicUnsubscribe, topicId } as ITopicSubEvent),
-        event => event.topicId === topicId
+        event => event.topicId === topicId,
       ),
       this.oldEventsSubject,
-    )
-      .pipe(
-        this.handleErrors(),
-        map(mapTo)
-      );
+    ).pipe(this.handleErrors(), map(mapTo));
   }
 
   emit(event: ISessionEvent): this {
@@ -161,12 +138,8 @@ implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, Ses
   }
 
   private handleErrors() {
-    return (source: Observable<ISessionEvent>):Observable<ISessionEvent> =>  source.pipe(
-      share(),
-      catchError(this.errorHandler),
-      retry({ delay: () =>  this.retryTimer }),
-      repeat({ delay: () =>  this.retryTimer }),
-    );
+    return (source: Observable<ISessionEvent>): Observable<ISessionEvent> =>
+      source.pipe(share(), catchError(this.errorHandler), retry({ delay: () => this.retryTimer }), repeat({ delay: () => this.retryTimer }));
   }
 
   private errorHandler(error: any, caught: Observable<ISessionEvent>): Observable<ISessionEvent> {

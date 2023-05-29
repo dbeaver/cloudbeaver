@@ -5,13 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { PromiseCancelledError } from './PromiseCancelledError';
 
-export type CancellableExecutor<T> = (
-  resolve: (value: T) => void,
-  reject: (reason?: any) => void
-) => undefined | (() => void); // returns nothing or cancel function
+export type CancellableExecutor<T> = (resolve: (value: T) => void, reject: (reason?: any) => void) => undefined | (() => void); // returns nothing or cancel function
 
 /**
  * When cancelled the promise will be rejected with the reason PROMISE_CANCELLED

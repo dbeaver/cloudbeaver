@@ -1,0 +1,4 @@
+{
+  "projects": ["../dbeaver", "../cloudbeaver/server"],
+  "targetPlatform": "./org.jkiss.cloudbeaver.tp.target"
+}

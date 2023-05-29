@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
@@ -16,10 +15,7 @@ import { VirtualFolderUtils } from './VirtualFolderUtils';
 
 @injectable()
 export class VirtualFolderViewBootstrap extends Bootstrap {
-  constructor(
-    private readonly navNodeViewService: NavNodeViewService,
-    private readonly navNodeInfoResource: NavNodeInfoResource
-  ) {
+  constructor(private readonly navNodeViewService: NavNodeViewService, private readonly navNodeInfoResource: NavNodeInfoResource) {
     super();
   }
 
@@ -67,5 +63,5 @@ export class VirtualFolderViewBootstrap extends Bootstrap {
     });
   }
 
-  load(): void { }
+  load(): void {}
 }

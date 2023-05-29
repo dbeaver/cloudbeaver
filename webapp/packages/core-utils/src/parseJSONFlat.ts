@@ -6,11 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function parseJSONFlat(
-  object: any,
-  setValue: (key: string, value: any) => void,
-  scope?: string
-) {
+export function parseJSONFlat(object: any, setValue: (key: string, value: any) => void, scope?: string) {
   if (typeof object === 'object') {
     if (Array.isArray(object)) {
       if (scope) {

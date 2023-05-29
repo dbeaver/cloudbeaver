@@ -37,12 +37,14 @@ import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -198,7 +200,7 @@ public class WebConnectionInfo {
     @Property
     public String getConnectTime() {
         return dataSourceContainer.getConnectTime() == null ? null :
-            CBModelConstants.ISO_DATE_FORMAT.format(dataSourceContainer.getConnectTime());
+            CBModelConstants.ISO_DATE_FORMAT.format(dataSourceContainer.getConnectTime().toInstant());
     }
 
     @Property
@@ -324,10 +326,14 @@ public class WebConnectionInfo {
         DBPConnectionConfiguration configWithAuth = new DBPConnectionConfiguration(dataSourceContainer.getConnectionConfiguration());
         session.provideAuthParameters(session.getProgressMonitor(), dataSourceContainer, configWithAuth);
 
+        // show all properties if it is a manual connection
+        Predicate<DBPPropertyDescriptor> predicate = CommonUtils.isEmpty(getRequiredAuth())
+            ? p -> true
+            : p -> WebCommonUtils.isAuthPropertyApplicable(p, session.getContextCredentialsProviders());
 
         DBPPropertySource credentialsSource = authModel.createCredentialsSource(dataSourceContainer, configWithAuth);
         return Arrays.stream(credentialsSource.getProperties())
-            .filter(p -> WebCommonUtils.isAuthPropertyApplicable(p, session.getContextCredentialsProviders()))
+            .filter(predicate)
             .map(p -> new WebPropertyInfo(session, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
     }
 

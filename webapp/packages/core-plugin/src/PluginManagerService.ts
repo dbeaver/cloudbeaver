@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { ProductManagerService } from '@cloudbeaver/core-product';
 
@@ -13,7 +12,7 @@ import { PluginSettings } from './PluginSettings';
 
 @injectable()
 export class PluginManagerService {
-  constructor(private readonly productManagerService: ProductManagerService) { }
+  constructor(private readonly productManagerService: ProductManagerService) {}
 
   getCoreSettings<T>(scope: string, defaults: T) {
     return new PluginSettings(this.productManagerService.settings, 'core.' + scope, defaults);

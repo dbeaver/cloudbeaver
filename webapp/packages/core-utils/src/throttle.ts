@@ -44,11 +44,10 @@ export function throttle<T extends (...args: any[]) => void | Promise<void>>(f: 
   } as T;
 }
 
-export function throttleAsync<
-  TResult,
-  TArguments extends any[],
-  T extends (...args: TArguments) => Promise<TResult>
->(f: T, delay: number): ThrottleAsync<TResult, TArguments> {
+export function throttleAsync<TResult, TArguments extends any[], T extends (...args: TArguments) => Promise<TResult>>(
+  f: T,
+  delay: number,
+): ThrottleAsync<TResult, TArguments> {
   let throttle = false;
   let _resolve: ((result: TResult) => void) | null = null;
   let _reject: ((reason?: any) => void) | null = null;
@@ -80,9 +79,7 @@ export function throttleAsync<
         throttle = false;
 
         if (functionArgs) {
-          f.apply(thisObject, functionArgs)
-            .then(_resolve)
-            .catch(_reject);
+          f.apply(thisObject, functionArgs).then(_resolve).catch(_reject);
 
           _resolve = null;
           _reject = null;

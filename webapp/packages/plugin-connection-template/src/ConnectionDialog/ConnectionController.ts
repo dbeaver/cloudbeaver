@@ -5,11 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { computed, makeObservable, observable } from 'mobx';
 
-import { observable, makeObservable, computed } from 'mobx';
-
-import { DBDriverResource, Connection, DatabaseAuthModelsResource, ConnectionInfoResource, DBDriver, ConnectionInitConfig, USER_NAME_PROPERTY_ID, createConnectionParam, ConnectionInfoProjectKey } from '@cloudbeaver/core-connections';
-import { injectable, IInitializableController, IDestructibleController } from '@cloudbeaver/core-di';
+import {
+  Connection,
+  ConnectionInfoProjectKey,
+  ConnectionInfoResource,
+  ConnectionInitConfig,
+  createConnectionParam,
+  DatabaseAuthModelsResource,
+  DBDriver,
+  DBDriverResource,
+  USER_NAME_PROPERTY_ID,
+} from '@cloudbeaver/core-connections';
+import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
@@ -23,7 +32,7 @@ import { TemplateConnectionsService } from '../TemplateConnectionsService';
 
 export enum ConnectionStep {
   ConnectionTemplateSelect,
-  Connection
+  Connection,
 }
 
 export interface IConnectionController {
@@ -34,8 +43,7 @@ export interface IConnectionController {
 }
 
 @injectable()
-export class ConnectionController
-implements IInitializableController, IDestructibleController, IConnectionController {
+export class ConnectionController implements IInitializableController, IDestructibleController, IConnectionController {
   step = ConnectionStep.ConnectionTemplateSelect;
   isLoading = true;
   isConnecting = false;
@@ -74,9 +82,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       return [];
     }
 
-    return this.template.networkHandlersConfig
-      .filter(handler => handler.enabled && !handler.savePassword)
-      .map(handler => handler.id);
+    return this.template.networkHandlersConfig.filter(handler => handler.enabled && !handler.savePassword).map(handler => handler.id);
   }
 
   constructor(
@@ -128,17 +134,11 @@ implements IInitializableController, IDestructibleController, IConnectionControl
     this.isConnecting = true;
     this.clearError();
     try {
-      const connections = await this.connectionInfoResource.load(
-        ConnectionInfoProjectKey(this.projectsService.userProject.id)
-      );
+      const connections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(this.projectsService.userProject.id));
       const connectionNames = connections.map(connection => connection.name);
 
       const uniqueConnectionName = getUniqueName(this.template.name || 'Template connection', connectionNames);
-      const connection = await this.connectionInfoResource.createFromTemplate(
-        this.template.projectId,
-        this.template.id,
-        uniqueConnectionName
-      );
+      const connection = await this.connectionInfoResource.createFromTemplate(this.template.projectId, this.template.id, uniqueConnectionName);
 
       try {
         await this.connectionInfoResource.init(this.getConfig(connection.projectId, connection.id));
@@ -241,7 +241,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       await this.templateConnectionsResource.load();
       await this.dbDriverResource.load(CachedMapAllKey);
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Can\'t load database sources');
+      this.notificationService.logException(exception, "Can't load database sources");
     } finally {
       this.isLoading = false;
     }
@@ -256,7 +256,7 @@ implements IInitializableController, IDestructibleController, IConnectionControl
       this.isLoading = true;
       this.authModel = await this.dbAuthModelsResource.load(this.dbDriver.defaultAuthModel);
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Can\'t load driver auth model');
+      this.notificationService.logException(exception, "Can't load driver auth model");
     } finally {
       this.isLoading = false;
     }

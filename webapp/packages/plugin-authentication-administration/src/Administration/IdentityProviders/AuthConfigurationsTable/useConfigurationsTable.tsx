@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, observable } from 'mobx';
 
 import { AuthConfigurationsResource, compareAuthConfigurations } from '@cloudbeaver/core-authentication';
@@ -30,66 +29,71 @@ export function useConfigurationsTable(): Readonly<State> {
 
   const translate = useTranslate();
 
-  return useObservableRef<State>(() => ({
-    tableState: new TableState(),
-    processing: false,
-    get configurations() {
-      return resource.values.slice().sort(compareAuthConfigurations);
+  return useObservableRef<State>(
+    () => ({
+      tableState: new TableState(),
+      processing: false,
+      get configurations() {
+        return resource.values.slice().sort(compareAuthConfigurations);
+      },
+      async update() {
+        if (this.processing) {
+          return;
+        }
+
+        try {
+          this.processing = true;
+          await resource.refresh(CachedMapAllKey);
+          notificationService.logSuccess({ title: 'administration_identity_providers_configuration_list_update_success' });
+        } catch (exception: any) {
+          notificationService.logException(exception, 'administration_identity_providers_configuration_list_update_fail');
+        } finally {
+          this.processing = false;
+        }
+      },
+      async delete() {
+        if (this.processing) {
+          return;
+        }
+
+        const deletionList = this.tableState.selectedList;
+
+        if (deletionList.length === 0) {
+          return;
+        }
+
+        const configurationNames = deletionList.map(id => resource.get(id)?.displayName).filter(Boolean);
+        const nameList = configurationNames.map(name => `"${name}"`).join(', ');
+        const message = `${translate('administration_identity_providers_delete_confirmation')}${nameList}. ${translate('ui_are_you_sure')}`;
+
+        const result = await dialogService.open(ConfirmationDialogDelete, {
+          title: 'ui_data_delete_confirmation',
+          message,
+          confirmActionText: 'ui_delete',
+        });
+
+        if (result === DialogueStateResult.Rejected) {
+          return;
+        }
+
+        try {
+          this.processing = true;
+          await resource.deleteConfiguration(resourceKeyList(deletionList));
+
+          this.tableState.unselect();
+          this.tableState.unexpand(deletionList);
+        } catch (exception: any) {
+          notificationService.logException(exception, 'Configurations delete failed');
+        } finally {
+          this.processing = false;
+        }
+      },
+    }),
+    {
+      processing: observable.ref,
+      configurations: computed,
     },
-    async update() {
-      if (this.processing) {
-        return;
-      }
-
-      try {
-        this.processing = true;
-        await resource.refresh(CachedMapAllKey);
-        notificationService.logSuccess({ title: 'administration_identity_providers_configuration_list_update_success' });
-      } catch (exception: any) {
-        notificationService.logException(exception, 'administration_identity_providers_configuration_list_update_fail');
-      } finally {
-        this.processing = false;
-      }
-    },
-    async delete() {
-      if (this.processing) {
-        return;
-      }
-
-      const deletionList = this.tableState.selectedList;
-
-      if (deletionList.length === 0) {
-        return;
-      }
-
-      const configurationNames = deletionList.map(id => resource.get(id)?.displayName).filter(Boolean);
-      const nameList = configurationNames.map(name => `"${name}"`).join(', ');
-      const message = `${translate('administration_identity_providers_delete_confirmation')}${nameList}. ${translate('ui_are_you_sure')}`;
-
-      const result = await dialogService.open(ConfirmationDialogDelete, {
-        title: 'ui_data_delete_confirmation',
-        message,
-        confirmActionText: 'ui_delete',
-      });
-
-      if (result === DialogueStateResult.Rejected) {
-        return;
-      }
-
-      try {
-        this.processing = true;
-        await resource.deleteConfiguration(resourceKeyList(deletionList));
-
-        this.tableState.unselect();
-        this.tableState.unexpand(deletionList);
-      } catch (exception: any) {
-        notificationService.logException(exception, 'Configurations delete failed');
-      } finally {
-        this.processing = false;
-      }
-    },
-  }), {
-    processing: observable.ref,
-    configurations: computed,
-  }, false, ['update', 'delete']);
+    false,
+    ['update', 'delete'],
+  );
 }

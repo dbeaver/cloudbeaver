@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { runInAction } from 'mobx';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
@@ -17,22 +16,21 @@ import type { IConnectionFormState } from '../IConnectionFormProps';
 const MAX_HOST_LENGTH = 20;
 
 export function useOptions(state: IConnectionFormState) {
-  const refObject = useObjectRef(() => ({
-    prevName: null as string | null,
-  }), {
-    state,
-  });
+  const refObject = useObjectRef(
+    () => ({
+      prevName: null as string | null,
+    }),
+    {
+      state,
+    },
+  );
 
   return useObjectRef({
     updateNameTemplate(driver: DBDriver | undefined) {
       runInAction(() => {
         const {
           prevName,
-          state: {
-            config,
-            info,
-            mode,
-          },
+          state: { config, info, mode },
         } = refObject;
 
         const isAutoFill = config.name === prevName || prevName === null;
@@ -66,10 +64,7 @@ export function useOptions(state: IConnectionFormState) {
     setDefaults(driver: DBDriver | undefined, prevDriver?: DBDriver) {
       runInAction(() => {
         const {
-          state: {
-            config,
-            info,
-          },
+          state: { config, info },
         } = refObject;
 
         if (info || driver?.id !== config.driverId) {
@@ -77,11 +72,9 @@ export function useOptions(state: IConnectionFormState) {
         }
 
         if (!config.configurationType || !driver?.configurationTypes.includes(config.configurationType)) {
-          config.configurationType = (
-            driver?.configurationTypes.includes(DriverConfigurationType.Manual)
-              ? DriverConfigurationType.Manual
-              : DriverConfigurationType.Url
-          );
+          config.configurationType = driver?.configurationTypes.includes(DriverConfigurationType.Manual)
+            ? DriverConfigurationType.Manual
+            : DriverConfigurationType.Url;
         }
 
         if ((!prevDriver && config.host === undefined) || config.host === prevDriver?.defaultServer) {
@@ -111,10 +104,7 @@ export function useOptions(state: IConnectionFormState) {
     },
     setAuthModel(model: DatabaseAuthModel) {
       const {
-        state: {
-          config,
-          info,
-        },
+        state: { config, info },
       } = refObject;
 
       config.credentials = {};

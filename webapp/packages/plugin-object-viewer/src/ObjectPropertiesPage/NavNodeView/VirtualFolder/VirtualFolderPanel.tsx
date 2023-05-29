@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { untracked } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
@@ -13,7 +12,7 @@ import styled, { css } from 'reshadow';
 
 import { TextPlaceholder, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { NavNodeInfoResource, NavTreeResource, DBObjectResource, type DBObject, DBObjectParentKey } from '@cloudbeaver/core-navigation-tree';
+import { type DBObject, DBObjectParentKey, DBObjectResource, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { type NavNodeTransformViewComponent, NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { TableLoader } from '../../ObjectPropertyTable/Table/TableLoader';
@@ -29,10 +28,7 @@ const style = css`
   }
 `;
 
-export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(function VirtualFolderPanel({
-  folderId,
-  nodeId,
-}) {
+export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(function VirtualFolderPanel({ folderId, nodeId }) {
   const translate = useTranslate();
   const nodeType = VirtualFolderUtils.getNodeType(folderId);
   const navNodeViewService = useService(NavNodeViewService);
@@ -51,12 +47,9 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
     navNodeViewService.logDuplicates(nodeId, duplicates);
   });
 
-  const objects = dbObject.data
-    .filter(object => (
-      object
-      && nodes.includes(object.id)
-      && navNodeInfoResource.get(object.id)?.nodeType === nodeType
-    )) as DBObject[];
+  const objects = dbObject.data.filter(
+    object => object && nodes.includes(object.id) && navNodeInfoResource.get(object.id)?.nodeType === nodeType,
+  ) as DBObject[];
 
   return styled(style)(
     <>
@@ -67,6 +60,6 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
           <TableLoader objects={objects} truncated={limited.truncated > 0} />
         </tab-wrapper>
       )}
-    </>
+    </>,
   );
 });

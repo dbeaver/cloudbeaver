@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { untracked } from 'mobx';
 
 import { CoreSettingsService } from '@cloudbeaver/core-app';
@@ -14,9 +13,30 @@ import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, Ren
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { type NavNode, type INodeActions, NavNodeManagerService, NavTreeResource, NavNodeInfoResource, NavTreeSettingsService, nodeDeleteContext, DATA_CONTEXT_NAV_NODE, ENodeFeature, getNodeDisplayName } from '@cloudbeaver/core-navigation-tree';
+import {
+  DATA_CONTEXT_NAV_NODE,
+  ENodeFeature,
+  getNodeDisplayName,
+  type INodeActions,
+  type NavNode,
+  NavNodeInfoResource,
+  NavNodeManagerService,
+  NavTreeResource,
+  NavTreeSettingsService,
+  nodeDeleteContext,
+} from '@cloudbeaver/core-navigation-tree';
 import { ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { ActionService, ACTION_DELETE, ACTION_OPEN, ACTION_REFRESH, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import {
+  ACTION_DELETE,
+  ACTION_OPEN,
+  ACTION_REFRESH,
+  ACTION_RENAME,
+  ActionService,
+  DATA_CONTEXT_MENU_NESTED,
+  menuExtractItems,
+  MenuSeparatorItem,
+  MenuService,
+} from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS';
 
@@ -37,7 +57,7 @@ export class NavNodeContextMenuService extends Bootstrap {
     private readonly coreSettingsService: CoreSettingsService,
     private readonly localizationService: LocalizationService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly navTreeSettingsService: NavTreeSettingsService
+    private readonly navTreeSettingsService: NavTreeSettingsService,
   ) {
     super();
   }
@@ -54,9 +74,7 @@ export class NavNodeContextMenuService extends Bootstrap {
         return;
       }
 
-      const nodes = ResourceKeyUtils
-        .mapArray(data, nodeId => this.navNodeInfoResource.get(nodeId))
-        .filter<NavNode>(Boolean as any);
+      const nodes = ResourceKeyUtils.mapArray(data, nodeId => this.navNodeInfoResource.get(nodeId)).filter<NavNode>(Boolean as any);
 
       const name = nodes.map(node => node.name).join(', ');
       const folder = nodes.some(node => node.folder);
@@ -120,10 +138,7 @@ export class NavNodeContextMenuService extends Bootstrap {
           return this.navNodeManagerService.getNavNodeCache(node.id).canOpen;
         }
 
-        return [
-          ACTION_OPEN,
-          ACTION_REFRESH,
-        ].includes(action);
+        return [ACTION_OPEN, ACTION_REFRESH].includes(action);
       },
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
@@ -172,7 +187,10 @@ export class NavNodeContextMenuService extends Bootstrap {
             try {
               await this.navTreeResource.deleteNode(node.id);
             } catch (exception: any) {
-              this.notificationService.logException(exception, this.localizationService.translate('app_navigationTree_node_delete_error', undefined, { name }));
+              this.notificationService.logException(
+                exception,
+                this.localizationService.translate('app_navigationTree_node_delete_error', undefined, { name }),
+              );
             }
             break;
           }
@@ -182,27 +200,14 @@ export class NavNodeContextMenuService extends Bootstrap {
 
     this.menuService.addCreator({
       isApplicable: context => context.has(DATA_CONTEXT_NAV_NODE) && !context.has(DATA_CONTEXT_MENU_NESTED),
-      getItems: (context, items) => [
-        ...items,
-        ACTION_OPEN,
-        ACTION_RENAME,
-        ACTION_DELETE,
-        ACTION_REFRESH,
-      ],
+      getItems: (context, items) => [...items, ACTION_OPEN, ACTION_RENAME, ACTION_DELETE, ACTION_REFRESH],
 
       orderItems: (context, items) => {
-        const actionsOpen = menuExtractItems(items, [
-          ACTION_OPEN,
-        ]);
+        const actionsOpen = menuExtractItems(items, [ACTION_OPEN]);
 
-        const actionsManage = menuExtractItems(items, [
-          ACTION_RENAME,
-          ACTION_DELETE,
-        ]);
+        const actionsManage = menuExtractItems(items, [ACTION_RENAME, ACTION_DELETE]);
 
-        const actionsRefresh = menuExtractItems(items, [
-          ACTION_REFRESH,
-        ]);
+        const actionsRefresh = menuExtractItems(items, [ACTION_REFRESH]);
 
         items.unshift(...actionsOpen);
 
@@ -220,5 +225,5 @@ export class NavNodeContextMenuService extends Bootstrap {
     });
   }
 
-  load(): void { }
+  load(): void {}
 }

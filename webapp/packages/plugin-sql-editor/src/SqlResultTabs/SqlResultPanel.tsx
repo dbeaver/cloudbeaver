@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -36,7 +35,7 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
     return styled(style)(
       <result-panel>
         <SqlResultSetPanel resultTab={resultTab} group={group} />
-      </result-panel>
+      </result-panel>,
     );
   }
 
@@ -46,7 +45,7 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
     return styled(style)(
       <result-panel>
         <SqlExecutionPlanPanel executionPlanTab={executionPlanTab} />
-      </result-panel>
+      </result-panel>,
     );
   }
 
@@ -56,7 +55,7 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
     return styled(style)(
       <result-panel>
         <SqlScriptStatisticsPanel tab={statisticsTab} />
-      </result-panel>
+      </result-panel>,
     );
   }
 

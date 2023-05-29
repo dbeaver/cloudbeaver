@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
@@ -22,51 +21,29 @@ export const ChangePassword = observer(function ChangePassword() {
   return styled(BASE_CONTAINERS_STYLES)(
     <Group form gap>
       <GroupTitle>{translate('plugin_user_profile_authentication_change_password')}</GroupTitle>
-      <InputField
-        type='password'
-        name='oldPassword'
-        state={state.config}
-        disabled={disabled}
-        mapValue={(value => value.trim())}
-        small
-        required
-      >
+      <InputField type="password" name="oldPassword" state={state.config} disabled={disabled} mapValue={value => value.trim()} small required>
         {translate('plugin_user_profile_authentication_change_password_current_password')}
       </InputField>
       <InputField
-        type='password'
-        name='password'
-        autoComplete='new-password'
+        type="password"
+        name="password"
+        autoComplete="new-password"
         state={state.config}
         disabled={disabled}
-        mapValue={(value => value.trim())}
+        mapValue={value => value.trim()}
         small
         required
       >
         {translate('plugin_user_profile_authentication_change_password_new_password')}
       </InputField>
-      <InputField
-        type='password'
-        name='repeatedPassword'
-        state={state.config}
-        disabled={disabled}
-        mapValue={(value => value.trim())}
-        small
-        required
-      >
+      <InputField type="password" name="repeatedPassword" state={state.config} disabled={disabled} mapValue={value => value.trim()} small required>
         {translate('plugin_user_profile_authentication_change_password_repeat_password')}
       </InputField>
       <GroupItem>
-        <Button
-          disabled={disabled || !state.formFilled}
-          loading={state.submitting}
-          type="button"
-          mod={['unelevated']}
-          onClick={state.changePassword}
-        >
+        <Button disabled={disabled || !state.formFilled} loading={state.submitting} type="button" mod={['unelevated']} onClick={state.changePassword}>
           {translate('plugin_user_profile_authentication_change_password_submit_label')}
         </Button>
       </GroupItem>
-    </Group>
+    </Group>,
   );
 });

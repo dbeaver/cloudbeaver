@@ -1,7 +1,7 @@
 export default [
   ['connections_administration_item', 'Connection Management'],
   ['connections_administration_connection_create', 'Add Database'],
-  ['connections_administration_search_database_tip', 'Type your hosts here, e.g. \'localhost host1.myhost.com 192.168.0.1\' and press Enter'],
+  ['connections_administration_search_database_tip', "Type your hosts here, e.g. 'localhost host1.myhost.com 192.168.0.1' and press Enter"],
   ['connections_administration_new_connection', 'New connection'],
   ['connections_administration_connection_create_error', 'Create connection error'],
   ['connections_administration_connection_save_error', 'Save connection error'],
@@ -9,7 +9,10 @@ export default [
   ['connections_administration_configuration_wizard_step_title', 'Database connections'],
   ['connections_administration_configuration_wizard_step_description', 'Add database connections'],
   ['connections_administration_configuration_wizard_title', 'Add database connections'],
-  ['connections_administration_configuration_wizard_message', 'Here you can create database connections manually or using a database server search.\nYou can skip this step and configure the connections later.'],
+  [
+    'connections_administration_configuration_wizard_message',
+    'Here you can create database connections manually or using a database server search.\nYou can skip this step and configure the connections later.',
+  ],
   ['connections_administration_connection_no_information', 'No information available'],
   ['connections_administration_delete_confirmation', "You're going to delete these connections: "],
   ['connections_administration_tools_add_tooltip', 'Add new connection'],
@@ -71,5 +74,8 @@ export default [
   ['connections_driver_search_placeholder', 'Type driver name...'],
   ['connections_not_found', 'No database connections were found'],
 
-  ['cloud_connections_access_placeholder', 'Cloud connections are visible to all users. Access management can be configured in "AWS Management Console".'],
+  [
+    'cloud_connections_access_placeholder',
+    'Cloud connections are visible to all users. Access management can be configured in "AWS Management Console".',
+  ],
 ];

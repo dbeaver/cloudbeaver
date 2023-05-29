@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import React from 'react';
 
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { MenuService, ActionService, DATA_CONTEXT_MENU } from '@cloudbeaver/core-view';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 
 import { DATA_VIEWER_CONSTRAINTS_DELETE_ACTION } from '../../DatabaseDataModel/Actions/ResultSet/Actions/DATA_VIEWER_CONSTRAINTS_DELETE_ACTION';
 import { ResultSetConstraintAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
@@ -38,10 +37,7 @@ export interface ITableHeaderPlaceholderProps {
 export class TableHeaderService extends Bootstrap {
   readonly tableHeaderPlaceholder = new PlaceholderContainer<ITableHeaderPlaceholderProps>();
 
-  constructor(
-    private readonly menuService: MenuService,
-    private readonly actionService: ActionService
-  ) {
+  constructor(private readonly menuService: MenuService, private readonly actionService: ActionService) {
     super();
   }
 
@@ -109,15 +105,10 @@ export class TableHeaderService extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      isApplicable: context => (
-        context.get(DATA_CONTEXT_MENU) === DATA_VIEWER_DATA_MODEL_TOOLS_MENU
-      ),
-      getItems: (context, items) => [
-        ...items,
-        DATA_VIEWER_CONSTRAINTS_DELETE_ACTION,
-      ],
+      isApplicable: context => context.get(DATA_CONTEXT_MENU) === DATA_VIEWER_DATA_MODEL_TOOLS_MENU,
+      getItems: (context, items) => [...items, DATA_VIEWER_CONSTRAINTS_DELETE_ACTION],
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 }

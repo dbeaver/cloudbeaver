@@ -5,15 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import {
-  TableItem, TableColumnValue, TableItemSelect, TableItemExpand
-} from '@cloudbeaver/core-blocks';
+import { TableColumnValue, TableItem, TableItemExpand, TableItemSelect } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-
 
 const styles = css`
   TableColumnValue[expand] {
@@ -40,6 +36,6 @@ export const MetadataParam = observer<Props>(function MetadataParam({ param, sel
       <TableColumnValue expand>{param.id}</TableColumnValue>
       <TableColumnValue>{param.description}</TableColumnValue>
       <TableColumnValue>{}</TableColumnValue>
-    </TableItem>
+    </TableItem>,
   );
 });

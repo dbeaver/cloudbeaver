@@ -5,20 +5,35 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useMemo, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { EventTreeNodeClickFlag, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, FolderExplorer, FolderExplorerPath, Loader, PlaceholderElement, Translate, TreeNodeNested, TreeNodeNestedMessage, TREE_NODE_STYLES, useFolderExplorer, useResource, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import {
+  EventTreeNodeClickFlag,
+  EventTreeNodeExpandFlag,
+  EventTreeNodeSelectFlag,
+  FolderExplorer,
+  FolderExplorerPath,
+  Loader,
+  PlaceholderElement,
+  Translate,
+  TREE_NODE_STYLES,
+  TreeNodeNested,
+  TreeNodeNestedMessage,
+  useFolderExplorer,
+  useObjectRef,
+  useResource,
+  useStyles,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { type NavNode, ROOT_NODE_PATH, NavTreeResource, NavNodeInfoResource, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { EObjectFeature, type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { useNavTreeDropBox } from '../useNavTreeDropBox';
 import { ElementsTreeContentLoader } from './ElementsTreeContentLoader';
-import { IElementsTreeContext, ElementsTreeContext } from './ElementsTreeContext';
+import { ElementsTreeContext, IElementsTreeContext } from './ElementsTreeContext';
 import { elementsTreeNameFilter } from './elementsTreeNameFilter';
 import { ElementsTreeTools } from './ElementsTreeTools/ElementsTreeTools';
 import type { IElementsTreeSettingsProps } from './ElementsTreeTools/NavigationTreeSettings/ElementsTreeSettingsService';
@@ -140,16 +155,12 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
 
   const root = folderExplorer.state.folder;
 
-  const limitFilter = useMemo(() => elementsTreeLimitFilter(
-    navTreeResource,
-    limit
-  ), [navTreeResource, limit]);
+  const limitFilter = useMemo(() => elementsTreeLimitFilter(navTreeResource, limit), [navTreeResource, limit]);
 
-  const nameFilter = useMemo(() => elementsTreeNameFilter(
-    navTreeResource,
-    navNodeInfoResource,
-    navNodeFilterCompare
-  ), [navTreeResource, navNodeInfoResource, navNodeFilterCompare]);
+  const nameFilter = useMemo(
+    () => elementsTreeNameFilter(navTreeResource, navNodeInfoResource, navNodeFilterCompare),
+    [navTreeResource, navNodeInfoResource, navNodeFilterCompare],
+  );
 
   const dndBox = useNavTreeDropBox(navNodeInfoResource.get(root));
   const dropOutside = useDropOutside(dndBox);
@@ -185,34 +196,25 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
       control,
       getTreeRoot: () => treeRootRef.current,
     }),
-    [tree, folderExplorer, selectionTree, control]
+    [tree, folderExplorer, selectionTree, control],
   );
 
-  const getName = useCallback(
-    (folder: string) => navNodeInfoResource.get(folder)?.name || 'Not found',
-    [navNodeInfoResource]
-  );
+  const getName = useCallback((folder: string) => navNodeInfoResource.get(folder)?.name || 'Not found', [navNodeInfoResource]);
 
   const canSkip = useCallback(
     (folder: string) => {
       const features = navNodeInfoResource.get(folder)?.objectFeatures;
       return !(
-        features?.includes(EObjectFeature.schema)
-        || features?.includes(EObjectFeature.catalog)
-        || features?.includes(EObjectFeature.dataSource)
+        features?.includes(EObjectFeature.schema) ||
+        features?.includes(EObjectFeature.catalog) ||
+        features?.includes(EObjectFeature.dataSource)
       );
     },
-    [navNodeInfoResource]
+    [navNodeInfoResource],
   );
 
   function handleClick(event: React.MouseEvent<HTMLDivElement>) {
-    if (EventContext.has(
-      event,
-      EventTreeNodeExpandFlag,
-      EventTreeNodeSelectFlag,
-      EventTreeNodeClickFlag,
-      EventStopPropagationFlag
-    )) {
+    if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventTreeNodeClickFlag, EventStopPropagationFlag)) {
       return;
     }
 
@@ -237,14 +239,12 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
                   })}
                 >
                   <TreeNodeNested root>
-                    <TreeNodeNestedMessage><Translate token='app_navigationTree_drop_here' /></TreeNodeNestedMessage>
+                    <TreeNodeNestedMessage>
+                      <Translate token="app_navigationTree_drop_here" />
+                    </TreeNodeNestedMessage>
                   </TreeNodeNested>
                 </drop-outside>
-                <ElementsTreeContentLoader
-                  context={context}
-                  emptyPlaceholder={emptyPlaceholder}
-                  childrenState={tree}
-                >
+                <ElementsTreeContentLoader context={context} emptyPlaceholder={emptyPlaceholder} childrenState={tree}>
                   <tree-elements>
                     <NavigationNodeNested
                       ref={dropOutside.nestedRef}
@@ -260,6 +260,6 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
           </box>
         </ElementsTreeContext.Provider>
       </tree-box>
-    </>
+    </>,
   );
 });

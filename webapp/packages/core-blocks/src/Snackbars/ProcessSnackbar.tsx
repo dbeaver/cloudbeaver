@@ -5,10 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 
-import { INotificationProcessExtraProps, ENotificationType, NotificationComponent } from '@cloudbeaver/core-events';
+import { ENotificationType, INotificationProcessExtraProps, NotificationComponent } from '@cloudbeaver/core-events';
 
 import { Button } from '../Button';
 import { useTranslate } from '../localization/useTranslate';
@@ -52,17 +51,10 @@ export const ProcessSnackbar: NotificationComponent<Props> = observer(function P
     >
       <SnackbarStatus status={status} />
       <SnackbarContent>
-        <SnackbarBody title={translate(title)}>
-          {message && translate(message)}
-        </SnackbarBody>
+        <SnackbarBody title={translate(title)}>{message && translate(message)}</SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
           {details.hasDetails && (
-            <Button
-              type="button"
-              mod={['outlined']}
-              disabled={details.isOpen}
-              onClick={details.open}
-            >
+            <Button type="button" mod={['outlined']} disabled={details.isOpen} onClick={details.open}>
               {translate('ui_errors_details')}
             </Button>
           )}

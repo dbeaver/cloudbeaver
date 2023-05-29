@@ -26,7 +26,7 @@ const styles = css`
 
   FieldCheckbox {
     margin-bottom: 6px;
-    margin-left: 24px
+    margin-left: 24px;
   }
 `;
 
@@ -48,21 +48,13 @@ export const OutputOptionsForm = observer(function OutputOptionsForm(props: Prop
 
         return styled(styles)(
           <root>
-            <Combobox
-              name="encoding"
-              state={props.outputSettings}
-              items={data.supportedEncodings}
-              searchable
-            >
-                Encoding
+            <Combobox name="encoding" state={props.outputSettings} items={data.supportedEncodings} searchable>
+              Encoding
             </Combobox>
-            <FieldCheckbox
-              name="insertBom"
-              state={props.outputSettings}
-            >
-                Insert BOM
+            <FieldCheckbox name="insertBom" state={props.outputSettings}>
+              Insert BOM
             </FieldCheckbox>
-          </root>
+          </root>,
         );
       }}
     </Loader>

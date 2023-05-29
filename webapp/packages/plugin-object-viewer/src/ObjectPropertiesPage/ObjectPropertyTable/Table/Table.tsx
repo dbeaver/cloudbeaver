@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
@@ -31,25 +30,25 @@ import { TableContext } from './TableContext';
 import { useTableData } from './useTableData';
 
 const style = css`
-    wrapper {
-      composes: theme-typography--body2 from global;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    DataGrid {
-      width: 100%;
-      height: 100%;
-    }
-    data-info {
-      padding: 4px 12px;
-    }
-    ObjectPropertyTableFooter {
-      composes: theme-background-secondary theme-text-on-secondary theme-border-color-background from global;
-      border-top: 1px solid;
-    }
-  `;
+  wrapper {
+    composes: theme-typography--body2 from global;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  DataGrid {
+    width: 100%;
+    height: 100%;
+  }
+  data-info {
+    padding: 4px 12px;
+  }
+  ObjectPropertyTableFooter {
+    composes: theme-background-secondary theme-text-on-secondary theme-border-color-background from global;
+    border-top: 1px solid;
+  }
+`;
 
 interface Props {
   objects: DBObject[];
@@ -85,10 +84,7 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
 
 const CUSTOM_COLUMNS = [ColumnSelect, ColumnIcon];
 
-export const Table = observer<Props>(function Table({
-  objects,
-  truncated,
-}) {
+export const Table = observer<Props>(function Table({ objects, truncated }) {
   const [tableContainer, setTableContainerRef] = useState<HTMLDivElement | null>(null);
   const navTreeResource = useService(NavTreeResource);
   const styles = useStyles(style, baseStyles, tableStyles);
@@ -98,9 +94,7 @@ export const Table = observer<Props>(function Table({
   const scrollBox = (tableContainer?.firstChild as HTMLDivElement | undefined) ?? null;
   useControlledScroll(scrollBox, tabLocalState);
 
-  const baseObject = objects
-    .slice()
-    .sort((a, b) => (b.object?.properties?.length || 0) - (a.object?.properties?.length || 0));
+  const baseObject = objects.slice().sort((a, b) => (b.object?.properties?.length || 0) - (a.object?.properties?.length || 0));
 
   const nodeIds = objects.map(object => object.id);
   const properties = baseObject[0]?.object?.properties ?? [];
@@ -126,21 +120,15 @@ export const Table = observer<Props>(function Table({
 
   return styled(styles)(
     <TableContext.Provider value={{ tableData, tableState }}>
-      <wrapper ref={setTableContainerRef} className='metadata-grid-container'>
-        <DataGrid
-          className='cb-metadata-grid-theme'
-          rows={objects}
-          rowKeyGetter={row => row.id}
-          columns={tableData.columns}
-          rowHeight={40}
-        />
+      <wrapper ref={setTableContainerRef} className="metadata-grid-container">
+        <DataGrid className="cb-metadata-grid-theme" rows={objects} rowKeyGetter={row => row.id} columns={tableData.columns} rowHeight={40} />
         {truncated && (
           <data-info>
-            <Translate token='app_navigationTree_limited' limit={navTreeResource.childrenLimit} />
+            <Translate token="app_navigationTree_limited" limit={navTreeResource.childrenLimit} />
           </data-info>
         )}
         <ObjectPropertyTableFooter nodeIds={nodeIds} tableState={tableState} />
       </wrapper>
-    </TableContext.Provider>
+    </TableContext.Provider>,
   );
 });

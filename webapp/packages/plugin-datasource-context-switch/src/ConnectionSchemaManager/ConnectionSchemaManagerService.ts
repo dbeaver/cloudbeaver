@@ -5,18 +5,44 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 
-import { computed, observable, makeObservable, action, runInAction } from 'mobx';
-
-import { ConnectionInfoResource, ConnectionsManagerService, ObjectContainer, DBDriverResource, isConnectionProvider, IConnectionProvider, isConnectionSetter, IConnectionSetter, IStructContainers, Connection, IConnectionInfoParams, serializeConnectionParam, IObjectCatalogProvider, IObjectCatalogSetter, IObjectSchemaProvider, IObjectSchemaSetter, isObjectCatalogProvider, isObjectCatalogSetter, isObjectSchemaProvider, isObjectSchemaSetter } from '@cloudbeaver/core-connections';
+import {
+  Connection,
+  ConnectionInfoResource,
+  ConnectionsManagerService,
+  DBDriverResource,
+  IConnectionInfoParams,
+  IConnectionProvider,
+  IConnectionSetter,
+  IObjectCatalogProvider,
+  IObjectCatalogSetter,
+  IObjectSchemaProvider,
+  IObjectSchemaSetter,
+  isConnectionProvider,
+  isConnectionSetter,
+  isObjectCatalogProvider,
+  isObjectCatalogSetter,
+  isObjectSchemaProvider,
+  isObjectSchemaSetter,
+  IStructContainers,
+  ObjectContainer,
+  serializeConnectionParam,
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExtensionUtils, IExtension } from '@cloudbeaver/core-extensions';
-import { type IObjectNavNodeProvider, type IDataContextActiveNode, isObjectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
-import { IProjectProvider, IProjectSetter, IProjectSetterState, isProjectProvider, isProjectSetter, isProjectSetterState } from '@cloudbeaver/core-projects';
+import { type IDataContextActiveNode, type IObjectNavNodeProvider, isObjectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
+import {
+  IProjectProvider,
+  IProjectSetter,
+  IProjectSetterState,
+  isProjectProvider,
+  isProjectSetter,
+  isProjectSetterState,
+} from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-
 
 export interface IConnectionInfo {
   name?: string;
@@ -41,7 +67,6 @@ interface IActiveItem<T> {
 @injectable()
 export class ConnectionSchemaManagerService {
   get activeNavNode(): IDataContextActiveNode | null | undefined {
-
     if (!this.activeItem?.getCurrentNavNode) {
       return null;
     }
@@ -50,7 +75,6 @@ export class ConnectionSchemaManagerService {
   }
 
   get activeProjectId(): string | null | undefined {
-
     if (!this.activeItem?.getCurrentProjectId) {
       return null;
     }
@@ -59,7 +83,6 @@ export class ConnectionSchemaManagerService {
   }
 
   get activeConnectionKey(): IConnectionInfoParams | null | undefined {
-
     if (!this.activeItem?.getCurrentConnectionId) {
       return null;
     }
@@ -123,10 +146,7 @@ export class ConnectionSchemaManagerService {
       return;
     }
 
-    return this.connectionsManagerService.getObjectContainerById(
-      this.currentConnectionKey,
-      this.currentObjectCatalogId
-    );
+    return this.connectionsManagerService.getObjectContainerById(this.currentConnectionKey, this.currentObjectCatalogId);
   }
 
   get currentObjectSchema(): ObjectContainer | undefined {
@@ -134,11 +154,7 @@ export class ConnectionSchemaManagerService {
       return;
     }
 
-    return this.connectionsManagerService.getObjectContainerById(
-      this.currentConnectionKey,
-      this.currentObjectCatalogId,
-      this.currentObjectSchemaId
-    );
+    return this.connectionsManagerService.getObjectContainerById(this.currentConnectionKey, this.currentObjectCatalogId, this.currentObjectSchemaId);
   }
 
   get objectContainerList(): IStructContainers | undefined {
@@ -161,17 +177,11 @@ export class ConnectionSchemaManagerService {
   }
 
   get isObjectCatalogChangeable(): boolean {
-    return (
-      !!this.activeItem?.changeCatalogId
-      && !!this.objectContainerList?.supportsCatalogChange
-    );
+    return !!this.activeItem?.changeCatalogId && !!this.objectContainerList?.supportsCatalogChange;
   }
 
   get isObjectSchemaChangeable(): boolean {
-    return (
-      !!this.activeItem?.changeSchemaId
-      && !!this.objectContainerList?.supportsSchemaChange
-    );
+    return !!this.activeItem?.changeSchemaId && !!this.objectContainerList?.supportsSchemaChange;
   }
 
   get isChangingProject(): boolean {
@@ -220,7 +230,7 @@ export class ConnectionSchemaManagerService {
     private readonly connectionInfo: ConnectionInfoResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly dbDriverResource: DBDriverResource,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
   ) {
     this.changingProjectId = false;
     this.changingConnection = false;
@@ -231,16 +241,16 @@ export class ConnectionSchemaManagerService {
     this.pendingSchemaId = null;
 
     makeObservable<
-    ConnectionSchemaManagerService,
-    'activeItem'
-    | 'changingProjectId'
-    | 'changingConnection'
-    | 'changingConnectionContainer'
-    | 'pendingProjectId'
-    | 'pendingConnectionKey'
-    | 'pendingCatalogId'
-    | 'pendingSchemaId'
-    | 'setExtensions'
+      ConnectionSchemaManagerService,
+      | 'activeItem'
+      | 'changingProjectId'
+      | 'changingConnection'
+      | 'changingConnectionContainer'
+      | 'pendingProjectId'
+      | 'pendingConnectionKey'
+      | 'pendingCatalogId'
+      | 'pendingSchemaId'
+      | 'setExtensions'
     >(this, {
       currentObjectCatalog: computed,
       currentObjectSchema: computed,
@@ -326,7 +336,6 @@ export class ConnectionSchemaManagerService {
     }
 
     try {
-
       runInAction(() => {
         this.changingConnectionContainer = true;
         this.pendingCatalogId = catalogId;
@@ -399,7 +408,7 @@ export class ConnectionSchemaManagerService {
     try {
       await this.dbDriverResource.load(CachedMapAllKey);
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Can\'t load database drivers', '', true);
+      this.notificationService.logException(exception, "Can't load database drivers", '', true);
     }
 
     if (!connection.connected) {
@@ -409,27 +418,42 @@ export class ConnectionSchemaManagerService {
     try {
       await this.connectionsManagerService.loadObjectContainer(key, catalogId);
     } catch (exception: any) {
-      this.notificationService.logException(
-        exception,
-        `Can't load objectContainers for ${serializeConnectionParam(key)}@${catalogId}`,
-        '',
-        true
-      );
+      this.notificationService.logException(exception, `Can't load objectContainers for ${serializeConnectionParam(key)}@${catalogId}`, '', true);
     }
   }
 
   private setExtensions<T>(item: IActiveItem<T>, extensions: Array<IExtension<T>>) {
     ExtensionUtils.from(extensions)
-      .on(isObjectNavNodeProvider, extension => { item.getCurrentNavNode = extension; })
-      .on(isProjectSetterState, extension => { item.getProjectSetterState = extension; })
-      .on(isProjectProvider, extension => { item.getCurrentProjectId = extension; })
-      .on(isConnectionProvider, extension => { item.getCurrentConnectionId = extension; })
-      .on(isObjectCatalogProvider, extension => { item.getCurrentCatalogId = extension; })
-      .on(isObjectSchemaProvider, extension => { item.getCurrentSchemaId = extension; })
+      .on(isObjectNavNodeProvider, extension => {
+        item.getCurrentNavNode = extension;
+      })
+      .on(isProjectSetterState, extension => {
+        item.getProjectSetterState = extension;
+      })
+      .on(isProjectProvider, extension => {
+        item.getCurrentProjectId = extension;
+      })
+      .on(isConnectionProvider, extension => {
+        item.getCurrentConnectionId = extension;
+      })
+      .on(isObjectCatalogProvider, extension => {
+        item.getCurrentCatalogId = extension;
+      })
+      .on(isObjectSchemaProvider, extension => {
+        item.getCurrentSchemaId = extension;
+      })
 
-      .on(isProjectSetter, extension => { item.changeProjectId = extension; })
-      .on(isConnectionSetter, extension => { item.changeConnectionId = extension; })
-      .on(isObjectCatalogSetter, extension => { item.changeCatalogId = extension; })
-      .on(isObjectSchemaSetter, extension => { item.changeSchemaId = extension; });
+      .on(isProjectSetter, extension => {
+        item.changeProjectId = extension;
+      })
+      .on(isConnectionSetter, extension => {
+        item.changeConnectionId = extension;
+      })
+      .on(isObjectCatalogSetter, extension => {
+        item.changeCatalogId = extension;
+      })
+      .on(isObjectSchemaSetter, extension => {
+        item.changeSchemaId = extension;
+      });
   }
 }

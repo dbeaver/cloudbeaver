@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { flat, ILoadableState } from '@cloudbeaver/core-utils';
 
@@ -28,9 +27,7 @@ export class MenuService {
   private readonly handlers: Map<string, IMenuHandler<any>>;
   private readonly creators: IMenuItemsCreator[];
 
-  constructor(
-    private readonly actionService: ActionService,
-  ) {
+  constructor(private readonly actionService: ActionService) {
     this.creators = [];
     this.handlers = new Map();
   }
@@ -67,8 +64,8 @@ export class MenuService {
   }
 
   getMenuItemLoaders(context: IDataContextProvider, itemCreators: MenuCreatorItem[]): ILoadableState[] {
-    return flat(itemCreators
-      .map(item => {
+    return flat(
+      itemCreators.map(item => {
         if (isAction(item)) {
           const handler = this.actionService.getHandler(context, item);
 
@@ -76,9 +73,8 @@ export class MenuService {
         }
 
         return null;
-      }))
-      .filter<ILoadableState>((item => item !== null) as ((obj: any) => obj is ILoadableState))
-    ;
+      }),
+    ).filter<ILoadableState>((item => item !== null) as (obj: any) => obj is ILoadableState);
   }
 
   getMenuItemCreators(context: IDataContextProvider): MenuCreatorItem[] {
@@ -99,7 +95,7 @@ export class MenuService {
           }
 
           return true;
-        })
+        }),
     );
   }
 

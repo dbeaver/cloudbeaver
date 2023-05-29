@@ -5,10 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useCallback, useContext, useState } from 'react';
-import styled, { use, css } from 'reshadow';
+import styled, { css, use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
@@ -25,55 +24,57 @@ import { isControlPresented } from './isControlPresented';
 import { useCapsLockTracker } from './useCapsLockTracker';
 
 const INPUT_FIELD_STYLES = css`
-    Icon {
-      composes: theme-text-on-secondary from global;
+  Icon {
+    composes: theme-text-on-secondary from global;
+  }
+  field-label {
+    display: block;
+    composes: theme-typography--body1 from global;
+    font-weight: 500;
+  }
+  field-label:not(:empty) {
+    padding-bottom: 10px;
+  }
+  input-container {
+    position: relative;
+  }
+  loader-container,
+  icon-container {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    display: flex;
+  }
+  icon-container {
+    cursor: pointer;
+    & Icon {
+      width: 100%;
+      height: 100%;
     }
-    field-label {
-      display: block;
-      composes: theme-typography--body1 from global;
-      font-weight: 500;
-    }
-    field-label:not(:empty) {
-      padding-bottom: 10px;
-    }
-    input-container {
-      position: relative;
-    }
-    loader-container, icon-container {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 24px;
-      height: 24px;
-      display: flex;
-    }
-    icon-container {
-      cursor: pointer;
-      & Icon {
-        width: 100%;
-        height: 100%;
-      }
-    }
-    input[disabled] + icon-container {
-      cursor: auto;
-      opacity: 0.8;
-    }
-    input:not(:only-child) {
-      padding-right: 32px !important;
-    }
+  }
+  input[disabled] + icon-container {
+    cursor: auto;
+    opacity: 0.8;
+  }
+  input:not(:only-child) {
+    padding-right: 32px !important;
+  }
 `;
 
-type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'style'> & ILayoutSizeProps & {
-  error?: boolean;
-  loading?: boolean;
-  description?: string;
-  labelTooltip?: string;
-  mod?: 'surface';
-  ref?: React.Ref<HTMLInputElement>;
-  style?: ComponentStyle;
-  onCustomCopy?: () => void;
-};
+type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'style'> &
+  ILayoutSizeProps & {
+    error?: boolean;
+    loading?: boolean;
+    description?: string;
+    labelTooltip?: string;
+    mod?: 'surface';
+    ref?: React.Ref<HTMLInputElement>;
+    style?: ComponentStyle;
+    onCustomCopy?: () => void;
+  };
 
 type ControlledProps = BaseProps & {
   name?: string;
@@ -100,134 +101,128 @@ interface InputFieldType {
   <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactElement<any, any> | null;
 }
 
-export const InputField: InputFieldType = observer(forwardRef(function InputField({
-  name,
-  style,
-  value: valueControlled,
-  defaultValue,
-  required,
-  state,
-  mapState,
-  mapValue,
-  children,
-  className,
-  error,
-  loading,
-  description,
-  labelTooltip,
-  mod,
-  fill,
-  small,
-  medium,
-  large,
-  tiny,
-  autoHide,
-  onChange,
-  onCustomCopy,
-  ...rest
-}: ControlledProps | ObjectProps<any, any>, ref: React.Ref<HTMLInputElement>) {
-  const capsLock = useCapsLockTracker();
-  const [passwordRevealed, setPasswordRevealed] = useState(false);
-  const translate = useTranslate();
-  const styles = useStyles(
-    baseFormControlStyles,
-    error ? baseInvalidFormControlStyles : baseValidFormControlStyles,
-    INPUT_FIELD_STYLES,
-    style
-  );
-  const context = useContext(FormContext);
-  loading = useStateDelay(loading ?? false, 300);
+export const InputField: InputFieldType = observer(
+  forwardRef(function InputField(
+    {
+      name,
+      style,
+      value: valueControlled,
+      defaultValue,
+      required,
+      state,
+      mapState,
+      mapValue,
+      children,
+      className,
+      error,
+      loading,
+      description,
+      labelTooltip,
+      mod,
+      fill,
+      small,
+      medium,
+      large,
+      tiny,
+      autoHide,
+      onChange,
+      onCustomCopy,
+      ...rest
+    }: ControlledProps | ObjectProps<any, any>,
+    ref: React.Ref<HTMLInputElement>,
+  ) {
+    const capsLock = useCapsLockTracker();
+    const [passwordRevealed, setPasswordRevealed] = useState(false);
+    const translate = useTranslate();
+    const styles = useStyles(baseFormControlStyles, error ? baseInvalidFormControlStyles : baseValidFormControlStyles, INPUT_FIELD_STYLES, style);
+    const context = useContext(FormContext);
+    loading = useStateDelay(loading ?? false, 300);
 
-  const revealPassword = useCallback(() => {
-    if (rest.disabled) {
-      return;
+    const revealPassword = useCallback(() => {
+      if (rest.disabled) {
+        return;
+      }
+
+      setPasswordRevealed(prev => !prev);
+    }, [rest.disabled]);
+
+    const handleChange = useCallback(
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = mapValue?.(event.target.value) ?? event.target.value;
+
+        if (state) {
+          state[name] = value;
+        }
+        if (onChange) {
+          onChange(value, name);
+        }
+        if (context) {
+          context.change(value, name);
+        }
+      },
+      [state, name, context, onChange],
+    );
+
+    const handleBlur = useCombinedHandler(rest.onBlur, capsLock.handleBlur);
+    const handleKeyDown = useCombinedHandler(rest.onKeyDown, capsLock.handleKeyDown, context?.keyDown);
+
+    if (autoHide && !isControlPresented(name, state, defaultValue)) {
+      return null;
     }
 
-    setPasswordRevealed(prev => !prev);
-  }, [rest.disabled]);
+    let value: any = valueControlled ?? defaultValue ?? undefined;
 
-  const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = mapValue?.(event.target.value) ?? event.target.value;
-
-    if (state) {
-      state[name] = value;
+    if (state && name !== undefined && name in state) {
+      value = state[name];
     }
-    if (onChange) {
-      onChange(value, name);
+
+    if (mapState) {
+      value = mapState(value);
     }
-    if (context) {
-      context.change(value, name);
+
+    const showRevealPasswordButton = rest.type === 'password' && !rest.readOnly;
+
+    if (showRevealPasswordButton && capsLock.warn) {
+      description = translate('ui_capslock_on');
     }
-  }, [state, name, context, onChange]);
 
-  const handleBlur = useCombinedHandler(rest.onBlur, capsLock.handleBlur);
-  const handleKeyDown = useCombinedHandler(rest.onKeyDown, capsLock.handleKeyDown, context?.keyDown);
-
-  if (autoHide && !isControlPresented(name, state, defaultValue)) {
-    return null;
-  }
-
-  let value: any = valueControlled ?? defaultValue ?? undefined;
-
-  if (state && name !== undefined && name in state) {
-    value = state[name];
-  }
-
-  if (mapState) {
-    value = mapState(value);
-  }
-
-  const showRevealPasswordButton = rest.type === 'password' && !rest.readOnly;
-
-  if (showRevealPasswordButton && capsLock.warn) {
-    description = translate('ui_capslock_on');
-  }
-
-  return styled(styles)(
-    <field className={className} {...use({ small, medium, large, tiny })}>
-      <field-label title={labelTooltip || rest.title}>{children}{required && ' *'}</field-label>
-      <input-container>
-        <input
-          ref={ref}
-          {...rest}
-          type={passwordRevealed ? 'text' : rest.type}
-          name={name}
-          value={value ?? ''}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          {...use({ mod })}
-          required={required}
-        />
-        {loading && (
-          <loader-container
-            title={translate('ui_processing_loading')}
-          >
-            <Loader small />
-          </loader-container>
-        )}
-        {showRevealPasswordButton && (
-          <icon-container
-            title={translate('ui_reveal_password')}
-            onClick={revealPassword}
-          >
-            <Icon
-              name={passwordRevealed ? 'password-hide' : 'password-show'}
-              viewBox='0 0 16 16'
-            />
-          </icon-container>
-        )}
-        {onCustomCopy && (
-          <icon-container title={translate('ui_copy_to_clipboard')} onClick={onCustomCopy}>
-            <Icon name="copy" viewBox='0 0 32 32' />
-          </icon-container>
-        )}
-      </input-container>
-      {(description || showRevealPasswordButton) && (
-        <field-description>
-          {description}
-        </field-description>
-      )}
-    </field>
-  );
-}));
+    return styled(styles)(
+      <field className={className} {...use({ small, medium, large, tiny })}>
+        <field-label title={labelTooltip || rest.title}>
+          {children}
+          {required && ' *'}
+        </field-label>
+        <input-container>
+          <input
+            ref={ref}
+            {...rest}
+            type={passwordRevealed ? 'text' : rest.type}
+            name={name}
+            value={value ?? ''}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            {...use({ mod })}
+            required={required}
+          />
+          {loading && (
+            <loader-container title={translate('ui_processing_loading')}>
+              <Loader small />
+            </loader-container>
+          )}
+          {showRevealPasswordButton && (
+            <icon-container title={translate('ui_reveal_password')} onClick={revealPassword}>
+              <Icon name={passwordRevealed ? 'password-hide' : 'password-show'} viewBox="0 0 16 16" />
+            </icon-container>
+          )}
+          {onCustomCopy && (
+            <icon-container title={translate('ui_copy_to_clipboard')} onClick={onCustomCopy}>
+              <Icon name="copy" viewBox="0 0 32 32" />
+            </icon-container>
+          )}
+        </input-container>
+        {(description || showRevealPasswordButton) && <field-description>{description}</field-description>}
+      </field>,
+    );
+  }),
+);

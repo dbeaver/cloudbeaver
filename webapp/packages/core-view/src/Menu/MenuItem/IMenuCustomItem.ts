@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { IMenuItem } from './IMenuItem';
@@ -25,13 +24,11 @@ export interface ICustomMenuItemProps<TExtraProps = unknown> {
   className?: string;
 }
 
-export interface IMenuCustomItemOptions<TExtraProps = unknown>
-  extends IMenuCustomItemCommonProperties<TExtraProps> {
+export interface IMenuCustomItemOptions<TExtraProps = unknown> extends IMenuCustomItemCommonProperties<TExtraProps> {
   id: string;
   getComponent: () => ICustomMenuItemComponent<TExtraProps>;
 }
 
-export interface IMenuCustomItem<TExtraProps = unknown>
-  extends IMenuItem, IMenuCustomItemCommonProperties<TExtraProps> {
+export interface IMenuCustomItem<TExtraProps = unknown> extends IMenuItem, IMenuCustomItemCommonProperties<TExtraProps> {
   getComponent?: () => ICustomMenuItemComponent<TExtraProps>;
 }

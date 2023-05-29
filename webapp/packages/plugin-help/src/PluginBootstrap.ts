@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { AppScreenService } from '@cloudbeaver/core-app';
 import { ActionSnackbar } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -34,7 +33,7 @@ export class PluginBootstrap extends Bootstrap {
     this.errorNotification = null;
   }
 
-  async load(): Promise<void> { }
+  async load(): Promise<void> {}
 
   register(): void {
     this.addTopAppMenuItems();
@@ -46,24 +45,25 @@ export class PluginBootstrap extends Bootstrap {
       if (this.errorNotification) {
         return;
       }
-      if (
-        this.screenService.isActive(AppScreenService.screenName)
-        && this.localStorageSaveService.storage === 'session'
-      ) {
-        this.errorNotification = this.notificationService.customNotification(() => ActionSnackbar, {
-          actionText: 'plugin_help_multi_tab_support_load_settings',
-          onAction: () => {
-            this.localStorageSaveService.updateStorage('local');
-            this.errorNotification?.close(false);
+      if (this.screenService.isActive(AppScreenService.screenName) && this.localStorageSaveService.storage === 'session') {
+        this.errorNotification = this.notificationService.customNotification(
+          () => ActionSnackbar,
+          {
+            actionText: 'plugin_help_multi_tab_support_load_settings',
+            onAction: () => {
+              this.localStorageSaveService.updateStorage('local');
+              this.errorNotification?.close(false);
+            },
           },
-        }, {
-          type: ENotificationType.Error,
-          title: 'plugin_help_multi_tab_support_title',
-          message: 'plugin_help_multi_tab_support_description',
-          onClose: () => {
-            this.errorNotification = null;
+          {
+            type: ENotificationType.Error,
+            title: 'plugin_help_multi_tab_support_title',
+            message: 'plugin_help_multi_tab_support_description',
+            onClose: () => {
+              this.errorNotification = null;
+            },
           },
-        });
+        );
       }
     };
     this.localStorageSaveService.onStorageChange.addHandler(displayErrorMessage);
@@ -74,10 +74,7 @@ export class PluginBootstrap extends Bootstrap {
   private addTopAppMenuItems() {
     this.menuService.addCreator({
       menus: [MENU_APP_STATE],
-      getItems: (context, items) => [
-        ...items,
-        ACTION_APP_HELP,
-      ],
+      getItems: (context, items) => [...items, ACTION_APP_HELP],
       orderItems: (context, items) => {
         const extracted = menuExtractItems(items, [ACTION_APP_HELP]);
 
@@ -89,9 +86,7 @@ export class PluginBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'app-help',
-      isActionApplicable: (context, action) => [
-        ACTION_APP_HELP,
-      ].includes(action),
+      isActionApplicable: (context, action) => [ACTION_APP_HELP].includes(action),
       handler: async (context, action) => {
         switch (action) {
           case ACTION_APP_HELP: {

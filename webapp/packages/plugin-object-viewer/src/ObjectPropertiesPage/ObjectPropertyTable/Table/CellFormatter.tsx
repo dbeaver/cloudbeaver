@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
@@ -13,7 +12,7 @@ import styled, { css, use } from 'reshadow';
 import { getComputed, Icon, useMouse, useStateDelay } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { type NavNode, NavNodeManagerService, DATA_CONTEXT_NAV_NODE, type DBObject } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, type DBObject, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
@@ -72,29 +71,31 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
 
   const mouseEnter = useStateDelay(mouse.state.mouseEnter, 33); // track mouse update only 30 times per second
 
-  const menuEmpty = !menuOpened && getComputed(() => {
-    if (!mouseEnter) {
-      return true;
-    }
+  const menuEmpty =
+    !menuOpened &&
+    getComputed(() => {
+      if (!mouseEnter) {
+        return true;
+      }
 
-    return !menu.available;
-  });
+      return !menu.available;
+    });
 
   return styled(menuStyles)(
-    <menu-container
-      ref={mouse.reference}
-      onDoubleClick={openNode}
-      {...use({ menuEmpty, menuOpened })}
-    >
+    <menu-container ref={mouse.reference} onDoubleClick={openNode} {...use({ menuEmpty, menuOpened })}>
       <menu-box>
-        <value className='cell-formatter__value' title={value}>{value}</value>
+        <value className="cell-formatter__value" title={value}>
+          {value}
+        </value>
         {!menuEmpty && (
           <ContextMenu menu={menu} modal disclosure onVisibleSwitch={switchState}>
-            <menu-icon><Icon name="snack" viewBox="0 0 16 10" /></menu-icon>
+            <menu-icon>
+              <Icon name="snack" viewBox="0 0 16 10" />
+            </menu-icon>
           </ContextMenu>
         )}
       </menu-box>
-    </menu-container>
+    </menu-container>,
   );
 });
 
@@ -112,8 +113,8 @@ export const CellFormatter = observer<FormatterProps<DBObject>>(function CellFor
   const value = property ? getValue(property.value) : '';
 
   return (
-    <div className='cell-formatter' title={value}>
-      {columnIdx === 0 && !!node ? <Menu node={node} value={value} /> : <span className='cell-formatter__value'>{value}</span>}
+    <div className="cell-formatter" title={value}>
+      {columnIdx === 0 && !!node ? <Menu node={node} value={value} /> : <span className="cell-formatter__value">{value}</span>}
     </div>
   );
 });

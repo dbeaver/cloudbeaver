@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IAction } from '../Action/IAction';
 import type { DataContextGetter } from '../DataContext/DataContextGetter';
 import type { IDataContextProvider } from '../DataContext/IDataContextProvider';
@@ -18,12 +17,6 @@ export interface IMenuItemsCreator {
   menus?: IMenu[];
   contexts?: DataContextGetter<any>[];
   isApplicable?: (context: IDataContextProvider) => boolean;
-  getItems: (
-    context: IDataContextProvider,
-    items: MenuCreatorItem[]
-  ) => MenuCreatorItem[];
-  orderItems?: (
-    context: IDataContextProvider,
-    items: MenuCreatorItem[]
-  ) => MenuCreatorItem[];
+  getItems: (context: IDataContextProvider, items: MenuCreatorItem[]) => MenuCreatorItem[];
+  orderItems?: (context: IDataContextProvider, items: MenuCreatorItem[]) => MenuCreatorItem[];
 }

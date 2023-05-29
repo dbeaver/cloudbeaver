@@ -5,13 +5,22 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SyncExecutor, ISyncExecutor, ITask, AutoRunningTask, whileTask } from '@cloudbeaver/core-executor';
+import { AutoRunningTask, ISyncExecutor, ITask, SyncExecutor, whileTask } from '@cloudbeaver/core-executor';
 import { SessionDataResource, SessionResource } from '@cloudbeaver/core-root';
-import { AuthInfo, AuthStatus, CachedDataResource, GetActiveUserQueryVariables, GraphQLService, ResourceKeySimple, ResourceKeyUtils, UserAuthToken, UserInfo } from '@cloudbeaver/core-sdk';
+import {
+  AuthInfo,
+  AuthStatus,
+  CachedDataResource,
+  GetActiveUserQueryVariables,
+  GraphQLService,
+  ResourceKeySimple,
+  ResourceKeyUtils,
+  UserAuthToken,
+  UserInfo,
+} from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthProviderService } from './AuthProviderService';
@@ -27,11 +36,7 @@ export interface ILoginOptions {
 }
 
 @injectable()
-export class UserInfoResource extends CachedDataResource<
-UserInfo | null,
-void,
-UserInfoIncludes
-> {
+export class UserInfoResource extends CachedDataResource<UserInfo | null, void, UserInfoIncludes> {
   readonly onUserChange: ISyncExecutor<string>;
 
   get authRole(): ELMRole | undefined {
@@ -46,13 +51,17 @@ UserInfoIncludes
     private readonly graphQLService: GraphQLService,
     private readonly authProviderService: AuthProviderService,
     private readonly sessionResource: SessionResource,
-    private readonly sessionDataResource: SessionDataResource
+    private readonly sessionDataResource: SessionDataResource,
   ) {
     super(() => null, undefined, ['customIncludeOriginDetails', 'includeConfigurationParameters']);
 
     this.onUserChange = new SyncExecutor();
 
-    this.sync(sessionResource, () => {}, () => {});
+    this.sync(
+      sessionResource,
+      () => {},
+      () => {},
+    );
 
     makeObservable(this, {
       parametersAvailable: computed,
@@ -77,15 +86,10 @@ UserInfoIncludes
     }
 
     // TODO: will be changed due wrong origin in authTokens
-    return (
-      this.data.authTokens.some(token => token.authProvider === providerId)
-    );
+    return this.data.authTokens.some(token => token.authProvider === providerId);
   }
 
-  async login(
-    provider: string,
-    { credentials, configurationId, linkUser }: ILoginOptions
-  ): Promise<AuthInfo> {
+  async login(provider: string, { credentials, configurationId, linkUser }: ILoginOptions): Promise<AuthInfo> {
     let processedCredentials: Record<string, any> | undefined;
 
     if (credentials) {
@@ -106,7 +110,7 @@ UserInfoIncludes
         this.resetIncludes();
         this.markOutdated();
       } else {
-        this.data.authTokens.push(...authInfo.userTokens as UserAuthToken[]);
+        this.data.authTokens.push(...(authInfo.userTokens as UserAuthToken[]));
       }
 
       this.sessionDataResource.markOutdated();
@@ -118,49 +122,49 @@ UserInfoIncludes
   finishFederatedAuthentication(authId: string, linkUser?: boolean): ITask<UserInfo | null> {
     let activeTask: ITask<AuthInfo> | undefined;
 
-    return new AutoRunningTask<UserInfo | null>(() => this.performUpdate(
-      undefined,
-      [],
-      async () => {
-        activeTask = whileTask<AuthInfo>(
-          authInfo => {
-            if (authInfo.authStatus === AuthStatus.Success) {
-              return true;
-            } else if (authInfo.authStatus === AuthStatus.Error) {
-              throw new Error('Authentication error');
+    return new AutoRunningTask<UserInfo | null>(
+      () =>
+        this.performUpdate(undefined, [], async () => {
+          activeTask = whileTask<AuthInfo>(
+            authInfo => {
+              if (authInfo.authStatus === AuthStatus.Success) {
+                return true;
+              } else if (authInfo.authStatus === AuthStatus.Error) {
+                throw new Error('Authentication error');
+              }
+
+              return false;
+            },
+            async () => {
+              const { authInfo } = await this.graphQLService.sdk.getAuthStatus({
+                authId,
+                linkUser,
+                customIncludeOriginDetails: true,
+              });
+              return authInfo as AuthInfo;
+            },
+            1000,
+          );
+
+          const authInfo = await activeTask;
+
+          if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
+            if (this.data === null) {
+              this.resetIncludes();
+              this.setData(await this.loader());
+            } else {
+              this.data.authTokens.push(...(authInfo.userTokens as UserAuthToken[]));
             }
 
-            return false;
-          },
-          async () => {
-            const { authInfo } = await this.graphQLService.sdk.getAuthStatus({
-              authId,
-              linkUser,
-              customIncludeOriginDetails: true,
-            });
-            return authInfo as AuthInfo;
-          },
-          1000
-        );
-
-        const authInfo = await activeTask;
-
-        if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
-          if (this.data === null) {
-            this.resetIncludes();
-            this.setData(await this.loader());
-          } else {
-            this.data.authTokens.push(...authInfo.userTokens as UserAuthToken[]);
+            this.sessionDataResource.markOutdated();
           }
 
-          this.sessionDataResource.markOutdated();
-        }
-
-        return this.data;
-      }
-    ), () => {
-      activeTask?.cancel();
-    });
+          return this.data;
+        }),
+      () => {
+        activeTask?.cancel();
+      },
+    );
   }
 
   async logout(provider?: string, configuration?: string): Promise<void> {
@@ -230,10 +234,7 @@ UserInfoIncludes
     return this.data?.configurationParameters[key];
   }
 
-  protected async loader(
-    key: void,
-    includes?: ReadonlyArray<string>,
-  ): Promise<UserInfo | null> {
+  protected async loader(key: void, includes?: ReadonlyArray<string>): Promise<UserInfo | null> {
     const { user } = await this.graphQLService.sdk.getActiveUser({
       ...this.getDefaultIncludes(),
       ...this.getIncludesMap(key, includes),

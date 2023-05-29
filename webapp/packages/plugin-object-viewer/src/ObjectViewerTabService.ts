@@ -5,17 +5,32 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable, runInAction } from 'mobx';
 
-import { connectionProvider, ConnectionInfoResource, Connection, createConnectionParam, IConnectionInfoParams, ConnectionNavNodeService, objectCatalogProvider, objectSchemaProvider, ConnectionInfoActiveProjectKey } from '@cloudbeaver/core-connections';
+import {
+  Connection,
+  ConnectionInfoActiveProjectKey,
+  ConnectionInfoResource,
+  ConnectionNavNodeService,
+  connectionProvider,
+  createConnectionParam,
+  IConnectionInfoParams,
+  objectCatalogProvider,
+  objectSchemaProvider,
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, objectNavNodeProvider, type INodeNavigationData, NodeManagerUtils, NavigationType } from '@cloudbeaver/core-navigation-tree';
+import {
+  type INodeNavigationData,
+  NavigationType,
+  NavNodeManagerService,
+  NodeManagerUtils,
+  objectNavNodeProvider,
+} from '@cloudbeaver/core-navigation-tree';
 import { projectProvider } from '@cloudbeaver/core-projects';
 import { ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { NavigationTabsService, ITab, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
+import { ITab, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabContext } from './IObjectViewerTabContext';
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
@@ -37,8 +52,7 @@ export class ObjectViewerTabService {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionNavNodeService: ConnectionNavNodeService,
   ) {
-    this.tabHandler = this.navigationTabsService
-      .registerTabHandler<IObjectViewerTabState>({
+    this.tabHandler = this.navigationTabsService.registerTabHandler<IObjectViewerTabState>({
       key: objectViewerTabHandlerKey,
       getTabComponent: () => ObjectViewerTab,
       getPanelComponent: () => ObjectViewerPanel,
@@ -75,18 +89,13 @@ export class ObjectViewerTabService {
     return tab.handlerState.pageId === page.key;
   }
 
-  objectViewerTabContext: IAsyncContextLoader<IObjectViewerTabContext, INodeNavigationData> = async (
-    contexts,
-    data
-  ) => {
+  objectViewerTabContext: IAsyncContextLoader<IObjectViewerTabContext, INodeNavigationData> = async (contexts, data) => {
     const tabInfo = contexts.getContext(this.navigationTabsService.navigationTabContext);
     const nodeInfo = contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
     const connection = await contexts.getContext(this.connectionNavNodeService.navigationNavNodeConnectionContext);
 
     // check if tab already exist for object
-    const tab = this.navigationTabsService.findTab(
-      isObjectViewerTab(tab => tab.handlerState.objectId === nodeInfo.nodeId)
-    );
+    const tab = this.navigationTabsService.findTab(isObjectViewerTab(tab => tab.handlerState.objectId === nodeInfo.nodeId));
 
     if (tab) {
       tab.handlerState.tabIcon = nodeInfo.icon;
@@ -143,9 +152,7 @@ export class ObjectViewerTabService {
       page: getPage(),
     };
 
-    const canSwitchPage = (
-      page: ObjectPage<any>
-    ) => !tabToSwitch.page || this.dbObjectPageService.canSwitchPage(tabToSwitch.page, page);
+    const canSwitchPage = (page: ObjectPage<any>) => !tabToSwitch.page || this.dbObjectPageService.canSwitchPage(tabToSwitch.page, page);
 
     const trySwitchPage = <T>(page: ObjectPage<T>, state?: T) => {
       if (!tabToSwitch.page || this.dbObjectPageService.canSwitchPage(tabToSwitch.page, page)) {
@@ -164,11 +171,7 @@ export class ObjectViewerTabService {
         return false;
       }
 
-      return this.dbObjectPageService.trySwitchPage(
-        tabInfo.tab,
-        page || tabToSwitch.page!,
-        state || tabToSwitch.state
-      );
+      return this.dbObjectPageService.trySwitchPage(tabInfo.tab, page || tabToSwitch.page!, state || tabToSwitch.state);
     };
 
     const isPageActive = (page: ObjectPage) => page === getPage();
@@ -197,16 +200,11 @@ export class ObjectViewerTabService {
   private closeConnectionTabs(key: ResourceKeySimple<IConnectionInfoParams>) {
     const tabs = Array.from(
       this.navigationTabsService.findTabs(
-        isObjectViewerTab(tab => (
-          tab.handlerState.connectionKey !== undefined
-          && this.connectionInfoResource.isIntersect(
-            key,
-            tab.handlerState.connectionKey
-          )
-        ))
-      )
-    )
-      .map(tab => tab.id);
+        isObjectViewerTab(
+          tab => tab.handlerState.connectionKey !== undefined && this.connectionInfoResource.isIntersect(key, tab.handlerState.connectionKey),
+        ),
+      ),
+    ).map(tab => tab.id);
 
     this.navigationTabsService.closeTabSilent(resourceKeyList(tabs), true);
   }
@@ -214,14 +212,12 @@ export class ObjectViewerTabService {
   private updateConnectionTabs(key: ResourceKeySimple<IConnectionInfoParams>) {
     ResourceKeyUtils.forEach(key, key => {
       const tab = this.navigationTabsService.findTab(
-        isObjectViewerTab(tab =>
-          tab.id === this.navigationTabsService.currentTabId
-          && tab.handlerState.connectionKey !== undefined
-          && this.connectionInfoResource.isKeyEqual(
-            tab.handlerState.connectionKey,
-            key
-          )
-        )
+        isObjectViewerTab(
+          tab =>
+            tab.id === this.navigationTabsService.currentTabId &&
+            tab.handlerState.connectionKey !== undefined &&
+            this.connectionInfoResource.isKeyEqual(tab.handlerState.connectionKey, key),
+        ),
       );
 
       if (tab) {
@@ -232,12 +228,14 @@ export class ObjectViewerTabService {
 
   private closeConnectionInfoTabs(connection: Connection) {
     if (!connection.connected) {
-      const tabs = Array.from(this.navigationTabsService.findTabs(
-        isObjectViewerTab(tab => (
-          tab.handlerState.connectionKey?.projectId === connection.projectId
-          && tab.handlerState.connectionKey.connectionId === connection.id
-        ))
-      )).map(tab => tab.id);
+      const tabs = Array.from(
+        this.navigationTabsService.findTabs(
+          isObjectViewerTab(
+            tab =>
+              tab.handlerState.connectionKey?.projectId === connection.projectId && tab.handlerState.connectionKey.connectionId === connection.id,
+          ),
+        ),
+      ).map(tab => tab.id);
 
       this.navigationTabsService.closeTabSilent(resourceKeyList(tabs), true);
     }
@@ -249,9 +247,7 @@ export class ObjectViewerTabService {
     await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
 
     ResourceKeyUtils.forEach(key, key => {
-      const tab = this.navigationTabsService.findTab(
-        isObjectViewerTab(tab => tab.handlerState.objectId === key)
-      );
+      const tab = this.navigationTabsService.findTab(isObjectViewerTab(tab => tab.handlerState.objectId === key));
 
       if (tab) {
         if (tab.handlerState.connectionKey) {
@@ -293,8 +289,7 @@ export class ObjectViewerTabService {
   }
 
   private getDBObjectCatalog(context: ITab<IObjectViewerTabState>) {
-    const nodeInfo = this.navNodeManagerService
-      .getNodeContainerInfo(context.handlerState.objectId);
+    const nodeInfo = this.navNodeManagerService.getNodeContainerInfo(context.handlerState.objectId);
 
     if (!nodeInfo.catalogId) {
       return;
@@ -303,8 +298,7 @@ export class ObjectViewerTabService {
   }
 
   private getDBObjectSchema(context: ITab<IObjectViewerTabState>) {
-    const nodeInfo = this.navNodeManagerService
-      .getNodeContainerInfo(context.handlerState.objectId);
+    const nodeInfo = this.navNodeManagerService.getNodeContainerInfo(context.handlerState.objectId);
 
     if (!nodeInfo.schemaId) {
       return;
@@ -335,17 +329,17 @@ export class ObjectViewerTabService {
 
   private async restoreObjectTab(tab: ITab<IObjectViewerTabState>) {
     if (
-      typeof tab.handlerState.folderId === 'string'
-      && ['string', 'undefined'].includes(typeof tab.handlerState.parentId)
-      && ['object', 'undefined'].includes(typeof tab.handlerState.connectionKey)
-      && ['string', 'undefined'].includes(typeof tab.handlerState.projectId)
-      && Array.isArray(tab.handlerState.parents)
-      && typeof tab.handlerState.objectId === 'string'
-      && typeof tab.handlerState.pagesState === 'object'
-      && typeof tab.handlerState.error === 'boolean'
-      && typeof tab.handlerState.childrenError === 'boolean'
-      && (!tab.handlerState.tabIcon || typeof tab.handlerState.tabIcon === 'string')
-      && (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
+      typeof tab.handlerState.folderId === 'string' &&
+      ['string', 'undefined'].includes(typeof tab.handlerState.parentId) &&
+      ['object', 'undefined'].includes(typeof tab.handlerState.connectionKey) &&
+      ['string', 'undefined'].includes(typeof tab.handlerState.projectId) &&
+      Array.isArray(tab.handlerState.parents) &&
+      typeof tab.handlerState.objectId === 'string' &&
+      typeof tab.handlerState.pagesState === 'object' &&
+      typeof tab.handlerState.error === 'boolean' &&
+      typeof tab.handlerState.childrenError === 'boolean' &&
+      (!tab.handlerState.tabIcon || typeof tab.handlerState.tabIcon === 'string') &&
+      (!tab.handlerState.tabTitle || typeof tab.handlerState.tabTitle === 'string')
     ) {
       if (tab.handlerState.connectionKey) {
         await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
@@ -389,9 +383,9 @@ export class ObjectViewerTabService {
       if (tab) {
         runInAction(() => {
           if (
-            !tab.handlerState.folderId
-            || (data.folderId && tab.handlerState.folderId !== data.folderId)
-            || (tab.handlerState.folderId !== nodeInfo.folderId)
+            !tab.handlerState.folderId ||
+            (data.folderId && tab.handlerState.folderId !== data.folderId) ||
+            tab.handlerState.folderId !== nodeInfo.folderId
           ) {
             tab.handlerState.childrenError = false;
             tab.handlerState.folderId = data.folderId || nodeInfo.folderId;
@@ -404,10 +398,7 @@ export class ObjectViewerTabService {
     }
   }
 
-  private async navigationPostHandler(
-    data: INodeNavigationData,
-    contexts: IExecutionContextProvider<INodeNavigationData>
-  ) {
+  private async navigationPostHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
     if (data.type !== NavigationType.open) {
       return;
     }
@@ -426,11 +417,9 @@ export class ObjectViewerTabService {
 }
 
 export function isObjectViewerTab(tab: ITab): tab is ITab<IObjectViewerTabState>;
+export function isObjectViewerTab(predicate: (tab: ITab<IObjectViewerTabState>) => boolean): (tab: ITab) => tab is ITab<IObjectViewerTabState>;
 export function isObjectViewerTab(
-  predicate: (tab: ITab<IObjectViewerTabState>) => boolean
-): (tab: ITab) => tab is ITab<IObjectViewerTabState>;
-export function isObjectViewerTab(
-  tab: ITab | ((tab: ITab<IObjectViewerTabState>) => boolean)
+  tab: ITab | ((tab: ITab<IObjectViewerTabState>) => boolean),
 ): boolean | ((tab: ITab) => tab is ITab<IObjectViewerTabState>) {
   if (typeof tab === 'function') {
     const predicate = tab;

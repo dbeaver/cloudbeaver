@@ -1,0 +1,77 @@
+{
+  "version": "2.0.0",
+  "problemMatcher": [],
+  "presentation": {
+    "clear": true
+  },
+  "options": {
+    "env": {
+      "cwd": "${workspaceFolder}/webapp",
+      "NODE_OPTIONS": "--max-old-space-size=8192"
+    }
+  },
+  "tasks": [
+    {
+      "label": "Run Tests",
+      "type": "shell",
+      "command": "yarn",
+      "group": "test",
+      "args": ["lerna", "run", "test", "--no-bail", "--stream", "--"]
+    },
+    {
+      "label": "Run DevServer CE",
+      "type": "shell",
+      "command": "yarn",
+      "args": [
+        "dev",
+        "--",
+        "--env",
+        "server=${input:stage.ce}",
+        "--host",
+        "0.0.0.0"
+      ],
+      "isBackground": true,
+      "options": {
+        "cwd": "${workspaceFolder}/webapp/packages/product-default"
+      }
+    },
+    {
+      "label": "Build CE",
+      "type": "shell",
+      "command": "./build-sqlite.bat",
+      "options": {
+        "cwd": "${workspaceFolder}/deploy"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Yarn Install",
+      "type": "shell",
+      "command": "yarn",
+      "args": []
+    },
+    {
+      "label": "Lerna Bootstrap",
+      "type": "shell",
+      "command": "yarn",
+      "args": ["lerna", "bootstrap"]
+    },
+    {
+      "label": "Bootstrap",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Yarn Install", "Lerna Bootstrap"]
+    }
+  ],
+  "inputs": [
+    {
+      "type": "pickString",
+      "id": "stage.ce",
+      "description": "CE Stage servers",
+      "default": "http://127.0.0.1:8978/",
+      "options": ["http://127.0.0.1:8978/"]
+    }
+  ]
+}

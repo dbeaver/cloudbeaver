@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
@@ -30,12 +29,7 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
   }
 
   get features(): ESqlDataSourceFeatures[] {
-    return [
-      ESqlDataSourceFeatures.script,
-      ESqlDataSourceFeatures.query,
-      ESqlDataSourceFeatures.executable,
-      ESqlDataSourceFeatures.setName,
-    ];
+    return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable, ESqlDataSourceFeatures.setName];
   }
 
   private state!: ILocalStorageSqlDataSourceState;

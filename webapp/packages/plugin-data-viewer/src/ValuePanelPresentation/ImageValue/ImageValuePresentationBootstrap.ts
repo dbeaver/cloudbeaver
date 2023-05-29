@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
@@ -47,10 +46,7 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
 
           const cellValue = view.getCellValue(firstSelectedCell);
 
-          return !(
-            this.isImageUrl(cellValue)
-            || (isResultSetContentValue(cellValue) && this.isImage(cellValue))
-          );
+          return !(this.isImageUrl(cellValue) || (isResultSetContentValue(cellValue) && this.isImage(cellValue)));
         }
 
         return true;
@@ -58,7 +54,7 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
     });
   }
 
-  load(): void { }
+  load(): void {}
 
   private isImage(value: IResultSetContentValue | null) {
     if (value !== null && 'binary' in value) {

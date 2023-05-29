@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled, { css } from 'reshadow';
@@ -35,13 +34,7 @@ interface Props {
   className?: string;
 }
 
-export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
-  leaf,
-  big,
-  filterActive,
-  disabled,
-  className,
-}) {
+export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, big, filterActive, disabled, className }) {
   const context = useContext(TreeNodeContext);
 
   if (!context) {
@@ -51,7 +44,10 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
   const showInFilter = context.showInFilter;
   disabled = getComputed(() => context.externalExpanded || context.disabled) || disabled;
   leaf = context.leaf || leaf;
-  const loading = useStateDelay(getComputed(() => context.loading || context.processing), 300);
+  const loading = useStateDelay(
+    getComputed(() => context.loading || context.processing),
+    300,
+  );
   const expandable = getComputed(() => !loading && (!leaf || context.externalExpanded));
 
   async function handleExpand(event: React.MouseEvent<HTMLDivElement>) {
@@ -98,6 +94,6 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
     <arrow className={className} onClick={handleExpand} onDoubleClick={handleDbClick}>
       {loading && <Loader small fullSize />}
       {expandable && <Icon name={iconName} viewBox={viewBox} />}
-    </arrow>
+    </arrow>,
   );
 });

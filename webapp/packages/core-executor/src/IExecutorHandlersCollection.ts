@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IAsyncContextLoader, IContextLoader, IExecutionContextProvider, ISyncContextLoader } from './IExecutionContext';
 import type { IExecutorHandler } from './IExecutorHandler';
 
@@ -29,14 +28,8 @@ export interface IExecutorHandlersCollection<T = unknown, TResult = any | Promis
 
   setInitialDataGetter(getter: () => T): this;
 
-  addContextCreator<TContext>(
-    context: ISyncContextLoader<TContext, T>,
-    creator: ISyncContextLoader<TContext, T>
-  ): this;
-  addContextCreator<TContext>(
-    context: IAsyncContextLoader<TContext, T>,
-    creator: IAsyncContextLoader<TContext, T>
-  ): this;
+  addContextCreator<TContext>(context: ISyncContextLoader<TContext, T>, creator: ISyncContextLoader<TContext, T>): this;
+  addContextCreator<TContext>(context: IAsyncContextLoader<TContext, T>, creator: IAsyncContextLoader<TContext, T>): this;
 
   before: <TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>) => this;
   next: <TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>) => this;
@@ -48,7 +41,5 @@ export interface IExecutorHandlersCollection<T = unknown, TResult = any | Promis
   removePostHandler: (handler: IExecutorHandler<T, TResult>) => void;
 
   for: (link: IExecutorHandlersCollection<any, TResult>) => IExecutorHandlersCollection<T, TResult>;
-  getLinkHandlers: (
-    link: IExecutorHandlersCollection<any, TResult>
-  ) => IExecutorHandlersCollection<T, TResult> | undefined;
+  getLinkHandlers: (link: IExecutorHandlersCollection<any, TResult>) => IExecutorHandlersCollection<T, TResult> | undefined;
 }

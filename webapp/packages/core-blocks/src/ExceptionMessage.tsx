@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
@@ -116,7 +115,15 @@ interface Props {
 }
 
 export const ExceptionMessage = observer<Props>(function ExceptionMessage({
-  name, message, exception = null, icon, inline, className, styles, onRetry, onClose,
+  name,
+  message,
+  exception = null,
+  icon,
+  inline,
+  className,
+  styles,
+  onRetry,
+  onClose,
 }) {
   const translate = useTranslate();
   const error = useErrorDetails(exception);
@@ -146,12 +153,12 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({
             <error-message>{message}</error-message>
             <error-actions>
               {error.hasDetails && (
-                <Button type='button' mod={['outlined']} disabled={error.isOpen} onClick={error.open}>
+                <Button type="button" mod={['outlined']} disabled={error.isOpen} onClick={error.open}>
                   {translate('ui_errors_details')}
                 </Button>
               )}
               {onRetry && (
-                <Button type='button' mod={['unelevated']} onClick={onRetry}>
+                <Button type="button" mod={['unelevated']} onClick={onRetry}>
                   {translate('ui_processing_retry')}
                 </Button>
               )}
@@ -164,6 +171,6 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({
           )}
         </>
       )}
-    </error>
+    </error>,
   );
 });
