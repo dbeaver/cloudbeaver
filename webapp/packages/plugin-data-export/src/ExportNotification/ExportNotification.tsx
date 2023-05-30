@@ -55,7 +55,7 @@ export const ExportNotification = observer<Props>(function ExportNotification({ 
           {message && <message>{message}</message>}
           <source-name>
             {controller.sourceName}
-            {controller.task?.context.sourceName && <pre title={controller.task.context.sourceName}>{controller.task.context.sourceName}</pre>}
+            {controller.task?.context.query && <pre title={controller.task.context.query}>{controller.task.context.query}</pre>}
           </source-name>
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
