@@ -75,7 +75,7 @@ const driverConfiguration: IDriverConfiguration[] = [
 ];
 
 export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ state }) {
-  const serverConfigResource = useResource(Options, ServerConfigResource, undefined as void);
+  const serverConfigResource = useResource(Options, ServerConfigResource, undefined);
   const connectionOptionsTabService = useService(ConnectionOptionsTabService);
   const service = useService(ConnectionFormService);
   const formRef = useRef<HTMLFormElement>(null);

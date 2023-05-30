@@ -42,6 +42,15 @@ export const indexColumn: Column<IResultSetRowKey, any> = {
   formatter: IndexFormatter,
 };
 
+const COLUMN_PADDING = 16;
+const COLUMN_HEADER_ICON_WIDTH = 16;
+const COLUMN_HEADER_TEXT_PADDING = 8;
+const COLUMN_HEADER_ORDER_PADDING = 8;
+const COLUMN_HEADER_ORDER_WIDTH = 16;
+
+const CELL_VALUE_BORDER = 2;
+const FONT = '400 12px Roboto';
+
 export function useTableData(
   model: IDatabaseDataModel<any, IDatabaseResultSet>,
   resultIndex: number,
@@ -72,17 +81,18 @@ export function useTableData(
         const columnNames = this.format.getHeaders();
         const rowStrings = this.format.getLongestCells();
 
-        // TODO: seems better to do not measure container size
-        //       for detecting max columns size, better to use configurable variable
-        const measuredCells = TextTools.getWidth({
-          font: '400 14px Roboto',
-          text: columnNames.map((cell, i) => {
-            if (cell.length > (rowStrings[i] || '').length) {
-              return cell;
-            }
-            return rowStrings[i];
-          }),
-        }).map(v => v + 16 + 32 + 20);
+        const columnsWidth = TextTools.getWidth({
+          font: FONT,
+          text: columnNames,
+        }).map(
+          width =>
+            width + COLUMN_PADDING + COLUMN_HEADER_ICON_WIDTH + COLUMN_HEADER_TEXT_PADDING + COLUMN_HEADER_ORDER_PADDING + COLUMN_HEADER_ORDER_WIDTH,
+        );
+
+        const cellsWidth = TextTools.getWidth({
+          font: FONT,
+          text: rowStrings,
+        }).map(width => width + COLUMN_PADDING + CELL_VALUE_BORDER);
 
         const columns: Array<Column<IResultSetRowKey, any>> = this.columnKeys.map<Column<IResultSetRowKey, any>>((col, index) => ({
           // key: uuid(),
@@ -90,7 +100,7 @@ export function useTableData(
           columnDataIndex: { index },
           name: this.getColumnInfo(col)?.label || '?',
           editable: true,
-          width: Math.min(300, measuredCells[index]),
+          width: Math.min(300, Math.max(columnsWidth[index], cellsWidth[index] ?? 0)),
           headerRenderer: TableColumnHeader,
           editorOptions: {
             onCellKeyDown,

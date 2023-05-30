@@ -36,7 +36,7 @@ const styles = css`
     overflow: hidden;
   }
   menu-container {
-    width: 20px;
+    width: 25px;
     height: 100%;
     box-sizing: border-box;
     overflow: hidden;
