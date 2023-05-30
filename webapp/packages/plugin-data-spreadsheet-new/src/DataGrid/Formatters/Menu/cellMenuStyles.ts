@@ -22,6 +22,7 @@ export const cellMenuStyles = css`
     right: 0px;
   }
   MenuTrigger {
+    padding: 0 8px;
     height: 100%;
 
     &:before {

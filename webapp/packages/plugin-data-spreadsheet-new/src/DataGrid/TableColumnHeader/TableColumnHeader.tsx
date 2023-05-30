@@ -54,9 +54,6 @@ const headerStyles = css`
     border-radius: 50%;
     border: 1px solid;
   }
-  OrderButton {
-    margin-left: 4px;
-  }
   [|dragging] {
     opacity: 0.5;
   }

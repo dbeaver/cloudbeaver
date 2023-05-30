@@ -25,7 +25,7 @@ const styles = css`
     cursor: auto;
     width: 10px;
     position: absolute;
-    right: 2px;
+    right: 8px;
     top: 50%;
     transform: translateY(-50%);
   }
