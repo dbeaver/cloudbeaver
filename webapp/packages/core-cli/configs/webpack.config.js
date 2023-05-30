@@ -3,7 +3,6 @@ const PnpWebpackPlugin = require('pnp-webpack-plugin');
 const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
 
 const excludedFromVendor = require('./excludedFromVendor.js');
 // const ESLintPlugin = require('eslint-webpack-plugin');
@@ -228,15 +227,15 @@ module.exports = (env, argv) => {
     plugins: [
       new ForkTsCheckerWebpackPlugin({
         typescript: {
+          configOverwrite: {
+            include: ['**/src/**/*.ts', '**/src/**/*.tsx'],
+          },
           diagnosticOptions: {
             semantic: true,
             syntactic: true,
           },
         },
       }),
-      // new ExtraWatchWebpackPlugin({
-      //   files: ['packages/*/src/**.ts', 'packages/*/src/**.tsx']
-      // }),
       new IgnoreNotFoundExportPlugin(),
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output

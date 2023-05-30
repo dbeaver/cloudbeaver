@@ -8,7 +8,8 @@
 import { runInAction } from 'mobx';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
-import { DBDriver, isJDBCConnection } from '@cloudbeaver/core-connections';
+import { DBDriver, DBDriverResource, isJDBCConnection } from '@cloudbeaver/core-connections';
+import { useService } from '@cloudbeaver/core-di';
 import { DatabaseAuthModel, DriverConfigurationType } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionFormState } from '../IConnectionFormProps';
@@ -16,9 +17,11 @@ import type { IConnectionFormState } from '../IConnectionFormProps';
 const MAX_HOST_LENGTH = 20;
 
 export function useOptions(state: IConnectionFormState) {
+  const dbDriverResource = useService(DBDriverResource);
   const refObject = useObjectRef(
     () => ({
       prevName: null as string | null,
+      prevDriverId: null as string | null,
     }),
     {
       state,
@@ -61,15 +64,24 @@ export function useOptions(state: IConnectionFormState) {
         config.name = name;
       });
     },
-    setDefaults(driver: DBDriver | undefined, prevDriver?: DBDriver) {
+    setDefaults(driver: DBDriver | undefined) {
       runInAction(() => {
         const {
           state: { config, info },
+          prevDriverId,
         } = refObject;
 
         if (info || driver?.id !== config.driverId) {
           return;
         }
+
+        let prevDriver: DBDriver | undefined;
+
+        if (prevDriverId) {
+          prevDriver = dbDriverResource.get(prevDriverId);
+        }
+
+        refObject.prevDriverId = driver?.id || null;
 
         if (!config.configurationType || !driver?.configurationTypes.includes(config.configurationType)) {
           config.configurationType = driver?.configurationTypes.includes(DriverConfigurationType.Manual)

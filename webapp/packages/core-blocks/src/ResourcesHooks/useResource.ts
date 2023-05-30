@@ -50,11 +50,7 @@ interface IActions<TResource extends CachedResource<any, any, any, any, any>, TK
   active?: boolean;
   forceSuspense?: boolean;
   silent?: boolean;
-  onData?: (
-    data: ResourceData<TResource, TKey, TIncludes>,
-    resource: TResource,
-    prevData: ResourceData<TResource, TKey, TIncludes> | undefined,
-  ) => Promise<any> | any;
+  onData?: (data: ResourceData<TResource, TKey, TIncludes>, resource: TResource) => Promise<any> | any;
   onError?: (exception: Error | Error[] | null) => void;
   preload?: ILoadableState[];
 }
@@ -323,7 +319,7 @@ export function useResource<
 
         return getData();
       },
-      get outdated() {
+      get outdated(): boolean {
         return propertiesRef.key === null || !this.preloaded || this.loading || !this.loaded || this.resource.isOutdated(propertiesRef.key);
       },
       get loaded() {
@@ -400,9 +396,9 @@ export function useResource<
   useEffect(() => {
     const disposeDataUpdate = reaction(
       () => ({ data: result.tryGetData, loaded: result.loaded }),
-      ({ data, loaded }, prev) => {
+      ({ data, loaded }) => {
         if (loaded) {
-          actions?.onData?.(data as any, resource, prev as any);
+          actions?.onData?.(data as any, resource);
         }
       },
       {

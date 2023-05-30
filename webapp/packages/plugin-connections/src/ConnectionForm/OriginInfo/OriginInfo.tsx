@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -54,21 +55,21 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
     },
     {
       // isActive: () => !info?.origin || userInfoService.hasOrigin(info.origin),
-      onData: (connection, res, prev) => {
-        if (!connection.origin.details) {
-          return;
-        }
-
-        if (prev?.origin.details) {
-          for (const property of prev.origin.details) {
-            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-            delete state[property.id!];
+      onData: connection => {
+        runInAction(() => {
+          if (!connection.origin.details) {
+            return;
           }
-        }
 
-        for (const property of connection.origin.details) {
-          state[property.id!] = property.value;
-        }
+          for (const property of Object.keys(state)) {
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+            delete state[property];
+          }
+
+          for (const property of connection.origin.details) {
+            state[property.id!] = property.value;
+          }
+        });
       },
     },
   );
