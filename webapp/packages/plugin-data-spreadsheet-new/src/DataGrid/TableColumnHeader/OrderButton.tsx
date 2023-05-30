@@ -15,22 +15,17 @@ const styles = css`
   order-button {
     display: flex;
     flex-direction: column;
-    align-content: center;
-    align-items: center;
     justify-content: center;
-    height: 20px;
-    width: 20px;
+    flex-shrink: 0;
+    height: 28px;
+    width: 16px;
     box-sizing: border-box;
     cursor: pointer;
     background: transparent;
     outline: none;
     color: inherit;
-  }
-  order-button > IconOrImage {
-    width: 12px;
-  }
-  order-button:hover > IconOrImage {
-    width: 13px;
+    padding: 0;
+    margin-left: 8px;
   }
 `;
 

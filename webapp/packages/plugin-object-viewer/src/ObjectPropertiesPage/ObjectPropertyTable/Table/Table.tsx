@@ -50,6 +50,11 @@ const style = css`
   }
 `;
 
+const CELL_FONT = '400 12px Roboto';
+const COLUMN_FONT = '700 12px Roboto';
+const CELL_PADDING = 16;
+const CELL_BORDER = 2;
+
 interface Props {
   objects: DBObject[];
   truncated?: boolean;
@@ -71,15 +76,19 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
     }
   }
 
-  return TextTools.getWidth({
-    font: '400 12px Roboto',
-    text: columnNames.map((cell, i) => {
-      if (cell.length >= rowStrings[i].length) {
-        return cell;
-      }
-      return rowStrings[i];
-    }),
-  }).map(v => v + 16 + 8);
+  const columnsWidth = TextTools.getWidth({
+    font: COLUMN_FONT,
+    text: columnNames,
+  }).map(width => width + CELL_PADDING + CELL_BORDER);
+
+  const cellsWidth = TextTools.getWidth({
+    font: CELL_FONT,
+    text: rowStrings,
+  }).map(width => width + CELL_PADDING + CELL_BORDER);
+
+  const widthData = columnNames.map((_, i) => Math.max(columnsWidth[i], cellsWidth[i] ?? 0));
+
+  return widthData;
 }
 
 const CUSTOM_COLUMNS = [ColumnSelect, ColumnIcon];
