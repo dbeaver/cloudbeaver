@@ -20,7 +20,7 @@ import {
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import type { IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { IExecutionContextProvider, ISyncContextLoader } from '@cloudbeaver/core-executor';
 import { type INodeNavigationData, NavNodeManagerService, NodeManagerUtils, objectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider } from '@cloudbeaver/core-projects';
 import { ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
@@ -84,10 +84,9 @@ export class ObjectViewerTabService {
     return tab.handlerState.pageId === page.key;
   }
 
-  objectViewerTabContext: IAsyncContextLoader<IObjectViewerTabContext, INodeNavigationData> = async (contexts, data) => {
+  objectViewerTabContext: ISyncContextLoader<IObjectViewerTabContext, INodeNavigationData> = (contexts, data) => {
     const tabInfo = contexts.getContext(this.navigationTabsService.navigationTabContext);
     const nodeInfo = contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
-    const connection = await contexts.getContext(this.connectionNavNodeService.navigationNavNodeConnectionContext);
 
     // check if tab already exist for object
     const tab = this.navigationTabsService.findTab(isObjectViewerTab(tab => tab.handlerState.objectId === nodeInfo.nodeId));
@@ -102,8 +101,14 @@ export class ObjectViewerTabService {
       return NodeManagerUtils.isDatabaseObject(data.nodeId);
     }
 
-    const initTab = (): ITab<IObjectViewerTabState> | null => {
+    if (isSupported()) {
+      nodeInfo.markOpen();
+    }
+
+    const initTab = async (): Promise<ITab<IObjectViewerTabState> | null> => {
       if (!tabInfo.tab && isSupported()) {
+        const connection = await contexts.getContext(this.connectionNavNodeService.navigationNavNodeConnectionContext);
+
         tabInfo.openNewTab<IObjectViewerTabState>({
           projectId: nodeInfo.projectId ?? null,
           handlerId: objectViewerTabHandlerKey,
@@ -362,18 +367,14 @@ export class ObjectViewerTabService {
   }
 
   private canOpenHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
-    const nodeInfo = contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);
-
-    if (NodeManagerUtils.isDatabaseObject(data.nodeId)) {
-      nodeInfo.markOpen();
-    }
+    contexts.getContext(this.objectViewerTabContext); // mark can open
   }
 
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
     try {
-      const { nodeInfo, initTab } = await contexts.getContext(this.objectViewerTabContext);
+      const { nodeInfo, initTab } = contexts.getContext(this.objectViewerTabContext);
 
-      const tab = initTab();
+      const tab = await initTab();
 
       if (tab) {
         runInAction(() => {
@@ -393,12 +394,12 @@ export class ObjectViewerTabService {
     }
   }
 
-  private async navigationPostHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
+  private navigationPostHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
     if (!contexts.hasContext(this.objectViewerTabContext)) {
       return;
     }
     try {
-      const { switchPage } = await contexts.getContext(this.objectViewerTabContext);
+      const { switchPage } = contexts.getContext(this.objectViewerTabContext);
 
       switchPage();
     } catch (exception: any) {

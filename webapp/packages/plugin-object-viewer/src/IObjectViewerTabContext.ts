@@ -18,7 +18,7 @@ export interface IObjectViewerTabContext {
   tabInfo: ITabNavigationContext;
   nodeInfo: INodeNavigationContext;
 
-  initTab(): ITab<IObjectViewerTabState> | null;
+  initTab(): Promise<ITab<IObjectViewerTabState> | null>;
   isPageActive: (page: ObjectPage<any>) => boolean;
   canSwitchPage: (page: ObjectPage<any>) => boolean;
   trySwitchPage: <T>(page: ObjectPage<T>, state?: T) => boolean;
