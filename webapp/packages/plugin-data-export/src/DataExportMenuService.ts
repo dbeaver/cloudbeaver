@@ -73,6 +73,7 @@ export class DataExportMenuService {
         this.commonDialogService.open(DataExportDialog, {
           connectionKey: createConnectionParam(connection),
           name: node?.name,
+          containerNodePath: node?.id,
         });
       },
     });

@@ -12,6 +12,7 @@ export interface IExportContext {
   connectionKey: IConnectionInfoParams;
   contextId?: string;
   resultId?: string | null;
+  containerNodePath?: string;
   name?: string;
   query?: string;
   filter?: SqlDataFilter;
