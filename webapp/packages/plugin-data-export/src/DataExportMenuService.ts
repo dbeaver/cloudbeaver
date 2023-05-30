@@ -95,6 +95,7 @@ export class DataExportMenuService {
     this.commonDialogService.open(DataExportDialog, {
       connectionKey: source.options.connectionKey,
       contextId: context.data.model.source.executionContext?.context?.id,
+      containerNodePath: source.options.containerNodePath,
       resultId: result.id,
       name: context.data.model.name ?? undefined,
       query: source.options.query,
