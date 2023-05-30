@@ -1,14 +1,9 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint",
-    "eslint-plugin-import-helpers"
-  ],
+  "plugins": ["@typescript-eslint"],
   "overrides": [
     {
-      "files": [
-        "**/*.cjs"
-      ],
+      "files": ["**/*.cjs"],
       "env": {
         "node": true
       }
@@ -42,6 +37,7 @@
     "no-inner-declarations": "off",
     "no-constant-condition": "off",
     "space-before-blocks": "error",
+    "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-invalid-void-type": "off",
     "@typescript-eslint/dot-notation": "off",
     "@typescript-eslint/no-throw-literal": "off",
@@ -64,10 +60,7 @@
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/semi": [
-      "error",
-      "always"
-    ],
+    "@typescript-eslint/semi": ["error", "always"],
     "@typescript-eslint/consistent-type-assertions": [
       "error",
       {
@@ -88,25 +81,12 @@
         }
       }
     ],
-    "@typescript-eslint/comma-spacing": [
-      "error"
-    ],
-    "@typescript-eslint/default-param-last": [
-      "error"
-    ],
-    "@typescript-eslint/func-call-spacing": [
-      "error"
-    ],
-    "@typescript-eslint/keyword-spacing": [
-      "error"
-    ],
-    "@typescript-eslint/no-duplicate-imports": [
-      "error"
-    ],
-    "@typescript-eslint/object-curly-spacing": [
-      "error",
-      "always"
-    ],
+    "@typescript-eslint/comma-spacing": ["error"],
+    "@typescript-eslint/default-param-last": ["error"],
+    "@typescript-eslint/func-call-spacing": ["error"],
+    "@typescript-eslint/keyword-spacing": ["error"],
+    "@typescript-eslint/no-duplicate-imports": ["error"],
+    "@typescript-eslint/object-curly-spacing": ["error", "always"],
     "@typescript-eslint/quotes": [
       "error",
       "single",
@@ -128,46 +108,27 @@
         "int32Hint": false
       }
     ],
-    "@typescript-eslint/no-confusing-non-null-assertion": [
-      "warn"
-    ],
+    "@typescript-eslint/no-confusing-non-null-assertion": ["warn"],
     "@typescript-eslint/no-confusing-void-expression": "off",
-    "@typescript-eslint/prefer-function-type": [
-      "warn"
-    ],
+    "@typescript-eslint/prefer-function-type": ["warn"],
     "arrow-spacing": "error",
     "import/no-duplicates": "off",
     "import/export": "off",
     "standard/no-callback-literal": "off",
     "no-empty": "off",
-    "curly": [
-      "error",
-      "all"
-    ],
-    "arrow-body-style": [
-      "error",
-      "as-needed"
-    ],
-    "function-call-argument-newline": [
-      "error",
-      "consistent"
-    ],
+    "curly": ["error", "all"],
+    "arrow-body-style": ["error", "as-needed"],
+    "function-call-argument-newline": ["error", "consistent"],
     "prefer-arrow-callback": [
       "error",
       {
         "allowNamedFunctions": true
       }
     ],
-    "operator-linebreak": [
-      "warn",
-      "before"
-    ],
+    "operator-linebreak": "off",
     "multiline-ternary": "off",
     "no-nested-ternary": "warn",
-    "arrow-parens": [
-      "error",
-      "as-needed"
-    ],
+    "arrow-parens": ["error", "as-needed"],
     "comma-dangle": [
       "warn",
       {
@@ -188,32 +149,10 @@
         "ignorePattern": "^export\\s(const\\s\\w+:?.+=.+function\\s|function\\s)\\w+\\s*\\(.*\\{$"
       }
     ],
-    "import-helpers/order-imports": [
-      "warn",
-      {
-        "newlinesBetween": "always",
-        "groups": [
-          "module",
-          "/^@/",
-          "/^~/",
-          [
-            "parent",
-            "sibling",
-            "index"
-          ]
-        ],
-        "alphabetize": {
-          "order": "asc",
-          "ignoreCase": true
-        }
-      }
-    ],
     "no-restricted-imports": [
       "error",
       {
-        "patterns": [
-          "@cloudbeaver/*/src/*"
-        ]
+        "patterns": ["@cloudbeaver/*/src/*"]
       }
     ],
     "react/destructuring-assignment": "off",
@@ -229,19 +168,10 @@
     "react/jsx-closing-tag-location": "error",
     "react/jsx-boolean-value": "error",
     "react/self-closing-comp": "error",
-    "react/jsx-curly-newline": "error",
-    "react/jsx-curly-brace-presence": [
-      "error",
-      "never"
-    ],
-    "react/jsx-fragments": [
-      "off",
-      "syntax"
-    ],
-    "react/jsx-equals-spacing": [
-      "error",
-      "never"
-    ],
+    "react/jsx-curly-newline": "off",
+    "react/jsx-curly-brace-presence": ["error", "never"],
+    "react/jsx-fragments": ["off", "syntax"],
+    "react/jsx-equals-spacing": ["error", "never"],
     "react/jsx-curly-spacing": [
       "error",
       {
@@ -249,10 +179,7 @@
         "children": true
       }
     ],
-    "react/jsx-first-prop-new-line": [
-      "warn",
-      "multiline"
-    ],
+    "react/jsx-first-prop-new-line": ["warn", "multiline"],
     "react/jsx-max-props-per-line": [
       1,
       {
