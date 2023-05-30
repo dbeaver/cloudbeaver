@@ -80,7 +80,7 @@ export class DataViewerTabService {
 
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
     try {
-      const { nodeInfo, tabInfo, initTab, trySwitchPage } = await contexts.getContext(this.objectViewerTabService.objectViewerTabContext);
+      const { nodeInfo, tabInfo, initTab, trySwitchPage } = contexts.getContext(this.objectViewerTabService.objectViewerTabContext);
 
       const node = await this.navNodeManagerService.loadNode(nodeInfo);
 
@@ -88,7 +88,7 @@ export class DataViewerTabService {
         return;
       }
 
-      initTab();
+      await initTab();
 
       if (tabInfo.isNewlyCreated) {
         trySwitchPage(this.page);
