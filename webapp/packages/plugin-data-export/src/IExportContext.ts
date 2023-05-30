@@ -11,8 +11,9 @@ import type { SqlDataFilter } from '@cloudbeaver/core-sdk';
 export interface IExportContext {
   connectionKey: IConnectionInfoParams;
   contextId?: string;
-  containerNodePath?: string;
   resultId?: string | null;
-  sourceName?: string;
+  containerNodePath?: string;
+  name?: string;
+  query?: string;
   filter?: SqlDataFilter;
 }
