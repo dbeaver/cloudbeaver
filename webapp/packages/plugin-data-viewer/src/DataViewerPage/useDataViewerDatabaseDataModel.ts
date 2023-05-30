@@ -119,7 +119,9 @@ export function useDataViewerDatabaseDataModel(tab: ITab<IObjectViewerTabState>)
             }
           }
 
-          model.setName(node?.name || null);
+          if (node?.name) {
+            model.setName(node.name);
+          }
           this._exception = null;
         } catch (exception: any) {
           this._exception = exception;

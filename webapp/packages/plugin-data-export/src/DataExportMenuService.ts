@@ -8,6 +8,7 @@
 import { createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, IMenuContext } from '@cloudbeaver/core-dialogs';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { ACTION_EXPORT, ActionService, DATA_CONTEXT_MENU_NESTED, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
@@ -25,6 +26,7 @@ export class DataExportMenuService {
     private readonly dataExportSettingsService: DataExportSettingsService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
+    private readonly localizationService: LocalizationService,
   ) {}
 
   register(): void {
@@ -70,7 +72,7 @@ export class DataExportMenuService {
 
         this.commonDialogService.open(DataExportDialog, {
           connectionKey: createConnectionParam(connection),
-          containerNodePath: node.id,
+          name: node?.name,
         });
       },
     });
@@ -92,9 +94,9 @@ export class DataExportMenuService {
     this.commonDialogService.open(DataExportDialog, {
       connectionKey: source.options.connectionKey,
       contextId: context.data.model.source.executionContext?.context?.id,
-      containerNodePath: source.options.containerNodePath,
       resultId: result.id,
-      sourceName: source.options.query,
+      name: context.data.model.name ?? undefined,
+      query: source.options.query,
       filter: {
         constraints: source.options.constraints,
         where: source.options.whereFilter,
