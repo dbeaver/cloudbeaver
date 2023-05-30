@@ -51,10 +51,9 @@ export class ExportNotificationController implements IInitializableController {
     if (!this.task) {
       return '';
     }
-    if (this.task.context.containerNodePath) {
-      const node = this.navNodeManagerService.getNode(this.task.context.containerNodePath);
 
-      return `${this.localization.translate('data_transfer_exporting_table')} ${node?.name}`;
+    if (this.task.context.name) {
+      return this.task.context.name;
     }
 
     return this.localization.translate('data_transfer_exporting_sql');

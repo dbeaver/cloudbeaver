@@ -106,8 +106,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     DBDriverResource,
     { key: config.driverId || null, includes: ['includeProviderProperties'] as const },
     {
-      onData: (data, resource, prevDriver) => {
-        optionsHook.setDefaults(data, prevDriver);
+      onData: data => {
+        optionsHook.setDefaults(data);
       },
     },
   );
