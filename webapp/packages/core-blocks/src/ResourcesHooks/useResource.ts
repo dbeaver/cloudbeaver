@@ -347,7 +347,7 @@ export function useResource<
       isError() {
         return isContainsException(this.exception);
       },
-      isOutdated() {
+      isOutdated(): boolean {
         return this.outdated;
       },
       isLoaded() {
@@ -373,7 +373,6 @@ export function useResource<
       // TODO: in case when array is mutated, but not replaced, it will not be updated
       // tryGetData: computed<any>({
       //   equals: (a, b) => {
-      //     console.log(a, b, isArraysEqual(a, b, undefined, true));
       //     if (Array.isArray(a) && Array.isArray(b)) {
       //       return isArraysEqual(a, b, undefined, true);
       //     }
@@ -400,9 +399,9 @@ export function useResource<
 
   useEffect(() => {
     const disposeDataUpdate = reaction(
-      () => result.tryGetData,
-      (data, prev) => {
-        if (result.loaded) {
+      () => ({ data: result.tryGetData, loaded: result.loaded }),
+      ({ data, loaded }, prev) => {
+        if (loaded) {
           actions?.onData?.(data as any, resource, prev as any);
         }
       },
