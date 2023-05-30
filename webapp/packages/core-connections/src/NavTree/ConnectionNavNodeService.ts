@@ -11,7 +11,6 @@ import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
   INodeNavigationData,
-  NavigationType,
   NavNodeInfoResource,
   NavNodeManagerService,
   NavTreeResource,
@@ -232,11 +231,7 @@ export class ConnectionNavNodeService extends Dependency {
     this.navTreeResource.insertToNode(parentId, insertIndex, connection.nodePath);
   }
 
-  private async navigateHandler({ type, nodeId }: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>): Promise<void> {
-    if (type !== NavigationType.open) {
-      return;
-    }
-
+  private async navigateHandler({ nodeId }: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>): Promise<void> {
     let connection: Connection | undefined | null = await contexts.getContext(this.navigationNavNodeConnectionContext);
 
     if (NodeManagerUtils.isDatabaseObject(nodeId) && connection) {

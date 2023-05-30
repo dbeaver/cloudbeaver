@@ -8,7 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { type INodeNavigationData, NavigationType, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { type INodeNavigationData, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 
 import { DBObjectPageService } from '../ObjectPage/DBObjectPageService';
 import type { ObjectPage } from '../ObjectPage/ObjectPage';
@@ -39,10 +39,6 @@ export class ObjectPropertiesPageService {
   }
 
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
-    if (data.type !== NavigationType.open) {
-      return;
-    }
-
     if (!this.page) {
       // TODO: it will be never true, because navHandler registers after page creation
       return;

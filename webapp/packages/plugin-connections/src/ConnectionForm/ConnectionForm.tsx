@@ -12,6 +12,7 @@ import styled, { css } from 'reshadow';
 import {
   BASE_CONTAINERS_STYLES,
   ErrorMessage,
+  ExceptionMessage,
   IconOrImage,
   Loader,
   Placeholder,
@@ -122,7 +123,6 @@ export const ConnectionForm = observer<Props>(function ConnectionForm({ state, o
   const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
   const styles = useStyles(style, BASE_CONTAINERS_STYLES, topBarStyles, formStyles);
   const service = useService(ConnectionFormService);
-  const error = useErrorDetails(state.initError);
 
   useExecutor({
     executor: state.submittingTask,
@@ -143,8 +143,8 @@ export const ConnectionForm = observer<Props>(function ConnectionForm({ state, o
     state.loadConnectionInfo();
   }, [state]);
 
-  if (error.name) {
-    return styled(styles)(<ErrorMessage text={error.message || error.name} hasDetails={error.hasDetails} onShowDetails={error.open} />);
+  if (state.initError) {
+    return styled(styles)(<ExceptionMessage exception={state.initError} onRetry={() => state.loadConnectionInfo()} />);
   }
 
   if (!state.configured) {
