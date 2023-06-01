@@ -109,6 +109,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       () => CachedMapAllKey,
       () => CachedMapAllKey,
     );
+    this.projectInfoResource.onDataOutdated.addHandler(() => this.markTreeOutdated(resourceKeyList(this.keys)));
     this.sessionDataResource.onDataOutdated.addHandler(() => this.markTreeOutdated(resourceKeyList(this.keys)));
     this.userInfoResource.onUserChange.addHandler(
       action(() => {
