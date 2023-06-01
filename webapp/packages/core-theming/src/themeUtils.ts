@@ -7,7 +7,7 @@
  */
 
 export interface ClassCollection {
-  [key: string]: string;
+  [key: string]: any;
 }
 
 export class Composes {
