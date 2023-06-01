@@ -33,7 +33,7 @@ export const VersionInfo = observer<Props>(function VersionInfo({ item }) {
   const styles = useStyles(BASE_CONTAINERS_STYLES, style);
   const versionResource = useResource(VersionInfo, VersionResource, item);
 
-  const version = versionResource.data;
+  const version = versionResource.tryGetData;
 
   return styled(styles)(
     <Container wrap gap overflow large>
