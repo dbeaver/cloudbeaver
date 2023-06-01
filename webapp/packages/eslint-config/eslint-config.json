@@ -24,6 +24,7 @@
     }
   },
   "rules": {
+    "no-undef": "off",
     "comma-spacing": "off",
     "default-param-last": "off",
     "func-call-spacing": "off",
@@ -45,6 +46,7 @@
     "@typescript-eslint/no-floating-promises": "off",
     "@typescript-eslint/no-implied-eval": "off",
     "@typescript-eslint/no-misused-promises": "off",
+    "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/no-unnecessary-type-assertion": "off",
     "@typescript-eslint/prefer-nullish-coalescing": "off",
     "@typescript-eslint/prefer-reduce-type-parameter": "off",

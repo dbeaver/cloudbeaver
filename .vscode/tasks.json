@@ -13,6 +13,20 @@
   },
   "tasks": [
     {
+      "label": "Generate dev proprties for CBCE",
+      "type": "shell",
+      "command": "mvn",
+      "args": [
+        "package",
+        "-q",
+        "exec:java",
+        "-Dexec.args=-productFile ${workspaceFolder}/server/product/web-server/CloudbeaverServer.product -projectsFolder ${workspaceFolder}/../ -eclipse ${env:DBEAVER_DEVEL_ECLIPSE_PATH} -output ${env:DBEAVER_DEVEL_ECLIPSE_WORKSPACE_PATH}/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/../dbeaver-packaging/tools/eclipse-plugins-resolver"
+      }
+    },
+    {
       "label": "Run Tests",
       "type": "shell",
       "command": "yarn",

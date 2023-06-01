@@ -36,9 +36,15 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java"
+  },
 
   "files.eol": "\n",
   "files.associations": {
     "*.css": "postcss"
-  }
+  },
+
+  "java.checkstyle.configuration": "${workspaceFolder}/../dbeaver/dbeaver-checkstyle-config.xml",
+  "java.checkstyle.version": "10.12.0"
 }

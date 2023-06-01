@@ -1,5 +1,6 @@
 {
   "recommendations": [
+    "shengchen.vscode-checkstyle",
     "vscjava.vscode-java-pack",
     "yaozheng.vscode-pde",
     "arcanis.vscode-zipfs",

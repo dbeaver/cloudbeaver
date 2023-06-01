@@ -1,29 +1,20 @@
 {
   "compileOnSave": false,
-  "files": [
-    "typings.d.ts"
-  ],
-  "include": [
-    "**/src"
-  ],
-  "exclude": [
-    "**/node_modules",
-  ],
+  "files": ["typings.d.ts"],
+  "include": ["**/src"],
+  "exclude": ["**/node_modules"],
   "compilerOptions": {
     "baseUrl": ".",
     "allowUnreachableCode": false,
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
-    "lib": [
-      "dom",
-      "ES2019",
-      "ES2022.Error"
-    ],
+    "lib": ["dom", "ES2019", "ES2022.Error"],
     "useDefineForClassFields": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "emitDeclarationOnly": true,
     "importsNotUsedAsValues": "error",
+    "ignoreDeprecations": "5.0",
     "jsx": "preserve",
     "target": "esnext",
     "module": "esnext",
@@ -46,11 +37,9 @@
     "noEmit": false,
     "strictNullChecks": true,
     "isolatedModules": true,
-    "composite": true,
-    "types": [
-      "reflect-metadata",
-      "node",
-      "jest"
-    ],
-    }
+    "allowArbitraryExtensions": true,
+    "composite": false,
+
+    "types": ["reflect-metadata", "node", "jest"]
+  }
 }
