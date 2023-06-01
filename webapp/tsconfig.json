@@ -38,7 +38,7 @@
     "strictNullChecks": true,
     "isolatedModules": true,
     "allowArbitraryExtensions": true,
-    "composite": false,
+    "composite": true,
 
     "types": ["reflect-metadata", "node", "jest"]
   }
