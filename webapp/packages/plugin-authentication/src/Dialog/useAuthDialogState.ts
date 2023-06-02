@@ -13,7 +13,8 @@ import { AuthInfoService, AuthProvider, AuthProviderConfiguration, AuthProviders
 import { useObservableRef, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import type { ITask } from '@cloudbeaver/core-executor';
+import { CachedMapAllKey, UserInfo } from '@cloudbeaver/core-sdk';
 
 import { FEDERATED_AUTH } from './FEDERATED_AUTH';
 
@@ -21,6 +22,7 @@ interface IData {
   state: IState;
   exception: Error | null;
   authenticating: boolean;
+  authTask: ITask<UserInfo | null> | null;
   destroyed: boolean;
   configure: boolean;
   adminPageActive: boolean;
@@ -28,6 +30,7 @@ interface IData {
   configurations: AuthProvider[];
 
   login: (linkUser: boolean) => Promise<void>;
+  loginFederated: (provider: AuthProvider, configuration: AuthProviderConfiguration, onClose?: () => void) => Promise<void>;
 }
 
 interface IState {
@@ -122,6 +125,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
     () => ({
       exception: null,
       authenticating: false,
+      authTask: null,
       destroyed: false,
 
       get configure(): boolean {
@@ -140,10 +144,13 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
 
         this.authenticating = true;
         try {
-          await authInfoService.login(state.activeProvider.id, {
+          const loginTask = authInfoService.login(state.activeProvider.id, {
             credentials: state.credentials,
             linkUser,
           });
+          this.authTask = loginTask;
+
+          await loginTask;
         } catch (exception: any) {
           if (this.destroyed) {
             notificationService.logException(exception, 'Login failed');
@@ -155,11 +162,31 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           this.authenticating = false;
         }
       },
+      async loginFederated(provider: AuthProvider, configuration: AuthProviderConfiguration, onClose?: () => void): Promise<void> {
+        state.setActiveConfiguration(provider, configuration);
+        this.authenticating = true;
+        try {
+          const loginTask = authInfoService.login(provider.id, {
+            configurationId: configuration.id,
+          });
+          this.authTask = loginTask;
+
+          const user = await loginTask;
+          if (user) {
+            onClose?.();
+          }
+        } catch (exception: any) {
+          notificationService.logException(exception, 'Federated authentication error');
+        } finally {
+          state.setActiveConfiguration(null, null);
+        }
+      },
     }),
     {
       state: observable.ref,
       exception: observable.ref,
       authenticating: observable.ref,
+      authTask: observable.ref,
       configure: computed,
       adminPageActive: observable.ref,
     },
@@ -174,6 +201,9 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
   useEffect(
     () => () => {
       data.destroyed = true;
+      if (data.authTask?.executing) {
+        data.authTask?.cancel();
+      }
     },
     [],
   );

@@ -191,9 +191,8 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
                 activeProvider={state.activeProvider}
                 activeConfiguration={state.activeConfiguration}
                 providers={dialogData.configurations}
-                onAuthorize={(provider, configuration) => {
-                  state.setActiveConfiguration(provider, configuration);
-                }}
+                authTask={dialogData.authTask}
+                login={dialogData.loginFederated}
                 onClose={rejectDialog}
               />
             ) : (

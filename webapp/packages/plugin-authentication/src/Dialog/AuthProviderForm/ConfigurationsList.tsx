@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { AuthInfoService, AuthProvider, AuthProviderConfiguration, comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
+import { AuthProvider, AuthProviderConfiguration, comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
 import {
   Button,
   Cell,
@@ -25,7 +25,6 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 
@@ -73,7 +72,8 @@ interface Props {
   activeProvider: AuthProvider | null;
   activeConfiguration: AuthProviderConfiguration | null;
   providers: AuthProvider[];
-  onAuthorize?: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
+  authTask: ITask<UserInfo | null> | null;
+  login: (provider: AuthProvider, configuration: AuthProviderConfiguration, onClose?: () => void) => Promise<void>;
   onClose?: () => void;
   className?: string;
 }
@@ -82,18 +82,16 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
   activeProvider,
   activeConfiguration,
   providers,
-  onAuthorize,
+  authTask,
+  login,
   onClose,
   className,
 }) {
-  const authInfoService = useService(AuthInfoService);
   const authenticationService = useService(AuthenticationService);
-  const notificationService = useService(NotificationService);
   const translate = useTranslate();
   const style = useStyles(styles);
 
   const [search, setSearch] = useState('');
-  const [authTask, setAuthTask] = useState<ITask<UserInfo | null> | null>(null);
   const authTaskState = usePromiseState(authTask);
   const configurations = getComputed<IProviderConfiguration[]>(() =>
     providers
@@ -117,25 +115,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
   });
 
   async function auth({ provider, configuration }: IProviderConfiguration) {
-    try {
-      onAuthorize?.(provider, configuration);
-      const authTask = authInfoService.login(provider.id, {
-        configurationId: configuration.id,
-      });
-      setAuthTask(authTask);
-
-      const user = await authTask;
-
-      if (user) {
-        onClose?.();
-      }
-
-      setAuthTask(null);
-    } catch (exception: any) {
-      notificationService.logException(exception, 'Federated authentication error');
-    } finally {
-      onAuthorize?.(null, null);
-    }
+    await login(provider, configuration, onClose);
   }
 
   function navToSettings() {
