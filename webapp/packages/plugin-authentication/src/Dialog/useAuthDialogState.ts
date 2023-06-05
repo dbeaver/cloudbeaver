@@ -29,7 +29,7 @@ interface IData {
   providers: AuthProvider[];
   configurations: AuthProvider[];
 
-  login: (linkUser: boolean) => Promise<void>;
+  login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) => Promise<void>;
   loginFederated: (provider: AuthProvider, configuration: AuthProviderConfiguration, onClose?: () => void) => Promise<void>;
 }
 
@@ -137,14 +137,22 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         }
         return false;
       },
-      async login(linkUser: boolean): Promise<void> {
-        if (!state.activeProvider || this.authenticating) {
+      async login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration): Promise<void> {
+        provider = (provider || state.activeProvider) ?? undefined;
+        configuration = (configuration || state.activeConfiguration) ?? undefined;
+
+        if (!provider || this.authenticating) {
           return;
         }
 
         this.authenticating = true;
         try {
-          const loginTask = authInfoService.login(state.activeProvider.id, {
+          if (configuration) {
+            this.state.setActiveConfiguration(provider, configuration ?? null);
+          }
+
+          const loginTask = authInfoService.login(provider.id, {
+            configurationId: configuration?.id,
             credentials: state.credentials,
             linkUser,
           });
@@ -160,25 +168,10 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           throw exception;
         } finally {
           this.authenticating = false;
-        }
-      },
-      async loginFederated(provider: AuthProvider, configuration: AuthProviderConfiguration, onClose?: () => void): Promise<void> {
-        state.setActiveConfiguration(provider, configuration);
-        this.authenticating = true;
-        try {
-          const loginTask = authInfoService.login(provider.id, {
-            configurationId: configuration.id,
-          });
-          this.authTask = loginTask;
 
-          const user = await loginTask;
-          if (user) {
-            onClose?.();
+          if (configuration) {
+            this.state.setActiveConfiguration(null, null);
           }
-        } catch (exception: any) {
-          notificationService.logException(exception, 'Federated authentication error');
-        } finally {
-          state.setActiveConfiguration(null, null);
         }
       },
     }),

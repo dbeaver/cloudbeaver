@@ -73,7 +73,7 @@ interface Props {
   activeConfiguration: AuthProviderConfiguration | null;
   providers: AuthProvider[];
   authTask: ITask<UserInfo | null> | null;
-  login: (provider: AuthProvider, configuration: AuthProviderConfiguration, onClose?: () => void) => Promise<void>;
+  login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) => Promise<void>;
   onClose?: () => void;
   className?: string;
 }
@@ -114,10 +114,6 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
     return target.toUpperCase().includes(search.toUpperCase());
   });
 
-  async function auth({ provider, configuration }: IProviderConfiguration) {
-    await login(provider, configuration, onClose);
-  }
-
   function navToSettings() {
     onClose?.();
     authenticationService.configureIdentityProvider?.();
@@ -137,7 +133,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
       <container className={className}>
         <Loader state={authTaskState} style={loaderStyle} message="authentication_authorizing" hideException>
           <center>
-            <Button type="button" mod={['unelevated']} onClick={() => auth({ provider: activeProvider, configuration: activeConfiguration })}>
+            <Button type="button" mod={['unelevated']} onClick={() => login(false, activeProvider, activeConfiguration)}>
               <Translate token="authentication_login" />
             </Button>
           </center>
@@ -156,7 +152,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
           const icon = configuration.iconURL || provider.icon;
           const title = `${configuration.displayName}\n${configuration.description || ''}`;
           return (
-            <Link key={configuration.id} title={title} wrapper onClick={() => auth({ provider, configuration })}>
+            <Link key={configuration.id} title={title} wrapper onClick={() => login(false, provider, configuration)}>
               <Cell before={icon ? <IconOrImage icon={icon} /> : undefined} description={configuration.description}>
                 {configuration.displayName}
               </Cell>
