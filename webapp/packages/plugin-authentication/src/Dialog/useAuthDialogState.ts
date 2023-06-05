@@ -167,6 +167,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           }
           throw exception;
         } finally {
+          this.authTask = null;
           this.authenticating = false;
 
           if (configuration) {
