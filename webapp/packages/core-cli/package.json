@@ -7,6 +7,7 @@
   "files": [
     "/package.json",
     "/tsconfig.json",
+    "/global.d.ts",
     "/src",
     "/configs",
     "/bin",

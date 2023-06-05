@@ -71,7 +71,7 @@ module.exports = (env, argv) => {
         httpProxy.createProxyServer({ target:`http://127.0.0.1:${port}` }).listen(8080);
       },
     },
-    devtool: 'eval-source-map',
+    devtool: 'source-map',
     // optimization: {
     //   moduleIds: 'named',
     // },

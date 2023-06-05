@@ -156,6 +156,7 @@ export * from './ExceptionMessage';
 export * from './getComputed';
 export * from './IconButton';
 export * from './IconOrImage';
+export * from './s';
 export * from './StaticImage';
 export * from './TextPlaceholder';
 export * from './TimerIcon';
