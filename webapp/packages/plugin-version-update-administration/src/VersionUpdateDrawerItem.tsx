@@ -40,7 +40,7 @@ export const VersionUpdateDrawerItem = observer<AdministrationItemDrawerProps>(f
   const translate = useTranslate();
   const versionUpdateService = useService(VersionUpdateService);
 
-  useResource(VersionUpdateDrawerItem, VersionResource, CachedMapAllKey);
+  useResource(VersionUpdateDrawerItem, VersionResource, CachedMapAllKey, { silent: true });
 
   return styled(useStyles(style, styles))(
     <Tab tabId={item.name} disabled={disabled} title="version_update" style={styles} onOpen={() => onSelect(item.name)}>

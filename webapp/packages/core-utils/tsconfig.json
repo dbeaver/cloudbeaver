@@ -4,7 +4,6 @@
     "rootDir": "src",
     "outDir": "lib",
     "declarationMap": true,
-    "composite": true,
     "declaration": true
   },
   "include": ["src"],
