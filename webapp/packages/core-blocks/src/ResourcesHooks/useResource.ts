@@ -83,7 +83,13 @@ interface IMapResourceResult<TResource, TIncludes> extends IMapResourceState<TRe
 }
 
 interface IDataResourceResult<TResource, TIncludes> extends IMapResourceState<TResource> {
+  /**
+   * Returns `undefined` or loaded data (observable, suspense)
+   */
   data: CachedDataResourceGetter<CachedResourceData<TResource>, TIncludes>;
+  /**
+   * Returns undefined or loaded data (observable). Accessing this method will not trigger React Suspense.
+   */
   tryGetData: CachedDataResourceGetter<CachedResourceData<TResource>, TIncludes>;
   exception: Error | null;
 }
@@ -94,6 +100,14 @@ type TResult<TResource, TKey, TIncludes> = TResource extends CachedDataResource<
   ? IMapResourceListResult<TResource, TIncludes>
   : IMapResourceResult<TResource, TIncludes>;
 
+/**
+ * Accepts resource class or instance and returns resource state.
+ *
+ * @param component React Component, React Functional Component, or React Hook
+ * @param ctor Resource instance or class
+ * @param keyObj `null` (skip resource loading) or any other valid value
+ * @param actions
+ */
 export function useResource<
   TResource extends CachedResource<any, any, any, any, any>,
   TKeyArg extends ResourceKey<CachedResourceKey<TResource>>,
