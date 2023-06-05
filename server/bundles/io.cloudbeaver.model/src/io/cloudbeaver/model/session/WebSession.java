@@ -238,57 +238,60 @@ public class WebSession extends BaseWebSession
     }
 
     /**
-     * updates connections based on event in web session
+     * updates data sources based on event in web session
      *
      * @param project       project of connection
-     * @param connectionIds list of updated connections
+     * @param dataSourceIds list of updated connections
      * @param type          type of event
      */
-    public synchronized boolean updateProjectConnection(
+    public synchronized boolean updateProjectDataSources(
         DBPProject project,
-        List<String> connectionIds,
+        List<String> dataSourceIds,
         WSEventType type
     ) {
         var sendDataSourceUpdatedEvent = false;
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         // save old connections
-        var oldDataSources = connectionIds.stream()
+        var oldDataSources = dataSourceIds.stream()
             .map(registry::getDataSource)
             .filter(Objects::nonNull)
             .collect(Collectors.toMap(
                 DBPDataSourceContainer::getId,
                 ds -> new DataSourceDescriptor((DataSourceDescriptor) ds, ds.getRegistry())
             ));
-        switch (type) {
-            case DATASOURCE_UPDATED:
-            case DATASOURCE_CREATED:
-                registry.refreshConfig(connectionIds);
-                break;
-            case DATASOURCE_DELETED:
-                registry.refreshConfig();
-                sendDataSourceUpdatedEvent = true;
-                break;
+        if (type == WSEventType.DATASOURCE_CREATED || type == WSEventType.DATASOURCE_UPDATED) {
+            registry.refreshConfig(dataSourceIds);
         }
-        for (String connectionId : connectionIds) {
-            DataSourceDescriptor container = (DataSourceDescriptor) registry.getDataSource(connectionId);
-            if (container == null) {
+        for (String dsId : dataSourceIds) {
+            DataSourceDescriptor ds = (DataSourceDescriptor) registry.getDataSource(dsId);
+            if (ds == null) {
                 continue;
             }
-            sendDataSourceUpdatedEvent |= isSendDataSourceUpdatedEvent(type, oldDataSources.get(connectionId), container);
+            switch (type) {
+                case DATASOURCE_CREATED: {
+                    WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
+                    this.connections.put(connectionInfo.getId(), connectionInfo);
+                    sendDataSourceUpdatedEvent = true;
+                    break;
+                }
+                case DATASOURCE_UPDATED: {
+                    // if settings were changed we need to send event
+                    sendDataSourceUpdatedEvent |= !ds.equalSettings(oldDataSources.get(dsId));
+                    break;
+                }
+                case DATASOURCE_DELETED: {
+                    WebDataSourceUtils.disconnectDataSource(this, ds);
+                    registry.removeDataSourceFromList(ds);
+                    this.connections.remove(ds.getId());
+                    sendDataSourceUpdatedEvent = true;
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
         }
         return sendDataSourceUpdatedEvent;
-    }
-
-    private boolean isSendDataSourceUpdatedEvent(WSEventType type, DataSourceDescriptor oldDataSource, DataSourceDescriptor newDataSource) {
-        if (type == WSEventType.DATASOURCE_CREATED) {
-            WebConnectionInfo connectionInfo = new WebConnectionInfo(this, newDataSource);
-            this.connections.put(connectionInfo.getId(), connectionInfo);
-        } else if (type == WSEventType.DATASOURCE_DELETED) {
-            this.connections.remove(newDataSource.getId());
-        } else {
-            return !newDataSource.equalSettings(oldDataSource);
-        }
-        return true;
     }
 
     // Note: for admin use only

@@ -137,6 +137,11 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     }
 
     @Override
+    public void removeDataSourceFromList(@NotNull DBPDataSourceContainer dataSource) {
+        dataSourceRegistry.removeDataSourceFromList(dataSource);
+    }
+
+    @Override
     public void updateDataSource(@NotNull DBPDataSourceContainer dataSource) throws DBException {
         dataSourceRegistry.updateDataSource(dataSource);
     }
