@@ -26,7 +26,7 @@ import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.registry.BaseProjectImpl;
-import org.jkiss.dbeaver.registry.DataSourceRegistry;
+import org.jkiss.dbeaver.registry.DataSourceRegistryRM;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.Pair;
 
@@ -115,7 +115,10 @@ public class WebProjectImpl extends BaseProjectImpl {
     @NotNull
     @Override
     protected DBPDataSourceRegistry createDataSourceRegistry() {
-        return new WebDataSourceRegistryProxy(new DataSourceRegistry(this), dataSourceFilter);
+        return new WebDataSourceRegistryProxy(
+            new DataSourceRegistryRM(this, getResourceController()),
+            dataSourceFilter
+        );
     }
 
     /**

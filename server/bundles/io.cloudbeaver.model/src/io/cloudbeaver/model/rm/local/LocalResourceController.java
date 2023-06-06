@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.rm.RMUtils;
+import io.cloudbeaver.model.rm.RMWebProjectImpl;
 import io.cloudbeaver.model.rm.lock.RMFileLockController;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -125,12 +126,11 @@ public class LocalResourceController implements RMController {
             if (project == null || refresh) {
                 SessionContextImpl sessionContext = new SessionContextImpl(null);
                 RMProject rmProject = makeProjectFromId(projectId, false);
-                project = new WebProjectImpl(
+                project = new RMWebProjectImpl(
                     workspace,
                     this,
                     sessionContext,
-                    rmProject,
-                    (container) -> true);
+                    rmProject);
                 projectRegistries.put(projectId, project);
             }
             return project;
