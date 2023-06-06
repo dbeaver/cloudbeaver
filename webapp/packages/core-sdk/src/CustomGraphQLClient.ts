@@ -6,10 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import axios, { AxiosProgressEvent, AxiosResponse, isAxiosError } from 'axios';
-import { ClientError, GraphQLClient, resolveRequestDocument } from 'graphql-request';
-import { parseRequestArgs } from 'graphql-request/dist/parseArgs';
-import type { RequestDocument, RequestOptions, Variables } from 'graphql-request/dist/types';
-import type * as Dom from 'graphql-request/dist/types.dom';
+import { ClientError, GraphQLClient, resolveRequestDocument, RequestDocument, RequestOptions, Variables } from 'graphql-request';
 
 import { GQLError } from './GQLError';
 import type { IResponseInterceptor } from './IResponseInterceptor';
@@ -50,12 +47,12 @@ export class CustomGraphQLClient extends GraphQLClient {
     this.interceptors.push(interceptor);
   }
 
-  request<T = any, V = Variables>(document: RequestDocument, variables?: V, requestHeaders?: Dom.RequestInit['headers']): Promise<T>;
+  request<T = any, V = Variables>(document: RequestDocument, variables?: V, requestHeaders?: HeadersInit): Promise<T>;
   request<T = any, V extends Variables = Variables>(options: RequestOptions<V>): Promise<T>;
   request<T = any, V extends Variables = Variables>(
     document: RequestDocument | RequestOptions<V>,
     variables?: V,
-    requestHeaders?: Dom.RequestInit['headers'],
+    requestHeaders?: HeadersInit,
   ): Promise<T> {
     return this.interceptors.reduce(
       (accumulator, interceptor) => interceptor(accumulator),
@@ -86,7 +83,7 @@ export class CustomGraphQLClient extends GraphQLClient {
   private async overrideRequest<T, V extends Variables = Variables>(
     documentOrOptions: RequestDocument | RequestOptions<V>,
     variables?: V,
-    requestHeaders?: Dom.RequestInit['headers'],
+    requestHeaders?: HeadersInit,
   ): Promise<T> {
     this.blockRequestsReasonHandler();
     try {
@@ -197,4 +194,21 @@ function isClientError(obj: any): obj is ClientError {
 
 function isObjectError(obj: ClientError) {
   return !!obj.response.errors;
+}
+
+function parseRequestArgs<V extends Variables = Variables>(
+  documentOrOptions: RequestDocument | RequestOptions<V>,
+  variables?: V,
+  requestHeaders?: HeadersInit,
+): RequestOptions<V> {
+  if ((documentOrOptions as RequestOptions<V>).document) {
+    return documentOrOptions as RequestOptions<V>;
+  }
+
+  return {
+    document: documentOrOptions as RequestDocument,
+    variables,
+    requestHeaders,
+    signal: undefined,
+  } as unknown as RequestOptions<V>;
 }

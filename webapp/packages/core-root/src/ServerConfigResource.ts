@@ -65,7 +65,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
   }
 
   requirePublic<T>(resource: CachedResource<any, any, T, any, any>, map?: (param: void) => T): this {
-    resource.preloadResource(this, () => {}).before(ExecutorInterrupter.interrupter(() => this.publicDisabled));
+    resource.preloadResource(this, () => { }).before(ExecutorInterrupter.interrupter(() => this.publicDisabled));
 
     this.outdateResource<T>(resource, map as any);
 
