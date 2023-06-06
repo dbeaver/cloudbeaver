@@ -20,8 +20,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
 import io.cloudbeaver.model.rm.DBNResourceManagerProject;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
@@ -197,7 +195,7 @@ public class WebNavigatorNodeInfo {
         if (node instanceof DBNRoot) {
             return features.toArray(new String[0]);
         }
-        if (node instanceof DBNAbstractResourceManagerNode && !isDistributedSpecialFolderNode()) {
+        if (node instanceof DBNResourceManagerResource && !isDistributedSpecialFolderNode()) {
             if (hasNodePermission(RMProjectPermission.RESOURCE_EDIT)) {
                 features.add(NODE_FEATURE_CAN_RENAME);
                 features.add(NODE_FEATURE_CAN_DELETE);
