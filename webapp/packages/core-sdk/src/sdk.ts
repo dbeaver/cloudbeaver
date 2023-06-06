@@ -474,7 +474,7 @@ export interface DriverInfo {
 }
 
 export interface DriverLibraryInfo {
-  icon: Scalars['String'];
+  icon?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   name: Scalars['String'];
 }
@@ -2689,55 +2689,8 @@ export type DriverListQueryVariables = Exact<{
   includeDriverLibraries: Scalars['Boolean'];
 }>;
 
-export type DriverListQuery = {
-  drivers: Array<{
-    id: string;
-    name?: string;
-    icon?: string;
-    description?: string;
-    defaultPort?: string;
-    defaultDatabase?: string;
-    defaultServer?: string;
-    defaultUser?: string;
-    sampleURL?: string;
-    embedded?: boolean;
-    enabled: boolean;
-    requiresServerName?: boolean;
-    anonymousAccess?: boolean;
-    promotedScore?: number;
-    providerId?: string;
-    driverClassName?: string;
-    custom?: boolean;
-    defaultAuthModel: string;
-    applicableAuthModels: Array<string>;
-    applicableNetworkHandlers: Array<string>;
-    configurationTypes: Array<DriverConfigurationType>;
-    driverParameters?: any;
-    providerProperties?: Array<{
-      id?: string;
-      displayName?: string;
-      description?: string;
-      category?: string;
-      dataType?: string;
-      defaultValue?: any;
-      validValues?: Array<any>;
-      length: ObjectPropertyLength;
-      features: Array<string>;
-      order: number;
-      supportedConfigurationTypes?: Array<string>;
-    }>;
-    driverProperties?: Array<{
-      id?: string;
-      displayName?: string;
-      description?: string;
-      category?: string;
-      dataType?: string;
-      defaultValue?: any;
-      validValues?: Array<any>;
-    }>;
-    driverLibraries?: Array<{ id: string; name: string; icon: string }>;
-  }>;
-};
+
+export type DriverListQuery = { drivers: Array<{ id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, custom?: boolean, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number, supportedConfigurationTypes?: Array<string> }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }>, driverLibraries?: Array<{ id: string, name: string, icon?: string }> }> };
 
 export type ExecutionContextCreateMutationVariables = Exact<{
   projectId: Scalars['ID'];
@@ -3735,53 +3688,6 @@ export type DatabaseConnectionFragment = {
   };
 };
 
-export type DatabaseDriverFragment = {
-  id: string;
-  name?: string;
-  icon?: string;
-  description?: string;
-  defaultPort?: string;
-  defaultDatabase?: string;
-  defaultServer?: string;
-  defaultUser?: string;
-  sampleURL?: string;
-  embedded?: boolean;
-  enabled: boolean;
-  requiresServerName?: boolean;
-  anonymousAccess?: boolean;
-  promotedScore?: number;
-  providerId?: string;
-  driverClassName?: string;
-  custom?: boolean;
-  defaultAuthModel: string;
-  applicableAuthModels: Array<string>;
-  applicableNetworkHandlers: Array<string>;
-  configurationTypes: Array<DriverConfigurationType>;
-  driverParameters?: any;
-  providerProperties?: Array<{
-    id?: string;
-    displayName?: string;
-    description?: string;
-    category?: string;
-    dataType?: string;
-    defaultValue?: any;
-    validValues?: Array<any>;
-    length: ObjectPropertyLength;
-    features: Array<string>;
-    order: number;
-    supportedConfigurationTypes?: Array<string>;
-  }>;
-  driverProperties?: Array<{
-    id?: string;
-    displayName?: string;
-    description?: string;
-    category?: string;
-    dataType?: string;
-    defaultValue?: any;
-    validValues?: Array<any>;
-  }>;
-  driverLibraries?: Array<{ id: string; name: string; icon: string }>;
-};
 
 export type DriverProviderPropertyInfoFragment = {
   id?: string;
@@ -3854,6 +3760,7 @@ export type NavNodePropertiesFragment = {
   value?: any;
   order: number;
 };
+export type DatabaseDriverFragment = { id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, custom?: boolean, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number, supportedConfigurationTypes?: Array<string> }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }>, driverLibraries?: Array<{ id: string, name: string, icon?: string }> };
 
 export type ObjectOriginInfoFragment = {
   type: string;
