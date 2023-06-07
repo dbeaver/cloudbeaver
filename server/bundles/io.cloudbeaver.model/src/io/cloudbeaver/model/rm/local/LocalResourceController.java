@@ -374,15 +374,23 @@ public class LocalResourceController implements RMController {
         @NotNull String configuration,
         @Nullable List<String> dataSourceIds
     ) throws DBException {
-        final DBPProject project = getProjectMetadata(projectId, false);
-        final DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-        final DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(StandardCharsets.UTF_8));
-        final DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
-        var configChanged = ((DataSourcePersistentRegistry) registry).loadDataSources(List.of(storage), manager, dataSourceIds, true, false);
-        registry.checkForErrors();
-        ((DataSourcePersistentRegistry) registry).saveDataSources();
-        registry.checkForErrors();
-        return configChanged;
+        try (var lock = lockController.lockProject(projectId, "updateProjectDataSources")) {
+            DBPProject project = getProjectMetadata(projectId, false);
+            DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+            DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(StandardCharsets.UTF_8));
+            DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
+            var configChanged = ((DataSourcePersistentRegistry) registry).loadDataSources(
+                List.of(storage),
+                manager,
+                dataSourceIds,
+                true,
+                false
+            );
+            registry.checkForErrors();
+            ((DataSourcePersistentRegistry) registry).saveDataSources();
+            registry.checkForErrors();
+            return configChanged;
+        }
     }
 
     @Override
@@ -463,8 +471,8 @@ public class LocalResourceController implements RMController {
         @Nullable String nameMask,
         boolean readProperties,
         boolean readHistory,
-        boolean recursive) throws DBException
-    {
+        boolean recursive
+    ) throws DBException {
         Path projectPath = getProjectPath(projectId);
         try {
             if (!Files.exists(projectPath)) {
@@ -512,24 +520,26 @@ public class LocalResourceController implements RMController {
     public String createResource(
         @NotNull String projectId,
         @NotNull String resourcePath,
-        boolean isFolder) throws DBException
-    {
-        validateResourcePath(resourcePath);
-        Path targetPath = getTargetPath(projectId, resourcePath);
-        if (Files.exists(targetPath)) {
-            throw new DBException("Resource '" + resourcePath + "' already exists");
-        }
-        createFolder(targetPath.getParent());
-        try {
-            if (isFolder) {
-                Files.createDirectories(targetPath);
-            } else {
-                Files.createFile(targetPath);
+        boolean isFolder
+    ) throws DBException {
+        try (var projectLock = lockController.lockProject(projectId, "createResource")) {
+            validateResourcePath(resourcePath);
+            Path targetPath = getTargetPath(projectId, resourcePath);
+            if (Files.exists(targetPath)) {
+                throw new DBException("Resource '" + resourcePath + "' already exists");
             }
-        } catch (IOException e) {
-            throw new DBException("Error creating resource '" + resourcePath + "'", e);
+            createFolder(targetPath.getParent());
+            try {
+                if (isFolder) {
+                    Files.createDirectories(targetPath);
+                } else {
+                    Files.createFile(targetPath);
+                }
+            } catch (IOException e) {
+                throw new DBException("Error creating resource '" + resourcePath + "'", e);
+            }
+            fireRmResourceAddEvent(projectId, resourcePath);
         }
-        fireRmResourceAddEvent(projectId, resourcePath);
         return DEFAULT_CHANGE_ID;
     }
 
@@ -539,33 +549,35 @@ public class LocalResourceController implements RMController {
         @NotNull String oldResourcePath,
         @NotNull String newResourcePath
     ) throws DBException {
-        var normalizedOldResourcePath = CommonUtils.normalizeResourcePath(oldResourcePath);
-        var normalizedNewResourcePath = CommonUtils.normalizeResourcePath(newResourcePath);
-        if (log.isDebugEnabled()) {
-            log.debug("Moving resource from '" + normalizedOldResourcePath + "' to '" + normalizedNewResourcePath + "'");
-        }
-        Path oldTargetPath = getTargetPath(projectId, normalizedOldResourcePath);
-        List<RMResource> rmOldResourcePath = makeResourcePath(projectId, oldTargetPath, false);
-        if (!Files.exists(oldTargetPath)) {
-            throw new DBException("Resource '" + oldTargetPath + "' doesn't exists");
-        }
-        Path newTargetPath = getTargetPath(projectId, normalizedNewResourcePath);
-        validateResourcePath(newTargetPath.toString());
-        try {
-            Files.move(oldTargetPath, newTargetPath);
-        } catch (IOException e) {
-            throw new DBException("Error moving resource '" + normalizedOldResourcePath + "'", e);
+        try (var projectLock = lockController.lockProject(projectId, "moveResource")) {
+            var normalizedOldResourcePath = CommonUtils.normalizeResourcePath(oldResourcePath);
+            var normalizedNewResourcePath = CommonUtils.normalizeResourcePath(newResourcePath);
+            if (log.isDebugEnabled()) {
+                log.debug("Moving resource from '" + normalizedOldResourcePath + "' to '" + normalizedNewResourcePath + "'");
+            }
+            Path oldTargetPath = getTargetPath(projectId, normalizedOldResourcePath);
+            List<RMResource> rmOldResourcePath = makeResourcePath(projectId, oldTargetPath, false);
+            if (!Files.exists(oldTargetPath)) {
+                throw new DBException("Resource '" + oldTargetPath + "' doesn't exists");
+            }
+            Path newTargetPath = getTargetPath(projectId, normalizedNewResourcePath);
+            validateResourcePath(newTargetPath.toString());
+            try {
+                Files.move(oldTargetPath, newTargetPath);
+            } catch (IOException e) {
+                throw new DBException("Error moving resource '" + normalizedOldResourcePath + "'", e);
+            }
+
+            log.debug("Moving resource properties");
+            try {
+                movePropertiesRecursive(projectId, newTargetPath, normalizedOldResourcePath, normalizedNewResourcePath);
+            } catch (IOException | DBException e) {
+                throw new DBException("Unable to move resource properties", e);
+            }
+            fireRmResourceDeleteEvent(projectId, rmOldResourcePath);
+            fireRmResourceAddEvent(projectId, normalizedNewResourcePath);
         }
 
-        log.debug("Moving resource properties");
-        try {
-            movePropertiesRecursive(projectId, newTargetPath, normalizedOldResourcePath, normalizedNewResourcePath);
-        } catch (IOException | DBException e) {
-            throw new DBException("Unable to move resource properties", e);
-        }
-
-        fireRmResourceDeleteEvent(projectId, rmOldResourcePath);
-        fireRmResourceAddEvent(projectId, normalizedNewResourcePath);
         return DEFAULT_CHANGE_ID;
     }
 
@@ -598,42 +610,44 @@ public class LocalResourceController implements RMController {
 
     @Override
     public void deleteResource(@NotNull String projectId, @NotNull String resourcePath, boolean recursive) throws DBException {
-        if (log.isDebugEnabled()) {
-            log.debug("Removing resource from '" + resourcePath + "'" + (recursive ? " recursive" : ""));
-        }
-        validateResourcePath(resourcePath);
-        Path targetPath = getTargetPath(projectId, resourcePath);
-        if (!Files.exists(targetPath)) {
-            throw new DBException("Resource '" + resourcePath + "' doesn't exists");
-        }
-        Collection<String> propertiesToRemove = List.of();
-        try {
-            if (recursive) {
-                propertiesToRemove = getPropertiesToRemove(projectId, targetPath);
-            } else {
-                propertiesToRemove = List.of(resourcePath);
+        try (var projectLock = lockController.lockProject(projectId, "deleteResource")) {
+            if (log.isDebugEnabled()) {
+                log.debug("Removing resource from '" + resourcePath + "'" + (recursive ? " recursive" : ""));
             }
-        } catch (IOException | DBException e) {
-            log.warn("Failed to remove resources properties", e);
-        }
-        final List<RMResource> rmResourcePath = makeResourcePath(projectId, targetPath, recursive);
-        try {
-            if (targetPath.toFile().isDirectory()) {
-                IOUtils.deleteDirectory(targetPath);
-            } else {
-                Files.delete(targetPath);
+            validateResourcePath(resourcePath);
+            Path targetPath = getTargetPath(projectId, resourcePath);
+            if (!Files.exists(targetPath)) {
+                throw new DBException("Resource '" + resourcePath + "' doesn't exists");
             }
-        } catch (IOException e) {
-            throw new DBException("Error deleting resource '" + resourcePath + "'", e);
-        }
+            Collection<String> propertiesToRemove = List.of();
+            try {
+                if (recursive) {
+                    propertiesToRemove = getPropertiesToRemove(projectId, targetPath);
+                } else {
+                    propertiesToRemove = List.of(resourcePath);
+                }
+            } catch (IOException | DBException e) {
+                log.warn("Failed to remove resources properties", e);
+            }
+            final List<RMResource> rmResourcePath = makeResourcePath(projectId, targetPath, recursive);
+            try {
+                if (targetPath.toFile().isDirectory()) {
+                    IOUtils.deleteDirectory(targetPath);
+                } else {
+                    Files.delete(targetPath);
+                }
+            } catch (IOException e) {
+                throw new DBException("Error deleting resource '" + resourcePath + "'", e);
+            }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Remove resources properties:\n" + propertiesToRemove);
-        }
-        getProjectMetadata(projectId, false)
+            if (log.isDebugEnabled()) {
+                log.debug("Remove resources properties:\n" + propertiesToRemove);
+            }
+            getProjectMetadata(projectId, false)
                 .resetResourcesPropertiesBatch(propertiesToRemove);
-        log.debug("Fire resource delete event");
-        fireRmResourceDeleteEvent(projectId, rmResourcePath);
+            log.debug("Fire resource delete event");
+            fireRmResourceDeleteEvent(projectId, rmResourcePath);
+        }
     }
 
     private Collection<String> getPropertiesToRemove(@NotNull String projectId, @NotNull Path targetPath) throws DBException, IOException {
@@ -673,31 +687,34 @@ public class LocalResourceController implements RMController {
         @NotNull String projectId,
         @NotNull String resourcePath,
         @NotNull byte[] data,
-        boolean forceOverwrite) throws DBException
-    {
-        validateResourcePath(resourcePath);
-        Number fileSizeLimit = WebAppUtils.getWebApplication()
+        boolean forceOverwrite
+    ) throws DBException {
+        try (var lock = lockController.lockProject(projectId, "setResourceContents")) {
+            validateResourcePath(resourcePath);
+            Number fileSizeLimit = WebAppUtils.getWebApplication()
                 .getAppConfiguration()
                 .getResourceQuota(WebSQLConstants.QUOTA_PROP_RM_FILE_SIZE_LIMIT);
-        if (fileSizeLimit != null && data.length > fileSizeLimit.longValue()) {
-            throw new DBQuotaException(
+            if (fileSizeLimit != null && data.length > fileSizeLimit.longValue()) {
+                throw new DBQuotaException(
                     "File size quota exceeded",
                     WebSQLConstants.QUOTA_PROP_RM_FILE_SIZE_LIMIT,
                     fileSizeLimit.longValue(),
-                    data.length);
-        }
-        Path targetPath = getTargetPath(projectId, resourcePath);
-        if (!forceOverwrite && Files.exists(targetPath)) {
-            throw new DBException("Resource '" + resourcePath + "' exists");
-        }
-        createFolder(targetPath.getParent());
-        try {
-            Files.write(targetPath, data);
-        } catch (IOException e) {
-            throw new DBException("Error reading resource '" + resourcePath + "'", e);
-        }
-        if (!forceOverwrite) {
-            fireRmResourceAddEvent(projectId, resourcePath);
+                    data.length
+                );
+            }
+            Path targetPath = getTargetPath(projectId, resourcePath);
+            if (!forceOverwrite && Files.exists(targetPath)) {
+                throw new DBException("Resource '" + resourcePath + "' exists");
+            }
+            createFolder(targetPath.getParent());
+            try {
+                Files.write(targetPath, data);
+            } catch (IOException e) {
+                throw new DBException("Error reading resource '" + resourcePath + "'", e);
+            }
+            if (!forceOverwrite) {
+                fireRmResourceAddEvent(projectId, resourcePath);
+            }
         }
         return DEFAULT_CHANGE_ID;
     }
