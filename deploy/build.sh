@@ -27,7 +27,7 @@ cd cloudbeaver/deploy
 echo "Build CloudBeaver server"
 
 cd ../server/product/aggregate
-mvn clean verify -Dheadless-platform
+mvn clean verify -U -Dheadless-platform
 if [[ "$?" -ne 0 ]] ; then
   echo 'Could not perform package'; exit $rc
 fi
