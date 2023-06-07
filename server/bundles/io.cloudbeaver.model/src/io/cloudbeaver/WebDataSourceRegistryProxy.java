@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.access.DBAAuthProfile;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
@@ -41,7 +42,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSourcePersistentRegistry {
+public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSourcePersistentRegistry, DBPDataSourceRegistryCache {
     private final DataSourceFilter dataSourceFilter;
     private final DataSourceRegistry dataSourceRegistry;
 
@@ -134,6 +135,11 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     @Override
     public void removeDataSource(@NotNull DBPDataSourceContainer dataSource) {
         dataSourceRegistry.removeDataSource(dataSource);
+    }
+
+    @Override
+    public void addDataSourceToList(@NotNull DBPDataSourceContainer dataSource) {
+        dataSourceRegistry.addDataSourceToList(dataSource);
     }
 
     @Override

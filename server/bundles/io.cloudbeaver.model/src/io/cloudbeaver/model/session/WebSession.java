@@ -45,6 +45,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
@@ -72,15 +73,15 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * Web session.
@@ -281,7 +282,9 @@ public class WebSession extends BaseWebSession
                 }
                 case DATASOURCE_DELETED: {
                     WebDataSourceUtils.disconnectDataSource(this, ds);
-                    registry.removeDataSourceFromList(ds);
+                    if (registry instanceof DBPDataSourceRegistryCache) {
+                        ((DBPDataSourceRegistryCache) registry).removeDataSourceFromList(ds);
+                    }
                     this.connections.remove(ds.getId());
                     sendDataSourceUpdatedEvent = true;
                     break;
