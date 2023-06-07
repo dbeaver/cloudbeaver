@@ -18,6 +18,7 @@ export * from './isNotNullDefined';
 export * from './flat';
 export * from './generateFileName';
 export * from './getMIME';
+export * from './getOS';
 export * from './getPathName';
 export * from './getPathParent';
 export * from './getPathParents';

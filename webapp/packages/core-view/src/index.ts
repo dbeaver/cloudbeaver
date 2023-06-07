@@ -26,6 +26,7 @@ export * from './Action/IAction';
 export * from './Action/IActionHandler';
 export * from './Action/IActionInfo';
 export * from './Action/IActionItem';
+export * from './Action/KeyBinding/getOSSpecificKeys';
 export * from './DataContext/createDataContext';
 export * from './DataContext/DataContext';
 export * from './DataContext/DynamicDataContext';

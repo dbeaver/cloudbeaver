@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { KEY_BINDING_OPEN_IN_TAB, KEY_BINDING_REDO, KEY_BINDING_UNDO } from '@cloudbeaver/core-view';
+import { getOSSpecificKeys, KEY_BINDING_OPEN_IN_TAB, KEY_BINDING_REDO, KEY_BINDING_UNDO } from '@cloudbeaver/core-view';
 import { KEY_BINDING_COLLAPSE_ALL, KEY_BINDING_ENABLE_FILTER, KEY_BINDING_LINK_OBJECT } from '@cloudbeaver/plugin-navigation-tree';
 import {
   KEY_BINDING_SQL_EDITOR_EXECUTE,
@@ -71,11 +71,11 @@ export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
   },
   {
     label: 'sql_editor_shortcut_undo',
-    code: transformKeys(KEY_BINDING_UNDO.keys),
+    code: transformKeys(getOSSpecificKeys(KEY_BINDING_UNDO)),
   },
   {
     label: 'sql_editor_shortcut_redo',
-    code: transformKeys(KEY_BINDING_REDO.keys),
+    code: transformKeys(getOSSpecificKeys(KEY_BINDING_REDO)),
   },
   {
     label: 'sql_editor_shortcut_open_editor_in_new_tab',

@@ -11,4 +11,5 @@ export interface IKeyBinding {
   label: string;
   preventDefault?: boolean;
   keys: string | string[];
+  keysMac?: string | string[];
 }

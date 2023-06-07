@@ -12,6 +12,7 @@ interface IKeyBindingOptions {
   label: string;
   preventDefault?: boolean;
   keys: string | string[];
+  keysMac?: string | string[];
 }
 
 export function createKeyBinding(options: IKeyBindingOptions): IKeyBinding {
