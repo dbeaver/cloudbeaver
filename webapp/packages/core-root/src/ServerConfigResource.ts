@@ -9,13 +9,15 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { CachedDataResource, CachedResource, GraphQLService, NavigatorSettingsInput, ServerConfig, ServerConfigInput } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, CachedResource, GraphQLService, NavigatorSettingsInput, ServerConfig as SDKServerConfig, ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { isNavigatorViewSettingsEqual } from './ConnectionNavigatorViewSettings';
 import { DataSynchronizationQueue } from './DataSynchronization/DataSynchronizationQueue';
 import { DataSynchronizationService } from './DataSynchronization/DataSynchronizationService';
 import { ServerConfigEventHandler } from './ServerConfigEventHandler';
+
+export type ServerConfig = Omit<SDKServerConfig, 'hostName'>;
 
 @injectable()
 export class ServerConfigResource extends CachedDataResource<ServerConfig | null> {

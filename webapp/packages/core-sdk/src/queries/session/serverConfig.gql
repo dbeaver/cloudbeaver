@@ -5,7 +5,6 @@ query serverConfig {
     workspaceId
     serverURL
     rootURI
-    hostName
     containerId
     defaultAuthRole
     productConfiguration
