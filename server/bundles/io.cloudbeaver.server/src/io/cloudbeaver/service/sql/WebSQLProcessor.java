@@ -186,7 +186,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 ruleManager,
                 document);
 
-            SQLQuery sqlQuery = (SQLQuery) SQLScriptParser.extractActiveQuery(parserContext, sql.length(), 0);
+            SQLQuery sqlQuery = (SQLQuery) SQLScriptParser.extractActiveQuery(parserContext, 0, sql.length());
 
             DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
                 try (DBCSession session = context.openSession(monitor, resolveQueryPurpose(dataFilter), "Execute SQL")) {

@@ -9,7 +9,6 @@ const { merge } = require('webpack-merge');
 const commonConfig = require('./webpack.config.js');
 const { getAssets, withTimestamp } = require('./webpack.product.utils');
 const HtmlInjectWebpackPlugin = require('./HtmlInjectWebpackPlugin.js');
-const excludedFromVendor = require('./excludedFromVendor.js');
 
 const main = resolve('src/index.ts');
 const sso = require.resolve('@cloudbeaver/plugin-sso/src/index.ts');
@@ -41,6 +40,7 @@ module.exports = (env, argv) => {
     workboxPlugin = [new WorkboxPlugin.InjectManifest({
       swSrc: getServiceWorkerSource(),
       swDest: 'service-worker.js',
+      maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
     })];
   }
 
