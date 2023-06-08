@@ -261,6 +261,10 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
 }
 
 export function getRmResourcePath(projectId: string, path?: string): string {
+  if (path) {
+    path = path.replace(/^\//, '');
+  }
+
   return createPath(projectId, path);
 }
 
