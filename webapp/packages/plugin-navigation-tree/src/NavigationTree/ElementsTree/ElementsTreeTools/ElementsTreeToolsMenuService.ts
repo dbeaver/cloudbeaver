@@ -13,6 +13,7 @@ import {
   ACTION_FILTER,
   ActionService,
   DATA_CONTEXT_MENU,
+  getBindingLabel,
   IAction,
   IDataContextProvider,
   KeyBindingService,
@@ -60,14 +61,17 @@ export class ElementsTreeToolsMenuService {
       getActionInfo: (context, action) => {
         switch (action) {
           case ACTION_LINK_OBJECT: {
-            const tooltip = this.localizationService.translate('app_navigationTree_action_link_with_editor') + ` (${KEY_BINDING_LINK_OBJECT.label})`;
+            const bindingLabel = getBindingLabel(KEY_BINDING_LINK_OBJECT);
+            const tooltip =
+              this.localizationService.translate('app_navigationTree_action_link_with_editor') + (bindingLabel ? ` (${bindingLabel})` : '');
             return {
               ...action.info,
               tooltip,
             };
           }
           case ACTION_COLLAPSE_ALL: {
-            const tooltip = this.localizationService.translate('app_navigationTree_action_collapse_all') + ` (${KEY_BINDING_COLLAPSE_ALL.label})`;
+            const bindingLabel = getBindingLabel(KEY_BINDING_COLLAPSE_ALL);
+            const tooltip = this.localizationService.translate('app_navigationTree_action_collapse_all') + (bindingLabel ? ` (${bindingLabel})` : '');
             return {
               ...action.info,
               tooltip,

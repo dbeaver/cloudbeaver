@@ -31,7 +31,7 @@ export function getCommonAndOSSpecificKeys(keyBinding: IKeyBinding | undefined):
   return keys;
 }
 
-function getOSSpecificKeys(keyBinding: IKeyBinding): string | string[] | undefined {
+export function getOSSpecificKeys(keyBinding: IKeyBinding): string | string[] | undefined {
   const OS = getOS();
   if (OS === OperatingSystem.windowsOS) {
     return keyBinding.keysWin;

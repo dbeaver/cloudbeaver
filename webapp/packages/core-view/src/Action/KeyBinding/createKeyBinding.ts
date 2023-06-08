@@ -9,7 +9,6 @@ import type { IKeyBinding } from './IKeyBinding';
 
 interface IKeyBindingOptions {
   id: string;
-  label: string;
   preventDefault?: boolean;
   keys?: string | string[];
   keysWin?: string | string[];

@@ -9,7 +9,6 @@ import { createKeyBinding } from '@cloudbeaver/core-view';
 
 export const KEY_BINDING_ENABLE_FILTER = createKeyBinding({
   id: 'enable-filter',
-  label: 'Ctrl + F',
   keys: 'ctrl+f',
   preventDefault: true,
 });
