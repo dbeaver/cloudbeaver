@@ -7,11 +7,13 @@
  */
 import { s } from '../s';
 import { useObjectRef } from '../useObjectRef';
-import styles from './SplitControls.m.css';
+import { useS } from '../useS';
+import SplitControlsStyles from './SplitControls.m.css';
 import { useSplit } from './useSplit';
 
 export const SplitControls: React.FC = function SplitControls() {
   const split = useSplit();
+  const styles = useS(SplitControlsStyles);
 
   const inverse = split.state.isMainSecond();
 

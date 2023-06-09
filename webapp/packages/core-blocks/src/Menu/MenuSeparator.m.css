@@ -1,0 +1,15 @@
+.menuSeparator {
+  composes: theme-border-color-background from global;
+
+  flex: 1;
+  width: 100%;
+  display: flex;
+  margin: 6px 0;
+  border: none !important;
+  border-bottom: 1px solid !important;
+
+  &:first-child,
+  &:last-child {
+    display: none;
+  }
+}
