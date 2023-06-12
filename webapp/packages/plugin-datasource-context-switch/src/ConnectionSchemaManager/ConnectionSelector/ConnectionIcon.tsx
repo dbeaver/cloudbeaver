@@ -8,11 +8,13 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { ConnectionImageWithMask, useResource, useStyles } from '@cloudbeaver/core-blocks';
+import { ConnectionImageWithMask, ConnectionImageWithMaskSvgStyles, SContext, StyleRegistry, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { clsx } from '@cloudbeaver/core-utils';
 
+import { default as ConnectionImageWithMaskSvgBackgroundStyles } from './ConnectionImageWithMask.m.css';
 import type { IConnectionSelectorExtraProps } from './IConnectionSelectorExtraProps';
 
 const connectionIconStyle = css`
@@ -21,8 +23,6 @@ const connectionIconStyle = css`
     display: flex;
 
     & ConnectionImageWithMask {
-      background-color: #fff;
-      padding: 2px;
       border-radius: var(--theme-form-element-radius);
 
       &[|small] {
@@ -36,6 +36,16 @@ interface Props extends IConnectionSelectorExtraProps {
   style?: ComponentStyle;
   className?: string;
 }
+
+const registry: StyleRegistry = [
+  [
+    ConnectionImageWithMaskSvgStyles,
+    {
+      mode: 'append',
+      styles: [ConnectionImageWithMaskSvgBackgroundStyles],
+    },
+  ],
+];
 
 export const ConnectionIcon: React.FC<Props> = observer(function ConnectionIcon({ connectionKey, small = true, style, className }) {
   const styles = useStyles(style, connectionIconStyle);
@@ -55,15 +65,17 @@ export const ConnectionIcon: React.FC<Props> = observer(function ConnectionIcon(
   }
 
   return styled(styles)(
-    <icon className={className}>
-      <ConnectionImageWithMask
-        icon={driver.icon}
-        connected={connection.data.connected}
-        maskId="connection-icon"
-        size={24}
-        paddingSize={4}
-        {...use({ small })}
-      />
+    <icon className={clsx(ConnectionImageWithMaskSvgBackgroundStyles.connectionIcon, className)}>
+      <SContext registry={registry}>
+        <ConnectionImageWithMask
+          icon={driver.icon}
+          connected={connection.data.connected}
+          maskId="connection-icon"
+          size={16}
+          paddingSize={0}
+          {...use({ small })}
+        />
+      </SContext>
     </icon>,
   );
 });

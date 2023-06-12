@@ -23,22 +23,23 @@ export * from './localization/Translate';
 export * from './localization/useTranslate';
 
 export * from './ConnectionImageWithMask/ConnectionImageWithMask';
+export { default as ConnectionImageWithMaskSvgStyles } from './ConnectionImageWithMask/ConnectionImageWithMaskSvg.m.css';
 
 export * from './Menu/ACTION_ICON_BUTTON_STYLES';
 export * from './Menu/Menu';
-export * as MenuStyles from './Menu/Menu.m.css';
+export { default as MenuStyles } from './Menu/Menu.m.css';
 export * from './Menu/MenuBarSmallItem';
 export * from './Menu/MenuEmptyItem';
 export * from './Menu/MenuItem';
-export * as MenuItemStyles from './Menu/MenuItem.m.css';
+export { default as MenuItemStyles } from './Menu/MenuItem.m.css';
 export * from './Menu/MenuItemCheckbox';
 export * from './Menu/MenuItemElement';
-export * as MenuItemElementStyles from './Menu/MenuItemElement.m.css';
+export { default as MenuItemElementStyles } from './Menu/MenuItemElement.m.css';
 export * from './Menu/MenuItemRadio';
 export * from './Menu/MenuPanel';
-export * as MenuPanelStyles from './Menu/MenuPanel.m.css';
+export { default as MenuPanelStyles } from './Menu/MenuPanel.m.css';
 export * from './Menu/MenuSeparator';
-export * as MenuSeparatorStyles from './Menu/MenuSeparator.m.css';
+export { default as MenuSeparatorStyles } from './Menu/MenuSeparator.m.css';
 export * from './Menu/MenuStateContext';
 export * from './Menu/useMouseContextMenu';
 

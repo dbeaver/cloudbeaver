@@ -32,7 +32,7 @@ export const BASE_DROPDOWN_STYLES = css`
       outline: none;
       color: inherit;
       cursor: pointer;
-      gap: 8px;
+      gap: 16px;
 
       & item-icon,
       & item-title {

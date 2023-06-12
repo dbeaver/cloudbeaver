@@ -106,6 +106,7 @@ module.exports = (env, argv) => {
     loader: require.resolve('babel-loader'),
     options: {
       root: __dirname,
+      cacheDirectory: true,
     },
   };
 
@@ -207,6 +208,7 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.(css|s[ac]ss)$/,
+          exclude: /node_modules/,
           oneOf: [
             {
               test: /\.module\.(css|s[ac]ss)$/,

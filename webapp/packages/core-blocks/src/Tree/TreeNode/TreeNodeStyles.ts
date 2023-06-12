@@ -142,21 +142,18 @@ export const TREE_NODE_STYLES = css`
   }
 
   node TreeNodeControl[big] {
-    height: 46px;
-    padding: 2 16px;
+    height: 32px;
+    padding: 0 8px;
 
-    & TreeNodeSelect {
-      margin: 3px;
-    }
     & TreeNodeName {
       margin: 0;
-      padding-right: 16px;
-      padding-left: 16px;
+      padding-right: 4px;
+      padding-left: 4px;
     }
     & TreeNodeIcon,
     & TreeNodeExpand {
-      width: 24px;
-      height: 24px;
+      width: 16px;
+      height: 16px;
     }
 
     & TreeNodeExpand [|size='small'] {
@@ -168,12 +165,16 @@ export const TREE_NODE_STYLES = css`
     }
 
     & > * {
-      margin-right: 11px;
-      margin-left: 11px;
+      margin-right: 4px;
+      margin-left: 4px;
+    }
+
+    & TreeNodeSelect {
+      margin: 0;
     }
   }
 
   node TreeNodeControl[big] + TreeNodeNested {
-    padding-left: 46px;
+    padding-left: 16px;
   }
 `;

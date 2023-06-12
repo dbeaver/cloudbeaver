@@ -43,7 +43,8 @@ module.exports = (env, argv) => {
       sso,
     },
     optimization: {
-      minimize: true,
+      minimize: false,
+      moduleIds: 'named',
     },
     devServer: {
       allowedHosts: 'all',
@@ -72,9 +73,6 @@ module.exports = (env, argv) => {
       },
     },
     devtool: 'source-map',
-    // optimization: {
-    //   moduleIds: 'named',
-    // },
     plugins: [
       new CopyWebpackPlugin({
         patterns: getAssets(package, ''),

@@ -59,7 +59,7 @@ const viewerStyles = css`
     overflow: hidden;
   }
   table-data {
-    gap: 8px;
+    gap: 4px;
   }
   table-data,
   Pane,
@@ -71,7 +71,7 @@ const viewerStyles = css`
     overflow: hidden;
   }
   Split:not([disable]) {
-    gap: 8px;
+    gap: 4px;
   }
   Pane {
     &:first-child {

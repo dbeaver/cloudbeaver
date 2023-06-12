@@ -11,10 +11,12 @@ import type { IStyleRegistry, Style } from '@cloudbeaver/core-theming';
 
 type Registry = Map<Style, IStyleRegistry[]>;
 
+export type StyleRegistry = [Style, IStyleRegistry][];
+
 export const SContextReact = createContext<Registry>(new Map());
 
 type Props = {
-  registry: [Style, IStyleRegistry][];
+  registry: StyleRegistry;
 };
 
 export const SContext: React.FC<React.PropsWithChildren<Props>> = function SContext({ registry, children }) {

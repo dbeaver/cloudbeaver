@@ -47,7 +47,7 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
   return (
     <div className={s(styles, { menuPanelItem: true })} title={tooltip ? translate(tooltip) : title}>
       <div className={s(styles, { menuItemIcon: true })}>
-        <Loader className={s(styles, { loader: true })} suspense inline fullSize>
+        <Loader className={s(styles, { loader: true })} suspense small fullSize>
           {typeof icon === 'string' ? <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} /> : icon}
         </Loader>
       </div>

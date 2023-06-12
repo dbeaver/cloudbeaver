@@ -22,8 +22,6 @@ const styles = css`
   }
   Tab {
     composes: theme-ripple from theme-typography--body2 from global;
-    text-transform: uppercase;
-    font-weight: normal;
 
     &:global([aria-selected='true']) {
       font-weight: normal !important;

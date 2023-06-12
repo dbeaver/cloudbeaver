@@ -7,6 +7,9 @@
  */
 import { GlobalConstants, isValidUrl } from '@cloudbeaver/core-utils';
 
+import { useS } from '../useS';
+import style from './ConnectionImageWithMaskSvg.m.css';
+
 interface Props {
   icon?: string;
   connected: boolean;
@@ -18,6 +21,7 @@ interface Props {
 }
 
 export const ConnectionImageWithMaskSvg: React.FC<Props> = ({ icon, connected, maskId, size = 16, markerRadius = 4, paddingSize = 0, className }) => {
+  const styles = useS(style);
   if (!icon) {
     return null;
   }
@@ -48,6 +52,7 @@ export const ConnectionImageWithMaskSvg: React.FC<Props> = ({ icon, connected, m
           mask={`url(#${maskId})`}
         />
       </mask>
+      <rect className={styles.background} x="0" y="0" width={size} height={size} mask={connected ? `url(#${maskId})` : undefined} />
       <image xlinkHref={url} width={size} height={size} mask={connected ? `url(#${maskId})` : undefined} />
     </svg>
   );

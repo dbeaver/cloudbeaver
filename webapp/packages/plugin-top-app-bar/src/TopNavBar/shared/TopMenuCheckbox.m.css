@@ -1,0 +1,3 @@
+.checkbox {
+  composes: theme-checkbox_surface from global;
+}
