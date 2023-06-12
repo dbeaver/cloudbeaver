@@ -1,0 +1,27 @@
+{
+  "name": "@cloudbeaver/plugin-d3js",
+  "sideEffects": false,
+  "version": "0.1.0",
+  "description": "The plugin reexports d3js library and contains utility functions and components for d3js",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "prebuild": "rimraf --glob lib/*",
+    "build": "webpack --config ../../configs/webpack.plugin.config.js",
+    "postbuild": "tsc",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "test": "core-cli-test",
+    "validate-dependencies": "core-cli-validate-dependencies"
+  },
+  "dependencies": {
+    "d3": "^7.7.0",
+    "d3-drag": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/d3": "^7.4.0",
+    "@types/d3-drag": "^3.0.1"
+  }
+}
