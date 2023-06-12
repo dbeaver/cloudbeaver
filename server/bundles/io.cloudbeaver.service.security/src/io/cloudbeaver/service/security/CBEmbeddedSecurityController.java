@@ -19,7 +19,6 @@ package io.cloudbeaver.service.security;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.SMAuthProviderAssigner;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
@@ -97,7 +96,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private boolean isSubjectExists(String subjectId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT 1 FROM CB_AUTH_SUBJECT WHERE SUBJECT_ID=?")) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.setPrefixes("SELECT 1 FROM {prefix}CB_AUTH_SUBJECT WHERE SUBJECT_ID=?"))
+            ) {
                 dbStat.setString(1, subjectId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     return dbResult.next();
@@ -128,7 +129,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 createAuthSubject(dbCon, userId, SUBJECT_USER);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "INSERT INTO CB_USER(USER_ID,IS_ACTIVE,CREATE_TIME,DEFAULT_AUTH_ROLE) VALUES(?,?,?,?)")
+                    database.setPrefixes("INSERT INTO {prefix}CB_USER(USER_ID,IS_ACTIVE,CREATE_TIME,DEFAULT_AUTH_ROLE) VALUES(?,?,?,?)"))
                 ) {
                     dbStat.setString(1, userId);
                     dbStat.setString(2, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
@@ -158,7 +159,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 deleteAuthSubject(dbCon, userId);
-                JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER WHERE USER_ID=?", userId);
+                JDBCUtils.executeStatement(dbCon, database.setPrefixes("DELETE FROM {prefix}CB_USER WHERE USER_ID=?"), userId);
                 txn.commit();
             }
         } catch (SQLException e) {
@@ -170,9 +171,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public void setUserTeams(String userId, String[] teamIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_USER_TEAM WHERE USER_ID=?", userId);
+                JDBCUtils.executeStatement(dbCon, database.setPrefixes("DELETE FROM {prefix}CB_USER_TEAM WHERE USER_ID=?"), userId);
                 if (!ArrayUtils.isEmpty(teamIds)) {
-                    try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_TEAM(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")) {
+                    try (PreparedStatement dbStat = dbCon.prepareStatement(
+                        database.setPrefixes("INSERT INTO {prefix}CB_USER_TEAM(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)"))
+                    ) {
                         for (String teamId : teamIds) {
                             dbStat.setString(1, userId);
                             dbStat.setString(2, teamId);
@@ -194,8 +197,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public SMTeam[] getUserTeams(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT R.* FROM CB_USER_TEAM UR,CB_TEAM R " +
-                    "WHERE UR.USER_ID=? AND UR.TEAM_ID=R.TEAM_ID")) {
+                database.setPrefixes("SELECT R.* FROM {prefix}CB_USER_TEAM UR, {prefix}CB_TEAM R " +
+                    "WHERE UR.USER_ID=? AND UR.TEAM_ID=R.TEAM_ID"))
+            ) {
                 dbStat.setString(1, userId);
                 List<SMTeam> teams = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -210,10 +214,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private static Set<String> getAllLinkedSubjects(Connection dbCon, String subjectId) throws SQLException {
+    private Set<String> getAllLinkedSubjects(Connection dbCon, String subjectId) throws SQLException {
         Set<String> allSubjects = new HashSet<>();
         allSubjects.add(subjectId);
-        try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT TEAM_ID FROM CB_USER_TEAM UR WHERE USER_ID=?")) {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            database.setPrefixes("SELECT TEAM_ID FROM {prefix}CB_USER_TEAM UR WHERE USER_ID=?"))
+        ) {
             dbStat.setString(1, subjectId);
             try (ResultSet dbResult = dbStat.executeQuery()) {
                 while (dbResult.next()) {
@@ -235,7 +241,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             SMUser user;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM CB_USER WHERE USER_ID=?"
+                database.setPrefixes("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {prefix}CB_USER WHERE USER_ID=?")
             )) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -251,7 +257,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
             readSubjectMetas(dbCon, user);
             // Teams
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT TEAM_ID FROM CB_USER_TEAM WHERE USER_ID=?")) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.setPrefixes("SELECT TEAM_ID FROM {prefix}CB_USER_TEAM WHERE USER_ID=?"))
+            ) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     List<String> teamIDs = new ArrayList<>();
@@ -280,8 +288,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             Map<String, SMUser> result = new LinkedHashMap<>();
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM CB_USER" +
-                    (CommonUtils.isEmpty(userNameMask) ? "\nORDER BY USER_ID" : " WHERE USER_ID=?"))) {
+                database.setPrefixes("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {prefix}CB_USER" +
+                    (CommonUtils.isEmpty(userNameMask) ? "\nORDER BY USER_ID" : " WHERE USER_ID=?")))
+            ) {
                 if (!CommonUtils.isEmpty(userNameMask)) {
                     dbStat.setString(1, userNameMask);
                 }
@@ -296,8 +305,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
             readSubjectsMetas(dbCon, SMSubjectType.user, userNameMask, result);
             // Read teams
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT USER_ID,TEAM_ID FROM CB_USER_TEAM" +
-                (CommonUtils.isEmpty(userNameMask) ? "" : " WHERE USER_ID=?"))) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.setPrefixes("SELECT USER_ID,TEAM_ID FROM {prefix}CB_USER_TEAM" +
+                (CommonUtils.isEmpty(userNameMask) ? "" : " WHERE USER_ID=?")))
+            ) {
                 if (!CommonUtils.isEmpty(userNameMask)) {
                     dbStat.setString(1, userNameMask);
                 }
@@ -322,7 +333,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private void cleanupSubjectMeta(Connection dbCon, String subjectId) throws SQLException {
         // Delete old metas
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            "DELETE FROM CB_SUBJECT_META WHERE SUBJECT_ID=?")) {
+            database.setPrefixes("DELETE FROM {prefix}CB_SUBJECT_META WHERE SUBJECT_ID=?"))
+        ) {
             dbStat.setString(1, subjectId);
             dbStat.execute();
         }
@@ -331,7 +343,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private void readSubjectMetas(Connection dbCon, SMSubject subject) throws SQLException {
         // Metas
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            "SELECT META_ID,META_VALUE FROM CB_SUBJECT_META WHERE SUBJECT_ID=?")) {
+            database.setPrefixes("SELECT META_ID,META_VALUE FROM {prefix}CB_SUBJECT_META WHERE SUBJECT_ID=?"))
+        ) {
             dbStat.setString(1, subject.getSubjectId());
             try (ResultSet dbResult = dbStat.executeQuery()) {
                 while (dbResult.next()) {
@@ -347,9 +360,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private void readSubjectsMetas(Connection dbCon, SMSubjectType subjectType, String nameMask, Map<String, ? extends SMSubject> result) throws SQLException {
         // Read metas
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            "SELECT m.SUBJECT_ID,m.META_ID,m.META_VALUE FROM CB_AUTH_SUBJECT s, CB_SUBJECT_META m\n" +
+            database.setPrefixes("SELECT m.SUBJECT_ID,m.META_ID,m.META_VALUE FROM {prefix}CB_AUTH_SUBJECT s, {prefix}CB_SUBJECT_META m\n" +
                 "WHERE s.SUBJECT_TYPE=? AND s.SUBJECT_ID=m.SUBJECT_ID" +
-            (CommonUtils.isEmpty(nameMask) ? "" : " AND s.SUBJECT_ID=?"))) {
+                (CommonUtils.isEmpty(nameMask) ? "" : " AND s.SUBJECT_ID=?")))
+        ) {
             dbStat.setString(1, subjectType.getCode());
             if (!CommonUtils.isEmpty(nameMask)) {
                 dbStat.setString(2, nameMask);
@@ -372,7 +386,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private void saveSubjectMetas(Connection dbCon, String subjectId, Map<String, String> metaParameters) throws SQLException {
         if (!CommonUtils.isEmpty(metaParameters)) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "INSERT INTO CB_SUBJECT_META(SUBJECT_ID,META_ID,META_VALUE) VALUES(?,?,?)")) {
+                database.setPrefixes("INSERT INTO {prefix}CB_SUBJECT_META(SUBJECT_ID,META_ID,META_VALUE) VALUES(?,?,?)"))
+            ) {
                 dbStat.setString(1, subjectId);
                 for (Map.Entry<String, String> mp : metaParameters.entrySet()) {
                     dbStat.setString(2, mp.getKey());
@@ -389,7 +404,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             Map<String, Object> result = new LinkedHashMap<>();
             // Read users
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT * FROM CB_USER_PARAMETERS  WHERE USER_ID=?")) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.setPrefixes("SELECT * FROM {prefix}CB_USER_PARAMETERS  WHERE USER_ID=?"))
+            ) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
@@ -412,7 +429,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 if (value == null) {
                     // Delete old metas
-                    try (PreparedStatement dbStat = dbCon.prepareStatement("DELETE FROM CB_USER_PARAMETERS WHERE USER_ID=? AND PARAM_ID=?")) {
+                    try (PreparedStatement dbStat = dbCon.prepareStatement(
+                        database.setPrefixes("DELETE FROM {prefix}CB_USER_PARAMETERS WHERE USER_ID=? AND PARAM_ID=?"))
+                    ) {
                         dbStat.setString(1, userId);
                         dbStat.setString(2, name);
                         dbStat.execute();
@@ -420,14 +439,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 } else {
                     // Update/Insert parameter
                     boolean updated;
-                    try (PreparedStatement dbStat = dbCon.prepareStatement("UPDATE CB_USER_PARAMETERS SET PARAM_VALUE=? WHERE USER_ID=? AND PARAM_ID=?")) {
+                    try (PreparedStatement dbStat = dbCon.prepareStatement(
+                        database.setPrefixes("UPDATE {prefix}CB_USER_PARAMETERS SET PARAM_VALUE=? WHERE USER_ID=? AND PARAM_ID=?"))
+                    ) {
                         dbStat.setString(1, CommonUtils.toString(value));
                         dbStat.setString(2, userId);
                         dbStat.setString(3, name);
                         updated = dbStat.executeUpdate() > 0;
                     }
                     if (!updated) {
-                        try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_USER_PARAMETERS (USER_ID,PARAM_ID,PARAM_VALUE) VALUES(?,?,?)")) {
+                        try (PreparedStatement dbStat = dbCon.prepareStatement(
+                            database.setPrefixes("INSERT INTO {prefix}CB_USER_PARAMETERS (USER_ID,PARAM_ID,PARAM_VALUE) VALUES(?,?,?)"))
+                        ) {
                             dbStat.setString(1, userId);
                             dbStat.setString(2, name);
                             dbStat.setString(3, CommonUtils.toString(value));
@@ -444,7 +467,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     public void enableUser(String userId, boolean enabled) throws DBException {
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement("UPDATE CB_USER SET IS_ACTIVE=? WHERE USER_ID=?")) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.setPrefixes("UPDATE {prefix}CB_USER SET IS_ACTIVE=? WHERE USER_ID=?"))) {
                 dbStat.setString(1, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
                 dbStat.setString(2, userId);
                 dbStat.executeUpdate();
@@ -462,7 +486,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             throw new SMException("User cannot change his own role");
         }
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement("UPDATE CB_USER SET DEFAULT_AUTH_ROLE=? WHERE USER_ID=?")) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.setPrefixes("UPDATE {prefix}CB_USER SET DEFAULT_AUTH_ROLE=? WHERE USER_ID=?"))) {
                 dbStat.setString(1, authRole);
                 dbStat.setString(2, userId);
                 if (dbStat.executeUpdate() <= 0) {
@@ -538,13 +563,15 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 JDBCUtils.executeStatement(
                     dbCon,
-                    "DELETE FROM CB_USER_CREDENTIALS WHERE USER_ID=? AND PROVIDER_ID=?",
+                    database.setPrefixes("DELETE FROM {prefix}CB_USER_CREDENTIALS WHERE USER_ID=? AND PROVIDER_ID=?"),
                     userId,
                     authProvider.getId()
                 );
                 if (!CommonUtils.isEmpty(credentials)) {
                     try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        "INSERT INTO CB_USER_CREDENTIALS(USER_ID,PROVIDER_ID,CRED_ID,CRED_VALUE) VALUES(?,?,?,?)")) {
+                        database.setPrefixes("INSERT INTO {prefix}CB_USER_CREDENTIALS(USER_ID,PROVIDER_ID,CRED_ID,CRED_VALUE) " +
+                            "VALUES(?,?,?,?)")
+                    )) {
                         for (String[] cred : transformedCredentials) {
                             if (cred == null) {
                                 continue;
@@ -585,9 +612,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             return null;
         }
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT U.USER_ID,U.IS_ACTIVE FROM CB_USER U,CB_USER_CREDENTIALS UC\n");
+        sql.append("SELECT U.USER_ID,U.IS_ACTIVE FROM {prefix}CB_USER U, {prefix}CB_USER_CREDENTIALS UC\n");
         for (int joinNum = 0; joinNum < identCredentials.size() - 1; joinNum++) {
-            sql.append(",CB_USER_CREDENTIALS UC").append(joinNum + 2);
+            sql.append(", {prefix}CB_USER_CREDENTIALS UC").append(joinNum + 2);
         }
         sql.append("WHERE U.USER_ID=UC.USER_ID AND UC.PROVIDER_ID=? AND UC.CRED_ID=? AND UC.CRED_VALUE=?");
         for (int joinNum = 0; joinNum < identCredentials.size() - 1; joinNum++) {
@@ -599,7 +626,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 .append(joinAlias).append("CRED_VALUE=?");
         }
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(sql.toString())) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(database.setPrefixes(sql.toString()))) {
                 dbStat.setString(1, authProvider.getId());
                 int param = 2;
                 for (Map.Entry<String, Object> credEntry : identCredentials.entrySet()) {
@@ -637,8 +664,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT CRED_ID,CRED_VALUE FROM CB_USER_CREDENTIALS\n" +
-                    "WHERE USER_ID=? AND PROVIDER_ID=?")) {
+                database.setPrefixes("SELECT CRED_ID,CRED_VALUE FROM {prefix}CB_USER_CREDENTIALS\n" +
+                    "WHERE USER_ID=? AND PROVIDER_ID=?"))) {
                 dbStat.setString(1, userId);
 
                 dbStat.setString(2, authProvider.getId());
@@ -673,8 +700,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public String[] getUserLinkedProviders(@NotNull String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT DISTINCT PROVIDER_ID FROM CB_USER_CREDENTIALS\n" +
-                    "WHERE USER_ID=?")) {
+                database.setPrefixes("SELECT DISTINCT PROVIDER_ID FROM {prefix}CB_USER_CREDENTIALS\n WHERE USER_ID=?"))) {
                 dbStat.setString(1, userId);
 
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -702,7 +728,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         // Add metas from enabled auth providers
         WebAppConfiguration appConfiguration = application.getAppConfiguration();
         if (appConfiguration instanceof WebAuthConfiguration) {
-            for (String apId : ((WebAuthConfiguration)appConfiguration).getEnabledAuthProviders()) {
+            for (String apId : ((WebAuthConfiguration) appConfiguration).getEnabledAuthProviders()) {
                 WebAuthProviderDescriptor ap = WebAuthProviderRegistry.getInstance().getAuthProvider(apId);
                 if (ap != null) {
                     List<DBPPropertyDescriptor> metaProps = ap.getMetaParameters(SMSubjectType.team);
@@ -727,15 +753,17 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             Map<String, SMTeam> teams = new LinkedHashMap<>();
             try (Statement dbStat = dbCon.createStatement()) {
-                try (ResultSet dbResult = dbStat.executeQuery("SELECT * FROM CB_TEAM ORDER BY TEAM_ID")) {
+                try (ResultSet dbResult = dbStat.executeQuery(
+                    database.setPrefixes("SELECT * FROM {prefix}CB_TEAM ORDER BY TEAM_ID"))) {
                     while (dbResult.next()) {
                         SMTeam team = fetchTeam(dbResult);
                         teams.put(team.getTeamId(), team);
                     }
                 }
-                try (ResultSet dbResult = dbStat.executeQuery("SELECT SUBJECT_ID,PERMISSION_ID\n" +
-                    "FROM CB_AUTH_PERMISSIONS AP,CB_TEAM R\n" +
-                    "WHERE AP.SUBJECT_ID=R.TEAM_ID\n")) {
+                try (ResultSet dbResult = dbStat.executeQuery(
+                    database.setPrefixes("SELECT SUBJECT_ID,PERMISSION_ID\n" +
+                    "FROM {prefix}CB_AUTH_PERMISSIONS AP, {prefix}CB_TEAM R\n" +
+                    "WHERE AP.SUBJECT_ID=R.TEAM_ID\n"))) {
                     while (dbResult.next()) {
                         SMTeam team = teams.get(dbResult.getString(1));
                         if (team != null) {
@@ -744,7 +772,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                 }
             }
-            readSubjectsMetas(dbCon, SMSubjectType.team,null, teams);
+            readSubjectsMetas(dbCon, SMSubjectType.team, null, teams);
             return teams.values().toArray(new SMTeam[0]);
         } catch (SQLException e) {
             throw new DBCException("Error reading teams from database", e);
@@ -763,7 +791,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public String[] getTeamMembers(String teamId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT USER_ID FROM CB_USER_TEAM WHERE TEAM_ID=?")) {
+                database.setPrefixes("SELECT USER_ID FROM {prefix}CB_USER_TEAM WHERE TEAM_ID=?"))) {
                 dbStat.setString(1, teamId);
                 List<String> subjects = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -799,7 +827,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 createAuthSubject(dbCon, teamId, SUBJECT_TEAM);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "INSERT INTO CB_TEAM(TEAM_ID,TEAM_NAME,TEAM_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)")) {
+                    database.setPrefixes("INSERT INTO {prefix}CB_TEAM(TEAM_ID,TEAM_NAME,TEAM_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)"))) {
                     dbStat.setString(1, teamId);
                     dbStat.setString(2, CommonUtils.notEmpty(name));
                     dbStat.setString(3, CommonUtils.notEmpty(description));
@@ -832,7 +860,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "UPDATE CB_TEAM SET TEAM_NAME=?,TEAM_DESCRIPTION=? WHERE TEAM_ID=?")) {
+                    database.setPrefixes("UPDATE {prefix}CB_TEAM SET TEAM_NAME=?,TEAM_DESCRIPTION=? WHERE TEAM_ID=?"))) {
                     dbStat.setString(1, CommonUtils.notEmpty(name));
                     dbStat.setString(2, CommonUtils.notEmpty(description));
                     dbStat.setString(3, teamId);
@@ -851,7 +879,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public void deleteTeam(String teamId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT COUNT(*) FROM CB_USER_TEAM WHERE TEAM_ID=?")) {
+                database.setPrefixes("SELECT COUNT(*) FROM {prefix}CB_USER_TEAM WHERE TEAM_ID=?")
+            )) {
                 dbStat.setString(1, teamId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
@@ -866,7 +895,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 deleteAuthSubject(dbCon, teamId);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "DELETE FROM CB_TEAM WHERE TEAM_ID=?")) {
+                    "DELETE FROM {prefix}CB_TEAM WHERE TEAM_ID=?")) {
                     dbStat.setString(1, teamId);
                     dbStat.execute();
                 }
@@ -900,7 +929,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 //        validatePermissions(SMConstants.SUBJECT_PERMISSION_SCOPE, permissionIds);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?", subjectId);
+                JDBCUtils.executeStatement(dbCon,
+                    database.setPrefixes("DELETE FROM {prefix}CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?"),
+                    subjectId);
                 insertPermissions(dbCon, subjectId, permissionIds.toArray(String[]::new), grantorId);
                 txn.commit();
             }
@@ -911,7 +942,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private void insertPermissions(Connection dbCon, String subjectId, String[] permissionIds, String grantorId) throws SQLException {
         if (!ArrayUtils.isEmpty(permissionIds)) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_AUTH_PERMISSIONS(SUBJECT_ID,PERMISSION_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.setPrefixes("INSERT INTO {prefix}CB_AUTH_PERMISSIONS(SUBJECT_ID,PERMISSION_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)"))
+            ) {
                 for (String permission : permissionIds) {
                     dbStat.setString(1, subjectId);
                     dbStat.setString(2, permission);
@@ -928,7 +961,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public Set<String> getSubjectPermissions(String subjectId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT PERMISSION_ID FROM CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?")) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.setPrefixes("SELECT PERMISSION_ID FROM {prefix}CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?"))) {
                 dbStat.setString(1, subjectId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
@@ -948,8 +982,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT DISTINCT AP.PERMISSION_ID FROM CB_AUTH_PERMISSIONS AP,CB_USER_TEAM UR\n" +
-                    "WHERE UR.TEAM_ID=AP.SUBJECT_ID AND UR.USER_ID=?")) {
+                database.setPrefixes(
+                    "SELECT DISTINCT AP.PERMISSION_ID FROM {prefix}CB_AUTH_PERMISSIONS AP, {prefix}CB_USER_TEAM UR\n" +
+                        "WHERE UR.TEAM_ID=AP.SUBJECT_ID AND UR.USER_ID=?"
+                )
+            )) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
@@ -957,7 +994,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                 }
             }
-            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT PERMISSION_ID FROM CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?")) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.setPrefixes("SELECT PERMISSION_ID FROM {prefix}CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?"))
+            ) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
@@ -983,7 +1022,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public boolean isSessionPersisted(String id) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT 1 FROM CB_SESSION WHERE SESSION_ID=?")) {
+                database.setPrefixes("SELECT 1 FROM {prefix}CB_SESSION WHERE SESSION_ID=?"))
+            ) {
                 dbStat.setString(1, id);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
@@ -1006,9 +1046,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     ) throws SQLException, DBException {
         var sessionId = UUID.randomUUID().toString();
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            "INSERT INTO CB_SESSION(SESSION_ID, APP_SESSION_ID, USER_ID,CREATE_TIME,LAST_ACCESS_TIME,"
-                + "LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT,LAST_ACCESS_INSTANCE_ID, SESSION_TYPE) "
-                + "VALUES(?,?,?,?,?,?,?,?,?)")) {
+            database.setPrefixes(
+                "INSERT INTO {prefix}CB_SESSION(SESSION_ID, APP_SESSION_ID, USER_ID,CREATE_TIME,LAST_ACCESS_TIME," +
+                    "LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT,LAST_ACCESS_INSTANCE_ID, SESSION_TYPE) " +
+                    "VALUES(?,?,?,?,?,?,?,?,?)"
+            )
+        )) {
             dbStat.setString(1, sessionId);
             dbStat.setString(2, appSessionId);
             JDBCUtils.setStringOrNull(dbStat, 3, userId);
@@ -1126,7 +1169,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 AuthPropertyDescriptor property = credProfile.getCredentialParameter(cred.getKey());
 
                 return property != null && property.getEncryption() == AuthPropertyEncryption.none;
-                })
+            })
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -1144,8 +1187,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "INSERT INTO CB_AUTH_ATTEMPT(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID) " +
-                        "VALUES(?,?,?,?,?,?)")) {
+                    database.setPrefixes(
+                        "INSERT INTO {prefix}CB_AUTH_ATTEMPT(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID) " +
+                            "VALUES(?,?,?,?,?,?)"
+                    )
+                )) {
                     dbStat.setString(1, authAttemptId);
                     dbStat.setString(2, status.toString());
                     dbStat.setString(3, appSessionId);
@@ -1160,8 +1206,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
 
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "INSERT INTO CB_AUTH_ATTEMPT_INFO(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) " +
-                        "VALUES(?,?,?,?)")) {
+                    database.setPrefixes(
+                        "INSERT INTO {prefix}CB_AUTH_ATTEMPT_INFO(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) " +
+                            "VALUES(?,?,?,?)"
+                    )
+                )) {
                     dbStat.setString(1, authAttemptId);
                     dbStat.setString(2, authProviderId);
                     dbStat.setString(3, authProviderConfigurationId);
@@ -1204,8 +1253,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @Nullable String smSessionId
     ) throws DBException {
         try (Connection dbCon = database.openConnection(); JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "UPDATE CB_AUTH_ATTEMPT SET AUTH_STATUS=?,AUTH_ERROR=?,SESSION_ID=? WHERE AUTH_ID=?")) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(database.setPrefixes(
+                "UPDATE {prefix}CB_AUTH_ATTEMPT SET AUTH_STATUS=?,AUTH_ERROR=?,SESSION_ID=? WHERE AUTH_ID=?"
+            ))) {
                 dbStat.setString(1, authStatus.toString());
                 JDBCUtils.setStringOrNull(dbStat, 2, error);
                 JDBCUtils.setStringOrNull(dbStat, 3, smSessionId);
@@ -1220,10 +1270,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 String authJson = gson.toJson(entry.getValue());
                 boolean configIdExist = providerId.getAuthProviderConfigurationId() != null;
                 var sqlBuilder = new StringBuilder();
-                sqlBuilder.append("UPDATE CB_AUTH_ATTEMPT_INFO SET AUTH_STATE=? ")
+                sqlBuilder.append("UPDATE {prefix}CB_AUTH_ATTEMPT_INFO SET AUTH_STATE=? ")
                     .append("WHERE AUTH_ID=? AND AUTH_PROVIDER_ID=? AND ")
                     .append(configIdExist ? "AUTH_PROVIDER_CONFIGURATION_ID=?" : "AUTH_PROVIDER_CONFIGURATION_ID IS NULL");
-                try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(database.setPrefixes(sqlBuilder.toString()))) {
                     dbStat.setString(1, authJson);
                     dbStat.setString(2, authId);
                     dbStat.setString(3, providerId.getAuthProviderId());
@@ -1232,7 +1282,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                     if (dbStat.executeUpdate() <= 0) {
                         try (PreparedStatement dbStatIns = dbCon.prepareStatement(
-                            "INSERT INTO CB_AUTH_ATTEMPT_INFO (AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) "
+                            "INSERT INTO {prefix}CB_AUTH_ATTEMPT_INFO (AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) "
                                 + "VALUES(?,?,?,?)")) {
                             dbStatIns.setString(1, authId);
                             dbStatIns.setString(2, providerId.getAuthProviderId());
@@ -1269,7 +1319,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             String authError;
             String smSessionId;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT AUTH_STATUS,AUTH_ERROR,SESSION_ID FROM CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
+                database.setPrefixes(
+                    "SELECT AUTH_STATUS,AUTH_ERROR,SESSION_ID FROM {prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
+                )
             )) {
                 dbStat.setString(1, authId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -1285,9 +1337,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             String redirectUrl = null;
 
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE " +
-                    "FROM CB_AUTH_ATTEMPT_INFO "
-                    + "WHERE AUTH_ID=? ORDER BY CREATE_TIME"
+                database.setPrefixes(
+                    "SELECT AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE " +
+                        "FROM {prefix}CB_AUTH_ATTEMPT_INFO "
+                        + "WHERE AUTH_ID=? ORDER BY CREATE_TIME"
+                )
             )) {
                 dbStat.setString(1, authId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -1368,7 +1422,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
         try (var dbCon = database.openConnection()) {
             List<String> authAttemptIds = JDBCUtils.queryStrings(dbCon,
-                "SELECT AUTH_ID FROM CB_AUTH_ATTEMPT WHERE SESSION_ID=? AND AUTH_STATUS IN (?,?) ORDER BY CREATE_TIME",
+                database.setPrefixes("SELECT AUTH_ID FROM {prefix}CB_AUTH_ATTEMPT " +
+                    "WHERE SESSION_ID=? AND AUTH_STATUS IN (?,?) ORDER BY CREATE_TIME"),
                 smSessionId, SMAuthStatus.SUCCESS.name(), SMAuthStatus.EXPIRED.name()
             );
             List<SMAuthInfo> result = new ArrayList<>();
@@ -1409,7 +1464,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private void invalidateUserTokens(String smToken) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?", smToken);
+            JDBCUtils.executeStatement(dbCon, database.setPrefixes("DELETE FROM {prefix}CB_AUTH_TOKEN WHERE TOKEN_ID=?"), smToken);
         } catch (SQLException e) {
             throw new DBCException("Session invalidation failed", e);
         }
@@ -1417,7 +1472,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private void invalidateAllUserTokens(String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE USER_ID=?", userId);
+            JDBCUtils.executeStatement(dbCon, database.setPrefixes("DELETE FROM {prefix}CB_AUTH_TOKEN WHERE USER_ID=?"), userId);
         } catch (SQLException e) {
             throw new DBCException("Session invalidation failed", e);
         }
@@ -1433,7 +1488,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     private SMTokens findTokenBySmSession(String smSessionId) throws DBException {
         try (Connection dbCon = database.openConnection();
-             PreparedStatement dbStat = dbCon.prepareStatement("SELECT TOKEN_ID, REFRESH_TOKEN_ID FROM CB_AUTH_TOKEN WHERE SESSION_ID=?")
+             PreparedStatement dbStat = dbCon.prepareStatement(
+                 database.setPrefixes("SELECT TOKEN_ID, REFRESH_TOKEN_ID FROM {prefix}CB_AUTH_TOKEN WHERE SESSION_ID=?"))
         ) {
             dbStat.setString(1, smSessionId);
             try (var dbResult = dbStat.executeQuery()) {
@@ -1451,11 +1507,13 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private SMTokenInfo findTokenByAppSession(@NotNull String appSessionId) throws DBException {
         try (var dbCon = database.openConnection();
              var dbStat = dbCon.prepareStatement(
-                 "SELECT CAT.TOKEN_ID FROM CB_AUTH_TOKEN CAT " +
-                     "  JOIN CB_SESSION CS ON CAT.SESSION_ID = CS.SESSION_ID " +
-                     "  WHERE CS.APP_SESSION_ID = ? AND CAT.USER_ID IS NOT NULL " +
-                     "  AND CAT.EXPIRATION_TIME > CURRENT_TIMESTAMP" +
-                     "  ORDER BY CAT.EXPIRATION_TIME DESC"
+                 database.setPrefixes(
+                     "SELECT CAT.TOKEN_ID FROM {prefix}CB_AUTH_TOKEN CAT " +
+                         "  JOIN {prefix}CB_SESSION CS ON CAT.SESSION_ID = CS.SESSION_ID " +
+                         "  WHERE CS.APP_SESSION_ID = ? AND CAT.USER_ID IS NOT NULL " +
+                         "  AND CAT.EXPIRATION_TIME > CURRENT_TIMESTAMP" +
+                         "  ORDER BY CAT.EXPIRATION_TIME DESC"
+                 )
              )
         ) {
             dbStat.setString(1, appSessionId);
@@ -1474,7 +1532,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private SMTokenInfo readAccessTokenInfo(String smAccessToken) throws DBException {
         try (Connection dbCon = database.openConnection();
              PreparedStatement dbStat = dbCon.prepareStatement(
-                 "SELECT REFRESH_TOKEN_ID,SESSION_ID,USER_ID,REFRESH_TOKEN_EXPIRATION_TIME,AUTH_ROLE FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?"
+                 database.setPrefixes("SELECT REFRESH_TOKEN_ID,SESSION_ID,USER_ID,REFRESH_TOKEN_EXPIRATION_TIME,AUTH_ROLE FROM " +
+                     "{prefix}CB_AUTH_TOKEN WHERE TOKEN_ID=?")
              )
         ) {
             dbStat.setString(1, smAccessToken);
@@ -1698,9 +1757,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private String readProviderConfigId(String authAttemptId, String authProviderId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT AUTH_PROVIDER_CONFIGURATION_ID " +
-                    "FROM CB_AUTH_ATTEMPT_INFO "
-                    + "WHERE AUTH_ID=? AND AUTH_PROVIDER_ID=?"
+                database.setPrefixes("SELECT AUTH_PROVIDER_CONFIGURATION_ID " +
+                    "FROM {prefix}CB_AUTH_ATTEMPT_INFO "
+                    + "WHERE AUTH_ID=? AND AUTH_PROVIDER_ID=?")
             )) {
                 dbStat.setString(1, authAttemptId);
                 dbStat.setString(2, authProviderId);
@@ -1722,7 +1781,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     protected String readUserAuthRole(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT DEFAULT_AUTH_ROLE FROM CB_USER WHERE USER_ID=?"
+                database.setPrefixes("SELECT DEFAULT_AUTH_ROLE FROM {prefix}CB_USER WHERE USER_ID=?")
             )) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -1753,7 +1812,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private AuthAttemptSessionInfo readAuthAttemptSessionInfo(@NotNull String authId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID FROM CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
+                database.setPrefixes("SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID FROM " +
+                    "{prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?")
             )) {
                 dbStat.setString(1, authId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -1840,7 +1900,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @Nullable String authRole,
         @NotNull Connection dbCon
     ) throws SQLException, DBException {
-        JDBCUtils.executeStatement(dbCon, "DELETE FROM CB_AUTH_TOKEN WHERE SESSION_ID=?", smSessionId);
+        JDBCUtils.executeStatement(dbCon, database.setPrefixes("DELETE FROM {prefix}CB_AUTH_TOKEN WHERE SESSION_ID=?"), smSessionId);
         return generateNewSessionTokens(smSessionId, userId, authRole, dbCon);
     }
 
@@ -1851,8 +1911,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @NotNull Connection dbCon
     ) throws SQLException {
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            "INSERT INTO CB_AUTH_TOKEN(TOKEN_ID,SESSION_ID,USER_ID,AUTH_ROLE,EXPIRATION_TIME,REFRESH_TOKEN_ID,REFRESH_TOKEN_EXPIRATION_TIME) " +
-                "VALUES(?,?,?,?,?,?,?)")) {
+            database.setPrefixes("INSERT INTO {prefix}CB_AUTH_TOKEN" +
+                "(TOKEN_ID,SESSION_ID,USER_ID,AUTH_ROLE,EXPIRATION_TIME,REFRESH_TOKEN_ID,REFRESH_TOKEN_EXPIRATION_TIME) " +
+                "VALUES(?,?,?,?,?,?,?)"))) {
 
             String smAccessToken = SecurityUtils.generatePassword(32);
             dbStat.setString(1, smAccessToken);
@@ -1887,7 +1948,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         String authRole;
         try (Connection dbCon = database.openConnection();
              PreparedStatement dbStat = dbCon.prepareStatement(
-                 "SELECT USER_ID, EXPIRATION_TIME, SESSION_ID, AUTH_ROLE FROM CB_AUTH_TOKEN WHERE TOKEN_ID=?");
+                 database.setPrefixes("SELECT USER_ID, EXPIRATION_TIME, SESSION_ID, AUTH_ROLE FROM {prefix}CB_AUTH_TOKEN WHERE TOKEN_ID=?"));
         ) {
             dbStat.setString(1, token);
             try (var dbResult = dbStat.executeQuery()) {
@@ -1953,7 +2014,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         String userId = getUserIdOrNull();
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "UPDATE CB_SESSION SET USER_ID=?,LAST_ACCESS_TIME=?,LAST_ACCESS_REMOTE_ADDRESS=?,LAST_ACCESS_USER_AGENT=?,LAST_ACCESS_INSTANCE_ID=? WHERE SESSION_ID=?")) {
+                database.setPrefixes("UPDATE {prefix}CB_SESSION " +
+                    "SET USER_ID=?,LAST_ACCESS_TIME=?,LAST_ACCESS_REMOTE_ADDRESS=?,LAST_ACCESS_USER_AGENT=?,LAST_ACCESS_INSTANCE_ID=? " +
+                    "WHERE SESSION_ID=?"))) {
                 JDBCUtils.setStringOrNull(dbStat, 1, userId);
                 dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
                 JDBCUtils.setStringOrNull(dbStat, 3, CommonUtils.truncateString(CommonUtils.toString(
@@ -1988,17 +2051,19 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 //        validatePermissions(objectType.getObjectType(), permissions);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                var sqlBuilder = new StringBuilder("DELETE FROM CB_OBJECT_PERMISSIONS WHERE SUBJECT_ID IN (");
+                var sqlBuilder = new StringBuilder("DELETE FROM {prefix}CB_OBJECT_PERMISSIONS WHERE SUBJECT_ID IN (");
                 appendStringParameters(sqlBuilder, subjectIds);
                 sqlBuilder.append(") AND OBJECT_TYPE=? ")
                     .append("AND OBJECT_ID IN (");
                 appendStringParameters(sqlBuilder, objectIds);
                 sqlBuilder.append(")");
-                JDBCUtils.executeStatement(dbCon, sqlBuilder.toString(), objectType.getObjectType());
+                JDBCUtils.executeStatement(dbCon, database.setPrefixes(sqlBuilder.toString()), objectType.getObjectType());
                 if (!CommonUtils.isEmpty(permissions)) {
                     try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        "INSERT INTO CB_OBJECT_PERMISSIONS(OBJECT_ID,OBJECT_TYPE,GRANT_TIME,GRANTED_BY,SUBJECT_ID,PERMISSION) "
-                            + "VALUES(?,?,?,?,?,?)")) {
+                        database.setPrefixes(
+                            "INSERT INTO {prefix}CB_OBJECT_PERMISSIONS" +
+                                "(OBJECT_ID,OBJECT_TYPE,GRANT_TIME,GRANTED_BY,SUBJECT_ID,PERMISSION) "
+                                + "VALUES(?,?,?,?,?,?)"))) {
                         for (String objectId : objectIds) {
                             dbStat.setString(1, objectId);
                             dbStat.setString(2, objectType.getObjectType());
@@ -2025,7 +2090,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public void deleteAllObjectPermissions(@NotNull String objectId, @NotNull SMObjectType objectType) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon,
-                "DELETE FROM CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND OBJECT_ID=?",
+                database.setPrefixes("DELETE FROM {prefix}CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND OBJECT_ID=?"),
                 objectType.getObjectType(),
                 objectId
             );
@@ -2039,7 +2104,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public void deleteAllSubjectObjectPermissions(@NotNull String subjectId, @NotNull SMObjectType objectType) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon,
-                "DELETE FROM CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND SUBJECT_ID=?",
+                database.setPrefixes("DELETE FROM {prefix}CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND SUBJECT_ID=?"),
                 objectType.getObjectType(),
                 subjectId
             );
@@ -2068,11 +2133,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             Set<String> allSubjects = getAllLinkedSubjects(dbCon, subjectId);
             {
-                var sqlBuilder = new StringBuilder("SELECT OBJECT_ID,PERMISSION FROM CB_OBJECT_PERMISSIONS ");
+                var sqlBuilder = new StringBuilder("SELECT OBJECT_ID,PERMISSION FROM {prefix}CB_OBJECT_PERMISSIONS ");
                 sqlBuilder.append("WHERE SUBJECT_ID IN (");
                 appendStringParameters(sqlBuilder, allSubjects);
                 sqlBuilder.append(") AND OBJECT_TYPE=?");
-                try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(database.setPrefixes(sqlBuilder.toString()))) {
                     dbStat.setString(1, objectType.getObjectType());
 
                     var permissionsByObjectId = new LinkedHashMap<String, Set<String>>();
@@ -2103,12 +2168,12 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             Set<String> allSubjects = getAllLinkedSubjects(dbCon, subjectId);
             {
-                var sqlBuilder = new StringBuilder("SELECT PERMISSION FROM CB_OBJECT_PERMISSIONS ");
+                var sqlBuilder = new StringBuilder("SELECT PERMISSION FROM {prefix}CB_OBJECT_PERMISSIONS ");
                 sqlBuilder.append("WHERE SUBJECT_ID IN (");
                 appendStringParameters(sqlBuilder, allSubjects);
                 sqlBuilder.append(") AND OBJECT_TYPE=? AND OBJECT_ID=?");
 
-                try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(database.setPrefixes(sqlBuilder.toString()))) {
                     dbStat.setString(1, objectType.getObjectType());
                     dbStat.setString(2, objectId);
 
@@ -2134,10 +2199,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     ) throws DBException {
         var grantedPermissionsBySubjectId = new HashMap<String, SMObjectPermissionsGrant.Builder>();
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
+            try (PreparedStatement dbStat = dbCon.prepareStatement(database.setPrefixes(
                 "SELECT OP.SUBJECT_ID,S.SUBJECT_TYPE, OP.PERMISSION\n" +
-                    "FROM CB_OBJECT_PERMISSIONS OP,CB_AUTH_SUBJECT S\n" +
-                    "WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.OBJECT_TYPE=? AND OP.OBJECT_ID=?")) {
+                    "FROM {prefix}CB_OBJECT_PERMISSIONS OP, {prefix}CB_CB_AUTH_SUBJECT S\n" +
+                    "WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.OBJECT_TYPE=? AND OP.OBJECT_ID=?"))) {
                 dbStat.setString(1, smObjectType.getObjectType());
                 dbStat.setString(2, objectId);
                 List<SMDataSourceGrant> result = new ArrayList<>();
@@ -2169,11 +2234,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             var allLinkedSubjects = getAllLinkedSubjects(dbCon, subjectId);
             var sqlBuilder =
                 new StringBuilder("SELECT OP.OBJECT_ID,S.SUBJECT_TYPE,S.SUBJECT_ID,OP.PERMISSION\n")
-                    .append("FROM CB_OBJECT_PERMISSIONS OP,CB_AUTH_SUBJECT S\n")
+                    .append("FROM {prefix}CB_OBJECT_PERMISSIONS OP, {prefix}CB_CB_AUTH_SUBJECT S\n")
                     .append("WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.SUBJECT_ID IN (");
             appendStringParameters(sqlBuilder, allLinkedSubjects);
             sqlBuilder.append(") AND OP.OBJECT_TYPE=?");
-            try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(database.setPrefixes(sqlBuilder.toString()))) {
                 dbStat.setString(1, smObjectType.getObjectType());
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
@@ -2224,9 +2289,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     protected String readTokenAuthRole(String smAccessToken) throws DBException {
         try (Connection dbCon = database.openConnection();
              PreparedStatement dbStat = dbCon.prepareStatement(
-                 "SELECT AUTH_ROLE FROM CB_AUTH_TOKEN " +
-                     "WHERE TOKEN_ID=?"
-             )
+                 database.setPrefixes("SELECT AUTH_ROLE FROM {prefix}CB_AUTH_TOKEN WHERE TOKEN_ID=?"))
         ) {
             dbStat.setString(1, smAccessToken);
             try (var dbResult = dbStat.executeQuery()) {
@@ -2245,7 +2308,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 Set<String> registeredProviders = new HashSet<>();
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "SELECT PROVIDER_ID FROM CB_AUTH_PROVIDER")) {
+                    database.setPrefixes("SELECT PROVIDER_ID FROM {prefix}CB_AUTH_PROVIDER"))) {
                     try (ResultSet dbResult = dbStat.executeQuery()) {
                         while (dbResult.next()) {
                             registeredProviders.add(dbResult.getString(1));
@@ -2253,7 +2316,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                 }
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "INSERT INTO CB_AUTH_PROVIDER(PROVIDER_ID,IS_ENABLED) VALUES(?,'Y')")) {
+                    database.setPrefixes("INSERT INTO {prefix}CB_AUTH_PROVIDER(PROVIDER_ID,IS_ENABLED) VALUES(?,'Y')"))) {
                     for (WebAuthProviderDescriptor authProvider : WebAuthProviderRegistry.getInstance().getAuthProviders()) {
                         if (!registeredProviders.contains(authProvider.getId())) {
                             dbStat.setString(1, authProvider.getId());
@@ -2270,7 +2333,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     private void createAuthSubject(Connection dbCon, String subjectId, String subjectType) throws SQLException {
-        try (PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO CB_AUTH_SUBJECT(SUBJECT_ID,SUBJECT_TYPE) VALUES(?,?)")) {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            database.setPrefixes("INSERT INTO {prefix}CB_AUTH_SUBJECT(SUBJECT_ID,SUBJECT_TYPE) VALUES(?,?)"))) {
             dbStat.setString(1, subjectId);
             dbStat.setString(2, subjectType);
             dbStat.execute();
@@ -2278,7 +2342,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     private void deleteAuthSubject(Connection dbCon, String subjectId) throws SQLException {
-        try (PreparedStatement dbStat = dbCon.prepareStatement("DELETE FROM CB_AUTH_SUBJECT WHERE SUBJECT_ID=?")) {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            database.setPrefixes("DELETE FROM {prefix}CB_AUTH_SUBJECT WHERE SUBJECT_ID=?"))) {
             dbStat.setString(1, subjectId);
             dbStat.execute();
         }
@@ -2323,13 +2388,13 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public void clearOldAuthAttemptInfo() throws DBException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon,
-                "DELETE FROM CB_AUTH_ATTEMPT_INFO AAI " +
-                "WHERE EXISTS " +
-                "(SELECT 1 FROM CB_AUTH_ATTEMPT AA " +
-                "LEFT JOIN CB_AUTH_TOKEN CAT ON AA.SESSION_ID = CAT.SESSION_ID " +
+                database.setPrefixes("DELETE FROM {prefix}CB_AUTH_ATTEMPT_INFO AAI " +
+                    "WHERE EXISTS " +
+                    "(SELECT 1 FROM {prefix}CB_AUTH_ATTEMPT AA " +
+                    "LEFT JOIN {prefix}CB_AUTH_TOKEN CAT ON AA.SESSION_ID = CAT.SESSION_ID " +
                     "WHERE (CAT.REFRESH_TOKEN_EXPIRATION_TIME < NOW() OR CAT.EXPIRATION_TIME IS NULL) " +
-                    "AND AA.AUTH_ID=AAI.AUTH_ID AND AUTH_STATUS='" + SMAuthStatus.EXPIRED +"') " +
-                "AND CREATE_TIME<?",
+                    "AND AA.AUTH_ID=AAI.AUTH_ID AND AUTH_STATUS='" + SMAuthStatus.EXPIRED + "') " +
+                    "AND CREATE_TIME<?"),
                 Timestamp.valueOf(LocalDateTime.now().minusMinutes(smConfig.getExpiredAuthAttemptInfoTtl()))
             );
         } catch (SQLException e) {
