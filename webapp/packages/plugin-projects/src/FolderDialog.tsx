@@ -23,7 +23,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { createPath, throttleAsync } from '@cloudbeaver/core-utils';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
@@ -70,6 +70,7 @@ export interface FolderDialogPayload {
   create?: boolean;
   title?: string;
   validation?: (result: IFolderDialogResult, setMessage: (message: string) => void) => Promise<boolean> | boolean;
+  filterProject?: (project: ProjectInfo) => boolean;
 }
 
 export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogResult> = observer(function FolderDialog({
@@ -81,7 +82,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
-  const { icon, folder, bigIcon, viewBox, value, projectId, selectProject, objectName, create, confirmActionText } = payload;
+  const { icon, folder, bigIcon, viewBox, value, projectId, selectProject, objectName, create, confirmActionText, filterProject } = payload;
   let { title } = payload;
 
   if (!title) {
@@ -113,7 +114,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
               state.setMessage(message);
             }
           });
-        } catch {}
+        } catch { }
 
         if (state.folder === folder && state.value === value && state.projectId === projectId) {
           state.valid = valid ?? true;
@@ -166,7 +167,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
       <CommonDialogBody>
         <SubmittingForm ref={focusedRef} onSubmit={resolveHandler}>
           <Container center gap>
-            {selectProject && <ProjectSelect value={state.projectId} onChange={projectId => state.setProjectId(projectId)} />}
+            {selectProject && <ProjectSelect value={state.projectId} filter={filterProject} onChange={projectId => state.setProjectId(projectId)} />}
             <InputField
               name="value"
               state={state}
