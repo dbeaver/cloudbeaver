@@ -114,7 +114,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> {}
+  load(): void | Promise<void> { }
 
   private async moveResourceToFolder({ type, targetNode, moveContexts }: INodeMoveData, contexts: IExecutionContextProvider<INodeMoveData>) {
     const move = contexts.getContext(navNodeMoveContext);
@@ -187,6 +187,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
           icon: '/icons/folder.svg#root',
           create: true,
           selectProject: targetNode.selectProject,
+          filterProject: project => project.canEditResources,
           validation: async ({ name, folder, projectId }, setMessage) => {
             const trimmed = name.trim();
 
