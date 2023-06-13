@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RMFileOperationHandlersRegistry {
     private static final Log log = Log.getLog(RMFileOperationHandlersRegistry.class);
@@ -31,7 +32,8 @@ public class RMFileOperationHandlersRegistry {
     private static final String TAG_FILE_HANDLER = "rmFileHandler"; //$NON-NLS-1$
 
     private static RMFileOperationHandlersRegistry instance = null;
-    private final List<RMFileOperationHandlerDescriptor> fileHandlers = new ArrayList<>();
+    private final List<RMFileOperationHandlerDescriptor> fileHandlersDescriptors = new ArrayList<>();
+    private final List<RMFileOperationHandler> fileHandlers = new ArrayList<>();
 
 
     public synchronized static RMFileOperationHandlersRegistry getInstance() {
@@ -47,16 +49,20 @@ public class RMFileOperationHandlersRegistry {
         for (IConfigurationElement ext : extConfigs) {
             try {
                 if (TAG_FILE_HANDLER.equals(ext.getName())) {
-                    this.fileHandlers.add(
+                    this.fileHandlersDescriptors.add(
                         new RMFileOperationHandlerDescriptor(ext));
                 }
+                this.fileHandlers.addAll(this.fileHandlersDescriptors
+                    .stream()
+                    .map(RMFileOperationHandlerDescriptor::getInstance)
+                    .collect(Collectors.toList()));
             } catch (DBException e) {
                 log.error("Error loading servlet handler", e);
             }
         }
     }
 
-    public List<RMFileOperationHandlerDescriptor> getFileHandlers() {
+    public List<RMFileOperationHandler> getFileHandlers() {
         return fileHandlers;
     }
 }
