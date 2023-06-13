@@ -56,10 +56,6 @@ export class ObjectPage<T = unknown> {
   onRestore?: ObjectPageRestoreCallback<T>;
 
   constructor(options: ObjectPageOptions<T>) {
-    makeObservable(this, {
-      order: observable,
-    });
-
     this.key = options.key;
     this.priority = options.priority;
     this.order = options.order;
@@ -70,6 +66,10 @@ export class ObjectPage<T = unknown> {
     this.onClose = options.onClose;
     this.onUnload = options.onUnload;
     this.onRestore = options.onRestore;
+
+    makeObservable(this, {
+      order: observable,
+    });
   }
 
   getState(tab: ITab<IObjectViewerTabState>): T | undefined {
