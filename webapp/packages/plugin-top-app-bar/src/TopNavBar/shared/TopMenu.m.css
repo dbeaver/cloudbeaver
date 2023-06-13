@@ -1,5 +1,3 @@
-/*Button:disabled,
-Button[aria-disabled='true'],*/
 .menuButton {
   &:hover,
   &:global([aria-expanded='true']) {

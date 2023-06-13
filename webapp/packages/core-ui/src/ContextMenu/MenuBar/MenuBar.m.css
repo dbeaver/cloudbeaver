@@ -1,5 +1,4 @@
 .menuBar {
-  /*composes: theme-background-secondary theme-text-on-secondary theme-border-color-background theme-typography--body2 from global;*/
   height: 32px;
   display: flex;
 

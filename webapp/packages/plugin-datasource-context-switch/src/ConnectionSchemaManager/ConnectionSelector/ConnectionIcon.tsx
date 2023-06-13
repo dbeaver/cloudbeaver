@@ -8,11 +8,18 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { ConnectionImageWithMask, ConnectionImageWithMaskSvgStyles, SContext, StyleRegistry, useResource, useStyles } from '@cloudbeaver/core-blocks';
+import {
+  ConnectionImageWithMask,
+  ConnectionImageWithMaskSvgStyles,
+  s,
+  SContext,
+  StyleRegistry,
+  useResource,
+  useStyles,
+} from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { clsx } from '@cloudbeaver/core-utils';
 
 import { default as ConnectionImageWithMaskSvgBackgroundStyles } from './ConnectionImageWithMask.m.css';
 import type { IConnectionSelectorExtraProps } from './IConnectionSelectorExtraProps';
@@ -65,7 +72,7 @@ export const ConnectionIcon: React.FC<Props> = observer(function ConnectionIcon(
   }
 
   return styled(styles)(
-    <icon className={clsx(ConnectionImageWithMaskSvgBackgroundStyles.connectionIcon, className)}>
+    <icon className={s(ConnectionImageWithMaskSvgBackgroundStyles, { connectionIcon: true }, className)}>
       <SContext registry={registry}>
         <ConnectionImageWithMask
           icon={driver.icon}
