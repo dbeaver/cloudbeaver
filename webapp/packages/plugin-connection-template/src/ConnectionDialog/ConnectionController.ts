@@ -95,6 +95,8 @@ export class ConnectionController implements IInitializableController, IDestruct
     private readonly dbAuthModelsResource: DatabaseAuthModelsResource,
     private readonly projectsService: ProjectsService,
   ) {
+    this.authModel = undefined;
+
     makeObservable(this, {
       step: observable,
       isLoading: observable,
