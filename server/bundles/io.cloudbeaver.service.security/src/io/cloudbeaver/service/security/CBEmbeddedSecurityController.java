@@ -19,7 +19,6 @@ package io.cloudbeaver.service.security;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.SMAuthProviderAssigner;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
