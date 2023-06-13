@@ -27,12 +27,12 @@ const styles = css`
     flex: 1;
     align-items: center;
     justify-content: flex-end;
-    gap: 24px;
+    gap: 16px;
   }
   buttons {
     flex: 0 0 auto;
     display: flex;
-    gap: 24px;
+    gap: 16px;
   }
   ErrorMessage {
     composes: theme-background-secondary theme-text-on-secondary from global;

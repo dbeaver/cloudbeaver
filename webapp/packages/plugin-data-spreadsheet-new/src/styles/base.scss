@@ -26,6 +26,9 @@
     .rdg-row {
       background-color: transparent;
     }
+    .rdg-cell.rdg-cell-frozen {
+      box-shadow: none;
+    }
 
     .text-formatter {
       display: flex;

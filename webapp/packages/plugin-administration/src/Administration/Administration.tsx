@@ -40,7 +40,7 @@ const administrationStyles = css`
   }
   TabList {
     width: 240px;
-    padding-top: 16px;
+    padding-top: 8px;
     border-right: 2px solid;
   }
   content-container {

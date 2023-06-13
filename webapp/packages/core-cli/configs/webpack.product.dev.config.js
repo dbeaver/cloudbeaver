@@ -43,7 +43,8 @@ module.exports = (env, argv) => {
       sso,
     },
     optimization: {
-      minimize: true,
+      minimize: false,
+      moduleIds: 'named',
     },
     devServer: {
       allowedHosts: 'all',
@@ -71,10 +72,7 @@ module.exports = (env, argv) => {
         httpProxy.createProxyServer({ target:`http://127.0.0.1:${port}` }).listen(8080);
       },
     },
-    devtool: 'eval-source-map',
-    // optimization: {
-    //   moduleIds: 'named',
-    // },
+    devtool: 'source-map',
     plugins: [
       new CopyWebpackPlugin({
         patterns: getAssets(package, ''),

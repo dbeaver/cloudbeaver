@@ -6,4 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export { default as clsx } from 'clsx';
+export { default as clsx, type ClassValue } from 'clsx';

@@ -11,7 +11,7 @@ export const VALUE_PANEL_TOOLS_STYLES = css`
   tools-container {
     display: flex;
     justify-content: space-between;
-    gap: 8px;
+    gap: 16px;
   }
   tools {
     composes: theme-background-surface theme-text-on-surface theme-border-color-background theme-form-element-radius from global;

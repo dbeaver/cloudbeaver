@@ -7,10 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { MenuItem, MenuItemCheckbox, MenuItemRadio } from 'reakit/Menu';
-import styled, { use } from 'reshadow';
 
-import { Checkbox, MenuItemElement, menuPanelStyles, Radio, useStyles } from '@cloudbeaver/core-blocks';
+import { Checkbox, MenuItem, MenuItemCheckbox, MenuItemElement, MenuItemRadio, Radio } from '@cloudbeaver/core-blocks';
 import type { IMenuActionItem } from '@cloudbeaver/core-view';
 
 import type { IContextMenuItemProps } from './IContextMenuItemProps';
@@ -19,8 +17,7 @@ interface IMenuActionElementProps extends IContextMenuItemProps {
   item: IMenuActionItem;
 }
 
-export const MenuActionElement = observer<IMenuActionElementProps>(function MenuActionElement({ item, menu, style, onClick }) {
-  const styles = useStyles(menuPanelStyles, style);
+export const MenuActionElement = observer<IMenuActionElementProps>(function MenuActionElement({ item, onClick }) {
   const actionInfo = item.action.actionInfo;
   const loading = item.action.isLoading();
 
@@ -31,10 +28,9 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
 
   if (actionInfo.type === 'select') {
     const checked = item.action.isChecked();
-    return styled(styles)(
+    return (
       <MenuItemRadio
-        {...menu}
-        {...use({ hidden: item.hidden })}
+        hidden={item.hidden}
         id={item.id}
         aria-label={actionInfo.label}
         disabled={item.disabled}
@@ -48,18 +44,16 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
           icon={<Radio checked={checked} mod={['primary', 'menu']} ripple={false} />}
           tooltip={actionInfo.tooltip}
           loading={loading}
-          style={style}
         />
-      </MenuItemRadio>,
+      </MenuItemRadio>
     );
   }
 
   if (actionInfo.type === 'checkbox') {
     const checked = item.action.isChecked();
-    return styled(styles)(
+    return (
       <MenuItemCheckbox
-        {...menu}
-        {...use({ hidden: item.hidden })}
+        hidden={item.hidden}
         id={item.id}
         aria-label={actionInfo.label}
         disabled={item.disabled}
@@ -70,25 +64,23 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
       >
         <MenuItemElement
           label={actionInfo.label}
-          icon={<Checkbox checked={checked} mod={['primary', 'small']} style={style} ripple={false} />}
+          icon={<Checkbox checked={checked} mod={['primary', 'small']} ripple={false} />}
           tooltip={actionInfo.tooltip}
           loading={loading}
-          style={style}
         />
-      </MenuItemCheckbox>,
+      </MenuItemCheckbox>
     );
   }
 
-  return styled(styles)(
-    <MenuItem {...menu} {...use({ hidden: item.hidden })} id={item.id} aria-label={actionInfo.label} disabled={item.disabled} onClick={handleClick}>
+  return (
+    <MenuItem hidden={item.hidden} id={item.id} aria-label={actionInfo.label} disabled={item.disabled} onClick={handleClick}>
       <MenuItemElement
         label={actionInfo.label}
         icon={actionInfo.icon}
         binding={item.action.binding?.binding.label}
         tooltip={actionInfo.tooltip}
         loading={loading}
-        style={style}
       />
-    </MenuItem>,
+    </MenuItem>
   );
 });

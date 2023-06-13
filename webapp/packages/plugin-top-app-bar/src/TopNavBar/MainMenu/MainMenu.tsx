@@ -6,18 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
+import { s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import { topMenuStyles } from '../shared/topMenuStyles';
-import { MENU_BAR_DISABLE_EFFECT_STYLES, MENU_BAR_ITEM_STYLES, MENU_BAR_STYLES } from '../styles';
+import style from '../shared/TopMenuWrapper.m.css';
 import { MENU_APP_ACTIONS } from './MENU_APP_ACTIONS';
 
 export const MainMenu = observer(function MainMenu() {
+  const styles = useS(style);
   const menu = useMenu({ menu: MENU_APP_ACTIONS });
   const { authenticated } = useService(AppAuthService);
 
@@ -25,13 +25,9 @@ export const MainMenu = observer(function MainMenu() {
     return null;
   }
 
-  return styled(MENU_BAR_STYLES)(
-    <menu-wrapper>
-      <MenuBar
-        menu={menu}
-        style={[topMenuStyles, MENU_BAR_ITEM_STYLES, topMenuStyles, MENU_BAR_DISABLE_EFFECT_STYLES]}
-        nestedMenuSettings={{ modal: true }}
-      />
-    </menu-wrapper>,
+  return (
+    <div className={s(styles, { menuWrapper: true })}>
+      <MenuBar menu={menu} nestedMenuSettings={{ modal: true }} />
+    </div>
   );
 });

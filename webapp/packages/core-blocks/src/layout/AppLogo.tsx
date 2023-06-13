@@ -14,13 +14,13 @@ const styles = css`
     height: 100%;
     display: flex;
     align-items: center;
-    padding: 0 14px;
+    padding: 0 8px;
     cursor: pointer;
   }
 
   IconOrImage {
-    height: 32px;
-    width: 154px;
+    height: 24px;
+    width: 120px;
     &[|small] {
       display: none;
     }
