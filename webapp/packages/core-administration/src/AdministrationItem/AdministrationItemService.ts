@@ -34,16 +34,16 @@ export class AdministrationItemService {
   private deActivationTask: IExecutor<IActivationData>;
 
   constructor() {
+    this.itemActivating = false;
+    this.itemDeactivating = false;
+    this.activationTask = new Executor();
+    this.deActivationTask = new Executor();
+
     makeObservable(this, {
       items: observable,
       itemActivating: observable,
       itemDeactivating: observable,
     });
-
-    this.itemActivating = false;
-    this.itemDeactivating = false;
-    this.activationTask = new Executor();
-    this.deActivationTask = new Executor();
 
     this.activationTask
       .addHandler(() => {

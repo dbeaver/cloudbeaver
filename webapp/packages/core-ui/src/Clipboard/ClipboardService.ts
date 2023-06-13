@@ -27,14 +27,15 @@ export class ClipboardService {
   }
 
   constructor(private readonly notificationService: NotificationService) {
-    makeObservable<ClipboardService, 'permissionUpdate'>(this, {
-      clipboardValue: observable,
-      permissionUpdate: observable,
-    });
     this.permissionUpdate = 1;
     this.readPermission = null;
     this.clipboardValue = null;
     this.clipboardAvailable = false;
+
+    makeObservable<ClipboardService, 'permissionUpdate'>(this, {
+      clipboardValue: observable,
+      permissionUpdate: observable,
+    });
   }
 
   async read(): Promise<string | null> {
