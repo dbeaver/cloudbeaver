@@ -35,15 +35,15 @@ export const BASE_TABLE_STYLES = css`
 
     &[|size='big'] {
       & > thead > tr > th {
-        height: 54px;
+        height: 36px;
 
         &[|min] {
-          width: 46px;
+          width: 32px;
         }
       }
 
       & > tbody > tr > td {
-        height: 46px;
+        height: 32px;
       }
     }
 
@@ -83,7 +83,7 @@ export const BASE_TABLE_STYLES = css`
   th {
     box-sizing: border-box;
     white-space: nowrap;
-    padding: 16px;
+    padding: 8px;
     height: 36px;
     padding-top: unset;
     padding-bottom: unset;
@@ -114,7 +114,7 @@ export const BASE_TABLE_STYLES = css`
     position: relative;
     box-sizing: border-box;
     height: 28px;
-    padding: 0 16px;
+    padding: 0 8px;
     transition: padding ease-in-out 0.24s;
 
     &[|ellipsis] {

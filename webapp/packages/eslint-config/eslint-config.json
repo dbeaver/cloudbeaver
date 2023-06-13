@@ -56,6 +56,7 @@
     "@typescript-eslint/restrict-template-expressions": "off",
     "@typescript-eslint/return-await": "off",
     "@typescript-eslint/strict-boolean-expressions": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-for-in-array": "off",
     "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/no-unused-vars": "warn",
@@ -166,11 +167,12 @@
     "react/display-name": "off",
     "react/jsx-no-literals": "off",
     "react/react-in-jsx-scope": "off",
+    "react/jsx-curly-newline": "off",
+    "react/jsx-wrap-multilines": "off",
     "react/jsx-closing-bracket-location": "error",
     "react/jsx-closing-tag-location": "error",
     "react/jsx-boolean-value": "error",
     "react/self-closing-comp": "error",
-    "react/jsx-curly-newline": "off",
     "react/jsx-curly-brace-presence": ["error", "never"],
     "react/jsx-fragments": ["off", "syntax"],
     "react/jsx-equals-spacing": ["error", "never"],
@@ -195,18 +197,6 @@
         "beforeSelfClosing": "always",
         "afterOpening": "never",
         "beforeClosing": "never"
-      }
-    ],
-    "react/jsx-wrap-multilines": [
-      "error",
-      {
-        "declaration": "parens-new-line",
-        "assignment": "parens-new-line",
-        "return": "parens-new-line",
-        "arrow": "parens-new-line",
-        "condition": "parens-new-line",
-        "logical": "parens-new-line",
-        "prop": "parens-new-line"
       }
     ],
     "react/jsx-sort-props": [

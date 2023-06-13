@@ -39,7 +39,7 @@ const styles = css`
   }
   container {
     display: flex;
-    gap: 8px;
+    gap: 16px;
     flex-direction: column;
     overflow: auto;
     flex: 1;

@@ -20,7 +20,7 @@ const styles = css`
   CommonDialogFooter {
     align-items: center;
     justify-content: flex-end;
-    gap: 24px;
+    gap: 16px;
   }
 `;
 

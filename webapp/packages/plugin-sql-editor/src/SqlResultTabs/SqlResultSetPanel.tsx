@@ -15,7 +15,7 @@ import type { IResultGroup, IResultTab } from '../ISqlEditorTabState';
 
 const styles = css`
   TableViewerLoader {
-    padding: 8px;
+    padding: 4px;
     padding-bottom: 0;
   }
 `;
