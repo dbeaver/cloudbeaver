@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useSplitUserState, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
@@ -38,6 +38,10 @@ export const LogViewer = observer(function LogViewer() {
   const closeInfoPanel = useCallback(() => {
     logViewerState.selectItem(null);
   }, [logViewerState]);
+
+  useEffect(() => {
+    logViewerState.update();
+  }, []);
 
   if (!logViewerState.isActive) {
     return <TextPlaceholder>{translate('plugin_log_viewer_placeholder')}</TextPlaceholder>;
