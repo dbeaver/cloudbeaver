@@ -59,6 +59,10 @@ export const TREE_NODE_STYLES = css`
         margin-right: 0;
         margin-left: 4px;
       }
+
+      & TreeNodeName {
+        margin-right: 4px;
+      }
     }
   }
 
@@ -95,6 +99,7 @@ export const TREE_NODE_STYLES = css`
     padding-right: 0;
     display: flex;
     align-items: center;
+    margin-right: 4px;
   }
 
   TreeNodeFilter {
