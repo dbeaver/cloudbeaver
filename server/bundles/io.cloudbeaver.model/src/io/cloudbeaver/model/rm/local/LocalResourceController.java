@@ -83,6 +83,7 @@ public class LocalResourceController implements RMController {
     private final String globalProjectName;
     private Supplier<SMController> smControllerSupplier;
     private final RMFileLockController lockController;
+    private final List<RMFileOperationHandler> fileHandlers;
 
     private final Map<String, WebProjectImpl> projectRegistries = new LinkedHashMap<>();
 
@@ -103,6 +104,10 @@ public class LocalResourceController implements RMController {
         this.lockController = new RMFileLockController(WebAppUtils.getWebApplication());
 
         this.globalProjectName = DBWorkbench.getPlatform().getApplication().getDefaultProjectName();
+        this.fileHandlers = RMFileOperationHandlersRegistry.getInstance().getFileHandlers()
+            .stream()
+            .map(RMFileOperationHandlerDescriptor::getInstance)
+            .collect(Collectors.toList());
     }
 
     protected SMController getSecurityController() {
@@ -119,7 +124,7 @@ public class LocalResourceController implements RMController {
         return userId == null ? null : this.userProjectsPath.resolve(userId);
     }
 
-    private WebProjectImpl getProjectMetadata(String projectId, boolean refresh) throws DBException {
+    private WebProjectImpl getWebProject(String projectId, boolean refresh) throws DBException {
         synchronized (projectRegistries) {
             WebProjectImpl project = projectRegistries.get(projectId);
             if (project == null || refresh) {
@@ -171,7 +176,10 @@ public class LocalResourceController implements RMController {
         }
         if (WebAppUtils.getWebApplication().isMultiNode()) {
             for (RMProject rmProject : projects) {
-                createResourceTypeFolders(getProjectPath(rmProject.getId()));
+                handleProjectOpened(rmProject.getId());
+                for (RMFileOperationHandler fileHandler : fileHandlers) {
+                    fileHandler.projectOpened(getProjectPath(rmProject.getId()));
+                }
             }
         }
 
@@ -329,7 +337,10 @@ public class LocalResourceController implements RMController {
 
     @Override
     public Object getProjectProperty(@NotNull String projectId, @NotNull String propName) throws DBException {
-        DBPProject project = getProjectMetadata(projectId, false);
+        var project = getWebProject(projectId, false);
+        for (RMFileOperationHandler fileHandler : fileHandlers) {
+            fileHandler.beforeFileRead(getProjectPath(projectId), project.getMetadataFilePath());
+        }
         return project.getProjectProperty(propName);
     }
 
@@ -339,14 +350,36 @@ public class LocalResourceController implements RMController {
         @NotNull String propName,
         @NotNull Object propValue
     ) throws DBException {
-        getProjectMetadata(projectId, false).setProjectProperty(propName, propValue);
+        WebProjectImpl webProject = getWebProject(projectId, false);
+        for (RMFileOperationHandler fileHandler : fileHandlers) {
+            fileHandler.beforeFileChange(getProjectPath(projectId), webProject.getMetadataFilePath());
+        }
+
+        webProject.setProjectProperty(propName, propValue);
+
+        for (RMFileOperationHandler fileHandler : fileHandlers) {
+            fileHandler.afterFileChange(
+                getProjectPath(projectId),
+                webProject.getMetadataFilePath(),
+                credentialsProvider.getActiveUserCredentials()
+            );
+        }
     }
 
     @Override
     public String getProjectsDataSources(@NotNull String projectId, @Nullable String[] dataSourceIds) throws DBException {
-        DBPProject projectMetadata = getProjectMetadata(projectId, false);
+        DBPProject projectMetadata = getWebProject(projectId, false);
         DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
         registry.checkForErrors();
+        DataSourceFileStorage fileStorage = registry.getDefaultStorage() instanceof DataSourceFileStorage
+            ? (DataSourceFileStorage) registry.getDefaultStorage()
+            : null;
+        if (fileStorage != null) {
+            for (RMFileOperationHandler fileHandler : fileHandlers) {
+                fileHandler.beforeFileRead(getProjectPath(projectId), fileStorage.getSourceFile());
+            }
+        }
+
         DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
         Predicate<DBPDataSourceContainer> filter = null;
         if (!ArrayUtils.isEmpty(dataSourceIds)) {
@@ -354,6 +387,7 @@ public class LocalResourceController implements RMController {
         }
         ((DataSourcePersistentRegistry) registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, filter);
         registry.checkForErrors();
+
         return new String(buffer.getData(), StandardCharsets.UTF_8);
     }
 
@@ -375,8 +409,16 @@ public class LocalResourceController implements RMController {
         @Nullable List<String> dataSourceIds
     ) throws DBException {
         try (var lock = lockController.lockProject(projectId, "updateProjectDataSources")) {
-            DBPProject project = getProjectMetadata(projectId, false);
+            DBPProject project = getWebProject(projectId, false);
             DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+            DataSourceFileStorage fileStorage = registry.getDefaultStorage() instanceof DataSourceFileStorage
+                ? (DataSourceFileStorage) registry.getDefaultStorage()
+                : null;
+            if (fileStorage != null) {
+                for (RMFileOperationHandler fileHandler : fileHandlers) {
+                    fileHandler.beforeFileRead(getProjectPath(projectId), fileStorage.getSourceFile());
+                }
+            }
             DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(StandardCharsets.UTF_8));
             DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
             var configChanged = ((DataSourcePersistentRegistry) registry).loadDataSources(
@@ -389,6 +431,15 @@ public class LocalResourceController implements RMController {
             registry.checkForErrors();
             ((DataSourcePersistentRegistry) registry).saveDataSources();
             registry.checkForErrors();
+            if (fileStorage != null) {
+                for (RMFileOperationHandler fileHandler : fileHandlers) {
+                    fileHandler.afterFileChange(
+                        getProjectPath(projectId),
+                        fileStorage.getSourceFile(),
+                        credentialsProvider.getActiveUserCredentials()
+                    );
+                }
+            }
             return configChanged;
         }
     }
@@ -397,11 +448,18 @@ public class LocalResourceController implements RMController {
     public void deleteProjectDataSources(@NotNull String projectId,
                                          @NotNull String[] dataSourceIds) throws DBException {
         try (var projectLock = lockController.lockProject(projectId, "deleteDatasources")) {
-            final DBPProject project = getProjectMetadata(projectId, false);
-            final DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-
+            DBPProject project = getWebProject(projectId, false);
+            DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+            DataSourceFileStorage fileStorage = registry.getDefaultStorage() instanceof DataSourceFileStorage
+                ? (DataSourceFileStorage) registry.getDefaultStorage()
+                : null;
+            if (fileStorage != null) {
+                for (RMFileOperationHandler fileHandler : fileHandlers) {
+                    fileHandler.beforeFileRead(getProjectPath(projectId), fileStorage.getSourceFile());
+                }
+            }
             for (String dataSourceId : dataSourceIds) {
-                final DBPDataSourceContainer dataSource = registry.getDataSource(dataSourceId);
+                DBPDataSourceContainer dataSource = registry.getDataSource(dataSourceId);
 
                 if (dataSource != null) {
                     registry.removeDataSource(dataSource);
@@ -410,6 +468,15 @@ public class LocalResourceController implements RMController {
                 }
             }
             registry.checkForErrors();
+            if (fileStorage != null) {
+                for (RMFileOperationHandler fileHandler : fileHandlers) {
+                    fileHandler.afterFileChange(
+                        getProjectPath(projectId),
+                        fileStorage.getSourceFile(),
+                        credentialsProvider.getActiveUserCredentials()
+                    );
+                }
+            }
         }
     }
 
@@ -417,14 +484,31 @@ public class LocalResourceController implements RMController {
     public void createProjectDataSourceFolder(@NotNull String projectId,
                                               @NotNull String folderPath) throws DBException {
         try (var projectLock = lockController.lockProject(projectId, "createDatasourceFolder")) {
-            DBPProject project = getProjectMetadata(projectId, false);
+            DBPProject project = getWebProject(projectId, false);
             DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+            DataSourceFileStorage fileStorage = registry.getDefaultStorage() instanceof DataSourceFileStorage
+                ? (DataSourceFileStorage) registry.getDefaultStorage()
+                : null;
+            if (fileStorage != null) {
+                for (RMFileOperationHandler fileHandler : fileHandlers) {
+                    fileHandler.beforeFileRead(getProjectPath(projectId), fileStorage.getSourceFile());
+                }
+            }
             var result = Path.of(folderPath);
             var newName = result.getFileName().toString();
             var parent = result.getParent();
             var parentFolder = parent == null ? null : registry.getFolder(parent.toString().replace("\\", "/"));
             DBPDataSourceFolder newFolder = registry.addFolder(parentFolder, newName);
             registry.checkForErrors();
+            if (fileStorage != null) {
+                for (RMFileOperationHandler fileHandler : fileHandlers) {
+                    fileHandler.afterFileChange(
+                        getProjectPath(projectId),
+                        fileStorage.getSourceFile(),
+                        credentialsProvider.getActiveUserCredentials()
+                    );
+                }
+            }
         }
     }
 
@@ -435,8 +519,16 @@ public class LocalResourceController implements RMController {
         boolean dropContents
     ) throws DBException {
         try (var projectLock = lockController.lockProject(projectId, "createDatasourceFolder")) {
-            DBPProject project = getProjectMetadata(projectId, false);
+            DBPProject project = getWebProject(projectId, false);
             DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+            DataSourceFileStorage fileStorage = registry.getDefaultStorage() instanceof DataSourceFileStorage
+                ? (DataSourceFileStorage) registry.getDefaultStorage()
+                : null;
+            if (fileStorage != null) {
+                for (RMFileOperationHandler fileHandler : fileHandlers) {
+                    fileHandler.beforeFileRead(getProjectPath(projectId), fileStorage.getSourceFile());
+                }
+            }
             for (String folderPath : folderPaths) {
                 DBPDataSourceFolder folder = registry.getFolder(folderPath);
                 if (folder != null) {
@@ -446,6 +538,15 @@ public class LocalResourceController implements RMController {
                 }
             }
             registry.checkForErrors();
+            if (fileStorage != null) {
+                for (RMFileOperationHandler fileHandler : fileHandlers) {
+                    fileHandler.afterFileChange(
+                        getProjectPath(projectId),
+                        fileStorage.getSourceFile(),
+                        credentialsProvider.getActiveUserCredentials()
+                    );
+                }
+            }
         }
     }
 
@@ -456,7 +557,7 @@ public class LocalResourceController implements RMController {
         @NotNull String newPath
     ) throws DBException {
         try (var projectLock = lockController.lockProject(projectId, "createDatasourceFolder")) {
-            DBPProject project = getProjectMetadata(projectId, false);
+            DBPProject project = getWebProject(projectId, false);
             DBPDataSourceRegistry registry = project.getDataSourceRegistry();
             registry.moveFolder(oldPath, newPath);
             registry.checkForErrors();
@@ -530,10 +631,17 @@ public class LocalResourceController implements RMController {
             }
             createFolder(targetPath.getParent());
             try {
+                Path projectPath = getProjectPath(projectId);
+                for (RMFileOperationHandler fileHandler : fileHandlers) {
+                    fileHandler.beforeFileChange(projectPath, targetPath);
+                }
                 if (isFolder) {
                     Files.createDirectories(targetPath);
                 } else {
                     Files.createFile(targetPath);
+                }
+                for (RMFileOperationHandler fileHandler : fileHandlers) {
+                    fileHandler.afterFileChange(projectPath, targetPath, credentialsProvider.getActiveUserCredentials());
                 }
             } catch (IOException e) {
                 throw new DBException("Error creating resource '" + resourcePath + "'", e);
@@ -542,6 +650,7 @@ public class LocalResourceController implements RMController {
         }
         return DEFAULT_CHANGE_ID;
     }
+
 
     @Override
     public String moveResource(
@@ -556,6 +665,9 @@ public class LocalResourceController implements RMController {
                 log.debug("Moving resource from '" + normalizedOldResourcePath + "' to '" + normalizedNewResourcePath + "'");
             }
             Path oldTargetPath = getTargetPath(projectId, normalizedOldResourcePath);
+            for (RMFileOperationHandler fileHandler : fileHandlers) {
+                fileHandler.beforeFileChange(getProjectPath(projectId), oldTargetPath);
+            }
             List<RMResource> rmOldResourcePath = makeResourcePath(projectId, oldTargetPath, false);
             if (!Files.exists(oldTargetPath)) {
                 throw new DBException("Resource '" + oldTargetPath + "' doesn't exists");
@@ -573,6 +685,13 @@ public class LocalResourceController implements RMController {
                 movePropertiesRecursive(projectId, newTargetPath, normalizedOldResourcePath, normalizedNewResourcePath);
             } catch (IOException | DBException e) {
                 throw new DBException("Unable to move resource properties", e);
+            }
+            for (RMFileOperationHandler fileHandler : fileHandlers) {
+                fileHandler.afterFileChange(
+                    getProjectPath(projectId),
+                    newTargetPath,
+                    credentialsProvider.getActiveUserCredentials()
+                );
             }
             fireRmResourceDeleteEvent(projectId, rmOldResourcePath);
             fireRmResourceAddEvent(projectId, normalizedNewResourcePath);
@@ -593,7 +712,7 @@ public class LocalResourceController implements RMController {
             @NotNull String oldRootPropertiesPath,
             @NotNull String newRootPropertiesPath
     ) throws IOException, DBException {
-        var project = getProjectMetadata(projectId, false);
+        var project = getWebProject(projectId, false);
         var projectPath = getProjectPath(projectId);
         var propertiesPathsList = new ArrayList<Pair<String, String>>();
         Files.walkFileTree(rootResourcePath, (UniversalFileVisitor<Path>) (path, attrs) -> {
@@ -619,6 +738,9 @@ public class LocalResourceController implements RMController {
             if (!Files.exists(targetPath)) {
                 throw new DBException("Resource '" + resourcePath + "' doesn't exists");
             }
+            for (RMFileOperationHandler fileHandler : fileHandlers) {
+                fileHandler.beforeFileChange(getProjectPath(projectId), targetPath);
+            }
             Collection<String> propertiesToRemove = List.of();
             try {
                 if (recursive) {
@@ -629,7 +751,7 @@ public class LocalResourceController implements RMController {
             } catch (IOException | DBException e) {
                 log.warn("Failed to remove resources properties", e);
             }
-            final List<RMResource> rmResourcePath = makeResourcePath(projectId, targetPath, recursive);
+            List<RMResource> rmResourcePath = makeResourcePath(projectId, targetPath, recursive);
             try {
                 if (targetPath.toFile().isDirectory()) {
                     IOUtils.deleteDirectory(targetPath);
@@ -639,11 +761,13 @@ public class LocalResourceController implements RMController {
             } catch (IOException e) {
                 throw new DBException("Error deleting resource '" + resourcePath + "'", e);
             }
-
+            for (RMFileOperationHandler fileHandler : fileHandlers) {
+                fileHandler.afterFileChange(getProjectPath(projectId), targetPath, credentialsProvider.getActiveUserCredentials());
+            }
             if (log.isDebugEnabled()) {
                 log.debug("Remove resources properties:\n" + propertiesToRemove);
             }
-            getProjectMetadata(projectId, false)
+            getWebProject(projectId, false)
                 .resetResourcesPropertiesBatch(propertiesToRemove);
             log.debug("Fire resource delete event");
             fireRmResourceDeleteEvent(projectId, rmResourcePath);
@@ -675,6 +799,9 @@ public class LocalResourceController implements RMController {
             throw new DBException("Resource '" + resourcePath + "' doesn't exists");
         }
         try {
+            for (RMFileOperationHandler fileHandler : fileHandlers) {
+                fileHandler.beforeFileRead(getProjectPath(projectId), targetPath);
+            }
             return Files.readAllBytes(targetPath);
         } catch (IOException e) {
             throw new DBException("Error reading resource '" + resourcePath + "'", e);
@@ -706,11 +833,17 @@ public class LocalResourceController implements RMController {
             if (!forceOverwrite && Files.exists(targetPath)) {
                 throw new DBException("Resource '" + resourcePath + "' exists");
             }
+            for (RMFileOperationHandler fileHandler : fileHandlers) {
+                fileHandler.beforeFileChange(getProjectPath(projectId), targetPath);
+            }
             createFolder(targetPath.getParent());
             try {
                 Files.write(targetPath, data);
             } catch (IOException e) {
                 throw new DBException("Error reading resource '" + resourcePath + "'", e);
+            }
+            for (RMFileOperationHandler fileHandler : fileHandlers) {
+                fileHandler.afterFileChange(getProjectPath(projectId), targetPath, this.credentialsProvider.getActiveUserCredentials());
             }
             if (!forceOverwrite) {
                 fireRmResourceAddEvent(projectId, resourcePath);
@@ -739,7 +872,18 @@ public class LocalResourceController implements RMController {
     ) throws DBException {
         try (var projectLock = lockController.lockProject(projectId, "resourcePropertyUpdate")) {
             validateResourcePath(resourcePath);
-            getProjectMetadata(projectId, false).setResourceProperty(resourcePath, propertyName, propertyValue);
+            WebProjectImpl webProject = getWebProject(projectId, false);
+            for (RMFileOperationHandler fileHandler : fileHandlers) {
+                fileHandler.beforeFileChange(getProjectPath(projectId), webProject.getMetadataFilePath());
+            }
+            webProject.setResourceProperty(resourcePath, propertyName, propertyValue);
+            for (RMFileOperationHandler fileHandler : fileHandlers) {
+                fileHandler.afterFileChange(
+                    getProjectPath(projectId),
+                    webProject.getMetadataFilePath(),
+                    credentialsProvider.getActiveUserCredentials()
+                );
+            }
             return DEFAULT_CHANGE_ID;
         }
     }
@@ -936,7 +1080,7 @@ public class LocalResourceController implements RMController {
                 );
             }
             if (readProperties) {
-                final BaseProjectImpl project = (BaseProjectImpl) getProjectMetadata(projectId, true);
+                final BaseProjectImpl project = (BaseProjectImpl) getWebProject(projectId, true);
                 final String resourcePath = getProjectRelativePath(projectId, path);
                 final Map<String, Object> properties = project.getResourceProperties(resourcePath);
 
@@ -983,15 +1127,22 @@ public class LocalResourceController implements RMController {
 
     private void fireRmProjectAddEvent(@NotNull RMProject project) throws DBException {
         RMEventManager.fireEvent(
-            new RMEvent(RMEvent.Action.RESOURCE_ADD,
+            new RMEvent(
+                RMEvent.Action.RESOURCE_ADD,
                 project
             )
         );
     }
 
-    public static Builder builder(SMCredentialsProvider credentialsProvider,
-                                  DBPWorkspace workspace,
-                                  Supplier<SMController> smControllerSupplier) {
+    protected void handleProjectOpened(String projectId) throws DBException {
+        createResourceTypeFolders(getProjectPath(projectId));
+    }
+
+    public static Builder builder(
+        SMCredentialsProvider credentialsProvider,
+        DBPWorkspace workspace,
+        Supplier<SMController> smControllerSupplier
+    ) {
         return new Builder(workspace, credentialsProvider, smControllerSupplier);
     }
 

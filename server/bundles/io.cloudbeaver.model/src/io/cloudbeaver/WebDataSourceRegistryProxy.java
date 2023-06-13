@@ -292,6 +292,11 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     }
 
     @Override
+    public DBPDataSourceConfigurationStorage getDefaultStorage() {
+        return dataSourceRegistry.getDefaultStorage();
+    }
+
+    @Override
     public void setAuthCredentialsProvider(DBACredentialsProvider authCredentialsProvider) {
         dataSourceRegistry.setAuthCredentialsProvider(authCredentialsProvider);
     }

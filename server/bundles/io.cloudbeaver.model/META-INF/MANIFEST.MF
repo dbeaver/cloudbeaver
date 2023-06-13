@@ -36,6 +36,7 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.service.admin,
  io.cloudbeaver.service.security,
  io.cloudbeaver.service.sql,
- io.cloudbeaver.utils
+ io.cloudbeaver.utils,
+ io.cloudbeaver.utils.file
 Automatic-Module-Name: io.cloudbeaver.model
 Import-Package: org.slf4j
