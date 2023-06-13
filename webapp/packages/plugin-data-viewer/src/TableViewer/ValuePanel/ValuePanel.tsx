@@ -20,13 +20,6 @@ const styles = css`
   table-left-bar {
     display: flex;
   }
-  Tab {
-    composes: theme-ripple from theme-typography--body2 from global;
-
-    &:global([aria-selected='true']) {
-      font-weight: normal !important;
-    }
-  }
   TabList {
     composes: theme-border-color-background from global;
     position: relative;
