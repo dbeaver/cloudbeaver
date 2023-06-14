@@ -16,11 +16,10 @@
  */
 package io.cloudbeaver.model.rm.local;
 
+import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.rm.RMUtils;
-import io.cloudbeaver.model.rm.RMWebProjectImpl;
 import io.cloudbeaver.model.rm.lock.RMFileLockController;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -85,7 +84,7 @@ public class LocalResourceController implements RMController {
     private Supplier<SMController> smControllerSupplier;
     private final RMFileLockController lockController;
 
-    private final Map<String, WebProjectImpl> projectRegistries = new LinkedHashMap<>();
+    private final Map<String, BaseWebProjectImpl> projectRegistries = new LinkedHashMap<>();
 
     public LocalResourceController(
         DBPWorkspace workspace,
@@ -120,17 +119,18 @@ public class LocalResourceController implements RMController {
         return userId == null ? null : this.userProjectsPath.resolve(userId);
     }
 
-    private WebProjectImpl getProjectMetadata(String projectId, boolean refresh) throws DBException {
+    private BaseWebProjectImpl getProjectMetadata(String projectId, boolean refresh) throws DBException {
         synchronized (projectRegistries) {
-            WebProjectImpl project = projectRegistries.get(projectId);
+            BaseWebProjectImpl project = projectRegistries.get(projectId);
             if (project == null || refresh) {
                 SessionContextImpl sessionContext = new SessionContextImpl(null);
                 RMProject rmProject = makeProjectFromId(projectId, false);
-                project = new RMWebProjectImpl(
+                project = new BaseWebProjectImpl(
                     workspace,
                     this,
                     sessionContext,
-                    rmProject);
+                    rmProject,
+                    (container) -> true);
                 projectRegistries.put(projectId, project);
             }
             return project;
