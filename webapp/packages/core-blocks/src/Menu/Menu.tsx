@@ -8,22 +8,25 @@
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useLayoutEffect, useRef, useState } from 'react';
 import { MenuButton, MenuInitialState, useMenuState } from 'reakit/Menu';
+import styled from 'reshadow';
+
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { ErrorBoundary } from '../ErrorBoundary';
-import { s } from '../s';
 import { useCombinedRef } from '../useCombinedRef';
 import { useObjectRef } from '../useObjectRef';
-import { useS } from '../useS';
-import style from './Menu.m.css';
+import { useStyles } from '../useStyles';
 import { MenuPanel } from './MenuPanel';
+import { menuPanelStyles } from './menuPanelStyles';
 import { IMenuState, MenuStateContext } from './MenuStateContext';
 import type { IMouseContextMenu } from './useMouseContextMenu';
 
-interface IMenuProps extends React.ButtonHTMLAttributes<any> {
+interface IMenuProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
   mouseContextMenu?: IMouseContextMenu;
   label: string;
   items: React.ReactNode | (() => React.ReactNode);
   menuRef?: React.RefObject<IMenuState | undefined>;
+  style?: ComponentStyle;
   disclosure?: boolean;
   placement?: MenuInitialState['placement'];
   submenu?: boolean;
@@ -45,6 +48,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
       menuRef,
       disclosure,
       children,
+      style,
       placement,
       visible,
       hasBindings,
@@ -54,7 +58,6 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
       modal,
       submenu,
       rtl,
-      className,
       ...props
     },
     ref,
@@ -71,7 +74,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
       visible,
       rtl,
     });
-    const styles = useS(style);
+    const styles = useStyles(menuPanelStyles, style);
 
     if (menuRef) {
       //@ts-expect-error Ref mutation
@@ -127,24 +130,17 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
     const MenuButtonLink = MenuButton;
 
     if (React.isValidElement(children) && disclosure) {
-      return (
+      return styled(styles)(
         <ErrorBoundary>
           <MenuStateContext.Provider value={menu}>
-            <MenuButton
-              key={relativePosition ? 'link' : 'main'}
-              ref={combinedRef}
-              className={s(styles, { menuButton: true }, className)}
-              {...menu}
-              visible={menuVisible}
-              {...props}
-              {...children.props}
-            >
+            <MenuButton key={relativePosition ? 'link' : 'main'} ref={combinedRef} {...menu} visible={menuVisible} {...props} {...children.props}>
               {disclosureProps => React.cloneElement(children, { ...disclosureProps, ...children.props })}
             </MenuButton>
             <MenuPanel
               ref={menuPanelRef}
               label={label}
               menu={menu}
+              style={style}
               rtl={rtl}
               submenu={submenu}
               panelAvailable={panelAvailable}
@@ -153,31 +149,23 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
             >
               {items}
             </MenuPanel>
-            {relativePosition && (
-              <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} {...menu} visible={menuVisible} />
-            )}
+            {relativePosition && <MenuButtonLink ref={menuButtonLinkRef} {...menu} visible={menuVisible} />}
           </MenuStateContext.Provider>
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
     }
 
-    return (
+    return styled(styles)(
       <ErrorBoundary>
         <MenuStateContext.Provider value={menu}>
-          <MenuButton
-            key={relativePosition ? 'link' : 'main'}
-            ref={combinedRef}
-            className={s(styles, { menuButton: true }, className)}
-            {...menu}
-            visible={menuVisible}
-            {...props}
-          >
-            <div className={s(styles, { box: true }, className)}>{children}</div>
+          <MenuButton key={relativePosition ? 'link' : 'main'} ref={combinedRef} {...menu} visible={menuVisible} {...props}>
+            <box>{children}</box>
           </MenuButton>
           <MenuPanel
             ref={menuPanelRef}
             label={label}
             menu={menu}
+            style={style}
             rtl={rtl}
             submenu={submenu}
             panelAvailable={panelAvailable}
@@ -186,11 +174,9 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
           >
             {items}
           </MenuPanel>
-          {relativePosition && (
-            <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} {...menu} visible={menuVisible} />
-          )}
+          {relativePosition && <MenuButtonLink ref={menuButtonLinkRef} {...menu} visible={menuVisible} />}
         </MenuStateContext.Provider>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
   }),
 );

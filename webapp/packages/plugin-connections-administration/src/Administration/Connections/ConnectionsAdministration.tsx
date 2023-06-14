@@ -19,6 +19,7 @@ import {
   Loader,
   ToolsAction,
   ToolsPanel,
+  Translate,
   useResource,
   useStyles,
   useTranslate,
@@ -34,7 +35,7 @@ import { CreateConnectionService } from './CreateConnectionService';
 
 const loaderStyle = css`
   ExceptionMessage {
-    padding: 16px;
+    padding: 24px;
   }
 `;
 

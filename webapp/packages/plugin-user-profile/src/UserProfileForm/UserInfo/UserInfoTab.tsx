@@ -10,7 +10,7 @@ import styled from 'reshadow';
 
 import { useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { Tab, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab } from '@cloudbeaver/core-ui';
 
 interface Props {
   className?: string;
@@ -23,7 +23,7 @@ export const UserInfoTab = observer<Props>(function UserInfoTab({ className, sty
 
   return styled(styles)(
     <Tab tabId="info" style={style} className={className}>
-      <TabTitle>{translate('plugin_user_profile_info')}</TabTitle>
+      {translate('plugin_user_profile_info')}
     </Tab>,
   );
 });

@@ -21,12 +21,12 @@ const styles = css`
     flex: 1;
     align-items: center;
     justify-content: flex-end;
-    gap: 16px;
+    gap: 24px;
   }
   buttons {
     flex: 1;
     display: flex;
-    gap: 16px;
+    gap: 24px;
   }
   wrapper {
     display: flex;

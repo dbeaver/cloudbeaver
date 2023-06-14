@@ -12,7 +12,7 @@ export const verticalTabStyles = css`
     overflow: auto;
     border: none !important;
     flex-shrink: 0;
-    height: 32px !important;
+    height: 36px !important;
   }
   vertical-tabs {
     display: flex;

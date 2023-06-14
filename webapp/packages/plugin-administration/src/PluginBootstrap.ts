@@ -5,8 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { lazy } from 'react';
-
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -14,11 +12,10 @@ import { PermissionsService } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
+import { AppStateMenu } from '@cloudbeaver/plugin-top-app-bar';
 
+import { AdministrationMenu } from './AdministrationMenu/AdministrationMenu';
 import { AdministrationTopAppBarService } from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService';
-
-const AdministrationMenu = lazy(() => import('./AdministrationMenu/AdministrationMenu').then(m => ({ default: m.AdministrationMenu })));
-const AppStateMenu = lazy(() => import('@cloudbeaver/plugin-top-app-bar').then(m => ({ default: m.AppStateMenu })));
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {

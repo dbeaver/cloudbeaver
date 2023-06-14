@@ -8,12 +8,10 @@
 
 @mixin button-core-styles() {
   $mdc-button-disabled-container-fill-color: #cccccc;
-  $mdc-button-density-scale: -3;
-  $mdc-density-default-scale: -3;
+  $mdc-button-density-scale: -2;
   $query: mdc-feature-all();
   @include mdc-button-core-styles;
   @include mdc-button-theme-baseline;
-  @include mdc-button-density(-3);
 
   .theme-button {
     @extend .mdc-button;

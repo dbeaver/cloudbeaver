@@ -23,8 +23,8 @@ interface Props {
 
 const styles = css`
   Checkbox {
-    margin-left: -6px;
-    margin-right: -6px;
+    margin-left: -10px;
+    margin-right: -10px;
   }
 `;
 
