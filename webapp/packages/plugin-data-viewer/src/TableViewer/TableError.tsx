@@ -57,7 +57,7 @@ const style = css`
   }
   error-body {
     display: flex;
-    gap: 24px;
+    gap: 16px;
     align-items: center;
     margin-bottom: 24px;
   }

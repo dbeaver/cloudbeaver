@@ -18,14 +18,9 @@ package io.cloudbeaver.server.graphql;
 
 import com.google.gson.*;
 import graphql.*;
-import graphql.execution.AsyncExecutionStrategy;
-import graphql.execution.DataFetcherExceptionHandlerResult;
-import graphql.execution.ExecutionPath;
-import graphql.execution.instrumentation.SimpleInstrumentation;
-import graphql.execution.instrumentation.parameters.InstrumentationExecutionParameters;
-import graphql.execution.instrumentation.parameters.InstrumentationFieldFetchParameters;
+import graphql.execution.*;
+import graphql.execution.instrumentation.SimplePerformantInstrumentation;
 import graphql.language.SourceLocation;
-import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.SchemaGenerator;
@@ -38,9 +33,7 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.service.WebServiceBindingBase;
-import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.utils.IOUtils;
 
 import javax.servlet.ServletException;
@@ -53,8 +46,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class GraphQLEndpoint extends HttpServlet {
@@ -82,7 +77,7 @@ public class GraphQLEndpoint extends HttpServlet {
 
         graphQL = GraphQL
             .newGraphQL(schema)
-            .instrumentation(new WebInstrumentation())
+            .instrumentation(new SimplePerformantInstrumentation())
             .queryExecutionStrategy(new WebExecutionStrategy())
             .mutationExecutionStrategy(new WebExecutionStrategy())
             .build();
@@ -260,57 +255,44 @@ public class GraphQLEndpoint extends HttpServlet {
         response.getWriter().print(resString);
     }
 
-    private static class WebInstrumentation extends SimpleInstrumentation {
-        @Override
-        public CompletableFuture<ExecutionResult> instrumentExecutionResult(ExecutionResult executionResult, InstrumentationExecutionParameters parameters) {
-            return super.instrumentExecutionResult(executionResult, parameters);
-        }
+    private class WebExecutionStrategy extends AsyncExecutionStrategy {
 
-        @Override
-        public DataFetcher<?> instrumentDataFetcher(DataFetcher<?> dataFetcher, InstrumentationFieldFetchParameters parameters) {
-            return dataFetcher;
-//            return environment -> {
-//                try {
-//                    return dataFetcher.get(environment);
-//                } catch (Exception e) {
-//                    log.debug(e);
-//                    throw e;
-//                }
-//            };
+        public WebExecutionStrategy() {
+            super(new WebDataFetcherExceptionHandler());
         }
     }
 
-    private class WebExecutionStrategy extends AsyncExecutionStrategy {
-        public WebExecutionStrategy() {
-            super(handlerParameters -> {
-                Throwable exception = handlerParameters.getException();
-                if (exception instanceof GraphQLException && exception.getCause() != null) {
-                    exception = exception.getCause();
-                }
-                if (exception instanceof InvocationTargetException) {
-                    exception = ((InvocationTargetException) exception).getTargetException();
-                }
-                log.debug("GraphQL call failed at '" + handlerParameters.getPath() + "'" /*+ ", " + handlerParameters.getArgumentValues()*/, exception);
+    private class WebDataFetcherExceptionHandler implements DataFetcherExceptionHandler {
+        @Override
+        public CompletableFuture<DataFetcherExceptionHandlerResult> handleException(DataFetcherExceptionHandlerParameters handlerParameters) {
+            Throwable exception = handlerParameters.getException();
+            if (exception instanceof GraphQLException && exception.getCause() != null) {
+                exception = exception.getCause();
+            }
+            if (exception instanceof InvocationTargetException) {
+                exception = ((InvocationTargetException) exception).getTargetException();
+            }
+            log.debug("GraphQL call failed at '" + handlerParameters.getPath() + "'" /*+ ", " + handlerParameters.getArgumentValues()*/, exception);
 
-                // Log in session
-                WebSession webSession = WebServiceBindingBase.findWebSession(handlerParameters.getDataFetchingEnvironment());
-                if (webSession != null) {
-                    webSession.addSessionError(exception);
-                }
+            // Log in session
+            WebSession webSession = WebServiceBindingBase.findWebSession(handlerParameters.getDataFetchingEnvironment());
+            if (webSession != null) {
+                webSession.addSessionError(exception);
+            }
 
-                SourceLocation sourceLocation = handlerParameters.getSourceLocation();
-                ExecutionPath path = handlerParameters.getPath();
+            SourceLocation sourceLocation = handlerParameters.getSourceLocation();
+            ResultPath path = handlerParameters.getPath();
 
-                DataFetcherExceptionHandlerResult.Builder handlerResult = DataFetcherExceptionHandlerResult.newResult();
-                if (!(exception instanceof GraphQLError)) {
-                    exception = new DBWebException(exception.getMessage(), exception);
-                }
-                if (exception instanceof DBWebException) {
-                    ((DBWebException) exception).setPath(path.toList());
-                    ((DBWebException) exception).setLocations(Collections.singletonList(sourceLocation));
-                }
-                return handlerResult.error((GraphQLError) exception).build();
-            });
+            DataFetcherExceptionHandlerResult.Builder handlerResult = DataFetcherExceptionHandlerResult.newResult();
+            if (!(exception instanceof GraphQLError)) {
+                exception = new DBWebException(exception.getMessage(), exception);
+            }
+            if (exception instanceof DBWebException) {
+                ((DBWebException) exception).setPath(path.toList());
+                ((DBWebException) exception).setLocations(Collections.singletonList(sourceLocation));
+            }
+            var result = handlerResult.error((GraphQLError) exception).build();
+            return CompletableFuture.completedFuture(result);
         }
     }
 

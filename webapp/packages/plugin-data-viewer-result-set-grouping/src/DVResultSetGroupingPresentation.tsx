@@ -57,7 +57,7 @@ const styles = css`
 
       & message {
         box-sizing: border-box;
-        padding: 24px;
+        padding: 16px;
         margin: auto;
         text-align: center;
         white-space: pre-wrap;

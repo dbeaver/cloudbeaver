@@ -1,0 +1,15 @@
+.menuItem {
+  background: none;
+  border: none;
+  outline: none !important;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover,
+  &:global([aria-expanded='true']) {
+    background: #236ea0;
+  }
+  &:before {
+    display: none;
+  }
+}
