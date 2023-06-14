@@ -1,8 +1,8 @@
 {
-  "name": "@cloudbeaver/core-browser",
+  "name": "@cloudbeaver/plugin-d3js",
   "sideEffects": false,
   "version": "0.1.0",
-  "description": "",
+  "description": "The plugin reexports d3js library and contains utility functions and components for d3js",
   "license": "Apache-2.0",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -17,20 +17,11 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-executor": "~0.1.0",
-    "@cloudbeaver/core-plugin": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
-    "dexie": "^3.2.4",
-    "workbox-core": "~7.x.x",
-    "workbox-precaching": "~7.x.x",
-    "workbox-window": "~7.x.x"
+    "d3": "^7.7.0",
+    "d3-drag": "^3.0.0"
   },
-  "peerDependencies": {
-    "@testing-library/jest-dom": "~5.x.x",
-    "mobx": "~6.x.x",
-    "mobx-react-lite": "~3.x.x",
-    "react": "~18.x.x",
-    "react-dom": "~18.x.x"
+  "devDependencies": {
+    "@types/d3": "^7.4.0",
+    "@types/d3-drag": "^3.0.1"
   }
 }
