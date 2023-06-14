@@ -108,21 +108,15 @@ export const AutoRefreshButton = observer<Props>(function AutoRefreshButton({ mo
         label="Auto refresh"
         items={
           <>
-            <MenuItem aria-label={translate('ui_custom')} close onClick={autoRefresh.configure}>
+            <MenuItem label={translate('ui_custom')} close onClick={autoRefresh.configure}>
               <MenuItemElement label={translate('ui_custom')} />
             </MenuItem>
             {intervals.map((inte, i) => (
-              <MenuItem
-                key={inte}
-                aria-label={intervals_messages[i]}
-                selected={interval === inte}
-                close
-                onClick={() => autoRefresh.setInterval(inte)}
-              >
+              <MenuItem key={inte} label={intervals_messages[i]} selected={interval === inte} close onClick={() => autoRefresh.setInterval(inte)}>
                 <MenuItemElement label={intervals_messages[i]} />
               </MenuItem>
             ))}
-            <MenuItem aria-label={translate('ui_processing_stop')} selected={interval === null} close onClick={autoRefresh.stop}>
+            <MenuItem label={translate('ui_processing_stop')} selected={interval === null} close onClick={autoRefresh.stop}>
               <MenuItemElement label={translate('ui_processing_stop')} />
             </MenuItem>
           </>

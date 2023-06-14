@@ -33,6 +33,11 @@ const tabsStyles = css`
     flex-shrink: 0;
     align-items: center;
   }
+  Tab {
+    height: 46px !important;
+    text-transform: uppercase;
+    font-weight: 500 !important;
+  }
 `;
 
 const topBarStyles = css`
@@ -40,7 +45,7 @@ const topBarStyles = css`
     composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
     position: relative;
     display: flex;
-    padding-top: 8px;
+    padding-top: 16px;
 
     &:before {
       content: '';
@@ -58,14 +63,14 @@ const topBarStyles = css`
   configuration-top-bar-actions {
     display: flex;
     align-items: center;
-    padding: 0 16px;
+    padding: 0 24px;
     gap: 16px;
   }
 
   configuration-status-message {
     composes: theme-typography--caption from global;
     height: 24px;
-    padding: 0 8px;
+    padding: 0 16px;
     display: flex;
     align-items: center;
     gap: 8px;

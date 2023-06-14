@@ -24,7 +24,7 @@ const styles = css`
 
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
 
     & > div {
       word-break: break-word;

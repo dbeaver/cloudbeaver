@@ -7,47 +7,24 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
-import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { MenuBar } from '@cloudbeaver/core-ui';
 import { IDataContext, useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../DATA_CONTEXT_SQL_EDITOR_STATE';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SQL_EDITOR_ACTIONS_MENU } from './SQL_EDITOR_ACTIONS_MENU';
-import SqlEditorActionsMenuBarStyles from './SqlEditorActionsMenuBar.m.css';
-import SqlEditorActionsMenuBarItemStyles from './SqlEditorActionsMenuBarItem.m.css';
+import { SQL_EDITOR_ACTIONS_MENU_STYLES } from './SQL_EDITOR_ACTIONS_MENU_STYLES';
 
 interface Props {
   state: ISqlEditorTabState;
   context?: IDataContext;
-  className?: string;
+  style?: ComponentStyle;
 }
 
-const registry: StyleRegistry = [
-  [
-    MenuBarStyles,
-    {
-      mode: 'append',
-      styles: [SqlEditorActionsMenuBarStyles],
-    },
-  ],
-  [
-    MenuBarItemStyles,
-    {
-      mode: 'append',
-      styles: [SqlEditorActionsMenuBarItemStyles],
-    },
-  ],
-];
-
-export const SqlEditorActionsMenu = observer<Props>(function SqlEditorActionsMenu({ state, context, className }) {
-  const styles = useS(SqlEditorActionsMenuBarStyles, SqlEditorActionsMenuBarItemStyles);
+export const SqlEditorActionsMenu = observer<Props>(function SqlEditorActionsMenu({ state, context, style }) {
   const menu = useMenu({ menu: SQL_EDITOR_ACTIONS_MENU, context });
   menu.context.set(DATA_CONTEXT_SQL_EDITOR_STATE, state);
 
-  return (
-    <SContext registry={registry}>
-      <MenuBar menu={menu} className={s(styles, { sqlActions: true }, className)} />
-    </SContext>
-  );
+  return <MenuBar style={[SQL_EDITOR_ACTIONS_MENU_STYLES, ...[style].flat(2)]} menu={menu} />;
 });

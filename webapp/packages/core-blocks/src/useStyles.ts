@@ -10,6 +10,7 @@ import { create } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
 import { BaseStyles, ComponentStyle, Style, ThemeService } from '@cloudbeaver/core-theming';
+import { flat } from '@cloudbeaver/core-utils';
 
 import { useExecutor } from './useExecutor';
 
@@ -27,8 +28,7 @@ export function useStyles(...componentStyles: ComponentStyle[]): Record<string, 
   const themeService = useService(ThemeService);
   const [currentThemeId, setCurrentThemeId] = useState(() => themeService.currentThemeId);
   const lastThemeRef = useRef<string>(currentThemeId);
-  //@ts-ignore
-  const filteredStyles = componentStyles.flat(Infinity).filter(Boolean) as Style[];
+  const filteredStyles = flat(componentStyles).filter(Boolean) as Style[];
   const trackTheme = filteredStyles.some(style => typeof style === 'function');
 
   useExecutor({
@@ -62,11 +62,11 @@ export function useStyles(...componentStyles: ComponentStyle[]): Record<string, 
         staticStyles.push(data);
       }
     }
-    loadedStyles.current = staticStyles.flat(Infinity);
+    loadedStyles.current = flat(staticStyles);
 
     if (themedStyles.length > 0) {
       Promise.all(themedStyles).then(styles => {
-        loadedStyles.current = [staticStyles, styles].flat(Infinity).filter(Boolean) as BaseStyles[];
+        loadedStyles.current = flat([staticStyles, flat(styles)]).filter(Boolean) as BaseStyles[];
         forceUpdate(patch + 1);
       });
     }
@@ -78,6 +78,5 @@ export function useStyles(...componentStyles: ComponentStyle[]): Record<string, 
 }
 
 export function joinStyles(...styles: ComponentStyle[]): ComponentStyle {
-  //@ts-ignore
-  return styles.flat(Infinity) as ComponentStyle;
+  return styles.flat(2);
 }

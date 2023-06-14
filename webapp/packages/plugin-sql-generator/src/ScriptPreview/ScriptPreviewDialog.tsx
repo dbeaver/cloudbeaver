@@ -31,7 +31,7 @@ const styles = css`
     flex: 1;
   }
   CommonDialogFooter {
-    gap: 16px;
+    gap: 24px;
   }
 `;
 

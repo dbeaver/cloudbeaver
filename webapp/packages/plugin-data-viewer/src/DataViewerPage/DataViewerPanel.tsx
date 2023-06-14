@@ -18,7 +18,7 @@ import { useDataViewerDatabaseDataModel } from './useDataViewerDatabaseDataModel
 
 const styles = css`
   TableViewerLoader {
-    padding: 4px;
+    padding: 8px;
     padding-bottom: 0;
   }
 `;

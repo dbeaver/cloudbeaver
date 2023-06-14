@@ -60,7 +60,7 @@ export const OVERLAY_BASE_STYLES = css`
   message,
   actions {
     flex-shrink: 0;
-    padding: 16px;
+    padding: 24px;
   }
 
   message {

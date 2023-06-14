@@ -13,11 +13,13 @@ import { isControlPresented } from '../isControlPresented';
 import { Checkbox, CheckboxBaseProps, CheckboxType, ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
 
 const style = css`
+  Checkbox {
+    margin: -10px;
+  }
   field {
     display: flex;
     align-items: center;
     white-space: pre-wrap;
-    height: 32px;
 
     & field-label {
       cursor: pointer;

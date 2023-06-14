@@ -82,7 +82,7 @@ const styles = css`
       outline: none;
       color: inherit;
       cursor: pointer;
-      gap: 16px;
+      gap: 8px;
 
       & item-icon,
       & item-title {
@@ -193,7 +193,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   iconSelector,
   titleSelector,
   isDisabled,
-  onChange = () => {},
+  onChange = () => { },
   onSelect,
   onSwitch,
   ...rest

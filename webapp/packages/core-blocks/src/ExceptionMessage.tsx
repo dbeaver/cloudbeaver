@@ -21,7 +21,7 @@ const style = css`
   error {
     flex: 1;
     display: flex;
-    padding: 16px;
+    padding: 24px;
   }
 
   error-name {
@@ -30,7 +30,6 @@ const style = css`
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    margin: 0;
 
     & span {
       display: inline-block;
@@ -149,7 +148,7 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({ exce
       {!icon && (
         <>
           <error-data>
-            <error-name as="h2">
+            <error-name>
               <span>{translate('core_blocks_exception_message_error_title')}</span>
             </error-name>
             <error-message>

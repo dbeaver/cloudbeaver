@@ -7,62 +7,49 @@
  */
 import { observer } from 'mobx-react-lite';
 import { ButtonHTMLAttributes, forwardRef } from 'react';
+import styled from 'reshadow';
 
-import { Icon, IconOrImage, Loader, s, useS, useStateDelay, useTranslate } from '@cloudbeaver/core-blocks';
-
-import style from './MenuBarItem.m.css';
+import { Icon, IconOrImage, Loader, useStateDelay, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 interface Props extends Omit<React.DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, 'style'> {
   label?: string;
   /** @deprecated must be refactored (#1)*/
   displayLabel?: boolean;
   loading?: boolean;
-  hidden?: boolean;
   icon?: string | React.ReactNode;
   displaySubmenuMark?: boolean;
   viewBox?: string;
+  style?: ComponentStyle;
 }
 
 export const MenuBarItem = observer<Props, HTMLButtonElement>(
   forwardRef(function MenuBarItem(
-    { label, displayLabel = true, loading = false, hidden, icon, displaySubmenuMark, viewBox = '0 0 24 24', className, ...rest },
+    { label, displayLabel = true, loading = false, icon, displaySubmenuMark, viewBox = '0 0 24 24', style = [], ...rest },
     ref,
   ) {
-    const styles = useS(style);
     const translate = useTranslate();
     loading = useStateDelay(loading, 100);
 
     const title = translate(rest.title);
-    return (
-      <button ref={ref} className={s(styles, { menuBarItem: true, hidden }, className)} {...rest} title={title} aria-label={title}>
-        <div className={s(styles, { menuBarItemBox: true }, className)}>
+    return styled(useStyles(style))(
+      <menu-bar-item ref={ref} as="button" {...rest} title={title} aria-label={title}>
+        <menu-bar-item-box>
           {loading ? (
-            <div className={s(styles, { menuBarItemIcon: true }, className)}>
-              <Loader className={s(styles, { loader: true }, className)} small fullSize />
-            </div>
+            <menu-bar-item-icon>
+              <Loader small fullSize />
+            </menu-bar-item-icon>
           ) : (
-            icon && (
-              <div className={s(styles, { menuBarItemIcon: true }, className)}>
-                <Loader className={s(styles, { loader: true }, className)} suspense small fullSize>
-                  {typeof icon === 'string' ? (
-                    <IconOrImage className={s(styles, { iconOrImage: true }, className)} icon={icon} viewBox={viewBox} />
-                  ) : (
-                    icon
-                  )}
-                </Loader>
-              </div>
-            )
+            icon && <menu-bar-item-icon>{typeof icon === 'string' ? <IconOrImage icon={icon} viewBox={viewBox} /> : icon}</menu-bar-item-icon>
           )}
-          {label && displayLabel && (
-            <div className={s(styles, { menuBarItemLabel: true }, className)}>{translate(label)}</div>
-          )}
+          {label && displayLabel ? <menu-bar-item-label>{translate(label)}</menu-bar-item-label> : <padding />}
           {displaySubmenuMark && (
-            <div className={s(styles, { menuBarItemMark: true }, className)}>
-              <Icon className={s(styles, { icon: true }, className)} name="angle" viewBox="0 0 15 8" />
-            </div>
+            <menu-bar-item-mark>
+              <Icon name="angle" viewBox="0 0 15 8" />
+            </menu-bar-item-mark>
           )}
-        </div>
-      </button>
+        </menu-bar-item-box>
+      </menu-bar-item>,
     );
   }),
 );

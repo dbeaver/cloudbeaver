@@ -9,7 +9,7 @@ import styled, { css } from 'reshadow';
 
 const styles = css`
   container {
-    height: 30px;
+    height: 32px;
     display: flex;
     flex-shrink: 0;
   }

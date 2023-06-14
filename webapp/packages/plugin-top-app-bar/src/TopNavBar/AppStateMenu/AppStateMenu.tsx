@@ -6,36 +6,30 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import styled, { css } from 'reshadow';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
-import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
+import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import style from '../shared/TopMenuWrapper.m.css';
-import AppMenuBarItemStyles from './AppStateMenu.m.css';
+import { topMenuStyles } from '../shared/topMenuStyles';
+import { MENU_BAR_DISABLE_EFFECT_STYLES, MENU_BAR_ITEM_STYLES, MENU_BAR_STYLES } from '../styles';
 import { MENU_APP_STATE } from './MENU_APP_STATE';
 
-const registry: StyleRegistry = [
-  [
-    MenuBarItemStyles,
-    {
-      mode: 'append',
-      styles: [AppMenuBarItemStyles],
-    },
-  ],
-  [
-    MenuBarStyles,
-    {
-      mode: 'append',
-      styles: [AppMenuBarItemStyles],
-    },
-  ],
-];
+const styles = css`
+  MenuBarElement {
+    & menu-bar-item-icon {
+      margin-right: 0;
+    }
+    & menu-bar-item-label,
+    & menu-bar-item-mark {
+      display: none;
+    }
+  }
+`;
 
 export const AppStateMenu = observer(function AppStateMenu() {
-  const styles = useS(AppMenuBarItemStyles, style);
   const menu = useMenu({ menu: MENU_APP_STATE });
   const { authenticated } = useService(AppAuthService);
 
@@ -43,11 +37,14 @@ export const AppStateMenu = observer(function AppStateMenu() {
     return null;
   }
 
-  return (
-    <SContext registry={registry}>
-      <div className={s(styles, { menuWrapper: true, appStateMenu: true })}>
-        <MenuBar menu={menu} nestedMenuSettings={{ modal: true }} rtl />
-      </div>
-    </SContext>
+  return styled(MENU_BAR_STYLES)(
+    <menu-wrapper>
+      <MenuBar
+        menu={menu}
+        style={[styles, topMenuStyles, MENU_BAR_ITEM_STYLES, topMenuStyles, MENU_BAR_DISABLE_EFFECT_STYLES]}
+        nestedMenuSettings={{ modal: true }}
+        rtl
+      />
+    </menu-wrapper>,
   );
 });
