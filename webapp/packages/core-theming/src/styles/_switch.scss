@@ -55,6 +55,7 @@ $mdc-density-default-scale: -3;
 }
 
 @mixin switch-core-styles-dense($query: mdc-feature-all()) {
+  $mdc-switch-baseline-theme-color: primary !global;
   $mdc-switch-track-width: 24px !global;
   $mdc-switch-track-height: 10px !global;
   $mdc-switch-thumb-diameter: 14px !global;

@@ -30,6 +30,9 @@ export class Deferred<T> {
   private readonly promiseExecutor = new PromiseExecutor<T>();
 
   constructor() {
+    this.payload = undefined;
+    this.rejectionReason = undefined;
+
     makeObservable<Deferred<T>, 'payload' | 'rejectionReason' | 'state' | 'toResolved' | 'toRejected' | 'toCancelled' | 'toCancelling' | 'toPending'>(
       this,
       {
