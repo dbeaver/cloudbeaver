@@ -6,27 +6,28 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import styled from 'reshadow';
 
-import { s, useResource, useS } from '@cloudbeaver/core-blocks';
+import { useResource, useStyles } from '@cloudbeaver/core-blocks';
 import {
   ConnectionDialectResource,
   ConnectionInfoActiveProjectKey,
   ConnectionInfoResource,
   createConnectionParam,
 } from '@cloudbeaver/core-connections';
-import { MenuBar } from '@cloudbeaver/core-ui';
+import { MENU_BAR_DEFAULT_STYLES, MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
 
+import { TAB_PANEL_STYLES } from '../TAB_PANEL_STYLES';
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from './DATA_CONTEXT_DDL_VIEWER_NODE';
 import { DATA_CONTEXT_DDL_VIEWER_VALUE } from './DATA_CONTEXT_DDL_VIEWER_VALUE';
 import { DdlResource } from './DdlResource';
-import style from './DDLViewerTabPanel.m.css';
 import { MENU_DDL_VIEWER_FOOTER } from './MENU_DDL_VIEWER_FOOTER';
 
 export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(function DDLViewerTabPanel({ nodeId, folderId }) {
-  const styles = useS(style);
+  const style = useStyles(TAB_PANEL_STYLES);
   const menu = useMenu({ menu: MENU_DDL_VIEWER_FOOTER });
 
   const ddlResource = useResource(DDLViewerTabPanel, DdlResource, nodeId);
@@ -40,10 +41,10 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
   menu.context.set(DATA_CONTEXT_DDL_VIEWER_NODE, nodeId);
   menu.context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, ddlResource.data);
 
-  return (
-    <div className={s(styles, { wrapper: true })}>
-      <SQLCodeEditorLoader className={s(styles, { sqlCodeEditorLoader: true })} value={ddlResource.data ?? ''} extensions={[sqlDialect]} readonly />
-      <MenuBar className={s(styles, { menuBar: true })} menu={menu} />
-    </div>
+  return styled(style)(
+    <wrapper>
+      <SQLCodeEditorLoader value={ddlResource.data ?? ''} extensions={[sqlDialect]} readonly />
+      <MenuBar menu={menu} style={MENU_BAR_DEFAULT_STYLES} />
+    </wrapper>,
   );
 });

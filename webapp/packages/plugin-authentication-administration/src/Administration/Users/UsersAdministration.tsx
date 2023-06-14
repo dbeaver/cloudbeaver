@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
 import { ToolsPanel, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { BASE_TAB_STYLES, ITabData, Tab, TabList, TabPanel, TabsState, TabTitle, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, ITabData, Tab, TabList, TabPanel, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { MetaParameters } from './MetaParameters/MetaParameters';
 import { TeamsPage } from './Teams/TeamsPage';
@@ -23,6 +23,12 @@ const tabsStyles = css`
     position: relative;
     flex-shrink: 0;
     align-items: center;
+    height: 33px;
+  }
+  Tab {
+    height: 32px !important;
+    text-transform: uppercase;
+    font-weight: 500 !important;
   }
   TabPanel {
     flex-direction: column;
@@ -53,10 +59,10 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
       <ToolsPanel>
         <TabList aria-label="User Administration pages" style={style}>
           <Tab tabId={EUsersAdministrationSub.Users} style={style}>
-            <TabTitle>{translate('authentication_administration_item_users')}</TabTitle>
+            {translate('authentication_administration_item_users')}
           </Tab>
           <Tab tabId={EUsersAdministrationSub.Teams} style={style}>
-            <TabTitle>{translate('administration_teams_tab_title')}</TabTitle>
+            {translate('administration_teams_tab_title')}
           </Tab>
           {/* <Tab
             tabId={EUsersAdministrationSub.MetaProperties}

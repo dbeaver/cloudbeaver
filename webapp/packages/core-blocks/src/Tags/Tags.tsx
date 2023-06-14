@@ -20,7 +20,7 @@ const style = css`
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 8px;
   }
 `;
 

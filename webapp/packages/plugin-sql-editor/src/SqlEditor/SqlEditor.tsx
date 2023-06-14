@@ -95,7 +95,7 @@ const tabStyles = css`
   }
   TabList {
     composes: theme-background-secondary theme-text-on-secondary from global;
-    margin-right: 4px;
+    margin-right: 8px;
     margin-left: 4px;
   }
 `;

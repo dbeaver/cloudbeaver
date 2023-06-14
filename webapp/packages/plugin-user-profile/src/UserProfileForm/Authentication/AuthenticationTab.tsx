@@ -10,7 +10,7 @@ import styled from 'reshadow';
 
 import { useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { Tab, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab } from '@cloudbeaver/core-ui';
 
 interface Props {
   className?: string;
@@ -23,7 +23,7 @@ export const AuthenticationTab = observer<Props>(function AuthenticationTab({ cl
 
   return styled(styles)(
     <Tab tabId="authentication" style={style} className={className}>
-      <TabTitle>{translate('ui_authentication')}</TabTitle>
+      {translate('ui_authentication')}
     </Tab>,
   );
 });

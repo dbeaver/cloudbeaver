@@ -22,6 +22,11 @@ const tabsStyles = css`
     flex-shrink: 0;
     align-items: center;
   }
+  Tab {
+    height: 46px !important;
+    text-transform: uppercase;
+    font-weight: 500 !important;
+  }
 `;
 
 const formStyles = css`
@@ -55,7 +60,7 @@ const topBarStyles = css`
     composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
     position: relative;
     display: flex;
-    padding-top: 8px;
+    padding-top: 16px;
     margin-bottom: 24px;
 
     &:before {
@@ -72,12 +77,12 @@ const topBarStyles = css`
     flex: 1;
   }
   StatusMessage {
-    padding: 0 8px;
+    padding: 0 16px;
   }
   connection-top-bar-actions {
     display: flex;
     align-items: center;
-    padding: 0 16px;
+    padding: 0 24px;
     gap: 16px;
   }
 `;

@@ -55,8 +55,8 @@ const styles = css`
     width: 32px;
   }
   [|timestamp] {
-    width: 100px;
-    min-width: 100px;
+    width: 200px;
+    min-width: 200px;
   }
 `;
 

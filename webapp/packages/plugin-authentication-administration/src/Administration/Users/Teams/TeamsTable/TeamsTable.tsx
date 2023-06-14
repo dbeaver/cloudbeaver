@@ -16,7 +16,7 @@ import { Team } from './Team';
 
 const loaderStyle = css`
   ExceptionMessage {
-    padding: 16px;
+    padding: 24px;
   }
 `;
 

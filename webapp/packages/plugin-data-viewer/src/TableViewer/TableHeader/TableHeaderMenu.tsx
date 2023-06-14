@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { css } from 'reshadow';
 
-import { PlaceholderComponent, useS } from '@cloudbeaver/core-blocks';
-import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
+import type { PlaceholderComponent } from '@cloudbeaver/core-blocks';
+import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_DV_DDM } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
@@ -17,13 +18,71 @@ import { DATA_CONTEXT_DATA_VIEWER_SIMPLE } from './DATA_CONTEXT_DATA_VIEWER_SIMP
 import { DATA_VIEWER_DATA_MODEL_TOOLS_MENU } from './DATA_VIEWER_DATA_MODEL_TOOLS_MENU';
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService';
 
+const TABLE_HEADER_MENU_BAR_STYLES = css`
+  menu-bar {
+    composes: theme-border-color-background theme-background-surface theme-text-on-surface theme-typography--body2 from global;
+    display: flex;
+    margin-left: 8px;
+    box-sizing: border-box;
+    border: 1px solid;
+    height: 24px;
+  }
+
+  menu-bar-item {
+    composes: theme-ripple from global;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    background: transparent;
+    outline: none;
+    color: inherit;
+
+    &[use|hidden] {
+      display: none;
+    }
+
+    & IconOrImage {
+      display: block;
+      width: 16px;
+    }
+
+    & Loader {
+      width: 16px;
+    }
+
+    & menu-bar-item-label {
+      display: block;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    & IconOrImage + menu-bar-item-label,
+    & Loader + menu-bar-item-label {
+      padding-left: 8px;
+    }
+  }
+
+  MenuSeparator {
+    composes: theme-border-color-background from global;
+    height: 100%;
+    margin: 0;
+    border: 0 !important;
+    border-right: 1px solid !important;
+
+    &:first-child,
+    &:last-child {
+      display: none;
+    }
+  }
+`;
+
 export const TableHeaderMenu: PlaceholderComponent<ITableHeaderPlaceholderProps> = observer(function TableHeaderMenu({ model, simple, resultIndex }) {
   const menu = useMenu({ menu: DATA_VIEWER_DATA_MODEL_TOOLS_MENU });
-  const menuBarStyles = useS(MenuBarStyles, MenuBarItemStyles);
 
   menu.context.set(DATA_CONTEXT_DV_DDM, model);
   menu.context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex);
   menu.context.set(DATA_CONTEXT_DATA_VIEWER_SIMPLE, simple);
 
-  return <MenuBar className={menuBarStyles.floating} menu={menu} />;
+  return <MenuBar menu={menu} style={TABLE_HEADER_MENU_BAR_STYLES} />;
 });
