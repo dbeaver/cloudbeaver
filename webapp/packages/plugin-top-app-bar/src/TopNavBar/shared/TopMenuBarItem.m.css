@@ -1,0 +1,61 @@
+.menuBarItem {
+  background: none;
+  border: none;
+  outline: none !important;
+  color: inherit;
+  cursor: pointer;
+
+  height: 100%;
+  padding: 0 4px !important;
+  margin-right: 1px;
+
+  &:after {
+    position: absolute;
+    background: #236ea0 !important;
+    height: 24px;
+    width: 1px;
+    top: 4px;
+    right: -1px;
+    opacity: 1 !important;
+    content: '';
+  }
+
+  & .menuBarItemBox {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    height: inherit;
+    position: relative;
+    justify-content: center;
+  }
+
+  & .menuBarItemLabel {
+    white-space: nowrap;
+    max-width: 240px;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    font-weight: inherit;
+    text-transform: none;
+  }
+
+  &:hover,
+  &:global([aria-expanded='true']) {
+    background: #338ecc;
+  }
+  &:before {
+    display: none;
+  }
+
+  & .menuBarItemMark {
+    display: flex;
+
+    & .icon {
+      width: 8px;
+      margin-right: 4px;
+    }
+  }
+}
+
+.loader {
+  composes: secondary from global;
+}

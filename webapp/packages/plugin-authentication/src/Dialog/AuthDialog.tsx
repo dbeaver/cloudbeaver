@@ -52,7 +52,6 @@ const styles = css`
     z-index: 1;
   }
   Tab {
-    text-transform: uppercase;
     &:global([aria-selected='true']) {
       font-weight: 500 !important;
     }

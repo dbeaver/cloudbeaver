@@ -1,0 +1,28 @@
+.menuButton {
+  composes: theme-ripple from global;
+}
+.menuButton {
+  background: none;
+  border: none;
+  outline: none !important;
+  color: inherit;
+  cursor: pointer;
+
+  & .box {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    height: inherit;
+  }
+}
+.menuButtonLink {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+}

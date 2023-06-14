@@ -1,0 +1,11 @@
+.menuSeparator {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  margin: 4px 0;
+
+  &:first-child,
+  &:last-child {
+    display: none;
+  }
+}

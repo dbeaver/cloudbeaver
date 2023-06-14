@@ -17,7 +17,7 @@ const styles = css`
     composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
     position: sticky;
     top: 0;
-    height: 48px;
+    height: 32px;
     display: flex;
     padding: 0 16px;
     align-items: center;
