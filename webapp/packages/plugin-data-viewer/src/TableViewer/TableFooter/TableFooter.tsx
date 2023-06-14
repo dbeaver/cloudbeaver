@@ -23,6 +23,7 @@ const tableFooterStyles = css`
     align-items: center;
     flex: 0 0 auto;
     overflow: auto;
+    gap: 8px;
     min-height: 32px;
     height: initial;
   }
@@ -62,9 +63,6 @@ const tableFooterStyles = css`
     white-space: nowrap;
     margin-left: auto;
     margin-right: 16px;
-  }
-  count {
-    padding: 0 4px;
   }
 `;
 

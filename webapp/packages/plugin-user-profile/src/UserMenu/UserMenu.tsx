@@ -6,19 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import styled from 'reshadow';
 
 import { AuthInfoService, DATA_CONTEXT_USER } from '@cloudbeaver/core-authentication';
-import { Icon, Loader, s, useS } from '@cloudbeaver/core-blocks';
+import { Icon, Loader } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
+import { topMenuStyles } from '@cloudbeaver/plugin-top-app-bar';
 
 import { UserInfo } from '../UserInfo';
 import { MENU_USER_PROFILE } from './MENU_USER_PROFILE';
-import style from './UserMenu.m.css';
+import { userMenuStyles } from './userMenuStyles';
 
 export const UserMenu = observer(function UserMenu() {
-  const styles = useS(style);
   const authInfoService = useService(AuthInfoService);
   const menu = useMenu({ menu: MENU_USER_PROFILE });
 
@@ -28,12 +29,12 @@ export const UserMenu = observer(function UserMenu() {
     return null;
   }
 
-  return (
+  return styled(userMenuStyles)(
     <Loader suspense inline>
       <UserInfo info={authInfoService.userInfo} />
-      <ContextMenu className={s(styles, { contextMenu: true })} menu={menu} rtl modal>
-        <Icon className={s(styles, { icon: true })} name="angle" viewBox="0 0 15 8" />
+      <ContextMenu menu={menu} style={[topMenuStyles]} rtl modal>
+        <Icon name="angle" viewBox="0 0 15 8" />
       </ContextMenu>
-    </Loader>
+    </Loader>,
   );
 });

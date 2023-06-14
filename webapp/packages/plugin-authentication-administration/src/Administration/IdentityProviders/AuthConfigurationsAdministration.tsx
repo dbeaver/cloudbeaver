@@ -29,7 +29,7 @@ import { CreateAuthConfigurationService } from './CreateAuthConfigurationService
 
 const loaderStyle = css`
   ExceptionMessage {
-    padding: 16px;
+    padding: 24px;
   }
 `;
 

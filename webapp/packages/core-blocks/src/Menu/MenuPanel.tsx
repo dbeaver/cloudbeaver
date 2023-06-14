@@ -8,13 +8,15 @@
 import { observer } from 'mobx-react-lite';
 import { Children, forwardRef } from 'react';
 import { Menu, MenuStateReturn } from 'reakit/Menu';
+import styled, { use } from 'reshadow';
+
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { ErrorBoundary } from '../ErrorBoundary';
 import { getComputed } from '../getComputed';
-import { s } from '../s';
-import { useS } from '../useS';
+import { useStyles } from '../useStyles';
 import { MenuEmptyItem } from './MenuEmptyItem';
-import style from './MenuPanel.m.css';
+import { menuPanelStyles } from './menuPanelStyles';
 
 export interface IMenuPanelProps {
   label: string;
@@ -25,12 +27,13 @@ export interface IMenuPanelProps {
   children: React.ReactNode | (() => React.ReactNode);
   rtl?: boolean;
   submenu?: boolean;
+  style?: ComponentStyle;
   className?: string;
 }
 
 export const MenuPanel = observer<IMenuPanelProps, HTMLDivElement>(
-  forwardRef(function MenuPanel({ label, menu, submenu, panelAvailable = true, rtl, getHasBindings, hasBindings, children, className }, ref) {
-    const styles = useS(style);
+  forwardRef(function MenuPanel({ label, menu, panelAvailable = true, rtl, getHasBindings, hasBindings, children, style, className }, ref) {
+    const styles = useStyles(menuPanelStyles, style);
     const visible = menu.visible;
 
     if (!visible) {
@@ -45,21 +48,15 @@ export const MenuPanel = observer<IMenuPanelProps, HTMLDivElement>(
       renderedChildren = typeof children === 'function' ? children() : children;
     }
 
-    return (
+    return styled(styles)(
       <ErrorBoundary>
-        <Menu
-          ref={ref}
-          className={s(styles, { menu: true, modal: menu.modal, submenu }, className)}
-          {...menu}
-          aria-label={label}
-          visible={panelAvailable}
-        >
-          <div dir={rtl ? 'rtl' : undefined} data-s-has-bindings={hasBindings} className={s(styles, { menuBox: true })}>
-            {Children.count(renderedChildren) === 0 && <MenuEmptyItem />}
+        <Menu ref={ref} {...menu} aria-label={label} className={className} visible={panelAvailable}>
+          <menu-box dir={rtl ? 'rtl' : undefined} {...use({ hasBindings })}>
+            {Children.count(renderedChildren) === 0 && <MenuEmptyItem style={style} />}
             {renderedChildren}
-          </div>
+          </menu-box>
         </Menu>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
   }),
 );

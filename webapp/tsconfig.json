@@ -1,6 +1,8 @@
 {
   "compileOnSave": false,
-  "exclude": ["node_modules"],
+  "files": ["typings.d.ts"],
+  "include": ["**/src"],
+  "exclude": ["**/node_modules"],
   "compilerOptions": {
     "baseUrl": ".",
     "allowUnreachableCode": false,
@@ -36,18 +38,8 @@
     "strictNullChecks": true,
     "isolatedModules": true,
     "allowArbitraryExtensions": true,
-    "composite": false,
+    "composite": true,
 
-    "types": ["reflect-metadata", "node", "jest", "@cloudbeaver/core-cli/global.d.ts"],
-    "plugins": [
-      {
-        // https://github.com/mrmckeb/typescript-plugin-css-modules/issues/222
-        "name": "typescript-plugin-css-modules",
-        "options": {
-          "customMatcher": "\\.m\\.(c|le|sa|sc)ss$",
-          "goToDefinition": true
-        }
-      }
-    ]
+    "types": ["reflect-metadata", "node", "jest"]
   }
 }

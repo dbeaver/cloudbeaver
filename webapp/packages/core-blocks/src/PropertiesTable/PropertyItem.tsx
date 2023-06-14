@@ -37,7 +37,7 @@ const styles = css`
     align-items: center;
     box-sizing: border-box;
     flex: 1;
-    padding: 2px 0;
+    padding: 4px 0;
 
     & ShadowInput {
       height: 24px;

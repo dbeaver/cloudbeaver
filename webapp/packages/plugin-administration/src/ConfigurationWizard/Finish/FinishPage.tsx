@@ -26,7 +26,7 @@ const styles = css`
     composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
     position: relative;
     border: solid 1px;
-    padding: 8px;
+    padding: 16px 24px;
   }
 
   p {

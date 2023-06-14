@@ -19,7 +19,7 @@ export const BASE_TAB_STYLES = css`
     padding: 0;
     white-space: nowrap;
 
-    height: 32px;
+    height: 48px;
     border-top: solid 2px transparent;
 
     &:global([aria-selected='true']) {
@@ -63,29 +63,25 @@ export const BASE_TAB_STYLES = css`
     align-items: center;
 
     & tab-icon {
-      display: flex;
       height: 24px;
       padding-left: 12px;
-      justify-content: center;
-      align-items: center;
 
       & StaticImage,
       & IconOrImage,
       & img {
-        width: 16px;
-        height: 16px;
+        width: 24px;
       }
 
       & placeholder {
-        width: 16px;
-        height: 16px;
+        width: 24px;
+        height: 24px;
       }
     }
 
     & tab-title {
       overflow: hidden;
       text-overflow: ellipsis;
-      padding: 0 8px;
+      padding: 0 12px;
     }
 
     & tab-title placeholder {

@@ -31,7 +31,7 @@ const styles = css`
   IconOrImage {
     width: 24px;
     height: 24px;
-    margin-right: 8px;
+    margin-right: 16px;
   }
 `;
 

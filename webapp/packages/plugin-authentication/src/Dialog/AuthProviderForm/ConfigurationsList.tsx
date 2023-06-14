@@ -60,7 +60,7 @@ const styles = css`
 
 const loaderStyle = css`
   ExceptionMessage {
-    padding: 16px;
+    padding: 24px;
   }
 `;
 

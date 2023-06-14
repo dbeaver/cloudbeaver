@@ -29,13 +29,9 @@
       display: flex;
       flex-direction: row;
       user-select: text;
-
-      &.rdg-cell-frozen {
-        box-shadow: none;
-      }
     }
 
-    .rdg-cell:global([aria-selected='true']) {
+    .rdg-cell:global([aria-selected=true]) {
       box-shadow: none;
     }
 
