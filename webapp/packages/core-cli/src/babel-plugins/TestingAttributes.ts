@@ -32,7 +32,7 @@ function nameForReactComponent(path: NodePath<FunctionType>): t.Identifier | nul
   if (!t.isArrowFunctionExpression(path.node) && t.isIdentifier(path.node.id)) {
     return path.node.id;
   }
-  if (t.isVariableDeclarator(parentPath)) {
+  if (t.isVariableDeclarator(parentPath.node)) {
     // @ts-expect-error expected
     return parentPath.node.id;
   }

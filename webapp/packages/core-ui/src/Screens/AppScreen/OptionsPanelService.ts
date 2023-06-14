@@ -21,15 +21,16 @@ export class OptionsPanelService {
   private basePanelComponent: (() => React.FC) | null;
 
   constructor(private readonly navigationService: NavigationService) {
-    makeObservable(this, {
-      active: observable,
-      panelComponent: observable,
-    });
     this.active = false;
     this.panelComponent = null;
     this.basePanelComponent = null;
     this.closeTask = new Executor();
     this.navigationService.navigationTask.addHandler(this.navigationHandler);
+
+    makeObservable(this, {
+      active: observable,
+      panelComponent: observable,
+    });
   }
 
   isOpen(component: () => React.FC): boolean {

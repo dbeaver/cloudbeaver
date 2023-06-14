@@ -34,7 +34,7 @@ import { useUsersTable } from './useUsersTable';
 
 const loaderStyle = css`
   ExceptionMessage {
-    padding: 24px;
+    padding: 16px;
   }
 `;
 

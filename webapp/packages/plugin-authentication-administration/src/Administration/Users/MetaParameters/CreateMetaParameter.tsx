@@ -25,9 +25,9 @@ const styles = css`
   }
 
   title-bar {
-    composes: theme-border-color-background theme-typography--headline6 from global;
+    composes: theme-border-color-background from global;
     box-sizing: border-box;
-    padding: 16px 24px;
+    padding: 8px;
     align-items: center;
     display: flex;
     font-weight: 400;

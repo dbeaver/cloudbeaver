@@ -4,8 +4,8 @@ export * from './Clipboard/ClipboardService';
 export * from './ContextMenu/ContextMenu';
 export * from './ContextMenu/IContextMenuItemProps';
 export * from './ContextMenu/MenuBar/MenuBar';
-export * from './ContextMenu/MenuBar/MENU_BAR_DEFAULT_STYLES';
-export * from './ContextMenu/MenuBar/MENU_BAR_SMALL_STYLES';
+export { default as MenuBarStyles } from './ContextMenu/MenuBar/MenuBar.m.css';
+export { default as MenuBarItemStyles } from './ContextMenu/MenuBar/MenuBarItem.m.css';
 
 export * from './DragAndDrop/DND_ELEMENT_TYPE';
 export * from './DragAndDrop/DND_NATIVE_TYPE';
