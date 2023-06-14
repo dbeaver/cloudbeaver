@@ -46,7 +46,7 @@ const styles = css`
     display: none;
   }
   TextPlaceholder {
-    padding: 24px;
+    padding: 16px;
   }
 `;
 

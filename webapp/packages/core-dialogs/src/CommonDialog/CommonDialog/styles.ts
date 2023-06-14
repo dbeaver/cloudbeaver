@@ -91,7 +91,7 @@ export const commonDialogBaseStyle = [
     dialog-body,
     footer {
       flex-shrink: 0;
-      padding: 24px;
+      padding: 16px;
 
       &[|no-padding] {
         padding: 0px;

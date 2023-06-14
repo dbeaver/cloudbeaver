@@ -1,0 +1,9 @@
+.appStateMenu .menuBarItem {
+  & .menuBarItemIcon {
+    margin-right: 0;
+  }
+  & .menuBarItemLabel,
+  & .menuBarItemMark {
+    display: none;
+  }
+}

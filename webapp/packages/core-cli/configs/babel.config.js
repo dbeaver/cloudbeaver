@@ -55,14 +55,13 @@ module.exports = {
         exclude: ['transform-async-to-generator', 'transform-regenerator'],
       },
     ],
+    ['@babel/preset-typescript', { isTSX: true, allExtensions: true, onlyRemoveTypeImports: true }],
     [
       '@babel/preset-react',
       {
-        'runtime': 'automatic',
-        // "importSource": "preact-jsx-runtime"
+        runtime: 'automatic',
       },
     ],
-    ['@babel/preset-typescript', { isTSX: true, allExtensions: true, onlyRemoveTypeImports: true }],
   ],
   plugins: [
     'babel-plugin-transform-typescript-metadata',
@@ -73,8 +72,8 @@ module.exports = {
     ['@babel/plugin-proposal-class-properties'],
     ['@babel/plugin-proposal-object-rest-spread', { useBuiltIns: true }],
     [testingAttributes, {}],
-    [require('@reshadow/babel'), { }],
-    /*devMode &&*/[
+    [require('@reshadow/babel'), {}],
+    /*devMode &&*/ [
       'babel-plugin-module-resolver',
       {
         alias: {

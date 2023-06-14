@@ -37,6 +37,9 @@ export function useLogViewer() {
         }
         props.selectedItem = item;
       },
+      async update() {
+        await sessionLogsLoader.resource.refresh();
+      },
       get isActive() {
         return props.logViewerService.isActive;
       },

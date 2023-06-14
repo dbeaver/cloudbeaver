@@ -34,7 +34,7 @@ import java.util.Map;
 public class ResourceManagerTest {
 
     public static final String GQL_TEMPLATE_RM_WRITE_RESOURCE = "rmWriteResource.json";
-    public static final String GQL_TEMPLATE_RM_DELETE_RESOURCE = "navDeleteNode.json";
+    public static final String GQL_TEMPLATE_RM_DELETE_RESOURCE = "rmDeleteResource.json";
     public static final String GQL_READ_EMPTY_PROJECT_ID_RESOURCES = "rmReadEmptyProjectIdResources.json";
 
     private static HttpClient client;
@@ -57,7 +57,7 @@ public class ResourceManagerTest {
         Assert.assertTrue(createResource(client, false));
         Assert.assertFalse(createResource(client, false));
         Assert.assertTrue(createResource(client, true));
-        Assert.assertEquals(1, deleteResource(client));
+        Assert.assertTrue(deleteResource(client));
     }
 
     @Test
@@ -83,14 +83,17 @@ public class ResourceManagerTest {
         return false;
     }
 
-    private int deleteResource(HttpClient client) throws Exception {
+    private boolean deleteResource(HttpClient client) throws Exception {
         String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_RM_DELETE_RESOURCE, CEServerTestSuite.getScriptsPath());
         Map<String, Object> map = WebTestUtils.doPost(CEServerTestSuite.GQL_API_URL, input, client);
         Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
-        if (data != null) {
-            return JSONUtils.getInteger(data, "navDeleteNodes");
+        if (map.containsKey("errors")) {
+            return false;
         }
-        return -1;
+        if (data != null) {
+            return data.containsKey("rmDeleteResource");
+        }
+        return false;
     }
 
 }

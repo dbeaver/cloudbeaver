@@ -1,0 +1,5 @@
+.toolsMenu .menuBarItem {
+  & .menuBarItemLabel {
+    display: none;
+  }
+}

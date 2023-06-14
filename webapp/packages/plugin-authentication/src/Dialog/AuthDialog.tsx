@@ -50,7 +50,6 @@ const styles = css`
     justify-content: center;
   }
   Tab {
-    text-transform: uppercase;
     &:global([aria-selected='true']) {
       font-weight: 500 !important;
     }

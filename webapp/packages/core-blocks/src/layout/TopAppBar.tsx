@@ -12,7 +12,7 @@ export const topAppBarStyles = css`
     composes: theme-text-on-primary theme-typography--body2 from global;
     display: flex;
     align-items: center;
-    height: 48px;
+    height: 32px;
     padding: 0 8px;
     background-color: #2a7cb4;
     z-index: 1;

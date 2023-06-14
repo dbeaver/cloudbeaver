@@ -38,10 +38,7 @@ const styles = css`
   }
 
   Tab {
-    composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
-    height: 46px !important;
-    text-transform: uppercase;
-    font-weight: 500 !important;
+    composes: theme-background-secondary theme-text-on-secondary from global;
   }
 
   TabList {
@@ -75,8 +72,7 @@ const styles = css`
   }
 
   title-bar {
-    composes: theme-typography--headline6 from global;
-    padding: 16px 24px;
+    padding: 8px;
     align-items: center;
     display: flex;
     font-weight: 400;

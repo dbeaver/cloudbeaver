@@ -5,8 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
 import type { IMenu } from '../IMenu';
 import type { IMenuItem, IMenuItemEvents } from './IMenuItem';
 
@@ -31,7 +29,6 @@ export type MenuSubMenuItemIconComponent<TExtraProps = unknown> = React.FC<ISubM
 
 export interface ISubMenuIconComponentProps<TExtraProps = unknown> {
   item: IMenuSubMenuItem<TExtraProps>;
-  style?: ComponentStyle;
   className?: string;
 }
 
