@@ -60,7 +60,7 @@ const styles = css`
     display: flex;
   }
   message {
-    padding: 24px;
+    padding: 16px;
     box-sizing: border-box;
     max-width: 240px;
     text-align: center;

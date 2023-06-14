@@ -6,10 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import "@material/radio/mixins";
+@import '@material/radio/mixins';
+$mdc-radio-density-scale: -3;
+$mdc-density-default-scale: -3;
+$mdc-radio-touch-area: 32px !default;
+$mdc-radio-ui-size: 16px !default;
 
 @mixin radio-core-styles($query: mdc-feature-all()) {
   @include mdc-radio-core-styles;
+  @include mdc-radio-density(-3);
 
   .theme-radio {
     @extend .mdc-radio;
