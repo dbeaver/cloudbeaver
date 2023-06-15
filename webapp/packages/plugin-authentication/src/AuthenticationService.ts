@@ -223,6 +223,9 @@ export class AuthenticationService extends Bootstrap {
       const user = await this.userInfoResource.finishFederatedAuthentication(data['auth-id'], false);
 
       if (user) {
+        //we request this method/request bc login form can be opened automatically.
+        //in case when authentication is required,
+        //loin form may be opened and we need to close it
         this.authDialogService.closeLoginForm();
       }
       action.process();

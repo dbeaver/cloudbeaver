@@ -123,44 +123,43 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     let activeTask: ITask<AuthInfo> | undefined;
 
     return new AutoRunningTask<UserInfo | null>(
-      () =>
-        this.performUpdate(undefined, [], async () => {
-          activeTask = whileTask<AuthInfo>(
-            authInfo => {
-              if (authInfo.authStatus === AuthStatus.Success) {
-                return true;
-              } else if (authInfo.authStatus === AuthStatus.Error) {
-                throw new Error('Authentication error');
-              }
-
-              return false;
-            },
-            async () => {
-              const { authInfo } = await this.graphQLService.sdk.getAuthStatus({
-                authId,
-                linkUser,
-                customIncludeOriginDetails: true,
-              });
-              return authInfo as AuthInfo;
-            },
-            1000,
-          );
-
-          const authInfo = await activeTask;
-
-          if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
-            if (this.data === null) {
-              this.resetIncludes();
-              this.setData(await this.loader());
-            } else {
-              this.data.authTokens.push(...(authInfo.userTokens as UserAuthToken[]));
+      async () => {
+        activeTask = whileTask<AuthInfo>(
+          authInfo => {
+            if (authInfo.authStatus === AuthStatus.Success) {
+              return true;
+            } else if (authInfo.authStatus === AuthStatus.Error) {
+              throw new Error('Authentication error');
             }
 
-            this.sessionDataResource.markOutdated();
+            return false;
+          },
+          async () => {
+            const { authInfo } = await this.graphQLService.sdk.getAuthStatus({
+              authId,
+              linkUser,
+              customIncludeOriginDetails: true,
+            });
+            return authInfo as AuthInfo;
+          },
+          1000,
+        );
+
+        const authInfo = await activeTask;
+
+        if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
+          if (this.data === null) {
+            this.resetIncludes();
+            this.setData(await this.loader());
+          } else {
+            this.data.authTokens.push(...(authInfo.userTokens as UserAuthToken[]));
           }
 
-          return this.data;
-        }),
+          this.sessionDataResource.markOutdated();
+        }
+
+        return this.data;
+      },
       () => {
         activeTask?.cancel();
       },
