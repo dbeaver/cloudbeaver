@@ -356,7 +356,7 @@ public class CBDatabase {
             } catch (SQLException e) {
                 try {
                     Object legacyVersion = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
-                        prepareSql( "SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER")));
+                        prepareSql("SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER")));
                     // Table CB_SERVER exist - this is a legacy schema
                     return LEGACY_SCHEMA_VERSION;
                 } catch (SQLException ex) {
@@ -521,6 +521,9 @@ public class CBDatabase {
         return id.toString();
     }
 
+    /**
+     * Replaces all predefined prefixes in sql query.
+     */
     @NotNull
     public String prepareSql(@NotNull String sql) {
         return InternalDatabaseConfig.prepareSql(sql, databaseConfiguration.getSchema());

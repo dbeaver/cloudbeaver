@@ -1214,7 +1214,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.prepareSql(
-                        "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT_INFO(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) " +
+                        "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT_INFO" +
+                            "(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) " +
                             "VALUES(?,?,?,?)"
                     )
                 )) {
@@ -1289,8 +1290,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                     if (dbStat.executeUpdate() <= 0) {
                         try (PreparedStatement dbStatIns = dbCon.prepareStatement(
-                            "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT_INFO (AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) "
-                                + "VALUES(?,?,?,?)")) {
+                            database.prepareSql("INSERT INTO {table_prefix}CB_AUTH_ATTEMPT_INFO " +
+                                "(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) "
+                                + "VALUES(?,?,?,?)")
+                        )) {
                             dbStatIns.setString(1, authId);
                             dbStatIns.setString(2, providerId.getAuthProviderId());
                             dbStatIns.setString(3, providerId.getAuthProviderConfigurationId());
