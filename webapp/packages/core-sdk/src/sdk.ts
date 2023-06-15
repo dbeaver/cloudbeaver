@@ -474,7 +474,7 @@ export interface DriverInfo {
 }
 
 export interface DriverLibraryInfo {
-  icon: Scalars['String'];
+  icon?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   name: Scalars['String'];
 }
@@ -1817,9 +1817,9 @@ export type AuthChangeLocalPasswordQuery = { authChangeLocalPassword: boolean };
 
 export type AuthLoginQueryVariables = Exact<{
   provider: Scalars['ID'];
-  configuration?: Maybe<Scalars['ID']>;
-  credentials?: Maybe<Scalars['Object']>;
-  linkUser?: Maybe<Scalars['Boolean']>;
+  configuration?: InputMaybe<Scalars['ID']>;
+  credentials?: InputMaybe<Scalars['Object']>;
+  linkUser?: InputMaybe<Scalars['Boolean']>;
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
@@ -1827,8 +1827,8 @@ export type AuthLoginQueryVariables = Exact<{
 export type AuthLoginQuery = { authInfo: { redirectLink?: string, authId?: string, authStatus: AuthStatus, userTokens?: Array<{ authProvider: string, authConfiguration?: string, loginTime: any, message?: string, origin: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> } }> } };
 
 export type AuthLogoutQueryVariables = Exact<{
-  provider?: Maybe<Scalars['ID']>;
-  configuration?: Maybe<Scalars['ID']>;
+  provider?: InputMaybe<Scalars['ID']>;
+  configuration?: InputMaybe<Scalars['ID']>;
 }>;
 
 
@@ -1858,7 +1858,7 @@ export type GetAuthProviderConfigurationParametersQueryVariables = Exact<{
 export type GetAuthProviderConfigurationParametersQuery = { parameters: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> };
 
 export type GetAuthProviderConfigurationsQueryVariables = Exact<{
-  providerId?: Maybe<Scalars['ID']>;
+  providerId?: InputMaybe<Scalars['ID']>;
 }>;
 
 
@@ -1876,7 +1876,7 @@ export type GetAuthRolesQuery = { roles: Array<string> };
 
 export type GetAuthStatusQueryVariables = Exact<{
   authId: Scalars['ID'];
-  linkUser?: Maybe<Scalars['Boolean']>;
+  linkUser?: InputMaybe<Scalars['Boolean']>;
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
@@ -1891,11 +1891,11 @@ export type GetUserProfilePropertiesQuery = { properties: Array<{ id?: string, d
 export type SaveAuthProviderConfigurationQueryVariables = Exact<{
   providerId: Scalars['ID'];
   id: Scalars['ID'];
-  displayName?: Maybe<Scalars['String']>;
-  disabled?: Maybe<Scalars['Boolean']>;
-  iconURL?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
-  parameters?: Maybe<Scalars['Object']>;
+  displayName?: InputMaybe<Scalars['String']>;
+  disabled?: InputMaybe<Scalars['Boolean']>;
+  iconURL?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
+  parameters?: InputMaybe<Scalars['Object']>;
 }>;
 
 
@@ -1911,8 +1911,8 @@ export type SaveUserMetaParametersQuery = { setUserMetaParameterValues: boolean 
 
 export type CreateTeamQueryVariables = Exact<{
   teamId: Scalars['ID'];
-  teamName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
+  teamName?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
   includeMetaParameters: Scalars['Boolean'];
 }>;
 
@@ -1939,7 +1939,7 @@ export type GetTeamMetaParametersQueryVariables = Exact<{ [key: string]: never; 
 export type GetTeamMetaParametersQuery = { parameters: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> };
 
 export type GetTeamsListQueryVariables = Exact<{
-  teamId?: Maybe<Scalars['ID']>;
+  teamId?: InputMaybe<Scalars['ID']>;
   includeMetaParameters: Scalars['Boolean'];
 }>;
 
@@ -1956,8 +1956,8 @@ export type SaveTeamMetaParametersQuery = { setTeamMetaParameterValues: boolean 
 
 export type UpdateTeamQueryVariables = Exact<{
   teamId: Scalars['ID'];
-  teamName?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
+  teamName?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
   includeMetaParameters: Scalars['Boolean'];
 }>;
 
@@ -1967,7 +1967,7 @@ export type UpdateTeamQuery = { team: { teamId: string, teamName?: string, descr
 export type CreateUserQueryVariables = Exact<{
   userId: Scalars['ID'];
   enabled: Scalars['Boolean'];
-  authRole?: Maybe<Scalars['String']>;
+  authRole?: InputMaybe<Scalars['String']>;
   includeMetaParameters: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
@@ -2005,7 +2005,7 @@ export type GetUserGrantedConnectionsQueryVariables = Exact<{
 export type GetUserGrantedConnectionsQuery = { grantedConnections: Array<{ connectionId: string, dataSourceId: string, subjectId: string, subjectType: AdminSubjectType }> };
 
 export type GetUsersListQueryVariables = Exact<{
-  userId?: Maybe<Scalars['ID']>;
+  userId?: InputMaybe<Scalars['ID']>;
   includeMetaParameters: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
@@ -2039,7 +2039,7 @@ export type SetConnectionsQuery = { grantedConnections?: boolean };
 
 export type SetUserAuthRoleQueryVariables = Exact<{
   userId: Scalars['ID'];
-  authRole?: Maybe<Scalars['String']>;
+  authRole?: InputMaybe<Scalars['String']>;
 }>;
 
 
@@ -2047,7 +2047,7 @@ export type SetUserAuthRoleQuery = { setUserAuthRole?: boolean };
 
 export type SetUserConfigurationParameterMutationVariables = Exact<{
   name: Scalars['String'];
-  value?: Maybe<Scalars['Object']>;
+  value?: InputMaybe<Scalars['Object']>;
 }>;
 
 
@@ -2065,7 +2065,7 @@ export type SetUserCredentialsQuery = { setUserCredentials?: boolean };
 export type SetUserMetaParameterQueryVariables = Exact<{
   id: Scalars['ID'];
   displayName: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
   required: Scalars['Boolean'];
 }>;
 
@@ -2155,7 +2155,7 @@ export type CreateConnectionMutation = { connection: { id: string, projectId: st
 
 export type CreateConnectionFolderMutationVariables = Exact<{
   projectId: Scalars['ID'];
-  parentFolderPath?: Maybe<Scalars['ID']>;
+  parentFolderPath?: InputMaybe<Scalars['ID']>;
   folderName: Scalars['String'];
 }>;
 
@@ -2165,7 +2165,7 @@ export type CreateConnectionFolderMutation = { folder: { id: string, projectId: 
 export type CreateConnectionFromNodeMutationVariables = Exact<{
   projectId: Scalars['ID'];
   nodePath: Scalars['String'];
-  config?: Maybe<ConnectionConfig>;
+  config?: InputMaybe<ConnectionConfig>;
   includeOrigin: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
   includeAuthProperties: Scalars['Boolean'];
@@ -2215,7 +2215,7 @@ export type DeleteConnectionFolderMutationVariables = Exact<{
 export type DeleteConnectionFolderMutation = { deleteConnectionFolder: boolean };
 
 export type DriverListQueryVariables = Exact<{
-  driverId?: Maybe<Scalars['ID']>;
+  driverId?: InputMaybe<Scalars['ID']>;
   includeProviderProperties: Scalars['Boolean'];
   includeDriverProperties: Scalars['Boolean'];
   includeDriverParameters: Scalars['Boolean'];
@@ -2223,13 +2223,13 @@ export type DriverListQueryVariables = Exact<{
 }>;
 
 
-export type DriverListQuery = { drivers: Array<{ id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, custom?: boolean, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number, supportedConfigurationTypes?: Array<string> }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }>, driverLibraries?: Array<{ id: string, name: string, icon: string }> }> };
+export type DriverListQuery = { drivers: Array<{ id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, custom?: boolean, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number, supportedConfigurationTypes?: Array<string> }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }>, driverLibraries?: Array<{ id: string, name: string, icon?: string }> }> };
 
 export type ExecutionContextCreateMutationVariables = Exact<{
   projectId: Scalars['ID'];
   connectionId: Scalars['ID'];
-  defaultCatalog?: Maybe<Scalars['String']>;
-  defaultSchema?: Maybe<Scalars['String']>;
+  defaultCatalog?: InputMaybe<Scalars['String']>;
+  defaultSchema?: InputMaybe<Scalars['String']>;
 }>;
 
 
@@ -2245,9 +2245,9 @@ export type ExecutionContextDestroyMutationVariables = Exact<{
 export type ExecutionContextDestroyMutation = { sqlContextDestroy: boolean };
 
 export type ExecutionContextListQueryVariables = Exact<{
-  projectId?: Maybe<Scalars['ID']>;
-  connectionId?: Maybe<Scalars['ID']>;
-  contextId?: Maybe<Scalars['ID']>;
+  projectId?: InputMaybe<Scalars['ID']>;
+  connectionId?: InputMaybe<Scalars['ID']>;
+  contextId?: InputMaybe<Scalars['ID']>;
 }>;
 
 
@@ -2257,8 +2257,8 @@ export type ExecutionContextUpdateMutationVariables = Exact<{
   projectId: Scalars['ID'];
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
-  defaultCatalog?: Maybe<Scalars['ID']>;
-  defaultSchema?: Maybe<Scalars['ID']>;
+  defaultCatalog?: InputMaybe<Scalars['ID']>;
+  defaultSchema?: InputMaybe<Scalars['ID']>;
 }>;
 
 
@@ -2270,15 +2270,15 @@ export type GetAuthModelsQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetAuthModelsQuery = { models: Array<{ id: string, displayName: string, description?: string, icon?: string, requiresLocalConfiguration?: boolean, requiredAuth?: string, properties: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }> };
 
 export type GetConnectionFoldersQueryVariables = Exact<{
-  projectId?: Maybe<Scalars['ID']>;
-  path?: Maybe<Scalars['ID']>;
+  projectId?: InputMaybe<Scalars['ID']>;
+  path?: InputMaybe<Scalars['ID']>;
 }>;
 
 
 export type GetConnectionFoldersQuery = { folders: Array<{ id: string, projectId: string, description?: string }> };
 
 export type GetTemplateConnectionsQueryVariables = Exact<{
-  projectId?: Maybe<Scalars['ID']>;
+  projectId?: InputMaybe<Scalars['ID']>;
   includeOrigin: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
   includeAuthProperties: Scalars['Boolean'];
@@ -2294,9 +2294,9 @@ export type GetTemplateConnectionsQueryVariables = Exact<{
 export type GetTemplateConnectionsQuery = { connections: Array<{ id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, readOnly: boolean, saveCredentials: boolean, credentialsSaved?: boolean, sharedCredentials: boolean, folder?: string, nodePath?: string, configurationType?: DriverConfigurationType, useUrl?: boolean, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties?: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, authNeeded?: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig?: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } }> };
 
 export type GetUserConnectionsQueryVariables = Exact<{
-  projectId?: Maybe<Scalars['ID']>;
-  connectionId?: Maybe<Scalars['ID']>;
-  projectIds?: Maybe<Array<Scalars['ID']> | Scalars['ID']>;
+  projectId?: InputMaybe<Scalars['ID']>;
+  connectionId?: InputMaybe<Scalars['ID']>;
+  projectIds?: InputMaybe<Array<Scalars['ID']> | Scalars['ID']>;
   includeOrigin: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
   includeAuthProperties: Scalars['Boolean'];
@@ -2314,10 +2314,10 @@ export type GetUserConnectionsQuery = { connections: Array<{ id: string, project
 export type InitConnectionMutationVariables = Exact<{
   projectId: Scalars['ID'];
   connectionId: Scalars['ID'];
-  credentials?: Maybe<Scalars['Object']>;
-  networkCredentials?: Maybe<Array<NetworkHandlerConfigInput> | NetworkHandlerConfigInput>;
-  saveCredentials?: Maybe<Scalars['Boolean']>;
-  sharedCredentials?: Maybe<Scalars['Boolean']>;
+  credentials?: InputMaybe<Scalars['Object']>;
+  networkCredentials?: InputMaybe<Array<NetworkHandlerConfigInput> | NetworkHandlerConfigInput>;
+  saveCredentials?: InputMaybe<Scalars['Boolean']>;
+  sharedCredentials?: InputMaybe<Scalars['Boolean']>;
   includeOrigin: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
   includeAuthProperties: Scalars['Boolean'];
@@ -2428,7 +2428,7 @@ export type RemoveDataTransferFileQuery = { result?: boolean };
 export type NavGetStructContainersQueryVariables = Exact<{
   projectId: Scalars['ID'];
   connectionId: Scalars['ID'];
-  catalogId?: Maybe<Scalars['ID']>;
+  catalogId?: InputMaybe<Scalars['ID']>;
   withDetails: Scalars['Boolean'];
 }>;
 
@@ -2459,7 +2459,7 @@ export type ConnectionFolderInfoFragment = { id: string, projectId: string, desc
 
 export type DatabaseConnectionFragment = { id: string, projectId: string, name: string, description?: string, driverId: string, template: boolean, connected: boolean, readOnly: boolean, saveCredentials: boolean, credentialsSaved?: boolean, sharedCredentials: boolean, folder?: string, nodePath?: string, configurationType?: DriverConfigurationType, useUrl?: boolean, host?: string, port?: string, serverName?: string, databaseName?: string, url?: string, properties?: any, providerProperties?: any, requiredAuth?: string, features: Array<string>, supportedDataFormats: Array<ResultDataFormat>, authNeeded?: boolean, authModel?: string, canViewSettings: boolean, canEdit: boolean, canDelete: boolean, origin?: { type: string, subType?: string, displayName: string, icon?: string, details?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, value?: any, length: ObjectPropertyLength, features: Array<string>, order: number }> }, authProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, value?: any, validValues?: Array<any>, defaultValue?: any, length: ObjectPropertyLength, features: Array<string>, order: number }>, networkHandlersConfig?: Array<{ id: string, enabled: boolean, authType: NetworkHandlerAuthType, userName?: string, password?: string, key?: string, savePassword: boolean, properties: any }>, navigatorSettings: { showSystemObjects: boolean, showUtilityObjects: boolean, showOnlyEntities: boolean, mergeEntities: boolean, hideFolders: boolean, hideSchemas: boolean, hideVirtualModel: boolean } };
 
-export type DatabaseDriverFragment = { id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, custom?: boolean, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number, supportedConfigurationTypes?: Array<string> }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }>, driverLibraries?: Array<{ id: string, name: string, icon: string }> };
+export type DatabaseDriverFragment = { id: string, name?: string, icon?: string, description?: string, defaultPort?: string, defaultDatabase?: string, defaultServer?: string, defaultUser?: string, sampleURL?: string, embedded?: boolean, enabled: boolean, requiresServerName?: boolean, anonymousAccess?: boolean, promotedScore?: number, providerId?: string, driverClassName?: string, custom?: boolean, defaultAuthModel: string, applicableAuthModels: Array<string>, applicableNetworkHandlers: Array<string>, configurationTypes: Array<DriverConfigurationType>, driverParameters?: any, providerProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number, supportedConfigurationTypes?: Array<string> }>, driverProperties?: Array<{ id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any> }>, driverLibraries?: Array<{ id: string, name: string, icon?: string }> };
 
 export type DriverProviderPropertyInfoFragment = { id?: string, displayName?: string, description?: string, category?: string, dataType?: string, defaultValue?: any, validValues?: Array<any>, length: ObjectPropertyLength, features: Array<string>, order: number, supportedConfigurationTypes?: Array<string> };
 
@@ -2504,9 +2504,9 @@ export type AsyncReadDataFromContainerMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   containerNodePath: Scalars['ID'];
-  resultId?: Maybe<Scalars['ID']>;
-  filter?: Maybe<SqlDataFilter>;
-  dataFormat?: Maybe<ResultDataFormat>;
+  resultId?: InputMaybe<Scalars['ID']>;
+  filter?: InputMaybe<SqlDataFilter>;
+  dataFormat?: InputMaybe<ResultDataFormat>;
 }>;
 
 
@@ -2516,9 +2516,9 @@ export type AsyncSqlExecuteQueryMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   query: Scalars['String'];
-  resultId?: Maybe<Scalars['ID']>;
-  filter?: Maybe<SqlDataFilter>;
-  dataFormat?: Maybe<ResultDataFormat>;
+  resultId?: InputMaybe<Scalars['ID']>;
+  filter?: InputMaybe<SqlDataFilter>;
+  dataFormat?: InputMaybe<ResultDataFormat>;
 }>;
 
 
@@ -2584,9 +2584,9 @@ export type UpdateResultsDataBatchMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   resultsId: Scalars['ID'];
-  updatedRows?: Maybe<Array<SqlResultRow> | SqlResultRow>;
-  deletedRows?: Maybe<Array<SqlResultRow> | SqlResultRow>;
-  addedRows?: Maybe<Array<SqlResultRow> | SqlResultRow>;
+  updatedRows?: InputMaybe<Array<SqlResultRow> | SqlResultRow>;
+  deletedRows?: InputMaybe<Array<SqlResultRow> | SqlResultRow>;
+  addedRows?: InputMaybe<Array<SqlResultRow> | SqlResultRow>;
 }>;
 
 
@@ -2597,9 +2597,9 @@ export type UpdateResultsDataBatchScriptMutationVariables = Exact<{
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
   resultsId: Scalars['ID'];
-  updatedRows?: Maybe<Array<SqlResultRow> | SqlResultRow>;
-  deletedRows?: Maybe<Array<SqlResultRow> | SqlResultRow>;
-  addedRows?: Maybe<Array<SqlResultRow> | SqlResultRow>;
+  updatedRows?: InputMaybe<Array<SqlResultRow> | SqlResultRow>;
+  deletedRows?: InputMaybe<Array<SqlResultRow> | SqlResultRow>;
+  addedRows?: InputMaybe<Array<SqlResultRow> | SqlResultRow>;
 }>;
 
 
@@ -2621,9 +2621,9 @@ export type MetadataGetNodeExtendedDdlQuery = { metadataGetNodeExtendedDDL?: str
 
 export type GetChildrenDbObjectInfoQueryVariables = Exact<{
   navNodeId: Scalars['ID'];
-  offset?: Maybe<Scalars['Int']>;
-  limit?: Maybe<Scalars['Int']>;
-  filter?: Maybe<ObjectPropertyFilter>;
+  offset?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  filter?: InputMaybe<ObjectPropertyFilter>;
 }>;
 
 
@@ -2631,7 +2631,7 @@ export type GetChildrenDbObjectInfoQuery = { dbObjects: Array<{ id: string, obje
 
 export type GetDbObjectInfoQueryVariables = Exact<{
   navNodeId: Scalars['ID'];
-  filter?: Maybe<ObjectPropertyFilter>;
+  filter?: InputMaybe<ObjectPropertyFilter>;
 }>;
 
 
@@ -2669,8 +2669,8 @@ export type NavMoveToMutation = { navMoveNodesToFolder?: boolean };
 
 export type NavNodeChildrenQueryVariables = Exact<{
   parentPath: Scalars['ID'];
-  offset?: Maybe<Scalars['Int']>;
-  limit?: Maybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']>;
   withDetails: Scalars['Boolean'];
 }>;
 
@@ -2706,9 +2706,9 @@ export type GetProjectListQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetProjectListQuery = { projects: Array<{ id: string, shared: boolean, global: boolean, name: string, description?: string, canEditDataSources: boolean, canViewDataSources: boolean, canEditResources: boolean, canViewResources: boolean, resourceTypes: Array<{ id: string, displayName: string, icon?: string, fileExtensions: Array<string>, rootFolder?: string }> }> };
 
 export type CreateProjectMutationVariables = Exact<{
-  projectId?: Maybe<Scalars['ID']>;
+  projectId?: InputMaybe<Scalars['ID']>;
   projectName: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
 }>;
 
 
@@ -2760,10 +2760,10 @@ export type GetProjectPermissionsListQuery = { permissions: Array<{ id: string, 
 
 export type GetResourceListQueryVariables = Exact<{
   projectId: Scalars['String'];
-  path?: Maybe<Scalars['String']>;
-  nameMask?: Maybe<Scalars['String']>;
+  path?: InputMaybe<Scalars['String']>;
+  nameMask?: InputMaybe<Scalars['String']>;
   includeProperties: Scalars['Boolean'];
-  readHistory?: Maybe<Scalars['Boolean']>;
+  readHistory?: InputMaybe<Scalars['Boolean']>;
 }>;
 
 
@@ -2815,7 +2815,7 @@ export type SetResourcePropertyMutationVariables = Exact<{
   projectId: Scalars['String'];
   resourcePath: Scalars['String'];
   name: Scalars['ID'];
-  value?: Maybe<Scalars['String']>;
+  value?: InputMaybe<Scalars['String']>;
 }>;
 
 
@@ -2866,7 +2866,7 @@ export type ChangeSessionLanguageMutationVariables = Exact<{
 export type ChangeSessionLanguageMutation = { changeSessionLanguage?: boolean };
 
 export type OpenSessionMutationVariables = Exact<{
-  defaultLocale?: Maybe<Scalars['String']>;
+  defaultLocale?: InputMaybe<Scalars['String']>;
 }>;
 
 
@@ -2931,8 +2931,8 @@ export type QuerySqlCompletionProposalsQueryVariables = Exact<{
   contextId: Scalars['ID'];
   position: Scalars['Int'];
   query: Scalars['String'];
-  simple?: Maybe<Scalars['Boolean']>;
-  maxResults?: Maybe<Scalars['Int']>;
+  simple?: InputMaybe<Scalars['Boolean']>;
+  maxResults?: InputMaybe<Scalars['Int']>;
 }>;
 
 
