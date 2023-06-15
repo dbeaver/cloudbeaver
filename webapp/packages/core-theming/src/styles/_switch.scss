@@ -7,8 +7,6 @@
  */
 
 @import '@material/switch/mixins';
-$mdc-switch-density-scale: -3;
-$mdc-density-default-scale: -3;
 
 @mixin switch-core-styles($query: mdc-feature-all()) {
   @include mdc-switch-core-styles($query);

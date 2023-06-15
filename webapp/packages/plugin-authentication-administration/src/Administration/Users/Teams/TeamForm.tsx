@@ -21,7 +21,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { teamContext } from './Contexts/teamContext';
 import type { ITeamFormState } from './ITeamFormProps';
@@ -40,7 +40,7 @@ const topBarStyles = css`
     composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
     position: relative;
     display: flex;
-    padding-top: 8px;
+    padding-top: 16px;
 
     &:before {
       content: '';
@@ -58,14 +58,14 @@ const topBarStyles = css`
   team-top-bar-actions {
     display: flex;
     align-items: center;
-    padding: 0 16px;
+    padding: 0 24px;
     gap: 16px;
   }
 
   team-status-message {
     composes: theme-typography--caption from global;
     height: 24px;
-    padding: 0 8px;
+    padding: 0 16px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -106,7 +106,7 @@ interface Props {
 export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onSave = () => {}, className }) {
   const translate = useTranslate();
   const props = useObjectRef({ onSave });
-  const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
+  const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
   const styles = useStyles(style, BASE_CONTAINERS_STYLES, topBarStyles, formStyles);
   const service = useService(TeamFormService);
 

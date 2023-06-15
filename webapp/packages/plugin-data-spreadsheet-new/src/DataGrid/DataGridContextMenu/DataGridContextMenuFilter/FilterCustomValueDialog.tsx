@@ -25,7 +25,7 @@ export const dialogStyle = css`
   CommonDialogFooter {
     align-items: center;
     justify-content: flex-end;
-    gap: 16px;
+    gap: 24px;
   }
 `;
 

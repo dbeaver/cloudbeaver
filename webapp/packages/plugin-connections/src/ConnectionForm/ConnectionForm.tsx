@@ -22,7 +22,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormService } from './ConnectionFormService';
 import { connectionConfigContext } from './Contexts/connectionConfigContext';
@@ -43,7 +43,7 @@ const topBarStyles = css`
   connection-top-bar {
     position: relative;
     display: flex;
-    padding-top: 8px;
+    padding-top: 16px;
 
     &:before {
       content: '';
@@ -61,7 +61,7 @@ const topBarStyles = css`
   connection-top-bar-actions {
     display: flex;
     align-items: center;
-    padding: 0 16px;
+    padding: 0 24px;
     gap: 16px;
   }
 
@@ -72,7 +72,7 @@ const topBarStyles = css`
   connection-status-message {
     composes: theme-typography--caption from global;
     height: 24px;
-    padding: 0 8px;
+    padding: 0 16px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -113,7 +113,7 @@ interface Props {
 export const ConnectionForm = observer<Props>(function ConnectionForm({ state, onCancel, onSave = () => {}, className }) {
   const translate = useTranslate();
   const props = useObjectRef({ onSave });
-  const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
+  const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
   const styles = useStyles(style, BASE_CONTAINERS_STYLES, topBarStyles, formStyles);
   const service = useService(ConnectionFormService);
 

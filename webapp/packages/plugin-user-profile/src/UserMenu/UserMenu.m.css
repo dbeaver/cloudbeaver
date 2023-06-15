@@ -1,11 +1,7 @@
 .contextMenu {
-  opacity: 1;
-  padding: 0 !important;
-  height: 32px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  outline: none !important;
+  height: 100%;
+  padding: 0;
+
   & .icon {
     width: 16px;
     height: 100%;

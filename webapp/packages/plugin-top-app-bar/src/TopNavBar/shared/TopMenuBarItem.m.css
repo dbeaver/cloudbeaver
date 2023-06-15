@@ -6,18 +6,27 @@
   cursor: pointer;
 
   height: 100%;
-  padding: 0 4px !important;
   margin-right: 1px;
 
   &:after {
     position: absolute;
     background: #236ea0 !important;
-    height: 24px;
+    height: 32px;
     width: 1px;
-    top: 4px;
+    top: 8px;
     right: -1px;
     opacity: 1 !important;
     content: '';
+  }
+
+  & .menuBarItemIcon {
+    width: 32px;
+    height: 32px;
+  }
+
+  & .loader,
+  & .iconOrImage {
+    width: 24px;
   }
 
   & .menuBarItemBox {
@@ -33,6 +42,7 @@
     white-space: nowrap;
     max-width: 240px;
     overflow-x: hidden;
+    font-size: 14px;
     text-overflow: ellipsis;
     font-weight: inherit;
     text-transform: none;
@@ -50,7 +60,6 @@
     display: flex;
 
     & .icon {
-      width: 8px;
       margin-right: 4px;
     }
   }

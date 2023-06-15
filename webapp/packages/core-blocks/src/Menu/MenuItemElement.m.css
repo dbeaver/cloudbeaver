@@ -5,7 +5,7 @@
   display: flex;
   position: relative;
   align-items: center;
-  height: 26px;
+  height: 28px;
   padding: 0 4px;
 
   & .menuItemText,

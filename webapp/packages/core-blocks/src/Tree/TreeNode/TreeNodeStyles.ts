@@ -147,15 +147,18 @@ export const TREE_NODE_STYLES = css`
   }
 
   node TreeNodeControl[big] {
-    height: 32px;
-    padding: 0 8px;
+    height: 46px;
+    padding: 0px 16px;
 
     & TreeNodeName {
       margin: 0;
-      padding-right: 4px;
-      padding-left: 4px;
+      padding-right: 8px;
+      padding-left: 8px;
     }
-    & TreeNodeIcon,
+    & TreeNodeIcon {
+      width: 24px;
+      height: 24px;
+    }
     & TreeNodeExpand {
       width: 16px;
       height: 16px;
@@ -170,8 +173,8 @@ export const TREE_NODE_STYLES = css`
     }
 
     & > * {
-      margin-right: 4px;
-      margin-left: 4px;
+      margin-right: 8px;
+      margin-left: 8px;
     }
 
     & TreeNodeSelect {
@@ -180,6 +183,6 @@ export const TREE_NODE_STYLES = css`
   }
 
   node TreeNodeControl[big] + TreeNodeNested {
-    padding-left: 16px;
+    padding-left: 24px;
   }
 `;

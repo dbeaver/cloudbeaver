@@ -34,7 +34,7 @@ import { CreateConnectionService } from './CreateConnectionService';
 
 const loaderStyle = css`
   ExceptionMessage {
-    padding: 16px;
+    padding: 24px;
   }
 `;
 

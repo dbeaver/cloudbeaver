@@ -54,12 +54,12 @@ const registry: StyleRegistry = [
   ],
 ];
 
-export const ConnectionIcon: React.FC<Props> = observer(function ConnectionIcon({ connectionKey, small = true, style, className }) {
+export const ConnectionIconSmall: React.FC<Props> = observer(function ConnectionIconSmall({ connectionKey, small = true, style, className }) {
   const styles = useStyles(style, connectionIconStyle);
 
-  const connection = useResource(ConnectionIcon, ConnectionInfoResource, connectionKey ?? null);
+  const connection = useResource(ConnectionIconSmall, ConnectionInfoResource, connectionKey ?? null);
 
-  const drivers = useResource(ConnectionIcon, DBDriverResource, CachedMapAllKey);
+  const drivers = useResource(ConnectionIconSmall, DBDriverResource, CachedMapAllKey);
 
   if (!connection.data?.driverId) {
     return null;
@@ -78,7 +78,7 @@ export const ConnectionIcon: React.FC<Props> = observer(function ConnectionIcon(
           icon={driver.icon}
           connected={connection.data.connected}
           maskId="connection-icon"
-          size={24}
+          size={16}
           paddingSize={0}
           {...use({ small })}
         />

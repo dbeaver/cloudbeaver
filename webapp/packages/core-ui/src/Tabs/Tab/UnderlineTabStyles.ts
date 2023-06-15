@@ -19,7 +19,6 @@ export const UNDERLINE_TAB_STYLES = css`
     border-bottom: 2px solid var(--theme-primary);
     outline: none;
     opacity: 1;
-    height: 30px !important;
     border-top: none !important;
     font-weight: normal !important;
     text-transform: uppercase;
@@ -34,8 +33,17 @@ export const UNDERLINE_TAB_STYLES = css`
     }
 
     &:hover {
-      cursor: pointer;
       opacity: 1;
+    }
+  }
+`;
+
+export const UNDERLINE_TAB_BIG_STYLES = css`
+  Tab {
+    font-size: 14px;
+
+    & TabTitle {
+      padding: 0 16px;
     }
   }
 `;

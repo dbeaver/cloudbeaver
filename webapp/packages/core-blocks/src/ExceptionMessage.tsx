@@ -21,7 +21,7 @@ const style = css`
   error {
     flex: 1;
     display: flex;
-    padding: 16px;
+    padding: 24px;
   }
 
   error-name {

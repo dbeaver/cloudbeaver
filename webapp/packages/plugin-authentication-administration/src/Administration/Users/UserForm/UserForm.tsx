@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 import { Button, Loader, StatusMessage, SubmittingForm, useFocus, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useController, useService } from '@cloudbeaver/core-di';
 import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
-import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { UserFormController } from './UserFormController';
 import { UserFormService } from './UserFormService';
@@ -55,7 +55,7 @@ const topBarStyles = css`
     composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
     position: relative;
     display: flex;
-    padding-top: 8px;
+    padding-top: 16px;
     margin-bottom: 24px;
 
     &:before {
@@ -72,12 +72,12 @@ const topBarStyles = css`
     flex: 1;
   }
   StatusMessage {
-    padding: 0 8px;
+    padding: 0 16px;
   }
   connection-top-bar-actions {
     display: flex;
     align-items: center;
-    padding: 0 16px;
+    padding: 0 24px;
     gap: 16px;
   }
 `;
@@ -89,7 +89,7 @@ interface Props {
 }
 
 export const UserForm = observer<Props>(function UserForm({ user, editing = false, onCancel }) {
-  const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
+  const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
   const styles = useStyles(style, topBarStyles, formStyles);
   const translate = useTranslate();
   const service = useService(UserFormService);

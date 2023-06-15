@@ -115,7 +115,7 @@ export const Table = observer<Props>(function Table({ objects, truncated }) {
     description: property.description,
     columnDataIndex: null,
     width: Math.min(300, measuredCells[index]),
-    minWidth: 32,
+    minWidth: 40,
     resizable: true,
     formatter: CellFormatter,
     headerRenderer: HeaderRenderer,

@@ -72,7 +72,8 @@ const styles = css`
   }
 
   title-bar {
-    padding: 8px;
+    composes: theme-typography--headline6 from global;
+    padding: 16px 24px;
     align-items: center;
     display: flex;
     font-weight: 400;

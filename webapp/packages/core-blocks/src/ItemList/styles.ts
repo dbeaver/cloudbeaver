@@ -39,7 +39,7 @@ export const ITEM_LIST_STYLES = css`
     composes: theme-background-surface theme-text-on-surface theme-typography--body1 from global;
     position: sticky;
     top: 0;
-    padding: 8px 16px;
+    padding: 16px 24px;
     z-index: 1;
 
     & input-box {
@@ -83,13 +83,13 @@ export const ITEM_LIST_STYLES = css`
     display: flex;
     box-sizing: border-box;
     align-items: center;
-    padding: 0 8px;
+    padding: 0 16px;
   }
   list-item-icon {
     display: flex;
     align-items: center;
     box-sizing: border-box;
-    padding: 4px;
+    padding: 8px;
 
     & StaticImage {
       box-sizing: border-box;
@@ -101,7 +101,7 @@ export const ITEM_LIST_STYLES = css`
     box-sizing: border-box;
     font-weight: 500;
     min-width: 250px;
-    padding: 4px 16px 4px 8px;
+    padding: 8px 24px 8px 8px;
     border-right: 1px solid;
 
     white-space: nowrap;
@@ -112,7 +112,7 @@ export const ITEM_LIST_STYLES = css`
     composes: theme-typography--body2 from global;
     box-sizing: border-box;
     max-width: 460px;
-    padding: 4px 8px 4px 16px;
+    padding: 8px 8px 8px 24px;
 
     white-space: nowrap;
     overflow: hidden;

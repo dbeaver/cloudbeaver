@@ -29,7 +29,7 @@ const style = css`
   error-inner-block {
     display: flex;
     margin: auto;
-    padding: 8px 16px;
+    padding: 16px 24px;
     flex-direction: column;
     align-items: center;
   }

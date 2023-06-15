@@ -8,12 +8,9 @@
 
 @import '@material/checkbox/mixins';
 $mdc-checkbox-icon-size: 16px;
-$mdc-checkbox-density-scale: -3;
-$mdc-density-default-scale: -3;
 
 @mixin checkbox-core-styles($query: mdc-feature-all()) {
   @include mdc-checkbox-core-styles($query);
-  @include mdc-checkbox-density(-3);
 
   .theme-checkbox {
     @extend .mdc-checkbox;

@@ -22,7 +22,7 @@ const styles = css`
   export-object {
     composes: theme-typography--body2 from global;
     flex-shrink: 0;
-    padding: 16px;
+    padding: 16px 24px;
     padding-top: 0;
     max-height: 50px;
     overflow: hidden;
