@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { ClientError } from 'graphql-request';
-import type { GraphQLRequestContext, GraphQLResponse } from 'graphql-request/dist/types';
+import type { GraphQLRequestContext, GraphQLResponse } from 'graphql-request/src/types';
 
 import { getTextBetween } from '@cloudbeaver/core-utils';
 

@@ -9,6 +9,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
+ org.jkiss.dbeaver.model.jdbc,
  org.jkiss.dbeaver.model.sql,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp,
