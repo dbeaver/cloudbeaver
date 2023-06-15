@@ -130,7 +130,7 @@ export const Table = observer<Props>(function Table({ objects, truncated }) {
   return styled(styles)(
     <TableContext.Provider value={{ tableData, tableState }}>
       <wrapper ref={setTableContainerRef} className="metadata-grid-container">
-        <DataGrid className="cb-metadata-grid-theme" rows={objects} rowKeyGetter={row => row.id} columns={tableData.columns} rowHeight={32} />
+        <DataGrid className="cb-metadata-grid-theme" rows={objects} rowKeyGetter={row => row.id} columns={tableData.columns} rowHeight={40} />
         {truncated && (
           <data-info>
             <Translate token="app_navigationTree_limited" limit={navTreeResource.childrenLimit} />
