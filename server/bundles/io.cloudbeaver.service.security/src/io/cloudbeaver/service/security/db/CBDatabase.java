@@ -351,12 +351,12 @@ public class CBDatabase {
             // Check and update schema
             try {
                 int version = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
-                    setPrefixes("SELECT VERSION FROM {prefix}CB_SCHEMA_INFO")));
+                    prepareSql("SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO")));
                 return version == 0 ? 1 : version;
             } catch (SQLException e) {
                 try {
                     Object legacyVersion = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
-                        setPrefixes( "SELECT SCHEMA_VERSION FROM {prefix}CB_SERVER")));
+                        prepareSql( "SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER")));
                     // Table CB_SERVER exist - this is a legacy schema
                     return LEGACY_SCHEMA_VERSION;
                 } catch (SQLException ex) {
@@ -380,13 +380,13 @@ public class CBDatabase {
         ) throws DBException, SQLException {
             var updateCount = JDBCUtils.executeUpdate(
                 connection,
-                setPrefixes("UPDATE {prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP"),
+                prepareSql("UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP"),
                 version
             );
             if (updateCount <= 0) {
                 JDBCUtils.executeSQL(
                     connection,
-                    setPrefixes("INSERT INTO {prefix}CB_SCHEMA_INFO (VERSION,UPDATE_TIME) VALUES(?,CURRENT_TIMESTAMP)"),
+                    prepareSql("INSERT INTO {table_prefix}CB_SCHEMA_INFO (VERSION,UPDATE_TIME) VALUES(?,CURRENT_TIMESTAMP)"),
                     version
                 );
             }
@@ -459,11 +459,12 @@ public class CBDatabase {
         String versionName = CommonUtils.truncateString(GeneralUtils.getProductVersion().toString(), 32);
 
         boolean hasInstanceRecord = JDBCUtils.queryString(connection,
-            setPrefixes("SELECT HOST_NAME FROM {prefix}CB_INSTANCE WHERE INSTANCE_ID=?"), instanceId) != null;
+            prepareSql("SELECT HOST_NAME FROM {table_prefix}CB_INSTANCE WHERE INSTANCE_ID=?"), instanceId) != null;
         if (!hasInstanceRecord) {
             JDBCUtils.executeSQL(
                 connection,
-                setPrefixes("INSERT INTO {prefix}CB_INSTANCE (INSTANCE_ID,MAC_ADDRESS,HOST_NAME,PRODUCT_NAME,PRODUCT_VERSION,UPDATE_TIME)" +
+                prepareSql("INSERT INTO {table_prefix}CB_INSTANCE " +
+                    "(INSTANCE_ID,MAC_ADDRESS,HOST_NAME,PRODUCT_NAME,PRODUCT_VERSION,UPDATE_TIME)" +
                     " VALUES(?,?,?,?,?,CURRENT_TIMESTAMP)"),
                 instanceId,
                 macAddress,
@@ -473,14 +474,15 @@ public class CBDatabase {
         } else {
             JDBCUtils.executeSQL(
                 connection,
-                setPrefixes("UPDATE {prefix}CB_INSTANCE SET HOST_NAME=?,PRODUCT_NAME=?,PRODUCT_VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP " +
+                prepareSql("UPDATE {table_prefix}CB_INSTANCE " +
+                    "SET HOST_NAME=?,PRODUCT_NAME=?,PRODUCT_VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP " +
                     "WHERE INSTANCE_ID=?"),
                 hostName,
                 productName,
                 versionName,
                 instanceId);
         }
-        JDBCUtils.executeSQL(connection, setPrefixes("DELETE FROM {prefix}CB_INSTANCE_DETAILS WHERE INSTANCE_ID=?"), instanceId);
+        JDBCUtils.executeSQL(connection, prepareSql("DELETE FROM {table_prefix}CB_INSTANCE_DETAILS WHERE INSTANCE_ID=?"), instanceId);
 
         Map<String, String> instanceDetails = new LinkedHashMap<>();
         for (Map.Entry<Object, Object> spe : System.getProperties().entrySet()) {
@@ -490,7 +492,7 @@ public class CBDatabase {
         }
 
         try (PreparedStatement dbStat = connection.prepareStatement(
-            setPrefixes("INSERT INTO {prefix}CB_INSTANCE_DETAILS(INSTANCE_ID,FIELD_NAME,FIELD_VALUE) VALUES(?,?,?)"))
+            prepareSql("INSERT INTO {table_prefix}CB_INSTANCE_DETAILS(INSTANCE_ID,FIELD_NAME,FIELD_VALUE) VALUES(?,?,?)"))
         ) {
             dbStat.setString(1, instanceId);
             for (Map.Entry<String, String> ide : instanceDetails.entrySet()) {
@@ -520,8 +522,8 @@ public class CBDatabase {
     }
 
     @NotNull
-    public String setPrefixes(@NotNull String sql) {
-        return InternalDatabaseConfig.setPrefixes(sql, databaseConfiguration.getSchema());
+    public String prepareSql(@NotNull String sql) {
+        return InternalDatabaseConfig.prepareSql(sql, databaseConfiguration.getSchema());
     }
     
 }
