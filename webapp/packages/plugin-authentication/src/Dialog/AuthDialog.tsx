@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
-import { AuthProvider, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AuthProvider, AuthProviderConfiguration, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ErrorMessage, Link, SubmittingForm, TextPlaceholder, useErrorDetails, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import {
@@ -36,9 +36,7 @@ const styles = css`
   }
   SubmittingForm {
     overflow: auto;
-    &[|form] {
-      margin: auto;
-    }
+    margin: auto;
   }
   SubmittingForm,
   AuthProviderForm {
@@ -47,7 +45,11 @@ const styles = css`
     flex-direction: column;
   }
   TabList {
+    composes: theme-background-surface theme-text-on-surface from global;
     justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
   Tab {
     text-transform: uppercase;
@@ -60,6 +62,7 @@ const styles = css`
     padding: 18px 24px;
   }
   ConfigurationsList {
+    overflow: auto;
     margin-top: 12px;
   }
   ErrorMessage {
@@ -109,8 +112,8 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
     subTitle = 'authentication_request_token';
   }
 
-  async function login() {
-    await dialogData.login(linkUser);
+  async function login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) {
+    await dialogData.login(linkUser, provider, configuration);
     rejectDialog();
   }
 
@@ -185,25 +188,22 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
               )}
             </TabList>
           )}
-          <SubmittingForm {...use({ form: !federate })} onSubmit={login}>
-            {federate ? (
-              <ConfigurationsList
-                activeProvider={state.activeProvider}
-                activeConfiguration={state.activeConfiguration}
-                providers={dialogData.configurations}
-                onAuthorize={(provider, configuration) => {
-                  state.setActiveConfiguration(provider, configuration);
-                }}
-                onClose={rejectDialog}
-              />
-            ) : (
-              renderForm(state.activeProvider)
-            )}
-          </SubmittingForm>
+          {federate ? (
+            <ConfigurationsList
+              activeProvider={state.activeProvider}
+              activeConfiguration={state.activeConfiguration}
+              providers={dialogData.configurations}
+              authTask={dialogData.authTask}
+              login={login}
+              onClose={rejectDialog}
+            />
+          ) : (
+            <SubmittingForm onSubmit={() => login(linkUser)}>{renderForm(state.activeProvider)}</SubmittingForm>
+          )}
         </CommonDialogBody>
         {!federate && (
           <CommonDialogFooter>
-            <AuthDialogFooter authAvailable={!dialogData.configure} isAuthenticating={dialogData.authenticating} onLogin={login}>
+            <AuthDialogFooter authAvailable={!dialogData.configure} isAuthenticating={dialogData.authenticating} onLogin={() => login(linkUser)}>
               {errorDetails.name && (
                 <ErrorMessage
                   text={errorDetails.message || errorDetails.name}
