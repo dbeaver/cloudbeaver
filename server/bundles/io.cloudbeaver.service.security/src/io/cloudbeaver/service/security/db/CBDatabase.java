@@ -47,7 +47,6 @@ import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.storage.H2Migrator;
-import org.jkiss.dbeaver.registry.storage.InternalDatabaseConfig;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
@@ -173,19 +172,19 @@ public class CBDatabase {
         Driver driverInstance = driver.getDriverInstance(monitor);
         dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), SystemVariablesResolver.INSTANCE);
 
-        SQLDialect dialect = driver.getScriptDialect().createInstance();
         try {
             this.cbDataSource = initConnectionPool(driver, dbURL, dbProperties, driverInstance);
         } catch (SQLException e) {
             throw new DBException("Error initializing connection pool");
         }
+        SQLDialect dialect = driver.getScriptDialect().createInstance();
 
         try (Connection connection = cbDataSource.getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
             log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
 
-            if (dialect instanceof SQLDialectSchemaController && CommonUtils.isNotEmpty(databaseConfiguration.getSchema())) {
-                var schemaName = databaseConfiguration.getSchema();
+            var schemaName = databaseConfiguration.getSchema();
+            if (dialect instanceof SQLDialectSchemaController && CommonUtils.isNotEmpty(schemaName)) {
                 var dialectSchemaController = (SQLDialectSchemaController) dialect;
                 var schemaExistQuery = dialectSchemaController.getSchemaExistQuery(schemaName);
                 boolean schemaExist = JDBCUtils.executeQuery(connection, schemaExistQuery) != null;
@@ -196,7 +195,6 @@ public class CBDatabase {
                     );
                     JDBCUtils.executeStatement(connection, createSchemaQuery);
                 }
-                connection.setSchema(schemaName);
             }
             SQLSchemaManager schemaManager = new SQLSchemaManager(
                 "CB",
@@ -209,6 +207,7 @@ public class CBDatabase {
                 new CBSchemaVersionManager(),
                 dialect,
                 null,
+                schemaName,
                 CURRENT_SCHEMA_VERSION,
                 0
             );
@@ -351,12 +350,12 @@ public class CBDatabase {
             // Check and update schema
             try {
                 int version = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
-                    prepareSql("SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO")));
+                    normalizeTableNames("SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO")));
                 return version == 0 ? 1 : version;
             } catch (SQLException e) {
                 try {
                     Object legacyVersion = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
-                        prepareSql("SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER")));
+                        normalizeTableNames("SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER")));
                     // Table CB_SERVER exist - this is a legacy schema
                     return LEGACY_SCHEMA_VERSION;
                 } catch (SQLException ex) {
@@ -380,13 +379,13 @@ public class CBDatabase {
         ) throws DBException, SQLException {
             var updateCount = JDBCUtils.executeUpdate(
                 connection,
-                prepareSql("UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP"),
+                normalizeTableNames("UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP"),
                 version
             );
             if (updateCount <= 0) {
                 JDBCUtils.executeSQL(
                     connection,
-                    prepareSql("INSERT INTO {table_prefix}CB_SCHEMA_INFO (VERSION,UPDATE_TIME) VALUES(?,CURRENT_TIMESTAMP)"),
+                    normalizeTableNames("INSERT INTO {table_prefix}CB_SCHEMA_INFO (VERSION,UPDATE_TIME) VALUES(?,CURRENT_TIMESTAMP)"),
                     version
                 );
             }
@@ -459,11 +458,11 @@ public class CBDatabase {
         String versionName = CommonUtils.truncateString(GeneralUtils.getProductVersion().toString(), 32);
 
         boolean hasInstanceRecord = JDBCUtils.queryString(connection,
-            prepareSql("SELECT HOST_NAME FROM {table_prefix}CB_INSTANCE WHERE INSTANCE_ID=?"), instanceId) != null;
+            normalizeTableNames("SELECT HOST_NAME FROM {table_prefix}CB_INSTANCE WHERE INSTANCE_ID=?"), instanceId) != null;
         if (!hasInstanceRecord) {
             JDBCUtils.executeSQL(
                 connection,
-                prepareSql("INSERT INTO {table_prefix}CB_INSTANCE " +
+                normalizeTableNames("INSERT INTO {table_prefix}CB_INSTANCE " +
                     "(INSTANCE_ID,MAC_ADDRESS,HOST_NAME,PRODUCT_NAME,PRODUCT_VERSION,UPDATE_TIME)" +
                     " VALUES(?,?,?,?,?,CURRENT_TIMESTAMP)"),
                 instanceId,
@@ -474,7 +473,7 @@ public class CBDatabase {
         } else {
             JDBCUtils.executeSQL(
                 connection,
-                prepareSql("UPDATE {table_prefix}CB_INSTANCE " +
+                normalizeTableNames("UPDATE {table_prefix}CB_INSTANCE " +
                     "SET HOST_NAME=?,PRODUCT_NAME=?,PRODUCT_VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP " +
                     "WHERE INSTANCE_ID=?"),
                 hostName,
@@ -482,7 +481,10 @@ public class CBDatabase {
                 versionName,
                 instanceId);
         }
-        JDBCUtils.executeSQL(connection, prepareSql("DELETE FROM {table_prefix}CB_INSTANCE_DETAILS WHERE INSTANCE_ID=?"), instanceId);
+        JDBCUtils.executeSQL(
+            connection,
+            normalizeTableNames("DELETE FROM {table_prefix}CB_INSTANCE_DETAILS WHERE INSTANCE_ID=?"),
+            instanceId);
 
         Map<String, String> instanceDetails = new LinkedHashMap<>();
         for (Map.Entry<Object, Object> spe : System.getProperties().entrySet()) {
@@ -492,7 +494,7 @@ public class CBDatabase {
         }
 
         try (PreparedStatement dbStat = connection.prepareStatement(
-            prepareSql("INSERT INTO {table_prefix}CB_INSTANCE_DETAILS(INSTANCE_ID,FIELD_NAME,FIELD_VALUE) VALUES(?,?,?)"))
+            normalizeTableNames("INSERT INTO {table_prefix}CB_INSTANCE_DETAILS(INSTANCE_ID,FIELD_NAME,FIELD_VALUE) VALUES(?,?,?)"))
         ) {
             dbStat.setString(1, instanceId);
             for (Map.Entry<String, String> ide : instanceDetails.entrySet()) {
@@ -525,8 +527,8 @@ public class CBDatabase {
      * Replaces all predefined prefixes in sql query.
      */
     @NotNull
-    public String prepareSql(@NotNull String sql) {
-        return InternalDatabaseConfig.prepareSql(sql, databaseConfiguration.getSchema());
+    public String normalizeTableNames(@NotNull String sql) {
+        return CommonUtils.normalizeTableNames(sql, databaseConfiguration.getSchema());
     }
     
 }
