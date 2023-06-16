@@ -21,7 +21,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
-import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
@@ -163,7 +162,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
             boolean shouldSkipProjectNode = nodePath.startsWith(DBNNode.NodePathType.ext.getPrefix());
             List<WebNavigatorNodeInfo> nodeParents = new ArrayList<>();
-            for (DBNNode parent = node.getParentNode(); parent != null && !(parent instanceof DBNRoot); parent = parent.getParentNode()) {
+            for (DBNNode parent = getLogicalParentNode(node);
+                 parent != null && !(parent instanceof DBNRoot);
+                 parent = getLogicalParentNode(parent)) {
                 //FIXME remove after node path refactoring
                 if (parent instanceof DBNProjectDatabases) {
                     continue;
@@ -178,6 +179,13 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         } catch (DBException e) {
             throw new DBWebException(e, null);
         }
+    }
+
+    private DBNNode getLogicalParentNode(DBNNode node) {
+        if (node instanceof DBNLocalFolder) {
+            return ((DBNLocalFolder) node).getLogicalParent();
+        }
+        return node.getParentNode();
     }
 
     @Override

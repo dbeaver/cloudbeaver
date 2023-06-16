@@ -209,6 +209,7 @@ export class TableFooterMenuService {
       id: 'save ',
       order: 1,
       title: 'ui_processing_save',
+      tooltip: 'ui_processing_save',
       icon: 'table-save',
       isPresent(context) {
         return context.contextType === TableFooterMenuService.nodeContextType;

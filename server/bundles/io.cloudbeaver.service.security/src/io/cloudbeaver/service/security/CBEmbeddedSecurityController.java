@@ -19,7 +19,6 @@ package io.cloudbeaver.service.security;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.SMAuthProviderAssigner;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
@@ -1558,7 +1557,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
 
             userAuthData.putAll((Map<String, Object>) authInfo.getAuthData().get(authConfiguration));
-            SMAutoAssign autoAssign = getAutoAssignUserData(authProvider, providerConfig, userAuthData, finishAuthMonitor);
+            SMAutoAssign autoAssign = isMainAuthSession
+                ? getAutoAssignUserData(authProvider, providerConfig, userAuthData, finishAuthMonitor)
+                //do not auto assign user data if it an additional auth
+                : null;
             if (autoAssign != null) {
                 detectedAuthRole = autoAssign.getAuthRole();
             }
