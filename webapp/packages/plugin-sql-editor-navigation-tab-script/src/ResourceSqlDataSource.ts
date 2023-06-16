@@ -93,7 +93,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   private _script: string;
   private actions?: IResourceActions;
   private info?: IResourceInfo;
-  private lastAction?: () => Promise<void>;
+  private lastAction: (() => Promise<void>) | undefined;
   private readonly state: IResourceSqlDataSourceState;
 
   private loaded: boolean;
@@ -108,6 +108,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     super();
     this.state = state;
     this._script = '';
+    this.lastAction = undefined;
     this.loaded = false;
     this.resourceUseKeyId = null;
     this.scheduler = new TaskScheduler(() => true);
