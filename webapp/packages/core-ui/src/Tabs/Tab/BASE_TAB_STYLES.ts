@@ -65,7 +65,7 @@ export const BASE_TAB_STYLES = css`
     & tab-icon {
       display: flex;
       height: 24px;
-      padding-left: 12px;
+      padding-left: 8px;
       justify-content: center;
       align-items: center;
 
