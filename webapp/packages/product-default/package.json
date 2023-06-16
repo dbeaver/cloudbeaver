@@ -1,7 +1,7 @@
 {
   "name": "@cloudbeaver/product-default",
   "sideEffects": false,
-  "version": "23.1.0",
+  "version": "23.1.1",
   "description": "",
   "license": "Apache-2.0",
   "main": "lib/index.js",

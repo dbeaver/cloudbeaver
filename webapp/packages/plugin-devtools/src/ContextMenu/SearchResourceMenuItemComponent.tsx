@@ -22,6 +22,7 @@ const styles = css`
 
 export const SearchResourceMenuItemComponent: ICustomMenuItemComponent<IContextMenuItemProps> = observer(function SearchResourceMenuItemComponent({
   item,
+  menu,
   onClick,
   menuData,
   className,

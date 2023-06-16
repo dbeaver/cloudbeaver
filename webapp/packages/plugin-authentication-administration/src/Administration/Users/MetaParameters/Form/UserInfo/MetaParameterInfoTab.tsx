@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { Tab, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab } from '@cloudbeaver/core-ui';
 
 interface Props {
   className?: string;
@@ -22,7 +22,7 @@ export const MetaParameterInfoTab = observer<Props>(function MetaParameterInfoTa
 
   return styled(styles)(
     <Tab tabId="info" style={style} className={className}>
-      <TabTitle>{translate('plugin_user_profile_info')}</TabTitle>
+      {translate('plugin_user_profile_info')}
     </Tab>,
   );
 });

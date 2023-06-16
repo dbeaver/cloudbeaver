@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-export type ClassCollection<T extends Record<string, string> = Record<string, string>> = {
-  [Key in keyof T]: string;
-};
+export interface ClassCollection {
+  [key: string]: any;
+}
 
 export class Composes {
   composes: ClassCollection;

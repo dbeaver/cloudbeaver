@@ -19,17 +19,17 @@ export class ProcessNotificationController implements IProcessNotificationState 
   message: string | null;
 
   constructor() {
+    this.error = null;
+    this.title = '';
+    this.message = null;
+    this.status = ENotificationType.Info;
+
     makeObservable(this, {
       error: observable,
       title: observable,
       status: observable,
       message: observable,
     });
-
-    this.error = null;
-    this.title = '';
-    this.message = null;
-    this.status = ENotificationType.Info;
   }
 
   init(title: string, message: string | null = null) {

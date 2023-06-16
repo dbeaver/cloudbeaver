@@ -26,7 +26,7 @@ export const dialogStyles = css`
   inner-box {
     display: flex;
     margin: auto;
-    padding: 16px;
+    padding: 24px;
     flex-direction: column;
     align-items: center;
 

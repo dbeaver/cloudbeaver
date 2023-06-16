@@ -63,7 +63,7 @@ const navigationTreeStyles = css`
   message {
     box-sizing: border-box;
     max-width: 240px;
-    padding: 16px;
+    padding: 24px;
   }
 `;
 
