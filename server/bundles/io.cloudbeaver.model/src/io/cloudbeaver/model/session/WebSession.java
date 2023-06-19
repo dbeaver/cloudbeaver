@@ -356,6 +356,10 @@ public class WebSession extends BaseWebSession
             ? this::isDataSourceAccessible
             : x -> true;
         WebProjectImpl sessionProject = application.createProjectImpl(this, project, filter);
+        // do not load data sources for anonymous project
+        if (project.getType() == RMProjectType.USER && userContext.getUser() == null) {
+            sessionProject.setInMemory(true);
+        }
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
         dataSourceRegistry.setAuthCredentialsProvider(this);
         addSessionProject(sessionProject);

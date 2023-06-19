@@ -24,8 +24,6 @@ import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
-import org.jkiss.dbeaver.registry.DataSourceConfigurationManagerNIO;
-import org.jkiss.dbeaver.registry.rm.DataSourceConfigurationManagerRM;
 import org.jkiss.dbeaver.registry.rm.DataSourceRegistryRM;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
@@ -69,11 +67,8 @@ public class WebProjectImpl extends BaseWebProjectImpl {
     @NotNull
     @Override
     protected DBPDataSourceRegistry createDataSourceRegistry() {
-        var configurationManager = DBWorkbench.isDistributed()
-            ? new DataSourceConfigurationManagerRM(this, getResourceController())
-            : new DataSourceConfigurationManagerNIO(this);
         return new WebDataSourceRegistryProxy(
-            new DataSourceRegistryRM(this, getResourceController(), configurationManager),
+            new DataSourceRegistryRM(this, getResourceController()),
             dataSourceFilter
         );
     }
