@@ -22,7 +22,7 @@ import {
   NavTreeResource,
   ProjectsNavNodeService,
 } from '@cloudbeaver/core-navigation-tree';
-import { ProjectInfo, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import {
   getRmResourceKey,
   getRmResourcePath,
@@ -45,6 +45,7 @@ import {
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
+import { NavResourceNodeService } from '../NavResourceNodeService';
 import { ResourceManagerService } from '../ResourceManagerService';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../Tree/DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
 import { getResourceKeyFromNodeId } from './getResourceKeyFromNodeId';
@@ -73,6 +74,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
+    private readonly navResourceNodeService: NavResourceNodeService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly projectsNavNodeService: ProjectsNavNodeService,
   ) {
@@ -114,7 +116,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 
   private async moveResourceToFolder({ type, targetNode, moveContexts }: INodeMoveData, contexts: IExecutionContextProvider<INodeMoveData>) {
     const move = contexts.getContext(navNodeMoveContext);
@@ -148,8 +150,19 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       move.setCanMove(true);
     } else {
       try {
-        await this.navTreeResource.moveTo(resourceKeyList(nodeIdList), targetNode.id);
-        await this.navTreeResource.refreshTree(RESOURCES_NODE_PATH, true);
+        const targetRmFolderId = getResourceKeyFromNodeId(targetNode.id);
+
+        if (targetRmFolderId) {
+          for (const nodeId of nodeIdList) {
+            const rmNodeId = getResourceKeyFromNodeId(nodeId);
+            if (rmNodeId) {
+              const key = getRmResourceKey(rmNodeId);
+              if (key.name) {
+                await this.navResourceNodeService.move(rmNodeId, createPath(targetRmFolderId, key.name));
+              }
+            }
+          }
+        }
       } catch (exception: any) {
         this.notificationService.logException(exception, 'plugin_resource_manager_folder_move_failed');
       }

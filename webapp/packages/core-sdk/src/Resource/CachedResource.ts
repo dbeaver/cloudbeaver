@@ -937,15 +937,16 @@ export abstract class CachedResource<
         }
       },
       {
-        before: () => {
-          this.markOutdatedSync(key);
-        },
         success: () => {
           if (loaded) {
+            this.onDataOutdated.execute(key); // TODO: probably need to remove, we need to notify any related resources that subscribed to .onOutdate, to recursively outdate them
             this.dataUpdate(key);
           }
         },
-        error: exception => this.markError(exception, key, include),
+        error: exception => {
+          this.markOutdatedSync(key);
+          this.markError(exception, key, include);
+        },
       },
     );
   }

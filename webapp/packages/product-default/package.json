@@ -47,6 +47,7 @@
     "@cloudbeaver/plugin-log-viewer": "~0.1.0",
     "@cloudbeaver/plugin-navigation-tabs": "~0.1.0",
     "@cloudbeaver/plugin-navigation-tree": "~0.1.0",
+    "@cloudbeaver/plugin-navigation-tree-rm": "~0.1.0",
     "@cloudbeaver/plugin-object-viewer": "~0.1.0",
     "@cloudbeaver/plugin-product": "~0.1.0",
     "@cloudbeaver/plugin-projects": "~0.1.0",

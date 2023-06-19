@@ -1,0 +1,108 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2023 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { LocalizationService } from '@cloudbeaver/core-localization';
+import { DATA_CONTEXT_NAV_NODE } from '@cloudbeaver/core-navigation-tree';
+import { getRmResourceKey, NAV_NODE_TYPE_RM_FOLDER, NAV_NODE_TYPE_RM_RESOURCE } from '@cloudbeaver/core-resource-manager';
+import { createPath, getPathParent } from '@cloudbeaver/core-utils';
+import { ACTION_DELETE, ACTION_RENAME, ActionService } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '@cloudbeaver/plugin-navigation-tree';
+import { getResourceKeyFromNodeId, NavResourceNodeService } from '@cloudbeaver/plugin-resource-manager';
+
+@injectable()
+export class NavTreeRMContextMenuService extends Bootstrap {
+  constructor(
+    private readonly actionService: ActionService,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly notificationService: NotificationService,
+    private readonly navResourceNodeService: NavResourceNodeService,
+    private readonly localizationService: LocalizationService,
+  ) {
+    super();
+  }
+
+  register(): void {
+    this.actionService.addHandler({
+      id: 'nav-node-rm-handler',
+      isActionApplicable: (context, action): boolean => {
+        const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
+
+        if (!node) {
+          return false;
+        }
+
+        if (![NAV_NODE_TYPE_RM_RESOURCE, NAV_NODE_TYPE_RM_FOLDER].includes(node.nodeType as string)) {
+          return false;
+        }
+
+        return [ACTION_RENAME, ACTION_DELETE].includes(action);
+      },
+      handler: async (context, action) => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const resourceKey = getResourceKeyFromNodeId(node.id);
+
+        if (!resourceKey) {
+          return;
+        }
+
+        const key = getRmResourceKey(resourceKey);
+
+        switch (action) {
+          case ACTION_RENAME: {
+            const actions = context.tryGet(DATA_CONTEXT_NAV_NODE_ACTIONS);
+
+            const save = async (newName: string) => {
+              if (key.name !== newName && newName.trim().length) {
+                try {
+                  await this.navResourceNodeService.move(resourceKey, createPath(getPathParent(resourceKey), newName));
+                  node.name = newName; // fix name flickering in tree
+                } catch (exception: any) {
+                  this.notificationService.logException(exception, 'app_navigationTree_node_rename_error');
+                  return false;
+                }
+              }
+              return true;
+            };
+
+            if (actions?.rename) {
+              actions.rename(save);
+            } else {
+              const result = await this.commonDialogService.open(RenameDialog, {
+                value: key.name ?? '',
+                subTitle: key.name,
+                objectName: node.nodeType || 'Object',
+                icon: node.icon,
+                validation: name => name.trim().length > 0,
+              });
+
+              if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+                save(result);
+              }
+            }
+            break;
+          }
+          case ACTION_DELETE: {
+            try {
+              await this.navResourceNodeService.delete(resourceKey);
+            } catch (exception: any) {
+              this.notificationService.logException(
+                exception,
+                this.localizationService.translate('app_navigationTree_node_delete_error', undefined, { name: key.name }),
+              );
+            }
+            break;
+          }
+        }
+      },
+    });
+  }
+
+  load(): void {}
+}
