@@ -72,4 +72,8 @@ public class WebProjectImpl extends BaseWebProjectImpl {
             dataSourceFilter
         );
     }
+
+    public Path getMetadataFilePath() {
+        return getMetadataPath().resolve(METADATA_STORAGE_FILE);
+    }
 }
