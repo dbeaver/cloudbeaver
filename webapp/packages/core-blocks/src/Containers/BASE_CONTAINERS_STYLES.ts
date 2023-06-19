@@ -161,6 +161,10 @@ export const BASE_CONTAINERS_STYLES = css`
       flex: 1 1 100%;
     }
 
+    &[noWrap] {
+      flex-wrap: nowrap;
+    }
+
     &[keepSize],
     & > [keepSize] {
       flex-grow: 0;

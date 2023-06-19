@@ -8,7 +8,7 @@
 import type { ILayoutSizeProps } from './ILayoutSizeProps';
 
 export function filterLayoutFakeProps<T extends ILayoutSizeProps>(props: T): Omit<T, keyof ILayoutSizeProps> {
-  const { keepSize, tiny, small, medium, large, maximum, fill, ...rest } = props;
+  const { noWrap, keepSize, tiny, small, medium, large, maximum, fill, ...rest } = props;
 
   return rest;
 }

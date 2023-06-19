@@ -160,9 +160,5 @@ export const BASE_TAB_ACTION_STYLES = css`
 
   portal {
     visibility: hidden;
-    & tab-action {
-      width: 10px;
-      height: 10px;
-    }
   }
 `;
