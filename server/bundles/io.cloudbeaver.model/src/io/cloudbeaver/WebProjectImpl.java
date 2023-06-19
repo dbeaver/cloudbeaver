@@ -73,7 +73,4 @@ public class WebProjectImpl extends BaseWebProjectImpl {
         );
     }
 
-    public Path getMetadataFilePath() {
-        return getMetadataPath().resolve(METADATA_STORAGE_FILE);
-    }
 }

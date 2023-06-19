@@ -344,7 +344,7 @@ public class LocalResourceController implements RMController {
         @NotNull String propName,
         @NotNull Object propValue
     ) throws DBException {
-        WebProjectImpl webProject = getWebProject(projectId, false);
+        BaseWebProjectImpl webProject = getWebProject(projectId, false);
         doFileWriteOperation(projectId, webProject.getMetadataFilePath(),
             () -> {
                 webProject.setProjectProperty(propName, propValue);
@@ -799,7 +799,7 @@ public class LocalResourceController implements RMController {
     ) throws DBException {
         try (var projectLock = lockController.lockProject(projectId, "resourcePropertyUpdate")) {
             validateResourcePath(resourcePath);
-            WebProjectImpl webProject = getWebProject(projectId, false);
+            BaseWebProjectImpl webProject = getWebProject(projectId, false);
             doFileWriteOperation(projectId, webProject.getMetadataFilePath(),
                 () -> {
                     webProject.setResourceProperty(resourcePath, propertyName, propertyValue);
