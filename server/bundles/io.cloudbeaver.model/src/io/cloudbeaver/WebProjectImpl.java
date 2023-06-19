@@ -157,4 +157,8 @@ public class WebProjectImpl extends BaseProjectImpl {
         }
         return propertiesChanged;
     }
+
+    public Path getMetadataFilePath() {
+        return getMetadataPath().resolve(METADATA_STORAGE_FILE);
+    }
 }
