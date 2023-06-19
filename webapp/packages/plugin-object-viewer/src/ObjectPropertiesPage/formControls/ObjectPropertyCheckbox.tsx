@@ -38,7 +38,7 @@ const styles = css`
     line-height: 26px;
   }
   Checkbox {
-    margin: -6px;
+    margin: -10px;
   }
 `;
 

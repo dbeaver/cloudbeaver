@@ -8,44 +8,46 @@
 import { observer } from 'mobx-react-lite';
 import React, { useContext } from 'react';
 import { MenuItem as ReakitMenuItem } from 'reakit/Menu';
-import type { CompositeItemOptions } from 'reakit/ts';
+import styled, { use } from 'reshadow';
 
-import { s } from '../s';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
+
 import { useCombinedHandler } from '../useCombinedHandler';
-import { useS } from '../useS';
-import style from './MenuItem.m.css';
+import { useStyles } from '../useStyles';
+import { menuPanelStyles } from './menuPanelStyles';
 import { MenuStateContext } from './MenuStateContext';
-import type { ReakitProxyComponent, ReakitProxyComponentOptions } from './ReakitProxyComponent';
 
-export type MenuItemOptions = CompositeItemOptions & {
+export interface IMenuItemProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
+  label: string;
+  hidden?: boolean;
   selected?: boolean;
   close?: boolean;
-};
+  style?: ComponentStyle;
+}
 
-export const MenuItem: ReakitProxyComponent<'button', MenuItemOptions> = observer<ReakitProxyComponentOptions<'button', MenuItemOptions>>(
-  function MenuItem({ children, hidden, selected, close, onClick, className, ...rest }) {
-    const menu = useContext(MenuStateContext);
-    const styles = useS(style);
+export const MenuItem = observer<IMenuItemProps>(function MenuItem({ label, children, hidden, selected, close, style, onClick, ...rest }) {
+  const menu = useContext(MenuStateContext);
+  const styles = useStyles(menuPanelStyles, style);
 
-    const handleClick = useCombinedHandler<[React.MouseEvent<HTMLButtonElement>]>(onClick, function handleClick() {
-      if (close) {
-        menu?.hide();
-      }
-    });
+  const handleClick = useCombinedHandler<[React.MouseEvent<HTMLButtonElement>]>(onClick, function handleClick() {
+    if (close) {
+      menu?.hide();
+    }
+  });
 
-    const MenuItem = ReakitMenuItem;
+  const MenuItem = ReakitMenuItem;
 
-    return (
-      <MenuItem
-        {...menu}
-        aria-selected={selected}
-        {...rest}
-        className={s(styles, { menuItem: true, hidden }, className)}
-        disabled={selected || rest.disabled}
-        onClick={handleClick}
-      >
-        {children}
-      </MenuItem>
-    );
-  },
-);
+  return styled(styles)(
+    <MenuItem
+      {...menu}
+      {...use({ hidden: hidden })}
+      aria-label={label}
+      aria-selected={selected}
+      {...rest}
+      disabled={selected || rest.disabled}
+      onClick={handleClick}
+    >
+      {children}
+    </MenuItem>,
+  );
+});

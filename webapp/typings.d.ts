@@ -1,5 +1,5 @@
 /* eslint-disable */
-/// <reference path="../../node_modules/reshadow/elements.d.ts" />
+/// <reference path="./node_modules/reshadow/elements.d.ts" />
 
 declare module '*.scss?raw' {
   const classes: { readonly [key: string]: string };
@@ -13,11 +13,6 @@ declare module '*.json5' {
 
 declare module '*.scss' {
   const classes: { readonly [key: string]: string };
-  export default classes;
-}
-
-declare module '*.m.css' {
-  const classes: { [key: string]: string };
   export default classes;
 }
 

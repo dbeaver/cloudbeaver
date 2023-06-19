@@ -31,9 +31,9 @@ const styles = css`
     &:after {
       position: absolute;
       background: #236ea0 !important;
-      height: 24px;
+      height: 32px;
       width: 1px;
-      top: 4px;
+      top: 8px;
       right: -1px;
       opacity: 1 !important;
       content: '';
@@ -41,14 +41,18 @@ const styles = css`
   }
   IconOrImage {
     display: block;
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
   }
   user-name {
     display: block;
     line-height: initial;
-    margin-left: 4px;
-    font-size: 12px;
+    margin-left: 8px;
+  }
+  @media only screen and (max-width: 1200px) {
+    user {
+      padding: 0 8px;
+    }
   }
 `;
 

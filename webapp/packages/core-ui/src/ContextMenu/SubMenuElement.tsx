@@ -7,8 +7,21 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useRef, useState } from 'react';
+import styled from 'reshadow';
 
-import { getComputed, IMenuState, Menu, MenuItemElement, useAutoLoad, useObjectRef } from '@cloudbeaver/core-blocks';
+import {
+  getComputed,
+  IMenuState,
+  joinStyles,
+  Loader,
+  Menu,
+  MenuItemElement,
+  menuPanelStyles,
+  useAutoLoad,
+  useObjectRef,
+  useStyles,
+} from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { DATA_CONTEXT_MENU_NESTED, DATA_CONTEXT_SUBMENU_ITEM, IMenuData, IMenuSubMenuItem, MenuActionItem, useMenu } from '@cloudbeaver/core-view';
 
 import type { IMenuItemRendererProps } from './MenuItemRenderer';
@@ -20,11 +33,13 @@ interface ISubMenuElementProps extends Omit<React.ButtonHTMLAttributes<any>, 'st
   menuModal?: boolean;
   menuRtl?: boolean;
   onItemClose?: () => void;
+  style?: ComponentStyle;
 }
 
 export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
-  forwardRef(function SubMenuElement({ menuData, subMenu, itemRenderer, menuModal: modal, menuRtl: rtl, onItemClose, ...rest }, ref) {
+  forwardRef(function SubMenuElement({ menuData, subMenu, itemRenderer, style, menuModal: modal, menuRtl: rtl, onItemClose, ...rest }, ref) {
     const menu = useRef<IMenuState>();
+    const styles = useStyles(menuPanelStyles, style);
     const subMenuData = useMenu({ menu: subMenu.menu, context: menuData.context });
     const [visible, setVisible] = useState(false);
     subMenuData.context.set(DATA_CONTEXT_MENU_NESTED, true);
@@ -74,7 +89,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
     const MenuItemRenderer = itemRenderer;
     const panelAvailable = subMenuData.available || !loaded;
 
-    return (
+    return styled(styles)(
       <Menu
         ref={ref}
         menuRef={menu}
@@ -83,12 +98,22 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
           subMenuData.items.map(
             item =>
               menu.current && (
-                <MenuItemRenderer key={item.id} item={item} menuData={subMenuData} rtl={rtl} modal={modal} onItemClose={handlers.handleItemClose} />
+                <MenuItemRenderer
+                  key={item.id}
+                  item={item}
+                  menuData={subMenuData}
+                  menu={menu.current}
+                  rtl={rtl}
+                  modal={modal}
+                  style={style}
+                  onItemClose={handlers.handleItemClose}
+                />
               ),
           )
         }
         rtl={rtl}
         modal={modal}
+        style={style}
         placement={rtl ? 'left-start' : 'right-start'}
         panelAvailable={panelAvailable}
         disabled={disabled}
@@ -100,13 +125,22 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
         <MenuItemElement
           label={label}
           displayLabel={displayLabel}
-          icon={IconComponent ? <IconComponent item={subMenu} {...extraProps} /> : icon}
+          icon={
+            IconComponent
+              ? styled(styles)(
+                  <Loader suspense small fullSize>
+                    <IconComponent item={subMenu} style={joinStyles(menuPanelStyles, style)} {...extraProps} />
+                  </Loader>,
+                )
+              : icon
+          }
           tooltip={tooltip}
           panelAvailable={panelAvailable}
           loading={loading}
+          style={style}
           menu
         />
-      </Menu>
+      </Menu>,
     );
   }),
 );

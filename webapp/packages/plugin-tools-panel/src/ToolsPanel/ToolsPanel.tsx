@@ -11,7 +11,16 @@ import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useStyles, useUserData } from '@cloudbeaver/core-blocks';
-import { BASE_TAB_STYLES, ITabData, ITabsContainer, TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import {
+  BASE_TAB_STYLES,
+  ITabData,
+  ITabsContainer,
+  TabList,
+  TabPanelList,
+  TabsContainer,
+  TabsState,
+  UNDERLINE_TAB_STYLES,
+} from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 const tabsStyles = css`
@@ -20,6 +29,11 @@ const tabsStyles = css`
     position: relative;
     flex-shrink: 0;
     align-items: center;
+  }
+  Tab {
+    height: 32px !important;
+    text-transform: uppercase;
+    font-weight: 500 !important;
   }
   TabPanel {
     display: flex;

@@ -59,13 +59,19 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
 
         if (this.isInUse(key)) {
           dataSynchronizationService.requestSynchronization('resource', key).then(async state => {
-            if (state && !this.isOutdated(parent)) {
-              await this.load(key);
+            if (state) {
+              if (!this.isOutdated(parent)) {
+                await this.load(key);
+              } else {
+                await this.load(parent);
+              }
             }
           });
         } else {
           if (!this.isOutdated(parent)) {
             await this.load(key);
+          } else {
+            await this.load(parent);
           }
         }
       },

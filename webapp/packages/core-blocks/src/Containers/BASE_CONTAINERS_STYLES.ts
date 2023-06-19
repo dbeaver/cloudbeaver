@@ -49,10 +49,6 @@ export const BASE_CONTAINERS_STYLES = css`
       align-items: flex-start;
     }
 
-    &[flexEnd] {
-      align-items: flex-end;
-    }
-
     &[center] {
       align-items: center;
       justify-content: center;
@@ -68,7 +64,7 @@ export const BASE_CONTAINERS_STYLES = css`
     }
 
     &[parent] {
-      padding: 16px;
+      padding: 24px;
 
       &[compact] {
         padding: 16px;
@@ -80,14 +76,14 @@ export const BASE_CONTAINERS_STYLES = css`
     }
 
     &[gap] {
-      gap: 16px;
+      gap: 24px;
 
       &[compact] {
         gap: 16px;
       }
 
       &[dense] {
-        gap: 16px;
+        gap: 8px;
       }
     }
   }
@@ -95,7 +91,7 @@ export const BASE_CONTAINERS_STYLES = css`
   Group {
     align-content: baseline;
     box-sizing: border-box;
-    padding: 16px;
+    padding: 24px;
     border-radius: var(--theme-group-element-radius);
 
     &[dense] {
@@ -221,7 +217,7 @@ export const BASE_CONTAINERS_STYLES = css`
   }
 
   Group[box] > GroupTitle {
-    padding: 16px;
+    padding: 24px;
   }
 
   GroupSubTitle {

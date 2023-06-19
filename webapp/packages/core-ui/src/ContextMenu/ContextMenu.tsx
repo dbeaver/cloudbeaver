@@ -8,8 +8,20 @@
 import { observer } from 'mobx-react-lite';
 import { ButtonHTMLAttributes, forwardRef, useRef, useState } from 'react';
 import type { MenuInitialState } from 'reakit/Menu';
+import styled from 'reshadow';
 
-import { getComputed, IMenuState, IMouseContextMenu, Menu, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  getComputed,
+  IMenuState,
+  IMouseContextMenu,
+  Menu,
+  menuPanelStyles,
+  useAutoLoad,
+  useObjectRef,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
+import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { IMenuData, MenuActionItem } from '@cloudbeaver/core-view';
 
 import { MenuItemRenderer } from './MenuItemRenderer';
@@ -21,9 +33,10 @@ interface IMenuProps extends React.PropsWithChildren {
 
 type ContextMenuRenderingChildren = (props: IMenuProps) => React.ReactNode | React.ReactElement;
 
-interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'children'> {
+interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'style' | 'children'> {
   mouseContextMenu?: IMouseContextMenu;
   menu: IMenuData;
+  style?: ComponentStyle;
   disclosure?: boolean;
   placement?: MenuInitialState['placement'];
   modal?: boolean;
@@ -35,7 +48,7 @@ interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'children'> 
 
 export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
   forwardRef(function ContextMenu(
-    { mouseContextMenu, menu: menuData, disclosure, children, placement, visible, onVisibleSwitch, modal, rtl, ...props },
+    { mouseContextMenu, menu: menuData, disclosure, children, style, placement, visible, onVisibleSwitch, modal, rtl, ...props },
     ref,
   ) {
     const translate = useTranslate();
@@ -48,6 +61,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
     const lazy = getComputed(() => !menuData.available || hidden);
 
     const menu = useRef<IMenuState>();
+    const styles = useStyles(menuPanelStyles, style);
 
     useAutoLoad(menuData.loaders, !lazy, menuVisible);
 
@@ -78,7 +92,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
 
     const renderingChildren: React.ReactNode = typeof children === 'function' ? children({ loading, disabled }) : children;
 
-    return (
+    return styled(styles)(
       <Menu
         ref={ref}
         label={translate(menuData.menu.label)}
@@ -87,7 +101,16 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
           menuData.items.map(
             item =>
               menu.current && (
-                <MenuItemRenderer key={item.id} item={item} menuData={menuData} rtl={rtl} modal={modal} onItemClose={handlers.handleItemClose} />
+                <MenuItemRenderer
+                  key={item.id}
+                  item={item}
+                  menuData={menuData}
+                  rtl={rtl}
+                  menu={menu.current}
+                  modal={modal}
+                  style={style}
+                  onItemClose={handlers.handleItemClose}
+                />
               ),
           )
         }
@@ -99,12 +122,13 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
         placement={placement}
         disabled={disabled}
         disclosure={disclosure}
+        style={style}
         getHasBindings={handlers.hasBindings}
         onVisibleSwitch={handlers.handleVisibleSwitch}
         {...props}
       >
         {renderingChildren}
-      </Menu>
+      </Menu>,
     );
   }),
 );

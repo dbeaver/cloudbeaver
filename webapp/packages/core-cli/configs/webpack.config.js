@@ -1,9 +1,8 @@
-const { resolve } = require('path');
+const { resolve, join } = require('path');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
 const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const threadLoader = require('thread-loader');
 
 const excludedFromVendor = require('./excludedFromVendor.js');
 // const ESLintPlugin = require('eslint-webpack-plugin');
@@ -33,8 +32,6 @@ const nodeModules = [
   resolve('../../node_modules/@cloudbeaver/core-cli/node_modules'), // core-cli
 ];
 
-threadLoader.warmup({}, ['babel-loader', 'css-loader', 'sass-loader', 'postcss-loader', 'style-loader', 'json5-loader', MiniCssExtractPlugin.loader]);
-
 module.exports = (env, argv) => {
   process.env.NODE_ENV = argv.mode;
   const devTool = 'source-map' in env && 'source-map';
@@ -52,7 +49,7 @@ module.exports = (env, argv) => {
     return loaders;
   }
 
-  function generateStyleLoaders(options = { hasModule: false, disable: false, pure: false }) {
+  function generateStyleLoaders(options = { hasModule: false, disable: false }) {
     const moduleScope = options.hasModule ? 'local' : 'global';
     let modules = {
       mode: moduleScope,
@@ -63,11 +60,7 @@ module.exports = (env, argv) => {
       modules = false;
     }
 
-    const postCssPlugins = [require('postcss-preset-env')({ stage: 0 })];
-
-    if (!options.pure) {
-      postCssPlugins.push(require('@reshadow/postcss')({ scopeBehaviour: moduleScope }));
-    }
+    const postCssPlugins = [require('postcss-preset-env')({ stage: 0 }), require('@reshadow/postcss')({ scopeBehaviour: moduleScope })];
 
     return [
       ...getBaseStyleLoaders(),
@@ -75,27 +68,26 @@ module.exports = (env, argv) => {
         loader: 'css-loader',
         options: {
           modules: modules,
-          sourceMap: devMode,
+          sourceMap: true,
         },
       },
+
       {
         loader: 'postcss-loader',
         options: {
-          sourceMap: devMode,
           postcssOptions: {
             plugins: postCssPlugins,
-            sourceMap: devMode,
+            sourceMap: true,
           },
         },
       },
       {
         loader: 'sass-loader',
         options: {
-          sourceMap: devMode,
+          sourceMap: true,
           sassOptions: {
             implementation: require('sass'),
             includePaths: nodeModules,
-            quietDeps: true,
           },
         },
       },
@@ -105,8 +97,7 @@ module.exports = (env, argv) => {
   var babelLoader = {
     loader: require.resolve('babel-loader'),
     options: {
-      root: __dirname,
-      cacheDirectory: true,
+      configFile: join(__dirname, 'babel.config.js'),
     },
   };
 
@@ -208,15 +199,10 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.(css|s[ac]ss)$/,
-          exclude: /node_modules/,
           oneOf: [
             {
               test: /\.module\.(css|s[ac]ss)$/,
               use: generateStyleLoaders({ hasModule: true }),
-            },
-            {
-              test: /\.m\.(css|s[ac]ss)$/,
-              use: generateStyleLoaders({ hasModule: true, pure: true }),
             },
             {
               include: /node_modules/,

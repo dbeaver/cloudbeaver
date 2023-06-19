@@ -12,7 +12,7 @@ export const UNDERLINE_TAB_STYLES = css`
     display: flex;
   }
   Tab {
-    composes: theme-typography--caption from global;
+    composes: theme-typography--body2 from global;
     background: none;
     color: inherit;
     border: none;
@@ -20,9 +20,9 @@ export const UNDERLINE_TAB_STYLES = css`
     outline: none;
     opacity: 1;
     height: 30px !important;
+    padding: 0 14px !important;
     border-top: none !important;
     font-weight: normal !important;
-    text-transform: uppercase;
 
     &:global([aria-selected='false']) {
       opacity: 0.8;
