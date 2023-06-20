@@ -9,7 +9,6 @@ import { createKeyBinding } from '@cloudbeaver/core-view';
 
 export const KEY_BINDING_LINK_OBJECT = createKeyBinding({
   id: 'link-object',
-  label: 'Ctrl + Shift + ,',
   keys: 'ctrl+shift+,',
   preventDefault: true,
 });

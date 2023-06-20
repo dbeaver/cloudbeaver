@@ -15,6 +15,7 @@ import { useService } from '@cloudbeaver/core-di';
 
 import { ActionService } from '../Action/ActionService';
 import type { IActionItem } from '../Action/IActionItem';
+import { getCommonAndOSSpecificKeys } from '../Action/KeyBinding/getCommonAndOSSpecificKeys';
 import { CaptureViewContext } from './CaptureViewContext';
 import type { IView } from './IView';
 import { useActiveView } from './useActiveView';
@@ -44,7 +45,7 @@ export const CaptureView = observer<React.PropsWithChildren<Props>>(function Cap
     .filter(Boolean) as IActionItem[];
 
   let keys = actionItems
-    .map(item => item.binding?.binding.keys)
+    .map(item => getCommonAndOSSpecificKeys(item.binding?.binding))
     .flat()
     .join(', ');
 
@@ -59,7 +60,10 @@ export const CaptureView = observer<React.PropsWithChildren<Props>>(function Cap
         return;
       }
 
-      const action = actionItems.find(action => action.binding?.binding.keys === handler.key || action.binding?.binding.keys.includes(handler.key));
+      const action = actionItems.find(action => {
+        const commonAndSpecificKeys = getCommonAndOSSpecificKeys(action.binding?.binding);
+        return commonAndSpecificKeys.includes(handler.key);
+      });
 
       if (action?.binding?.binding.preventDefault) {
         event.preventDefault();

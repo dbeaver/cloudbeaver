@@ -8,7 +8,8 @@
 
 export interface IKeyBinding {
   id: string;
-  label: string;
   preventDefault?: boolean;
-  keys: string | string[];
+  keys?: string | string[];
+  keysWin?: string | string[];
+  keysMac?: string | string[];
 }

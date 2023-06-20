@@ -9,7 +9,6 @@ import { createKeyBinding } from '../createKeyBinding';
 
 export const KEY_BINDING_OPEN_IN_TAB = createKeyBinding({
   id: 'open-in-tab',
-  label: 'Alt + T',
   keys: 'alt+t',
   preventDefault: true,
 });

@@ -24,6 +24,8 @@ import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -37,6 +39,9 @@ import java.util.List;
 import java.util.Map;
 
 public class WebDataSourceUtils {
+
+    private static final Log log = Log.getLog(WebDataSourceUtils.class);
+
     private WebDataSourceUtils() {
     }
 
@@ -117,5 +122,20 @@ public class WebDataSourceUtils {
         handlerCfg.setUserName(webConfig.getUserName());
         handlerCfg.setPassword(webConfig.getPassword());
         handlerCfg.setSecureProperty(SSHConstants.PROP_KEY_VALUE, webConfig.getKey());
+    }
+
+
+    public static boolean disconnectDataSource(@NotNull WebSession webSession, @NotNull DBPDataSourceContainer dataSource) {
+        if (dataSource.isConnected()) {
+            try {
+                dataSource.disconnect(webSession.getProgressMonitor());
+                return true;
+            } catch (DBException e) {
+                log.error("Error closing connection", e);
+            }
+            // Disconnect in async mode?
+            //new DisconnectJob(connectionInfo.getDataSource()).schedule();
+        }
+        return false;
     }
 }
