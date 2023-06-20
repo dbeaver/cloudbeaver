@@ -62,16 +62,12 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
             if (state) {
               if (!this.isOutdated(parent)) {
                 await this.load(key);
-              } else {
-                await this.load(parent);
               }
             }
           });
         } else {
           if (!this.isOutdated(parent)) {
             await this.load(key);
-          } else {
-            await this.load(parent);
           }
         }
       },
