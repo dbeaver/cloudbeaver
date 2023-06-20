@@ -309,38 +309,6 @@ export class ResourceFoldersBootstrap extends Bootstrap {
   private syncNavTree() {
     this.navNodeManagerService.onMove.addHandler(this.moveResourceToFolder.bind(this));
 
-    // this.navNodeInfoResource.onItemUpdate.addHandler(executorHandlerFilter(
-    //   () => syncOutdate,
-    //   key => {
-    //     syncOutdate = false;
-    //     try {
-    //       const resources = [...new Set(ResourceKeyUtils
-    //         .mapArray(key, getResourceKeyFromNodeId)
-    //         .filter(isDefined)
-    //         .map(getPathParent))];
-
-    //       const keyList = resourceKeyList(resources);
-
-    //       if (!this.resourceManagerResource.isOutdated(keyList)) {
-    //         this.resourceManagerResource.markOutdated(keyList); // because of this
-    //       }
-    //     } finally {
-    //       syncOutdate = true;
-    //     }
-    //   }
-    // ));
-
-    // this.navNodeInfoResource.onItemDelete.addHandler(executorHandlerFilter(
-    //   () => true,
-    //   key => {
-    //     const resources = ResourceKeyUtils
-    //       .mapArray(key, getResourceKeyFromNodeId)
-    //       .filter(isDefined);
-
-    //     this.resourceManagerResource.delete(resourceKeyList(resources));
-    //   }
-    // ));
-
     this.resourceManagerResource.onItemUpdate.addHandler(key => {
       const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getResourceNodeId).map(getPathParent))]);
       if (!this.navTreeResource.isOutdated(updated)) {

@@ -840,9 +840,10 @@ export abstract class CachedResource<
   }
 
   protected markOutdatedSync(key: ResourceKey<TKey>): void {
-    if (!this.hasMetadata(key)) {
-      return;
-    }
+    // Commented because it can lead to skipping existing keys outdate if some of them doesn't exists
+    // if (!this.hasMetadata(key)) {
+    //   return;
+    // }
     this.updateMetadata(key, metadata => {
       metadata.outdated = true;
     });
@@ -947,6 +948,9 @@ export abstract class CachedResource<
           this.markOutdatedSync(key);
           this.markError(exception, key, include);
         },
+        after: () => {
+          this.flushOutdatedWaitList();
+        },
       },
     );
   }
@@ -1006,6 +1010,9 @@ export abstract class CachedResource<
           }
         },
         error: exception => this.markError(exception, key, include),
+        after: () => {
+          this.flushOutdatedWaitList();
+        },
       },
     );
   }
@@ -1026,17 +1033,15 @@ export abstract class CachedResource<
 
     const value = await promise(param, context, refresh);
     this.markUpdated(param);
+    return value;
+  }
 
+  private flushOutdatedWaitList(): void {
     for (let i = 0; i < this.outdateWaitList.length; i++) {
       const key = this.outdateWaitList[i];
-      // if (this.includes(param, key)) {
       this.markOutdatedSync(key);
-      // this.outdateWaitList.splice(i, 1);
-      // break;
-      // }
     }
     this.outdateWaitList = [];
-    return value;
   }
 
   public getName(): string {
