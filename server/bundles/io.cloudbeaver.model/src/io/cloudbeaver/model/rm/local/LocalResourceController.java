@@ -381,9 +381,7 @@ public class LocalResourceController implements RMController {
         @NotNull String configuration,
         @Nullable List<String> dataSourceIds
     ) throws DBException {
-        try (var projectLock = lockController.lockProject(projectId, "createDatasources")) {
-            updateProjectDataSources(projectId, configuration, dataSourceIds);
-        }
+        updateProjectDataSources(projectId, configuration, dataSourceIds);
     }
 
     @Override
