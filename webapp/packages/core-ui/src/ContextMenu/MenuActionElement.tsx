@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import { Checkbox, MenuItem, MenuItemCheckbox, MenuItemElement, MenuItemRadio, Radio } from '@cloudbeaver/core-blocks';
-import type { IMenuActionItem } from '@cloudbeaver/core-view';
+import { getBindingLabel, IMenuActionItem } from '@cloudbeaver/core-view';
 
 import type { IContextMenuItemProps } from './IContextMenuItemProps';
 
@@ -20,6 +20,10 @@ interface IMenuActionElementProps extends IContextMenuItemProps {
 export const MenuActionElement = observer<IMenuActionElementProps>(function MenuActionElement({ item, onClick }) {
   const actionInfo = item.action.actionInfo;
   const loading = item.action.isLoading();
+  let binding;
+  if (item.action.binding !== null) {
+    binding = getBindingLabel(item.action.binding.binding);
+  }
 
   function handleClick() {
     onClick();
@@ -74,13 +78,7 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
 
   return (
     <MenuItem hidden={item.hidden} id={item.id} aria-label={actionInfo.label} disabled={item.disabled} onClick={handleClick}>
-      <MenuItemElement
-        label={actionInfo.label}
-        icon={actionInfo.icon}
-        binding={item.action.binding?.binding.label}
-        tooltip={actionInfo.tooltip}
-        loading={loading}
-      />
+      <MenuItemElement label={actionInfo.label} icon={actionInfo.icon} binding={binding} tooltip={actionInfo.tooltip} loading={loading} />
     </MenuItem>
   );
 });

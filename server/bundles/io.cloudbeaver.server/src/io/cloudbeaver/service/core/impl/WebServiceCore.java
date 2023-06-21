@@ -736,18 +736,8 @@ public class WebServiceCore implements DBWServiceCore {
     ) throws DBWebException {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, connectionId);
 
-        boolean disconnected = false;
         DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
-        if (connectionInfo.isConnected()) {
-            try {
-                dataSourceContainer.disconnect(webSession.getProgressMonitor());
-                disconnected = true;
-            } catch (DBException e) {
-                log.error("Error closing connection", e);
-            }
-            // Disconnect in async mode?
-            //new DisconnectJob(connectionInfo.getDataSource()).schedule();
-        }
+        boolean disconnected = WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer);
         if (forceDelete) {
             DBPDataSourceRegistry registry = getProjectById(webSession, projectId).getDataSourceRegistry();
             registry.removeDataSource(dataSourceContainer);
