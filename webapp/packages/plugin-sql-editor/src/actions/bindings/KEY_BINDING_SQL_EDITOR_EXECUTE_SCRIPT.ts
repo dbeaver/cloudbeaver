@@ -9,7 +9,6 @@ import { createKeyBinding } from '@cloudbeaver/core-view';
 
 export const KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT = createKeyBinding({
   id: 'sql-editor-execute-script',
-  label: 'Alt + X',
   keys: 'alt+x',
   preventDefault: true,
 });

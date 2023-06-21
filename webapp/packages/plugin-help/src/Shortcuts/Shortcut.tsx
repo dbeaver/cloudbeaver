@@ -7,7 +7,7 @@
  */
 import styled, { css } from 'reshadow';
 
-import { useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IShortcut } from './IShortcut';
 

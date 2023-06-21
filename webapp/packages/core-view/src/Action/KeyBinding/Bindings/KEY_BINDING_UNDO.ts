@@ -9,7 +9,7 @@ import { createKeyBinding } from '../createKeyBinding';
 
 export const KEY_BINDING_UNDO = createKeyBinding({
   id: 'undo',
-  label: 'Ctrl + Z',
-  keys: ['ctrl+z', 'cmd+z'],
+  keys: 'ctrl+z',
+  keysMac: 'cmd+z',
   preventDefault: true,
 });
