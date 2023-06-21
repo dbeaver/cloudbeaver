@@ -9,7 +9,6 @@ import { createKeyBinding } from '@cloudbeaver/core-view';
 
 export const KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN = createKeyBinding({
   id: 'sql-editor-show-execution-plan',
-  label: 'Shift + Ctrl + E',
   keys: 'shift+ctrl+e',
   preventDefault: true,
 });

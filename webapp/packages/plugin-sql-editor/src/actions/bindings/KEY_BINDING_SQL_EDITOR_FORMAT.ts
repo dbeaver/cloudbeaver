@@ -9,7 +9,6 @@ import { createKeyBinding } from '@cloudbeaver/core-view';
 
 export const KEY_BINDING_SQL_EDITOR_FORMAT = createKeyBinding({
   id: 'sql-editor-format',
-  label: 'Shift + Ctrl + F',
   keys: 'shift+ctrl+f',
   preventDefault: true,
 });

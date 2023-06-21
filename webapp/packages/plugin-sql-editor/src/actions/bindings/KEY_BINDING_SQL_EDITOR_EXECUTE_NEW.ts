@@ -9,7 +9,6 @@ import { createKeyBinding } from '@cloudbeaver/core-view';
 
 export const KEY_BINDING_SQL_EDITOR_EXECUTE_NEW = createKeyBinding({
   id: 'sql-editor-execute-new',
-  label: 'Ctrl + \\ or Shift + Ctrl + Enter',
   keys: ['ctrl+\\', 'shift+ctrl+enter'],
   preventDefault: true,
 });

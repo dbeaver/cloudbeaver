@@ -11,7 +11,7 @@ import { MenuItem, MenuItemCheckbox, MenuItemRadio } from 'reakit/Menu';
 import styled, { use } from 'reshadow';
 
 import { Checkbox, MenuItemElement, menuPanelStyles, Radio, useStyles } from '@cloudbeaver/core-blocks';
-import type { IMenuActionItem } from '@cloudbeaver/core-view';
+import { getBindingLabel, IMenuActionItem } from '@cloudbeaver/core-view';
 
 import type { IContextMenuItemProps } from './IContextMenuItemProps';
 
@@ -23,6 +23,10 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
   const styles = useStyles(menuPanelStyles, style);
   const actionInfo = item.action.actionInfo;
   const loading = item.action.isLoading();
+  let binding;
+  if (item.action.binding !== null) {
+    binding = getBindingLabel(item.action.binding.binding);
+  }
 
   function handleClick() {
     onClick();
@@ -84,7 +88,7 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
       <MenuItemElement
         label={actionInfo.label}
         icon={actionInfo.icon}
-        binding={item.action.binding?.binding.label}
+        binding={binding}
         tooltip={actionInfo.tooltip}
         loading={loading}
         style={style}

@@ -6,26 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React, { forwardRef, useContext, useState } from 'react';
+import React, { forwardRef, useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import {
-  getComputed,
-  TREE_NODE_STYLES,
-  TreeNodeContext,
-  TreeNodeControl,
-  TreeNodeName,
-  useMouseContextMenu,
-  useObjectRef,
-} from '@cloudbeaver/core-blocks';
+import { getComputed, TREE_NODE_STYLES, TreeNodeContext, TreeNodeControl, TreeNodeName, useMouseContextMenu } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { type INodeActions, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 
 import { ElementsTreeContext } from '../ElementsTree/ElementsTreeContext';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../ElementsTree/NavigationNodeComponent';
 import { isDraggingInsideProject } from '../ElementsTree/NavigationTreeNode/isDraggingInsideProject';
-import { NavigationNodeEditorLoader } from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeLoaders';
 import { TreeNodeMenuLoader } from '../ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenuLoader';
 
 const styles = css`
@@ -71,14 +62,6 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
     const selected = treeNodeContext.selected;
 
-    const [editing, setEditing] = useState(false);
-
-    const nodeActions = useObjectRef<INodeActions>({
-      rename: () => {
-        setEditing(true);
-      },
-    });
-
     const isDragging = getComputed(() => {
       if (!node.projectId || !elementsTreeContext?.tree.activeDnDData) {
         return false;
@@ -118,15 +101,15 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
         onClick={handleClick}
         onDoubleClick={handleDbClick}
         onContextMenu={handleContextMenuOpen}
-        {...use({ outdated, editing, dragging: dndElement })}
+        {...use({ outdated, dragging: dndElement })}
         className={className}
       >
         <TreeNodeName title={node.name}>
-          {editing ? <NavigationNodeEditorLoader node={node} onClose={() => setEditing(false)} /> : <name-box>{node.name}</name-box>}
+          <name-box>{node.name}</name-box>
         </TreeNodeName>
-        {!editing && !dndPlaceholder && (
+        {!dndPlaceholder && (
           <portal onClick={handlePortalClick}>
-            <TreeNodeMenuLoader mouseContextMenu={mouseContextMenu} node={node} actions={nodeActions} selected={selected} />
+            <TreeNodeMenuLoader mouseContextMenu={mouseContextMenu} node={node} selected={selected} />
           </portal>
         )}
       </TreeNodeControl>,

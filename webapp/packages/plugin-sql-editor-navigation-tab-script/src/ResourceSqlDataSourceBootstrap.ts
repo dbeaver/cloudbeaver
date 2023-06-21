@@ -223,6 +223,9 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       const tab = this.sqlEditorTabResourceService.getResourceTab(key);
 
       if (tab) {
+        const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId) as ResourceSqlDataSource;
+
+        dataSource?.setResourceKey(undefined); // prevent deleted resource refresh
         tabs.push(tab.id);
       }
     });

@@ -24,6 +24,7 @@ import localization from '@cloudbeaver/plugin-localization';
 import logViewer from '@cloudbeaver/plugin-log-viewer';
 import navigationTabs from '@cloudbeaver/plugin-navigation-tabs';
 import navigationTree from '@cloudbeaver/plugin-navigation-tree';
+import { navigationTreeRMPlugin } from '@cloudbeaver/plugin-navigation-tree-rm';
 import objectViewer from '@cloudbeaver/plugin-object-viewer';
 import productPlugin from '@cloudbeaver/plugin-product';
 import projects from '@cloudbeaver/plugin-projects';
@@ -87,6 +88,7 @@ const PLUGINS: PluginManifest[] = [
   sqlEditorResource,
   logViewer,
   navigationTree,
+  navigationTreeRMPlugin,
   datasourceContextSwitch,
   topAppBar,
   version,

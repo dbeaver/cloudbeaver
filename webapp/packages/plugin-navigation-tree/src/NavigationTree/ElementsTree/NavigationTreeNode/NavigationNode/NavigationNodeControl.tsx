@@ -5,8 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import React, { forwardRef, useContext, useDeferredValue, useState } from 'react';
+import React, { forwardRef, useContext, useDeferredValue } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import {
@@ -21,6 +22,7 @@ import {
   TreeNodeName,
   useMouseContextMenu,
   useObjectRef,
+  useObservableRef,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
@@ -71,6 +73,20 @@ const styles = css`
   }
 `;
 
+interface IEditingState {
+  saving: boolean;
+  editing: boolean;
+
+  resolve: (value: string) => Promise<boolean>;
+
+  startEditing(resolve: (value: string) => Promise<boolean>): void;
+
+  save(name: string): void;
+  setSaveStatus(saving: boolean): void;
+  finish(): void;
+  cancel(): void;
+}
+
 export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(
   forwardRef(function NavigationNodeControl({ node, dndElement, dndPlaceholder }, ref) {
     const mouseContextMenu = useMouseContextMenu();
@@ -83,12 +99,56 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
     const connected = getComputed(() => node.objectFeatures.includes(EObjectFeature.dataSourceConnected));
     const selected = treeNodeContext.selected;
 
-    const [editing, setEditing] = useState(false);
+    const editingState = useObservableRef<IEditingState>(
+      () => ({
+        saving: false,
+        editing: false,
+        resolve: () => Promise.resolve(false),
+
+        startEditing(resolve) {
+          this.editing = true;
+          this.saving = false;
+          this.resolve = resolve;
+        },
+
+        async save(name: string) {
+          this.setSaveStatus(true);
+          try {
+            const saved = await this.resolve(name);
+
+            if (saved) {
+              this.finish();
+            }
+          } finally {
+            this.setSaveStatus(false);
+          }
+        },
+        setSaveStatus(saving: boolean) {
+          this.saving = saving;
+        },
+        finish() {
+          this.editing = false;
+          this.saving = false;
+          this.resolve = () => Promise.resolve(false);
+        },
+        cancel() {
+          this.finish();
+        },
+      }),
+      {
+        saving: observable.ref,
+        editing: observable.ref,
+        startEditing: action.bound,
+        save: action.bound,
+        setSaveStatus: action.bound,
+        finish: action.bound,
+        cancel: action.bound,
+      },
+      false,
+    );
 
     const nodeActions = useObjectRef<INodeActions>({
-      rename: () => {
-        setEditing(true);
-      },
+      rename: editingState.startEditing,
     });
 
     let icon = node.icon;
@@ -113,6 +173,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
 
     const expandable = useDeferredValue(getComputed(() => treeContext?.tree.isNodeExpandable(node.id) ?? true));
     const filterActive = useDeferredValue(getComputed(() => treeContext?.tree.filtering));
+    const { editing, saving } = editingState;
 
     const attributes = { [DATA_ATTRIBUTE_NODE_EDITING]: editing };
 
@@ -133,7 +194,11 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
         </TreeNodeIcon>
         <TreeNodeName title={node.name} {...use({ editing })}>
           <Loader suspense inline fullSize>
-            {editing ? <NavigationNodeEditorLoader node={node} onClose={() => setEditing(false)} /> : <name-box>{node.name}</name-box>}
+            {editing ? (
+              <NavigationNodeEditorLoader node={node} disabled={saving} onSave={editingState.save} onClose={editingState.cancel} />
+            ) : (
+              <name-box>{node.name}</name-box>
+            )}
           </Loader>
         </TreeNodeName>
         {!editing && !dndPlaceholder && (
