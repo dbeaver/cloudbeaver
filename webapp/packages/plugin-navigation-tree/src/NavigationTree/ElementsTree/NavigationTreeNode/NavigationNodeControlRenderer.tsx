@@ -7,13 +7,16 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useContext, useDeferredValue, useEffect, useRef, useState } from 'react';
+import styled, { css, use } from 'reshadow';
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
-import type { NavNode } from '@cloudbeaver/core-navigation-tree';
+import { getComputed, TreeNodeContext, useObjectRef } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import { type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { NavTreeControlComponent } from '../NavigationNodeComponent';
+import { transformNodeInfo } from '../transformNodeInfo';
 import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
 import type { INavigationNode } from './useNavigationNode';
 
@@ -25,6 +28,17 @@ interface Props {
   style?: ComponentStyle;
 }
 
+const styles = css`
+  Control {
+    transition: opacity 0.3s ease;
+    opacity: 1;
+
+    &[|outdated] {
+      opacity: 0.5;
+    }
+  }
+`;
+
 export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
   forwardRef(function NavigationNodeControlRenderer({ node, navNode, dragging, control: externalControl, style }, ref) {
     const elementRef = useRef<HTMLDivElement | null>(null);
@@ -32,7 +46,8 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
     const contextRef = useObjectRef({
       context: useContext(ElementsTreeContext),
     });
-    const Control = navNode.control || externalControl || NavigationNodeControlLoader;
+    const treeNodeContext = useContext(TreeNodeContext);
+    const navNodeInfoResource = useService(NavNodeInfoResource);
     const observer = useRef<IntersectionObserver | null>(null);
 
     useEffect(() => {
@@ -77,6 +92,16 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
       return <div ref={setRef} style={{ height: `${size}px` }} />;
     }
 
-    return <Control ref={setRef} dndElement={dragging} style={style} node={node} />;
+    const Control = navNode.control || externalControl || NavigationNodeControlLoader;
+    const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
+    const nodeInfo = transformNodeInfo(node, contextRef.context?.tree.nodeInfoTransformers ?? []);
+
+    function onClickHandler(event: React.MouseEvent<HTMLDivElement>) {
+      treeNodeContext.select(event.ctrlKey || event.metaKey);
+    }
+
+    return styled(styles)(
+      <Control ref={setRef} {...use({ outdated })} nodeInfo={nodeInfo} dndElement={dragging} style={style} node={node} onClick={onClickHandler} />,
+    );
   }),
 );

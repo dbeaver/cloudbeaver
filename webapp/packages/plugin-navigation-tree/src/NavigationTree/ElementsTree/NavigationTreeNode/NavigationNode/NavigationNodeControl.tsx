@@ -7,17 +7,15 @@
  */
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import React, { forwardRef, useContext, useDeferredValue } from 'react';
-import styled, { css, use } from 'reshadow';
+import React, { forwardRef, useContext } from 'react';
+import styled, { use } from 'reshadow';
 
 import {
-  ConnectionImageWithMask,
   getComputed,
   Loader,
   TREE_NODE_STYLES,
   TreeNodeContext,
   TreeNodeControl,
-  TreeNodeExpand,
   TreeNodeIcon,
   TreeNodeName,
   useMouseContextMenu,
@@ -26,52 +24,14 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { EObjectFeature, type INodeActions, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { type INodeActions, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
-import { ElementsTreeContext } from '../../ElementsTreeContext';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../../NavigationNodeComponent';
 import { TreeNodeMenuLoader } from '../TreeNodeMenu/TreeNodeMenuLoader';
 import { DATA_ATTRIBUTE_NODE_EDITING } from './DATA_ATTRIBUTE_NODE_EDITING';
+import { NAVIGATION_NODE_CONTROL_STYLES } from './NAVIGATION_NODE_CONTROL_STYLES';
+import { NavigationNodeExpand } from './NavigationNodeExpand';
 import { NavigationNodeEditorLoader } from './NavigationNodeLoaders';
-
-const styles = css`
-  TreeNodeControl {
-    transition: opacity 0.3s ease;
-    opacity: 1;
-
-    &[|outdated] {
-      opacity: 0.5;
-    }
-  }
-  TreeNodeControl:hover > portal,
-  TreeNodeControl:global([aria-selected='true']) > portal,
-  portal:focus-within {
-    visibility: visible;
-  }
-  TreeNodeName {
-    height: 100%;
-    max-width: 320px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    &[|editing] {
-      padding: 0;
-      overflow: visible;
-      margin-left: 2px;
-    }
-  }
-  portal {
-    position: relative;
-    box-sizing: border-box;
-    margin-left: auto !important;
-    margin-right: 8px !important;
-    visibility: hidden;
-  }
-  name-box {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-`;
 
 interface IEditingState {
   saving: boolean;
@@ -88,17 +48,13 @@ interface IEditingState {
 }
 
 export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(
-  forwardRef(function NavigationNodeControl({ node, dndElement, dndPlaceholder }, ref) {
+  forwardRef(function NavigationNodeControl({ node, nodeInfo, dndElement, dndPlaceholder, className, onClick }, ref) {
     const mouseContextMenu = useMouseContextMenu();
     const treeNodeContext = useContext(TreeNodeContext);
-    const treeContext = useContext(ElementsTreeContext);
     const navNodeInfoResource = useService(NavNodeInfoResource);
     const navTreeResource = useService(NavTreeResource);
-    const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
     const error = getComputed(() => !!navNodeInfoResource.getException(node.id) || !!navTreeResource.getException(node.id));
-    const connected = getComputed(() => node.objectFeatures.includes(EObjectFeature.dataSourceConnected));
     const selected = treeNodeContext.selected;
-
     const editingState = useObservableRef<IEditingState>(
       () => ({
         saving: false,
@@ -151,7 +107,9 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
       rename: editingState.startEditing,
     });
 
-    let icon = node.icon;
+    let icon = nodeInfo.icon;
+    const name = nodeInfo.name;
+    const title = nodeInfo.tooltip;
 
     if (error) {
       icon = '/icons/error_icon_sm.svg';
@@ -162,42 +120,35 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
       treeNodeContext.select();
     }
 
-    function onClickHandler(event: React.MouseEvent<HTMLDivElement>) {
-      treeNodeContext.select(event.ctrlKey || event.metaKey);
-    }
-
     function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
       mouseContextMenu.handleContextMenuOpen(event);
       treeNodeContext.select();
     }
 
-    const expandable = useDeferredValue(getComputed(() => treeContext?.tree.isNodeExpandable(node.id) ?? true));
-    const filterActive = useDeferredValue(getComputed(() => treeContext?.tree.filtering));
     const { editing, saving } = editingState;
 
     const attributes = { [DATA_ATTRIBUTE_NODE_EDITING]: editing };
 
     return styled(
       TREE_NODE_STYLES,
-      styles,
+      NAVIGATION_NODE_CONTROL_STYLES,
     )(
       <TreeNodeControl
         ref={ref}
         {...attributes}
-        onClick={onClickHandler}
+        className={className}
+        onClick={onClick}
         onContextMenu={handleContextMenuOpen}
-        {...use({ outdated, editing, dragging: dndElement })}
+        {...use({ editing, dragging: dndElement })}
       >
-        {expandable && <TreeNodeExpand filterActive={filterActive} />}
-        <TreeNodeIcon {...use({ connected })}>
-          <ConnectionImageWithMask icon={icon} connected={connected} maskId="tree-node-icon" />
-        </TreeNodeIcon>
-        <TreeNodeName title={node.name} {...use({ editing })}>
+        <NavigationNodeExpand nodeId={node.id} />
+        <TreeNodeIcon icon={icon} />
+        <TreeNodeName title={title} {...use({ editing })}>
           <Loader suspense inline fullSize>
             {editing ? (
               <NavigationNodeEditorLoader node={node} disabled={saving} onSave={editingState.save} onClose={editingState.cancel} />
             ) : (
-              <name-box>{node.name}</name-box>
+              <name-box>{name}</name-box>
             )}
           </Loader>
         </TreeNodeName>

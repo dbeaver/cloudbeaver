@@ -9,7 +9,6 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { Translate, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
@@ -19,6 +18,7 @@ import { CaptureView } from '@cloudbeaver/core-view';
 import { NavNodeViewService } from '../NodesManager/NavNodeView/NavNodeViewService';
 import { navigationTreeConnectionGroupFilter } from './ConnectionGroup/navigationTreeConnectionGroupFilter';
 import { navigationTreeConnectionGroupRenderer } from './ConnectionGroup/navigationTreeConnectionGroupRenderer';
+import { navTreeConnectionRenderer } from './ConnectionsRenderer/navTreeConnectionRenderer';
 import { ElementsTree } from './ElementsTree/ElementsTree';
 import {
   createElementsTreeSettings,
@@ -98,6 +98,7 @@ export const NavigationTree = observer(function NavigationTree() {
   );
 
   const duplicateFilter = useMemo(() => navigationTreeDuplicateFilter(navNodeViewService), [navNodeViewService]);
+  const connectionRenderer = useMemo(() => navTreeConnectionRenderer(navNodeInfoResource), [navNodeInfoResource]);
   const projectsRendererRenderer = useMemo(() => navigationTreeProjectsRendererRenderer(navNodeInfoResource), [navNodeInfoResource]);
   const projectsExpandStateGetter = useMemo(
     () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource, projectsService, projectsNavNodeService),
@@ -116,7 +117,7 @@ export const NavigationTree = observer(function NavigationTree() {
         root={root}
         localState={navTreeService.treeState}
         filters={[duplicateFilter, connectionGroupFilter, projectFilter]}
-        renderers={[projectsRendererRenderer, navigationTreeConnectionGroupRenderer]}
+        renderers={[projectsRendererRenderer, navigationTreeConnectionGroupRenderer, connectionRenderer]}
         navNodeFilterCompare={navigationTreeProjectSearchCompare}
         expandStateGetters={[projectsExpandStateGetter]}
         settingsElements={settingsElements}
