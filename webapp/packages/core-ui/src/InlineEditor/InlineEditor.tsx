@@ -106,10 +106,10 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-      if (autofocus) {
+      if (autofocus && !disabled) {
         setTimeout(() => inputRef.current?.focus(), 100);
       }
-    }, []);
+    }, [disabled]);
 
     useImperativeHandle(ref, () => inputRef.current!);
 
