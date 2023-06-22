@@ -2227,7 +2227,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
                 "SELECT OP.SUBJECT_ID,S.SUBJECT_TYPE, OP.PERMISSION\n" +
-                    "FROM {table_prefix}CB_OBJECT_PERMISSIONS OP, {table_prefix}CB_CB_AUTH_SUBJECT S\n" +
+                    "FROM {table_prefix}CB_OBJECT_PERMISSIONS OP, {table_prefix}CB_AUTH_SUBJECT S\n" +
                     "WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.OBJECT_TYPE=? AND OP.OBJECT_ID=?"))) {
                 dbStat.setString(1, smObjectType.getObjectType());
                 dbStat.setString(2, objectId);
@@ -2260,7 +2260,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             var allLinkedSubjects = getAllLinkedSubjects(dbCon, subjectId);
             var sqlBuilder =
                 new StringBuilder("SELECT OP.OBJECT_ID,S.SUBJECT_TYPE,S.SUBJECT_ID,OP.PERMISSION\n")
-                    .append("FROM {table_prefix}CB_OBJECT_PERMISSIONS OP, {table_prefix}CB_CB_AUTH_SUBJECT S\n")
+                    .append("FROM {table_prefix}CB_OBJECT_PERMISSIONS OP, {table_prefix}CB_AUTH_SUBJECT S\n")
                     .append("WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.SUBJECT_ID IN (");
             appendStringParameters(sqlBuilder, allLinkedSubjects);
             sqlBuilder.append(") AND OP.OBJECT_TYPE=?");
