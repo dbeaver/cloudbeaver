@@ -9,8 +9,7 @@ import type { NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/c
 import { RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { createPath } from '@cloudbeaver/core-utils';
 import type { IElementsTreeNodeExpandInfoGetter } from '@cloudbeaver/plugin-navigation-tree';
-
-import type { ResourceManagerService } from '../../ResourceManagerService';
+import type { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 export function navigationTreeResourceExpandStateGetter(
   navNodeInfoResource: NavNodeInfoResource,

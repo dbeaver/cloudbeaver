@@ -22,17 +22,10 @@ export function transformResourceNodeInfo(
       const project = projectsNavNodeService.getProject(node.id);
 
       if (project) {
-        const resourceType = projectInfoResource.getResourceType(project, resourceTypeId);
-
-        for (let ext of resourceType?.fileExtensions || []) {
-          ext = `.${ext}`;
-          if (info.name.endsWith(ext)) {
-            return {
-              ...info,
-              name: info.name.slice(0, info.name.length - ext.length),
-            };
-          }
-        }
+        return {
+          ...info,
+          name: projectInfoResource.getNameWithoutExtension(project.id, resourceTypeId, info.name),
+        };
       }
     }
     return info;

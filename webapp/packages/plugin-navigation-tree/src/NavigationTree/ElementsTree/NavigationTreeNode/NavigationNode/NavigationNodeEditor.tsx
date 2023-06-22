@@ -24,14 +24,14 @@ const styles = css`
 `;
 
 interface Props {
-  node: NavNode;
+  name: string;
   disabled?: boolean;
   onSave: (name: string) => void;
   onClose: () => void;
 }
 
-export const NavigationNodeEditor = observer<Props>(function NavigationNodeEditor({ node, disabled, onSave, onClose }) {
-  const [name, setName] = useState(node.name || '');
+export const NavigationNodeEditor = observer<Props>(function NavigationNodeEditor({ name: initialName, disabled, onSave, onClose }) {
+  const [name, setName] = useState(initialName);
 
   function save() {
     onSave(name);

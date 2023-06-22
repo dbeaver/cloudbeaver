@@ -26,7 +26,6 @@ import {
   validateElementsTreeSettings,
 } from '@cloudbeaver/plugin-navigation-tree';
 
-import { ResourceManagerService } from '../ResourceManagerService';
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';
 import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigationTreeProjectSearchCompare';
 import { navigationTreeProjectsExpandStateGetter } from './ProjectsRenderer/navigationTreeProjectsExpandStateGetter';
@@ -36,6 +35,7 @@ import { ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsS
 import { navigationTreeResourceExpandStateGetter } from './ResourceFolderRenderer/navigationTreeResourceExpandStateGetter';
 import { ResourceManagerTreeCaptureViewContext } from './ResourceManagerTreeCaptureViewContext';
 import { transformResourceNodeInfo } from './ResourceRenderer/transformResourceNodeInfo';
+import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 const styles = css`
   CaptureView {

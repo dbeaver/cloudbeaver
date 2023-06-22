@@ -146,7 +146,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
         <TreeNodeName title={title} {...use({ editing })}>
           <Loader suspense inline fullSize>
             {editing ? (
-              <NavigationNodeEditorLoader node={node} disabled={saving} onSave={editingState.save} onClose={editingState.cancel} />
+              <NavigationNodeEditorLoader name={name} disabled={saving} onSave={editingState.save} onClose={editingState.cancel} />
             ) : (
               <name-box>{name}</name-box>
             )}
