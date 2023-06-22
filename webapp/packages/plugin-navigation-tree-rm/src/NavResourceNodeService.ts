@@ -7,7 +7,6 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { getPathName } from '@cloudbeaver/core-utils';
 
@@ -15,11 +14,7 @@ import { getResourceNodeId } from './NavNodes/getResourceNodeId';
 
 @injectable()
 export class NavResourceNodeService {
-  constructor(
-    private readonly resourceManagerResource: ResourceManagerResource,
-    private readonly commonDialogService: CommonDialogService,
-    private readonly projectInfoResource: ProjectInfoResource,
-  ) {}
+  constructor(private readonly resourceManagerResource: ResourceManagerResource, private readonly commonDialogService: CommonDialogService) {}
 
   async move(key: string, newKey: string): Promise<string> {
     await this.resourceManagerResource.move(key, newKey);
