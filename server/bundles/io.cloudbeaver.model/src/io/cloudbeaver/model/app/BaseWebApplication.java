@@ -18,6 +18,7 @@ package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.WebProjectImpl;
+import io.cloudbeaver.WebSessionProjectImpl;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebGlobalWorkspace;
@@ -173,10 +174,8 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         @NotNull RMProject project,
         @NotNull DataSourceFilter dataSourceFilter
     ) {
-        return new WebProjectImpl(
-            webSession.getWorkspace(),
-            webSession.getRmController(),
-            webSession.getSessionContext(),
+        return new WebSessionProjectImpl(
+            webSession,
             project,
             dataSourceFilter
         );
