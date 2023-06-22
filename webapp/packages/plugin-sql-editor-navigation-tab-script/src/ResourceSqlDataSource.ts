@@ -17,7 +17,7 @@ import { TaskScheduler } from '@cloudbeaver/core-executor';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath, debounce, getPathName, getPathParent, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
-import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
+import { BaseSqlDataSource, ESqlDataSourceFeatures, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
 
@@ -90,6 +90,11 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable, ESqlDataSourceFeatures.setName];
   }
 
+  get hasChanges() {
+    return this._script !== this._previous;
+  }
+
+  private _previous: string;
   private _script: string;
   private actions?: IResourceActions;
   private info?: IResourceInfo;
@@ -103,11 +108,13 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly resourceManagerResource: ResourceManagerResource,
+    private readonly sqlEditorService: SqlEditorService,
     state: IResourceSqlDataSourceState,
   ) {
     super();
     this.state = state;
     this._script = '';
+    this._previous = this._script;
     this.lastAction = undefined;
     this.loaded = false;
     this.resourceUseKeyId = null;
@@ -117,14 +124,16 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
     resourceManagerResource.onDataOutdated.addHandler(this.syncResource);
 
-    makeObservable<this, '_script' | 'lastAction' | 'loaded'>(this, {
+    makeObservable<this, '_script' | 'lastAction' | 'loaded' | '_previous'>(this, {
       script: computed,
       executionContext: computed,
       resourceKey: computed,
+      hasChanges: computed,
       features: computed<ESqlDataSourceFeatures[]>({
         equals: isArraysEqual,
       }),
       _script: observable,
+      _previous: observable.ref,
       lastAction: observable.ref,
       loaded: observable,
       setExecutionContext: action,
@@ -197,7 +206,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this._script = script;
     super.setScript(script);
 
-    if (previous !== script) {
+    if (this.sqlEditorService.autoSave && previous !== script) {
       this.debouncedWrite();
     }
   }
@@ -304,6 +313,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       try {
         this.exception = null;
         this._script = await this.actions.read(this, this.resourceKey);
+        this._previous = this._script;
 
         const executionContext = await this.actions.getProperties(this, this.resourceKey);
 
@@ -339,6 +349,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       try {
         this.exception = null;
         await this.actions.write(this, this.resourceKey, this.script);
+        this._previous = this.script;
         this.saved = true;
         this.markUpdated();
       } catch (exception: any) {

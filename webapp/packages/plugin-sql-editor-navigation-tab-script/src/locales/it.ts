@@ -1,4 +1,5 @@
 export default [
+  ['plugin_sql_editor_navigation_tab_resource_save_script_title', 'Save as script'],
   ['plugin_sql_editor_navigation_tab_resource_save_script_success', 'Script successfully saved'],
   ['plugin_sql_editor_navigation_tab_resource_open_script_error', 'Failed to open the script'],
   ['plugin_sql_editor_navigation_tab_resource_save_script_error', 'Error occurred while trying to save the script'],

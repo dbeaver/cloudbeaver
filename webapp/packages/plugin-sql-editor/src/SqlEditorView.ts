@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { ACTION_REDO, ACTION_UNDO, IActiveView, View } from '@cloudbeaver/core-view';
+import { ACTION_REDO, ACTION_SAVE, ACTION_UNDO, IActiveView, View } from '@cloudbeaver/core-view';
 import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 import { ACTION_SQL_EDITOR_EXECUTE } from './actions/ACTION_SQL_EDITOR_EXECUTE';
@@ -27,6 +27,7 @@ export class SqlEditorView extends View<ITab> {
       ACTION_UNDO,
       ACTION_REDO,
       ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+      ACTION_SAVE,
     );
   }
 

@@ -17,6 +17,8 @@ import { DataSynchronizationQueue } from './DataSynchronization/DataSynchronizat
 import { DataSynchronizationService } from './DataSynchronization/DataSynchronizationService';
 import { ServerConfigEventHandler } from './ServerConfigEventHandler';
 
+export const FEATURE_GIT_ID = 'git';
+
 export type ServerConfig = Omit<SDKServerConfig, 'hostName'>;
 
 @injectable()

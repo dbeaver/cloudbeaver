@@ -23,11 +23,13 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
+import { FEATURE_GIT_ID, ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { getSqlEditorName } from './getSqlEditorName';
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
+import { SqlEditorSettingsService } from './SqlEditorSettingsService';
 
 export type SQLProposal = SqlCompletionProposal;
 
@@ -39,6 +41,10 @@ export interface IQueryChangeData {
 
 @injectable()
 export class SqlEditorService {
+  get autoSave() {
+    return this.sqlEditorSettingsService.settings.getValue('autoSave') && !this.serverConfigResource.isFeatureEnabled(FEATURE_GIT_ID, true);
+  }
+
   readonly onQueryChange: ISyncExecutor<IQueryChangeData>;
 
   constructor(
@@ -49,6 +55,8 @@ export class SqlEditorService {
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly sqlDataSourceService: SqlDataSourceService,
+    private readonly sqlEditorSettingsService: SqlEditorSettingsService,
+    private readonly serverConfigResource: ServerConfigResource,
   ) {
     this.onQueryChange = new SyncExecutor();
   }

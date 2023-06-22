@@ -20,13 +20,12 @@ import { throttle } from '@cloudbeaver/core-utils';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavResourceNodeService, ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 import { ResourceManagerScriptsService } from '@cloudbeaver/plugin-resource-manager-scripts';
-import { getSqlEditorName, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
+import { getSqlEditorName, SqlDataSourceService, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
 import { ResourceSqlDataSource } from './ResourceSqlDataSource';
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
-
 const RESOURCE_TAB_STATE = 'sql_editor_resource_tab_state';
 const SYNC_DELAY = 5 * 60 * 1000;
 
@@ -49,6 +48,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly windowEventsService: WindowEventsService,
     private readonly sqlEditorTabResourceService: SqlEditorTabResourceService,
+    private readonly sqlEditorService: SqlEditorService,
     localStorageSaveService: LocalStorageSaveService,
   ) {
     super();
@@ -90,7 +90,12 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     this.sqlDataSourceService.register({
       key: ResourceSqlDataSource.key,
       getDataSource: (editorId, options) => {
-        const dataSource = new ResourceSqlDataSource(this.connectionInfoResource, this.resourceManagerResource, this.createState(editorId));
+        const dataSource = new ResourceSqlDataSource(
+          this.connectionInfoResource,
+          this.resourceManagerResource,
+          this.sqlEditorService,
+          this.createState(editorId)
+        );
 
         if (options?.executionContext) {
           dataSource.setExecutionContext(options.executionContext);
@@ -163,7 +168,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> {}
+  load(): void | Promise<void> { }
 
   private createState(editorId: string, resourceKey?: string): IResourceSqlDataSourceState {
     let state = this.dataSourceStateState.get(editorId);
