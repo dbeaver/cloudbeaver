@@ -75,7 +75,7 @@ export class NavTreeRMContextMenuService extends Bootstrap {
 
             const save = async (newName: string) => {
               if (key.name !== newName && newName.trim().length) {
-                if (resourceType) {
+                if (resourceType && node.nodeType === NAV_NODE_TYPE_RM_RESOURCE && !node.folder) {
                   newName = this.projectInfoResource.getNameWithExtension(key.projectId, resourceType.id, newName);
                 }
 
