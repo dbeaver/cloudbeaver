@@ -909,7 +909,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 deleteAuthSubject(dbCon, teamId);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    "DELETE FROM {table_prefix}CB_TEAM WHERE TEAM_ID=?")) {
+                    database.normalizeTableNames("DELETE FROM {table_prefix}CB_TEAM WHERE TEAM_ID=?"))) {
                     dbStat.setString(1, teamId);
                     dbStat.execute();
                 }
