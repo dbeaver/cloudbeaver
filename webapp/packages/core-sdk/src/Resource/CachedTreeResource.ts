@@ -33,6 +33,9 @@ export const CachedTreeRootValueKey = resourceKeyAlias('@cached-tree-resource/ro
 export const CachedTreeRootChildrenKey = resourceKeyListAlias('@cached-tree-resource/root-children');
 export const CachedTreeChildrenKey = resourceKeyListAliasFactory('@cached-tree-resource/children', (path: string) => ({ path }));
 
+/**
+ * CachedTreeResource is a resource that stores data that has tree structure.
+ */
 export abstract class CachedTreeResource<
   TValue,
   TContext extends Record<string, any> = Record<string, never>,
@@ -357,7 +360,7 @@ export abstract class CachedTreeResource<
    * Use it instead of this.data.clear
    * This method can be override
    */
-  protected override clearData(): void {
+  protected override resetDataToDefault(): void {
     this.data = this.getDefaultNode('');
   }
 

@@ -35,6 +35,7 @@ export interface ICachedResourceMetadata {
   loading: boolean;
   includes: string[];
   exception: Error | null;
+  /** List of generated id's added each time resource is used and removed on release */
   dependencies: string[];
 }
 
@@ -62,6 +63,9 @@ export type CachedResourceMetadata<TResource> = TResource extends CachedResource
 
 export const CachedResourceParamKey = resourceKeyAlias('@cached-resource/param-default');
 
+/**
+ * CachedResource is a base class for all resources. It used to load, cache and manage data from external sources.
+ */
 export abstract class CachedResource<
   TData,
   TValue,
@@ -83,7 +87,7 @@ export abstract class CachedResource<
   readonly beforeLoad: IExecutor<ResourceKey<TKey>>;
 
   protected metadata: MetadataMap<TKey, TMetadata>;
-  protected defaultIncludes: TInclude; // needed for CachedResourceContext
+  protected defaultIncludes: TInclude;
 
   protected get loading(): boolean {
     return this.scheduler.executing;
@@ -94,6 +98,7 @@ export abstract class CachedResource<
   protected logActivity: boolean;
   protected outdateWaitList: ResourceKey<TKey>[];
 
+  /** Need to infer value type */
   private readonly typescriptHack: TValue;
 
   constructor(defaultKey: ResourceKey<TKey>, private readonly defaultValue: () => TData, defaultIncludes: TInclude = [] as any) {
@@ -182,6 +187,13 @@ export abstract class CachedResource<
     this.onClear.addHandler(subscriptionHandler);
   }
 
+  /**
+   * Outdate resource when {@link resource} is outdated.
+   * Preload {@link resource} before current resource is loaded and connect {@link resource} to current resource.
+   * @param resource - Resource to sync with
+   * @param mapTo - Map current resource key to {@link resource} key
+   * @param mapOut - Map {@link resource} key to current resource key
+   */
   sync<T = TKey>(
     resource: CachedResource<any, any, T, any, any>,
     mapTo?: (param: ResourceKey<TKey>) => ResourceKey<T>,
@@ -203,6 +215,12 @@ export abstract class CachedResource<
     this.preloadResource(resource, mapTo);
   }
 
+  /**
+   * Mark {@link resource} as updated when current resource is updated.
+   * @param resource - Resource to mark as updated
+   * @param mapTo - Map current resource key to {@link resource} key
+   * @param mapOut - Map {@link resource} key to current resource key
+   */
   updateResource<T = TKey>(resource: CachedResource<any, any, T, any, any>, map?: (param: ResourceKey<TKey>) => ResourceKey<T>): this {
     this.onDataUpdate.addHandler(param => {
       try {
@@ -225,6 +243,12 @@ export abstract class CachedResource<
     return this;
   }
 
+  /**
+   * Mark {@link resource} as outdated when current resource is outdated.
+   * @param resource - Resource to mark as outdated
+   * @param mapTo - Map current resource key to {@link resource} key
+   * @param mapOut - Map {@link resource} key to current resource key
+   */
   outdateResource<T = TKey>(resource: CachedResource<any, any, T, any, any>, map?: (param: ResourceKey<TKey>) => ResourceKey<T>): this {
     this.onDataOutdated.addHandler(param => {
       try {
@@ -247,6 +271,12 @@ export abstract class CachedResource<
     return this;
   }
 
+  /**
+   * Preload {@link resource} before current resource is loaded and connect {@link resource} to current resource.
+   * @param resource - Resource to preload
+   * @param mapTo - Map current resource key to {@link resource} key
+   * @param mapOut - Map {@link resource} key to current resource key
+   */
   preloadResource<T = TKey>(resource: CachedResource<any, any, T, any, any>, map?: (param: ResourceKey<TKey>) => ResourceKey<T>): this {
     resource.connect(this);
 
@@ -271,6 +301,10 @@ export abstract class CachedResource<
     return this;
   }
 
+  /**
+   * Execute handler before resource is loaded
+   * @param handler - Handler to execute
+   */
   before(handler: IExecutorHandler<ResourceKey<TKey>>): this {
     this.beforeLoad.addHandler(async (param, contexts) => {
       try {
@@ -289,14 +323,28 @@ export abstract class CachedResource<
     return this;
   }
 
+  /**
+   * Return true if resource is in use
+   * @param param - Resource key
+   */
   isInUse(param: ResourceKey<TKey>): boolean {
     return this.someMetadata(param, metadata => metadata.dependencies.length > 0);
   }
 
+  /**
+   * Return true if resource is in use by {@link id}
+   * @param id - Dependency id
+   */
   hasUseId(id: string): boolean {
     return this.getAllMetadata().some(metadata => metadata.dependencies.includes(id));
   }
 
+  /**
+   * Use resource by {@link param}. Optionally provide {@link id} to track dependency.
+   * @param param - Resource key
+   * @param id - Dependency id (uuid by default)
+   * @returns Dependency id
+   */
   use(param: ResourceKey<TKey>, id = uuid()): string {
     this.updateMetadata(param, metadata => {
       metadata.dependencies.push(id);
@@ -311,6 +359,11 @@ export abstract class CachedResource<
     return id;
   }
 
+  /**
+   * Release resource by {@link param} and {@link id}
+   * @param param - Resource key
+   * @param id - Dependency id
+   */
   free(param: ResourceKey<TKey>, id: string): void {
     this.updateMetadata(param, metadata => {
       if (metadata.dependencies.length > 0) {
@@ -339,6 +392,10 @@ export abstract class CachedResource<
     return this.everyMetadata(param, metadata => metadata.loaded) && (!includes || this.isIncludes(param, includes));
   }
 
+  /**
+   * Return true if resource is outdated or not loaded
+   * @param param - Resource key
+   */
   isLoadable(param?: ResourceKey<TKey>, context?: TInclude): boolean {
     if (param === undefined) {
       param = CachedResourceParamKey;
@@ -364,6 +421,10 @@ export abstract class CachedResource<
     return false;
   }
 
+  /**
+   * Return promise that will be resolved when resource will finish loading pending requests.
+   * Will be resolved immediately if resource is not loading.
+   */
   waitLoad(): Promise<void> {
     return this.scheduler.wait();
   }
@@ -376,6 +437,11 @@ export abstract class CachedResource<
     return this.someMetadata(key, metadata => metadata.loading);
   }
 
+  /**
+   * Return true if specified {@link includes} is loaded for specified {@link key}
+   * @param key - Resource key
+   * @param includes - Includes
+   */
   isIncludes(key: ResourceKey<TKey>, includes: TInclude): boolean {
     return this.everyMetadata(key, metadata => includes.every(include => metadata.includes.includes(include)));
   }
@@ -446,7 +512,6 @@ export abstract class CachedResource<
    * Use it instead of this.metadata.values
    * This method can be override
    */
-
   getAllMetadata(): TMetadata[] {
     return [...this.metadata.values()];
   }
@@ -578,6 +643,10 @@ export abstract class CachedResource<
     });
   }
 
+  /**
+   * Method cleans error for {@link key} when specified or for resource itself.
+   * Method will execute {@link onDataUpdate}.
+   */
   dataUpdate(key?: ResourceKey<TKey>): void {
     if (key === undefined) {
       key = CachedResourceParamKey;
@@ -618,6 +687,13 @@ export abstract class CachedResource<
     return this.data;
   }
 
+  /**
+   * Load data for {@link key} when specified or for resource itself.
+   * Data loading will be skipped if data already loaded and updated.
+   * @param key - Resource key
+   * @param context - Includes
+   * @returns Resource data
+   */
   async load(key?: ResourceKey<TKey>, context?: TInclude): Promise<any> {
     if (key === undefined) {
       key = CachedResourceParamKey;
@@ -640,7 +716,7 @@ export abstract class CachedResource<
   }
 
   clear(): void {
-    this.clearData();
+    this.resetDataToDefault();
     this.metadata.clear();
     this.onUse.execute(this.getInitialOnUseData());
     this.onDataUpdate.execute(this.transformToAlias(CachedResourceParamKey));
@@ -675,10 +751,10 @@ export abstract class CachedResource<
   }
 
   /**
-   * Check if key is a part of param
-   * @param param - param
-   * @param key - key
-   * @returns {boolean} Returns true if param can be represented by key
+   * Check if key is a part of nextKey
+   * @param nextKey - Resource key
+   * @param key - Resource key
+   * @returns {boolean} Returns true if key can be represented by nextKey
    */
   isIntersect(key: ResourceKey<TKey>, nextKey: ResourceKey<TKey>): boolean {
     if (key === nextKey) {
@@ -804,6 +880,13 @@ export abstract class CachedResource<
     return key;
   }
 
+  /**
+   * Check if key is valid. Can be override to provide custom validation.
+   * When key is alias checks that alias is registered.
+   * When key is list checks that all keys are valid.
+   * When key is primitive checks that this type of primitive is valid for current resource.
+   * @param param - Resource key
+   */
   protected validateResourceKey(param: ResourceKey<TKey>): boolean {
     if (isResourceAlias(param)) {
       return this.hasAlias(param);
@@ -815,6 +898,9 @@ export abstract class CachedResource<
     return this.validateKey(param);
   }
 
+  /**
+   * Check if key is valid. Can be override to provide custom validation.
+   */
   protected abstract validateKey(key: TKey): boolean;
 
   protected resetIncludes(): void {
@@ -831,7 +917,7 @@ export abstract class CachedResource<
     }
   }
 
-  protected clearData(): void {
+  protected resetDataToDefault(): void {
     this.setData(this.defaultValue());
   }
 
@@ -884,18 +970,45 @@ export abstract class CachedResource<
 
   protected abstract loader(param: ResourceKey<TKey>, include: ReadonlyArray<string> | undefined, refresh: boolean): Promise<TData>;
 
-  //TODO must be protected
+  /**
+   * Implements same behavior as {@link CachedResource.load} and {@link CachedResource.refresh} for custom loaders.
+   * Resource will be marked as loading and will be marked as loaded after loader is finished.
+   * Exceptions will be handled and stored in metadata.
+   * @param key - Resource key
+   * @param include - Includes
+   * @param update - Update function
+   */
   async performUpdate<T>(
     key: ResourceKey<TKey>,
     include: TInclude | undefined,
     update: (key: ResourceKey<TKey>, context?: ReadonlyArray<string>) => Promise<T>,
   ): Promise<T>;
+
+  /**
+   * Implements same behavior as {@link CachedResource.load} and {@link CachedResource.refresh} for custom loaders.
+   * Resource will be marked as loading and will be marked as loaded after loader is finished.
+   * Exceptions will be handled and stored in metadata.
+   * @param key - Resource key
+   * @param include - Includes
+   * @param update - Update function
+   * @param exitCheck - Function will be called before calling {@link update} function. If it returns true then update will be skipped.
+   */
   async performUpdate<T>(
     key: ResourceKey<TKey>,
     include: TInclude | undefined,
     update: (key: ResourceKey<TKey>, context?: ReadonlyArray<string>) => Promise<T>,
     exitCheck: (key: ResourceKey<TKey>, context?: ReadonlyArray<string>) => boolean,
   ): Promise<T | undefined>;
+
+  /**
+   * Implements same behavior as {@link CachedResource.load} and {@link CachedResource.refresh} for custom loaders.
+   * Resource will be marked as loading and will be marked as loaded after loader is finished.
+   * Exceptions will be handled and stored in metadata.
+   * @param key - Resource key
+   * @param include - Includes
+   * @param update - Update function
+   * @param exitCheck - Function will be called before calling {@link update} function. If it returns true then update will be skipped.
+   */
   async performUpdate<T>(
     key: ResourceKey<TKey>,
     include: TInclude | undefined,
@@ -905,6 +1018,7 @@ export abstract class CachedResource<
     if (isResourceAlias(key)) {
       key = this.transformToAlias(key);
     }
+
     const context = new ExecutionContext(key);
     await this.preLoadData(key, context, true, include);
     await this.beforeLoad.execute(key, context);
