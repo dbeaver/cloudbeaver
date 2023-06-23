@@ -228,14 +228,20 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
     const tabs: string[] = [];
 
+    const dataSources = this.sqlDataSourceService.dataSources
+      .filter(([, dataSource]) => dataSource instanceof ResourceSqlDataSource)
+      .map(([, dataSource]) => dataSource as ResourceSqlDataSource);
+
     ResourceKeyUtils.forEach(keyObj, key => {
-      const tab = this.sqlEditorTabResourceService.getResourceTab(key);
+      for (const dataSource of dataSources) {
+        if (dataSource.resourceKey && dataSource.resourceKey.startsWith(key)) {
+          const tab = this.sqlEditorTabResourceService.getResourceTab(dataSource.resourceKey);
 
-      if (tab) {
-        const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId) as ResourceSqlDataSource;
-
-        dataSource?.setResourceKey(undefined); // prevent deleted resource refresh
-        tabs.push(tab.id);
+          if (tab) {
+            tabs.push(tab.id);
+          }
+          dataSource.setResourceKey(undefined); // prevent deleted resource refresh
+        }
       }
     });
 
