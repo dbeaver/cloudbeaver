@@ -6,6 +6,7 @@ export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSet
 export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/ElementsTreeSettingsService';
 
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeLoaders';
+export * from './NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS';
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenuLoader';
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNodeRendererLoader';
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/isDraggingInsideProject';
