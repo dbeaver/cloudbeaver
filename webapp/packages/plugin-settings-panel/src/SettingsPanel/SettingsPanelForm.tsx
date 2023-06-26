@@ -49,16 +49,18 @@ export const SettingsPanelForm: React.FC = observer(function SettingsPanelForm()
   return styled(style)(
     <ColoredContainer gap overflow parent>
       <Group medium gap vertical overflow>
-        {groups.map(([_, { id, name }]) => (
+        {groups.map(([_, { id: groupId, name }]) => (
           <>
             <GroupTitle keepSize large>
               {name}
             </GroupTitle>
             <SettingsInfoForm
-              fields={settings.map(settingsItem => ({
-                ...settingsItem,
-                value: getValue(settingsItem.key, settingsItem.scopeType, settingsItem.scope),
-              }))}
+              fields={settings
+                .filter(settingsItem => settingsItem.groupId === groupId)
+                .map(settingsItem => ({
+                  ...settingsItem,
+                  value: getValue(settingsItem.key, settingsItem.scopeType, settingsItem.scope),
+                }))}
               readOnly
             />
           </>
