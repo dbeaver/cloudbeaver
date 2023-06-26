@@ -12,14 +12,33 @@ import { PluginSettings } from './PluginSettings';
 
 @injectable()
 export class PluginManagerService {
-  constructor(private readonly productManagerService: ProductManagerService) {}
-
-  getCoreSettings<T>(scope: string, defaults: T) {
-    return new PluginSettings(this.productManagerService.settings, 'core.' + scope, defaults);
+  store: Map<string, PluginSettings<any>>;
+  constructor(private readonly productManagerService: ProductManagerService) {
+    this.store = new Map();
   }
 
-  getPluginSettings<T>(scope: string, defaults: T) {
-    return new PluginSettings(this.productManagerService.settings, 'plugin.' + scope, defaults);
+  getCoreSettings<T>(scope: string, defaults?: T): PluginSettings<any> {
+    const coreSettings = this.store.get('core.' + scope);
+    if (coreSettings !== undefined) {
+      return coreSettings;
+    } else {
+      const coreSettings = new PluginSettings(this.productManagerService.settings, 'core.' + scope, defaults);
+      this.store.set('core.' + scope, coreSettings);
+
+      return coreSettings;
+    }
+  }
+
+  getPluginSettings<T>(scope: string, defaults?: T): PluginSettings<any> {
+    const pluginSettings = this.store.get('plugin.' + scope);
+    if (pluginSettings !== undefined) {
+      return pluginSettings;
+    } else {
+      const pluginSettings = new PluginSettings(this.productManagerService.settings, 'plugin.' + scope, defaults);
+      this.store.set('plugin.' + scope, pluginSettings);
+
+      return pluginSettings;
+    }
   }
 
   /**

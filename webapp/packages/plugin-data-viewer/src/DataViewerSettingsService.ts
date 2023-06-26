@@ -7,6 +7,8 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
+import { SettingsManagerService } from '@cloudbeaver/core-settings';
+import { createSettingsGroup, FormFieldType } from '@cloudbeaver/plugin-settings-panel';
 
 const defaultSettings = {
   disableEdit: false,
@@ -23,9 +25,43 @@ export class DataViewerSettingsService {
   /** @deprecated Use settings instead, will be removed in 23.0.0 */
   readonly deprecatedSettings: PluginSettings<typeof defaultSettings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService) {
+  constructor(private readonly pluginManagerService: PluginManagerService, private readonly settingsManagerService: SettingsManagerService) {
     this.settings = this.pluginManagerService.getPluginSettings('data-viewer', defaultSettings);
     this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('core.app.dataViewer', defaultSettings);
+
+    const DATA_EDITOR_SETTINGS_GROUP = createSettingsGroup('Data Editor');
+
+    settingsManagerService.addGroup(DATA_EDITOR_SETTINGS_GROUP);
+    settingsManagerService.addSettings('plugin', 'data-viewer', [
+      {
+        key: 'disableEdit',
+        type: FormFieldType.Checkbox,
+        name: 'Disable Edit',
+        description: 'Disable edit',
+        groupId: DATA_EDITOR_SETTINGS_GROUP.id,
+      },
+      {
+        key: 'fetchMin',
+        type: FormFieldType.Input,
+        name: 'Fetch Min',
+        description: 'Minimum number of rows to fetch',
+        groupId: DATA_EDITOR_SETTINGS_GROUP.id,
+      },
+      {
+        key: 'fetchMax',
+        type: FormFieldType.Input,
+        name: 'Fetch Max',
+        description: 'Maximum number of rows to fetch',
+        groupId: DATA_EDITOR_SETTINGS_GROUP.id,
+      },
+      {
+        key: 'fetchDefault',
+        type: FormFieldType.Input,
+        name: 'Fetch Default',
+        description: 'Default number of rows to fetch',
+        groupId: DATA_EDITOR_SETTINGS_GROUP.id,
+      },
+    ]);
   }
 
   getMaxFetchSize(): number {
