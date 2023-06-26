@@ -33,6 +33,9 @@ export type CachedMapResourceLoader<TRealKey, TKey, TValue, TIncludes> = TRealKe
 export const CachedMapAllKey = resourceKeyListAlias('@cached-map-resource/all');
 export const CachedMapEmptyKey = resourceKeyListAlias('@cached-map-resource/empty');
 
+/**
+ * CachedMapResource is a resource that stores data in a Map.
+ */
 export abstract class CachedMapResource<
   TKey,
   TValue,
@@ -251,7 +254,7 @@ export abstract class CachedMapResource<
    * Use it instead of this.data.clear
    * This method can be override
    */
-  protected override clearData(): void {
+  protected override resetDataToDefault(): void {
     this.data.clear();
   }
 }
