@@ -64,7 +64,7 @@ export type CachedResourceMetadata<TResource> = TResource extends CachedResource
 export const CachedResourceParamKey = resourceKeyAlias('@cached-resource/param-default');
 
 /**
- * CachedResource is a base class for all resources. It used to load, cache and manage data from external sources.
+ * CachedResource is a base class for all resources. It is used to load, cache and manage data from external sources.
  */
 export abstract class CachedResource<
   TData,
@@ -510,7 +510,7 @@ export abstract class CachedResource<
 
   /**
    * Use it instead of this.metadata.values
-   * This method can be override
+   * This method can be overridden
    */
   getAllMetadata(): TMetadata[] {
     return [...this.metadata.values()];
@@ -518,7 +518,7 @@ export abstract class CachedResource<
 
   /**
    * Use it instead of this.metadata.get
-   * This method can be override
+   * This method can be overridden
    */
   getMetadata(key: ResourceKeyFlat<TKey>): TMetadata;
   getMetadata(key: ResourceKeyList<TKey>): TMetadata[];
@@ -533,7 +533,7 @@ export abstract class CachedResource<
 
   /**
    * Use to update metadata
-   * This method can be override
+   * This method can be overridden
    */
   updateMetadata(key: ResourceKey<TKey>, callback: (data: TMetadata) => void): void {
     ResourceKeyUtils.forEach(key, key => {
@@ -543,7 +543,7 @@ export abstract class CachedResource<
 
   /**
    * Use it instead of this.metadata.delete
-   * This method can be override
+   * This method can be overridden
    */
   deleteMetadata(param: ResourceKey<TKey>): void {
     ResourceKeyUtils.forEach(param, key => {
@@ -744,7 +744,7 @@ export abstract class CachedResource<
   }
 
   /**
-   * Can be override to provide equality check for complicated keys
+   * Can be overridden to provide equality check for complicated keys
    */
   isKeyEqual(param: TKey, second: TKey): boolean {
     return param === second;
@@ -777,7 +777,7 @@ export abstract class CachedResource<
   }
 
   /**
-   * Can be override to provide static link to complicated keys
+   * Can be overridden to provide static link to complicated keys
    */
   protected getKeyRef(key: TKey): TKey {
     if (isPrimitive(key)) {
@@ -787,7 +787,7 @@ export abstract class CachedResource<
   }
 
   /**
-   * Can be override to provide static link to complicated keys
+   * Can be overridden to provide static link to complicated keys
    */
   protected getMetadataKeyRef(key: ResourceKeyFlat<TKey>): TKey {
     if (isResourceAlias(key)) {
@@ -881,7 +881,7 @@ export abstract class CachedResource<
   }
 
   /**
-   * Check if key is valid. Can be override to provide custom validation.
+   * Check if key is valid. Can be overridden to provide custom validation.
    * When key is alias checks that alias is registered.
    * When key is list checks that all keys are valid.
    * When key is primitive checks that this type of primitive is valid for current resource.
@@ -899,7 +899,7 @@ export abstract class CachedResource<
   }
 
   /**
-   * Check if key is valid. Can be override to provide custom validation.
+   * Check if key is valid. Can be overridden to provide custom validation.
    */
   protected abstract validateKey(key: TKey): boolean;
 
