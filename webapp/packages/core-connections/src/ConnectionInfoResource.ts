@@ -535,8 +535,8 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     super.dataDelete(key);
   }
 
-  protected clearData(): void {
-    super.clearData();
+  protected resetDataToDefault(): void {
+    super.resetDataToDefault();
     this.nodeIdMap.clear();
   }
 
