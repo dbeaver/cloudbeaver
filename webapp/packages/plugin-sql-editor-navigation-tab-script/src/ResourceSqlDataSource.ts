@@ -149,7 +149,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     return this.scheduler.executing;
   }
 
-  setResourceKey(resourceKey: string): void {
+  setResourceKey(resourceKey: string | undefined): void {
     if (this.state.resourceKey && this.resourceUseKeyId) {
       this.resourceManagerResource.free(toJS(this.state.resourceKey), this.resourceUseKeyId);
       this.resourceUseKeyId = null;
