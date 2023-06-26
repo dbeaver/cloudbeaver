@@ -247,7 +247,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         String catalog
     ) throws DBWebException {
         DBPDataSource dataSource = connection.getDataSource();
-        DBRProgressMonitor monitor = connection.getSession().getProgressMonitor();
         DBCExecutionContext executionContext = DBUtils.getDefaultContext(connection.getDataSource(), false);
         if (executionContext == null) {
             throw new DBWebException("No default execution context for " + connection.getName());
@@ -259,6 +258,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         structContainers.setSupportsCatalogChange(contextDefaults != null && contextDefaults.supportsCatalogChange());
         structContainers.setSupportsSchemaChange(contextDefaults != null && contextDefaults.supportsSchemaChange());
 
+        DBRProgressMonitor monitor = connection.getSession().getProgressMonitor();
         List<? extends DBSObject> nodes = this.getCatalogs(
                 monitor,
                 connection.getDataSourceContainer().getDataSource(),
@@ -273,7 +273,16 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 continue;
             }
 
-            if(node instanceof DBSCatalog) {
+            if (structContainers.getParentNode() == null) {
+                DBNModel navigatorModel = connection.getSession().getNavigatorModel();
+                DBNNode parentNode = navigatorModel.getNodeByObject(monitor, node, false).getParentNode();
+
+                if (parentNode != null) {
+                    structContainers.setParentNode(new WebNavigatorNodeInfo(connection.getSession(), parentNode));
+                }
+            }
+
+            if (node instanceof DBSCatalog) {
                 WebNavigatorNodeInfo catalogObjectInfo = this.getNodeFromObject(connection.getSession(), node);
 
                 if (catalogObjectInfo != null) {

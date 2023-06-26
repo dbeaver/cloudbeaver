@@ -45,6 +45,10 @@ export abstract class CachedMapResource<
   readonly onItemUpdate: ISyncExecutor<ResourceKeySimple<TKey>>;
   readonly onItemDelete: ISyncExecutor<ResourceKeySimple<TKey>>;
 
+  get entries(): [TKey, TValue][] {
+    return Array.from(this.data.entries());
+  }
+
   get values(): TValue[] {
     return Array.from(this.data.values());
   }
@@ -66,6 +70,9 @@ export abstract class CachedMapResource<
       replace: action,
       dataSet: action,
       dataDelete: action,
+      entries: computed<[TKey, TValue][]>({
+        equals: (a, b) => isArraysEqual(a, b, isArraysEqual),
+      }),
       values: computed<TValue[]>({
         equals: isArraysEqual,
       }),

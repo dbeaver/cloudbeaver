@@ -23,6 +23,7 @@ import { isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeySimple, 
 import { ConnectionFolderEventHandler, IConnectionFolderEvent } from '../ConnectionFolderEventHandler';
 import { Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
 import { ConnectionsManagerService } from '../ConnectionsManagerService';
+import { ContainerResource } from '../ContainerResource';
 import type { IConnectionInfoParams } from '../IConnectionsResource';
 import { getConnectionParentId } from './getConnectionParentId';
 import { getFolderNodeParents } from './getFolderNodeParents';
@@ -32,6 +33,7 @@ export class ConnectionNavNodeService extends Dependency {
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly navTreeResource: NavTreeResource,
+    private readonly containerResource: ContainerResource,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly connectionsManagerService: ConnectionsManagerService,
@@ -49,6 +51,7 @@ export class ConnectionNavNodeService extends Dependency {
     this.connectionInfoResource.onItemUpdate.addHandler(this.connectionUpdateHandler);
     this.connectionInfoResource.onItemDelete.addHandler(this.connectionRemoveHandler);
     this.connectionInfoResource.onConnectionCreate.addHandler(this.connectionCreateHandler);
+    this.navNodeInfoResource.onDataOutdated.addHandler(this.navNodeOutdateHandler.bind(this));
 
     this.navTreeResource.before(this.preloadConnectionInfo.bind(this));
 
@@ -241,5 +244,21 @@ export class ConnectionNavNodeService extends Dependency {
         throw new Error('Connection not established');
       }
     }
+  }
+
+  private navNodeOutdateHandler(key: ResourceKey<string>) {
+    const outdateKeys = this.containerResource.entries
+      .filter(([_, value]) =>
+        ResourceKeyUtils.some(
+          key,
+          key =>
+            value.parentNode?.id === key ||
+            value.catalogList.some(catalog => catalog.catalog?.id === key || catalog.schemaList.some(schema => schema?.id === key)) ||
+            value.schemaList.some(schema => schema?.id === key),
+        ),
+      )
+      .map(([key]) => key);
+
+    this.containerResource.markOutdated(resourceKeyList(outdateKeys));
   }
 }
