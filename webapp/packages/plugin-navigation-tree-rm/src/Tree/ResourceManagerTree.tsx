@@ -26,7 +26,6 @@ import {
   validateElementsTreeSettings,
 } from '@cloudbeaver/plugin-navigation-tree';
 
-import { ResourceManagerService } from '../ResourceManagerService';
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';
 import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigationTreeProjectSearchCompare';
 import { navigationTreeProjectsExpandStateGetter } from './ProjectsRenderer/navigationTreeProjectsExpandStateGetter';
@@ -35,6 +34,8 @@ import { navigationTreeResourceTypeFilter } from './ProjectsRenderer/navigationT
 import { ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm';
 import { navigationTreeResourceExpandStateGetter } from './ResourceFolderRenderer/navigationTreeResourceExpandStateGetter';
 import { ResourceManagerTreeCaptureViewContext } from './ResourceManagerTreeCaptureViewContext';
+import { transformResourceNodeInfo } from './ResourceRenderer/transformResourceNodeInfo';
+import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 const styles = css`
   CaptureView {
@@ -107,6 +108,10 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
     () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource, projectsService, projectsNavNodeService),
     [navNodeInfoResource, projectsService, projectsNavNodeService],
   );
+  const transformResourceNode = useMemo(
+    () => transformResourceNodeInfo(projectInfoResource, projectsNavNodeService, navNodeInfoResource, resourceTypeId),
+    [projectInfoResource, projectsNavNodeService, navNodeInfoResource, resourceTypeId],
+  );
   const projectFilter = useMemo(
     () =>
       navigationTreeProjectFilter(
@@ -134,6 +139,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
         getChildren={navTreeService.getChildren}
         loadChildren={navTreeService.loadNestedNodes}
         settings={settings}
+        nodeInfoTransformers={[transformResourceNode]}
         filters={[resourceTypeFilter, projectFilter]}
         renderers={[projectsRendererRenderer]}
         expandStateGetters={[projectsExpandStateGetter, resourceExpandStateGetter]}

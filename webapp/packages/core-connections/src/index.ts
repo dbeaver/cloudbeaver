@@ -14,6 +14,7 @@ export * from './NavTree/getConnectionFolderIdFromNodeId';
 export * from './NavTree/getConnectionFolderId';
 export * from './NavTree/getConnectionParentId';
 export * from './NavTree/getFolderNodeParents';
+export * from './NavTree/NAV_NODE_TYPE_CONNECTION';
 
 export * from './extensions/IConnectionProvider';
 export * from './extensions/IConnectionSetter';

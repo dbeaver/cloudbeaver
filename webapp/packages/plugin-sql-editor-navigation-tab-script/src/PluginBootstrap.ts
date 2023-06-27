@@ -10,13 +10,14 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { type INodeNavigationData, NavNodeInfoResource, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { createResourceOfType, isResourceOfType, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { isResourceOfType, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { createPath, getPathName } from '@cloudbeaver/core-utils';
 import { ACTION_SAVE, ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { getResourceKeyFromNodeId, NavResourceNodeService, ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
+import { getResourceKeyFromNodeId, NavResourceNodeService } from '@cloudbeaver/plugin-navigation-tree-rm';
+import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 import { ResourceManagerScriptsService, SaveScriptDialog, SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
 import {
   DATA_CONTEXT_SQL_EDITOR_STATE,
@@ -123,12 +124,7 @@ export class PluginBootstrap extends Bootstrap {
                 throw new Error('Project not found');
               }
 
-              const resourceType = this.projectInfoResource.getResourceType(project, SCRIPTS_TYPE_ID);
-              if (!resourceType) {
-                throw new Error('Script Resource type not found');
-              }
-
-              const scriptName = createResourceOfType(resourceType, result.name.trim());
+              const scriptName = this.projectInfoResource.getNameWithExtension(projectId, SCRIPTS_TYPE_ID, result.name.trim());
               const scriptsRootFolder = this.resourceManagerScriptsService.getRootFolder(project);
               const folderResourceKey = getResourceKeyFromNodeId(createPath(RESOURCES_NODE_PATH, projectId, scriptsRootFolder));
 

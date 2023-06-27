@@ -25,8 +25,8 @@ import {
 } from '@cloudbeaver/plugin-navigation-tree';
 
 import { getRmProjectNodeId } from '../../NavNodes/getRmProjectNodeId';
-import { ResourceManagerService } from '../../ResourceManagerService';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
+import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 const styles = css`
   TreeNodeControl {

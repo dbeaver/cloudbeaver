@@ -13,5 +13,12 @@ export const ConfirmationDialogDelete: DialogComponent<ConfirmationDialogPayload
   payload,
   ...rest
 }) {
-  return <ConfirmationDialog payload={{ ...payload, icon: '/icons/error_icon.svg', bigIcon: true }} {...rest} />;
+  const bigIcon = payload.bigIcon ?? payload.subTitle === undefined ?? true;
+  let icon = payload.icon ?? '/icons/error_icon_sm.svg';
+
+  if (bigIcon) {
+    icon = '/icons/error_icon.svg';
+  }
+
+  return <ConfirmationDialog payload={{ ...payload, icon, bigIcon }} {...rest} />;
 };

@@ -46,11 +46,11 @@ import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeav
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
 import { NavResourceNodeService } from '../NavResourceNodeService';
-import { ResourceManagerService } from '../ResourceManagerService';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../Tree/DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
 import { getResourceKeyFromNodeId } from './getResourceKeyFromNodeId';
 import { getResourceNodeId } from './getResourceNodeId';
 import { getRmProjectNodeId } from './getRmProjectNodeId';
+import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 interface ITargetNode {
   projectId: string;
