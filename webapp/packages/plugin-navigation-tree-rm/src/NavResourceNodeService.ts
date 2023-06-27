@@ -7,6 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { getPathName } from '@cloudbeaver/core-utils';
 
@@ -14,7 +15,11 @@ import { getResourceNodeId } from './NavNodes/getResourceNodeId';
 
 @injectable()
 export class NavResourceNodeService {
-  constructor(private readonly resourceManagerResource: ResourceManagerResource, private readonly commonDialogService: CommonDialogService) {}
+  constructor(
+    private readonly resourceManagerResource: ResourceManagerResource,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly localizationService: LocalizationService,
+  ) {}
 
   async move(key: string, newKey: string): Promise<string> {
     await this.resourceManagerResource.move(key, newKey);
@@ -25,8 +30,7 @@ export class NavResourceNodeService {
   async delete(key: string) {
     const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
       title: 'ui_data_delete_confirmation',
-      subTitle: getPathName(key),
-      message: 'plugin_navigation_tree_rm_delete_confirmation_message',
+      message: this.localizationService.translate('plugin_navigation_tree_rm_delete_confirmation_message', undefined, { name: getPathName(key) }),
       confirmActionText: 'ui_delete',
     });
 
