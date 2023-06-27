@@ -12,17 +12,16 @@ export const UNDERLINE_TAB_STYLES = css`
     display: flex;
   }
   Tab {
-    composes: theme-typography--body2 from global;
+    composes: theme-typography--caption from global;
     background: none;
     color: inherit;
     border: none;
     border-bottom: 2px solid var(--theme-primary);
     outline: none;
     opacity: 1;
-    height: 30px !important;
-    padding: 0 14px !important;
     border-top: none !important;
     font-weight: normal !important;
+    text-transform: uppercase;
 
     &:global([aria-selected='false']) {
       opacity: 0.8;
@@ -34,8 +33,17 @@ export const UNDERLINE_TAB_STYLES = css`
     }
 
     &:hover {
-      cursor: pointer;
       opacity: 1;
+    }
+  }
+`;
+
+export const UNDERLINE_TAB_BIG_STYLES = css`
+  Tab {
+    font-size: 14px;
+
+    & TabTitle {
+      padding: 0 16px;
     }
   }
 `;

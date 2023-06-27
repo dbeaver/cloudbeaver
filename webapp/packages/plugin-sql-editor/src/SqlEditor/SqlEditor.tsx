@@ -83,6 +83,7 @@ const tabStyles = css`
   tabs {
     composes: theme-background-secondary theme-text-on-secondary from global;
     overflow-x: hidden;
+    padding-top: 4px;
   }
   Tab {
     composes: theme-ripple theme-background-background theme-text-text-primary-on-light theme-typography--body2 from global;

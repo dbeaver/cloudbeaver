@@ -25,10 +25,6 @@ const tabsStyles = css`
     align-items: center;
     overflow: auto;
   }
-  Tab {
-    height: 36px !important;
-    font-weight: 500 !important;
-  }
   TabPanel {
     display: flex;
     flex-direction: column;

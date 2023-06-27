@@ -10,28 +10,29 @@ import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import type { NavNode } from '@cloudbeaver/core-navigation-tree';
 import { InlineEditor } from '@cloudbeaver/core-ui';
 
 const styles = css`
   InlineEditor {
     height: 22px;
 
-    & input {
+    & input,
+    & input[disabled],
+    & input[readonly] {
       padding: 1px;
     }
   }
 `;
 
 interface Props {
-  node: NavNode;
+  name: string;
   disabled?: boolean;
   onSave: (name: string) => void;
   onClose: () => void;
 }
 
-export const NavigationNodeEditor = observer<Props>(function NavigationNodeEditor({ node, disabled, onSave, onClose }) {
-  const [name, setName] = useState(node.name || '');
+export const NavigationNodeEditor = observer<Props>(function NavigationNodeEditor({ name: initialName, disabled, onSave, onClose }) {
+  const [name, setName] = useState(initialName);
 
   function save() {
     onSave(name);

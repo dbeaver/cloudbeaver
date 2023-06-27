@@ -12,15 +12,12 @@ import styled, { css } from 'reshadow';
 import { ErrorMessage, IProperty, PropertiesTable, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 import type { DataTransferOutputSettings, DataTransferProcessorInfo, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
-import { ITabData, Tab, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { ITabData, Tab, TabList, TabsState, TabTitle, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { OutputOptionsForm } from './OutputOptionsForm';
 import { ProcessorConfigureDialogFooter } from './ProcessorConfigureDialogFooter';
 
 const styles = css`
-  Tab {
-    composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
-  }
   PropertiesTable {
     flex: 1;
     overflow: hidden;
@@ -103,10 +100,10 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
           <TabsState currentTabId={currentTabId} onChange={handleTabChange}>
             <TabList aria-label="Export Settings tabs">
               <Tab tabId={SETTINGS_TABS.EXTRACTION} style={UNDERLINE_TAB_STYLES}>
-                {translate('data_transfer_format_settings')}
+                <TabTitle>{translate('data_transfer_format_settings')}</TabTitle>
               </Tab>
               <Tab tabId={SETTINGS_TABS.OUTPUT} style={UNDERLINE_TAB_STYLES}>
-                {translate('data_transfer_output_settings')}
+                <TabTitle>{translate('data_transfer_output_settings')}</TabTitle>
               </Tab>
             </TabList>
           </TabsState>
