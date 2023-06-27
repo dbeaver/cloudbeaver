@@ -11,8 +11,7 @@ import { NAV_NODE_TYPE_RM_PROJECT, RESOURCES_NODE_PATH } from '@cloudbeaver/core
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { createPath, isDefined } from '@cloudbeaver/core-utils';
 import type { IElementsTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
-
-import type { ResourceManagerService } from '../../ResourceManagerService';
+import type { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 export function navigationTreeProjectFilter(
   projectsNavNodeService: ProjectsNavNodeService,
