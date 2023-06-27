@@ -25,23 +25,23 @@ import java.nio.file.Path;
 
 public interface RMFileOperationHandler {
 
-    void projectOpened(@NotNull Path projectPath) throws DBException;
+    void projectOpened(@NotNull String projectId) throws DBException;
 
     /**
      * Executed before reading file
      */
-    void beforeFileRead(@NotNull Path projectPath, @NotNull Path filePath) throws DBException;
+    void beforeFileRead(@NotNull String projectId, @NotNull Path filePath) throws DBException;
 
     /**
      * Executed before file modification
      */
-    void beforeFileChange(@NotNull Path projectPath, @NotNull Path filePath) throws DBException;
+    void beforeFileChange(@NotNull String projectId, @NotNull Path filePath) throws DBException;
 
     /**
      * Executed after file modification
      */
     void afterFileChange(
-        @NotNull Path projectPath,
+        @NotNull String projectId,
         @NotNull Path filePath,
         @Nullable SMCredentials smCredentials
     ) throws DBException;

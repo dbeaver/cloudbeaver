@@ -54,8 +54,10 @@ import org.jkiss.utils.Pair;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -72,6 +74,8 @@ public class LocalResourceController implements RMAdminController, RMController 
     private static final String FILE_REGEX = "(?U)[\\w.$()@/\\\\ -]+";
     private static final String PROJECT_REGEX = "(?U)[\\w.$()@ -]+"; // slash not allowed in project name
     private static final String PROJECT_CONF_FOLDER = ".configuration";
+    private static final String BACKUP_FOLDER = "projects_backup";
+    private static final DateTimeFormatter BACKUP_SUFFIX = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
     public static final String DEFAULT_CHANGE_ID = "0";
 
     private final DBPWorkspace workspace;
@@ -924,29 +928,26 @@ public class LocalResourceController implements RMAdminController, RMController 
     }
 
     private <T> T doProjectOperation(String projectId, RMFileOperation<T> operation) throws DBException {
-        var projectPath = getProjectPath(projectId);
         for (RMFileOperationHandler fileHandler : fileHandlers) {
-            fileHandler.projectOpened(projectPath);
+            fileHandler.projectOpened(projectId);
         }
         return operation.doOperation();
     }
 
     private <T> T doFileReadOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
-        var projectPath = getProjectPath(projectId);
         for (RMFileOperationHandler fileHandler : fileHandlers) {
-            fileHandler.beforeFileRead(projectPath, file);
+            fileHandler.beforeFileRead(projectId, file);
         }
         return operation.doOperation();
     }
 
     private <T> T doFileWriteOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
-        var projectPath = getProjectPath(projectId);
         for (RMFileOperationHandler fileHandler : fileHandlers) {
-            fileHandler.beforeFileChange(projectPath, file);
+            fileHandler.beforeFileChange(projectId, file);
         }
         var result = operation.doOperation();
         for (RMFileOperationHandler fileHandler : fileHandlers) {
-            fileHandler.afterFileChange(projectPath, file, credentialsProvider.getActiveUserCredentials());
+            fileHandler.afterFileChange(projectId, file, credentialsProvider.getActiveUserCredentials());
         }
         return result;
     }
@@ -1128,6 +1129,67 @@ public class LocalResourceController implements RMAdminController, RMController 
             } catch (IOException e) {
                 throw new DBException("Error reading project configuration '" + configurationPath + "'", e);
             }
+        });
+    }
+
+    @Override
+    public String backupProject(@NotNull String projectId) throws DBException {
+        try (var projectLock = lockController.lockProject(projectId, "backup")) {
+            // use global workspace for backup
+            Path backupFolder = DBWorkbench.getPlatform().getWorkspace().getMetadataFolder().resolve(BACKUP_FOLDER);
+            Path projectPath = getProjectPath(projectId);
+            Path projectBackupPath = backupFolder.resolve(projectPath.getFileName() + "_" + BACKUP_SUFFIX.format(LocalDateTime.now()));
+            try {
+                Files.createDirectories(projectBackupPath);
+                var projectName = projectPath.getFileName();
+                log.info("Create backup for project: " + projectName);
+                Files.move(projectPath, projectBackupPath, StandardCopyOption.REPLACE_EXISTING);
+                log.info(String.format("Backup for project %s stored at %s", projectName, projectBackupPath));
+                return projectBackupPath.relativize(projectBackupPath).toString();
+            } catch (Exception e) {
+                throw new DBException("Failed to backup project", e);
+            }
+        }
+    }
+
+
+    @Override
+    public void restoreBackup(@NotNull String projectId, @NotNull String backupId) throws DBException {
+        try (var projectLock = lockController.lockProject(projectId, "restoreFromBackup")) {
+            Path backupFolder = DBWorkbench.getPlatform().getWorkspace().getMetadataFolder().resolve(BACKUP_FOLDER);
+            Path projectBackupPath = backupFolder.resolve(backupId);
+
+            log.info(String.format(
+                "Copy all file from backup [%s] to the project [%s]",
+                projectBackupPath,
+                projectId
+            ));
+            copyFilesRecursive(projectBackupPath, getProjectPath(projectId));
+
+        } catch (Exception e) {
+            throw new DBException("Failed to restore project from backup", e);
+        }
+    }
+
+    private void copyFilesRecursive(@NotNull Path from, @NotNull Path to) throws IOException {
+        Set<String> skippedFiles = Set.of("", from.getFileName().toString());
+        Files.walkFileTree(from, EnumSet.noneOf(FileVisitOption.class), 1, (UniversalFileVisitor<Path>) (filePath, attrs) -> {
+            var relativePath = from.relativize(filePath);
+            if (skippedFiles.contains(relativePath.getFileName().toString())) {
+                return FileVisitResult.CONTINUE;
+            }
+            var targetPath = to.resolve(relativePath);
+            if (Files.isDirectory(filePath)) {
+                // empty resource folders?
+                if (Files.notExists(targetPath)) {
+                    Files.createDirectories(targetPath);
+                }
+                copyFilesRecursive(filePath, targetPath);
+            } else {
+                Files.copy(filePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            return FileVisitResult.CONTINUE;
         });
     }
 

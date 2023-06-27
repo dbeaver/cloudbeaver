@@ -64,7 +64,7 @@ public class RMUtils {
      * @return path to the project based on the name of projects and prefixes that it contains
      */
     @NotNull
-    public static Path getProjectPathByName(@NotNull String projectId) throws DBException {
+    public static Path getProjectPathById(@NotNull String projectId) throws DBException {
         int divPos = projectId.indexOf("_");
         if (divPos <= 0) {
             throw new DBException("Bad project ID");
