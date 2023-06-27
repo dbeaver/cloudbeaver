@@ -22,6 +22,7 @@ import { SqlResultTabsService } from './SqlResultTabsService';
 const styles = css`
   Tab {
     composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
+    height: 38px !important;
   }
   TabIcon {
     composes: theme-text-surface from global;

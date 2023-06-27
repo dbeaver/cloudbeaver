@@ -29,7 +29,7 @@ const tabsStyles = css`
 
 const formStyles = css`
   box {
-    composes: theme-background-surface theme-text-on-surface from global;
+    composes: theme-background-secondary theme-text-on-surface from global;
     width: 100%;
     display: flex;
     flex-direction: column;
