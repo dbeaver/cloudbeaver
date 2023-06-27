@@ -22,6 +22,7 @@ import { TabHandlerTab } from './Tabs/TabHandlerTab';
 const styles = css`
   Tab {
     composes: theme-ripple theme-background-background theme-text-text-primary-on-light from global;
+    height: 38px !important;
   }
   tabs {
     composes: theme-background-secondary theme-text-on-secondary from global;

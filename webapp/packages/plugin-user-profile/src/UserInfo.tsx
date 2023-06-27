@@ -49,11 +49,6 @@ const styles = css`
     line-height: initial;
     margin-left: 8px;
   }
-  @media only screen and (max-width: 1200px) {
-    user {
-      padding: 0 8px;
-    }
-  }
 `;
 
 interface Props {
