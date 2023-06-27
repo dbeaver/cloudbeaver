@@ -13,6 +13,7 @@ import { getComputed, TreeNode, useObjectRef, useStyles } from '@cloudbeaver/cor
 
 import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
+import { transformNodeInfo } from '../transformNodeInfo';
 import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
 
 export const NavigationNodeDragged: NavigationNodeComponent = observer(function NavigationNode({ node, className, control: externalControl, style }) {
@@ -22,11 +23,12 @@ export const NavigationNodeDragged: NavigationNodeComponent = observer(function 
   const control = getComputed(() => contextRef.context?.control);
 
   const Control = control || externalControl || NavigationNodeControlLoader;
+  const nodeInfo = transformNodeInfo(node, contextRef.context?.tree.nodeInfoTransformers ?? []);
 
   return styled(useStyles(style))(
     <TreeNode externalExpanded={false} className={className} leaf>
       {/* <DNDPreview data={dndData} src="/icons/empty.svg" /> */}
-      <Control node={node} dndPlaceholder />
+      <Control nodeInfo={nodeInfo} node={node} dndPlaceholder />
     </TreeNode>,
   );
 });

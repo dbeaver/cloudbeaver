@@ -24,8 +24,8 @@ import {
   useNode,
 } from '@cloudbeaver/plugin-navigation-tree';
 
-import type { ResourceManagerService } from '../../ResourceManagerService';
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
+import type { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 const nestedStyles = css`
   TreeNode {
