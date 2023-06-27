@@ -65,13 +65,13 @@ import java.util.stream.Stream;
 /**
  * Resource manager API
  */
-public class LocalResourceController implements RMController {
+public class LocalResourceController implements RMAdminController, RMController {
 
     private static final Log log = Log.getLog(LocalResourceController.class);
 
     private static final String FILE_REGEX = "(?U)[\\w.$()@/\\\\ -]+";
     private static final String PROJECT_REGEX = "(?U)[\\w.$()@ -]+"; // slash not allowed in project name
-
+    private static final String PROJECT_CONF_FOLDER = ".configuration";
     public static final String DEFAULT_CHANGE_ID = "0";
 
     private final DBPWorkspace workspace;
@@ -765,7 +765,7 @@ public class LocalResourceController implements RMController {
                 try {
                     Files.write(targetPath, data);
                 } catch (IOException e) {
-                    throw new DBException("Error reading resource '" + resourcePath + "'", e);
+                    throw new DBException("Error writing resource '" + resourcePath + "'", e);
                 }
                 return null;
             });
@@ -1092,6 +1092,43 @@ public class LocalResourceController implements RMController {
         Supplier<SMController> smControllerSupplier
     ) {
         return new Builder(workspace, credentialsProvider, smControllerSupplier);
+    }
+
+    @Override
+    public void saveProjectConfiguration(@NotNull String projectId, @NotNull String configurationPath, @NotNull String configuration)
+        throws DBException {
+        try (var projectLock = lockController.lockProject(projectId, "saveProjectConfiguration")) {
+            DBPProject project = getWebProject(projectId, false);
+            Path metaFolder = project.getMetadataFolder(true);
+            doFileWriteOperation(projectId, metaFolder, () -> {
+                Path targetConfigurationPath = metaFolder.resolve(PROJECT_CONF_FOLDER).resolve(configurationPath);
+                createFolder(targetConfigurationPath.getParent());
+                try {
+                    Files.writeString(targetConfigurationPath, configuration);
+                } catch (IOException e) {
+                    throw new DBException("Error writing project configuration '" + configurationPath + "'", e);
+                }
+                return null;
+            });
+        }
+    }
+
+    @Nullable
+    @Override
+    public String readProjectConfiguration(@NotNull String projectId, @NotNull String configurationPath) throws DBException {
+        DBPProject project = getWebProject(projectId, false);
+        Path metaFolder = project.getMetadataFolder(false);
+        return doFileReadOperation(projectId, metaFolder, () -> {
+            Path targetConfigurationPath = metaFolder.resolve(PROJECT_CONF_FOLDER).resolve(configurationPath);
+            if (Files.notExists(targetConfigurationPath)) {
+                return null;
+            }
+            try {
+                return Files.readString(targetConfigurationPath);
+            } catch (IOException e) {
+                throw new DBException("Error reading project configuration '" + configurationPath + "'", e);
+            }
+        });
     }
 
     public static final class Builder {

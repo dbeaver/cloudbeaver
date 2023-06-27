@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.rm.RMAdminController;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
@@ -53,7 +54,8 @@ public interface WebApplication extends DBPApplication {
     WebProjectImpl createProjectImpl(
         @NotNull WebSession webSession,
         @NotNull RMProject project,
-        @NotNull DataSourceFilter dataSourceFilter);
+        @NotNull DataSourceFilter dataSourceFilter
+    );
 
     SMController createSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
@@ -61,8 +63,15 @@ public interface WebApplication extends DBPApplication {
 
     DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
-    RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
-                                          @NotNull DBPWorkspace workspace) throws DBException;
+    RMController createResourceController(
+        @NotNull SMCredentialsProvider credentialsProvider,
+        @NotNull DBPWorkspace workspace
+    ) throws DBException;
+
+    RMAdminController createAdminResourceController(
+        @NotNull SMCredentialsProvider credentialsProvider,
+        @NotNull DBPWorkspace workspace
+    ) throws DBException;
 
     DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider);
 
