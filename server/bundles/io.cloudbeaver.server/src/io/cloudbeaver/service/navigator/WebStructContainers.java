@@ -35,6 +35,14 @@ public class WebStructContainers {
     private boolean supportsCatalogChange = false;
     private boolean supportsSchemaChange = false;
 
+    public Boolean getSupportsCatalogChange() {
+        return supportsCatalogChange;
+    }
+
+    public Boolean getSupportsSchemaChange() {
+        return supportsSchemaChange;
+    }
+
     public WebNavigatorNodeInfo getParentNode() {
         return parentNode;
     }
