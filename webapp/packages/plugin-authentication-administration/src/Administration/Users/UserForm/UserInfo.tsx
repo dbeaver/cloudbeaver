@@ -32,6 +32,10 @@ import type { IUserFormProps } from './UserFormService';
 const styles = css`
   Group {
     height: 100%;
+
+    & > Group {
+      height: initial;
+    }
   }
 `;
 
@@ -114,23 +118,25 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
           {translate('authentication_user_enabled')}
         </FieldCheckbox>
         <GroupTitle>{translate('authentication_user_team')}</GroupTitle>
-        {controller.teams.map(team => {
-          const label = `${team.teamId}${team.teamName && team.teamName !== team.teamId ? ' (' + team.teamName + ')' : ''}`;
-          const tooltip = `${label}${team.description ? '\n' + team.description : ''}`;
-          return (
-            <FieldCheckbox
-              key={team.teamId}
-              id={`${controller.user.userId}_${team.teamId}`}
-              title={tooltip}
-              name="team"
-              checked={!!controller.credentials.teams.get(team.teamId)}
-              disabled={controller.isSaving}
-              onChange={checked => handleTeamChange(team.teamId, checked)}
-            >
-              {label}
-            </FieldCheckbox>
-          );
-        })}
+        <Group box="no-overflow" gap dense>
+          {controller.teams.map(team => {
+            const label = `${team.teamId}${team.teamName && team.teamName !== team.teamId ? ' (' + team.teamName + ')' : ''}`;
+            const tooltip = `${label}${team.description ? '\n' + team.description : ''}`;
+            return (
+              <FieldCheckbox
+                key={team.teamId}
+                id={`${controller.user.userId}_${team.teamId}`}
+                title={tooltip}
+                name="team"
+                checked={!!controller.credentials.teams.get(team.teamId)}
+                disabled={controller.isSaving}
+                onChange={checked => handleTeamChange(team.teamId, checked)}
+              >
+                {label}
+              </FieldCheckbox>
+            );
+          })}
+        </Group>
       </Group>
       <Loader state={userMetaParameters} inline>
         {() =>

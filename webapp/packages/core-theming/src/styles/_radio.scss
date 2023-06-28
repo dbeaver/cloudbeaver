@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import "@material/radio/mixins";
+@import '@material/radio/mixins';
 
 @mixin radio-core-styles($query: mdc-feature-all()) {
   @include mdc-radio-core-styles;

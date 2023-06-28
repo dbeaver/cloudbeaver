@@ -79,7 +79,7 @@ const viewerStyles = css`
     }
   }
   TablePresentationBar {
-    margin-top: 32px;
+    margin-top: 36px;
     &:first-child {
       margin-right: 4px;
     }

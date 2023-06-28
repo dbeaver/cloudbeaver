@@ -19,7 +19,6 @@ import {
   Loader,
   ToolsAction,
   ToolsPanel,
-  Translate,
   useResource,
   useStyles,
   useTranslate,

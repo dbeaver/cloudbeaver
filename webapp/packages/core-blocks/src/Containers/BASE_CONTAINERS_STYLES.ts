@@ -49,6 +49,10 @@ export const BASE_CONTAINERS_STYLES = css`
       align-items: flex-start;
     }
 
+    &[flexEnd] {
+      align-items: flex-end;
+    }
+
     &[center] {
       align-items: center;
       justify-content: center;
@@ -155,6 +159,10 @@ export const BASE_CONTAINERS_STYLES = css`
 
     & > :global(*) {
       flex: 1 1 100%;
+    }
+
+    &[noWrap] {
+      flex-wrap: nowrap;
     }
 
     &[keepSize],

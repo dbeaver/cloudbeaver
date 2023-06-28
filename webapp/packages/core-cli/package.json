@@ -7,6 +7,7 @@
   "files": [
     "/package.json",
     "/tsconfig.json",
+    "/global.d.ts",
     "/src",
     "/configs",
     "/bin",
@@ -71,8 +72,6 @@
   },
   "peerDependencies": {
     "@types/jest": "~29.x.x",
-    "@types/react": "~18.x.x",
-    "@types/react-dom": "~18.x.x",
     "babel-jest": "~29.x.x",
     "jest": "~29.x.x",
     "jest-environment-jsdom": "~29.x.x"
