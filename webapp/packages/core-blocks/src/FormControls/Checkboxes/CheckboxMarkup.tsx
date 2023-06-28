@@ -10,7 +10,10 @@ import styled, { css } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { s } from '../../s';
+import { useS } from '../../useS';
 import { useStyles } from '../../useStyles';
+import CheckboxMarkupStyles from './CheckboxMarkup.m.css';
 
 export type CheckboxMod = 'primary' | 'surface' | 'small';
 
@@ -95,6 +98,8 @@ interface ICheckboxMarkupProps extends Omit<React.InputHTMLAttributes<HTMLInputE
   style?: ComponentStyle;
 }
 
+export { CheckboxMarkupStyles };
+
 export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxMarkup({
   id,
   label,
@@ -107,6 +112,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
   readOnly,
   ...rest
 }) {
+  const styles = useS(CheckboxMarkupStyles);
   const checkboxRef = useRef<HTMLInputElement>(null);
 
   useLayoutEffect(() => {
@@ -125,7 +131,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
     ),
   )(
     <checkbox-container className={className} title={title}>
-      <checkbox>
+      <checkbox className={s(styles, { checkbox: true })}>
         <checkbox-input ref={checkboxRef} as="input" type="checkbox" {...rest} disabled={rest.disabled || readOnly} id={id || rest.name} />
         <checkbox-background>
           <checkbox-checkmark as="svg" viewBox="0 0 24 24">

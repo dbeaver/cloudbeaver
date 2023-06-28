@@ -7,6 +7,7 @@
  */
 
 export interface ILayoutSizeProps {
+  noWrap?: boolean;
   keepSize?: boolean;
   tiny?: boolean;
   small?: boolean;

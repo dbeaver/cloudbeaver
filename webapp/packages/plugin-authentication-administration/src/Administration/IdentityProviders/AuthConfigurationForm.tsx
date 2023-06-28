@@ -21,7 +21,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
-import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { AuthConfigurationFormService } from './AuthConfigurationFormService';
 import { authConfigurationContext } from './Contexts/authConfigurationContext';
@@ -32,11 +32,6 @@ const tabsStyles = css`
     position: relative;
     flex-shrink: 0;
     align-items: center;
-  }
-  Tab {
-    height: 46px !important;
-    text-transform: uppercase;
-    font-weight: 500 !important;
   }
 `;
 
@@ -111,7 +106,7 @@ interface Props {
 export const AuthConfigurationForm = observer<Props>(function AuthConfigurationForm({ state, onCancel, onSave = () => {}, className }) {
   const translate = useTranslate();
   const props = useObjectRef({ onSave });
-  const style = useStyles(BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES);
+  const style = useStyles(BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES);
   const styles = useStyles(style, BASE_CONTAINERS_STYLES, topBarStyles, formStyles);
   const service = useService(AuthConfigurationFormService);
 

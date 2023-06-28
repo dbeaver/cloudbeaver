@@ -17,7 +17,7 @@ const viewerStyles = css`
     display: flex;
     width: 100%;
     flex: 1 1 auto;
-    padding-top: 16px; /* TODO: must be refactored */
+    padding-top: 16px;
   }
 `;
 
