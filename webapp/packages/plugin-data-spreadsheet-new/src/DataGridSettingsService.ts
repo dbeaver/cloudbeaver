@@ -21,7 +21,7 @@ export class DataGridSettingsService {
   readonly deprecatedSettings: PluginSettings<typeof defaultSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('data-spreadsheet', defaultSettings);
+    this.settings = this.pluginManagerService.createSettings('data-spreadsheet', 'plugin', defaultSettings);
     this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('plugin_data_spreadsheet_new', defaultSettings);
   }
 }

@@ -71,8 +71,8 @@ export class LocalizationService extends Bootstrap {
 
     this.settings = getDefaultLocalizationSettings();
     this.onChange = new SyncExecutor();
-    this.pluginSettings = this.pluginManagerService.getCoreSettings('localization', defaultThemeSettings);
-    this.deprecatedPluginSettings = this.pluginManagerService.getCoreSettings('user', defaultThemeSettings);
+    this.pluginSettings = this.pluginManagerService.createSettings('localization', 'core', defaultThemeSettings);
+    this.deprecatedPluginSettings = this.pluginManagerService.createSettings('user', 'core', defaultThemeSettings);
 
     sessionResource.onDataUpdate.addHandler(this.syncLanguage.bind(this));
     this.onChange.addHandler(key => {

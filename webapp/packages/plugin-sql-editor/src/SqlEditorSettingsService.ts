@@ -22,7 +22,7 @@ export class SqlEditorSettingsService {
   readonly deprecatedSettings: PluginSettings<SqlEditorSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('sql-editor', defaultSettings);
+    this.settings = this.pluginManagerService.createSettings('sql-editor', 'plugin', defaultSettings);
     this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('core.app.sqlEditor', defaultSettings);
   }
 }

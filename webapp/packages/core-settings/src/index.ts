@@ -1,4 +1,5 @@
 export { manifest as coreSettingsManifest } from './manifest';
+export * from './createSettingsGroup';
 export * from './SettingsService';
 export * from './LocalStorageSaveService';
 export * from './SettingsManagerService';

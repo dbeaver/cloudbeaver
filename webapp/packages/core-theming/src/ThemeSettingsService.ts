@@ -7,7 +7,9 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
+import { SettingsManagerService } from '@cloudbeaver/core-settings';
 
+import { settings, THEME_SETTINGS_GROUP } from './THEME_SETTINGS_GROUP';
 import { themes } from './themes';
 
 export interface IThemeSettings {
@@ -24,8 +26,11 @@ export class ThemeSettingsService {
   /** @deprecated Use settings instead, will be removed in 23.0.0 */
   readonly deprecatedSettings: PluginSettings<IThemeSettings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getCoreSettings('theming', defaultThemeSettings);
-    this.deprecatedSettings = this.pluginManagerService.getCoreSettings('user', defaultThemeSettings);
+  constructor(private readonly pluginManagerService: PluginManagerService, settingsManagerService: SettingsManagerService) {
+    this.settings = this.pluginManagerService.createSettings('theming', 'core', defaultThemeSettings);
+    this.deprecatedSettings = this.pluginManagerService.createSettings('user', 'core', defaultThemeSettings);
+
+    settingsManagerService.addGroup(THEME_SETTINGS_GROUP);
+    settingsManagerService.addSettings(settings.scopeType, settings.scope, settings.settingsData);
   }
 }

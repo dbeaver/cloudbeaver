@@ -8,8 +8,9 @@
 import { observer } from 'mobx-react-lite';
 
 import { TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
+import type { FormFieldType } from '@cloudbeaver/core-settings';
 
-import { type FormFieldType, SettingsInfoFormField } from './SettingsInfoFormField';
+import { SettingsInfoFormField } from './SettingsInfoFormField';
 
 interface SettingsProps {
   key: string;

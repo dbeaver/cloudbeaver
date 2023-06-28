@@ -60,3 +60,4 @@ export * from './DataViewerDataChangeConfirmationService';
 export * from './useDataModel';
 export * from './ValuePanelPresentation/BooleanValue/isBooleanValuePresentationAvailable';
 export * from './DataViewerSettingsService';
+export * from './DATA_EDITOR_SETTINGS_GROUP';

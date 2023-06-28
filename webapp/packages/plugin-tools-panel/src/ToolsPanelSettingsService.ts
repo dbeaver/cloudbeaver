@@ -19,6 +19,6 @@ export class ToolsPanelSettingsService {
   readonly settings: PluginSettings<Settings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('tools-panel', settings);
+    this.settings = this.pluginManagerService.createSettings('tools-panel', 'plugin', settings);
   }
 }

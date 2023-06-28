@@ -9,12 +9,11 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, GroupTitle, useStyles } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 import { SettingsManagerService } from '@cloudbeaver/core-settings';
 
-import { SettingsInfoForm } from './SettingsInfoForm';
+import { SettingsGroup } from './SettingsGroup';
 
 const styles = css`
   ColoredContainer {
@@ -22,50 +21,19 @@ const styles = css`
   }
 `;
 
-export const SettingsPanelForm: React.FC = observer(function SettingsPanelForm() {
-  const settingsManagerService = useService(SettingsManagerService);
-  const pluginManagerService = useService(PluginManagerService);
+export const SettingsPanelForm = observer(function SettingsPanelForm() {
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
 
+  const settingsManagerService = useService(SettingsManagerService);
   const groups = Array.from(settingsManagerService.groups);
-  const settings = settingsManagerService.settings;
-
-  function getValue(key: string, scopeType: string, scope?: string) {
-    let settings!: PluginSettings<any>;
-
-    if (scope) {
-      if (scopeType === 'plugin') {
-        settings = pluginManagerService.getPluginSettings(scope);
-      }
-
-      if (scopeType === 'core') {
-        settings = pluginManagerService.getCoreSettings(scope);
-      }
-    }
-
-    return settings.getValue(key);
-  }
 
   return styled(style)(
     <ColoredContainer gap overflow parent>
-      <Group medium gap vertical overflow>
-        {groups.map(([_, { id: groupId, name }]) => (
-          <>
-            <GroupTitle keepSize large>
-              {name}
-            </GroupTitle>
-            <SettingsInfoForm
-              fields={settings
-                .filter(settingsItem => settingsItem.groupId === groupId)
-                .map(settingsItem => ({
-                  ...settingsItem,
-                  value: getValue(settingsItem.key, settingsItem.scopeType, settingsItem.scope),
-                }))}
-              readOnly
-            />
-          </>
+      <Container medium gap vertical overflow>
+        {groups.map(([_, group]) => (
+          <SettingsGroup key={group.id} group={group} />
         ))}
-      </Group>
+      </Container>
     </ColoredContainer>,
   );
 });

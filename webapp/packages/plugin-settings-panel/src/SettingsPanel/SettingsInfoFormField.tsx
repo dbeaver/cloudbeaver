@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { Combobox, FieldCheckbox, InputField, Textarea } from '@cloudbeaver/core-blocks';
+import { FormFieldType } from '@cloudbeaver/core-settings';
 
 export interface SettingsInfoFormFieldProps {
   id: string;
@@ -21,13 +22,6 @@ export interface SettingsInfoFormFieldProps {
   readOnly?: boolean;
   onSelect?: (value: any) => void;
   onChange?: (value: any) => void;
-}
-
-export enum FormFieldType {
-  Checkbox,
-  Combobox,
-  Textarea,
-  Input,
 }
 
 export const SettingsInfoFormField = observer<SettingsInfoFormFieldProps>(function SettingsInfoFormField({
@@ -58,6 +52,7 @@ export const SettingsInfoFormField = observer<SettingsInfoFormFieldProps>(functi
         items={options}
         keySelector={value => value}
         valueSelector={value => value}
+        value={value}
         title={description}
         disabled={disabled}
         readOnly={readOnly}

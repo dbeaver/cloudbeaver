@@ -7,6 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { ProductManagerService } from '@cloudbeaver/core-product';
+import type { SettingsScopeType } from '@cloudbeaver/core-settings';
 
 import { PluginSettings } from './PluginSettings';
 
@@ -17,33 +18,21 @@ export class PluginManagerService {
     this.store = new Map();
   }
 
-  getCoreSettings<T>(scope: string, defaults?: T): PluginSettings<any> {
-    const coreSettings = this.store.get('core.' + scope);
-    if (coreSettings !== undefined) {
-      return coreSettings;
-    } else {
-      const coreSettings = new PluginSettings(this.productManagerService.settings, 'core.' + scope, defaults);
-      this.store.set('core.' + scope, coreSettings);
+  createSettings<T>(scope: string, scopeType: SettingsScopeType, defaults: T) {
+    const key = scopeType + '.' + scope;
+    const settings = new PluginSettings(this.productManagerService.settings, key, defaults);
 
-      return coreSettings;
-    }
+    this.store.set(key, settings);
+    return settings;
   }
 
-  getPluginSettings<T>(scope: string, defaults?: T): PluginSettings<any> {
-    const pluginSettings = this.store.get('plugin.' + scope);
-    if (pluginSettings !== undefined) {
-      return pluginSettings;
-    } else {
-      const pluginSettings = new PluginSettings(this.productManagerService.settings, 'plugin.' + scope, defaults);
-      this.store.set('plugin.' + scope, pluginSettings);
-
-      return pluginSettings;
-    }
+  getSettings(scope: string, scopeType: SettingsScopeType): PluginSettings<any> | undefined {
+    return this.store.get(scopeType + '.' + scope);
   }
 
   /**
-   * Please use getPluginSettings instead
-   * @deprecated Please use getPluginSettings instead, will be removed in 23.0.0
+   * Please use createSettings instead
+   * @deprecated Please use createSettings instead, will be removed in 23.0.0
    */
   getDeprecatedPluginSettings<T>(scope: string, defaults: T) {
     return new PluginSettings(this.productManagerService.settings, scope, defaults);

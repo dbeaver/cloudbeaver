@@ -7,11 +7,8 @@
  */
 import { uuid } from '@cloudbeaver/core-utils';
 
-export interface SettingsGroup {
-  id: string;
-  name: string;
-}
+import type { SettingsGroupType } from './SettingsManagerService';
 
-export function createSettingsGroup(name: string): SettingsGroup {
+export function createSettingsGroup(name: string): SettingsGroupType {
   return { name, id: uuid() };
 }

@@ -7,6 +7,9 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
+import { SettingsManagerService } from '@cloudbeaver/core-settings';
+
+import { AUTH_SETTINGS_GROUP, settings } from './AUTH_SETTINGS_GROUP';
 
 const defaultSettings = {
   baseAuthProvider: undefined as undefined | string,
@@ -20,7 +23,10 @@ export type AuthSettings = typeof defaultSettings;
 export class AuthSettingsService {
   readonly settings: PluginSettings<AuthSettings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getCoreSettings('authentication', defaultSettings);
+  constructor(private readonly pluginManagerService: PluginManagerService, settingsManagerService: SettingsManagerService) {
+    this.settings = this.pluginManagerService.createSettings('authentication', 'core', defaultSettings);
+
+    settingsManagerService.addGroup(AUTH_SETTINGS_GROUP);
+    settingsManagerService.addSettings(settings.scopeType, settings.scope, settings.settingsData);
   }
 }

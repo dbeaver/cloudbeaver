@@ -19,7 +19,7 @@ export class AdministrationSettingsService {
   readonly settings: PluginSettings<AdministrationSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getCoreSettings('administration', defaultSettings);
+    this.settings = this.pluginManagerService.createSettings('administration', 'core', defaultSettings);
   }
 
   isBase(feature: string): boolean {
