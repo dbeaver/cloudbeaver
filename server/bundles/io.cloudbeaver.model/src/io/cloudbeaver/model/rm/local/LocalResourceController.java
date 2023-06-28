@@ -1122,17 +1122,15 @@ public class LocalResourceController implements RMAdminController, RMController 
     public String readProjectConfiguration(@NotNull String projectId, @NotNull String configurationPath) throws DBException {
         DBPProject project = getWebProject(projectId, false);
         Path metaFolder = project.getMetadataFolder(false);
-        return doFileReadOperation(projectId, metaFolder, () -> {
-            Path targetConfigurationPath = metaFolder.resolve(PROJECT_CONF_FOLDER).resolve(configurationPath);
-            if (Files.notExists(targetConfigurationPath)) {
-                return null;
-            }
-            try {
-                return Files.readString(targetConfigurationPath);
-            } catch (IOException e) {
-                throw new DBException("Error reading project configuration '" + configurationPath + "'", e);
-            }
-        });
+        Path targetConfigurationPath = metaFolder.resolve(PROJECT_CONF_FOLDER).resolve(configurationPath);
+        if (Files.notExists(targetConfigurationPath)) {
+            return null;
+        }
+        try {
+            return Files.readString(targetConfigurationPath);
+        } catch (IOException e) {
+            throw new DBException("Error reading project configuration '" + configurationPath + "'", e);
+        }
     }
 
     @Override
