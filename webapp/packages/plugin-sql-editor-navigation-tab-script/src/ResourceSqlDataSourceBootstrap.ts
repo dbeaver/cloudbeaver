@@ -95,6 +95,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
           this.projectInfoResource,
           this.connectionInfoResource,
           this.resourceManagerResource,
+          this.sqlEditorService,
           this.createState(editorId),
         );
 

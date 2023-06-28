@@ -1,4 +1,5 @@
 export default [
+  ['plugin_sql_editor_navigation_tab_resource_save_script_title', 'Save as script'],
   ['plugin_sql_editor_navigation_tab_script_state_renaming', 'Renaming script...'],
   ['plugin_sql_editor_navigation_tab_script_state_reading', 'Reading script...'],
   ['plugin_sql_editor_navigation_tab_script_state_saving', 'Saving script...'],
