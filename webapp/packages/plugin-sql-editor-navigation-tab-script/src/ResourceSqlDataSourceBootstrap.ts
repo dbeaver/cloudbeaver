@@ -18,7 +18,8 @@ import { CachedMapAllKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils }
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { throttle } from '@cloudbeaver/core-utils';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { NavResourceNodeService, ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
+import { NavResourceNodeService } from '@cloudbeaver/plugin-navigation-tree-rm';
+import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 import { ResourceManagerScriptsService } from '@cloudbeaver/plugin-resource-manager-scripts';
 import { getSqlEditorName, SqlDataSourceService, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
@@ -91,10 +92,10 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       key: ResourceSqlDataSource.key,
       getDataSource: (editorId, options) => {
         const dataSource = new ResourceSqlDataSource(
+          this.projectInfoResource,
           this.connectionInfoResource,
           this.resourceManagerResource,
-          this.sqlEditorService,
-          this.createState(editorId)
+          this.createState(editorId),
         );
 
         if (options?.executionContext) {
@@ -209,12 +210,15 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       return;
     }
 
-    const dataSource = this.sqlDataSourceService.dataSources
+    const dataSources = this.sqlDataSourceService.dataSources
       .filter(([, dataSource]) => dataSource instanceof ResourceSqlDataSource)
-      .map(([, dataSource]) => dataSource as ResourceSqlDataSource)
-      .find(ds => ds.resourceKey && ds.resourceKey === data.from);
+      .map(([, dataSource]) => dataSource as ResourceSqlDataSource);
 
-    dataSource?.setResourceKey(data.to);
+    for (const dataSource of dataSources) {
+      if (dataSource.resourceKey && dataSource.resourceKey.startsWith(data.from)) {
+        dataSource?.setResourceKey(data.to + dataSource.resourceKey.slice(data.from.length));
+      }
+    }
   }
 
   private resourceDeleteHandler(keyObj: ResourceKeySimple<string>) {
@@ -224,14 +228,20 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
     const tabs: string[] = [];
 
+    const dataSources = this.sqlDataSourceService.dataSources
+      .filter(([, dataSource]) => dataSource instanceof ResourceSqlDataSource)
+      .map(([, dataSource]) => dataSource as ResourceSqlDataSource);
+
     ResourceKeyUtils.forEach(keyObj, key => {
-      const tab = this.sqlEditorTabResourceService.getResourceTab(key);
+      for (const dataSource of dataSources) {
+        if (dataSource.resourceKey && dataSource.resourceKey.startsWith(key)) {
+          const tab = this.sqlEditorTabResourceService.getResourceTab(dataSource.resourceKey);
 
-      if (tab) {
-        const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId) as ResourceSqlDataSource;
-
-        dataSource?.setResourceKey(undefined); // prevent deleted resource refresh
-        tabs.push(tab.id);
+          if (tab) {
+            tabs.push(tab.id);
+          }
+          dataSource.setResourceKey(undefined); // prevent deleted resource refresh
+        }
       }
     });
 

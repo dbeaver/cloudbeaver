@@ -31,6 +31,7 @@ import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionSchemaManagerService } from './ConnectionSchemaManagerService';
 import { ConnectionIcon } from './ConnectionSelector/ConnectionIcon';
+import { ConnectionIconSmall } from './ConnectionSelector/ConnectionIconSmall';
 import type { IConnectionSelectorExtraProps } from './ConnectionSelector/IConnectionSelectorExtraProps';
 import { MENU_CONNECTION_DATA_CONTAINER_SELECTOR } from './MENU_CONNECTION_DATA_CONTAINER_SELECTOR';
 import { MENU_CONNECTION_SELECTOR } from './MENU_CONNECTION_SELECTOR';
@@ -151,7 +152,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
                 },
               },
               {
-                iconComponent: () => ConnectionIcon,
+                iconComponent: () => ConnectionIconSmall,
                 isDisabled: () =>
                   this.connectionSchemaManagerService.currentConnectionKey !== null &&
                   this.connectionSchemaManagerService.currentConnectionKey !== undefined &&

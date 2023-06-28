@@ -17,6 +17,8 @@ import {
   ProjectInfo as SchemaProjectInfo,
 } from '@cloudbeaver/core-sdk';
 
+import { createResourceOfType } from './createResourceOfType';
+
 export type ProjectInfo = SchemaProjectInfo;
 export type ProjectInfoResourceType = RmResourceType;
 
@@ -40,6 +42,37 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
     this.userInfoResource.onUserChange.addPostHandler(() => {
       this.clear();
     });
+  }
+
+  getNameWithoutExtension(projectId: string, resourceTypeId: string, fileName: string): string {
+    const project = this.get(projectId);
+
+    if (project) {
+      const resourceType = this.getResourceType(project, resourceTypeId);
+
+      for (let ext of resourceType?.fileExtensions || []) {
+        ext = `.${ext}`;
+        if (fileName.toLowerCase().endsWith(ext)) {
+          return fileName.slice(0, fileName.length - ext.length);
+        }
+      }
+    }
+
+    return fileName;
+  }
+
+  getNameWithExtension(projectId: string, resourceTypeId: string, fileName: string): string {
+    const project = this.get(projectId);
+
+    if (project) {
+      const resourceType = this.getResourceType(project, resourceTypeId);
+
+      if (resourceType?.fileExtensions.length) {
+        return createResourceOfType(resourceType, fileName);
+      }
+    }
+
+    return fileName;
   }
 
   getUserProject(userId: string): ProjectInfo | undefined {

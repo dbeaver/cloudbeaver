@@ -193,7 +193,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   iconSelector,
   titleSelector,
   isDisabled,
-  onChange = () => { },
+  onChange = () => {},
   onSelect,
   onSwitch,
   ...rest

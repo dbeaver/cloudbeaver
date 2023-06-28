@@ -10,16 +10,20 @@ import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbe
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE } from '@cloudbeaver/core-navigation-tree';
+import { isResourceOfType, ProjectInfoResource, ProjectInfoResourceType } from '@cloudbeaver/core-projects';
 import { getRmResourceKey, NAV_NODE_TYPE_RM_FOLDER, NAV_NODE_TYPE_RM_RESOURCE } from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
 import { ACTION_DELETE, ACTION_RENAME, ActionService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '@cloudbeaver/plugin-navigation-tree';
-import { getResourceKeyFromNodeId, NavResourceNodeService } from '@cloudbeaver/plugin-resource-manager';
+
+import { getResourceKeyFromNodeId } from './NavNodes/getResourceKeyFromNodeId';
+import { NavResourceNodeService } from './NavResourceNodeService';
 
 @injectable()
 export class NavTreeRMContextMenuService extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
+    private readonly projectInfoResource: ProjectInfoResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
     private readonly navResourceNodeService: NavResourceNodeService,
@@ -53,6 +57,17 @@ export class NavTreeRMContextMenuService extends Bootstrap {
         }
 
         const key = getRmResourceKey(resourceKey);
+        const project = this.projectInfoResource.get(key.projectId);
+
+        let resourceType: ProjectInfoResourceType | undefined = undefined;
+        if (project) {
+          for (const type of project.resourceTypes) {
+            if (isResourceOfType(type, node.id)) {
+              resourceType = type;
+              break;
+            }
+          }
+        }
 
         switch (action) {
           case ACTION_RENAME: {
@@ -60,6 +75,10 @@ export class NavTreeRMContextMenuService extends Bootstrap {
 
             const save = async (newName: string) => {
               if (key.name !== newName && newName.trim().length) {
+                if (resourceType && node.nodeType === NAV_NODE_TYPE_RM_RESOURCE && !node.folder) {
+                  newName = this.projectInfoResource.getNameWithExtension(key.projectId, resourceType.id, newName);
+                }
+
                 try {
                   await this.navResourceNodeService.move(resourceKey, createPath(getPathParent(resourceKey), newName));
                   node.name = newName; // fix name flickering in tree

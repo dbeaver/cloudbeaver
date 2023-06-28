@@ -16,8 +16,8 @@
  */
 package io.cloudbeaver.model.rm.local;
 
+import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.model.rm.lock.RMFileLockController;
@@ -89,7 +89,7 @@ public class LocalResourceController implements RMAdminController, RMController 
     private final RMFileLockController lockController;
     private final List<RMFileOperationHandler> fileHandlers;
 
-    private final Map<String, WebProjectImpl> projectRegistries = new LinkedHashMap<>();
+    private final Map<String, BaseWebProjectImpl> projectRegistries = new LinkedHashMap<>();
 
     public LocalResourceController(
         DBPWorkspace workspace,
@@ -125,13 +125,13 @@ public class LocalResourceController implements RMAdminController, RMController 
         return userId == null ? null : this.userProjectsPath.resolve(userId);
     }
 
-    private WebProjectImpl getWebProject(String projectId, boolean refresh) throws DBException {
+    private BaseWebProjectImpl getWebProject(String projectId, boolean refresh) throws DBException {
         synchronized (projectRegistries) {
-            WebProjectImpl project = projectRegistries.get(projectId);
+            BaseWebProjectImpl project = projectRegistries.get(projectId);
             if (project == null || refresh) {
                 SessionContextImpl sessionContext = new SessionContextImpl(null);
                 RMProject rmProject = makeProjectFromId(projectId, false);
-                project = new WebProjectImpl(
+                project = new BaseWebProjectImpl(
                     workspace,
                     this,
                     sessionContext,
@@ -348,7 +348,7 @@ public class LocalResourceController implements RMAdminController, RMController 
         @NotNull String propName,
         @NotNull Object propValue
     ) throws DBException {
-        WebProjectImpl webProject = getWebProject(projectId, false);
+        BaseWebProjectImpl webProject = getWebProject(projectId, false);
         doFileWriteOperation(projectId, webProject.getMetadataFilePath(),
             () -> {
                 webProject.setProjectProperty(propName, propValue);
@@ -801,7 +801,7 @@ public class LocalResourceController implements RMAdminController, RMController 
     ) throws DBException {
         try (var projectLock = lockController.lockProject(projectId, "resourcePropertyUpdate")) {
             validateResourcePath(resourcePath);
-            WebProjectImpl webProject = getWebProject(projectId, false);
+            BaseWebProjectImpl webProject = getWebProject(projectId, false);
             doFileWriteOperation(projectId, webProject.getMetadataFilePath(),
                 () -> {
                     webProject.setResourceProperty(resourcePath, propertyName, propertyValue);

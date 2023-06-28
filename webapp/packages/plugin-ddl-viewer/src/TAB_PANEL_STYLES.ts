@@ -23,6 +23,6 @@ export const TAB_PANEL_STYLES = css`
   }
 
   MenuBar {
-    border-top: 1px solid;
+    border-top: 1px solid var(--theme-background);
   }
 `;

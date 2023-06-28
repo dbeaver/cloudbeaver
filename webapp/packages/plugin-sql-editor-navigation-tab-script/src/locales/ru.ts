@@ -1,5 +1,8 @@
 export default [
-  ['plugin_sql_editor_navigation_tab_resource_save_script_title', 'Сохранить как скрипт'],
+  ['plugin_sql_editor_navigation_tab_script_state_renaming', 'Переименовывание скрипта...'],
+  ['plugin_sql_editor_navigation_tab_script_state_reading', 'Чтение скрипта...'],
+  ['plugin_sql_editor_navigation_tab_script_state_saving', 'Сохранение скрипта...'],
+  ['plugin_sql_editor_navigation_tab_script_state_updating', 'Обновление информации о скрипте...'],
   ['plugin_sql_editor_navigation_tab_resource_save_script_success', 'Скрипт успешно сохранен'],
   ['plugin_sql_editor_navigation_tab_resource_open_script_error', 'Не удалось открыть скрипт'],
   ['plugin_sql_editor_navigation_tab_resource_save_script_error', 'Возникла ошибка при попытки сохранить скрипт'],

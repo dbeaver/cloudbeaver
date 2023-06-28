@@ -144,7 +144,7 @@ export class SqlEditorBootstrap extends Bootstrap {
             const result = await this.commonDialogService.open(RenameDialog, {
               value: regexp?.[1] ?? name,
               objectName: name,
-              icon: '/icons/sql_script_m.svg',
+              icon: dataSource.icon,
               validation: name =>
                 !this.sqlEditorTabService.sqlEditorTabs.some(
                   tab => tab.handlerState.order !== state.order && this.sqlEditorService.getName(tab.handlerState) === name.trim(),

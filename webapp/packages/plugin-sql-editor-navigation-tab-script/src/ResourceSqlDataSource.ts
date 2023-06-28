@@ -14,10 +14,12 @@ import {
   NOT_INITIALIZED_CONTEXT_ID,
 } from '@cloudbeaver/core-connections';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
+import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath, debounce, getPathName, getPathParent, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
-import { BaseSqlDataSource, ESqlDataSourceFeatures, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
+import { SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
+import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
 
@@ -43,13 +45,13 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   static key = 'resource';
 
   get name(): string | null {
-    if (!this.resourceKey) {
+    if (!this.resourceKey || !this.projectId) {
       return null;
     }
 
     const resource = this.resourceManagerResource.get(this.resourceKey);
 
-    return resource?.name ?? getPathName(this.resourceKey);
+    return this.projectInfoResource.getNameWithoutExtension(this.projectId, SCRIPTS_TYPE_ID, resource?.name ?? getPathName(this.resourceKey));
   }
 
   get script(): string {
@@ -106,6 +108,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   private resourceUseKeyId: string | null;
 
   constructor(
+    private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly resourceManagerResource: ResourceManagerResource,
     private readonly sqlEditorService: SqlEditorService,
@@ -278,17 +281,14 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     await this.write();
 
     await this.scheduler.schedule(undefined, async () => {
-      if (!this.actions || !this.resourceKey || !this.saved || !name?.trim()) {
+      if (!this.actions || !this.resourceKey || !this.projectId || !this.saved || !name?.trim()) {
         return;
       }
 
-      // TODO: use createResourceOfType instead
-      if (!name.toLowerCase().endsWith('.sql')) {
-        name += '.sql';
-      }
+      name = this.projectInfoResource.getNameWithExtension(this.projectId, SCRIPTS_TYPE_ID, name);
 
       this.lastAction = this.rename.bind(this, name);
-      this.message = 'Renaming script...';
+      this.message = 'plugin_sql_editor_navigation_tab_script_state_renaming';
 
       try {
         this.exception = null;
@@ -308,7 +308,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       }
 
       this.lastAction = this.read.bind(this);
-      this.message = 'Reading script...';
+      this.message = 'plugin_sql_editor_navigation_tab_script_state_reading';
 
       try {
         this.exception = null;
@@ -344,7 +344,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       }
 
       this.lastAction = this.write.bind(this);
-      this.message = 'Saving script...';
+      this.message = 'plugin_sql_editor_navigation_tab_script_state_saving';
 
       try {
         this.exception = null;
@@ -371,7 +371,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       }
 
       this.lastAction = this.saveProperties.bind(this);
-      this.message = 'Update info...';
+      this.message = 'plugin_sql_editor_navigation_tab_script_state_updating';
 
       try {
         this.exception = null;
