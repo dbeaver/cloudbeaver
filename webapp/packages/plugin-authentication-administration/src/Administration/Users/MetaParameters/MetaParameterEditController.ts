@@ -13,7 +13,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { AdminUserInfo, GQLErrorCatcher, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class UserEditController implements IInitializableController, IDestructibleController {
+export class MetaParameterEditController implements IInitializableController, IDestructibleController {
   isLoading = true;
   user: AdminUserInfo | null = null;
 
