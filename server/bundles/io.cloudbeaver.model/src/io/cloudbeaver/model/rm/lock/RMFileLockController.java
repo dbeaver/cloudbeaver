@@ -18,6 +18,7 @@ package io.cloudbeaver.model.rm.lock;
 
 import com.google.gson.Gson;
 import io.cloudbeaver.model.app.WebApplication;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -71,7 +72,8 @@ public class RMFileLockController {
      * @param operationName - executed operation name
      * @return - lock
      */
-    public RMLock lockProject(String projectId, String operationName) throws DBException {
+    @NotNull
+    public RMLock lockProject(@NotNull String projectId,@NotNull  String operationName) throws DBException {
         synchronized (RMFileLockController.class) {
             try {
                 createLockFolderIfNeeded();
@@ -88,6 +90,24 @@ public class RMFileLockController {
             } catch (Exception e) {
                 throw new DBException("Failed to lock project: " + projectId, e);
             }
+        }
+    }
+
+    /**
+     * if the project is already locked, the operation will be executed as a child of the first lock,
+     * otherwise it creates its own lock.
+     *
+     * @param projectId     - project to be locked
+     * @param operationName - executed operation name
+     * @return - lock
+     */
+    @Nullable
+    public RMLock lockIfNotLocked(@NotNull String projectId, @NotNull String operationName) throws DBException {
+        synchronized (RMFileLockController.class) {
+            if (isProjectLocked(projectId)) {
+                return null;
+            }
+            return lockProject(projectId, operationName);
         }
     }
 

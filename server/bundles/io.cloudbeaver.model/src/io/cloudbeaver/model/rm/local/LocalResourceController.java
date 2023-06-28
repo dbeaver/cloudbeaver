@@ -1096,8 +1096,11 @@ public class LocalResourceController implements RMAdminController, RMController 
     }
 
     @Override
-    public void saveProjectConfiguration(@NotNull String projectId, @NotNull String configurationPath, @NotNull String configuration)
-        throws DBException {
+    public void saveProjectConfiguration(
+        @NotNull String projectId,
+        @NotNull String configurationPath,
+        @NotNull String configuration
+    ) throws DBException {
         try (var projectLock = lockController.lockProject(projectId, "saveProjectConfiguration")) {
             DBPProject project = getWebProject(projectId, false);
             Path metaFolder = project.getMetadataFolder(true);
@@ -1134,7 +1137,7 @@ public class LocalResourceController implements RMAdminController, RMController 
 
     @Override
     public String backupProject(@NotNull String projectId) throws DBException {
-        try (var projectLock = lockController.lockProject(projectId, "backup")) {
+        try (var projectLock = lockController.lockIfNotLocked(projectId, "backup")) {
             // use global workspace for backup
             Path backupFolder = DBWorkbench.getPlatform().getWorkspace().getMetadataFolder().resolve(BACKUP_FOLDER);
             Path projectPath = getProjectPath(projectId);
@@ -1155,7 +1158,7 @@ public class LocalResourceController implements RMAdminController, RMController 
 
     @Override
     public void restoreBackup(@NotNull String projectId, @NotNull String backupId) throws DBException {
-        try (var projectLock = lockController.lockProject(projectId, "restoreFromBackup")) {
+        try (var projectLock = lockController.lockIfNotLocked(projectId, "restoreFromBackup")) {
             Path backupFolder = DBWorkbench.getPlatform().getWorkspace().getMetadataFolder().resolve(BACKUP_FOLDER);
             Path projectBackupPath = backupFolder.resolve(backupId);
 
@@ -1165,7 +1168,6 @@ public class LocalResourceController implements RMAdminController, RMController 
                 projectId
             ));
             copyFilesRecursive(projectBackupPath, getProjectPath(projectId));
-
         } catch (Exception e) {
             throw new DBException("Failed to restore project from backup", e);
         }
