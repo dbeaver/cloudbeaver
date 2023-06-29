@@ -73,7 +73,6 @@ public class LocalResourceController implements RMAdminController, RMController 
 
     private static final String FILE_REGEX = "(?U)[\\w.$()@/\\\\ -]+";
     private static final String PROJECT_REGEX = "(?U)[\\w.$()@ -]+"; // slash not allowed in project name
-    private static final String PROJECT_CONF_FOLDER = ".configuration";
     private static final String BACKUP_FOLDER = "projects_backup";
     private static final DateTimeFormatter BACKUP_SUFFIX = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
     public static final String DEFAULT_CHANGE_ID = "0";
@@ -1104,16 +1103,14 @@ public class LocalResourceController implements RMAdminController, RMController 
         try (var projectLock = lockController.lockProject(projectId, "saveProjectConfiguration")) {
             DBPProject project = getWebProject(projectId, false);
             Path metaFolder = project.getMetadataFolder(true);
-            doFileWriteOperation(projectId, metaFolder, () -> {
-                Path targetConfigurationPath = metaFolder.resolve(PROJECT_CONF_FOLDER).resolve(configurationPath);
-                createFolder(targetConfigurationPath.getParent());
-                try {
-                    Files.writeString(targetConfigurationPath, configuration);
-                } catch (IOException e) {
-                    throw new DBException("Error writing project configuration '" + configurationPath + "'", e);
-                }
-                return null;
-            });
+            //not wrapped in doFileWriteOperation since these configurations should not be processed by handlers
+            Path targetConfigurationPath = metaFolder.resolve(RMConstants.PROJECT_CONF_FOLDER).resolve(configurationPath);
+            createFolder(targetConfigurationPath.getParent());
+            try {
+                Files.writeString(targetConfigurationPath, configuration);
+            } catch (IOException e) {
+                throw new DBException("Error writing project configuration '" + configurationPath + "'", e);
+            }
         }
     }
 
@@ -1122,7 +1119,7 @@ public class LocalResourceController implements RMAdminController, RMController 
     public String readProjectConfiguration(@NotNull String projectId, @NotNull String configurationPath) throws DBException {
         DBPProject project = getWebProject(projectId, false);
         Path metaFolder = project.getMetadataFolder(false);
-        Path targetConfigurationPath = metaFolder.resolve(PROJECT_CONF_FOLDER).resolve(configurationPath);
+        Path targetConfigurationPath = metaFolder.resolve(RMConstants.PROJECT_CONF_FOLDER).resolve(configurationPath);
         if (Files.notExists(targetConfigurationPath)) {
             return null;
         }
