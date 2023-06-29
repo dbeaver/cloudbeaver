@@ -7,11 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import React, { useCallback } from 'react';
-import { MenuItem, MenuItemCheckbox, MenuSeparator, MenuStateReturn } from 'reakit/Menu';
-import styled, { use } from 'reshadow';
 
-import { Checkbox, joinStyles, Loader, MenuItemElement, menuPanelStyles, useStyles } from '@cloudbeaver/core-blocks';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { Checkbox, MenuItem, MenuItemCheckbox, MenuItemElement, MenuSeparator } from '@cloudbeaver/core-blocks';
 import {
   IMenuData,
   IMenuItem,
@@ -26,18 +23,15 @@ import {
 import { MenuActionElement } from './MenuActionElement';
 import { SubMenuElement } from './SubMenuElement';
 
-export interface IMenuItemRendererProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
+export interface IMenuItemRendererProps extends React.ButtonHTMLAttributes<any> {
   item: IMenuItem;
   menuData: IMenuData;
-  menu: MenuStateReturn; // from reakit useMenuState
   modal?: boolean;
   rtl?: boolean;
   onItemClose?: () => void;
-  style?: ComponentStyle;
 }
 
-export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuItemRenderer({ item, modal, rtl, menuData, menu, onItemClose, style }) {
-  const styles = useStyles(menuPanelStyles, style);
+export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuItemRenderer({ item, modal, rtl, menuData, onItemClose }) {
   const onClick = useCallback(
     (keepMenuOpen = true) => {
       item.events?.onSelect?.();
@@ -52,42 +46,39 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
   if (item instanceof MenuCustomItem) {
     const CustomMenuItem = item.getComponent();
 
-    return styled(styles)(<CustomMenuItem item={item} menu={menu} menuData={menuData} style={style} onClick={onClick} />);
+    return <CustomMenuItem item={item} menuData={menuData} onClick={onClick} />;
   }
 
   if (item instanceof MenuSubMenuItem) {
-    return styled(styles)(
+    return (
       <MenuItem
-        {...menu}
         {...{ as: SubMenuElement }}
-        {...use({ hidden: item.hidden })}
         id={item.id}
         aria-label={item.menu.label}
+        hidden={item.hidden}
         itemRenderer={MenuItemRenderer}
         menuRtl={rtl}
         menuData={menuData}
         menuModal={modal}
         subMenu={item}
-        style={style}
         onItemClose={onItemClose}
         onClick={() => onClick()}
-      />,
+      />
     );
   }
 
   if (item instanceof MenuSeparatorItem) {
-    return styled(styles)(<MenuSeparator {...menu} />);
+    return <MenuSeparator />;
   }
 
   if (item instanceof MenuActionItem) {
-    return <MenuActionElement item={item} menu={menu} menuData={menuData} style={style} onClick={onClick} />;
+    return <MenuActionElement item={item} menuData={menuData} onClick={onClick} />;
   }
 
   if (item instanceof MenuCheckboxItem) {
-    return styled(styles)(
+    return (
       <MenuItemCheckbox
-        {...menu}
-        {...use({ hidden: item.hidden })}
+        hidden={item.hidden}
         id={item.id}
         aria-label={item.label}
         disabled={item.disabled}
@@ -98,11 +89,10 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
       >
         <MenuItemElement
           label={item.label}
-          icon={<Checkbox checked={item.checked} mod={['primary', 'small']} style={style} ripple={false} />}
+          icon={<Checkbox checked={item.checked} mod={['primary', 'small']} ripple={false} />}
           tooltip={item.tooltip}
-          style={style}
         />
-      </MenuItemCheckbox>,
+      </MenuItemCheckbox>
     );
   }
 
@@ -110,31 +100,10 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
     const IconComponent = item.iconComponent?.();
     const extraProps = item.getExtraProps?.();
 
-    return styled(styles)(
-      <MenuItem
-        {...menu}
-        {...use({ hidden: item.hidden })}
-        id={item.id}
-        aria-label={item.label}
-        disabled={item.disabled}
-        onClick={onClick}
-        {...extraProps}
-      >
-        <MenuItemElement
-          label={item.label}
-          icon={
-            IconComponent
-              ? styled(styles)(
-                  <Loader suspense inline fullSize>
-                    <IconComponent item={item} style={joinStyles(menuPanelStyles, style)} {...extraProps} />
-                  </Loader>,
-                )
-              : item.icon
-          }
-          tooltip={item.tooltip}
-          style={style}
-        />
-      </MenuItem>,
+    return (
+      <MenuItem id={item.id} aria-label={item.label} hidden={item.hidden} disabled={item.disabled} onClick={onClick} {...extraProps}>
+        <MenuItemElement label={item.label} icon={IconComponent ? <IconComponent item={item} {...extraProps} /> : item.icon} tooltip={item.tooltip} />
+      </MenuItem>
     );
   }
 

@@ -6,14 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, TableContext } from '@cloudbeaver/core-blocks';
+import { Loader, TableContext, useStyles } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 
 import { UserForm } from '../UserForm/UserForm';
-import { UserEditController } from './UserEditController';
+import { MetaParameterEditController } from './MetaParameterEditController';
 
 const styles = css`
   box {
@@ -30,21 +30,13 @@ interface Props {
   item: string;
 }
 
-export const UserEdit = observer<Props>(function UserEdit({ item }) {
-  const boxRef = useRef<HTMLDivElement>(null);
-  const controller = useController(UserEditController, item);
+export const MetaParameterEdit = observer<Props>(function UserEdit({ item }) {
+  const controller = useController(MetaParameterEditController, item);
   const tableContext = useContext(TableContext);
   const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext]);
 
-  useEffect(() => {
-    boxRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-    });
-  }, []);
-
   return styled(useStyles(styles))(
-    <box ref={boxRef} as="div">
+    <box>
       {controller.user ? <UserForm user={controller.user} editing onCancel={collapse} /> : <Loader />}
     </box>,
   );

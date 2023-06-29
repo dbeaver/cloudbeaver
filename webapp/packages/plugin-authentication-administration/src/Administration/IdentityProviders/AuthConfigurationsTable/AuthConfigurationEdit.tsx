@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AuthConfigurationsResource } from '@cloudbeaver/core-authentication';
@@ -33,26 +33,18 @@ interface Props {
 
 export const AuthConfigurationEdit = observer<Props>(function AuthConfigurationEdit({ item }) {
   const resource = useService(AuthConfigurationsResource);
-  const boxRef = useRef<HTMLDivElement>(null);
   const tableContext = useContext(TableContext);
 
   const collapse = useCallback(() => {
     tableContext?.setItemExpand(item, false);
   }, [tableContext, item]);
 
-  useEffect(() => {
-    boxRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-    });
-  }, []);
-
   const data = useAuthConfigurationFormState(resource, state => state.setOptions('edit'));
 
   data.config.id = item;
 
   return styled(useStyles(styles))(
-    <box ref={boxRef} as="div">
+    <box>
       <AuthConfigurationForm state={data} onCancel={collapse} />
     </box>,
   );

@@ -59,6 +59,10 @@ export const TREE_NODE_STYLES = css`
         margin-right: 0;
         margin-left: 4px;
       }
+
+      & TreeNodeName {
+        margin-right: 4px;
+      }
     }
   }
 
@@ -95,6 +99,7 @@ export const TREE_NODE_STYLES = css`
     padding-right: 0;
     display: flex;
     align-items: center;
+    margin-right: 4px;
   }
 
   TreeNodeFilter {
@@ -143,20 +148,20 @@ export const TREE_NODE_STYLES = css`
 
   node TreeNodeControl[big] {
     height: 46px;
-    padding: 2 16px;
+    padding: 0px 16px;
 
-    & TreeNodeSelect {
-      margin: 3px;
-    }
     & TreeNodeName {
       margin: 0;
-      padding-right: 16px;
-      padding-left: 16px;
+      padding-right: 8px;
+      padding-left: 8px;
     }
-    & TreeNodeIcon,
-    & TreeNodeExpand {
+    & TreeNodeIcon {
       width: 24px;
       height: 24px;
+    }
+    & TreeNodeExpand {
+      width: 16px;
+      height: 16px;
     }
 
     & TreeNodeExpand [|size='small'] {
@@ -168,12 +173,16 @@ export const TREE_NODE_STYLES = css`
     }
 
     & > * {
-      margin-right: 11px;
-      margin-left: 11px;
+      margin-right: 8px;
+      margin-left: 8px;
+    }
+
+    & TreeNodeSelect {
+      margin: 0;
     }
   }
 
   node TreeNodeControl[big] + TreeNodeNested {
-    padding-left: 46px;
+    padding-left: 24px;
   }
 `;
