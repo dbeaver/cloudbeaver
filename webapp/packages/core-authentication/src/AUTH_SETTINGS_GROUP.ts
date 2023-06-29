@@ -7,7 +7,7 @@
  */
 import { createSettingsGroup, FormFieldType, SettingsData } from '@cloudbeaver/core-settings';
 
-export const AUTH_SETTINGS_GROUP = createSettingsGroup('Authentication');
+export const AUTH_SETTINGS_GROUP = createSettingsGroup('settings_panel_authentication');
 
 export const settings: SettingsData = {
   scopeType: 'core',
@@ -16,8 +16,8 @@ export const settings: SettingsData = {
     {
       key: 'disableAnonymousAccess',
       type: FormFieldType.Checkbox,
-      name: 'Anonymous access',
-      description: 'Disable anonymous access',
+      name: 'settings_panel_authentication_disable_anonymous_access_name',
+      description: 'settings_panel_authentication_disable_anonymous_access_description',
       groupId: AUTH_SETTINGS_GROUP.id,
     },
   ],

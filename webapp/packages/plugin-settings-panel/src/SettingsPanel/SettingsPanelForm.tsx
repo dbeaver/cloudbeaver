@@ -16,8 +16,11 @@ import { SettingsManagerService } from '@cloudbeaver/core-settings';
 import { SettingsGroup } from './SettingsGroup';
 
 const styles = css`
-  ColoredContainer {
+  content {
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
   }
 `;
 
@@ -28,12 +31,14 @@ export const SettingsPanelForm = observer(function SettingsPanelForm() {
   const groups = Array.from(settingsManagerService.groups);
 
   return styled(style)(
-    <ColoredContainer gap overflow parent>
-      <Container medium gap vertical overflow>
-        {groups.map(([_, group]) => (
-          <SettingsGroup key={group.id} group={group} />
-        ))}
-      </Container>
-    </ColoredContainer>,
+    <content>
+      <ColoredContainer gap overflow parent>
+        <Container medium gap vertical overflow>
+          {groups.map(([_, group]) => (
+            <SettingsGroup key={group.id} group={group} />
+          ))}
+        </Container>
+      </ColoredContainer>
+    </content>,
   );
 });

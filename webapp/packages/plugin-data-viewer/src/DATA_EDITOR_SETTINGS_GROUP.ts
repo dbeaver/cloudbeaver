@@ -7,7 +7,7 @@
  */
 import { createSettingsGroup, FormFieldType, SettingsData } from '@cloudbeaver/core-settings';
 
-export const DATA_EDITOR_SETTINGS_GROUP = createSettingsGroup('Data Editor');
+export const DATA_EDITOR_SETTINGS_GROUP = createSettingsGroup('settings_panel_data_editor');
 
 export const settings: SettingsData = {
   scopeType: 'plugin',
@@ -16,29 +16,29 @@ export const settings: SettingsData = {
     {
       key: 'disableEdit',
       type: FormFieldType.Checkbox,
-      name: 'Disable Edit',
-      description: 'Disable edit',
+      name: 'settings_panel_data_editor_disable_edit_name',
+      description: 'settings_panel_data_editor_disable_edit_description',
       groupId: DATA_EDITOR_SETTINGS_GROUP.id,
     },
     {
       key: 'fetchMin',
       type: FormFieldType.Input,
-      name: 'Fetch Min',
-      description: 'Minimum number of rows to fetch',
+      name: 'settings_panel_data_editor_fetch_min_name',
+      description: 'settings_panel_data_editor_fetch_min_description',
       groupId: DATA_EDITOR_SETTINGS_GROUP.id,
     },
     {
       key: 'fetchMax',
       type: FormFieldType.Input,
-      name: 'Fetch Max',
-      description: 'Maximum number of rows to fetch',
+      name: 'settings_panel_data_editor_fetch_max_name',
+      description: 'settings_panel_data_editor_fetch_max_description',
       groupId: DATA_EDITOR_SETTINGS_GROUP.id,
     },
     {
       key: 'fetchDefault',
       type: FormFieldType.Input,
-      name: 'Fetch Default',
-      description: 'Default number of rows to fetch',
+      name: 'settings_panel_data_editor_fetch_default_name',
+      description: 'settings_panel_data_editor_fetch_default_description',
       groupId: DATA_EDITOR_SETTINGS_GROUP.id,
     },
   ],

@@ -7,7 +7,7 @@
  */
 import { createSettingsGroup, FormFieldType, type SettingsData } from '@cloudbeaver/core-settings';
 
-export const CONNECTIONS_SETTINGS_GROUP = createSettingsGroup('Connections');
+export const CONNECTIONS_SETTINGS_GROUP = createSettingsGroup('settings_panel_connections');
 
 export const settings: SettingsData = {
   scopeType: 'plugin',
@@ -16,8 +16,8 @@ export const settings: SettingsData = {
     {
       key: 'hideConnectionViewForUsers',
       type: FormFieldType.Checkbox,
-      name: 'Show connections to admins only',
-      description: 'Show connections to admins only',
+      name: 'settings_panel_connections_hide_connections_view_name',
+      description: 'settings_panel_connections_hide_connections_view_description',
       groupId: CONNECTIONS_SETTINGS_GROUP.id,
     },
   ],

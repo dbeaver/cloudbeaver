@@ -19,6 +19,11 @@ export interface SettingsGroupType {
   name: string;
 }
 
+export interface SettingsOptions {
+  id: string | number;
+  name: string;
+}
+
 export type SettingsScopeType = 'plugin' | 'core';
 
 export interface SettingsData {
@@ -39,7 +44,7 @@ interface ScopeSettingsItemOptions {
   name: string;
   groupId: string;
   description?: string;
-  options?: any[];
+  options?: SettingsOptions[];
 }
 
 @injectable()

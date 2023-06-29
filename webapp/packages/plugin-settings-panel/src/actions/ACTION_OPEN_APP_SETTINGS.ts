@@ -8,6 +8,6 @@
 import { createAction } from '@cloudbeaver/core-view';
 
 export const ACTION_OPEN_APP_SETTINGS = createAction('open-app-settings', {
-  label: 'plugin_settings_panel',
-  tooltip: 'plugin_settings_panel',
+  label: 'settings_panel',
+  tooltip: 'settings_panel',
 });

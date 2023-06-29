@@ -34,7 +34,7 @@ export const SettingsInfoForm = observer<SettingsInfoFormProps>(function Setting
   const translate = useTranslate();
 
   if (fields.length === 0) {
-    return <TextPlaceholder>{translate('plugin_settings_panel_empty_fields')}</TextPlaceholder>;
+    return <TextPlaceholder>{translate('settings_panel_empty_fields')}</TextPlaceholder>;
   }
 
   return (

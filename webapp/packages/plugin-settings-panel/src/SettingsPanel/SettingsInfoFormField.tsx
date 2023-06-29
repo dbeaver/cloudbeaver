@@ -50,8 +50,8 @@ export const SettingsInfoFormField = observer<SettingsInfoFormFieldProps>(functi
       <Combobox
         id={id}
         items={options}
-        keySelector={value => value}
-        valueSelector={value => value}
+        keySelector={value => value.id}
+        valueSelector={value => value.name}
         value={value}
         title={description}
         disabled={disabled}

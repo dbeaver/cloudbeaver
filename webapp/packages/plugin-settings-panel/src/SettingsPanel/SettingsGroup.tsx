@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, GroupTitle } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Group, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';
 import { SettingsGroupType, SettingsManagerService, SettingsScopeType } from '@cloudbeaver/core-settings';
@@ -23,6 +23,7 @@ interface Props {
 export const SettingsGroup = observer<Props>(function SettingsGroup({ group }) {
   const settingsManagerService = useService(SettingsManagerService);
   const pluginManagerService = useService(PluginManagerService);
+  const translate = useTranslate();
 
   function getValue(scope: string, scopeType: SettingsScopeType, key: string) {
     const settings = pluginManagerService.getSettings(scope, scopeType);
@@ -31,12 +32,18 @@ export const SettingsGroup = observer<Props>(function SettingsGroup({ group }) {
 
   const settings = settingsManagerService.settings
     .filter(settingsItem => settingsItem.groupId === group.id)
-    .map(settingsItem => ({ ...settingsItem, value: getValue(settingsItem.scope, settingsItem.scopeType, settingsItem.key) }));
+    .map(settingsItem => ({
+      ...settingsItem,
+      value: getValue(settingsItem.scope, settingsItem.scopeType, settingsItem.key),
+      name: translate(settingsItem.name),
+      description: translate(settingsItem.description),
+      options: settingsItem.options?.map(option => ({ ...option, name: translate(option.name) })),
+    }));
 
   return styled(BASE_CONTAINERS_STYLES)(
     <Group gap vertical>
       <GroupTitle keepSize large>
-        {group.name}
+        {translate(group.name)}
       </GroupTitle>
       <SettingsInfoForm fields={settings} readOnly />
     </Group>,
