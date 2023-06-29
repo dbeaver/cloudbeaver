@@ -9,7 +9,7 @@ import { createSettingsGroup, FormFieldType, SettingsData } from '@cloudbeaver/c
 
 import { themes } from './themes';
 
-export const THEME_SETTINGS_GROUP = createSettingsGroup('settings_panel_theming');
+export const THEME_SETTINGS_GROUP = createSettingsGroup('settings_theming');
 
 export const settings: SettingsData = {
   scopeType: 'core',
@@ -18,8 +18,8 @@ export const settings: SettingsData = {
     {
       key: 'defaultTheme',
       type: FormFieldType.Combobox,
-      name: 'settings_panel_theming_default_theme_name',
-      description: 'settings_panel_theming_default_theme_description',
+      name: 'settings_theming_default_theme_name',
+      description: 'settings_theming_default_theme_description',
       options: themes.map(theme => ({ id: theme.id, name: theme.name })),
       groupId: THEME_SETTINGS_GROUP.id,
     },

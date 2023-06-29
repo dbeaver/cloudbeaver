@@ -7,7 +7,7 @@
  */
 import { createSettingsGroup, FormFieldType, type SettingsData } from '@cloudbeaver/core-settings';
 
-export const CONNECTIONS_SETTINGS_GROUP = createSettingsGroup('settings_panel_connections');
+export const CONNECTIONS_SETTINGS_GROUP = createSettingsGroup('settings_connections');
 
 export const settings: SettingsData = {
   scopeType: 'plugin',
@@ -16,8 +16,8 @@ export const settings: SettingsData = {
     {
       key: 'hideConnectionViewForUsers',
       type: FormFieldType.Checkbox,
-      name: 'settings_panel_connections_hide_connections_view_name',
-      description: 'settings_panel_connections_hide_connections_view_description',
+      name: 'settings_connections_hide_connections_view_name',
+      description: 'settings_connections_hide_connections_view_description',
       groupId: CONNECTIONS_SETTINGS_GROUP.id,
     },
   ],
