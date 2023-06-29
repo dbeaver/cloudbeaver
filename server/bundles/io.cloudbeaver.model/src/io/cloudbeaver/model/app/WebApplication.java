@@ -25,7 +25,6 @@ import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
-import org.jkiss.dbeaver.model.rm.RMAdminController;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
@@ -64,11 +63,6 @@ public interface WebApplication extends DBPApplication {
     DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
     RMController createResourceController(
-        @NotNull SMCredentialsProvider credentialsProvider,
-        @NotNull DBPWorkspace workspace
-    ) throws DBException;
-
-    RMAdminController createAdminResourceController(
         @NotNull SMCredentialsProvider credentialsProvider,
         @NotNull DBPWorkspace workspace
     ) throws DBException;

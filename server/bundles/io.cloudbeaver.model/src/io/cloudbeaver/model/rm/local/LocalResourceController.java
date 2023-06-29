@@ -67,14 +67,12 @@ import java.util.stream.Stream;
 /**
  * Resource manager API
  */
-public class LocalResourceController implements RMAdminController, RMController {
+public class LocalResourceController implements RMController {
 
     private static final Log log = Log.getLog(LocalResourceController.class);
 
     private static final String FILE_REGEX = "(?U)[\\w.$()@/\\\\ -]+";
     private static final String PROJECT_REGEX = "(?U)[\\w.$()@ -]+"; // slash not allowed in project name
-    private static final String BACKUP_FOLDER = "projects_backup";
-    private static final DateTimeFormatter BACKUP_SUFFIX = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
     public static final String DEFAULT_CHANGE_ID = "0";
 
     private final DBPWorkspace workspace;
@@ -85,8 +83,8 @@ public class LocalResourceController implements RMAdminController, RMController 
     private final Path sharedProjectsPath;
     private final String globalProjectName;
     private Supplier<SMController> smControllerSupplier;
-    private final RMFileLockController lockController;
-    private final List<RMFileOperationHandler> fileHandlers;
+    protected final RMFileLockController lockController;
+    protected final List<RMFileOperationHandler> fileHandlers;
 
     private final Map<String, BaseWebProjectImpl> projectRegistries = new LinkedHashMap<>();
 
@@ -124,7 +122,7 @@ public class LocalResourceController implements RMAdminController, RMController 
         return userId == null ? null : this.userProjectsPath.resolve(userId);
     }
 
-    private BaseWebProjectImpl getWebProject(String projectId, boolean refresh) throws DBException {
+    protected BaseWebProjectImpl getWebProject(String projectId, boolean refresh) throws DBException {
         synchronized (projectRegistries) {
             BaseWebProjectImpl project = projectRegistries.get(projectId);
             if (project == null || refresh) {
@@ -780,7 +778,7 @@ public class LocalResourceController implements RMAdminController, RMController 
         return DEFAULT_CHANGE_ID;
     }
 
-    private void createFolder(Path targetPath) throws DBException {
+    protected void createFolder(Path targetPath) throws DBException {
         if (!Files.exists(targetPath)) {
             try {
                 Files.createDirectories(targetPath);
@@ -951,7 +949,7 @@ public class LocalResourceController implements RMAdminController, RMController 
         return result;
     }
 
-    private Path getProjectPath(String projectId) throws DBException {
+    protected Path getProjectPath(String projectId) throws DBException {
         RMProjectName project = parseProjectName(projectId);
         RMProjectType type = project.getType();
         String projectName = project.getName();
@@ -1092,102 +1090,6 @@ public class LocalResourceController implements RMAdminController, RMController 
         Supplier<SMController> smControllerSupplier
     ) {
         return new Builder(workspace, credentialsProvider, smControllerSupplier);
-    }
-
-    @Override
-    public void saveProjectConfiguration(
-        @NotNull String projectId,
-        @NotNull String configurationPath,
-        @NotNull String configuration
-    ) throws DBException {
-        try (var projectLock = lockController.lockProject(projectId, "saveProjectConfiguration")) {
-            DBPProject project = getWebProject(projectId, false);
-            Path metaFolder = project.getMetadataFolder(true);
-            //not wrapped in doFileWriteOperation since these configurations should not be processed by handlers
-            Path targetConfigurationPath = metaFolder.resolve(RMConstants.PROJECT_CONF_FOLDER).resolve(configurationPath);
-            createFolder(targetConfigurationPath.getParent());
-            try {
-                Files.writeString(targetConfigurationPath, configuration);
-            } catch (IOException e) {
-                throw new DBException("Error writing project configuration '" + configurationPath + "'", e);
-            }
-        }
-    }
-
-    @Nullable
-    @Override
-    public String readProjectConfiguration(@NotNull String projectId, @NotNull String configurationPath) throws DBException {
-        DBPProject project = getWebProject(projectId, false);
-        Path metaFolder = project.getMetadataFolder(false);
-        Path targetConfigurationPath = metaFolder.resolve(RMConstants.PROJECT_CONF_FOLDER).resolve(configurationPath);
-        if (Files.notExists(targetConfigurationPath)) {
-            return null;
-        }
-        try {
-            return Files.readString(targetConfigurationPath);
-        } catch (IOException e) {
-            throw new DBException("Error reading project configuration '" + configurationPath + "'", e);
-        }
-    }
-
-    @Override
-    public String backupProject(@NotNull String projectId) throws DBException {
-        try (var projectLock = lockController.lockIfNotLocked(projectId, "backup")) {
-            // use global workspace for backup
-            Path backupFolder = DBWorkbench.getPlatform().getWorkspace().getMetadataFolder().resolve(BACKUP_FOLDER);
-            Path projectPath = getProjectPath(projectId);
-            Path projectBackupPath = backupFolder.resolve(projectPath.getFileName() + "_" + BACKUP_SUFFIX.format(LocalDateTime.now()));
-            try {
-                Files.createDirectories(projectBackupPath);
-                var projectName = projectPath.getFileName();
-                log.info("Create backup for project: " + projectName);
-                Files.move(projectPath, projectBackupPath, StandardCopyOption.REPLACE_EXISTING);
-                log.info(String.format("Backup for project %s stored at %s", projectName, projectBackupPath));
-                return projectBackupPath.relativize(projectBackupPath).toString();
-            } catch (Exception e) {
-                throw new DBException("Failed to backup project", e);
-            }
-        }
-    }
-
-
-    @Override
-    public void restoreBackup(@NotNull String projectId, @NotNull String backupId) throws DBException {
-        try (var projectLock = lockController.lockIfNotLocked(projectId, "restoreFromBackup")) {
-            Path backupFolder = DBWorkbench.getPlatform().getWorkspace().getMetadataFolder().resolve(BACKUP_FOLDER);
-            Path projectBackupPath = backupFolder.resolve(backupId);
-
-            log.info(String.format(
-                "Copy all file from backup [%s] to the project [%s]",
-                projectBackupPath,
-                projectId
-            ));
-            copyFilesRecursive(projectBackupPath, getProjectPath(projectId));
-        } catch (Exception e) {
-            throw new DBException("Failed to restore project from backup", e);
-        }
-    }
-
-    private void copyFilesRecursive(@NotNull Path from, @NotNull Path to) throws IOException {
-        Set<String> skippedFiles = Set.of("", from.getFileName().toString());
-        Files.walkFileTree(from, EnumSet.noneOf(FileVisitOption.class), 1, (UniversalFileVisitor<Path>) (filePath, attrs) -> {
-            var relativePath = from.relativize(filePath);
-            if (skippedFiles.contains(relativePath.getFileName().toString())) {
-                return FileVisitResult.CONTINUE;
-            }
-            var targetPath = to.resolve(relativePath);
-            if (Files.isDirectory(filePath)) {
-                // empty resource folders?
-                if (Files.notExists(targetPath)) {
-                    Files.createDirectories(targetPath);
-                }
-                copyFilesRecursive(filePath, targetPath);
-            } else {
-                Files.copy(filePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-            }
-
-            return FileVisitResult.CONTINUE;
-        });
     }
 
     public static final class Builder {

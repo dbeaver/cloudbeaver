@@ -34,7 +34,6 @@ import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
-import org.jkiss.dbeaver.model.rm.RMAdminController;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
@@ -75,14 +74,6 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         @NotNull DBPWorkspace workspace
     ) throws DBException {
         throw new IllegalStateException("Resource controller is not supported by " + getClass().getSimpleName());
-    }
-
-    @Override
-    public RMAdminController createAdminResourceController(
-        @NotNull SMCredentialsProvider credentialsProvider,
-        @NotNull DBPWorkspace workspace
-    ) throws DBException {
-        throw new IllegalStateException("Admin resource controller is not supported by " + getClass().getSimpleName());
     }
 
     @NotNull
