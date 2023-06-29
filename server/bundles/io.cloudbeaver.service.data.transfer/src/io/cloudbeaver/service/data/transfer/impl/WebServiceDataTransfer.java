@@ -223,6 +223,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
         WebDataTransferOutputSettings outputSettings = parameters.getOutputSettings();
         settings.setOutputEncodingBOM(outputSettings.isInsertBom());
+        settings.setCompressResults(outputSettings.isCompress());
         if (!CommonUtils.isEmpty(outputSettings.getEncoding())) {
             settings.setOutputEncoding(outputSettings.getEncoding());
         }

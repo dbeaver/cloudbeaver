@@ -30,7 +30,8 @@ public class WebDataTransferDefaultExportSettings {
         this.outputSettings = new WebDataTransferOutputSettings(
             false,
             defConsumerSettings.getOutputEncoding(),
-            defConsumerSettings.getOutputTimestampPattern()
+            defConsumerSettings.getOutputTimestampPattern(),
+            defConsumerSettings.isCompressResults()
         );
         this.supportedEncodings = Charset.availableCharsets().keySet();
     }
