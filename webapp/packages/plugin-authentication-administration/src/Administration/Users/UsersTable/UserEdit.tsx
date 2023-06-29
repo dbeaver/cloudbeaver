@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader, TableContext } from '@cloudbeaver/core-blocks';
@@ -31,20 +31,12 @@ interface Props {
 }
 
 export const UserEdit = observer<Props>(function UserEdit({ item }) {
-  const boxRef = useRef<HTMLDivElement>(null);
   const controller = useController(UserEditController, item);
   const tableContext = useContext(TableContext);
   const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext]);
 
-  useEffect(() => {
-    boxRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-    });
-  }, []);
-
   return styled(styles)(
-    <box ref={boxRef} as="div">
+    <box>
       {controller.user ? <UserForm user={controller.user} editing onCancel={collapse} /> : <Loader />}
     </box>,
   );

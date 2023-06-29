@@ -247,7 +247,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         String catalog
     ) throws DBWebException {
         DBPDataSource dataSource = connection.getDataSource();
-        DBRProgressMonitor monitor = connection.getSession().getProgressMonitor();
         DBCExecutionContext executionContext = DBUtils.getDefaultContext(connection.getDataSource(), false);
         if (executionContext == null) {
             throw new DBWebException("No default execution context for " + connection.getName());
@@ -259,63 +258,63 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         structContainers.setSupportsCatalogChange(contextDefaults != null && contextDefaults.supportsCatalogChange());
         structContainers.setSupportsSchemaChange(contextDefaults != null && contextDefaults.supportsSchemaChange());
 
-        List<? extends DBSObject> nodes = this.getCatalogs(
+        DBRProgressMonitor monitor = connection.getSession().getProgressMonitor();
+        List<? extends DBSObject> dbsObjects = this.getCatalogs(
                 monitor,
                 connection.getDataSourceContainer().getDataSource(),
-                contextDefaults
-        );
+                contextDefaults);
 
-        List<WebCatalog> catalogList = structContainers.getCatalogList();
-        List<WebNavigatorNodeInfo> schemaList = structContainers.getSchemaList();
-
-        for (DBSObject node : nodes) {
-            if (!dataSource.getContainer().getNavigatorSettings().isShowSystemObjects() && DBUtils.isSystemObject(node)) {
+        for (DBSObject dbsObject : dbsObjects) {
+            if (!dataSource.getContainer().getNavigatorSettings().isShowSystemObjects()
+                    && DBUtils.isSystemObject(dbsObject)) {
                 continue;
             }
 
-            if(node instanceof DBSCatalog) {
-                WebNavigatorNodeInfo catalogObjectInfo = this.getNodeFromObject(connection.getSession(), node);
+            WebNavigatorNodeInfo objectNode = this.getNodeFromObject(connection.getSession(), dbsObject);
 
-                if (catalogObjectInfo != null) {
-                    WebCatalog webCatalog = new WebCatalog(catalogObjectInfo);
+            if (objectNode == null) {
+                continue;
+            }
 
-                    if (
-                        contextDefaults != null && contextDefaults.supportsSchemaChange()
-                        && (
-                            (contextDefaults.getDefaultCatalog() != null && contextDefaults.getDefaultCatalog().getName().equals(node.getName()))
-                            || node.getName().equals(catalog)
-                        )
-                    ) {
-                        try {
-                            List<WebNavigatorNodeInfo> schemasList = webCatalog.getSchemaList();
-                            Collection<? extends DBSObject> objectsCollection = ((DBSObjectContainer) node).getChildren(monitor);
+            if (structContainers.getParentNode() == null) {
+                structContainers.setParentNode(
+                        new WebNavigatorNodeInfo(connection.getSession(), objectNode.getNode().getParentNode()));
+            }
 
-                            for (DBSObject schemaObject : objectsCollection) {
-                                if (!dataSource.getContainer().getNavigatorSettings().isShowSystemObjects() && DBUtils.isSystemObject(node)) {
-                                    continue;
-                                }
-                                if (schemaObject instanceof DBSSchema) {
-                                    WebNavigatorNodeInfo schemaNodeInfo = this.getNodeFromObject(connection.getSession(), schemaObject);
+            if (dbsObject instanceof DBSCatalog) {
+                WebCatalog webCatalog = new WebCatalog(objectNode);
 
-                                    if (schemaNodeInfo != null) {
-                                        schemasList.add(schemaNodeInfo);
-                                    }
+                if (structContainers.getSupportsSchemaChange()
+                        && ((contextDefaults.getDefaultCatalog() != null
+                                && contextDefaults.getDefaultCatalog().getName().equals(dbsObject.getName()))
+                                || dbsObject.getName().equals(catalog))) {
+                    try {
+                        Collection<? extends DBSObject> dbsObjectChildren = ((DBSObjectContainer) dbsObject)
+                                .getChildren(monitor);
+
+                        for (DBSObject dbsObjectChild : dbsObjectChildren) {
+                            if (!dataSource.getContainer().getNavigatorSettings().isShowSystemObjects()
+                                    && DBUtils.isSystemObject(dbsObjectChild)) {
+                                continue;
+                            }
+                            if (dbsObjectChild instanceof DBSSchema) {
+                                WebNavigatorNodeInfo schemaNodeInfo = this.getNodeFromObject(connection.getSession(),
+                                        dbsObjectChild);
+
+                                if (schemaNodeInfo != null) {
+                                    webCatalog.getSchemaList().add(schemaNodeInfo);
                                 }
                             }
-                        } catch (DBException e) {
-//                          throw new DBWebException("Error reading schema list", e);
-                            // TODO: we need to log some message to console
                         }
+                    } catch (DBException e) {
+                        // throw new DBWebException("Error reading schema list", e);
+                        // TODO: we need to log some message to console
                     }
-
-                    catalogList.add(webCatalog);
                 }
-            } else if(node instanceof DBSSchema && contextDefaults != null && contextDefaults.supportsSchemaChange()) {
-                WebNavigatorNodeInfo schemaNodeInfo = this.getNodeFromObject(connection.getSession(), node);
 
-                if(schemaNodeInfo != null){
-                    schemaList.add(schemaNodeInfo);
-                }
+                structContainers.getCatalogList().add(webCatalog);
+            } else if (dbsObject instanceof DBSSchema && structContainers.getSupportsSchemaChange()) {
+                structContainers.getSchemaList().add(objectNode);
             }
         }
         return structContainers;
