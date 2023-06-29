@@ -20,6 +20,7 @@
     "@cloudbeaver/plugin-resource-manager": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "~0.1.0",
+    "@cloudbeaver/plugin-navigation-tree-rm": "~0.1.0",
     "@cloudbeaver/core-connections": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-dialogs": "~0.1.0",

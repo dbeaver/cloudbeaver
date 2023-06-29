@@ -10,7 +10,7 @@ import styled, { css } from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { ResourceManagerTree } from '@cloudbeaver/plugin-resource-manager';
+import { ResourceManagerTree } from '@cloudbeaver/plugin-navigation-tree-rm';
 
 import { SCRIPTS_TYPE_ID } from './SCRIPTS_TYPE_ID';
 

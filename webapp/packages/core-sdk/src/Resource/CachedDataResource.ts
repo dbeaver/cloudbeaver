@@ -17,6 +17,9 @@ export type CachedDataResourceGetter<TValue, TIncludes> = TValue extends null
   ? CachedResourceValueIncludes<TValue, TIncludes> | null
   : CachedResourceValueIncludes<TValue, TIncludes>;
 
+  /**
+   * CachedDataResource is a resource that stores data that has no identifiers.
+   */
 export abstract class CachedDataResource<
   TData,
   TKey = void,

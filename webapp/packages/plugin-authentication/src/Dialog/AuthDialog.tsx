@@ -19,7 +19,7 @@ import {
   CommonDialogWrapper,
   DialogComponent,
 } from '@cloudbeaver/core-dialogs';
-import { BASE_TAB_STYLES, Tab, TabList, TabsState, TabTitle, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, Tab, TabList, TabsState, TabTitle, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { AuthenticationService } from '../AuthenticationService';
 import type { IAuthOptions } from '../IAuthOptions';
@@ -52,7 +52,6 @@ const styles = css`
     z-index: 1;
   }
   Tab {
-    text-transform: uppercase;
     &:global([aria-selected='true']) {
       font-weight: 500 !important;
     }
@@ -148,7 +147,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
     return <AuthProviderForm provider={provider} credentials={state.credentials} authenticate={dialogData.authenticating} />;
   }
 
-  return styled(useStyles(BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES))(
+  return styled(useStyles(BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES))(
     <TabsState
       currentTabId={state.tabId}
       onChange={tabData => {
