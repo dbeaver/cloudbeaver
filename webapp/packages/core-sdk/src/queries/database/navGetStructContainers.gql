@@ -9,6 +9,9 @@ query navGetStructContainers(
     connectionId: $connectionId
     catalog: $catalogId
   ) {
+    parentNode {
+      ...NavNodeInfo
+    }
     catalogList {
       catalog {
         ...NavNodeInfo

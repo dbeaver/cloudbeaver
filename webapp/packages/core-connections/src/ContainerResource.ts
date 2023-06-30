@@ -28,6 +28,7 @@ export interface ICatalogData {
 }
 
 export interface IStructContainers {
+  parentNode: ObjectContainer | null;
   catalogList: ICatalogData[];
   schemaList: ObjectContainer[];
   supportsCatalogChange: boolean;
@@ -98,6 +99,7 @@ export class ContainerResource extends CachedMapResource<ObjectContainerParams, 
       containers.set(
         { projectId, connectionId, catalogId },
         {
+          parentNode: navGetStructContainers.parentNode,
           catalogList: navGetStructContainers.catalogList,
           schemaList: navGetStructContainers.schemaList,
           supportsCatalogChange: navGetStructContainers.supportsCatalogChange,

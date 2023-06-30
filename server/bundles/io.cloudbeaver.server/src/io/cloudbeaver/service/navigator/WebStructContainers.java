@@ -29,21 +29,40 @@ public class WebStructContainers {
 
     private static final Log log = Log.getLog(WebStructContainers.class);
 
+    private WebNavigatorNodeInfo parentNode = null;
     private List<WebCatalog> catalogList = new ArrayList<>();
     private List<WebNavigatorNodeInfo> schemaList = new ArrayList<>();
     private boolean supportsCatalogChange = false;
     private boolean supportsSchemaChange = false;
 
+    public Boolean getSupportsCatalogChange() {
+        return supportsCatalogChange;
+    }
+
+    public Boolean getSupportsSchemaChange() {
+        return supportsSchemaChange;
+    }
+
+    public WebNavigatorNodeInfo getParentNode() {
+        return parentNode;
+    }
+
     public List<WebCatalog> getCatalogList() {
         return catalogList;
     }
+
     public List<WebNavigatorNodeInfo> getSchemaList() {
         return schemaList;
+    }
+
+    public void setParentNode(WebNavigatorNodeInfo parentNode) {
+        this.parentNode = parentNode;
     }
 
     public void setCatalogList(List<WebCatalog> catalogList) {
         this.catalogList = catalogList;
     }
+
     public void setSchemaList(List<WebNavigatorNodeInfo> schemaList) {
         this.schemaList = schemaList;
     }
@@ -51,6 +70,7 @@ public class WebStructContainers {
     public void setSupportsCatalogChange(boolean support) {
         this.supportsCatalogChange = support;
     }
+
     public void setSupportsSchemaChange(boolean support) {
         this.supportsSchemaChange = support;
     }
