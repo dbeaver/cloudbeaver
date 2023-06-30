@@ -56,6 +56,7 @@
     "@cloudbeaver/plugin-root": "~0.1.0",
     "@cloudbeaver/plugin-settings-menu": "~0.1.0",
     "@cloudbeaver/plugin-settings-menu-administration": "~0.1.0",
+    "@cloudbeaver/plugin-settings-panel": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "~0.1.0",
     "@cloudbeaver/plugin-sql-editor-navigation-tab-script": "~0.1.0",

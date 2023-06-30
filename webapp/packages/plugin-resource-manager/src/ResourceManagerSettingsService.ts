@@ -21,7 +21,7 @@ export class ResourceManagerSettingsService {
   readonly deprecatedSettings: PluginSettings<ResourceManagerSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('resource-manager', defaultSettings);
+    this.settings = this.pluginManagerService.createSettings('resource-manager', 'plugin', defaultSettings);
     this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('plugin_resource_manager', defaultSettings);
   }
 }
