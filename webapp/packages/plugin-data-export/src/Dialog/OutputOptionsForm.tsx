@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Combobox, Container, FieldCheckbox, Loader, useResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Combobox, Container, FieldCheckbox, Loader, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import type { DataTransferOutputSettings } from '@cloudbeaver/core-sdk';
 
 import { DefaultExportOutputSettingsResource } from './DefaultExportOutputSettingsResource';
@@ -24,6 +24,8 @@ interface Props {
 }
 
 export const OutputOptionsForm = observer(function OutputOptionsForm(props: Props) {
+  const translate = useTranslate();
+
   const resource = useResource(OutputOptionsForm, DefaultExportOutputSettingsResource, undefined);
 
   return (
@@ -44,9 +46,14 @@ export const OutputOptionsForm = observer(function OutputOptionsForm(props: Prop
               <Combobox name="encoding" state={props.outputSettings} items={data.supportedEncodings} tiny searchable>
                 Encoding
               </Combobox>
-              <FieldCheckbox name="insertBom" state={props.outputSettings} small>
-                Insert BOM
-              </FieldCheckbox>
+              <Container vertical gap>
+                <FieldCheckbox name="insertBom" state={props.outputSettings} small>
+                  Insert BOM
+                </FieldCheckbox>
+                <FieldCheckbox name="compress" state={props.outputSettings} small>
+                  {translate('data_transfer_output_settings_compress')}
+                </FieldCheckbox>
+              </Container>
             </Container>
           </Container>,
         );
