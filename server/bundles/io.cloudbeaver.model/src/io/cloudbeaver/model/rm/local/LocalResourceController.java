@@ -54,10 +54,8 @@ import org.jkiss.utils.Pair;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -1177,9 +1175,16 @@ public class LocalResourceController implements RMController {
         return RMProjectType.GLOBAL.getPrefix().equals(rmProjectName.getPrefix());
     }
 
-    public static boolean isPrivateProject(String projectId, String userId) {
+    public static boolean isPrivateProject(String projectId) {
+        RMProjectName rmProjectName = parseProjectNameUnsafe(projectId);
+        return RMProjectType.USER.getPrefix().equals(rmProjectName.getPrefix());
+    }
+
+    public static boolean isProjectOwner(String projectId, String userId) {
         RMProjectName rmProjectName = parseProjectNameUnsafe(projectId);
         return RMProjectType.USER.getPrefix().equals(rmProjectName.getPrefix()) &&
             rmProjectName.name.equals(userId);
     }
+
+
 }
