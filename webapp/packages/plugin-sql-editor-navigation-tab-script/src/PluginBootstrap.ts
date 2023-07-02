@@ -14,7 +14,7 @@ import { isResourceOfType, ProjectInfoResource, ProjectsService } from '@cloudbe
 import { NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { createPath, getPathName } from '@cloudbeaver/core-utils';
-import { ACTION_SAVE, ActionService, DATA_CONTEXT_MENU, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_SAVE, ActionService, DATA_CONTEXT_MENU, KEY_BINDING_SAVE, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { getResourceKeyFromNodeId, NavResourceNodeService } from '@cloudbeaver/plugin-navigation-tree-rm';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
@@ -36,7 +36,6 @@ import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-s
 import { ResourceSqlDataSource } from './ResourceSqlDataSource';
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
 import { ACTION_SAVE_AS_SCRIPT } from './ACTION_SAVE_AS_SCRIPT';
-import { KEY_BINDING_SCRIPT_SAVE } from './bindings/KEY_BINDING_SCRIPT_SAVE';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -234,7 +233,7 @@ export class PluginBootstrap extends Bootstrap {
 
     this.keyBindingService.addKeyBindingHandler({
       id: 'script-save',
-      binding: KEY_BINDING_SCRIPT_SAVE,
+      binding: KEY_BINDING_SAVE,
       isBindingApplicable: (context, action) => action === ACTION_SAVE,
       handler: async context => {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);

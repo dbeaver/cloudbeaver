@@ -18,6 +18,7 @@ export * from './Action/Actions/ACTION_ZOOM_OUT';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_OPEN_IN_TAB';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_REDO';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_UNDO';
+export * from './Action/KeyBinding/Bindings/KEY_BINDING_SAVE';
 export * from './Action/KeyBinding/KeyBindingService';
 export * from './Action/KeyBinding/createKeyBinding';
 export * from './Action/ActionService';
