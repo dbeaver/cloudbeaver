@@ -22,7 +22,7 @@ export class EventsSettingsService {
   readonly deprecatedSettings: PluginSettings<EventsSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('notifications', defaultSettings);
+    this.settings = this.pluginManagerService.createSettings('notifications', 'plugin', defaultSettings);
     this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('core_events', defaultSettings);
   }
 }

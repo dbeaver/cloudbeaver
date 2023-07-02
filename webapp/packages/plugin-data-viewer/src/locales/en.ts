@@ -40,4 +40,13 @@ export default [
   ['data_viewer_script_preview_dialog_title', 'Preview changes'],
   ['data_viewer_script_preview_error_title', "Can't get the script"],
   ['data_viewer_refresh_result_set', 'Refresh result set'],
+  ['settings_data_editor', 'Data Editor'],
+  ['settings_data_editor_disable_edit_name', 'Disable Edit'],
+  ['settings_data_editor_disable_edit_description', 'Disable Edit'],
+  ['settings_data_editor_fetch_min_name', 'Minimum fetch size'],
+  ['settings_data_editor_fetch_min_description', 'Minimum number of rows to fetch'],
+  ['settings_data_editor_fetch_max_name', 'Maximum fetch size'],
+  ['settings_data_editor_fetch_max_description', 'Maximum number of rows to fetch'],
+  ['settings_data_editor_fetch_default_name', 'Default fetch size'],
+  ['settings_data_editor_fetch_default_description', 'Default number of rows to fetch'],
 ];

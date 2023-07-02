@@ -21,6 +21,6 @@ export class ConnectionSearchSettingsService {
   readonly settings: PluginSettings<Settings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('connection-search', settings);
+    this.settings = this.pluginManagerService.createSettings('connection-search', 'plugin', settings);
   }
 }

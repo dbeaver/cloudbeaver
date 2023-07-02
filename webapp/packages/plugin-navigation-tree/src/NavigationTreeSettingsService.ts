@@ -25,7 +25,7 @@ export class NavigationTreeSettingsService {
   readonly settings: PluginSettings<NavigationTreeSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('navigation-tree', defaultSettings);
+    this.settings = this.pluginManagerService.createSettings('navigation-tree', 'plugin', defaultSettings);
 
     makeObservable(this, {
       disabled: computed,

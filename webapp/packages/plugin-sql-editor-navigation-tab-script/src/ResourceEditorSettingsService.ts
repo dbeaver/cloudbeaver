@@ -17,6 +17,6 @@ export class ResourceEditorSettingsService {
   readonly settings: PluginSettings<ResourceEditorSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('sql-editor-navigation-tab-resource', defaultSettings);
+    this.settings = this.pluginManagerService.createSettings('sql-editor-navigation-tab-resource', 'plugin', defaultSettings);
   }
 }

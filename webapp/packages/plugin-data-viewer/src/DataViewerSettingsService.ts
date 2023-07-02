@@ -7,6 +7,9 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
+import { SettingsManagerService } from '@cloudbeaver/core-settings';
+
+import { DATA_EDITOR_SETTINGS_GROUP, settings } from './DATA_EDITOR_SETTINGS_GROUP';
 
 const defaultSettings = {
   disableEdit: false,
@@ -23,9 +26,12 @@ export class DataViewerSettingsService {
   /** @deprecated Use settings instead, will be removed in 23.0.0 */
   readonly deprecatedSettings: PluginSettings<typeof defaultSettings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('data-viewer', defaultSettings);
+  constructor(private readonly pluginManagerService: PluginManagerService, private readonly settingsManagerService: SettingsManagerService) {
+    this.settings = this.pluginManagerService.createSettings('data-viewer', 'plugin', defaultSettings);
     this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('core.app.dataViewer', defaultSettings);
+
+    settingsManagerService.addGroup(DATA_EDITOR_SETTINGS_GROUP);
+    settingsManagerService.addSettings(settings.scopeType, settings.scope, settings.settingsData);
   }
 
   getMaxFetchSize(): number {

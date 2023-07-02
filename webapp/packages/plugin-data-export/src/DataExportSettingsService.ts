@@ -21,7 +21,7 @@ export class DataExportSettingsService {
   readonly deprecatedSettings: PluginSettings<DataExportSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('data-export', defaultSettings);
+    this.settings = this.pluginManagerService.createSettings('data-export', 'plugin', defaultSettings);
     this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('plugin_data_export', defaultSettings);
   }
 }

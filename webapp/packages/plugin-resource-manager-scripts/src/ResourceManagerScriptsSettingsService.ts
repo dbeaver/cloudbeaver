@@ -19,6 +19,6 @@ export class ResourceManagerScriptsSettingsService {
   readonly settings: PluginSettings<Settings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('resource-manager-scripts', settings);
+    this.settings = this.pluginManagerService.createSettings('resource-manager-scripts', 'plugin', settings);
   }
 }

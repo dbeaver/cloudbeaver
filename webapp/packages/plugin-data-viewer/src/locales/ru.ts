@@ -36,4 +36,13 @@ export default [
   ['data_viewer_script_preview_dialog_title', 'Предпросмотр изменений'],
   ['data_viewer_script_preview_error_title', 'Не удалось получить скрипт'],
   ['data_viewer_refresh_result_set', 'Обновить резалт сет'],
+  ['settings_data_editor', 'Редактор данных'],
+  ['settings_data_editor_disable_edit_name', 'Отключить редактирование'],
+  ['settings_data_editor_disable_edit_description', 'Отключить редактирование'],
+  ['settings_data_editor_fetch_min_name', 'Минимальный размер выборки'],
+  ['settings_data_editor_fetch_min_description', 'Минимальное количество строк для выборки'],
+  ['settings_data_editor_fetch_max_name', 'Максимальный размер выборки'],
+  ['settings_data_editor_fetch_max_description', 'Максимальное количество строк для выборки'],
+  ['settings_data_editor_fetch_default_name', 'Размер выборки по умолчанию'],
+  ['settings_data_editor_fetch_default_description', 'Количество строк для выборки по умолчанию'],
 ];
