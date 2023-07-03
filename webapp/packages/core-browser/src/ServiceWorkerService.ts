@@ -8,7 +8,7 @@
 import { Workbox } from 'workbox-window';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 @injectable()
@@ -40,23 +40,14 @@ export class ServiceWorkerService {
     }
   }
 
-  async requestUpdate(): Promise<boolean> {
-    const contexts = await this.onUpdate.execute();
-
-    return !ExecutorInterrupter.isInterrupted(contexts);
-  }
-
   private registerSkipWaitingPrompt(workbox: Workbox): void {
     workbox.addEventListener('controlling', async event => {
       if (!event.isUpdate) {
         return;
       }
 
-      const updateAccepted = await this.requestUpdate();
-
-      if (updateAccepted) {
-        window.location.reload();
-      }
+      await this.onUpdate.execute();
+      window.location.reload();
     });
 
     workbox.addEventListener('waiting', event => {
