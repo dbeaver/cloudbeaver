@@ -20,6 +20,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
@@ -184,6 +185,10 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     }
 
     private void collectLeafBindings(DBDAttributeBinding attr, List<DBDAttributeBinding> leafBindings) {
+        if (attr.getDataKind() == DBPDataKind.ARRAY) {
+            leafBindings.add(attr);
+            return;
+        }
         List<DBDAttributeBinding> nestedBindings = attr.getNestedBindings();
         if (CommonUtils.isEmpty(nestedBindings)) {
             leafBindings.add(attr);
