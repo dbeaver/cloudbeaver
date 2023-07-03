@@ -92,11 +92,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable, ESqlDataSourceFeatures.setName];
   }
 
-  get hasChanges() {
-    return this._script !== this._previous;
-  }
-
-  private _previous: string;
   private _script: string;
   private actions?: IResourceActions;
   private info?: IResourceInfo;
@@ -117,7 +112,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     super();
     this.state = state;
     this._script = '';
-    this._previous = this._script;
     this.lastAction = undefined;
     this.loaded = false;
     this.resourceUseKeyId = null;
@@ -127,16 +121,14 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
     resourceManagerResource.onDataOutdated.addHandler(this.syncResource);
 
-    makeObservable<this, '_script' | 'lastAction' | 'loaded' | '_previous'>(this, {
+    makeObservable<this, '_script' | 'lastAction' | 'loaded'>(this, {
       script: computed,
       executionContext: computed,
       resourceKey: computed,
-      hasChanges: computed,
       features: computed<ESqlDataSourceFeatures[]>({
         equals: isArraysEqual,
       }),
       _script: observable,
-      _previous: observable.ref,
       lastAction: observable.ref,
       loaded: observable,
       setExecutionContext: action,
@@ -313,7 +305,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       try {
         this.exception = null;
         this._script = await this.actions.read(this, this.resourceKey);
-        this._previous = this._script;
 
         const executionContext = await this.actions.getProperties(this, this.resourceKey);
 
@@ -349,7 +340,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       try {
         this.exception = null;
         await this.actions.write(this, this.resourceKey, this.script);
-        this._previous = this.script;
         this.saved = true;
         this.markUpdated();
       } catch (exception: any) {

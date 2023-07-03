@@ -195,7 +195,7 @@ export class PluginBootstrap extends Bootstrap {
             return true;
           }
 
-          return source.isLoading() || !source.hasChanges;
+          return source.isLoading() || source.isSaved();
         }
 
         return false;
