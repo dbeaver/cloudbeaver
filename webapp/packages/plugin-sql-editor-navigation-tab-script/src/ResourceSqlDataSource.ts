@@ -117,6 +117,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.resourceUseKeyId = null;
     this.scheduler = new TaskScheduler(() => true);
     this.debouncedWrite = debounce(this.debouncedWrite.bind(this), VALUE_SYNC_DELAY);
+    this.debouncedSaveProperties = debounce(this.debouncedSaveProperties.bind(this), VALUE_SYNC_DELAY);
     this.syncResource = this.syncResource.bind(this);
 
     resourceManagerResource.onDataOutdated.addHandler(this.syncResource);
@@ -265,7 +266,9 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       this.state.executionContext = toJS(executionContext);
       super.setExecutionContext(executionContext);
 
-      this.saveProperties();
+      if (this.sqlEditorService.autoSave) {
+        this.debouncedSaveProperties();
+      }
     }
   }
 
@@ -352,6 +355,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   async save(): Promise<void> {
     await this.write();
+    await this.saveProperties();
   }
 
   private async saveProperties() {
@@ -385,5 +389,9 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   private debouncedWrite() {
     this.write();
+  }
+
+  private debouncedSaveProperties() {
+    this.saveProperties();
   }
 }

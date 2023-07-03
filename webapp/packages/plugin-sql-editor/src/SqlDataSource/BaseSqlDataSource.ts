@@ -98,6 +98,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo | undefined): void {
+    this.saved = false;
     this.onUpdate.execute();
   }
 
