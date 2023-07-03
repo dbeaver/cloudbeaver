@@ -185,6 +185,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     }
 
     private void collectLeafBindings(DBDAttributeBinding attr, List<DBDAttributeBinding> leafBindings) {
+        // we need to show arrays as string because there was a problem with showing multiple rows for custom objects
         if (attr.getDataKind() == DBPDataKind.ARRAY) {
             leafBindings.add(attr);
             return;
