@@ -33,6 +33,14 @@ class WebDataTransferUtils {
         return CommonUtils.isEmpty(ext) ? "data" : ext;
     }
 
+    public static String getResultTaskFileExtension(
+        DataTransferProcessorDescriptor processor,
+        WebDataTransferOutputSettings outputSettings
+    ) {
+        String processorExt = getProcessorFileExtension(processor);
+        return outputSettings.isCompress() ? processorExt + ".zip" : processorExt;
+    }
+
     public static WebDataTransferSessionConfig getSessionDataTransferConfig(WebSession session) {
         return session.getAttribute("dataTransfer", x -> new WebDataTransferSessionConfig(), WebDataTransferSessionConfig::deleteExportFiles);
     }
