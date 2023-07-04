@@ -34,6 +34,7 @@ import resourceManagerScripts from '@cloudbeaver/plugin-resource-manager-scripts
 import root from '@cloudbeaver/plugin-root';
 import settingsMenu from '@cloudbeaver/plugin-settings-menu';
 import settingsMenuAdministration from '@cloudbeaver/plugin-settings-menu-administration';
+import settingsPanelPlugin from '@cloudbeaver/plugin-settings-panel';
 import sqlEditor from '@cloudbeaver/plugin-sql-editor';
 import sqlEditorTab from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import sqlEditorResource from '@cloudbeaver/plugin-sql-editor-navigation-tab-script';
@@ -81,6 +82,7 @@ const PLUGINS: PluginManifest[] = [
   productPlugin,
   settingsMenu,
   settingsMenuAdministration,
+  settingsPanelPlugin,
   help,
   resourceManager,
   resourceManagerAdministration,

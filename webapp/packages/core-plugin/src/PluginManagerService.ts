@@ -7,24 +7,32 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { ProductManagerService } from '@cloudbeaver/core-product';
+import type { SettingsScopeType } from '@cloudbeaver/core-settings';
 
 import { PluginSettings } from './PluginSettings';
 
 @injectable()
 export class PluginManagerService {
-  constructor(private readonly productManagerService: ProductManagerService) {}
-
-  getCoreSettings<T>(scope: string, defaults: T) {
-    return new PluginSettings(this.productManagerService.settings, 'core.' + scope, defaults);
+  store: Map<string, PluginSettings<any>>;
+  constructor(private readonly productManagerService: ProductManagerService) {
+    this.store = new Map();
   }
 
-  getPluginSettings<T>(scope: string, defaults: T) {
-    return new PluginSettings(this.productManagerService.settings, 'plugin.' + scope, defaults);
+  createSettings<T>(scope: string, scopeType: SettingsScopeType, defaults: T) {
+    const key = scopeType + '.' + scope;
+    const settings = new PluginSettings(this.productManagerService.settings, key, defaults);
+
+    this.store.set(key, settings);
+    return settings;
+  }
+
+  getSettings(scope: string, scopeType: SettingsScopeType): PluginSettings<any> | undefined {
+    return this.store.get(scopeType + '.' + scope);
   }
 
   /**
-   * Please use getPluginSettings instead
-   * @deprecated Please use getPluginSettings instead, will be removed in 23.0.0
+   * Please use createSettings instead
+   * @deprecated Please use createSettings instead, will be removed in 23.0.0
    */
   getDeprecatedPluginSettings<T>(scope: string, defaults: T) {
     return new PluginSettings(this.productManagerService.settings, scope, defaults);

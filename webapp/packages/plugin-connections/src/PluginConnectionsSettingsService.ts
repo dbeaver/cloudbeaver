@@ -7,6 +7,9 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
+import { SettingsManagerService } from '@cloudbeaver/core-settings';
+
+import { CONNECTIONS_SETTINGS_GROUP, settings } from './CONNECTIONS_SETTINGS_GROUP';
 
 const defaultSettings = {
   hideConnectionViewForUsers: false,
@@ -18,7 +21,10 @@ export type PluginConnectionsSettings = typeof defaultSettings;
 export class PluginConnectionsSettingsService {
   readonly settings: PluginSettings<PluginConnectionsSettings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('connections', defaultSettings);
+  constructor(private readonly pluginManagerService: PluginManagerService, settingsManagerService: SettingsManagerService) {
+    this.settings = this.pluginManagerService.createSettings('connections', 'plugin', defaultSettings);
+
+    settingsManagerService.addGroup(CONNECTIONS_SETTINGS_GROUP);
+    settingsManagerService.addSettings(settings.scopeType, settings.scope, settings.settingsData);
   }
 }

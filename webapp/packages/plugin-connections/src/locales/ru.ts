@@ -14,4 +14,7 @@ export default [
   ['connections_public_connection_folder_delete_confirmation', 'Вы удаляете "{arg:name}". Подключения не будут удалены. Вы уверены?'],
   ['plugin_connections_menu_connections_label', 'Подключение'],
   ['plugin_connections_action_disconnect_all_label', 'Отключить все'],
+  ['settings_connections', 'Подключения'],
+  ['settings_connections_hide_connections_view_name', 'Показывать подключения только администраторам'],
+  ['settings_connections_hide_connections_view_description', 'Показывать подключения только администраторам'],
 ];

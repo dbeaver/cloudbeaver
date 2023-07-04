@@ -22,6 +22,6 @@ export class NavTreeSettingsService {
   readonly settings: PluginSettings<NavTreeSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getCoreSettings('navigation-tree', defaultSettings);
+    this.settings = this.pluginManagerService.createSettings('navigation-tree', 'core', defaultSettings);
   }
 }

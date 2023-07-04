@@ -8,6 +8,7 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocalStorageSaveService } from './LocalStorageSaveService';
+import { SettingsManagerService } from './SettingsManagerService';
 import { SettingsService } from './SettingsService';
 
 export const manifest: PluginManifest = {
@@ -15,5 +16,5 @@ export const manifest: PluginManifest = {
     name: 'Core Settings',
   },
 
-  providers: [SettingsService, LocalStorageSaveService],
+  providers: [SettingsService, LocalStorageSaveService, SettingsManagerService],
 };

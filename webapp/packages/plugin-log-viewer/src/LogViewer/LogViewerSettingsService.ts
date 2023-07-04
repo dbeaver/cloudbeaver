@@ -23,6 +23,6 @@ export class LogViewerSettingsService {
   readonly settings: PluginSettings<LogViewerSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('log-viewer', defaultSettings);
+    this.settings = this.pluginManagerService.createSettings('log-viewer', 'plugin', defaultSettings);
   }
 }
