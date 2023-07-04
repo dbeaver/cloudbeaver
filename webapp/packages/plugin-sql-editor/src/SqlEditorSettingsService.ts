@@ -11,6 +11,7 @@ import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 const defaultSettings = {
   maxFileSize: 10 * 1024, // kilobyte
   disabled: false,
+  autoSave: true,
 };
 
 export type SqlEditorSettings = typeof defaultSettings;

@@ -71,7 +71,6 @@ public class LocalResourceController implements RMController {
 
     private static final String FILE_REGEX = "(?U)[\\w.$()@/\\\\ -]+";
     private static final String PROJECT_REGEX = "(?U)[\\w.$()@ -]+"; // slash not allowed in project name
-
     public static final String DEFAULT_CHANGE_ID = "0";
 
     private final DBPWorkspace workspace;
@@ -82,8 +81,8 @@ public class LocalResourceController implements RMController {
     private final Path sharedProjectsPath;
     private final String globalProjectName;
     private Supplier<SMController> smControllerSupplier;
-    private final RMFileLockController lockController;
-    private final List<RMFileOperationHandler> fileHandlers;
+    protected final RMFileLockController lockController;
+    protected final List<RMFileOperationHandler> fileHandlers;
 
     private final Map<String, BaseWebProjectImpl> projectRegistries = new LinkedHashMap<>();
 
@@ -121,7 +120,7 @@ public class LocalResourceController implements RMController {
         return userId == null ? null : this.userProjectsPath.resolve(userId);
     }
 
-    private BaseWebProjectImpl getWebProject(String projectId, boolean refresh) throws DBException {
+    protected BaseWebProjectImpl getWebProject(String projectId, boolean refresh) throws DBException {
         synchronized (projectRegistries) {
             BaseWebProjectImpl project = projectRegistries.get(projectId);
             if (project == null || refresh) {
@@ -765,7 +764,7 @@ public class LocalResourceController implements RMController {
                 try {
                     Files.write(targetPath, data);
                 } catch (IOException e) {
-                    throw new DBException("Error reading resource '" + resourcePath + "'", e);
+                    throw new DBException("Error writing resource '" + resourcePath + "'", e);
                 }
                 return null;
             });
@@ -777,7 +776,7 @@ public class LocalResourceController implements RMController {
         return DEFAULT_CHANGE_ID;
     }
 
-    private void createFolder(Path targetPath) throws DBException {
+    protected void createFolder(Path targetPath) throws DBException {
         if (!Files.exists(targetPath)) {
             try {
                 Files.createDirectories(targetPath);
@@ -924,34 +923,31 @@ public class LocalResourceController implements RMController {
     }
 
     private <T> T doProjectOperation(String projectId, RMFileOperation<T> operation) throws DBException {
-        var projectPath = getProjectPath(projectId);
         for (RMFileOperationHandler fileHandler : fileHandlers) {
-            fileHandler.projectOpened(projectPath);
+            fileHandler.projectOpened(projectId);
         }
         return operation.doOperation();
     }
 
     private <T> T doFileReadOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
-        var projectPath = getProjectPath(projectId);
         for (RMFileOperationHandler fileHandler : fileHandlers) {
-            fileHandler.beforeFileRead(projectPath, file);
+            fileHandler.beforeFileRead(projectId, file);
         }
         return operation.doOperation();
     }
 
     private <T> T doFileWriteOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
-        var projectPath = getProjectPath(projectId);
         for (RMFileOperationHandler fileHandler : fileHandlers) {
-            fileHandler.beforeFileChange(projectPath, file);
+            fileHandler.beforeFileChange(projectId, file);
         }
         var result = operation.doOperation();
         for (RMFileOperationHandler fileHandler : fileHandlers) {
-            fileHandler.afterFileChange(projectPath, file, credentialsProvider.getActiveUserCredentials());
+            fileHandler.afterFileChange(projectId, file, credentialsProvider.getActiveUserCredentials());
         }
         return result;
     }
 
-    private Path getProjectPath(String projectId) throws DBException {
+    protected Path getProjectPath(String projectId) throws DBException {
         RMProjectName project = parseProjectName(projectId);
         RMProjectType type = project.getType();
         String projectName = project.getName();
@@ -1179,9 +1175,16 @@ public class LocalResourceController implements RMController {
         return RMProjectType.GLOBAL.getPrefix().equals(rmProjectName.getPrefix());
     }
 
-    public static boolean isPrivateProject(String projectId, String userId) {
+    public static boolean isPrivateProject(String projectId) {
+        RMProjectName rmProjectName = parseProjectNameUnsafe(projectId);
+        return RMProjectType.USER.getPrefix().equals(rmProjectName.getPrefix());
+    }
+
+    public static boolean isProjectOwner(String projectId, String userId) {
         RMProjectName rmProjectName = parseProjectNameUnsafe(projectId);
         return RMProjectType.USER.getPrefix().equals(rmProjectName.getPrefix()) &&
             rmProjectName.name.equals(userId);
     }
+
+
 }
