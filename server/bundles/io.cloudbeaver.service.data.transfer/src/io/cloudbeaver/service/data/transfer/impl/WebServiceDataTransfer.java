@@ -174,7 +174,8 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                         throw new DBException("Error exporting data", e);
                     }
                     Path finallyExportFile = parameters.getOutputSettings().isCompress()
-                        ? exportFile.resolveSibling(exportFile.getFileName() + ".zip")
+                        ? exportFile.resolveSibling(WebDataTransferUtils.normalizeFileName(
+                            exportFile.getFileName().toString(), parameters.getOutputSettings()))
                         : exportFile;
                     WebDataTransferTaskConfig taskConfig = new WebDataTransferTaskConfig(finallyExportFile, parameters);
                     String exportFileName = CommonUtils.escapeFileName(CommonUtils.truncateString(dataContainer.getName(), 32));
