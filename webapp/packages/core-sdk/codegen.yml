@@ -21,7 +21,7 @@ generates:
       - typescript-graphql-request
     config:
       skipTypename: true
-      documentMode : 'string'
+      documentMode: 'string'
       useTypeImports: true
       avoidOptionals:
         field: false
@@ -36,8 +36,8 @@ generates:
         arguments: interface
       scalars:
         Object: any
-        JSON: "{ [key: string]: any }"
+        JSON: '{ [key: string]: any }'
         DateTime: any
 hooks:
   afterAllFileWrite:
-    - eslint --fix
+    - prettier ./src/sdk.ts -write
