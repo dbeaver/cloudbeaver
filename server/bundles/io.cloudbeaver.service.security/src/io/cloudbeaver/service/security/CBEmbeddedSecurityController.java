@@ -156,13 +156,13 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Override
-    public void createUsers(@NotNull List<SMUserInfo> users, @Nullable String defaultAuthRole) throws DBException {
-        for (SMUserInfo user : users) {
+    public void importUsers(@NotNull SMUserImportList userImportList) throws DBException {
+        for (SMUserProvisioning user : userImportList.getUsers()) {
             if (isSubjectExists(user.getUserId())) {
                 log.info("Skip already exist user: " + user.getUserId());
                 continue;
             }
-            createUser(user.getUserId(), user.getMetaParameters(), true, defaultAuthRole);
+            createUser(user.getUserId(), user.getMetaParameters(), true, userImportList.getAuthRole());
         }
     }
 
