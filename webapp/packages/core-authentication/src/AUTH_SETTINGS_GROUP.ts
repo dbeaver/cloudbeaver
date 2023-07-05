@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createSettingsGroup, FormFieldType, SettingsData } from '@cloudbeaver/core-settings';
+import { createSettingsGroup, SettingsData } from '@cloudbeaver/core-settings';
 
 export const AUTH_SETTINGS_GROUP = createSettingsGroup('settings_authentication');
 
@@ -13,12 +13,13 @@ export const settings: SettingsData = {
   scopeType: 'core',
   scope: 'authentication',
   settingsData: [
-    {
-      key: 'disableAnonymousAccess',
-      type: FormFieldType.Checkbox,
-      name: 'settings_authentication_disable_anonymous_access_name',
-      description: 'settings_authentication_disable_anonymous_access_description',
-      groupId: AUTH_SETTINGS_GROUP.id,
-    },
+    // TODO: it's administrator settings
+    // {
+    //   key: 'disableAnonymousAccess',
+    //   type: FormFieldType.Checkbox,
+    //   name: 'settings_authentication_disable_anonymous_access_name',
+    //   description: 'settings_authentication_disable_anonymous_access_description',
+    //   groupId: AUTH_SETTINGS_GROUP.id,
+    // },
   ],
 };
