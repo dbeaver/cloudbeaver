@@ -46,6 +46,12 @@ const filterStyles = css`
       right: 4px;
       top: 4px;
     }
+    &[name='cross'] {
+      width: 14px;
+      height: 14px;
+      top: 9px;
+      right: 9px;
+    }
   }
 `;
 
@@ -106,10 +112,12 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   const styles = useStyles(filterStyles, style, toggleMode && toggleModeButtonStyle);
   const [inputRef, ref] = useFocus<HTMLInputElement>({});
   const [toggled, setToggled] = useState(!toggleMode);
+  const [isFilled, setIsFilled] = useState(false);
 
   const filter = useCallback(
     (value: string | number, name?: string) => {
       value = String(value);
+      setIsFilled(!!value);
 
       if (state && name) {
         state[name] = value;
@@ -163,7 +171,11 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
         onKeyDown={onKeyDown}
         {...use({ toggled, max })}
       />
-      <IconButton name="search" disabled={disabled} onClick={toggle} {...use({ toggled })} />
+      {isFilled ? (
+        <IconButton name="cross" disabled={disabled} onClick={() => filter('', name)} />
+      ) : (
+        <IconButton name="search" disabled={disabled} onClick={toggle} {...use({ toggled })} />
+      )}
     </filter-container>,
   );
 });
