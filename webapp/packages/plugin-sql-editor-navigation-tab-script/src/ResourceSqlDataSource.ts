@@ -19,7 +19,7 @@ import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-res
 import { isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath, debounce, getPathName, getPathParent, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
-import { BaseSqlDataSource, ESqlDataSourceFeatures } from '@cloudbeaver/plugin-sql-editor';
+import { BaseSqlDataSource, ESqlDataSourceFeatures, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
 
@@ -106,6 +106,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly resourceManagerResource: ResourceManagerResource,
+    private readonly sqlEditorService: SqlEditorService,
     state: IResourceSqlDataSourceState,
   ) {
     super();
@@ -116,6 +117,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this.resourceUseKeyId = null;
     this.scheduler = new TaskScheduler(() => true);
     this.debouncedWrite = debounce(this.debouncedWrite.bind(this), VALUE_SYNC_DELAY);
+    this.debouncedSaveProperties = debounce(this.debouncedSaveProperties.bind(this), VALUE_SYNC_DELAY);
     this.syncResource = this.syncResource.bind(this);
 
     resourceManagerResource.onDataOutdated.addHandler(this.syncResource);
@@ -200,7 +202,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     this._script = script;
     super.setScript(script);
 
-    if (previous !== script) {
+    if (this.sqlEditorService.autoSave && previous !== script) {
       this.debouncedWrite();
     }
   }
@@ -264,7 +266,9 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       this.state.executionContext = toJS(executionContext);
       super.setExecutionContext(executionContext);
 
-      this.saveProperties();
+      if (this.sqlEditorService.autoSave) {
+        this.debouncedSaveProperties();
+      }
     }
   }
 
@@ -351,6 +355,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   async save(): Promise<void> {
     await this.write();
+    await this.saveProperties();
   }
 
   private async saveProperties() {
@@ -384,5 +389,9 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   private debouncedWrite() {
     this.write();
+  }
+
+  private debouncedSaveProperties() {
+    this.saveProperties();
   }
 }

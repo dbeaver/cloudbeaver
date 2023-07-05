@@ -53,7 +53,8 @@ public interface WebApplication extends DBPApplication {
     WebProjectImpl createProjectImpl(
         @NotNull WebSession webSession,
         @NotNull RMProject project,
-        @NotNull DataSourceFilter dataSourceFilter);
+        @NotNull DataSourceFilter dataSourceFilter
+    );
 
     SMController createSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
@@ -61,8 +62,10 @@ public interface WebApplication extends DBPApplication {
 
     DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
-    RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
-                                          @NotNull DBPWorkspace workspace) throws DBException;
+    RMController createResourceController(
+        @NotNull SMCredentialsProvider credentialsProvider,
+        @NotNull DBPWorkspace workspace
+    ) throws DBException;
 
     DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider);
 

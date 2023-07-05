@@ -76,12 +76,13 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
     this.history.onNavigate.addHandler(value => this.setScript(value, SOURCE_HISTORY));
 
-    makeObservable<this, 'outdated' | 'editing'>(this, {
+    makeObservable<this, 'outdated' | 'editing' | 'saved'>(this, {
       databaseModels: observable.ref,
       exception: observable.ref,
       outdated: observable.ref,
       message: observable.ref,
       editing: observable.ref,
+      saved: observable.ref,
     });
   }
 
@@ -97,6 +98,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo | undefined): void {
+    this.saved = false;
     this.onUpdate.execute();
   }
 
