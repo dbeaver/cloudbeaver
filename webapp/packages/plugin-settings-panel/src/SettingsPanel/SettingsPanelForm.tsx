@@ -28,13 +28,13 @@ export const SettingsPanelForm = observer(function SettingsPanelForm() {
   const style = useStyles(BASE_CONTAINERS_STYLES, styles);
 
   const settingsManagerService = useService(SettingsManagerService);
-  const groups = Array.from(settingsManagerService.groups);
+  const groups = Array.from(settingsManagerService.groups.values());
 
   return styled(style)(
     <content>
       <ColoredContainer gap overflow parent>
         <Container medium gap vertical overflow>
-          {groups.map(([_, group]) => (
+          {groups.map(group => (
             <SettingsGroup key={group.id} group={group} />
           ))}
         </Container>
