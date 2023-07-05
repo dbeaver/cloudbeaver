@@ -20,6 +20,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
@@ -184,6 +185,11 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     }
 
     private void collectLeafBindings(DBDAttributeBinding attr, List<DBDAttributeBinding> leafBindings) {
+        // we need to show arrays as string because there was a problem with showing multiple rows for custom objects
+        if (attr.getDataKind() == DBPDataKind.ARRAY) {
+            leafBindings.add(attr);
+            return;
+        }
         List<DBDAttributeBinding> nestedBindings = attr.getNestedBindings();
         if (CommonUtils.isEmpty(nestedBindings)) {
             leafBindings.add(attr);
