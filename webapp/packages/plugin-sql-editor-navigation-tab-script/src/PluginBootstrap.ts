@@ -33,9 +33,9 @@ import {
 } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
+import { ACTION_SAVE_AS_SCRIPT } from './ACTION_SAVE_AS_SCRIPT';
 import { ResourceSqlDataSource } from './ResourceSqlDataSource';
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
-import { ACTION_SAVE_AS_SCRIPT } from './ACTION_SAVE_AS_SCRIPT';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -141,7 +141,8 @@ export class PluginBootstrap extends Bootstrap {
                 throw new Error('Project not found');
               }
 
-              const scriptName = this.projectInfoResource.getNameWithExtension(projectId, SCRIPTS_TYPE_ID, result.name.trim());
+              const nameWithoutExtension = result.name.trim();
+              const scriptName = this.projectInfoResource.getNameWithExtension(projectId, SCRIPTS_TYPE_ID, nameWithoutExtension);
               const scriptsRootFolder = this.resourceManagerScriptsService.getRootFolder(project);
               const folderResourceKey = getResourceKeyFromNodeId(createPath(RESOURCES_NODE_PATH, projectId, scriptsRootFolder));
 
@@ -163,7 +164,7 @@ export class PluginBootstrap extends Bootstrap {
 
               this.notificationService.logSuccess({
                 title: 'plugin_sql_editor_navigation_tab_resource_save_script_success',
-                message: getPathName(resourceKey),
+                message: nameWithoutExtension,
               });
 
               if (!this.resourceManagerScriptsService.active) {
@@ -248,7 +249,7 @@ export class PluginBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 
   private canOpenHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>): void {
     const nodeInfo = contexts.getContext(this.navNodeManagerService.navigationNavNodeContext);

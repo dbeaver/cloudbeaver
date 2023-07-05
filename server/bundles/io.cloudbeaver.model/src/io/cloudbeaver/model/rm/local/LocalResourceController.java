@@ -756,7 +756,7 @@ public class LocalResourceController implements RMController {
             }
             Path targetPath = getTargetPath(projectId, resourcePath);
             if (!forceOverwrite && Files.exists(targetPath)) {
-                throw new DBException("Resource '" + resourcePath + "' exists");
+                throw new DBException("Resource '" + IOUtils.getFileNameWithoutExtension(targetPath) + "' already exists");
             }
 
             doFileWriteOperation(projectId, targetPath, () -> {
