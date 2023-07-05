@@ -346,12 +346,14 @@ export interface DataTransferDefaultExportSettings {
 }
 
 export interface DataTransferOutputSettings {
+  compress: Scalars['Boolean'];
   encoding: Scalars['String'];
   insertBom: Scalars['Boolean'];
   timestampPattern: Scalars['String'];
 }
 
 export interface DataTransferOutputSettingsInput {
+  compress?: InputMaybe<Scalars['Boolean']>;
   encoding?: InputMaybe<Scalars['String']>;
   insertBom?: InputMaybe<Scalars['Boolean']>;
   timestampPattern?: InputMaybe<Scalars['String']>;
@@ -2412,7 +2414,7 @@ export type ExportDataFromResultsQuery = { taskInfo: { id: string, name?: string
 export type GetDataTransferDefaultParametersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetDataTransferDefaultParametersQuery = { settings: { supportedEncodings: Array<string>, outputSettings: { insertBom: boolean, encoding: string, timestampPattern: string } } };
+export type GetDataTransferDefaultParametersQuery = { settings: { supportedEncodings: Array<string>, outputSettings: { insertBom: boolean, encoding: string, timestampPattern: string, compress: boolean } } };
 
 export type GetDataTransferProcessorsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3974,6 +3976,7 @@ export const GetDataTransferDefaultParametersDocument = `
       insertBom
       encoding
       timestampPattern
+      compress
     }
     supportedEncodings
   }

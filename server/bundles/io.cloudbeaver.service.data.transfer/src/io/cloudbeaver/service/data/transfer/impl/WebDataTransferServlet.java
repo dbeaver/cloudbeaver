@@ -71,7 +71,7 @@ public class WebDataTransferServlet extends WebServiceServletBase {
         } else {
             fileName = taskInfo.getDataFileId();
         }
-
+        fileName = WebDataTransferUtils.normalizeFileName(fileName, taskInfo.getParameters().getOutputSettings());
         Path dataFile = taskInfo.getDataFile();
         session.addInfoMessage("Download data ...");
         response.setHeader("Content-Type", processor.getContentType());
