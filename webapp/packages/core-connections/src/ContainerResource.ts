@@ -99,7 +99,7 @@ export class ContainerResource extends CachedMapResource<ObjectContainerParams, 
       containers.set(
         { projectId, connectionId, catalogId },
         {
-          parentNode: navGetStructContainers.parentNode,
+          parentNode: navGetStructContainers.parentNode ?? null,
           catalogList: navGetStructContainers.catalogList,
           schemaList: navGetStructContainers.schemaList,
           supportsCatalogChange: navGetStructContainers.supportsCatalogChange,
