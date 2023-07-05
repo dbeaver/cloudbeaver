@@ -246,7 +246,7 @@ public class WebServiceRM implements DBWServiceRM {
                 WSResourceProperty.CONTENT);
             return content;
         } catch (Exception e) {
-            throw new DBWebException("Error writing resource '" + resourcePath + "' data", e);
+            throw new DBWebException("Error writing resource data", e);
         }
     }
 
