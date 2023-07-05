@@ -27,6 +27,7 @@ import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-t
 import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
 import { ResourceSqlDataSource } from './ResourceSqlDataSource';
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
+
 const RESOURCE_TAB_STATE = 'sql_editor_resource_tab_state';
 const SYNC_DELAY = 5 * 60 * 1000;
 
@@ -170,7 +171,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 
   private createState(editorId: string, resourceKey?: string): IResourceSqlDataSourceState {
     let state = this.dataSourceStateState.get(editorId);

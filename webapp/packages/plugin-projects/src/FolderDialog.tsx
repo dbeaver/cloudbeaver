@@ -114,7 +114,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
               state.setMessage(message);
             }
           });
-        } catch { }
+        } catch {}
 
         if (state.folder === folder && state.value === value && state.projectId === projectId) {
           state.valid = valid ?? true;

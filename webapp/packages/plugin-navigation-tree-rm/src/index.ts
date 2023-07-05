@@ -1,4 +1,5 @@
 import { navigationTreeRMPlugin } from './manifest';
+
 export * from './NavNodes/getResourceKeyFromNodeId';
 export * from './NavNodes/getResourceNodeId';
 export * from './NavNodes/getRmProjectNodeId';
