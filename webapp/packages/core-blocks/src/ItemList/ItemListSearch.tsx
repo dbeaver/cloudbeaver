@@ -28,12 +28,12 @@ export const ItemListSearch: React.FC<IProps> = function ItemListSearch({ value,
   const [search, setSearch] = useState(value ?? '');
   const translate = useTranslate();
   const changeHandler = useCallback(
-    (value: string) => {
+    (changeValue: string) => {
       if (value === undefined) {
-        setSearch(value);
+        setSearch(changeValue);
       }
       if (onChange) {
-        onChange(value);
+        onChange(changeValue);
       }
     },
     [value, onChange],
@@ -52,6 +52,8 @@ export const ItemListSearch: React.FC<IProps> = function ItemListSearch({ value,
     }
   }, [value, onSearch]);
 
+  const inputValue = value ?? search;
+
   return styled(useStyles(styles || []))(
     <list-search className={className}>
       <input-box>
@@ -59,14 +61,14 @@ export const ItemListSearch: React.FC<IProps> = function ItemListSearch({ value,
           ref={inputRef}
           name="search"
           placeholder={translate(placeholder || 'ui_search')}
-          value={value ?? search}
+          value={inputValue}
           autoComplete="off"
           disabled={disabled}
           onChange={event => changeHandler(event.target.value)}
           {...use({ mod: 'surface' })}
         />
         <action-button as="div">
-          {!onSearch && (value ?? search) ? (
+          {!onSearch && inputValue ? (
             <IconButton name="cross" onClick={() => changeHandler('')} />
           ) : (
             <IconButton name="search" onClick={searchHandler} />
