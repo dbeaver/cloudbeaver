@@ -13,8 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { DatabaseAuthModel, DriverConfigurationType } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionFormState } from '../IConnectionFormProps';
-
-const MAX_HOST_LENGTH = 20;
+import { getConnectionName } from './getConnectionName';
 
 export function useOptions(state: IConnectionFormState) {
   const dbDriverResource = useService(DBDriverResource);
@@ -32,13 +31,10 @@ export function useOptions(state: IConnectionFormState) {
     updateNameTemplate(driver: DBDriver | undefined) {
       runInAction(() => {
         const {
-          prevName,
           state: { config, info, mode },
         } = refObject;
 
-        const isAutoFill = config.name === prevName || prevName === null;
-
-        if (mode === 'edit' || !isAutoFill) {
+        if (mode === 'edit') {
           return;
         }
 
@@ -53,13 +49,8 @@ export function useOptions(state: IConnectionFormState) {
           return;
         }
 
-        let name = driver.name || '';
-        if (config.host) {
-          name += '@' + config.host.slice(0, MAX_HOST_LENGTH);
-          if (config.port && config.port !== driver.defaultPort) {
-            name += ':' + config.port;
-          }
-        }
+        const name = getConnectionName(driver.name || '', config.host, config.port, driver.defaultPort);
+
         refObject.prevName = name;
         config.name = name;
       });
@@ -132,6 +123,17 @@ export function useOptions(state: IConnectionFormState) {
       }
 
       refObject.state.checkFormState();
+    },
+
+    isNameAutoFill() {
+      const {
+        prevName,
+        state: { config },
+      } = refObject;
+
+      const isAutoFill = config.name === prevName || prevName === null;
+
+      return isAutoFill;
     },
   });
 }
