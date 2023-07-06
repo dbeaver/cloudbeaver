@@ -13,7 +13,7 @@ import { ConnectionExecutionContextService, createConnectionParam } from '@cloud
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
-import type { SqlCompletionProposal, SqlDialectInfo } from '@cloudbeaver/core-sdk';
+import type { SqlCompletionProposal, SqlDialectInfo, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 import { createLastPromiseGetter, isObjectsEqual, LastPromiseGetter, throttleAsync } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
@@ -39,6 +39,7 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly sqlResultTabsService: SqlResultTabsService;
   readonly dataSource: ISqlDataSource | undefined;
   readonly getLastAutocomplete: LastPromiseGetter<SqlCompletionProposal[]>;
+  readonly parseScript: LastPromiseGetter<SqlScriptInfoFragment>;
 
   cursor: ICursor;
   readonlyState: boolean;
@@ -175,6 +176,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       getLastAutocomplete: createLastPromiseGetter(),
+      parseScript: createLastPromiseGetter(),
 
       getHintProposals: throttleAsync(async function getHintProposals(this: ISQLEditorDataPrivate, position, simple) {
         if (!this.dataSource?.executionContext) {
@@ -353,7 +355,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return;
         }
 
-        const { queries } = await this.sqlEditorService.parseSQLScript(connectionId, script);
+        const { queries } = await this.parseScript([connectionId, script], () => this.sqlEditorService.parseSQLScript(connectionId, script));
 
         if (this.parser.actualScript === script) {
           this.parser.setQueries(queries);
