@@ -40,6 +40,10 @@ export const SettingsGroup = observer<Props>(function SettingsGroup({ group }) {
       options: settingsItem.options?.map(option => ({ ...option, name: translate(option.name) })),
     }));
 
+  if (settings.length === 0) {
+    return null;
+  }
+
   return styled(BASE_CONTAINERS_STYLES)(
     <Group gap vertical>
       <GroupTitle keepSize large>

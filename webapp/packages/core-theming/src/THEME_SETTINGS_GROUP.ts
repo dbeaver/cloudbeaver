@@ -20,7 +20,7 @@ export const settings: SettingsData = {
       type: FormFieldType.Combobox,
       name: 'settings_theming_default_theme_name',
       description: 'settings_theming_default_theme_description',
-      options: themes.map(theme => ({ id: theme.id, name: theme.name })),
+      options: themes.map(theme => ({ id: theme.id, name: theme.name })), // TODO: must be taken from ThemeService service, themes is default themes
       groupId: THEME_SETTINGS_GROUP.id,
     },
   ],
