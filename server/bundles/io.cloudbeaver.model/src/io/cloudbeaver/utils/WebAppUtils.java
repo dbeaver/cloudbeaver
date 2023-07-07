@@ -54,6 +54,14 @@ public class WebAppUtils {
         return (WebApplication) DBWorkbench.getPlatform().getApplication();
     }
 
+    public static WebAuthApplication getWebAuthApplication() throws DBException {
+        WebApplication application = getWebApplication();
+        if (!WebAuthApplication.class.isAssignableFrom(application.getClass())) {
+            throw new DBException("The current application doesn't contain authorization configuration");
+        }
+        return  (WebAuthApplication) application;
+    }
+
     public static SMAuthenticationManager getAuthManager(WebApplication application) throws DBException {
         var smController = application.createSecurityController(new NoAuthCredentialsProvider());
         if (!SMAuthenticationManager.class.isAssignableFrom(smController.getClass())) {
@@ -144,12 +152,7 @@ public class WebAppUtils {
 
     @NotNull
     public static StringBuilder getAuthApiPrefix(String serviceId) throws DBException {
-        WebApplication application = getWebApplication();
-        if (!WebAuthApplication.class.isAssignableFrom(application.getClass())) {
-            throw new DBException("The current application doesn't contain authorization configuration");
-        }
-        WebAuthApplication webAuthApplication = (WebAuthApplication) application;
-        return getAuthApiPrefix(webAuthApplication, serviceId);
+        return getAuthApiPrefix(getWebAuthApplication(), serviceId);
     }
 
     @NotNull
