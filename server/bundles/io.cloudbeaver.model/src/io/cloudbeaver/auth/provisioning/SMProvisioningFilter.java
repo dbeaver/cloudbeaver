@@ -17,12 +17,12 @@ public class SMProvisioningFilter {
     }
 
     @Nullable
-    public Integer getPage() {
+    public Integer getOffset() {
         return offset;
     }
 
     @Nullable
-    public Integer getPageSize() {
+    public Integer getLimit() {
         return limit;
     }
 }
