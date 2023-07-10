@@ -56,6 +56,7 @@ type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 
     mod?: 'surface';
     ref?: React.Ref<HTMLInputElement>;
     style?: ComponentStyle;
+    aggregate?: boolean;
   };
 
 type ControlledProps = BaseProps & {
@@ -101,6 +102,7 @@ export const InputFiles: InputFilesType = observer(
       large,
       tiny,
       autoHide,
+      aggregate,
       onChange,
       ...rest
     }: ControlledProps | ObjectProps<any, any>,
@@ -120,6 +122,23 @@ export const InputFiles: InputFilesType = observer(
     }
 
     function setValue(value: FileList | null) {
+      if (aggregate) {
+        if (value) {
+          const allFiles = [...Array.from(innerState || []), ...Array.from(value)];
+          const existingFiles = new Set();
+          const aggregation = new DataTransfer();
+
+          for (const file of allFiles) {
+            if (!existingFiles.has(file.name)) {
+              aggregation.items.add(file);
+              existingFiles.add(file.name);
+            }
+          }
+
+          value = aggregation.files;
+        }
+      }
+
       setInnerState(value);
       if (state) {
         state[name] = value;
