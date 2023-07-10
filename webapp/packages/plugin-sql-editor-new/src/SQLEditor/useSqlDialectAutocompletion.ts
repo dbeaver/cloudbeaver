@@ -11,7 +11,7 @@ import { createComplexLoader, useComplexLoader, useObjectRef } from '@cloudbeave
 import { useService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
-import type { Completion, CompletionConfig, CompletionContext, CompletionResult, Extension } from '@cloudbeaver/plugin-codemirror6';
+import type { Compartment, Completion, CompletionConfig, CompletionContext, CompletionResult, Extension } from '@cloudbeaver/plugin-codemirror6';
 import type { ISQLEditorData, SQLProposal } from '@cloudbeaver/plugin-sql-editor';
 
 const codemirrorComplexLoader = createComplexLoader(() => import('@cloudbeaver/plugin-codemirror6'));
@@ -23,7 +23,7 @@ type SqlCompletion = Completion & {
 const CLOSE_CHARACTERS = /[\s()[\]{};:>,=\\*]/;
 const COMPLETION_WORD = /[\w*]*/;
 
-export function useSqlDialectAutocompletion(data: ISQLEditorData): Extension[] {
+export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment, Extension] {
   const { closeCompletion, useEditorAutocompletion } = useComplexLoader(codemirrorComplexLoader);
   const localizationService = useService(LocalizationService);
   const optionsRef = useObjectRef({ data });

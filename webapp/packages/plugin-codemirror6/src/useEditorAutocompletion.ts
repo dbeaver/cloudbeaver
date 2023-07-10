@@ -6,28 +6,28 @@
  * you may not use this file except in compliance with the License.
  */
 import { autocompletion, startCompletion } from '@codemirror/autocomplete';
-import type { Extension } from '@codemirror/state';
+import { Compartment, type Extension } from '@codemirror/state';
 import { keymap } from '@codemirror/view';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 export type CompletionConfig = Parameters<typeof autocompletion>[0];
 
-export function useEditorAutocompletion(config?: CompletionConfig): Extension[] {
-  const [autocompleteKeyMap] = useState(() =>
-    keymap.of([
-      { key: 'Alt-Space', run: startCompletion, preventDefault: true },
-      { key: 'Shift-Ctrl-Space', run: startCompletion, preventDefault: true },
-    ]),
-  );
+const EDITOR_AUTOCOMPLETION_COMPARTMENT = new Compartment();
 
+export function useEditorAutocompletion(config?: CompletionConfig): [Compartment, Extension] {
   const autocompletionExtension = useMemo(
-    () =>
+    () => [
+      keymap.of([
+        { key: 'Alt-Space', run: startCompletion, preventDefault: true },
+        { key: 'Shift-Ctrl-Space', run: startCompletion, preventDefault: true },
+      ]),
       autocompletion({
         ...config,
         closeOnBlur: false,
       }),
+    ],
     [config],
   );
 
-  return [autocompletionExtension, autocompleteKeyMap];
+  return [EDITOR_AUTOCOMPLETION_COMPARTMENT, autocompletionExtension];
 }

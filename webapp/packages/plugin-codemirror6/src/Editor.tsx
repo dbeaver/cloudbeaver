@@ -11,22 +11,22 @@ import styled from 'reshadow';
 
 import { clsx } from '@cloudbeaver/core-utils';
 
-import type { IDefaultExtensions } from './getDefaultExtensions';
 import type { IEditorProps } from './IEditorProps';
 import type { IEditorRef } from './IEditorRef';
 import { ReactCodemirror } from './ReactCodemirror';
 import { EDITOR_BASE_STYLES } from './theme';
-import { useEditorDefaultExtensions } from './useDefaultExtensions';
+import { useCodemirrorExtensions } from './useCodemirrorExtensions';
+import { type IDefaultExtensions, useEditorDefaultExtensions } from './useEditorDefaultExtensions';
 
 export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
-  forwardRef(function Editor({ lineNumbers, extensions = [], ...rest }, ref) {
+  forwardRef(function Editor({ lineNumbers, extensions, ...rest }, ref) {
+    extensions = useCodemirrorExtensions(extensions);
     const defaultExtensions = useEditorDefaultExtensions({ lineNumbers });
-    const combinedExtensions = [...defaultExtensions];
-    combinedExtensions.push(...extensions);
+    extensions.set(...defaultExtensions);
 
     return styled(EDITOR_BASE_STYLES)(
       <wrapper className={clsx('editor', rest.className)}>
-        <ReactCodemirror {...rest} ref={ref} extensions={combinedExtensions} />
+        <ReactCodemirror {...rest} ref={ref} extensions={extensions} />
       </wrapper>,
     );
   }),

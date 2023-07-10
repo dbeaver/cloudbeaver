@@ -7,12 +7,24 @@
  */
 
 @mixin base-code-editor() {
-
   .editor,
-  .ReactCodemirror {
+  .ReactCodemirror,
+  .cm-mergeView,
+  .cm-mergeViewEditors,
+  .cm-editor {
     @include mdc-typography('body2');
     width: 100%;
     height: 100%;
+  }
+
+  .cm-mergeViewEditor:first-child {
+    border-right: 1px solid;
+    @include mdc-theme-prop(border-color, background, false);
+  }
+
+  .ͼ1 .cm-scroller,
+  .ͼ1 {
+    height: 100% !important;
   }
 
   .editor {
@@ -37,20 +49,24 @@
     border-left: 1.2px solid $cursor;
   }
 
-  .editor .cm-gutters {
+  .editor .cm-gutters,
+  .cm-panel {
     @include mdc-theme-prop(background-color, surface, false);
     @include mdc-theme-prop(color, text-hint-on-light, false);
     @include mdc-theme-prop(border-color, background, false);
   }
 
   .editor .cm-activeLine {
-    background: none;
     box-shadow: 0 0 0 2px $mdc-theme-sub-secondary;
   }
 
   .editor .cm-activeLineGutter {
-    background: none;
     @include mdc-theme-prop(color, on-surface, false);
+  }
+
+  .ͼ2 .cm-activeLine:not(.cm-changedLine, .cm-deletedLine),
+  .ͼ2 .cm-activeLineGutter:not(.cm-changedLineGutter, .cm-deletedLineGutter) {
+    background-color: unset;
   }
 
   .editor .active-query {
@@ -62,19 +78,8 @@
   }
 
   .editor .cm-content ::selection {
+    @include mdc-theme-prop(background, primary, false);
     color: white;
-  }
-
-  .editor .cm-line::selection,
-  .editor .cm-line> :global(span)::selection,
-  .editor .cm-line> :global(span)> :global(span)::selection {
-    @include mdc-theme-prop(background, primary, false);
-  }
-
-  .editor .cm-line::-moz-selection,
-  .editor .cm-line> :global(span)::-moz-selection,
-  .editor .cm-line> :global(span)> :global(span)::-moz-selection {
-    @include mdc-theme-prop(background, primary, false);
   }
 
   .editor .cm-lineNumbers .cm-gutterElement {

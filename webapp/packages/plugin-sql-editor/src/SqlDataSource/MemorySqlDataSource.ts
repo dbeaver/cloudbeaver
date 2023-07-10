@@ -13,6 +13,12 @@ import { BaseSqlDataSource } from './BaseSqlDataSource';
 import { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
 
 export class MemorySqlDataSource extends BaseSqlDataSource {
+  get baseScript(): string {
+    return this._script;
+  }
+  get baseExecutionContext(): IConnectionExecutionContextInfo | undefined {
+    return this._executionContext;
+  }
   static key = 'memory';
 
   get name(): string | null {
@@ -29,6 +35,10 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
 
   get features(): ESqlDataSourceFeatures[] {
     return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable, ESqlDataSourceFeatures.setName];
+  }
+
+  get isSaved(): boolean {
+    return true;
   }
 
   private _name: string | null;
@@ -48,10 +58,6 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
       script: computed,
       executionContext: computed,
     });
-  }
-
-  isSaved(): boolean {
-    return true;
   }
 
   isReadonly(): boolean {
@@ -75,5 +81,13 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
 
   canRename(name: string | null): boolean {
     return true;
+  }
+
+  protected setBaseScript(script: string): void {
+    this._script = script;
+  }
+
+  protected setBaseExecutionContext(executionContext: IConnectionExecutionContextInfo | undefined): void {
+    this._executionContext = executionContext;
   }
 }

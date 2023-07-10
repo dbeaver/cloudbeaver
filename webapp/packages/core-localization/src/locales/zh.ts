@@ -25,6 +25,7 @@ export default [
   ['ui_custom', 'Custom'],
   ['ui_configure', '配置'],
   ['ui_apply', '应用'],
+  ['ui_ignore', 'Ignore'],
   ['ui_error', '错误'],
   ['ui_error_message', '错误：'],
   ['ui_error_close', '关闭'],
