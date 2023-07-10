@@ -31,12 +31,8 @@ export function useOptions(state: IConnectionFormState) {
     updateNameTemplate(driver: DBDriver | undefined) {
       runInAction(() => {
         const {
-          state: { config, info, mode },
+          state: { config, info },
         } = refObject;
-
-        if (mode === 'edit') {
-          return;
-        }
 
         if (isJDBCConnection(driver, info)) {
           refObject.prevName = config.url || '';
@@ -96,7 +92,9 @@ export function useOptions(state: IConnectionFormState) {
           config.url = driver?.sampleURL;
         }
 
-        this.updateNameTemplate(driver);
+        if (this.isNameAutoFill()) {
+          this.updateNameTemplate(driver);
+        }
 
         if (driver?.id !== prevDriver?.id) {
           config.credentials = {};
@@ -128,12 +126,12 @@ export function useOptions(state: IConnectionFormState) {
     isNameAutoFill() {
       const {
         prevName,
-        state: { config },
+        state: { config, mode },
       } = refObject;
 
       const isAutoFill = config.name === prevName || prevName === null;
 
-      return isAutoFill;
+      return isAutoFill && mode === 'create';
     },
   });
 }
