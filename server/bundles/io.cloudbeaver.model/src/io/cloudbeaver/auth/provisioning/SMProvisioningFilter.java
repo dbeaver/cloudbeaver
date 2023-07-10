@@ -12,13 +12,8 @@ public class SMProvisioningFilter {
     private final Integer limit;
 
     public SMProvisioningFilter(Map<String, Object> params) {
-        if (params == null) {
-            this.offset = null;
-            this.limit = null;
-        } else {
-            this.offset = JSONUtils.getInteger(params, "offset");
-            this.limit = JSONUtils.getInteger(params, "limit");
-        }
+        this.offset = JSONUtils.getInteger(params, "offset");
+        this.limit = JSONUtils.getInteger(params, "limit");
     }
 
     @Nullable
