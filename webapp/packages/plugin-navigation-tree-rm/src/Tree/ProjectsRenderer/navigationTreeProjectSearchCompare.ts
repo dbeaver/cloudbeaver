@@ -8,10 +8,10 @@
 import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
 import { EEquality, elementsTreeNameFilterNode, NavNodeFilterCompareFn } from '@cloudbeaver/plugin-navigation-tree';
 
-export const navigationTreeProjectSearchCompare: NavNodeFilterCompareFn = function navigationTreeProjectSearchCompare(node, filter) {
+export const navigationTreeProjectSearchCompare: NavNodeFilterCompareFn = function navigationTreeProjectSearchCompare(tree, node, filter) {
   if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT) {
     return EEquality.none;
   }
 
-  return elementsTreeNameFilterNode(node, filter);
+  return elementsTreeNameFilterNode(tree, node, filter);
 };
