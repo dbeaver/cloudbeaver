@@ -14,4 +14,7 @@ export default [
   ['connections_public_connection_folder_delete_confirmation', 'You\'re going to delete "{arg:name}". Connections won\'t be deleted. Are you sure?'],
   ['plugin_connections_menu_connections_label', '连接'],
   ['plugin_connections_action_disconnect_all_label', '断开所有连接'],
+  ['settings_connections', 'Connections'],
+  ['settings_connections_hide_connections_view_name', 'Show connections to admins only'],
+  ['settings_connections_hide_connections_view_description', 'Show connections to admins only'],
 ];

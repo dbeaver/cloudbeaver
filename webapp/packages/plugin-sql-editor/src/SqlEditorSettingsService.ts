@@ -11,6 +11,7 @@ import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 const defaultSettings = {
   maxFileSize: 10 * 1024, // kilobyte
   disabled: false,
+  autoSave: true,
 };
 
 export type SqlEditorSettings = typeof defaultSettings;
@@ -22,7 +23,7 @@ export class SqlEditorSettingsService {
   readonly deprecatedSettings: PluginSettings<SqlEditorSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getPluginSettings('sql-editor', defaultSettings);
+    this.settings = this.pluginManagerService.createSettings('sql-editor', 'plugin', defaultSettings);
     this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('core.app.sqlEditor', defaultSettings);
   }
 }

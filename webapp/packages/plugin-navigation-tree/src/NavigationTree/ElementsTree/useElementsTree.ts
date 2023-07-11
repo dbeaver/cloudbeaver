@@ -20,9 +20,11 @@ import type { IDNDData } from '@cloudbeaver/core-ui';
 import { ILoadableState, MetadataMap, throttle } from '@cloudbeaver/core-utils';
 
 import type { IElementsTreeAction } from './IElementsTreeAction';
+import type { INavTreeNodeInfo } from './INavTreeNodeInfo';
 import type { NavigationNodeRendererComponent } from './NavigationNodeComponent';
 
 export type IElementsTreeCustomRenderer = (nodeId: string) => NavigationNodeRendererComponent | undefined;
+export type IElementsTreeCustomNodeInfo = (nodeId: string, info: INavTreeNodeInfo) => INavTreeNodeInfo;
 
 export interface IElementsTreeNodeExpandedInfo {
   expanded: boolean;
@@ -66,6 +68,7 @@ export interface IElementsTreeOptions {
   disabled?: boolean;
   filters?: IElementsTreeFilter[];
   renderers?: IElementsTreeCustomRenderer[];
+  nodeInfoTransformers?: IElementsTreeCustomNodeInfo[];
   expandStateGetters?: IElementsTreeNodeExpandInfoGetter[];
   localState?: MetadataMap<string, ITreeNodeState>;
   getChildren: (id: string) => string[] | undefined;
@@ -97,6 +100,7 @@ export interface IElementsTree extends ILoadableState {
   loading: boolean;
   disabled: boolean;
   activeDnDData: IDNDData[];
+  nodeInfoTransformers: IElementsTreeCustomNodeInfo[];
   renderers: IElementsTreeCustomRenderer[];
   state: MetadataMap<string, ITreeNodeState>;
   userData: IElementsTreeUserState;
@@ -141,6 +145,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
   );
 
   options = useObjectRef(options);
+  options.nodeInfoTransformers = useMemo(() => options.nodeInfoTransformers || [], [...(options.nodeInfoTransformers || [])]);
   options.renderers = useMemo(() => options.renderers || [], [...(options.renderers || [])]);
   options.filters = useMemo(() => options.filters || [], [...(options.filters || [])]);
   options.expandStateGetters = useMemo(() => options.expandStateGetters || [], [...(options.expandStateGetters || [])]);
@@ -627,6 +632,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       filtering: computed,
       loading: observable.ref,
       renderers: observable.ref,
+      nodeInfoTransformers: observable.ref,
       baseRoot: observable.ref,
       collapse: action.bound,
       userData: observable.ref,
@@ -639,6 +645,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       settings: options.settings,
       baseRoot: options.baseRoot,
       renderers: options.renderers,
+      nodeInfoTransformers: options.nodeInfoTransformers,
       userData,
     },
     ['isLoading', 'isLoaded'],

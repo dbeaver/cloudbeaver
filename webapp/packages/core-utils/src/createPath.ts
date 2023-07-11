@@ -7,5 +7,8 @@
  */
 
 export function createPath(...names: Array<string | undefined>): string {
-  return names.filter(Boolean).join('/');
+  return names
+    .filter(Boolean)
+    .map((name, i) => (i === 0 ? name!.replace(/\/$/, '') : name!.replace(/^\/|\/$/g, '')))
+    .join('/');
 }

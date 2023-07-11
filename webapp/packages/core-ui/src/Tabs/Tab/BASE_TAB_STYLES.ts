@@ -19,7 +19,7 @@ export const BASE_TAB_STYLES = css`
     padding: 0;
     white-space: nowrap;
 
-    height: 48px;
+    height: 32px;
     border-top: solid 2px transparent;
 
     &:global([aria-selected='true']) {
@@ -63,25 +63,29 @@ export const BASE_TAB_STYLES = css`
     align-items: center;
 
     & tab-icon {
+      display: flex;
       height: 24px;
-      padding-left: 12px;
+      padding-left: 8px;
+      justify-content: center;
+      align-items: center;
 
       & StaticImage,
       & IconOrImage,
       & img {
-        width: 24px;
+        width: 16px;
+        height: 16px;
       }
 
       & placeholder {
-        width: 24px;
-        height: 24px;
+        width: 16px;
+        height: 16px;
       }
     }
 
     & tab-title {
       overflow: hidden;
       text-overflow: ellipsis;
-      padding: 0 12px;
+      padding: 0 8px;
     }
 
     & tab-title placeholder {
@@ -156,9 +160,5 @@ export const BASE_TAB_ACTION_STYLES = css`
 
   portal {
     visibility: hidden;
-    & tab-action {
-      width: 10px;
-      height: 10px;
-    }
   }
 `;

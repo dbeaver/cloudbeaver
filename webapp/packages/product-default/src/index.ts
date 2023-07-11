@@ -24,6 +24,7 @@ import localization from '@cloudbeaver/plugin-localization';
 import logViewer from '@cloudbeaver/plugin-log-viewer';
 import navigationTabs from '@cloudbeaver/plugin-navigation-tabs';
 import navigationTree from '@cloudbeaver/plugin-navigation-tree';
+import { navigationTreeRMPlugin } from '@cloudbeaver/plugin-navigation-tree-rm';
 import objectViewer from '@cloudbeaver/plugin-object-viewer';
 import productPlugin from '@cloudbeaver/plugin-product';
 import projects from '@cloudbeaver/plugin-projects';
@@ -33,6 +34,7 @@ import resourceManagerScripts from '@cloudbeaver/plugin-resource-manager-scripts
 import root from '@cloudbeaver/plugin-root';
 import settingsMenu from '@cloudbeaver/plugin-settings-menu';
 import settingsMenuAdministration from '@cloudbeaver/plugin-settings-menu-administration';
+import settingsPanelPlugin from '@cloudbeaver/plugin-settings-panel';
 import sqlEditor from '@cloudbeaver/plugin-sql-editor';
 import sqlEditorTab from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import sqlEditorResource from '@cloudbeaver/plugin-sql-editor-navigation-tab-script';
@@ -80,6 +82,7 @@ const PLUGINS: PluginManifest[] = [
   productPlugin,
   settingsMenu,
   settingsMenuAdministration,
+  settingsPanelPlugin,
   help,
   resourceManager,
   resourceManagerAdministration,
@@ -87,6 +90,7 @@ const PLUGINS: PluginManifest[] = [
   sqlEditorResource,
   logViewer,
   navigationTree,
+  navigationTreeRMPlugin,
   datasourceContextSwitch,
   topAppBar,
   version,

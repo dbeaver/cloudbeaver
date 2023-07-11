@@ -10,7 +10,7 @@ import { useLayoutEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AdministrationItemService, filterOnlyActive, IAdministrationItemRoute } from '@cloudbeaver/core-administration';
-import { ErrorBoundary, Loader, SlideBox, slideBoxStyles, SlideElement, SlideOverlay, useStyles } from '@cloudbeaver/core-blocks';
+import { Loader, SlideBox, slideBoxStyles, SlideElement, SlideOverlay, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, OptionsPanelService, TabList, TabsState, verticalTabStyles } from '@cloudbeaver/core-ui';
 

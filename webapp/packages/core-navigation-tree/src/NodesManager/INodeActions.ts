@@ -7,5 +7,5 @@
  */
 
 export interface INodeActions {
-  readonly rename?: () => void;
+  readonly rename?: (saveCallback: (name: string) => Promise<boolean>) => void;
 }

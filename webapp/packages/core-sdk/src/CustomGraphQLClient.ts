@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import axios, { AxiosProgressEvent, AxiosResponse, isAxiosError } from 'axios';
-import { ClientError, GraphQLClient, resolveRequestDocument, RequestDocument, RequestOptions, Variables } from 'graphql-request';
+import { ClientError, GraphQLClient, RequestDocument, RequestOptions, resolveRequestDocument, Variables } from 'graphql-request';
 
 import { GQLError } from './GQLError';
 import type { IResponseInterceptor } from './IResponseInterceptor';

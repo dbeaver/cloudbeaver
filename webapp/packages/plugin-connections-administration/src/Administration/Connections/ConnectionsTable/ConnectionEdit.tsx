@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader } from '@cloudbeaver/core-blocks';
@@ -34,16 +33,8 @@ interface Props {
 
 export const ConnectionEdit = observer<Props>(function ConnectionEditNew({ item }) {
   const connectionInfoResource = useService(ConnectionInfoResource);
-  const boxRef = useRef<HTMLDivElement>(null);
   // const tableContext = useContext(TableContext);
   // const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext, item]);
-
-  useEffect(() => {
-    boxRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-    });
-  }, []);
 
   const data = useConnectionFormState(connectionInfoResource, state => state.setOptions('edit', 'admin'));
 
@@ -51,7 +42,7 @@ export const ConnectionEdit = observer<Props>(function ConnectionEditNew({ item 
   data.projectId = item.projectId;
 
   return styled(styles)(
-    <box ref={boxRef}>
+    <box>
       <Loader suspense>
         <ConnectionFormLoader
           state={data}

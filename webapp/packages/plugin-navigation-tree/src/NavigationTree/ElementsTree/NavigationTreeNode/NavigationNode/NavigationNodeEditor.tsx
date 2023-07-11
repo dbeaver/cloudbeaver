@@ -9,49 +9,33 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { useService } from '@cloudbeaver/core-di';
-import { EventContext, EventStopPropagationFlag, NotificationService } from '@cloudbeaver/core-events';
-import { type NavNode, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { InlineEditor } from '@cloudbeaver/core-ui';
 
 const styles = css`
   InlineEditor {
     height: 22px;
 
-    & input {
+    & input,
+    & input[disabled],
+    & input[readonly] {
       padding: 1px;
     }
   }
 `;
 
 interface Props {
-  node: NavNode;
+  name: string;
+  disabled?: boolean;
+  onSave: (name: string) => void;
   onClose: () => void;
 }
 
-export const NavigationNodeEditor = observer<Props>(function NavigationNodeEditor({ node, onClose }) {
-  const navTreeResource = useService(NavTreeResource);
-  const notificationService = useService(NotificationService);
+export const NavigationNodeEditor = observer<Props>(function NavigationNodeEditor({ name: initialName, disabled, onSave, onClose }) {
+  const [name, setName] = useState(initialName);
 
-  const [loading, setLoading] = useState(false);
-  const [name, setName] = useState(node.name || '');
-
-  async function save() {
-    if (loading) {
-      return;
-    }
-
-    try {
-      if (node.name !== name && name.trim().length) {
-        setLoading(true);
-        await navTreeResource.changeName(node, name);
-      }
-    } catch (exception: any) {
-      notificationService.logException(exception, 'app_navigationTree_node_change_name_error');
-    } finally {
-      setLoading(false);
-      onClose();
-    }
+  function save() {
+    onSave(name);
   }
 
   function stopPropagation(event: React.MouseEvent<HTMLDivElement>) {
@@ -61,7 +45,7 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
   return styled(styles)(
     <InlineEditor
       value={name}
-      disabled={loading}
+      disabled={disabled}
       controlsPosition="inside"
       style={styles}
       simple

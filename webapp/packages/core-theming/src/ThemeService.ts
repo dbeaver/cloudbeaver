@@ -13,6 +13,7 @@ import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { SettingsService } from '@cloudbeaver/core-settings';
 
+import type { Style } from './ComponentStyle';
 import './styles/main/base.pure.css';
 import './styles/main/color.pure.scss';
 import './styles/main/elevation.pure.scss';
@@ -35,6 +36,11 @@ export interface ITheme {
 
 interface ISettings {
   currentThemeId: string;
+}
+
+export interface IStyleRegistry {
+  mode: 'replace' | 'append';
+  styles: Style[];
 }
 
 @injectable()
@@ -67,6 +73,7 @@ export class ThemeService extends Bootstrap {
 
   readonly onChange: ISyncExecutor<ITheme>;
 
+  private readonly stylesRegistry: Map<Style, IStyleRegistry[]> = new Map();
   private readonly themeMap: Map<string, ITheme> = new Map();
   private readonly settings: ISettings;
 
@@ -93,6 +100,37 @@ export class ThemeService extends Bootstrap {
 
   register(): void {
     this.loadAllThemes();
+  }
+
+  addStyleRegistry<T extends Record<string, string>>(style: Style<T>, mode: 'replace' | 'append', styles: Style<T>[]): void {
+    if (!this.stylesRegistry.has(style)) {
+      this.stylesRegistry.set(style, []);
+    }
+
+    this.stylesRegistry.get(style)!.push({ mode, styles });
+  }
+
+  mapStyles<T extends Record<string, string>>(styles: Style<T>[], context?: Map<Style, IStyleRegistry[]>): Style<T>[] {
+    return styles
+      .map(style => {
+        const registries = this.stylesRegistry.get(style) ?? context?.get(style);
+
+        if (!registries) {
+          return [style];
+        }
+
+        return registries.reduce(
+          (acc, registry) => {
+            if (registry.mode === 'replace') {
+              acc = acc.filter(s => s !== style);
+            }
+
+            return [...acc, ...this.mapStyles(registry.styles, context)] as Style<T>[];
+          },
+          [style] as Style<T>[],
+        );
+      })
+      .flat();
   }
 
   async load(): Promise<void> {

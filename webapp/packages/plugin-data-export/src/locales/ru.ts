@@ -12,4 +12,6 @@ export default [
   ['data_transfer_notification_delete', 'Удалить'],
   ['data_transfer_exporting_table', 'Таблица:'],
   ['data_transfer_exporting_sql', 'SQL:'],
+
+  ['data_transfer_output_settings_compress', 'Сжатие'],
 ];

@@ -15,6 +15,7 @@ import { AuthProviderService } from './AuthProviderService';
 import { AuthProvidersResource } from './AuthProvidersResource';
 import { AuthRolesResource } from './AuthRolesResource';
 import { AuthSettingsService } from './AuthSettingsService';
+import { LocaleService } from './LocaleService';
 import { TeamMetaParametersResource } from './TeamMetaParametersResource';
 import { TeamsManagerService } from './TeamsManagerService';
 import { TeamsResource } from './TeamsResource';
@@ -46,5 +47,6 @@ export const manifest: PluginManifest = {
     UserConfigurationBootstrap,
     AuthRolesResource,
     TeamMetaParametersResource,
+    LocaleService,
   ],
 };

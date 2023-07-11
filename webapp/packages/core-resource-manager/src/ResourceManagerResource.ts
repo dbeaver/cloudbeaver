@@ -59,8 +59,10 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
 
         if (this.isInUse(key)) {
           dataSynchronizationService.requestSynchronization('resource', key).then(async state => {
-            if (state && !this.isOutdated(parent)) {
-              await this.load(key);
+            if (state) {
+              if (!this.isOutdated(parent)) {
+                await this.load(key);
+              }
             }
           });
         } else {
@@ -115,6 +117,7 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
   async move(from: string, to: string): Promise<void> {
     const fromResourceKey = getRmResourceKey(from);
     const toResourceKey = getRmResourceKey(to);
+
     await this.performUpdate(from, undefined, async () => {
       await this.graphQLService.sdk.moveResource({
         projectId: fromResourceKey.projectId,

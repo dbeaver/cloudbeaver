@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.data.transfer.impl;
 
 import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.tools.transfer.registry.DataTransferProcessorDescriptor;
@@ -31,6 +32,13 @@ class WebDataTransferUtils {
         DBPPropertyDescriptor extProperty = processor.getProperty("extension");
         String ext = extProperty == null ? processor.getAppFileExtension() : CommonUtils.toString(extProperty.getDefaultValue(), null);
         return CommonUtils.isEmpty(ext) ? "data" : ext;
+    }
+
+    public static String normalizeFileName(
+        @NotNull String fileName,
+        @NotNull WebDataTransferOutputSettings outputSettings
+    ) {
+        return outputSettings.isCompress() ? fileName + ".zip" : fileName;
     }
 
     public static WebDataTransferSessionConfig getSessionDataTransferConfig(WebSession session) {

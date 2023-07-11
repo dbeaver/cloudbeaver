@@ -9,13 +9,22 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { CachedDataResource, CachedResource, GraphQLService, NavigatorSettingsInput, ServerConfig as SDKServerConfig, ServerConfigInput } from '@cloudbeaver/core-sdk';
+import {
+  CachedDataResource,
+  CachedResource,
+  GraphQLService,
+  NavigatorSettingsInput,
+  ServerConfig as SDKServerConfig,
+  ServerConfigInput,
+} from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { isNavigatorViewSettingsEqual } from './ConnectionNavigatorViewSettings';
 import { DataSynchronizationQueue } from './DataSynchronization/DataSynchronizationQueue';
 import { DataSynchronizationService } from './DataSynchronization/DataSynchronizationService';
 import { ServerConfigEventHandler } from './ServerConfigEventHandler';
+
+export const FEATURE_GIT_ID = 'git';
 
 export type ServerConfig = Omit<SDKServerConfig, 'hostName'>;
 
@@ -67,7 +76,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
   }
 
   requirePublic<T>(resource: CachedResource<any, any, T, any, any>, map?: (param: void) => T): this {
-    resource.preloadResource(this, () => { }).before(ExecutorInterrupter.interrupter(() => this.publicDisabled));
+    resource.preloadResource(this, () => {}).before(ExecutorInterrupter.interrupter(() => this.publicDisabled));
 
     this.outdateResource<T>(resource, map as any);
 

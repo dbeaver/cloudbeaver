@@ -42,16 +42,18 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable];
   }
 
-  protected saved: boolean;
+  readonly icon: string;
   readonly history: ISqlDataSourceHistory;
   readonly onUpdate: ISyncExecutor;
   readonly onSetScript: ISyncExecutor<ISetScriptData>;
   readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>[]>;
 
+  protected saved: boolean;
   protected outdated: boolean;
   protected editing: boolean;
 
-  constructor() {
+  constructor(icon = '/icons/sql_script_m.svg') {
+    this.icon = icon;
     this.databaseModels = [];
     this.exception = undefined;
     this.message = undefined;
@@ -74,12 +76,13 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
     this.history.onNavigate.addHandler(value => this.setScript(value, SOURCE_HISTORY));
 
-    makeObservable<this, 'outdated' | 'editing'>(this, {
+    makeObservable<this, 'outdated' | 'editing' | 'saved'>(this, {
       databaseModels: observable.ref,
       exception: observable.ref,
       outdated: observable.ref,
       message: observable.ref,
       editing: observable.ref,
+      saved: observable.ref,
     });
   }
 
@@ -95,6 +98,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo | undefined): void {
+    this.saved = false;
     this.onUpdate.execute();
   }
 

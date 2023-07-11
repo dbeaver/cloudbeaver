@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { Combobox, FieldCheckbox, Loader, useResource } from '@cloudbeaver/core-blocks';
+import { BASE_CONTAINERS_STYLES, Combobox, Container, FieldCheckbox, Loader, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import type { DataTransferOutputSettings } from '@cloudbeaver/core-sdk';
 
 import { DefaultExportOutputSettingsResource } from './DefaultExportOutputSettingsResource';
@@ -17,17 +17,6 @@ const styles = css`
   Combobox {
     width: 140px;
   }
-
-  root {
-    padding: 24px;
-    display: flex;
-    align-items: end;
-  }
-
-  FieldCheckbox {
-    margin-bottom: 6px;
-    margin-left: 24px;
-  }
 `;
 
 interface Props {
@@ -35,6 +24,8 @@ interface Props {
 }
 
 export const OutputOptionsForm = observer(function OutputOptionsForm(props: Props) {
+  const translate = useTranslate();
+
   const resource = useResource(OutputOptionsForm, DefaultExportOutputSettingsResource, undefined);
 
   return (
@@ -46,15 +37,25 @@ export const OutputOptionsForm = observer(function OutputOptionsForm(props: Prop
           return null;
         }
 
-        return styled(styles)(
-          <root>
-            <Combobox name="encoding" state={props.outputSettings} items={data.supportedEncodings} searchable>
-              Encoding
-            </Combobox>
-            <FieldCheckbox name="insertBom" state={props.outputSettings}>
-              Insert BOM
-            </FieldCheckbox>
-          </root>,
+        return styled(
+          styles,
+          BASE_CONTAINERS_STYLES,
+        )(
+          <Container gap parent>
+            <Container wrap gap flexEnd>
+              <Combobox name="encoding" state={props.outputSettings} items={data.supportedEncodings} tiny searchable>
+                Encoding
+              </Combobox>
+              <Container vertical gap>
+                <FieldCheckbox name="insertBom" state={props.outputSettings} small>
+                  Insert BOM
+                </FieldCheckbox>
+                <FieldCheckbox name="compress" state={props.outputSettings} small>
+                  {translate('data_transfer_output_settings_compress')}
+                </FieldCheckbox>
+              </Container>
+            </Container>
+          </Container>,
         );
       }}
     </Loader>

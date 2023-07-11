@@ -16,6 +16,7 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
+    "@cloudbeaver/plugin-navigation-tree-rm": "~0.1.0",
     "@cloudbeaver/plugin-resource-manager": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0",

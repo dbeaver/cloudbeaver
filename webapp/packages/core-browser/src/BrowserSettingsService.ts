@@ -29,7 +29,7 @@ export class BrowserSettingsService {
   readonly deprecatedSettings: PluginSettings<DeprecatedCookiesSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getCoreSettings('browser', defaultSettings);
-    this.deprecatedSettings = this.pluginManagerService.getCoreSettings('cookies', deprecatedDefaultSettings);
+    this.settings = this.pluginManagerService.createSettings('browser', 'core', defaultSettings);
+    this.deprecatedSettings = this.pluginManagerService.createSettings('cookies', 'core', deprecatedDefaultSettings);
   }
 }

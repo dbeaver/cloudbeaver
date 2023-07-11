@@ -19,6 +19,6 @@ export class ConnectionsSettingsService {
   readonly settings: PluginSettings<ConnectionsSettings>;
 
   constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.getCoreSettings('connections', defaultSettings);
+    this.settings = this.pluginManagerService.createSettings('connections', 'core', defaultSettings);
   }
 }

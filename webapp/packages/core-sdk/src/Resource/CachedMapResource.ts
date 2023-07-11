@@ -33,6 +33,9 @@ export type CachedMapResourceLoader<TRealKey, TKey, TValue, TIncludes> = TRealKe
 export const CachedMapAllKey = resourceKeyListAlias('@cached-map-resource/all');
 export const CachedMapEmptyKey = resourceKeyListAlias('@cached-map-resource/empty');
 
+/**
+ * CachedMapResource is a resource that stores data in a Map.
+ */
 export abstract class CachedMapResource<
   TKey,
   TValue,
@@ -41,6 +44,10 @@ export abstract class CachedMapResource<
 > extends CachedResource<Map<TKey, TValue>, TValue, TKey, CachedResourceIncludeArgs<TValue, TContext>, TMetadata> {
   readonly onItemUpdate: ISyncExecutor<ResourceKeySimple<TKey>>;
   readonly onItemDelete: ISyncExecutor<ResourceKeySimple<TKey>>;
+
+  get entries(): [TKey, TValue][] {
+    return Array.from(this.data.entries());
+  }
 
   get values(): TValue[] {
     return Array.from(this.data.values());
@@ -63,6 +70,9 @@ export abstract class CachedMapResource<
       replace: action,
       dataSet: action,
       dataDelete: action,
+      entries: computed<[TKey, TValue][]>({
+        equals: (a, b) => isArraysEqual(a, b, isArraysEqual),
+      }),
       values: computed<TValue[]>({
         equals: isArraysEqual,
       }),
@@ -251,7 +261,7 @@ export abstract class CachedMapResource<
    * Use it instead of this.data.clear
    * This method can be override
    */
-  protected override clearData(): void {
+  protected override resetDataToDefault(): void {
     this.data.clear();
   }
 }
