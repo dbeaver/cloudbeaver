@@ -22,6 +22,7 @@ import org.jkiss.dbeaver.model.net.DBWHandlerType;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -52,6 +53,7 @@ public class WebNetworkHandlerConfig {
         return configuration.isEnabled();
     }
 
+    @Deprecated
     public SSHConstants.AuthType getAuthType() {
         return CommonUtils.valueOf(SSHConstants.AuthType.class, configuration.getStringProperty(SSHConstants.PROP_AUTH_TYPE), SSHConstants.AuthType.PASSWORD);
     }
@@ -64,7 +66,7 @@ public class WebNetworkHandlerConfig {
         return CommonUtils.isEmpty(configuration.getPassword()) ? null : "";
     }
 
-
+    @Deprecated // use secure properties
     public String getKey() {
         return CommonUtils.isEmpty(configuration.getSecureProperty(SSHConstants.PROP_KEY_VALUE)) ? null : "";
     }
@@ -76,6 +78,15 @@ public class WebNetworkHandlerConfig {
     @NotNull
     public Map<String, Object> getProperties() {
         return configuration.getProperties();
+    }
+
+    @NotNull
+    public Map<String, String> getSecureProperties() {
+        Map<String, String> secureProperties = new LinkedHashMap<>(configuration.getSecureProperties());
+        for (Map.Entry<String, String> property : secureProperties.entrySet()) {
+            property.setValue(CommonUtils.isEmpty(property.getValue()) ? null : "");
+        }
+        return secureProperties;
     }
 
 }
