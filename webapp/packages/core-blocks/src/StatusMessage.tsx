@@ -44,18 +44,13 @@ interface Props {
   status?: ENotificationType;
   exception?: Error | null;
   className?: string;
-  onlyErrors?: boolean;
   onShowDetails?: () => void;
 }
 
-export const StatusMessage = observer<Props>(function StatusMessage({ status, message, exception = null, className, onlyErrors, onShowDetails }) {
+export const StatusMessage = observer<Props>(function StatusMessage({ status, message, exception = null, className, onShowDetails }) {
   const translate = useTranslate();
   const errorDetails = useErrorDetails(exception);
   const isError = status === ENotificationType.Error || exception !== null;
-
-  if (onlyErrors && !isError) {
-    return null;
-  }
 
   if (Array.isArray(message)) {
     message = message.map(m => translate(m)).join(', ');
