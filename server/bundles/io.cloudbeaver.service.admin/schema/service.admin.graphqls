@@ -138,6 +138,8 @@ extend type Query {
 
     setUserCredentials(userId: ID!, providerId: ID!, credentials: Object!): Boolean
 
+    deleteUserCredentials(userId: ID!, providerId: ID!): Boolean
+
     enableUser(userId: ID!, enabled: Boolean!): Boolean
 
     setUserAuthRole(userId: ID!, authRole: String): Boolean
