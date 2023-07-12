@@ -10,7 +10,7 @@ import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { EEquality, NavNodeFilterCompareFn } from './NavNodeFilterCompareFn';
-import type { IElementsTreeFilter, ITreeNodeState } from './useElementsTree';
+import type { IElementsTree, IElementsTreeFilter, ITreeNodeState } from './useElementsTree';
 
 function isDefined<T>(val: T | undefined | null): val is T {
   return val !== undefined && val !== null;
@@ -24,20 +24,21 @@ export function elementsTreeNameFilter(
   return (tree, filter, node, children, state) => {
     const nodeState = state.get(node.id);
 
-    if (filter === '' || nodeState.showInFilter || compare(node, filter) === EEquality.full) {
+    if (filter === '' || nodeState.showInFilter || compare(tree, node, filter) === EEquality.full) {
       return children;
     }
 
     const nodes = navNodeInfoResource
       .get(resourceKeyList(children))
       .filter(isDefined)
-      .filter(child => filterNode(navTreeResource, navNodeInfoResource, compare, filter, child, state));
+      .filter(child => filterNode(tree, navTreeResource, navNodeInfoResource, compare, filter, child, state));
 
     return nodes.map(node => node.id);
   };
 }
 
 function filterNode(
+  tree: IElementsTree,
   navTreeResource: NavTreeResource,
   navNodeInfoResource: NavNodeInfoResource,
   compare: NavNodeFilterCompareFn,
@@ -47,7 +48,7 @@ function filterNode(
 ): boolean {
   const nodeState = state.get(node.id);
 
-  if (compare(node, filter) !== EEquality.none || nodeState.showInFilter) {
+  if (compare(tree, node, filter) !== EEquality.none || nodeState.showInFilter) {
     return true;
   }
 
@@ -57,14 +58,15 @@ function filterNode(
   return navNodeInfoResource
     .get(resourceKeyList(children))
     .filter(isDefined)
-    .some(child => filterNode(navTreeResource, navNodeInfoResource, compare, filter, child, state));
+    .some(child => filterNode(tree, navTreeResource, navNodeInfoResource, compare, filter, child, state));
   // }
 
   // return false;
 }
 
-export function elementsTreeNameFilterNode(node: NavNode, filter: string): EEquality {
-  const nodeName = node.name?.toLowerCase().trim();
+export function elementsTreeNameFilterNode(tree: IElementsTree, node: NavNode, filter: string): EEquality {
+  const nodeInfo = tree.getTransformedNodeInfo(node);
+  const nodeName = nodeInfo.name?.toLowerCase().trim();
   const filterToLower = filter.toLowerCase().trim();
 
   if (nodeName === filterToLower) {

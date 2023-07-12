@@ -116,7 +116,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const configurationTypes = driverConfiguration.filter(conf => driver?.configurationTypes.includes(conf.value));
 
   function handleFormChange(value?: unknown, name?: string) {
-    if (name !== 'name') {
+    if (name !== 'name' && optionsHook.isNameAutoFill()) {
       optionsHook.updateNameTemplate(driver);
     }
 
