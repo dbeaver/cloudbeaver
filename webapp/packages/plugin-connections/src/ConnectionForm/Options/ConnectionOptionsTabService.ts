@@ -15,6 +15,7 @@ import {
   DatabaseAuthModelsResource,
   DatabaseConnection,
   DBDriverResource,
+  isJDBCConnection,
   isLocalConnection,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -31,6 +32,7 @@ import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
 import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
+import { getConnectionName } from './getConnectionName';
 
 export const Options = React.lazy(async () => {
   const { Options } = await import('./Options');
@@ -78,7 +80,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     this.connectionFormService.fillConfigTask.addHandler(this.fillConfig.bind(this));
   }
 
-  load(): void {}
+  load(): void { }
 
   isProjectShared(state: IConnectionFormState): boolean {
     if (state.projectId === null) {
@@ -174,7 +176,32 @@ export class ConnectionOptionsTabService extends Bootstrap {
     // }
   }
 
-  private fillConfig({ state, updated }: IConnectionFormFillConfigData, contexts: IExecutionContextProvider<IConnectionFormFillConfigData>) {
+  private async setDefaults(state: IConnectionFormState) {
+    if (!state.config.driverId) {
+      return;
+    }
+
+    const driver = await this.dbDriverResource.load(state.config.driverId, ['includeProviderProperties']);
+
+    state.config.authModelId = driver?.defaultAuthModel;
+
+    state.config.configurationType = driver?.configurationTypes.includes(DriverConfigurationType.Manual)
+      ? DriverConfigurationType.Manual
+      : DriverConfigurationType.Url;
+
+    state.config.host = driver?.defaultServer || 'localhost';
+    state.config.port = driver?.defaultPort;
+    state.config.databaseName = driver?.defaultDatabase;
+    state.config.url = driver?.sampleURL;
+
+    if (isJDBCConnection(driver)) {
+      state.config.name = state.config.url;
+    } else {
+      state.config.name = getConnectionName(driver.name || '', state.config.host, state.config.port, driver.defaultPort);
+    }
+  }
+
+  private async fillConfig({ state, updated }: IConnectionFormFillConfigData, contexts: IExecutionContextProvider<IConnectionFormFillConfigData>) {
     if (!updated) {
       return;
     }
@@ -189,6 +216,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     if (!state.info) {
+      await this.setDefaults(state);
       return;
     }
 
