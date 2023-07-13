@@ -22,6 +22,7 @@ import { ILoadableState, MetadataMap, throttle } from '@cloudbeaver/core-utils';
 import type { IElementsTreeAction } from './IElementsTreeAction';
 import type { INavTreeNodeInfo } from './INavTreeNodeInfo';
 import type { NavigationNodeRendererComponent } from './NavigationNodeComponent';
+import { transformNodeInfo } from './transformNodeInfo';
 
 export type IElementsTreeCustomRenderer = (nodeId: string) => NavigationNodeRendererComponent | undefined;
 export type IElementsTreeCustomNodeInfo = (nodeId: string, info: INavTreeNodeInfo) => INavTreeNodeInfo;
@@ -105,6 +106,7 @@ export interface IElementsTree extends ILoadableState {
   state: MetadataMap<string, ITreeNodeState>;
   userData: IElementsTreeUserState;
 
+  getTransformedNodeInfo(node: NavNode): INavTreeNodeInfo;
   getNodeState: (nodeId: string) => ITreeNodeState;
   isNodeExpanded: (nodeId: string, ignoreFilter?: boolean) => boolean;
   isNodeExpandable: (nodeId: string) => boolean;
@@ -366,6 +368,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
       },
       getNodeState(nodeId: string) {
         return this.state.get(nodeId);
+      },
+      getTransformedNodeInfo(node: NavNode): INavTreeNodeInfo {
+        return transformNodeInfo(node, this.nodeInfoTransformers);
       },
       isNodeExpanded(nodeId: string, ignoreFilter?: boolean): boolean {
         if (nodeId === this.root) {
