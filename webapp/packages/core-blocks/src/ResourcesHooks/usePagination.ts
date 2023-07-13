@@ -8,7 +8,14 @@
 import { action, computed, observable } from 'mobx';
 
 import { type IServiceConstructor, useService } from '@cloudbeaver/core-di';
-import { CachedMapPageKey, CachedMapResource, ICachedMapPageOptions, ResourceKeyListAlias } from '@cloudbeaver/core-sdk';
+import {
+  CachedMapPageKey,
+  CachedMapResource,
+  CachedMapResourceListGetter,
+  CachedMapResourceValue,
+  ICachedMapPageOptions,
+  ResourceKeyListAlias,
+} from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { useObservableRef } from '../useObservableRef';
@@ -16,19 +23,20 @@ import { useObservableRef } from '../useObservableRef';
 interface IOptions {
   pageSize?: number;
   getKey?: (first: number, after?: any) => ResourceKeyListAlias<any, Readonly<ICachedMapPageOptions>>;
-  dependencies: any[];
+  dependencies?: any[];
 }
 
-interface IPagination {
+interface IPagination<TResource> {
   after: any;
   key: ResourceKeyListAlias<any, any>;
+  data: CachedMapResourceListGetter<CachedMapResourceValue<TResource>, []>;
   hasNextPage: boolean;
   loaded: ResourceKeyListAlias<any, any>[];
   refresh: () => void;
   loadMore: () => void;
 }
 
-interface IPaginationPrivate extends IPagination {
+interface IPaginationPrivate<TResource> extends IPagination<TResource> {
   pageSize: number;
   resource: CachedMapResource<any, any, any, any>;
   dependencies: any[];
@@ -38,11 +46,11 @@ interface IPaginationPrivate extends IPagination {
 export function usePagination<TResource extends CachedMapResource<any, any, any, any>>(
   ctor: IServiceConstructor<TResource>,
   options?: IOptions,
-): IPagination {
+): IPagination<TResource> {
   const pageSize = options?.pageSize || 100;
   const resource = useService(ctor);
 
-  const pagination = useObservableRef<IPaginationPrivate>(
+  const pagination = useObservableRef<IPaginationPrivate<TResource>>(
     () => {
       const key = options?.getKey?.(pageSize) || CachedMapPageKey(pageSize);
       const dependencies = options?.dependencies || [];
@@ -54,6 +62,9 @@ export function usePagination<TResource extends CachedMapResource<any, any, any,
         dependencies,
         get hasNextPage(): boolean {
           return this.resource.getPageInfo(this.key)?.hasNextPage || false;
+        },
+        get data(): CachedMapResourceListGetter<CachedMapResourceValue<TResource>, []> {
+          return this.loaded.map(key => this.resource.get(key)).flat();
         },
         loaded: [key],
         loadMore() {
