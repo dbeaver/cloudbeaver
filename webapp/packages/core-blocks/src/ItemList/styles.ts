@@ -48,6 +48,7 @@ export const ITEM_LIST_STYLES = css`
 
     & input {
       padding: 4px 32px 4px 8px;
+      font-size: 100%;
     }
 
     & search-button {

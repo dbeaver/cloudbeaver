@@ -85,7 +85,7 @@ export const TeamsPage = observer<Props>(function TeamsPage({ sub, param }) {
             <CreateTeam />
           </Group>
         )}
-        <Group box="no-overflow">
+        <Group boxNoOverflow>
           <TeamsTable teams={table.teams} state={table.state} selectedItems={table.tableState.selected} expandedItems={table.tableState.expanded} />
         </Group>
       </Container>

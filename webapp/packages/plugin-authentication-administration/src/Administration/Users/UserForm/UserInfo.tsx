@@ -118,7 +118,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
           {translate('authentication_user_enabled')}
         </FieldCheckbox>
         <GroupTitle>{translate('authentication_user_team')}</GroupTitle>
-        <Group box="no-overflow" gap dense>
+        <Group boxNoOverflow gap dense>
           {controller.teams.map(team => {
             const label = `${team.teamId}${team.teamName && team.teamName !== team.teamId ? ' (' + team.teamName + ')' : ''}`;
             const tooltip = `${label}${team.description ? '\n' + team.description : ''}`;

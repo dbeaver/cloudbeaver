@@ -1,0 +1,41 @@
+.field {
+  box-sizing: border-box;
+
+  & .field {
+    height: 32px;
+    padding: 0;
+  }
+}
+
+.fieldLabel {
+  composes: theme-typography--body1 from global;
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.fieldDescription {
+  composes: theme-typography--caption from global;
+  box-sizing: border-box;
+  padding-top: 4px;
+  min-height: 24px;
+}
+
+.valid {
+  composes: theme-text-text-hint-on-light from global;
+}
+
+.invalid {
+  composes: theme-text-negative from global;
+}
+
+input,
+textarea {
+  font-size: 12px;
+
+  &.select {
+    cursor: pointer;
+    user-select: none;
+  }
+}

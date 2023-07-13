@@ -104,7 +104,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
 
   return styled(style)(
     <ColoredContainer parent>
-      <Group box keepSize large>
+      <Group box large>
         <PropertiesTable
           properties={joinedProperties.get()}
           propertiesState={formState.config.properties}

@@ -14,9 +14,12 @@ import { blobToData, bytesToSize } from '@cloudbeaver/core-utils';
 
 import { Button } from '../Button';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { IconButton } from '../IconButton';
 import { useTranslate } from '../localization/useTranslate';
+import { s } from '../s';
 import { UploadArea } from '../UploadArea';
+import { useS } from '../useS';
 import { useStyles } from '../useStyles';
 import { baseFormControlStyles, baseInvalidFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
@@ -76,10 +79,6 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
   tooltip,
   required,
   fileName,
-  small,
-  medium,
-  large,
-  tiny,
   style,
   maxFileSize = DEFAULT_MAX_FILE_SIZE,
   disabled,
@@ -87,6 +86,7 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
   children,
   onChange,
   mapValue,
+  ...rest
 }: Props<Record<any, any>>) {
   const translate = useTranslate();
   const context = useContext(FormContext);
@@ -95,6 +95,7 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
   const [error, setError] = useState<Error | null>(null);
 
   const styles = useStyles(INPUT_FILE_FIELD_STYLES, baseFormControlStyles, style, error ? baseInvalidFormControlStyles : baseValidFormControlStyles);
+  const sizeStyles = useS(elementsSizeStyles);
 
   const savedExternally = !!fileName && state[name] !== '';
   const saved = savedExternally || !!state[name];
@@ -163,7 +164,7 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
   }
 
   return styled(styles)(
-    <field className={className} {...use({ small, medium, large, tiny })}>
+    <field className={s(sizeStyles, { ...rest }, className)}>
       <field-label title={labelTooltip}>
         {children}
         {required && ' *'}

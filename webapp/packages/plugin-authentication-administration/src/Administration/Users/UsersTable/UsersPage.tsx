@@ -115,7 +115,7 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
           </Group>
         )}
 
-        <Group box="no-overflow">
+        <Group boxNoOverflow>
           <Loader style={loaderStyle} state={[usersResource, authRolesResource]} overlay>
             <UsersTable
               keys={keys}

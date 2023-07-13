@@ -85,7 +85,7 @@ export const AuthConfigurationsAdministration: AdministrationItemContentComponen
             <CreateAuthConfiguration />
           </Group>
         )}
-        <Group box="no-overflow">
+        <Group boxNoOverflow>
           <Loader style={loaderStyle} loading={table.processing} overlay>
             <AuthConfigurationsTable
               configurations={table.configurations}

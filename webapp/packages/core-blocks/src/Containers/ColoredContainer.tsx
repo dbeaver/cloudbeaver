@@ -7,14 +7,20 @@
  */
 import { forwardRef } from 'react';
 
+import { s } from '../s';
+import { useS } from '../useS';
+import coloredContainerStyles from './ColoredContainer.m.css';
+import containerStyles from './Container.m.css';
 import { filterContainerFakeProps } from './filterContainerFakeProps';
 import type { IContainerProps } from './IContainerProps';
+import elementsSizeStyles from './shared/ElementsSize.m.css';
 
 export const ColoredContainer = forwardRef<HTMLDivElement, IContainerProps & React.HTMLAttributes<HTMLDivElement>>(function ColoredContainer(
-  props,
+  { className, ...rest },
   ref,
 ) {
-  const divProps = filterContainerFakeProps(props);
+  const styles = useS(coloredContainerStyles, containerStyles, elementsSizeStyles);
+  const divProps = filterContainerFakeProps(rest);
 
-  return <div ref={ref} {...divProps} />;
+  return <div ref={ref} {...divProps} className={s(styles, { coloredContainer: true, container: true, ...(rest as IContainerProps) }, className)} />;
 });

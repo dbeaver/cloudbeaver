@@ -12,13 +12,17 @@ import styled, { css, use } from 'reshadow';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Button } from '../Button';
+import { getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { useTranslate } from '../localization/useTranslate';
+import { s } from '../s';
 import { Tag } from '../Tags/Tag';
 import { Tags } from '../Tags/Tags';
 import { UploadArea } from '../UploadArea';
 import { useCombinedHandler } from '../useCombinedHandler';
 import { useRefInherit } from '../useRefInherit';
+import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
 import { useStyles } from '../useStyles';
 import { baseFormControlStyles, baseInvalidFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
@@ -95,21 +99,18 @@ export const InputFiles: InputFilesType = observer(
       labelTooltip,
       hideTags,
       mod,
-      fill,
-      small,
-      medium,
-      large,
-      tiny,
       autoHide,
       onChange,
       ...rest
     }: ControlledProps | ObjectProps<any, any>,
     refInherit: React.Ref<HTMLInputElement>,
   ) {
+    const layoutProps = getLayoutProps(rest);
     const ref = useRefInherit<HTMLInputElement>(refInherit);
     const [innerState, setInnerState] = useState<FileList | null>(null);
     const translate = useTranslate();
     const styles = useStyles(baseFormControlStyles, error ? baseInvalidFormControlStyles : baseValidFormControlStyles, INPUT_FIELD_STYLES, style);
+    const sizeStyles = useS(elementsSizeStyles);
     const context = useContext(FormContext);
     loading = useStateDelay(loading ?? false, 300);
 
@@ -166,7 +167,7 @@ export const InputFiles: InputFilesType = observer(
     const files = Array.from(value ?? []);
 
     return styled(styles)(
-      <field className={className} {...use({ small, medium, large, tiny })}>
+      <field className={s(sizeStyles, { ...layoutProps }, className)}>
         <field-label title={labelTooltip || rest.title}>
           {children}
           {required && ' *'}

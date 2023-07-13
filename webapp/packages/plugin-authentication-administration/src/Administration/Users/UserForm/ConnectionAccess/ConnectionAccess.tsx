@@ -63,7 +63,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
   if (controller.connections.length === 0) {
     return styled(style)(
       <ColoredContainer parent>
-        <Group keepSize large>
+        <Group large>
           <TextPlaceholder>{translate('authentication_administration_user_connections_empty')}</TextPlaceholder>
         </Group>
       </ColoredContainer>,
@@ -73,7 +73,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
   if (isAdmin) {
     return styled(style)(
       <ColoredContainer parent>
-        <Group keepSize large>
+        <Group large>
           <TextPlaceholder>{translate('connections_connection_access_admin_info')}</TextPlaceholder>
         </Group>
       </ColoredContainer>,
@@ -82,7 +82,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = obse
 
   return styled(style)(
     <ColoredContainer parent overflow>
-      <Group box keepSize large>
+      <Group box large>
         <Table selectedItems={controller.selectedConnections} size="big" onSelect={controller.handleConnectionsAccessChange}>
           <TableHeader fixed>
             <TableColumnHeader min />

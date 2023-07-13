@@ -109,7 +109,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
             <CreateConnection method={param} configurationWizard={configurationWizard} />
           </Group>
         )}
-        <Group box="no-overflow">
+        <Group boxNoOverflow>
           <Loader style={loaderStyle} loading={controller.isProcessing} overlay>
             <ConnectionsTable
               keys={controller.keys}

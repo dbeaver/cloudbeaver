@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, GroupItem, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, GroupItem, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { useAuthenticationAction } from './useAuthenticationAction';
 
@@ -29,7 +29,7 @@ export type Props = {
 
 export const AuthenticationProvider = observer<Props>(function AuthenticationProvider(props) {
   const translate = useTranslate();
-  const style = useStyles(styles, BASE_CONTAINERS_STYLES);
+  const style = useStyles(styles);
   const action = useAuthenticationAction(props);
 
   if (action.authorized) {

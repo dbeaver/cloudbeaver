@@ -6,82 +6,22 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
 import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps';
-import { useStyles } from '../../useStyles';
-import { baseFormControlStyles, baseValidFormControlStyles } from '../baseFormControlStyles';
+import elementsSizeStyles from '../../Containers/shared/ElementsSize.m.css';
+import { s } from '../../s';
+import { useS } from '../../useS';
+import formControlStyles from '../FormControl.m.css';
 import { isControlPresented } from '../isControlPresented';
 import type { ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
+import switchStyles from './Switch.m.css';
+import denseModStyles from './SwitchDense.m.css';
+import primaryModStyles from './SwitchPrimary.m.css';
 import { useCheckboxState } from './useCheckboxState';
 
-const switchStyles = css`
-  switch-control {
-    composes: theme-switch from global;
-  }
-  switch-control-track {
-    composes: theme-switch__track from global;
-  }
-  switch-input {
-    composes: theme-switch_native-control from global;
-  }
-  switch-control-underlay {
-    composes: theme-switch__thumb-underlay from global;
-  }
-  switch-control-thumb {
-    composes: theme-switch__thumb from global;
-  }
-  radio-ripple {
-    composes: theme-radio_ripple from global;
-  }
-  switch-body {
-    display: flex;
-    align-items: center;
-  }
-  switch-body {
-    composes: theme-typography--body1 from global;
-  }
-  switch-body field-label {
-    cursor: pointer;
-    user-select: none;
-    display: block;
-    padding-left: 18px;
-    min-width: 50px;
-    white-space: pre-wrap;
-    font-weight: 500;
-  }
-`;
-
 const switchMod = {
-  primary: css`
-    switch-control {
-      composes: theme-switch_primary from global;
-    }
-  `,
-  dense: css`
-    switch-body {
-      composes: theme-switch_dense from global;
-    }
-    field-label {
-      composes: theme-typography--body2 from global;
-    }
-    switch-body field-label {
-      font-weight: initial;
-    }
-  `,
-};
-
-const switchState = {
-  disabled: css`
-    switch-control {
-      composes: theme-switch--disabled mdc-switch--disabled from global;
-    }
-  `,
-  checked: css`
-    switch-control {
-      composes: theme-switch--checked mdc-switch--checked from global;
-    }
-  `,
+  primary: primaryModStyles,
+  dense: denseModStyles,
 };
 
 interface IBaseProps {
@@ -121,28 +61,20 @@ export const Switch: SwitchType = observer(function Switch({
     onChange,
   });
   rest = filterLayoutFakeProps(rest);
-  const styles = useStyles(
-    baseFormControlStyles,
-    baseValidFormControlStyles,
-    switchStyles,
-    ...mod.map(mod => switchMod[mod]),
-    disabled && switchState.disabled,
-    checkboxState.checked && switchState.checked,
-  );
+  const styles = useS(elementsSizeStyles, formControlStyles, switchStyles, ...mod.map(mod => switchMod[mod]));
 
   if (autoHide && !isControlPresented(name, state)) {
     return null;
   }
 
-  return styled(styles)(
+  return (
     <field className={className} title={rest.title}>
-      <switch-body>
-        <switch-control>
-          <switch-control-track />
-          <switch-control-underlay>
-            <switch-control-thumb />
-            <switch-input
-              as="input"
+      <div data-testid="switch-body" className={styles.switchBody}>
+        <div data-testid="switch-control" className={s(styles, { switchControl: true, disabled: disabled, checked: checkboxState.checked })}>
+          <div data-testid="switch-control-track" className={styles.switchControlTrack} />
+          <div data-testid="switch-control-underlay" className={styles.switchControlUnderlay}>
+            <div data-testid="switch-control-thumb" className={styles.switchControlThumb} />
+            <input
               {...rest}
               type="checkbox"
               id={id || value || name}
@@ -150,15 +82,21 @@ export const Switch: SwitchType = observer(function Switch({
               aria-checked={checkboxState.checked}
               checked={checkboxState.checked}
               disabled={disabled}
+              data-testid="switch-input"
+              className={styles.switchInput}
               onChange={checkboxState.change}
             />
-          </switch-control-underlay>
-        </switch-control>
-        <field-label as="label" htmlFor={id || value || name}>
+          </div>
+        </div>
+        <label htmlFor={id || value || name} data-testid="field-label" className={styles.fieldLabel}>
           {children}
-        </field-label>
-      </switch-body>
-      {description && <field-description>{description}</field-description>}
-    </field>,
+        </label>
+      </div>
+      {description && (
+        <div data-testid="field-description" className={styles.fieldDescription}>
+          {description}
+        </div>
+      )}
+    </field>
   );
 });
