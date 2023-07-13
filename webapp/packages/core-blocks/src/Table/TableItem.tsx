@@ -12,6 +12,7 @@ import styled, { use } from 'reshadow';
 import { EventContext } from '@cloudbeaver/core-events';
 
 import { getComputed } from '../getComputed';
+import { Loader } from '../Loader/Loader';
 import { useObjectRef } from '../useObjectRef';
 import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
@@ -113,7 +114,9 @@ export const TableItem = observer<React.PropsWithChildren<Props>>(function Table
       {isExpanded && ExpandElement && (
         <tr {...use({ noHover: true, expanded: isExpanded })}>
           <td colSpan={Children.toArray(children).length} {...use({ expandArea: true })}>
-            <ExpandElement item={item} />
+            <Loader suspense>
+              <ExpandElement item={item} />
+            </Loader>
           </td>
         </tr>
       )}
