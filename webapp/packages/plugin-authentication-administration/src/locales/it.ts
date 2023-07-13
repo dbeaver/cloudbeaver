@@ -25,6 +25,7 @@ export default [
   ['authentication_administration_users_filters_status_enabled', 'ENABLED'],
   ['authentication_administration_users_filters_status_disabled', 'DISABLED'],
   ['authentication_administration_users_filters_status_all', 'ALL'],
+  ['authentication_administration_users_empty', 'There are no users'],
 
   ['administration_teams_team_info_created', 'Team created'],
   ['administration_teams_team_info_updated', 'Team updated'],

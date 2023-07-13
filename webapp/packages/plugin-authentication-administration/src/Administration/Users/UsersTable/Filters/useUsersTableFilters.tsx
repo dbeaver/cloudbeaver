@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, observable } from 'mobx';
+import { action, observable } from 'mobx';
 
 import type { AdminUser } from '@cloudbeaver/core-authentication';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
-import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export enum EUserStatus {
   ENABLED = 'ENABLED',
@@ -44,20 +43,24 @@ export interface IUserFilters {
   search: string;
   role: string;
   status: EUserStatus;
-  filteredUsers: AdminUser[];
+  isSearching: boolean;
+  filterUsers: (users: AdminUser[]) => AdminUser[];
   setSearch: (value: string) => void;
   setRole: (role: string) => void;
   setStatus: (status: EUserStatus) => void;
 }
 
-export function useUsersTableFilters(users: AdminUser[]) {
+export function useUsersTableFilters() {
   const filters: IUserFilters = useObservableRef(
     () => ({
       search: '',
       role: USER_ROLE_ALL,
       status: EUserStatus.ENABLED,
-      get filteredUsers() {
-        return this.users.filter(user => {
+      get isSearching() {
+        return this.search.trim() !== '';
+      },
+      filterUsers(users: AdminUser[]) {
+        return users.filter(user => {
           const matchSearch = user.userId.toLowerCase().includes(this.search.trim().toLowerCase());
           const matchStatus = this.status === EUserStatus.ALL || (this.status === EUserStatus.ENABLED ? user.enabled : !user.enabled);
           const matchRole = this.role === USER_ROLE_ALL || this.role === user.authRole;
@@ -79,13 +82,11 @@ export function useUsersTableFilters(users: AdminUser[]) {
       search: observable.ref,
       role: observable.ref,
       status: observable.ref,
-      users: observable.ref,
-      filteredUsers: computed<AdminUser[]>({ equals: (first, second) => isArraysEqual(first, second, undefined, true) }),
       setSearch: action.bound,
       setRole: action.bound,
       setStatus: action.bound,
     },
-    { users },
+    false,
   );
 
   return filters;

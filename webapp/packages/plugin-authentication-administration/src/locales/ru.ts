@@ -29,6 +29,7 @@ export default [
   ['authentication_administration_users_filters_status_enabled', 'ВКЛЮЧЕН'],
   ['authentication_administration_users_filters_status_disabled', 'ВЫКЛЮЧЕН'],
   ['authentication_administration_users_filters_status_all', 'ВСЕ'],
+  ['authentication_administration_users_empty', 'Нет пользователей'],
 
   ['administration_configuration_wizard_configuration_admin', 'Учетные данные администратора'],
   ['administration_configuration_wizard_configuration_admin_name', 'Логин'],

@@ -291,19 +291,59 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         return getUserById(getUserIdOrThrow());
     }
 
+    @Override
+    public int countUsers(String after, String userIdMask) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    database.normalizeTableNames(
+                            "SELECT COUNT(*) FROM {table_prefix}CB_USER" +
+                                    (CommonUtils.isEmpty(after) ? "" : " WHERE USER_ID > ?") +
+                                    (CommonUtils.isEmpty(userIdMask) ? ""
+                                            : (CommonUtils.isEmpty(after) ? " WHERE" : " AND")
+                                                    + " USER_ID LIKE ?")))) {
+                int parameterIndex = 1;
+                if (!CommonUtils.isEmpty(after)) {
+                    dbStat.setString(parameterIndex++, after);
+                }
+                if (!CommonUtils.isEmpty(userIdMask)) {
+                    dbStat.setString(parameterIndex++, "%" + userIdMask + "%");
+                }
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    if (dbResult.next()) {
+                        return dbResult.getInt(1);
+                    } else {
+                        return 0;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while counting users", e);
+        }
+    }
+
     @NotNull
     @Override
-    public SMUser[] findUsers(String userNameMask) throws DBCException {
+    public SMUser[] findUsers(Integer first, String after, String userIdMask) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             Map<String, SMUser> result = new LinkedHashMap<>();
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER" +
-                    (CommonUtils.isEmpty(userNameMask) ? "\nORDER BY USER_ID" : " WHERE USER_ID=?")))
-            ) {
-                if (!CommonUtils.isEmpty(userNameMask)) {
-                    dbStat.setString(1, userNameMask);
+                database.normalizeTableNames(
+                    "SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER" +
+                        (CommonUtils.isEmpty(after) ? "" : " WHERE USER_ID > ?") +
+                        (CommonUtils.isEmpty(userIdMask) ? ""
+                            : (CommonUtils.isEmpty(after) ? " WHERE" : " AND")
+                                + " USER_ID LIKE ?"))
+                    +
+                    "\nORDER BY USER_ID LIMIT ?")) {
+                int parameterIndex = 1;
+                if (!CommonUtils.isEmpty(after)) {
+                    dbStat.setString(parameterIndex++, after);
                 }
+                if (!CommonUtils.isEmpty(userIdMask)) {
+                    dbStat.setString(parameterIndex++, "%" + userIdMask + "%");
+                }
+                dbStat.setInt(parameterIndex++, first);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String userId = dbResult.getString(1);
@@ -313,14 +353,20 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                 }
             }
-            readSubjectsMetas(dbCon, SMSubjectType.user, userNameMask, result);
+            readSubjectsMetas(dbCon, SMSubjectType.user, userIdMask, result);
             // Read teams
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames("SELECT USER_ID,TEAM_ID FROM {table_prefix}CB_USER_TEAM" +
-                (CommonUtils.isEmpty(userNameMask) ? "" : " WHERE USER_ID=?")))
-            ) {
-                if (!CommonUtils.isEmpty(userNameMask)) {
-                    dbStat.setString(1, userNameMask);
+                    (CommonUtils.isEmpty(after) ? "" : " WHERE USER_ID > ?") +
+                    (CommonUtils.isEmpty(userIdMask) ? ""
+                        : (CommonUtils.isEmpty(after) ? " WHERE" : " AND")
+                            + " USER_ID LIKE ?")))) {
+                int parameterIndex = 1;
+                if (!CommonUtils.isEmpty(after)) {
+                    dbStat.setString(parameterIndex++, after);
+                }
+                if (!CommonUtils.isEmpty(userIdMask)) {
+                    dbStat.setString(parameterIndex++, "%" + userIdMask + "%");
                 }
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
@@ -367,17 +413,17 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private void readSubjectsMetas(Connection dbCon, SMSubjectType subjectType, String nameMask, Map<String, ? extends SMSubject> result) throws SQLException {
+    private void readSubjectsMetas(Connection dbCon, SMSubjectType subjectType, String userIdMask, Map<String, ? extends SMSubject> result) throws SQLException {
         // Read metas
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             database.normalizeTableNames("SELECT m.SUBJECT_ID,m.META_ID,m.META_VALUE FROM {table_prefix}CB_AUTH_SUBJECT s, " +
                 "{table_prefix}CB_SUBJECT_META m\n" +
                 "WHERE s.SUBJECT_TYPE=? AND s.SUBJECT_ID=m.SUBJECT_ID" +
-                (CommonUtils.isEmpty(nameMask) ? "" : " AND s.SUBJECT_ID=?")))
+                (CommonUtils.isEmpty(userIdMask) ? "" : " AND s.SUBJECT_ID LIKE ?")))
         ) {
             dbStat.setString(1, subjectType.getCode());
-            if (!CommonUtils.isEmpty(nameMask)) {
-                dbStat.setString(2, nameMask);
+            if (!CommonUtils.isEmpty(userIdMask)) {
+                dbStat.setString(2, "%" + userIdMask + "%");
             }
             try (ResultSet dbResult = dbStat.executeQuery()) {
                 while (dbResult.next()) {

@@ -12,10 +12,10 @@ import { ILoadableState, isArraysEqual, isContainsException } from '@cloudbeaver
 
 import { CachedResource, CachedResourceKey, ICachedResourceMetadata } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
-import type { ResourceKey, ResourceKeySimple } from './ResourceKey';
+import type { ResourceKey, ResourceKeyFlat, ResourceKeySimple } from './ResourceKey';
 import type { ResourceKeyAlias } from './ResourceKeyAlias';
 import { isResourceKeyList, resourceKeyList, ResourceKeyList } from './ResourceKeyList';
-import { ResourceKeyListAlias, resourceKeyListAlias } from './ResourceKeyListAlias';
+import { ResourceKeyListAlias, resourceKeyListAlias, resourceKeyListAliasFactory } from './ResourceKeyListAlias';
 import { ResourceKeyUtils } from './ResourceKeyUtils';
 
 export type CachedMapResourceKey<TResource> = CachedResourceKey<TResource>;
@@ -30,8 +30,35 @@ export type CachedMapResourceLoader<TRealKey, TKey, TValue, TIncludes> = TRealKe
   ? Array<CachedResourceValueIncludes<TValue, TIncludes>>
   : CachedResourceValueIncludes<TValue, TIncludes>;
 
+export interface ICachedMapPageOptions {
+  first: number;
+  after?: any;
+}
+
 export const CachedMapAllKey = resourceKeyListAlias('@cached-map-resource/all');
 export const CachedMapEmptyKey = resourceKeyListAlias('@cached-map-resource/empty');
+export const CachedMapPageKey = resourceKeyListAliasFactory<any, [first: number, after?: any], Readonly<ICachedMapPageOptions>>(
+  '@cached-map-resource/page',
+  (first: number, after?: any) => ({ first, after }),
+);
+
+interface IPageInfo<TKey> {
+  totalCount?: number;
+  edges?: TKey[];
+  hasNextPage?: boolean;
+  endCursor?: string | null;
+}
+
+interface IGQLConnection<TKey> {
+  totalCount: number;
+  edges: Array<TKey>;
+  pageInfo: {
+    hasNextPage: boolean;
+    endCursor: string | null;
+  };
+}
+
+type ICachedMapResourceMetadata<TKey> = ICachedResourceMetadata & IPageInfo<TKey>;
 
 /**
  * CachedMapResource is a resource that stores data in a Map.
@@ -40,7 +67,7 @@ export abstract class CachedMapResource<
   TKey,
   TValue,
   TContext extends Record<string, any> = Record<string, never>,
-  TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata,
+  TMetadata extends ICachedMapResourceMetadata<TKey> = ICachedMapResourceMetadata<TKey>,
 > extends CachedResource<Map<TKey, TValue>, TValue, TKey, CachedResourceIncludeArgs<TValue, TContext>, TMetadata> {
   readonly onItemUpdate: ISyncExecutor<ResourceKeySimple<TKey>>;
   readonly onItemDelete: ISyncExecutor<ResourceKeySimple<TKey>>;
@@ -63,6 +90,11 @@ export abstract class CachedMapResource<
     this.onItemDelete = new SyncExecutor<ResourceKeySimple<TKey>>(null);
 
     this.addAlias(CachedMapAllKey, () => resourceKeyList(this.keys));
+    this.addAlias(CachedMapPageKey, key => {
+      const pageInfo = this.getPageInfo(key as ResourceKeyFlat<TKey>);
+
+      return resourceKeyList(pageInfo?.edges || []);
+    });
 
     makeObservable<this, 'dataSet' | 'dataDelete'>(this, {
       set: action,
@@ -119,6 +151,14 @@ export abstract class CachedMapResource<
   get(key: ResourceKey<TKey>): Array<TValue | undefined> | TValue | undefined {
     key = this.transformToKey(key);
     return ResourceKeyUtils.map(key, key => this.dataGet(this.getKeyRef(key)));
+  }
+
+  getPageInfo(key: ResourceKeyFlat<TKey>): IPageInfo<TKey> | undefined {
+    if (!this.hasMetadata(key)) {
+      return undefined;
+    }
+
+    return this.getMetadata(key);
   }
 
   set(key: TKey | ResourceKeyAlias<TKey, any>, value: TValue): void;
@@ -223,6 +263,15 @@ export abstract class CachedMapResource<
     }
 
     return super.getKeyRef(key);
+  }
+
+  protected setPageInfo(key: ResourceKeyFlat<TKey>, pageInfo: IGQLConnection<TKey>): void {
+    const metadata = this.getMetadata(key);
+
+    metadata.totalCount = pageInfo.totalCount;
+    metadata.edges = pageInfo.edges;
+    metadata.hasNextPage = pageInfo.pageInfo.hasNextPage;
+    metadata.endCursor = pageInfo.pageInfo.endCursor;
   }
 
   /**

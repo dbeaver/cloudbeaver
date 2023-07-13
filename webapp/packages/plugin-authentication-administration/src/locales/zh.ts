@@ -28,6 +28,7 @@ export default [
   ['authentication_administration_users_filters_status_enabled', 'ENABLED'],
   ['authentication_administration_users_filters_status_disabled', 'DISABLED'],
   ['authentication_administration_users_filters_status_all', 'ALL'],
+  ['authentication_administration_users_empty', 'There are no users'],
 
   ['administration_configuration_wizard_configuration_admin', '管理员凭据'],
   ['administration_configuration_wizard_configuration_admin_name', '登录'],

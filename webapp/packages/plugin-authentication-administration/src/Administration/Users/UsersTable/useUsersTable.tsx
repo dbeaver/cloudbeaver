@@ -7,24 +7,37 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import type { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
-import { TableState, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { AdminUser, UsersResource, UsersResourceNewUsers, UsersResourceSearchUser } from '@cloudbeaver/core-authentication';
+import { TableState, useObservableRef, usePagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
-import { isArraysEqual } from '@cloudbeaver/core-utils';
+import { ILoadableState, isArraysEqual, isDefined } from '@cloudbeaver/core-utils';
+
+import type { IUserFilters } from './Filters/useUsersTableFilters';
 
 interface State {
   loading: boolean;
+  readonly hasMore: boolean;
   state: TableState;
   users: AdminUser[];
+  loadableState: ILoadableState;
+  loadMore(): void;
   update: () => Promise<void>;
   delete: () => Promise<void>;
 }
 
-export function useUsersTable(usersResource: UsersResource) {
+export function useUsersTable(filters: IUserFilters) {
   const translate = useTranslate();
+  const usersResource = useService(UsersResource);
+  const pagination = usePagination(UsersResource, {
+    getKey(first, after) {
+      return UsersResourceSearchUser(first, after, filters.search);
+    },
+    dependencies: [filters.search],
+  });
+  const usersLoader = useResource(useUsersTable, usersResource, pagination.key);
   const notificationService = useService(NotificationService);
   const commonDialogService = useService(CommonDialogService);
 
@@ -32,20 +45,16 @@ export function useUsersTable(usersResource: UsersResource) {
     () => ({
       loading: false,
       state: new TableState(),
+      get hasMore() {
+        return pagination.hasNextPage;
+      },
       get users() {
-        return this.usersResource.values.slice().sort((a, b) => {
-          if (this.usersResource.isNew(a.userId) === this.usersResource.isNew(b.userId)) {
-            return a.userId.localeCompare(b.userId);
-          }
-          if (this.usersResource.isNew(a.userId)) {
-            return -1;
-          }
-          return 1;
-        });
+        const users = Array.from(new Set([UsersResourceNewUsers, ...pagination.loaded].map(key => this.usersLoader.resource.get(key)).flat()));
+        return filters.filterUsers(users.filter(isDefined));
       },
       async update() {
         try {
-          await this.usersResource.refreshAll();
+          pagination.refresh();
           notificationService.logSuccess({ title: 'authentication_administration_tools_refresh_success' });
         } catch (exception: any) {
           notificationService.logException(exception, 'authentication_administration_tools_refresh_fail');
@@ -77,7 +86,7 @@ export function useUsersTable(usersResource: UsersResource) {
         this.loading = true;
 
         try {
-          await this.usersResource.delete(resourceKeyList(deletionList));
+          await this.usersLoader.resource.delete(resourceKeyList(deletionList));
           this.state.unselect();
 
           for (const id of deletionList) {
@@ -89,14 +98,18 @@ export function useUsersTable(usersResource: UsersResource) {
           this.loading = false;
         }
       },
+      loadMore() {
+        pagination.loadMore();
+      },
     }),
     {
       loading: observable.ref,
       users: computed<AdminUser[]>({ equals: (first, second) => isArraysEqual(first, second, undefined, true) }),
       update: action.bound,
       delete: action.bound,
+      loadMore: action.bound,
     },
-    { usersResource },
+    { usersLoader, loadableState: usersLoader },
   );
 
   return state;

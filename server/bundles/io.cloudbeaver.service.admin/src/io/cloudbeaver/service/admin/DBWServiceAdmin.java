@@ -21,6 +21,7 @@ import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebPropertyInfo;
+import io.cloudbeaver.model.pagination.GQLConnection;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.service.DBWService;
@@ -31,7 +32,6 @@ import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Web service API
@@ -40,7 +40,13 @@ public interface DBWServiceAdmin extends DBWService {
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     @NotNull
-    List<AdminUserInfo> listUsers(@NotNull WebSession webSession, @Nullable String userName) throws DBWebException;
+    AdminUserInfo getUserById(@NotNull WebSession webSession, @NotNull String userId) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    @NotNull
+    GQLConnection<AdminUserInfo> listUsers(@NotNull WebSession webSession, @NotNull Integer first,
+            @Nullable String after, @Nullable String userIdMask)
+            throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     @NotNull

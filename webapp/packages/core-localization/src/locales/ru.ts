@@ -5,6 +5,7 @@ export default [
   ['ui_light_theme', 'Светлая'],
   ['ui_dark_theme', 'Темная'],
   ['ui_stepper_back', 'Назад'],
+  ['ui_load_more', 'Загрузить ещё'],
   ['ui_processing_loading', 'Загрузка...'],
   ['ui_processing_cancel', 'Отменить'],
   ['ui_processing_canceling', 'Отмена...'],

@@ -31,7 +31,8 @@ import org.jkiss.utils.CommonUtils;
 /**
  * Web service implementation
  */
-public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmin> implements DBWServiceBindingServlet<CBApplication> {
+public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmin>
+                implements DBWServiceBindingServlet<CBApplication> {
 
     private static final String SCHEMA_FILE_NAME = "schema/service.admin.graphqls";
 
@@ -42,8 +43,11 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
     @Override
     public void bindWiring(DBWBindingContext model) throws DBWebException {
         model.getQueryType()
+            .dataFetcher("adminUserInfo",
+                env -> getService(env).getUserById(getWebSession(env), env.getArgument("userId")))
             .dataFetcher("listUsers",
-                env -> getService(env).listUsers(getWebSession(env), env.getArgument("userId")))
+                env -> getService(env).listUsers(getWebSession(env), env.getArgument("first"),
+                        env.getArgument("after"), env.getArgument("userIdMask")))
             .dataFetcher("listTeams",
                 env -> getService(env).listTeams(getWebSession(env), env.getArgument("teamId")))
             .dataFetcher("listPermissions",

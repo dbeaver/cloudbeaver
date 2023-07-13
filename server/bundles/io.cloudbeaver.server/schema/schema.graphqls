@@ -3,6 +3,11 @@ scalar Object
 # Date/Time
 scalar DateTime
 
+type PageInfo {
+    hasNextPage: Boolean!
+    endCursor: ID
+}
+
 type Query
 
 type Mutation

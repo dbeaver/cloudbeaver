@@ -1,5 +1,15 @@
-query getUsersList($userId: ID, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
-  users: listUsers(userId: $userId) {
-    ...AdminUserInfo
-  } 
+query getUsersList($first: Int!, $after: ID, $userIdMask: String, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  users: listUsers(first: $first, after: $after, userIdMask: $userIdMask) {
+    totalCount
+    edges {
+      cursor
+      node {
+        ...AdminUserInfo
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
 }

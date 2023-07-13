@@ -94,6 +94,17 @@ export interface AdminUserInfo {
   userId: Scalars['ID'];
 }
 
+export interface AdminUserInfoConnection {
+  edges: Array<AdminUserInfoConnectionEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int'];
+}
+
+export interface AdminUserInfoConnectionEdge {
+  cursor: Scalars['ID'];
+  node: AdminUserInfo;
+}
+
 export interface AsyncTaskInfo {
   error?: Maybe<ServerError>;
   id: Scalars['String'];
@@ -927,6 +938,11 @@ export enum ObjectPropertyLength {
   Tiny = 'TINY',
 }
 
+export interface PageInfo {
+  endCursor?: Maybe<Scalars['ID']>;
+  hasNextPage: Scalars['Boolean'];
+}
+
 export interface ProductInfo {
   buildTime: Scalars['String'];
   description?: Maybe<Scalars['String']>;
@@ -953,6 +969,7 @@ export interface ProjectInfo {
 
 export interface Query {
   activeUser?: Maybe<UserInfo>;
+  adminUserInfo: AdminUserInfo;
   authChangeLocalPassword: Scalars['Boolean'];
   authLogin: AuthInfo;
   authLogout?: Maybe<Scalars['Boolean']>;
@@ -988,7 +1005,7 @@ export interface Query {
   listTeamMetaParameters: Array<ObjectPropertyInfo>;
   listTeams: Array<AdminTeamInfo>;
   listUserProfileProperties: Array<ObjectPropertyInfo>;
-  listUsers: Array<AdminUserInfo>;
+  listUsers?: Maybe<AdminUserInfoConnection>;
   metadataGetNodeDDL?: Maybe<Scalars['String']>;
   metadataGetNodeExtendedDDL?: Maybe<Scalars['String']>;
   navGetStructContainers: DatabaseStructContainers;
@@ -1034,6 +1051,10 @@ export interface Query {
   templateConnections: Array<ConnectionInfo>;
   updateTeam: AdminTeamInfo;
   userConnections: Array<ConnectionInfo>;
+}
+
+export interface QueryAdminUserInfoArgs {
+  userId: Scalars['ID'];
 }
 
 export interface QueryAuthChangeLocalPasswordArgs {
@@ -1155,7 +1176,9 @@ export interface QueryListTeamsArgs {
 }
 
 export interface QueryListUsersArgs {
-  userId?: InputMaybe<Scalars['ID']>;
+  after?: InputMaybe<Scalars['ID']>;
+  first: Scalars['Int'];
+  userIdMask?: InputMaybe<Scalars['String']>;
 }
 
 export interface QueryMetadataGetNodeDdlArgs {
@@ -2105,22 +2128,14 @@ export type EnableUserQueryVariables = Exact<{
 
 export type EnableUserQuery = { enableUser?: boolean };
 
-export type GetUserGrantedConnectionsQueryVariables = Exact<{
+export type GetAdminUserInfoQueryVariables = Exact<{
   userId: Scalars['ID'];
-}>;
-
-export type GetUserGrantedConnectionsQuery = {
-  grantedConnections: Array<{ connectionId: string; dataSourceId: string; subjectId: string; subjectType: AdminSubjectType }>;
-};
-
-export type GetUsersListQueryVariables = Exact<{
-  userId?: InputMaybe<Scalars['ID']>;
   includeMetaParameters: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
-export type GetUsersListQuery = {
-  users: Array<{
+export type GetAdminUserInfoQuery = {
+  user: {
     userId: string;
     grantedTeams: Array<string>;
     linkedAuthProviders: Array<string>;
@@ -2146,7 +2161,60 @@ export type GetUsersListQuery = {
         order: number;
       }>;
     }>;
-  }>;
+  };
+};
+
+export type GetUserGrantedConnectionsQueryVariables = Exact<{
+  userId: Scalars['ID'];
+}>;
+
+export type GetUserGrantedConnectionsQuery = {
+  grantedConnections: Array<{ connectionId: string; dataSourceId: string; subjectId: string; subjectType: AdminSubjectType }>;
+};
+
+export type GetUsersListQueryVariables = Exact<{
+  first: Scalars['Int'];
+  after?: InputMaybe<Scalars['ID']>;
+  userIdMask?: InputMaybe<Scalars['String']>;
+  includeMetaParameters: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+}>;
+
+export type GetUsersListQuery = {
+  users?: {
+    totalCount: number;
+    edges: Array<{
+      cursor: string;
+      node: {
+        userId: string;
+        grantedTeams: Array<string>;
+        linkedAuthProviders: Array<string>;
+        metaParameters?: any;
+        enabled: boolean;
+        authRole?: string;
+        origins: Array<{
+          type: string;
+          subType?: string;
+          displayName: string;
+          icon?: string;
+          details?: Array<{
+            id?: string;
+            displayName?: string;
+            description?: string;
+            category?: string;
+            dataType?: string;
+            defaultValue?: any;
+            validValues?: Array<any>;
+            value?: any;
+            length: ObjectPropertyLength;
+            features: Array<string>;
+            order: number;
+          }>;
+        }>;
+      };
+    }>;
+    pageInfo: { hasNextPage: boolean; endCursor?: string };
+  };
 };
 
 export type GrantUserTeamQueryVariables = Exact<{
@@ -5483,6 +5551,13 @@ export const EnableUserDocument = `
   enableUser(userId: $userId, enabled: $enabled)
 }
     `;
+export const GetAdminUserInfoDocument = `
+    query getAdminUserInfo($userId: ID!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  user: adminUserInfo(userId: $userId) {
+    ...AdminUserInfo
+  }
+}
+    ${AdminUserInfoFragmentDoc}`;
 export const GetUserGrantedConnectionsDocument = `
     query getUserGrantedConnections($userId: ID!) {
   grantedConnections: getSubjectConnectionAccess(subjectId: $userId) {
@@ -5494,9 +5569,19 @@ export const GetUserGrantedConnectionsDocument = `
 }
     `;
 export const GetUsersListDocument = `
-    query getUsersList($userId: ID, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
-  users: listUsers(userId: $userId) {
-    ...AdminUserInfo
+    query getUsersList($first: Int!, $after: ID, $userIdMask: String, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  users: listUsers(first: $first, after: $after, userIdMask: $userIdMask) {
+    totalCount
+    edges {
+      cursor
+      node {
+        ...AdminUserInfo
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
   }
 }
     ${AdminUserInfoFragmentDoc}`;
@@ -6835,6 +6920,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
       return withWrapper(
         wrappedRequestHeaders => client.request<EnableUserQuery>(EnableUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
         'enableUser',
+        'query',
+      );
+    },
+    getAdminUserInfo(variables: GetAdminUserInfoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetAdminUserInfoQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<GetAdminUserInfoQuery>(GetAdminUserInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
+        'getAdminUserInfo',
         'query',
       );
     },

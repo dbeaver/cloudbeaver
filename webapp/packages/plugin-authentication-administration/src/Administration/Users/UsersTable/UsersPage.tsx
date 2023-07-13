@@ -9,13 +9,12 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
-import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, AuthRolesResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, AuthRolesResource } from '@cloudbeaver/core-authentication';
 import {
   BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Container,
   Group,
-  Loader,
   ToolsAction,
   ToolsPanel,
   useResource,
@@ -31,12 +30,6 @@ import { UsersTableFilters } from './Filters/UsersTableFilters';
 import { useUsersTableFilters } from './Filters/useUsersTableFilters';
 import { UsersTable } from './UsersTable';
 import { useUsersTable } from './useUsersTable';
-
-const loaderStyle = css`
-  ExceptionMessage {
-    padding: 24px;
-  }
-`;
 
 const styles = css`
   ToolsPanel {
@@ -56,17 +49,16 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
 
   const createUserService = useService(CreateUserService);
 
-  const usersResource = useResource(UsersPage, UsersResource, CachedMapAllKey);
   const authProvidersResource = useResource(UsersPage, AuthProvidersResource, CachedMapAllKey);
   const authRolesResource = useResource(UsersPage, AuthRolesResource, undefined);
 
-  const table = useUsersTable(usersResource.resource);
-  const filters = useUsersTableFilters(table.users);
+  const filters = useUsersTableFilters();
+  const table = useUsersTable(filters);
 
   const isLocalProviderAvailable = authProvidersResource.resource.has(AUTH_PROVIDER_LOCAL_ID);
   const create = param === 'create';
   const displayAuthRole = authRolesResource.data.length > 0;
-  const keys = filters.filteredUsers.map(user => user.userId);
+  const loading = authRolesResource.isLoading() || table.loadableState.isLoading();
 
   return styled(style)(
     <ColoredContainer vertical wrap gap parent>
@@ -116,15 +108,15 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
         )}
 
         <Group box="no-overflow">
-          <Loader style={loaderStyle} state={[usersResource, authRolesResource]} overlay>
-            <UsersTable
-              keys={keys}
-              selectedItems={table.state.selected}
-              expandedItems={table.state.expanded}
-              users={filters.filteredUsers}
-              displayAuthRole={displayAuthRole}
-            />
-          </Loader>
+          <UsersTable
+            users={table.users}
+            selectedItems={table.state.selected}
+            expandedItems={table.state.expanded}
+            displayAuthRole={displayAuthRole}
+            loading={loading}
+            hasMore={table.hasMore}
+            onLoadMore={table.loadMore}
+          />
         </Group>
       </Container>
     </ColoredContainer>,
