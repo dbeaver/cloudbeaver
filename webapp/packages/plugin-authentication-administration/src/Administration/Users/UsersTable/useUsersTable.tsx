@@ -33,9 +33,9 @@ export function useUsersTable(filters: IUserFilters) {
   const usersResource = useService(UsersResource);
   const pagination = usePagination(UsersResource, {
     getKey(first, after) {
-      return UsersResourceSearchUser(first, after, filters.search);
+      return UsersResourceSearchUser(first, after, filters.search, filters.status === 'true' ? true : filters.status === 'false' ? false : undefined);
     },
-    dependencies: [filters.search],
+    dependencies: [filters.search, filters.status],
   });
   const usersLoader = useResource(useUsersTable, usersResource, pagination.key);
   const notificationService = useService(NotificationService);

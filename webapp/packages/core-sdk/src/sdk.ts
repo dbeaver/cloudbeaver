@@ -1177,6 +1177,7 @@ export interface QueryListTeamsArgs {
 
 export interface QueryListUsersArgs {
   after?: InputMaybe<Scalars['ID']>;
+  enabledState?: InputMaybe<Scalars['Boolean']>;
   first: Scalars['Int'];
   userIdMask?: InputMaybe<Scalars['String']>;
 }
@@ -2176,6 +2177,7 @@ export type GetUsersListQueryVariables = Exact<{
   first: Scalars['Int'];
   after?: InputMaybe<Scalars['ID']>;
   userIdMask?: InputMaybe<Scalars['String']>;
+  enabledState?: InputMaybe<Scalars['Boolean']>;
   includeMetaParameters: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
@@ -5569,8 +5571,13 @@ export const GetUserGrantedConnectionsDocument = `
 }
     `;
 export const GetUsersListDocument = `
-    query getUsersList($first: Int!, $after: ID, $userIdMask: String, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
-  users: listUsers(first: $first, after: $after, userIdMask: $userIdMask) {
+    query getUsersList($first: Int!, $after: ID, $userIdMask: String, $enabledState: Boolean, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  users: listUsers(
+    first: $first
+    after: $after
+    userIdMask: $userIdMask
+    enabledState: $enabledState
+  ) {
     totalCount
     edges {
       cursor

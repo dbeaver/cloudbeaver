@@ -83,23 +83,22 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @NotNull
     @Override
     public GQLConnection<AdminUserInfo> listUsers(@NotNull WebSession webSession, Integer first, String after,
-            String userIdMask)
-            throws DBWebException {
+            String userIdMask, Boolean enabledState) throws DBWebException {
         try {
             List<GQLConnectionEdge<AdminUserInfo>> edges = new ArrayList<>();
-            for (SMUser smUser : webSession.getAdminSecurityController().findUsers(first, after, userIdMask)) {
+            for (SMUser smUser : webSession.getAdminSecurityController().findUsers(first, after, userIdMask, enabledState)) {
                 edges.add(
                         new GQLConnectionEdge<>(new AdminUserInfo(webSession, new WebUser(smUser)),
                                 smUser.getUserId()));
             }
-            int totalCount = webSession.getAdminSecurityController().countUsers(null, userIdMask);
+            int totalCount = webSession.getAdminSecurityController().countUsers(null, userIdMask, enabledState);
             String endCursor = null;
 
             if (!edges.isEmpty()) {
                 endCursor = edges.get(edges.size() - 1).getCursor();
             }
 
-            int moreCount = webSession.getAdminSecurityController().countUsers(endCursor, userIdMask);
+            int moreCount = webSession.getAdminSecurityController().countUsers(endCursor, userIdMask, enabledState);
             return new GQLConnection<>(totalCount, edges,
                     new GQLPageInfo(moreCount > 0, endCursor));
         } catch (Exception e) {

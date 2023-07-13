@@ -42,13 +42,14 @@ type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId' | 'after' 
 
 interface IUserResourceSearchPageOptions extends ICachedMapPageOptions {
   userId?: string;
+  enabledState?: boolean;
 }
 
 export const UsersResourceSearchUser = resourceKeyListAliasFactory<
   any,
-  [first: number, after?: any, userId?: string],
+  [first: number, after?: any, userId?: string, enabledState?: boolean],
   Readonly<IUserResourceSearchPageOptions>
->('@users-resource/page', (first: number, after?: any, userId?: any) => ({ first, after, userId }));
+>('@users-resource/page', (first: number, after?: any, userId?: string, enabledState?: boolean) => ({ first, after, userId, enabledState }));
 
 export const UsersResourceNewUsers = resourceKeyListAlias('@users-resource/new-users');
 
@@ -256,6 +257,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
           first: page || search ? originalKey.options.first : 100,
           after: page || search ? originalKey.options.after : undefined,
           userIdMask: search ? originalKey.options.userId : undefined,
+          enabledState: search ? originalKey.options.enabledState : undefined,
           ...this.getDefaultIncludes(),
           ...this.getIncludesMap(userId, includes),
         });

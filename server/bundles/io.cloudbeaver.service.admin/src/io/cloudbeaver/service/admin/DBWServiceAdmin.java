@@ -45,7 +45,7 @@ public interface DBWServiceAdmin extends DBWService {
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     @NotNull
     GQLConnection<AdminUserInfo> listUsers(@NotNull WebSession webSession, @NotNull Integer first,
-            @Nullable String after, @Nullable String userIdMask)
+            @Nullable String after, @Nullable String userIdMask, @Nullable Boolean enabledState)
             throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)

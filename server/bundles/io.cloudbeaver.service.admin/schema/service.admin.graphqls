@@ -129,7 +129,7 @@ extend type Query {
     #### Users and teams
 
     adminUserInfo(userId: ID!): AdminUserInfo!
-    listUsers(first: Int!, after: ID, userIdMask: String): AdminUserInfoConnection
+    listUsers(first: Int!, after: ID, userIdMask: String, enabledState: Boolean): AdminUserInfoConnection
     listTeams(teamId: ID): [AdminTeamInfo!]!
     listPermissions: [AdminPermissionInfo!]!
     listAuthRoles: [String!]!

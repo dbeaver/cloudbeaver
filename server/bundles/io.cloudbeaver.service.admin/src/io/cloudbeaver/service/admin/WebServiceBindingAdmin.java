@@ -47,7 +47,7 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
                 env -> getService(env).getUserById(getWebSession(env), env.getArgument("userId")))
             .dataFetcher("listUsers",
                 env -> getService(env).listUsers(getWebSession(env), env.getArgument("first"),
-                        env.getArgument("after"), env.getArgument("userIdMask")))
+                        env.getArgument("after"), env.getArgument("userIdMask"), env.getArgument("enabledState")))
             .dataFetcher("listTeams",
                 env -> getService(env).listTeams(getWebSession(env), env.getArgument("teamId")))
             .dataFetcher("listPermissions",

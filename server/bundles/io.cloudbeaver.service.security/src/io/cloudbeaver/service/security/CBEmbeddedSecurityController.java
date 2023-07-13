@@ -292,21 +292,29 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Override
-    public int countUsers(String after, String userIdMask) throws DBCException {
+    public int countUsers(String after, String userIdMask, Boolean enabledState) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames(
-                            "SELECT COUNT(*) FROM {table_prefix}CB_USER" +
-                                    (CommonUtils.isEmpty(after) ? "" : " WHERE USER_ID > ?") +
-                                    (CommonUtils.isEmpty(userIdMask) ? ""
-                                            : (CommonUtils.isEmpty(after) ? " WHERE" : " AND")
-                                                    + " USER_ID LIKE ?")))) {
+            String whereString = "\nWHERE";
+            if (!CommonUtils.isEmpty(after)) {
+                whereString += " USER_ID > ?";
+            }
+            if (!CommonUtils.isEmpty(userIdMask)) {
+                whereString += (whereString != "\nWHERE" ? "AND" : "") + " USER_ID LIKE ?";
+            }
+            if (enabledState != null) {
+                whereString += (whereString != "\nWHERE" ? "AND" : "") + " IS_ACTIVE=?";
+            }
+            try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
+                    "SELECT COUNT(*) FROM {table_prefix}CB_USER" + (whereString != "\nWHERE" ? whereString : "")))) {
                 int parameterIndex = 1;
                 if (!CommonUtils.isEmpty(after)) {
                     dbStat.setString(parameterIndex++, after);
                 }
                 if (!CommonUtils.isEmpty(userIdMask)) {
                     dbStat.setString(parameterIndex++, "%" + userIdMask + "%");
+                }
+                if (enabledState != null) {
+                    dbStat.setString(parameterIndex++, enabledState ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
                 }
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
@@ -323,25 +331,34 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @NotNull
     @Override
-    public SMUser[] findUsers(Integer first, String after, String userIdMask) throws DBCException {
+    public SMUser[] findUsers(Integer first, String after, String userIdMask, Boolean enabledState)
+            throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             Map<String, SMUser> result = new LinkedHashMap<>();
+            String whereString = "\nWHERE";
+            if (!CommonUtils.isEmpty(after)) {
+                whereString += " USER_ID > ?";
+            }
+            if (!CommonUtils.isEmpty(userIdMask)) {
+                whereString += (whereString != "\nWHERE" ? "AND" : "") + " USER_ID LIKE ?";
+            }
+            String usersTableWhere = whereString;
+            if (enabledState != null) {
+                usersTableWhere += (usersTableWhere != "\nWHERE" ? "AND" : "") + " IS_ACTIVE=?";
+            }
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames(
-                    "SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER" +
-                        (CommonUtils.isEmpty(after) ? "" : " WHERE USER_ID > ?") +
-                        (CommonUtils.isEmpty(userIdMask) ? ""
-                            : (CommonUtils.isEmpty(after) ? " WHERE" : " AND")
-                                + " USER_ID LIKE ?"))
-                    +
-                    "\nORDER BY USER_ID LIMIT ?")) {
+                    database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER"
+                            + (usersTableWhere != "\nWHERE" ? usersTableWhere : "") + "\nORDER BY USER_ID LIMIT ?"))) {
                 int parameterIndex = 1;
                 if (!CommonUtils.isEmpty(after)) {
                     dbStat.setString(parameterIndex++, after);
                 }
                 if (!CommonUtils.isEmpty(userIdMask)) {
                     dbStat.setString(parameterIndex++, "%" + userIdMask + "%");
+                }
+                if (enabledState != null) {
+                    dbStat.setString(parameterIndex++, enabledState ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
                 }
                 dbStat.setInt(parameterIndex++, first);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -356,11 +373,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             readSubjectsMetas(dbCon, SMSubjectType.user, userIdMask, result);
             // Read teams
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT USER_ID,TEAM_ID FROM {table_prefix}CB_USER_TEAM" +
-                    (CommonUtils.isEmpty(after) ? "" : " WHERE USER_ID > ?") +
-                    (CommonUtils.isEmpty(userIdMask) ? ""
-                        : (CommonUtils.isEmpty(after) ? " WHERE" : " AND")
-                            + " USER_ID LIKE ?")))) {
+                    database.normalizeTableNames("SELECT USER_ID,TEAM_ID FROM {table_prefix}CB_USER_TEAM"
+                            + (whereString != "\nWHERE" ? whereString : "")))) {
                 int parameterIndex = 1;
                 if (!CommonUtils.isEmpty(after)) {
                     dbStat.setString(parameterIndex++, after);

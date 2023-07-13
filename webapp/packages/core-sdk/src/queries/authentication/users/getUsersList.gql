@@ -1,5 +1,12 @@
-query getUsersList($first: Int!, $after: ID, $userIdMask: String, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
-  users: listUsers(first: $first, after: $after, userIdMask: $userIdMask) {
+query getUsersList(
+  $first: Int!
+  $after: ID
+  $userIdMask: String
+  $enabledState: Boolean
+  $includeMetaParameters: Boolean!
+  $customIncludeOriginDetails: Boolean!
+) {
+  users: listUsers(first: $first, after: $after, userIdMask: $userIdMask, enabledState: $enabledState) {
     totalCount
     edges {
       cursor
