@@ -16,7 +16,6 @@ import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { NavTreeControlComponent } from '../NavigationNodeComponent';
-import { transformNodeInfo } from '../transformNodeInfo';
 import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
 import type { INavigationNode } from './useNavigationNode';
 
@@ -49,6 +48,10 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
     const treeNodeContext = useContext(TreeNodeContext);
     const navNodeInfoResource = useService(NavNodeInfoResource);
     const observer = useRef<IntersectionObserver | null>(null);
+
+    if (!contextRef.context) {
+      throw new Error('ElementsTreeContext not found');
+    }
 
     useEffect(() => {
       if (elementRef.current) {
@@ -94,7 +97,7 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
 
     const Control = navNode.control || externalControl || NavigationNodeControlLoader;
     const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
-    const nodeInfo = transformNodeInfo(node, contextRef.context?.tree.nodeInfoTransformers ?? []);
+    const nodeInfo = contextRef.context?.tree.getTransformedNodeInfo(node);
 
     function onClickHandler(event: React.MouseEvent<HTMLDivElement>) {
       treeNodeContext.select(event.ctrlKey || event.metaKey);
