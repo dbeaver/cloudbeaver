@@ -413,7 +413,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private void readSubjectsMetas(Connection dbCon, SMSubjectType subjectType, String userIdMask, Map<String, ? extends SMSubject> result) throws SQLException {
+    private void readSubjectsMetas(Connection dbCon, SMSubjectType subjectType, String userIdMask,
+            Map<String, ? extends SMSubject> result) throws SQLException {
         // Read metas
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             database.normalizeTableNames("SELECT m.SUBJECT_ID,m.META_ID,m.META_VALUE FROM {table_prefix}CB_AUTH_SUBJECT s, " +
