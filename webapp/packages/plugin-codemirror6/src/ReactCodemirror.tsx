@@ -20,13 +20,6 @@ import { useCodemirrorExtensions } from './useCodemirrorExtensions';
 
 const External = Annotation.define<boolean>();
 
-const defaultTheme = EditorView.theme({
-  '&': {
-    width: '100%',
-    height: '100%',
-  },
-});
-
 export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
   forwardRef(function ReactCodemirror(
     { children, getValue, value, incomingValue, extensions = new Map<Compartment, Extension>(), readonly, autoFocus, onChange, onUpdate },
@@ -68,10 +61,10 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
         if (incomingValue !== undefined) {
           merge = new MergeView({
             a: {
-              extensions: [defaultTheme, updateListener, ...effects],
+              extensions: [updateListener, ...effects],
             },
             b: {
-              extensions: [defaultTheme, EditorView.editable.of(false), ...effects],
+              extensions: [EditorView.editable.of(false), ...effects],
             },
             parent: container,
           });
@@ -81,7 +74,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
         } else {
           editorView = new EditorView({
             parent: container,
-            extensions: [defaultTheme, updateListener, ...effects],
+            extensions: [updateListener, ...effects],
           });
         }
 

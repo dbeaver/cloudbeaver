@@ -14,13 +14,15 @@ export type CompletionConfig = Parameters<typeof autocompletion>[0];
 
 const EDITOR_AUTOCOMPLETION_COMPARTMENT = new Compartment();
 
+const EDITOR_AUTOCOMPLETION_KEYMAP = keymap.of([
+  { key: 'Alt-Space', run: startCompletion, preventDefault: true },
+  { key: 'Shift-Ctrl-Space', run: startCompletion, preventDefault: true },
+]);
+
 export function useEditorAutocompletion(config?: CompletionConfig): [Compartment, Extension] {
   const autocompletionExtension = useMemo(
     () => [
-      keymap.of([
-        { key: 'Alt-Space', run: startCompletion, preventDefault: true },
-        { key: 'Shift-Ctrl-Space', run: startCompletion, preventDefault: true },
-      ]),
+      EDITOR_AUTOCOMPLETION_KEYMAP,
       autocompletion({
         ...config,
         closeOnBlur: false,

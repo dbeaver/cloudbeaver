@@ -228,7 +228,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   setExecutionContext(executionContext: IConnectionExecutionContextInfo | undefined): void {
-    executionContext = !executionContext ? undefined : JSON.parse(JSON.stringify(toJS(executionContext)));
+    executionContext = JSON.parse(JSON.stringify(toJS(executionContext) ?? {}));
 
     if (this.resourceKey && executionContext?.projectId && getRmResourceKey(this.resourceKey).projectId !== executionContext.projectId) {
       throw new Error('Resource SQL Data Source and Execution context projects don\t match');

@@ -162,16 +162,20 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   setIncomingExecutionContext(executionContext?: IConnectionExecutionContextInfo | undefined): void {
     executionContext = toJS(executionContext);
 
-    if (!isObjectsEqual(executionContext, toJS(this.baseExecutionContext))) {
-      if (isObjectsEqual(this.executionContext, toJS(this.baseExecutionContext))) {
-        this.setBaseExecutionContext(executionContext);
-        this.setExecutionContext(executionContext);
-      } else {
-        this.incomingExecutionContext = executionContext;
-      }
-    } else {
-      this.incomingExecutionContext = null;
-    }
+    this.setBaseExecutionContext(executionContext);
+    this.setExecutionContext(executionContext);
+
+    // TODO: we need to display execution context changes
+    // if (!isObjectsEqual(executionContext, toJS(this.baseExecutionContext))) {
+    //   if (isObjectsEqual(this.executionContext, toJS(this.baseExecutionContext))) {
+    //     this.setBaseExecutionContext(executionContext);
+    //     this.setExecutionContext(executionContext);
+    //   } else {
+    //     this.incomingExecutionContext = executionContext;
+    //   }
+    // } else {
+    //   this.incomingExecutionContext = null;
+    // }
   }
 
   isError(): boolean {

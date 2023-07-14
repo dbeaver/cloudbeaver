@@ -8,23 +8,23 @@
 
 @mixin base-code-editor() {
   .editor,
+  .cm-editor,
+  .ReactCodemirror {
+    width: 100%;
+    height: 100%;
+  }
+
+  .editor,
   .ReactCodemirror,
   .cm-mergeView,
   .cm-mergeViewEditors,
   .cm-editor {
     @include mdc-typography('body2');
-    width: 100%;
-    height: 100%;
   }
 
   .cm-mergeViewEditor:first-child {
     border-right: 1px solid;
     @include mdc-theme-prop(border-color, background, false);
-  }
-
-  .ͼ1 .cm-scroller,
-  .ͼ1 {
-    height: 100% !important;
   }
 
   .editor {
