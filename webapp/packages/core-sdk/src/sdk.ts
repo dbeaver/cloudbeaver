@@ -835,24 +835,30 @@ export enum NetworkHandlerAuthType {
 }
 
 export interface NetworkHandlerConfig {
+  /** @deprecated Field no longer supported */
   authType: NetworkHandlerAuthType;
   enabled: Scalars['Boolean'];
   id: Scalars['ID'];
+  /** @deprecated Field no longer supported */
   key?: Maybe<Scalars['String']>;
   password?: Maybe<Scalars['String']>;
   properties: Scalars['Object'];
   savePassword: Scalars['Boolean'];
+  secureProperties: Scalars['Object'];
   userName?: Maybe<Scalars['String']>;
 }
 
 export interface NetworkHandlerConfigInput {
+  /** @deprecated Field no longer supported */
   authType?: InputMaybe<NetworkHandlerAuthType>;
   enabled?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
+  /** @deprecated Field no longer supported */
   key?: InputMaybe<Scalars['String']>;
   password?: InputMaybe<Scalars['String']>;
   properties?: InputMaybe<Scalars['Object']>;
   savePassword?: InputMaybe<Scalars['Boolean']>;
+  secureProperties?: InputMaybe<Scalars['Object']>;
   userName?: InputMaybe<Scalars['String']>;
 }
 
@@ -2349,6 +2355,7 @@ export type CloseConnectionMutation = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2449,6 +2456,7 @@ export type CreateConnectionMutation = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2558,6 +2566,7 @@ export type CreateConnectionFromNodeMutation = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2659,6 +2668,7 @@ export type CreateConnectionFromTemplateMutation = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2901,6 +2911,7 @@ export type GetTemplateConnectionsQuery = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3002,6 +3013,7 @@ export type GetUserConnectionsQuery = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3106,6 +3118,7 @@ export type InitConnectionMutation = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3211,6 +3224,7 @@ export type SetConnectionNavigatorSettingsMutation = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3332,6 +3346,7 @@ export type UpdateConnectionMutation = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3755,6 +3770,7 @@ export type DatabaseConnectionFragment = {
     key?: string;
     savePassword: boolean;
     properties: any;
+    secureProperties: any;
   }>;
   navigatorSettings: {
     showSystemObjects: boolean;
@@ -5060,6 +5076,7 @@ export const DatabaseConnectionFragmentDoc = `
     key
     savePassword
     properties
+    secureProperties
   }
   navigatorSettings {
     ...AllNavigatorSettings

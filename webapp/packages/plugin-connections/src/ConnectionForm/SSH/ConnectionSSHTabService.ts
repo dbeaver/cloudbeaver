@@ -116,34 +116,38 @@ export class ConnectionSSHTabService extends Bootstrap {
       return;
     }
 
-    for (const handler of config.networkHandlersConfig) {
-      if (handler.enabled) {
-        const initial = info?.networkHandlersConfig?.find(h => h.id === handler.id);
-        if (this.isChanged(handler, initial)) {
-          if (handler.savePassword && !handler.userName?.length) {
-            validation.error("Field SSH 'User' can't be empty");
-          }
+    const handler = config.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
 
-          if (!handler.properties?.host?.length) {
-            validation.error("Field SSH 'Host' can't be empty");
-          }
+    if (!handler) {
+      return;
+    }
 
-          const port = Number(handler.properties?.port);
-          if (Number.isNaN(port) || port < 1) {
-            validation.error("Field SSH 'Port' can't be empty");
-          }
+    if (handler.enabled) {
+      const initial = info?.networkHandlersConfig?.find(h => h.id === handler.id);
+      if (this.isChanged(handler, initial)) {
+        if (handler.savePassword && !handler.userName?.length) {
+          validation.error("Field SSH 'User' can't be empty");
         }
 
-        const keyAuth = handler.authType === NetworkHandlerAuthType.PublicKey;
-        const keySaved = initial?.key === '';
-        if (keyAuth && handler.savePassword && !keySaved && !handler.key?.length) {
-          validation.error("Field SSH 'Private key' can't be empty");
+        if (!handler.properties?.host?.length) {
+          validation.error("Field SSH 'Host' can't be empty");
         }
 
-        const passwordSaved = initial?.password === '' && initial.authType === handler.authType;
-        if (!keyAuth && handler.savePassword && !passwordSaved && !handler.password?.length) {
-          validation.error("Field SSH 'Password' can't be empty");
+        const port = Number(handler.properties?.port);
+        if (Number.isNaN(port) || port < 1) {
+          validation.error("Field SSH 'Port' can't be empty");
         }
+      }
+
+      const keyAuth = handler.authType === NetworkHandlerAuthType.PublicKey;
+      const keySaved = initial?.key === '';
+      if (keyAuth && handler.savePassword && !keySaved && !handler.key?.length) {
+        validation.error("Field SSH 'Private key' can't be empty");
+      }
+
+      const passwordSaved = initial?.password === '' && initial.authType === handler.authType;
+      if (!keyAuth && handler.savePassword && !passwordSaved && !handler.password?.length) {
+        validation.error("Field SSH 'Password' can't be empty");
       }
     }
   }
@@ -157,27 +161,35 @@ export class ConnectionSSHTabService extends Bootstrap {
       return;
     }
 
-    const configs: NetworkHandlerConfigInput[] = [];
+    let handlerConfig: NetworkHandlerConfigInput | undefined;
 
-    for (const handler of state.config.networkHandlersConfig) {
-      const initial = state.info?.networkHandlersConfig?.find(h => h.id === handler.id);
-      const passwordChanged = this.isPasswordChanged(handler, initial);
-      const keyChanged = this.isKeyChanged(handler, initial);
+    const handler = state.config.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
 
-      if (this.isChanged(handler, initial) || passwordChanged || keyChanged) {
-        configs.push({
-          ...handler,
-          key: handler.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? handler.key : undefined,
-          password: passwordChanged ? handler.password : undefined,
-        });
-      }
-      if (handler.enabled && !handler.savePassword) {
-        credentialsState.requireNetworkHandler(handler.id);
-      }
+    if (!handler) {
+      return;
     }
 
-    if (configs.length > 0) {
-      config.networkHandlersConfig = configs;
+    const initial = state.info?.networkHandlersConfig?.find(h => h.id === handler.id);
+    const passwordChanged = this.isPasswordChanged(handler, initial);
+    const keyChanged = this.isKeyChanged(handler, initial);
+
+    if (this.isChanged(handler, initial) || passwordChanged || keyChanged) {
+      handlerConfig = {
+        ...handler,
+        key: handler.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? handler.key : undefined,
+        password: passwordChanged ? handler.password : undefined,
+      };
+    }
+    if (handler.enabled && !handler.savePassword) {
+      credentialsState.requireNetworkHandler(handler.id);
+    }
+
+    if (handlerConfig) {
+      if (!config.networkHandlersConfig) {
+        config.networkHandlersConfig = [];
+      }
+
+      config.networkHandlersConfig.push(handlerConfig);
     }
   }
 
