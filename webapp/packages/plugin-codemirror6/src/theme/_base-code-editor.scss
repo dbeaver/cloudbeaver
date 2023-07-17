@@ -9,9 +9,12 @@
 @mixin base-code-editor() {
   .editor,
   .cm-editor,
+  .cm-mergeView,
+  .cm-mergeViewEditors,
+  .cm-scroller,
   .ReactCodemirror {
     width: 100%;
-    height: 100%;
+    height: 100% !important;
   }
 
   .editor,
