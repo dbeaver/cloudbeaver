@@ -88,8 +88,25 @@ public class WebDataSourceUtils {
         if (cfgInput.getPassword() != null) {
             handlerConfig.setPassword(cfgInput.getPassword());
         }
-        if (cfgInput.getKey() != null) {
+        if (cfgInput.getKey() != null) { // backward compatibility
             handlerConfig.setSecureProperty(SSHConstants.PROP_KEY_VALUE, cfgInput.getKey());
+        }
+
+        setSecureProperties(handlerConfig, cfgInput);
+
+
+    }
+
+    private static void setSecureProperties(DBWHandlerConfiguration handlerConfig, WebNetworkHandlerConfigInput cfgInput) {
+        var secureProperties = cfgInput.getSecureProperties();
+        if (secureProperties == null) {
+            return;
+        }
+        for (var pr : secureProperties.entrySet()) {
+            if (pr.getValue() == null) {
+                continue;
+            }
+            handlerConfig.setSecureProperty(pr.getKey(), pr.getValue());
         }
     }
 
