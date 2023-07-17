@@ -121,7 +121,7 @@ public class WebDataSourceUtils {
     public static void updateHandlerCredentials(DBWHandlerConfiguration handlerCfg, WebNetworkHandlerConfigInput webConfig) {
         handlerCfg.setUserName(webConfig.getUserName());
         handlerCfg.setPassword(webConfig.getPassword());
-        handlerCfg.setSecureProperty(SSHConstants.PROP_KEY_VALUE, webConfig.getKey());
+        handlerCfg.setSecureProperties(webConfig.getSecureProperties());
     }
 
 
