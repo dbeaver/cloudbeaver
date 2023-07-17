@@ -43,13 +43,14 @@ interface Props {
   message?: string | string[] | null;
   status?: ENotificationType;
   exception?: Error | null;
-  onShowDetails?: () => void;
   className?: string;
+  onShowDetails?: () => void;
 }
 
-export const StatusMessage = observer<Props>(function StatusMessage({ status, message, exception = null, onShowDetails, className }) {
+export const StatusMessage = observer<Props>(function StatusMessage({ status, message, exception = null, className, onShowDetails }) {
   const translate = useTranslate();
   const errorDetails = useErrorDetails(exception);
+  const isError = status === ENotificationType.Error || exception !== null;
 
   if (Array.isArray(message)) {
     message = message.map(m => translate(m)).join(', ');
@@ -60,7 +61,7 @@ export const StatusMessage = observer<Props>(function StatusMessage({ status, me
   message = message ?? errorDetails.message;
   let icon = '/icons/info_icon.svg';
 
-  if (status === ENotificationType.Error || exception !== null) {
+  if (isError) {
     icon = '/icons/error_icon.svg';
   } else if (status === ENotificationType.Success) {
     icon = '/icons/success_icon.svg';
