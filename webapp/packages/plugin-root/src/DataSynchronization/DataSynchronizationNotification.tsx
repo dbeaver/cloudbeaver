@@ -47,8 +47,12 @@ export const DataSynchronizationNotification = observer<NotificationComponentPro
     notification.close(false);
   }
 
+  function ignoreChanges() {
+    notification.close(false);
+  }
+
   return styled(styles)(
-    <SnackbarWrapper onClose={() => notification.close(false)}>
+    <SnackbarWrapper onClose={ignoreChanges}>
       <SnackbarStatus status={ENotificationType.Info} />
       <SnackbarContent>
         <SnackbarBody title={translate(notification.title)}>
@@ -62,7 +66,10 @@ export const DataSynchronizationNotification = observer<NotificationComponentPro
           </message>
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
-          <Button type="button" mod={['outlined']} onClick={applyChanges}>
+          <Button type="button" mod={['outlined']} onClick={ignoreChanges}>
+            {translate('ui_ignore')}
+          </Button>
+          <Button type="button" mod={['unelevated']} onClick={applyChanges}>
             {translate('ui_apply')}
           </Button>
         </SnackbarFooter>

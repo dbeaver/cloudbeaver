@@ -16,12 +16,12 @@ import { getRmResourceKey, IResourceManagerMoveData, ResourceManagerResource } f
 import { NetworkStateService, WindowEventsService } from '@cloudbeaver/core-root';
 import { CachedMapAllKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
-import { throttle } from '@cloudbeaver/core-utils';
+import { createPath, getPathParent, throttle } from '@cloudbeaver/core-utils';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavResourceNodeService } from '@cloudbeaver/plugin-navigation-tree-rm';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
-import { ResourceManagerScriptsService } from '@cloudbeaver/plugin-resource-manager-scripts';
-import { getSqlEditorName, SqlDataSourceService, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
+import { ResourceManagerScriptsService, SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
+import { createSqlDataSourceHistoryInitialState, getSqlEditorName, SqlDataSourceService, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
@@ -70,17 +70,18 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
         for (const [key, value] of Array.from(map.entries())) {
           if (
             !['string', 'undefined'].includes(typeof value.resourceKey) ||
-            !['undefined', 'object'].includes(typeof value.executionContext) ||
-            !['string', 'undefined'].includes(typeof value.executionContext?.connectionId) ||
-            !['string', 'undefined'].includes(typeof value.executionContext?.id) ||
-            !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultCatalog) ||
-            !['string', 'undefined', 'object'].includes(typeof value.executionContext?.defaultSchema)
+            !['string'].includes(typeof value.script) ||
+            !['string', 'undefined'].includes(typeof value.baseScript) ||
+            isExecutionContextInfoValid(value.executionContext) ||
+            isExecutionContextInfoValid(value.baseExecutionContext)
           ) {
             map.delete(key);
           }
         }
         return map;
       },
+      this.bindState.bind(this),
+      'indexed',
     );
   }
 
@@ -97,20 +98,16 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
           this.connectionInfoResource,
           this.resourceManagerResource,
           this.sqlEditorService,
-          this.createState(editorId),
+          this.createState(editorId, options?.script),
         );
 
         if (options?.executionContext) {
           dataSource.setExecutionContext(options.executionContext);
         }
 
-        if (options?.script) {
-          dataSource.setScript(options.script);
-        }
-
-        if (options?.name) {
-          dataSource.setName(options.name);
-        }
+        // if (options?.name) {
+        //   dataSource.setName(options.name);
+        // }
 
         dataSource.setActions({
           rename: this.rename.bind(this),
@@ -138,15 +135,11 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       },
       onDestroy: (_, editorId) => this.deleteState(editorId),
       onUnload: async dataSource => {
-        if (dataSource instanceof ResourceSqlDataSource) {
-          await dataSource.write();
-        }
+        await dataSource.save();
       },
       canDestroy: async (dataSource, editorId) => {
         try {
-          if (dataSource instanceof ResourceSqlDataSource) {
-            await dataSource.write();
-          }
+          await dataSource.save();
         } catch {
           const tab = this.sqlEditorTabService.sqlEditorTabs.find(tab => tab.handlerState.editorId === editorId);
           let name: string | undefined = undefined;
@@ -173,12 +166,15 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
   load(): void | Promise<void> {}
 
-  private createState(editorId: string, resourceKey?: string): IResourceSqlDataSourceState {
+  private createState(editorId: string, script?: string, resourceKey?: string): IResourceSqlDataSourceState {
     let state = this.dataSourceStateState.get(editorId);
 
     if (!state) {
       state = observable<IResourceSqlDataSourceState>({
+        script: script ?? '',
+        baseScript: script ?? '',
         resourceKey,
+        history: createSqlDataSourceHistoryInitialState(script),
       });
 
       this.dataSourceStateState.set(editorId, state);
@@ -250,12 +246,18 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     this.navigationTabsService.closeTabSilent(resourceKeyList(tabs), true);
   }
 
-  private async rename(dataSource: ResourceSqlDataSource, resourceKey: string, newResourceKey: string): Promise<string> {
+  private async rename(dataSource: ResourceSqlDataSource, resourceKey: string, name: string): Promise<string> {
+    if (!dataSource.projectId) {
+      throw new Error('Project ID is not defined');
+    }
     if (!this.resourceManagerService.enabled) {
       throw new Error('Resource Manager disabled');
     }
 
     try {
+      name = this.projectInfoResource.getNameWithExtension(dataSource.projectId, SCRIPTS_TYPE_ID, name);
+      const newResourceKey = createPath(getPathParent(resourceKey), name);
+
       await this.navResourceNodeService.move(resourceKey, newResourceKey);
       return newResourceKey;
     } catch (exception) {
@@ -308,4 +310,22 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       throw exception;
     }
   }
+
+  private bindState() {
+    for (const [editorId, datasource] of this.sqlDataSourceService.dataSources) {
+      if (datasource instanceof ResourceSqlDataSource) {
+        datasource.bindState(this.createState(editorId));
+      }
+    }
+  }
+}
+
+function isExecutionContextInfoValid(executionContext: IConnectionExecutionContextInfo | undefined) {
+  return (
+    !['undefined', 'object'].includes(typeof executionContext) ||
+    !['string', 'undefined'].includes(typeof executionContext?.connectionId) ||
+    !['string', 'undefined'].includes(typeof executionContext?.id) ||
+    !['string', 'undefined', 'object'].includes(typeof executionContext?.defaultCatalog) ||
+    !['string', 'undefined', 'object'].includes(typeof executionContext?.defaultSchema)
+  );
 }

@@ -16,7 +16,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { bytesToSize } from '@cloudbeaver/core-utils';
-import { EditorLoader } from '@cloudbeaver/plugin-codemirror6';
+import { EditorLoader, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
@@ -176,6 +176,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const autoFormat = !!firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
     const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
     const typeExtension = useMemo(() => getTypeExtension(state.currentContentType) ?? [], [state.currentContentType]);
+    const extensions = useCodemirrorExtensions(undefined, typeExtension);
 
     const value = autoFormat ? formatter.format(state.currentContentType, stringValue) : stringValue;
 
@@ -191,13 +192,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
           </TabsState>
         </actions>
-        <EditorLoader
-          key={readonly ? '1' : '0'}
-          value={value}
-          readonly={readonly}
-          extensions={[typeExtension]}
-          onChange={value => handleChange(value)}
-        />
+        <EditorLoader key={readonly ? '1' : '0'} value={value} readonly={readonly} extensions={extensions} onChange={value => handleChange(value)} />
         {valueTruncated && <QuotaPlaceholder limit={limit} size={valueSize} />}
         {canSave && (
           <tools-container>

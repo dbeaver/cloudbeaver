@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-blocks';
+import { s, useStyles } from '@cloudbeaver/core-blocks';
 import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
@@ -18,6 +18,7 @@ import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs
 import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, ISqlEditorTabState, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
+import sqlEditorTabStyles from './SqlEditorTab.m.css';
 
 export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer(function SqlEditorTab({ tab, onSelect, onClose, style }) {
   const viewContext = useContext(CaptureViewContext);
@@ -41,6 +42,7 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
 
   const name = getSqlEditorName(tab.handlerState, dataSource, connection);
   const icon = dataSource?.icon ?? '/icons/sql_script_m.svg';
+  const saved = dataSource?.isSaved !== false;
 
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
@@ -49,6 +51,7 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
     <Tab tabId={tab.id} style={style} title={name} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={icon} />
       <TabTitle>{name}</TabTitle>
+      {!saved && <unsaved-mark className={s(sqlEditorTabStyles, { unsavedMark: true })} />}
     </Tab>,
   );
 });

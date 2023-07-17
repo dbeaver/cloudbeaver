@@ -14,6 +14,14 @@ import { ESqlDataSourceFeatures } from '../ESqlDataSourceFeatures';
 import type { ILocalStorageSqlDataSourceState } from './ILocalStorageSqlDataSourceState';
 
 export class LocalStorageSqlDataSource extends BaseSqlDataSource {
+  get baseScript(): string {
+    return this.state.script;
+  }
+
+  get baseExecutionContext(): IConnectionExecutionContextInfo | undefined {
+    return this.state.executionContext;
+  }
+
   static key = 'local-storage';
 
   get name(): string | null {
@@ -32,6 +40,10 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
     return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable, ESqlDataSourceFeatures.setName];
   }
 
+  get isSaved(): boolean {
+    return true;
+  }
+
   private state!: ILocalStorageSqlDataSourceState;
 
   constructor(state: ILocalStorageSqlDataSourceState) {
@@ -43,10 +55,6 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
       script: computed,
       executionContext: computed,
     });
-  }
-
-  isSaved(): boolean {
-    return true;
   }
 
   isReadonly(): boolean {
@@ -76,5 +84,13 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
     this.state = state;
     this.outdated = false;
     this.history.restore(state.history);
+  }
+
+  protected setBaseScript(script: string): void {
+    this.state.script = script;
+  }
+
+  protected setBaseExecutionContext(executionContext: IConnectionExecutionContextInfo | undefined): void {
+    this.state.executionContext = executionContext;
   }
 }
