@@ -102,6 +102,7 @@ export class ConnectionSSLTabService extends Bootstrap {
         id: initialConfig?.id ?? handler.id,
         enabled: initialConfig?.enabled ?? false,
         properties: initialConfig?.properties ?? {},
+        secureProperties: initialConfig?.secureProperties ?? {},
       });
     }
   }
@@ -129,6 +130,10 @@ export class ConnectionSSLTabService extends Bootstrap {
 
     const initial = state.info?.networkHandlersConfig?.find(h => h.id === handler.id);
     const handlerConfig = { ...handler };
+
+    if (handlerConfig.properties) {
+      delete handlerConfig.properties;
+    }
 
     if (handler.enabled && !handler.savePassword) {
       credentialsState.requireNetworkHandler(handler.id);

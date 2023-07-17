@@ -51,13 +51,14 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
       <ColoredContainer parent>
         <Group gap form keepSize large vertical>
           <Switch name="enabled" state={handlerState} description={handler.description} mod={['primary']} disabled={disabled || readonly}>
-            {translate('Enable SSL')}
+            {translate('connections_public_connection_ssl_enable')}
           </Switch>
           <ObjectPropertyInfoForm
-            state={handlerState.properties}
+            state={handlerState.secureProperties}
             properties={handler.properties}
             disabled={disabled || readonly || !enabled}
             hideEmptyPlaceholder
+            small
           />
         </Group>
       </ColoredContainer>
