@@ -94,6 +94,7 @@ export default [
   ['ui_file_size_exceeds', 'Максимальный размер файла превышен. Размер файла: {arg:size}. Максимальный размер: {arg:maxSize}'],
   ['ui_upload_file', 'Загрузить файл'],
   ['ui_upload_files', 'Загрузить файлы'],
+  ['ui_upload_files_duplicate_error', 'Файлы с такими именами уже существуют'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],
