@@ -14,16 +14,14 @@ import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { Tab, TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
-import { SSL_CODE_NAME } from './SSL_CODE_NAME';
+import { getSSLDriverHandler } from './getSSLDriverHandler';
 
 export const SSLTab: TabContainerTabComponent<IConnectionFormProps> = observer(function SSLTab({ style, ...rest }) {
   const styles = useStyles(style);
   const networkHandlerResource = useResource(SSLTab, NetworkHandlerResource, CachedMapAllKey);
   const dbDriverResource = useResource(SSLTab, DBDriverResource, rest.state.config.driverId ?? null);
 
-  const handler = networkHandlerResource.resource.values.find(
-    handler => dbDriverResource.data?.applicableNetworkHandlers.includes(handler.id) && handler.codeName === SSL_CODE_NAME,
-  );
+  const handler = getSSLDriverHandler(networkHandlerResource.resource.values, dbDriverResource.data?.applicableNetworkHandlers ?? []);
 
   if (!handler) {
     return null;
@@ -32,7 +30,7 @@ export const SSLTab: TabContainerTabComponent<IConnectionFormProps> = observer(f
   return styled(styles)(
     <Tab {...rest} title={handler.description} style={style}>
       <TabTitle>
-        <Translate token={handler.label ?? ''} />
+        <Translate token={handler.label} />
       </TabTitle>
     </Tab>,
   );

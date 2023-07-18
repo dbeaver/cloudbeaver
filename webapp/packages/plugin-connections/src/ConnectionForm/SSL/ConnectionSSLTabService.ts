@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable } from 'mobx';
+import { action, makeObservable, toJS } from 'mobx';
 import React from 'react';
 
 import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
@@ -20,6 +20,8 @@ import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
 import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
+import { getDefaultConfig } from './getDefaultConfig';
+import { getSSLDriverHandler } from './getSSLDriverHandler';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME';
 
 export const SSLTab = React.lazy(async () => {
@@ -30,6 +32,8 @@ export const SSLPanel = React.lazy(async () => {
   const { SSLPanel } = await import('./SSLPanel');
   return { default: SSLPanel };
 });
+
+const PROPERTY_FEATURE_SECURED = 'secured';
 
 @injectable()
 export class ConnectionSSLTabService extends Bootstrap {
@@ -55,10 +59,7 @@ export class ConnectionSSLTabService extends Bootstrap {
       isHidden: (_, props) => {
         if (props?.state.config.driverId) {
           const driver = this.dbDriverResource.get(props.state.config.driverId);
-          const handler = this.networkHandlerResource.values.find(
-            handler => driver?.applicableNetworkHandlers.includes(handler.id) && handler.codeName === SSL_CODE_NAME,
-          );
-
+          const handler = getSSLDriverHandler(this.networkHandlerResource.values, driver?.applicableNetworkHandlers ?? []);
           return !handler;
         }
 
@@ -82,10 +83,10 @@ export class ConnectionSSLTabService extends Bootstrap {
       return;
     }
 
-    const driver = this.dbDriverResource.get(state.config.driverId);
-
+    const driver = await this.dbDriverResource.load(state.config.driverId);
     const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
-    const handler = handlers.find(handler => driver?.applicableNetworkHandlers.includes(handler.id) && handler.codeName === SSL_CODE_NAME);
+
+    const handler = getSSLDriverHandler(handlers, driver?.applicableNetworkHandlers ?? []);
 
     if (!handler) {
       return;
@@ -98,12 +99,11 @@ export class ConnectionSSLTabService extends Bootstrap {
     }
 
     if (!state.config.networkHandlersConfig.some(state => state.id === handler.id)) {
-      state.config.networkHandlersConfig.push({
-        id: initialConfig?.id ?? handler.id,
-        enabled: initialConfig?.enabled ?? false,
-        properties: initialConfig?.properties ?? {},
-        secureProperties: initialConfig?.secureProperties ?? {},
-      });
+      const config = initialConfig ? { ...initialConfig } : { id: handler.id, ...getDefaultConfig() };
+      if (config.secureProperties) {
+        config.properties = { ...config.properties, ...config.secureProperties };
+      }
+      state.config.networkHandlersConfig.push(config);
     }
   }
 
@@ -123,6 +123,7 @@ export class ConnectionSSLTabService extends Bootstrap {
 
     const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
     const handler = state.config.networkHandlersConfig.find(handler => handlers.some(h => h.id === handler.id && h.codeName === SSL_CODE_NAME));
+    const descriptor = handlers.find(h => h.id === handler?.id);
 
     if (!handler) {
       return;
@@ -131,8 +132,15 @@ export class ConnectionSSLTabService extends Bootstrap {
     const initial = state.info?.networkHandlersConfig?.find(h => h.id === handler.id);
     const handlerConfig = { ...handler };
 
-    if (handlerConfig.properties) {
-      delete handlerConfig.properties;
+    if (descriptor) {
+      for (const [key, value] of Object.entries(handlerConfig.properties)) {
+        const secured = descriptor.properties.find(p => p.id === key)?.features.includes(PROPERTY_FEATURE_SECURED);
+
+        if (secured) {
+          handlerConfig.secureProperties[key] = toJS(value);
+          delete handlerConfig.properties[key];
+        }
+      }
     }
 
     if (handler.enabled && !handler.savePassword) {
@@ -162,7 +170,11 @@ export class ConnectionSSLTabService extends Bootstrap {
       return false;
     }
 
-    if (handler.enabled !== initial?.enabled || !isObjectsEqual(handler.properties, initial?.properties)) {
+    if (
+      handler.enabled !== initial?.enabled ||
+      handler.savePassword !== initial?.savePassword ||
+      !isObjectsEqual(handler.secureProperties, initial?.secureProperties)
+    ) {
       return true;
     }
 
