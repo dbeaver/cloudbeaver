@@ -33,6 +33,7 @@ import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.jkiss.code.NotNull;
@@ -50,6 +51,7 @@ import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMObjects;
+import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
@@ -337,8 +339,11 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         if (configurationMode) {
             // Try to configure automatically
             performAutoConfiguration(configPath.toFile().getParentFile());
-        } else if (appConfiguration.isGrantConnectionsAccessToAnonymousTeam() && !isMultiNode()) {
-            grantAnonymousAccessToConnections(appConfiguration, "auto-grant");
+        } else if (!isMultiNode()) {
+            if (appConfiguration.isGrantConnectionsAccessToAnonymousTeam()) {
+                grantAnonymousAccessToConnections(appConfiguration, CBConstants.ADMIN_AUTO_GRANT);
+            }
+            grantPermissionsToConnections();
         }
 
         if (enableSecurityManager) {
@@ -665,6 +670,22 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         }
     }
 
+    protected Map<String, Object> readConnectionsPermissionsConfiguration(Path parentPath) {
+        String permissionsConfigPath = WebAppUtils.getRelativePath(CBConstants.DEFAULT_DATASOURCE_PERMISSIONS_CONFIGURATION, parentPath);
+        if (!CommonUtils.isEmpty(permissionsConfigPath)) {
+            File permissionsConfigFile = new File(permissionsConfigPath);
+            if (permissionsConfigFile.exists()) {
+                log.debug("Load permissions configuration from '" + permissionsConfigFile.getAbsolutePath() + "'");
+                try (Reader reader = new InputStreamReader(new FileInputStream(permissionsConfigFile), StandardCharsets.UTF_8)) {
+                    return JSONUtils.parseMap(getGson(), reader);
+                } catch (Exception e) {
+                    log.error("Error reading permissions configuration", e);
+                }
+            }
+        }
+        return null;
+    }
+
     protected Map<String, Object> readConfiguration(File configFile) throws DBException {
         Map<String, Object> configProps = new LinkedHashMap<>();
         if (configFile.exists()) {
@@ -870,6 +891,35 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             }
         } catch (Exception e) {
             log.error("Error granting anonymous access to connections", e);
+        }
+    }
+
+    private void grantPermissionsToConnections() {
+        try {
+            var globalRegistry = WebDataSourceUtils.getGlobalDataSourceRegistry();
+            var permissionsConfiguration = readConnectionsPermissionsConfiguration(globalRegistry.getProject().getMetadataFolder(false));
+            if (permissionsConfiguration == null) {
+                return;
+            }
+            for (var entry : permissionsConfiguration.entrySet()) {
+                var dataSourceId = entry.getKey();
+                var ds = globalRegistry.getDataSource(dataSourceId);
+                if (ds == null) {
+                    log.error("Connection " + dataSourceId + " is not found in project " + globalRegistry.getProject().getName());
+                }
+                List<String> permissions = JSONUtils.getStringList(permissionsConfiguration, dataSourceId);
+                var securityController = getSecurityController();
+                securityController.deleteAllObjectPermissions(dataSourceId, SMObjects.DATASOURCE);
+                securityController.setObjectPermissions(
+                    Set.of(dataSourceId),
+                    SMObjects.DATASOURCE,
+                    new HashSet<>(permissions),
+                    Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION),
+                    CBConstants.ADMIN_AUTO_GRANT
+                );
+            }
+        } catch (DBException e) {
+            log.error("Cannot grant permissions to connections", e);
         }
     }
 
