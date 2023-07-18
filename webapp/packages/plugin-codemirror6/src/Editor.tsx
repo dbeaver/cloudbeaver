@@ -22,7 +22,7 @@ export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
   forwardRef(function Editor({ lineNumbers, extensions, ...rest }, ref) {
     extensions = useCodemirrorExtensions(extensions);
     const defaultExtensions = useEditorDefaultExtensions({ lineNumbers });
-    extensions.set(...defaultExtensions);
+    extensions = new Map([defaultExtensions, ...extensions]);
 
     return styled(EDITOR_BASE_STYLES)(
       <wrapper className={clsx('editor', rest.className)}>
