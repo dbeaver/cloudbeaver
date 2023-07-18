@@ -43,35 +43,28 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSResourceUpdatedEvent event) {
         if (activeUserSession instanceof WebSession) {
-            var parsedResourcePath = event.getResourceParsedPath();
-            var resourceParsedPath = parsedResourcePath instanceof RMResource[]
-                ? (RMResource[]) parsedResourcePath
-                : gson.fromJson(gson.toJson(parsedResourcePath), RMResource[].class);
             var webSession = (WebSession) activeUserSession;
             acceptChangesInNavigatorTree(
                 WSEventType.valueById(event.getId()),
-                resourceParsedPath,
+                event.getResourcePath(),
                 webSession.getProjectById(event.getProjectId())
             );
         }
         activeUserSession.addSessionEvent(event);
     }
 
-    private void acceptChangesInNavigatorTree(WSEventType eventType,
-                                              RMResource[] resourceParsedPath,
-                                              WebProjectImpl project) {
-        List<RMResource> rmResourcePath = Arrays.asList(resourceParsedPath);
+    private void acceptChangesInNavigatorTree(WSEventType eventType, String resourcePath, WebProjectImpl project) {
         if (eventType == WSEventType.RM_RESOURCE_CREATED) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_ADD,
                     project.getRmProject(),
-                    rmResourcePath)
+                    resourcePath)
             );
         } else if (eventType == WSEventType.RM_RESOURCE_DELETED) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_DELETE,
                     project.getRmProject(),
-                    rmResourcePath)
+                    resourcePath)
             );
         }
     }

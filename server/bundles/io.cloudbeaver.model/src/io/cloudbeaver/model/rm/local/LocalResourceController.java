@@ -598,7 +598,6 @@ public class LocalResourceController implements RMController {
                 log.debug("Moving resource from '" + normalizedOldResourcePath + "' to '" + normalizedNewResourcePath + "'");
             }
             Path oldTargetPath = getTargetPath(projectId, normalizedOldResourcePath);
-            List<RMResource> rmOldResourcePath = makeResourcePath(projectId, oldTargetPath, false);
 
             doFileWriteOperation(projectId, oldTargetPath, () -> {
                 if (!Files.exists(oldTargetPath)) {
@@ -621,7 +620,7 @@ public class LocalResourceController implements RMController {
                 return null;
             });
 
-            fireRmResourceDeleteEvent(projectId, rmOldResourcePath);
+            fireRmResourceDeleteEvent(projectId, normalizedOldResourcePath);
             fireRmResourceAddEvent(projectId, normalizedNewResourcePath);
         }
 
@@ -663,7 +662,6 @@ public class LocalResourceController implements RMController {
             }
             validateResourcePath(resourcePath);
             Path targetPath = getTargetPath(projectId, resourcePath);
-            List<RMResource> rmResourcePath = makeResourcePath(projectId, targetPath, recursive);
             doFileWriteOperation(projectId, targetPath, () -> {
                 if (!Files.exists(targetPath)) {
                     throw new DBException("Resource '" + resourcePath + "' doesn't exists");
@@ -696,7 +694,7 @@ public class LocalResourceController implements RMController {
             });
 
             log.debug("Fire resource delete event");
-            fireRmResourceDeleteEvent(projectId, rmResourcePath);
+            fireRmResourceDeleteEvent(projectId, resourcePath);
         }
     }
 
@@ -1056,11 +1054,11 @@ public class LocalResourceController implements RMController {
         RMEventManager.fireEvent(
             new RMEvent(RMEvent.Action.RESOURCE_ADD,
                 getProject(projectId, false, false),
-                Arrays.asList(getResourcePath(projectId, resourcePath)))
+                resourcePath)
         );
     }
 
-    private void fireRmResourceDeleteEvent(@NotNull String projectId, @NotNull List<RMResource> resourcePath) throws DBException {
+    private void fireRmResourceDeleteEvent(@NotNull String projectId, @NotNull String resourcePath) throws DBException {
         RMEventManager.fireEvent(
             new RMEvent(RMEvent.Action.RESOURCE_DELETE,
                 makeProjectFromId(projectId, false),
