@@ -38,7 +38,7 @@ const NEW_USER_SYMBOL = Symbol('new-user');
 export type AdminUser = AdminUserInfoFragment;
 
 type AdminUserNew = AdminUser & { [NEW_USER_SYMBOL]: boolean };
-type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId' | 'after' | 'first'>;
+type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId' | 'page' | 'filter'>;
 
 interface IUserResourceSearchPageOptions extends ICachedMapPageOptions {
   userId?: string;
@@ -47,9 +47,9 @@ interface IUserResourceSearchPageOptions extends ICachedMapPageOptions {
 
 export const UsersResourceSearchUser = resourceKeyListAliasFactory<
   any,
-  [first: number, after?: any, userId?: string, enabledState?: boolean],
+  [offset: number, limit: number, userId?: string, enabledState?: boolean],
   Readonly<IUserResourceSearchPageOptions>
->('@users-resource/page', (first: number, after?: any, userId?: string, enabledState?: boolean) => ({ first, after, userId, enabledState }));
+>('@users-resource/page', (offset: number, limit: number, userId?: string, enabledState?: boolean) => ({ offset, limit, userId, enabledState }));
 
 export const UsersResourceNewUsers = resourceKeyListAlias('@users-resource/new-users');
 
@@ -254,24 +254,24 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
         usersList.push(user);
       } else {
         const { users } = await this.graphQLService.sdk.getUsersList({
-          first: page || search ? originalKey.options.first : 100,
-          after: page || search ? originalKey.options.after : undefined,
-          userIdMask: search ? originalKey.options.userId : undefined,
-          enabledState: search ? originalKey.options.enabledState : undefined,
+          page: {
+            offset: page || search ? originalKey.options.offset : 100,
+            limit: page || search ? originalKey.options.limit : 0,
+          },
+          filter: {
+            userIdMask: search ? originalKey.options.userId : undefined,
+            enabledState: search ? originalKey.options.enabledState : undefined,
+          },
           ...this.getDefaultIncludes(),
           ...this.getIncludesMap(userId, includes),
         });
 
-        usersList.push(...(users?.edges.map(edge => edge.node) ?? []));
+        usersList.push(...users);
 
         if (page || search) {
           this.setPageInfo(originalKey, {
-            totalCount: users?.totalCount ?? 0,
-            edges: users?.edges.map(edge => edge.cursor) ?? [],
-            pageInfo: {
-              endCursor: users?.pageInfo.endCursor ?? null,
-              hasNextPage: users?.pageInfo.hasNextPage ?? false,
-            },
+            edges: users.map(user => user.userId),
+            hasNextPage: users.length === originalKey.options.limit,
           });
         }
       }

@@ -31,31 +31,21 @@ export type CachedMapResourceLoader<TRealKey, TKey, TValue, TIncludes> = TRealKe
   : CachedResourceValueIncludes<TValue, TIncludes>;
 
 export interface ICachedMapPageOptions {
-  first: number;
-  after?: any;
+  offset: number;
+  limit: number;
 }
 
 export const CachedMapAllKey = resourceKeyListAlias('@cached-map-resource/all');
 export const CachedMapEmptyKey = resourceKeyListAlias('@cached-map-resource/empty');
-export const CachedMapPageKey = resourceKeyListAliasFactory<any, [first: number, after?: any], Readonly<ICachedMapPageOptions>>(
+export const CachedMapPageKey = resourceKeyListAliasFactory<any, [offset: number, limit: number], Readonly<ICachedMapPageOptions>>(
   '@cached-map-resource/page',
-  (first: number, after?: any) => ({ first, after }),
+  (offset: number, limit: number) => ({ offset, limit }),
 );
 
 interface IPageInfo<TKey> {
   totalCount?: number;
   edges?: TKey[];
   hasNextPage?: boolean;
-  endCursor?: string | null;
-}
-
-interface IGQLConnection<TKey> {
-  totalCount: number;
-  edges: Array<TKey>;
-  pageInfo: {
-    hasNextPage: boolean;
-    endCursor: string | null;
-  };
 }
 
 type ICachedMapResourceMetadata<TKey> = ICachedResourceMetadata & IPageInfo<TKey>;
@@ -265,13 +255,12 @@ export abstract class CachedMapResource<
     return super.getKeyRef(key);
   }
 
-  protected setPageInfo(key: ResourceKeyFlat<TKey>, pageInfo: IGQLConnection<TKey>): void {
+  protected setPageInfo(key: ResourceKeyFlat<TKey>, pageInfo: IPageInfo<TKey>): void {
     const metadata = this.getMetadata(key);
 
     metadata.totalCount = pageInfo.totalCount;
     metadata.edges = pageInfo.edges;
-    metadata.hasNextPage = pageInfo.pageInfo.hasNextPage;
-    metadata.endCursor = pageInfo.pageInfo.endCursor;
+    metadata.hasNextPage = pageInfo.hasNextPage;
   }
 
   /**

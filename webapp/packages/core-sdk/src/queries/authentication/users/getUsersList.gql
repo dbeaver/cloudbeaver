@@ -1,22 +1,5 @@
-query getUsersList(
-  $first: Int!
-  $after: ID
-  $userIdMask: String
-  $enabledState: Boolean
-  $includeMetaParameters: Boolean!
-  $customIncludeOriginDetails: Boolean!
-) {
-  users: listUsers(first: $first, after: $after, userIdMask: $userIdMask, enabledState: $enabledState) {
-    totalCount
-    edges {
-      cursor
-      node {
-        ...AdminUserInfo
-      }
-    }
-    pageInfo {
-      hasNextPage
-      endCursor
-    }
+query getUsersList($page: PageInput!, $filter: AdminUserFilterInput!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  users: listUsers(page: $page, filter: $filter) {
+    ...AdminUserInfo
   }
 }

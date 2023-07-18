@@ -82,6 +82,11 @@ export interface AdminTeamInfo {
   teamPermissions: Array<Scalars['ID']>;
 }
 
+export interface AdminUserFilterInput {
+  enabledState?: InputMaybe<Scalars['Boolean']>;
+  userIdMask?: InputMaybe<Scalars['String']>;
+}
+
 export interface AdminUserInfo {
   authRole?: Maybe<Scalars['String']>;
   configurationParameters: Scalars['Object'];
@@ -92,17 +97,6 @@ export interface AdminUserInfo {
   metaParameters: Scalars['Object'];
   origins: Array<ObjectOrigin>;
   userId: Scalars['ID'];
-}
-
-export interface AdminUserInfoConnection {
-  edges: Array<AdminUserInfoConnectionEdge>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
-}
-
-export interface AdminUserInfoConnectionEdge {
-  cursor: Scalars['ID'];
-  node: AdminUserInfo;
 }
 
 export interface AsyncTaskInfo {
@@ -938,9 +932,9 @@ export enum ObjectPropertyLength {
   Tiny = 'TINY',
 }
 
-export interface PageInfo {
-  endCursor?: Maybe<Scalars['ID']>;
-  hasNextPage: Scalars['Boolean'];
+export interface PageInput {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
 }
 
 export interface ProductInfo {
@@ -1005,7 +999,7 @@ export interface Query {
   listTeamMetaParameters: Array<ObjectPropertyInfo>;
   listTeams: Array<AdminTeamInfo>;
   listUserProfileProperties: Array<ObjectPropertyInfo>;
-  listUsers?: Maybe<AdminUserInfoConnection>;
+  listUsers: Array<AdminUserInfo>;
   metadataGetNodeDDL?: Maybe<Scalars['String']>;
   metadataGetNodeExtendedDDL?: Maybe<Scalars['String']>;
   navGetStructContainers: DatabaseStructContainers;
@@ -1176,10 +1170,8 @@ export interface QueryListTeamsArgs {
 }
 
 export interface QueryListUsersArgs {
-  after?: InputMaybe<Scalars['ID']>;
-  enabledState?: InputMaybe<Scalars['Boolean']>;
-  first: Scalars['Int'];
-  userIdMask?: InputMaybe<Scalars['String']>;
+  filter: AdminUserFilterInput;
+  page: PageInput;
 }
 
 export interface QueryMetadataGetNodeDdlArgs {
@@ -2174,49 +2166,40 @@ export type GetUserGrantedConnectionsQuery = {
 };
 
 export type GetUsersListQueryVariables = Exact<{
-  first: Scalars['Int'];
-  after?: InputMaybe<Scalars['ID']>;
-  userIdMask?: InputMaybe<Scalars['String']>;
-  enabledState?: InputMaybe<Scalars['Boolean']>;
+  page: PageInput;
+  filter: AdminUserFilterInput;
   includeMetaParameters: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
 
 export type GetUsersListQuery = {
-  users?: {
-    totalCount: number;
-    edges: Array<{
-      cursor: string;
-      node: {
-        userId: string;
-        grantedTeams: Array<string>;
-        linkedAuthProviders: Array<string>;
-        metaParameters?: any;
-        enabled: boolean;
-        authRole?: string;
-        origins: Array<{
-          type: string;
-          subType?: string;
-          displayName: string;
-          icon?: string;
-          details?: Array<{
-            id?: string;
-            displayName?: string;
-            description?: string;
-            category?: string;
-            dataType?: string;
-            defaultValue?: any;
-            validValues?: Array<any>;
-            value?: any;
-            length: ObjectPropertyLength;
-            features: Array<string>;
-            order: number;
-          }>;
-        }>;
-      };
+  users: Array<{
+    userId: string;
+    grantedTeams: Array<string>;
+    linkedAuthProviders: Array<string>;
+    metaParameters?: any;
+    enabled: boolean;
+    authRole?: string;
+    origins: Array<{
+      type: string;
+      subType?: string;
+      displayName: string;
+      icon?: string;
+      details?: Array<{
+        id?: string;
+        displayName?: string;
+        description?: string;
+        category?: string;
+        dataType?: string;
+        defaultValue?: any;
+        validValues?: Array<any>;
+        value?: any;
+        length: ObjectPropertyLength;
+        features: Array<string>;
+        order: number;
+      }>;
     }>;
-    pageInfo: { hasNextPage: boolean; endCursor?: string };
-  };
+  }>;
 };
 
 export type GrantUserTeamQueryVariables = Exact<{
@@ -5571,24 +5554,9 @@ export const GetUserGrantedConnectionsDocument = `
 }
     `;
 export const GetUsersListDocument = `
-    query getUsersList($first: Int!, $after: ID, $userIdMask: String, $enabledState: Boolean, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
-  users: listUsers(
-    first: $first
-    after: $after
-    userIdMask: $userIdMask
-    enabledState: $enabledState
-  ) {
-    totalCount
-    edges {
-      cursor
-      node {
-        ...AdminUserInfo
-      }
-    }
-    pageInfo {
-      hasNextPage
-      endCursor
-    }
+    query getUsersList($page: PageInput!, $filter: AdminUserFilterInput!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  users: listUsers(page: $page, filter: $filter) {
+    ...AdminUserInfo
   }
 }
     ${AdminUserInfoFragmentDoc}`;

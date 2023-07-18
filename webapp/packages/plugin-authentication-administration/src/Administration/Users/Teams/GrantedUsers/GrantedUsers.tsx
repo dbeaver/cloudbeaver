@@ -53,7 +53,7 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
   const state = useGrantedUsers(formState.config, formState.mode);
   const { selected } = useTab(tabId);
 
-  const users = useResource(GrantedUsers, UsersResource, UsersResourceSearchUser(1000), { active: selected });
+  const users = useResource(GrantedUsers, UsersResource, UsersResourceSearchUser(0, 1000), { active: selected });
 
   const grantedUsers = getComputed(() =>
     users.data.filter<AdminUser>((user): user is AdminUser => !!user && state.state.grantedUsers.includes(user.userId)),

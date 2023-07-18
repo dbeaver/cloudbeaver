@@ -22,10 +22,6 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.app.BaseWebApplication;
-import io.cloudbeaver.model.pagination.GQLConnection;
-import io.cloudbeaver.model.pagination.GQLConnectionEdge;
-import io.cloudbeaver.model.pagination.GQLPageInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
@@ -42,6 +38,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPPage;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -49,6 +46,7 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
+import org.jkiss.dbeaver.model.security.user.SMUserFilter;
 import org.jkiss.utils.CommonUtils;
 
 import java.text.MessageFormat;
@@ -82,25 +80,14 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @NotNull
     @Override
-    public GQLConnection<AdminUserInfo> listUsers(@NotNull WebSession webSession, Integer first, String after,
-            String userIdMask, Boolean enabledState) throws DBWebException {
+    public List<AdminUserInfo> listUsers(@NotNull WebSession webSession, @NotNull DBPPage page,
+            @NotNull SMUserFilter filter) throws DBWebException {
         try {
-            List<GQLConnectionEdge<AdminUserInfo>> edges = new ArrayList<>();
-            for (SMUser smUser : webSession.getAdminSecurityController().findUsers(first, after, userIdMask, enabledState)) {
-                edges.add(
-                        new GQLConnectionEdge<>(new AdminUserInfo(webSession, new WebUser(smUser)),
-                                smUser.getUserId()));
+            List<AdminUserInfo> users = new ArrayList<>();
+            for (SMUser smUser : webSession.getAdminSecurityController().findUsers(page, filter)) {
+                users.add(new AdminUserInfo(webSession, new WebUser(smUser)));
             }
-            int totalCount = webSession.getAdminSecurityController().countUsers(null, userIdMask, enabledState);
-            String endCursor = null;
-
-            if (!edges.isEmpty()) {
-                endCursor = edges.get(edges.size() - 1).getCursor();
-            }
-
-            int moreCount = webSession.getAdminSecurityController().countUsers(endCursor, userIdMask, enabledState);
-            return new GQLConnection<>(totalCount, edges,
-                    new GQLPageInfo(moreCount > 0, endCursor));
+            return users;
         } catch (Exception e) {
             throw new DBWebException("Error reading users", e);
         }

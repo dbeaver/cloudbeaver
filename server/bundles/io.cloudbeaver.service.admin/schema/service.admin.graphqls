@@ -114,22 +114,16 @@ input ServerConfigInput {
     sessionExpireTime: Int
 }
 
-type AdminUserInfoConnectionEdge {
-    cursor: ID!
-    node: AdminUserInfo!
-}
-
-type AdminUserInfoConnection {
-    totalCount: Int!
-    edges: [AdminUserInfoConnectionEdge!]!
-    pageInfo: PageInfo!
+input AdminUserFilterInput {
+    userIdMask: String
+    enabledState: Boolean
 }
 
 extend type Query {
     #### Users and teams
 
     adminUserInfo(userId: ID!): AdminUserInfo!
-    listUsers(first: Int!, after: ID, userIdMask: String, enabledState: Boolean): AdminUserInfoConnection
+    listUsers(page: PageInput!, filter: AdminUserFilterInput!): [AdminUserInfo!]!
     listTeams(teamId: ID): [AdminTeamInfo!]!
     listPermissions: [AdminPermissionInfo!]!
     listAuthRoles: [String!]!

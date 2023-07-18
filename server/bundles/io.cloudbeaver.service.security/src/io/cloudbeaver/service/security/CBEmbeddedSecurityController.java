@@ -37,6 +37,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPPage;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
@@ -292,30 +293,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Override
-    public int countUsers(String after, String userIdMask, Boolean enabledState) throws DBCException {
+    public int countUsers(@NotNull SMUserFilter filter) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            String whereString = "\nWHERE";
-            if (!CommonUtils.isEmpty(after)) {
-                whereString += " USER_ID > ?";
-            }
-            if (!CommonUtils.isEmpty(userIdMask)) {
-                whereString += (whereString != "\nWHERE" ? "AND" : "") + " USER_ID LIKE ?";
-            }
-            if (enabledState != null) {
-                whereString += (whereString != "\nWHERE" ? "AND" : "") + " IS_ACTIVE=?";
-            }
             try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
-                    "SELECT COUNT(*) FROM {table_prefix}CB_USER" + (whereString != "\nWHERE" ? whereString : "")))) {
-                int parameterIndex = 1;
-                if (!CommonUtils.isEmpty(after)) {
-                    dbStat.setString(parameterIndex++, after);
-                }
-                if (!CommonUtils.isEmpty(userIdMask)) {
-                    dbStat.setString(parameterIndex++, "%" + userIdMask + "%");
-                }
-                if (enabledState != null) {
-                    dbStat.setString(parameterIndex++, enabledState ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
-                }
+                    "SELECT COUNT(*) FROM {table_prefix}CB_USER" + buildUsersFilter(filter)))) {
+                setUsersFilterValues(dbStat, filter, 1);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
                         return dbResult.getInt(1);
@@ -331,36 +313,17 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @NotNull
     @Override
-    public SMUser[] findUsers(Integer first, String after, String userIdMask, Boolean enabledState)
-            throws DBCException {
+    public SMUser[] findUsers(String userNameMask) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             Map<String, SMUser> result = new LinkedHashMap<>();
-            String whereString = "\nWHERE";
-            if (!CommonUtils.isEmpty(after)) {
-                whereString += " USER_ID > ?";
-            }
-            if (!CommonUtils.isEmpty(userIdMask)) {
-                whereString += (whereString != "\nWHERE" ? "AND" : "") + " USER_ID LIKE ?";
-            }
-            String usersTableWhere = whereString;
-            if (enabledState != null) {
-                usersTableWhere += (usersTableWhere != "\nWHERE" ? "AND" : "") + " IS_ACTIVE=?";
-            }
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER"
-                            + (usersTableWhere != "\nWHERE" ? usersTableWhere : "") + "\nORDER BY USER_ID LIMIT ?"))) {
-                int parameterIndex = 1;
-                if (!CommonUtils.isEmpty(after)) {
-                    dbStat.setString(parameterIndex++, after);
+                database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER" +
+                    (CommonUtils.isEmpty(userNameMask) ? "\nORDER BY USER_ID" : " WHERE USER_ID=?")))
+            ) {
+                if (!CommonUtils.isEmpty(userNameMask)) {
+                    dbStat.setString(1, userNameMask);
                 }
-                if (!CommonUtils.isEmpty(userIdMask)) {
-                    dbStat.setString(parameterIndex++, "%" + userIdMask + "%");
-                }
-                if (enabledState != null) {
-                    dbStat.setString(parameterIndex++, enabledState ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
-                }
-                dbStat.setInt(parameterIndex++, first);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String userId = dbResult.getString(1);
@@ -370,17 +333,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                 }
             }
-            readSubjectsMetas(dbCon, SMSubjectType.user, userIdMask, result);
+            readSubjectsMetas(dbCon, SMSubjectType.user, userNameMask, result);
             // Read teams
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("SELECT USER_ID,TEAM_ID FROM {table_prefix}CB_USER_TEAM"
-                            + (whereString != "\nWHERE" ? whereString : "")))) {
-                int parameterIndex = 1;
-                if (!CommonUtils.isEmpty(after)) {
-                    dbStat.setString(parameterIndex++, after);
-                }
-                if (!CommonUtils.isEmpty(userIdMask)) {
-                    dbStat.setString(parameterIndex++, "%" + userIdMask + "%");
+                database.normalizeTableNames("SELECT USER_ID,TEAM_ID FROM {table_prefix}CB_USER_TEAM" +
+                (CommonUtils.isEmpty(userNameMask) ? "" : " WHERE USER_ID=?")))
+            ) {
+                if (!CommonUtils.isEmpty(userNameMask)) {
+                    dbStat.setString(1, userNameMask);
                 }
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
@@ -398,6 +358,80 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error while loading users", e);
         }
+    }
+
+    @NotNull
+    @Override
+    public SMUser[] findUsers(@NotNull DBPPage page, @NotNull SMUserFilter filter)
+            throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            Map<String, SMUser> result = new LinkedHashMap<>();
+            // Read users
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER"
+                            + buildUsersFilter(filter) + "\nORDER BY USER_ID LIMIT ?, ?"))) {
+                int parameterIndex = setUsersFilterValues(dbStat, filter, 1);
+                dbStat.setInt(parameterIndex++, page.getOffset());
+                dbStat.setInt(parameterIndex++, page.getLimit());
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        String userId = dbResult.getString(1);
+                        String active = dbResult.getString(2);
+                        String authRole = dbResult.getString(3);
+                        result.put(userId, new SMUser(userId, CHAR_BOOL_TRUE.equals(active), authRole));
+                    }
+                }
+            }
+            readSubjectsMetas(dbCon, SMSubjectType.user, filter.getUserIdMask(), result);
+            // Read teams
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    database.normalizeTableNames("SELECT USER_ID,TEAM_ID FROM {table_prefix}CB_USER_TEAM"
+                            + "\nWHERE USER_ID IN (?)"))) {
+                Array teamsArray = dbCon.createArrayOf("VARCHAR", result.keySet().toArray(new String[0]));
+                dbStat.setArray(1, teamsArray);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        String userId = dbResult.getString(1);
+                        String teamId = dbResult.getString(2);
+                        SMUser user = result.get(userId);
+                        if (user != null) {
+                            String[] teams = ArrayUtils.add(String.class, user.getUserTeams(), teamId);
+                            user.setUserTeams(teams);
+                        }
+                    }
+                }
+            }
+            return result.values().toArray(new SMUser[0]);
+        } catch (SQLException e) {
+            throw new DBCException("Error while loading users", e);
+        }
+    }
+
+    private String buildUsersFilter(SMUserFilter filter) {
+        StringBuilder where = new StringBuilder();
+        List<String> whereParts = new ArrayList<>();
+        if (!CommonUtils.isEmpty(filter.getUserIdMask())) {
+            whereParts.add("USER_ID LIKE ?");
+        }
+        if (filter.getEnabledState() != null) {
+            whereParts.add("IS_ACTIVE=?");
+        }
+        if (whereParts.size() > 0) {
+            where.append(whereParts.stream().collect(Collectors.joining(" AND ", " WHERE ", "")));
+        }
+        return where.toString();
+    }
+
+    private int setUsersFilterValues(PreparedStatement dbStat, SMUserFilter filter, int parameterIndex)
+            throws SQLException {
+        if (!CommonUtils.isEmpty(filter.getUserIdMask())) {
+            dbStat.setString(parameterIndex++, "%" + filter.getUserIdMask() + "%");
+        }
+        if (filter.getEnabledState() != null) {
+            dbStat.setString(parameterIndex++, filter.getEnabledState() ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
+        }
+
+        return parameterIndex;
     }
 
     private void cleanupSubjectMeta(Connection dbCon, String subjectId) throws SQLException {

@@ -14,25 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.pagination;
+package io.cloudbeaver;
 
-/**
- * GraphQL page info
- */
-public class GQLPageInfo {
-    public final Boolean hasNextPage;
-    public final String endCursor;
+import org.jkiss.dbeaver.model.DBPPage;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
-    public GQLPageInfo(Boolean hasNextPage, String endCursor) {
-        this.hasNextPage = hasNextPage;
-        this.endCursor = endCursor;
-    }
+import java.util.Map;
 
-    public Boolean getHasNextPage() {
-        return hasNextPage;
-    }
-
-    public String getEndCursor() {
-        return endCursor;
+public class WebPage extends DBPPage {
+    public WebPage(Map<String, Object> params) {
+        super(JSONUtils.getInteger(params, "offset"), JSONUtils.getInteger(params, "limit"));
     }
 }

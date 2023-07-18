@@ -22,13 +22,13 @@ import { useObservableRef } from '../useObservableRef';
 
 interface IOptions {
   pageSize?: number;
-  getKey?: (first: number, after?: any) => ResourceKeyListAlias<any, Readonly<ICachedMapPageOptions>>;
+  getKey?: (offset: number, limit: number) => ResourceKeyListAlias<any, Readonly<ICachedMapPageOptions>>;
   dependencies?: any[];
 }
 
 interface IPagination<TResource> {
-  after: any;
-  key: ResourceKeyListAlias<any, any>;
+  offset: number;
+  key: ResourceKeyListAlias<any, Readonly<ICachedMapPageOptions>>;
   data: CachedMapResourceListGetter<CachedMapResourceValue<TResource>, []>;
   hasNextPage: boolean;
   loaded: ResourceKeyListAlias<any, any>[];
@@ -43,21 +43,22 @@ interface IPaginationPrivate<TResource> extends IPagination<TResource> {
   reset(): void;
 }
 
+const DEFAULT_PAGE_SIZE = 100;
+
 export function usePagination<TResource extends CachedMapResource<any, any, any, any>>(
   ctor: IServiceConstructor<TResource>,
   options?: IOptions,
 ): IPagination<TResource> {
-  const pageSize = options?.pageSize || 100;
+  const pageSize = options?.pageSize || DEFAULT_PAGE_SIZE;
   const resource = useService(ctor);
 
   const pagination = useObservableRef<IPaginationPrivate<TResource>>(
     () => {
-      const key = options?.getKey?.(pageSize) || CachedMapPageKey(pageSize);
+      const key = options?.getKey?.(0, pageSize) || CachedMapPageKey(0, pageSize);
       const dependencies = options?.dependencies || [];
-      const after = null;
 
       return {
-        after,
+        offset: 0,
         key,
         dependencies,
         get hasNextPage(): boolean {
@@ -71,11 +72,9 @@ export function usePagination<TResource extends CachedMapResource<any, any, any,
           const pageInfo = this.resource.getPageInfo(this.key);
 
           if (pageInfo?.hasNextPage) {
-            if (pageInfo.endCursor) {
-              this.after = pageInfo.endCursor;
-              this.key = options?.getKey?.(this.pageSize, this.after) || CachedMapPageKey(this.pageSize, this.after);
-              this.loaded.push(this.key);
-            }
+            this.offset = this.key.options.offset + this.pageSize;
+            this.key = options?.getKey?.(this.offset, this.pageSize) || CachedMapPageKey(this.offset, this.pageSize);
+            this.loaded.push(this.key);
           }
         },
         refresh() {
@@ -85,14 +84,14 @@ export function usePagination<TResource extends CachedMapResource<any, any, any,
           this.reset();
         },
         reset() {
-          this.after = null;
-          this.key = options?.getKey?.(this.pageSize) || CachedMapPageKey(this.pageSize);
+          this.offset = 0;
+          this.key = options?.getKey?.(this.offset, this.pageSize) || CachedMapPageKey(this.offset, this.pageSize);
           this.loaded = [this.key];
         },
       };
     },
     {
-      after: observable.ref,
+      offset: observable.ref,
       key: observable.ref,
       loaded: observable.shallow,
       hasNextPage: computed,

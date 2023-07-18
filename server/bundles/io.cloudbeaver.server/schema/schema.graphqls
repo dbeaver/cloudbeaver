@@ -3,9 +3,9 @@ scalar Object
 # Date/Time
 scalar DateTime
 
-type PageInfo {
-    hasNextPage: Boolean!
-    endCursor: ID
+input PageInput {
+    limit: Int
+    offset: Int
 }
 
 type Query

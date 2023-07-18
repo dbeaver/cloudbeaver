@@ -32,8 +32,13 @@ export function useUsersTable(filters: IUserFilters) {
   const translate = useTranslate();
   const usersResource = useService(UsersResource);
   const pagination = usePagination(UsersResource, {
-    getKey(first, after) {
-      return UsersResourceSearchUser(first, after, filters.search, filters.status === 'true' ? true : filters.status === 'false' ? false : undefined);
+    getKey(offset, limit) {
+      return UsersResourceSearchUser(
+        offset,
+        limit,
+        filters.search,
+        filters.status === 'true' ? true : filters.status === 'false' ? false : undefined,
+      );
     },
     dependencies: [filters.search, filters.status],
   });

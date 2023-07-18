@@ -14,25 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.pagination;
+package io.cloudbeaver.service.admin;
 
-/**
- * GraphQL connection edge
- */
-public class GQLConnectionEdge<T> {
-    private final T node;
-    private final String cursor;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.security.user.SMUserFilter;
 
-    public GQLConnectionEdge(T node, String cursor) {
-        this.node = node;
-        this.cursor = cursor;
-    }
+import java.util.Map;
 
-    public T getNode() {
-        return node;
-    }
-
-    public String getCursor() {
-        return cursor;
+public class AdminUserInfoFilter extends SMUserFilter {
+    public AdminUserInfoFilter(Map<String, Object> params) {
+        super(JSONUtils.getString(params, "userIdMask"),
+                params.containsKey("enabledState") ? JSONUtils.getBoolean(params, "enabledState") : null);
     }
 }
