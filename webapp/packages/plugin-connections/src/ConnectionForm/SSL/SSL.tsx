@@ -11,10 +11,14 @@ import styled, { css } from 'reshadow';
 import {
   BASE_CONTAINERS_STYLES,
   ColoredContainer,
+  FieldCheckbox,
   Group,
+  GroupTitle,
   ObjectPropertyInfoForm,
   SubmittingForm,
   Switch,
+  useAdministrationSettings,
+  useObjectPropertyCategories,
   useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
@@ -43,6 +47,9 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
   const translate = useTranslate();
 
   const styles = useStyles(SSl_STYLES, BASE_CONTAINERS_STYLES);
+  const { credentialsSavingEnabled } = useAdministrationSettings();
+  const { categories, isUncategorizedExists } = useObjectPropertyCategories(handler.properties);
+
   const disabled = formDisabled || loading;
   const enabled = handlerState.enabled || false;
 
@@ -53,13 +60,43 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
           <Switch name="enabled" state={handlerState} description={handler.description} mod={['primary']} disabled={disabled || readonly}>
             {translate('connections_public_connection_ssl_enable')}
           </Switch>
-          <ObjectPropertyInfoForm
-            state={handlerState.secureProperties}
-            properties={handler.properties}
-            disabled={disabled || readonly || !enabled}
-            hideEmptyPlaceholder
-            small
-          />
+          {isUncategorizedExists && (
+            <ObjectPropertyInfoForm
+              state={handlerState.properties}
+              properties={handler.properties}
+              category={null}
+              disabled={disabled || readonly || !enabled}
+              hideEmptyPlaceholder
+              showRememberTip
+              small
+            />
+          )}
+
+          {categories.map(category => (
+            <>
+              <GroupTitle keepSize>{category}</GroupTitle>
+              <ObjectPropertyInfoForm
+                state={handlerState.properties}
+                properties={handler.properties}
+                category={category}
+                disabled={disabled || readonly || !enabled}
+                hideEmptyPlaceholder
+                showRememberTip
+                small
+              />
+            </>
+          ))}
+
+          {credentialsSavingEnabled && (
+            <FieldCheckbox
+              id={handler.id + ' savePassword'}
+              name="savePassword"
+              state={handlerState}
+              disabled={disabled || !enabled || readonly || formState.config.sharedCredentials}
+            >
+              {translate('connections_connection_edit_save_credentials')}
+            </FieldCheckbox>
+          )}
         </Group>
       </ColoredContainer>
     </SubmittingForm>,
