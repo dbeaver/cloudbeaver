@@ -9,9 +9,9 @@ import { forwardRef } from 'react';
 
 import { ComplexLoader, createComplexLoader } from '@cloudbeaver/core-blocks';
 
-import type { IDefaultExtensions } from './getDefaultExtensions';
 import type { IEditorProps } from './IEditorProps';
 import type { IEditorRef } from './IEditorRef';
+import type { IDefaultExtensions } from './useEditorDefaultExtensions';
 
 const loader = createComplexLoader(async function loader() {
   const { Editor } = await import('./Editor');

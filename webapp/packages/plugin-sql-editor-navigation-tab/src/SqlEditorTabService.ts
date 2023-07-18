@@ -457,7 +457,7 @@ export class SqlEditorTabService extends Bootstrap {
 
     const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
 
-    if (dataSource?.isSaved() === false) {
+    if (dataSource?.isSaved === false) {
       const result = await this.commonDialogService.open(ConfirmationDialog, {
         title: 'plugin_sql_editor_navigation_tab_data_source_save_confirmation_title',
         subTitle: dataSource.name ?? undefined,

@@ -15,6 +15,7 @@ import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { GQLErrorCatcher, SqlDialectInfo } from '@cloudbeaver/core-sdk';
+import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
 
@@ -99,6 +100,8 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   );
 
   const sqlDialect = useSqlDialectExtension(state.dialect);
+  const extensions = useCodemirrorExtensions();
+  extensions.set(...sqlDialect);
   const error = useErrorDetails(state.error.exception);
 
   useEffect(() => {
@@ -122,7 +125,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
       <CommonDialogBody noOverflow noBodyPadding>
         <wrapper>
           <Loader loading={state.loading}>
-            {() => styled(styles)(<SQLCodeEditorLoader value={state.query} extensions={[sqlDialect]} readonly />)}
+            {() => styled(styles)(<SQLCodeEditorLoader value={state.query} extensions={extensions} readonly />)}
           </Loader>
         </wrapper>
       </CommonDialogBody>

@@ -13,6 +13,8 @@ export * from './actions/ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN';
 export * from './SqlDataSource/LocalStorage/ILocalStorageSqlDataSourceState';
 export * from './SqlDataSource/LocalStorage/LocalStorageSqlDataSource';
 export * from './SqlDataSource/LocalStorage/LocalStorageSqlDataSourceBootstrap';
+export * from './SqlDataSource/SqlDataSourceHistory/ISqlDataSourceHistoryState';
+export * from './SqlDataSource/SqlDataSourceHistory/createSqlDataSourceHistoryInitialState';
 export * from './SqlDataSource/BaseSqlDataSource';
 export * from './SqlDataSource/ESqlDataSourceFeatures';
 export * from './SqlDataSource/ISqlDataSource';

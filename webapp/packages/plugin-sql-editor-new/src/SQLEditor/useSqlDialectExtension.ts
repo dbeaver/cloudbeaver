@@ -11,6 +11,7 @@ import { createComplexLoader, type IComplexLoaderData, useComplexLoader } from '
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import {
   CassandraLoader,
+  Compartment,
   type Extension,
   MariaSQLLoader,
   MSSQLLoader,
@@ -24,7 +25,9 @@ import {
 
 const codemirrorComplexLoader = createComplexLoader(() => import('@cloudbeaver/plugin-codemirror6'));
 
-export function useSqlDialectExtension(dialectInfo: SqlDialectInfo | undefined): Extension {
+const SQL_EDITOR_COMPARTMENT = new Compartment();
+
+export function useSqlDialectExtension(dialectInfo: SqlDialectInfo | undefined): [Compartment, Extension] {
   const { SQLDialect, SQL_EDITOR } = useComplexLoader(codemirrorComplexLoader);
   const loader = getDialectLoader(dialectInfo?.name);
   const dialect = useComplexLoader(loader);
@@ -45,9 +48,12 @@ export function useSqlDialectExtension(dialectInfo: SqlDialectInfo | undefined):
       });
     }
 
-    return SQL_EDITOR({
-      dialect: dialectInner,
-    });
+    return [
+      SQL_EDITOR_COMPARTMENT,
+      SQL_EDITOR({
+        dialect: dialectInner,
+      }),
+    ];
   }, [dialect, dialectInfo]);
 }
 

@@ -1,0 +1,10 @@
+.unsavedMark {
+  background-color: var(--theme-primary);
+  width: 8px;
+  height: 8px;
+  border-radius: 100%;
+  margin-right: 4px;
+  margin-left: -4px;
+  display: inline-block;
+  vertical-align: middle;
+}
