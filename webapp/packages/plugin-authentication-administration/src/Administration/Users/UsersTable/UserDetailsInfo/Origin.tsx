@@ -9,39 +9,19 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
-import { Icon, PlaceholderComponent, StaticImage, useTranslate } from '@cloudbeaver/core-blocks';
+import { Icon, PlaceholderComponent, s, StaticImage, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 
 import type { IUserDetailsInfoProps } from '../../UsersAdministrationService';
+import style from './Origin.m.css';
 
 const USER_DETAILS_STYLES = css`
   StaticImage {
     width: 24px;
     height: 24px;
-  }
-`;
-
-const ORIGIN_STYLES = css`
-  container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 24px;
-    height: 46px;
-    cursor: pointer;
-  }
-  container:hover Icon {
-    display: block;
-  }
-  container:hover OriginIcon {
-    display: none;
-  }
-  Icon {
-    display: none;
-    width: 16px;
   }
 `;
 
@@ -66,6 +46,8 @@ export const Origin: PlaceholderComponent<IUserDetailsInfoProps> = observer(func
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
 
+  const styles = useS(style);
+
   async function onDelete(originId: string, originName: string) {
     const state = await commonDialogService.open(ConfirmationDialog, {
       title: 'ui_data_delete_confirmation',
@@ -86,14 +68,19 @@ export const Origin: PlaceholderComponent<IUserDetailsInfoProps> = observer(func
     }
   }
 
-  return styled(ORIGIN_STYLES)(
+  return (
     <>
       {user.origins.map(origin => (
-        <container key={origin.type + origin.subType} title={origin.displayName} onClick={() => onDelete(origin.type, origin.displayName)}>
-          <OriginIcon origin={origin} />
-          <Icon name="reject" viewBox="0 0 16 16" />
+        <container
+          key={origin.type + origin.subType}
+          title={origin.displayName}
+          className={s(styles, { container: true })}
+          onClick={() => onDelete(origin.type, origin.displayName)}
+        >
+          <OriginIcon className={s(styles, { originIcon: true })} origin={origin} />
+          <Icon className={s(styles, { icon: true })} name="reject" viewBox="0 0 16 16" />
         </container>
       ))}
-    </>,
+    </>
   );
 });

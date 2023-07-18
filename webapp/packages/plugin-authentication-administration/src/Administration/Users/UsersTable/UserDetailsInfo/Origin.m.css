@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 46px;
+  cursor: pointer;
+}
+.container:hover {
+  & .icon {
+    display: block;
+  }
+
+  & .originIcon {
+    display: none;
+  }
+}
+
+.icon {
+  display: none;
+  width: 16px;
+}
