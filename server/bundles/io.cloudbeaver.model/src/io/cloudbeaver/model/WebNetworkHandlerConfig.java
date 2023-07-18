@@ -84,7 +84,7 @@ public class WebNetworkHandlerConfig {
     public Map<String, String> getSecureProperties() {
         Map<String, String> secureProperties = new LinkedHashMap<>(configuration.getSecureProperties());
         for (Map.Entry<String, String> property : secureProperties.entrySet()) {
-            property.setValue(CommonUtils.isEmpty(property.getValue()) ? null : "");
+            property.setValue(CommonUtils.isEmpty(property.getValue()) ? null : WebConnectionInfo.SECURED_VALUE);
         }
         return secureProperties;
     }
