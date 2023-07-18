@@ -31,7 +31,8 @@ export const SSLPanel: TabContainerTabComponent<IConnectionFormProps> = observer
     });
   }
 
-  const handlerState = props.state.config.networkHandlersConfig?.find(state => state.id === handler?.id);
+
+  const handlerState = props.state.config.networkHandlersConfig?.find(h => h.id === handler?.id);
 
   if (!handler || !handlerState || !tab.selected) {
     return null;

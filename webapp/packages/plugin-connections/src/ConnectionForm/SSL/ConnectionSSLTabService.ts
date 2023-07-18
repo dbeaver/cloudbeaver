@@ -22,6 +22,7 @@ import { connectionFormStateContext } from '../Contexts/connectionFormStateConte
 import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
 import { getDefaultConfig } from './getDefaultConfig';
 import { getSSLDriverHandler } from './getSSLDriverHandler';
+import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME';
 
 export const SSLTab = React.lazy(async () => {
@@ -32,8 +33,6 @@ export const SSLPanel = React.lazy(async () => {
   const { SSLPanel } = await import('./SSLPanel');
   return { default: SSLPanel };
 });
-
-const PROPERTY_FEATURE_SECURED = 'secured';
 
 @injectable()
 export class ConnectionSSLTabService extends Bootstrap {
@@ -100,9 +99,11 @@ export class ConnectionSSLTabService extends Bootstrap {
 
     if (!state.config.networkHandlersConfig.some(state => state.id === handler.id)) {
       const config = initialConfig ? { ...initialConfig } : { id: handler.id, ...getDefaultConfig() };
+
       if (config.secureProperties) {
         config.properties = { ...config.properties, ...config.secureProperties };
       }
+
       state.config.networkHandlersConfig.push(config);
     }
   }
