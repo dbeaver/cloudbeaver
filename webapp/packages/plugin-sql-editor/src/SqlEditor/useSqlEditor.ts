@@ -14,7 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlCompletionProposal, SqlDialectInfo, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
-import { createLastPromiseGetter, isObjectsEqual, LastPromiseGetter, throttleAsync } from '@cloudbeaver/core-utils';
+import { createLastPromiseGetter, LastPromiseGetter, throttleAsync } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
@@ -122,8 +122,16 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         return context?.executing || false;
       },
 
+      get isIncomingChanges(): boolean {
+        return this.dataSource?.isIncomingChanges ?? false;
+      },
+
       get value(): string {
         return this.dataSource?.script ?? '';
+      },
+
+      get incomingValue(): string | undefined {
+        return this.dataSource?.incomingScript;
       },
 
       onMode: new SyncExecutor(),

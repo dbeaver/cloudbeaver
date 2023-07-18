@@ -28,6 +28,7 @@ export default [
   ['ui_custom', 'Custom'],
   ['ui_configure', 'Configure'],
   ['ui_apply', 'Apply'],
+  ['ui_ignore', 'Ignore'],
   ['ui_unexpected_error', 'Unexpected error'],
   ['ui_error', 'Error'],
   ['ui_error_message', 'Error:'],

@@ -29,6 +29,7 @@ export interface ISqlDataSource extends ILoadableState {
   readonly icon?: string;
   readonly emptyPlaceholder?: string;
   readonly script: string;
+  readonly incomingScript?: string;
   readonly projectId: string | null;
   readonly databaseModels: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>[];
   readonly executionContext?: IConnectionExecutionContextInfo;
@@ -38,8 +39,12 @@ export interface ISqlDataSource extends ILoadableState {
   readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>[]>;
   readonly features: ESqlDataSourceFeatures[];
   readonly history: ISqlDataSourceHistory;
+  readonly isAutoSaveEnabled: boolean;
+  readonly isIncomingChanges: boolean;
+  readonly isSaved: boolean;
+  readonly isScriptSaved: boolean;
+  readonly isExecutionContextSaved: boolean;
 
-  isSaved(): boolean;
   isReadonly(): boolean;
   isEditing(): boolean;
   isOutdated(): boolean;
@@ -52,6 +57,10 @@ export interface ISqlDataSource extends ILoadableState {
   setScript(script: string, source?: string): void;
   setEditing(state: boolean): void;
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void;
+  setIncomingExecutionContext(executionContext?: IConnectionExecutionContextInfo): void;
+  setIncomingScript(script?: string): void;
+  applyIncoming(): void;
+  keepCurrent(): void;
   save(): Promise<void> | void;
   load(): Promise<void> | void;
   reset(): Promise<void> | void;

@@ -12,12 +12,14 @@ import styled, { css } from 'reshadow';
 
 import { useFocus } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { ActionService } from '../Action/ActionService';
 import type { IActionItem } from '../Action/IActionItem';
 import { getCommonAndOSSpecificKeys } from '../Action/KeyBinding/getCommonAndOSSpecificKeys';
 import { CaptureViewContext } from './CaptureViewContext';
 import type { IView } from './IView';
+import { parseHotkey } from './parseHotkey';
 import { useActiveView } from './useActiveView';
 import { useViewContext } from './useViewContext';
 
@@ -44,14 +46,7 @@ export const CaptureView = observer<React.PropsWithChildren<Props>>(function Cap
     .filter(action => action?.binding && !action.isDisabled())
     .filter(Boolean) as IActionItem[];
 
-  let keys = actionItems
-    .map(item => getCommonAndOSSpecificKeys(item.binding?.binding))
-    .flat()
-    .join(', ');
-
-  if (keys === '') {
-    keys = '*';
-  }
+  const keys = actionItems.map(item => getCommonAndOSSpecificKeys(item.binding?.binding)).flat();
 
   useHotkeys(
     keys,
@@ -62,18 +57,31 @@ export const CaptureView = observer<React.PropsWithChildren<Props>>(function Cap
 
       const action = actionItems.find(action => {
         const commonAndSpecificKeys = getCommonAndOSSpecificKeys(action.binding?.binding);
-        return commonAndSpecificKeys.includes(handler.key);
-      });
+        return commonAndSpecificKeys.some(key => {
+          const hotkey = parseHotkey(key);
 
-      if (action?.binding?.binding.preventDefault) {
-        event.preventDefault();
-      }
+          return isObjectsEqual(hotkey, handler);
+        });
+      });
 
       action?.activate(true);
     },
     {
-      enabled: keys !== '*',
-      enableOnTags: ['INPUT', 'SELECT', 'TEXTAREA'],
+      enabled: keys.length > 0,
+      enableOnFormTags: ['INPUT', 'SELECT', 'TEXTAREA'],
+      preventDefault(event, handler) {
+        const action = actionItems.find(action => {
+          const commonAndSpecificKeys = getCommonAndOSSpecificKeys(action.binding?.binding);
+          return commonAndSpecificKeys.some(key => {
+            const hotkey = parseHotkey(key);
+
+            return isObjectsEqual(hotkey, handler);
+          });
+        });
+
+        return action?.binding?.binding.preventDefault === true;
+      },
+      enableOnContentEditable: true,
     },
   );
 

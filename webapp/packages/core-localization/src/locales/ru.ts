@@ -25,6 +25,7 @@ export default [
   ['ui_custom', 'Настроить'],
   ['ui_configure', 'Настроить'],
   ['ui_apply', 'Применить'],
+  ['ui_ignore', 'Пропустить'],
   ['ui_error', 'Ошибка'],
   ['ui_error_message', 'Ошибка:'],
   ['ui_error_close', 'Закрыть'],
