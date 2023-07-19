@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.app;
 
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 
 import java.util.Set;
@@ -33,5 +34,6 @@ public interface WebAuthConfiguration {
 
     Set<SMAuthProviderCustomConfiguration> getAuthCustomConfigurations();
 
+    @Nullable
     SMAuthProviderCustomConfiguration getAuthProviderConfiguration(String configId);
 }

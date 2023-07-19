@@ -125,6 +125,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         if (isSubjectExists(userId)) {
             throw new DBCException("User or team '" + userId + "' already exists");
         }
+        log.debug("Create user: " + userId);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 createAuthSubject(dbCon, userId, SUBJECT_USER);
@@ -151,6 +152,17 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving user in database", e);
+        }
+    }
+
+    @Override
+    public void importUsers(@NotNull SMUserImportList userImportList) throws DBException {
+        for (SMUserProvisioning user : userImportList.getUsers()) {
+            if (isSubjectExists(user.getUserId())) {
+                log.info("Skip already exist user: " + user.getUserId());
+                continue;
+            }
+            createUser(user.getUserId(), user.getMetaParameters(), true, userImportList.getAuthRole());
         }
     }
 
