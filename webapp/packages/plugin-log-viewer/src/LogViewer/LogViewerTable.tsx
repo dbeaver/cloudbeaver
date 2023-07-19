@@ -81,7 +81,7 @@ export const LogViewerTable = observer<Props>(function LogViewerTable({ items, s
             <TableColumnHeader>
               <message-title-box>
                 <message-title>{translate('plugin_log_viewer_entry_message')}</message-title>
-                <MenuBarSmallItem name="trash" viewBox="0 0 24 24" title={translate('plugin_log_viewer_clear_log')} onClick={onClear}>
+                <MenuBarSmallItem icon="trash" viewBox="0 0 24 24" title={translate('plugin_log_viewer_clear_log')} onClick={onClear}>
                   {translate('ui_clear')}
                 </MenuBarSmallItem>
               </message-title-box>
