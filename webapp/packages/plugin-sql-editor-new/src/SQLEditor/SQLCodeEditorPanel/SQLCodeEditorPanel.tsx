@@ -13,7 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
-import { closeCompletion, IEditorRef, ReactCodemirrorPanel, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
+import { closeCompletion, IEditorRef, Prec, ReactCodemirrorPanel, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import type { ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTIVE_QUERY_EXTENSION } from '../ACTIVE_QUERY_EXTENSION';
@@ -35,7 +35,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
 
   const editor = useSQLCodeEditor(editorRef);
   const panel = useSQLCodeEditorPanel(data, editor);
-  const extensions = useCodemirrorExtensions(undefined, [ACTIVE_QUERY_EXTENSION, QUERY_STATUS_GUTTER_EXTENSION]);
+  const extensions = useCodemirrorExtensions(undefined, [ACTIVE_QUERY_EXTENSION, Prec.lowest(QUERY_STATUS_GUTTER_EXTENSION)]);
   const autocompletion = useSqlDialectAutocompletion(data);
   const sqlDialect = useSqlDialectExtension(data.dialect);
 
