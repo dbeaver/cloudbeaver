@@ -50,7 +50,7 @@ export const ITEM_LIST_STYLES = css`
       padding: 4px 32px 4px 8px;
     }
 
-    & search-button {
+    & action-button {
       position: absolute;
       display: flex;
       align-items: center;
@@ -59,7 +59,7 @@ export const ITEM_LIST_STYLES = css`
       right: 4px;
       transform: translateY(-50%);
 
-      & ListSearchButton {
+      & IconButton {
         position: relative;
         box-sizing: border-box;
         overflow: hidden;
@@ -67,10 +67,14 @@ export const ITEM_LIST_STYLES = css`
         height: 24px;
         width: 24px;
         margin: 0;
+
+        &[name='cross'] {
+          padding: 4px;
+        }
       }
     }
   }
-  ListSearchButton {
+  IconButton {
     composes: theme-ripple theme-background-primary theme-text-on-primary from global;
   }
   list-item:not(:nth-last-child(2)) {
