@@ -24,7 +24,7 @@ export const SSLPanel: TabContainerTabComponent<IConnectionFormProps> = observer
 
   const handler = getSSLDriverHandler(networkHandlerResource.resource.values, dbDriverResource.data?.applicableNetworkHandlers ?? []);
 
-  if (handler && !props.state.config.networkHandlersConfig?.some(state => state.id === handler?.id)) {
+  if (props.state.configured && handler && !props.state.config.networkHandlersConfig?.some(state => state.id === handler?.id)) {
     props.state.config.networkHandlersConfig?.push(getSSLDefaultConfig(handler.id));
   }
 

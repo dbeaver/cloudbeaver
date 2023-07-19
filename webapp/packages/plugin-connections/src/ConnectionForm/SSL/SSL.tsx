@@ -69,6 +69,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
               category={null}
               disabled={disabled || readonly || !enabled}
               isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
+              autofillToken="new-password"
               hideEmptyPlaceholder
               showRememberTip
               small
@@ -84,6 +85,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
                 category={category}
                 disabled={disabled || readonly || !enabled}
                 isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
+                autofillToken="new-password"
                 hideEmptyPlaceholder
                 showRememberTip
                 small
