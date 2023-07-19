@@ -120,12 +120,15 @@ export class ConnectionSSLTabService extends Bootstrap {
     const config = contexts.getContext(connectionConfigContext);
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
 
-    if (!state.config.networkHandlersConfig || state.config.networkHandlersConfig.length === 0) {
+    if (!state.config.networkHandlersConfig || state.config.networkHandlersConfig.length === 0 || !state.config.driverId) {
       return;
     }
 
+    const driver = await this.dbDriverResource.load(state.config.driverId);
     const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
-    const handler = state.config.networkHandlersConfig.find(handler => handlers.some(h => h.id === handler.id && h.codeName === SSL_CODE_NAME));
+    const handler = state.config.networkHandlersConfig.find(
+      handler => driver?.applicableNetworkHandlers.includes(handler.id) && handlers.some(h => h.id === handler.id && h.codeName === SSL_CODE_NAME),
+    );
     const descriptor = handlers.find(h => h.id === handler?.id);
 
     if (!handler) {
