@@ -179,7 +179,10 @@ export class ConnectionSSHTabService extends Bootstrap {
         key: handler.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? handler.key : undefined,
         password: passwordChanged ? handler.password : undefined,
       };
+
+      delete handlerConfig.secureProperties;
     }
+
     if (handler.enabled && !handler.savePassword) {
       credentialsState.requireNetworkHandler(handler.id);
     }
