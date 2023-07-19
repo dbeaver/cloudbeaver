@@ -59,7 +59,7 @@ export const PROPERTIES_TABLE_STYLES = css`
   }
 `;
 
-export const PROPERTIES_FIlTER_STYLES = css`
+export const PROPERTIES_FILTER_STYLES = css`
   input {
     composes: theme-background-surface from global;
     box-sizing: border-box;
