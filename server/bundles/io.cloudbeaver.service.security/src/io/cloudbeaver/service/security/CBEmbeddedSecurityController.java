@@ -699,6 +699,20 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
+    @Override
+    public void deleteUserCredentials(@NotNull String userId, @NotNull String authProviderId) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            JDBCUtils.executeStatement(
+                dbCon,
+                database.normalizeTableNames("DELETE FROM {table_prefix}CB_USER_CREDENTIALS WHERE USER_ID=? AND PROVIDER_ID=?"),
+                userId,
+                authProviderId
+            );
+        } catch (SQLException e) {
+            throw new DBCException("Error deleting user credentials", e);
+        }
+    }
+
     @Nullable
     private String findUserByCredentials(WebAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
         Map<String, Object> identCredentials = new LinkedHashMap<>();

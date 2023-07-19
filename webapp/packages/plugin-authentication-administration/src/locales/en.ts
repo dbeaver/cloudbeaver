@@ -11,6 +11,7 @@ export default [
   ['authentication_administration_user_connections_empty', 'No available connections'],
   ['authentication_administration_user_origin_empty', 'No available details'],
   ['authentication_administration_user_info', 'Info'],
+  ['authentication_administration_user_local', 'Local user'],
   ['authentication_administration_item', 'Access Management'],
   ['authentication_administration_item_users', 'Users'],
   ['authentication_administration_item_metaParameters', 'Meta Parameters'],
@@ -30,6 +31,13 @@ export default [
   ['authentication_administration_users_filters_status_disabled', 'DISABLED'],
   ['authentication_administration_users_filters_status_all', 'ALL'],
   ['authentication_administration_users_empty', 'There are no users'],
+
+  ['authentication_administration_user_remove_credentials_error', 'Failed to remove user credentials'],
+  ['authentication_administration_user_remove_credentials_success', 'User credentials were removed'],
+  [
+    'authentication_administration_user_remove_credentials_confirmation_message',
+    'Are you sure you want to delete "{arg:originName}" credentials from "{arg:userId}"?',
+  ],
 
   ['administration_configuration_wizard_configuration_admin', 'Administrator Credentials'],
   ['administration_configuration_wizard_configuration_admin_name', 'Login'],

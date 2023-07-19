@@ -10,6 +10,7 @@ export default [
   ['authentication_administration_user_connections_empty', 'Nessuna connessione disponibile'],
   ['authentication_administration_user_origin_empty', 'Nessun dettaglio disponibile'],
   ['authentication_administration_user_info', 'Info'],
+  ['authentication_administration_user_local', 'Local user'],
   ['authentication_administration_item', 'Utenti'],
   ['authentication_administration_tools_add_tooltip', 'Aggiungi nuovo utente'],
   ['authentication_administration_tools_refresh_tooltip', 'Aggiorna la lista utenti'],
@@ -26,6 +27,13 @@ export default [
   ['authentication_administration_users_filters_status_disabled', 'DISABLED'],
   ['authentication_administration_users_filters_status_all', 'ALL'],
   ['authentication_administration_users_empty', 'There are no users'],
+
+  ['authentication_administration_user_remove_credentials_error', 'Failed to remove user credentials'],
+  ['authentication_administration_user_remove_credentials_success', 'User credentials were removed'],
+  [
+    'authentication_administration_user_remove_credentials_confirmation_message',
+    'Are you sure you want to delete "{arg:originName}" credentials from "{arg:userId}"?',
+  ],
 
   ['administration_teams_team_info_created', 'Team created'],
   ['administration_teams_team_info_updated', 'Team updated'],
