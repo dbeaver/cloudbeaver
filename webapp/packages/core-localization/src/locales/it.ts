@@ -25,6 +25,7 @@ export default [
   ['ui_custom', 'Custom'],
   ['ui_configure', 'Configure'],
   ['ui_apply', 'Applica'],
+  ['ui_ignore', 'Ignore'],
   ['ui_error', 'Errore'],
   ['ui_error_message', 'Errore:'],
   ['ui_error_close', 'Chiudi'],
@@ -81,6 +82,7 @@ export default [
   ['ui_file_size_exceeds', 'Max file size exceeds. File size: {arg:size}. Max file size: {arg:maxSize}'],
   ['ui_upload_file', 'Upload file'],
   ['ui_upload_files', 'Upload files'],
+  ['ui_upload_files_duplicate_error', 'Files with the same name already exist'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],

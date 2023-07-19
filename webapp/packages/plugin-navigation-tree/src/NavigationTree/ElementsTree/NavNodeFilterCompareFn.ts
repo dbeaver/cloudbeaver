@@ -7,10 +7,12 @@
  */
 import type { NavNode } from '@cloudbeaver/core-navigation-tree';
 
+import type { IElementsTree } from './useElementsTree';
+
 export enum EEquality {
   none,
   partially,
   full,
 }
 
-export type NavNodeFilterCompareFn = (node: NavNode, filter: string) => EEquality;
+export type NavNodeFilterCompareFn = (tree: IElementsTree, node: NavNode, filter: string) => EEquality;

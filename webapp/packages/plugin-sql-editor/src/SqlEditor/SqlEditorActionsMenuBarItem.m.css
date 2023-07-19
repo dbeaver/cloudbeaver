@@ -1,3 +1,7 @@
 .sqlActions .menuBarItem {
   padding: 4px;
 }
+
+.sqlActions .menuBarItemLabel {
+  display: none;
+}

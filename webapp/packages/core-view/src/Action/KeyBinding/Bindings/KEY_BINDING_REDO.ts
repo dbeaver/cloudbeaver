@@ -9,7 +9,6 @@ import { createKeyBinding } from '../createKeyBinding';
 
 export const KEY_BINDING_REDO = createKeyBinding({
   id: 'redo',
-  keys: ['ctrl+y', 'ctrl+shift+z'],
-  keysMac: ['shift+cmd+z', 'cmd+y'],
+  keys: ['mod+y', 'mod+shift+z'],
   preventDefault: true,
 });

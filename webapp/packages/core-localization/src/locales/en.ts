@@ -27,6 +27,7 @@ export default [
   ['ui_custom', 'Custom'],
   ['ui_configure', 'Configure'],
   ['ui_apply', 'Apply'],
+  ['ui_ignore', 'Ignore'],
   ['ui_unexpected_error', 'Unexpected error'],
   ['ui_error', 'Error'],
   ['ui_error_message', 'Error:'],
@@ -97,6 +98,7 @@ export default [
   ['ui_file_size_exceeds', 'Max file size exceeds. File size: {arg:size}. Max file size: {arg:maxSize}'],
   ['ui_upload_file', 'Upload file'],
   ['ui_upload_files', 'Upload files'],
+  ['ui_upload_files_duplicate_error', 'Files with the same name already exist'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],
