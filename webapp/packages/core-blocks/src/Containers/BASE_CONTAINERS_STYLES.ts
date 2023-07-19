@@ -24,6 +24,7 @@ export const BASE_CONTAINERS_STYLES = css`
     flex-direction: row;
     align-content: baseline;
     position: relative;
+    box-sizing: border-box;
 
     &[hideEmpty]:empty {
       display: none;

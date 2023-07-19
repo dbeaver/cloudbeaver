@@ -17,7 +17,7 @@ import { TaskScheduler } from '@cloudbeaver/core-executor';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { createPath, debounce, getPathName, getPathParent, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
+import { debounce, getPathName, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
 import { BaseSqlDataSource, ESqlDataSourceFeatures, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 
@@ -28,7 +28,7 @@ interface IResourceInfo {
 }
 
 interface IResourceActions {
-  rename(dataSource: ResourceSqlDataSource, key: string, newKey: string): Promise<string>;
+  rename(dataSource: ResourceSqlDataSource, key: string, name: string): Promise<string>;
   read(dataSource: ResourceSqlDataSource, key: string): Promise<string>;
   write(dataSource: ResourceSqlDataSource, key: string, value: string): Promise<void>;
   getProperties(dataSource: ResourceSqlDataSource, key: string): Promise<IConnectionExecutionContextInfo | undefined>;
@@ -55,7 +55,15 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   get script(): string {
-    return this._script;
+    return this.state.script;
+  }
+
+  get baseScript(): string {
+    return this.state.baseScript;
+  }
+
+  get baseExecutionContext(): IConnectionExecutionContextInfo | undefined {
+    return this.state.baseExecutionContext;
   }
 
   get projectId(): string | null {
@@ -92,11 +100,14 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable, ESqlDataSourceFeatures.setName];
   }
 
-  private _script: string;
+  get isAutoSaveEnabled(): boolean {
+    return this.sqlEditorService.autoSave;
+  }
+
   private actions?: IResourceActions;
   private info?: IResourceInfo;
   private lastAction: (() => Promise<void>) | undefined;
-  private readonly state: IResourceSqlDataSourceState;
+  private state!: IResourceSqlDataSourceState;
 
   private loaded: boolean;
   private readonly scheduler: TaskScheduler;
@@ -110,8 +121,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     state: IResourceSqlDataSourceState,
   ) {
     super();
-    this.state = state;
-    this._script = '';
+    this.bindState(state);
     this.lastAction = undefined;
     this.loaded = false;
     this.resourceUseKeyId = null;
@@ -122,18 +132,15 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
     resourceManagerResource.onDataOutdated.addHandler(this.syncResource);
 
-    makeObservable<this, '_script' | 'lastAction' | 'loaded'>(this, {
+    makeObservable<this, 'lastAction' | 'loaded'>(this, {
       script: computed,
       executionContext: computed,
       resourceKey: computed,
       features: computed<ESqlDataSourceFeatures[]>({
         equals: isArraysEqual,
       }),
-      _script: observable,
       lastAction: observable.ref,
       loaded: observable,
-      setExecutionContext: action,
-      setScript: action,
       setResourceKey: action,
     });
   }
@@ -154,6 +161,20 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     return this.scheduler.executing;
   }
 
+  canRename(name: string | null): boolean {
+    if (this.isReadonly()) {
+      return false;
+    }
+
+    if (!name) {
+      return false;
+    }
+
+    name = name.trim();
+
+    return !!this.actions && !!this.resourceKey && name.length > 0;
+  }
+
   setResourceKey(resourceKey: string | undefined): void {
     if (this.state.resourceKey && this.resourceUseKeyId) {
       this.resourceManagerResource.free(toJS(this.state.resourceKey), this.resourceUseKeyId);
@@ -161,7 +182,8 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     }
 
     this.state.resourceKey = toJS(resourceKey);
-    this.reloadResource();
+    this.loaded = false;
+    this.markOutdated();
     this.onUpdate.execute();
   }
 
@@ -174,78 +196,45 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   setName(name: string | null): void {
-    this.rename(name);
+    name = name?.trim() ?? null;
+    if (!name || name === this.name) {
+      return;
+    }
+
+    const previousName = this.name;
     super.setName(name);
+
+    this.rename(name).catch(() => {
+      super.setName(previousName);
+    });
   }
 
   setProject(projectId: string | null): void {
     super.setProject(projectId);
   }
 
-  canRename(name: string | null): boolean {
-    if (this.isReadonly()) {
-      return false;
-    }
-
-    if (!name) {
-      return false;
-    }
-
-    name = name.trim();
-
-    return !!this.actions && !!this.resourceKey && this.saved && name.length > 0;
-  }
-
   setScript(script: string): void {
-    const previous = this._script;
+    const previous = this.state.script;
+    if (previous === script) {
+      return;
+    }
 
-    this._script = script;
+    this.state.script = script;
     super.setScript(script);
 
-    if (this.sqlEditorService.autoSave && previous !== script) {
+    if (this.isAutoSaveEnabled) {
       this.debouncedWrite();
     }
   }
 
-  dispose(): void {
-    super.dispose();
-    this.resourceManagerResource.onItemUpdate.removeHandler(this.syncResource);
-    if (this.state.resourceKey && this.resourceUseKeyId) {
-      this.resourceManagerResource.free(this.state.resourceKey, this.resourceUseKeyId);
-      this.resourceUseKeyId = null;
-    }
-  }
+  setExecutionContext(executionContext: IConnectionExecutionContextInfo | undefined): void {
+    executionContext = JSON.parse(JSON.stringify(toJS(executionContext) ?? {}));
 
-  syncResource(key: ResourceKey<string>) {
-    if (isResourceAlias(key)) {
-      return;
-    }
-
-    const resourceKey = this.resourceKey;
-    if (resourceKey && ResourceKeyUtils.some(key, key => resourceKey.startsWith(key))) {
-      this.reloadResource();
-    }
-  }
-
-  reloadResource(): void {
-    this.markOutdated();
-    this.saved = true;
-    this.loaded = false;
-  }
-
-  async load(): Promise<void> {
-    if (this.state.resourceKey && !this.resourceUseKeyId) {
-      this.resourceUseKeyId = this.resourceManagerResource.use(this.state.resourceKey);
-    }
-    await this.read();
-  }
-
-  setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
     if (this.resourceKey && executionContext?.projectId && getRmResourceKey(this.resourceKey).projectId !== executionContext.projectId) {
       throw new Error('Resource SQL Data Source and Execution context projects don\t match');
     }
 
-    if (!isObjectsEqual(toJS(this.state.executionContext), toJS(executionContext))) {
+    if (!isObjectsEqual(toJS(this.state.executionContext), executionContext)) {
       const initNew =
         !isValuesEqual(executionContext?.connectionId, this.executionContext?.connectionId, undefined) ||
         !isValuesEqual(executionContext?.defaultCatalog, this.executionContext?.defaultCatalog, undefined) ||
@@ -263,128 +252,180 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
         }
       }
 
-      this.state.executionContext = toJS(executionContext);
+      this.state.executionContext = executionContext;
       super.setExecutionContext(executionContext);
 
-      if (this.sqlEditorService.autoSave) {
+      if (this.isAutoSaveEnabled) {
         this.debouncedSaveProperties();
       }
     }
   }
 
-  async rename(name: string | null) {
-    await this.write();
-
-    await this.scheduler.schedule(undefined, async () => {
-      if (!this.actions || !this.resourceKey || !this.projectId || !this.saved || !name?.trim()) {
-        return;
-      }
-
-      name = this.projectInfoResource.getNameWithExtension(this.projectId, SCRIPTS_TYPE_ID, name);
-
-      this.lastAction = this.rename.bind(this, name);
-      this.message = 'plugin_sql_editor_navigation_tab_script_state_renaming';
-
-      try {
-        this.exception = null;
-        this.setResourceKey(await this.actions.rename(this, this.resourceKey, createPath(getPathParent(this.resourceKey), name)));
-      } catch (exception: any) {
-        this.exception = exception;
-      } finally {
-        this.message = undefined;
-      }
-    });
-  }
-
-  async read() {
-    await this.scheduler.schedule(undefined, async () => {
-      if (!this.actions || !this.resourceKey || !this.isOutdated() || !this.saved) {
-        return;
-      }
-
-      this.lastAction = this.read.bind(this);
-      this.message = 'plugin_sql_editor_navigation_tab_script_state_reading';
-
-      try {
-        this.exception = null;
-        this._script = await this.actions.read(this, this.resourceKey);
-
-        const executionContext = await this.actions.getProperties(this, this.resourceKey);
-
-        runInAction(() => {
-          if (executionContext) {
-            this.setExecutionContext(executionContext);
-          } else {
-            this.setExecutionContext();
-          }
-        });
-
-        this.markUpdated();
-        this.loaded = true;
-        super.setScript(this.script);
-        this.saved = true;
-      } catch (exception: any) {
-        this.exception = exception;
-      } finally {
-        this.message = undefined;
-      }
-    });
-  }
-
-  async write() {
-    await this.scheduler.schedule(undefined, async () => {
-      if (!this.actions || !this.resourceKey || this.saved) {
-        return;
-      }
-
-      this.lastAction = this.write.bind(this);
-      this.message = 'plugin_sql_editor_navigation_tab_script_state_saving';
-
-      try {
-        this.exception = null;
-        await this.actions.write(this, this.resourceKey, this.script);
-        this.saved = true;
-        this.markUpdated();
-      } catch (exception: any) {
-        this.exception = exception;
-      } finally {
-        this.message = undefined;
-      }
-    });
+  async load(): Promise<void> {
+    if (this.state.resourceKey && !this.resourceUseKeyId) {
+      this.resourceUseKeyId = this.resourceManagerResource.use(this.state.resourceKey);
+    }
+    await this.read();
   }
 
   async save(): Promise<void> {
-    await this.write();
-    await this.saveProperties();
+    try {
+      await this.write();
+      await this.saveProperties();
+      super.save();
+    } catch (exception: any) {
+      this.exception = exception;
+    }
   }
 
-  private async saveProperties() {
+  dispose(): void {
+    super.dispose();
+    this.resourceManagerResource.onItemUpdate.removeHandler(this.syncResource);
+    if (this.state.resourceKey && this.resourceUseKeyId) {
+      this.resourceManagerResource.free(this.state.resourceKey, this.resourceUseKeyId);
+      this.resourceUseKeyId = null;
+    }
+  }
+
+  bindState(state: IResourceSqlDataSourceState): void {
+    this.state = state;
+    this.outdated = true;
+    this.history.restore(state.history);
+  }
+
+  private syncResource(key: ResourceKey<string>) {
+    if (isResourceAlias(key)) {
+      return;
+    }
+
+    const resourceKey = this.resourceKey;
+    if (resourceKey && ResourceKeyUtils.some(key, key => resourceKey.startsWith(key))) {
+      this.markOutdated();
+    }
+  }
+
+  private async rename(name: string) {
+    await this.save();
+
     await this.scheduler.schedule(undefined, async () => {
       if (!this.actions || !this.resourceKey) {
         return;
       }
 
+      this.lastAction = this.rename.bind(this, name);
+
+      try {
+        if (!this.isSaved) {
+          throw new Error('Please save changes before renaming');
+        }
+        this.exception = null;
+
+        this.message = 'plugin_sql_editor_navigation_tab_script_state_renaming';
+        this.setResourceKey(await this.actions.rename(this, this.resourceKey, name));
+      } catch (exception: any) {
+        this.exception = exception;
+        throw exception;
+      } finally {
+        this.message = undefined;
+      }
+    });
+  }
+
+  private async read() {
+    await this.scheduler.schedule(undefined, async () => {
+      if (!this.actions || !this.resourceKey || !this.isOutdated()) {
+        return;
+      }
+
+      this.lastAction = this.read.bind(this);
+
+      try {
+        this.exception = null;
+        await this.readData();
+      } catch (exception: any) {
+        this.exception = exception;
+      }
+    });
+  }
+
+  private async saveProperties() {
+    await this.scheduler.schedule(undefined, async () => {
+      if (!this.actions || !this.resourceKey || this.isExecutionContextSaved) {
+        return;
+      }
+
       this.lastAction = this.saveProperties.bind(this);
-      this.message = 'plugin_sql_editor_navigation_tab_script_state_updating';
 
       try {
         this.exception = null;
 
         if (!this.isReadonly()) {
+          this.message = 'plugin_sql_editor_navigation_tab_script_state_updating';
           const executionContext = await this.actions.setProperties(this, this.resourceKey, this.executionContext);
 
-          if (executionContext) {
-            this.setExecutionContext(executionContext);
-          } else {
-            this.setExecutionContext();
-          }
+          this.setExecutionContext(executionContext);
+          this.setBaseExecutionContext(this.executionContext);
         }
-      } catch (exception: any) {
-        this.exception = exception;
       } finally {
         this.message = undefined;
       }
     });
+  }
+
+  private async write() {
+    await this.scheduler.schedule(undefined, async () => {
+      if (!this.actions || !this.resourceKey || this.isScriptSaved) {
+        return;
+      }
+
+      this.lastAction = this.write.bind(this);
+
+      try {
+        this.exception = null;
+        await this.readData();
+
+        if (!this.isIncomingChanges) {
+          this.message = 'plugin_sql_editor_navigation_tab_script_state_saving';
+          await this.actions.write(this, this.resourceKey, this.script);
+          this.setBaseScript(this.script);
+        }
+      } finally {
+        this.message = undefined;
+      }
+    });
+  }
+
+  private async readData() {
+    try {
+      if (!this.actions || !this.resourceKey) {
+        return;
+      }
+      this.message = 'plugin_sql_editor_navigation_tab_script_state_reading';
+      const script = await this.actions.read(this, this.resourceKey);
+      const executionContext = await this.actions.getProperties(this, this.resourceKey);
+
+      runInAction(() => {
+        if (!this.loaded) {
+          if (this.baseScript !== script) {
+            this.setScript(script);
+          }
+          if (!isObjectsEqual(toJS(this.baseExecutionContext), executionContext)) {
+            this.setExecutionContext(executionContext);
+          }
+
+          this.setBaseScript(script);
+          this.setBaseExecutionContext(executionContext);
+        } else {
+          this.setIncomingExecutionContext(executionContext);
+          this.setIncomingScript(script);
+        }
+
+        this.markUpdated();
+        this.loaded = true;
+      });
+    } finally {
+      this.message = undefined;
+    }
   }
 
   private debouncedWrite() {
@@ -393,5 +434,13 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   private debouncedSaveProperties() {
     this.saveProperties();
+  }
+
+  protected setBaseScript(script: string): void {
+    this.state.baseScript = script;
+  }
+
+  protected setBaseExecutionContext(executionContext: IConnectionExecutionContextInfo | undefined): void {
+    this.state.baseExecutionContext = toJS(executionContext);
   }
 }

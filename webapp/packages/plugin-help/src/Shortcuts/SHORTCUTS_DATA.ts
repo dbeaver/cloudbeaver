@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
 import { getCommonAndOSSpecificKeys, IKeyBinding, KEY_BINDING_OPEN_IN_TAB, KEY_BINDING_REDO, KEY_BINDING_UNDO } from '@cloudbeaver/core-view';
 import { KEY_BINDING_COLLAPSE_ALL, KEY_BINDING_ENABLE_FILTER, KEY_BINDING_LINK_OBJECT } from '@cloudbeaver/plugin-navigation-tree';
 import {
@@ -101,5 +102,17 @@ export const NAVIGATION_TREE_SHORTCUTS: IShortcut[] = [
 function transformKeys(keyBinding: IKeyBinding): string[] {
   const keys = getCommonAndOSSpecificKeys(keyBinding);
 
-  return keys.map(key => key.toLocaleUpperCase().replace(/\+/gi, ' + '));
+  return keys.map(key => transformModToDisplayKey(key.toLocaleUpperCase().replace(/\+/gi, ' + ')));
+}
+
+function transformModToDisplayKey(key: string): string {
+  const OS = getOS();
+  if (OS === OperatingSystem.windowsOS || OperatingSystem.linuxOS) {
+    return key.replace('MOD', 'CTRL');
+  }
+
+  if (OS === OperatingSystem.macOS) {
+    return key.replace('MOD', 'CMD');
+  }
+  return key;
 }

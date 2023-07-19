@@ -978,6 +978,7 @@ export interface Query {
   deleteAuthProviderConfiguration: Scalars['Boolean'];
   deleteTeam?: Maybe<Scalars['Boolean']>;
   deleteUser?: Maybe<Scalars['Boolean']>;
+  deleteUserCredentials?: Maybe<Scalars['Boolean']>;
   deleteUserMetaParameter: Scalars['Boolean'];
   driverList: Array<DriverInfo>;
   emptyEvent?: Maybe<Scalars['Boolean']>;
@@ -1118,6 +1119,11 @@ export interface QueryDeleteTeamArgs {
 }
 
 export interface QueryDeleteUserArgs {
+  userId: Scalars['ID'];
+}
+
+export interface QueryDeleteUserCredentialsArgs {
+  providerId: Scalars['ID'];
   userId: Scalars['ID'];
 }
 
@@ -2097,6 +2103,13 @@ export type DeleteUserQueryVariables = Exact<{
 }>;
 
 export type DeleteUserQuery = { deleteUser?: boolean };
+
+export type DeleteUserCredentialsQueryVariables = Exact<{
+  userId: Scalars['ID'];
+  providerId: Scalars['ID'];
+}>;
+
+export type DeleteUserCredentialsQuery = { result?: boolean };
 
 export type DeleteUserMetaParameterQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -5490,6 +5503,11 @@ export const DeleteUserDocument = `
   deleteUser(userId: $userId)
 }
     `;
+export const DeleteUserCredentialsDocument = `
+    query deleteUserCredentials($userId: ID!, $providerId: ID!) {
+  result: deleteUserCredentials(userId: $userId, providerId: $providerId)
+}
+    `;
 export const DeleteUserMetaParameterDocument = `
     query deleteUserMetaParameter($id: ID!) {
   state: deleteUserMetaParameter(id: $id)
@@ -6834,6 +6852,17 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
       return withWrapper(
         wrappedRequestHeaders => client.request<DeleteUserQuery>(DeleteUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
         'deleteUser',
+        'query',
+      );
+    },
+    deleteUserCredentials(
+      variables: DeleteUserCredentialsQueryVariables,
+      requestHeaders?: GraphQLClientRequestHeaders,
+    ): Promise<DeleteUserCredentialsQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<DeleteUserCredentialsQuery>(DeleteUserCredentialsDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
+        'deleteUserCredentials',
         'query',
       );
     },

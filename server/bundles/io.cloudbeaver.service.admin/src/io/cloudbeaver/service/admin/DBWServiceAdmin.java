@@ -91,6 +91,9 @@ public interface DBWServiceAdmin extends DBWService {
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean setUserCredentials(@NotNull WebSession webSession, @NotNull String userID, @NotNull String providerId, @NotNull Map<String, Object> credentials) throws DBWebException;
 
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean deleteUserCredentials(@NotNull WebSession webSession, @NotNull String userId, @NotNull String providerId) throws DBWebException;
+
     ////////////////////////////////////////////////////////////////////
     // Connection management
 

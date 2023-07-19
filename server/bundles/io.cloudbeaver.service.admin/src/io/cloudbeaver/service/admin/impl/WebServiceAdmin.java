@@ -319,6 +319,20 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
+    public boolean deleteUserCredentials(
+        @NotNull WebSession webSession,
+        @NotNull String userId,
+        @NotNull String providerId
+    ) throws DBWebException {
+        try {
+            webSession.getAdminSecurityController().deleteUserCredentials(userId, providerId);
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error setting user credentials", e);
+        }
+    }
+
+    @Override
     public Boolean enableUser(@NotNull WebSession webSession, @NotNull String userID, @NotNull Boolean enabled) throws DBWebException {
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
