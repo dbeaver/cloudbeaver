@@ -72,7 +72,7 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
         </>
       )}
       {ssh && keyAuth && <SSHKeyUploader state={state} disabled={disabled} />}
-      <ObjectPropertyInfoForm state={state.secureProperties} properties={properties ?? []} hideEmptyPlaceholder />
+      {!ssh && <ObjectPropertyInfoForm state={state.secureProperties} properties={properties ?? []} hideEmptyPlaceholder />}
       {allowSaveCredentials && (
         <FieldCheckbox
           id={id + ' savePassword'}

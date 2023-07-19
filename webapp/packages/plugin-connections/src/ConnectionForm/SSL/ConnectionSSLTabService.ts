@@ -98,7 +98,9 @@ export class ConnectionSSLTabService extends Bootstrap {
     }
 
     if (!state.config.networkHandlersConfig.some(state => state.id === handler.id)) {
-      const config = initialConfig ? { ...initialConfig } : { id: handler.id, ...getDefaultConfig() };
+      const config: NetworkHandlerConfigInput = initialConfig
+        ? { ...initialConfig, properties: toJS(initialConfig.properties), secureProperties: toJS(initialConfig.secureProperties) }
+        : { id: handler.id, ...getDefaultConfig() };
 
       if (config.secureProperties) {
         config.properties = { ...config.properties, ...config.secureProperties };
@@ -131,7 +133,11 @@ export class ConnectionSSLTabService extends Bootstrap {
     }
 
     const initial = state.info?.networkHandlersConfig?.find(h => h.id === handler.id);
-    const handlerConfig = { ...handler };
+    const handlerConfig: NetworkHandlerConfigInput = {
+      ...handler,
+      properties: toJS(handler.properties),
+      secureProperties: toJS(handler.secureProperties),
+    };
 
     if (descriptor) {
       for (const [key, value] of Object.entries(handlerConfig.properties)) {
