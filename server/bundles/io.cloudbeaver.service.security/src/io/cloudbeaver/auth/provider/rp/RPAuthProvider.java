@@ -28,6 +28,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMController;
 
 import java.util.Map;
@@ -58,7 +59,11 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession> {
 
     @NotNull
     @Override
-    public DBWUserIdentity getUserIdentity(@NotNull DBRProgressMonitor monitor, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> authParameters) throws DBException {
+    public DBWUserIdentity getUserIdentity(
+        @NotNull DBRProgressMonitor monitor,
+        @Nullable SMAuthProviderCustomConfiguration customConfiguration,
+        @NotNull Map<String, Object> authParameters
+    ) throws DBException {
         String userName = String.valueOf(authParameters.get("user"));
         return new DBWUserIdentity(userName, userName);
     }
@@ -70,7 +75,12 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession> {
     }
 
     @Override
-    public SMSession openSession(@NotNull DBRProgressMonitor monitor, @NotNull SMSession mainSession, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> userCredentials) throws DBException {
+    public SMSession openSession(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull SMSession mainSession,
+        @Nullable SMAuthProviderCustomConfiguration customConfiguration,
+        @NotNull Map<String, Object> userCredentials
+    ) throws DBException {
         return new LocalAuthSession(mainSession, (String) userCredentials.get("user"));
     }
 

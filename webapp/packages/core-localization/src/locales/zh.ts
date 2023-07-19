@@ -87,6 +87,7 @@ export default [
   ['ui_close_all_to_the_left', 'Close all to the Left'],
   ['ui_or', 'Or'],
   ['ui_download', 'Download'],
+  ['ui_import', 'Import'],
   ['ui_view', 'View'],
   ['ui_limit', 'Limit'],
   ['ui_file_size', 'File size'],

@@ -11,12 +11,12 @@ import { useCallback, useMemo, useState } from 'react';
 import styled from 'reshadow';
 
 import { Button } from '../Button';
-import { ShadowInput } from '../FormControls/ShadowInput';
+import { Filter } from '../FormControls/Filter';
 import { useTranslate } from '../localization/useTranslate';
 import { useObjectRef } from '../useObjectRef';
 import type { IProperty } from './IProperty';
 import { PropertyItem } from './PropertyItem';
-import { PROPERTIES_TABLE_ADD_STYLES, PROPERTIES_TABLE_STYLES } from './styles';
+import { PROPERTIES_FILTER_STYLES, PROPERTIES_TABLE_ADD_STYLES, PROPERTIES_TABLE_STYLES } from './styles';
 
 type PropertiesState = Record<string, string | null>;
 
@@ -121,7 +121,12 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
         <properties-header-name>
           <div>{translate('core_block_properties_table_name')}</div>
           {props.filterable ? (
-            <ShadowInput value={filterValue} placeholder={translate('core_block_properties_table_filter_name')} onChange={setFilterValue} />
+            <Filter
+              value={filterValue}
+              placeholder={translate('core_block_properties_table_filter_name')}
+              style={PROPERTIES_FILTER_STYLES}
+              onFilter={setFilterValue}
+            />
           ) : null}
         </properties-header-name>
         <properties-header-value>{translate('core_block_properties_table_value')}</properties-header-value>
