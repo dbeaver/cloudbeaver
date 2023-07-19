@@ -20,7 +20,7 @@ import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
 import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
-import { getDefaultConfig } from './getDefaultConfig';
+import { getSSLDefaultConfig } from './getSSLDefaultConfig';
 import { getSSLDriverHandler } from './getSSLDriverHandler';
 import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME';
@@ -100,7 +100,7 @@ export class ConnectionSSLTabService extends Bootstrap {
     if (!state.config.networkHandlersConfig.some(state => state.id === handler.id)) {
       const config: NetworkHandlerConfigInput = initialConfig
         ? { ...initialConfig, properties: toJS(initialConfig.properties), secureProperties: toJS(initialConfig.secureProperties) }
-        : { id: handler.id, ...getDefaultConfig() };
+        : getSSLDefaultConfig(handler.id);
 
       if (config.secureProperties) {
         config.properties = { ...config.properties, ...config.secureProperties };
@@ -139,14 +139,31 @@ export class ConnectionSSLTabService extends Bootstrap {
       secureProperties: toJS(handler.secureProperties),
     };
 
-    if (descriptor) {
+    const changed = this.isChanged(handlerConfig, initial);
+
+    if (changed && descriptor) {
       for (const [key, value] of Object.entries(handlerConfig.properties)) {
         const secured = descriptor.properties.find(p => p.id === key)?.features.includes(PROPERTY_FEATURE_SECURED);
 
         if (secured) {
-          handlerConfig.secureProperties[key] = toJS(value);
+          const propertyChanged = initial?.secureProperties?.[key] !== value;
+
+          if (propertyChanged) {
+            handlerConfig.secureProperties[key] = toJS(value);
+          } else {
+            delete handlerConfig.secureProperties[key];
+          }
+
           delete handlerConfig.properties[key];
         }
+      }
+
+      if (Object.keys(handlerConfig.secureProperties).length === 0) {
+        delete handlerConfig.secureProperties;
+      }
+
+      if (Object.keys(handlerConfig.properties).length === 0) {
+        delete handlerConfig.properties;
       }
     }
 
@@ -154,7 +171,7 @@ export class ConnectionSSLTabService extends Bootstrap {
       credentialsState.requireNetworkHandler(handler.id);
     }
 
-    if (handlerConfig) {
+    if (changed) {
       if (!config.networkHandlersConfig) {
         config.networkHandlersConfig = [];
       }
@@ -177,10 +194,12 @@ export class ConnectionSSLTabService extends Bootstrap {
       return false;
     }
 
+    const initialProperties = { ...(initial?.properties ?? {}), ...(initial?.secureProperties ?? {}) };
+
     if (
       handler.enabled !== initial?.enabled ||
       handler.savePassword !== initial?.savePassword ||
-      !isObjectsEqual(handler.secureProperties, initial?.secureProperties)
+      !isObjectsEqual(handler.properties, initialProperties)
     ) {
       return true;
     }

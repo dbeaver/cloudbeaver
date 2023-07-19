@@ -26,6 +26,7 @@ import type { NetworkHandlerConfigInput, NetworkHandlerDescriptor } from '@cloud
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
+import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR';
 
 const SSl_STYLES = css`
   SubmittingForm {
@@ -52,6 +53,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
 
   const disabled = formDisabled || loading;
   const enabled = handlerState.enabled || false;
+  const initialHandler = info?.networkHandlersConfig?.find(h => h.id === handler.id);
 
   return styled(styles)(
     <SubmittingForm>
@@ -66,6 +68,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
               properties={handler.properties}
               category={null}
               disabled={disabled || readonly || !enabled}
+              isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
               hideEmptyPlaceholder
               showRememberTip
               small
@@ -80,6 +83,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
                 properties={handler.properties}
                 category={category}
                 disabled={disabled || readonly || !enabled}
+                isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
                 hideEmptyPlaceholder
                 showRememberTip
                 small

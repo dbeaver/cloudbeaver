@@ -13,7 +13,7 @@ import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { TabContainerTabComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
-import { getDefaultConfig } from './getDefaultConfig';
+import { getSSLDefaultConfig } from './getSSLDefaultConfig';
 import { getSSLDriverHandler } from './getSSLDriverHandler';
 import { SSL } from './SSL';
 
@@ -25,12 +25,8 @@ export const SSLPanel: TabContainerTabComponent<IConnectionFormProps> = observer
   const handler = getSSLDriverHandler(networkHandlerResource.resource.values, dbDriverResource.data?.applicableNetworkHandlers ?? []);
 
   if (handler && !props.state.config.networkHandlersConfig?.some(state => state.id === handler?.id)) {
-    props.state.config.networkHandlersConfig?.push({
-      id: handler.id,
-      ...getDefaultConfig(),
-    });
+    props.state.config.networkHandlersConfig?.push(getSSLDefaultConfig(handler.id));
   }
-
 
   const handlerState = props.state.config.networkHandlersConfig?.find(h => h.id === handler?.id);
 
