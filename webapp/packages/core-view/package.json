@@ -22,7 +22,7 @@
     "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-extensions": "~0.1.0",
     "@cloudbeaver/core-theming": "~0.1.0",
-    "react-hotkeys-hook": "~3.4.7"
+    "react-hotkeys-hook": "~4.4.1"
   },
   "peerDependencies": {
     "mobx": "~6.x.x",

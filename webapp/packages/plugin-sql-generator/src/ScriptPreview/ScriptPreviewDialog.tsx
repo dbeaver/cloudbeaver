@@ -12,6 +12,7 @@ import { Button, useClipboard, useResource, useTranslate } from '@cloudbeaver/co
 import { ConnectionDialectResource, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
 
@@ -53,6 +54,8 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
     contextInfo ? createConnectionParam(contextInfo.projectId, contextInfo.connectionId) : null,
   );
   const sqlDialect = useSqlDialectExtension(dialect.data);
+  const extensions = useCodemirrorExtensions();
+  extensions.set(...sqlDialect);
 
   const apply = async () => {
     await payload.model.save();
@@ -64,7 +67,7 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
       <CommonDialogHeader title="data_viewer_script_preview_dialog_title" icon="sql-script" onReject={rejectDialog} />
       <CommonDialogBody noBodyPadding noOverflow>
         <wrapper>
-          <SQLCodeEditorLoader value={payload.script} extensions={[sqlDialect]} lineNumbers readonly />
+          <SQLCodeEditorLoader value={payload.script} extensions={extensions} lineNumbers readonly />
         </wrapper>
       </CommonDialogBody>
       <CommonDialogFooter>

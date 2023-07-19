@@ -702,7 +702,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     public Map<String, Object> readConfigurationFile(File configFile) throws DBException {
         try (Reader reader = new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8)) {
             return JSONUtils.parseMap(getGson(), reader);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new DBException("Error parsing server configuration", e);
         }
     }

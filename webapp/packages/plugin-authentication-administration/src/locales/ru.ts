@@ -11,6 +11,7 @@ export default [
   ['authentication_administration_user_connections_empty', 'Нет доступных коннекшенов'],
   ['authentication_administration_user_origin_empty', 'Дополнительная информация не доступна'],
   ['authentication_administration_user_info', 'Общее'],
+  ['authentication_administration_user_local', 'Локальный пользователь'],
   ['authentication_administration_item', 'Управление доступом'],
   ['authentication_administration_item_users', 'Пользователи'],
   ['authentication_administration_item_metaParameters', 'Свойства Пользователей'],
@@ -29,6 +30,13 @@ export default [
   ['authentication_administration_users_filters_status_enabled', 'ВКЛЮЧЕН'],
   ['authentication_administration_users_filters_status_disabled', 'ВЫКЛЮЧЕН'],
   ['authentication_administration_users_filters_status_all', 'ВСЕ'],
+
+  ['authentication_administration_user_remove_credentials_error', 'Не удалось удалить учетные данные пользователя'],
+  ['authentication_administration_user_remove_credentials_success', 'Учетные данные пользователя удалены'],
+  [
+    'authentication_administration_user_remove_credentials_confirmation_message',
+    'Вы уверены что хотите удалить "{arg:originName}" учетные данные у "{arg:userId}"?',
+  ],
 
   ['administration_configuration_wizard_configuration_admin', 'Учетные данные администратора'],
   ['administration_configuration_wizard_configuration_admin_name', 'Логин'],

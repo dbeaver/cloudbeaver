@@ -1,10 +1,12 @@
 import { createComplexLoader } from '@cloudbeaver/core-blocks';
 
+export * from './ReactCodemirrorPanel';
 export * from './EditorLoader';
 export * from './IEditorProps';
 export * from './IEditorRef';
-export type { IDefaultExtensions } from './getDefaultExtensions';
+export * from './useEditorDefaultExtensions';
 export * from './useEditorAutocompletion';
+export * from './useCodemirrorExtensions';
 
 export * from '@codemirror/view';
 export * from '@codemirror/state';
