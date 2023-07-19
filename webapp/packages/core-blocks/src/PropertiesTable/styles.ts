@@ -57,13 +57,34 @@ export const PROPERTIES_TABLE_STYLES = css`
     height: 24px;
     pointer-events: none;
   }
+`;
 
-  ShadowInput {
+export const PROPERTIES_FIlTER_STYLES = css`
+  input {
     composes: theme-background-surface from global;
     box-sizing: border-box;
     height: 24px;
     flex: 1;
     margin-left: 8px;
+  }
+
+  IconButton {
+    right: 0px;
+    top: 0px;
+    width: 20px;
+    height: 20px;
+
+    &[|toggled] {
+      right: 0px;
+      top: 0px;
+    }
+
+    &[name='cross'] {
+      width: 14px;
+      height: 14px;
+      top: 5px;
+      right: 0;
+    }
   }
 `;
 
