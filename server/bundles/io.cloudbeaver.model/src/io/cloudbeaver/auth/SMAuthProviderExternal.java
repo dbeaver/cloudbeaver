@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 
 import java.util.Map;
 
@@ -51,7 +52,7 @@ public interface SMAuthProviderExternal<AUTH_SESSION extends SMSession> extends 
     @NotNull
     DBWUserIdentity getUserIdentity(
         @NotNull DBRProgressMonitor monitor,
-        @NotNull Map<String, Object> providerConfig,
+        @Nullable SMAuthProviderCustomConfiguration customConfiguration,
         @NotNull Map<String, Object> authParameters) throws DBException;
 
     /**
