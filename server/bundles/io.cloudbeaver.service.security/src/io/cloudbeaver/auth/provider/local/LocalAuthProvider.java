@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.model.auth.AuthPropertyEncryption;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.utils.CommonUtils;
 
@@ -74,7 +75,12 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
     }
 
     @Override
-    public LocalAuthSession openSession(@NotNull DBRProgressMonitor monitor, @NotNull SMSession mainSession, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> userCredentials) throws DBException {
+    public LocalAuthSession openSession(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull SMSession mainSession,
+        @Nullable SMAuthProviderCustomConfiguration customConfiguration,
+        @NotNull Map<String, Object> userCredentials
+    ) throws DBException {
         String userName = CommonUtils.toString(userCredentials.get(CRED_USER));
         if (CommonUtils.isEmpty(userName)) {
             throw new DBException("Invalid user name");
