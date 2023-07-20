@@ -46,6 +46,12 @@ const filterStyles = css`
       right: 4px;
       top: 4px;
     }
+    &[name='cross'] {
+      width: 16px;
+      height: 16px;
+      top: 8px;
+      right: 8px;
+    }
   }
 `;
 
@@ -163,7 +169,11 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
         onKeyDown={onKeyDown}
         {...use({ toggled, max })}
       />
-      <IconButton name="search" disabled={disabled} onClick={toggle} {...use({ toggled })} />
+      {String(value) ? (
+        <IconButton name="cross" disabled={disabled} onClick={() => filter('', name)} />
+      ) : (
+        <IconButton name="search" disabled={disabled} onClick={toggle} {...use({ toggled })} />
+      )}
     </filter-container>,
   );
 });

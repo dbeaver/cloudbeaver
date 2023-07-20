@@ -16,7 +16,7 @@ import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { createPath, getPathName } from '@cloudbeaver/core-utils';
 import { ACTION_SAVE, ActionService, DATA_CONTEXT_MENU, KEY_BINDING_SAVE, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { getResourceKeyFromNodeId, NavResourceNodeService } from '@cloudbeaver/plugin-navigation-tree-rm';
+import { getResourceKeyFromNodeId } from '@cloudbeaver/plugin-navigation-tree-rm';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 import { ResourceManagerScriptsService, SaveScriptDialog, SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
 import {
@@ -28,7 +28,6 @@ import {
   MemorySqlDataSource,
   SQL_EDITOR_TOOLS_MENU,
   SqlDataSourceService,
-  SqlEditorService,
   SqlEditorSettingsService,
 } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
@@ -41,7 +40,6 @@ import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
-    private readonly navResourceNodeService: NavResourceNodeService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navigationTabsService: NavigationTabsService,
     private readonly notificationService: NotificationService,
@@ -55,7 +53,6 @@ export class PluginBootstrap extends Bootstrap {
     private readonly menuService: MenuService,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
-    private readonly sqlEditorService: SqlEditorService,
     private readonly resourceManagerResource: ResourceManagerResource,
     private readonly resourceManagerScriptsService: ResourceManagerScriptsService,
     private readonly keyBindingService: KeyBindingService,
@@ -70,33 +67,24 @@ export class PluginBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'scripts-base-handler',
       isActionApplicable: (context, action): boolean => {
-        if (action === ACTION_SAVE_AS_SCRIPT || action === ACTION_SAVE) {
-          const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
 
-          if (!state) {
-            return false;
-          }
-
-          if (!this.projectsService.activeProjects.some(project => project.canEditResources)) {
-            return false;
-          }
-
-          const dataSource = this.sqlDataSourceService.get(state.editorId);
-
-          if (action === ACTION_SAVE_AS_SCRIPT) {
-            return dataSource instanceof MemorySqlDataSource || dataSource instanceof LocalStorageSqlDataSource;
-          }
-
-          if (action === ACTION_SAVE) {
-            return dataSource instanceof ResourceSqlDataSource;
-          }
+        if (!state) {
+          return false;
         }
 
-        return false;
-      },
-      isHidden: (context, action) => {
+        if (!this.projectsService.activeProjects.some(project => project.canEditResources)) {
+          return false;
+        }
+
+        const dataSource = this.sqlDataSourceService.get(state.editorId);
+
+        if (action === ACTION_SAVE_AS_SCRIPT) {
+          return dataSource instanceof MemorySqlDataSource || dataSource instanceof LocalStorageSqlDataSource;
+        }
+
         if (action === ACTION_SAVE) {
-          return this.sqlEditorService.autoSave;
+          return dataSource?.isAutoSaveEnabled === false;
         }
 
         return false;
@@ -196,7 +184,7 @@ export class PluginBootstrap extends Bootstrap {
             return true;
           }
 
-          return source.isLoading() || source.isSaved();
+          return source.isLoading() || source.isSaved;
         }
 
         return false;

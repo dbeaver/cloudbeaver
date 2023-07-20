@@ -31,5 +31,5 @@ interface Props {
 }
 
 export const SqlEditorStatusBar = observer<Props>(function SqlEditorStatusBar({ dataSource }) {
-  return styled(viewerStyles)(<Loader state={dataSource} message={dataSource?.message} small inline inlineException />);
+  return styled(viewerStyles)(<Loader state={dataSource} message={dataSource?.message} inline inlineException />);
 });

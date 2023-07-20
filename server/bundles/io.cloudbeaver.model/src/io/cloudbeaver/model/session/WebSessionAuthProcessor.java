@@ -103,7 +103,6 @@ public class WebSessionAuthProcessor {
             String userId = curUser.getUserId();
 
             var securityController = webSession.getSecurityController();
-            Map<String, Object> providerConfig = Collections.emptyMap();
             var newAuthInfos = new ArrayList<WebAuthInfo>();
             for (Map.Entry<SMAuthConfigurationReference, Object> entry : authInfo.getAuthData().entrySet()) {
                 SMAuthConfigurationReference authConfiguration = entry.getKey();
@@ -138,7 +137,10 @@ public class WebSessionAuthProcessor {
                 }
 
                 DBWUserIdentity userIdentity = null;
-
+                var providerConfigId = authConfiguration.getAuthProviderConfigurationId();
+                var providerConfig = WebAppUtils.getWebAuthApplication()
+                    .getAuthConfiguration()
+                    .getAuthProviderConfiguration(providerConfigId);
                 if (authProviderExternal != null) {
                     try {
                         userIdentity =

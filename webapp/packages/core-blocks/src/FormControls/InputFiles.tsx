@@ -60,6 +60,8 @@ type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 
     mod?: 'surface';
     ref?: React.Ref<HTMLInputElement>;
     style?: ComponentStyle;
+    aggregate?: boolean;
+    onDuplicate?: (files: File[]) => void;
   };
 
 type ControlledProps = BaseProps & {
@@ -100,7 +102,9 @@ export const InputFiles: InputFilesType = observer(
       hideTags,
       mod,
       autoHide,
+      aggregate,
       onChange,
+      onDuplicate,
       ...rest
     }: ControlledProps | ObjectProps<any, any>,
     refInherit: React.Ref<HTMLInputElement>,
@@ -121,6 +125,30 @@ export const InputFiles: InputFilesType = observer(
     }
 
     function setValue(value: FileList | null) {
+      if (aggregate) {
+        if (value) {
+          const currentFiles = Array.from(innerState || []);
+          const newFiles = Array.from(value);
+          const existingFiles = new Set();
+          const aggregation = new DataTransfer();
+
+          for (const file of [...currentFiles, ...newFiles]) {
+            if (!existingFiles.has(file.name)) {
+              aggregation.items.add(file);
+              existingFiles.add(file.name);
+            }
+          }
+
+          const duplication = newFiles.filter(n => currentFiles.some(c => c.name === n.name));
+
+          if (duplication.length > 0) {
+            onDuplicate?.(duplication);
+          }
+
+          value = aggregation.files;
+        }
+      }
+
       setInnerState(value);
       if (state) {
         state[name] = value;

@@ -16,6 +16,7 @@ import {
 } from '@cloudbeaver/core-connections';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
+import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
 
@@ -36,13 +37,15 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
   const connectionParam = connection ? createConnectionParam(connection) : null;
   const connectionDialectResource = useResource(DDLViewerTabPanel, ConnectionDialectResource, connectionParam);
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
+  const extensions = useCodemirrorExtensions();
+  extensions.set(...sqlDialect);
 
   menu.context.set(DATA_CONTEXT_DDL_VIEWER_NODE, nodeId);
   menu.context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, ddlResource.data);
 
   return (
     <div className={s(styles, { wrapper: true })}>
-      <SQLCodeEditorLoader className={s(styles, { sqlCodeEditorLoader: true })} value={ddlResource.data ?? ''} extensions={[sqlDialect]} readonly />
+      <SQLCodeEditorLoader className={s(styles, { sqlCodeEditorLoader: true })} value={ddlResource.data ?? ''} extensions={extensions} readonly />
       <MenuBar className={s(styles, { menuBar: true })} menu={menu} />
     </div>
   );

@@ -17,12 +17,25 @@
   "dependencies": {
     "@cloudbeaver/core-blocks": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
-    "@codemirror/lang-html": "^6.4.4",
-    "@codemirror/lang-javascript": "^6.1.9",
-    "@codemirror/lang-json": "^6.0.1",
-    "@codemirror/lang-sql": "^6.5.0",
-    "@codemirror/lang-xml": "^6.0.2",
-    "codemirror": "^6.0.1"
+    "@codemirror/lang-html": "6.4.5",
+    "@codemirror/lang-javascript": "6.1.9",
+    "@codemirror/lang-json": "6.0.1",
+    "@codemirror/lang-sql": "6.5.2",
+    "@codemirror/lang-xml": "6.0.2",
+    "@codemirror/merge": "6.1.1",
+    "@codemirror/commands": "6.2.4",
+    "@codemirror/autocomplete": "6.8.1",
+    "@codemirror/search": "6.5.0",
+    "@codemirror/language": "6.8.0",
+    "@codemirror/state": "6.2.1",
+    "@codemirror/view": "6.14.1"
   },
-  "peerDependencies": {}
+  "peerDependencies": {
+    "react": "~18.x.x",
+    "react-dom": "~18.x.x",
+    "mobx": "~6.x.x",
+    "mobx-react-lite": "~3.x.x",
+    "reshadow": "~0.x.x",
+    "@testing-library/jest-dom": "~5.x.x"
+  }
 }

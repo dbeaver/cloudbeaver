@@ -10,10 +10,10 @@ import { NAV_NODE_TYPE_PROJECT } from '@cloudbeaver/core-projects';
 import { elementsTreeNameFilterNode } from '../ElementsTree/elementsTreeNameFilter';
 import { EEquality, type NavNodeFilterCompareFn } from '../ElementsTree/NavNodeFilterCompareFn';
 
-export const navigationTreeProjectSearchCompare: NavNodeFilterCompareFn = function navigationTreeProjectSearchCompare(node, filter) {
+export const navigationTreeProjectSearchCompare: NavNodeFilterCompareFn = function navigationTreeProjectSearchCompare(tree, node, filter) {
   if (node.nodeType === NAV_NODE_TYPE_PROJECT) {
     return EEquality.none;
   }
 
-  return elementsTreeNameFilterNode(node, filter);
+  return elementsTreeNameFilterNode(tree, node, filter);
 };
