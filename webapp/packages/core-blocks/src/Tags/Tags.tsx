@@ -6,28 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './Tags.m.css';
 
 interface Props {
   className?: string;
 }
 
-const style = css`
-  tags {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-`;
-
 export const Tags = observer<React.PropsWithChildren<Props>>(function Tags({ children, className }) {
-  return styled(style)(
-    <tags as="ul" className={className}>
+  const styles = useS(style);
+  
+  return (
+    <ul className={s(styles, { tags: true }, className)}>
       {children}
-    </tags>,
+    </ul>
   );
 });
