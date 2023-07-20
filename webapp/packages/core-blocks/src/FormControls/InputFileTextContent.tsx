@@ -7,12 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 import { ReactNode, useContext, useState } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { blobToData, bytesToSize } from '@cloudbeaver/core-utils';
 
 import { Button } from '../Button';
+import { getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { IconButton } from '../IconButton';
@@ -94,6 +95,7 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
   const [selected, setSelected] = useState<File | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
+  const layoutProps = getLayoutProps(rest);
   const styles = useStyles(INPUT_FILE_FIELD_STYLES, baseFormControlStyles, style, error ? baseInvalidFormControlStyles : baseValidFormControlStyles);
   const sizeStyles = useS(elementsSizeStyles);
 
@@ -164,7 +166,7 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
   }
 
   return styled(styles)(
-    <field className={s(sizeStyles, { ...rest }, className)}>
+    <field className={s(sizeStyles, { ...layoutProps }, className)}>
       <field-label title={labelTooltip}>
         {children}
         {required && ' *'}

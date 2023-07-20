@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, type PlaceholderComponent, PlaceholderElement, Switch, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { type PlaceholderComponent, PlaceholderElement, Switch, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import type { IElementsTreeSettingsProps } from '@cloudbeaver/plugin-navigation-tree';
@@ -18,7 +18,7 @@ export const ProjectsSettingsForm: PlaceholderComponent<IElementsTreeSettingsPro
   style,
 }) {
   const projectsService = useService(ProjectsService);
-  const styles = useStyles(BASE_CONTAINERS_STYLES, style);
+  const styles = useStyles(style);
   const translate = useTranslate();
 
   if (!settings || projectsService.activeProjects.length <= 1) {

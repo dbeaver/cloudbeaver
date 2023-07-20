@@ -11,7 +11,6 @@ import { useCallback, useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Group,
   StaticImage,
@@ -45,7 +44,7 @@ const styles = css`
 `;
 
 export const ConnectionAccess: TabContainerPanelComponent<IUserFormProps> = observer(function ConnectionAccess({ controller, editing }) {
-  const style = useStyles(styles, BASE_CONTAINERS_STYLES);
+  const style = useStyles(styles);
   const translate = useTranslate();
   const driversResource = useService(DBDriverResource);
   const getConnectionPermission = useCallback(

@@ -11,7 +11,6 @@ import styled, { css } from 'reshadow';
 
 import { AuthRolesResource, UserMetaParametersResource } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Combobox,
   Container,
@@ -40,7 +39,7 @@ const styles = css`
 `;
 
 export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(function UserInfo({ controller, editing }) {
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles);
+  const style = useStyles(styles);
   const translate = useTranslate();
   const userMetaParameters = useResource(UserInfo, UserMetaParametersResource, undefined);
   const authRoles = useResource(UserInfo, AuthRolesResource, undefined);

@@ -10,16 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import {
-  BASE_CONTAINERS_STYLES,
-  ColoredContainer,
-  Group,
-  IProperty,
-  Loader,
-  PropertiesTable,
-  useResource,
-  useStyles,
-} from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Group, IProperty, PropertiesTable, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
@@ -42,7 +33,7 @@ const styles = css`
 `;
 
 export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> = observer(function DriverProperties({ tabId, state: formState }) {
-  const style = useStyles(styles, BASE_CONTAINERS_STYLES);
+  const style = useStyles(styles);
   const { selected } = useTab(tabId);
 
   const [state] = useState(() => {

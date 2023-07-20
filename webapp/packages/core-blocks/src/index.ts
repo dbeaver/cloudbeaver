@@ -120,14 +120,6 @@ export * from './FormControls/BASE_DROPDOWN_STYLES';
 export * from './FormControls/FormBox';
 export * from './FormControls/Filter';
 
-export * from './Containers/BASE_CONTAINERS_STYLES';
-export { default as ContainerStyles } from './Containers/Container.m.css';
-export { default as ColoredContainerStyles } from './Containers/ColoredContainer.m.css';
-export { default as GroupStyles } from './Containers/Group.m.css';
-export { default as GroupCloseStyles } from './Containers/GroupClose.m.css';
-export { default as GroupItemStyles } from './Containers/GroupItem.m.css';
-export { default as GroupSubTitleStyles } from './Containers/GroupSubTitle.m.css';
-export { default as GroupTitleStyles } from './Containers/GroupTitle.m.css';
 export * from './Containers/Container';
 export * from './Containers/Group';
 export * from './Containers/GroupClose';

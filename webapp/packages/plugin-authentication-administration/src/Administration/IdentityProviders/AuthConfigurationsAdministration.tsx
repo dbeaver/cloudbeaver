@@ -9,17 +9,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
-import {
-  BASE_CONTAINERS_STYLES,
-  ColoredContainer,
-  Container,
-  Group,
-  Loader,
-  ToolsAction,
-  ToolsPanel,
-  useStyles,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, Loader, ToolsAction, ToolsPanel, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { AuthConfigurationsTable } from './AuthConfigurationsTable/AuthConfigurationsTable';
@@ -41,7 +31,7 @@ const styles = css`
 
 export const AuthConfigurationsAdministration: AdministrationItemContentComponent = observer(function AuthConfigurationsAdministration({ sub }) {
   const translate = useTranslate();
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
+  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
   const service = useService(CreateAuthConfigurationService);
 
   const table = useConfigurationsTable();

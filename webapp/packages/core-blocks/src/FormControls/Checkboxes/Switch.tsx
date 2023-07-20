@@ -68,7 +68,7 @@ export const Switch: SwitchType = observer(function Switch({
   }
 
   return (
-    <field className={className} title={rest.title}>
+    <div data-testid="field" className={s(styles, { field: true }, className)} title={rest.title}>
       <div data-testid="switch-body" className={styles.switchBody}>
         <div data-testid="switch-control" className={s(styles, { switchControl: true, disabled: disabled, checked: checkboxState.checked })}>
           <div data-testid="switch-control-track" className={styles.switchControlTrack} />
@@ -97,6 +97,6 @@ export const Switch: SwitchType = observer(function Switch({
           {description}
         </div>
       )}
-    </field>
+    </div>
   );
 });

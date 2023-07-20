@@ -29,10 +29,10 @@
     height: 100%;
   }
 }
-input[disabled] + .iconContainer {
+.input[disabled] + .iconContainer {
   cursor: auto;
   opacity: 0.8;
 }
-input:not(:only-child) {
+.input:not(:only-child) {
   padding-right: 32px !important;
 }

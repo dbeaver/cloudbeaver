@@ -11,7 +11,6 @@ import styled, { css } from 'reshadow';
 
 import { AUTH_PROVIDER_LOCAL_ID, EAdminPermission } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Combobox,
   Container,
@@ -168,10 +167,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     properties = info.authProperties;
   }
 
-  return styled(
-    styles,
-    BASE_CONTAINERS_STYLES,
-  )(
+  return styled(styles)(
     <SubmittingForm ref={formRef} disabled={driverMap.isLoading()} onChange={handleFormChange}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>

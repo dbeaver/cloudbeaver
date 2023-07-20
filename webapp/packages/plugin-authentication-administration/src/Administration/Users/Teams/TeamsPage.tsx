@@ -9,16 +9,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
-import {
-  BASE_CONTAINERS_STYLES,
-  ColoredContainer,
-  Container,
-  Group,
-  ToolsAction,
-  ToolsPanel,
-  useStyles,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, ToolsAction, ToolsPanel, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { CreateTeam } from './CreateTeam';
@@ -39,7 +30,7 @@ interface Props {
 
 export const TeamsPage = observer<Props>(function TeamsPage({ sub, param }) {
   const translate = useTranslate();
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
+  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
   const service = useService(CreateTeamService);
 
   const table = useTeamsTable();

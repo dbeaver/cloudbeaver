@@ -30,8 +30,8 @@
   composes: theme-text-negative from global;
 }
 
-input,
-textarea {
+.input,
+.textarea {
   font-size: 12px;
 
   &.select {

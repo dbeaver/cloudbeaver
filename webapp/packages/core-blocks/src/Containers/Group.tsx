@@ -10,7 +10,7 @@ import { forwardRef } from 'react';
 import { s } from '../s';
 import { useS } from '../useS';
 import containerStyles from './Container.m.css';
-import { filterContainerFakeProps } from './filterContainerFakeProps';
+import { filterContainerFakeProps, getContainerProps } from './filterContainerFakeProps';
 import style from './Group.m.css';
 import type { IContainerProps } from './IContainerProps';
 import elementsSizeStyles from './shared/ElementsSize.m.css';
@@ -28,6 +28,7 @@ export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTM
 ) {
   const styles = useS(style, containerStyles, elementsSizeStyles);
   const divProps = filterContainerFakeProps(rest);
+  const containerProps = getContainerProps(rest);
 
   return (
     <div
@@ -42,7 +43,7 @@ export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTM
           center,
           boxNoOverflow,
           box,
-          ...(rest as IContainerProps),
+          ...containerProps,
         },
         className,
       )}

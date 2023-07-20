@@ -7,10 +7,11 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useCallback, useContext, useState } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled, { use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { Icon } from '../Icon';
@@ -92,6 +93,7 @@ export const InputField: InputFieldType = observer(
     const capsLock = useCapsLockTracker();
     const [passwordRevealed, setPasswordRevealed] = useState(false);
     const translate = useTranslate();
+    const layoutProps = getLayoutProps(rest);
     const propStyles = useStyles(style);
     const styles = useS(inputFieldStyle, formControlStyles, elementsSizeStyles);
     const context = useContext(FormContext);
@@ -146,7 +148,7 @@ export const InputField: InputFieldType = observer(
     }
 
     return styled(propStyles)(
-      <div data-testid="field" className={s(styles, { ...(rest as ILayoutSizeProps), field: true }, className)}>
+      <div data-testid="field" className={s(styles, { ...layoutProps, field: true }, className)}>
         <div data-testid="field-label" title={labelTooltip || rest.title} className={styles.fieldLabel}>
           {children}
           {required && ' *'}
@@ -158,6 +160,7 @@ export const InputField: InputFieldType = observer(
             type={passwordRevealed ? 'text' : rest.type}
             name={name}
             value={value ?? ''}
+            className={styles.input}
             onChange={handleChange}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}

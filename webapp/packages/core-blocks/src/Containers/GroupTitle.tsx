@@ -7,7 +7,7 @@
  */
 import { s } from '../s';
 import { useS } from '../useS';
-import { filterLayoutFakeProps } from './filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from './filterLayoutFakeProps';
 import styles from './GroupTitle.m.css';
 import type { ILayoutSizeProps } from './ILayoutSizeProps';
 import elementsSizeStyles from './shared/ElementsSize.m.css';
@@ -15,5 +15,6 @@ import elementsSizeStyles from './shared/ElementsSize.m.css';
 export const GroupTitle: React.FC<ILayoutSizeProps & React.HTMLAttributes<HTMLHeadingElement>> = function GroupTitle({ className, ...rest }) {
   const style = useS(styles, elementsSizeStyles);
   const divProps = filterLayoutFakeProps(rest);
-  return <h2 {...divProps} className={s(style, { groupTitle: true, ...(rest as ILayoutSizeProps) }, className)} />;
+  const layoutProps = getLayoutProps(rest);
+  return <h2 {...divProps} className={s(style, { groupTitle: true, ...layoutProps }, className)} />;
 };

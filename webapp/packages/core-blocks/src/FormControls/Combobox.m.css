@@ -8,7 +8,7 @@
   }
 }
 
-.field input {
+.field .input {
   margin: 0;
 }
 
@@ -19,7 +19,7 @@
   font-weight: 500;
 }
 
-input {
+.input {
   padding-right: 24px !important;
 }
 
@@ -110,7 +110,7 @@ input {
       height: 100%;
     }
 
-    &:not(:empty) + input {
+    &:not(:empty) + .input {
       padding-left: 34px !important;
     }
   }

@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, GroupItem, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
+import { Group, GroupItem, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
 
 const style = css`
   GroupItem {
@@ -21,10 +21,7 @@ const style = css`
 
 export const Recommendations = observer(function Recommendations() {
   const translate = useTranslate();
-  return styled(
-    BASE_CONTAINERS_STYLES,
-    style,
-  )(
+  return styled(style)(
     <Group gap large>
       <GroupTitle>{translate('version_update_recommendations')}</GroupTitle>
       <GroupItem>

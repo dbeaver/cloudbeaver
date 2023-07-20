@@ -7,12 +7,13 @@
  */
 import { s } from '../s';
 import { useS } from '../useS';
-import { filterLayoutFakeProps } from './filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from './filterLayoutFakeProps';
 import styles from './GroupItem.m.css';
 import type { ILayoutSizeProps } from './ILayoutSizeProps';
 
 export const GroupItem: React.FC<ILayoutSizeProps & React.HTMLAttributes<HTMLDivElement>> = function GroupItem({ className, ...rest }) {
   const style = useS(styles);
   const divProps = filterLayoutFakeProps(rest);
-  return <div {...divProps} className={s(style, { groupItem: true, ...(rest as ILayoutSizeProps) }, className)} />;
+  const layoutProps = getLayoutProps(rest);
+  return <div {...divProps} className={s(style, { groupItem: true, ...layoutProps }, className)} />;
 };
