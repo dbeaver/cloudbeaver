@@ -33,15 +33,17 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.SMStandardMeta;
 import org.jkiss.dbeaver.model.security.exception.SMException;
+import org.jkiss.utils.CommonUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class RPSessionHandler implements DBWSessionHandler {
 
@@ -68,11 +70,19 @@ public class RPSessionHandler implements DBWSessionHandler {
         SMAuthProviderExternal<?> authProviderExternal = (SMAuthProviderExternal<?>) authProvider.getInstance();
         String userName = request.getHeader(RPAuthProvider.X_USER);
         String teams = request.getHeader(RPAuthProvider.X_ROLE);
+        String firstName = request.getHeader(RPAuthProvider.X_FIRST_NAME);
+        String lastName = request.getHeader(RPAuthProvider.X_LAST_NAME);
         List<String> userTeams = teams == null ? Collections.emptyList() : List.of(teams.split("\\|"));
         if (userName != null) {
             try {
                 Map<String, Object> credentials = new HashMap<>();
                 credentials.put("user", userName);
+                if (!CommonUtils.isEmpty(firstName)) {
+                    credentials.put(SMStandardMeta.META_FIRST_NAME, firstName);
+                }
+                if (!CommonUtils.isEmpty(lastName)) {
+                    credentials.put(SMStandardMeta.META_LAST_NAME, lastName);
+                }
                 Map<String, Object> sessionParameters = webSession.getSessionParameters();
                 sessionParameters.put(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS, userTeams);
                 Map<String, Object> userCredentials = authProviderExternal.authExternalUser(
