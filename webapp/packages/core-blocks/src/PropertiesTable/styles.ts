@@ -68,6 +68,10 @@ export const PROPERTIES_FILTER_STYLES = css`
     margin-left: 8px;
   }
 
+  InputField {
+    width: 100%;
+  }
+
   IconButton {
     right: 0px;
     top: 0px;
