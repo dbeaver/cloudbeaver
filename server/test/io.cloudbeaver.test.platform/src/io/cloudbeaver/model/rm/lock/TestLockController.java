@@ -18,6 +18,7 @@ package io.cloudbeaver.model.rm.lock;
 
 import io.cloudbeaver.model.app.WebApplication;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.rm.lock.RMFileLockController;
 
 import java.nio.file.Path;
 

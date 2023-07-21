@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
+import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -38,12 +39,14 @@ import java.util.List;
 public class WebSessionWorkspace implements DBPWorkspace {
 
     private final BaseWebSession session;
+    private final RMController rmController;
     private final SessionContextImpl workspaceAuthContext;
     private final List<WebProjectImpl> accessibleProjects = new ArrayList<>();
     private WebProjectImpl activeProject;
 
-    public WebSessionWorkspace(BaseWebSession session) {
+    public WebSessionWorkspace(BaseWebSession session, RMController rmController) {
         this.session = session;
+        this.rmController = rmController;
         this.workspaceAuthContext = new SessionContextImpl(null);
     }
 
@@ -163,5 +166,11 @@ public class WebSessionWorkspace implements DBPWorkspace {
     public boolean supportsRealmFeature(String feature) {
         return false;
     }
+
+    @NotNull
+    @Override
+    public RMController getResourceController() {
+        return rmController;
+    };
 
 }

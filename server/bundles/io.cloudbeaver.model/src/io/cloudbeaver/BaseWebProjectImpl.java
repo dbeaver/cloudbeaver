@@ -40,7 +40,6 @@ public class BaseWebProjectImpl extends BaseProjectImpl {
     private final Path path;
     @NotNull
     protected final DataSourceFilter dataSourceFilter;
-    private final RMController resourceController;
 
     public BaseWebProjectImpl(
         @NotNull DBPWorkspace workspace,
@@ -49,16 +48,10 @@ public class BaseWebProjectImpl extends BaseProjectImpl {
         @NotNull RMProject project,
         @NotNull DataSourceFilter dataSourceFilter
     ) {
-        super(workspace, sessionContext);
-        this.resourceController = resourceController;
+        super(workspace, resourceController, sessionContext);
         this.path = RMUtils.getProjectPath(project);
         this.project = project;
         this.dataSourceFilter = dataSourceFilter;
-    }
-
-    @NotNull
-    public RMController getResourceController() {
-        return resourceController;
     }
 
     @Override

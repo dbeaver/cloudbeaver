@@ -242,6 +242,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         }
     }
 
+    @Override
     public String getApplicationId() {
         try {
             return getApplicationInstanceId();
