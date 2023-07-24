@@ -60,6 +60,7 @@ import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Database management
@@ -275,7 +276,7 @@ public class CBDatabase {
     }
 
     @Nullable
-    CBDatabaseInitialData getInitialData() {
+    CBDatabaseInitialData getInitialData() throws DBException {
         String initialDataPath = databaseConfiguration.getInitialDataConfiguration();
         if (CommonUtils.isEmpty(initialDataPath)) {
             return null;
@@ -287,8 +288,7 @@ public class CBDatabase {
             Gson gson = new GsonBuilder().setLenient().create();
             return gson.fromJson(reader, CBDatabaseInitialData.class);
         } catch (Exception e) {
-            log.error("Error loading initial data configuration", e);
-            return null;
+            throw new DBException("Error loading initial data configuration", e);
         }
     }
 
@@ -412,15 +412,26 @@ public class CBDatabase {
 
                 String adminName = initialData.getAdminName();
                 String adminPassword = initialData.getAdminPassword();
-
-                if (!CommonUtils.isEmpty(initialData.getTeams())) {
+                List<SMTeam> initialTeams = initialData.getTeams();
+                String defaultTeam = application.getAppConfiguration().getDefaultUserTeam();
+                if (CommonUtils.isNotEmpty(defaultTeam)) {
+                    Set<String> initialTeamNames = initialTeams == null
+                        ? Set.of()
+                        : initialTeams.stream().map(SMTeam::getTeamId).collect(Collectors.toSet());
+                    if (!initialTeamNames.contains(defaultTeam)) {
+                        throw new DBException("Initial teams configuration doesn't contain default team " + defaultTeam);
+                    }
+                }
+                if (!CommonUtils.isEmpty(initialTeams)) {
                     // Create teams
-                    for (SMTeam team : initialData.getTeams()) {
+                    for (SMTeam team : initialTeams) {
                         adminSecurityController.createTeam(team.getTeamId(), team.getName(), team.getDescription(), adminName);
                         if (adminName != null && !application.isMultiNode()) {
-                            adminSecurityController.setSubjectPermissions(team.getTeamId(),
+                            adminSecurityController.setSubjectPermissions(
+                                team.getTeamId(),
                                 new ArrayList<>(team.getPermissions()),
-                                adminName);
+                                adminName
+                            );
                         }
                     }
                 }

@@ -107,7 +107,7 @@ function transformKeys(keyBinding: IKeyBinding): string[] {
 
 function transformModToDisplayKey(key: string): string {
   const OS = getOS();
-  if (OS === OperatingSystem.windowsOS) {
+  if (OS === OperatingSystem.windowsOS || OperatingSystem.linuxOS) {
     return key.replace('MOD', 'CTRL');
   }
 

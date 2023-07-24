@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.auth.provisioning.SMProvisioner;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
@@ -76,6 +77,10 @@ public class WebAuthProviderInfo {
 
     public boolean isPrivate() {
         return descriptor.isPrivate();
+    }
+
+    public boolean isSupportProvisioning() {
+        return descriptor.getInstance() instanceof SMProvisioner;
     }
 
     public List<WebAuthProviderConfiguration> getConfigurations() {

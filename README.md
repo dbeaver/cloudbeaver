@@ -22,6 +22,13 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 23.1.3 - 2023-07-24
+
+- Users can simultaneously edit resources, allowing them to work together;
+- We have improved the UX in the search bar - users can delete a query or request by clicking on the cross icon;
+- The search request considers file names and exclude the .sql file extension for now;
+- Different bug fixes and enhancements have been made.
+
 ### CloudBeaver 23.1.2 - 2023-07-10
 
 - We have improved the SQL Editor functionality by adding support for displaying tables with nested arrays of objects;
