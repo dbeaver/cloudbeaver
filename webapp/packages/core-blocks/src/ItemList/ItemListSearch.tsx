@@ -28,12 +28,12 @@ export const ItemListSearch: React.FC<IProps> = function ItemListSearch({ value,
   const [search, setSearch] = useState(value ?? '');
   const translate = useTranslate();
   const changeHandler = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+    (changeValue: string) => {
       if (value === undefined) {
-        setSearch(event.target.value);
+        setSearch(changeValue);
       }
       if (onChange) {
-        onChange(event.target.value);
+        onChange(changeValue);
       }
     },
     [value, onChange],
@@ -52,7 +52,7 @@ export const ItemListSearch: React.FC<IProps> = function ItemListSearch({ value,
     }
   }, [value, onSearch]);
 
-  const ListSearchButton = IconButton;
+  const inputValue = value ?? search;
 
   return styled(useStyles(styles || []))(
     <list-search className={className}>
@@ -61,15 +61,19 @@ export const ItemListSearch: React.FC<IProps> = function ItemListSearch({ value,
           ref={inputRef}
           name="search"
           placeholder={translate(placeholder || 'ui_search')}
-          value={value ?? search}
+          value={inputValue}
           autoComplete="off"
           disabled={disabled}
-          onChange={changeHandler}
+          onChange={event => changeHandler(event.target.value)}
           {...use({ mod: 'surface' })}
         />
-        <search-button as="div" onClick={searchHandler}>
-          <ListSearchButton name="search" />
-        </search-button>
+        <action-button as="div">
+          {!onSearch && inputValue ? (
+            <IconButton name="cross" onClick={() => changeHandler('')} />
+          ) : (
+            <IconButton name="search" onClick={searchHandler} />
+          )}
+        </action-button>
       </input-box>
     </list-search>,
   );
