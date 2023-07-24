@@ -26,10 +26,14 @@
 
 .iconButton {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  height: 22px;
-  width: 22px;
+
+  &.large {
+    top: 8px;
+    right: 8px;
+    height: 22px;
+    width: 22px;
+  }
+
   &:hover {
     opacity: 0.7;
   }
