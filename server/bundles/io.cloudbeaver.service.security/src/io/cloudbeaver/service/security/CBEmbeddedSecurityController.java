@@ -1154,9 +1154,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 Map<String, Object> securedUserIdentifyingCredentials = userCredentials;
                 WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
                 var authProviderInstance = authProviderDescriptor.getInstance();
+
+                SMAuthProviderCustomConfiguration providerConfig = authProviderConfigurationId == null
+                    ? null
+                    : application.getAuthConfiguration().getAuthProviderConfiguration(authProviderConfigurationId);
+
                 if (SMAuthProviderExternal.class.isAssignableFrom(authProviderInstance.getClass())) {
                     var authProviderExternal = (SMAuthProviderExternal<?>) authProviderInstance;
-                    securedUserIdentifyingCredentials = authProviderExternal.authExternalUser(authProgressMonitor, Map.of(), userCredentials);
+                    securedUserIdentifyingCredentials = authProviderExternal.authExternalUser(
+                        authProgressMonitor,
+                        providerConfig,
+                        userCredentials
+                    );
                 }
 
                 var filteredUserCreds = filterSecuredUserData(
