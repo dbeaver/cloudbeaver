@@ -20,4 +20,6 @@ export default [
   ['settings_connections', 'Connections'],
   ['settings_connections_hide_connections_view_name', 'Show connections to admins only'],
   ['settings_connections_hide_connections_view_description', 'Show connections to admins only'],
+
+  ['connections_public_connection_ssl_enable', 'Enable SSL'],
 ];

@@ -282,15 +282,17 @@ type NetworkHandlerDescriptor {
     properties: [ObjectPropertyInfo!]!
 }
 
+# SSH network handler config. Name without prefix only for backward compatibility
 type NetworkHandlerConfig {
     id: ID!
     enabled: Boolean!
-    authType: NetworkHandlerAuthType!
+    authType: NetworkHandlerAuthType! @deprecated # use properties
     userName: String
     password: String
-    key: String
+    key: String @deprecated # use secured properties
     savePassword: Boolean!
     properties: Object!
+    secureProperties: Object!
 }
 
 # Connection instance
@@ -426,12 +428,13 @@ input NavigatorSettingsInput {
 input NetworkHandlerConfigInput {
     id: ID!
     enabled: Boolean
-    authType: NetworkHandlerAuthType
+    authType: NetworkHandlerAuthType @deprecated # use properties
     userName: String
     password: String
-    key: String
+    key: String @deprecated # use secured properties
     savePassword: Boolean
     properties: Object
+    secureProperties: Object
 }
 
 # Configuration of particular connection. Used for new connection create. Includes auth info
