@@ -5,18 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useContext } from 'react';
-import styled from 'reshadow';
-
-import { useStyles } from '../useStyles';
-import { Styles } from './styles';
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './ItemList.m.css';
 
 interface Props {
   className?: string;
 }
 
 export const ListItemName: React.FC<React.PropsWithChildren<Props>> = function ListItemName({ children, className }) {
-  const styles = useContext(Styles);
+  const styles = useS(style);
 
-  return styled(useStyles(styles))(<list-item-name className={className}>{children}</list-item-name>);
+  return <div className={s(styles, { listItemName: true }, className)}>{children}</div>;
 };
