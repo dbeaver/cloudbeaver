@@ -5,11 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useContext } from 'react';
-import styled from 'reshadow';
-
-import { useStyles } from '../useStyles';
-import { Styles } from './styles';
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './ItemList.m.css';
 
 interface Props {
   onClick: () => void;
@@ -17,11 +15,11 @@ interface Props {
 }
 
 export const ListItem: React.FC<React.PropsWithChildren<Props>> = function ListItem({ children, onClick, className }) {
-  const styles = useContext(Styles);
+  const styles = useS(style);
 
-  return styled(useStyles(styles))(
-    <list-item as="div" className={className} onClick={onClick}>
+  return (
+    <div className={s(styles, { listItem: true }, className)} onClick={onClick}>
       {children}
-    </list-item>,
+    </div>
   );
 };

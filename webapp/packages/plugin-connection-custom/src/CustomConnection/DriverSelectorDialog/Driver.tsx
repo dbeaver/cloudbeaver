@@ -7,9 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
-import styled, { css } from 'reshadow';
 
-import { ListItem, ListItemDescription, ListItemIcon, ListItemName, StaticImage } from '@cloudbeaver/core-blocks';
+import { ListItem, ListItemDescription, ListItemIcon, ListItemName, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
+
+import style from './Driver.m.css';
 
 export interface IDriver {
   id: string;
@@ -18,14 +19,6 @@ export interface IDriver {
   description?: string;
 }
 
-const styles = css`
-  StaticImage {
-    box-sizing: border-box;
-    width: 24px;
-    max-height: 24px;
-  }
-`;
-
 interface Props {
   driver: IDriver;
   onSelect: (driverId: string) => void;
@@ -33,14 +26,15 @@ interface Props {
 
 export const Driver = observer<Props>(function Driver({ driver, onSelect }) {
   const select = useCallback(() => onSelect(driver.id), [driver]);
+  const styles = useS(style);
 
-  return styled(styles)(
+  return (
     <ListItem onClick={select}>
       <ListItemIcon>
-        <StaticImage icon={driver.icon} />
+        <StaticImage icon={driver.icon} className={s(styles, { staticImage: true })} />
       </ListItemIcon>
       <ListItemName>{driver.name}</ListItemName>
       <ListItemDescription title={driver.description}>{driver.description}</ListItemDescription>
-    </ListItem>,
+    </ListItem>
   );
 });

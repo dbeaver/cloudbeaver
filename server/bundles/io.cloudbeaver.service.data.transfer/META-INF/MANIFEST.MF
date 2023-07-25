@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Vendor: %Bundle-Vendor
-Bundle-Name: %Bundle-Name
+Bundle-Vendor: DBeaver Corp
+Bundle-Name: Cloudbeaver Web Service - Data Transfer
 Bundle-SymbolicName: io.cloudbeaver.service.data.transfer;singleton:=true
 Bundle-Version: 1.0.78.qualifier
 Bundle-Release-Date: 20230724
@@ -11,5 +11,4 @@ Bundle-ClassPath: .
 Require-Bundle: io.cloudbeaver.server,
  org.jkiss.dbeaver.data.transfer,
  org.jkiss.dbeaver.registry
-Bundle-Localization: OSGI-INF/l10n/bundle
 Automatic-Module-Name: io.cloudbeaver.service.data.transfer

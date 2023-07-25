@@ -31,8 +31,9 @@ interface RenderFieldProps {
   readOnly?: boolean;
   autoHide?: boolean;
   showRememberTip?: boolean;
-  onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
+  saved?: boolean;
   className?: string;
+  onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
 
 type ControlType = 'checkbox' | 'combobox' | 'link' | 'input' | 'textarea' | 'file';
@@ -78,8 +79,9 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   readOnly,
   autoHide,
   showRememberTip,
-  onFocus,
+  saved,
   className,
+  onFocus,
 }) {
   const translate = useTranslate();
 
@@ -88,7 +90,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
 
   const value = getValue(property.value, controltype);
   const defaultValue = getValue(property.defaultValue, controltype);
-  const passwordSaved = showRememberTip && password && !!property.value;
+  const passwordSaved = showRememberTip && ((password && !!property.value) || saved);
   const description = passwordSaved ? translate('ui_processing_saved') : undefined;
 
   if (controltype === 'file' && state) {
@@ -203,6 +205,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         <Textarea
           title={state[property.id!]}
           labelTooltip={property.description || property.displayName}
+          description={description}
           name={property.id!}
           state={state}
           disabled={disabled}
@@ -219,6 +222,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       <Textarea
         title={value}
         labelTooltip={property.description || property.displayName}
+        description={description}
         name={property.id!}
         value={value}
         disabled={disabled}
