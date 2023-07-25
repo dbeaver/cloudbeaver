@@ -17,7 +17,6 @@
 package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebPage;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWBindingContext;
@@ -44,11 +43,17 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
     @Override
     public void bindWiring(DBWBindingContext model) throws DBWebException {
         model.getQueryType()
-            .dataFetcher("adminUserInfo",
-                env -> getService(env).getUserById(getWebSession(env), env.getArgument("userId")))
-            .dataFetcher("listUsers",
-                env -> getService(env).listUsers(getWebSession(env), new WebPage(env.getArgument("page")),
-                    new AdminUserInfoFilter(env.getArgument("filter"))))
+            .dataFetcher(
+                "adminUserInfo",
+                env -> getService(env).getUserById(getWebSession(env), env.getArgument("userId"))
+            )
+            .dataFetcher(
+                "listUsers",
+                env -> getService(env).listUsers(
+                    getWebSession(env),
+                    new AdminUserInfoFilter(env.getArgument("filter"), env.getArgument("page"))
+                )
+            )
             .dataFetcher("listTeams",
                 env -> getService(env).listTeams(getWebSession(env), env.getArgument("teamId")))
             .dataFetcher("listPermissions",

@@ -326,65 +326,23 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     @NotNull
     @Override
     public SMUser[] findUsers(String userNameMask) throws DBCException {
-        try (Connection dbCon = database.openConnection()) {
-            Map<String, SMUser> result = new LinkedHashMap<>();
-            // Read users
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER" +
-                    (CommonUtils.isEmpty(userNameMask) ? "\nORDER BY USER_ID" : " WHERE USER_ID=?")))
-            ) {
-                if (!CommonUtils.isEmpty(userNameMask)) {
-                    dbStat.setString(1, userNameMask);
-                }
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    while (dbResult.next()) {
-                        String userId = dbResult.getString(1);
-                        String active = dbResult.getString(2);
-                        String authRole = dbResult.getString(3);
-                        result.put(userId, new SMUser(userId, CHAR_BOOL_TRUE.equals(active), authRole));
-                    }
-                }
-            }
-            readSubjectsMetas(dbCon, SMSubjectType.user, userNameMask, result);
-            // Read teams
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT USER_ID,TEAM_ID FROM {table_prefix}CB_USER_TEAM" +
-                (CommonUtils.isEmpty(userNameMask) ? "" : " WHERE USER_ID=?")))
-            ) {
-                if (!CommonUtils.isEmpty(userNameMask)) {
-                    dbStat.setString(1, userNameMask);
-                }
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    while (dbResult.next()) {
-                        String userId = dbResult.getString(1);
-                        String teamId = dbResult.getString(2);
-                        SMUser user = result.get(userId);
-                        if (user != null) {
-                            String[] teams = ArrayUtils.add(String.class, user.getUserTeams(), teamId);
-                            user.setUserTeams(teams);
-                        }
-                    }
-                }
-            }
-            return result.values().toArray(new SMUser[0]);
-        } catch (SQLException e) {
-            throw new DBCException("Error while loading users", e);
-        }
+        return findUsers(new SMUserFilter(userNameMask, null, new DBPPage(0, Integer.MAX_VALUE)));
     }
 
     @NotNull
     @Override
-    public SMUser[] findUsers(@NotNull DBPPage page, @NotNull SMUserFilter filter)
-            throws DBCException {
+    public SMUser[] findUsers(@NotNull SMUserFilter filter)
+        throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             Map<String, SMUser> result = new LinkedHashMap<>();
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER"
-                            + buildUsersFilter(filter) + "\nORDER BY USER_ID LIMIT ?, ?"))) {
+                database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER"
+                    + buildUsersFilter(filter) + "\nORDER BY USER_ID LIMIT ? OFFSET ?"))) {
                 int parameterIndex = setUsersFilterValues(dbStat, filter, 1);
-                dbStat.setInt(parameterIndex++, page.getOffset());
-                dbStat.setInt(parameterIndex++, page.getLimit());
+                dbStat.setInt(parameterIndex++, filter.getPage().getLimit());
+                dbStat.setInt(parameterIndex++, filter.getPage().getOffset());
+
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String userId = dbResult.getString(1);
@@ -394,13 +352,17 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     }
                 }
             }
+            if (result.isEmpty()) {
+                return new SMUser[0];
+            }
+
             readSubjectsMetas(dbCon, SMSubjectType.user, filter.getUserIdMask(), result);
             // Read teams
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("SELECT USER_ID,TEAM_ID FROM {table_prefix}CB_USER_TEAM"
-                            + "\nWHERE USER_ID IN (?)"))) {
-                Array teamsArray = dbCon.createArrayOf("VARCHAR", result.keySet().toArray(new String[0]));
-                dbStat.setArray(1, teamsArray);
+                database.normalizeTableNames("SELECT USER_ID,TEAM_ID FROM {table_prefix}CB_USER_TEAM"
+                    + "\nWHERE USER_ID IN (?)"))) {
+                String userIds = String.join(",", result.keySet());
+                dbStat.setString(1, userIds);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String userId = dbResult.getString(1);

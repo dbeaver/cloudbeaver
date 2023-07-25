@@ -38,7 +38,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.DBPPage;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -46,7 +45,6 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
-import org.jkiss.dbeaver.model.security.user.SMUserFilter;
 import org.jkiss.utils.CommonUtils;
 
 import java.text.MessageFormat;
@@ -80,11 +78,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @NotNull
     @Override
-    public List<AdminUserInfo> listUsers(@NotNull WebSession webSession, @NotNull DBPPage page,
-            @NotNull SMUserFilter filter) throws DBWebException {
+    public List<AdminUserInfo> listUsers(@NotNull WebSession webSession, @NotNull AdminUserInfoFilter adminFilter) throws DBWebException {
         try {
             List<AdminUserInfo> users = new ArrayList<>();
-            for (SMUser smUser : webSession.getAdminSecurityController().findUsers(page, filter)) {
+            for (SMUser smUser : webSession.getAdminSecurityController().findUsers(adminFilter.getFilter())) {
                 users.add(new AdminUserInfo(webSession, new WebUser(smUser)));
             }
             return users;

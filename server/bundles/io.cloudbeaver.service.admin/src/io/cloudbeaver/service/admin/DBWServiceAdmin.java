@@ -26,10 +26,8 @@ import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.DBPPage;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
-import org.jkiss.dbeaver.model.security.user.SMUserFilter;
 
 import java.util.List;
 import java.util.Map;
@@ -45,9 +43,8 @@ public interface DBWServiceAdmin extends DBWService {
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     @NotNull
-    List<AdminUserInfo> listUsers(@NotNull WebSession webSession, @NotNull DBPPage page,
-            @NotNull SMUserFilter filter)
-            throws DBWebException;
+    List<AdminUserInfo> listUsers(@NotNull WebSession webSession, AdminUserInfoFilter filter)
+        throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     @NotNull

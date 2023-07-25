@@ -16,14 +16,32 @@
  */
 package io.cloudbeaver.service.admin;
 
+import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.DBPPage;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.security.user.SMUserFilter;
 
 import java.util.Map;
 
-public class AdminUserInfoFilter extends SMUserFilter {
-    public AdminUserInfoFilter(Map<String, Object> params) {
-        super(JSONUtils.getString(params, "userIdMask"),
-                params.containsKey("enabledState") ? JSONUtils.getBoolean(params, "enabledState") : null);
+public class AdminUserInfoFilter {
+    @NotNull
+    private final SMUserFilter filter;
+
+    public AdminUserInfoFilter(@NotNull Map<String, Object> params, @NotNull Map<String, Object> pageParams) {
+        DBPPage page = new DBPPage(
+            JSONUtils.getInteger(pageParams, "offset", 0),
+            JSONUtils.getInteger(pageParams, "limit", Integer.MAX_VALUE)
+        );
+
+        Boolean enabledState = params.containsKey("enabledState") ? JSONUtils.getBoolean(params, "enabledState") : null;
+        this.filter = new SMUserFilter(
+            JSONUtils.getString(params, "userIdMask"),
+            enabledState,
+            page
+        );
+    }
+
+    public SMUserFilter getFilter() {
+        return filter;
     }
 }
