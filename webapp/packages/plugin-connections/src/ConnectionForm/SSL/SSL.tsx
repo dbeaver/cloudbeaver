@@ -9,7 +9,6 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   FieldCheckbox,
   Group,
@@ -47,7 +46,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
 
   const translate = useTranslate();
 
-  const styles = useStyles(SSl_STYLES, BASE_CONTAINERS_STYLES);
+  const styles = useStyles(SSl_STYLES);
   const { credentialsSavingEnabled } = useAdministrationSettings();
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(handler.properties);
 
