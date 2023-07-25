@@ -11,13 +11,13 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { type INodeNavigationData, NavNodeInfoResource, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { isResourceOfType, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { getRmResourcePath, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
+import { CachedMapAllKey, CachedTreeChildrenKey } from '@cloudbeaver/core-sdk';
 import { createPath, getPathName } from '@cloudbeaver/core-utils';
 import { ACTION_SAVE, ActionService, DATA_CONTEXT_MENU, KEY_BINDING_SAVE, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { getResourceKeyFromNodeId } from '@cloudbeaver/plugin-navigation-tree-rm';
-import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
+import { RESOURCE_NAME_REGEX, ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 import { ResourceManagerScriptsService, SaveScriptDialog, SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
 import {
   DATA_CONTEXT_SQL_EDITOR_STATE,
@@ -114,6 +114,29 @@ export class PluginBootstrap extends Bootstrap {
           const result = await this.commonDialogService.open(SaveScriptDialog, {
             defaultScriptName: name,
             projectId,
+            validation: async ({ name, projectId }, setMessage) => {
+              const trimmedName = name.trim();
+
+              if (!projectId || !trimmedName.length) {
+                return false;
+              }
+
+              if (!RESOURCE_NAME_REGEX.test(name)) {
+                setMessage('plugin_resource_manager_scripts_script_name_invalid_characters_message');
+                return false;
+              }
+
+              const nameWithExtension = this.projectInfoResource.getNameWithExtension(projectId, SCRIPTS_TYPE_ID, trimmedName);
+              const key = getRmResourcePath(projectId);
+
+              try {
+                await this.resourceManagerResource.load(CachedTreeChildrenKey(key));
+
+                return !this.resourceManagerResource.has(createPath(key, nameWithExtension));
+              } catch (exception: any) {
+                return false;
+              }
+            },
           });
 
           if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {

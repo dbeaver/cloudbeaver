@@ -44,13 +44,13 @@ import {
 } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
+import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import { NavResourceNodeService } from '../NavResourceNodeService';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../Tree/DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
 import { getResourceKeyFromNodeId } from './getResourceKeyFromNodeId';
 import { getResourceNodeId } from './getResourceNodeId';
 import { getRmProjectNodeId } from './getRmProjectNodeId';
-import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 interface ITargetNode {
   projectId: string;
