@@ -10,7 +10,6 @@ export * from './ItemList/ListItem';
 export * from './ItemList/ListItemDescription';
 export * from './ItemList/ListItemIcon';
 export * from './ItemList/ListItemName';
-export { ITEM_LIST_STYLES } from './ItemList/styles';
 
 export * from './layout/AppLogo';
 export * from './layout/BASE_LAYOUT_GRID_STYLES';

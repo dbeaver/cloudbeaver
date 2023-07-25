@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
  */
 public class WebConnectionInfo {
 
-    private static final String SECURED_VALUE = "********";
+    public static final String SECURED_VALUE = "********";
     private final WebSession session;
     private final DBPDataSourceContainer dataSourceContainer;
     private WebServerError connectError;
