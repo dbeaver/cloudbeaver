@@ -253,18 +253,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           </Group>
           <Group form gap>
             <Container wrap gap>
-              <InputField
-                type="text"
-                name="name"
-                minLength={1}
-                state={config}
-                disabled={disabled}
-                readOnly={readonly}
-                mod="surface"
-                required
-                tiny
-                fill
-              >
+              <InputField type="text" name="name" minLength={1} state={config} disabled={disabled} readOnly={readonly} mod="surface" required fill>
                 {translate('connections_connection_name')}
               </InputField>
               <ProjectSelect
