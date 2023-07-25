@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Vendor: %Bundle-Vendor
-Bundle-Name: %Bundle-Name
+Bundle-Vendor: DBeaver Corp
+Bundle-Name: Cloudbeaver Web Service - Metadata
 Bundle-SymbolicName: io.cloudbeaver.service.metadata;singleton:=true
 Bundle-Version: 1.0.81.qualifier
 Bundle-Release-Date: 20230724
