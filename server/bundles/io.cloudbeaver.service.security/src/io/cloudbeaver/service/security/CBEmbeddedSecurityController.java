@@ -50,6 +50,7 @@ import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 import org.jkiss.dbeaver.model.security.user.*;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
@@ -357,12 +358,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
 
             readSubjectsMetas(dbCon, SMSubjectType.user, filter.getUserIdMask(), result);
+            StringBuilder teamsSql = new StringBuilder()
+                .append("SELECT USER_ID,TEAM_ID FROM {table_prefix}CB_USER_TEAM")
+                .append("\n")
+                .append("WHERE USER_ID IN (")
+                .append(SQLUtils.generateParamList(result.size()))
+                .append(")");
             // Read teams
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT USER_ID,TEAM_ID FROM {table_prefix}CB_USER_TEAM"
-                    + "\nWHERE USER_ID IN (?)"))) {
-                String userIds = String.join(",", result.keySet());
-                dbStat.setString(1, userIds);
+            try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(teamsSql.toString()))) {
+                int parameterIndex = 1;
+                for (String userId : result.keySet()) {
+                    dbStat.setString(parameterIndex++, userId);
+                }
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String userId = dbResult.getString(1);
