@@ -6,8 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import type { EditorView } from '@codemirror/view';
+import type { SelectionRange } from '@codemirror/state';
 
 export interface IEditorRef {
   container: HTMLDivElement | null;
   view: EditorView | null;
+  selection: SelectionRange | null;
 }
