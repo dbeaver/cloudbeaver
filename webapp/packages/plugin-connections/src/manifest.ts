@@ -19,6 +19,7 @@ import { ConnectionFoldersBootstrap } from './NavNodes/ConnectionFoldersBootstra
 import { PluginBootstrap } from './PluginBootstrap';
 import { PluginConnectionsSettingsService } from './PluginConnectionsSettingsService';
 import { PublicConnectionFormService } from './PublicConnectionForm/PublicConnectionFormService';
+import { ConnectionSSLTabService } from './ConnectionForm/SSL/ConnectionSSLTabService';
 
 export const connectionPlugin: PluginManifest = {
   info: {
@@ -37,6 +38,7 @@ export const connectionPlugin: PluginManifest = {
     ConnectionSSHTabService,
     ConnectionOriginInfoTabService,
     ConnectionFoldersBootstrap,
+    ConnectionSSLTabService,
     PluginConnectionsSettingsService,
   ],
 };

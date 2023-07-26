@@ -17,4 +17,6 @@ export default [
   ['settings_connections', 'Подключения'],
   ['settings_connections_hide_connections_view_name', 'Показывать подключения только администраторам'],
   ['settings_connections_hide_connections_view_description', 'Показывать подключения только администраторам'],
+
+  ['connections_public_connection_ssl_enable', 'Включить SSL'],
 ];
