@@ -133,11 +133,14 @@ public class WebNavigatorNodeInfo {
     public boolean isNavigable() {
         if (node instanceof DBNDatabaseNode) {
             DBNDatabaseNode databaseNode = (DBNDatabaseNode) this.node;
-            if (!databaseNode.getMeta().isNavigable()) {
-                return false;
-            }
+            return databaseNode.getMeta().isNavigable();
         }
         return true;
+    }
+
+    @Property
+    public boolean isFiltered() {
+        return node.isFiltered();
     }
 
     @Property

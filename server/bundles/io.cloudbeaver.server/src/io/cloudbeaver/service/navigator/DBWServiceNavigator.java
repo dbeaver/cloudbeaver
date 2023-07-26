@@ -23,6 +23,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
 
 import java.util.List;
 
@@ -48,6 +49,18 @@ public interface DBWServiceNavigator extends DBWService {
     WebNavigatorNodeInfo getNavigatorNodeInfo(
         @NotNull WebSession session,
         @NotNull String nodePath) throws DBWebException;
+
+    @WebAction
+    DBSObjectFilter getNavigatorNodeFilter(
+        @NotNull WebSession webSession,
+        @NotNull String nodePath);
+
+    @WebAction
+    boolean setNavigatorNodeFilter(
+        @NotNull WebSession webSession,
+        @NotNull String nodePath,
+        @Nullable String[] include,
+        @Nullable String[] exclude);
 
     @WebAction
     boolean refreshNavigatorNode(
@@ -77,4 +90,5 @@ public interface DBWServiceNavigator extends DBWService {
         @NotNull WebSession session,
         @NotNull List<String> nodePaths,
         @NotNull String folderPath) throws DBWebException;
+
 }

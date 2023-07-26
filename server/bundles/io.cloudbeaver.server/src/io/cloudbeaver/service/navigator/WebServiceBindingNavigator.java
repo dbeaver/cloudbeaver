@@ -51,6 +51,10 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
                 getWebSession(env),
                 env.getArgument("nodePath")
             ))
+            .dataFetcher("navFolderFilter", env -> getService(env).getNavigatorNodeFilter(
+                getWebSession(env),
+                env.getArgument("nodePath")
+            ))
             .dataFetcher("navRefreshNode", env -> getService(env).refreshNavigatorNode(
                 getWebSession(env),
                 env.getArgument("nodePath")
@@ -63,6 +67,12 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
 
             ));
         model.getMutationType()
+            .dataFetcher("navSetFolderFilter", env -> getService(env).setNavigatorNodeFilter(
+                getWebSession(env),
+                env.getArgument("nodePath"),
+                env.getArgument("include"),
+                env.getArgument("exclude")
+            ))
             .dataFetcher("navRenameNode", env -> getService(env).renameNode(
                 getWebSession(env),
                 env.getArgument("nodePath"),
