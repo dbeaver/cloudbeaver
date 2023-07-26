@@ -23,6 +23,7 @@ export default [
   ['authentication_user_login_cant_be_used', 'Quel nome non può essere usato'],
   ['authentication_user_icon_tooltip', 'Utente'],
 
+  ['plugin_authentication_user_loading_error', "Can't load user data"],
   ['plugin_authentication_loading_error_dialog_title', 'Authentication error'],
   ['plugin_authentication_loading_error_dialog_message', 'An error occurred while loading user data. Do you want to logout?'],
 ];

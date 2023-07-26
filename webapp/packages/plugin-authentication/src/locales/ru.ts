@@ -32,6 +32,7 @@ export default [
   ['authentication_user_icon_tooltip', 'Пользователь'],
   ['authentication_team_icon_tooltip', 'Команда'],
 
+  ['plugin_authentication_user_loading_error', 'Не удалось загрузить данные пользователя'],
   ['plugin_authentication_loading_error_dialog_title', 'Ошибка аутентификации'],
   ['plugin_authentication_loading_error_dialog_message', 'Произошла ошибка при загрузке данных пользователя. Выйти?'],
 ];

@@ -25,7 +25,7 @@ export class UserLoadingErrorDialogBootstrap extends Bootstrap {
   load(): void | Promise<void> {}
 
   private async handleException(exception: Error) {
-    this.notificationService.logException(exception, 'User loading error');
+    this.notificationService.logException(exception, 'plugin_authentication_user_loading_error');
     const result = await this.commonDialogService.open(ConfirmationDialog, {
       title: 'plugin_authentication_loading_error_dialog_title',
       message: 'plugin_authentication_loading_error_dialog_message',
