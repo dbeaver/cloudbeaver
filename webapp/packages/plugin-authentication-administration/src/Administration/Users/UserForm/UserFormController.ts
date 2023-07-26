@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable, observable } from 'mobx';
+import { computed, makeObservable, observable, toJS } from 'mobx';
 
 import { AdminUser, AuthRolesResource, compareTeams, isLocalUser, TeamInfo, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import {
@@ -359,7 +359,7 @@ export class UserFormController implements IInitializableController, IDestructib
 
   private async loadUser() {
     try {
-      this.credentials.metaParameters = this.user.metaParameters;
+      this.credentials.metaParameters = observable(toJS(this.user.metaParameters ?? {}));
       this.credentials.login = this.user.userId;
       this.credentials.teams = new Map(this.user.grantedTeams.map(teamId => [teamId, true]));
       this.credentials.authRole = this.user.authRole;

@@ -9,11 +9,11 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Loader, TableContext } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
+import { UsersResource } from '@cloudbeaver/core-authentication';
+import { Loader, TableContext, useResource } from '@cloudbeaver/core-blocks';
+import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
 
 import { UserForm } from '../UserForm/UserForm';
-import { UserEditController } from './UserEditController';
 
 const styles = css`
   box {
@@ -31,13 +31,9 @@ interface Props {
 }
 
 export const UserEdit = observer<Props>(function UserEdit({ item }) {
-  const controller = useController(UserEditController, item);
+  const user = useResource(UserEdit, UsersResource, { key: item, includes: ['includeMetaParameters'] });
   const tableContext = useContext(TableContext);
   const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext]);
 
-  return styled(styles)(
-    <box>
-      {controller.user ? <UserForm user={controller.user} editing onCancel={collapse} /> : <Loader />}
-    </box>,
-  );
+  return styled(styles)(<box>{user.data ? <UserForm user={user.data as AdminUserInfo} editing onCancel={collapse} /> : <Loader />}</box>);
 });

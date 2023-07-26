@@ -151,6 +151,12 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     return this.get(user.userId)!;
   }
 
+  cleanNewFlags(): void {
+    for (const user of this.data.values()) {
+      (user as AdminUserNew)[NEW_USER_SYMBOL] = false;
+    }
+  }
+
   async grantTeam(userId: string, teamId: string, skipUpdate?: boolean): Promise<void> {
     await this.graphQLService.sdk.grantUserTeam({ userId, teamId });
 
@@ -293,6 +299,11 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       customIncludeOriginDetails: false,
       includeMetaParameters: false,
     };
+  }
+
+  protected dataSet(key: string, value: AdminUserInfoFragment): void {
+    const oldValue = this.data.get(key);
+    super.dataSet(key, { ...oldValue, ...value });
   }
 
   protected validateKey(key: string): boolean {
