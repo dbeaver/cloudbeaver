@@ -57,6 +57,7 @@ import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.text.MessageFormat;
@@ -209,13 +210,33 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     }
 
     @Override
-    public DBSObjectFilter getNavigatorNodeFilter(@NotNull WebSession webSession, @NotNull String nodePath) {
-        return null;
-    }
+    public boolean setNavigatorNodeFilter(@NotNull WebSession webSession, @NotNull String nodePath, @Nullable String[] include, @Nullable String[] exclude) throws DBWebException {
+        try {
+            DBRProgressMonitor monitor = webSession.getProgressMonitor();
 
-    @Override
-    public boolean setNavigatorNodeFilter(@NotNull WebSession webSession, @NotNull String nodePath, @Nullable String[] include, @Nullable String[] exclude) {
-        return false;
+            DBNNode node = webSession.getNavigatorModel().getNodeByPath(monitor, nodePath);
+            if (node == null) {
+                throw new DBWebException("Navigator node '"  + nodePath + "' not found");
+            }
+            if (!(node instanceof DBNDatabaseFolder)) {
+                throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
+            }
+            DBSObjectFilter filter = new DBSObjectFilter();
+            if (!ArrayUtils.isEmpty(include)) {
+                filter.setInclude(Arrays.asList(include));
+            }
+            if (!ArrayUtils.isEmpty(exclude)) {
+                filter.setExclude(Arrays.asList(exclude));
+            }
+            ((DBNDatabaseFolder) node).setNodeFilter(
+                ((DBNDatabaseFolder) node).getItemsMeta(), filter, true);
+        } catch (DBException e) {
+            if (e instanceof DBWebException) {
+                throw (DBWebException)e;
+            }
+            throw new DBWebException("Error changing navigator node '"  + nodePath + "' filters", e);
+        }
+        return true;
     }
 
     @Override

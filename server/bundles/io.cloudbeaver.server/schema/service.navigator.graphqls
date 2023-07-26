@@ -86,6 +86,9 @@ type NavigatorNodeInfo {
     inline: Boolean!
     navigable: Boolean!
     filtered: Boolean!
+
+    # Reads node filter. Expensive invocation, read only when it is really needed
+    filter: NavigatorNodeFilter
 }
 
 type NavigatorNodeFilter {
@@ -123,8 +126,6 @@ extend type Query {
     navNodeParents( nodePath: ID! ): [ NavigatorNodeInfo! ]!
 
     navNodeInfo( nodePath: ID! ): NavigatorNodeInfo!
-
-    navFolderFilter( nodePath: ID!): NavigatorNodeFilter
 
     navRefreshNode( nodePath: ID! ): Boolean
 
