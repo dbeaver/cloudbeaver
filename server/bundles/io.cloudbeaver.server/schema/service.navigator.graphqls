@@ -145,6 +145,8 @@ extend type Mutation {
     # Moves nodes with specified IDs to the connection folder
     navMoveNodesToFolder( nodePaths: [ID!]!, folderPath: ID!): Boolean!
 
+    # Sets filter for the folder node. If both include and exclude are null then filter is removed.
+    # Node must be refreshed after applying filters. Node children can be changed
     navSetFolderFilter( nodePath: ID!, include: [String!], exclude: [String!]): Boolean!
 
 }
