@@ -213,6 +213,7 @@ public class WebDatabaseDriverInfo {
             return new String[0];
         }
         return NetworkHandlerRegistry.getInstance().getDescriptors(driver).stream()
+            .filter(h -> !h.isDesktopHandler())
             .map(NetworkHandlerDescriptor::getId).toArray(String[]::new);
     }
 
