@@ -20,6 +20,7 @@ import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.net.DBWHandlerType;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -75,6 +76,18 @@ public class WebNetworkHandlerConfigInput {
 
     public Map<String, Object> getProperties() {
         return JSONUtils.getObjectOrNull(cfg, "properties");
+    }
+
+    public Map<String, String> getSecureProperties() {
+        var secureProperties = JSONUtils.getObjectOrNull(cfg, "secureProperties");
+        if (secureProperties == null) {
+            return null;
+        }
+        var result = new LinkedHashMap<String, String>();
+        for (Map.Entry<String, Object> property : secureProperties.entrySet()) {
+            result.put(property.getKey(), CommonUtils.toString(property.getValue()));
+        }
+        return result;
     }
 
 }

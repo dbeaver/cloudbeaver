@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Vendor: DBeaver Security Sevice
+Bundle-Vendor: Cloudbeaver Web Service - Security
 Bundle-Vendor: DBeaver Corp
 Bundle-SymbolicName: io.cloudbeaver.service.security;singleton:=true
 Bundle-Version: 1.0.33.qualifier

@@ -8,7 +8,7 @@ fragment DatabaseConnection on ConnectionInfo {
   template
   connected
   readOnly
-  
+
   saveCredentials
   credentialsSaved @include(if: $includeCredentialsSaved)
   sharedCredentials
@@ -52,6 +52,7 @@ fragment DatabaseConnection on ConnectionInfo {
     key
     savePassword
     properties
+    secureProperties
   }
 
   navigatorSettings {
