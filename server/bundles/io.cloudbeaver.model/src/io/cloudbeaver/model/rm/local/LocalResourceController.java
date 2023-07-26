@@ -19,7 +19,6 @@ package io.cloudbeaver.model.rm.local;
 import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.rm.RMUtils;
 import io.cloudbeaver.model.rm.lock.RMFileLockController;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;

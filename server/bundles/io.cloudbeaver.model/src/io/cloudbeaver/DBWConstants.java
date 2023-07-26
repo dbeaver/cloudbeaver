@@ -33,9 +33,6 @@ public class DBWConstants {
 
     public static final String STATE_ATTR_SIGN_IN_STATE = "state.signin";
 
-    public static final String USER_PROJECTS_FOLDER = "user-projects";
-    public static final String SHARED_PROJECTS_FOLDER = "shared-projects";
-
     public enum SignInState {
         GLOBAL,
         EMBEDDED

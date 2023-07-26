@@ -17,7 +17,6 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.model.rm.RMUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
@@ -25,6 +24,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
+import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
