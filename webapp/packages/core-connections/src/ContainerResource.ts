@@ -94,6 +94,7 @@ export class ContainerResource extends CachedMapResource<ObjectContainerParams, 
         connectionId,
         catalogId,
         withDetails: false,
+        withFilters: false,
       });
 
       containers.set(
