@@ -1,37 +1,49 @@
 .tiny,
-.grid.tiny > * {
+.grid.tiny > *,
+.container > .tiny,
+.container > .grid.tiny > * {
   flex-basis: 140px;
   max-width: 210px;
 }
 
 .small,
-.grid.small > * {
+.grid.small > *,
+.container > .small,
+.container > .grid.small > * {
   flex-basis: 260px;
   max-width: 390px;
 }
 
 .medium,
-.grid.medium > * {
+.grid.medium > *,
+.container > .medium,
+.container > .grid.medium > * {
   flex-basis: 460px;
   max-width: 640px;
 }
 
 .large,
-.grid.large > * {
+.grid.large > *,
+.container > .large,
+.container > .grid.large > * {
   flex-basis: 800px;
   max-width: 800px;
 }
 
 .maximum,
-.grid.maximum > * {
+.grid.maximum > *,
+.container > .maximum,
+.container > .grid.maximum > * {
   max-width: 100%;
 }
 
-.fill {
+.fill,
+.container > .fill {
   max-width: none;
 }
 
-.keepSize {
+.keepSize,
+.container > .keepSize {
   flex-grow: 0;
   flex-basis: 0;
   flex-basis: auto; /* test for layout */

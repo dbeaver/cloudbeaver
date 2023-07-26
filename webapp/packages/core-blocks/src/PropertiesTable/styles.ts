@@ -69,7 +69,7 @@ export const PROPERTIES_FILTER_STYLES = css`
   }
 
   InputField {
-    width: 100%;
+    max-width: 100%;
   }
 
   IconButton {
