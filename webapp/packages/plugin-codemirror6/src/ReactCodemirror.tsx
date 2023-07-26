@@ -33,11 +33,15 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     const [view, setView] = useState<EditorView | null>(null);
     const [incomingView, setIncomingView] = useState<EditorView | null>(null);
     const callbackRef = useObjectRef({ onChange, onUpdate });
+    const [selection, setSelection] = useState(view?.state.selection.main ?? null);
 
     useLayoutEffect(() => {
       if (container) {
         const updateListener = EditorView.updateListener.of((update: ViewUpdate) => {
           const remote = update.transactions.some(tr => tr.annotation(External));
+          if (update.selectionSet) {
+            setSelection(update.state.selection.main);
+          }
 
           if (update.docChanged && !remote) {
             const doc = update.state.doc;
@@ -159,8 +163,9 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
       () => ({
         container,
         view,
+        selection,
       }),
-      [container, view],
+      [container, view, selection],
     );
 
     const context = useMemo<IReactCodemirrorContext>(
