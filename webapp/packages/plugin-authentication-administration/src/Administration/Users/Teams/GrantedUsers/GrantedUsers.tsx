@@ -10,7 +10,6 @@ import styled, { css } from 'reshadow';
 
 import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Container,
   getComputed,
@@ -48,7 +47,7 @@ const styles = css`
 `;
 
 export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer(function GrantedUsers({ tabId, state: formState }) {
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles);
+  const style = useStyles(styles);
   const translate = useTranslate();
 
   const state = useGrantedUsers(formState.config, formState.mode);

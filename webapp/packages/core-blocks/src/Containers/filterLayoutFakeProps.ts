@@ -12,3 +12,8 @@ export function filterLayoutFakeProps<T extends ILayoutSizeProps>(props: T): Omi
 
   return rest;
 }
+
+export function getLayoutProps<T extends ILayoutSizeProps>(props: T): ILayoutSizeProps {
+  const { noWrap, keepSize, tiny, small, medium, large, maximum, fill } = props;
+  return { noWrap, keepSize, tiny, small, medium, large, maximum, fill };
+}

@@ -10,18 +10,7 @@ import styled, { css } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, AuthRolesResource, UsersResource } from '@cloudbeaver/core-authentication';
-import {
-  BASE_CONTAINERS_STYLES,
-  ColoredContainer,
-  Container,
-  Group,
-  Loader,
-  ToolsAction,
-  ToolsPanel,
-  useResource,
-  useStyles,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, Loader, ToolsAction, ToolsPanel, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
@@ -52,7 +41,7 @@ interface Props {
 
 export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
   const translate = useTranslate();
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
+  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
 
   const createUserService = useService(CreateUserService);
 
@@ -115,7 +104,7 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
           </Group>
         )}
 
-        <Group box="no-overflow">
+        <Group boxNoOverflow>
           <Loader style={loaderStyle} state={[usersResource, authRolesResource]} overlay>
             <UsersTable
               keys={keys}

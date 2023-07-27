@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, GroupItem, GroupTitle, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Group, GroupItem, GroupTitle, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 
 const style = css`
   GroupItem {
@@ -25,7 +25,7 @@ const style = css`
 
 export const Instructions = observer(function Instructions() {
   const translate = useTranslate();
-  const styles = useStyles(BASE_CONTAINERS_STYLES, style);
+  const styles = useStyles(style);
 
   return styled(styles)(
     <Group gap large>

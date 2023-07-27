@@ -119,7 +119,6 @@ export * from './FormControls/BASE_DROPDOWN_STYLES';
 export * from './FormControls/FormBox';
 export * from './FormControls/Filter';
 
-export * from './Containers/BASE_CONTAINERS_STYLES';
 export * from './Containers/Container';
 export * from './Containers/Group';
 export * from './Containers/GroupClose';

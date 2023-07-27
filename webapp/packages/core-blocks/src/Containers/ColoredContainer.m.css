@@ -1,0 +1,3 @@
+.coloredContainer {
+  composes: theme-background-secondary theme-text-on-secondary from global;
+}
