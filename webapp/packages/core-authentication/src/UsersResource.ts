@@ -5,8 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { runInAction } from 'mobx';
-
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
@@ -14,13 +12,17 @@ import {
   AdminUserInfo,
   AdminUserInfoFragment,
   CachedMapAllKey,
+  CachedMapPageKey,
   CachedMapResource,
   GetUsersListQueryVariables,
   GraphQLService,
+  ICachedMapPageOptions,
   isResourceAlias,
-  isResourceKeyAlias,
   ResourceKey,
+  ResourceKeyFlat,
   resourceKeyList,
+  resourceKeyListAlias,
+  resourceKeyListAliasFactory,
   ResourceKeySimple,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-sdk';
@@ -36,7 +38,20 @@ const NEW_USER_SYMBOL = Symbol('new-user');
 export type AdminUser = AdminUserInfoFragment;
 
 type AdminUserNew = AdminUser & { [NEW_USER_SYMBOL]: boolean };
-type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId'>;
+type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId' | 'page' | 'filter'>;
+
+interface IUserResourceSearchPageOptions extends ICachedMapPageOptions {
+  userId?: string;
+  enabledState?: boolean;
+}
+
+export const UsersResourceSearchUser = resourceKeyListAliasFactory<
+  any,
+  [offset: number, limit: number, userId?: string, enabledState?: boolean],
+  Readonly<IUserResourceSearchPageOptions>
+>('@users-resource/page', (offset: number, limit: number, userId?: string, enabledState?: boolean) => ({ offset, limit, userId, enabledState }));
+
+export const UsersResourceNewUsers = resourceKeyListAlias('@users-resource/new-users');
 
 interface UserCreateOptions {
   userId: string;
@@ -60,13 +75,19 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     super();
 
     sessionPermissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
-  }
+    this.addAlias(UsersResourceSearchUser, key => {
+      const pageInfo = this.getPageInfo(key as ResourceKeyFlat<string>);
 
-  isNew(id: string): boolean {
-    if (!this.has(id)) {
-      return true;
-    }
-    return NEW_USER_SYMBOL in this.get(id)!;
+      return resourceKeyList(pageInfo?.edges || []);
+    });
+
+    this.addAlias(UsersResourceNewUsers, () => {
+      const orderedKeys = this.entries
+        .filter(k => isNewUser(k[1]))
+        .sort((a, b) => compareUsers(a[1], b[1]))
+        .map(([key]) => key);
+      return resourceKeyList(orderedKeys);
+    });
   }
 
   getEmptyUser(): AdminUserInfo {
@@ -128,6 +149,12 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     }
 
     return this.get(user.userId)!;
+  }
+
+  cleanNewFlags(): void {
+    for (const user of this.data.values()) {
+      (user as AdminUserNew)[NEW_USER_SYMBOL] = false;
+    }
   }
 
   async grantTeam(userId: string, teamId: string, skipUpdate?: boolean): Promise<void> {
@@ -211,7 +238,14 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   }
 
   protected async loader(originalKey: ResourceKey<string>, includes?: string[]): Promise<Map<string, AdminUser>> {
+    const search = this.isAlias(originalKey, UsersResourceSearchUser);
+    const page = this.isAlias(originalKey, CachedMapPageKey);
     const all = this.isAlias(originalKey, CachedMapAllKey);
+
+    if (all) {
+      throw new Error('Loading all users is prohibited');
+    }
+
     const usersList: AdminUser[] = [];
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {
@@ -221,21 +255,41 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
         userId = key;
       }
 
-      const { users } = await this.graphQLService.sdk.getUsersList({
-        userId,
-        ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(userId, includes),
-      });
+      if (userId !== undefined) {
+        const { user } = await this.graphQLService.sdk.getAdminUserInfo({
+          userId,
+          ...this.getDefaultIncludes(),
+          ...this.getIncludesMap(userId, includes),
+        });
 
-      usersList.push(...users);
+        usersList.push(user);
+      } else {
+        const { users } = await this.graphQLService.sdk.getUsersList({
+          page: {
+            offset: page || search ? originalKey.options.offset : 100,
+            limit: page || search ? originalKey.options.limit : 0,
+          },
+          filter: {
+            userIdMask: search ? originalKey.options.userId : undefined,
+            enabledState: search ? originalKey.options.enabledState : undefined,
+          },
+          ...this.getDefaultIncludes(),
+          ...this.getIncludesMap(userId, includes),
+        });
+
+        usersList.push(...users);
+
+        if (page || search) {
+          this.setPageInfo(originalKey, {
+            edges: users.map(user => user.userId),
+            hasNextPage: users.length === originalKey.options.limit,
+          });
+        }
+      }
     });
 
     const key = resourceKeyList(usersList.map(user => user.userId));
-    if (all) {
-      this.replace(key, usersList);
-    } else {
-      this.set(key, usersList);
-    }
+    this.set(key, usersList);
 
     return this.data;
   }
@@ -247,6 +301,11 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     };
   }
 
+  protected dataSet(key: string, value: AdminUserInfoFragment): void {
+    const oldValue = this.data.get(key);
+    super.dataSet(key, { ...oldValue, ...value });
+  }
+
   protected validateKey(key: string): boolean {
     return typeof key === 'string';
   }
@@ -254,4 +313,12 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
 export function isLocalUser(user: AdminUser): boolean {
   return user.origins.some(origin => origin.type === AUTH_PROVIDER_LOCAL_ID);
+}
+
+export function isNewUser(user: AdminUser): boolean {
+  return NEW_USER_SYMBOL in user;
+}
+
+export function compareUsers(a: AdminUser, b: AdminUser): number {
+  return a.userId.localeCompare(b.userId);
 }

@@ -7,6 +7,7 @@ export default [
   ['ui_stepper_back', 'Indietro'],
   ['ui_stepper_next', 'Avanti'],
   ['ui_stepper_finish', 'Termina'],
+  ['ui_load_more', 'Load more'],
   ['ui_processing_loading', 'Caricamento...'],
   ['ui_processing_cancel', 'Annulla'],
   ['ui_processing_canceling', 'Annullamento...'],
