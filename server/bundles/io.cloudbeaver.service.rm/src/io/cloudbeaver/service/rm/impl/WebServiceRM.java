@@ -118,7 +118,6 @@ public class WebServiceRM implements DBWServiceRM {
                 projectId,
                 webSession,
                 resourcePath,
-                getResourceController(webSession).getResourcePath(projectId, resourcePath),
                 WSConstants.EventAction.UPDATE,
                 WSResourceProperty.PROPERTY,
                 propertyName);
@@ -156,7 +155,6 @@ public class WebServiceRM implements DBWServiceRM {
                 projectId,
                 webSession,
                 resourcePath,
-                getResourceController(webSession).getResourcePath(projectId, resourcePath),
                 WSConstants.EventAction.CREATE,
                 WSResourceProperty.NAME);
             return result;
@@ -172,13 +170,11 @@ public class WebServiceRM implements DBWServiceRM {
     ) throws DBException {
         checkIsRmEnabled(webSession);
         try {
-            var rmResourcePath = getResourceController(webSession).getResourcePath(projectId, resourcePath);
             getResourceController(webSession).deleteResource(projectId, resourcePath, false);
             WebEventUtils.addRmResourceUpdatedEvent(
                 projectId,
                 webSession,
                 resourcePath,
-                rmResourcePath,
                 WSConstants.EventAction.DELETE,
                 WSResourceProperty.NAME);
             return true;
@@ -196,22 +192,18 @@ public class WebServiceRM implements DBWServiceRM {
         checkIsRmEnabled(webSession);
         try {
             var resourceController = getResourceController(webSession);
-            var oldRmResourcePath = resourceController.getResourcePath(projectId, oldResourcePath);
-            resourceController.moveResource(projectId, oldResourcePath, newResourcePath);;
-            var newRmResourcePath = resourceController.getResourcePath(projectId, newResourcePath);
+            resourceController.moveResource(projectId, oldResourcePath, newResourcePath);
 
             WebEventUtils.addRmResourceUpdatedEvent(
                 projectId,
                 webSession,
                 oldResourcePath,
-                oldRmResourcePath,
                 WSConstants.EventAction.DELETE,
                 WSResourceProperty.NAME);
             WebEventUtils.addRmResourceUpdatedEvent(
                 projectId,
                 webSession,
                 newResourcePath,
-                newRmResourcePath,
                 WSConstants.EventAction.CREATE,
                 WSResourceProperty.NAME);
             return true;
@@ -241,7 +233,6 @@ public class WebServiceRM implements DBWServiceRM {
                 projectId,
                 webSession,
                 resourcePath,
-                getResourceController(webSession).getResourcePath(projectId, resourcePath),
                 eventType,
                 WSResourceProperty.CONTENT);
             return content;

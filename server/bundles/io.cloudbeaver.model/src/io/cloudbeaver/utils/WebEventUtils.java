@@ -130,18 +130,16 @@ public class WebEventUtils {
         String projectId,
         WebSession session,
         String resourcePath,
-        RMResource[] resourceParsedPath,
         WSConstants.EventAction eventAction,
         WSResourceProperty property
     ) {
-        addRmResourceUpdatedEvent(projectId, session, resourcePath, resourceParsedPath, eventAction, property, null);
+        addRmResourceUpdatedEvent(projectId, session, resourcePath, eventAction, property, null);
     }
 
     public static void addRmResourceUpdatedEvent(
         String projectId,
         WebSession session,
         String resourcePath,
-        RMResource[] resourceParsedPath,
         WSConstants.EventAction eventAction,
         WSResourceProperty property,
         String details
@@ -154,7 +152,6 @@ public class WebEventUtils {
                     session.getUserId(),
                     projectId,
                     resourcePath,
-                    resourceParsedPath,
                     property,
                     details
                 );
@@ -165,7 +162,6 @@ public class WebEventUtils {
                     session.getUserId(),
                     projectId,
                     resourcePath,
-                    resourceParsedPath,
                     property,
                     details
                 );
@@ -176,7 +172,6 @@ public class WebEventUtils {
                     session.getUserId(),
                     projectId,
                     resourcePath,
-                    resourceParsedPath,
                     property,
                     details
                 );
