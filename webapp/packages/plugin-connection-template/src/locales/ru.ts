@@ -8,5 +8,5 @@ export default [
   ['basicConnection_connectionDialog_passwordPlaceholder', 'password'],
   ['basicConnection_connectionDialog_connecting', 'Подключение...'],
   ['basicConnection_connectionDialog_connecting_message', 'Подключение к базе...'],
-  ['basicConnection_main_menu_item', 'Из шаблона'],
+  ['plugin_connection_template_action_connection_template_label', 'Из шаблона'],
 ];
