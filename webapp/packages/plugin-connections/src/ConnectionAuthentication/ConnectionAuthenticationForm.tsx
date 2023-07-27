@@ -6,10 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
 import {
-  BASE_CONTAINERS_STYLES,
   Container,
   FieldCheckbox,
   Group,
@@ -17,7 +15,6 @@ import {
   ObjectPropertyInfoForm,
   TextPlaceholder,
   useResource,
-  useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
@@ -62,7 +59,7 @@ export const ConnectionAuthenticationForm = observer<Props>(function ConnectionA
     properties = properties.filter(property => !property.features.some(feature => hideFeatures.includes(feature)));
   }
 
-  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+  return (
     <Container className={className}>
       {authModelId && (
         <Group gap small>
@@ -98,6 +95,6 @@ export const ConnectionAuthenticationForm = observer<Props>(function ConnectionA
           disabled={disabled}
         />
       )}
-    </Container>,
+    </Container>
   );
 });

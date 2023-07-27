@@ -9,8 +9,11 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
+import { s } from '../s';
+import { useS } from '../useS';
 import { useStyles } from '../useStyles';
 import { baseFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
@@ -139,7 +142,9 @@ export const Radio: RadioType = observer(function Radio({
   children,
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
+  const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
+  const sizeStyles = useS(elementsSizeStyles);
   const formContext = useContext(FormContext);
   const context = useContext(RadioGroupContext);
 
@@ -188,7 +193,7 @@ export const Radio: RadioType = observer(function Radio({
       rest.disabled && radioState.disabled,
     ),
   )(
-    <field className={className}>
+    <field className={s(sizeStyles, { ...layoutProps }, className)}>
       <radio>
         <input {...rest} type="radio" id={id} name={name} value={value ?? ''} checked={checked} onChange={handleChange} />
         <radio-background>

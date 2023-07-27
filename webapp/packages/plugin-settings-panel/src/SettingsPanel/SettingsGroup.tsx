@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
+import { Group, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { PluginManagerService } from '@cloudbeaver/core-plugin';
 import { SettingsGroupType, SettingsManagerService, SettingsScopeType } from '@cloudbeaver/core-settings';
@@ -44,12 +43,12 @@ export const SettingsGroup = observer<Props>(function SettingsGroup({ group }) {
     return null;
   }
 
-  return styled(BASE_CONTAINERS_STYLES)(
+  return (
     <Group gap vertical>
       <GroupTitle keepSize large>
         {translate(group.name)}
       </GroupTitle>
       <SettingsInfoForm fields={settings} readOnly />
-    </Group>,
+    </Group>
   );
 });

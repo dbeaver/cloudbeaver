@@ -5,25 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import styled, { css } from 'reshadow';
-
-const SNACKBAR_CONTENT_STYLES = css`
-  notification-content {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow: hidden;
-  }
-`;
+import { s } from '../../s';
+import { useS } from '../../useS';
+import style from './SnackbarContent.m.css';
 
 interface Props {
   className?: string;
 }
 
 export const SnackbarContent: React.FC<React.PropsWithChildren<Props>> = function SnackbarContent({ children, className }) {
-  return styled(SNACKBAR_CONTENT_STYLES)(
-    <notification-content as="div" className={className}>
+  const styles = useS(style);
+  return (
+    <div data-testid="notification-content" className={s(styles, { notificationContent: true }, className)}>
       {children}
-    </notification-content>,
+    </div>
   );
 };

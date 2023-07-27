@@ -74,7 +74,7 @@ public class LocalResourceController implements RMController {
     public static final String DEFAULT_CHANGE_ID = "0";
 
     private final DBPWorkspace workspace;
-    private final SMCredentialsProvider credentialsProvider;
+    protected final SMCredentialsProvider credentialsProvider;
 
     private final Path rootPath;
     private final Path userProjectsPath;
@@ -355,12 +355,12 @@ public class LocalResourceController implements RMController {
     @Override
     public String getProjectsDataSources(@NotNull String projectId, @Nullable String[] dataSourceIds) throws DBException {
         DBPProject projectMetadata = getWebProject(projectId, false);
-        DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
-        registry.checkForErrors();
         return doFileReadOperation(
             projectId,
             projectMetadata.getMetadataFolder(false),
             () -> {
+                DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
+                registry.checkForErrors();
                 DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
                 Predicate<DBPDataSourceContainer> filter = null;
                 if (!ArrayUtils.isEmpty(dataSourceIds)) {
@@ -920,21 +920,21 @@ public class LocalResourceController implements RMController {
         }
     }
 
-    private <T> T doProjectOperation(String projectId, RMFileOperation<T> operation) throws DBException {
+    protected <T> T doProjectOperation(String projectId, RMFileOperation<T> operation) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
             fileHandler.projectOpened(projectId);
         }
         return operation.doOperation();
     }
 
-    private <T> T doFileReadOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
+    protected <T> T doFileReadOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
             fileHandler.beforeFileRead(projectId, file);
         }
         return operation.doOperation();
     }
 
-    private <T> T doFileWriteOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
+    protected <T> T doFileWriteOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
             fileHandler.beforeFileChange(projectId, file);
         }

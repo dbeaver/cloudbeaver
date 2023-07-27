@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES,
   Button,
   getComputed,
   getSelectedItems,
@@ -97,10 +96,7 @@ export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAc
     }
   }
 
-  return styled(
-    styles,
-    BASE_CONTAINERS_STYLES,
-  )(
+  return styled(styles)(
     <Group box medium overflow>
       <container>
         <ConnectionAccessTableHeader filterState={filterState} disabled={disabled}>

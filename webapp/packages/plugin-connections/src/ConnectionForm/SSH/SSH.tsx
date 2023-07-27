@@ -10,7 +10,6 @@ import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  BASE_CONTAINERS_STYLES,
   Button,
   ColoredContainer,
   Combobox,
@@ -74,7 +73,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
     setLoading(false);
   };
 
-  const styles = useStyles(SSH_STYLES, BASE_CONTAINERS_STYLES);
+  const styles = useStyles(SSH_STYLES);
   const translate = useTranslate();
   const disabled = formDisabled || loading;
   const enabled = handlerState.enabled || false;

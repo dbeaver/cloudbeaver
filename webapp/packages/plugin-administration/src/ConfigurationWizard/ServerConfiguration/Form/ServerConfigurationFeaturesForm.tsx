@@ -7,19 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
 
 import { AdministrationSettingsService } from '@cloudbeaver/core-administration';
-import {
-  BASE_CONTAINERS_STYLES,
-  FormContext,
-  GroupTitle,
-  PlaceholderComponent,
-  Switch,
-  useResource,
-  useStyles,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { FormContext, GroupTitle, PlaceholderComponent, Switch, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { FeaturesResource } from '@cloudbeaver/core-root';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
@@ -35,13 +25,12 @@ export const ServerConfigurationFeaturesForm: PlaceholderComponent<IConfiguratio
     const administrationSettingsService = useService(AdministrationSettingsService);
     const features = useResource(ServerConfigurationFeaturesForm, FeaturesResource, configurationWizard ? null : undefined);
     const translate = useTranslate();
-    const styles = useStyles(BASE_CONTAINERS_STYLES);
 
     if (features.data.length === 0 || configurationWizard) {
       return null;
     }
 
-    return styled(styles)(
+    return (
       <>
         <GroupTitle>{translate('administration_configuration_wizard_configuration_services_group')}</GroupTitle>
         {features.data.map(feature => (
@@ -58,7 +47,7 @@ export const ServerConfigurationFeaturesForm: PlaceholderComponent<IConfiguratio
             {feature.label}
           </Switch>
         ))}
-      </>,
+      </>
     );
   },
 );

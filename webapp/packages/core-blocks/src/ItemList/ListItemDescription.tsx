@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useContext } from 'react';
-import styled from 'reshadow';
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './ItemList.m.css';
 
-import { useStyles } from '../useStyles';
-import { Styles } from './styles';
 
 interface Props {
   title?: string;
@@ -17,11 +16,11 @@ interface Props {
 }
 
 export const ListItemDescription: React.FC<React.PropsWithChildren<Props>> = function ListItemDescription({ title, children, className }) {
-  const styles = useContext(Styles);
+  const styles = useS(style);
 
-  return styled(useStyles(styles))(
-    <list-item-description title={title} className={className}>
+  return (
+    <div title={title} className={s(styles, { listItemDescription: true }, className)}>
       {children}
-    </list-item-description>,
+    </div>
   );
 };
