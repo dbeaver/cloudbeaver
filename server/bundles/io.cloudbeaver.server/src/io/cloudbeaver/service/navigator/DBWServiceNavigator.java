@@ -53,8 +53,8 @@ public interface DBWServiceNavigator extends DBWService {
     boolean setNavigatorNodeFilter(
         @NotNull WebSession webSession,
         @NotNull String nodePath,
-        @Nullable String[] include,
-        @Nullable String[] exclude) throws DBWebException;
+        @Nullable List<String> include,
+        @Nullable List<String> exclude) throws DBWebException;
 
     @WebAction
     boolean refreshNavigatorNode(

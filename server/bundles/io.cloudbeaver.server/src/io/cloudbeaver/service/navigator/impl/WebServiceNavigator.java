@@ -57,7 +57,6 @@ import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.text.MessageFormat;
@@ -210,7 +209,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     }
 
     @Override
-    public boolean setNavigatorNodeFilter(@NotNull WebSession webSession, @NotNull String nodePath, @Nullable String[] include, @Nullable String[] exclude) throws DBWebException {
+    public boolean setNavigatorNodeFilter(
+        @NotNull WebSession webSession,
+        @NotNull String nodePath,
+        @Nullable List<String> include,
+        @Nullable List<String> exclude) throws DBWebException {
         try {
             DBRProgressMonitor monitor = webSession.getProgressMonitor();
 
@@ -222,11 +225,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
             }
             DBSObjectFilter filter = new DBSObjectFilter();
-            if (!ArrayUtils.isEmpty(include)) {
-                filter.setInclude(Arrays.asList(include));
+            if (!CommonUtils.isEmpty(include)) {
+                filter.setInclude(include);
             }
-            if (!ArrayUtils.isEmpty(exclude)) {
-                filter.setExclude(Arrays.asList(exclude));
+            if (!CommonUtils.isEmpty(exclude)) {
+                filter.setExclude(exclude);
             }
             ((DBNDatabaseFolder) node).setNodeFilter(
                 ((DBNDatabaseFolder) node).getItemsMeta(), filter, true);
