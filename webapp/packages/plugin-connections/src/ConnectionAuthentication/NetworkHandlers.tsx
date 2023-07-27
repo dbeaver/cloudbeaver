@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, useStyles } from '@cloudbeaver/core-blocks';
+import { Group } from '@cloudbeaver/core-blocks';
 import type { NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
 import { NetworkHandlerAuthForm } from './NetworkHandlerAuthForm';
@@ -21,13 +20,11 @@ interface Props {
 }
 
 export const NetworkHandlers = observer<Props>(function NetworkHandlers({ networkHandlers, networkHandlersConfig, allowSaveCredentials, disabled }) {
-  const styles = useStyles(BASE_CONTAINERS_STYLES);
-
   if (!networkHandlers.length) {
     return null;
   }
 
-  return styled(styles)(
+  return (
     <Group gap small>
       {networkHandlers.map(handler => (
         <NetworkHandlerAuthForm
@@ -38,6 +35,6 @@ export const NetworkHandlers = observer<Props>(function NetworkHandlers({ networ
           disabled={disabled}
         />
       ))}
-    </Group>,
+    </Group>
   );
 });

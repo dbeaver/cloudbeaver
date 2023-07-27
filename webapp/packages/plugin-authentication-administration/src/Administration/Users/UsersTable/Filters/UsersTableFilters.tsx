@@ -10,7 +10,7 @@ import { useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { AuthRolesResource } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, Combobox, Filter, Group, IconOrImage, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Combobox, Filter, Group, IconOrImage, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { IUserFilters, USER_ROLE_ALL, USER_STATUSES } from './useUsersTableFilters';
 
@@ -61,7 +61,7 @@ interface Props {
 
 export const UsersTableFilters = observer<Props>(function UsersTableFilters({ filters }) {
   const translate = useTranslate();
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles);
+  const style = useStyles(styles);
   const authRolesResource = useResource(UsersTableFilters, AuthRolesResource, undefined);
 
   const [open, setOpen] = useState(false);

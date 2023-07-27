@@ -82,6 +82,11 @@ export interface AdminTeamInfo {
   teamPermissions: Array<Scalars['ID']>;
 }
 
+export interface AdminUserFilterInput {
+  enabledState?: InputMaybe<Scalars['Boolean']>;
+  userIdMask?: InputMaybe<Scalars['String']>;
+}
+
 export interface AdminUserInfo {
   authRole?: Maybe<Scalars['String']>;
   configurationParameters: Scalars['Object'];
@@ -835,24 +840,30 @@ export enum NetworkHandlerAuthType {
 }
 
 export interface NetworkHandlerConfig {
+  /** @deprecated Field no longer supported */
   authType: NetworkHandlerAuthType;
   enabled: Scalars['Boolean'];
   id: Scalars['ID'];
+  /** @deprecated Field no longer supported */
   key?: Maybe<Scalars['String']>;
   password?: Maybe<Scalars['String']>;
   properties: Scalars['Object'];
   savePassword: Scalars['Boolean'];
+  secureProperties: Scalars['Object'];
   userName?: Maybe<Scalars['String']>;
 }
 
 export interface NetworkHandlerConfigInput {
+  /** @deprecated Field no longer supported */
   authType?: InputMaybe<NetworkHandlerAuthType>;
   enabled?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
+  /** @deprecated Field no longer supported */
   key?: InputMaybe<Scalars['String']>;
   password?: InputMaybe<Scalars['String']>;
   properties?: InputMaybe<Scalars['Object']>;
   savePassword?: InputMaybe<Scalars['Boolean']>;
+  secureProperties?: InputMaybe<Scalars['Object']>;
   userName?: InputMaybe<Scalars['String']>;
 }
 
@@ -927,6 +938,11 @@ export enum ObjectPropertyLength {
   Tiny = 'TINY',
 }
 
+export interface PageInput {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+}
+
 export interface ProductInfo {
   buildTime: Scalars['String'];
   description?: Maybe<Scalars['String']>;
@@ -953,6 +969,7 @@ export interface ProjectInfo {
 
 export interface Query {
   activeUser?: Maybe<UserInfo>;
+  adminUserInfo: AdminUserInfo;
   authChangeLocalPassword: Scalars['Boolean'];
   authLogin: AuthInfo;
   authLogout?: Maybe<Scalars['Boolean']>;
@@ -1035,6 +1052,10 @@ export interface Query {
   templateConnections: Array<ConnectionInfo>;
   updateTeam: AdminTeamInfo;
   userConnections: Array<ConnectionInfo>;
+}
+
+export interface QueryAdminUserInfoArgs {
+  userId: Scalars['ID'];
 }
 
 export interface QueryAuthChangeLocalPasswordArgs {
@@ -1161,7 +1182,8 @@ export interface QueryListTeamsArgs {
 }
 
 export interface QueryListUsersArgs {
-  userId?: InputMaybe<Scalars['ID']>;
+  filter: AdminUserFilterInput;
+  page: PageInput;
 }
 
 export interface QueryMetadataGetNodeDdlArgs {
@@ -2118,6 +2140,42 @@ export type EnableUserQueryVariables = Exact<{
 
 export type EnableUserQuery = { enableUser?: boolean };
 
+export type GetAdminUserInfoQueryVariables = Exact<{
+  userId: Scalars['ID'];
+  includeMetaParameters: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+}>;
+
+export type GetAdminUserInfoQuery = {
+  user: {
+    userId: string;
+    grantedTeams: Array<string>;
+    linkedAuthProviders: Array<string>;
+    metaParameters?: any;
+    enabled: boolean;
+    authRole?: string;
+    origins: Array<{
+      type: string;
+      subType?: string;
+      displayName: string;
+      icon?: string;
+      details?: Array<{
+        id?: string;
+        displayName?: string;
+        description?: string;
+        category?: string;
+        dataType?: string;
+        defaultValue?: any;
+        validValues?: Array<any>;
+        value?: any;
+        length: ObjectPropertyLength;
+        features: Array<string>;
+        order: number;
+      }>;
+    }>;
+  };
+};
+
 export type GetUserGrantedConnectionsQueryVariables = Exact<{
   userId: Scalars['ID'];
 }>;
@@ -2127,7 +2185,8 @@ export type GetUserGrantedConnectionsQuery = {
 };
 
 export type GetUsersListQueryVariables = Exact<{
-  userId?: InputMaybe<Scalars['ID']>;
+  page: PageInput;
+  filter: AdminUserFilterInput;
   includeMetaParameters: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
@@ -2362,6 +2421,7 @@ export type CloseConnectionMutation = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2462,6 +2522,7 @@ export type CreateConnectionMutation = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2571,6 +2632,7 @@ export type CreateConnectionFromNodeMutation = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2672,6 +2734,7 @@ export type CreateConnectionFromTemplateMutation = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2914,6 +2977,7 @@ export type GetTemplateConnectionsQuery = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3015,6 +3079,7 @@ export type GetUserConnectionsQuery = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3119,6 +3184,7 @@ export type InitConnectionMutation = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3224,6 +3290,7 @@ export type SetConnectionNavigatorSettingsMutation = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3345,6 +3412,7 @@ export type UpdateConnectionMutation = {
       key?: string;
       savePassword: boolean;
       properties: any;
+      secureProperties: any;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3768,6 +3836,7 @@ export type DatabaseConnectionFragment = {
     key?: string;
     savePassword: boolean;
     properties: any;
+    secureProperties: any;
   }>;
   navigatorSettings: {
     showSystemObjects: boolean;
@@ -5073,6 +5142,7 @@ export const DatabaseConnectionFragmentDoc = `
     key
     savePassword
     properties
+    secureProperties
   }
   navigatorSettings {
     ...AllNavigatorSettings
@@ -5501,6 +5571,13 @@ export const EnableUserDocument = `
   enableUser(userId: $userId, enabled: $enabled)
 }
     `;
+export const GetAdminUserInfoDocument = `
+    query getAdminUserInfo($userId: ID!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  user: adminUserInfo(userId: $userId) {
+    ...AdminUserInfo
+  }
+}
+    ${AdminUserInfoFragmentDoc}`;
 export const GetUserGrantedConnectionsDocument = `
     query getUserGrantedConnections($userId: ID!) {
   grantedConnections: getSubjectConnectionAccess(subjectId: $userId) {
@@ -5512,8 +5589,8 @@ export const GetUserGrantedConnectionsDocument = `
 }
     `;
 export const GetUsersListDocument = `
-    query getUsersList($userId: ID, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
-  users: listUsers(userId: $userId) {
+    query getUsersList($page: PageInput!, $filter: AdminUserFilterInput!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  users: listUsers(page: $page, filter: $filter) {
     ...AdminUserInfo
   }
 }
@@ -6864,6 +6941,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
       return withWrapper(
         wrappedRequestHeaders => client.request<EnableUserQuery>(EnableUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
         'enableUser',
+        'query',
+      );
+    },
+    getAdminUserInfo(variables: GetAdminUserInfoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetAdminUserInfoQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<GetAdminUserInfoQuery>(GetAdminUserInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
+        'getAdminUserInfo',
         'query',
       );
     },

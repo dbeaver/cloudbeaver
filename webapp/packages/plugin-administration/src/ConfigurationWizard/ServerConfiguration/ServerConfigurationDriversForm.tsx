@@ -10,7 +10,6 @@ import { useCallback } from 'react';
 import styled from 'reshadow';
 
 import {
-  BASE_CONTAINERS_STYLES,
   Combobox,
   Group,
   GroupTitle,
@@ -66,7 +65,7 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
     }
   }, []);
 
-  return styled(useStyles(BASE_CONTAINERS_STYLES, style))(
+  return styled(useStyles(style))(
     <Group maximum gap>
       <GroupTitle>{translate('administration_disabled_drivers_title')}</GroupTitle>
       <Combobox

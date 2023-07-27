@@ -7,7 +7,7 @@
  */
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, Group, GroupTitle, Link, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Group, GroupTitle, Link, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 
 import { Shortcut } from './Shortcut';
@@ -35,7 +35,7 @@ const style = css`
 
 export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({ rejectDialog }) {
   const translate = useTranslate();
-  const styles = useStyles(BASE_CONTAINERS_STYLES, style);
+  const styles = useStyles(style);
 
   return styled(styles)(
     <CommonDialogWrapper size="large">

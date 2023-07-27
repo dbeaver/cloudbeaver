@@ -11,11 +11,12 @@ import { AuthenticationLocaleService } from './AuthenticationLocaleService';
 import { AuthenticationService } from './AuthenticationService';
 import { AuthDialogService } from './Dialog/AuthDialogService';
 import { PluginBootstrap } from './PluginBootstrap';
+import { UserLoadingErrorDialogBootstrap } from './UserLoadingErrorDialogBootstrap';
 
 export const manifest: PluginManifest = {
   info: {
     name: 'Plugin Authentication',
   },
 
-  providers: [AuthenticationService, AuthDialogService, PluginBootstrap, AuthenticationLocaleService],
+  providers: [AuthenticationService, AuthDialogService, PluginBootstrap, AuthenticationLocaleService, UserLoadingErrorDialogBootstrap],
 };

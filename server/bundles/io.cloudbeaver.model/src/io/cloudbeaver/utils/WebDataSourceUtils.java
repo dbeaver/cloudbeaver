@@ -88,8 +88,22 @@ public class WebDataSourceUtils {
         if (cfgInput.getPassword() != null) {
             handlerConfig.setPassword(cfgInput.getPassword());
         }
-        if (cfgInput.getKey() != null) {
+        setSecureProperties(handlerConfig, cfgInput, true);
+        if (cfgInput.getKey() != null) { // backward compatibility
             handlerConfig.setSecureProperty(SSHConstants.PROP_KEY_VALUE, cfgInput.getKey());
+        }
+    }
+
+    private static void setSecureProperties(DBWHandlerConfiguration handlerConfig, WebNetworkHandlerConfigInput cfgInput, boolean ignoreNulls) {
+        var secureProperties = cfgInput.getSecureProperties();
+        if (secureProperties == null) {
+            return;
+        }
+        for (var pr : secureProperties.entrySet()) {
+            if (ignoreNulls && pr.getValue() == null) {
+                continue;
+            }
+            handlerConfig.setSecureProperty(pr.getKey(), pr.getValue());
         }
     }
 
@@ -121,7 +135,7 @@ public class WebDataSourceUtils {
     public static void updateHandlerCredentials(DBWHandlerConfiguration handlerCfg, WebNetworkHandlerConfigInput webConfig) {
         handlerCfg.setUserName(webConfig.getUserName());
         handlerCfg.setPassword(webConfig.getPassword());
-        handlerCfg.setSecureProperty(SSHConstants.PROP_KEY_VALUE, webConfig.getKey());
+        setSecureProperties(handlerCfg, webConfig, false);
     }
 
 
