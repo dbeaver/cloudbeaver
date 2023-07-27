@@ -460,12 +460,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         String projectId = rmNode.getResourceProject().getId();
         // Get paths from nodes
         String resourcePath = rmNode.getResourceFolder();
-        RMController rmController = session.getRmController();
-        var oldRmResourcePath = rmController.getResourcePath(projectId, resourcePath);
         node.rename(session.getProgressMonitor(), newName);
         var newPath = rmNode.getResourceFolder();
-        var newRmResourcePath = rmController.getResourcePath(projectId, newPath);
-        addRmMoveEvent(session, projectId, resourcePath, newPath, oldRmResourcePath, newRmResourcePath);
+        addRmMoveEvent(session, projectId, resourcePath, newPath);
         return node.getName();
     }
 
@@ -473,22 +470,18 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         @NotNull WebSession session,
         String projectId,
         String oldResourcePath,
-        String newResourcePath,
-        RMResource[] oldRmResourcePath,
-        RMResource[] newRmResourcePath
+        String newResourcePath
     ) {
         WebEventUtils.addRmResourceUpdatedEvent(
             projectId,
             session,
             oldResourcePath,
-            oldRmResourcePath,
             WSConstants.EventAction.DELETE,
             WSResourceProperty.NAME);
         WebEventUtils.addRmResourceUpdatedEvent(
             projectId,
             session,
             newResourcePath,
-            newRmResourcePath,
             WSConstants.EventAction.CREATE,
             WSResourceProperty.NAME);
     }
@@ -550,13 +543,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     DBNResourceManagerResource rmResource = ((DBNResourceManagerResource) node);
                     String resourceProjectId = rmResource.getResourceProject().getId();
                     String resourcePath = rmResource.getResourceFolder();
-                    var rmResourcePath = session.getRmController().getResourcePath(resourceProjectId, resourcePath);
                     session.getRmController().deleteResource(resourceProjectId, resourcePath, true);
                     WebEventUtils.addRmResourceUpdatedEvent(
                         resourceProjectId,
                         session,
                         resourcePath,
-                        rmResourcePath,
                         WSConstants.EventAction.DELETE,
                         WSResourceProperty.NAME);
                 }
@@ -649,11 +640,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         newPath = ((DBNResourceManagerResource) folderNode).getResourceFolder() + "/" + newPath;
                     }
                     String resourcePath = rmOldNode.getResourceFolder();
-                    RMController rmController = session.getRmController();
-                    var oldRmResourcePath = rmController.getResourcePath(projectId, resourcePath);
-                    rmController.moveResource(projectId, resourcePath, newPath);
-                    var newRmResourcePath = rmController.getResourcePath(projectId, newPath);
-                    addRmMoveEvent(session, projectId, resourcePath, newPath, oldRmResourcePath, newRmResourcePath);
+                    session.getRmController().moveResource(projectId, resourcePath, newPath);
+                    addRmMoveEvent(session, projectId, resourcePath, newPath);
                 } else {
                     throw new DBWebException("Navigator node '"  + path + "' is not a data source node");
                 }
