@@ -10,6 +10,9 @@ import { useContext, useEffect, useMemo, useRef } from 'react';
 import { appContext } from './AppContext';
 import type { ExtractInitArgs, IDestructibleController, IInitializableController, IServiceConstructor } from './IApp';
 
+/**
+ * @deprecated use hooks instead
+ */
 export function useController<T extends IInitializableController>(ctor: IServiceConstructor<T>, ...args: ExtractInitArgs<T>): T;
 export function useController<T>(ctor: IServiceConstructor<T>): T;
 export function useController<T>(ctor: IServiceConstructor<T>, ...args: any[]): T {

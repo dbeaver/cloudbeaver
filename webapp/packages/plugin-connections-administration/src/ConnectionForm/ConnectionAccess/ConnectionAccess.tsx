@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 
 import { TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Container,
   Group,
@@ -85,16 +84,10 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
     info = 'cloud_connections_access_placeholder';
   }
 
-  return styled(
-    styles,
-    BASE_CONTAINERS_STYLES,
-  )(
+  return styled(styles)(
     <Loader state={[users, teams, state.state]}>
       {() =>
-        styled(
-          styles,
-          BASE_CONTAINERS_STYLES,
-        )(
+        styled(styles)(
           <ColoredContainer parent gap vertical>
             {!users.resource.values.length && !teams.resource.values.length ? (
               <Group keepSize large>

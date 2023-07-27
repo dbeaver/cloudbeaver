@@ -9,7 +9,6 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   FieldCheckbox,
   Group,
@@ -47,7 +46,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
 
   const translate = useTranslate();
 
-  const styles = useStyles(SSl_STYLES, BASE_CONTAINERS_STYLES);
+  const styles = useStyles(SSl_STYLES);
   const { credentialsSavingEnabled } = useAdministrationSettings();
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(handler.properties);
 
@@ -58,7 +57,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
   return styled(styles)(
     <SubmittingForm>
       <ColoredContainer parent>
-        <Group gap form keepSize large vertical>
+        <Group gap form large vertical>
           <Switch name="enabled" state={handlerState} description={handler.description} mod={['primary']} disabled={disabled || readonly}>
             {translate('connections_public_connection_ssl_enable')}
           </Switch>

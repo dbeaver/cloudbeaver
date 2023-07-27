@@ -8,11 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, Group, InputField, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, InputField, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { AuthProvidersList } from '@cloudbeaver/plugin-user-profile';
 
-import { AuthProvidersList } from '../AuthProviders/ConfigurationsList';
 import { MetaParameterInfoForm } from './MetaParameterInfoForm';
 
 interface Props {
@@ -22,7 +22,7 @@ interface Props {
 }
 
 export const MetaParametersForm = observer<Props>(function MetaParametersForm({ user, className, style }) {
-  const styles = useStyles(style, BASE_CONTAINERS_STYLES);
+  const styles = useStyles(style);
   const translate = useTranslate();
 
   return styled(styles)(

@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Combobox, Group, GroupTitle, ITag, Tag, Tags, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Combobox, Group, GroupTitle, ITag, Tag, Tags, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey, resourceKeyList, ServerConfigInput } from '@cloudbeaver/core-sdk';
 
@@ -57,7 +57,7 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
     }
   }, []);
 
-  return styled(useStyles(BASE_CONTAINERS_STYLES, style))(
+  return styled(useStyles(style))(
     <Group maximum gap>
       <GroupTitle>{translate('administration_disabled_drivers_title')}</GroupTitle>
       <Combobox

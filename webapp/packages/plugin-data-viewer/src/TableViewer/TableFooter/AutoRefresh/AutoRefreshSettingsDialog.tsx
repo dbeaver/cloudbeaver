@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, FieldCheckbox, Group, InputField, SubmittingForm, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, FieldCheckbox, Group, InputField, SubmittingForm, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
 import type { IAutoRefreshSettings } from './IAutoRefreshSettings';
@@ -61,10 +61,7 @@ export const AutoRefreshSettingsDialog = observer<DialogComponentProps<Payload>>
     }
   }
 
-  return styled(
-    styles,
-    BASE_CONTAINERS_STYLES,
-  )(
+  return styled(styles)(
     <CommonDialogWrapper size="small">
       <CommonDialogHeader title="data_viewer_auto_refresh_settings" icon="/icons/settings_cog_m.svg" onReject={rejectDialog} />
       <CommonDialogBody noBodyPadding noOverflow>

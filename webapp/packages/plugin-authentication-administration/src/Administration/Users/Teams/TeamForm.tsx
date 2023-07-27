@@ -10,16 +10,7 @@ import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import {
-  BASE_CONTAINERS_STYLES,
-  IconOrImage,
-  Loader,
-  Placeholder,
-  useExecutor,
-  useObjectRef,
-  useStyles,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { IconOrImage, Loader, Placeholder, useExecutor, useObjectRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
@@ -107,7 +98,7 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
   const translate = useTranslate();
   const props = useObjectRef({ onSave });
   const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
-  const styles = useStyles(style, BASE_CONTAINERS_STYLES, topBarStyles, formStyles);
+  const styles = useStyles(style, topBarStyles, formStyles);
   const service = useService(TeamFormService);
 
   useExecutor({

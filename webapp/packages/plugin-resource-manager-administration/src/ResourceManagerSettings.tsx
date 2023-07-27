@@ -6,15 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, GroupTitle, PlaceholderComponent, Switch, useTranslate } from '@cloudbeaver/core-blocks';
+import { GroupTitle, PlaceholderComponent, Switch, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
 
 export const ResourceManagerSettings: PlaceholderComponent<IConfigurationPlaceholderProps> = observer(function ResourceManagerSettings({ state }) {
   const translate = useTranslate();
 
-  return styled(BASE_CONTAINERS_STYLES)(
+  return (
     <>
       <GroupTitle>{translate('plugin_resource_manager_title')}</GroupTitle>
       <Switch
@@ -27,6 +26,6 @@ export const ResourceManagerSettings: PlaceholderComponent<IConfigurationPlaceho
       >
         {translate('plugin_resource_manager_administration_settings_enable')}
       </Switch>
-    </>,
+    </>
   );
 });

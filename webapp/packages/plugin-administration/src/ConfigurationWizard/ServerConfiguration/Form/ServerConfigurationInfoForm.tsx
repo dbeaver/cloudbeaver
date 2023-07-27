@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, GroupTitle, InputField, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Group, GroupTitle, InputField, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState';
@@ -20,7 +19,7 @@ interface Props {
 export const ServerConfigurationInfoForm = observer<Props>(function ServerConfigurationInfoForm({ state }) {
   const serverConfigLoader = useResource(ServerConfigurationInfoForm, ServerConfigResource, undefined);
   const translate = useTranslate();
-  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+  return (
     <Group form gap>
       <GroupTitle>{translate('administration_configuration_wizard_configuration_server_info')}</GroupTitle>
       <InputField type="text" name="serverName" state={state.serverConfig} mod="surface" required medium>
@@ -52,6 +51,6 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
       >
         {translate('administration_configuration_wizard_configuration_server_session_lifetime')}
       </InputField>
-    </Group>,
+    </Group>
   );
 });

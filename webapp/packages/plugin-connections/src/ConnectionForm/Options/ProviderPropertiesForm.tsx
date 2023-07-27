@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Container, Group, GroupTitle, ObjectPropertyInfoForm, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Group, GroupTitle, ObjectPropertyInfoForm, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ConnectionConfig, DriverProviderPropertyInfoFragment } from '@cloudbeaver/core-sdk';
 
 type DriverProviderPropertyInfo = DriverProviderPropertyInfoFragment;
@@ -32,7 +31,7 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
   const booleanProperties = supportedProperties.filter(property => property.dataType === 'Boolean');
   const nonBooleanProperties = supportedProperties.filter(property => property.dataType !== 'Boolean');
 
-  return styled(BASE_CONTAINERS_STYLES)(
+  return (
     <Group form gap>
       <GroupTitle>{translate('ui_settings')}</GroupTitle>
       {booleanProperties.length > 0 && (
@@ -59,6 +58,6 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
           />
         </Container>
       )}
-    </Group>,
+    </Group>
   );
 });

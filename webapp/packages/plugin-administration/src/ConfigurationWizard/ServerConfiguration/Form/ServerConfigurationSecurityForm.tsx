@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, GroupTitle, Switch, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Group, GroupTitle, Switch, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 
 interface Props {
@@ -17,7 +16,7 @@ interface Props {
 
 export const ServerConfigurationSecurityForm = observer<Props>(function ServerConfigurationSecurityForm({ serverConfig }) {
   const translate = useTranslate();
-  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+  return (
     <Group form gap>
       <GroupTitle>{translate('administration_configuration_wizard_configuration_security')}</GroupTitle>
       <Switch
@@ -41,6 +40,6 @@ export const ServerConfigurationSecurityForm = observer<Props>(function ServerCo
       >
         {translate('administration_configuration_wizard_configuration_security_public_credentials')}
       </Switch>
-    </Group>,
+    </Group>
   );
 });
