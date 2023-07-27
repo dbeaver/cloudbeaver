@@ -11,7 +11,6 @@ import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  BASE_CONTAINERS_STYLES,
   Button,
   Container,
   InputField,
@@ -158,10 +157,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
   const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
   const subTitle = createPath(projectInfoLoader.data?.name ?? state.projectId, state.folder);
 
-  return styled(
-    style,
-    BASE_CONTAINERS_STYLES,
-  )(
+  return styled(style)(
     <CommonDialogWrapper size="small" className={className} fixedWidth>
       <CommonDialogHeader subTitle={subTitle} title={title} icon={icon} viewBox={viewBox} bigIcon={bigIcon} onReject={rejectDialog} />
       <CommonDialogBody>

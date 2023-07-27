@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Container, InputField, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, InputField, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 interface Props {
@@ -23,7 +22,7 @@ interface Props {
 export const ParametersForm = observer<Props>(function ParametersForm({ config, embedded, requiresServerName, disabled, readOnly, originLocal }) {
   const translate = useTranslate();
 
-  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+  return (
     <Container gap>
       {!embedded && (
         <Container wrap gap>
@@ -43,6 +42,6 @@ export const ParametersForm = observer<Props>(function ParametersForm({ config, 
           {translate('customConnection_custom_server_name')}
         </InputField>
       )}
-    </Container>,
+    </Container>
   );
 });

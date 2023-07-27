@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, GroupTitle, type PlaceholderComponent, Switch, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { GroupTitle, type PlaceholderComponent, Switch, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IElementsTreeSettingsProps } from './ElementsTreeSettingsService';
 
@@ -16,7 +16,7 @@ export const ElementsTreeBaseSettingsForm: PlaceholderComponent<IElementsTreeSet
   tree: { root, settings },
   style,
 }) {
-  const styles = useStyles(BASE_CONTAINERS_STYLES, style);
+  const styles = useStyles(style);
   const translate = useTranslate();
 
   if (!settings) {

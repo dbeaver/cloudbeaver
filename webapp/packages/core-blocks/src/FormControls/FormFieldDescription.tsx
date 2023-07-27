@@ -7,8 +7,11 @@
  */
 import styled, { css } from 'reshadow';
 
-import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
+import { s } from '../s';
+import { useS } from '../useS';
 import { useStyles } from '../useStyles';
 import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 
@@ -36,11 +39,13 @@ export const FormFieldDescription: React.FC<React.PropsWithChildren<Props>> = fu
   className,
   ...rest
 }) {
+  const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
   const styles = useStyles(baseFormControlStyles, baseValidFormControlStyles, style);
+  const sizeStyles = useS(elementsSizeStyles);
 
   return styled(styles)(
-    <field title={title} className={className} {...rest}>
+    <field title={title} className={s(sizeStyles, { ...layoutProps }, className)} {...rest}>
       {label && <field-label as="label">{label}</field-label>}
       <field-description>{children}</field-description>
     </field>,

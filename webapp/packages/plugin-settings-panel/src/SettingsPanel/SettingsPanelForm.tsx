@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Container, useStyles } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { SettingsManagerService } from '@cloudbeaver/core-settings';
 
@@ -25,7 +25,7 @@ const styles = css`
 `;
 
 export const SettingsPanelForm = observer(function SettingsPanelForm() {
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles);
+  const style = useStyles(styles);
 
   const settingsManagerService = useService(SettingsManagerService);
   const groups = Array.from(settingsManagerService.groups.values());
