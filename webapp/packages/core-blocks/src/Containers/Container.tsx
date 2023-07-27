@@ -7,11 +7,33 @@
  */
 import { forwardRef } from 'react';
 
-import { filterContainerFakeProps } from './filterContainerFakeProps';
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './Container.m.css';
+import { filterContainerFakeProps, getContainerProps } from './filterContainerFakeProps';
 import type { IContainerProps } from './IContainerProps';
+import elementsSizeStyle from './shared/ElementsSize.m.css';
 
-export const Container = forwardRef<HTMLDivElement, IContainerProps & React.HTMLAttributes<HTMLDivElement>>(function Container(props, ref) {
-  const divProps = filterContainerFakeProps(props);
+export const Container = forwardRef<HTMLDivElement, IContainerProps & React.HTMLAttributes<HTMLDivElement>>(function Container(
+  { className, ...rest },
+  ref,
+) {
+  const styles = useS(style, elementsSizeStyle);
+  const divProps = filterContainerFakeProps(rest);
+  const containerProps = getContainerProps(rest);
 
-  return <div ref={ref} {...divProps} />;
+  return (
+    <div
+      ref={ref}
+      {...divProps}
+      className={s(
+        styles,
+        {
+          container: true,
+          ...containerProps,
+        },
+        className,
+      )}
+    />
+  );
 });

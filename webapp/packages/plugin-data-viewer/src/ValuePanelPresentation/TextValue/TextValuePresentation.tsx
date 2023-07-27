@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, useObservableRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, useObservableRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
@@ -77,7 +77,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const notificationService = useService(NotificationService);
     const quotasService = useService(QuotasService);
     const textValuePresentationService = useService(TextValuePresentationService);
-    const style = useStyles(styles, BASE_CONTAINERS_STYLES, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
+    const style = useStyles(styles, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
 
     const state = useObservableRef(
       () => ({

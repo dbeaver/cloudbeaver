@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { filterLayoutFakeProps } from './filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from './filterLayoutFakeProps';
 import type { IContainerProps } from './IContainerProps';
 
 export function filterContainerFakeProps<T extends IContainerProps>(props: T): Omit<T, keyof IContainerProps> {
@@ -13,4 +13,9 @@ export function filterContainerFakeProps<T extends IContainerProps>(props: T): O
     filterLayoutFakeProps(props);
 
   return rest as Omit<T, keyof IContainerProps>;
+}
+
+export function getContainerProps<T extends IContainerProps>(props: T): IContainerProps {
+  const { hideEmpty, flexStart, flexEnd, baseline, center, vertical, wrap, overflow, parent, gap, grid, dense, compact, ...rest } = props;
+  return { hideEmpty, flexStart, flexEnd, baseline, center, vertical, wrap, overflow, parent, gap, grid, dense, compact, ...getLayoutProps(props) };
 }
