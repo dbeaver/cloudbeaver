@@ -3,6 +3,11 @@ scalar Object
 # Date/Time
 scalar DateTime
 
+input PageInput {
+    limit: Int
+    offset: Int
+}
+
 type Query
 
 type Mutation

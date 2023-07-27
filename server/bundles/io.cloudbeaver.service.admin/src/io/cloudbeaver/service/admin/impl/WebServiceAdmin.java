@@ -22,7 +22,6 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
@@ -66,16 +65,26 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         .flatMap(service -> service.getPermissions().stream())
         .collect(Collectors.toMap(WebPermissionDescriptor::getId, Function.identity()));
 
+    @NotNull
+    @Override
+    public AdminUserInfo getUserById(@NotNull WebSession webSession, @NotNull String userId) throws DBWebException {
+        try {
+            SMUser smUser = webSession.getAdminSecurityController().getUserById(userId);
+            return new AdminUserInfo(webSession, new WebUser(smUser));
+        } catch (Exception e) {
+            throw new DBWebException("Error getting user - " + userId, e);
+        }
+    }
 
     @NotNull
     @Override
-    public List<AdminUserInfo> listUsers(@NotNull WebSession webSession, String userName) throws DBWebException {
+    public List<AdminUserInfo> listUsers(@NotNull WebSession webSession, @NotNull AdminUserInfoFilter adminFilter) throws DBWebException {
         try {
-            List<AdminUserInfo> webUsers = new ArrayList<>();
-            for (SMUser smUser : webSession.getAdminSecurityController().findUsers(userName)) {
-                webUsers.add(new AdminUserInfo(webSession, new WebUser(smUser)));
+            List<AdminUserInfo> users = new ArrayList<>();
+            for (SMUser smUser : webSession.getAdminSecurityController().findUsers(adminFilter.getFilter())) {
+                users.add(new AdminUserInfo(webSession, new WebUser(smUser)));
             }
-            return webUsers;
+            return users;
         } catch (Exception e) {
             throw new DBWebException("Error reading users", e);
         }

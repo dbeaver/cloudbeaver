@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { TeamsResource, UsersResource, UsersResourceSearchUser } from '@cloudbeaver/core-authentication';
 import {
   ColoredContainer,
   Container,
@@ -56,7 +56,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
 
   useAutoLoad(state, selected);
 
-  const users = useResource(ConnectionAccess, UsersResource, CachedMapAllKey, { active: selected });
+  const users = useResource(ConnectionAccess, UsersResource, UsersResourceSearchUser(0, 1000), { active: selected });
   const teams = useResource(ConnectionAccess, TeamsResource, CachedMapAllKey, { active: selected });
 
   const grantedUsers = useMemo(
