@@ -329,6 +329,9 @@ public class WebSessionManager {
     public void sendSessionsStates() {
         synchronized (sessionMap) {
             for (var session : sessionMap.values()) {
+                if (session instanceof WebHeadlessSession) {
+                    continue;
+                }
                 try {
                     session.getUserContext().refreshPermissions();
                     session.addSessionEvent(new WSSessionStateEvent(session.getRemainingTime(), session.isValid()));
