@@ -32,7 +32,7 @@ import { getComputed } from '../getComputed';
 import { useObjectRef } from '../useObjectRef';
 import { useObservableRef } from '../useObservableRef';
 
-interface KeyWithIncludes<TKey, TIncludes> {
+export interface ResourceKeyWithIncludes<TKey, TIncludes> {
   readonly key: TKey | null;
   readonly includes: TIncludes;
 }
@@ -66,8 +66,8 @@ interface IMapResourceState<TResource> extends ILoadableState {
   loaded: boolean;
   resource: TResource;
   isOutdated: () => boolean;
-  load: () => void;
-  reload: () => void;
+  load: () => Promise<void>;
+  reload: () => Promise<void>;
 }
 
 interface IMapResourceListResult<TResource, TIncludes> extends IMapResourceState<TResource> {
@@ -115,7 +115,7 @@ export function useResource<
 >(
   component: { name: string },
   ctor: IServiceConstructor<TResource> | TResource,
-  keyObj: TResource extends any ? TKeyArg | null | KeyWithIncludes<TKeyArg, TIncludes> : never,
+  keyObj: TResource extends any ? TKeyArg | null | ResourceKeyWithIncludes<TKeyArg, TIncludes> : never,
   actions?: TResource extends any ? IActions<TResource, TKeyArg, TIncludes> : never,
 ): TResult<TResource, TKeyArg, TIncludes>;
 
@@ -126,7 +126,7 @@ export function useResource<
 >(
   component: { name: string },
   ctor: IServiceConstructor<TResource> | TResource,
-  keyObj: TResource extends any ? TKeyArg | null | KeyWithIncludes<TKeyArg, TIncludes> : never,
+  keyObj: TResource extends any ? TKeyArg | null | ResourceKeyWithIncludes<TKeyArg, TIncludes> : never,
   actions?: TResource extends any ? IActions<TResource, TKeyArg, TIncludes> : never,
 ): IMapResourceResult<TResource, TIncludes> | IMapResourceListResult<TResource, TIncludes> | IDataResourceResult<TResource, TIncludes> {
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -462,6 +462,6 @@ export function useResource<
   return result;
 }
 
-function isKeyWithIncludes<TKey, TIncludes>(obj: any): obj is KeyWithIncludes<TKey, TIncludes> {
+function isKeyWithIncludes<TKey, TIncludes>(obj: any): obj is ResourceKeyWithIncludes<TKey, TIncludes> {
   return obj && typeof obj === 'object' && 'includes' in obj && 'key' in obj;
 }

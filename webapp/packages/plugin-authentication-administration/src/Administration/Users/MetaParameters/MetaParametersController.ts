@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
-import { AdminUser, AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { AdminUser, AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, compareUsers, UsersResource } from '@cloudbeaver/core-authentication';
 import { IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -23,15 +23,7 @@ export class MetaParametersController implements IInitializableController {
   readonly error = new GQLErrorCatcher();
 
   get users(): AdminUser[] {
-    return Array.from(this.usersResource.data.values()).sort((a, b) => {
-      if (this.usersResource.isNew(a.userId) === this.usersResource.isNew(b.userId)) {
-        return a.userId.localeCompare(b.userId);
-      }
-      if (this.usersResource.isNew(a.userId)) {
-        return -1;
-      }
-      return 1;
-    });
+    return Array.from(this.usersResource.data.values()).sort(compareUsers);
   }
 
   get isProvidersLoading(): boolean {

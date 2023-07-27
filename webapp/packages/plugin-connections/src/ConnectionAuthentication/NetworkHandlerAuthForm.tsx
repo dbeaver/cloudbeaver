@@ -6,18 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import {
-  BASE_CONTAINERS_STYLES,
-  FieldCheckbox,
-  GroupTitle,
-  InputField,
-  ObjectPropertyInfoForm,
-  useResource,
-  useStyles,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { FieldCheckbox, GroupTitle, InputField, ObjectPropertyInfoForm, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
@@ -56,7 +46,7 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
     : translate(`connections_network_handler_${id}_password`, 'connections_network_handler_default_password');
   const properties = handler.data?.properties.filter(p => p.features.includes(PROPERTY_FEATURE_SECURED));
 
-  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+  return (
     <>
       <GroupTitle>
         {handler.data?.label || translate(`connections_network_handler_${id}_title`, 'connections_network_handler_default_title')}
@@ -84,6 +74,6 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
           disabled={disabled}
         />
       )}
-    </>,
+    </>
   );
 });

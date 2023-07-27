@@ -10,7 +10,6 @@ import styled from 'reshadow';
 
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Container,
   Group,
@@ -36,7 +35,7 @@ interface Props {
 
 export const UserInfoPanel = observer<Props>(function UserInfoPanel({ user, className, style }) {
   const userMetaParameters = useResource(UserInfoPanel, UserMetaParametersResource, undefined);
-  const styles = useStyles(BASE_TAB_STYLES, style, BASE_CONTAINERS_STYLES);
+  const styles = useStyles(BASE_TAB_STYLES, style);
   const translate = useTranslate();
 
   return styled(styles)(

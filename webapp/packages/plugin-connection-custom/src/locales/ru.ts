@@ -17,5 +17,5 @@ export default [
   ['customConnection_test', 'Проверить'],
   ['customConnection_create', 'Создать'],
   ['customConnection_create_error', 'Ошибка при создании подключения'],
-  ['plugin_connection_custom_action_custom_label', 'Создать'],
+  ['plugin_connection_custom_action_custom_label', 'Новое подключение'],
 ];

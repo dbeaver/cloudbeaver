@@ -6,10 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Group,
   GroupTitle,
@@ -37,7 +35,7 @@ export const ObjectProperties = observer<Props>(function ObjectProperties({ obje
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(dbObject.data?.object?.properties ?? emptyArray);
   const properties = dbObject.data?.object?.properties;
 
-  return styled(BASE_CONTAINERS_STYLES)(
+  return (
     <>
       {!properties || properties.length === 0 ? (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
@@ -56,6 +54,6 @@ export const ObjectProperties = observer<Props>(function ObjectProperties({ obje
           ))}
         </ColoredContainer>
       )}
-    </>,
+    </>
   );
 });
