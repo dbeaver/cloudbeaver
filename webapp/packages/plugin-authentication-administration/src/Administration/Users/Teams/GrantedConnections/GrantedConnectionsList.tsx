@@ -11,7 +11,6 @@ import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  BASE_CONTAINERS_STYLES,
   Button,
   getComputed,
   getSelectedItems,
@@ -68,7 +67,7 @@ interface Props {
 
 export const GrantedConnectionList = observer<Props>(function GrantedConnectionList({ grantedConnections, disabled, onRevoke, onEdit }) {
   const props = useObjectRef({ onRevoke, onEdit });
-  const style = useStyles(styles, BASE_CONTAINERS_STYLES);
+  const style = useStyles(styles);
   const translate = useTranslate();
 
   const driversResource = useService(DBDriverResource);

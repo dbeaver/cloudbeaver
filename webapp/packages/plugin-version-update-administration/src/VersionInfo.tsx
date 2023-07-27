@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import ReactMarkdown from 'react-markdown';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Container, Group, GroupItem, GroupTitle, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Group, GroupItem, GroupTitle, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { VersionResource } from '@cloudbeaver/core-version';
 
 interface Props {
@@ -30,7 +30,7 @@ const style = css`
 
 export const VersionInfo = observer<Props>(function VersionInfo({ item }) {
   const translate = useTranslate();
-  const styles = useStyles(BASE_CONTAINERS_STYLES, style);
+  const styles = useStyles(style);
   const versionResource = useResource(VersionInfo, VersionResource, item);
 
   const version = versionResource.tryGetData;

@@ -10,8 +10,12 @@ import { useCallback } from 'react';
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
+import { getLayoutProps } from '../../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps';
+import elementsSizeStyles from '../../Containers/shared/ElementsSize.m.css';
+import { s } from '../../s';
 import { TextPlaceholder } from '../../TextPlaceholder';
+import { useS } from '../../useS';
 import { RenderField } from './RenderField';
 
 interface ObjectPropertyFormProps extends ILayoutSizeProps {
@@ -44,7 +48,9 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
   hideEmptyPlaceholder,
   isSaved,
   onFocus,
+  ...rest
 }) {
+  const layoutProps = getLayoutProps(rest);
   const handleFocus = useCallback(
     (e: React.FocusEvent<HTMLInputElement>) => {
       if (onFocus) {
@@ -53,6 +59,8 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
     },
     [onFocus],
   );
+
+  const sizeStyles = useS(elementsSizeStyles);
 
   if (properties.length === 0 && !hideEmptyPlaceholder) {
     return <TextPlaceholder>Properties empty</TextPlaceholder>;
@@ -67,7 +75,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
         return (
           <RenderField
             key={property.id}
-            className={className}
+            className={s(sizeStyles, { ...layoutProps }, className)}
             property={property}
             state={state}
             editable={editable}
