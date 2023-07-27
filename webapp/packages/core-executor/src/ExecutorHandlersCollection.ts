@@ -12,9 +12,14 @@ import type { IExecutorHandler } from './IExecutorHandler';
 import type { ExecutorDataFilter, ExecutorDataMap, IChainLink, IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 
 export class ExecutorHandlersCollection<T = unknown, TResult = any | Promise<any>> implements IExecutorHandlersCollection<T, TResult> {
-  handlers: Array<IExecutorHandler<T, TResult>> = [];
-  postHandlers: Array<IExecutorHandler<T, TResult>> = [];
-  chain: Array<IChainLink<T, TResult>> = [];
+  handlers: Array<IExecutorHandler<T, TResult>>;
+  postHandlers: Array<IExecutorHandler<T, TResult>>;
+  chain: Array<IChainLink<T, TResult>>;
+
+  get isEmpty(): boolean {
+    return this.handlers.length === 0 && this.postHandlers.length === 0 && this.chain.length === 0;
+  }
+
   readonly contextCreators: Map<IContextLoader<any, T>, IContextLoader<any, T>>;
   readonly collections: Array<IExecutorHandlersCollection<T, TResult>>;
   protected initialDataGetter: (() => T) | null;
@@ -25,6 +30,9 @@ export class ExecutorHandlersCollection<T = unknown, TResult = any | Promise<any
     this.contextCreators = new Map();
     this.collections = [];
     this.initialDataGetter = null;
+    this.handlers = [];
+    this.postHandlers = [];
+    this.chain = [];
 
     makeObservable<this, 'links'>(this, {
       handlers: observable.shallow,
