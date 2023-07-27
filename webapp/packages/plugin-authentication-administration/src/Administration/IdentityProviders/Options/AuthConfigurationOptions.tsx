@@ -11,7 +11,6 @@ import styled, { css } from 'reshadow';
 
 import { AuthConfigurationParametersResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Combobox,
   FieldCheckbox,
@@ -49,7 +48,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
 
   const translate = useTranslate();
   const copy = useClipboard();
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles);
+  const style = useStyles(styles);
 
   const providers = useResource(AuthConfigurationOptions, AuthProvidersResource, CachedMapAllKey);
   const parameters = useResource(AuthConfigurationOptions, AuthConfigurationParametersResource, state.config.providerId || null);

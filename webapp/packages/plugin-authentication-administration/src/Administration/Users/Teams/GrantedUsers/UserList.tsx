@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES,
   Button,
   getComputed,
   getSelectedItems,
@@ -67,7 +66,7 @@ interface Props {
 
 export const UserList = observer<Props>(function UserList({ userList, grantedUsers, disabled, onGrant }) {
   const props = useObjectRef({ onGrant });
-  const style = useStyles(styles, BASE_CONTAINERS_STYLES);
+  const style = useStyles(styles);
   const translate = useTranslate();
 
   const usersResource = useService(UsersResource);

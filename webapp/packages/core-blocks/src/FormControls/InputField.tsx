@@ -7,62 +7,26 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useCallback, useContext, useState } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled, { use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { Icon } from '../Icon';
 import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
+import { s } from '../s';
 import { useCombinedHandler } from '../useCombinedHandler';
+import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
 import { useStyles } from '../useStyles';
-import { baseFormControlStyles, baseInvalidFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
+import formControlStyles from './FormControl.m.css';
+import inputFieldStyle from './InputField.m.css';
 import { isControlPresented } from './isControlPresented';
 import { useCapsLockTracker } from './useCapsLockTracker';
-
-const INPUT_FIELD_STYLES = css`
-  Icon {
-    composes: theme-text-on-secondary from global;
-  }
-  field-label {
-    display: block;
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
-  }
-  field-label:not(:empty) {
-    padding-bottom: 10px;
-  }
-  input-container {
-    position: relative;
-  }
-  loader-container,
-  icon-container {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 24px;
-    height: 24px;
-    display: flex;
-  }
-  icon-container {
-    cursor: pointer;
-    & Icon {
-      width: 100%;
-      height: 100%;
-    }
-  }
-  input[disabled] + icon-container {
-    cursor: auto;
-    opacity: 0.8;
-  }
-  input:not(:only-child) {
-    padding-right: 32px !important;
-  }
-`;
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'style'> &
   ILayoutSizeProps & {
@@ -119,11 +83,6 @@ export const InputField: InputFieldType = observer(
       description,
       labelTooltip,
       mod,
-      fill,
-      small,
-      medium,
-      large,
-      tiny,
       autoHide,
       onChange,
       onCustomCopy,
@@ -134,7 +93,9 @@ export const InputField: InputFieldType = observer(
     const capsLock = useCapsLockTracker();
     const [passwordRevealed, setPasswordRevealed] = useState(false);
     const translate = useTranslate();
-    const styles = useStyles(baseFormControlStyles, error ? baseInvalidFormControlStyles : baseValidFormControlStyles, INPUT_FIELD_STYLES, style);
+    const layoutProps = getLayoutProps(rest);
+    const propStyles = useStyles(style);
+    const styles = useS(inputFieldStyle, formControlStyles, elementsSizeStyles);
     const context = useContext(FormContext);
     loading = useStateDelay(loading ?? false, 300);
 
@@ -186,19 +147,20 @@ export const InputField: InputFieldType = observer(
       description = translate('ui_capslock_on');
     }
 
-    return styled(styles)(
-      <field className={className} {...use({ small, medium, large, tiny })}>
-        <field-label title={labelTooltip || rest.title}>
+    return styled(propStyles)(
+      <div data-testid="field" className={s(styles, { ...layoutProps, field: true }, className)}>
+        <div data-testid="field-label" title={labelTooltip || rest.title} className={styles.fieldLabel}>
           {children}
           {required && ' *'}
-        </field-label>
-        <input-container>
+        </div>
+        <div data-testid="input-container" className={styles.inputContainer}>
           <input
             ref={ref}
             {...rest}
             type={passwordRevealed ? 'text' : rest.type}
             name={name}
             value={value ?? ''}
+            className={styles.input}
             onChange={handleChange}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
@@ -206,23 +168,27 @@ export const InputField: InputFieldType = observer(
             required={required}
           />
           {loading && (
-            <loader-container title={translate('ui_processing_loading')}>
+            <div data-testid="loader-container" title={translate('ui_processing_loading')} className={styles.loaderContainer}>
               <Loader small />
-            </loader-container>
+            </div>
           )}
           {showRevealPasswordButton && (
-            <icon-container title={translate('ui_reveal_password')} onClick={revealPassword}>
-              <Icon name={passwordRevealed ? 'password-hide' : 'password-show'} viewBox="0 0 16 16" />
-            </icon-container>
+            <div data-testid="icon-container" title={translate('ui_reveal_password')} className={styles.iconContainer} onClick={revealPassword}>
+              <Icon name={passwordRevealed ? 'password-hide' : 'password-show'} viewBox="0 0 16 16" className={styles.icon} />
+            </div>
           )}
           {onCustomCopy && (
-            <icon-container title={translate('ui_copy_to_clipboard')} onClick={onCustomCopy}>
-              <Icon name="copy" viewBox="0 0 32 32" />
-            </icon-container>
+            <div data-testid="icon-container" title={translate('ui_copy_to_clipboard')} className={styles.iconContainer} onClick={onCustomCopy}>
+              <Icon name="copy" viewBox="0 0 32 32" className={styles.icon} />
+            </div>
           )}
-        </input-container>
-        {(description || showRevealPasswordButton) && <field-description>{description}</field-description>}
-      </field>,
+        </div>
+        {(description || showRevealPasswordButton) && (
+          <div data-testid="field-description" className={s(styles, { fieldDescription: true, valid: !error, invalid: error })}>
+            {description}
+          </div>
+        )}
+      </div>,
     );
   }),
 );

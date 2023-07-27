@@ -10,7 +10,6 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   ExceptionMessage,
   Group,
@@ -44,7 +43,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   const translate = useTranslate();
   // const userInfoService = useService(UserInfoResource);
   const state = useTabState<Record<string, any>>();
-  const styles = useStyles(style, BASE_CONTAINERS_STYLES);
+  const styles = useStyles(style);
 
   const connection = useResource(
     OriginInfo,

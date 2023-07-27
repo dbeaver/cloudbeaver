@@ -10,7 +10,6 @@ import styled, { css } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentComponent, ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Container,
   Group,
@@ -58,7 +57,7 @@ const styles = css`
 
 export const ServerConfigurationPage: AdministrationItemContentComponent = observer(function ServerConfigurationPage({ configurationWizard }) {
   const translate = useTranslate();
-  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES, BASE_CONTAINERS_STYLES);
+  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
   const [focusedRef, state] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const service = useService(ServerConfigurationService);
   const serverConfigResource = useService(ServerConfigResource);

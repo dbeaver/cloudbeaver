@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Cell, IconOrImage, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Cell, IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
@@ -21,7 +21,6 @@ const style = css`
 `;
 
 export const VersionChecker = observer(function VersionChecker() {
-  const styles = useStyles(BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
   const versionUpdateService = useService(VersionUpdateService);
   const versionService = useService(VersionService);
@@ -34,7 +33,7 @@ export const VersionChecker = observer(function VersionChecker() {
       ? `${translate('version_current')}: ${versionService.current}, ${translate('version_latest')}: ${versionResource.latest.number}`
       : '';
 
-  return styled(styles)(
+  return (
     <Cell
       before={<IconOrImage icon={icon} />}
       description={versionUpdateService.newVersionAvailable ? description : undefined}
@@ -42,6 +41,6 @@ export const VersionChecker = observer(function VersionChecker() {
       ripple={false}
     >
       {translate(text)}
-    </Cell>,
+    </Cell>
   );
 });

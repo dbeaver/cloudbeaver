@@ -10,7 +10,6 @@ import styled, { css } from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentProps } from '@cloudbeaver/core-administration';
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Container,
   Group,
@@ -56,7 +55,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
   const service = useService(CreateConnectionService);
   const controller = useController(ConnectionsAdministrationController);
   const translate = useTranslate();
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
+  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
 
   useResource(ConnectionsAdministration, ConnectionInfoResource, {
     key: ConnectionInfoActiveProjectKey,
@@ -109,7 +108,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
             <CreateConnection method={param} configurationWizard={configurationWizard} />
           </Group>
         )}
-        <Group box="no-overflow">
+        <Group boxNoOverflow>
           <Loader style={loaderStyle} loading={controller.isProcessing} overlay>
             <ConnectionsTable
               keys={controller.keys}

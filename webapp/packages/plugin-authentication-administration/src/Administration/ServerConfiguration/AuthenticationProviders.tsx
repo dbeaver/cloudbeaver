@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import React, { useContext } from 'react';
-import styled from 'reshadow';
 
 import {
   AUTH_PROVIDER_LOCAL_ID,
@@ -16,19 +15,7 @@ import {
   AuthProvidersResource,
   AuthSettingsService,
 } from '@cloudbeaver/core-authentication';
-import {
-  BASE_CONTAINERS_STYLES,
-  FormContext,
-  Group,
-  GroupTitle,
-  Loader,
-  PlaceholderComponent,
-  Switch,
-  useExecutor,
-  useResource,
-  useStyles,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { FormContext, Group, GroupTitle, PlaceholderComponent, Switch, useExecutor, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
@@ -42,7 +29,6 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   const authProviderService = useService(AuthProviderService);
   const providers = useResource(AuthenticationProviders, AuthProvidersResource, CachedMapAllKey);
   const translate = useTranslate();
-  const styles = useStyles(BASE_CONTAINERS_STYLES);
   const formContext = useContext(FormContext);
   const authSettingsService = useService(AuthSettingsService);
 
@@ -91,7 +77,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
     return null;
   }
 
-  return styled(styles)(
+  return (
     <React.Fragment>
       <Group key="authentication" form gap>
         <GroupTitle>{translate('administration_configuration_wizard_configuration_authentication_group')}</GroupTitle>
@@ -155,6 +141,6 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
         })}
       </Group>
       {configurationWizard && localProvider && <ServerConfigurationAdminForm serverConfig={serverConfig} />}
-    </React.Fragment>,
+    </React.Fragment>
   );
 });
