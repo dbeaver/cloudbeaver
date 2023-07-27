@@ -250,6 +250,16 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     await this.onNodeMove.execute({ key, target });
   }
 
+  async setFilter(nodePath: string, include?: string[], exclude?: string[]) {
+    await this.graphQLService.sdk.navSetFolderFilter({
+      nodePath,
+      exclude,
+      include,
+    });
+
+    this.refreshTree(nodePath);
+  }
+
   async changeName(node: NavNode, name: string): Promise<string> {
     const parentId = node.parentId;
     if (isUndefined(parentId)) {
