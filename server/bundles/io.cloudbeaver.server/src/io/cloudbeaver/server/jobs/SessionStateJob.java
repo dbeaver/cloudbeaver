@@ -23,7 +23,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 public class SessionStateJob extends PeriodicSystemJob {
     private static final Log log = Log.getLog(SessionStateJob.class);
-    private static final int PERIOD_MS = 60_000; // once per 60 seconds
+    private static final int PERIOD_MS = 30_000; // once per 60 seconds
 
     public SessionStateJob(@NotNull CBPlatform platform) {
         super("Session state sender", platform, PERIOD_MS);
