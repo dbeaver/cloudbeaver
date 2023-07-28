@@ -15,6 +15,7 @@ import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 interface State extends ILoadableState {
   filters: Required<NavigatorNodeFilter>;
+  navNodeInfoResource: NavNodeInfoResource;
   nodePath: string;
   loading: boolean;
   loaded: boolean;
@@ -42,7 +43,7 @@ export function useFilters(nodePath: string) {
         return this.loaded;
       },
       isError() {
-        return false;
+        return !!this.exception;
       },
       async load() {
         if (this.loaded || this.loading) {
@@ -51,7 +52,7 @@ export function useFilters(nodePath: string) {
 
         try {
           this.loading = true;
-          const filters = await navNodeInfoResource.loadNodeFilter(this.nodePath);
+          const filters = await this.navNodeInfoResource.loadNodeFilter(this.nodePath);
 
           if (filters?.exclude) {
             this.exclude(filters.exclude);
@@ -77,14 +78,18 @@ export function useFilters(nodePath: string) {
         if (Array.isArray(value)) {
           this.filters.include.push(...value);
         } else {
-          this.filters.include.push(value);
+          if (!this.filters.include.includes(value)) {
+            this.filters.include.unshift(value);
+          }
         }
       },
       exclude(value) {
         if (Array.isArray(value)) {
           this.filters.exclude.push(...value);
         } else {
-          this.filters.exclude.push(value);
+          if (!this.filters.exclude.includes(value)) {
+            this.filters.exclude.unshift(value);
+          }
         }
       },
     }),
@@ -99,7 +104,7 @@ export function useFilters(nodePath: string) {
       deleteInclude: action.bound,
       deleteExclude: action.bound,
     },
-    { nodePath },
+    { nodePath, navNodeInfoResource },
   );
 
   return state;

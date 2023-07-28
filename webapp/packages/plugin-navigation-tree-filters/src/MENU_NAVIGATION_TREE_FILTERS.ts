@@ -7,4 +7,4 @@
  */
 import { createMenu } from '@cloudbeaver/core-view';
 
-export const MENU_NAVIGATOR_FILTERS = createMenu('navigator-filters', 'plugin_navigator_filters_title', 'filter');
+export const MENU_NAVIGATION_TREE_FILTERS = createMenu('navigation-tree-filters', 'plugin_navigation_tree_filters_title', 'filter');

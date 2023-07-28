@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-navigator-filters",
+  "name": "@cloudbeaver/plugin-navigation-tree-filters",
   "sideEffects": false,
   "version": "0.1.0",
   "description": "",
