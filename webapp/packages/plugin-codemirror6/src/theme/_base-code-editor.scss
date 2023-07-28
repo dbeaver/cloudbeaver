@@ -59,6 +59,10 @@
     @include mdc-theme-prop(border-color, background, false);
   }
 
+  .cm-panels-top {
+    @include mdc-theme-prop(border-color, background, false);
+  }
+
   .editor .cm-activeLine {
     box-shadow: 0 0 0 2px $mdc-theme-sub-secondary;
   }
