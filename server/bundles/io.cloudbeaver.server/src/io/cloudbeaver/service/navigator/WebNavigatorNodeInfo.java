@@ -268,7 +268,7 @@ public class WebNavigatorNodeInfo {
             throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
         }
         DBSObjectFilter filter = ((DBNDatabaseFolder) node).getNodeFilter(((DBNDatabaseFolder) node).getItemsMeta(), true);
-        return filter == null || filter.isEmpty() || filter.isEnabled() ? null : filter;
+        return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
     }
 
     @Override

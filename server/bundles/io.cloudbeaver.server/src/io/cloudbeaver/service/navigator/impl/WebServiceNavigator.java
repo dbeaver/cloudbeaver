@@ -231,6 +231,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             if (!CommonUtils.isEmpty(exclude)) {
                 filter.setExclude(exclude);
             }
+            filter.setEnabled(true);
             ((DBNDatabaseFolder) node).setNodeFilter(
                 ((DBNDatabaseFolder) node).getItemsMeta(), filter, true);
             if (hasNodeEditPermission(webSession, node, ((WebProjectImpl) node.getOwnerProject()).getRmProject())) {
