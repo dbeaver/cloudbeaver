@@ -9,17 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import {
-  BASE_CONTAINERS_STYLES,
-  ExceptionMessage,
-  IconOrImage,
-  Loader,
-  Placeholder,
-  useExecutor,
-  useObjectRef,
-  useStyles,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { ExceptionMessage, IconOrImage, Loader, Placeholder, useExecutor, useObjectRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
@@ -114,7 +104,7 @@ export const ConnectionForm = observer<Props>(function ConnectionForm({ state, o
   const translate = useTranslate();
   const props = useObjectRef({ onSave });
   const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
-  const styles = useStyles(style, BASE_CONTAINERS_STYLES, topBarStyles, formStyles);
+  const styles = useStyles(style, topBarStyles, formStyles);
   const service = useService(ConnectionFormService);
 
   useExecutor({

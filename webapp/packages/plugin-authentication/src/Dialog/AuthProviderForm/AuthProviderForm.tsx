@@ -6,10 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
 import type { AuthProvider, IAuthCredentials } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, Combobox, Group, InputField, useFocus, useStyles } from '@cloudbeaver/core-blocks';
+import { Combobox, Group, InputField, useFocus } from '@cloudbeaver/core-blocks';
 
 interface Props {
   provider: AuthProvider;
@@ -26,7 +25,7 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({ prov
 
   const profile = provider.credentialProfiles[credentials.profile as any as number];
 
-  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+  return (
     <Group ref={elementRef} gap small center>
       {provider.credentialProfiles.length > 1 && (
         <Combobox
@@ -58,6 +57,6 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({ prov
             </InputField>
           ),
       )}
-    </Group>,
+    </Group>
   );
 });
