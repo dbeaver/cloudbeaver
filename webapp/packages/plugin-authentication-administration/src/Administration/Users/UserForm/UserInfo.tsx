@@ -11,7 +11,6 @@ import styled, { css } from 'reshadow';
 
 import { AuthRolesResource, UserMetaParametersResource } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Combobox,
   Container,
@@ -40,7 +39,7 @@ const styles = css`
 `;
 
 export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(function UserInfo({ controller, editing }) {
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles);
+  const style = useStyles(styles);
   const translate = useTranslate();
   const userMetaParameters = useResource(UserInfo, UserMetaParametersResource, undefined);
   const authRoles = useResource(UserInfo, AuthRolesResource, undefined);
@@ -118,7 +117,7 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
           {translate('authentication_user_enabled')}
         </FieldCheckbox>
         <GroupTitle>{translate('authentication_user_team')}</GroupTitle>
-        <Group box="no-overflow" gap dense>
+        <Group boxNoOverflow gap dense>
           {controller.teams.map(team => {
             const label = `${team.teamId}${team.teamName && team.teamName !== team.teamId ? ' (' + team.teamName + ')' : ''}`;
             const tooltip = `${label}${team.description ? '\n' + team.description : ''}`;

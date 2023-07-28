@@ -7,21 +7,43 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Table, TableBody, TableColumnHeader, TableHeader, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Button,
+  Loader,
+  Table,
+  TableBody,
+  TableColumnHeader,
+  TableColumnValue,
+  TableHeader,
+  TableItem,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
 import { User } from './User';
 
 interface Props {
-  keys: string[];
   users: AdminUserInfoFragment[];
   selectedItems: Map<string, boolean>;
   expandedItems: Map<string, boolean>;
   displayAuthRole: boolean;
+  loading?: boolean;
+  hasMore: boolean;
+  onLoadMore?: () => void;
 }
 
-export const UsersTable = observer<Props>(function UsersTable({ keys, users, selectedItems, expandedItems, displayAuthRole }) {
+export const UsersTable = observer<Props>(function UsersTable({
+  users,
+  selectedItems,
+  expandedItems,
+  displayAuthRole,
+  loading,
+  hasMore,
+  onLoadMore,
+}) {
   const translate = useTranslate();
+  const keys = users.map(user => user.userId);
+  const colSpan = displayAuthRole ? 6 : 5;
 
   return (
     <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size="big">
@@ -31,7 +53,9 @@ export const UsersTable = observer<Props>(function UsersTable({ keys, users, sel
                     <TableSelect />
                   </TableColumnHeader>
                 )} */}
-        <TableColumnHeader min />
+        <TableColumnHeader min>
+          <Loader loading={loading} small />
+        </TableColumnHeader>
         <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
         {displayAuthRole && <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>}
         <TableColumnHeader>{translate('authentication_user_team')}</TableColumnHeader>
@@ -47,6 +71,22 @@ export const UsersTable = observer<Props>(function UsersTable({ keys, users, sel
             // selectable={isLocalProviderAvailable}
           />
         ))}
+        {(loading || users.length === 0) && (
+          <TableItem item="load-more">
+            <TableColumnValue colSpan={colSpan} centerContent flex>
+              {translate(loading ? 'ui_processing_loading' : 'authentication_administration_users_empty')}
+            </TableColumnValue>
+          </TableItem>
+        )}
+        {hasMore && (
+          <TableItem item="load-more">
+            <TableColumnValue colSpan={colSpan} centerContent flex>
+              <Button type="button" mod={['outlined']} loading={loading} loader onClick={onLoadMore}>
+                {translate('ui_load_more')}
+              </Button>
+            </TableColumnValue>
+          </TableItem>
+        )}
       </TableBody>
     </Table>
   );

@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Combobox, Container, FieldCheckbox, Loader, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Combobox, Container, FieldCheckbox, Loader, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import type { DataTransferOutputSettings } from '@cloudbeaver/core-sdk';
 
 import { DefaultExportOutputSettingsResource } from './DefaultExportOutputSettingsResource';
@@ -37,10 +37,7 @@ export const OutputOptionsForm = observer(function OutputOptionsForm(props: Prop
           return null;
         }
 
-        return styled(
-          styles,
-          BASE_CONTAINERS_STYLES,
-        )(
+        return styled(styles)(
           <Container gap parent>
             <Container wrap gap flexEnd>
               <Combobox name="encoding" state={props.outputSettings} items={data.supportedEncodings} tiny searchable>

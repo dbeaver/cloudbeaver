@@ -20,6 +20,7 @@ package io.cloudbeaver.model.rm;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPHiddenObject;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -33,6 +34,8 @@ import org.jkiss.utils.ArrayUtils;
 import java.util.*;
 
 public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, RMEventListener {
+
+    private static final Log log = Log.getLog(DBNResourceManagerRoot.class);
 
     private DBNResourceManagerProject[] projects;
     private RMController resourceController;
@@ -123,10 +126,10 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
         var action = event.getAction();
         switch (action) {
             case RESOURCE_DELETE:
-                deleteResourceNode(event.getProject(), event.getResourceTree());
+                deleteResourceNode(event.getProject(), event.getResourcePath());
                 break;
             case RESOURCE_ADD:
-                addResourceNode(event.getProject(), event.getResourceTree());
+                addResourceNode(event.getProject(), event.getResourcePath());
                 break;
             case PROJECT_ADD:
                 addProjectNode(event.getProject());
@@ -134,9 +137,13 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
         }
     }
 
-    private void deleteResourceNode(RMProject project, List<RMResource> resourcePath) {
+    private void deleteResourceNode(RMProject project, String resourcePath) {
+        if (resourcePath == null) {
+            return;
+        }
         var projectNode = getProjectNode(project);
-        projectNode.ifPresent(dbnResourceManagerProject -> dbnResourceManagerProject.removeChildResourceNode(new ArrayDeque<>(resourcePath)));
+        var rmResourcePath = Arrays.asList(resourcePath.split("/"));
+        projectNode.ifPresent(dbnResourceManagerProject -> dbnResourceManagerProject.removeChildResourceNode(new ArrayDeque<>(rmResourcePath)));
     }
 
     @NotNull
@@ -146,9 +153,17 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
             .findFirst();
     }
 
-    private void addResourceNode(RMProject project, List<RMResource> resourcePath) {
+    private void addResourceNode(RMProject project, String resourcePath) {
+        if (resourcePath == null) {
+            return;
+        }
         var projectNode = getProjectNode(project);
-        projectNode.ifPresent(dbnResourceManagerProject -> dbnResourceManagerProject.addChildResourceNode(new ArrayDeque<>(resourcePath)));
+        try {
+            var rmResourcePath = Arrays.asList(getResourceController().getResourcePath(project.getId(), resourcePath));
+            projectNode.ifPresent(dbnResourceManagerProject -> dbnResourceManagerProject.addChildResourceNode(new ArrayDeque<>(rmResourcePath)));
+        } catch (DBException e) {
+            log.error("Cannot add new node to resource manager tree", e);
+        }
     }
 
     private void addProjectNode(RMProject project) {

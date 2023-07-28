@@ -8,7 +8,8 @@
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 export type ResourceAliasOptionsKey = string | number;
-export type ResourceAliasOptionsValue = ResourceAliasOptionsKey | Array<ResourceAliasOptionsKey>;
+export type ResourceAliasOptionsValueTypes = string | number | boolean | null | undefined;
+export type ResourceAliasOptionsValue = ResourceAliasOptionsValueTypes | Array<ResourceAliasOptionsValueTypes>;
 export type ResourceAliasOptions = Readonly<Record<ResourceAliasOptionsKey, ResourceAliasOptionsValue>> | undefined;
 
 export abstract class ResourceAlias<TKey, TOptions extends ResourceAliasOptions> {

@@ -1,0 +1,8 @@
+.groupTitle {
+  composes: theme-typography--body2 from global;
+  composes: groupTitle from './Group.m.css';
+  font-weight: 400;
+  margin: 0;
+  text-transform: uppercase;
+  opacity: 0.9;
+}

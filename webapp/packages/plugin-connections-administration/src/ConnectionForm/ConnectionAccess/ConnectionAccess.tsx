@@ -10,9 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { TeamsResource, UsersResource, UsersResourceSearchUser } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Container,
   Group,
@@ -57,7 +56,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
 
   useAutoLoad(state, selected);
 
-  const users = useResource(ConnectionAccess, UsersResource, CachedMapAllKey, { active: selected });
+  const users = useResource(ConnectionAccess, UsersResource, UsersResourceSearchUser(0, 1000), { active: selected });
   const teams = useResource(ConnectionAccess, TeamsResource, CachedMapAllKey, { active: selected });
 
   const grantedUsers = useMemo(
@@ -85,16 +84,10 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
     info = 'cloud_connections_access_placeholder';
   }
 
-  return styled(
-    styles,
-    BASE_CONTAINERS_STYLES,
-  )(
+  return styled(styles)(
     <Loader state={[users, teams, state.state]}>
       {() =>
-        styled(
-          styles,
-          BASE_CONTAINERS_STYLES,
-        )(
+        styled(styles)(
           <ColoredContainer parent gap vertical>
             {!users.resource.values.length && !teams.resource.values.length ? (
               <Group keepSize large>

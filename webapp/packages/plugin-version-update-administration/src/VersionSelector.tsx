@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Combobox, Container, Group, GroupItem } from '@cloudbeaver/core-blocks';
+import { Combobox, Container, Group, GroupItem } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { IVersion, VersionResource } from '@cloudbeaver/core-version';
@@ -46,10 +46,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
   const version = versions.find(v => v.number === selected);
   const Instruction = versionUpdateService.instructionGetter?.();
 
-  return styled(
-    BASE_CONTAINERS_STYLES,
-    style,
-  )(
+  return styled(style)(
     <Container gap>
       <Group gap large>
         <Combobox

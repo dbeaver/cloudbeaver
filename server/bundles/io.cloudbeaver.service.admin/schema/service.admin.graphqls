@@ -114,11 +114,16 @@ input ServerConfigInput {
     sessionExpireTime: Int
 }
 
-extend type Query {
+input AdminUserFilterInput {
+    userIdMask: String
+    enabledState: Boolean
+}
 
+extend type Query {
     #### Users and teams
 
-    listUsers(userId: ID): [AdminUserInfo!]!
+    adminUserInfo(userId: ID!): AdminUserInfo!
+    listUsers(page: PageInput!, filter: AdminUserFilterInput!): [AdminUserInfo!]!
     listTeams(teamId: ID): [AdminTeamInfo!]!
     listPermissions: [AdminPermissionInfo!]!
     listAuthRoles: [String!]!
