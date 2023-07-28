@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
-import { ACTION_ICON_BUTTON_STYLES, IconButton, TableColumnValue, TableItem, useStyles } from '@cloudbeaver/core-blocks';
+import { ACTION_ICON_BUTTON_STYLES, IconButton, TableColumnValue, TableItem } from '@cloudbeaver/core-blocks';
 
 interface Props {
   id: string;
@@ -18,18 +18,8 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
-const style = css`
-  StaticImage {
-    display: flex;
-    width: 24px;
-  }
-  TableColumnValue {
-    height: 36px;
-  }
-`;
-
 export const FiltersTableItem = observer<Props>(function FiltersTableItem({ id, name, disabled, className, onDelete }) {
-  return styled(useStyles(style, ACTION_ICON_BUTTON_STYLES))(
+  return styled(ACTION_ICON_BUTTON_STYLES)(
     <TableItem item={id} title={name} disabled={disabled} selectDisabled={disabled} className={className}>
       <TableColumnValue>{name}</TableColumnValue>
       <TableColumnValue centerContent flex>

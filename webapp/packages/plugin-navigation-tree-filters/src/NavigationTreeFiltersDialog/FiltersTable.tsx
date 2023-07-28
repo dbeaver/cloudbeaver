@@ -7,60 +7,11 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Button, Group, InputField, SubmittingForm, Table, TableBody, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Group, InputField, s, SubmittingForm, Table, TableBody, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
+import styles from './FiltersTable.m.css';
 import { FiltersTableItem } from './FiltersTableItem';
-
-export const TABLE_STYLES = css`
-  Table {
-    composes: theme-background-surface theme-text-on-surface from global;
-  }
-  header {
-    composes: theme-border-color-background theme-background-surface theme-text-on-surface from global;
-    overflow: hidden;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 16px;
-    gap: 16px;
-    border-bottom: 1px solid;
-    flex: 1 0 auto;
-  }
-  header-actions {
-    width: 100%;
-    display: flex;
-    gap: 16px;
-  }
-  Group {
-    position: relative;
-  }
-  Group,
-  container,
-  table-container {
-    height: 100%;
-  }
-  container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  table-container {
-    overflow: auto;
-  }
-  InputField {
-    flex: 1;
-  }
-  SubmittingForm {
-    width: 100%;
-  }
-  h4 {
-    margin: 0;
-  }
-`;
 
 interface Props {
   title: string;
@@ -71,7 +22,7 @@ interface Props {
 
 export const FiltersTable = observer<Props>(function FiltersTable({ title, filters, onAdd, onDelete }) {
   const translate = useTranslate();
-  const style = useStyles(TABLE_STYLES);
+  const style = useS(styles);
   const [filter, setFilter] = useState('');
 
   function add() {
@@ -83,30 +34,35 @@ export const FiltersTable = observer<Props>(function FiltersTable({ title, filte
     }
   }
 
-  return styled(style)(
-    <Group box medium overflow>
-      <container>
-        <header>
-          <h4>{title}</h4>
-          <SubmittingForm onSubmit={add}>
-            <header-actions>
-              <InputField placeholder={translate('plugin_navigation_tree_filters_info')} value={filter} onChange={v => setFilter(String(v))} />
-              <Button mod={['unelevated']} onClick={add}>
+  return (
+    <Group className={styles.group} box medium overflow>
+      <container className={s(style, { container: true })}>
+        <header className={s(style, { header: true })}>
+          <h4 className={s(style, { h4: true })}>{title}</h4>
+          <SubmittingForm className={s(style, { submittingForm: true })} onSubmit={add}>
+            <div className={s(style, { headerActions: true })}>
+              <InputField
+                className={s(style, { inputField: true })}
+                placeholder={translate('plugin_navigation_tree_filters_info')}
+                value={filter}
+                onChange={v => setFilter(String(v))}
+              />
+              <Button className={style.button} mod={['unelevated']} onClick={add}>
                 +
               </Button>
-            </header-actions>
+            </div>
           </SubmittingForm>
         </header>
-        <table-container>
-          <Table keys={filters}>
+        <div className={s(style, { tableContainer: true })}>
+          <Table className={s(style, { table: true })} keys={filters}>
             <TableBody>
               {filters.map(filter => (
                 <FiltersTableItem key={filter} id={filter} name={filter} onDelete={onDelete} />
               ))}
             </TableBody>
           </Table>
-        </table-container>
+        </div>
       </container>
-    </Group>,
+    </Group>
   );
 });
