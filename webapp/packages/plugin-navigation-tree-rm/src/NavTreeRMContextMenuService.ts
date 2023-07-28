@@ -9,7 +9,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { DATA_CONTEXT_NAV_NODE } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, ENodeFeature } from '@cloudbeaver/core-navigation-tree';
 import { isResourceOfType, ProjectInfoResource, ProjectInfoResourceType } from '@cloudbeaver/core-projects';
 import { getRmResourceKey, NAV_NODE_TYPE_RM_FOLDER, NAV_NODE_TYPE_RM_RESOURCE } from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
@@ -46,7 +46,15 @@ export class NavTreeRMContextMenuService extends Bootstrap {
           return false;
         }
 
-        return [ACTION_RENAME, ACTION_DELETE].includes(action);
+        if (action === ACTION_RENAME) {
+          return node.features?.includes(ENodeFeature.canRename) ?? false;
+        }
+
+        if (action === ACTION_DELETE) {
+          return node.features?.includes(ENodeFeature.canDelete) ?? false;
+        }
+
+        return false;
       },
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);

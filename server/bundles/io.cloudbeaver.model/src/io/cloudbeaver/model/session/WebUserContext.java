@@ -80,16 +80,21 @@ public class WebUserContext implements SMCredentialsProvider {
      * refresh context state based on new token from security manager
      *
      * @param smAuthInfo - auth info from security manager
+     * @return - true if context changed
      * @throws DBException - if user already authorized and new token come from another user
      */
     public synchronized boolean refresh(SMAuthInfo smAuthInfo) throws DBException {
-        if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS || smAuthInfo.getSmAccessToken() == null) {
-            throw new DBCException("Authorization did not complete successfully");
-        }
-        if (smAuthInfo.getAuthPermissions() == null) {
+        if (smAuthInfo.getAuthPermissions() == null && !isAuthorizedInSecurityManager()) {
             throw new DBCException("Required information about session permissions is missing");
         }
-        return refresh(smAuthInfo.getSmAccessToken(), smAuthInfo.getSmRefreshToken(), smAuthInfo.getAuthPermissions());
+        boolean sessionChanged = !CommonUtils.equalObjects(smSessionId, smAuthInfo.getAuthPermissions().getSessionId());
+        if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS || (sessionChanged && smAuthInfo.getSmAccessToken() == null)) {
+            throw new DBCException("Authorization did not complete successfully");
+        }
+        if (sessionChanged) {
+            return refresh(smAuthInfo.getSmAccessToken(), smAuthInfo.getSmRefreshToken(), smAuthInfo.getAuthPermissions());
+        }
+        return false;
     }
 
     public synchronized boolean refresh(
@@ -108,7 +113,7 @@ public class WebUserContext implements SMCredentialsProvider {
             smAuthPermissions.getSessionId(),
             smAuthPermissions.getPermissions()
         );
-        this.refreshToken = smRefreshToken;
+        setRefreshToken(smRefreshToken);
         setUserPermissions(smAuthPermissions.getPermissions());
         this.securityController = application.createSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
@@ -131,7 +136,7 @@ public class WebUserContext implements SMCredentialsProvider {
             return;
         }
         var newTokens = securityController.refreshSession(refreshToken);
-        this.refreshToken = newTokens.getSmRefreshToken();
+        setRefreshToken(newTokens.getSmRefreshToken());
         this.smCredentials = new SMCredentials(
             newTokens.getSmAccessToken(),
             smCredentials.getUserId(),
@@ -204,6 +209,7 @@ public class WebUserContext implements SMCredentialsProvider {
      */
     public synchronized void refreshPermissions() throws DBException {
         if (isAuthorizedInSecurityManager()) {
+            log.debug("refresh permissions " + getUserId() + " " + getSmSessionId());
             setUserPermissions(securityController.getTokenPermissions().getPermissions());
         } else {
             setUserPermissions(getDefaultPermissions());
@@ -237,5 +243,9 @@ public class WebUserContext implements SMCredentialsProvider {
     @NotNull
     public Set<String> getAccessibleProjectIds() {
         return accessibleProjectIds;
+    }
+
+    private void setRefreshToken(@Nullable String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

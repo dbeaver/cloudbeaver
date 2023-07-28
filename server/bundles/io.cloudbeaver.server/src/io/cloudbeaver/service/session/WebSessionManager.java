@@ -326,11 +326,18 @@ public class WebSessionManager {
     /**
      * Send session state with remaining alive time to all cached session
      */
-    public void sendSessionsStates() throws DBException {
+    public void sendSessionsStates() {
         synchronized (sessionMap) {
             for (var session : sessionMap.values()) {
-                session.getUserContext().refreshPermissions();
-                session.addSessionEvent(new WSSessionStateEvent(session.getRemainingTime(), session.isValid()));
+                if (session instanceof WebHeadlessSession) {
+                    continue;
+                }
+                try {
+                    session.getUserContext().refreshPermissions();
+                    session.addSessionEvent(new WSSessionStateEvent(session.getRemainingTime(), session.isValid()));
+                } catch (Exception e) {
+                    log.error("Failed to refresh session state: " + session.getSessionId(), e);
+                }
             }
         }
     }

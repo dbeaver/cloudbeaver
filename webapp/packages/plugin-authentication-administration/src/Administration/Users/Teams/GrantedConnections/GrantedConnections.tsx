@@ -6,11 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   Container,
   getComputed,
@@ -51,7 +49,7 @@ const styles = css`
 `;
 
 export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = observer(function GrantedConnections({ tabId, state: formState }) {
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles);
+  const style = useStyles(styles);
   const translate = useTranslate();
 
   const state = useGrantedConnections(formState.config, formState.mode);

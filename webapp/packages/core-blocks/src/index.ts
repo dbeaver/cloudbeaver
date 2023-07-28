@@ -10,7 +10,6 @@ export * from './ItemList/ListItem';
 export * from './ItemList/ListItemDescription';
 export * from './ItemList/ListItemIcon';
 export * from './ItemList/ListItemName';
-export { ITEM_LIST_STYLES } from './ItemList/styles';
 
 export * from './layout/AppLogo';
 export * from './layout/BASE_LAYOUT_GRID_STYLES';
@@ -120,7 +119,6 @@ export * from './FormControls/BASE_DROPDOWN_STYLES';
 export * from './FormControls/FormBox';
 export * from './FormControls/Filter';
 
-export * from './Containers/BASE_CONTAINERS_STYLES';
 export * from './Containers/Container';
 export * from './Containers/Group';
 export * from './Containers/GroupClose';
@@ -181,6 +179,7 @@ export * from './useExecutor';
 export * from './useFn';
 export * from './useFocus';
 export * from './useFormValidator';
+export * from './ResourcesHooks/usePagination';
 export * from './ResourcesHooks/useResource';
 export * from './useMouse';
 export * from './useObjectRef';

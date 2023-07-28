@@ -9,20 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import {
-  BASE_CONTAINERS_STYLES,
-  ColoredContainer,
-  Group,
-  GroupTitle,
-  InputField,
-  Loader,
-  ObjectPropertyInfoForm,
-  SubmittingForm,
-  Textarea,
-  useResource,
-  useStyles,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Group, InputField, SubmittingForm, Textarea, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
@@ -39,7 +26,7 @@ const styles = css`
 
 export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(function TeamOptions({ state }) {
   const serverConfigResource = useResource(TeamOptions, ServerConfigResource, undefined);
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles);
+  const style = useStyles(styles);
   const formRef = useRef<HTMLFormElement>(null);
   const translate = useTranslate();
   const edit = state.mode === 'edit';

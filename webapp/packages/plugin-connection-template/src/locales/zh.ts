@@ -8,5 +8,5 @@ export default [
   ['basicConnection_connectionDialog_passwordPlaceholder', '密码'],
   ['basicConnection_connectionDialog_connecting', '连接中...'],
   ['basicConnection_connectionDialog_connecting_message', '连接数据库...'],
-  ['basicConnection_main_menu_item', '从模板创建'],
+  ['plugin_connection_template_action_connection_template_label', '从模板创建'],
 ];

@@ -7,7 +7,7 @@
  */
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, GroupItem, Translate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Group, GroupItem, Translate } from '@cloudbeaver/core-blocks';
 
 const styles = css`
   p {
@@ -21,10 +21,7 @@ const styles = css`
 `;
 
 export const WelcomePage: React.FC = function WelcomePage() {
-  return styled(
-    styles,
-    BASE_CONTAINERS_STYLES,
-  )(
+  return styled(styles)(
     <ColoredContainer wrap gap overflow parent>
       <Group form>
         <h3>

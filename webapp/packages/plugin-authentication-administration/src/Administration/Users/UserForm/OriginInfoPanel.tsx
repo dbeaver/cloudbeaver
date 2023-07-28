@@ -6,11 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import {
-  BASE_CONTAINERS_STYLES,
   ColoredContainer,
   ExceptionMessage,
   Group,
@@ -20,7 +18,6 @@ import {
   TextPlaceholder,
   useAutoLoad,
   useObjectRef,
-  useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -44,7 +41,6 @@ interface IState {
 }
 
 export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = observer(function OriginInfoPanel({ tabId, user }) {
-  const style = useStyles(BASE_CONTAINERS_STYLES);
   const translate = useTranslate();
   const usersResource = useService(UsersResource);
   const state = useTabState<IState>(() => ({
@@ -125,40 +121,40 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
   }
 
   if (state.loading) {
-    return styled(style)(
+    return (
       <ColoredContainer parent>
         <Group large>
           <Loader key="static" />
         </Group>
-      </ColoredContainer>,
+      </ColoredContainer>
     );
   }
 
   if (state.exception) {
-    return styled(style)(
+    return (
       <ColoredContainer parent>
         <Group large>
           <ExceptionMessage exception={state.exception} onRetry={() => loadableState.reload?.()} />
         </Group>
-      </ColoredContainer>,
+      </ColoredContainer>
     );
   }
 
   if (!origin || (state.loaded && state.properties.length === 0)) {
-    return styled(style)(
+    return (
       <ColoredContainer parent>
         <Group large>
           <TextPlaceholder>{translate('authentication_administration_user_origin_empty')}</TextPlaceholder>
         </Group>
-      </ColoredContainer>,
+      </ColoredContainer>
     );
   }
 
-  return styled(style)(
+  return (
     <ColoredContainer parent>
       <Group gap large>
         <ObjectPropertyInfoForm properties={state.properties} state={state.state} readOnly small autoHide />
       </Group>
-    </ColoredContainer>,
+    </ColoredContainer>
   );
 });
