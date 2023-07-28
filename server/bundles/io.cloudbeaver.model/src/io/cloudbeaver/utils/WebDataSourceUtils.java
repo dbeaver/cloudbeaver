@@ -88,10 +88,10 @@ public class WebDataSourceUtils {
         if (cfgInput.getPassword() != null) {
             handlerConfig.setPassword(cfgInput.getPassword());
         }
+        setSecureProperties(handlerConfig, cfgInput, true);
         if (cfgInput.getKey() != null) { // backward compatibility
             handlerConfig.setSecureProperty(SSHConstants.PROP_KEY_VALUE, cfgInput.getKey());
         }
-        setSecureProperties(handlerConfig, cfgInput, true);
     }
 
     private static void setSecureProperties(DBWHandlerConfiguration handlerConfig, WebNetworkHandlerConfigInput cfgInput, boolean ignoreNulls) {
