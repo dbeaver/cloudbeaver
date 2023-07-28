@@ -8,17 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import {
-  BASE_CONTAINERS_STYLES,
-  Button,
-  ColoredContainer,
-  FormFieldDescription,
-  Group,
-  IconOrImage,
-  Link,
-  TextPlaceholder,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { Button, ColoredContainer, FormFieldDescription, Group, IconOrImage, Link, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
@@ -53,10 +43,7 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(function P
   const productInfo = serverConfigResource.data?.productInfo;
   const logoIcon = themeService.currentThemeId === 'light' ? '/icons/product-logo_light.svg' : '/icons/product-logo_dark.svg';
 
-  return styled(
-    BASE_CONTAINERS_STYLES,
-    productInfoDialogStyles,
-  )(
+  return styled(productInfoDialogStyles)(
     <CommonDialogWrapper size="large">
       <CommonDialogHeader title="app_product_info" onReject={props.rejectDialog} />
       <CommonDialogBody>

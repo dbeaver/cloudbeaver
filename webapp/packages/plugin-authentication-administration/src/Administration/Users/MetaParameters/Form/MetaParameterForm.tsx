@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, IconOrImage, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { BASE_TAB_STYLES, TabList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
@@ -99,7 +99,7 @@ interface Props {
 export const MetaParameterForm = observer<Props>(function MetaParameterForm({ user, state }) {
   const translate = useTranslate();
   const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
-  const styles = useStyles(style, BASE_CONTAINERS_STYLES, topBarStyles, formStyles);
+  const styles = useStyles(style, topBarStyles, formStyles);
 
   return styled(styles)(
     <flex-box>

@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Group, Loader, Placeholder, PlaceholderElement, useStyles } from '@cloudbeaver/core-blocks';
+import { Group, Loader, Placeholder, PlaceholderElement, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { ElementsTreeSettingsService, IElementsTreeSettingsProps } from './ElementsTreeSettingsService';
@@ -34,7 +34,7 @@ interface Props extends IElementsTreeSettingsProps {
 }
 
 export const NavigationTreeSettings = observer<Props>(function NavigationTreeSettings({ elements, tree, style, className }) {
-  const styles = useStyles(BASE_CONTAINERS_STYLES, expandStyles, style);
+  const styles = useStyles(expandStyles, style);
   const elementsTreeSettingsService = useService(ElementsTreeSettingsService);
 
   return styled(styles)(

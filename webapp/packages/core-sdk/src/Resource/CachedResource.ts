@@ -100,6 +100,7 @@ export abstract class CachedResource<
 
   /** Need to infer value type */
   private readonly typescriptHack: TValue;
+  private captureAliasGetterExecution: boolean;
 
   constructor(defaultKey: ResourceKey<TKey>, private readonly defaultValue: () => TData, defaultIncludes: TInclude = [] as any) {
     super();
@@ -114,6 +115,7 @@ export abstract class CachedResource<
     this.defaultIncludes = defaultIncludes;
     this.paramAliases = [];
     this.outdateWaitList = [];
+    this.captureAliasGetterExecution = false;
     this.metadata = new MetadataMap((key, metadata) => observable(this.getDefaultMetadata(key, metadata) as TMetadata, undefined, { deep: false }));
     this.scheduler = new TaskScheduler(this.isIntersect);
     this.data = defaultValue();
@@ -824,7 +826,7 @@ export abstract class CachedResource<
       if (isResourceAlias(param)) {
         for (const alias of this.paramAliases) {
           if (alias.id === param.id) {
-            param = alias.getAlias(param);
+            param = this.captureGetAlias(alias, param);
             deep++;
             break;
           }
@@ -848,6 +850,10 @@ export abstract class CachedResource<
   protected transformToAlias(
     key: ResourceKeyAlias<TKey, any> | ResourceKeyListAlias<TKey, any>,
   ): ResourceKeyAlias<TKey, any> | ResourceKeyListAlias<TKey, any> {
+    if (this.captureAliasGetterExecution) {
+      return key;
+    }
+
     let deep = 0;
     // eslint-disable-next-line no-labels
     transform: if (deep < 10) {
@@ -862,7 +868,7 @@ export abstract class CachedResource<
 
       for (const alias of this.paramAliases) {
         if (alias.id === key.id) {
-          const data = alias.getAlias(key);
+          const data = this.captureGetAlias(alias, key);
 
           if (isResourceAlias(data)) {
             key = data;
@@ -878,6 +884,15 @@ export abstract class CachedResource<
       console.warn('CachedResource: parameter transform was stopped');
     }
     return key;
+  }
+
+  protected captureGetAlias(alias: IParamAlias<TKey>, param: ResourceAlias<TKey, any>): ResourceKey<TKey> {
+    try {
+      this.captureAliasGetterExecution = true;
+      return alias.getAlias(param);
+    } finally {
+      this.captureAliasGetterExecution = false;
+    }
   }
 
   /**
