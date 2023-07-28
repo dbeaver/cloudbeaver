@@ -163,6 +163,7 @@ export interface AuthProviderInfo {
   label: Scalars['String'];
   private: Scalars['Boolean'];
   requiredFeatures: Array<Scalars['String']>;
+  supportProvisioning: Scalars['Boolean'];
   trusted: Scalars['Boolean'];
 }
 
