@@ -37,13 +37,13 @@ export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTM
       className={s(
         styles,
         {
+          ...containerProps,
           group: true,
           container: true,
           form,
           center,
           boxNoOverflow,
           box,
-          ...containerProps,
         },
         className,
       )}
