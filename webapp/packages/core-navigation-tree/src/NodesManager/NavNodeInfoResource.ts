@@ -30,7 +30,6 @@ export const ROOT_NODE_PATH = '';
 
 interface INodeMetadata extends ICachedResourceMetadata {
   withDetails: boolean;
-  withFilters: boolean;
 }
 
 @injectable()
@@ -148,7 +147,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
       const { navNodeInfo } = await this.graphQLService.sdk.navNodeInfo({
         nodePath,
         withDetails: metadata.withDetails,
-        withFilters: metadata.withFilters,
+        withFilters: false,
       });
 
       return this.navNodeInfoToNavNode(navNodeInfo);
@@ -162,7 +161,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
     const { node, parents } = await this.graphQLService.sdk.getNodeParents({
       nodePath,
       withDetails: metadata.withDetails,
-      withFilters: metadata.withFilters,
+      withFilters: false,
     });
 
     return runInAction(() => {
@@ -182,7 +181,6 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
   protected getDefaultMetadata(key: string, metadata: MetadataMap<string, INodeMetadata>): INodeMetadata {
     return Object.assign(super.getDefaultMetadata(key, metadata), {
       withDetails: false,
-      withFilters: false,
     });
   }
 

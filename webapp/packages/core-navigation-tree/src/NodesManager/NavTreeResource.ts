@@ -43,7 +43,6 @@ type NavNodeChildrenQuery = fake & NodePath;
 
 interface INodeMetadata extends ICachedResourceMetadata {
   withDetails: boolean;
-  withFilters: boolean;
 }
 
 export interface INavNodeMoveData {
@@ -526,7 +525,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       offset,
       limit,
       withDetails: metadata.withDetails,
-      withFilters: metadata.withFilters,
+      withFilters: false,
     });
 
     return { navNodeChildren, navNodeInfo, parentPath };
@@ -535,7 +534,6 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   protected getDefaultMetadata(key: string, metadata: MetadataMap<string, INodeMetadata>): INodeMetadata {
     return Object.assign(super.getDefaultMetadata(key, metadata), {
       withDetails: false,
-      withFilters: false,
     });
   }
 

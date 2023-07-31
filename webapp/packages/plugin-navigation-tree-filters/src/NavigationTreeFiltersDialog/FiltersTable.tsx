@@ -38,7 +38,7 @@ export const FiltersTable = observer<Props>(function FiltersTable({ title, filte
     <Group className={styles.group} box medium overflow>
       <container className={s(style, { container: true })}>
         <header className={s(style, { header: true })}>
-          <h4 className={s(style, { h4: true })}>{title}</h4>
+          <h4 className={s(style, { headerTitle: true })}>{title}</h4>
           <SubmittingForm className={s(style, { submittingForm: true })} onSubmit={add}>
             <div className={s(style, { headerActions: true })}>
               <InputField
