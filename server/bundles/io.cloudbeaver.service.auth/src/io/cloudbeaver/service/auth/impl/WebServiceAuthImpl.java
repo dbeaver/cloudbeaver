@@ -139,9 +139,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         } catch (DBException e) {
             throw new DBWebException("User logout failed", e);
         }
-        if (CBApplication.getInstance().getAppConfiguration().isAnonymousAccessEnabled()) {
-            webSession.notifySessionAuthChange();
-        }
     }
 
     @Override
