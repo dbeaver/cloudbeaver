@@ -20,6 +20,7 @@ export interface IChainLink<T, TResult> {
 }
 
 export interface IExecutorHandlersCollection<T = unknown, TResult = any | Promise<any>> {
+  readonly isEmpty: boolean;
   readonly handlers: Array<IExecutorHandler<T, TResult>>;
   readonly postHandlers: Array<IExecutorHandler<T, TResult>>;
   readonly chain: Array<IChainLink<T, TResult>>;

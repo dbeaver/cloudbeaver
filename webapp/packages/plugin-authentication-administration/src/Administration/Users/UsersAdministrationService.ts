@@ -8,7 +8,7 @@
 import React from 'react';
 
 import { AdministrationItemService } from '@cloudbeaver/core-administration';
-import { AdminUser, TeamsResource } from '@cloudbeaver/core-authentication';
+import { AdminUser, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
@@ -44,6 +44,7 @@ export class UsersAdministrationService extends Bootstrap {
     private readonly createUserService: CreateUserService,
     private readonly teamsResource: TeamsResource,
     private readonly createTeamService: CreateTeamService,
+    private readonly usersResource: UsersResource,
   ) {
     super();
   }
@@ -63,7 +64,7 @@ export class UsersAdministrationService extends Bootstrap {
         {
           name: EUsersAdministrationSub.Teams,
           onActivate: this.loadTeams.bind(this),
-          onDeActivate: (configurationWizard, outside) => {
+          onDeActivate: (param, configurationWizard, outside) => {
             if (outside) {
               this.teamsResource.cleanNewFlags();
             }
@@ -79,9 +80,13 @@ export class UsersAdministrationService extends Bootstrap {
 
   load(): void | Promise<void> {}
 
-  private async cancelCreate(param: string | null) {
+  private async cancelCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
     if (param === 'create') {
       this.createUserService.close();
+    }
+
+    if (outside) {
+      this.usersResource.cleanNewFlags();
     }
   }
 

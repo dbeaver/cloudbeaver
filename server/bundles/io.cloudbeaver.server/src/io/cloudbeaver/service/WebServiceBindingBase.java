@@ -174,6 +174,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                     throw e.getTargetException();
                 }
             } catch (Throwable ex) {
+                log.error("Unexpected error during gql request", ex);
                 if (SMUtils.isTokenExpiredExceptionWasHandled(ex)) {
                     WebSession webSession = findWebSession(env);
                     if (webSession != null) {

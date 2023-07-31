@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { PermissionsResource } from '@cloudbeaver/core-administration';
-import { BASE_CONTAINERS_STYLES, FieldCheckbox, Group, GroupTitle, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { FieldCheckbox, Group, GroupTitle, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import type { ITeamFormProps } from '../ITeamFormProps';
@@ -24,7 +24,7 @@ export const Permissions = observer<ITeamFormProps>(function Permissions({ state
   const translate = useTranslate();
   const permissionsResource = useResource(Permissions, PermissionsResource, CachedMapAllKey);
 
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles);
+  const style = useStyles(styles);
 
   return styled(style)(
     <Group small gap>

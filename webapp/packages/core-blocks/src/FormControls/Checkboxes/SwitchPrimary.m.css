@@ -1,0 +1,3 @@
+.switchControl {
+  composes: theme-switch_primary from global;
+}

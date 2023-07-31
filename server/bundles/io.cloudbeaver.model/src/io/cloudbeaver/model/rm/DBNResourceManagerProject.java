@@ -101,7 +101,7 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
         return children;
     }
 
-    public RMController getResourceController() {
+    protected RMController getResourceController() {
         return ((DBNResourceManagerRoot) getParentNode()).getResourceController();
     }
 

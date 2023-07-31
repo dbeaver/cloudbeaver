@@ -31,7 +31,6 @@ import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Web service API
@@ -40,7 +39,12 @@ public interface DBWServiceAdmin extends DBWService {
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     @NotNull
-    List<AdminUserInfo> listUsers(@NotNull WebSession webSession, @Nullable String userName) throws DBWebException;
+    AdminUserInfo getUserById(@NotNull WebSession webSession, @NotNull String userId) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    @NotNull
+    List<AdminUserInfo> listUsers(@NotNull WebSession webSession, AdminUserInfoFilter filter)
+        throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     @NotNull

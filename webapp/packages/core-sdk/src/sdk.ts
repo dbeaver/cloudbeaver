@@ -82,6 +82,11 @@ export interface AdminTeamInfo {
   teamPermissions: Array<Scalars['ID']>;
 }
 
+export interface AdminUserFilterInput {
+  enabledState?: InputMaybe<Scalars['Boolean']>;
+  userIdMask?: InputMaybe<Scalars['String']>;
+}
+
 export interface AdminUserInfo {
   authRole?: Maybe<Scalars['String']>;
   configurationParameters: Scalars['Object'];
@@ -158,6 +163,7 @@ export interface AuthProviderInfo {
   label: Scalars['String'];
   private: Scalars['Boolean'];
   requiredFeatures: Array<Scalars['String']>;
+  supportProvisioning: Scalars['Boolean'];
   trusted: Scalars['Boolean'];
 }
 
@@ -933,6 +939,11 @@ export enum ObjectPropertyLength {
   Tiny = 'TINY',
 }
 
+export interface PageInput {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+}
+
 export interface ProductInfo {
   buildTime: Scalars['String'];
   description?: Maybe<Scalars['String']>;
@@ -959,6 +970,7 @@ export interface ProjectInfo {
 
 export interface Query {
   activeUser?: Maybe<UserInfo>;
+  adminUserInfo: AdminUserInfo;
   authChangeLocalPassword: Scalars['Boolean'];
   authLogin: AuthInfo;
   authLogout?: Maybe<Scalars['Boolean']>;
@@ -1041,6 +1053,10 @@ export interface Query {
   templateConnections: Array<ConnectionInfo>;
   updateTeam: AdminTeamInfo;
   userConnections: Array<ConnectionInfo>;
+}
+
+export interface QueryAdminUserInfoArgs {
+  userId: Scalars['ID'];
 }
 
 export interface QueryAuthChangeLocalPasswordArgs {
@@ -1167,7 +1183,8 @@ export interface QueryListTeamsArgs {
 }
 
 export interface QueryListUsersArgs {
-  userId?: InputMaybe<Scalars['ID']>;
+  filter: AdminUserFilterInput;
+  page: PageInput;
 }
 
 export interface QueryMetadataGetNodeDdlArgs {
@@ -2124,6 +2141,42 @@ export type EnableUserQueryVariables = Exact<{
 
 export type EnableUserQuery = { enableUser?: boolean };
 
+export type GetAdminUserInfoQueryVariables = Exact<{
+  userId: Scalars['ID'];
+  includeMetaParameters: Scalars['Boolean'];
+  customIncludeOriginDetails: Scalars['Boolean'];
+}>;
+
+export type GetAdminUserInfoQuery = {
+  user: {
+    userId: string;
+    grantedTeams: Array<string>;
+    linkedAuthProviders: Array<string>;
+    metaParameters?: any;
+    enabled: boolean;
+    authRole?: string;
+    origins: Array<{
+      type: string;
+      subType?: string;
+      displayName: string;
+      icon?: string;
+      details?: Array<{
+        id?: string;
+        displayName?: string;
+        description?: string;
+        category?: string;
+        dataType?: string;
+        defaultValue?: any;
+        validValues?: Array<any>;
+        value?: any;
+        length: ObjectPropertyLength;
+        features: Array<string>;
+        order: number;
+      }>;
+    }>;
+  };
+};
+
 export type GetUserGrantedConnectionsQueryVariables = Exact<{
   userId: Scalars['ID'];
 }>;
@@ -2133,7 +2186,8 @@ export type GetUserGrantedConnectionsQuery = {
 };
 
 export type GetUsersListQueryVariables = Exact<{
-  userId?: InputMaybe<Scalars['ID']>;
+  page: PageInput;
+  filter: AdminUserFilterInput;
   includeMetaParameters: Scalars['Boolean'];
   customIncludeOriginDetails: Scalars['Boolean'];
 }>;
@@ -2360,8 +2414,6 @@ export type CloseConnectionMutation = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -2369,6 +2421,8 @@ export type CloseConnectionMutation = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2461,8 +2515,6 @@ export type CreateConnectionMutation = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -2470,6 +2522,8 @@ export type CreateConnectionMutation = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2571,8 +2625,6 @@ export type CreateConnectionFromNodeMutation = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -2580,6 +2632,8 @@ export type CreateConnectionFromNodeMutation = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2673,8 +2727,6 @@ export type CreateConnectionFromTemplateMutation = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -2682,6 +2734,8 @@ export type CreateConnectionFromTemplateMutation = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2916,8 +2970,6 @@ export type GetTemplateConnectionsQuery = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -2925,6 +2977,8 @@ export type GetTemplateConnectionsQuery = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3018,8 +3072,6 @@ export type GetUserConnectionsQuery = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -3027,6 +3079,8 @@ export type GetUserConnectionsQuery = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3123,8 +3177,6 @@ export type InitConnectionMutation = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -3132,6 +3184,8 @@ export type InitConnectionMutation = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3229,8 +3283,6 @@ export type SetConnectionNavigatorSettingsMutation = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -3238,6 +3290,8 @@ export type SetConnectionNavigatorSettingsMutation = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3351,8 +3405,6 @@ export type UpdateConnectionMutation = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -3360,6 +3412,8 @@ export type UpdateConnectionMutation = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3775,8 +3829,6 @@ export type DatabaseConnectionFragment = {
     order: number;
   }>;
   networkHandlersConfig?: Array<{
-    id: string;
-    enabled: boolean;
     authType: NetworkHandlerAuthType;
     userName?: string;
     password?: string;
@@ -3784,6 +3836,8 @@ export type DatabaseConnectionFragment = {
     savePassword: boolean;
     properties: any;
     secureProperties: any;
+    id: string;
+    enabled: boolean;
   }>;
   navigatorSettings: {
     showSystemObjects: boolean;
@@ -3915,6 +3969,8 @@ export type NavNodePropertiesFragment = {
   value?: any;
   order: number;
 };
+
+export type NetworkHandlerBasicsFragment = { id: string; enabled: boolean };
 
 export type ObjectOriginInfoFragment = {
   type: string;
@@ -5034,6 +5090,12 @@ export const UserConnectionAuthPropertiesFragmentDoc = `
   order
 }
     `;
+export const NetworkHandlerBasicsFragmentDoc = `
+    fragment NetworkHandlerBasics on NetworkHandlerConfig {
+  id
+  enabled
+}
+    `;
 export const AllNavigatorSettingsFragmentDoc = `
     fragment AllNavigatorSettings on NavigatorSettings {
   showSystemObjects
@@ -5080,9 +5142,11 @@ export const DatabaseConnectionFragmentDoc = `
   authProperties @include(if: $includeAuthProperties) {
     ...UserConnectionAuthProperties
   }
+  networkHandlersConfig @skip(if: $includeNetworkHandlersConfig) {
+    ...NetworkHandlerBasics
+  }
   networkHandlersConfig @include(if: $includeNetworkHandlersConfig) {
-    id
-    enabled
+    ...NetworkHandlerBasics
     authType
     userName
     password
@@ -5100,6 +5164,7 @@ export const DatabaseConnectionFragmentDoc = `
 }
     ${ObjectOriginInfoFragmentDoc}
 ${UserConnectionAuthPropertiesFragmentDoc}
+${NetworkHandlerBasicsFragmentDoc}
 ${AllNavigatorSettingsFragmentDoc}`;
 export const DriverProviderPropertyInfoFragmentDoc = `
     fragment DriverProviderPropertyInfo on ObjectPropertyInfo {
@@ -5518,6 +5583,13 @@ export const EnableUserDocument = `
   enableUser(userId: $userId, enabled: $enabled)
 }
     `;
+export const GetAdminUserInfoDocument = `
+    query getAdminUserInfo($userId: ID!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  user: adminUserInfo(userId: $userId) {
+    ...AdminUserInfo
+  }
+}
+    ${AdminUserInfoFragmentDoc}`;
 export const GetUserGrantedConnectionsDocument = `
     query getUserGrantedConnections($userId: ID!) {
   grantedConnections: getSubjectConnectionAccess(subjectId: $userId) {
@@ -5529,8 +5601,8 @@ export const GetUserGrantedConnectionsDocument = `
 }
     `;
 export const GetUsersListDocument = `
-    query getUsersList($userId: ID, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
-  users: listUsers(userId: $userId) {
+    query getUsersList($page: PageInput!, $filter: AdminUserFilterInput!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  users: listUsers(page: $page, filter: $filter) {
     ...AdminUserInfo
   }
 }
@@ -6881,6 +6953,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
       return withWrapper(
         wrappedRequestHeaders => client.request<EnableUserQuery>(EnableUserDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
         'enableUser',
+        'query',
+      );
+    },
+    getAdminUserInfo(variables: GetAdminUserInfoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetAdminUserInfoQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<GetAdminUserInfoQuery>(GetAdminUserInfoDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
+        'getAdminUserInfo',
         'query',
       );
     },

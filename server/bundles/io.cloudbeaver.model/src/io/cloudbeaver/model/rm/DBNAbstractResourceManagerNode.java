@@ -19,7 +19,7 @@ public abstract class DBNAbstractResourceManagerNode extends DBNNode implements 
         super(parentNode);
     }
 
-    public void removeChildResourceNode(@NotNull Queue<RMResource> resourcePath) {
+    public void removeChildResourceNode(@NotNull Queue<String> resourcePath) {
         if (children == null || resourcePath.isEmpty()) {
             return;
         }
@@ -49,7 +49,7 @@ public abstract class DBNAbstractResourceManagerNode extends DBNNode implements 
             return;
         }
         var expectedResource = resourcePath.poll();
-        var node = RMNavigatorUtils.findResourceNode(children, expectedResource);
+        var node = RMNavigatorUtils.findResourceNode(children, expectedResource.getName());
         if (node == null) { // we are in expected parent node
             DBNResourceManagerResource newResourceNode = new DBNResourceManagerResource(this, expectedResource);
             children = ArrayUtils.add(DBNResourceManagerResource.class, children, newResourceNode);

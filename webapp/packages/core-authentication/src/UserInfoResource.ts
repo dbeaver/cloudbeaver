@@ -38,6 +38,7 @@ export interface ILoginOptions {
 @injectable()
 export class UserInfoResource extends CachedDataResource<UserInfo | null, void, UserInfoIncludes> {
   readonly onUserChange: ISyncExecutor<string>;
+  readonly onException: ISyncExecutor<Error>;
 
   get authRole(): ELMRole | undefined {
     return this.data?.authRole as ELMRole | undefined;
@@ -56,6 +57,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     super(() => null, undefined, ['customIncludeOriginDetails', 'includeConfigurationParameters']);
 
     this.onUserChange = new SyncExecutor();
+    this.onException = new SyncExecutor();
 
     this.sync(
       sessionResource,
@@ -234,12 +236,20 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
   }
 
   protected async loader(key: void, includes?: ReadonlyArray<string>): Promise<UserInfo | null> {
-    const { user } = await this.graphQLService.sdk.getActiveUser({
-      ...this.getDefaultIncludes(),
-      ...this.getIncludesMap(key, includes),
-    });
+    try {
+      const { user } = await this.graphQLService.sdk.getActiveUser({
+        ...this.getDefaultIncludes(),
+        ...this.getIncludesMap(key, includes),
+      });
 
-    return (user as UserInfo | null) || null;
+      return (user as UserInfo | null) || null;
+    } catch (exception: any) {
+      if (this.onException.isEmpty) {
+        throw exception;
+      }
+      this.onException.execute(exception);
+      return null;
+    }
   }
 
   protected setData(data: UserInfo | null): void {
