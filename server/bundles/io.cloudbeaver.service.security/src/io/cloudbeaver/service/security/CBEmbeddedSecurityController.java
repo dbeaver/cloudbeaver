@@ -219,20 +219,22 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     @NotNull
     @Override
     public SMTeam[] getUserTeams(String userId) throws DBException {
+        Map<String, SMTeam> teams = new LinkedHashMap<>();
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames("SELECT R.* FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R " +
                     "WHERE UR.USER_ID=? AND UR.TEAM_ID=R.TEAM_ID"))
             ) {
                 dbStat.setString(1, userId);
-                List<SMTeam> teams = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
-                        teams.add(fetchTeam(dbResult));
+                        var team = fetchTeam(dbResult);
+                        teams.put(team.getTeamId(), team);
                     }
                 }
-                return teams.toArray(new SMTeam[0]);
             }
+            readSubjectsMetas(dbCon, SMSubjectType.team, null, teams);
+            return teams.values().toArray(new SMTeam[0]);
         } catch (SQLException e) {
             throw new DBCException("Error while reading user teams", e);
         }
@@ -1219,9 +1221,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 Map<String, Object> securedUserIdentifyingCredentials = userCredentials;
                 WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
                 var authProviderInstance = authProviderDescriptor.getInstance();
+
+                SMAuthProviderCustomConfiguration providerConfig = authProviderConfigurationId == null
+                    ? null
+                    : application.getAuthConfiguration().getAuthProviderConfiguration(authProviderConfigurationId);
+
                 if (SMAuthProviderExternal.class.isAssignableFrom(authProviderInstance.getClass())) {
                     var authProviderExternal = (SMAuthProviderExternal<?>) authProviderInstance;
-                    securedUserIdentifyingCredentials = authProviderExternal.authExternalUser(authProgressMonitor, Map.of(), userCredentials);
+                    securedUserIdentifyingCredentials = authProviderExternal.authExternalUser(
+                        authProgressMonitor,
+                        providerConfig,
+                        userCredentials
+                    );
                 }
 
                 var filteredUserCreds = filterSecuredUserData(

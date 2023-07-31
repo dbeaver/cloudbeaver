@@ -35,13 +35,13 @@ import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class RPSessionHandler implements DBWSessionHandler {
 
@@ -76,7 +76,7 @@ public class RPSessionHandler implements DBWSessionHandler {
                 Map<String, Object> sessionParameters = webSession.getSessionParameters();
                 sessionParameters.put(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS, userTeams);
                 Map<String, Object> userCredentials = authProviderExternal.authExternalUser(
-                    webSession.getProgressMonitor(), sessionParameters, credentials);
+                    webSession.getProgressMonitor(), null, credentials);
                 String currentSmSessionId = webSession.getUser() == null ? null : webSession.getUserContext().getSmSessionId();
                 try {
                     SMAuthInfo smAuthInfo = securityController.authenticate(
