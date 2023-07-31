@@ -126,12 +126,13 @@ export class PluginBootstrap extends Bootstrap {
                 return false;
               }
 
+              const project = this.projectInfoResource.get(projectId);
               const nameWithExtension = this.projectInfoResource.getNameWithExtension(projectId, SCRIPTS_TYPE_ID, trimmedName);
-              const key = getRmResourcePath(projectId);
+              const rootFolder = project ? this.resourceManagerScriptsService.getRootFolder(project) : undefined;
+              const key = getRmResourcePath(projectId, rootFolder);
 
               try {
                 await this.resourceManagerResource.load(CachedTreeChildrenKey(key));
-
                 return !this.resourceManagerResource.has(createPath(key, nameWithExtension));
               } catch (exception: any) {
                 return false;

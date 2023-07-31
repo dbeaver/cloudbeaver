@@ -114,6 +114,7 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
               autoHide
               onChange={projectId => {
                 state.projectId = projectId;
+                state.validate();
               }}
             />
             <InputField
