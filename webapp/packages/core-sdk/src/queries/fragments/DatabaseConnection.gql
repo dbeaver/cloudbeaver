@@ -43,9 +43,12 @@ fragment DatabaseConnection on ConnectionInfo {
     ...UserConnectionAuthProperties
   }
 
+  networkHandlersConfig @skip(if: $includeNetworkHandlersConfig) {
+    ...NetworkHandlerBasics
+  }
+
   networkHandlersConfig @include(if: $includeNetworkHandlersConfig) {
-    id
-    enabled
+    ...NetworkHandlerBasics
     authType
     userName
     password

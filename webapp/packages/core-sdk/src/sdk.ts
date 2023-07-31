@@ -2414,8 +2414,6 @@ export type CloseConnectionMutation = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -2423,6 +2421,8 @@ export type CloseConnectionMutation = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2515,8 +2515,6 @@ export type CreateConnectionMutation = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -2524,6 +2522,8 @@ export type CreateConnectionMutation = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2625,8 +2625,6 @@ export type CreateConnectionFromNodeMutation = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -2634,6 +2632,8 @@ export type CreateConnectionFromNodeMutation = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2727,8 +2727,6 @@ export type CreateConnectionFromTemplateMutation = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -2736,6 +2734,8 @@ export type CreateConnectionFromTemplateMutation = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -2970,8 +2970,6 @@ export type GetTemplateConnectionsQuery = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -2979,6 +2977,8 @@ export type GetTemplateConnectionsQuery = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3072,8 +3072,6 @@ export type GetUserConnectionsQuery = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -3081,6 +3079,8 @@ export type GetUserConnectionsQuery = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3177,8 +3177,6 @@ export type InitConnectionMutation = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -3186,6 +3184,8 @@ export type InitConnectionMutation = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3283,8 +3283,6 @@ export type SetConnectionNavigatorSettingsMutation = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -3292,6 +3290,8 @@ export type SetConnectionNavigatorSettingsMutation = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3405,8 +3405,6 @@ export type UpdateConnectionMutation = {
       order: number;
     }>;
     networkHandlersConfig?: Array<{
-      id: string;
-      enabled: boolean;
       authType: NetworkHandlerAuthType;
       userName?: string;
       password?: string;
@@ -3414,6 +3412,8 @@ export type UpdateConnectionMutation = {
       savePassword: boolean;
       properties: any;
       secureProperties: any;
+      id: string;
+      enabled: boolean;
     }>;
     navigatorSettings: {
       showSystemObjects: boolean;
@@ -3829,8 +3829,6 @@ export type DatabaseConnectionFragment = {
     order: number;
   }>;
   networkHandlersConfig?: Array<{
-    id: string;
-    enabled: boolean;
     authType: NetworkHandlerAuthType;
     userName?: string;
     password?: string;
@@ -3838,6 +3836,8 @@ export type DatabaseConnectionFragment = {
     savePassword: boolean;
     properties: any;
     secureProperties: any;
+    id: string;
+    enabled: boolean;
   }>;
   navigatorSettings: {
     showSystemObjects: boolean;
@@ -3969,6 +3969,8 @@ export type NavNodePropertiesFragment = {
   value?: any;
   order: number;
 };
+
+export type NetworkHandlerBasicsFragment = { id: string; enabled: boolean };
 
 export type ObjectOriginInfoFragment = {
   type: string;
@@ -5088,6 +5090,12 @@ export const UserConnectionAuthPropertiesFragmentDoc = `
   order
 }
     `;
+export const NetworkHandlerBasicsFragmentDoc = `
+    fragment NetworkHandlerBasics on NetworkHandlerConfig {
+  id
+  enabled
+}
+    `;
 export const AllNavigatorSettingsFragmentDoc = `
     fragment AllNavigatorSettings on NavigatorSettings {
   showSystemObjects
@@ -5134,9 +5142,11 @@ export const DatabaseConnectionFragmentDoc = `
   authProperties @include(if: $includeAuthProperties) {
     ...UserConnectionAuthProperties
   }
+  networkHandlersConfig @skip(if: $includeNetworkHandlersConfig) {
+    ...NetworkHandlerBasics
+  }
   networkHandlersConfig @include(if: $includeNetworkHandlersConfig) {
-    id
-    enabled
+    ...NetworkHandlerBasics
     authType
     userName
     password
@@ -5154,6 +5164,7 @@ export const DatabaseConnectionFragmentDoc = `
 }
     ${ObjectOriginInfoFragmentDoc}
 ${UserConnectionAuthPropertiesFragmentDoc}
+${NetworkHandlerBasicsFragmentDoc}
 ${AllNavigatorSettingsFragmentDoc}`;
 export const DriverProviderPropertyInfoFragmentDoc = `
     fragment DriverProviderPropertyInfo on ObjectPropertyInfo {
