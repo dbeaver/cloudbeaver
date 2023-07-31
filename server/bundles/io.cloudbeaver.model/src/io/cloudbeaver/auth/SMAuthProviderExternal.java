@@ -42,7 +42,7 @@ public interface SMAuthProviderExternal<AUTH_SESSION extends SMSession> extends 
     @NotNull
     default Map<String, Object> authExternalUser(
         @NotNull DBRProgressMonitor monitor,
-        @NotNull Map<String, Object> providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
+        @Nullable SMAuthProviderCustomConfiguration providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
         @NotNull Map<String, Object> authParameters // Passed auth parameters (e.g. user name or password)
     ) throws DBException {
         return authParameters;
