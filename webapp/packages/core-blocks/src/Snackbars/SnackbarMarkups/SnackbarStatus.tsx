@@ -5,25 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import styled, { css } from 'reshadow';
-
 import { ENotificationType } from '@cloudbeaver/core-events';
 
 import { Loader } from '../../Loader/Loader';
+import { s } from '../../s';
+import { useS } from '../../useS';
 import { NotificationMark } from '../NotificationMark';
-
-const SNACKBAR_STATUS_STYLES = css`
-  NotificationMark {
-    padding-right: 12px;
-  }
-  loader-container {
-    padding-right: 12px;
-    & Loader {
-      width: 40px;
-      height: 40px;
-    }
-  }
-`;
+import style from './SnackbarStatus.m.css';
 
 interface SnackbarStatusProps {
   status: ENotificationType;
@@ -31,13 +19,12 @@ interface SnackbarStatusProps {
 }
 
 export const SnackbarStatus: React.FC<SnackbarStatusProps> = function SnackbarStatus({ status, className }) {
-  return styled(SNACKBAR_STATUS_STYLES)(
-    status === ENotificationType.Loading ? (
-      <loader-container className={className}>
-        <Loader fullSize hideMessage />
-      </loader-container>
-    ) : (
-      <NotificationMark className={className} type={status} />
-    ),
+  const styles = useS(style);
+  return status === ENotificationType.Loading ? (
+    <div data-testid="loader-container" className={s(styles, { loaderContainer: true }, className)}>
+      <Loader className={styles.loader} fullSize hideMessage />
+    </div>
+  ) : (
+    <NotificationMark className={s(styles, { notificationMark: true }, className)} type={status} />
   );
 };

@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %Bundle-Name
+Bundle-Name: CloudBeaver Platform Test Suite
 Bundle-SymbolicName: io.cloudbeaver.test.platform
 Bundle-Version: 1.0.0.qualifier
 Bundle-Release-Date: 20220606
-Bundle-Vendor: %Bundle-Vendor
+Bundle-Vendor: DBeaver Corp
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.core.runtime,

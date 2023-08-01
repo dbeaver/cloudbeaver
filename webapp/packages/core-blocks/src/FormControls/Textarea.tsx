@@ -11,7 +11,11 @@ import styled, { css, use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
+import { s } from '../s';
+import { useS } from '../useS';
 import { useStyles } from '../useStyles';
 import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
@@ -79,11 +83,6 @@ export const Textarea: TextareaType = observer(function Textarea({
   required,
   children,
   className,
-  fill,
-  tiny,
-  small,
-  medium,
-  large,
   description,
   labelTooltip,
   mod,
@@ -91,6 +90,8 @@ export const Textarea: TextareaType = observer(function Textarea({
   onChange = () => {},
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
+  const layoutProps = getLayoutProps(rest);
+  const sizeStyles = useS(elementsSizeStyles);
   const context = useContext(FormContext);
 
   const handleChange = useCallback(
@@ -111,7 +112,7 @@ export const Textarea: TextareaType = observer(function Textarea({
   const value = state ? state[name] : controlledValue;
 
   return styled(useStyles(baseFormControlStyles, baseValidFormControlStyles, styles, style))(
-    <field className={className} {...use({ tiny, small, medium, large, embedded })}>
+    <field className={s(sizeStyles, { ...layoutProps }, className)} {...use({ embedded })}>
       <field-label title={labelTooltip || rest.title}>
         {children}
         {required && ' *'}

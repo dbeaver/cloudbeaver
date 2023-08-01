@@ -7,24 +7,32 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Combobox, Group, GroupTitle, ITag, Tag, Tags, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Combobox,
+  Group,
+  GroupTitle,
+  ITag,
+  s,
+  Tag,
+  Tags,
+  useResource,
+  useS,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey, resourceKeyList, ServerConfigInput } from '@cloudbeaver/core-sdk';
+
+import style from './ServerConfigurationDriversForm.m.css';
 
 interface Props {
   serverConfig: ServerConfigInput;
 }
 
-const style = css`
-  Tags {
-    max-height: 100px;
-    overflow: auto;
-  }
-`;
-
 export const ServerConfigurationDriversForm = observer<Props>(function ServerConfigurationDriversForm({ serverConfig }) {
+  const styles = useS(style);
   const translate = useTranslate();
   const driversResource = useResource(ServerConfigurationDriversForm, DBDriverResource, CachedMapAllKey);
 
@@ -57,7 +65,7 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
     }
   }, []);
 
-  return styled(useStyles(BASE_CONTAINERS_STYLES, style))(
+  return styled(useStyles(style))(
     <Group maximum gap>
       <GroupTitle>{translate('administration_disabled_drivers_title')}</GroupTitle>
       <Combobox
@@ -70,7 +78,7 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
         searchable
         onSelect={handleSelect}
       />
-      <Tags>
+      <Tags className={s(styles, { wrapper: true })}>
         {tags.map(tag => (
           <Tag key={tag.id} id={tag.id} label={tag.label} icon={tag.icon} onRemove={handleRemove} />
         ))}

@@ -8,131 +8,20 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Menu, MenuButton, MenuItem, useMenuState } from 'reakit/Menu';
-import styled, { css, use } from 'reshadow';
 
-import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { getComputed } from '../getComputed';
 import { Icon } from '../Icon';
 import { IconOrImage } from '../IconOrImage';
 import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
-import { useStyles } from '../useStyles';
-import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
+import { s } from '../s';
+import { useS } from '../useS';
+import comboboxStyles from './Combobox.m.css';
 import { FormContext } from './FormContext';
-
-const styles = css`
-  field[|inline] {
-    display: flex;
-    align-items: center;
-
-    & field-label {
-      padding-right: 8px;
-      padding-bottom: 0;
-    }
-  }
-  field input {
-    margin: 0;
-  }
-  field-label {
-    display: block;
-    padding-bottom: 10px;
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
-  }
-  input {
-    padding-right: 24px !important;
-  }
-  MenuButton {
-    position: absolute;
-    right: 0;
-    background: transparent;
-    outline: none;
-    display: flex;
-    align-items: center;
-    height: 100%;
-    padding: 0 8px 0 0;
-    cursor: pointer;
-    &:hover,
-    &:focus {
-      opacity: 0.7;
-    }
-  }
-  MenuItem {
-    composes: theme-ripple from global;
-  }
-
-  Menu {
-    composes: theme-text-on-surface theme-background-surface theme-typography--caption theme-elevation-z3 from global;
-    display: flex;
-    flex-direction: column;
-    max-height: 300px;
-    overflow: auto;
-    outline: none;
-    z-index: 999;
-    border-radius: var(--theme-form-element-radius);
-
-    & MenuItem {
-      background: transparent;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      padding: 8px 12px;
-      text-align: left;
-      outline: none;
-      color: inherit;
-      cursor: pointer;
-      gap: 8px;
-
-      & item-icon,
-      & item-title {
-        position: relative;
-      }
-
-      & item-icon {
-        width: 16px;
-        height: 16px;
-        overflow: hidden;
-        flex-shrink: 0;
-
-        & IconOrImage {
-          width: 100%;
-          height: 100%;
-        }
-      }
-    }
-  }
-  Icon {
-    height: 16px;
-    display: block;
-  }
-  MenuButton Icon[|focus] {
-    transform: rotate(180deg);
-  }
-  input-box {
-    flex: 1;
-    position: relative;
-    display: flex;
-    align-items: center;
-
-    & input-icon {
-      position: absolute;
-      left: 0;
-      width: 16px;
-      height: 16px;
-      margin-left: 12px;
-
-      & IconOrImage {
-        width: 100%;
-        height: 100%;
-      }
-
-      &:not(:empty) + input {
-        padding-left: 34px !important;
-      }
-    }
-  }
-`;
+import formControlStyles from './FormControl.m.css';
 
 type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSelect' | 'name' | 'value' | 'defaultValue'> &
   ILayoutSizeProps & {
@@ -198,11 +87,13 @@ export const Combobox: ComboboxType = observer(function Combobox({
   onSwitch,
   ...rest
 }: ControlledProps<any, any> | ObjectProps<any, any, any>) {
+  const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
   const translate = useTranslate();
   const context = useContext(FormContext);
   const menuRef = useRef<HTMLDivElement>(null);
   const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
+  const styles = useS(elementsSizeStyles, formControlStyles, comboboxStyles);
 
   const menu = useMenuState({
     placement: 'bottom-end',
@@ -363,17 +254,19 @@ export const Combobox: ComboboxType = observer(function Combobox({
     inputValue = translate('ui_processing_loading');
   }
 
-  return styled(useStyles(baseFormControlStyles, baseValidFormControlStyles, styles))(
-    <field className={className} {...use({ inline })}>
+  return (
+    <div data-testid="field" className={s(styles, { field: true, inline, ...layoutProps }, className)}>
       {children && (
-        <field-label title={title}>
+        <div title={title} data-testid="field-label" className={styles.fieldLabel}>
           {children}
           {rest.required && ' *'}
-        </field-label>
+        </div>
       )}
-      <input-box>
+      <div data-testid="input-box" className={styles.inputBox}>
         {(icon || loading) && (
-          <input-icon>{loading ? <Loader small fullSize /> : typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</input-icon>
+          <div data-testid="input-icon" className={styles.inputIcon}>
+            {loading ? <Loader small fullSize /> : typeof icon === 'string' ? <IconOrImage icon={icon} className={styles.iconOrImage} /> : icon}
+          </div>
         )}
         <input
           ref={setInputRef}
@@ -385,14 +278,14 @@ export const Combobox: ComboboxType = observer(function Combobox({
           readOnly={readOnly || select}
           data-focus={focus}
           data-select={select}
+          className={s(styles, { input: true, select, focus })}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onClick={handleClick}
           {...rest}
-          {...use({ select, focus })}
         />
-        <MenuButton {...menu} disabled={readOnly || disabled || hideMenu}>
-          <Icon name="arrow" viewBox="0 0 16 16" {...use({ focus })} />
+        <MenuButton {...menu} disabled={readOnly || disabled || hideMenu} className={styles.menuButton}>
+          <Icon name="arrow" viewBox="0 0 16 16" className={s(styles, { icon: true, focus })} />
         </MenuButton>
         <Menu
           {...menu}
@@ -400,10 +293,11 @@ export const Combobox: ComboboxType = observer(function Combobox({
           aria-label={propertyName}
           // unstable_finalFocusRef={inputRef || undefined}
           // unstable_initialFocusRef={ref}
+          className={styles.menu}
           modal
         >
           {!filteredItems.length ? (
-            <MenuItem id="placeholder" disabled {...menu}>
+            <MenuItem id="placeholder" disabled {...menu} className={styles.menuItem}>
               {translate('combobox_no_results_placeholder')}
             </MenuItem>
           ) : (
@@ -420,17 +314,28 @@ export const Combobox: ComboboxType = observer(function Combobox({
                   title={title}
                   {...menu}
                   disabled={disabled}
+                  className={styles.menuItem}
                   onClick={event => handleSelect(event.currentTarget.id)}
                 >
-                  {iconSelector && <item-icon>{icon && typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</item-icon>}
-                  <item-value>{valueSelector(item)}</item-value>
+                  {iconSelector && (
+                    <div data-testid="item-icon" className={styles.itemIcon}>
+                      {icon && typeof icon === 'string' ? <IconOrImage icon={icon} className={styles.iconOrImage} /> : icon}
+                    </div>
+                  )}
+                  <div data-testid="item-value" className={styles.itemValue}>
+                    {valueSelector(item)}
+                  </div>
                 </MenuItem>
               );
             })
           )}
         </Menu>
-      </input-box>
-      {description && <field-description>{description}</field-description>}
-    </field>,
+      </div>
+      {description && (
+        <div data-testid="field-description" className={styles.fieldDescription}>
+          {description}
+        </div>
+      )}
+    </div>
   );
 });

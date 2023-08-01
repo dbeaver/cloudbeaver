@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Vendor: %Bundle-Vendor
-Bundle-Name: %Bundle-Name
+Bundle-Vendor: DBeaver Corp
+Bundle-Name: Cloudbeaver Web Service - Resource manager
 Bundle-SymbolicName: io.cloudbeaver.service.rm;singleton:=true
 Bundle-Version: 1.0.30.qualifier
 Bundle-Release-Date: 20230724
@@ -10,5 +10,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Require-Bundle: io.cloudbeaver.server,
  io.cloudbeaver.service.admin
-Bundle-Localization: OSGI-INF/l10n/bundle
 Automatic-Module-Name: io.cloudbeaver.service.rm

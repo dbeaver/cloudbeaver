@@ -8,5 +8,5 @@ export default [
   ['basicConnection_connectionDialog_passwordPlaceholder', 'password'],
   ['basicConnection_connectionDialog_connecting', 'Collegamento...'],
   ['basicConnection_connectionDialog_connecting_message', 'Collegamento al database...'],
-  ['basicConnection_main_menu_item', 'Dal Template'],
+  ['plugin_connection_template_action_connection_template_label', 'Dal Template'],
 ];

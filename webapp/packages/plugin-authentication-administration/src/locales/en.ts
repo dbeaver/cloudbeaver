@@ -30,6 +30,7 @@ export default [
   ['authentication_administration_users_filters_status_enabled', 'ENABLED'],
   ['authentication_administration_users_filters_status_disabled', 'DISABLED'],
   ['authentication_administration_users_filters_status_all', 'ALL'],
+  ['authentication_administration_users_empty', 'There are no users'],
 
   ['authentication_administration_user_remove_credentials_error', 'Failed to remove user credentials'],
   ['authentication_administration_user_remove_credentials_success', 'User credentials were removed'],

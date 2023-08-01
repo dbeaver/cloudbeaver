@@ -9,17 +9,7 @@ import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import {
-  BASE_CONTAINERS_STYLES,
-  Button,
-  Container,
-  InputField,
-  SubmittingForm,
-  Translate,
-  useFocus,
-  useObservableRef,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { Button, Container, InputField, SubmittingForm, Translate, useFocus, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
@@ -96,10 +86,7 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
 
   const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
 
-  return styled(
-    style,
-    BASE_CONTAINERS_STYLES,
-  )(
+  return styled(style)(
     <CommonDialogWrapper size="small" className={className} fixedWidth>
       <CommonDialogHeader title={translate('plugin_resource_manager_scripts_save_script')} icon="/icons/sql_script_m.svg" onReject={rejectDialog} />
       <CommonDialogBody>
