@@ -219,20 +219,22 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     @NotNull
     @Override
     public SMTeam[] getUserTeams(String userId) throws DBException {
+        Map<String, SMTeam> teams = new LinkedHashMap<>();
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames("SELECT R.* FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R " +
                     "WHERE UR.USER_ID=? AND UR.TEAM_ID=R.TEAM_ID"))
             ) {
                 dbStat.setString(1, userId);
-                List<SMTeam> teams = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
-                        teams.add(fetchTeam(dbResult));
+                        var team = fetchTeam(dbResult);
+                        teams.put(team.getTeamId(), team);
                     }
                 }
-                return teams.toArray(new SMTeam[0]);
             }
+            readSubjectsMetas(dbCon, SMSubjectType.team, null, teams);
+            return teams.values().toArray(new SMTeam[0]);
         } catch (SQLException e) {
             throw new DBCException("Error while reading user teams", e);
         }
@@ -1183,7 +1185,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 var smTokens = generateNewSessionToken(smSessionId, null, null, dbCon);
                 var permissions = getAnonymousUserPermissions();
                 txn.commit();
-                return SMAuthInfo.success(
+                return SMAuthInfo.successMainSession(
                     UUID.randomUUID().toString(),
                     smTokens.getSmAccessToken(),
                     smTokens.getSmRefreshToken(),
@@ -1215,12 +1217,22 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         var authProgressMonitor = new LoggingProgressMonitor(log);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                boolean isMainSession = previousSmSessionId == null;
                 Map<String, Object> securedUserIdentifyingCredentials = userCredentials;
                 WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
                 var authProviderInstance = authProviderDescriptor.getInstance();
+
+                SMAuthProviderCustomConfiguration providerConfig = authProviderConfigurationId == null
+                    ? null
+                    : application.getAuthConfiguration().getAuthProviderConfiguration(authProviderConfigurationId);
+
                 if (SMAuthProviderExternal.class.isAssignableFrom(authProviderInstance.getClass())) {
                     var authProviderExternal = (SMAuthProviderExternal<?>) authProviderInstance;
-                    securedUserIdentifyingCredentials = authProviderExternal.authExternalUser(authProgressMonitor, Map.of(), userCredentials);
+                    securedUserIdentifyingCredentials = authProviderExternal.authExternalUser(
+                        authProgressMonitor,
+                        providerConfig,
+                        userCredentials
+                    );
                 }
 
                 var filteredUserCreds = filterSecuredUserData(
@@ -1236,7 +1248,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     appSessionId,
                     previousSmSessionId,
                     sessionType,
-                    sessionParameters
+                    sessionParameters,
+                    isMainSession
                 );
 
                 if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
@@ -1252,7 +1265,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 return finishAuthentication(
                     SMAuthInfo.inProgress(
                         authAttemptId,
-                        null, Map.of(new SMAuthConfigurationReference(authProviderId, null), securedUserIdentifyingCredentials)
+                        null,
+                        Map.of(new SMAuthConfigurationReference(authProviderId, null), securedUserIdentifyingCredentials)
                     ),
                     true,
                     false
@@ -1286,7 +1300,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         String appSessionId,
         String prevSessionId,
         SMSessionType sessionType,
-        Map<String, Object> sessionParameters
+        Map<String, Object> sessionParameters,
+        boolean isMainSession
     ) throws DBException {
         String authAttemptId = UUID.randomUUID().toString();
         try (Connection dbCon = database.openConnection()) {
@@ -1489,7 +1504,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             SMTokens smTokens = findTokenBySmSession(smSessionId);
             SMAuthPermissions authPermissions = getTokenPermissions(smTokens.getSmAccessToken());
             String authRole = readTokenAuthRole(smTokens.getSmAccessToken());
-            var successAuthStatus = SMAuthInfo.success(
+            var successAuthStatus = SMAuthInfo.successMainSession(
                 authId,
                 smTokens.getSmAccessToken(),
                 smTokens.getSmRefreshToken(),
@@ -1517,7 +1532,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         for (SMAuthInfo authData : allLatestAuthData) {
             mergedData.putAll(authData.getAuthData());
         }
-        return SMAuthInfo.success(
+        return SMAuthInfo.successMainSession(
             "restore_session_attempt_" + UUID.randomUUID(),
             latestActiveSmTokens.getAccessToken(),
             latestActiveSmTokens.getRefreshToken(),
@@ -1597,6 +1612,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         return currentUserCreds;
     }
 
+    @NotNull
     private SMTokens findTokenBySmSession(String smSessionId) throws DBException {
         try (Connection dbCon = database.openConnection();
              PreparedStatement dbStat = dbCon.prepareStatement(
@@ -1697,12 +1713,13 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
         SMTokens smTokens = null;
         SMAuthPermissions permissions = null;
+        String activeUserId = null;
         if (!isMainAuthSession) {
+            var accessToken = findTokenBySmSession(authAttemptSessionInfo.getSmSessionId()).getSmAccessToken();
             //this is an additional authorization and we should to return the original permissions and  userId
-            smTokens = findTokenBySmSession(authAttemptSessionInfo.getSmSessionId());
-            permissions = getTokenPermissions(smTokens.getSmAccessToken());
+            permissions = getTokenPermissions(accessToken);
+            activeUserId = permissions.getUserId();
         }
-        String activeUserId = permissions == null ? null : permissions.getUserId();
 
         Map<SMAuthConfigurationReference, Object> storedUserData = new LinkedHashMap<>();
         SMTeam[] allTeams = null;
@@ -1768,7 +1785,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
 
         String tokenAuthRole = updateUserAuthRoleIfNeeded(activeUserId, detectedAuthRole);
-        if (smTokens == null && permissions == null) {
+        if (isMainAuthSession) {
             try (Connection dbCon = database.openConnection()) {
                 try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                     String smSessionId;
@@ -1798,15 +1815,24 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
         var authStatus = forceExpireAuthAfterSuccess ? SMAuthStatus.EXPIRED : SMAuthStatus.SUCCESS;
         updateAuthStatus(authId, authStatus, storedUserData, null, permissions.getSessionId());
-        return SMAuthInfo.success(
-            authId,
-            smTokens.getSmAccessToken(),
-            //refresh token must be sent only once
-            isMainAuthSession ? smTokens.getSmRefreshToken() : null,
-            permissions,
-            authInfo.getAuthData(),
-            tokenAuthRole
-        );
+
+        if (isMainAuthSession) {
+            return SMAuthInfo.successMainSession(
+                authId,
+                smTokens.getSmAccessToken(),
+                //refresh token must be sent only from main session
+                smTokens.getSmRefreshToken(),
+                permissions,
+                authInfo.getAuthData(),
+                tokenAuthRole
+            );
+        } else {
+            return SMAuthInfo.successChildSession(
+                authId,
+                permissions,
+                authInfo.getAuthData()
+            );
+        }
     }
 
     private void autoUpdateUserTeams(
@@ -2057,6 +2083,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         return getTokenPermissions(activeUserCredentials.getSmAccessToken());
     }
 
+    @NotNull
     private SMAuthPermissions getTokenPermissions(@NotNull String token) throws DBException {
         String userId;
         String sessionId;
