@@ -27,10 +27,14 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.auth.SMSession;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.SMStandardMeta;
+import org.jkiss.utils.CommonUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class RPAuthProvider implements SMAuthProviderExternal<SMSession> {
@@ -39,15 +43,19 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession> {
 
     public static final String X_USER = "X-User";
     public static final String X_ROLE = "X-Role";
+    public static final String X_FIRST_NAME = "X-First-name";
+    public static final String X_LAST_NAME = "X-Last-name";
     public static final String AUTH_PROVIDER = "reverseProxy";
 
     @NotNull
     @Override
-    public String validateLocalAuth(@NotNull DBRProgressMonitor monitor,
-                                    @NotNull SMController securityController,
-                                    @NotNull Map<String, Object> providerConfig,
-                                    @NotNull Map<String, Object> userCredentials,
-                                    @Nullable String activeUserId) throws DBException {
+    public String validateLocalAuth(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull SMController securityController,
+        @NotNull Map<String, Object> providerConfig,
+        @NotNull Map<String, Object> userCredentials,
+        @Nullable String activeUserId
+    ) throws DBException {
         String userName = (String) userCredentials.get("user");
 
         if (activeUserId == null) {
@@ -65,7 +73,25 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession> {
         @NotNull Map<String, Object> authParameters
     ) throws DBException {
         String userName = String.valueOf(authParameters.get("user"));
-        return new DBWUserIdentity(userName, userName);
+        StringBuilder nameBuilder = new StringBuilder();
+        Map<String, String> userMeta = new HashMap<>();
+        String firstName = JSONUtils.getString(authParameters, SMStandardMeta.META_FIRST_NAME);
+        String lastName = JSONUtils.getString(authParameters, SMStandardMeta.META_LAST_NAME);
+        if (CommonUtils.isNotEmpty(firstName)) {
+            nameBuilder.append(firstName);
+            userMeta.put(SMStandardMeta.META_FIRST_NAME, firstName);
+        }
+
+        if (CommonUtils.isNotEmpty(lastName)) {
+            nameBuilder.append(lastName);
+            userMeta.put(SMStandardMeta.META_LAST_NAME, lastName);
+        }
+
+        return new DBWUserIdentity(
+            userName,
+            nameBuilder.length() > 0 ? nameBuilder.toString() : userName,
+            userMeta
+        );
     }
 
     @Nullable
