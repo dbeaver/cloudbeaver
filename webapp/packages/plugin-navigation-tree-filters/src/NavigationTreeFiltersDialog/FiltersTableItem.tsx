@@ -8,7 +8,9 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { ACTION_ICON_BUTTON_STYLES, IconButton, TableColumnValue, TableItem } from '@cloudbeaver/core-blocks';
+import { ACTION_ICON_BUTTON_STYLES, IconButton, s, TableColumnValue, TableItem, useS } from '@cloudbeaver/core-blocks';
+
+import styles from './FiltersTableItem.m.css';
 
 interface Props {
   id: string;
@@ -19,10 +21,12 @@ interface Props {
 }
 
 export const FiltersTableItem = observer<Props>(function FiltersTableItem({ id, name, disabled, className, onDelete }) {
+  const style = useS(styles);
+
   return styled(ACTION_ICON_BUTTON_STYLES)(
-    <TableItem item={id} title={name} disabled={disabled} selectDisabled={disabled} className={className}>
+    <TableItem className={s(style, { tableItem: true }, className)} item={id} title={name} disabled={disabled} selectDisabled={disabled}>
       <TableColumnValue>{name}</TableColumnValue>
-      <TableColumnValue centerContent flex>
+      <TableColumnValue className={s(style, { deleteColumnCell: true })} flex>
         <IconButton name="cross-bold" onClick={() => onDelete(id)} />
       </TableColumnValue>
     </TableItem>,

@@ -1,6 +1,6 @@
 export default [
   ['plugin_navigation_tree_filters_title', 'Фильтры'],
-  ['plugin_navigation_tree_filters_info', 'Вы можете использовать маски (%,_and*) в фильтрах'],
+  ['plugin_navigation_tree_filters_info', 'Вы можете использовать маски (%,_and*)'],
   ['plugin_navigation_tree_filters_configuration', 'Настроить "{arg:name}" фильтр'],
   ['plugin_navigation_tree_filters_reset', 'Сбросить фильтр'],
   ['plugin_navigation_tree_filters_filter', 'Фильтр'],

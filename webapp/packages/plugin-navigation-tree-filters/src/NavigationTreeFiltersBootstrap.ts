@@ -50,7 +50,6 @@ export class NavigationTreeFiltersBootstrap extends Bootstrap {
             {
               id: 'configure-filter',
               label: this.localizationService.translate('plugin_navigation_tree_filters_configuration', undefined, { name: node.name }) + '...',
-              icon: 'filter',
             },
             {
               onSelect: async () => {
@@ -66,7 +65,6 @@ export class NavigationTreeFiltersBootstrap extends Bootstrap {
               {
                 id: 'reset-filter',
                 label: 'plugin_navigation_tree_filters_reset',
-                icon: 'filter-reset',
               },
               {
                 onSelect: async () => {
