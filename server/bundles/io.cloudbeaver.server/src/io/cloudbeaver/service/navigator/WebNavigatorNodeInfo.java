@@ -36,6 +36,7 @@ import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
 import org.jkiss.dbeaver.registry.DataSourceFolder;
 import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
@@ -133,11 +134,14 @@ public class WebNavigatorNodeInfo {
     public boolean isNavigable() {
         if (node instanceof DBNDatabaseNode) {
             DBNDatabaseNode databaseNode = (DBNDatabaseNode) this.node;
-            if (!databaseNode.getMeta().isNavigable()) {
-                return false;
-            }
+            return databaseNode.getMeta().isNavigable();
         }
         return true;
+    }
+
+    @Property
+    public boolean isFiltered() {
+        return node.isFiltered();
     }
 
     @Property
@@ -256,6 +260,15 @@ public class WebNavigatorNodeInfo {
             return object == null ? null : new WebDatabaseObjectInfo(session, object);
         }
         return null;
+    }
+
+    @Property
+    public DBSObjectFilter getFilter() throws DBWebException {
+        if (!(node instanceof DBNDatabaseFolder)) {
+            throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
+        }
+        DBSObjectFilter filter = ((DBNDatabaseFolder) node).getNodeFilter(((DBNDatabaseFolder) node).getItemsMeta(), true);
+        return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
     }
 
     @Override

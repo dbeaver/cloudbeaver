@@ -92,7 +92,7 @@ public class WebSessionWorkspace implements DBPWorkspace {
     }
 
     @Override
-    public DBPProject getProject(@NotNull String projectName) {
+    public WebProjectImpl getProject(@NotNull String projectName) {
         for (WebProjectImpl project : accessibleProjects) {
             if (project.getName().equals(projectName)) {
                 return project;

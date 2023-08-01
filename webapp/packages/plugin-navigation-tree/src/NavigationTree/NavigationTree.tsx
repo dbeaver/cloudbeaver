@@ -24,6 +24,7 @@ import {
   createElementsTreeSettings,
   validateElementsTreeSettings,
 } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings';
+import { transformFilteredNodeInfo } from './ElementsTree/transformFilteredNodeInfo';
 import type { IElementsTreeSettings } from './ElementsTree/useElementsTree';
 import { getNavigationTreeUserSettingsId } from './getNavigationTreeUserSettingsId';
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter';
@@ -104,6 +105,7 @@ export const NavigationTree = observer(function NavigationTree() {
     () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource, projectsService, projectsNavNodeService),
     [navNodeInfoResource, projectsService, projectsNavNodeService],
   );
+  const transformFilteredNode = useMemo(() => transformFilteredNodeInfo(navNodeInfoResource), [navNodeInfoResource]);
   const projectFilter = useMemo(
     () => navigationTreeProjectFilter(projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource),
     [projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource],
@@ -119,6 +121,7 @@ export const NavigationTree = observer(function NavigationTree() {
         filters={[duplicateFilter, connectionGroupFilter, projectFilter]}
         renderers={[projectsRendererRenderer, navigationTreeConnectionGroupRenderer, connectionRenderer]}
         navNodeFilterCompare={navigationTreeProjectSearchCompare}
+        nodeInfoTransformers={[transformFilteredNode]}
         expandStateGetters={[projectsExpandStateGetter]}
         settingsElements={settingsElements}
         emptyPlaceholder={() =>

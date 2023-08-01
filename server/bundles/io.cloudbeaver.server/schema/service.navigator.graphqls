@@ -67,7 +67,7 @@ type NavigatorNodeInfo {
     # Node type
     nodeType: String
     # Can this property have child nodes?
-    hasChildren: Boolean
+    hasChildren: Boolean!
     # Project id of the node
     projectId: String
 
@@ -82,9 +82,18 @@ type NavigatorNodeInfo {
     # If is different than properties. It doesn't perform any expensive operation and doesn't require authentication.
     nodeDetails: [ ObjectPropertyInfo! ]
 
-    folder: Boolean
-    inline: Boolean
-    navigable: Boolean
+    folder: Boolean!
+    inline: Boolean!
+    navigable: Boolean!
+    filtered: Boolean!
+
+    # Reads node filter. Expensive invocation, read only when it is really needed
+    filter: NavigatorNodeFilter
+}
+
+type NavigatorNodeFilter {
+    include: [String!]
+    exclude: [String!]
 }
 
 type DatabaseCatalog {
@@ -134,6 +143,10 @@ extend type Mutation {
     navDeleteNodes( nodePaths: [ID!]! ): Int
 
     # Moves nodes with specified IDs to the connection folder
-    navMoveNodesToFolder( nodePaths: [ID!]!, folderPath: ID!): Boolean
+    navMoveNodesToFolder( nodePaths: [ID!]!, folderPath: ID!): Boolean!
+
+    # Sets filter for the folder node. If both include and exclude are null then filter is removed.
+    # Node must be refreshed after applying filters. Node children can be changed
+    navSetFolderFilter( nodePath: ID!, include: [String!], exclude: [String!]): Boolean!
 
 }

@@ -515,8 +515,9 @@ export interface Mutation {
   emptyEventMutation?: Maybe<Scalars['Boolean']>;
   initConnection: ConnectionInfo;
   navDeleteNodes?: Maybe<Scalars['Int']>;
-  navMoveNodesToFolder?: Maybe<Scalars['Boolean']>;
+  navMoveNodesToFolder: Scalars['Boolean'];
   navRenameNode?: Maybe<Scalars['String']>;
+  navSetFolderFilter: Scalars['Boolean'];
   openSession: SessionInfo;
   readLobValue: Scalars['String'];
   refreshSessionConnections?: Maybe<Scalars['Boolean']>;
@@ -650,6 +651,12 @@ export interface MutationNavMoveNodesToFolderArgs {
 
 export interface MutationNavRenameNodeArgs {
   newName: Scalars['String'];
+  nodePath: Scalars['ID'];
+}
+
+export interface MutationNavSetFolderFilterArgs {
+  exclude?: InputMaybe<Array<Scalars['String']>>;
+  include?: InputMaybe<Array<Scalars['String']>>;
   nodePath: Scalars['ID'];
 }
 
@@ -791,17 +798,24 @@ export interface MutationUpdateResultsDataBatchScriptArgs {
   updatedRows?: InputMaybe<Array<SqlResultRow>>;
 }
 
+export interface NavigatorNodeFilter {
+  exclude?: Maybe<Array<Scalars['String']>>;
+  include?: Maybe<Array<Scalars['String']>>;
+}
+
 export interface NavigatorNodeInfo {
   description?: Maybe<Scalars['String']>;
   features?: Maybe<Array<Scalars['String']>>;
-  folder?: Maybe<Scalars['Boolean']>;
+  filter?: Maybe<NavigatorNodeFilter>;
+  filtered: Scalars['Boolean'];
+  folder: Scalars['Boolean'];
   fullName?: Maybe<Scalars['String']>;
-  hasChildren?: Maybe<Scalars['Boolean']>;
+  hasChildren: Scalars['Boolean'];
   icon?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
-  inline?: Maybe<Scalars['Boolean']>;
+  inline: Scalars['Boolean'];
   name?: Maybe<Scalars['String']>;
-  navigable?: Maybe<Scalars['Boolean']>;
+  navigable: Scalars['Boolean'];
   nodeDetails?: Maybe<Array<ObjectPropertyInfo>>;
   nodeType?: Maybe<Scalars['String']>;
   object?: Maybe<DatabaseObjectInfo>;
@@ -3513,6 +3527,7 @@ export type NavGetStructContainersQueryVariables = Exact<{
   connectionId: Scalars['ID'];
   catalogId?: InputMaybe<Scalars['ID']>;
   withDetails: Scalars['Boolean'];
+  withFilters: Scalars['Boolean'];
 }>;
 
 export type NavGetStructContainersQuery = {
@@ -3522,12 +3537,13 @@ export type NavGetStructContainersQuery = {
     parentNode?: {
       id: string;
       name?: string;
-      hasChildren?: boolean;
+      hasChildren: boolean;
       nodeType?: string;
       icon?: string;
-      folder?: boolean;
-      inline?: boolean;
-      navigable?: boolean;
+      folder: boolean;
+      inline: boolean;
+      navigable: boolean;
+      filtered: boolean;
       features?: Array<string>;
       projectId?: string;
       object?: { features?: Array<string> };
@@ -3542,17 +3558,19 @@ export type NavGetStructContainersQuery = {
         value?: any;
         order: number;
       }>;
+      filter?: { include?: Array<string>; exclude?: Array<string> };
     };
     catalogList: Array<{
       catalog: {
         id: string;
         name?: string;
-        hasChildren?: boolean;
+        hasChildren: boolean;
         nodeType?: string;
         icon?: string;
-        folder?: boolean;
-        inline?: boolean;
-        navigable?: boolean;
+        folder: boolean;
+        inline: boolean;
+        navigable: boolean;
+        filtered: boolean;
         features?: Array<string>;
         projectId?: string;
         object?: { features?: Array<string> };
@@ -3567,16 +3585,18 @@ export type NavGetStructContainersQuery = {
           value?: any;
           order: number;
         }>;
+        filter?: { include?: Array<string>; exclude?: Array<string> };
       };
       schemaList: Array<{
         id: string;
         name?: string;
-        hasChildren?: boolean;
+        hasChildren: boolean;
         nodeType?: string;
         icon?: string;
-        folder?: boolean;
-        inline?: boolean;
-        navigable?: boolean;
+        folder: boolean;
+        inline: boolean;
+        navigable: boolean;
+        filtered: boolean;
         features?: Array<string>;
         projectId?: string;
         object?: { features?: Array<string> };
@@ -3591,17 +3611,19 @@ export type NavGetStructContainersQuery = {
           value?: any;
           order: number;
         }>;
+        filter?: { include?: Array<string>; exclude?: Array<string> };
       }>;
     }>;
     schemaList: Array<{
       id: string;
       name?: string;
-      hasChildren?: boolean;
+      hasChildren: boolean;
       nodeType?: string;
       icon?: string;
-      folder?: boolean;
-      inline?: boolean;
-      navigable?: boolean;
+      folder: boolean;
+      inline: boolean;
+      navigable: boolean;
+      filtered: boolean;
       features?: Array<string>;
       projectId?: string;
       object?: { features?: Array<string> };
@@ -3616,6 +3638,7 @@ export type NavGetStructContainersQuery = {
         value?: any;
         order: number;
       }>;
+      filter?: { include?: Array<string>; exclude?: Array<string> };
     }>;
   };
 };
@@ -3936,12 +3959,13 @@ export type NavNodeDbObjectInfoFragment = {
 export type NavNodeInfoFragment = {
   id: string;
   name?: string;
-  hasChildren?: boolean;
+  hasChildren: boolean;
   nodeType?: string;
   icon?: string;
-  folder?: boolean;
-  inline?: boolean;
-  navigable?: boolean;
+  folder: boolean;
+  inline: boolean;
+  navigable: boolean;
+  filtered: boolean;
   features?: Array<string>;
   projectId?: string;
   object?: { features?: Array<string> };
@@ -3956,6 +3980,7 @@ export type NavNodeInfoFragment = {
     value?: any;
     order: number;
   }>;
+  filter?: { include?: Array<string>; exclude?: Array<string> };
 };
 
 export type NavNodePropertiesFragment = {
@@ -4367,18 +4392,20 @@ export type GetNavNodeFullNameQuery = { navNodeInfo: { fullName?: string } };
 export type GetNodeParentsQueryVariables = Exact<{
   nodePath: Scalars['ID'];
   withDetails: Scalars['Boolean'];
+  withFilters: Scalars['Boolean'];
 }>;
 
 export type GetNodeParentsQuery = {
   node: {
     id: string;
     name?: string;
-    hasChildren?: boolean;
+    hasChildren: boolean;
     nodeType?: string;
     icon?: string;
-    folder?: boolean;
-    inline?: boolean;
-    navigable?: boolean;
+    folder: boolean;
+    inline: boolean;
+    navigable: boolean;
+    filtered: boolean;
     features?: Array<string>;
     projectId?: string;
     object?: { features?: Array<string> };
@@ -4393,16 +4420,18 @@ export type GetNodeParentsQuery = {
       value?: any;
       order: number;
     }>;
+    filter?: { include?: Array<string>; exclude?: Array<string> };
   };
   parents: Array<{
     id: string;
     name?: string;
-    hasChildren?: boolean;
+    hasChildren: boolean;
     nodeType?: string;
     icon?: string;
-    folder?: boolean;
-    inline?: boolean;
-    navigable?: boolean;
+    folder: boolean;
+    inline: boolean;
+    navigable: boolean;
+    filtered: boolean;
     features?: Array<string>;
     projectId?: string;
     object?: { features?: Array<string> };
@@ -4417,6 +4446,7 @@ export type GetNodeParentsQuery = {
       value?: any;
       order: number;
     }>;
+    filter?: { include?: Array<string>; exclude?: Array<string> };
   }>;
 };
 
@@ -4431,25 +4461,27 @@ export type NavMoveToMutationVariables = Exact<{
   folderPath: Scalars['ID'];
 }>;
 
-export type NavMoveToMutation = { navMoveNodesToFolder?: boolean };
+export type NavMoveToMutation = { navMoveNodesToFolder: boolean };
 
 export type NavNodeChildrenQueryVariables = Exact<{
   parentPath: Scalars['ID'];
   offset?: InputMaybe<Scalars['Int']>;
   limit?: InputMaybe<Scalars['Int']>;
   withDetails: Scalars['Boolean'];
+  withFilters: Scalars['Boolean'];
 }>;
 
 export type NavNodeChildrenQuery = {
   navNodeChildren: Array<{
     id: string;
     name?: string;
-    hasChildren?: boolean;
+    hasChildren: boolean;
     nodeType?: string;
     icon?: string;
-    folder?: boolean;
-    inline?: boolean;
-    navigable?: boolean;
+    folder: boolean;
+    inline: boolean;
+    navigable: boolean;
+    filtered: boolean;
     features?: Array<string>;
     projectId?: string;
     object?: { features?: Array<string> };
@@ -4464,16 +4496,18 @@ export type NavNodeChildrenQuery = {
       value?: any;
       order: number;
     }>;
+    filter?: { include?: Array<string>; exclude?: Array<string> };
   }>;
   navNodeInfo: {
     id: string;
     name?: string;
-    hasChildren?: boolean;
+    hasChildren: boolean;
     nodeType?: string;
     icon?: string;
-    folder?: boolean;
-    inline?: boolean;
-    navigable?: boolean;
+    folder: boolean;
+    inline: boolean;
+    navigable: boolean;
+    filtered: boolean;
     features?: Array<string>;
     projectId?: string;
     object?: { features?: Array<string> };
@@ -4488,24 +4522,27 @@ export type NavNodeChildrenQuery = {
       value?: any;
       order: number;
     }>;
+    filter?: { include?: Array<string>; exclude?: Array<string> };
   };
 };
 
 export type NavNodeInfoQueryVariables = Exact<{
   nodePath: Scalars['ID'];
   withDetails: Scalars['Boolean'];
+  withFilters: Scalars['Boolean'];
 }>;
 
 export type NavNodeInfoQuery = {
   navNodeInfo: {
     id: string;
     name?: string;
-    hasChildren?: boolean;
+    hasChildren: boolean;
     nodeType?: string;
     icon?: string;
-    folder?: boolean;
-    inline?: boolean;
-    navigable?: boolean;
+    folder: boolean;
+    inline: boolean;
+    navigable: boolean;
+    filtered: boolean;
     features?: Array<string>;
     projectId?: string;
     object?: { features?: Array<string> };
@@ -4520,6 +4557,7 @@ export type NavNodeInfoQuery = {
       value?: any;
       order: number;
     }>;
+    filter?: { include?: Array<string>; exclude?: Array<string> };
   };
 };
 
@@ -4535,6 +4573,14 @@ export type NavRenameNodeMutationVariables = Exact<{
 }>;
 
 export type NavRenameNodeMutation = { navRenameNode?: string };
+
+export type NavSetFolderFilterMutationVariables = Exact<{
+  nodePath: Scalars['ID'];
+  include?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
+  exclude?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
+}>;
+
+export type NavSetFolderFilterMutation = { navSetFolderFilter: boolean };
 
 export type GetProjectListQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -5268,6 +5314,7 @@ export const NavNodeInfoFragmentDoc = `
   folder
   inline
   navigable
+  filtered
   features
   projectId
   object {
@@ -5275,6 +5322,10 @@ export const NavNodeInfoFragmentDoc = `
   }
   nodeDetails @include(if: $withDetails) {
     ...NavNodeProperties
+  }
+  filter @include(if: $withFilters) {
+    include
+    exclude
   }
 }
     ${NavNodePropertiesFragmentDoc}`;
@@ -5998,7 +6049,7 @@ export const RemoveDataTransferFileDocument = `
 }
     `;
 export const NavGetStructContainersDocument = `
-    query navGetStructContainers($projectId: ID!, $connectionId: ID!, $catalogId: ID, $withDetails: Boolean!) {
+    query navGetStructContainers($projectId: ID!, $connectionId: ID!, $catalogId: ID, $withDetails: Boolean!, $withFilters: Boolean!) {
   navGetStructContainers(
     projectId: $projectId
     connectionId: $connectionId
@@ -6271,7 +6322,7 @@ export const GetNavNodeFullNameDocument = `
 }
     `;
 export const GetNodeParentsDocument = `
-    query getNodeParents($nodePath: ID!, $withDetails: Boolean!) {
+    query getNodeParents($nodePath: ID!, $withDetails: Boolean!, $withFilters: Boolean!) {
   node: navNodeInfo(nodePath: $nodePath) {
     ...NavNodeInfo
   }
@@ -6291,7 +6342,7 @@ export const NavMoveToDocument = `
 }
     `;
 export const NavNodeChildrenDocument = `
-    query navNodeChildren($parentPath: ID!, $offset: Int, $limit: Int, $withDetails: Boolean!) {
+    query navNodeChildren($parentPath: ID!, $offset: Int, $limit: Int, $withDetails: Boolean!, $withFilters: Boolean!) {
   navNodeChildren(parentPath: $parentPath, offset: $offset, limit: $limit) {
     ...NavNodeInfo
   }
@@ -6301,7 +6352,7 @@ export const NavNodeChildrenDocument = `
 }
     ${NavNodeInfoFragmentDoc}`;
 export const NavNodeInfoDocument = `
-    query navNodeInfo($nodePath: ID!, $withDetails: Boolean!) {
+    query navNodeInfo($nodePath: ID!, $withDetails: Boolean!, $withFilters: Boolean!) {
   navNodeInfo(nodePath: $nodePath) {
     ...NavNodeInfo
   }
@@ -6315,6 +6366,11 @@ export const NavRefreshNodeDocument = `
 export const NavRenameNodeDocument = `
     mutation navRenameNode($nodePath: ID!, $newName: String!) {
   navRenameNode(nodePath: $nodePath, newName: $newName)
+}
+    `;
+export const NavSetFolderFilterDocument = `
+    mutation navSetFolderFilter($nodePath: ID!, $include: [String!], $exclude: [String!]) {
+  navSetFolderFilter(nodePath: $nodePath, include: $include, exclude: $exclude)
 }
     `;
 export const GetProjectListDocument = `
@@ -7663,6 +7719,17 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
         wrappedRequestHeaders =>
           client.request<NavRenameNodeMutation>(NavRenameNodeDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
         'navRenameNode',
+        'mutation',
+      );
+    },
+    navSetFolderFilter(
+      variables: NavSetFolderFilterMutationVariables,
+      requestHeaders?: GraphQLClientRequestHeaders,
+    ): Promise<NavSetFolderFilterMutation> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<NavSetFolderFilterMutation>(NavSetFolderFilterDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
+        'navSetFolderFilter',
         'mutation',
       );
     },

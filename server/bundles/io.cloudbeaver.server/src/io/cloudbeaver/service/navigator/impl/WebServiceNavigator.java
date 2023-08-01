@@ -17,7 +17,9 @@
 package io.cloudbeaver.service.navigator.impl;
 
 
+import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
@@ -43,13 +45,12 @@ import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContextDefaults;
 import org.jkiss.dbeaver.model.navigator.*;
-import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
-import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
+import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
@@ -205,6 +206,45 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         } catch (DBException e) {
             throw new DBWebException("Error getting navigator node '"  + nodePath + "'", e);
         }
+    }
+
+    @Override
+    public boolean setNavigatorNodeFilter(
+        @NotNull WebSession webSession,
+        @NotNull String nodePath,
+        @Nullable List<String> include,
+        @Nullable List<String> exclude) throws DBWebException {
+        try {
+            DBRProgressMonitor monitor = webSession.getProgressMonitor();
+
+            DBNNode node = webSession.getNavigatorModel().getNodeByPath(monitor, nodePath);
+            if (node == null) {
+                throw new DBWebException("Navigator node '"  + nodePath + "' not found");
+            }
+            if (!(node instanceof DBNDatabaseFolder)) {
+                throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
+            }
+            DBSObjectFilter filter = new DBSObjectFilter();
+            if (!CommonUtils.isEmpty(include)) {
+                filter.setInclude(include);
+            }
+            if (!CommonUtils.isEmpty(exclude)) {
+                filter.setExclude(exclude);
+            }
+            filter.setEnabled(true);
+            ((DBNDatabaseFolder) node).setNodeFilter(
+                ((DBNDatabaseFolder) node).getItemsMeta(), filter, true);
+            if (hasNodeEditPermission(webSession, node, ((WebProjectImpl) node.getOwnerProject()).getRmProject())) {
+                // Save settings
+                ((DBNDatabaseFolder) node).getDataSourceContainer().persistConfiguration();
+            }
+        } catch (DBException e) {
+            if (e instanceof DBWebException) {
+                throw (DBWebException)e;
+            }
+            throw new DBWebException("Error changing navigator node '"  + nodePath + "' filters", e);
+        }
+        return true;
     }
 
     @Override
@@ -528,9 +568,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     }
 
     private void checkProjectEditAccess(DBNNode node, WebSession session) throws DBException {
-        var project = session.getProjectById(node.getOwnerProject().getId());
-        if (project == null || !hasNodeEditPermission(session, node, project.getRmProject())
-        ) {
+        BaseWebProjectImpl project = (BaseWebProjectImpl) node.getOwnerProject();
+        if (project == null || !hasNodeEditPermission(session, node, project.getRmProject())) {
             throw new DBException("Access denied");
         }
     }
