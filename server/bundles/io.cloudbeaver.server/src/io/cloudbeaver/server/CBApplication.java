@@ -672,15 +672,13 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
 
     protected Map<String, Object> readConnectionsPermissionsConfiguration(Path parentPath) {
         String permissionsConfigPath = WebAppUtils.getRelativePath(CBConstants.DEFAULT_DATASOURCE_PERMISSIONS_CONFIGURATION, parentPath);
-        if (!CommonUtils.isEmpty(permissionsConfigPath)) {
-            File permissionsConfigFile = new File(permissionsConfigPath);
-            if (permissionsConfigFile.exists()) {
-                log.debug("Load permissions configuration from '" + permissionsConfigFile.getAbsolutePath() + "'");
-                try (Reader reader = new InputStreamReader(new FileInputStream(permissionsConfigFile), StandardCharsets.UTF_8)) {
-                    return JSONUtils.parseMap(getGson(), reader);
-                } catch (Exception e) {
-                    log.error("Error reading permissions configuration", e);
-                }
+        File permissionsConfigFile = new File(permissionsConfigPath);
+        if (permissionsConfigFile.exists()) {
+            log.debug("Load permissions configuration from '" + permissionsConfigFile.getAbsolutePath() + "'");
+            try (Reader reader = new InputStreamReader(new FileInputStream(permissionsConfigFile), StandardCharsets.UTF_8)) {
+                return JSONUtils.parseMap(getGson(), reader);
+            } catch (Exception e) {
+                log.error("Error reading permissions configuration", e);
             }
         }
         return null;
@@ -919,7 +917,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                 );
             }
         } catch (DBException e) {
-            log.error("Cannot grant permissions to connections", e);
+            log.error("Error granting permissions to connections", e);
         }
     }
 

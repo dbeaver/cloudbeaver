@@ -2191,7 +2191,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         if (CommonUtils.isEmpty(subjectIds) || CommonUtils.isEmpty(objectIds)) {
             return;
         }
-        Set<String> allSubjects = getAllSubjects();
+        Set<String> filteredSubjects = getFilteredSubjects(subjectIds);
 //        validatePermissions(objectType.getObjectType(), permissions);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
@@ -2214,7 +2214,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                             dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
                             dbStat.setString(4, grantor);
                             for (String subjectId : subjectIds) {
-                                if (!allSubjects.contains(subjectId)) {
+                                if (!filteredSubjects.contains(subjectId)) {
                                     log.error("Subject '" + subjectId + "' is not found in database");
                                     continue;
                                 }
@@ -2550,20 +2550,19 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    public Set<String> getAllSubjects() {
+    public Set<String> getFilteredSubjects(Set<String> allSubjects) {
         try (Connection dbCon = database.openConnection()) {
             Set<String> result = new HashSet<>();
-            var dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT USER_ID FROM {table_prefix}CB_USER U " +
-                    "UNION ALL (SELECT TEAM_ID FROM {table_prefix}CB_TEAM)")
-            );
+            var sqlBuilder = new StringBuilder("SELECT SUBJECT_ID FROM {table_prefix}CB_AUTH_SUBJECT U WHERE SUBJECT_ID IN (");
+            appendStringParameters(sqlBuilder, allSubjects);
+            sqlBuilder.append(")");
+            var dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder.toString()));
             try (ResultSet dbResult = dbStat.executeQuery()) {
                 while (dbResult.next()) {
                     result.add(dbResult.getString(1));
                 }
             }
             return result;
-
         } catch (SQLException e) {
             log.error("Error getting all subject ids from database", e);
             return Set.of();
