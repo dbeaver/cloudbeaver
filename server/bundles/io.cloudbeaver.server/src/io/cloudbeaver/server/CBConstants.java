@@ -60,7 +60,7 @@ public class CBConstants {
     public static final String DEFAULT_DRIVERS_LOCATION = DEFAULT_DEPLOY_LOCATION + "/drivers";
     public static final String DEFAULT_WORKSPACE_LOCATION = DEFAULT_DEPLOY_LOCATION + "/workspace";
     public static final String DEFAULT_PRODUCT_CONFIGURATION = "conf/product.conf";
-    public static final String DEFAULT_DATASOURCE_PERMISSIONS_CONFIGURATION = "data-sources-permissions.conf";
+    public static final String DEFAULT_DATASOURCE_PERMISSIONS_CONFIGURATION = "data-sources-permissions.json";
     public static final String DEFAULT_ADMIN_NAME = "cbadmin";
     public static final String DEFAULT_ADMIN_TEAM = "admin";
 
