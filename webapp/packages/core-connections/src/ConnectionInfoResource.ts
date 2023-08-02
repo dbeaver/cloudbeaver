@@ -212,6 +212,11 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     });
   }
 
+  /** After a session global update, connections and tree resources start loading concurrently,
+   *  and there is a chance that the connection is already closed, but we are unaware of it.
+   *  Use it when you want to be sure that connected status of the connection is valid,
+   *  for example when you use it as an active flag inside the tree resource
+   * */
   isSessionUpdate(): boolean {
     return this.sessionUpdate;
   }
