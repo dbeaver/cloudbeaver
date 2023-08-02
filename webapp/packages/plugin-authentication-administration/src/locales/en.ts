@@ -15,7 +15,7 @@ export default [
   ['authentication_administration_item', 'Access Management'],
   ['authentication_administration_item_users', 'Users'],
   ['authentication_administration_item_metaParameters', 'Meta Parameters'],
-  ['authentication_administration_tools_add_tooltip', 'Add new user'],
+  ['authentication_administration_tools_add_tooltip', 'Create new user'],
   ['authentication_administration_tools_refresh_tooltip', 'Refresh user list'],
   ['authentication_administration_tools_delete_tooltip', 'Delete selected users'],
   ['authentication_administration_tools_refresh_success', 'User list was refreshed'],
