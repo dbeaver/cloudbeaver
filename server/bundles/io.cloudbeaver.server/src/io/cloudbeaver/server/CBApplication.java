@@ -262,6 +262,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         }
 
         final Runtime runtime = Runtime.getRuntime();
+        initializeAdditionalConfiguration();
 
         Location instanceLoc = Platform.getInstanceLocation();
         try {
@@ -358,6 +359,10 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         log.debug("Shutdown");
 
         return;
+    }
+
+    protected void initializeAdditionalConfiguration() {
+
     }
 
     /**
