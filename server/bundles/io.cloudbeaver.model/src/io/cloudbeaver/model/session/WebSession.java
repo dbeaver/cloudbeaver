@@ -467,6 +467,7 @@ public class WebSession extends BaseWebSession
         }
         SMAuthInfo authInfo = getSecurityController().authenticateAnonymousUser(this.id, getSessionParameters(), CB_SESSION_TYPE);
         updateSMSession(authInfo);
+        notifySessionAuthChange();
     }
 
     @NotNull

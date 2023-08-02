@@ -24,6 +24,7 @@ import localization from '@cloudbeaver/plugin-localization';
 import logViewer from '@cloudbeaver/plugin-log-viewer';
 import navigationTabs from '@cloudbeaver/plugin-navigation-tabs';
 import navigationTree from '@cloudbeaver/plugin-navigation-tree';
+import navigationTreeFilters from '@cloudbeaver/plugin-navigation-tree-filters';
 import { navigationTreeRMPlugin } from '@cloudbeaver/plugin-navigation-tree-rm';
 import objectViewer from '@cloudbeaver/plugin-object-viewer';
 import productPlugin from '@cloudbeaver/plugin-product';
@@ -99,6 +100,7 @@ const PLUGINS: PluginManifest[] = [
   toolsPanel,
   projects,
   browserPlugin,
+  navigationTreeFilters,
 ];
 
 bootstrap(PLUGINS);
