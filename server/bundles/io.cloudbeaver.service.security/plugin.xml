@@ -15,7 +15,11 @@
             </credentials>
 
         </authProvider>
-        <authProvider id="reverseProxy" label="Reverse proxy" description="Reverse proxy header based authentication" trusted="true" class="io.cloudbeaver.auth.provider.rp.RPAuthProvider">
+        <authProvider id="reverseProxy" label="Reverse proxy"
+                      description="Reverse proxy header based authentication"
+                      trusted="true"
+                      class="io.cloudbeaver.auth.provider.rp.RPAuthProvider"
+                      icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/key.png">
             <credentials>
                 <propertyGroup label="General">
                     <property id="user" label="User name" type="string" description="User name" admin="true" user="true" identifying="true"/>

@@ -69,7 +69,8 @@
     "@cloudbeaver/plugin-user-profile": "~0.1.0",
     "@cloudbeaver/plugin-user-profile-administration": "~0.1.0",
     "@cloudbeaver/plugin-version": "~0.1.0",
-    "@cloudbeaver/plugin-version-update-administration": "~0.1.0"
+    "@cloudbeaver/plugin-version-update-administration": "~0.1.0",
+    "@cloudbeaver/plugin-navigation-tree-filters": "~0.1.0"
   },
   "peerDependencies": {
     "reflect-metadata": "~0.x.x"

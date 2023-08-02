@@ -131,12 +131,23 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
     return node;
   }
 
+  async loadNodeFilter(nodePath: string) {
+    const { navNodeInfo } = await this.graphQLService.sdk.navNodeInfo({
+      nodePath,
+      withDetails: false,
+      withFilters: true,
+    });
+
+    return navNodeInfo.filter;
+  }
+
   private async loadNodeInfo(nodePath: string): Promise<NavNode> {
     if (this.has(nodePath)) {
       const metadata = this.metadata.get(nodePath);
       const { navNodeInfo } = await this.graphQLService.sdk.navNodeInfo({
         nodePath,
         withDetails: metadata.withDetails,
+        withFilters: false,
       });
 
       return this.navNodeInfoToNavNode(navNodeInfo);
@@ -150,6 +161,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
     const { node, parents } = await this.graphQLService.sdk.getNodeParents({
       nodePath,
       withDetails: metadata.withDetails,
+      withFilters: false,
     });
 
     return runInAction(() => {
