@@ -1,7 +1,7 @@
 {
   "name": "@cloudbeaver/product-default",
   "sideEffects": false,
-  "version": "23.1.3",
+  "version": "23.1.4",
   "description": "",
   "license": "Apache-2.0",
   "main": "lib/index.js",
@@ -47,6 +47,7 @@
     "@cloudbeaver/plugin-log-viewer": "~0.1.0",
     "@cloudbeaver/plugin-navigation-tabs": "~0.1.0",
     "@cloudbeaver/plugin-navigation-tree": "~0.1.0",
+    "@cloudbeaver/plugin-navigation-tree-filters": "~0.1.0",
     "@cloudbeaver/plugin-navigation-tree-rm": "~0.1.0",
     "@cloudbeaver/plugin-object-viewer": "~0.1.0",
     "@cloudbeaver/plugin-product": "~0.1.0",
@@ -69,8 +70,7 @@
     "@cloudbeaver/plugin-user-profile": "~0.1.0",
     "@cloudbeaver/plugin-user-profile-administration": "~0.1.0",
     "@cloudbeaver/plugin-version": "~0.1.0",
-    "@cloudbeaver/plugin-version-update-administration": "~0.1.0",
-    "@cloudbeaver/plugin-navigation-tree-filters": "~0.1.0"
+    "@cloudbeaver/plugin-version-update-administration": "~0.1.0"
   },
   "peerDependencies": {
     "reflect-metadata": "~0.x.x"
