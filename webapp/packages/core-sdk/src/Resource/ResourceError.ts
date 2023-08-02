@@ -19,6 +19,7 @@ export class ResourceError extends LoadingError {
   ) {
     super(
       () => {
+        this.resource.cleanError(this.key);
         this.resource.markOutdated(this.key);
       },
       message,
