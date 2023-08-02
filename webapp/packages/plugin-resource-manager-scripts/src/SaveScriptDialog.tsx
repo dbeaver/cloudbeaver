@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 import { Button, Container, InputField, SubmittingForm, Translate, useFocus, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
-import { RESOURCE_NAME_REGEX } from '@cloudbeaver/plugin-resource-manager';
 
 const style = css`
   fill {
@@ -20,19 +19,21 @@ const style = css`
   }
 `;
 
-interface Payload {
-  defaultScriptName?: string;
-  projectId?: string | null;
-}
-
 export interface ISaveScriptDialogResult {
   name: string;
   projectId: string | null;
 }
 
+interface Payload {
+  defaultScriptName?: string;
+  projectId?: string | null;
+  validation?: (result: ISaveScriptDialogResult, setMessage: (message: string) => void) => Promise<boolean> | boolean;
+}
+
 interface State extends ISaveScriptDialogResult {
-  errorMessage: string | null;
-  validate: () => void;
+  message: string | null;
+  valid: boolean;
+  validate: () => Promise<void>;
   submit: () => Promise<void>;
 }
 
@@ -49,20 +50,25 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
     () => ({
       name: payload.defaultScriptName ?? '',
       projectId: payload.projectId ?? null,
-      errorMessage: null,
-      validate() {
-        this.errorMessage = null;
+      message: null,
+      valid: true,
+      async validate() {
+        this.message = null;
 
-        const valid = RESOURCE_NAME_REGEX.test(this.name.trim());
+        let valid: boolean | undefined;
 
-        if (!valid) {
-          this.errorMessage = translate('plugin_resource_manager_scripts_script_name_invalid_characters_message');
-        }
+        try {
+          valid = await payload.validation?.({ name: this.name, projectId: this.projectId }, (message: string) => {
+            this.message = message;
+          });
+        } catch {}
+
+        this.valid = valid ?? true;
       },
       async submit() {
-        this.validate();
+        await this.validate();
 
-        if (!this.errorMessage) {
+        if (state.valid) {
           resolveDialog(this);
         }
       },
@@ -70,12 +76,15 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
     {
       name: observable.ref,
       projectId: observable.ref,
-      errorMessage: observable.ref,
-      validate: action.bound,
+      message: observable.ref,
+      valid: observable.ref,
       submit: action.bound,
+      validate: action.bound,
     },
     false,
   );
+
+  const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
 
   return styled(style)(
     <CommonDialogWrapper size="small" className={className} fixedWidth>
@@ -83,9 +92,6 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
       <CommonDialogBody>
         <SubmittingForm ref={focusedRef} onSubmit={state.submit}>
           <Container center gap>
-            <InputField name="name" state={state} error={!!state.errorMessage} description={state.errorMessage ?? undefined}>
-              {translate('ui_name') + ':'}
-            </InputField>
             <ProjectSelect
               value={state.projectId}
               filter={p => p.canEditResources && p.id === (payload.projectId ?? p.id)}
@@ -95,8 +101,19 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
               autoHide
               onChange={projectId => {
                 state.projectId = projectId;
+                state.validate();
               }}
             />
+            <InputField
+              name="name"
+              state={state}
+              error={!state.valid}
+              disabled={state.projectId === null}
+              description={errorMessage}
+              onChange={state.validate}
+            >
+              {translate('ui_name') + ':'}
+            </InputField>
           </Container>
         </SubmittingForm>
       </CommonDialogBody>
@@ -105,7 +122,7 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
           <Translate token="ui_processing_cancel" />
         </Button>
         <fill />
-        <Button type="button" mod={['unelevated']} disabled={!state.name.trim() || state.projectId === null} onClick={state.submit}>
+        <Button type="button" mod={['unelevated']} disabled={!state.valid} onClick={state.submit}>
           <Translate token="ui_processing_save" />
         </Button>
       </CommonDialogFooter>
