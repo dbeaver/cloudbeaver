@@ -19,6 +19,8 @@ export class ResourceError extends LoadingError {
   ) {
     super(
       () => {
+        // @TODO extract clean error logic to the CachedResource.
+        // For now when the ResourceError is thrown and refresh fn is called, the error is not cleaned in the resource
         this.resource.cleanError(this.key);
         this.resource.markOutdated(this.key);
       },
