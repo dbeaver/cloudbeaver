@@ -62,7 +62,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   const connected = getComputed(() => connection.data?.connected || false);
 
   const children = useResource(ObjectViewerPanel, NavTreeResource, objectId, {
-    active: connected,
+    active: !connection.resource.isSessionUpdate() && connected,
     // onData: data => {
     //   state.notFound = !data.includes(objectId);
     // },

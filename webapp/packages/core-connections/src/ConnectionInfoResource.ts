@@ -212,6 +212,10 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     });
   }
 
+  isSessionUpdate(): boolean {
+    return this.sessionUpdate;
+  }
+
   getEmptyConfig(): ConnectionConfig {
     return {
       template: false,
