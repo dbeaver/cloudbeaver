@@ -35,7 +35,6 @@ public class CBConstants {
     public static final String PARAM_DRIVERS_LOCATION = "driversLocation";
     public static final String PARAM_WORKSPACE_LOCATION = "workspaceLocation";
     public static final String PARAM_PRODUCT_CONFIGURATION = "productConfiguration";
-    public static final String PARAM_PERMISSIONS_CONFIGURATION = "dataSourcePermissionsConfiguration";
     public static final String PARAM_EXTERNAL_PROPERTIES = "externalProperties";
     public static final String PARAM_STATIC_CONTENT = "staticContent";
     public static final String PARAM_RESOURCE_QUOTAS = "resourceQuotas";

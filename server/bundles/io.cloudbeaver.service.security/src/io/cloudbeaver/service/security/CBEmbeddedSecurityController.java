@@ -2553,15 +2553,21 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public Set<String> getFilteredSubjects(Set<String> allSubjects) {
         try (Connection dbCon = database.openConnection()) {
             Set<String> result = new HashSet<>();
-            var sqlBuilder = new StringBuilder("SELECT SUBJECT_ID FROM {table_prefix}CB_AUTH_SUBJECT U WHERE SUBJECT_ID IN (");
-            appendStringParameters(sqlBuilder, allSubjects);
-            sqlBuilder.append(")");
-            var dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder.toString()));
-            try (ResultSet dbResult = dbStat.executeQuery()) {
-                while (dbResult.next()) {
-                    result.add(dbResult.getString(1));
+            var sqlBuilder = new StringBuilder("SELECT SUBJECT_ID FROM {table_prefix}CB_AUTH_SUBJECT U ")
+                .append("WHERE SUBJECT_ID IN (")
+                .append(SQLUtils.generateParamList(allSubjects.size()))
+                .append(")");
+            try (var dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder.toString()))) {
+                int parameterIndex = 1;
+                for (String subjectId : allSubjects) {
+                    dbStat.setString(parameterIndex++, subjectId);
                 }
-            }
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        result.add(dbResult.getString(1));
+                    }
+                }
+            };
             return result;
         } catch (SQLException e) {
             log.error("Error getting all subject ids from database", e);
