@@ -268,7 +268,8 @@ extend type Query {
         contextId: ID!,
         connectionId: ID!,
         resultsId: ID!,
-        columnNames: [String!]
+        columnNames: [String!],
+        functions: [String]
     ): String!
 }
 

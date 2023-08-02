@@ -100,7 +100,8 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
             getService(env).generateGroupByQuery(
                 getSQLContext(env),
                 env.getArgument("resultsId"),
-                env.getArgument("columnNames"))
+                env.getArgument("columnNames"),
+                env.getArgument("functions"))
             )
         ;
 
