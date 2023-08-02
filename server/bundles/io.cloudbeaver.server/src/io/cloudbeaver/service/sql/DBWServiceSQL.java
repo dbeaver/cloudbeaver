@@ -153,5 +153,6 @@ public interface DBWServiceSQL extends DBWService {
     String generateGroupByQuery(@NotNull WebSQLContextInfo contextInfo,
                                 @NotNull String resultsId,
                                 @NotNull List<String> columnsList,
-                                @Nullable List<String> functions) throws DBWebException;
+                                @Nullable List<String> functions,
+                                @Nullable Boolean showDuplicatesOnly) throws DBWebException;
 }

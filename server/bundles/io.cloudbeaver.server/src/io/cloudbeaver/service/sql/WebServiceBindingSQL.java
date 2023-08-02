@@ -101,7 +101,8 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                 getSQLContext(env),
                 env.getArgument("resultsId"),
                 env.getArgument("columnNames"),
-                env.getArgument("functions"))
+                env.getArgument("functions"),
+                env.getArgument("showDuplicatesOnly"))
             )
         ;
 

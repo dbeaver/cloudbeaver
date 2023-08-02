@@ -492,7 +492,8 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
         @NotNull List<String> columnsList,
-        @Nullable List<String> functions
+        @Nullable List<String> functions,
+        @Nullable Boolean showDuplicatesOnly
     ) throws DBWebException {
         try {
 
@@ -505,7 +506,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                 contextInfo.getProcessor().getSyntaxManager(),
                 columnsList,
                 functions == null ? List.of(SQLGroupingQueryGenerator.DEFAULT_FUNCTION) : functions, // backward compatibility
-                false);
+                CommonUtils.getBoolean(showDuplicatesOnly, false));
             return groupingQueryGenerator.generateGroupingQuery(resultsInfo.getQueryText());
         } catch (DBException e) {
             throw new DBWebException("Error on generating GROUP BY query", e);
