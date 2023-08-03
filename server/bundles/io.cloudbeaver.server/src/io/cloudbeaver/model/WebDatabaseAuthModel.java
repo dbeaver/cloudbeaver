@@ -19,12 +19,15 @@ package io.cloudbeaver.model;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.utils.WebCommonUtils;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 /**
  * WebDatabaseAuthModel
@@ -73,8 +76,12 @@ public class WebDatabaseAuthModel {
     public WebPropertyInfo[] getProperties() throws DBWebException {
 
         DBPPropertySource credentialsSource = model.createCredentialsSource(null, null);
+        Predicate<DBPPropertyDescriptor> predicate = CommonUtils.isEmpty(getRequiredAuth())
+            ? p -> true
+            : p -> WebCommonUtils.isAuthPropertyApplicable(p, webSession.getContextCredentialsProviders());
+
         return Arrays.stream(credentialsSource.getProperties())
-            .filter(p -> WebServiceUtils.isAuthPropertyApplicable(p, webSession.getContextCredentialsProviders()))
+            .filter(predicate)
             .map(p -> new WebPropertyInfo(webSession, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
     }
 
