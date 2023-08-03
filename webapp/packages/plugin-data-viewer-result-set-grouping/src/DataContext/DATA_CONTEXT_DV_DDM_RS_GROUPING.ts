@@ -9,8 +9,14 @@ import { createDataContext } from '@cloudbeaver/core-view';
 
 export interface IResultSetGroupingData {
   getColumns(): string[];
+  setColumns(columns: string[]): void;
   removeColumn(...columns: string[]): void;
+  addColumn(column: string): void;
   clear(): void;
+  getFunctions(): string[];
+  setFunctions(functions: string[]): void;
+  shouldShowDuplicatesOnly(): boolean;
+  setShowDuplicatesOnly(showDuplicatesOnly: boolean): void;
 }
 
 export const DATA_CONTEXT_DV_DDM_RS_GROUPING = createDataContext<IResultSetGroupingData>('data-viewer-database-data-model-result-set-grouping-data');

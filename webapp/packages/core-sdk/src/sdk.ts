@@ -1369,8 +1369,10 @@ export interface QuerySqlGenerateGroupingQueryArgs {
   columnNames?: InputMaybe<Array<Scalars['String']>>;
   connectionId: Scalars['ID'];
   contextId: Scalars['ID'];
+  functions?: InputMaybe<Array<Scalars['String']>>;
   projectId?: InputMaybe<Scalars['ID']>;
   resultsId: Scalars['ID'];
+  showDuplicatesOnly?: InputMaybe<Scalars['Boolean']>;
 }
 
 export interface QuerySqlListContextsArgs {
@@ -4207,6 +4209,8 @@ export type GetResultsetGroupingQueryQueryVariables = Exact<{
   connectionId: Scalars['ID'];
   resultsId: Scalars['ID'];
   columnNames: Array<Scalars['String']> | Scalars['String'];
+  functions?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
+  showDuplicatesOnly?: InputMaybe<Scalars['Boolean']>;
 }>;
 
 export type GetResultsetGroupingQueryQuery = { query: string };
@@ -6166,13 +6170,15 @@ export const GetResultsetDataUrlDocument = `
 }
     `;
 export const GetResultsetGroupingQueryDocument = `
-    query getResultsetGroupingQuery($projectId: ID!, $contextId: ID!, $connectionId: ID!, $resultsId: ID!, $columnNames: [String!]!) {
+    query getResultsetGroupingQuery($projectId: ID!, $contextId: ID!, $connectionId: ID!, $resultsId: ID!, $columnNames: [String!]!, $functions: [String!], $showDuplicatesOnly: Boolean) {
   query: sqlGenerateGroupingQuery(
     projectId: $projectId
     contextId: $contextId
     connectionId: $connectionId
     resultsId: $resultsId
     columnNames: $columnNames
+    functions: $functions
+    showDuplicatesOnly: $showDuplicatesOnly
   )
 }
     `;
