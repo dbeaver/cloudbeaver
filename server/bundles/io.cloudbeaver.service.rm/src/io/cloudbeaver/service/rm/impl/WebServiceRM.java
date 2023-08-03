@@ -247,6 +247,7 @@ public class WebServiceRM implements DBWServiceRM {
     ) throws DBWebException {
         try {
             RMProject rmProject = getResourceController(session).createProject(name, description);
+            getAccessibleProjectIds(session).add(rmProject.getId());
             session.createWebProject(rmProject);
             WebAppUtils.getWebApplication().getEventController().addEvent(
                 WSProjectUpdateEvent.create(session.getSessionId(), session.getUserId(), rmProject.getId())
@@ -262,6 +263,7 @@ public class WebServiceRM implements DBWServiceRM {
         try {
             var project = session.getProjectById(projectId);
             getResourceController(session).deleteProject(projectId);
+            getAccessibleProjectIds(session).remove(projectId);
             session.deleteSessionProject(project);
             WebAppUtils.getWebApplication().getEventController().addEvent(
                 WSProjectUpdateEvent.delete(session.getSessionId(), session.getUserId(), projectId)
@@ -270,6 +272,11 @@ public class WebServiceRM implements DBWServiceRM {
         } catch (DBException e) {
             throw new DBWebException("Error deleting project", e);
         }
+    }
+
+    @NotNull
+    private Set<String> getAccessibleProjectIds(@NotNull WebSession session) {
+        return session.getUserContext().getAccessibleProjectIds();
     }
 
     @Override
