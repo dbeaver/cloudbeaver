@@ -269,7 +269,7 @@ extend type Query {
         connectionId: ID!,
         resultsId: ID!,
         columnNames: [String!],
-        functions: [String],
+        functions: [String!],
         showDuplicatesOnly: Boolean
     ): String!
 }
