@@ -22,6 +22,15 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 23.1.4 - 2023-08-07
+
+- The SSL option is now available for establishing connections in MySQL and PostgreSQL.
+- The filters for the Navigation tree now allow hiding and showing schemas within the interface.
+- Access permissions can be specified for pre-configured connections via the configuration file.
+- Reverse Proxy authentication now includes the option to provide users' First name and Last name.
+- Trino driver has been upgraded to version 3.41.
+- Different bug fixes and enhancements have been made.
+
 ### CloudBeaver 23.1.3 - 2023-07-24
 
 - Users can simultaneously edit resources, allowing them to work together;
