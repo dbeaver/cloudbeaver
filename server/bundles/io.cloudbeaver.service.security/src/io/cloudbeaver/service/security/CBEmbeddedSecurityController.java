@@ -2191,6 +2191,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         if (CommonUtils.isEmpty(subjectIds) || CommonUtils.isEmpty(objectIds)) {
             return;
         }
+        Set<String> filteredSubjects = getFilteredSubjects(subjectIds);
 //        validatePermissions(objectType.getObjectType(), permissions);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
@@ -2213,6 +2214,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                             dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
                             dbStat.setString(4, grantor);
                             for (String subjectId : subjectIds) {
+                                if (!filteredSubjects.contains(subjectId)) {
+                                    log.error("Subject '" + subjectId + "' is not found in database");
+                                    continue;
+                                }
                                 dbStat.setString(5, subjectId);
                                 for (String permission : permissions) {
                                     dbStat.setString(6, permission);
@@ -2542,6 +2547,31 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             );
         } catch (SQLException e) {
             throw new DBCException("Error deleting auth attempt info", e);
+        }
+    }
+
+    public Set<String> getFilteredSubjects(Set<String> allSubjects) {
+        try (Connection dbCon = database.openConnection()) {
+            Set<String> result = new HashSet<>();
+            var sqlBuilder = new StringBuilder("SELECT SUBJECT_ID FROM {table_prefix}CB_AUTH_SUBJECT U ")
+                .append("WHERE SUBJECT_ID IN (")
+                .append(SQLUtils.generateParamList(allSubjects.size()))
+                .append(")");
+            try (var dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder.toString()))) {
+                int parameterIndex = 1;
+                for (String subjectId : allSubjects) {
+                    dbStat.setString(parameterIndex++, subjectId);
+                }
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        result.add(dbResult.getString(1));
+                    }
+                }
+            };
+            return result;
+        } catch (SQLException e) {
+            log.error("Error getting all subject ids from database", e);
+            return Set.of();
         }
     }
 }
