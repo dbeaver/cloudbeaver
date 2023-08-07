@@ -232,6 +232,7 @@ public class WebSession extends BaseWebSession
         return userContext.getFileController();
     }
 
+    @Override
     public synchronized void refreshUserData() {
         refreshSessionAuth();
 

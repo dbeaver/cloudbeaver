@@ -109,6 +109,15 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         return userContext.refresh(smAuthInfo);
     }
 
+    public synchronized void refreshUserData() {
+        try {
+            userContext.refreshAccessibleProjects();
+        } catch (DBException e) {
+            addSessionError(e);
+            log.error("Error refreshing accessible projects", e);
+        }
+    }
+
     @NotNull
     @Override
     public SMAuthSpace getSessionSpace() {

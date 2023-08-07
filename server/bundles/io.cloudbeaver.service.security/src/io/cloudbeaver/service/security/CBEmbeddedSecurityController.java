@@ -1570,7 +1570,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public SMTokens refreshSession(@NotNull String refreshToken) throws DBException {
         var currentUserCreds = getCurrentUserCreds();
         var currentUserAccessToken = currentUserCreds.getSmAccessToken();
-        String currentUserAuthRole = readTokenAuthRole(currentUserAccessToken);
 
         var smTokenInfo = readAccessTokenInfo(currentUserAccessToken);
 
@@ -1580,7 +1579,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
         try (var dbCon = database.openConnection()) {
             invalidateUserTokens(currentUserAccessToken);
-            return generateNewSessionToken(smTokenInfo.getSessionId(), smTokenInfo.getUserId(), currentUserAuthRole, dbCon);
+            return generateNewSessionToken(
+                smTokenInfo.getSessionId(),
+                smTokenInfo.getUserId(),
+                updateUserAuthRoleIfNeeded(smTokenInfo.getUserId(), null),
+                dbCon);
         } catch (SQLException e) {
             throw new DBException("Error refreshing sm session", e);
         }
@@ -1937,7 +1940,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private String updateUserAuthRoleIfNeeded(@Nullable String userId, @Nullable String authRole) throws DBException {
+    protected String updateUserAuthRoleIfNeeded(@Nullable String userId, @Nullable String authRole) throws DBException {
         if (userId == null) {
             return null;
         }
