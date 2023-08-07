@@ -27,6 +27,8 @@ export function useGroupingData(state: IDVResultSetGroupingPresentationState) {
       clear() {
         this.state.presentationId = '';
         this.state.columns = [];
+        this.state.functions = [];
+        this.state.showDuplicatesOnly = false;
       },
       getFunctions() {
         return this.state.functions;
@@ -34,7 +36,7 @@ export function useGroupingData(state: IDVResultSetGroupingPresentationState) {
       setFunctions(functions) {
         this.state.functions = functions;
       },
-      shouldShowDuplicatesOnly() {
+      getShowDuplicatesOnly() {
         return this.state.showDuplicatesOnly;
       },
       setShowDuplicatesOnly(showDuplicatesOnly) {

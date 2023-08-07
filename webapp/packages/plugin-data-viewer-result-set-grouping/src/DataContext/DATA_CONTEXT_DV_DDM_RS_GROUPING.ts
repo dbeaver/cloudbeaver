@@ -15,7 +15,7 @@ export interface IResultSetGroupingData {
   clear(): void;
   getFunctions(): string[];
   setFunctions(functions: string[]): void;
-  shouldShowDuplicatesOnly(): boolean;
+  getShowDuplicatesOnly(): boolean;
   setShowDuplicatesOnly(showDuplicatesOnly: boolean): void;
 }
 

@@ -20,7 +20,7 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { ACTION_DATA_VIEWER_GROUPING_CLEAR } from './Actions/ACTION_DATA_VIEWER_GROUPING_CLEAR';
-import { ACTION_DATA_VIEWER_GROUPING_ADD_COLUMNS } from './Actions/ACTION_DATA_VIEWER_GROUPING_ADD_COLUMNS';
+import { ACTION_DATA_VIEWER_GROUPING_CONFIGURE } from './Actions/ACTION_DATA_VIEWER_GROUPING_CONFIGURE';
 import { ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN } from './Actions/ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN';
 import { ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES } from './Actions/ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES';
 import { DATA_CONTEXT_DV_DDM_RS_GROUPING } from './DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING';
@@ -58,7 +58,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
         return [
           ACTION_DATA_VIEWER_GROUPING_CLEAR,
           ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN,
-          ACTION_DATA_VIEWER_GROUPING_ADD_COLUMNS,
+          ACTION_DATA_VIEWER_GROUPING_CONFIGURE,
           ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES,
         ].includes(action);
       },
@@ -119,11 +119,11 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
             grouping.removeColumn(...columnsToRemove);
             break;
           }
-          case ACTION_DATA_VIEWER_GROUPING_ADD_COLUMNS:
+          case ACTION_DATA_VIEWER_GROUPING_CONFIGURE:
             await this.commonDialogService.open(DVGroupingColumnEditorDialog, { grouping });
             break;
           case ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES:
-            grouping.setShowDuplicatesOnly(!grouping.shouldShowDuplicatesOnly());
+            grouping.setShowDuplicatesOnly(!grouping.getShowDuplicatesOnly());
         }
       },
     });
@@ -137,7 +137,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
           ...items,
           ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN,
           ACTION_DATA_VIEWER_GROUPING_CLEAR,
-          ACTION_DATA_VIEWER_GROUPING_ADD_COLUMNS,
+          ACTION_DATA_VIEWER_GROUPING_CONFIGURE,
           ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES,
         ];
       },

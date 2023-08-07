@@ -1,18 +1,9 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2019-2023 DBeaver Corp
+ * Copyright (C) 2020-2023 DBeaver Corp and others
  *
- * All Rights Reserved
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of DBeaver Corp and its suppliers, if any.
- * The intellectual and technical concepts contained
- * herein are proprietary to DBeaver Corp and its suppliers
- * and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from DBeaver Corp.
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
@@ -40,39 +31,21 @@ export const DVGroupingColumnEditorDialog = observer<DialogComponentProps<Payloa
   const [columns, setColumns] = useState([...grouping.getColumns()]);
   const [functions, setFunctions] = useState([...grouping.getFunctions()]);
 
-  const onAddColumn = (name: string) => {
-    if (!name) {
-      return;
-    }
+  function addColumnHandler(name: string) {
     setColumns([...columns, name]);
-  };
+  }
 
-  const onAddFunction = (name: string) => {
-    if (!name) {
-      return;
-    }
+  function addFunctionHandler(name: string) {
     setFunctions([...functions, name]);
-  };
+  }
 
-  const onDeleteColumn = (name: string) => {
+  function deleteColumnHandler(name: string) {
     setColumns(columns.filter(column => column !== name));
-  };
+  }
 
-  const onDeleteFunction = (name: string) => {
+  function deleteFunctionHandler(name: string) {
     setFunctions(functions.filter(column => column !== name));
-  };
-
-  const onColumnChange = (name: string, index: number) => {
-    const newColumns = [...columns];
-    newColumns[index] = name;
-    setColumns(newColumns);
-  };
-
-  const onFunctionChange = (name: string, index: number) => {
-    const newFunctions = [...functions];
-    newFunctions[index] = name;
-    setFunctions(newFunctions);
-  };
+  }
 
   async function submit() {
     grouping.setColumns(columns);
@@ -84,27 +57,25 @@ export const DVGroupingColumnEditorDialog = observer<DialogComponentProps<Payloa
     <CommonDialogWrapper size="medium">
       <CommonDialogHeader
         title={translate('plugin-data-viewer-result-set-grouping_grouping_configuration')}
-        icon="/icons/plugin_data_viewer_result_set_grouping_add_column.svg"
+        icon="/icons/settings.svg"
         onReject={rejectDialog}
       />
-      <CommonDialogBody noBodyPadding>
-        <Group box>
-          <div className={s(style, { tablesContainer: true })}>
-            <GroupingColumnEditorTable
-              title={translate('plugin-data-viewer-result-set-grouping_grouping_columns')}
-              columns={columns}
-              onAdd={onAddColumn}
-              onDelete={onDeleteColumn}
-              onColumnChange={onColumnChange}
-            />
-            <GroupingColumnEditorTable
-              title={translate('plugin-data-viewer-result-set-grouping_grouping_functions')}
-              columns={functions}
-              onAdd={onAddFunction}
-              onDelete={onDeleteFunction}
-              onColumnChange={onFunctionChange}
-            />
-          </div>
+      <CommonDialogBody>
+        <Group box medium gap>
+          <GroupingColumnEditorTable
+            title={translate('plugin-data-viewer-result-set-grouping_grouping_columns')}
+            placeholder={translate('plugin-data-viewer-result-set-grouping_grouping_columns_placeholder')}
+            columns={columns}
+            onAdd={addColumnHandler}
+            onDelete={deleteColumnHandler}
+          />
+          <GroupingColumnEditorTable
+            title={translate('plugin-data-viewer-result-set-grouping_grouping_functions')}
+            placeholder={translate('plugin-data-viewer-result-set-grouping_grouping_functions_placeholder')}
+            columns={functions}
+            onAdd={addFunctionHandler}
+            onDelete={deleteFunctionHandler}
+          />
         </Group>
       </CommonDialogBody>
       <CommonDialogFooter>

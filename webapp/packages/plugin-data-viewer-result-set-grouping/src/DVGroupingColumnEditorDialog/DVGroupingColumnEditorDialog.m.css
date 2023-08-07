@@ -4,16 +4,3 @@
   gap: 14px;
   justify-content: flex-end;
 }
-
-.tablesContainer {
-  padding: 0 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  height: 100%;
-}
-
-.tableContainer {
-  overflow: auto;
-  flex: 1;
-}

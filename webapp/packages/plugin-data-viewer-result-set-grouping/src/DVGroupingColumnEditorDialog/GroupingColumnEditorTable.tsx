@@ -8,59 +8,59 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { Button, Group, InputField, s, Table, TableBody, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Group, GroupTitle, InputField, s, SubmittingForm, Table, TableBody, useS } from '@cloudbeaver/core-blocks';
 
 import styles from './GroupingColumnEditorTable.m.css';
 import { GroupingTableItem } from './GroupingTableItem';
 
 interface Props {
   title: string;
+  placeholder: string;
   columns: string[];
   onAdd: (name: string) => void;
   onDelete: (name: string) => void;
-  onColumnChange: (name: string, index: number) => void;
 }
 
-export const GroupingColumnEditorTable = observer<Props>(function GroupingColumnEditorTable({ title, columns, onAdd, onDelete, onColumnChange }) {
-  const translate = useTranslate();
+export const GroupingColumnEditorTable = observer<Props>(function GroupingColumnEditorTable({ title, placeholder, columns, onAdd, onDelete }) {
   const style = useS(styles);
   const [newColumnName, setNewColumnName] = useState('');
 
+  function addColumnHandler() {
+    const value = newColumnName.trim();
+
+    if (value) {
+      onAdd(value);
+      setNewColumnName('');
+    }
+  }
+
   return (
-    <Group className={styles.group} box medium overflow>
-      <container className={s(style, { container: true })}>
+    <Group box medium overflow>
         <header className={s(style, { header: true })}>
-          <h4 className={s(style, { headerTitle: true })}>{title}</h4>
-          <div className={s(style, { submittingForm: true })}>
+          <GroupTitle>{title}</GroupTitle>
+          <SubmittingForm onSubmit={addColumnHandler}>
             <div className={s(style, { headerActions: true })}>
               <InputField
                 className={s(style, { inputField: true })}
-                placeholder={translate('')}
+                placeholder={placeholder}
                 value={newColumnName}
                 onChange={v => setNewColumnName(String(v))}
               />
-              <Button className={style.button} mod={['unelevated']} onClick={() => onAdd(newColumnName)}>
+              <Button mod={['unelevated']} onClick={addColumnHandler}>
                 +
               </Button>
             </div>
-          </div>
+          </SubmittingForm>
         </header>
-        <div className={s(style, { tableContainer: true })}>
-          <Table className={s(style, { table: false })} keys={columns} selectedItems={new Map()}>
+        <Container className={s(style, { tableContainer: true })} overflow>
+          <Table keys={columns}>
             <TableBody>
               {columns.map((name, idx) => (
-                <GroupingTableItem
-                  key={idx}
-                  id={name}
-                  name={name}
-                  onDelete={onDelete}
-                  onChange={name => onColumnChange(name, idx)}
-                />
+                <GroupingTableItem key={idx} id={name} name={name} onDelete={onDelete} />
               ))}
             </TableBody>
           </Table>
-        </div>
-      </container>
+        </Container>
     </Group>
   );
 });

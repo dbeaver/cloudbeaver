@@ -1,22 +1,3 @@
-.deleteColumnCell {
-  opacity: 0;
-  justify-content: flex-end;
-}
-
-.tableItem:hover .deleteColumnCell {
-  opacity: 1;
-}
-
 .tableColumnValue {
   width: 100%;
-  height: 30px!important;
-  transition: none!important;
-}
-
-.tableColumnInput {
-  padding: 0!important;
-}
-
-.input {
-  height: 29px!important;
 }

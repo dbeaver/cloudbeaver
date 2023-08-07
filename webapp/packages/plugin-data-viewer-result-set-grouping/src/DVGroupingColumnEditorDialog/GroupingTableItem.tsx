@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useRef, useState } from 'react';
 
 import { IconButton, s, TableColumnValue, TableItem, useS } from '@cloudbeaver/core-blocks';
 
@@ -18,40 +17,14 @@ interface Props {
   disabled?: boolean;
   className?: string;
   onDelete: (id: string) => void;
-  onChange: (name: string) => void;
 }
 
-export const GroupingTableItem = observer<Props>(function GroupingTableItem({ id, name, disabled, className, onDelete, onChange }) {
+export const GroupingTableItem = observer<Props>(function GroupingTableItem({ id, name, disabled, className, onDelete }) {
   const style = useS(styles);
 
-  const [isEdited, setIsEdited] = useState(false);
-  const focusedRef = useRef<HTMLInputElement>(null);
-
   return (
-    <TableItem className={s(style, { tableItem: true }, className)} item={id} title={name} disabled={disabled} selectDisabled={disabled}>
-      {isEdited ? (
-        <TableColumnValue className={s(style, { tableColumnValue: true, tableColumnInput: true })}>
-          <input
-            ref={focusedRef}
-            className={s(style, { input: true })}
-            value={name}
-            onChange={e => onChange(e.target.value)}
-            onBlur={() => setIsEdited(false)}
-          />
-        </TableColumnValue>
-      ) : (
-        <TableColumnValue
-          className={s(style, { tableColumnValue: true })}
-          onClick={() => {
-            setIsEdited(true);
-            requestAnimationFrame(() => {
-              focusedRef.current?.focus();
-            });
-          }}
-        >
-          {name}
-        </TableColumnValue>
-      )}
+    <TableItem className={className} item={id} title={name} disabled={disabled} selectDisabled={disabled}>
+      <TableColumnValue className={s(style, { tableColumnValue: true })}>{name}</TableColumnValue>
       <TableColumnValue>
         <IconButton name="cross-bold" onClick={() => onDelete(id)} />
       </TableColumnValue>
