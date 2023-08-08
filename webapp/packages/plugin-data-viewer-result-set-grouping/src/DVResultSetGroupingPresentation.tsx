@@ -19,8 +19,7 @@ import type { IGroupingQueryState } from './IGroupingQueryState';
 import { useGroupingData } from './useGroupingData';
 import { useGroupingDataModel } from './useGroupingDataModel';
 import { useGroupingDnDColumns } from './useGroupingDnDColumns';
-
-const DEFAULT_GROUPING_QUERY_OPERATION = 'COUNT(*)';
+import { DEFAULT_GROUPING_QUERY_OPERATION } from './DEFAULT_GROUPING_QUERY_OPERATION';
 
 const styles = css`
   drop-area {

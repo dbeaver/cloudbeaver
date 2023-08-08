@@ -1,12 +1,8 @@
 .header {
   composes: theme-border-color-background theme-background-surface theme-text-on-surface from global;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
   padding-bottom: 16px;
-  border-bottom: 1px solid;
   gap: 16px;
-  flex: 1 0 auto;
+  border-bottom: 1px solid;
 }
 .headerActions {
   width: 100%;

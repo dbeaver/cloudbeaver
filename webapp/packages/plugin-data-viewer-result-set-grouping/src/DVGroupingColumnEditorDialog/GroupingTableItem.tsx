@@ -7,24 +7,21 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { IconButton, s, TableColumnValue, TableItem, useS } from '@cloudbeaver/core-blocks';
-
-import styles from './GroupingTableItem.m.css';
+import { IconButton, TableColumnValue, TableItem } from '@cloudbeaver/core-blocks';
 
 interface Props {
   id: string;
   name: string;
-  disabled?: boolean;
   className?: string;
   onDelete: (id: string) => void;
 }
 
-export const GroupingTableItem = observer<Props>(function GroupingTableItem({ id, name, disabled, className, onDelete }) {
-  const style = useS(styles);
-
+export const GroupingTableItem = observer<Props>(function GroupingTableItem({ id, name, className, onDelete }) {
   return (
-    <TableItem className={className} item={id} title={name} disabled={disabled} selectDisabled={disabled}>
-      <TableColumnValue className={s(style, { tableColumnValue: true })}>{name}</TableColumnValue>
+    <TableItem className={className} item={id} title={name}>
+      <TableColumnValue width="100%" flex>
+        {name}
+      </TableColumnValue>
       <TableColumnValue>
         <IconButton name="cross-bold" onClick={() => onDelete(id)} />
       </TableColumnValue>

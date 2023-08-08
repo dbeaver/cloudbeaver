@@ -36,10 +36,9 @@ export const GroupingColumnEditorTable = observer<Props>(function GroupingColumn
 
   return (
     <Group box medium overflow>
-        <header className={s(style, { header: true })}>
+        <Container className={s(style, { header: true })}>
           <GroupTitle>{title}</GroupTitle>
-          <SubmittingForm onSubmit={addColumnHandler}>
-            <div className={s(style, { headerActions: true })}>
+          <SubmittingForm className={s(style, { headerActions: true })} onSubmit={addColumnHandler}>
               <InputField
                 className={s(style, { inputField: true })}
                 placeholder={placeholder}
@@ -49,9 +48,8 @@ export const GroupingColumnEditorTable = observer<Props>(function GroupingColumn
               <Button mod={['unelevated']} onClick={addColumnHandler}>
                 +
               </Button>
-            </div>
           </SubmittingForm>
-        </header>
+        </Container>
         <Container className={s(style, { tableContainer: true })} overflow>
           <Table keys={columns}>
             <TableBody>

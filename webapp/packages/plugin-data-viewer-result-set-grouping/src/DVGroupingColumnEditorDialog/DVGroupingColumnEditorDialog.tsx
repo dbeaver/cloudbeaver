@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { Button, Group, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Group, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
 import type { IResultSetGroupingData } from '../DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING';

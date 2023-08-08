@@ -4,6 +4,7 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 
 import type { IResultSetGroupingData } from './DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING';
 import type { IDVResultSetGroupingPresentationState } from './DVResultSetGroupingPresentation';
+import { DEFAULT_GROUPING_QUERY_OPERATION } from './DEFAULT_GROUPING_QUERY_OPERATION';
 
 export interface IPrivateGroupingData extends IResultSetGroupingData {
   state: IDVResultSetGroupingPresentationState;
@@ -27,7 +28,7 @@ export function useGroupingData(state: IDVResultSetGroupingPresentationState) {
       clear() {
         this.state.presentationId = '';
         this.state.columns = [];
-        this.state.functions = [];
+        this.state.functions = [DEFAULT_GROUPING_QUERY_OPERATION];
         this.state.showDuplicatesOnly = false;
       },
       getFunctions() {
