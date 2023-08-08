@@ -28,7 +28,7 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 - The filters for the Navigation tree now allow hiding and showing schemas within the interface.
 - Access permissions can be specified for pre-configured connections via the configuration file.
 - Reverse Proxy authentication now includes the option to provide users' First name and Last name.
-- Trino driver has been upgraded to version 3.41.
+- Trino driver has been upgraded to version 421.
 - Different bug fixes and enhancements have been made.
 
 ### CloudBeaver 23.1.3 - 2023-07-24
