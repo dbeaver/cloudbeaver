@@ -23,12 +23,8 @@ import {
   GraphQLService,
   InitConnectionMutationVariables,
   isResourceAlias,
-  isResourceKeyAlias,
-  isResourceKeyList,
   NavigatorSettingsInput,
   ResourceKey,
-  resourceKeyAlias,
-  resourceKeyAliasFactory,
   resourceKeyList,
   ResourceKeyList,
   resourceKeyListAlias,
@@ -469,12 +465,13 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     refresh: boolean,
   ): Promise<Map<IConnectionInfoParams, Connection>> {
     const connectionsList: Connection[] = [];
+    const projectKey = this.isAlias(originalKey, ConnectionInfoProjectKey);
     let removedConnections: IConnectionInfoParams[] = [];
     let projectId: string | undefined;
     let projectIds: string[] | undefined;
 
-    if (this.isAlias(originalKey, ConnectionInfoProjectKey)) {
-      projectIds = originalKey.options.projectIds;
+    if (projectKey) {
+      projectIds = projectKey.options.projectIds;
     }
 
     if (this.isAlias(originalKey, ConnectionInfoActiveProjectKey)) {

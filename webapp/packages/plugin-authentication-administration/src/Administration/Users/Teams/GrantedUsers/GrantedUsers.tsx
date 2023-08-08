@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { AdminUser, UsersResource, UsersResourceSearchUser } from '@cloudbeaver/core-authentication';
+import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   ColoredContainer,
   Container,
@@ -22,6 +22,7 @@ import {
   useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
+import { CachedResourcePageListKey } from '@cloudbeaver/core-sdk';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormProps } from '../ITeamFormProps';
@@ -52,7 +53,7 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
   const state = useGrantedUsers(formState.config, formState.mode);
   const { selected } = useTab(tabId);
 
-  const users = useResource(GrantedUsers, UsersResource, UsersResourceSearchUser(0, 1000), { active: selected });
+  const users = useResource(GrantedUsers, UsersResource, CachedResourcePageListKey(0, 1000), { active: selected });
 
   const grantedUsers = getComputed(() =>
     users.data.filter<AdminUser>((user): user is AdminUser => !!user && state.state.grantedUsers.includes(user.userId)),

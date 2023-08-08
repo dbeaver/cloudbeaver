@@ -15,7 +15,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, CachedResourcePageKey, getNextPageOffset, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import type { IDNDData } from '@cloudbeaver/core-ui';
 import { ILoadableState, MetadataMap, throttle } from '@cloudbeaver/core-utils';
 
@@ -203,6 +203,15 @@ export function useElementsTree(options: IOptions): IElementsTree {
                   await elementsTree.expand(node, false);
                 }
                 return;
+              }
+
+              const pageInfo = navTreeResource.getPageInfo(CachedResourcePageKey(0, 0).setTarget(child));
+
+              if (pageInfo) {
+                const lastOffset = getNextPageOffset(pageInfo);
+                for (let offset = 0; offset < lastOffset; offset += navTreeResource.childrenLimit) {
+                  await navTreeResource.load(CachedResourcePageKey(offset, navTreeResource.childrenLimit).setTarget(child));
+                }
               }
 
               if (

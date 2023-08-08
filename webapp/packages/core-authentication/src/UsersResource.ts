@@ -11,15 +11,15 @@ import {
   AdminConnectionGrantInfo,
   AdminUserInfo,
   AdminUserInfoFragment,
+  CACHED_RESOURCE_DEFAULT_PAGE_LIMIT,
+  CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapAllKey,
-  CachedMapPageKey,
   CachedMapResource,
+  CachedResourcePageKey,
   GetUsersListQueryVariables,
   GraphQLService,
-  ICachedMapPageOptions,
   isResourceAlias,
   ResourceKey,
-  ResourceKeyFlat,
   resourceKeyList,
   resourceKeyListAlias,
   resourceKeyListAliasFactory,
@@ -40,16 +40,16 @@ export type AdminUser = AdminUserInfoFragment;
 type AdminUserNew = AdminUser & { [NEW_USER_SYMBOL]: boolean };
 type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId' | 'page' | 'filter'>;
 
-interface IUserResourceSearchPageOptions extends ICachedMapPageOptions {
+interface IUserResourceFilterOptions {
   userId?: string;
   enabledState?: boolean;
 }
 
-export const UsersResourceSearchUser = resourceKeyListAliasFactory<
+export const UsersResourceFilterKey = resourceKeyListAliasFactory<
   any,
-  [offset: number, limit: number, userId?: string, enabledState?: boolean],
-  Readonly<IUserResourceSearchPageOptions>
->('@users-resource/page', (offset: number, limit: number, userId?: string, enabledState?: boolean) => ({ offset, limit, userId, enabledState }));
+  [userId?: string, enabledState?: boolean],
+  Readonly<IUserResourceFilterOptions>
+>('@users-resource/filter', (userId?: string, enabledState?: boolean) => ({ userId, enabledState }));
 
 export const UsersResourceNewUsers = resourceKeyListAlias('@users-resource/new-users');
 
@@ -75,11 +75,16 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     super();
 
     sessionPermissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
-    this.addAlias(UsersResourceSearchUser, key => {
-      const pageInfo = this.getPageInfo(key as ResourceKeyFlat<string>);
-
-      return resourceKeyList(pageInfo?.edges || []);
-    });
+    this.addAlias(UsersResourceFilterKey, key =>
+      resourceKeyList(
+        this.entries
+          .filter(
+            ([userId, user]) =>
+              userId.includes(key.options.userId ?? '') && (key.options.enabledState === undefined || user.enabled === key.options.enabledState),
+          )
+          .map(([userId]) => userId),
+      ),
+    );
 
     this.addAlias(UsersResourceNewUsers, () => {
       const orderedKeys = this.entries
@@ -238,8 +243,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   }
 
   protected async loader(originalKey: ResourceKey<string>, includes?: string[]): Promise<Map<string, AdminUser>> {
-    const search = this.isAlias(originalKey, UsersResourceSearchUser);
-    const page = this.isAlias(originalKey, CachedMapPageKey);
     const all = this.isAlias(originalKey, CachedMapAllKey);
 
     if (all) {
@@ -264,14 +267,31 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
         usersList.push(user);
       } else {
+        const pageKey = this.isAlias(originalKey, CachedResourcePageKey);
+        const filterKey = this.isAlias(originalKey, UsersResourceFilterKey);
+        let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
+        let limit = CACHED_RESOURCE_DEFAULT_PAGE_LIMIT;
+        let userIdMask: string | undefined;
+        let enabledState: boolean | undefined;
+
+        if (pageKey) {
+          offset = pageKey.options.offset;
+          limit = pageKey.options.limit;
+        }
+
+        if (filterKey) {
+          userIdMask = filterKey.options.userId;
+          enabledState = filterKey.options.enabledState;
+        }
+
         const { users } = await this.graphQLService.sdk.getUsersList({
           page: {
-            offset: page || search ? originalKey.options.offset : 100,
-            limit: page || search ? originalKey.options.limit : 0,
+            offset,
+            limit,
           },
           filter: {
-            userIdMask: search ? originalKey.options.userId : undefined,
-            enabledState: search ? originalKey.options.enabledState : undefined,
+            userIdMask,
+            enabledState,
           },
           ...this.getDefaultIncludes(),
           ...this.getIncludesMap(userId, includes),
@@ -279,12 +299,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
         usersList.push(...users);
 
-        if (page || search) {
-          this.setPageInfo(originalKey, {
-            edges: users.map(user => user.userId),
-            hasNextPage: users.length === originalKey.options.limit,
-          });
-        }
+        this.setPageEnd(CachedResourcePageKey(offset, users.length).setTarget(filterKey), users.length === limit);
       }
     });
 
@@ -316,7 +331,7 @@ export function isLocalUser(user: AdminUser): boolean {
 }
 
 export function isNewUser(user: AdminUser): boolean {
-  return NEW_USER_SYMBOL in user;
+  return NEW_USER_SYMBOL in user && user[NEW_USER_SYMBOL] === true;
 }
 
 export function compareUsers(a: AdminUser, b: AdminUser): number {
