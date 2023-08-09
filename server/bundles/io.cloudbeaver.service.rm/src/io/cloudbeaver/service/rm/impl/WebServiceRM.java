@@ -271,11 +271,6 @@ public class WebServiceRM implements DBWServiceRM {
         }
     }
 
-    @NotNull
-    private Set<String> getAccessibleProjectIds(@NotNull WebSession session) {
-        return session.getUserContext().getAccessibleProjectIds();
-    }
-
     @Override
     public List<AdminPermissionInfo> listProjectPermissions() throws DBWebException {
         try {
