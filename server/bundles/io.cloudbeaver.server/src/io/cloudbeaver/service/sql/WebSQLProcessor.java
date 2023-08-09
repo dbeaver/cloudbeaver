@@ -739,9 +739,11 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         List<WebSQLQueryResults> resultList = new ArrayList<>();
         int maxResultsCount = resolveMaxResultsCount(dataContainer.getDataSource());
+        WebSQLQueryResults stats = new WebSQLQueryResults(webSession, dataFormat);
+        var rowsUpdated = 0;
         for (int i = 0; i < maxResultsCount; i++) {
-            WebSQLQueryResults results = new WebSQLQueryResults(webSession, dataFormat);
             if (hasResultSet) {
+                WebSQLQueryResults results = new WebSQLQueryResults(webSession, dataFormat);
                 try (DBCResultSet resultSet = dbStat.openResultSet()) {
                     if (resultSet == null) {
                         break;
@@ -752,19 +754,20 @@ public class WebSQLProcessor implements WebSessionProvider {
                         dataReceiver.getResultSet().getResultsInfo().setQueryText(resultSet.getSourceStatement().getQueryString());
                     }
                 }
+                resultList.add(results);
             } else {
                 long updateRowCount = dbStat.getUpdateRowCount();
                 if (updateRowCount >= 0) {
-                    results.setUpdateRowCount(updateRowCount);
+                    rowsUpdated += updateRowCount;
                 } else {
                     break;
                 }
             }
-            resultList.add(results);
             hasResultSet = dbStat.nextResults();
         }
         if (resultList.isEmpty()) {
-            resultList.add(new WebSQLQueryResults(webSession, dataFormat));
+            stats.setUpdateRowCount(rowsUpdated);
+            resultList.add(stats);
         }
         executeInfo.setResults(resultList.toArray(new WebSQLQueryResults[0]));
 
