@@ -144,14 +144,18 @@ public class DBWebException extends DBException implements GraphQLError {
     }
 
     private static String makeMessage(String message, Throwable cause) {
-        if (CommonUtils.isEmpty(message)) {
-            if (cause != null) {
-                if (cause.getMessage() != null) {
-                    return cause.getMessage();
-                }
-                return cause.getClass().getName();
+        if (cause == null) {
+            if (CommonUtils.isEmpty(message)) {
+                return "Unknown internal error";
+            } else {
+                return message;
             }
-            return "Unknown internal error";
+        }
+        if (CommonUtils.isEmpty(message)) {
+            if (cause.getMessage() != null) {
+                return cause.getMessage();
+            }
+            return cause.getClass().getName();
         }
         if (CommonUtils.equalObjects(message, cause.getMessage())) {
             return message;
