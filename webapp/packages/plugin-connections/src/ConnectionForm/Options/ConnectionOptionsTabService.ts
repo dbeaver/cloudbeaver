@@ -8,7 +8,7 @@
 import { action, makeObservable, runInAction, toJS } from 'mobx';
 import React from 'react';
 
-import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, EAdminPermission, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
   ConnectionInfoProjectKey,
   createConnectionParam,
@@ -16,13 +16,12 @@ import {
   DatabaseConnection,
   DBDriverResource,
   isJDBCConnection,
-  isLocalConnection,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { isSharedProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { PermissionsService, ServerConfigResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { getUniqueName, isValuesEqual } from '@cloudbeaver/core-utils';
 
@@ -50,7 +49,6 @@ export class ConnectionOptionsTabService extends Bootstrap {
     private readonly localizationService: LocalizationService,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
-    private readonly permissionsService: PermissionsService,
   ) {
     super();
 
@@ -80,7 +78,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     this.connectionFormService.fillConfigTask.addHandler(this.fillConfig.bind(this));
   }
 
-  load(): void { }
+  load(): void {}
 
   isProjectShared(state: IConnectionFormState): boolean {
     if (state.projectId === null) {
@@ -94,14 +92,6 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     return isSharedProject(project);
-  }
-
-  isTemplateAvailable(state: IConnectionFormState): boolean {
-    const isProjectShared = this.isProjectShared(state);
-    const adminPermission = this.permissionsService.has(EAdminPermission.admin);
-    const originLocal = !state.info || isLocalConnection(state.info);
-
-    return adminPermission && originLocal && isProjectShared && !this.serverConfigResource.distributed;
   }
 
   private async save({ state, submitType }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
@@ -286,7 +276,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     tempConfig.description = state.config.description;
 
-    tempConfig.template = this.isTemplateAvailable(state) ? state.config.template : false;
+    tempConfig.template = state.config.template;
 
     tempConfig.driverId = state.config.driverId;
 
