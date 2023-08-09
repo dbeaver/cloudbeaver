@@ -20,23 +20,24 @@
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-events": "~0.1.0",
     "@cloudbeaver/core-executor": "~0.1.0",
-    "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-plugin": "~0.1.0",
+    "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-settings": "~0.1.0",
+    "@fontsource/roboto": "^5.0.8",
     "@material/button": "~4.0.0",
+    "@material/checkbox": "~4.0.0",
     "@material/elevation": "~4.0.0",
     "@material/layout-grid": "~4.0.0",
     "@material/radio": "~4.0.0",
     "@material/ripple": "~4.0.0",
-    "@material/theme": "~4.0.0",
-    "@material/typography": "~4.0.0",
     "@material/switch": "~4.0.0",
-    "@material/checkbox": "~4.0.0"
+    "@material/theme": "~4.0.0",
+    "@material/typography": "~4.0.0"
   },
   "peerDependencies": {
+    "@testing-library/jest-dom": "~5.x.x",
     "mobx": "~6.x.x",
     "react": "~18.x.x",
-    "reshadow": "~0.x.x",
-    "@testing-library/jest-dom": "~5.x.x"
+    "reshadow": "~0.x.x"
   }
 }
