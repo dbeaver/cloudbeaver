@@ -12,7 +12,8 @@
     ]
   },
   "scripts": {
-    "prebuild": "npm run clean-dist",
+    "prebuild": "npm run clean-dist && lerna run gql:gen --stream --parallel",
+    "pretest": "npm run clean-dist && lerna run gql:gen --stream --parallel",
     "clean-dist": "rimraf --glob lib/*"
   },
   "devDependencies": {
