@@ -31,14 +31,17 @@ jobs:
       - name: Run install
         uses: borales/actions-yarn@v4
         with:
+          dir: webapp
           cmd: install
 
       - name: Run lerna bootstrap
         uses: borales/actions-yarn@v4
         with:
+          dir: webapp
           cmd: lerna bootstrap
 
       - name: Run test
         uses: borales/actions-yarn@v4
         with:
+          dir: webapp
           cmd: lerna run test
