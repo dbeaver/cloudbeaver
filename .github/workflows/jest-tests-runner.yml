@@ -63,7 +63,7 @@ jobs:
         uses: borales/actions-yarn@v4
         with:
           dir: webapp
-          cmd: lerna run pretest
+          cmd: yarn run pretest
 
       - name: Run test
         uses: borales/actions-yarn@v4
