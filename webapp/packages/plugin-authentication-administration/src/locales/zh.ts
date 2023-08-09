@@ -14,7 +14,7 @@ export default [
   ['authentication_administration_item', '访问管理'],
   ['authentication_administration_item_users', '用户'],
   ['authentication_administration_item_metaParameters', '元参数'],
-  ['authentication_administration_tools_add_tooltip', '添加新用户'],
+  ['authentication_administration_tools_add_tooltip', 'Create new user'],
   ['authentication_administration_tools_refresh_tooltip', '刷新用户列表'],
   ['authentication_administration_tools_delete_tooltip', '删除选中的用户'],
   ['authentication_administration_tools_refresh_success', '用户列表已刷新'],
