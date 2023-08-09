@@ -63,6 +63,8 @@ const styles = css`
   ConfigurationsList {
     overflow: auto;
     margin-top: 12px;
+    margin-bottom: 12px;
+    max-height: 400px;
   }
   ErrorMessage {
     composes: theme-background-secondary theme-text-on-secondary from global;
