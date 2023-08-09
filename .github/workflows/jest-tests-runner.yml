@@ -4,9 +4,9 @@ name: Run Jest Tests
 on:
   # Triggers the workflow on push or pull request events but only for the "devel" branch
   pull_request:
-    branches: [ "devel" ]
+    branches: ["devel"]
     paths:
-      - 'webapp/**' # monitor for the frontend changes
+      - "webapp/**" # monitor for the frontend changes
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -22,11 +22,23 @@ jobs:
         working-directory: ./webapp
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-     - uses: actions/checkout@v3
-     - uses: actions/setup-node@v3
-       with:
-        node-version: '18'
-     - run: npm install yarn -g
-     - run: yarn
-     - run: yarn lerna bootstrap
-     - run: yarn lerna run test
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Run install
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install
+
+      - name: Run lerna bootstrap
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: lerna bootstrap
+
+      - name: Run test
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: lerna run test
