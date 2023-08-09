@@ -52,7 +52,7 @@ export abstract class ResourceAlias<TKey, TOptions extends ResourceAliasOptions>
   }
 
   isEqual(key: ResourceAlias<TKey, any>): boolean {
-    if (!!this.parent !== !!key.parent) {
+    if (!this.parent !== !key.parent) {
       return false;
     }
 
