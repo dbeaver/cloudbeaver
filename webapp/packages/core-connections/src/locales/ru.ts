@@ -1,6 +1,6 @@
 export default [
-  ['connections_administration_item', 'Подключения'],
-  ['connections_administration_connection_create', 'Создание подключения'],
+  ['connections_administration_item', 'Шаблоны подключений'],
+  ['connections_administration_connection_create', 'Создание шаблона подключения'],
   ['connections_administration_search_database_tip', "Укажите ваши хосты, например 'localhost host1.myhost.com 192.168.0.1' и нажмите Enter"],
   ['connections_administration_new_connection', 'Создание подключения'],
   ['connections_administration_connection_create_error', 'Ошибка при создании подключения'],

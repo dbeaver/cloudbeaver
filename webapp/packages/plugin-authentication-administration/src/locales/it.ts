@@ -12,7 +12,7 @@ export default [
   ['authentication_administration_user_info', 'Info'],
   ['authentication_administration_user_local', 'Local user'],
   ['authentication_administration_item', 'Utenti'],
-  ['authentication_administration_tools_add_tooltip', 'Aggiungi nuovo utente'],
+  ['authentication_administration_tools_add_tooltip', 'Create new user'],
   ['authentication_administration_tools_refresh_tooltip', 'Aggiorna la lista utenti'],
   ['authentication_administration_tools_delete_tooltip', 'Elimina gli utenti selezionati'],
   ['authentication_administration_tools_refresh_success', 'Lista degli utenti ricaricata'],

@@ -15,7 +15,7 @@ export default [
   ['authentication_administration_item', 'Управление доступом'],
   ['authentication_administration_item_users', 'Пользователи'],
   ['authentication_administration_item_metaParameters', 'Свойства Пользователей'],
-  ['authentication_administration_tools_add_tooltip', 'Добавить нового пользователя'],
+  ['authentication_administration_tools_add_tooltip', 'Создать нового пользователя'],
   ['authentication_administration_tools_refresh_tooltip', 'Обновить список пользователей'],
   ['authentication_administration_tools_delete_tooltip', 'Удалить выбранных пользователей'],
   ['authentication_administration_tools_refresh_success', 'Список пользователей обновлен'],
