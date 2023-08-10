@@ -62,6 +62,21 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
           ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES,
         ].includes(action);
       },
+      getActionInfo(context, action) {
+        const grouping = context.get(DATA_CONTEXT_DV_DDM_RS_GROUPING);
+        const isShowDuplicatesOnly = grouping.getShowDuplicatesOnly();
+
+        if (action === ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES && isShowDuplicatesOnly) {
+          return {
+            ...action.info,
+            label: 'plugin-data-viewer-result-set-grouping_action_show_all',
+            tooltip: 'plugin-data-viewer-result-set-grouping_action_show_all',
+            icon: '/icons/plugin_data_viewer_result_set_grouping_show_all_sm.svg',
+          };
+        }
+
+        return action.info;
+      },
       isDisabled(context, action) {
         const grouping = context.get(DATA_CONTEXT_DV_DDM_RS_GROUPING);
         const model = context.get(DATA_CONTEXT_DV_DDM);
@@ -87,8 +102,6 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
               return selectionAction.isElementSelected({ column: key });
             });
           }
-          case ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES:
-            return grouping.getColumns().length === 0;
         }
 
         return false;
@@ -124,6 +137,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
             break;
           case ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES:
             grouping.setShowDuplicatesOnly(!grouping.getShowDuplicatesOnly());
+            break;
         }
       },
     });
