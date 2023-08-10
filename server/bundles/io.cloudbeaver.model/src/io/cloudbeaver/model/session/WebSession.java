@@ -234,6 +234,7 @@ public class WebSession extends BaseWebSession
 
     @Override
     public synchronized void refreshUserData() {
+        super.refreshUserData();
         refreshSessionAuth();
 
         initNavigatorModel();

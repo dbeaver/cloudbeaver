@@ -128,7 +128,7 @@ public class WebUserContext implements SMCredentialsProvider {
         return isSessionChanged;
     }
 
-    public void refreshAccessibleProjects() throws DBException {
+    public synchronized void refreshAccessibleProjects() throws DBException {
         this.accessibleProjectIds.clear();
         this.accessibleProjectIds.addAll(
             Arrays.stream(rmController.listAccessibleProjects()).map(RMProject::getId).collect(Collectors.toSet())

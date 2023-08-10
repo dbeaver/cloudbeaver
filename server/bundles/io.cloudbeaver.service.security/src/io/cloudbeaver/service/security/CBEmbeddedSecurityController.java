@@ -51,6 +51,7 @@ import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
+import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
@@ -214,7 +215,16 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error saving user teams in database", e);
         }
+        var event = WSSubjectPermissionEvent.update(
+            getSmSessionId(),
+            getUserId(),
+            SMSubjectType.user,
+            userId
+        );
+        application.getEventController().addEvent(event);
     }
+
+
 
     @NotNull
     @Override
@@ -588,7 +598,16 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error while updating user authentication role", e);
         }
+        var event = WSSubjectPermissionEvent.update(
+            getSmSessionId(),
+            getUserId(),
+            SMSubjectType.user,
+            userId
+        );
+        application.getEventController().addEvent(event);
     }
+
+
 
     ///////////////////////////////////////////
     // Credentials
@@ -2576,5 +2595,17 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             log.error("Error getting all subject ids from database", e);
             return Set.of();
         }
+    }
+
+    @Nullable
+    private String getSmSessionId() {
+        var credentials = credentialsProvider.getActiveUserCredentials();
+        return credentials == null ? null : credentials.getSmSessionId();
+    }
+
+    @Nullable
+    private String getUserId() {
+        var credentials = credentialsProvider.getActiveUserCredentials();
+        return credentials == null ? null : credentials.getUserId();
     }
 }

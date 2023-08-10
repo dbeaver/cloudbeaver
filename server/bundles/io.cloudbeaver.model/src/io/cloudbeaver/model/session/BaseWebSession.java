@@ -111,6 +111,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     public synchronized void refreshUserData() {
         try {
+            userContext.refreshPermissions();
             userContext.refreshAccessibleProjects();
         } catch (DBException e) {
             addSessionError(e);

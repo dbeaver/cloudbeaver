@@ -25,7 +25,10 @@ enum CBServerEventId {
     cb_rm_resource_deleted,
 
     cb_rm_project_added,
-    cb_rm_project_removed
+    cb_rm_project_removed,
+
+    cb_object_permissions_updated,
+    cb_subject_permissions_updated
 }
 
 # Events sent by client
@@ -43,7 +46,9 @@ enum CBEventTopic {
     cb_datasource,
     cb_datasource_folder,
     cb_scripts,
-    cb_projects
+    cb_projects,
+    cb_object_permissions,
+    cb_subject_permissions
 }
 
 # Base server event interface
@@ -120,6 +125,14 @@ type CBProjectUpdateEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
     projectId: String!
+}
+
+# Subject permission update event
+type CBSubjectPermissionUpdateEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    subjectType: AdminSubjectType!
+    subjectId: String!
 }
 
 # Topic subscription event
