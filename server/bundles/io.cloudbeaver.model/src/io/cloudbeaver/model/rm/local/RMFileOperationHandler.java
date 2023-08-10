@@ -45,4 +45,13 @@ public interface RMFileOperationHandler {
         @NotNull Path filePath,
         @Nullable SMCredentials smCredentials
     ) throws DBException;
+
+    /**
+     * Executed if something goes wrong in file modification
+     */
+    void handleFileChangeException(
+        @NotNull String projectId,
+        @NotNull Path filePath,
+        @NotNull Throwable cause
+    ) throws DBException;
 }
