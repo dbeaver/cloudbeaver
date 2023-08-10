@@ -158,7 +158,6 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
           <fill />
           <IconButton name="cross" viewBox="0 0 16 16" onClick={createConnectionService.cancelCreate} />
         </title-bar>
-        <TabList style={componentStyle} />
         <connection-create-content>
           <TabPanelList style={componentStyle} />
           {createConnectionService.disabled && <Loader overlay />}

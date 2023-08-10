@@ -1,6 +1,6 @@
 export default [
-  ['connections_administration_item', 'Gestione delle connessioni'],
-  ['connections_administration_connection_create', 'Aggiungi Database'],
+  ['connections_administration_item', 'Connection Templates'],
+  ['connections_administration_connection_create', 'Add Database Template'],
   ['connections_administration_search_database_tip', "Digita gli hosts qui, p.e. 'localhost host1.myhost.com 192.168.0.1' e premi Invio"],
   ['connections_administration_new_connection', 'Nuova Connessione'],
   ['connections_administration_connection_create_error', 'Errore di creazione connessione'],
