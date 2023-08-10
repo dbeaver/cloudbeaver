@@ -49,6 +49,7 @@ const buttonStyles = css`
     }
 
     & button-label {
+      line-height: 1;
       opacity: 1;
     }
 
