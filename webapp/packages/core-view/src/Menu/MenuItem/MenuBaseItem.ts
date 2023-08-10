@@ -22,11 +22,12 @@ export class MenuBaseItem<TExtraProps = unknown> extends MenuItem implements IMe
   readonly icon?: string;
   readonly tooltip?: string;
   readonly hidden?: boolean;
+  readonly _disabled?: boolean;
   readonly iconComponent?: () => MenuBaseItemIconComponent<TExtraProps>;
   readonly getExtraProps?: () => TExtraProps;
 
   get disabled(): boolean {
-    return this.isDisabled?.() ?? false;
+    return this.isDisabled?.() ?? this._disabled ?? false;
   }
 
   constructor(options: IMenuBaseItemOptions<TExtraProps>, events?: IMenuItemEvents, getters?: IMenuBaseItemPropertyGetters<TExtraProps>) {
@@ -34,6 +35,7 @@ export class MenuBaseItem<TExtraProps = unknown> extends MenuItem implements IMe
     this.label = options.label;
     this.icon = options.icon;
     this.tooltip = options.tooltip;
+    this._disabled = options.disabled;
     this.isDisabled = getters?.isDisabled;
     this.iconComponent = getters?.iconComponent;
     this.getExtraProps = getters?.getExtraProps;
