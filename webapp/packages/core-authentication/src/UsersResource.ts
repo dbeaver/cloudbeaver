@@ -16,6 +16,7 @@ import {
   CachedMapAllKey,
   CachedMapResource,
   CachedResourcePageKey,
+  CachedResourcePageListKey,
   GetUsersListQueryVariables,
   GraphQLService,
   isResourceAlias,
@@ -287,7 +288,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
         usersList.push(...users);
 
-        this.setPageEnd(CachedResourcePageKey(offset, users.length).setTarget(filterKey), users.length === limit);
+        this.setPageEnd(CachedResourcePageListKey(offset, users.length).setTarget(filterKey), users.length === limit);
       }
     });
 
