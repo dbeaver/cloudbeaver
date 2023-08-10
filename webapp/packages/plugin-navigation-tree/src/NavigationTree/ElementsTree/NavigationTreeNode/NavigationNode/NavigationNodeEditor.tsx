@@ -33,6 +33,8 @@ interface Props {
 
 export const NavigationNodeEditor = observer<Props>(function NavigationNodeEditor({ name: initialName, disabled, onSave, onClose }) {
   const [name, setName] = useState(initialName);
+  const isNameChanged = initialName !== name;
+  const isDisabledSave = disabled || !isNameChanged;
 
   function save() {
     onSave(name);
@@ -46,6 +48,7 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
     <InlineEditor
       value={name}
       disabled={disabled}
+      disableSave={isDisabledSave}
       controlsPosition="inside"
       style={styles}
       simple
