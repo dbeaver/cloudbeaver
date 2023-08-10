@@ -156,7 +156,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const isURLConfiguration = config.configurationType === DriverConfigurationType.Url;
   const edit = state.mode === 'edit';
   const originLocal = !info || isLocalConnection(info);
-  const templateAvailable = connectionOptionsTabService.isTemplateAvailable(state);
 
   const availableAuthModels = applicableAuthModels.filter(model => !!model && (adminPermission || !model.requiresLocalConfiguration));
   const drivers = driverMap.resource.enabledDrivers.filter(({ id }) => availableDrivers.includes(id));
@@ -256,13 +255,15 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               <InputField type="text" name="name" minLength={1} state={config} disabled={disabled} readOnly={readonly} mod="surface" required fill>
                 {translate('connections_connection_name')}
               </InputField>
-              <ProjectSelect
-                value={state.projectId}
-                readOnly={readonly || edit}
-                disabled={disabled}
-                autoHide
-                onChange={projectId => state.setProject(projectId)}
-              />
+              {!config.template && (
+                <ProjectSelect
+                  value={state.projectId}
+                  readOnly={readonly || edit}
+                  disabled={disabled}
+                  autoHide
+                  onChange={projectId => state.setProject(projectId)}
+                />
+              )}
               {!config.template && (
                 <InputField
                   type="text"
@@ -280,18 +281,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 </InputField>
               )}
             </Container>
-            {templateAvailable && (
-              <FieldCheckbox
-                id={config.connectionId}
-                name="template"
-                state={config}
-                disabled={edit || disabled}
-                readOnly={readonly}
-                // autoHide // maybe better to use autoHide
-              >
-                {translate('connections_connection_template')}
-              </FieldCheckbox>
-            )}
             <Textarea name="description" rows={3} state={config} disabled={disabled} readOnly={readonly}>
               {translate('connections_connection_description')}
             </Textarea>
