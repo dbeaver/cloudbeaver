@@ -1,0 +1,6 @@
+.box {
+  flex: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}

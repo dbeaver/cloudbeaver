@@ -15,25 +15,72 @@ export type ResourceAliasOptions = Readonly<Record<ResourceAliasOptionsKey, Reso
 export abstract class ResourceAlias<TKey, TOptions extends ResourceAliasOptions> {
   readonly id: string;
   readonly options: TOptions;
+  target: any;
+  parent?: ResourceAlias<TKey, any>;
   private readonly typescriptHack: TKey;
   abstract readonly name: string;
 
-  constructor(id: string, options: TOptions) {
+  constructor(id: string, options: TOptions, parent?: ResourceAlias<TKey, any>) {
     this.typescriptHack = null as any;
     this.id = id;
     this.options = options;
+    this.parent = parent;
+  }
+
+  find<TOptions extends ResourceAliasOptions = any>(
+    key: ResourceAlias<TKey, TOptions> | ResourceAliasFactory<TKey, TOptions>,
+  ): ResourceAlias<TKey, TOptions> | undefined {
+    if (this.id === key.id) {
+      return this as any;
+    }
+
+    if (this.parent) {
+      return this.parent.find(key);
+    }
+
+    return undefined;
+  }
+
+  setTarget(target: any): this {
+    this.target = target;
+    return this;
+  }
+
+  setParent(parent: ResourceAlias<TKey, any>): this {
+    const copy = new (this.constructor as any)(this.id, this.options, parent) as this;
+    return copy.setTarget(this.target);
   }
 
   isEqual(key: ResourceAlias<TKey, any>): boolean {
-    if (isResourceAlias(key)) {
-      return key.id === this.id && isObjectsEqual(this.options, key.options);
+    if (!this.parent !== !key.parent) {
+      return false;
     }
 
-    return true;
+    if (this.parent && !this.parent.isEqual(key.parent!)) {
+      return false;
+    }
+
+    return key.id === this.id && isObjectsEqual(this.options, key.options);
   }
 
   toString(): string {
-    return `${this.name}(${this.id})(${JSON.stringify(this.options)})`;
+    return `${this.getKeyPrefix()}(${JSON.stringify(this.options)})`;
+  }
+
+  isKeyOfAlias(key: string): boolean {
+    return key.startsWith(this.getKeyPrefix());
+  }
+
+  [Symbol.toPrimitive](): string {
+    return this.toString();
+  }
+
+  private get [Symbol.toStringTag]() {
+    return this.toString();
+  }
+
+  private getKeyPrefix(): string {
+    return `${this.name}(${this.id})`;
   }
 }
 const key = Symbol('key');
@@ -42,6 +89,8 @@ export interface ResourceAliasFactory<TKey, TOptions extends ResourceAliasOption
   readonly id: string;
   readonly [key]: TKey;
   readonly [options]: TOptions;
+
+  isKeyOfAlias(key: string): boolean;
 }
 
 export function isResourceAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(data: any): data is ResourceAlias<TKey, TOptions>;
