@@ -61,22 +61,24 @@ export const DVGroupingColumnEditorDialog = observer<DialogComponentProps<Payloa
         onReject={rejectDialog}
       />
       <CommonDialogBody>
-        <Group box medium gap>
-          <GroupingColumnEditorTable
-            title={translate('plugin-data-viewer-result-set-grouping_grouping_columns')}
-            placeholder={translate('plugin-data-viewer-result-set-grouping_grouping_columns_placeholder')}
-            columns={columns}
-            onAdd={addColumnHandler}
-            onDelete={deleteColumnHandler}
-          />
-          <GroupingColumnEditorTable
-            title={translate('plugin-data-viewer-result-set-grouping_grouping_functions')}
-            placeholder={translate('plugin-data-viewer-result-set-grouping_grouping_functions_placeholder')}
-            columns={functions}
-            onAdd={addFunctionHandler}
-            onDelete={deleteFunctionHandler}
-          />
-        </Group>
+        <Container>
+          <Group box medium gap>
+            <GroupingColumnEditorTable
+              title={translate('plugin-data-viewer-result-set-grouping_grouping_columns')}
+              placeholder={translate('plugin-data-viewer-result-set-grouping_grouping_columns_placeholder')}
+              columns={columns}
+              onAdd={addColumnHandler}
+              onDelete={deleteColumnHandler}
+            />
+            <GroupingColumnEditorTable
+              title={translate('plugin-data-viewer-result-set-grouping_grouping_functions')}
+              placeholder={translate('plugin-data-viewer-result-set-grouping_grouping_functions_placeholder')}
+              columns={functions}
+              onAdd={addFunctionHandler}
+              onDelete={deleteFunctionHandler}
+            />
+          </Group>
+        </Container>
       </CommonDialogBody>
       <CommonDialogFooter>
         <div className={s(style, { footerContainer: true })}>
