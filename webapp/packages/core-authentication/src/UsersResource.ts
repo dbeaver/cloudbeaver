@@ -221,18 +221,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     });
   }
 
-  async loadAll(): Promise<Map<string, AdminUser>> {
-    this.resetIncludes();
-    await this.load(CachedMapAllKey);
-    return this.data;
-  }
-
-  async refreshAll(): Promise<Map<string, AdminUser>> {
-    this.resetIncludes();
-    await this.refresh(CachedMapAllKey);
-    return this.data;
-  }
-
   isActiveUser(userId: string): boolean {
     return this.authInfoService.userInfo?.userId === userId;
   }

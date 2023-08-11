@@ -1,44 +1,45 @@
 fragment AuthProviderInfo on AuthProviderInfo {
+  id
+  label
+  icon
+  description
+  defaultProvider
+  trusted
+  private
+  supportProvisioning
+
+  #configurationParameters {
+  #  id
+  #  displayName
+  #  description
+  #  category
+  #  dataType
+  #  value
+  #  validValues
+  #  defaultValue
+  #  features
+  #}
+
+  configurable
+  configurations {
+    ...AuthProviderConfigurationInfo
+  }
+
+  credentialProfiles {
     id
     label
-    icon
     description
-    defaultProvider
-    trusted
-    private
 
-    #configurationParameters {
-    #  id
-    #  displayName
-    #  description
-    #  category
-    #  dataType
-    #  value
-    #  validValues
-    #  defaultValue
-    #  features
-    #}
-
-    configurable
-    configurations {
-      ...AuthProviderConfigurationInfo
-    }
-
-    credentialProfiles {
+    credentialParameters {
       id
-      label
+      displayName
       description
-
-      credentialParameters {
-        id
-        displayName
-        description
-        admin
-        user
-        identifying
-        possibleValues
-        encryption
-      }
+      admin
+      user
+      identifying
+      possibleValues
+      encryption
     }
-    requiredFeatures
+  }
+  requiredFeatures
 }
