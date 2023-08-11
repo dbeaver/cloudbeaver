@@ -24,10 +24,30 @@ import { isPrimitive, MetadataMap, uuid } from '@cloudbeaver/core-utils';
 import { isResourceAlias, ResourceAlias, ResourceAliasFactory, ResourceAliasOptions } from './ResourceAlias';
 import { ResourceError } from './ResourceError';
 import type { ResourceKey, ResourceKeyFlat } from './ResourceKey';
-import { resourceKeyAlias, ResourceKeyAlias } from './ResourceKeyAlias';
+import { resourceKeyAlias, ResourceKeyAlias, resourceKeyAliasFactory } from './ResourceKeyAlias';
 import { isResourceKeyList, ResourceKeyList } from './ResourceKeyList';
-import type { ResourceKeyListAlias } from './ResourceKeyListAlias';
+import { type ResourceKeyListAlias, resourceKeyListAliasFactory } from './ResourceKeyListAlias';
 import { ResourceKeyUtils } from './ResourceKeyUtils';
+
+interface IPageInfo {
+  offset: number;
+  limit: number;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface ICachedResourcePageOptions extends IPageInfo {}
+
+interface IResourcePage {
+  from: number;
+  to: number;
+  outdated: boolean;
+}
+
+export interface ICachedResourcePage {
+  totalCount?: number;
+  end?: number;
+  pages: IResourcePage[];
+}
 
 export interface ICachedResourceMetadata {
   loaded: boolean;
@@ -37,6 +57,7 @@ export interface ICachedResourceMetadata {
   exception: Error | null;
   /** List of generated id's added each time resource is used and removed on release */
   dependencies: string[];
+  page?: ICachedResourcePage;
 }
 
 export interface IUseData<TKey> {
@@ -61,7 +82,23 @@ export type CachedResourceKey<TResource> = TResource extends CachedResource<any,
 export type CachedResourceContext<TResource> = TResource extends CachedResource<any, any, any, infer T, any> ? T : void;
 export type CachedResourceMetadata<TResource> = TResource extends CachedResource<any, any, any, any, infer T> ? T : void;
 
+export const CACHED_RESOURCE_DEFAULT_PAGE_OFFSET = 0;
+export const CACHED_RESOURCE_DEFAULT_PAGE_LIMIT = 100;
 export const CachedResourceParamKey = resourceKeyAlias('@cached-resource/param-default');
+export const CachedResourcePageListKey = resourceKeyListAliasFactory<any, [offset: number, limit: number], Readonly<ICachedResourcePageOptions>>(
+  '@cached-resource/page',
+  (offset: number, limit: number) => ({
+    offset,
+    limit,
+  }),
+);
+export const CachedResourcePageKey = resourceKeyAliasFactory<any, [offset: number, limit: number], Readonly<ICachedResourcePageOptions>>(
+  '@cached-resource/page',
+  (offset: number, limit: number) => ({
+    offset,
+    limit,
+  }),
+);
 
 /**
  * CachedResource is a base class for all resources. It is used to load, cache and manage data from external sources.
@@ -128,6 +165,8 @@ export abstract class CachedResource<
 
     this.onUse.setInitialDataGetter(this.getInitialOnUseData.bind(this));
     this.addAlias(CachedResourceParamKey, () => defaultKey);
+    this.addAlias(CachedResourcePageKey, key => key.target);
+    this.addAlias(CachedResourcePageListKey, key => key.target);
 
     if (this.logActivity) {
       // this.spy(this.beforeLoad, 'beforeLoad');
@@ -391,6 +430,15 @@ export abstract class CachedResource<
       return false;
     }
 
+    const pageKey = this.isAlias(param, CachedResourcePageKey) || this.isAlias(param, CachedResourcePageListKey);
+    if (pageKey) {
+      const pageInfo = this.getPageInfo(pageKey);
+
+      if (!pageInfo || !isPageInRange(pageInfo, pageKey.options)) {
+        return false;
+      }
+    }
+
     return this.everyMetadata(param, metadata => metadata.loaded) && (!includes || this.isIncludes(param, includes));
   }
 
@@ -409,18 +457,21 @@ export abstract class CachedResource<
     return this.paramAliases.some(alias => alias.id === key.id);
   }
 
-  isAlias<TOptions extends ResourceAliasOptions = any>(
+  isAlias<TOptions extends ResourceAliasOptions>(
     key: ResourceKey<TKey>,
     aliasToCompare?: ResourceAlias<TKey, TOptions> | ResourceAliasFactory<TKey, TOptions>,
-  ): key is ResourceKeyAlias<TKey, TOptions> | ResourceKeyListAlias<TKey, TOptions> {
+  ): ResourceAlias<TKey, TOptions> | undefined {
     if (isResourceAlias(key)) {
       key = this.transformToAlias(key);
       if (this.hasAlias(key)) {
-        return aliasToCompare === undefined || aliasToCompare.id === key.id;
+        if (aliasToCompare === undefined) {
+          return key as ResourceAlias<TKey, TOptions>;
+        }
+        return key.find(aliasToCompare);
       }
       throw new Error(`Alias ${key.toString()} is not registered in ${this.getName()}`);
     }
-    return false;
+    return undefined;
   }
 
   /**
@@ -446,6 +497,31 @@ export abstract class CachedResource<
    */
   isIncludes(key: ResourceKey<TKey>, includes: TInclude): boolean {
     return this.everyMetadata(key, metadata => includes.every(include => metadata.includes.includes(include)));
+  }
+
+  getPageInfo(key: ResourceAlias<TKey, Readonly<ICachedResourcePageOptions>>): ICachedResourcePage | undefined {
+    if (!this.hasMetadata(key as TKey)) {
+      return undefined;
+    }
+
+    const page = this.getMetadata(key as TKey).page;
+
+    if (!page || !isPageInRange(page, key.options)) {
+      return undefined;
+    }
+
+    return page;
+  }
+
+  hasNextPage(key: ResourceAlias<TKey, Readonly<ICachedResourcePageOptions>>): boolean {
+    const pageInfo = this.getPageInfo(key);
+    const to = key.options.offset + key.options.limit;
+
+    if (!pageInfo) {
+      return false;
+    }
+
+    return pageInfo.end === undefined || to < pageInfo.end;
   }
 
   hasMetadata(key: ResourceKey<TKey>): boolean {
@@ -569,7 +645,42 @@ export abstract class CachedResource<
       param = CachedResourceParamKey;
     }
 
+    const pageKey = this.isAlias(param, CachedResourcePageKey) || this.isAlias(param, CachedResourcePageListKey);
+    if (pageKey) {
+      const pageInfo = this.getPageInfo(pageKey);
+
+      if (isPageOutdated(pageInfo?.pages || [], pageKey.options)) {
+        return true;
+      }
+    }
+
     return this.someMetadata(param, metadata => !metadata.loaded || metadata.outdated);
+  }
+
+  protected setPageEnd(key: ResourceAlias<TKey, Readonly<ICachedResourcePageOptions>>, hasNextPage: boolean): void {
+    const count = key.options.offset + key.options.limit;
+
+    this.updateMetadata(key as TKey, metadata => {
+      let end = metadata.page?.end;
+
+      if (hasNextPage) {
+        if (end !== undefined && end <= count) {
+          end = undefined;
+        }
+      } else {
+        end = count;
+      }
+
+      metadata.page = observable({
+        pages: [],
+        ...metadata.page,
+        end,
+      });
+
+      if (!hasNextPage) {
+        metadata.page.pages = limitPages(metadata.page?.pages || [], count);
+      }
+    });
   }
 
   markLoading(param: ResourceKey<TKey>, state: boolean, context?: TInclude): void {
@@ -579,12 +690,23 @@ export abstract class CachedResource<
   }
 
   markLoaded(param: ResourceKey<TKey>, includes?: TInclude): void {
+    const pageKey = this.isAlias(param, CachedResourcePageKey) || this.isAlias(param, CachedResourcePageListKey);
+
     this.updateMetadata(param, metadata => {
       metadata.loaded = true;
+
+      if (pageKey) {
+        metadata.page = observable({
+          ...metadata.page,
+          pages: expandRange(metadata.page?.pages || [], pageKey.options, false),
+        });
+      }
+
       if (includes) {
         this.commitIncludes(metadata, includes);
       }
     });
+
     if (isResourceAlias(param)) {
       param = this.transformToKey(param);
 
@@ -599,9 +721,21 @@ export abstract class CachedResource<
 
   markError(exception: Error, key: ResourceKey<TKey>, include?: TInclude): ResourceError {
     exception = new ResourceError(this, key, include, exception.message, { cause: exception });
+    const pageKey = this.isAlias(key, CachedResourcePageKey) || this.isAlias(key, CachedResourcePageListKey);
     this.updateMetadata(key, metadata => {
       metadata.exception = exception;
       metadata.outdated = false;
+
+      if (pageKey) {
+        metadata.page = observable({
+          ...metadata.page,
+          pages: expandRange(metadata.page?.pages || [], pageKey.options, false),
+        });
+      } else {
+        metadata.page?.pages.forEach(page => {
+          page.outdated = false;
+        });
+      }
     });
     if (isResourceAlias(key)) {
       key = this.transformToAlias(key);
@@ -639,10 +773,26 @@ export abstract class CachedResource<
     if (param === undefined) {
       param = CachedResourceParamKey;
     }
+    const pageKey = this.isAlias(param, CachedResourcePageKey) || this.isAlias(param, CachedResourcePageListKey);
 
     this.updateMetadata(param, metadata => {
       metadata.outdated = false;
+
+      if (pageKey) {
+        metadata.page = observable({
+          ...metadata.page,
+          pages: expandRange(metadata.page?.pages || [], pageKey.options, false),
+        });
+      }
     });
+
+    if (isResourceAlias(param)) {
+      param = this.transformToKey(param);
+
+      this.updateMetadata(param, metadata => {
+        metadata.outdated = false;
+      });
+    }
   }
 
   /**
@@ -766,7 +916,8 @@ export abstract class CachedResource<
     if (isResourceAlias(key) && isResourceAlias(nextKey)) {
       key = this.transformToAlias(key);
       nextKey = this.transformToAlias(nextKey);
-      return key.isEqual(nextKey);
+
+      return key.isEqual(nextKey) && this.isIntersect(key.target, nextKey.target);
     } else if (isResourceAlias(key) || isResourceAlias(nextKey)) {
       return true;
     }
@@ -793,14 +944,20 @@ export abstract class CachedResource<
    */
   protected getMetadataKeyRef(key: ResourceKeyFlat<TKey>): TKey {
     if (isResourceAlias(key)) {
-      return this.transformToAlias(key).toString() as TKey;
+      key = this.transformToAlias(key);
+
+      if (key.target) {
+        return this.getMetadataKeyRef(key.target);
+      }
+
+      return key.toString() as TKey;
     }
 
     if (isPrimitive(key)) {
       return key;
     }
 
-    const ref = Array.from(this.metadata.keys()).find(k => this.isKeyEqual(k, key));
+    const ref = Array.from(this.metadata.keys()).find(k => this.isKeyEqual(k, key as TKey));
 
     if (ref) {
       return ref;
@@ -871,7 +1028,7 @@ export abstract class CachedResource<
           const data = this.captureGetAlias(alias, key);
 
           if (isResourceAlias(data)) {
-            key = data;
+            key = data.setParent(key);
           } else {
             return key;
           }
@@ -945,12 +1102,33 @@ export abstract class CachedResource<
     // if (!this.hasMetadata(key)) {
     //   return;
     // }
+    const pageKey = this.isAlias(key, CachedResourcePageKey) || this.isAlias(key, CachedResourcePageListKey);
     this.updateMetadata(key, metadata => {
       metadata.outdated = true;
+
+      if (pageKey) {
+        metadata.page = observable({
+          ...metadata.page,
+          pages: expandRange(metadata.page?.pages || [], pageKey.options, true),
+        });
+      } else {
+        metadata.page?.pages.forEach(page => {
+          page.outdated = true;
+        });
+      }
     });
+
     if (isResourceAlias(key)) {
-      key = this.transformToAlias(key);
+      key = this.transformToKey(key);
+
+      this.updateMetadata(key, metadata => {
+        metadata.outdated = true;
+        metadata.page?.pages.forEach(page => {
+          page.outdated = true;
+        });
+      });
     }
+
     this.onDataOutdated.execute(key);
   }
 
@@ -1204,4 +1382,107 @@ export abstract class CachedResource<
   private spy(executor: ISyncExecutor<any>, action: string): void {
     executor.addHandler(this.logName(action)).addPostHandler(this.logInterrupted(action));
   }
+}
+
+export function getNextPageOffset(info: ICachedResourcePage): number {
+  let lastPage: IResourcePage | undefined = undefined;
+
+  for (const page of info.pages) {
+    if (!lastPage) {
+      lastPage = page;
+      continue;
+    }
+    if (page.from !== lastPage.to) {
+      break;
+    }
+    lastPage = page;
+  }
+
+  return lastPage?.to ?? CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
+}
+
+function isPageOutdated(pages: IResourcePage[], info: IPageInfo): boolean {
+  for (const { from, to, outdated } of pages) {
+    if (outdated && info.offset >= from && info.offset + info.limit <= to) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isPageInRange({ pages, end }: ICachedResourcePage, info: IPageInfo): boolean {
+  const infoTo = info.offset + info.limit;
+  let meetFrom = false;
+  let meetTo = false;
+  let lastIndex = -1;
+
+  for (const { from, to } of pages) {
+    if (lastIndex === -1) {
+      lastIndex = from;
+    }
+    if (from !== lastIndex) {
+      return false;
+    }
+    lastIndex = to;
+    if (info.offset >= from) {
+      meetFrom = true;
+    }
+    if (infoTo <= to || (end !== undefined && end <= infoTo)) {
+      meetTo = true;
+    }
+    if (meetFrom && meetTo) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function limitPages(pages: IResourcePage[], limit: number): IResourcePage[] {
+  const result: IResourcePage[] = [];
+
+  for (const page of pages) {
+    if (page.from >= limit) {
+      break;
+    }
+    result.push({ ...page, to: Math.min(limit, page.to) });
+  }
+
+  return result;
+}
+
+function expandRange(pages: IResourcePage[], info: IPageInfo, outdated: boolean): IResourcePage[] {
+  pages = [...pages, { from: info.offset, to: info.offset + info.limit, outdated, end: false }].sort((a, b) => a.from - b.from);
+  const result: IResourcePage[] = [];
+  let previous: IResourcePage | undefined;
+
+  for (const { from, to, outdated } of pages) {
+    if (!previous) {
+      previous = { from, to, outdated };
+      continue;
+    }
+
+    if (from <= previous.from + previous.to) {
+      if (previous.outdated === outdated) {
+        previous.to = Math.max(previous.to, to);
+      } else {
+        if (previous.from < from) {
+          result.push({ ...previous, to: from });
+        }
+        if (previous.to > to) {
+          result.push({ from, to, outdated });
+          previous = { ...previous, from: to };
+        } else {
+          previous = { from, to, outdated };
+        }
+      }
+    } else {
+      result.push(previous);
+      previous = { from, to, outdated };
+    }
+  }
+
+  if (previous) {
+    result.push(previous);
+  }
+  return result;
 }

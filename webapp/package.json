@@ -12,7 +12,8 @@
     ]
   },
   "scripts": {
-    "prebuild": "npm run clean-dist",
+    "prebuild": "npm run clean-dist && lerna run gql:gen --stream --parallel",
+    "pretest": "npm run clean-dist && lerna run gql:gen --stream --parallel",
     "clean-dist": "rimraf --glob lib/*"
   },
   "devDependencies": {
@@ -22,6 +23,7 @@
     "@types/jest": "^29.5.2",
     "@types/react": "~18.0.28",
     "@types/react-dom": "~18.2.4",
+    "concurrently": "^8.2.0",
     "lerna": "5.5.4",
     "mobx": "~6.8.0",
     "mobx-react-lite": "~3.4.3",

@@ -8,24 +8,31 @@
 import { makeObservable, observable } from 'mobx';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
+import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
 
 import { UsersAdministrationNavigationService } from '../UsersAdministrationNavigationService';
 
+export interface IToolsContainerProps {
+  param: string | null | undefined;
+}
+
 @injectable()
 export class CreateUserService {
-  user: AdminUserInfo | null = null;
+  user: AdminUserInfo | null;
+  readonly toolsContainer: PlaceholderContainer<IToolsContainerProps>;
 
   constructor(
     private readonly usersAdministrationNavigationService: UsersAdministrationNavigationService,
     private readonly usersResource: UsersResource,
   ) {
+    this.toolsContainer = new PlaceholderContainer();
+    this.user = null;
+
     makeObservable(this, {
       user: observable,
     });
-
-    this.user = null;
 
     this.clearUserTemplate = this.clearUserTemplate.bind(this);
     this.cancelCreate = this.cancelCreate.bind(this);

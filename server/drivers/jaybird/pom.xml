@@ -18,7 +18,7 @@
         <dependency>
             <groupId>org.firebirdsql.jdbc</groupId>
             <artifactId>jaybird</artifactId>
-            <version>4.0.0.java8</version>
+            <version>5.0.2.java11</version>
         </dependency>
     </dependencies>
 

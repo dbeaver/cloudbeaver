@@ -37,8 +37,9 @@ export function isResourceKeyAlias<TKey = any, TOptions extends ResourceAliasOpt
 export function resourceKeyAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(
   id: string,
   options?: TOptions,
+  parent?: ResourceAlias<TKey, any>,
 ): ResourceKeyAlias<TKey, TOptions> {
-  return new ResourceKeyAlias(id, options!);
+  return new ResourceKeyAlias(id, options!, parent);
 }
 
 export interface ResourceKeyAliasFactory<TKey, TArgs extends any[], TOptions extends ResourceAliasOptions>
@@ -54,5 +55,6 @@ export function resourceKeyAliasFactory<TKey = any, TArgs extends any[] = any[],
     return resourceKeyAlias(id, optionsGetter(...args));
   }
   Object.defineProperty(factory, 'id', { value: id, writable: false });
+  Object.defineProperty(factory, 'isKeyOfAlias', { value: (key: string) => key.startsWith(`${ResourceKeyAlias.name}(${id})`), writable: false });
   return factory as ResourceKeyAliasFactory<TKey, TArgs, TOptions>;
 }
