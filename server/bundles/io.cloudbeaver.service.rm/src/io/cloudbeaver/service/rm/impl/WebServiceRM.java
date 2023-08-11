@@ -247,7 +247,7 @@ public class WebServiceRM implements DBWServiceRM {
     ) throws DBWebException {
         try {
             RMProject rmProject = getResourceController(session).createProject(name, description);
-            session.createWebProject(rmProject);
+            session.addSessionProject(rmProject.getId());
             WebAppUtils.getWebApplication().getEventController().addEvent(
                 WSProjectUpdateEvent.create(session.getSessionId(), session.getUserId(), rmProject.getId())
             );
@@ -260,9 +260,8 @@ public class WebServiceRM implements DBWServiceRM {
     @Override
     public boolean deleteProject(@NotNull WebSession session, @NotNull String projectId) throws DBWebException {
         try {
-            var project = session.getProjectById(projectId);
             getResourceController(session).deleteProject(projectId);
-            session.deleteSessionProject(project);
+            session.removeSessionProject(projectId);
             WebAppUtils.getWebApplication().getEventController().addEvent(
                 WSProjectUpdateEvent.delete(session.getSessionId(), session.getUserId(), projectId)
             );
