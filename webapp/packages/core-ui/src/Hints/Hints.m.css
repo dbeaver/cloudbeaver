@@ -1,0 +1,52 @@
+.menuItem {
+  composes: theme-ripple from global;
+}
+
+.menu {
+  composes: theme-text-on-surface theme-background-surface theme-typography--caption theme-elevation-z3 theme-border-color-background from global;
+  display: flex;
+  flex-direction: column;
+  max-height: 300px;
+  overflow: auto;
+  outline: none;
+  z-index: 999;
+  border: 1px solid;
+
+  & .menuItem {
+    background: transparent;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 4px 8px;
+    text-align: left;
+    outline: none;
+    color: inherit;
+    cursor: pointer;
+    gap: 8px;
+
+    & .itemIcon,
+    & .itemTitle {
+      position: relative;
+    }
+
+    & .itemIcon {
+      width: 16px;
+      height: 16px;
+      overflow: hidden;
+      flex-shrink: 0;
+
+      & .iconOrImage {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+}
+
+.menuButton {
+  position: absolute;
+  right: 0;
+  padding: 0;
+  height: 100%;
+  width: 0px;
+}

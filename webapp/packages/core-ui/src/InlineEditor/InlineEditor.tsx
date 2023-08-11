@@ -14,6 +14,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { Hints } from '../Hints/Hints';
+import type { HintsState } from '../Hints/useHints';
 import { EditorDialog } from './EditorDialog';
 import { InlineEditorStyles } from './styles';
 
@@ -31,6 +33,7 @@ export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLIn
   active?: boolean;
   loading?: boolean;
   style?: ComponentStyle;
+  hintsState?: HintsState;
   onChange: (value: string) => void;
   onSave?: () => void;
   onReject?: () => void;
@@ -55,6 +58,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
       loading,
       disabled,
       style,
+      hintsState,
       onChange,
       onSave,
       onUndo,
@@ -74,10 +78,18 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
       disableSave,
     });
 
+    const inputRef = useRef<HTMLInputElement>(null);
+    if (hintsState) {
+      hintsState.inputRef = inputRef;
+    }
+
     const commonDialogService = useService(CommonDialogService);
 
     const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
       props.onChange(event.target.value);
+      if (hintsState) {
+        hintsState.updateInputValue(event.target.value);
+      }
     }, []);
 
     const handlePopup = useCallback(async () => {
@@ -100,10 +112,31 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
         case 'Escape':
           props.onReject?.();
           break;
+        case 'ArrowDown':
+          hintsState?.menuRef.current?.focus();
+          break;
       }
     }, []);
 
-    const inputRef = useRef<HTMLInputElement>(null);
+    const handleClick = useCallback(() => {
+      hintsState?.toggleHints();
+    }, [hintsState]);
+
+    const handleBlur = useCallback(() => {
+      if (hintsState) {
+        hintsState.changed = false;
+      }
+    }, [hintsState]);
+
+    const onHintSelect = useCallback(
+      (value: any) => {
+        if (hintsState) {
+          const changedValue = hintsState.getChangedValue(value);
+          props.onChange(changedValue);
+        }
+      },
+      [hintsState],
+    );
 
     useEffect(() => {
       if (autofocus && !disabled) {
@@ -124,8 +157,11 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
             disabled={disabled}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
+            onClick={handleClick}
+            onBlur={handleBlur}
             {...rest}
           />
+          {hintsState && <Hints ref={hintsState.menuRef} menu={hintsState.menu} hints={hintsState.filteredHints} onSelect={onHintSelect} />}
         </editor-container>
         <editor-actions as="div" {...use({ position: controlsPosition })} onMouseDown={e => e.preventDefault()}>
           {!hideSave && (
