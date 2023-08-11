@@ -56,5 +56,6 @@ export function resourceKeyListAliasFactory<TKey = any, TArgs extends any[] = an
     return resourceKeyListAlias(id, optionsGetter(...args));
   }
   Object.defineProperty(factory, 'id', { value: id, writable: false });
+  Object.defineProperty(factory, 'isKeyOfAlias', { value: (key: string) => key.startsWith(`${ResourceKeyListAlias.name}(${id})`), writable: false });
   return factory as ResourceKeyListAliasFactory<TKey, TArgs, TOptions>;
 }

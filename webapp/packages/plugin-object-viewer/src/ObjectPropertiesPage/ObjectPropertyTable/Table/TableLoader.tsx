@@ -6,18 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { ComplexLoader, createComplexLoader } from '@cloudbeaver/core-blocks';
-import type { DBObject } from '@cloudbeaver/core-navigation-tree';
+
+import type { TableProps } from './Table';
 
 const loader = createComplexLoader(async function loader() {
   const { Table } = await import('./Table');
   return { Table };
 });
 
-interface Props {
-  objects: DBObject[];
-  truncated?: boolean;
-}
-
-export const TableLoader: React.FC<Props> = function TableLoader(props) {
+export const TableLoader: React.FC<TableProps> = function TableLoader(props) {
   return <ComplexLoader loader={loader}>{({ Table }) => <Table {...props} />}</ComplexLoader>;
 };

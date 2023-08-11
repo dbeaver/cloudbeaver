@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import {
@@ -15,15 +15,11 @@ import {
   EventTreeNodeSelectFlag,
   FolderExplorer,
   FolderExplorerPath,
-  Loader,
   PlaceholderElement,
   Translate,
   TREE_NODE_STYLES,
   TreeNodeNested,
   TreeNodeNestedMessage,
-  useFolderExplorer,
-  useObjectRef,
-  useResource,
   useStyles,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -106,7 +102,6 @@ const styles = css`
 
 export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWithChildren {
   root?: string;
-  limit?: number;
   selectionTree?: boolean;
   control?: NavTreeControlComponent;
   emptyPlaceholder?: React.FC;
@@ -121,7 +116,6 @@ export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWith
 
 export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   root: baseRoot = ROOT_NODE_PATH,
-  limit,
   control,
   settings,
   disabled,
@@ -156,7 +150,7 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
 
   const root = folderExplorer.state.folder;
 
-  const limitFilter = useMemo(() => elementsTreeLimitFilter(navTreeResource, limit), [navTreeResource, limit]);
+  const limitFilter = useMemo(() => elementsTreeLimitFilter(navTreeResource), [navTreeResource]);
 
   const nameFilter = useMemo(
     () => elementsTreeNameFilter(navTreeResource, navNodeInfoResource, navNodeFilterCompare),

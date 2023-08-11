@@ -7,6 +7,7 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { AdministrationViewService } from './Administration/AdministrationViewService';
 import { AdministrationScreenServiceBootstrap } from './AdministrationScreen/AdministrationScreenServiceBootstrap';
 import { AdministrationTopAppBarService } from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService';
 import { WizardTopAppBarService } from './AdministrationScreen/ConfigurationWizard/WizardTopAppBar/WizardTopAppBarService';
@@ -30,5 +31,6 @@ export const manifest: PluginManifest = {
     AdministrationScreenServiceBootstrap,
     AdministrationTopAppBarService,
     WizardTopAppBarService,
+    AdministrationViewService,
   ],
 };

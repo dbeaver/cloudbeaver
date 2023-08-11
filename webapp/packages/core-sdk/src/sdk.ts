@@ -1900,6 +1900,7 @@ export type GetAuthProvidersQuery = {
     defaultProvider: boolean;
     trusted: boolean;
     private: boolean;
+    supportProvisioning: boolean;
     configurable: boolean;
     requiredFeatures: Array<string>;
     configurations?: Array<{
@@ -3732,6 +3733,7 @@ export type AuthProviderInfoFragment = {
   defaultProvider: boolean;
   trusted: boolean;
   private: boolean;
+  supportProvisioning: boolean;
   configurable: boolean;
   requiredFeatures: Array<string>;
   configurations?: Array<{
@@ -5081,6 +5083,7 @@ export const AuthProviderInfoFragmentDoc = `
   defaultProvider
   trusted
   private
+  supportProvisioning
   configurable
   configurations {
     ...AuthProviderConfigurationInfo
