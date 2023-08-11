@@ -140,7 +140,7 @@ public class WebSessionWorkspace implements DBPWorkspace {
         accessibleProjects.add(project);
     }
 
-    void remoteProject(WebProjectImpl project) {
+    void removeProject(WebProjectImpl project) {
         accessibleProjects.remove(project);
     }
 

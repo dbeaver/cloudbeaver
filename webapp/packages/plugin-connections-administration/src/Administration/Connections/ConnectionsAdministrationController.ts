@@ -42,7 +42,7 @@ export class ConnectionsAdministrationController {
       .filter(connection => {
         const project = this.projectInfoResource.get(connection.projectId);
 
-        return project && (isSharedProject(project) || isGlobalProject(project));
+        return connection.template && project && (isSharedProject(project) || isGlobalProject(project));
       })
       .sort((connectionA, connectionB) => {
         const compareNew = compareNewConnectionsInfo(connectionA, connectionB);
