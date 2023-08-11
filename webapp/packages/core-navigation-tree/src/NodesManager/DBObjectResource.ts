@@ -5,10 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { runInAction } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import {
+  CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapResource,
+  CachedResourcePageKey,
+  CachedResourcePageListKey,
   DetailsError,
   GraphQLService,
   isResourceAlias,
@@ -38,8 +43,14 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     this.navNodeInfoResource.outdateResource(this);
     this.navNodeInfoResource.deleteInResource(this);
 
-    this.navTreeResource.onDataUpdate.addHandler(key => {
+    this.navTreeResource.onDataOutdated.addHandler(key => {
       ResourceKeyUtils.forEach(key, nodeId => {
+        const pageAlias = this.isAlias(nodeId, CachedResourcePageKey) ?? this.isAlias(nodeId, CachedResourcePageListKey);
+
+        if (pageAlias) {
+          this.markOutdated(DBObjectParentKey(pageAlias.target));
+        }
+
         if (!isResourceAlias(nodeId)) {
           this.markOutdated(DBObjectParentKey(nodeId));
         }
@@ -48,8 +59,18 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
 
     this.beforeLoad.addHandler(async (originalKey, context) => {
       await this.navTreeResource.waitLoad();
-      if (this.isAlias(originalKey, DBObjectParentKey)) {
-        await this.navTreeResource.load(originalKey.options.parentId);
+      const parentKey = this.isAlias(originalKey, DBObjectParentKey);
+      const pageKey = this.isAlias(originalKey, CachedResourcePageKey) || this.isAlias(originalKey, CachedResourcePageListKey);
+      let limit = this.navTreeResource.childrenLimit;
+      let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
+
+      if (pageKey) {
+        limit = pageKey.options.limit;
+        offset = pageKey.options.offset;
+      }
+
+      if (parentKey) {
+        await this.navTreeResource.load(CachedResourcePageKey(offset, limit).setTarget(parentKey.options.parentId));
         return;
       }
 
@@ -71,8 +92,26 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, DBObject>> {
-    if (this.isAlias(originalKey, DBObjectParentKey)) {
-      await this.loadFromChildren(originalKey.options.parentId, 0, this.navTreeResource.childrenLimit + 1);
+    let limit = this.navTreeResource.childrenLimit;
+    let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
+    const parentKey = this.isAlias(originalKey, DBObjectParentKey);
+    const pageKey = this.isAlias(originalKey, CachedResourcePageKey) || this.isAlias(originalKey, CachedResourcePageListKey);
+
+    if (pageKey) {
+      limit = pageKey.options.limit;
+      offset = pageKey.options.offset;
+    }
+
+    if (parentKey) {
+      const nodeId = parentKey.options.parentId;
+      await this.loadFromChildren(nodeId, offset, limit);
+
+      runInAction(() => {
+        this.setPageEnd(
+          CachedResourcePageKey(offset, limit).setTarget(originalKey),
+          this.navTreeResource.hasNextPage(CachedResourcePageKey(offset, limit).setTarget(nodeId)),
+        );
+      });
       return this.data;
     }
 
