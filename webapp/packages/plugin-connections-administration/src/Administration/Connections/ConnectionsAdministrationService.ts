@@ -38,10 +38,6 @@ const SSH = React.lazy(async () => {
   const { SSH } = await import('./ConnectionsTable/ConnectionDetailsInfo/SSH');
   return { default: SSH };
 });
-const Template = React.lazy(async () => {
-  const { Template } = await import('./ConnectionsTable/ConnectionDetailsInfo/Template');
-  return { default: Template };
-});
 
 @injectable()
 export class ConnectionsAdministrationService extends Bootstrap {
@@ -63,7 +59,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
     this.administrationItemService.create({
       name: 'connections',
       type: AdministrationItemType.Administration,
-      order: 2,
+      order: 2.2,
       configurationWizardOptions: {
         defaultRoute: { sub: 'create' },
         description: 'connections_administration_configuration_wizard_step_description',
@@ -83,7 +79,6 @@ export class ConnectionsAdministrationService extends Bootstrap {
       onDeActivate: this.refreshUserConnections.bind(this),
     });
     this.connectionDetailsPlaceholder.add(Origin, 0);
-    this.connectionDetailsPlaceholder.add(Template, 1);
     this.connectionDetailsPlaceholder.add(SSH, 2);
   }
 

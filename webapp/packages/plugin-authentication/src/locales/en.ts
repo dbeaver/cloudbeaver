@@ -35,4 +35,6 @@ export default [
   ['plugin_authentication_user_loading_error', "Can't load user data"],
   ['plugin_authentication_loading_error_dialog_title', 'Authentication error'],
   ['plugin_authentication_loading_error_dialog_message', 'An error occurred while loading user data. Do you want to logout?'],
+
+  ['plugin_authentication_authentication_method_disabled', 'Authentication method is disabled, please configure authentication methods in settings'],
 ];

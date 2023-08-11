@@ -1,6 +1,6 @@
 export default [
-  ['connections_administration_item', '连接管理'],
-  ['connections_administration_connection_create', '添加数据库'],
+  ['connections_administration_item', 'Connection Templates'],
+  ['connections_administration_connection_create', 'Add Database Template'],
   ['connections_administration_search_database_tip', '在此处输入您的主机，例如“localhost host1.myhost.com 192.168.0.1”然后按 Enter'],
   ['connections_administration_new_connection', '新连接'],
   ['connections_administration_connection_create_error', '创建连接失败'],

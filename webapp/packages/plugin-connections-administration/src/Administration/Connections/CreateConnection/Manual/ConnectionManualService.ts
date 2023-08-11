@@ -29,6 +29,7 @@ export class ConnectionManualService {
       projectId,
       {
         ...this.connectionInfoResource.getEmptyConfig(),
+        template: true,
         driverId,
       },
       [driverId],
