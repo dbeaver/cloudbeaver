@@ -92,8 +92,10 @@ export class ObjectViewerTabService {
     const tab = this.navigationTabsService.findTab(isObjectViewerTab(tab => tab.handlerState.objectId === nodeInfo.nodeId));
 
     if (tab) {
-      tab.handlerState.tabIcon = nodeInfo.icon;
-      tab.handlerState.tabTitle = nodeInfo.name;
+      runInAction(() => {
+        tab.handlerState.tabIcon = nodeInfo.icon;
+        tab.handlerState.tabTitle = nodeInfo.name;
+      });
       tabInfo.registerTab(tab);
     }
 

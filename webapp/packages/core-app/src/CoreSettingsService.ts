@@ -13,8 +13,7 @@ const defaultSettings = {
   'app.logViewer.maxLogRecords': 1000,
   'app.logViewer.logBatchSize': 2000,
   'app.logViewer.maxFailedRequests': 3,
-  // temporary limit for all nodes children in app
-  'app.navigationTree.childrenLimit': 1000,
+  'app.navigationTree.childrenLimit': 100,
   'app.metadata.editing': true,
   'app.metadata.deleting': true,
 };

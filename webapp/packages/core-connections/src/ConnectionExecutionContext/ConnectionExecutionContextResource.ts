@@ -143,9 +143,10 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     const contextsList: IConnectionExecutionContextInfo[] = [];
     let projectId: string | undefined;
     const all = this.isAlias(originalKey, CachedMapAllKey);
+    const projectKey = this.isAlias(originalKey, ConnectionExecutionContextProjectKey);
 
-    if (this.isAlias(originalKey, ConnectionExecutionContextProjectKey)) {
-      projectId = originalKey.options.projectId;
+    if (projectKey) {
+      projectId = projectKey.options.projectId;
     }
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {

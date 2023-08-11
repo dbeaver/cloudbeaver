@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { CachedResourcePageKey } from '@cloudbeaver/core-sdk';
 
 import type { IElementsTreeFilter } from '../useElementsTree';
 
@@ -13,15 +14,14 @@ export const NAVIGATION_TREE_LIMIT = {
   limit: 'nav-tree://limit',
 };
 
-export function elementsTreeLimitFilter(navTreeResource: NavTreeResource, limit?: number): IElementsTreeFilter {
+export function elementsTreeLimitFilter(navTreeResource: NavTreeResource): IElementsTreeFilter {
   return (tree, filter, node, children) => {
-    limit = limit ?? navTreeResource.childrenLimit;
-    const nextChildren = children.slice(0, limit);
+    const pageInfo = navTreeResource.getPageInfo(CachedResourcePageKey(0, 0).setTarget(node.id));
 
-    if (children.length > limit) {
-      nextChildren.push(NAVIGATION_TREE_LIMIT.limit);
+    if (pageInfo && pageInfo.end === undefined) {
+      return [...children, NAVIGATION_TREE_LIMIT.limit];
     }
 
-    return nextChildren;
+    return children;
   };
 }

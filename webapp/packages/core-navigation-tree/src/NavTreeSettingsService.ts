@@ -9,8 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
-  // temporary limit for all nodes children in app
-  childrenLimit: 1000,
+  childrenLimit: 100,
   editing: true,
   deleting: true,
 };

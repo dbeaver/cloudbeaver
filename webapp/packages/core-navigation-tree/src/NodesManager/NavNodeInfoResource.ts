@@ -13,6 +13,7 @@ import {
   CachedMapResource,
   GraphQLService,
   ICachedResourceMetadata,
+  isResourceAlias,
   NavNodeInfoFragment,
   ResourceKey,
   ResourceKeyList,
@@ -91,7 +92,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, NavNode>> {
-    if (this.isAlias(key)) {
+    if (isResourceAlias(key)) {
       throw new Error('Aliases not supported by this resource');
     }
     const values: NavNode[] = [];
