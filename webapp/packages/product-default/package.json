@@ -8,9 +8,9 @@
   "module": "lib/index.js",
   "types": "src/index.ts",
   "scripts": {
-    "prebuild": "rimraf --glob lib/* && rimraf tsconfig.tsbuildinfo",
+    "prebuild": "rimraf --glob lib/* && rimraf tsconfig.tsbuildinfo && cd ../../ && lerna run gql:gen --stream --parallel",
     "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.product.config.js",
-    "dev": "core-cli-build serve --mode=development --progress --config=../core-cli/configs/webpack.product.dev.config.js --port=3100",
+    "dev": "concurrently -P \"cd ../../ && lerna run gql:gen:dev --stream --parallel\" \"core-cli-build serve --mode=development --progress --config=../core-cli/configs/webpack.product.dev.config.js --port=3100 {@}\"",
     "preanalyse": "rimraf --glob lib/* && if not exist lib mkdir lib",
     "analyse": "core-cli-build --mode=production --config ../core-cli/configs/webpack.product.config.js --profile --json > ./lib/stats.json",
     "postanalyse": "core-cli-analyzer ./lib/stats.json",
