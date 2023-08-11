@@ -861,9 +861,13 @@ public class LocalResourceController implements RMController {
         return type.getPrefix() + "_" + projectName;
     }
 
+    @Nullable
     private RMProject makeProjectFromId(String projectId, boolean loadPermissions) throws DBException {
         var projectName = parseProjectName(projectId);
         var projectPath = getProjectPath(projectId);
+        if (!Files.exists(projectPath)) {
+            return null;
+        }
         Set<RMProjectPermission> permissions = Set.of();
         if (loadPermissions && credentialsProvider.getActiveUserCredentials() != null) {
             permissions = getProjectPermissions(projectId, projectName.getType());
