@@ -106,7 +106,6 @@ module.exports = (env, argv) => {
   var babelLoader = {
     loader: require.resolve('babel-loader'),
     options: {
-      plugins: [devMode && require.resolve('react-refresh/babel')].filter(Boolean),
       root: __dirname,
       cacheDirectory: true,
     },
