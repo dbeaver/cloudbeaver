@@ -13,7 +13,10 @@ import { AdministrationItemService, filterOnlyActive, IAdministrationItemRoute }
 import { Loader, SlideBox, slideBoxStyles, SlideElement, SlideOverlay, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, OptionsPanelService, TabList, TabsState, verticalTabStyles } from '@cloudbeaver/core-ui';
+import { CaptureView } from '@cloudbeaver/core-view';
 
+import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext';
+import { AdministrationViewService } from './AdministrationViewService';
 import { DrawerItem } from './DrawerItem';
 import { ItemContent } from './ItemContent';
 
@@ -31,7 +34,7 @@ const administrationStyles = css`
   SlideElement {
     composes: theme-background-secondary theme-text-on-secondary from global;
   }
-  container {
+  CaptureView {
     composes: theme-background-secondary theme-text-on-secondary from global;
     display: flex;
     flex-direction: row;
@@ -76,6 +79,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   children,
 }) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const administrationViewService = useService(AdministrationViewService);
   const administrationItemService = useService(AdministrationItemService);
   const optionsPanelService = useService(OptionsPanelService);
 
@@ -88,7 +92,8 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   }, [activeScreen?.item]);
 
   return styled(useStyles(BASE_TAB_STYLES, verticalTabStyles, administrationStyles, tabsStyles, slideBoxStyles))(
-    <container>
+    <CaptureView view={administrationViewService}>
+      <AdministrationCaptureViewContext />
       <TabsState currentTabId={activeScreen?.item} orientation="vertical">
         <TabList aria-label="Administration items">
           {items.map(item => (
@@ -123,6 +128,6 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
           </SlideBox>
         </content-container>
       </TabsState>
-    </container>,
+    </CaptureView>,
   );
 });

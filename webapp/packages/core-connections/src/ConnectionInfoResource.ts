@@ -23,12 +23,8 @@ import {
   GraphQLService,
   InitConnectionMutationVariables,
   isResourceAlias,
-  isResourceKeyAlias,
-  isResourceKeyList,
   NavigatorSettingsInput,
   ResourceKey,
-  resourceKeyAlias,
-  resourceKeyAliasFactory,
   resourceKeyList,
   ResourceKeyList,
   resourceKeyListAlias,
@@ -210,6 +206,15 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       createFromNode: action,
       add: action,
     });
+  }
+
+  /** After a session global update, connections and tree resources start loading concurrently,
+   *  and there is a chance that the connection is already closed, but we are unaware of it.
+   *  Use it when you want to be sure that connected status of the connection is valid,
+   *  for example when you use it as an active flag inside the tree resource
+   * */
+  isSessionUpdate(): boolean {
+    return this.sessionUpdate;
   }
 
   getEmptyConfig(): ConnectionConfig {
@@ -460,12 +465,13 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     refresh: boolean,
   ): Promise<Map<IConnectionInfoParams, Connection>> {
     const connectionsList: Connection[] = [];
+    const projectKey = this.isAlias(originalKey, ConnectionInfoProjectKey);
     let removedConnections: IConnectionInfoParams[] = [];
     let projectId: string | undefined;
     let projectIds: string[] | undefined;
 
-    if (this.isAlias(originalKey, ConnectionInfoProjectKey)) {
-      projectIds = originalKey.options.projectIds;
+    if (projectKey) {
+      projectIds = projectKey.options.projectIds;
     }
 
     if (this.isAlias(originalKey, ConnectionInfoActiveProjectKey)) {

@@ -62,7 +62,7 @@ export class MetaParametersController implements IInitializableController {
 
   update = async () => {
     try {
-      await this.usersResource.refreshAll();
+      this.usersResource.markOutdated();
       this.notificationService.logSuccess({ title: 'authentication_administration_tools_refresh_success' });
     } catch (exception: any) {
       if (!this.error.catch(exception)) {

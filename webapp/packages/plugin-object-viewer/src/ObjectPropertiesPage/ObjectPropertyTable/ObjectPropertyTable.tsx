@@ -7,60 +7,51 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import styled, { css } from 'reshadow';
 
-import { TextPlaceholder, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, TextPlaceholder, usePagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type DBObject, DBObjectParentKey, DBObjectResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { isDefined } from '@cloudbeaver/core-utils';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
+import styles from './ObjectPropertyTable.m.css';
 import { TableLoader } from './Table/TableLoader';
-
-const styles = css`
-  div {
-    flex: auto;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-`;
 
 interface ObjectPropertyTableProps {
   objectId: string;
   parentId?: string;
+  className?: string;
 }
 
-export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function ObjectPropertyTable({ objectId, parentId }) {
+export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function ObjectPropertyTable({ objectId, parentId, className }) {
   const translate = useTranslate();
   const navNodeViewService = useService(NavNodeViewService);
-  const children = useResource(ObjectPropertyTable, NavTreeResource, parentId ?? null);
-  const tree = useResource(ObjectPropertyTable, NavTreeResource, objectId, {
-    preload: [children],
+  const navTreeResource = useService(NavTreeResource);
+
+  const pagination = usePagination(DBObjectResource, {
+    key: DBObjectParentKey(objectId),
+    pageSize: navTreeResource.childrenLimit,
   });
 
-  const limited = navNodeViewService.limit(tree.data || []);
+  const dbObjectLoader = useResource(ObjectPropertyTable, DBObjectResource, pagination.key);
 
-  const { nodes, duplicates } = navNodeViewService.filterDuplicates(limited.nodes);
+  const { nodes, duplicates } = navNodeViewService.filterDuplicates(dbObjectLoader.data.filter(isDefined).map(node => node?.id) || []);
 
-  const dbObject = useResource(ObjectPropertyTable, DBObjectResource, DBObjectParentKey(objectId), {
-    preload: [tree],
-  });
+  const objects = dbObjectLoader.data.filter(node => nodes.includes(node?.id || '')) as DBObject[];
 
   useEffect(() => {
     navNodeViewService.logDuplicates(objectId, duplicates);
   });
 
-  const objects = dbObject.data.filter(object => nodes.includes(object?.id ?? '')) as DBObject[];
-
-  return styled(styles)(
+  return (
     <>
       {nodes.length === 0 ? (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       ) : (
-        <div>
-          <TableLoader objects={objects} truncated={limited.truncated > 0} />
+        <div className={s(styles, { box: true }, className)}>
+          <TableLoader objects={objects} hasNextPage={pagination.hasNextPage} loadMore={pagination.loadMore} />
         </div>
       )}
-    </>,
+    </>
   );
 });

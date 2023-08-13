@@ -987,7 +987,7 @@ public class WebSession extends BaseWebSession
     }
 
     public void deleteSessionProject(@Nullable WebProjectImpl project) {
-        getWorkspace().remoteProject((WebProjectImpl) project);
+        getWorkspace().removeProject(project);
         if (navigatorModel != null) {
             navigatorModel.getRoot().removeProject(project);
         }

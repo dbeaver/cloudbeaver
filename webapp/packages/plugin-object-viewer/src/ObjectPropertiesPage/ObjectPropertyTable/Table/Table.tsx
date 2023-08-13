@@ -6,12 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { IScrollState, Translate, useControlledScroll, useStyles, useTable } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
-import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { IScrollState, Link, useControlledScroll, useStyles, useTable, useTranslate } from '@cloudbeaver/core-blocks';
+import type { DBObject } from '@cloudbeaver/core-navigation-tree';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { isDefined, TextTools } from '@cloudbeaver/core-utils';
@@ -55,9 +54,10 @@ const COLUMN_FONT = '700 12px Roboto';
 const CELL_PADDING = 16;
 const CELL_BORDER = 2;
 
-interface Props {
+export interface TableProps {
   objects: DBObject[];
-  truncated?: boolean;
+  hasNextPage: boolean;
+  loadMore: () => void;
 }
 
 function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
@@ -93,9 +93,9 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
 
 const CUSTOM_COLUMNS = [ColumnSelect, ColumnIcon];
 
-export const Table = observer<Props>(function Table({ objects, truncated }) {
+export const Table = observer<TableProps>(function Table({ objects, hasNextPage, loadMore }) {
   const [tableContainer, setTableContainerRef] = useState<HTMLDivElement | null>(null);
-  const navTreeResource = useService(NavTreeResource);
+  const translate = useTranslate();
   const styles = useStyles(style, baseStyles, tableStyles);
   const tableState = useTable();
   const tabLocalState = useTabLocalState<IScrollState>(() => ({ scrollTop: 0, scrollLeft: 0 }));
@@ -123,6 +123,15 @@ export const Table = observer<Props>(function Table({ objects, truncated }) {
 
   const tableData = useTableData(dataColumns, CUSTOM_COLUMNS);
 
+  const handleScroll = useCallback(
+    async (event: React.UIEvent<HTMLDivElement>) => {
+      if (isAtBottom(event)) {
+        loadMore();
+      }
+    },
+    [loadMore],
+  );
+
   if (objects.length === 0) {
     return null;
   }
@@ -130,10 +139,19 @@ export const Table = observer<Props>(function Table({ objects, truncated }) {
   return styled(styles)(
     <TableContext.Provider value={{ tableData, tableState }}>
       <wrapper ref={setTableContainerRef} className="metadata-grid-container">
-        <DataGrid className="cb-metadata-grid-theme" rows={objects} rowKeyGetter={row => row.id} columns={tableData.columns} rowHeight={40} />
-        {truncated && (
+        <DataGrid
+          className="cb-metadata-grid-theme"
+          rows={objects}
+          rowKeyGetter={row => row.id}
+          columns={tableData.columns}
+          rowHeight={40}
+          onScroll={handleScroll}
+        />
+        {hasNextPage && (
           <data-info>
-            <Translate token="app_navigationTree_limited" limit={navTreeResource.childrenLimit} />
+            <Link title={translate('app_navigationTree_limited')} onClick={loadMore}>
+              {translate('ui_load_more')}
+            </Link>
           </data-info>
         )}
         <ObjectPropertyTableFooter nodeIds={nodeIds} tableState={tableState} />
@@ -141,3 +159,8 @@ export const Table = observer<Props>(function Table({ objects, truncated }) {
     </TableContext.Provider>,
   );
 });
+
+function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
+  const target = event.target as HTMLDivElement;
+  return target.clientHeight + target.scrollTop + target.clientHeight * 0.3 > target.scrollHeight;
+}

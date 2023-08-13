@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { observable } from 'mobx';
+import { observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
@@ -61,8 +61,11 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   const connection = useResource(ObjectViewerPanel, ConnectionInfoResource, connectionKey);
   const connected = getComputed(() => connection.data?.connected || false);
 
+  // After a session global update, connections and tree resources start loading concurrently,
+  // and there is a chance that the connection is already closed, but we are unaware of it.
+  // So we use isSessionUpdate to be sure that connected status of the connection is valid.
   const children = useResource(ObjectViewerPanel, NavTreeResource, objectId, {
-    active: connected,
+    active: !connection.resource.isSessionUpdate() && connected,
     // onData: data => {
     //   state.notFound = !data.includes(objectId);
     // },
@@ -71,8 +74,10 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
 
   const node = useResource(ObjectViewerPanel, navNodeInfoResource, objectId, {
     onData(data) {
-      tab.handlerState.tabIcon = data.icon;
-      tab.handlerState.tabTitle = data.name;
+      runInAction(() => {
+        tab.handlerState.tabIcon = data.icon;
+        tab.handlerState.tabTitle = data.name;
+      });
     },
     active: !state.notFound,
     preload: [children],

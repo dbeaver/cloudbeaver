@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { AuthProvider, AuthProviderConfiguration, comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
+import { AuthProvider, AuthProviderConfiguration, AuthProvidersResource, comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
 import {
   Button,
   Cell,
@@ -27,6 +27,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
+import { ServerConfigurationAdministrationNavService } from '@cloudbeaver/plugin-administration';
 
 import { AuthenticationService } from '../../AuthenticationService';
 
@@ -87,12 +88,14 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
   onClose,
   className,
 }) {
+  const serverConfigurationAdministrationNavService = useService(ServerConfigurationAdministrationNavService);
   const authenticationService = useService(AuthenticationService);
   const translate = useTranslate();
   const style = useStyles(styles);
 
   const [search, setSearch] = useState('');
   const authTaskState = usePromiseState(authTask);
+  const authProvidersResource = useService(AuthProvidersResource);
   const configurations = getComputed<IProviderConfiguration[]>(() =>
     providers
       .map(provider =>
@@ -104,6 +107,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
   const sortedConfigurations = configurations.slice().sort((a, b) => comparePublicAuthConfigurations(a.configuration, b.configuration));
 
   let filteredConfigurations: IProviderConfiguration[];
+  const providerDisabled = authProvidersResource.isEnabled(activeProvider?.id || '') === false;
 
   if (!search) {
     filteredConfigurations = sortedConfigurations;
@@ -116,6 +120,11 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
 
   function navToSettings() {
     onClose?.();
+    serverConfigurationAdministrationNavService.navToSettings();
+  }
+
+  function navToIdentityProvidersSettings() {
+    onClose?.();
     authenticationService.configureIdentityProvider?.();
   }
 
@@ -123,7 +132,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
     return (
       <TextPlaceholder>
         {translate('authentication_configure')}
-        {authenticationService.configureIdentityProvider && <Link onClick={navToSettings}>{translate('ui_configure')}</Link>}
+        {authenticationService.configureIdentityProvider && <Link onClick={navToIdentityProvidersSettings}>{translate('ui_configure')}</Link>}
       </TextPlaceholder>
     );
   }
@@ -133,9 +142,16 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
       <container className={className}>
         <Loader state={authTaskState} style={loaderStyle} message="authentication_authorizing" hideException>
           <center>
-            <Button type="button" mod={['unelevated']} onClick={() => login(false, activeProvider, activeConfiguration)}>
-              <Translate token="authentication_login" />
-            </Button>
+            {providerDisabled ? (
+              <TextPlaceholder>
+                {translate('plugin_authentication_authentication_method_disabled')}
+                {authenticationService.configureIdentityProvider && <Link onClick={navToSettings}>{translate('ui_configure')}</Link>}
+              </TextPlaceholder>
+            ) : (
+              <Button type="button" mod={['unelevated']} onClick={() => login(false, activeProvider, activeConfiguration)}>
+                <Translate token="authentication_login" />
+              </Button>
+            )}
           </center>
         </Loader>
       </container>,
