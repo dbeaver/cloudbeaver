@@ -82,11 +82,13 @@ export function useGroupingDataModel(
 
         return {
           columns: state.columns,
+          functions: state.functions,
+          showDuplicatesOnly: state.showDuplicatesOnly,
           sourceResultId: result?.id,
         };
       },
-      async ({ columns, sourceResultId }) => {
-        if (columns.length !== 0 && sourceResultId) {
+      async ({ columns, functions, sourceResultId }) => {
+        if (columns.length !== 0 && functions.length !== 0 && sourceResultId) {
           const executionContext = sourceModel.source.executionContext;
           model.model.source.setExecutionContext(executionContext).setSupportedDataFormats(connectionInfo?.supportedDataFormats ?? []);
 
@@ -97,6 +99,8 @@ export function useGroupingDataModel(
               .setOptions({
                 query: '',
                 columns,
+                functions,
+                showDuplicatesOnly: state.showDuplicatesOnly,
                 sourceResultId,
                 connectionKey,
                 constraints: [],
