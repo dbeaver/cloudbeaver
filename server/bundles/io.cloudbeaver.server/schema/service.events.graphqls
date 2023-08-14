@@ -131,8 +131,6 @@ type CBProjectUpdateEvent implements CBServerEvent {
 type CBSubjectPermissionUpdateEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
-    subjectType: AdminSubjectType!
-    subjectId: String!
 }
 
 # Topic subscription event
