@@ -8,7 +8,7 @@
 import { createAction } from '@cloudbeaver/core-view';
 
 export const ACTION_DATA_VIEWER_GROUPING_CONFIGURE = createAction('data-viewer-grouping-configure', {
-  label: 'plugin-data-viewer-result-set-grouping_action_configure',
-  tooltip: 'plugin-data-viewer-result-set-grouping_action_configure_tooltip',
+  label: 'plugin_data_viewer_result_set_grouping_action_configure',
+  tooltip: 'plugin_data_viewer_result_set_grouping_action_configure_tooltip',
   icon: '/icons/settings.svg',
 });
