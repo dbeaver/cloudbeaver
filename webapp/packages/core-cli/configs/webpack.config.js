@@ -4,7 +4,6 @@ const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const threadLoader = require('thread-loader');
-const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const excludedFromVendor = require('./excludedFromVendor.js');
 // const ESLintPlugin = require('eslint-webpack-plugin');
@@ -240,7 +239,6 @@ module.exports = (env, argv) => {
     },
     devtool: devTool,
     plugins: [
-      devMode && new ReactRefreshPlugin(),
       new ForkTsCheckerWebpackPlugin({
         typescript: {
           configOverwrite: {

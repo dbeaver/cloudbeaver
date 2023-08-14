@@ -18,6 +18,7 @@ const HtmlInjectWebpackPlugin = require('./HtmlInjectWebpackPlugin');
 const { getAssets } = require('./webpack.product.utils');
 
 const package = require(resolve('package.json'));
+const ReactRefreshPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
 const certPath = resolve(__dirname, '../../../../../certs/private.pem');
 const keyPath = resolve(__dirname, '../../../../../certs/private.key');
@@ -107,6 +108,7 @@ module.exports = (env, argv) => {
         },
       ]),
       new webpack.HotModuleReplacementPlugin(),
+      new ReactRefreshPlugin(),
     ],
   });
 };

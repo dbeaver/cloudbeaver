@@ -82,6 +82,6 @@ module.exports = {
         },
       },
     ],
-    devMode && require.resolve('react-refresh/babel'),
+    (devMode && !testMode) && require.resolve('react-refresh/babel'),
   ].filter(Boolean),
 };
