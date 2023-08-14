@@ -19,14 +19,14 @@ import {
   SyncExecutor,
   TaskScheduler,
 } from '@cloudbeaver/core-executor';
-import { isPrimitive, MetadataMap, uuid } from '@cloudbeaver/core-utils';
+import { isNotNullDefined, isPrimitive, MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
 import { isResourceAlias, ResourceAlias, ResourceAliasFactory, ResourceAliasOptions } from './ResourceAlias';
 import { ResourceError } from './ResourceError';
 import type { ResourceKey, ResourceKeyFlat } from './ResourceKey';
 import { resourceKeyAlias, ResourceKeyAlias, resourceKeyAliasFactory } from './ResourceKeyAlias';
-import { isResourceKeyList, ResourceKeyList } from './ResourceKeyList';
-import { type ResourceKeyListAlias, resourceKeyListAliasFactory } from './ResourceKeyListAlias';
+import { isResourceKeyList, resourceKeyList, ResourceKeyList } from './ResourceKeyList';
+import { type ResourceKeyListAlias, resourceKeyListAlias, resourceKeyListAliasFactory } from './ResourceKeyListAlias';
 import { ResourceKeyUtils } from './ResourceKeyUtils';
 
 interface IPageInfo {
@@ -85,8 +85,9 @@ export type CachedResourceMetadata<TResource> = TResource extends CachedResource
 export const CACHED_RESOURCE_DEFAULT_PAGE_OFFSET = 0;
 export const CACHED_RESOURCE_DEFAULT_PAGE_LIMIT = 100;
 export const CachedResourceParamKey = resourceKeyAlias('@cached-resource/param-default');
+export const CachedResourceListEmptyKey = resourceKeyListAlias('@cached-resource/empty');
 export const CachedResourcePageListKey = resourceKeyListAliasFactory<any, [offset: number, limit: number], Readonly<ICachedResourcePageOptions>>(
-  '@cached-resource/page',
+  '@cached-resource/page-list',
   (offset: number, limit: number) => ({
     offset,
     limit,
@@ -165,8 +166,9 @@ export abstract class CachedResource<
 
     this.onUse.setInitialDataGetter(this.getInitialOnUseData.bind(this));
     this.addAlias(CachedResourceParamKey, () => defaultKey);
+    this.addAlias(CachedResourceListEmptyKey, () => resourceKeyList([]));
     this.addAlias(CachedResourcePageKey, key => key.target);
-    this.addAlias(CachedResourcePageListKey, key => key.target);
+    this.addAlias(CachedResourcePageListKey, key => key.target ?? CachedResourceListEmptyKey);
 
     if (this.logActivity) {
       // this.spy(this.beforeLoad, 'beforeLoad');
@@ -946,7 +948,7 @@ export abstract class CachedResource<
     if (isResourceAlias(key)) {
       key = this.transformToAlias(key);
 
-      if (key.target) {
+      if (isNotNullDefined(key.target)) {
         return this.getMetadataKeyRef(key.target);
       }
 
