@@ -4,9 +4,9 @@ name: Run Jest Tests
 on:
   # Triggers the workflow on push or pull request events but only for the "devel" branch
   pull_request:
-    branches: [ "devel" ]
+    branches: ["devel"]
     paths:
-      - 'webapp/**' # monitor for the frontend changes
+      - "webapp/**" # monitor for the frontend changes
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -22,11 +22,51 @@ jobs:
         working-directory: ./webapp
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-     - uses: actions/checkout@v3
-     - uses: actions/setup-node@v3
-       with:
-        node-version: '18'
-     - run: npm install yarn -g
-     - run: yarn
-     - run: yarn lerna bootstrap
-     - run: yarn lerna run test
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        name: List the state of node modules
+        continue-on-error: true
+        run: npm list
+
+      - name: Run install
+        uses: borales/actions-yarn@v4
+        with:
+          dir: webapp
+          cmd: install
+
+      - name: Run lerna bootstrap
+        uses: borales/actions-yarn@v4
+        with:
+          dir: webapp
+          cmd: lerna bootstrap
+
+      - name: Run pre test
+        uses: borales/actions-yarn@v4
+        with:
+          dir: webapp
+          cmd: pretest
+
+      - name: Run test
+        uses: borales/actions-yarn@v4
+        with:
+          dir: webapp
+          cmd: lerna run test
