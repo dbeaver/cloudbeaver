@@ -110,6 +110,8 @@ export * from './Tree/TreeNode/TreeNodeStyles';
 export * from './Button';
 export * from './ToolsPanel/ToolsAction';
 export * from './ToolsPanel/ToolsPanel';
+export { default as ToolsPanelStyles } from './ToolsPanel/ToolsPanel.m.css';
+export { default as ToolsActionStyles } from './ToolsPanel/ToolsAction.m.css';
 export * from './FormControls/Checkboxes/Checkbox';
 export * from './FormControls/Checkboxes/FieldCheckbox';
 export * from './FormControls/Checkboxes/CheckboxMarkup';
