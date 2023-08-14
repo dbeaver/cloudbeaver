@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { observable } from 'mobx';
+import { observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
@@ -74,8 +74,10 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
 
   const node = useResource(ObjectViewerPanel, navNodeInfoResource, objectId, {
     onData(data) {
-      tab.handlerState.tabIcon = data.icon;
-      tab.handlerState.tabTitle = data.name;
+      runInAction(() => {
+        tab.handlerState.tabIcon = data.icon;
+        tab.handlerState.tabTitle = data.name;
+      });
     },
     active: !state.notFound,
     preload: [children],

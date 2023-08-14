@@ -16,6 +16,7 @@ import {
   DetailsError,
   GetResourceListQueryVariables,
   GraphQLService,
+  isResourceAlias,
   ResourceKey,
   resourceKeyList,
   ResourceKeyUtils,
@@ -213,27 +214,28 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
     const resourcesList = new Map<string, RmResourceInfo>();
 
     await ResourceKeyUtils.forEachAsync(key, async key => {
-      if (this.isAlias(key, CachedTreeChildrenKey)) {
-        const resourceKey = getRmResourceKey(key.options.path);
+      const childrenKey = this.isAlias(key, CachedTreeChildrenKey);
+      if (childrenKey) {
+        const resourceKey = getRmResourceKey(childrenKey.options.path);
 
         const { resources } = await this.graphQLService.sdk.getResourceList({
           projectId: resourceKey.projectId,
           path: resourceKey.path,
           ...this.getDefaultIncludes(),
-          ...this.getIncludesMap(key.options.path, includes),
+          ...this.getIncludesMap(childrenKey.options.path, includes),
         });
 
         for (const resource of resources) {
-          resourcesList.set(createPath(key.options.path, resource.name), resource);
+          resourcesList.set(createPath(childrenKey.options.path, resource.name), resource);
         }
 
-        const parent = getPathParent(key.options.path);
+        const parent = getPathParent(childrenKey.options.path);
         if (parent) {
           key = parent;
         }
       }
 
-      if (!this.isAlias(key)) {
+      if (!isResourceAlias(key)) {
         const resourceKey = getRmResourceKey(key);
         const { resources } = await this.graphQLService.sdk.getResourceList({
           projectId: resourceKey.projectId,

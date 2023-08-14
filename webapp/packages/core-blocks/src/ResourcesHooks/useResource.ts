@@ -230,19 +230,24 @@ export function useResource<
         await resource.load(key, includes as any);
       },
       async load(refresh?: boolean): Promise<void> {
-        if (this.loadingPromise) {
-          return this.loadingPromise;
-        }
-
         if (propertiesRef.key === null) {
           return;
         }
 
+        let loadingPromise: Promise<void> | null = null;
+
         try {
-          this.loadingPromise = (this[loadFunctionName] as (refresh?: boolean) => Promise<void>)(refresh);
-          await this.loadingPromise;
+          loadingPromise = (this[loadFunctionName] as (refresh?: boolean) => Promise<void>)(refresh);
+          this.loadingPromise = loadingPromise;
+          await loadingPromise;
+          if (this.loadingPromise !== loadingPromise) {
+            return;
+          }
           this.exception = null;
         } catch (exception: any) {
+          if (this.loadingPromise !== loadingPromise) {
+            return;
+          }
           if (actions?.silent !== true && propertiesRef.errorContext) {
             if (this.isResourceError()) {
               const errors = Array.isArray(this.resourceException) ? this.resourceException : [this.resourceException];
@@ -352,7 +357,7 @@ export function useResource<
           return false;
         }
 
-        return refObj.loadingPromise !== null || this.resource.isLoading(propertiesRef.key);
+        return this.resource.isLoading(propertiesRef.key);
       },
       isError() {
         return isContainsException(this.exception);
