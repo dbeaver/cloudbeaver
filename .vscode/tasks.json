@@ -26,6 +26,7 @@
       "args": [
         "dev",
         "--",
+        "--",
         "--env",
         "server=${input:stage.ce}",
         "--host",

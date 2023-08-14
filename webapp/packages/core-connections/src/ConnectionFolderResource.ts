@@ -86,13 +86,13 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
 
   protected async loader(originalKey: ResourceKey<IConnectionFolderParam>): Promise<Map<IConnectionFolderParam, ConnectionFolder>> {
     const all = this.isAlias(originalKey, CachedMapAllKey);
-    const isProjectFolders = this.isAlias(originalKey, ConnectionFolderProjectKey);
+    const projectFoldersKey = this.isAlias(originalKey, ConnectionFolderProjectKey);
     const folderList: ConnectionFolder[] = [];
     let projectId: string | undefined;
     let folderId: string | undefined;
 
-    if (isProjectFolders) {
-      projectId = originalKey.options.projectId;
+    if (projectFoldersKey) {
+      projectId = projectFoldersKey.options.projectId;
     }
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {
@@ -114,7 +114,7 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
       if (all) {
         this.replace(key, folderList);
       } else {
-        if (isProjectFolders) {
+        if (projectFoldersKey) {
           const removedFolders = this.keys.filter(key => !folderList.some(f => key.projectId === projectId && key.folderId === f.id));
 
           this.delete(resourceKeyList(removedFolders));

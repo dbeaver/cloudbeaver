@@ -14,12 +14,15 @@ import { Executor, ExecutorInterrupter, IExecutionContext, IExecutor } from '@cl
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import {
+  CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapAllKey,
   CachedMapResource,
+  CachedResourcePageKey,
   DetailsError,
   NavNodeChildrenQuery as fake,
   GraphQLService,
   ICachedResourceMetadata,
+  isResourceAlias,
   isResourceKeyList,
   ResourceError,
   ResourceKey,
@@ -421,7 +424,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
   protected async preLoadData(key: ResourceKey<string>, contexts: IExecutionContext<ResourceKey<string>>): Promise<void> {
     await ResourceKeyUtils.forEachAsync(key, async nodeId => {
-      if (this.isAlias(nodeId)) {
+      if (isResourceAlias(nodeId)) {
         return;
       }
 
@@ -440,17 +443,30 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     });
   }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, string[]>> {
-    if (this.isAlias(key)) {
-      throw new Error('Aliases not supported by this resource');
+  protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, string[]>> {
+    const pageKey = this.isAlias(originalKey, CachedResourcePageKey);
+    const allKey = this.isAlias(originalKey, CachedMapAllKey);
+
+    if (allKey) {
+      throw new Error('Loading all nodes is prohibited');
     }
-    const limit = this.childrenLimit + 1;
+
+    const offset = pageKey?.options.offset ?? CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
+    const limit = pageKey?.options.limit ?? this.childrenLimit;
     const values: NavNodeChildrenQuery[] = [];
 
-    await ResourceKeyUtils.forEachAsync(key, async nodeId => {
-      values.push(await this.loadNodeChildren(nodeId, 0, limit));
+    await ResourceKeyUtils.forEachAsync(originalKey, async key => {
+      const nodeId = pageKey?.target ?? key;
+      const navNodeChildren = await this.loadNodeChildren(nodeId, offset, limit);
+      values.push(navNodeChildren);
+
+      this.setPageEnd(
+        CachedResourcePageKey(offset, navNodeChildren.navNodeChildren.length).setTarget(nodeId),
+        navNodeChildren.navNodeChildren.length === limit,
+      );
     });
-    this.setNavObject(values);
+
+    this.setNavObject(values, offset, limit);
 
     return this.data;
   }
@@ -477,7 +493,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     return nestedChildren;
   }
 
-  private setNavObject(data: NavNodeChildrenQuery | NavNodeChildrenQuery[]) {
+  private setNavObject(data: NavNodeChildrenQuery | NavNodeChildrenQuery[], offset: number, limit: number): void {
     if (Array.isArray(data)) {
       if (data.length === 0) {
         return;
@@ -499,7 +515,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
       this.set(
         resourceKeyList(data.map(data => data.parentPath)),
-        data.map(data => data.navNodeChildren.map(node => node.id)),
+        data.map(data => this.insertSlice(data, offset, limit)),
       );
     } else {
       const metadata = this.metadata.get(data.parentPath);
@@ -511,11 +527,22 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
         ...data.navNodeChildren.map(node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)),
       ]);
 
-      this.set(
-        data.parentPath,
-        data.navNodeChildren.map(node => node.id),
-      );
+      this.set(data.parentPath, this.insertSlice(data, offset, limit));
     }
+  }
+
+  private insertSlice(data: NavNodeChildrenQuery, offset: number, limit: number): string[] {
+    let children = [...(this.get(data.parentPath) || [])];
+
+    children.splice(offset, limit, ...data.navNodeChildren.map(node => node.id));
+
+    if (data.navNodeChildren.length < limit) {
+      children.splice(offset + data.navNodeChildren.length, children.length - offset - data.navNodeChildren.length);
+    }
+
+    children = children.filter((value, index, self) => self.indexOf(value) === index);
+
+    return children;
   }
 
   private async loadNodeChildren(parentPath: string, offset: number, limit: number): Promise<NavNodeChildrenQuery> {

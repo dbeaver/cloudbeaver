@@ -73,28 +73,11 @@ export class NavNodeViewService {
       return;
     }
 
-    const limited = this.limit(children);
-
-    return this.transformations.reduce((children, transform) => transform(nodeId, children), limited.nodes as string[] | undefined);
+    return this.transformations.reduce((children, transform) => transform(nodeId, children), children as string[] | undefined);
   }
 
   addTransform(transform: INavNodeFolderTransform): void {
     this.transformers.push(transform);
-  }
-
-  limit(nodes: string[]): INodeLimitedList {
-    let truncated = 0;
-
-    if (nodes.length > this.navTreeResource.childrenLimit) {
-      truncated = nodes.length - this.navTreeResource.childrenLimit;
-    }
-
-    nodes = nodes.slice(0, this.navTreeResource.childrenLimit);
-
-    return {
-      nodes,
-      truncated,
-    };
   }
 
   filterDuplicates(nodes: string[]): INodeDuplicateList {

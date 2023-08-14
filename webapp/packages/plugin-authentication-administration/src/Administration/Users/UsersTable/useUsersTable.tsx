@@ -7,7 +7,7 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { AdminUser, UsersResource, UsersResourceNewUsers, UsersResourceSearchUser } from '@cloudbeaver/core-authentication';
+import { AdminUser, compareUsers, UsersResource, UsersResourceFilterKey, UsersResourceNewUsers } from '@cloudbeaver/core-authentication';
 import { TableState, useObservableRef, usePagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -32,15 +32,7 @@ export function useUsersTable(filters: IUserFilters) {
   const translate = useTranslate();
   const usersResource = useService(UsersResource);
   const pagination = usePagination(UsersResource, {
-    getKey(offset, limit) {
-      return UsersResourceSearchUser(
-        offset,
-        limit,
-        filters.search,
-        filters.status === 'true' ? true : filters.status === 'false' ? false : undefined,
-      );
-    },
-    dependencies: [filters.search, filters.status],
+    key: UsersResourceFilterKey(filters.search, filters.status === 'true' ? true : filters.status === 'false' ? false : undefined),
   });
   const usersLoader = useResource(useUsersTable, usersResource, pagination.key);
   const notificationService = useService(NotificationService);
@@ -54,7 +46,9 @@ export function useUsersTable(filters: IUserFilters) {
         return pagination.hasNextPage;
       },
       get users() {
-        const users = Array.from(new Set([UsersResourceNewUsers, ...pagination.loaded].map(key => this.usersLoader.resource.get(key)).flat()));
+        const users = Array.from(
+          new Set([...this.usersLoader.resource.get(UsersResourceNewUsers), ...usersLoader.tryGetData.filter(isDefined).sort(compareUsers)]),
+        );
         return filters.filterUsers(users.filter(isDefined));
       },
       async update() {
