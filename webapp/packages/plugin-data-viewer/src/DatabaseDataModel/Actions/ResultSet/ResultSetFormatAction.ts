@@ -31,13 +31,8 @@ export class ResultSetFormatAction
   private readonly view: ResultSetViewAction;
   private readonly edit: ResultSetEditAction;
 
-  constructor(
-    source: IDatabaseDataSource<any, IDatabaseResultSet>,
-    result: IDatabaseResultSet,
-    view: ResultSetViewAction,
-    edit: ResultSetEditAction,
-  ) {
-    super(source, result);
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, view: ResultSetViewAction, edit: ResultSetEditAction) {
+    super(source);
     this.view = view;
     this.edit = edit;
   }

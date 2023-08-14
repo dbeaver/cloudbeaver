@@ -28,8 +28,8 @@ export class DocumentDataAction extends DatabaseDataAction<any, IDatabaseResultS
     return this.result.data?.rows?.length || 0;
   }
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
-    super(source, result);
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>) {
+    super(source);
 
     makeObservable(this, {
       documents: computed,

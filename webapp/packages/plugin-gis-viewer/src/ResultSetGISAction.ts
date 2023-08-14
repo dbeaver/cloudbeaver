@@ -35,9 +35,9 @@ export class ResultSetGISAction
 
   private readonly view: ResultSetViewAction;
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
-    super(source, result);
-    this.view = this.getAction(ResultSetViewAction);
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, view: ResultSetViewAction) {
+    super(source);
+    this.view = view;
   }
 
   isGISFormat(cell: IResultSetElementKey): boolean {
