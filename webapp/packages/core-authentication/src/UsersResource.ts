@@ -181,6 +181,11 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
   async enableUser(userId: string, enabled: boolean, skipUpdate?: boolean): Promise<void> {
     await this.graphQLService.sdk.enableUser({ userId, enabled });
+    const user = this.get(userId);
+
+    if (user) {
+      user.enabled = enabled;
+    }
 
     if (!skipUpdate) {
       this.markOutdated(userId);
