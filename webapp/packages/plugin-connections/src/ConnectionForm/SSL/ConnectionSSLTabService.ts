@@ -139,10 +139,22 @@ export class ConnectionSSLTabService extends Bootstrap {
     const changed = this.isChanged(handlerConfig, initial);
 
     if (changed && descriptor) {
-      for (const [key, value] of Object.entries(handlerConfig.properties)) {
-        const secured = descriptor.properties.find(p => p.id === key)?.features.includes(PROPERTY_FEATURE_SECURED);
+      for (const descriptorProperty of descriptor.properties) {
+        if (!descriptorProperty.id) {
+          continue;
+        }
+
+        const key = descriptorProperty.id;
+        const isDefault = descriptorProperty.defaultValue !== null && descriptorProperty.defaultValue !== undefined;
+
+        if (!(key in handlerConfig.properties) && isDefault) {
+          handlerConfig.properties[key] = descriptorProperty.defaultValue;
+        }
+
+        const secured = descriptorProperty.features.includes(PROPERTY_FEATURE_SECURED);
 
         if (secured) {
+          const value = handlerConfig.properties[key];
           const propertyChanged = initial?.secureProperties?.[key] !== value;
 
           if (propertyChanged) {
