@@ -1,4 +1,6 @@
 .tiny,
+.field.tiny,
+.container.tiny,
 .grid.tiny > *,
 .container > .tiny,
 .container > .grid.tiny > * {
@@ -7,6 +9,8 @@
 }
 
 .small,
+.field.small,
+.container.small,
 .grid.small > *,
 .container > .small,
 .container > .grid.small > * {
@@ -15,6 +19,8 @@
 }
 
 .medium,
+.field.medium,
+.container.medium,
 .grid.medium > *,
 .container > .medium,
 .container > .grid.medium > * {
@@ -23,6 +29,8 @@
 }
 
 .large,
+.field.large,
+.container.large,
 .grid.large > *,
 .container > .large,
 .container > .grid.large > * {
@@ -31,6 +39,8 @@
 }
 
 .maximum,
+.field.maximum,
+.container.maximum,
 .grid.maximum > *,
 .container > .maximum,
 .container > .grid.maximum > * {
@@ -38,13 +48,15 @@
 }
 
 .fill,
+.field.fill,
+.container.fill,
 .container > .fill {
   max-width: none;
 }
 
 .keepSize,
+.field.keepSize,
+.container.keepSize,
 .container > .keepSize {
   flex-grow: 0;
-  flex-basis: 0;
-  flex-basis: auto; /* test for layout */
 }
