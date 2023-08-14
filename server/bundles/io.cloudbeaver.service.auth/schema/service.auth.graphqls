@@ -62,6 +62,8 @@ type AuthProviderInfo {
 
     # Configurable providers must be configured first. See configurations field.
     configurable: Boolean!
+    # Federated providers means authorization must occur asynchronously through redirects.
+    federated: Boolean!
 
     # Provider configurations (applicable only if configurable=true)
     configurations: [AuthProviderConfiguration!]
