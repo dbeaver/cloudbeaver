@@ -30,6 +30,7 @@ import {
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
+import { isSafari } from '@cloudbeaver/core-utils';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { authTypes } from './authTypes';
@@ -152,7 +153,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
             <InputField
               type="password"
               name="password"
-              autoComplete="new-password"
+              autoComplete={isSafari ? 'section-connection-ssh-authentication section-ssh password' : 'new-password'}
               state={handlerState}
               disabled={disabled || !enabled}
               readOnly={readonly}
