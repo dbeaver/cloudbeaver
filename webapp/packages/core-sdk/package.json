@@ -8,11 +8,12 @@
   "module": "lib/index.js",
   "types": "src/index.ts",
   "scripts": {
-    "prebuild": "rimraf --glob lib/*",
+    "prebuild": "rimraf --glob lib/* & rimraf node_modules",
     "build": "webpack --config ../../configs/webpack.plugin.config.js",
     "postbuild": "tsc",
     "pregql:gen": "rimraf node_modules",
     "gql:gen": "graphql-codegen",
+    "pregql:gen:dev": "rimraf node_modules",
     "gql:gen:dev": "graphql-codegen --watch",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
