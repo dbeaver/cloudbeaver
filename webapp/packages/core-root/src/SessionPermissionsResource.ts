@@ -35,7 +35,7 @@ export class SessionPermissionsResource extends CachedDataResource<Set<string>> 
     );
 
     sessionPermissionEventHandler.onEvent<ISessionPermissionEvent>(
-      ServerEventId.CbObjectPermissionsUpdated,
+      ServerEventId.CbSubjectPermissionsUpdated,
       () => {
         this.dataSynchronizationService
           .requestSynchronization('permissions', this.localizationService.translate('app_root_event_permissions_changed_message'))
