@@ -12,6 +12,8 @@ export interface IDataGroupingOptions extends IDataQueryOptions {
   query: string;
   sourceResultId: string;
   columns: string[];
+  functions: string[];
+  showDuplicatesOnly: boolean;
 }
 
 export class GroupingDataSource extends QueryDataSource<IDataGroupingOptions> {
@@ -35,6 +37,8 @@ export class GroupingDataSource extends QueryDataSource<IDataGroupingOptions> {
         contextId: executionContextInfo.id,
         resultsId: options.sourceResultId,
         columnNames: options.columns,
+        functions: options.functions,
+        showDuplicatesOnly: options.showDuplicatesOnly || false,
       });
 
       this.setOptions({ ...options, query });
