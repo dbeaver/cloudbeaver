@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useMenuState } from 'reakit';
+import React from 'react';
 import styled, { css } from 'reshadow';
 
-import { PlaceholderComponent, useTranslate } from '@cloudbeaver/core-blocks';
-import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
-import { InlineEditor, useHints } from '@cloudbeaver/core-ui';
+import { getComputed, PlaceholderComponent, useTranslate } from '@cloudbeaver/core-blocks';
+import { InlineEditor } from '@cloudbeaver/core-ui';
 
+import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService';
 import { useWhereFilter } from './useWhereFilter';
 
@@ -28,15 +28,16 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
   const translate = useTranslate();
   const state = useWhereFilter(model, resultIndex);
 
-  const menu = useMenuState({
-    placement: 'bottom-end',
-    gutter: 1,
+  const autocompletionItems = getComputed(() => {
+    let result;
+    if (model && resultIndex !== undefined && model.source.hasResult(resultIndex)) {
+      result = model.source
+        .getAction(resultIndex, ResultSetViewAction)
+        .columns.map(column => ({ key: column.label || '', value: column.label || '', icon: column.icon || '' }));
+    }
+
+    return result;
   });
-
-  const mapColumnsToHints = (columns: SqlResultColumn[]) =>
-    columns.map(column => ({ key: column.label || '', value: column.label || '', icon: column.icon || '' }));
-
-  const hintsState = useHints(menu, undefined, model, resultIndex, mapColumnsToHints);
 
   return styled(styles)(
     <InlineEditor
@@ -47,7 +48,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
       edited={!!state.filter}
       disableSave={!state.applicableFilter}
       disabled={state.disabled}
-      hintsState={hintsState}
+      autocompletionItems={autocompletionItems}
       simple
       onSave={state.apply}
       onChange={state.set}

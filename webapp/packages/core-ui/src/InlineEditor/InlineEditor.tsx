@@ -9,13 +9,13 @@ import { observer } from 'mobx-react-lite';
 import { ChangeEvent, forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import styled, { use } from 'reshadow';
 
-import { Icon, IconOrImage, Loader, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import { getComputed, Icon, IconOrImage, Loader, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
-import { Hints } from '../Hints/Hints';
-import type { HintsState } from '../Hints/useHints';
+import { Autocompletion } from '../Autocompletion/Autocompletion';
+import { IAutocompletion, useAutocompletion } from '../Autocompletion/useAutocompletion';
 import { EditorDialog } from './EditorDialog';
 import { InlineEditorStyles } from './styles';
 
@@ -33,7 +33,7 @@ export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLIn
   active?: boolean;
   loading?: boolean;
   style?: ComponentStyle;
-  hintsState?: HintsState;
+  autocompletionItems?: IAutocompletion[];
   onChange: (value: string) => void;
   onSave?: () => void;
   onReject?: () => void;
@@ -58,7 +58,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
       loading,
       disabled,
       style,
-      hintsState,
+      autocompletionItems,
       onChange,
       onSave,
       onUndo,
@@ -79,17 +79,12 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
     });
 
     const inputRef = useRef<HTMLInputElement>(null);
-    if (hintsState) {
-      hintsState.inputRef = inputRef;
-    }
-
     const commonDialogService = useService(CommonDialogService);
+    const { state: autocompletionState, updateInputValueDebounced } = useAutocompletion(autocompletionItems, inputRef, onChange);
 
     const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
       props.onChange(event.target.value);
-      if (hintsState) {
-        hintsState.updateInputValue(event.target.value);
-      }
+      updateInputValueDebounced?.(event.target.value);
     }, []);
 
     const handlePopup = useCallback(async () => {
@@ -102,41 +97,37 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
       }
     }, []);
 
-    const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
-      switch (event.key) {
-        case 'Enter':
-          if (!props.disableSave && props.onSave) {
-            props.onSave();
-          }
-          break;
-        case 'Escape':
-          props.onReject?.();
-          break;
-        case 'ArrowDown':
-          hintsState?.menuRef.current?.focus();
-          break;
-      }
-    }, []);
-
-    const handleClick = useCallback(() => {
-      hintsState?.toggleHints();
-    }, [hintsState]);
-
-    const handleBlur = useCallback(() => {
-      if (hintsState) {
-        hintsState.changed = false;
-      }
-    }, [hintsState]);
-
-    const onHintSelect = useCallback(
-      (value: any) => {
-        if (hintsState) {
-          const changedValue = hintsState.getChangedValue(value);
-          props.onChange(changedValue);
+    const handleKeyDown = useCallback(
+      (event: React.KeyboardEvent<HTMLInputElement>) => {
+        switch (event.key) {
+          case 'Enter':
+            if (!props.disableSave && props.onSave) {
+              props.onSave();
+            }
+            break;
+          case 'Escape':
+            props.onReject?.();
+            break;
+          case 'ArrowDown':
+            autocompletionState.onArrowDown();
+            break;
         }
       },
-      [hintsState],
+      [autocompletionState],
     );
+
+    const handleBlur = useCallback(() => {
+      if (autocompletionState.isAutocompletionEnabled) {
+        autocompletionState.changed = false;
+      }
+    }, [autocompletionState]);
+
+    const autocompletionProps = getComputed(() => ({
+      items: autocompletionState.filteredItems,
+      menu: autocompletionState.menu,
+      ref: autocompletionState.menuRef,
+      onSelect: autocompletionState.onSelect,
+    }));
 
     useEffect(() => {
       if (autofocus && !disabled) {
@@ -156,12 +147,12 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
             autoComplete="off"
             disabled={disabled}
             onChange={handleChange}
+            onClick={autocompletionState.toggleAutocompletion}
             onKeyDown={handleKeyDown}
-            onClick={handleClick}
             onBlur={handleBlur}
             {...rest}
           />
-          {hintsState && <Hints ref={hintsState.menuRef} menu={hintsState.menu} hints={hintsState.filteredHints} onSelect={onHintSelect} />}
+          {autocompletionItems && <Autocompletion {...autocompletionProps} />}
         </editor-container>
         <editor-actions as="div" {...use({ position: controlsPosition })} onMouseDown={e => e.preventDefault()}>
           {!hideSave && (

@@ -11,30 +11,27 @@ import { Menu, MenuButton, MenuItem, MenuStateReturn } from 'reakit/Menu';
 
 import { Icon, IconOrImage, s, useS } from '@cloudbeaver/core-blocks';
 
-import style from './Hints.m.css';
-import type { Hint } from './useHints';
+import style from './Autocompletion.m.css';
+import type { IAutocompletion } from './useAutocompletion';
 
-interface Props {
+interface AutocompletionProps {
   menu: MenuStateReturn;
-  hints: Hint[];
+  items: IAutocompletion[];
   ref?: React.Ref<HTMLDivElement>;
   propertyName?: string;
-  onSelect?: (id: string, value: string) => void;
+  onSelect?: (value: string) => void;
 }
 
-type EditorHintsType = (props: Props, ref: React.Ref<HTMLDivElement>) => React.ReactElement | null;
+type AutocompletionType = (props: AutocompletionProps, ref: React.Ref<HTMLDivElement>) => React.ReactElement | null;
 
-export const Hints: EditorHintsType = observer(
-  forwardRef(function Hints({ menu, hints, propertyName, onSelect }: Props, ref: React.Ref<HTMLDivElement>) {
+export const Autocompletion: AutocompletionType = observer(
+  forwardRef(function Autocompletion({ menu, items, propertyName, onSelect }: AutocompletionProps, ref: React.Ref<HTMLDivElement>) {
     const styles = useS(style);
 
     const handleSelect = useCallback(
-      (id: any, value: any) => {
+      (id: any) => {
         menu.hide();
-
-        if (onSelect) {
-          onSelect(id, value);
-        }
+        onSelect?.(id);
       },
       [menu, onSelect],
     );
@@ -45,7 +42,7 @@ export const Hints: EditorHintsType = observer(
           <Icon name="arrow" viewBox="0 0 16 16" className={s(styles, { icon: true })} />
         </MenuButton>
         <Menu {...menu} ref={ref} aria-label={propertyName} className={styles.menu} modal>
-          {hints.map(item => (
+          {items.map(item => (
             <MenuItem
               key={item.key}
               id={item.key}
@@ -53,7 +50,7 @@ export const Hints: EditorHintsType = observer(
               title={item.title}
               {...menu}
               className={styles.menuItem}
-              onClick={event => handleSelect(event.currentTarget.id, event.currentTarget.value)}
+              onClick={event => handleSelect(event.currentTarget.id)}
             >
               {item.icon && (
                 <div data-testid="item-icon" className={styles.itemIcon}>

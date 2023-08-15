@@ -17,8 +17,8 @@ export * from './DragAndDrop/useDNDData';
 
 export * from './InlineEditor/InlineEditor';
 
-export * from './Hints/Hints';
-export * from './Hints/useHints';
+export * from './Autocompletion/Autocompletion';
+export * from './Autocompletion/useAutocompletion';
 
 export * from './Screens/AppScreen/NavigationService';
 export * from './Screens/AppScreen/OptionsPanelService';
