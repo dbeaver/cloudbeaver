@@ -80,11 +80,11 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
 
     const inputRef = useRef<HTMLInputElement>(null);
     const commonDialogService = useService(CommonDialogService);
-    const { state: autocompletionState, updateInputValueDebounced } = useAutocompletion(autocompletionItems, inputRef, onChange);
+    const { state: autocompletionState, updateInputValueForAutocompletion } = useAutocompletion(autocompletionItems, inputRef, onChange);
 
     const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
       props.onChange(event.target.value);
-      updateInputValueDebounced?.(event.target.value);
+      updateInputValueForAutocompletion?.(event.target.value);
     }, []);
 
     const handlePopup = useCallback(async () => {
@@ -113,7 +113,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
             break;
         }
       },
-      [autocompletionState],
+      [autocompletionState.onArrowDown],
     );
 
     const handleBlur = useCallback(() => {

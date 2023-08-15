@@ -39,7 +39,7 @@ interface AutocompletionState {
 
 interface AutocompletionStateReturnType {
   state: AutocompletionState;
-  updateInputValueDebounced: (value: string) => void;
+  updateInputValueForAutocompletion: (value: string) => void;
 }
 
 export const AUTOCOMPLETION_FILTER_DELAY = 250;
@@ -149,7 +149,7 @@ export function useAutocompletion(
     { menu, autocompletionItems, inputRef },
   );
 
-  const updateInputValueDebounced = debounce((value: string) => {
+  const updateInputValueForAutocompletion = debounce((value: string) => {
     state.updateInputValue(value);
   }, AUTOCOMPLETION_FILTER_DELAY);
 
@@ -174,5 +174,5 @@ export function useAutocompletion(
     };
   }, [state.inputRef]);
 
-  return { state, updateInputValueDebounced };
+  return { state, updateInputValueForAutocompletion };
 }
