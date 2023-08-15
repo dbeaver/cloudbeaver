@@ -67,10 +67,16 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         this.tabId = tabId;
       },
       setActiveProvider(provider: AuthProvider | null, configuration: AuthProviderConfiguration | null): void {
+        const providerChanged = this.activeProvider?.id !== provider?.id;
+        const configurationChanged = this.activeConfiguration?.id !== configuration?.id;
+
         this.activeProvider = provider;
-        this.credentials.profile = '0';
-        this.credentials.credentials = {};
         this.activeConfiguration = configuration;
+
+        if (providerChanged || configurationChanged) {
+          this.credentials.profile = '0';
+          this.credentials.credentials = {};
+        }
 
         if (provider) {
           if (provider.federated) {
