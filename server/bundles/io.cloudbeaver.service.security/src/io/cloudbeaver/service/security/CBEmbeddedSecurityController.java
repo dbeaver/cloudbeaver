@@ -1266,7 +1266,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     SMAuthInfo.inProgress(
                         authAttemptId,
                         null,
-                        Map.of(new SMAuthConfigurationReference(authProviderId, null), securedUserIdentifyingCredentials)
+                        Map.of(new SMAuthConfigurationReference(authProviderId, authProviderConfigurationId), securedUserIdentifyingCredentials)
                     ),
                     true,
                     false
