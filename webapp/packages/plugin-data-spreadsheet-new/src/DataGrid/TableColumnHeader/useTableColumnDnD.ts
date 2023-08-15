@@ -17,11 +17,13 @@ import {
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
+type TableColumnInsertPositionSide = 'left' | 'right' | null;
+
 interface TableColumnDnD {
   setRef: (element: React.ReactElement | Element | null) => void;
   data: IDNDData;
   box: IDNDBox;
-  side: 'left' | 'right' | null;
+  side: TableColumnInsertPositionSide;
 }
 
 export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number, columnKey: IResultSetColumnKey | null): TableColumnDnD {
@@ -55,7 +57,7 @@ export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number
 
   const setRef = useCombinedRef(dndData.setTargetRef, dndBox.setRef);
 
-  let side: 'left' | 'right' | null = null;
+  let side: TableColumnInsertPositionSide = null;
 
   if (columnKey && dndBox.state.isOver && dndBox.state.context) {
     const dndColumnKey = dndBox.state.context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
