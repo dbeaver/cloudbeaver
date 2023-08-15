@@ -8,4 +8,6 @@
 
 export interface IGroupingQueryState {
   columns: string[];
+  functions: string[];
+  showDuplicatesOnly: boolean;
 }
