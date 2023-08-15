@@ -59,4 +59,5 @@
 .container.keepSize,
 .container > .keepSize {
   flex-grow: 0;
+  flex-basis: auto;
 }
