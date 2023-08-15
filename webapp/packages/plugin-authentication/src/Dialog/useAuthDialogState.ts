@@ -73,7 +73,11 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         this.activeConfiguration = configuration;
 
         if (provider) {
-          this.setTabId(getAuthProviderTabId(provider, configuration));
+          if (provider.federated) {
+            this.setTabId(FEDERATED_AUTH);
+          } else {
+            this.setTabId(getAuthProviderTabId(provider, configuration));
+          }
         } else {
           this.setTabId(null);
         }
@@ -151,9 +155,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
 
         this.authenticating = true;
         try {
-          if (configuration) {
-            this.state.setActiveProvider(provider, configuration);
-          }
+          this.state.setActiveProvider(provider, configuration ?? null);
 
           const loginTask = authInfoService.login(provider.id, {
             configurationId: configuration?.id,
@@ -174,8 +176,9 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           this.authTask = null;
           this.authenticating = false;
 
-          if (configuration) {
+          if (provider.federated) {
             this.state.setActiveProvider(null, null);
+            this.state.setTabId(FEDERATED_AUTH);
           }
         }
       },
