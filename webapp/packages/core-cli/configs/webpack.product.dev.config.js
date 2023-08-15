@@ -9,16 +9,16 @@ const commonConfig = require('./webpack.config.js');
 const main = resolve('src/index.ts');
 const sso = require.resolve('@cloudbeaver/plugin-sso/src/index.ts');
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
+const { getAssets } = require('./webpack.product.utils');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlReplaceWebpackPlugin = require('html-replace-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-
+const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const HtmlInjectWebpackPlugin = require('./HtmlInjectWebpackPlugin');
-const { getAssets } = require('./webpack.product.utils');
+
 
 const package = require(resolve('package.json'));
-const ReactRefreshPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
 const certPath = resolve(__dirname, '../../../../../certs/private.pem');
 const keyPath = resolve(__dirname, '../../../../../certs/private.key');
