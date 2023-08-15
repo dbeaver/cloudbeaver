@@ -21,6 +21,8 @@ import {
   CachedResourceContext,
   CachedResourceData,
   CachedResourceKey,
+  isResourceKeyList,
+  isResourceKeyListAlias,
   ResourceKey,
   ResourceKeyList,
   ResourceKeyListAlias,
@@ -170,6 +172,13 @@ export function useResource<
   });
 
   function getData(): any {
+    if (actions?.active === false) {
+      if (isResourceKeyList(propertiesRef.key) || isResourceKeyListAlias(propertiesRef.key)) {
+        return [];
+      }
+
+      return undefined;
+    }
     if (propertiesRef.resource instanceof CachedMapResource) {
       if (propertiesRef.key === null) {
         return undefined;
