@@ -21,9 +21,8 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
-
-import java.util.HashSet;
-import java.util.Set;
+import org.jkiss.utils.ArrayUtils;
+import org.jkiss.utils.CommonUtils;
 
 public class WSSubjectPermissionUpdatedEventHandler extends WSDefaultEventHandler<WSSubjectPermissionEvent> {
     private static final Log log = Log.getLog(WSSubjectPermissionUpdatedEventHandler.class);
@@ -49,9 +48,14 @@ public class WSSubjectPermissionUpdatedEventHandler extends WSDefaultEventHandle
         if (user == null) {
             return false;
         }
-        var userSubjects = new HashSet<>(Set.of(user.getTeams()));
-        userSubjects.add(user.getUserId());
-
-        return userSubjects.contains(event.getSubjectId());
+        var subjectId = event.getSubjectId();
+        switch (event.getSubjectType()) {
+            case user:
+                return CommonUtils.equalObjects(user.getUserId(), subjectId);
+            case team:
+                return ArrayUtils.containsIgnoreCase(user.getTeams(), subjectId);
+            default:
+                return false;
+        }
     }
 }

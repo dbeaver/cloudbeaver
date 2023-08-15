@@ -147,11 +147,6 @@ public class WebUserContext implements SMCredentialsProvider {
             smCredentials.getSmSessionId(),
             smCredentials.getPermissions()
         );
-        this.securityController = application.createSecurityController(this);
-        this.adminSecurityController = application.getAdminSecurityController(this);
-        this.secretController = application.getSecretController(this);
-        this.rmController = application.createResourceController(this, workspace);
-        this.fileController = application.createFileController(this);
     }
 
     /**
