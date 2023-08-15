@@ -7,7 +7,7 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { AdminUser, UsersResource, UsersResourceFilterKey, UsersResourceNewUsers } from '@cloudbeaver/core-authentication';
+import { AdminUser, compareUsers, UsersResource, UsersResourceFilterKey, UsersResourceNewUsers } from '@cloudbeaver/core-authentication';
 import { TableState, useObservableRef, usePagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -46,7 +46,9 @@ export function useUsersTable(filters: IUserFilters) {
         return pagination.hasNextPage;
       },
       get users() {
-        const users = Array.from(new Set([...this.usersLoader.resource.get(UsersResourceNewUsers), ...usersLoader.tryGetData]));
+        const users = Array.from(
+          new Set([...this.usersLoader.resource.get(UsersResourceNewUsers), ...usersLoader.tryGetData.filter(isDefined).sort(compareUsers)]),
+        );
         return filters.filterUsers(users.filter(isDefined));
       },
       async update() {
