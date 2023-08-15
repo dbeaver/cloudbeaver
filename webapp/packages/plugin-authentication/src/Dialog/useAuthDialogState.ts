@@ -27,7 +27,7 @@ interface IData {
   configure: boolean;
   adminPageActive: boolean;
   providers: AuthProvider[];
-  configurations: AuthProvider[];
+  federatedProviders: AuthProvider[];
 
   login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) => Promise<void>;
   loginFederated: (provider: AuthProvider, configuration: AuthProviderConfiguration, onClose?: () => void) => Promise<void>;
@@ -39,9 +39,8 @@ interface IState {
   activeConfiguration: AuthProviderConfiguration | null;
   credentials: IAuthCredentials;
 
-  setTabId: (tabId: string) => void;
-  setActiveProvider: (provider: AuthProvider | null) => void;
-  setActiveConfiguration: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
+  setTabId: (tabId: string | null) => void;
+  setActiveProvider: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
 }
 
 export function useAuthDialogState(accessRequest: boolean, providerId: string | null, configurationId?: string): IData {
@@ -64,18 +63,20 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         credentials: {},
       },
 
-      setTabId(tabId: string): void {
+      setTabId(tabId: string | null): void {
         this.tabId = tabId;
       },
-      setActiveProvider(provider: AuthProvider | null): void {
+      setActiveProvider(provider: AuthProvider | null, configuration: AuthProviderConfiguration | null): void {
         this.activeProvider = provider;
         this.credentials.profile = '0';
         this.credentials.credentials = {};
-        this.activeConfiguration = null;
-      },
-      setActiveConfiguration(provider: AuthProvider | null, configuration: AuthProviderConfiguration | null): void {
-        this.setActiveProvider(provider);
         this.activeConfiguration = configuration;
+
+        if (provider) {
+          this.setTabId(getAuthProviderTabId(provider, configuration));
+        } else {
+          this.setTabId(null);
+        }
       },
     }),
     {
@@ -84,7 +85,6 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       activeConfiguration: observable.ref,
       credentials: observable,
       setActiveProvider: action,
-      setActiveConfiguration: action,
     },
     false,
   );
@@ -94,7 +94,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       return true;
     }
 
-    if (provider.configurable || provider.trusted || provider.private) {
+    if (provider.federated || provider.trusted || provider.private) {
       return false;
     }
 
@@ -111,13 +111,17 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
     return false;
   });
 
-  const configurations = providers.filter(
-    provider => provider.configurable && (provider.configurations?.length || 0) > 0 && authProvidersResource.resource.isAuthEnabled(provider.id),
+  const federatedProviders = providers.filter(
+    provider =>
+      provider.federated &&
+      provider.configurable &&
+      (provider.configurations?.length || 0) > 0 &&
+      authProvidersResource.resource.isAuthEnabled(provider.id),
   );
 
   const tabIds = activeProviders.map(provider => provider.id);
 
-  if (configurations.length > 0) {
+  if (federatedProviders.length > 0) {
     tabIds.push(FEDERATED_AUTH);
   }
 
@@ -148,7 +152,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         this.authenticating = true;
         try {
           if (configuration) {
-            this.state.setActiveConfiguration(provider, configuration ?? null);
+            this.state.setActiveProvider(provider, configuration);
           }
 
           const loginTask = authInfoService.login(provider.id, {
@@ -171,7 +175,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           this.authenticating = false;
 
           if (configuration) {
-            this.state.setActiveConfiguration(null, null);
+            this.state.setActiveProvider(null, null);
           }
         }
       },
@@ -188,7 +192,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       state,
       adminPageActive,
       providers: activeProviders,
-      configurations,
+      federatedProviders,
     },
   );
 
@@ -203,13 +207,11 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
   );
 
   if (tabIds.length > 0 && (state.tabId === null || !tabIds.includes(state.tabId))) {
-    const tabId = tabIds[0];
-    state.setTabId(tabId);
+    const provider = providers.find(provider => provider.id === providerId) || activeProviders[0] || null;
+    const configuration =
+      provider?.configurations?.find(configuration => configuration.id === configurationId) || provider?.configurations?.[0] || null;
 
-    const provider = activeProviders.find(provider => provider.id === tabId) || providers.find(provider => provider.id === providerId) || null;
-    const configuration = provider?.configurations?.find(configuration => configuration.id === configurationId) ?? null;
-
-    state.setActiveConfiguration(provider, configuration);
+    state.setActiveProvider(provider, configuration);
   }
 
   return data;
@@ -228,4 +230,11 @@ function compareProviders(providerA: AuthProvider, providerB: AuthProvider): num
     return -1;
   }
   return 1;
+}
+
+export function getAuthProviderTabId(provider: AuthProvider, configuration?: AuthProviderConfiguration | null): string {
+  if (!configuration) {
+    return provider.id;
+  }
+  return provider.id + '_' + configuration.id;
 }
