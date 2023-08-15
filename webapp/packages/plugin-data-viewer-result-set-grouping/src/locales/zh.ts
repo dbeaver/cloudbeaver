@@ -3,6 +3,7 @@ export default [
   ['plugin_data_viewer_result_set_grouping_placeholder', 'There is no data to show.\nDrag and drop a column from the result viewer to group values.'],
   ['plugin_data_viewer_result_set_grouping_column_delete_tooltip', 'Remove grouping by selected columns'],
   ['plugin_data_viewer_result_set_grouping_action_show_duplicates', 'Show duplicates'],
+  ['plugin_data_viewer_result_set_grouping_action_show_all', 'Show all'],
   ['plugin_data_viewer_result_set_grouping_action_configure', 'Configure'],
   ['plugin_data_viewer_result_set_grouping_action_configure_tooltip', 'Edit grouping configuration'],
   ['plugin_data_viewer_result_set_grouping_grouping_configuration', 'Grouping configuration'],
