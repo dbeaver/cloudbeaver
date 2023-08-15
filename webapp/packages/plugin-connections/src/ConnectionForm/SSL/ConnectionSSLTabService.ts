@@ -12,7 +12,7 @@ import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-conn
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
-import { isObjectsEqual } from '@cloudbeaver/core-utils';
+import { isNotNullDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
@@ -145,7 +145,7 @@ export class ConnectionSSLTabService extends Bootstrap {
         }
 
         const key = descriptorProperty.id;
-        const isDefault = descriptorProperty.defaultValue !== null && descriptorProperty.defaultValue !== undefined;
+        const isDefault = isNotNullDefined(descriptorProperty.defaultValue);
 
         if (!(key in handlerConfig.properties) && isDefault) {
           handlerConfig.properties[key] = descriptorProperty.defaultValue;
