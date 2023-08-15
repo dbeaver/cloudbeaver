@@ -108,6 +108,10 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       return false;
     }
 
+    if (provider.configurable && (provider.configurations?.length ?? 0) === 0) {
+      return false;
+    }
+
     if (providerId !== null) {
       return provider.id === providerId;
     }
@@ -129,7 +133,15 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       authProvidersResource.resource.isAuthEnabled(provider.id),
   );
 
-  const tabIds = activeProviders.map(provider => provider.id);
+  const tabIds = activeProviders
+    .map(provider => {
+      if (provider.configurable) {
+        return provider.configurations?.map(configuration => getAuthProviderTabId(provider, configuration)) ?? [];
+      }
+
+      return provider.id;
+    })
+    .flat();
 
   if (federatedProviders.length > 0) {
     tabIds.push(FEDERATED_AUTH);
