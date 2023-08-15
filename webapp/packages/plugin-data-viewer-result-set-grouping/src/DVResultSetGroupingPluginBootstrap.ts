@@ -69,8 +69,8 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
         if (action === ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES && isShowDuplicatesOnly) {
           return {
             ...action.info,
-            label: 'plugin-data-viewer-result-set-grouping_action_show_all',
-            tooltip: 'plugin-data-viewer-result-set-grouping_action_show_all',
+            label: 'plugin_data_viewer_result_set_grouping_action_show_all',
+            tooltip: 'plugin_data_viewer_result_set_grouping_action_show_all',
             icon: '/icons/plugin_data_viewer_result_set_grouping_show_all_sm.svg',
           };
         }
