@@ -109,6 +109,6 @@ export default [
   ['app_root_server_node_changed_title', 'Приложение было перезапущено'],
   ['app_root_server_node_changed_message', 'Приложение было перезапущено. Пожалуйста, перезагрузите страницу.'],
   ['app_root_quota_exceeded', 'Квота превышена'],
-  ['app_root_event_permissions_changed_message', 'Ваши настройки доступа были изменены'],
+  ['app_root_event_permissions_changed_message', 'Ваши права доступа были изменены'],
   ['core_eventsLog_dbeaverErrorDetails', 'Детали ошибки'],
 ];
