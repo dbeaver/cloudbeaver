@@ -43,19 +43,16 @@ export class ResultSetFormatAction
 
   getLongestCells(offset = 0, count?: number): string[] {
     const rows = this.view.rows.slice(offset, count);
-    let cells: string[] = [];
+    const cells: string[] = [];
 
     for (const row of rows) {
-      if (cells.length === 0) {
-        cells = row.map(v => this.toDisplayString(v));
-        continue;
-      }
-
       for (let i = 0; i < row.length; i++) {
         const value = this.toDisplayString(row[i]);
+        const columnIndex = this.view.columnIndex({ index: i });
+        const current = cells[columnIndex] ?? '';
 
-        if (value.length > cells[i].length) {
-          cells[i] = value;
+        if (value.length > current.length) {
+          cells[columnIndex] = value;
         }
       }
     }
