@@ -491,9 +491,12 @@ public class WebServiceSQL implements DBWServiceSQL {
     public String generateGroupByQuery(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
-        @NotNull List<String> columnsList
+        @NotNull List<String> columnsList,
+        @Nullable List<String> functions,
+        @Nullable Boolean showDuplicatesOnly
     ) throws DBWebException {
         try {
+
             WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
             var dataSource = contextInfo.getProcessor().getConnection().getDataSource();
             var groupingQueryGenerator = new SQLGroupingQueryGenerator(
@@ -502,8 +505,8 @@ public class WebServiceSQL implements DBWServiceSQL {
                 getSqlDialectFromConnection(dataSource.getContainer()),
                 contextInfo.getProcessor().getSyntaxManager(),
                 columnsList,
-                List.of(SQLGroupingQueryGenerator.DEFAULT_FUNCTION),
-                false);
+                functions == null ? List.of(SQLGroupingQueryGenerator.DEFAULT_FUNCTION) : functions, // backward compatibility
+                CommonUtils.getBoolean(showDuplicatesOnly, false));
             return groupingQueryGenerator.generateGroupingQuery(resultsInfo.getQueryText());
         } catch (DBException e) {
             throw new DBWebException("Error on generating GROUP BY query", e);
