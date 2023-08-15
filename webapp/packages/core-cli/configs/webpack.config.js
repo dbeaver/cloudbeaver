@@ -107,6 +107,7 @@ module.exports = (env, argv) => {
     options: {
       root: __dirname,
       cacheDirectory: true,
+      envName: argv.mode,
     },
   };
 

@@ -940,7 +940,11 @@ public class LocalResourceController implements RMController {
 
     protected <T> T doFileReadOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
-            fileHandler.beforeFileRead(projectId, file);
+            try {
+                fileHandler.beforeFileRead(projectId, file);
+            } catch (Exception e) {
+                log.error("Error before file reading", e);
+            }
         }
         return operation.doOperation();
     }

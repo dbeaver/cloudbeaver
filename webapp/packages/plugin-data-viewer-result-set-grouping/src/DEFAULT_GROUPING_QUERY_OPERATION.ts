@@ -1,0 +1,1 @@
+export const DEFAULT_GROUPING_QUERY_OPERATION = 'COUNT(*)';

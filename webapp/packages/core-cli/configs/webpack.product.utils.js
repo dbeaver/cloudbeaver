@@ -20,7 +20,7 @@ function getCloudbeaverDeps(package) {
 
 function scanCloudbeaverDeps(package) {
   const deps = new Set();
-  const list = getCloudbeaverDeps(package);
+  const list = [package.name];
 
   while (list.length) {
     const dependency = list.shift();
@@ -37,10 +37,8 @@ function scanCloudbeaverDeps(package) {
 
 function getAssets(package, to) {
   const patterns = scanCloudbeaverDeps(package)
-    .map(dependency => ({ from: resolve('../../node_modules', dependency, 'public'), to, force: true }))
-    .reverse();
-
-  patterns.push({ from: './public', to, force: true });
+    .reverse()
+    .map((dependency, index) => ({ from: resolve('../../node_modules', dependency, 'public'), to, force: true, priority: index }));
 
   return patterns.filter(pattern => fs.existsSync(pattern.from));
 }

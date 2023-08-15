@@ -9,13 +9,14 @@ const commonConfig = require('./webpack.config.js');
 const main = resolve('src/index.ts');
 const sso = require.resolve('@cloudbeaver/plugin-sso/src/index.ts');
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
+const { getAssets } = require('./webpack.product.utils');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlReplaceWebpackPlugin = require('html-replace-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-
+const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const HtmlInjectWebpackPlugin = require('./HtmlInjectWebpackPlugin');
-const { getAssets } = require('./webpack.product.utils');
+
 
 const package = require(resolve('package.json'));
 
@@ -51,6 +52,7 @@ module.exports = (env, argv) => {
       // port: 8080,
       client: {
         webSocketURL: 'auto://0.0.0.0:0/ws',
+        overlay: false,
       },
       server,
       proxy: {
@@ -106,6 +108,7 @@ module.exports = (env, argv) => {
         },
       ]),
       new webpack.HotModuleReplacementPlugin(),
+      new ReactRefreshPlugin(),
     ],
   });
 };
