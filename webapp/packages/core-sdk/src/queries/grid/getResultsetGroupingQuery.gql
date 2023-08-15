@@ -4,6 +4,8 @@ query getResultsetGroupingQuery(
   $connectionId: ID!
   $resultsId: ID!
   $columnNames: [ String! ]!
+  $functions: [ String! ]
+  $showDuplicatesOnly: Boolean
 ) {
   query: sqlGenerateGroupingQuery(
     projectId: $projectId,
@@ -11,5 +13,7 @@ query getResultsetGroupingQuery(
     connectionId: $connectionId, 
     resultsId: $resultsId,
     columnNames: $columnNames
+    functions: $functions
+    showDuplicatesOnly: $showDuplicatesOnly
   )
 }
