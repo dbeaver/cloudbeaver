@@ -175,6 +175,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   }
 
   setResults(results: TResult[]): this {
+    results = observable(results);
     this.actions.updateResults(results);
     this.results = results;
     return this;

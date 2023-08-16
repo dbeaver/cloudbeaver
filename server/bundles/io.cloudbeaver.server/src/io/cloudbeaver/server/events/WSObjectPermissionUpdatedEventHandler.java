@@ -30,8 +30,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class WSPermissionUpdatedEventHandler extends WSDefaultEventHandler<WSObjectPermissionEvent> {
-    private static final Log log = Log.getLog(WSPermissionUpdatedEventHandler.class);
+public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler<WSObjectPermissionEvent> {
+    private static final Log log = Log.getLog(WSObjectPermissionUpdatedEventHandler.class);
     private volatile Set<String> subjectsWithProjectAccess;
 
     @Override

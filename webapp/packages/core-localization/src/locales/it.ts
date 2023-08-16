@@ -92,5 +92,6 @@ export default [
   ['app_root_session_expire_warning_button', 'Sono qua'],
   ['app_root_session_expired_title', 'Sessione scaduta'],
   ['app_root_session_expired_message', 'La sessione è scaduta. Vuoi ricaricare?'],
+  ['app_root_event_permissions_changed_message', 'Your permissions have been changed'],
   ['core_eventsLog_dbeaverErrorDetails', "Dettagli dell'errore"],
 ];

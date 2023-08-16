@@ -47,8 +47,8 @@ export class ResultSetConstraintAction
     return this.source.options.constraints.filter(isFilterConstraint);
   }
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
-    super(source, result);
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>) {
+    super(source);
     makeObservable(this, {
       orderConstraints: computed,
       filterConstraints: computed,
@@ -253,11 +253,10 @@ export class ResultSetConstraintAction
   }
 
   updateResults(results: IDatabaseResultSet[]): void {
-    if (!this.source.options || results.length !== this.source.results.length) {
+    const nextResult = results[this.resultIndex];
+    if (!this.source.options || results.length !== this.source.results.length || !nextResult) {
       return;
     }
-
-    const nextResult = results[this.resultIndex];
 
     for (const constraint of this.source.options.constraints) {
       const prevColumn = this.result.data?.columns?.find(column => column.position === constraint.attributePosition);

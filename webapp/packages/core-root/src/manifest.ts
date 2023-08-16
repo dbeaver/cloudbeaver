@@ -23,6 +23,7 @@ import { SessionEventSource } from './SessionEventSource';
 import { SessionExpireEventService } from './SessionExpireEventService';
 import { SessionExpireService } from './SessionExpireService';
 import { SessionInfoEventHandler } from './SessionInfoEventHandler';
+import { SessionPermissionEventHandler } from './SessionPermissionEventHandler';
 import { SessionPermissionsResource } from './SessionPermissionsResource';
 import { SessionResource } from './SessionResource';
 import { SessionService } from './SessionService';
@@ -56,5 +57,6 @@ export const manifest: PluginManifest = {
     SessionEventSource,
     SessionInfoEventHandler,
     DataSynchronizationService,
+    SessionPermissionEventHandler,
   ],
 };

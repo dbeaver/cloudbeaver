@@ -226,9 +226,9 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   }
 
   private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
-    return results.map<IDatabaseResultSet>(result => ({
+    return results.map<IDatabaseResultSet>((result, index) => ({
       id: result.resultSet?.id || '0',
-      uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${result.resultSet?.id || '0'}`,
+      uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${index}`,
       connectionId: executionContextInfo.connectionId,
       contextId: executionContextInfo.id,
       dataFormat: result.dataFormat!,

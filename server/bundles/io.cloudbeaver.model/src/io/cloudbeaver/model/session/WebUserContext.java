@@ -123,12 +123,16 @@ public class WebUserContext implements SMCredentialsProvider {
         if (isSessionChanged) {
             this.smSessionId = smAuthPermissions.getSessionId();
             setUser(smAuthPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));
-            this.accessibleProjectIds.clear();
-            this.accessibleProjectIds.addAll(
-                Arrays.stream(rmController.listAccessibleProjects()).map(RMProject::getId).collect(Collectors.toSet())
-            );
+            refreshAccessibleProjects();
         }
         return isSessionChanged;
+    }
+
+    public synchronized void refreshAccessibleProjects() throws DBException {
+        this.accessibleProjectIds.clear();
+        this.accessibleProjectIds.addAll(
+            Arrays.stream(rmController.listAccessibleProjects()).map(RMProject::getId).collect(Collectors.toSet())
+        );
     }
 
     public synchronized void refreshSMSession() throws DBException {

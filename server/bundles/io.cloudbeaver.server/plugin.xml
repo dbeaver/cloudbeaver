@@ -58,8 +58,11 @@
         <eventHandler class="io.cloudbeaver.server.events.WSRmResourceUpdatedEventHandlerImpl">
             <topic id="cb_scripts"/>
         </eventHandler>
-        <eventHandler class="io.cloudbeaver.server.events.WSPermissionUpdatedEventHandler">
-            <topic id="cb_permissions"/>
+        <eventHandler class="io.cloudbeaver.server.events.WSObjectPermissionUpdatedEventHandler">
+            <topic id="cb_object_permissions"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSSubjectPermissionUpdatedEventHandler">
+            <topic id="cb_subject_permissions"/>
         </eventHandler>
         <eventHandler class="io.cloudbeaver.server.events.WSProjectUpdatedEventHandler">
             <topic id="cb_projects"/>
