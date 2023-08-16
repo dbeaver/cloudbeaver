@@ -62,6 +62,7 @@ public class WebNetworkHandlerConfigInput {
         return JSONUtils.getString(cfg, "password");
     }
 
+    @Deprecated // use secured properties
     public String getKey() {
         return JSONUtils.getString(cfg, "key");
     }

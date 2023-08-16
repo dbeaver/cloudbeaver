@@ -27,14 +27,15 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javax.servlet.http.HttpServletRequest;
 
 public class CBJettyWebSocketManager implements JettyWebSocketCreator {
     private static final Log log = Log.getLog(CBJettyWebSocketManager.class);
@@ -64,6 +65,8 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
                 return null;
             }
             return createNewEventsWebSocket(headlessSession);
+        } catch (SMAccessTokenExpiredException e) {
+            return new CBExpiredSessionWebSocket();
         } catch (DBException e) {
             log.error("Error resolve websocket session", e);
             return null;

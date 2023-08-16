@@ -136,6 +136,7 @@ public class WebDataSourceUtils {
         handlerCfg.setUserName(webConfig.getUserName());
         handlerCfg.setPassword(webConfig.getPassword());
         setSecureProperties(handlerCfg, webConfig, false);
+        handlerCfg.setSecureProperty(SSHConstants.PROP_KEY_VALUE, webConfig.getKey()); // backward compatibility
     }
 
 

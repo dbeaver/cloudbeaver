@@ -16,26 +16,20 @@
  */
 package io.cloudbeaver.server.websockets;
 
-import com.google.gson.Gson;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.api.WriteCallback;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.client.WSUpdateActiveProjectsClientEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSocketConnectedEvent;
 
-import java.io.IOException;
-
-public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionEventHandler {
-    private static final Gson gson = WSUtils.gson;
+public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessionEventHandler {
     private static final Log log = Log.getLog(CBEventsWebSocket.class);
 
     @NotNull
@@ -53,7 +47,7 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
     public void onWebSocketConnect(Session session) {
         super.onWebSocketConnect(session);
         this.webSession.addEventHandler(this);
-        handeWebSessionEvent(new WSSocketConnectedEvent(webSession.getApplication().getApplicationRunId()));
+        handleEvent(new WSSocketConnectedEvent(webSession.getApplication().getApplicationRunId()));
         log.debug("EventWebSocket connected to the " + webSession.getSessionId() + " session");
     }
 
@@ -103,30 +97,15 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
         webSession.addSessionError(cause);
     }
 
-    public void awaitClosure() throws InterruptedException {
-        log.debug("Awaiting closure from remote");
+    @Override
+    public void handleWebSessionEvent(WSEvent event) {
+        super.handleEvent(event);
     }
 
     @Override
-    public void handeWebSessionEvent(WSEvent event) {
-        if (isNotConnected()) {
-            return;
-        }
-        try {
-            getRemote().sendString(gson.toJson(event));
-        } catch (IOException e) {
-            log.error("Failed to send websocket message", e);
-            webSession.addSessionError(e);
-        }
-    }
-
-    @Override
-    public void close() {
-        var session = getSession();
-        // the socket may not be connected to the client
-        if (session != null) {
-            getSession().close();
-        }
+    protected void handleEventException(Exception e) {
+        super.handleEventException(e);
+        webSession.addSessionError(e);
     }
 
     @NotNull

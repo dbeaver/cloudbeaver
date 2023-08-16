@@ -34,9 +34,10 @@ import {
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedMapEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedResourceListEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
+import { isSafari } from '@cloudbeaver/core-utils';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
 import { ConnectionFormService } from '../ConnectionFormService';
@@ -137,7 +138,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const { data: applicableAuthModels } = useResource(
     Options,
     DatabaseAuthModelsResource,
-    getComputed(() => (driver?.applicableAuthModels ? resourceKeyList(driver.applicableAuthModels) : CachedMapEmptyKey)),
+    getComputed(() => (driver?.applicableAuthModels ? resourceKeyList(driver.applicableAuthModels) : CachedResourceListEmptyKey)),
   );
 
   const { data: authModel } = useResource(
@@ -310,7 +311,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 <>
                   <Container wrap gap hideEmpty>
                     <ObjectPropertyInfoForm
-                      autofillToken="new-password"
+                      autofillToken={isSafari ? 'section-connection-authentication section-options' : 'new-password'}
                       properties={properties}
                       state={config.credentials}
                       disabled={disabled}

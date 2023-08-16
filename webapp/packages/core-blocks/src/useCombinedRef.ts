@@ -8,12 +8,12 @@
 import { useCallback } from 'react';
 
 export function useCombinedRef<T>(...refs: React.ForwardedRef<T>[]) {
-  return useCallback((instance: T) => {
+  return useCallback((instance: T | null) => {
     for (const ref of refs) {
       if (typeof ref === 'function') {
         ref(instance);
       } else if (ref) {
-        (ref as React.MutableRefObject<T>).current = instance;
+        (ref as React.MutableRefObject<T | null>).current = instance;
       }
     }
   }, refs);

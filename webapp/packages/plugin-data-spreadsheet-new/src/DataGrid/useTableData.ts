@@ -96,7 +96,7 @@ export function useTableData(
         const columns: Array<Column<IResultSetRowKey, any>> = this.columnKeys.map<Column<IResultSetRowKey, any>>((col, index) => ({
           // key: uuid(),
           key: ResultSetDataKeysUtils.serialize(col),
-          columnDataIndex: { index },
+          columnDataIndex: col,
           name: this.getColumnInfo(col)?.label || '?',
           editable: true,
           width: Math.min(300, Math.max(columnsWidth[index], cellsWidth[index] ?? 0)),

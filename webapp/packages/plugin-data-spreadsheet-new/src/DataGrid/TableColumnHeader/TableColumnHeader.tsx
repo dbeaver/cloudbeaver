@@ -57,6 +57,20 @@ const headerStyles = css`
   [|dragging] {
     opacity: 0.5;
   }
+  table-header:before {
+    position: absolute;
+    z-index: 10;
+    height: 100%;
+    border-left: solid 2px var(--theme-primary);
+  }
+  [|rearrange='left']:before {
+    content: '';
+    left: 0;
+  }
+  [|rearrange='right']:before {
+    content: '';
+    right: 0;
+  }
 `;
 
 export const TableColumnHeader = observer<HeaderRendererProps<any>>(function TableColumnHeader({ column: calculatedColumn }) {
@@ -67,7 +81,7 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
   const resultIndex = dataGridContext.resultIndex;
   const model = dataGridContext.model;
 
-  const dndData = useTableColumnDnD(model, resultIndex, calculatedColumn.columnDataIndex);
+  const dnd = useTableColumnDnD(model, resultIndex, calculatedColumn.columnDataIndex);
 
   const dataReadonly = getComputed(() => tableDataContext.isReadOnly() || model.isReadonly(resultIndex));
   const sortingDisabled = getComputed(() => !tableDataContext.constraints.supported || !model.source.executionContext?.context);
@@ -105,7 +119,7 @@ export const TableColumnHeader = observer<HeaderRendererProps<any>>(function Tab
   }
 
   return styled(headerStyles)(
-    <table-header ref={dndData.setTargetRef} {...use({ dragging: dndData.state.isDragging })}>
+    <table-header ref={dnd.setRef} {...use({ dragging: dnd.data.state.isDragging, rearrange: dnd.side })}>
       <shrink-container as="div" title={columnTooltip} onClick={handleClick}>
         <icon>
           {icon && <StaticImage icon={icon} />}

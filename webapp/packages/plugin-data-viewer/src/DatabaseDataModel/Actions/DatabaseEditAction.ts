@@ -30,8 +30,8 @@ export abstract class DatabaseEditAction<TKey, TValue, TResult extends IDatabase
   readonly applyAction: ISyncExecutor<IDatabaseDataEditApplyActionData<any>>;
   protected features: Array<keyof this>;
 
-  constructor(source: IDatabaseDataSource<any, TResult>, result: TResult) {
-    super(source, result);
+  constructor(source: IDatabaseDataSource<any, TResult>) {
+    super(source);
     this.action = new SyncExecutor();
     this.applyAction = new SyncExecutor();
     this.features = [];

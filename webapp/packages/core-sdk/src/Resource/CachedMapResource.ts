@@ -31,7 +31,6 @@ export type CachedMapResourceLoader<TRealKey, TKey, TValue, TIncludes> = TRealKe
   : CachedResourceValueIncludes<TValue, TIncludes>;
 
 export const CachedMapAllKey = resourceKeyListAlias('@cached-map-resource/all');
-export const CachedMapEmptyKey = resourceKeyListAlias('@cached-map-resource/empty');
 
 /**
  * CachedMapResource is a resource that stores data in a Map.
