@@ -11,15 +11,21 @@ import type { IMenuItem } from './MenuItem/IMenuItem';
 
 type MenuItem = IMenuItem | IAction;
 
-export function menuExtractItems(items: MenuCreatorItem[], actions: MenuItem[]): MenuItem[] {
+interface MenuExtractOptions {
+  excludeNonMatching?: boolean;
+}
+
+export function menuExtractItems(items: MenuCreatorItem[], actions: MenuItem[], options?: MenuExtractOptions): MenuItem[] {
   const list: MenuItem[] = [];
 
   for (const action of actions) {
     const index = items.indexOf(action);
     if (index > -1) {
       items.splice(index, 1);
+      list.push(action);
+    } else if (!options?.excludeNonMatching) {
+      list.push(action);
     }
-    list.push(action);
   }
 
   return list;

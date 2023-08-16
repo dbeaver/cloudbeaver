@@ -196,7 +196,7 @@ export class NavNodeContextMenuService extends Bootstrap {
           ? this.coreSettingsService.settings.getValue('app.metadata.deleting')
           : this.navTreeSettingsService.settings.getValue('deleting');
 
-        items = [...items];
+        items = [ACTION_OPEN, ACTION_REFRESH, ...items];
 
         if (editingGlobalPermission) {
           items.push(ACTION_RENAME);
@@ -206,17 +206,12 @@ export class NavNodeContextMenuService extends Bootstrap {
           items.push(ACTION_DELETE);
         }
 
-        items.push(ACTION_REFRESH);
-
         return items;
       },
-
       orderItems: (context, items) => {
-        const actionsOpen = menuExtractItems(items, [ACTION_OPEN]);
-        const actionsManage = menuExtractItems(items, [ACTION_RENAME, ACTION_DELETE]);
+        const actionsManage = menuExtractItems(items, [ACTION_RENAME, ACTION_DELETE], { excludeNonMatching: true });
         const actionsRefresh = menuExtractItems(items, [ACTION_REFRESH]);
 
-        items.unshift(...actionsOpen);
         items.push(...actionsManage);
 
         if (actionsRefresh.length > 0) {
