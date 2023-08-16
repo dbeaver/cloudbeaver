@@ -6,8 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { ISessionEvent, SessionEventId, SessionEventSource, SessionEventTopic, TopicEventHandler } from '@cloudbeaver/core-root';
 import type { CbSubjectPermissionUpdateEvent as ISessionPermissionEvent } from '@cloudbeaver/core-sdk';
+
+import { TopicEventHandler } from './ServerEventEmitter/TopicEventHandler';
+import { ISessionEvent, SessionEventId, SessionEventSource, SessionEventTopic } from './SessionEventSource';
 
 export { ISessionPermissionEvent };
 
