@@ -113,5 +113,6 @@ export default [
   ['app_root_server_node_changed_title', 'The application was relaunched'],
   ['app_root_server_node_changed_message', 'The application was relaunched. Please, reload the page.'],
   ['app_root_quota_exceeded', 'Quota exceeded'],
+  ['app_root_event_permissions_changed_message', 'Your permissions have been changed'],
   ['core_eventsLog_dbeaverErrorDetails', 'Error details'],
 ];

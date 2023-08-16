@@ -107,5 +107,6 @@ export default [
   ['app_root_session_expired_title', '会话已过期'],
   ['app_root_session_expired_message', '会话已过期。您想重新加载吗？'],
   ['app_root_quota_exceeded', '超出配额'],
+  ['app_root_event_permissions_changed_message', 'Your permissions have been changed'],
   ['core_eventsLog_dbeaverErrorDetails', '错误详情'],
 ];
