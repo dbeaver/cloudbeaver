@@ -37,6 +37,7 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { CachedResourceListEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
+import { isSafari } from '@cloudbeaver/core-utils';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
 import { ConnectionFormService } from '../ConnectionFormService';
@@ -310,7 +311,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 <>
                   <Container wrap gap hideEmpty>
                     <ObjectPropertyInfoForm
-                      autofillToken="new-password"
+                      autofillToken={isSafari ? 'section-connection-authentication section-options' : 'new-password'}
                       properties={properties}
                       state={config.credentials}
                       disabled={disabled}

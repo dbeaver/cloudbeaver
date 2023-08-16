@@ -22,8 +22,8 @@ export abstract class DatabaseSelectAction<TKey, TResult extends IDatabaseDataRe
   static dataFormat: ResultDataFormat[] | null = null;
   readonly actions: ISyncExecutor<DatabaseDataSelectActionsData<TKey>>;
 
-  constructor(source: IDatabaseDataSource<any, TResult>, result: TResult) {
-    super(source, result);
+  constructor(source: IDatabaseDataSource<any, TResult>) {
+    super(source);
     this.actions = new SyncExecutor();
   }
 

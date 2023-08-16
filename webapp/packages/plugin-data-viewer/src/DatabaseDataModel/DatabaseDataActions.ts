@@ -50,7 +50,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
       let action = actions.find(action => action instanceof Action);
 
       if (!action) {
-        const allDeps = getDependingDataActions(Action).slice(2); // skip source and result arguments
+        const allDeps = getDependingDataActions(Action).slice(1); // skip source argument
 
         const depends: any[] = [];
 
@@ -66,7 +66,8 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
           throw new Error('Unsupported inject in: ' + Action.name);
         }
 
-        action = new Action(this.source, result, ...depends);
+        action = new Action(this.source, ...depends);
+        action.updateResult(result, this.source.results.indexOf(result));
         this.addActionToList(result.uniqueResultId, actions, action);
       }
       return action as T;
@@ -95,7 +96,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
         if (!result) {
           action.dispose();
         } else {
-          action.updateResult(result);
+          action.updateResult(result, results.indexOf(result));
         }
       }
 

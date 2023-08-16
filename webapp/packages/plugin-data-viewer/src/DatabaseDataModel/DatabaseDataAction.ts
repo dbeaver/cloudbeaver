@@ -12,11 +12,8 @@ import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { IDatabaseDataSource } from './IDatabaseDataSource';
 
 export abstract class DatabaseDataAction<TOptions, TResult extends IDatabaseDataResult> implements IDatabaseDataAction<TOptions, TResult> {
-  result: TResult;
-
-  get resultIndex(): number {
-    return this.source.results.indexOf(this.result);
-  }
+  result!: TResult;
+  resultIndex: number;
 
   get empty(): boolean {
     return !this.result.data;
@@ -24,17 +21,20 @@ export abstract class DatabaseDataAction<TOptions, TResult extends IDatabaseData
 
   readonly source: IDatabaseDataSource<TOptions, TResult>;
 
-  constructor(source: IDatabaseDataSource<TOptions, TResult>, result: TResult) {
-    this.result = result;
+  constructor(source: IDatabaseDataSource<TOptions, TResult>) {
     this.source = source;
+    this.result = undefined as any;
+    this.resultIndex = -1;
 
     makeObservable(this, {
       result: observable.ref,
+      resultIndex: observable.ref,
     });
   }
 
-  updateResult(result: TResult): void {
+  updateResult(result: TResult, index: number): void {
     this.result = result;
+    this.resultIndex = index;
   }
 
   updateResults(results: TResult[]): void {}
