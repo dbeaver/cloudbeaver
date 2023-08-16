@@ -41,13 +41,12 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
 
   constructor(
     source: IDatabaseDataSource<any, IDatabaseResultSet>,
-    result: IDatabaseResultSet,
     view: ResultSetViewAction,
     data: ResultSetDataAction,
     graphQLService: GraphQLService,
     quotasService: QuotasService,
   ) {
-    super(source, result);
+    super(source);
 
     this.view = view;
     this.data = data;

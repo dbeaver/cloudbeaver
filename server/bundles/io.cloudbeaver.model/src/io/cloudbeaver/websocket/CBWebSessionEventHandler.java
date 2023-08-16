@@ -20,7 +20,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 
 public interface CBWebSessionEventHandler {
-    void handeWebSessionEvent(WSEvent event) throws DBException;
+    void handleWebSessionEvent(WSEvent event) throws DBException;
 
     void close();
 }

@@ -82,7 +82,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         synchronized (sessionEventHandlers) {
             for (CBWebSessionEventHandler eventHandler : sessionEventHandlers) {
                 try {
-                    eventHandler.handeWebSessionEvent(event);
+                    eventHandler.handleWebSessionEvent(event);
                 } catch (DBException e) {
                     log.error(e.getMessage(), e);
                     addSessionError(e);
@@ -107,6 +107,16 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     public synchronized boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
         return userContext.refresh(smAuthInfo);
+    }
+
+    public synchronized void refreshUserData() {
+        try {
+            userContext.refreshPermissions();
+            userContext.refreshAccessibleProjects();
+        } catch (DBException e) {
+            addSessionError(e);
+            log.error("Error refreshing accessible projects", e);
+        }
     }
 
     @NotNull
@@ -158,7 +168,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         synchronized (sessionEventHandlers) {
             for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
                 try {
-                    sessionEventHandler.handeWebSessionEvent(sessionExpiredEvent);
+                    sessionEventHandler.handleWebSessionEvent(sessionExpiredEvent);
                 } catch (DBException e) {
                     log.warn("Failed to send session expiration event", e);
                 }
