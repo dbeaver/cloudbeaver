@@ -31,6 +31,7 @@ export function matchType(type?: string) {
     case 'int':
     case 'double':
     case 'long':
+    case 'Integer':
       return 'number';
     default:
       return 'text';
