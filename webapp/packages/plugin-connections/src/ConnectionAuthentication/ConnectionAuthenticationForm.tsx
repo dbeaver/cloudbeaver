@@ -71,6 +71,7 @@ export const ConnectionAuthenticationForm = observer<Props>(function ConnectionA
                 properties={properties}
                 state={config.credentials}
                 disabled={disabled}
+                canShowPassword={false}
               />
               {allowSaveCredentials && (
                 <FieldCheckbox
