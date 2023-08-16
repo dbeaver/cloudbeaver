@@ -14,11 +14,10 @@ type AbstractConstructorFunction<
   TOptions,
   TResult extends IDatabaseDataResult,
   TAction extends IDatabaseDataAction<TOptions, TResult>,
-> = abstract new (source: IDatabaseDataSource<TOptions, TResult>, result: TResult, ...actions: any[]) => TAction;
+> = abstract new (source: IDatabaseDataSource<TOptions, TResult>, ...actions: any[]) => TAction;
 
 type ConstructorFunction<TOptions, TResult extends IDatabaseDataResult, TAction extends IDatabaseDataAction<TOptions, TResult>> = new (
   source: IDatabaseDataSource<TOptions, TResult>,
-  result: TResult,
   ...actions: any[]
 ) => TAction;
 
@@ -45,7 +44,7 @@ export interface IDatabaseDataAction<TOptions, TResult extends IDatabaseDataResu
   readonly empty: boolean;
   result: TResult;
   resultIndex: number;
-  updateResult: (result: TResult) => void;
+  updateResult: (result: TResult, index: number) => void;
   updateResults: (results: TResult[]) => void;
   afterResultUpdate: () => void;
   tryGetAction: <T extends IDatabaseDataAction<TOptions, TResult>>(action: IDatabaseDataActionClass<TOptions, TResult, T>) => T | undefined;

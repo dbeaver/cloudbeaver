@@ -51,6 +51,7 @@ import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
+import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
@@ -214,7 +215,16 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error saving user teams in database", e);
         }
+        var event = WSSubjectPermissionEvent.update(
+            getSmSessionId(),
+            getUserId(),
+            SMSubjectType.user,
+            userId
+        );
+        application.getEventController().addEvent(event);
     }
+
+
 
     @NotNull
     @Override
@@ -588,7 +598,16 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error while updating user authentication role", e);
         }
+        var event = WSSubjectPermissionEvent.update(
+            getSmSessionId(),
+            getUserId(),
+            SMSubjectType.user,
+            userId
+        );
+        application.getEventController().addEvent(event);
     }
+
+
 
     ///////////////////////////////////////////
     // Credentials
@@ -1570,7 +1589,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public SMTokens refreshSession(@NotNull String refreshToken) throws DBException {
         var currentUserCreds = getCurrentUserCreds();
         var currentUserAccessToken = currentUserCreds.getSmAccessToken();
-        String currentUserAuthRole = readTokenAuthRole(currentUserAccessToken);
 
         var smTokenInfo = readAccessTokenInfo(currentUserAccessToken);
 
@@ -1580,7 +1598,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
         try (var dbCon = database.openConnection()) {
             invalidateUserTokens(currentUserAccessToken);
-            return generateNewSessionToken(smTokenInfo.getSessionId(), smTokenInfo.getUserId(), currentUserAuthRole, dbCon);
+            return generateNewSessionToken(
+                smTokenInfo.getSessionId(),
+                smTokenInfo.getUserId(),
+                updateUserAuthRoleIfNeeded(smTokenInfo.getUserId(), null),
+                dbCon);
         } catch (SQLException e) {
             throw new DBException("Error refreshing sm session", e);
         }
@@ -1937,7 +1959,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         }
     }
 
-    private String updateUserAuthRoleIfNeeded(@Nullable String userId, @Nullable String authRole) throws DBException {
+    protected String updateUserAuthRoleIfNeeded(@Nullable String userId, @Nullable String authRole) throws DBException {
         if (userId == null) {
             return null;
         }
@@ -2573,5 +2595,17 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             log.error("Error getting all subject ids from database", e);
             return Set.of();
         }
+    }
+
+    @Nullable
+    private String getSmSessionId() {
+        var credentials = credentialsProvider.getActiveUserCredentials();
+        return credentials == null ? null : credentials.getSmSessionId();
+    }
+
+    @Nullable
+    private String getUserId() {
+        var credentials = credentialsProvider.getActiveUserCredentials();
+        return credentials == null ? null : credentials.getUserId();
     }
 }
