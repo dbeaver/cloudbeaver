@@ -23,6 +23,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { NetworkHandlerConfigInput, NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
+import { isSafari } from '@cloudbeaver/core-utils';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR';
@@ -53,6 +54,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
   const disabled = formDisabled || loading;
   const enabled = handlerState.enabled || false;
   const initialHandler = info?.networkHandlersConfig?.find(h => h.id === handler.id);
+  const autofillToken = isSafari ? 'section-connection-authentication-ssl section-ssl' : 'new-password';
 
   return styled(styles)(
     <SubmittingForm>
@@ -68,7 +70,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
               category={null}
               disabled={disabled || readonly || !enabled}
               isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
-              autofillToken="new-password"
+              autofillToken={autofillToken}
               hideEmptyPlaceholder
               showRememberTip
               small
@@ -84,7 +86,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
                 category={category}
                 disabled={disabled || readonly || !enabled}
                 isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
-                autofillToken="new-password"
+                autofillToken={autofillToken}
                 hideEmptyPlaceholder
                 showRememberTip
                 small

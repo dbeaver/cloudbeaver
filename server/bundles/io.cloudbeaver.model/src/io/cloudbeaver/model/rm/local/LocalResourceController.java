@@ -604,7 +604,7 @@ public class LocalResourceController implements RMController {
             var normalizedNewResourcePath = CommonUtils.normalizeResourcePath(newResourcePath);
             if (log.isDebugEnabled()) {
                 log.debug("Moving resource from '" + normalizedOldResourcePath + "' to '" + normalizedNewResourcePath +
-                    "' in project '" + projectId + "'") ;
+                    "' in project '" + projectId + "'");
             }
             Path oldTargetPath = getTargetPath(projectId, normalizedOldResourcePath);
 
@@ -643,10 +643,10 @@ public class LocalResourceController implements RMController {
      * Gathers the old-new properties paths pairs and updates properties via BaseProjectImpl#moveResourcePropertiesBatch()
      */
     private void movePropertiesRecursive(
-            @NotNull String projectId,
-            @NotNull Path rootResourcePath,
-            @NotNull String oldRootPropertiesPath,
-            @NotNull String newRootPropertiesPath
+        @NotNull String projectId,
+        @NotNull Path rootResourcePath,
+        @NotNull String oldRootPropertiesPath,
+        @NotNull String newRootPropertiesPath
     ) throws IOException, DBException {
         var project = getWebProject(projectId, false);
         var projectPath = getProjectPath(projectId);
@@ -953,7 +953,15 @@ public class LocalResourceController implements RMController {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
             fileHandler.beforeFileChange(projectId, file);
         }
-        var result = operation.doOperation();
+        T result;
+        try {
+            result = operation.doOperation();
+        } catch (Exception e) {
+            for (RMFileOperationHandler fileHandler : fileHandlers) {
+                fileHandler.handleFileChangeException(projectId, file, e);
+            }
+            throw e;
+        }
         for (RMFileOperationHandler fileHandler : fileHandlers) {
             fileHandler.afterFileChange(projectId, file, credentialsProvider.getActiveUserCredentials());
         }
@@ -1144,6 +1152,7 @@ public class LocalResourceController implements RMController {
     public static class RMProjectName {
         String prefix;
         String name;
+
         private RMProjectName(String prefix, String name) {
             this.prefix = prefix;
             this.name = name;

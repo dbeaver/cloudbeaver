@@ -20,6 +20,7 @@ fragment AuthProviderInfo on AuthProviderInfo {
   #  features
   #}
 
+  federated
   configurable
   configurations {
     ...AuthProviderConfigurationInfo

@@ -59,7 +59,7 @@ export const DataSynchronizationNotification = observer<NotificationComponentPro
           {notification.message && translate(notification.message)}
           <message>
             {groups.map(messages => {
-              const message = uniq(messages.map(m => m.message)).join('\n');
+              const message = uniq(messages.map(m => translate(m.message))).join('\n');
 
               return <div key={messages[0].label}>{message}</div>;
             })}

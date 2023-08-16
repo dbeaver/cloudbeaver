@@ -322,9 +322,8 @@ public class WebConnectionInfo {
             return new WebPropertyInfo[0];
         }
 
-        // Fill session and user provided credentials
+        // Fill user provided credentials
         DBPConnectionConfiguration configWithAuth = new DBPConnectionConfiguration(dataSourceContainer.getConnectionConfiguration());
-        session.provideAuthParameters(session.getProgressMonitor(), dataSourceContainer, configWithAuth);
 
         // show all properties if it is a manual connection
         Predicate<DBPPropertyDescriptor> predicate = CommonUtils.isEmpty(getRequiredAuth())

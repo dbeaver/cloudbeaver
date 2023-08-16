@@ -24,6 +24,7 @@
     "dexie": "^3.2.4",
     "workbox-core": "~7.x.x",
     "workbox-precaching": "~7.x.x",
+    "workbox-routing": "~7.x.x",
     "workbox-window": "~7.x.x"
   },
   "peerDependencies": {

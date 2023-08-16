@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.model.navigator.DBNRoot;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.utils.ArrayUtils;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.*;
 
@@ -77,6 +78,9 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
     public DBNResourceManagerProject[] getChildren(DBRProgressMonitor monitor) throws DBException {
         if (projects == null) {
             List<? extends DBPProject> projectList = getParentNode().getModel().getModelProjects();
+            if (CommonUtils.isEmpty(projectList)) {
+                return new DBNResourceManagerProject[0];
+            }
             SMSession session = null;
             for (DBPProject project : projectList) {
                 session = getParentNode().getModel().getModelAuthContext().getSpaceSession(monitor, project.getWorkspace(), false);

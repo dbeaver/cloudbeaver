@@ -1,0 +1,23 @@
+.button {
+  composes: theme-ripple from global;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background: transparent;
+  outline: none;
+  color: inherit;
+}
+.iconOrImage {
+  display: block;
+  width: 16px;
+}
+.buttonLabel {
+  display: block;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 12px;
+}
+.iconOrImage + .buttonLabel {
+  padding-left: 4px;
+}

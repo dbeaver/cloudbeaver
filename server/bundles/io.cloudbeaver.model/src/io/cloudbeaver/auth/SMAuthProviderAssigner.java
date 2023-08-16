@@ -19,6 +19,7 @@ package io.cloudbeaver.auth;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public interface SMAuthProviderAssigner {
     @NotNull
     SMAutoAssign detectAutoAssignments(
         @NotNull DBRProgressMonitor monitor,
-        @NotNull Map<String, Object> providerConfig,
+        @NotNull SMAuthProviderCustomConfiguration providerConfig,
         @NotNull Map<String, Object> authParameters
     ) throws DBException;
 

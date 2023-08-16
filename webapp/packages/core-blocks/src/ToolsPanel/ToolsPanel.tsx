@@ -5,20 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import styled, { css } from 'reshadow';
-
-const styles = css`
-  container {
-    height: 30px;
-    display: flex;
-    flex-shrink: 0;
-  }
-`;
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './ToolsPanel.m.css';
 
 interface Props {
   className?: string;
 }
 
 export const ToolsPanel: React.FC<React.PropsWithChildren<Props>> = function ToolsPanel({ className, children }) {
-  return styled(styles)(<container className={className}>{children}</container>);
+  const styles = useS(style);
+
+  return <div className={s(styles, { toolsPanel: true }, className)}>{children}</div>;
 };

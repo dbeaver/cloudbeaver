@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlResultColumn } from '@cloudbeaver/core-sdk';
 
@@ -31,35 +31,33 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
   }
 
   get columnKeys(): IResultSetColumnKey[] {
-    return this.data.columns.map((c, index) => ({ index }));
+    return this.columns.map(c => ({ index: this.data.columns.indexOf(c) }));
   }
 
   get rows(): IResultSetValue[][] {
-    return this.result.data?.rows || [];
+    return this.data.rows;
   }
 
   get columns(): SqlResultColumn[] {
-    return this.result.data?.columns || [];
+    return this.columnsOrder.map(i => this.data.columns[i]);
   }
 
+  private columnsOrder: number[] = [];
   private readonly data: ResultSetDataAction;
   private readonly editor: ResultSetEditAction;
 
-  constructor(
-    source: IDatabaseDataSource<any, IDatabaseResultSet>,
-    result: IDatabaseResultSet,
-    data: ResultSetDataAction,
-    editor: ResultSetEditAction,
-  ) {
-    super(source, result);
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, data: ResultSetDataAction, editor: ResultSetEditAction) {
+    super(source);
     this.data = data;
     this.editor = editor;
 
-    makeObservable(this, {
+    makeObservable<this, 'columnsOrder'>(this, {
       rowKeys: computed,
       columnKeys: computed,
       rows: computed,
       columns: computed,
+      columnsOrder: observable,
+      setColumnOrder: action,
     });
   }
 
@@ -83,8 +81,23 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     return this.rowKeys.findIndex(row => ResultSetDataKeysUtils.isEqual(row, key));
   }
 
+  setColumnOrder(key: IResultSetColumnKey, index: number): void {
+    const columnIndex = this.columnDataIndex(key);
+
+    if (columnIndex === -1) {
+      return;
+    }
+
+    this.columnsOrder.splice(this.columnsOrder.indexOf(columnIndex), 1);
+    this.columnsOrder.splice(index, 0, columnIndex);
+  }
+
   columnIndex(key: IResultSetColumnKey): number {
     return this.columnKeys.findIndex(column => ResultSetDataKeysUtils.isEqual(column, key));
+  }
+
+  columnDataIndex(key: IResultSetColumnKey): number {
+    return this.data.columns.findIndex((column, index) => ResultSetDataKeysUtils.isEqual({ index }, key));
   }
 
   nextKey(key: IResultSetElementKey): IResultSetElementKey | null {
@@ -156,5 +169,12 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     }
 
     return column.supportedOperations.filter(operation => operation.argumentCount === 1 || operation.argumentCount === 0);
+  }
+
+  updateResult(result: IDatabaseResultSet, index: number): void {
+    super.updateResult(result, index);
+    if (this.columnsOrder.length !== this.data.columns.length) {
+      this.columnsOrder = this.data.columns.map((key, index) => index);
+    }
   }
 }
