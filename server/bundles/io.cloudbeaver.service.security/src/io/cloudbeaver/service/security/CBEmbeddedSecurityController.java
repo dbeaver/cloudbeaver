@@ -51,6 +51,7 @@ import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
+import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -2210,11 +2211,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @NotNull Set<String> permissions,
         @NotNull String grantor
     ) throws DBException {
-        if (CommonUtils.isEmpty(subjectIds) || CommonUtils.isEmpty(objectIds)) {
+        if (CommonUtils.isEmpty(objectIds)) {
+            return;
+        } else if (CommonUtils.isEmpty(subjectIds)) {
+            addObjectPermissionsUpdateEvent(objectIds, objectType);
             return;
         }
         Set<String> filteredSubjects = getFilteredSubjects(subjectIds);
-//        validatePermissions(objectType.getObjectType(), permissions);
+//        validatePermissions(objectType, permissions);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 var sqlBuilder = new StringBuilder("DELETE FROM {table_prefix}CB_OBJECT_PERMISSIONS WHERE SUBJECT_ID IN (");
@@ -2223,7 +2227,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     .append("AND OBJECT_ID IN (");
                 appendStringParameters(sqlBuilder, objectIds);
                 sqlBuilder.append(")");
-                JDBCUtils.executeStatement(dbCon, database.normalizeTableNames(sqlBuilder.toString()), objectType.getObjectType());
+                JDBCUtils.executeStatement(dbCon, database.normalizeTableNames(sqlBuilder.toString()), objectType);
                 if (!CommonUtils.isEmpty(permissions)) {
                     try (PreparedStatement dbStat = dbCon.prepareStatement(
                         database.normalizeTableNames(
@@ -2232,7 +2236,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                                 + "VALUES(?,?,?,?,?,?)"))) {
                         for (String objectId : objectIds) {
                             dbStat.setString(1, objectId);
-                            dbStat.setString(2, objectType.getObjectType());
+                            dbStat.setString(2, objectType.name());
                             dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
                             dbStat.setString(4, grantor);
                             for (String subjectId : subjectIds) {
@@ -2251,8 +2255,21 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 }
                 txn.commit();
             }
+            addObjectPermissionsUpdateEvent(objectIds, objectType);
         } catch (SQLException e) {
             throw new DBCException("Error granting object permissions", e);
+        }
+    }
+
+    private void addObjectPermissionsUpdateEvent(@NotNull Set<String> objectIds, @NotNull SMObjectType objectType) {
+        for (var objectId : objectIds) {
+            var event = WSObjectPermissionEvent.update(
+                getSmSessionId(),
+                getUserId(),
+                objectType,
+                objectId
+            );
+            application.getEventController().addEvent(event);
         }
     }
 
@@ -2261,7 +2278,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon,
                 database.normalizeTableNames("DELETE FROM {table_prefix}CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND OBJECT_ID=?"),
-                objectType.getObjectType(),
+                objectType.name(),
                 objectId
             );
 
@@ -2275,7 +2292,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon,
                 database.normalizeTableNames("DELETE FROM {table_prefix}CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND SUBJECT_ID=?"),
-                objectType.getObjectType(),
+                objectType.name(),
                 subjectId
             );
 
@@ -2308,7 +2325,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 appendStringParameters(sqlBuilder, allSubjects);
                 sqlBuilder.append(") AND OBJECT_TYPE=?");
                 try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder.toString()))) {
-                    dbStat.setString(1, objectType.getObjectType());
+                    dbStat.setString(1, objectType.name());
 
                     var permissionsByObjectId = new LinkedHashMap<String, Set<String>>();
                     try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -2344,7 +2361,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 sqlBuilder.append(") AND OBJECT_TYPE=? AND OBJECT_ID=?");
 
                 try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder.toString()))) {
-                    dbStat.setString(1, objectType.getObjectType());
+                    dbStat.setString(1, objectType.name());
                     dbStat.setString(2, objectId);
 
                     var permissions = new HashSet<String>();
@@ -2373,7 +2390,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 "SELECT OP.SUBJECT_ID,S.SUBJECT_TYPE, OP.PERMISSION\n" +
                     "FROM {table_prefix}CB_OBJECT_PERMISSIONS OP, {table_prefix}CB_AUTH_SUBJECT S\n" +
                     "WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.OBJECT_TYPE=? AND OP.OBJECT_ID=?"))) {
-                dbStat.setString(1, smObjectType.getObjectType());
+                dbStat.setString(1, smObjectType.name());
                 dbStat.setString(2, objectId);
                 List<SMDataSourceGrant> result = new ArrayList<>();
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -2409,7 +2426,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             appendStringParameters(sqlBuilder, allLinkedSubjects);
             sqlBuilder.append(") AND OP.OBJECT_TYPE=?");
             try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder.toString()))) {
-                dbStat.setString(1, smObjectType.getObjectType());
+                dbStat.setString(1, smObjectType.name());
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String objectId = dbResult.getString(1);
