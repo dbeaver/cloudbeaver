@@ -61,7 +61,7 @@ export const DataSynchronizationNotification = observer<NotificationComponentPro
             {groups.map(messages => {
               const message = uniq(messages.map(m => m.message)).join('\n');
 
-              return <div key={messages[0].label}>{message}</div>;
+              return <div key={messages[0].label}>{translate(message)}</div>;
             })}
           </message>
         </SnackbarBody>

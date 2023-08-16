@@ -7,7 +7,6 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 import { CachedDataResource, CachedResource, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { DataSynchronizationService } from './DataSynchronization/DataSynchronizationService';
@@ -21,7 +20,6 @@ export class SessionPermissionsResource extends CachedDataResource<Set<string>> 
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly dataSynchronizationService: DataSynchronizationService,
-    private readonly localizationService: LocalizationService,
     sessionDataResource: SessionDataResource,
     sessionResource: SessionResource,
     sessionPermissionEventHandler: SessionPermissionEventHandler,
@@ -37,13 +35,11 @@ export class SessionPermissionsResource extends CachedDataResource<Set<string>> 
     sessionPermissionEventHandler.onEvent<ISessionPermissionEvent>(
       ServerEventId.CbSubjectPermissionsUpdated,
       () => {
-        this.dataSynchronizationService
-          .requestSynchronization('permissions', this.localizationService.translate('app_root_event_permissions_changed_message'))
-          .then(state => {
-            if (state) {
-              sessionResource.markOutdated();
-            }
-          });
+        this.dataSynchronizationService.requestSynchronization('permissions', 'app_root_event_permissions_changed_message').then(state => {
+          if (state) {
+            sessionResource.markOutdated();
+          }
+        });
       },
       undefined,
       sessionResource,
