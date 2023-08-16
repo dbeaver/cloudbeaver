@@ -31,8 +31,8 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
     return this.result.data?.columns || [];
   }
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
-    super(source, result);
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>) {
+    super(source);
     makeObservable(this, {
       rows: computed,
       columns: computed,

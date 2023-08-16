@@ -25,8 +25,8 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
   readonly editedElements: Map<number, IDatabaseDataDocument>;
   private readonly data: DocumentDataAction;
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet, data: DocumentDataAction) {
-    super(source, result);
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, data: DocumentDataAction) {
+    super(source);
     this.editedElements = new Map();
     this.data = data;
 

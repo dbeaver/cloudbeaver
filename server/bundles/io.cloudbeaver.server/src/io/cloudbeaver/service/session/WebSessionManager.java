@@ -333,7 +333,6 @@ public class WebSessionManager {
                     continue;
                 }
                 try {
-                    session.getUserContext().refreshPermissions();
                     session.addSessionEvent(new WSSessionStateEvent(session.getRemainingTime(), session.isValid()));
                 } catch (Exception e) {
                     log.error("Failed to refresh session state: " + session.getSessionId(), e);
