@@ -40,14 +40,8 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
   private readonly data: ResultSetDataAction;
   private readonly validationDisposer: IReactionDisposer;
 
-  constructor(
-    source: IDatabaseDataSource<any, IDatabaseResultSet>,
-    result: IDatabaseResultSet,
-    view: ResultSetViewAction,
-    edit: ResultSetEditAction,
-    data: ResultSetDataAction,
-  ) {
-    super(source, result);
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, view: ResultSetViewAction, edit: ResultSetEditAction, data: ResultSetDataAction) {
+    super(source);
     this.view = view;
     this.edit = edit;
     this.data = data;
@@ -304,20 +298,21 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
       focusedElement = null;
     }
 
-    const removeKeys: string[] = [];
+    const removeKeys: IResultSetElementKey[] = [];
     const selectedElements = this.selectedElements.entries();
 
     for (const [key, rowSelection] of selectedElements) {
-      const element = rowSelection[0];
-      if (element && !this.view.has(element)) {
-        removeKeys.push(key);
+      for (const element of rowSelection) {
+        if (element && !this.view.has(element)) {
+          removeKeys.push(element);
+        }
       }
     }
 
     this.focus(focusedElement);
 
     for (const key of removeKeys) {
-      this.selectedElements.delete(key);
+      this.set(key, false, true);
     }
   }
 

@@ -45,16 +45,12 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
   private readonly editorData: Map<string, IResultSetUpdate>;
   private readonly data: ResultSetDataAction;
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet, data: ResultSetDataAction) {
-    super(source, result);
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, data: ResultSetDataAction) {
+    super(source);
     this.applyAction = new SyncExecutor();
     this.editorData = new Map();
     this.data = data;
     this.features = [];
-
-    if (result.data?.singleEntity) {
-      this.features = ['add', 'delete'];
-    }
 
     makeObservable<this, 'editorData'>(this, {
       editorData: observable,
@@ -513,6 +509,14 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
           break;
         }
       }
+    }
+  }
+
+  updateResult(result: IDatabaseResultSet, index: number): void {
+    super.updateResult(result, index);
+
+    if (result.data?.singleEntity) {
+      this.features = ['add', 'delete'];
     }
   }
 
