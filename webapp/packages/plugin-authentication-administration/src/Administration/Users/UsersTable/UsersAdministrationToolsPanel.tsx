@@ -8,20 +8,31 @@
 import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource } from '@cloudbeaver/core-authentication';
-import { s, ToolsAction, ToolsPanel, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, SContext, StyleRegistry, ToolsAction, ToolsPanel, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
-import { MenuBar } from '@cloudbeaver/core-ui';
+import { MenuBar, MenuBarItemStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
 import { MENU_USERS_ADMINISTRATION } from '../../../Menus/MENU_USERS_ADMINISTRATION';
 import { CreateUserService } from './CreateUserService';
 import styles from './UsersAdministrationToolsPanel.m.css';
+import UsersAdministrationMenuBarItemStyles from './UsersAdministrationMenuBarItemStyles.m.css';
 
 interface Props {
   create: boolean;
   onUpdate: () => void;
 }
+
+const registry: StyleRegistry = [
+  [
+    MenuBarItemStyles,
+    {
+      mode: 'append',
+      styles: [UsersAdministrationMenuBarItemStyles],
+    },
+  ],
+];
 
 export const UsersAdministrationToolsPanel = observer<Props>(function UsersAdministrationToolsPanel({ create, onUpdate }) {
   const createUserService = useService(CreateUserService);
@@ -43,7 +54,9 @@ export const UsersAdministrationToolsPanel = observer<Props>(function UsersAdmin
           {translate('ui_create')}
         </ToolsAction>
       )}
-      <MenuBar menu={menu} className={s(styles, { menuBar: true })} />
+      <SContext registry={registry}>
+        <MenuBar menu={menu} className={s(styles, { menuBar: true })} />
+      </SContext>
       <ToolsAction title={translate('authentication_administration_tools_refresh_tooltip')} icon="refresh" viewBox="0 0 24 24" onClick={onUpdate}>
         {translate('ui_refresh')}
       </ToolsAction>
