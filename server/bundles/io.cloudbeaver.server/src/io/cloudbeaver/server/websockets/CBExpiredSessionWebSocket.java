@@ -14,13 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.websocket;
+package io.cloudbeaver.server.websockets;
 
-import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.eclipse.jetty.websocket.api.Session;
+import org.jkiss.dbeaver.model.websocket.event.session.WSAccessTokenExpiredEvent;
 
-public interface CBWebSessionEventHandler {
-    void handleWebSessionEvent(WSEvent event) throws DBException;
-
-    void close();
+public class CBExpiredSessionWebSocket extends CBAbstractWebSocket {
+    @Override
+    public void onWebSocketConnect(Session session) {
+        super.onWebSocketConnect(session);
+        handleEvent(new WSAccessTokenExpiredEvent());
+        close();
+    }
 }
