@@ -10,12 +10,24 @@ import { useLayoutEffect, useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { AdministrationItemService, filterOnlyActive, IAdministrationItemRoute } from '@cloudbeaver/core-administration';
-import { Loader, SlideBox, slideBoxStyles, SlideElement, SlideOverlay, useStyles } from '@cloudbeaver/core-blocks';
+import {
+  Loader,
+  SContext,
+  SlideBox,
+  slideBoxStyles,
+  SlideElement,
+  SlideOverlay,
+  StyleRegistry,
+  ToolsActionStyles,
+  ToolsPanelStyles,
+  useStyles,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, OptionsPanelService, TabList, TabsState, verticalTabStyles } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext';
+import AdministrationToolbarStyles from './AdministrationToolbarStyles.m.css';
 import { AdministrationViewService } from './AdministrationViewService';
 import { DrawerItem } from './DrawerItem';
 import { ItemContent } from './ItemContent';
@@ -72,6 +84,23 @@ interface Props {
   onItemSelect: (name: string) => void;
 }
 
+const registry: StyleRegistry = [
+  [
+    ToolsPanelStyles,
+    {
+      mode: 'append',
+      styles: [AdministrationToolbarStyles],
+    },
+  ],
+  [
+    ToolsActionStyles,
+    {
+      mode: 'append',
+      styles: [AdministrationToolbarStyles],
+    },
+  ],
+];
+
 export const Administration = observer<React.PropsWithChildren<Props>>(function Administration({
   configurationWizard,
   activeScreen,
@@ -93,41 +122,43 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
 
   return styled(useStyles(BASE_TAB_STYLES, verticalTabStyles, administrationStyles, tabsStyles, slideBoxStyles))(
     <CaptureView view={administrationViewService}>
-      <AdministrationCaptureViewContext />
-      <TabsState currentTabId={activeScreen?.item} orientation="vertical">
-        <TabList aria-label="Administration items">
-          {items.map(item => (
-            <DrawerItem
-              key={item.name}
-              item={item}
-              configurationWizard={configurationWizard}
-              style={[BASE_TAB_STYLES, verticalTabStyles, tabsStyles]}
-              disabled={onlyActiveItem && onlyActiveItem.filterOnlyActive?.(configurationWizard, item) !== true ? true : false}
-              onSelect={onItemSelect}
-            />
-          ))}
-        </TabList>
-        <content-container ref={contentRef} as="div">
-          {children}
-          <SlideBox open={optionsPanelService.active}>
-            <SlideElement>
-              <Loader suspense>
-                <content>
-                  <OptionsPanel />
-                </content>
-              </Loader>
-            </SlideElement>
-            <SlideElement>
-              <Loader suspense>
-                <content>
-                  <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
-                </content>
-              </Loader>
-              <SlideOverlay onClick={() => optionsPanelService.close()} />
-            </SlideElement>
-          </SlideBox>
-        </content-container>
-      </TabsState>
+      <SContext registry={registry}>
+        <AdministrationCaptureViewContext />
+        <TabsState currentTabId={activeScreen?.item} orientation="vertical">
+          <TabList aria-label="Administration items">
+            {items.map(item => (
+              <DrawerItem
+                key={item.name}
+                item={item}
+                configurationWizard={configurationWizard}
+                style={[BASE_TAB_STYLES, verticalTabStyles, tabsStyles]}
+                disabled={!!(onlyActiveItem && onlyActiveItem.filterOnlyActive?.(configurationWizard, item) !== true)}
+                onSelect={onItemSelect}
+              />
+            ))}
+          </TabList>
+          <content-container ref={contentRef} as="div">
+            {children}
+            <SlideBox open={optionsPanelService.active}>
+              <SlideElement>
+                <Loader suspense>
+                  <content>
+                    <OptionsPanel />
+                  </content>
+                </Loader>
+              </SlideElement>
+              <SlideElement>
+                <Loader suspense>
+                  <content>
+                    <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
+                  </content>
+                </Loader>
+                <SlideOverlay onClick={() => optionsPanelService.close()} />
+              </SlideElement>
+            </SlideBox>
+          </content-container>
+        </TabsState>
+      </SContext>
     </CaptureView>,
   );
 });

@@ -6,46 +6,25 @@
  * you may not use this file except in compliance with the License.
  */
 import type { ButtonHTMLAttributes } from 'react';
-import styled, { css } from 'reshadow';
 
 import { IconOrImage } from '../IconOrImage';
-
-const styles = css`
-  button {
-    composes: theme-ripple from global;
-    padding: 0 8px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    background: transparent;
-    outline: none;
-    color: inherit;
-  }
-  IconOrImage {
-    display: block;
-    width: 16px;
-  }
-  button-label {
-    display: block;
-    text-transform: uppercase;
-    font-weight: 700;
-    font-size: 12px;
-  }
-  IconOrImage + button-label {
-    padding-left: 4px;
-  }
-`;
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './ToolsAction.m.css';
 
 interface Props extends ButtonHTMLAttributes<any> {
   icon?: string;
   viewBox?: string;
+  className?: string;
 }
 
-export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox, children, ...rest }) {
-  return styled(styles)(
-    <button type="button" {...rest}>
-      {icon && <IconOrImage icon={icon} viewBox={viewBox} />}
-      {children && <button-label>{children}</button-label>}
-    </button>,
+export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox, children, className, ...rest }) {
+  const styles = useS(style);
+
+  return (
+    <button type="button" {...rest} className={s(styles, { button: true }, className)}>
+      {icon && <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} viewBox={viewBox} />}
+      {children && <div className={s(styles, { buttonLabel: true })}>{children}</div>}
+    </button>
   );
 };

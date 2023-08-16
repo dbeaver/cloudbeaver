@@ -23,10 +23,31 @@ const tabsStyles = css`
     position: relative;
     flex-shrink: 0;
     align-items: center;
+    padding: 0 24px;
   }
+
   TabPanel {
     flex-direction: column;
     overflow: auto;
+  }
+
+  Tab {
+    height: 100%;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0 4px;
+  }
+
+  tab-inner {
+    height: 100%;
+  }
+
+  tab-outer {
+    height: 100%;
+  }
+
+  TabTitle {
+    font-weight: 700;
   }
 `;
 
