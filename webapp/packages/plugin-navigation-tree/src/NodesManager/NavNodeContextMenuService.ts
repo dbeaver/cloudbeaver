@@ -209,9 +209,11 @@ export class NavNodeContextMenuService extends Bootstrap {
         return items;
       },
       orderItems: (context, items) => {
+        const actionsOpen = menuExtractItems(items, [ACTION_OPEN]);
         const actionsManage = menuExtractItems(items, [ACTION_RENAME, ACTION_DELETE]);
         const actionsRefresh = menuExtractItems(items, [ACTION_REFRESH]);
 
+        items.unshift(...actionsOpen);
         items.push(...actionsManage);
 
         if (actionsRefresh.length > 0) {
