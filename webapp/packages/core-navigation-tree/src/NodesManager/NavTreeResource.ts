@@ -18,6 +18,7 @@ import {
   CachedMapAllKey,
   CachedMapResource,
   CachedResourcePageKey,
+  CachedResourcePageListKey,
   DetailsError,
   NavNodeChildrenQuery as fake,
   GraphQLService,
@@ -444,7 +445,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, string[]>> {
-    const pageKey = this.isAlias(originalKey, CachedResourcePageKey);
+    const pageKey = this.isAlias(originalKey, CachedResourcePageKey) || this.isAlias(originalKey, CachedResourcePageListKey);
     const allKey = this.isAlias(originalKey, CachedMapAllKey);
 
     if (allKey) {
