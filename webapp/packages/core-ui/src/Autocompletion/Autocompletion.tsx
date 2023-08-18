@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useCallback } from 'react';
-import { Menu, MenuButton, MenuItem, MenuStateReturn } from 'reakit/Menu';
+import { forwardRef, useCallback, useEffect } from 'react';
+import { Menu, MenuButton, MenuInitialState, MenuItem, useMenuState } from 'reakit/Menu';
 
 import { Icon, IconOrImage, s, useS } from '@cloudbeaver/core-blocks';
 
@@ -15,8 +15,9 @@ import style from './Autocompletion.m.css';
 import type { IAutocompletion } from './useAutocompletion';
 
 interface AutocompletionProps {
-  menu: MenuStateReturn;
-  items: IAutocompletion[];
+  items: IAutocompletion[] | null;
+  placement?: MenuInitialState['placement'];
+  gutter?: number;
   ref?: React.Ref<HTMLDivElement>;
   propertyName?: string;
   onSelect?: (value: string) => void;
@@ -25,8 +26,15 @@ interface AutocompletionProps {
 type AutocompletionType = (props: AutocompletionProps, ref: React.Ref<HTMLDivElement>) => React.ReactElement | null;
 
 export const Autocompletion: AutocompletionType = observer(
-  forwardRef(function Autocompletion({ menu, items, propertyName, onSelect }: AutocompletionProps, ref: React.Ref<HTMLDivElement>) {
+  forwardRef(function Autocompletion(
+    { items, placement = 'bottom-end', gutter = 1, propertyName, onSelect }: AutocompletionProps,
+    ref: React.Ref<HTMLDivElement>,
+  ) {
     const styles = useS(style);
+    const menu = useMenuState({
+      placement: placement,
+      gutter: gutter,
+    });
 
     const handleSelect = useCallback(
       (id: any) => {
@@ -36,13 +44,22 @@ export const Autocompletion: AutocompletionType = observer(
       [menu, onSelect],
     );
 
+    useEffect(() => {
+      if (menu.visible && (items === null || items.length === 0)) {
+        menu.hide();
+      }
+      if (!menu.visible && items !== null && items.length !== 0) {
+        menu.show();
+      }
+    }, [items, menu]);
+
     return (
       <>
         <MenuButton {...menu} className={styles.menuButton}>
           <Icon name="arrow" viewBox="0 0 16 16" className={s(styles, { icon: true })} />
         </MenuButton>
         <Menu {...menu} ref={ref} aria-label={propertyName} className={styles.menu} modal>
-          {items.map(item => (
+          {items?.map(item => (
             <MenuItem
               key={item.key}
               id={item.key}

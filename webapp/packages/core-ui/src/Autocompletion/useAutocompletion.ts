@@ -1,15 +1,7 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
-import { action, computed, observable } from 'mobx';
-import { useEffect, useRef } from 'react';
-import { MenuInitialState, type MenuStateReturn, useMenuState } from 'reakit';
+import { action, observable } from 'mobx';
+import { useEffect, useRef, useState } from 'react';
 
-import { useObservableRef } from '@cloudbeaver/core-blocks';
+import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { debounce } from '@cloudbeaver/core-utils';
 
 export interface IAutocompletion {
@@ -19,139 +11,106 @@ export interface IAutocompletion {
   title?: string;
 }
 
-interface AutocompletionState {
-  inputRef: React.RefObject<HTMLInputElement> | null;
-  autocompletionItems: IAutocompletion[] | null;
-  inputValue: string;
-  indexToSearchFrom: number;
-  changed: boolean;
-  readonly menuRef: React.RefObject<HTMLDivElement>;
-  readonly menu: MenuStateReturn;
-  filteredItems: IAutocompletion[];
-  separatorLastIndex: number;
-  isAutocompletionEnabled: boolean;
-  getChangedValue: (value: string) => string;
-  onSelect: (value: string) => void;
-  onArrowDown: () => void;
-  updateInputValue: (newValue: string) => void;
-  toggleAutocompletion: () => void;
+type BindingFirstKeyType = 'Ctrl' | 'Alt' | 'Shift';
+
+interface AutocompletionData {
+  source: (value: string, position: number) => IAutocompletion[] | null;
+  onChange?: (value: string) => void;
+  binding?: `${BindingFirstKeyType}+${string}`;
+  updateDelay?: number;
+  disableFilter?: boolean;
 }
 
-interface AutocompletionStateReturnType {
-  state: AutocompletionState;
-  updateInputValueForAutocompletion: (value: string) => void;
+export interface IAutocompletionState {
+  completions: IAutocompletion[] | null;
+  inputRef: HTMLInputElement | null;
+  menuRef: React.RefObject<HTMLInputElement> | null;
+  setInputRef: (ref: HTMLInputElement) => void;
+  show: (value: string, position: number, explicit?: boolean) => void;
+  hide: () => void;
+  onSelect: (completion: string) => void;
 }
 
-export const AUTOCOMPLETION_FILTER_DELAY = 250;
+interface AutocompletionResult {
+  state: IAutocompletionState;
+  show: (value: string, position: number, explicit?: boolean) => void;
+}
 
-export function useAutocompletion(
-  autocompletionItems?: IAutocompletion[],
-  inputRef?: React.RefObject<HTMLInputElement>,
-  onChange?: (value: string) => void,
-  placement: MenuInitialState['placement'] = 'bottom-end',
-  gutter = 1,
-): AutocompletionStateReturnType {
-  const menuRef = useRef<HTMLDivElement>(null);
-  const menu = useMenuState({
-    placement: placement,
-    gutter: gutter,
-  });
+const lastWordRegex = /\b(\w+)$/;
 
-  const state = useObservableRef<AutocompletionState>(
+export function useAutocompletion(data: AutocompletionData): AutocompletionResult {
+  const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
+  const menuRef = useRef<HTMLInputElement>(null);
+
+  const optionsRef = useObjectRef({ data });
+
+  const state = useObservableRef<IAutocompletionState>(
     () => ({
       inputRef,
-      autocompletionItems,
-      inputValue: '',
-      indexToSearchFrom: 0,
-      changed: false,
       menuRef,
-      menu,
-      get filteredItems() {
-        if (!this.autocompletionItems) {
-          return [];
+      completions: null,
+      setInputRef,
+      show(value: string, position: number, explicit?: boolean): void {
+        const completions = optionsRef.data.source(value, position);
+        if (!completions) {
+          return;
         }
-
-        const filterValue = this.inputValue.substring(this.indexToSearchFrom).trim();
-        return this.autocompletionItems.filter(
-          item =>
-            !filterValue ||
-            item.value.toUpperCase().includes(filterValue.toUpperCase()) ||
-            filterValue.toUpperCase().includes(item.value.toUpperCase()),
-        );
-      },
-      get separatorLastIndex() {
-        const lastIndex = this.inputValue.trim().lastIndexOf(' ');
-        return lastIndex === -1 ? 0 : lastIndex;
-      },
-      get isAutocompletionEnabled() {
-        return !!this.autocompletionItems;
-      },
-      getChangedValue(value: string) {
-        const lastWordCroppedValue = this.inputValue.trim().substring(0, this.separatorLastIndex);
-        const changedValue = lastWordCroppedValue.length ? lastWordCroppedValue + ' ' + value : value;
-        const indexToSearchFrom = this.inputValue.length - this.separatorLastIndex;
-
-        this.changed = false;
-        this.indexToSearchFrom = indexToSearchFrom;
-
-        return changedValue;
-      },
-      onSelect(value: string) {
-        const newValue = this.getChangedValue(value);
-        onChange?.(newValue);
-      },
-      onArrowDown() {
-        if (this.isAutocompletionEnabled) {
-          (this.menuRef.current?.children[0] as HTMLElement)?.focus();
+        if (explicit) {
+          this.completions = completions;
+          return;
         }
-      },
-      updateInputValue(newValue: string) {
-        if (this.isAutocompletionEnabled) {
-          this.inputValue = newValue;
-          this.changed = true;
-          this.indexToSearchFrom = this.separatorLastIndex;
+        if (!optionsRef.data.disableFilter) {
+          const lastWordMatch = lastWordRegex.exec(value);
+          const lastWord = lastWordMatch ? lastWordMatch[0] : null;
 
-          if (this.filteredItems.length === 0 && this.menu.visible) {
-            this.menu.hide();
+          if (lastWord === null) {
+            this.completions = null;
+            return;
           }
-          if (this.filteredItems.length !== 0 && !this.menu.visible) {
-            this.menu.show();
-          }
+
+          this.completions = completions.filter(
+            completion =>
+              completion.value.toLowerCase() !== lastWord.toLowerCase() && completion.value.toLowerCase().startsWith(lastWord.toLowerCase()),
+          );
         }
       },
-      toggleAutocompletion() {
-        if (this.filteredItems.length !== 0) {
-          if (this.menu.visible) {
-            this.menu.hide();
-          } else {
-            this.menu.show();
-          }
+      hide() {
+        this.completions = null;
+        //TODO
+      },
+      onSelect(completion: string) {
+        const newValue = this.inputRef?.value.replace(lastWordRegex, completion);
+        if (newValue) {
+          optionsRef.data.onChange?.(newValue);
         }
+        this.completions = null;
       },
     }),
     {
       inputRef: observable.ref,
-      autocompletionItems: observable.ref,
-      inputValue: observable.ref,
-      indexToSearchFrom: observable.ref,
-      changed: observable.ref,
       menuRef: observable.ref,
-      menu: observable.ref,
-      filteredItems: computed,
-      separatorLastIndex: computed,
-      isAutocompletionEnabled: computed,
-      getChangedValue: action.bound,
+      completions: observable.ref,
+      setInputRef: action.bound,
+      show: action.bound,
+      hide: action.bound,
       onSelect: action.bound,
-      onArrowDown: action.bound,
-      updateInputValue: action.bound,
-      toggleAutocompletion: action.bound,
     },
-    { menu, autocompletionItems, inputRef },
+    { inputRef },
   );
 
-  const updateInputValueForAutocompletion = debounce((value: string) => {
-    state.updateInputValue(value);
-  }, AUTOCOMPLETION_FILTER_DELAY);
+  let show = state.show;
+
+  if (optionsRef.data.updateDelay) {
+    show = debounce(state.show, optionsRef.data.updateDelay);
+  }
+
+  useEffect(() => {
+    state.inputRef?.addEventListener('keydown', event => {
+      if (event.key === 'ArrowDown') {
+        (state.menuRef?.current?.children[0] as HTMLElement)?.focus();
+      }
+    });
+  }, [state.inputRef]);
 
   useEffect(() => {
     if (!state.inputRef) {
@@ -159,14 +118,14 @@ export function useAutocompletion(
     }
 
     const resizeObserver = new ResizeObserver(() => {
-      if (menuRef.current && state.inputRef?.current) {
-        const size = state.inputRef.current.getBoundingClientRect();
-        menuRef.current.style.width = size.width + 'px';
+      if (state.menuRef?.current && state.inputRef) {
+        const size = state.inputRef.getBoundingClientRect();
+        state.menuRef.current.style.width = size.width + 'px';
       }
     });
 
-    if (state.inputRef?.current) {
-      resizeObserver.observe(state.inputRef.current);
+    if (state.inputRef) {
+      resizeObserver.observe(state.inputRef);
     }
 
     return () => {
@@ -174,5 +133,5 @@ export function useAutocompletion(
     };
   }, [state.inputRef]);
 
-  return { state, updateInputValueForAutocompletion };
+  return { state, show };
 }

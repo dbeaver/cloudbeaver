@@ -9,13 +9,14 @@ import { observer } from 'mobx-react-lite';
 import { ChangeEvent, forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import styled, { use } from 'reshadow';
 
-import { getComputed, Icon, IconOrImage, Loader, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import { Icon, IconOrImage, Loader, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Autocompletion } from '../Autocompletion/Autocompletion';
-import { IAutocompletion, useAutocompletion } from '../Autocompletion/useAutocompletion';
+import type { IAutocompletion } from '../Autocompletion/useAutocompletion';
+import { useAutocompletion } from '../Autocompletion/useAutocompletion';
 import { EditorDialog } from './EditorDialog';
 import { InlineEditorStyles } from './styles';
 
@@ -78,13 +79,17 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
       disableSave,
     });
 
-    const inputRef = useRef<HTMLInputElement>(null);
     const commonDialogService = useService(CommonDialogService);
-    const { state: autocompletionState, updateInputValueForAutocompletion } = useAutocompletion(autocompletionItems, inputRef, onChange);
+    const { state: autocompletionState, show } = useAutocompletion({
+      source: () => autocompletionItems || null,
+      onChange: props.onChange,
+      binding: 'Ctrl+Space',
+      updateDelay: 250,
+    });
 
     const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
       props.onChange(event.target.value);
-      updateInputValueForAutocompletion?.(event.target.value);
+      show(event.target.value, event.target.selectionStart || 0);
     }, []);
 
     const handlePopup = useCallback(async () => {
@@ -97,62 +102,43 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
       }
     }, []);
 
-    const handleKeyDown = useCallback(
-      (event: React.KeyboardEvent<HTMLInputElement>) => {
-        switch (event.key) {
-          case 'Enter':
-            if (!props.disableSave && props.onSave) {
-              props.onSave();
-            }
-            break;
-          case 'Escape':
-            props.onReject?.();
-            break;
-          case 'ArrowDown':
-            autocompletionState.onArrowDown();
-            break;
-        }
-      },
-      [autocompletionState.onArrowDown],
-    );
-
-    const handleBlur = useCallback(() => {
-      if (autocompletionState.isAutocompletionEnabled) {
-        autocompletionState.changed = false;
+    const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+      switch (event.key) {
+        case 'Enter':
+          if (!props.disableSave && props.onSave) {
+            props.onSave();
+          }
+          break;
+        case 'Escape':
+          props.onReject?.();
+          break;
       }
-    }, [autocompletionState]);
-
-    const autocompletionProps = getComputed(() => ({
-      items: autocompletionState.filteredItems,
-      menu: autocompletionState.menu,
-      ref: autocompletionState.menuRef,
-      onSelect: autocompletionState.onSelect,
-    }));
+    }, []);
 
     useEffect(() => {
       if (autofocus && !disabled) {
-        setTimeout(() => inputRef.current?.focus(), 100);
+        setTimeout(() => autocompletionState.inputRef?.focus(), 100);
       }
     }, [disabled]);
 
-    useImperativeHandle(ref, () => inputRef.current!);
+    useImperativeHandle(ref, () => autocompletionState.inputRef!);
 
     return styled(useStyles(InlineEditorStyles, style))(
       <editor className={className} {...use({ active })} onClick={onClick} onDoubleClick={onDoubleClick}>
         <editor-container>
           <input
-            ref={inputRef}
+            ref={autocompletionState.setInputRef}
             lang="en"
             value={value}
             autoComplete="off"
             disabled={disabled}
             onChange={handleChange}
-            onClick={autocompletionState.toggleAutocompletion}
             onKeyDown={handleKeyDown}
-            onBlur={handleBlur}
             {...rest}
           />
-          {autocompletionItems && <Autocompletion {...autocompletionProps} />}
+          {autocompletionState && (
+            <Autocompletion ref={autocompletionState.menuRef} items={autocompletionState.completions} onSelect={autocompletionState.onSelect} />
+          )}
         </editor-container>
         <editor-actions as="div" {...use({ position: controlsPosition })} onMouseDown={e => e.preventDefault()}>
           {!hideSave && (
