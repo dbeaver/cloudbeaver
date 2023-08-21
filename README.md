@@ -22,6 +22,15 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 23.1.5 - 2023-08-21
+
+- The ability to use custom functions in the Grouping panel has been added;
+- Pagination has been added to the Navigation tree and metadata viewer, allowing working with more than 1000 database items;
+- "Connection Management" tab has been renamed to "Connection Templates" - now only connection templates are displayed;
+- Custom settings have been added to the interface for the following dialogue connections: SQLite, DB2, SQL Server, MySQL, Oracle and PostgreSQL;
+- The ability to rearrange columns in the Data Editor has been added;
+- Different bug fixes and enhancements have been made.
+
 ### CloudBeaver 23.1.4 - 2023-08-07
 
 - The SSL option is now available for establishing connections in MySQL and PostgreSQL.
