@@ -60,6 +60,8 @@ type NavigatorNodeInfo {
     name: String
     #Node full name
     fullName: String
+    #Node plain name
+    plainName: String
     # Node icon path
     icon: String
     # Node description

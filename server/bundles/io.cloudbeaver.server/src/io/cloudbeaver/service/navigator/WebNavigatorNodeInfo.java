@@ -83,6 +83,14 @@ public class WebNavigatorNodeInfo {
     }
 
     @Property
+    public String getPlainName() { // for renaming node
+        if (node instanceof DBNDatabaseNode) {
+            return ((DBNDatabaseNode) node).getPlainNodeName(true, false);
+        }
+        return node.getNodeName();
+    }
+
+    @Property
     public String getProjectId() {
         DBPProject ownerProject = node.getOwnerProject();
         return ownerProject == null ? null : ownerProject.getId();
