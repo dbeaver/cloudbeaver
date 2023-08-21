@@ -1285,7 +1285,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     SMAuthInfo.inProgress(
                         authAttemptId,
                         null,
-                        Map.of(new SMAuthConfigurationReference(authProviderId, null), securedUserIdentifyingCredentials)
+                        Map.of(new SMAuthConfigurationReference(authProviderId, authProviderConfigurationId), securedUserIdentifyingCredentials)
                     ),
                     true,
                     false
@@ -1745,8 +1745,8 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
         Map<SMAuthConfigurationReference, Object> storedUserData = new LinkedHashMap<>();
         SMTeam[] allTeams = null;
+        SMAuthProviderCustomConfiguration providerConfig = null;
         String detectedAuthRole = null;
-        Map<String, Object> providerConfig = new LinkedHashMap<>();
         Map<String, Object> userAuthData = new LinkedHashMap<>();
         for (SMAuthConfigurationReference authConfiguration : authProviderIds) {
             String authProviderId = authConfiguration.getAuthProviderId();
@@ -1761,7 +1761,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     var providerCustomConfig =
                         application.getAuthConfiguration().getAuthProviderConfiguration(providerConfigId);
                     if (providerCustomConfig != null) {
-                        providerConfig.putAll(providerCustomConfig.getParameters());
+                        providerConfig = providerCustomConfig;
                     }
                 }
             }
@@ -1893,7 +1893,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     @Nullable
     private SMAutoAssign getAutoAssignUserData(
         WebAuthProviderDescriptor authProvider,
-        Map<String, Object> providerConfig,
+        SMAuthProviderCustomConfiguration providerConfig,
         Map<String, Object> userData,
         DBRProgressMonitor monitor
     ) throws DBException {
@@ -2005,7 +2005,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @Nullable String activeUserId,
         boolean createNewUserIfNotExist,
         String authRole,
-        Map<String, Object> providerConfig
+        SMAuthProviderCustomConfiguration providerConfig
     ) throws DBException {
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
 

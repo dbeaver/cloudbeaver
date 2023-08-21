@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.provisioning.SMProvisioner;
 import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
@@ -68,6 +69,10 @@ public class WebAuthProviderInfo {
 
     public boolean isConfigurable() {
         return descriptor.isConfigurable();
+    }
+
+    public boolean isFederated() {
+        return descriptor.getInstance() instanceof SMAuthProviderFederated;
     }
 
     public boolean isTrusted() {
