@@ -45,7 +45,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
 
     this.navTreeResource.onDataOutdated.addHandler(key => {
       ResourceKeyUtils.forEach(key, nodeId => {
-        const pageAlias = this.isAlias(nodeId, CachedResourcePageKey) ?? this.isAlias(nodeId, CachedResourcePageListKey);
+        const pageAlias = this.isAlias(nodeId, CachedResourcePageKey) || this.isAlias(nodeId, CachedResourcePageListKey);
 
         if (pageAlias) {
           this.markOutdated(DBObjectParentKey(pageAlias.target));

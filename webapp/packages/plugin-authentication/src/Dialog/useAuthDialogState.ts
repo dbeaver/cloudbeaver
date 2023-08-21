@@ -38,6 +38,7 @@ interface IState {
   activeProvider: AuthProvider | null;
   activeConfiguration: AuthProviderConfiguration | null;
   credentials: IAuthCredentials;
+  tabIds: string[];
 
   setTabId: (tabId: string | null) => void;
   setActiveProvider: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
@@ -52,52 +53,6 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
   const primaryId = authProvidersResource.resource.getPrimary();
   const adminPageActive = administrationScreenService.isAdministrationPageActive;
   const providers = authProvidersResource.data.filter(notEmptyProvider).sort(compareProviders);
-
-  const state = useObservableRef<IState>(
-    () => ({
-      tabId: null,
-      activeProvider: null,
-      activeConfiguration: null,
-      credentials: {
-        profile: '0',
-        credentials: {},
-      },
-
-      setTabId(tabId: string | null): void {
-        this.tabId = tabId;
-      },
-      setActiveProvider(provider: AuthProvider | null, configuration: AuthProviderConfiguration | null): void {
-        const providerChanged = this.activeProvider?.id !== provider?.id;
-        const configurationChanged = this.activeConfiguration?.id !== configuration?.id;
-
-        this.activeProvider = provider;
-        this.activeConfiguration = configuration;
-
-        if (providerChanged || configurationChanged) {
-          this.credentials.profile = '0';
-          this.credentials.credentials = {};
-        }
-
-        if (provider) {
-          if (provider.federated) {
-            this.setTabId(FEDERATED_AUTH);
-          } else {
-            this.setTabId(getAuthProviderTabId(provider, configuration));
-          }
-        } else {
-          this.setTabId(null);
-        }
-      },
-    }),
-    {
-      tabId: observable.ref,
-      activeProvider: observable.ref,
-      activeConfiguration: observable.ref,
-      credentials: observable,
-      setActiveProvider: action,
-    },
-    false,
-  );
 
   const activeProviders = providers.filter(provider => {
     if (provider.id === primaryId && adminPageActive && accessRequest) {
@@ -146,6 +101,54 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
   if (federatedProviders.length > 0) {
     tabIds.push(FEDERATED_AUTH);
   }
+  const state = useObservableRef<IState>(
+    () => ({
+      tabId: null,
+      activeProvider: null,
+      activeConfiguration: null,
+      credentials: {
+        profile: '0',
+        credentials: {},
+      },
+      setTabId(tabId: string | null): void {
+        if (tabIds.includes(tabId as any)) {
+          this.tabId = tabId;
+        } else {
+          this.tabId = tabIds[0] ?? null;
+        }
+      },
+      setActiveProvider(provider: AuthProvider | null, configuration: AuthProviderConfiguration | null): void {
+        const providerChanged = this.activeProvider?.id !== provider?.id;
+        const configurationChanged = this.activeConfiguration?.id !== configuration?.id;
+
+        this.activeProvider = provider;
+        this.activeConfiguration = configuration;
+
+        if (providerChanged || configurationChanged) {
+          this.credentials.profile = '0';
+          this.credentials.credentials = {};
+        }
+
+        if (provider) {
+          if (provider.federated) {
+            this.setTabId(FEDERATED_AUTH);
+          } else {
+            this.setTabId(getAuthProviderTabId(provider, configuration));
+          }
+        } else {
+          this.setTabId(null);
+        }
+      },
+    }),
+    {
+      tabId: observable.ref,
+      activeProvider: observable.ref,
+      activeConfiguration: observable.ref,
+      credentials: observable,
+      setActiveProvider: action,
+    },
+    { tabIds },
+  );
 
   const data = useObservableRef<IData>(
     () => ({
