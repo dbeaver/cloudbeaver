@@ -26,7 +26,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
-import org.jkiss.dbeaver.model.security.SMObjects;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +82,7 @@ public class AdminUserInfo {
     @Property
     public SMDataSourceGrant[] getGrantedConnections() throws DBException {
         return session.getAdminSecurityController()
-            .getSubjectObjectPermissionGrants(getUserId(), SMObjects.DATASOURCE)
+            .getSubjectObjectPermissionGrants(getUserId(), SMObjectType.datasource)
             .stream()
             .map(objectPermission -> new SMDataSourceGrant(
                 objectPermission.getObjectPermissions().getObjectId(),
