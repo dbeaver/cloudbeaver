@@ -14,7 +14,7 @@ export default [
   ],
   ['connections_administration_connection_no_information', 'Нет доступной информации'],
   ['connections_administration_delete_confirmation', 'Вы собираетесь удалить следующие подключения: '],
-  ['connections_administration_tools_add_tooltip', 'Добавить новое подключение'],
+  ['connections_administration_tools_add_tooltip', 'Добавить новый шаблон подключения'],
   ['connections_administration_tools_refresh_tooltip', 'Обновить список подключений'],
   ['connections_administration_tools_delete_tooltip', 'Удалить выбранные подключения'],
   ['connections_administration_tools_refresh_success', 'Список подключений обновлен'],
