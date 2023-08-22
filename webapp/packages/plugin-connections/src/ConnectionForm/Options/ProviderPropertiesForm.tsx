@@ -75,23 +75,25 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
       )}
 
       {categories.length > 0 && (
-        <Group gap>
+        <Group gap form>
           <GroupTitle>{translate('ui_advanced_settings')}</GroupTitle>
-          <Container wrap gap vertical>
-            {categories.map(category => (
-              <Expandable key={category} style={EXPANDABLE_FORM_STYLES} label={category}>
-                <Container wrap gap>
-                  <ObjectPropertyInfoForm
-                    properties={supportedProperties}
-                    state={config.providerProperties}
-                    category={category}
-                    disabled={disabled}
-                    readOnly={readonly}
-                    tiny
-                    hideEmptyPlaceholder
-                  />
-                </Container>
-              </Expandable>
+          <Container wrap gap>
+            {categories.map((category, index) => (
+              <Container key={`${category}_${config.driverId}`} gap>
+                <Expandable style={EXPANDABLE_FORM_STYLES} label={category} defaultExpanded={index === 0}>
+                  <Container wrap gap>
+                    <ObjectPropertyInfoForm
+                      properties={supportedProperties}
+                      state={config.providerProperties}
+                      category={category}
+                      disabled={disabled}
+                      readOnly={readonly}
+                      keepSize
+                      hideEmptyPlaceholder
+                    />
+                  </Container>
+                </Expandable>
+              </Container>
             ))}
           </Container>
         </Group>
