@@ -123,7 +123,7 @@ export class NavNodeContextMenuService extends Bootstrap {
       },
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
-        const name = getNodeDisplayName(node);
+        const name = node.plainName ?? getNodeDisplayName(node);
 
         switch (action) {
           case ACTION_OPEN: {
