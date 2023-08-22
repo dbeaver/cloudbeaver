@@ -45,7 +45,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
     @Override
     public String validateLocalAuth(@NotNull DBRProgressMonitor monitor,
                                     @NotNull SMController securityController,
-                                    @NotNull Map<String, Object> providerConfig,
+                                    @NotNull SMAuthProviderCustomConfiguration providerConfig,
                                     @NotNull Map<String, Object> userCredentials,
                                     @Nullable String activeUserId) throws DBException {
 

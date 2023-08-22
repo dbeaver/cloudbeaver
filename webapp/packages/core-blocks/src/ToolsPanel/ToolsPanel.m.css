@@ -1,0 +1,5 @@
+.toolsPanel {
+  height: 30px;
+  display: flex;
+  flex-shrink: 0;
+}

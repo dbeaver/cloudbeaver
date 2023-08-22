@@ -261,7 +261,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
         usersList.push(user);
       } else {
-        const pageKey = this.isAlias(originalKey, CachedResourcePageKey);
+        const pageKey = this.isAlias(originalKey, CachedResourcePageKey) || this.isAlias(originalKey, CachedResourcePageListKey);
         const filterKey = this.isAlias(originalKey, UsersResourceFilterKey);
         let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
         let limit = CACHED_RESOURCE_DEFAULT_PAGE_LIMIT;

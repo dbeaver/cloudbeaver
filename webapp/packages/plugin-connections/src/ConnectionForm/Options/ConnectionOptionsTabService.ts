@@ -23,7 +23,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { isSharedProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { getUniqueName, isValuesEqual } from '@cloudbeaver/core-utils';
+import { getUniqueName, isNotNullDefined, isValuesEqual } from '@cloudbeaver/core-utils';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
@@ -326,7 +326,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
         if (!supported) {
           delete providerProperties[providerProperty.id];
         } else {
-          const isDefault = providerProperty.defaultValue !== null && providerProperty.defaultValue !== undefined;
+          const isDefault = isNotNullDefined(providerProperty.defaultValue);
           if (!(providerProperty.id in providerProperties) && isDefault) {
             providerProperties[providerProperty.id] = providerProperty.defaultValue;
           }
