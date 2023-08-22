@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useCallback, useContext, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useContext, useLayoutEffect, useRef, useState } from 'react';
 import styled, { use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
@@ -19,6 +19,7 @@ import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useCombinedHandler } from '../useCombinedHandler';
+import { useMergeRefs } from '../useMergeRefs';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
 import { useStyles } from '../useStyles';
@@ -93,6 +94,7 @@ export const InputField: InputFieldType = observer(
     ref,
   ) {
     const inputRef = useRef<HTMLInputElement | null>(null);
+    const mergedRef = useMergeRefs(inputRef, ref);
     const capsLock = useCapsLockTracker();
     const [passwordRevealed, setPasswordRevealed] = useState(false);
     const translate = useTranslate();
@@ -133,18 +135,6 @@ export const InputField: InputFieldType = observer(
     const passwordType = rest.type === 'password';
     const uncontrolled = passwordType && !canShowPassword;
 
-    useImperativeHandle(ref, () => inputRef.current!, [inputRef]);
-
-    useLayoutEffect(() => {
-      if (uncontrolled && value && inputRef.current) {
-        inputRef.current.value = value;
-      }
-    }, []);
-
-    if (autoHide && !isControlPresented(name, state, defaultValue)) {
-      return null;
-    }
-
     let value: any = valueControlled ?? defaultValue ?? undefined;
 
     if (state && name !== undefined && name in state) {
@@ -159,6 +149,16 @@ export const InputField: InputFieldType = observer(
       description = translate('ui_capslock_on');
     }
 
+    useLayoutEffect(() => {
+      if (uncontrolled && value && inputRef.current) {
+        inputRef.current.value = value;
+      }
+    });
+
+    if (autoHide && !isControlPresented(name, state, defaultValue)) {
+      return null;
+    }
+
     return styled(propStyles)(
       <div data-testid="field" className={s(styles, { ...layoutProps, field: true }, className)}>
         <div data-testid="field-label" title={labelTooltip || rest.title} className={styles.fieldLabel}>
@@ -167,7 +167,7 @@ export const InputField: InputFieldType = observer(
         </div>
         <div data-testid="input-container" className={styles.inputContainer}>
           <input
-            ref={inputRef}
+            ref={mergedRef}
             {...rest}
             type={passwordRevealed ? 'text' : rest.type}
             name={name}
