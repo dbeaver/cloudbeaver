@@ -37,11 +37,11 @@ interface Props {
 export const ConnectionDialogFooter = observer<Props>(function ConnectionDialogFooter({ isConnecting, onConnect, onBack }) {
   const translate = useTranslate();
   return styled(styles)(
-    <controls as="div">
+    <controls>
+      <fill />
       <Button type="button" mod={['outlined']} disabled={isConnecting} onClick={onBack}>
         {translate('ui_stepper_back')}
       </Button>
-      <fill as="div" />
       <Button type="button" mod={['unelevated']} disabled={isConnecting} onClick={onConnect}>
         {isConnecting ? translate('basicConnection_connectionDialog_connecting') : translate('connections_connection_connect')}
       </Button>

@@ -13,7 +13,7 @@ export default [
     'Qui puoi creare connessioni ai database manualmente oppure usando una ricerca di un database server.\nPuoi saltare questo step e configurare le connessioni dopo.',
   ],
   ['connections_administration_connection_no_information', 'Nessuna informazione disponibile'],
-  ['connections_administration_tools_add_tooltip', 'Aggiungi una nuova connessione'],
+  ['connections_administration_tools_add_tooltip', 'Add new template'],
   ['connections_administration_tools_refresh_tooltip', 'Ricarica la lista di connessioni'],
   ['connections_administration_tools_delete_tooltip', 'Elimina le connessioni selezionate'],
   ['connections_administration_tools_refresh_success', 'Lista delle connessioni ricaricata'],
