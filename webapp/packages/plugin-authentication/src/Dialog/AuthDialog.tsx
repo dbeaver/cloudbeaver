@@ -90,27 +90,31 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   const showTabs = dialogData.providers.length + dialogData.federatedProviders.length > 1;
   const federate = state.tabId === FEDERATED_AUTH;
 
-  let dialogTitle = translate('authentication_login_dialog_title');
+  let dialogTitle: string = translate('authentication_login_dialog_title');
   let subTitle: string | undefined;
+  let tooltip: string | undefined;
   let icon: string | undefined;
 
   if (state.activeProvider) {
-    dialogTitle += `: ${state.activeProvider.label}`;
-    subTitle = state.activeProvider.description;
+    subTitle = state.activeProvider.label;
+    tooltip = state.activeProvider.description;
     icon = state.activeProvider.icon;
 
     if (state.activeConfiguration) {
-      dialogTitle += `: ${state.activeConfiguration.displayName}`;
-      subTitle = state.activeConfiguration.description;
+      subTitle += ` | ${state.activeConfiguration.displayName}`;
       icon = state.activeConfiguration.iconURL || icon;
+
+      if (state.activeConfiguration.description) {
+        tooltip = state.activeConfiguration.description;
+      }
     }
   } else if (federate) {
-    dialogTitle += `: ${translate('authentication_auth_federated')}`;
+    dialogTitle = `${translate('authentication_auth_federated')} ${dialogTitle}`;
     subTitle = 'authentication_identity_provider_dialog_subtitle';
   }
 
   if (additional) {
-    subTitle = 'authentication_request_token';
+    subTitle = `${state.activeConfiguration?.displayName ?? state.activeProvider?.label} ${translate('authentication_request_token')}`;
   }
 
   async function login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) {
@@ -159,7 +163,13 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
       }}
     >
       <CommonDialogWrapper size="large" aria-label={translate('authentication_login_dialog_title')}>
-        <CommonDialogHeader title={dialogTitle} icon={icon} subTitle={subTitle} onReject={options?.persistent ? undefined : rejectDialog} />
+        <CommonDialogHeader
+          title={dialogTitle}
+          tooltip={tooltip}
+          icon={icon}
+          subTitle={subTitle}
+          onReject={options?.persistent ? undefined : rejectDialog}
+        />
         <CommonDialogBody noBodyPadding>
           {showTabs && (
             <TabList aria-label="Auth providers">
