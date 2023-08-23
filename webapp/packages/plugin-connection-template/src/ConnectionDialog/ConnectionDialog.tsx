@@ -82,12 +82,12 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
               />
             </SubmittingForm>
           ))}
-        {controller.responseMessage && (
-          <ErrorMessage text={controller.responseMessage} hasDetails={controller.hasDetails} onShowDetails={controller.onShowDetails} />
-        )}
       </CommonDialogBody>
       {controller.step === ConnectionStep.Connection && (
         <CommonDialogFooter>
+          {controller.responseMessage && (
+            <ErrorMessage text={controller.responseMessage} hasDetails={controller.hasDetails} onShowDetails={controller.onShowDetails} />
+          )}
           <ConnectionDialogFooter
             isConnecting={controller.isConnecting}
             onBack={() => controller.onStep(ConnectionStep.ConnectionTemplateSelect)}

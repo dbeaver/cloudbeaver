@@ -84,6 +84,7 @@ export default [
   ['ui_continue', 'Continue'],
   ['ui_authentication', 'Authentication'],
   ['ui_settings', 'Settings'],
+  ['ui_advanced_settings', 'Advanced settings'],
   ['ui_expand', 'Expand'],
   ['ui_close_all', 'Close all'],
   ['ui_close_others', 'Close others'],

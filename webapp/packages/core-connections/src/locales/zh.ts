@@ -14,7 +14,7 @@ export default [
   ],
   ['connections_administration_connection_no_information', '没有可用信息'],
   ['connections_administration_delete_confirmation', '您将删除这些连接：'],
-  ['connections_administration_tools_add_tooltip', '添加新连接'],
+  ['connections_administration_tools_add_tooltip', 'Add new template'],
   ['connections_administration_tools_refresh_tooltip', '刷新连接列表'],
   ['connections_administration_tools_delete_tooltip', '删除选中的连接'],
   ['connections_administration_tools_refresh_success', '连接列表已刷新'],

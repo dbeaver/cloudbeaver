@@ -68,6 +68,7 @@ export default [
   ['ui_search_no_result_placeholder', 'Nessun risultato trovato.'],
   ['ui_save_reminder', 'Ci sono modifiche non salvate.'],
   ['ui_settings', 'Impostazioni'],
+  ['ui_advanced_settings', 'Advanced settings'],
   ['ui_expand', 'Expand'],
   ['ui_close_all', 'Close all'],
   ['ui_close_others', 'Close others'],
