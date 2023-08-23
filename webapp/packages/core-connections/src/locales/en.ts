@@ -15,7 +15,7 @@ export default [
   ],
   ['connections_administration_connection_no_information', 'No information available'],
   ['connections_administration_delete_confirmation', "You're going to delete these connections: "],
-  ['connections_administration_tools_add_tooltip', 'Add new connection'],
+  ['connections_administration_tools_add_tooltip', 'Add new template'],
   ['connections_administration_tools_refresh_tooltip', 'Refresh connection list'],
   ['connections_administration_tools_delete_tooltip', 'Delete selected connections'],
   ['connections_administration_tools_refresh_success', 'Connection list was refreshed'],
