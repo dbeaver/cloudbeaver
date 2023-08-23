@@ -481,12 +481,6 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async handleTabUnload(editorTab: ITab<ISqlEditorTabState>) {
-    const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
-
-    if (dataSource?.executionContext) {
-      await this.sqlEditorService.destroyContext(dataSource.executionContext);
-    }
-
     await this.sqlDataSourceService.unload(editorTab.handlerState.editorId);
 
     this.sqlResultTabsService.removeResultTabs(editorTab.handlerState);
@@ -504,6 +498,11 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async handleTabClose(editorTab: ITab<ISqlEditorTabState>) {
+    const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
+
+    if (dataSource?.executionContext) {
+      await this.sqlEditorService.destroyContext(dataSource.executionContext);
+    }
     await this.sqlDataSourceService.destroy(editorTab.handlerState.editorId);
   }
 }
