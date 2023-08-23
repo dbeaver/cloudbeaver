@@ -59,8 +59,8 @@ type NavigatorNodeInfo {
     # Node human readable name
     name: String
     #Node full name
-    fullName: String @deprecated
-    #Node plain name
+    fullName: String @deprecated # Use name parameter (23.2.0)
+    #Node plain name (23.2.0)
     plainName: String
     # Node icon path
     icon: String
