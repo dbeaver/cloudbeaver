@@ -41,7 +41,9 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
 import org.jkiss.dbeaver.registry.DataSourceFolder;
 import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.IOUtils;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -87,7 +89,10 @@ public class WebNavigatorNodeInfo {
         if (node instanceof DBNDatabaseNode) {
             return ((DBNDatabaseNode) node).getPlainNodeName(true, false);
         }
-        return node.getNodeName();
+        if (node instanceof DBNResourceManagerResource) {
+            return IOUtils.getFileNameWithoutExtension(Path.of(getName()));
+        }
+        return getName();
     }
 
     @Property
