@@ -23,7 +23,6 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebDataSourceProviderInfo;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
@@ -334,7 +333,7 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Error connecting to database", e);
         } finally {
             dataSourceContainer.setSavePassword(oldSavePassword);
-            connectionInfo.clearSavedCredentials();
+            connectionInfo.clearCache();
         }
         // Mark all specified network configs as saved
         boolean[] saveConfig = new boolean[1];
@@ -732,7 +731,10 @@ public class WebServiceCore implements DBWServiceCore {
 
     @NotNull
     private WebConnectionInfo closeAndDeleteConnection(
-        WebSession webSession, String projectId, String connectionId, boolean forceDelete
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String connectionId,
+        boolean forceDelete
     ) throws DBWebException {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, connectionId);
 
@@ -754,7 +756,7 @@ public class WebServiceCore implements DBWServiceCore {
             webSession.removeConnection(connectionInfo);
         } else {
             // Just reset saved credentials
-            connectionInfo.clearSavedCredentials();
+            connectionInfo.clearCache();
         }
 
         return connectionInfo;

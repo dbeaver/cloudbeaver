@@ -258,6 +258,9 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
     private static class WebSQLConfiguration {
         private final Map<WebConnectionInfo, WebSQLProcessor> processors = new HashMap<>();
 
+        public WebSQLConfiguration() {
+        }
+
         WebSQLProcessor getSQLProcessor(WebConnectionInfo connectionInfo) throws DBWebException {
             return WebServiceBindingSQL.getSQLProcessor(connectionInfo, true);
         }
@@ -277,6 +280,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                 WebSQLProcessor processor = processors.get(connectionInfo);
                 if (processor == null) {
                     processor = new WebSQLProcessor(connectionInfo.getSession(), connectionInfo);
+                    connectionInfo.addCloseListener(processors::remove);
                     processors.put(connectionInfo, processor);
                 }
                 return processor;
