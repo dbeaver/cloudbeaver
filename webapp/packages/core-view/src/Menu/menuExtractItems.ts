@@ -18,8 +18,8 @@ export function menuExtractItems(items: MenuCreatorItem[], actions: MenuItem[]):
     const index = items.indexOf(action);
     if (index > -1) {
       items.splice(index, 1);
+      list.push(action);
     }
-    list.push(action);
   }
 
   return list;
