@@ -287,13 +287,13 @@ public class WebServiceRM implements DBWServiceRM {
     ) throws DBWebException {
         try {
             SMController sm = webSession.getSecurityController();
-            sm.deleteAllObjectPermissions(projectId, SMObjects.PROJECT);
+            sm.deleteAllObjectPermissions(projectId, SMObjectType.project);
             for (Map.Entry<String, Set<String>> entry : projectPermissions.getSubjectPermissions().entrySet()) {
                 String subjectId = entry.getKey();
                 Set<String> permissions = entry.getValue();
                 sm.setObjectPermissions(
                     Set.of(projectId),
-                    SMObjects.PROJECT,
+                    SMObjectType.project,
                     Set.of(subjectId),
                     permissions,
                     webSession.getUserId()
@@ -313,7 +313,7 @@ public class WebServiceRM implements DBWServiceRM {
         var event = WSObjectPermissionEvent.update(
             webSession.getUserContext().getSmSessionId(),
             webSession.getUserId(),
-            SMObjects.PROJECT,
+            SMObjectType.project,
             projectId
         );
         webSession.getApplication().getEventController().addEvent(event);
@@ -332,7 +332,7 @@ public class WebServiceRM implements DBWServiceRM {
                 Set<String> permissions = entry.getValue();
                 sm.setObjectPermissions(
                     Set.of(projectId),
-                    SMObjects.PROJECT,
+                    SMObjectType.project,
                     Set.of(subjectId),
                     permissions,
                     webSession.getUserId()
@@ -351,7 +351,7 @@ public class WebServiceRM implements DBWServiceRM {
     ) throws DBWebException {
         SMController sm = webSession.getSecurityController();
         try {
-            return sm.getObjectPermissionGrants(projectId, SMObjects.PROJECT);
+            return sm.getObjectPermissionGrants(projectId, SMObjectType.project);
         } catch (DBException e) {
             throw new DBWebException("Error reading project permission grants", e);
         }
@@ -363,7 +363,7 @@ public class WebServiceRM implements DBWServiceRM {
     ) throws DBWebException {
         try {
             SMAdminController sm = webSession.getAdminSecurityController();
-            return sm.getSubjectObjectPermissionGrants(subjectId, SMObjects.PROJECT);
+            return sm.getSubjectObjectPermissionGrants(subjectId, SMObjectType.project);
         } catch (DBException e) {
             throw new DBWebException("Error reading project permission grants", e);
         }
