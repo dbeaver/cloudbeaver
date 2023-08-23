@@ -80,6 +80,7 @@ export default [
   ['ui_continue', 'Продолжить'],
   ['ui_authentication', 'Аутентификация'],
   ['ui_settings', 'Настройки'],
+  ['ui_advanced_settings', 'Расширенные настройки'],
   ['ui_expand', 'Развернуть'],
   ['ui_close_all', 'Закрыть все'],
   ['ui_close_others', 'Закрыть другие'],
