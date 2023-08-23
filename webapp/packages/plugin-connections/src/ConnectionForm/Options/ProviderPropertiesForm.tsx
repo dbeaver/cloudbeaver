@@ -7,7 +7,16 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, Group, GroupTitle, ObjectPropertyInfoForm, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Container,
+  Expandable,
+  EXPANDABLE_FORM_STYLES,
+  Group,
+  GroupTitle,
+  ObjectPropertyInfoForm,
+  useObjectPropertyCategories,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import type { ConnectionConfig, DriverProviderPropertyInfoFragment } from '@cloudbeaver/core-sdk';
 
 type DriverProviderPropertyInfo = DriverProviderPropertyInfoFragment;
@@ -24,40 +33,71 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
 
   const supportedProperties = properties.filter(property => property.supportedConfigurationTypes?.some(type => type === config.configurationType));
 
+  const { categories, isUncategorizedExists } = useObjectPropertyCategories(supportedProperties);
+
   if (!supportedProperties.length) {
     return null;
   }
 
-  const booleanProperties = supportedProperties.filter(property => property.dataType === 'Boolean');
-  const nonBooleanProperties = supportedProperties.filter(property => property.dataType !== 'Boolean');
+  const booleanProperties = supportedProperties.filter(property => !property.category && property.dataType === 'Boolean');
+  const nonBooleanProperties = supportedProperties.filter(property => !property.category && property.dataType !== 'Boolean');
 
   return (
-    <Group form gap>
-      <GroupTitle>{translate('ui_settings')}</GroupTitle>
-      {booleanProperties.length > 0 && (
-        <Container gap wrap>
-          <ObjectPropertyInfoForm
-            properties={booleanProperties}
-            state={config.providerProperties}
-            disabled={disabled}
-            readOnly={readonly}
-            keepSize
-            hideEmptyPlaceholder
-          />
-        </Container>
+    <>
+      {isUncategorizedExists && (
+        <Group form gap>
+          <GroupTitle>{translate('ui_settings')}</GroupTitle>
+          {booleanProperties.length > 0 && (
+            <Container gap wrap>
+              <ObjectPropertyInfoForm
+                properties={booleanProperties}
+                state={config.providerProperties}
+                disabled={disabled}
+                readOnly={readonly}
+                keepSize
+                hideEmptyPlaceholder
+              />
+            </Container>
+          )}
+          {nonBooleanProperties.length > 0 && (
+            <Container wrap gap>
+              <ObjectPropertyInfoForm
+                properties={nonBooleanProperties}
+                state={config.providerProperties}
+                disabled={disabled}
+                readOnly={readonly}
+                tiny
+                hideEmptyPlaceholder
+              />
+            </Container>
+          )}
+        </Group>
       )}
-      {nonBooleanProperties.length > 0 && (
-        <Container wrap gap>
-          <ObjectPropertyInfoForm
-            properties={nonBooleanProperties}
-            state={config.providerProperties}
-            disabled={disabled}
-            readOnly={readonly}
-            tiny
-            hideEmptyPlaceholder
-          />
-        </Container>
+
+      {categories.length > 0 && (
+        <Group gap form>
+          <GroupTitle>{translate('ui_advanced_settings')}</GroupTitle>
+          <Container wrap gap>
+            {categories.map((category, index) => (
+              <Container key={`${category}_${config.driverId}`} gap>
+                <Expandable style={EXPANDABLE_FORM_STYLES} label={category} defaultExpanded={index === 0}>
+                  <Container wrap gap>
+                    <ObjectPropertyInfoForm
+                      properties={supportedProperties}
+                      state={config.providerProperties}
+                      category={category}
+                      disabled={disabled}
+                      readOnly={readonly}
+                      keepSize
+                      hideEmptyPlaceholder
+                    />
+                  </Container>
+                </Expandable>
+              </Container>
+            ))}
+          </Container>
+        </Group>
       )}
-    </Group>
+    </>
   );
 });

@@ -16,6 +16,7 @@ import {
   serializeConnectionParam,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
@@ -51,6 +52,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
     private readonly containerResource: ContainerResource,
     private readonly menuService: MenuService,
     private readonly connectionsSettingsService: ConnectionsSettingsService,
+    private readonly localizationService: LocalizationService,
   ) {
     super();
   }
@@ -219,10 +221,15 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
           icon = '/icons/plugin_datasource_context_switch_database_m.svg';
         }
 
+        const tooltip = this.localizationService.translate('plugin_datasource_context_switch_select_container_tooltip', undefined, {
+          name: connectionSchemaManagerService.currentConnection?.name,
+        });
+
         return {
           ...menu,
           icon,
           label,
+          tooltip,
         };
       },
     });
