@@ -92,7 +92,7 @@ public class WebNavigatorNodeInfo {
         if (node instanceof DBNResourceManagerResource) {
             return IOUtils.getFileNameWithoutExtension(Path.of(getName()));
         }
-        return getName();
+        return null;
     }
 
     @Property
@@ -102,6 +102,7 @@ public class WebNavigatorNodeInfo {
     }
 
     @Property
+    @Deprecated
     public String getFullName() {
         String nodeName;
         if (node instanceof DBNDatabaseNode && !(node instanceof DBNDataSource)) {

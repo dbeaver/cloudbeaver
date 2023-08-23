@@ -59,7 +59,7 @@ type NavigatorNodeInfo {
     # Node human readable name
     name: String
     #Node full name
-    fullName: String
+    fullName: String @deprecated
     #Node plain name
     plainName: String
     # Node icon path
