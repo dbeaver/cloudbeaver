@@ -14,7 +14,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
   DATA_CONTEXT_NAV_NODE,
   ENodeFeature,
-  getNodeDisplayName,
+  getNodePlainName,
   type INodeActions,
   NAV_NODE_TYPE_FOLDER,
   type NavNode,
@@ -123,7 +123,7 @@ export class NavNodeContextMenuService extends Bootstrap {
       },
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
-        const name = node.plainName ?? getNodeDisplayName(node);
+        const name = getNodePlainName(node);
 
         switch (action) {
           case ACTION_OPEN: {
