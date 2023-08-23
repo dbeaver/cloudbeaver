@@ -24,7 +24,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { type INodeActions, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { getNodePlainName, type INodeActions, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
 import type { NavTreeControlComponent, NavTreeControlProps } from '../../NavigationNodeComponent';
 import { TreeNodeMenuLoader } from '../TreeNodeMenu/TreeNodeMenuLoader';
@@ -146,7 +146,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
         <TreeNodeName title={title} {...use({ editing })}>
           <Loader suspense inline fullSize>
             {editing ? (
-              <NavigationNodeEditorLoader name={node.plainName ?? name} disabled={saving} onSave={editingState.save} onClose={editingState.cancel} />
+              <NavigationNodeEditorLoader name={getNodePlainName(node)} disabled={saving} onSave={editingState.save} onClose={editingState.cancel} />
             ) : (
               <name-box>{name}</name-box>
             )}
