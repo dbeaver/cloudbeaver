@@ -83,7 +83,7 @@ public class LocalResourceController implements RMController {
     protected final RMFileLockController lockController;
     protected final List<RMFileOperationHandler> fileHandlers;
 
-    private static final Map<String, BaseWebProjectImpl> projectRegistries = new LinkedHashMap<>();
+    private final Map<String, BaseWebProjectImpl> projectRegistries = new LinkedHashMap<>();
 
     public LocalResourceController(
         DBPWorkspace workspace,
@@ -312,9 +312,6 @@ public class LocalResourceController implements RMController {
                 log.debug("Deleting project '" + projectId + "'");
                 IOUtils.deleteDirectory(targetPath);
                 getSecurityController().deleteAllObjectPermissions(projectId, SMObjects.PROJECT);
-                synchronized (projectRegistries) {
-                    projectRegistries.remove(projectId);
-                }
             } catch (IOException e) {
                 throw new DBException("Error deleting project '" + project.getName() + "'", e);
             }
