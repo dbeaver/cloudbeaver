@@ -114,7 +114,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   }
 
   if (additional) {
-    subTitle = `${state.activeConfiguration?.displayName ?? state.activeProvider?.label} ${translate('authentication_request_token')}`;
+    subTitle = `${state.activeConfiguration?.displayName || state.activeProvider?.label} ${translate('authentication_request_token')}`;
   }
 
   async function login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) {
