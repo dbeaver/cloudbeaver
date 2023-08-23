@@ -12,7 +12,7 @@ import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-conn
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
-import { isObjectsEqual } from '@cloudbeaver/core-utils';
+import { isNotNullDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
@@ -139,10 +139,22 @@ export class ConnectionSSLTabService extends Bootstrap {
     const changed = this.isChanged(handlerConfig, initial);
 
     if (changed && descriptor) {
-      for (const [key, value] of Object.entries(handlerConfig.properties)) {
-        const secured = descriptor.properties.find(p => p.id === key)?.features.includes(PROPERTY_FEATURE_SECURED);
+      for (const descriptorProperty of descriptor.properties) {
+        if (!descriptorProperty.id) {
+          continue;
+        }
+
+        const key = descriptorProperty.id;
+        const isDefault = isNotNullDefined(descriptorProperty.defaultValue);
+
+        if (!(key in handlerConfig.properties) && isDefault) {
+          handlerConfig.properties[key] = descriptorProperty.defaultValue;
+        }
+
+        const secured = descriptorProperty.features.includes(PROPERTY_FEATURE_SECURED);
 
         if (secured) {
+          const value = handlerConfig.properties[key];
           const propertyChanged = initial?.secureProperties?.[key] !== value;
 
           if (propertyChanged) {

@@ -52,7 +52,7 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession> {
     public String validateLocalAuth(
         @NotNull DBRProgressMonitor monitor,
         @NotNull SMController securityController,
-        @NotNull Map<String, Object> providerConfig,
+        @NotNull SMAuthProviderCustomConfiguration providerConfig,
         @NotNull Map<String, Object> userCredentials,
         @Nullable String activeUserId
     ) throws DBException {

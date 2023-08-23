@@ -7,11 +7,12 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { AuthProvider, IAuthCredentials } from '@cloudbeaver/core-authentication';
+import type { AuthProvider, AuthProviderConfiguration, IAuthCredentials } from '@cloudbeaver/core-authentication';
 import { Combobox, Group, InputField, useFocus } from '@cloudbeaver/core-blocks';
 
 interface Props {
   provider: AuthProvider;
+  configuration: AuthProviderConfiguration | null;
   credentials: IAuthCredentials;
   authenticate: boolean;
 }
