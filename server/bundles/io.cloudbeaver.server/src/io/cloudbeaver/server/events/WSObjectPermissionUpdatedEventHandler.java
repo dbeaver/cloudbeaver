@@ -17,79 +17,108 @@
 package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.SMObjectPermissionsGrant;
-import org.jkiss.dbeaver.model.security.SMObjects;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler<WSObjectPermissionEvent> {
     private static final Log log = Log.getLog(WSObjectPermissionUpdatedEventHandler.class);
-    private volatile Set<String> subjectsWithProjectAccess;
-
-    @Override
-    public void handleEvent(@NotNull WSObjectPermissionEvent event) {
-        if (!SMObjects.PROJECT_OBJECT_TYPE_ID.equals(event.getSmObjectType().getObjectType())) {
-            return;
-        }
-        var smController = CBPlatform.getInstance().getApplication().getSecurityController();
-        try {
-            var permissionGrants = smController.getObjectPermissionGrants(event.getObjectId(), event.getSmObjectType());
-            subjectsWithProjectAccess = permissionGrants.stream()
-                .map(SMObjectPermissionsGrant::getSubjectId)
-                .collect(Collectors.toSet());
-            super.handleEvent(event);
-            subjectsWithProjectAccess = Set.of();
-        } catch (DBException e) {
-            log.error("Cannot get permission grants", e);
-        }
-
-    }
 
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSObjectPermissionEvent event) {
         try {
+            // we have accessible data sources only in web session
+            if (event.getSmObjectType() == SMObjectType.datasource && !(activeUserSession instanceof WebSession)) {
+                return;
+            }
             var user = activeUserSession.getUserContext().getUser();
-            var projectId = event.getObjectId();
+            var objectId = event.getObjectId();
 
             var userSubjects = new HashSet<>(Set.of(user.getTeams()));
             userSubjects.add(user.getUserId());
 
-            var accessibleProjectIds = activeUserSession.getUserContext().getAccessibleProjectIds();
-            var isAccessibleNow = accessibleProjectIds.contains(projectId);
-
-            var shouldBeAccessible = subjectsWithProjectAccess.stream().anyMatch(userSubjects::contains);
-
-            if (shouldBeAccessible && !isAccessibleNow) {
-                // adding project to session cache
-                activeUserSession.addSessionProject(projectId);
-                activeUserSession.addSessionEvent(
-                    WSProjectUpdateEvent.create(
-                        event.getSessionId(),
-                        event.getUserId(),
-                        projectId
-                    )
-                );
-            } else if (!shouldBeAccessible && isAccessibleNow) {
-                // removing project from session cache
-                activeUserSession.removeSessionProject(projectId);
-                activeUserSession.addSessionEvent(
-                    WSProjectUpdateEvent.delete(
-                        event.getSessionId(),
-                        event.getUserId(),
-                        projectId
-                    )
-                );
-            };
+            var smController = CBPlatform.getInstance().getApplication().getSecurityController();
+            var shouldBeAccessible = smController.getObjectPermissionGrants(event.getObjectId(), event.getSmObjectType())
+                .stream()
+                .map(SMObjectPermissionsGrant::getSubjectId)
+                .anyMatch(userSubjects::contains);
+            boolean isAccessibleNow;
+            switch (event.getSmObjectType()) {
+                case project:
+                    var accessibleProjectIds = activeUserSession.getUserContext().getAccessibleProjectIds();
+                    isAccessibleNow = accessibleProjectIds.contains(objectId);
+                    if (shouldBeAccessible && !isAccessibleNow) {
+                        // adding project to session cache
+                        activeUserSession.addSessionProject(objectId);
+                        activeUserSession.addSessionEvent(
+                            WSProjectUpdateEvent.create(
+                                event.getSessionId(),
+                                event.getUserId(),
+                                objectId
+                            )
+                        );
+                    } else if (!shouldBeAccessible && isAccessibleNow) {
+                        // removing project from session cache
+                        activeUserSession.removeSessionProject(objectId);
+                        activeUserSession.addSessionEvent(
+                            WSProjectUpdateEvent.delete(
+                                event.getSessionId(),
+                                event.getUserId(),
+                                objectId
+                            )
+                        );
+                    };
+                    break;
+                case datasource:
+                    var webSession = (WebSession) activeUserSession;
+                    var project = webSession.getProjectById(WebAppUtils.getGlobalProjectId());
+                    if (project == null) {
+                        log.error("Project " + WebAppUtils.getGlobalProjectId() +
+                            " is not found in session " + activeUserSession.getSessionId());
+                        return;
+                    }
+                    isAccessibleNow = webSession.findWebConnectionInfo(objectId) != null;
+                    var dataSources = List.of(objectId);
+                    if (shouldBeAccessible && !isAccessibleNow) {
+                        webSession.addAccessibleConnectionToCache(objectId);
+                        webSession.addSessionEvent(
+                            WSDataSourceEvent.create(
+                                event.getSessionId(),
+                                event.getUserId(),
+                                WebAppUtils.getGlobalProjectId(),
+                                dataSources,
+                                WSDataSourceProperty.CONFIGURATION
+                            )
+                        );
+                    } else if (!shouldBeAccessible && isAccessibleNow) {
+                        webSession.removeAccessibleConnectionFromCache(objectId);
+                        webSession.addSessionEvent(
+                            WSDataSourceEvent.delete(
+                                event.getSessionId(),
+                                event.getUserId(),
+                                WebAppUtils.getGlobalProjectId(),
+                                dataSources,
+                                WSDataSourceProperty.CONFIGURATION
+                            )
+                        );
+                    }
+            }
         } catch (DBException e) {
-            log.error("Error on changing permissions for project " + event.getObjectId() + " in session " + event.getSessionId(), e);
+            log.error("Error on changing permissions for project " +
+                event.getObjectId() + " in session " + activeUserSession.getSessionId(), e);
         }
     }
 
