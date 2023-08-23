@@ -590,7 +590,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Project '" + projectId + "'is not global");
         }
         try {
-            return webSession.getAdminSecurityController().getObjectPermissionGrants(connectionId, SMObjects.DATASOURCE)
+            return webSession.getAdminSecurityController().getObjectPermissionGrants(connectionId, SMObjectType.datasource)
                 .stream()
                 .map(objectPermissionGrant -> new SMDataSourceGrant(
                     objectPermissionGrant.getObjectPermissions().getObjectId(),
@@ -624,9 +624,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             var adminSM = webSession.getAdminSecurityController();
-            adminSM.deleteAllObjectPermissions(connectionId, SMObjects.DATASOURCE);
+            adminSM.deleteAllObjectPermissions(connectionId, SMObjectType.datasource);
             webSession.getAdminSecurityController()
-                .setObjectPermissions(Set.of(connectionId), SMObjects.DATASOURCE,
+                .setObjectPermissions(Set.of(connectionId), SMObjectType.datasource,
                     new HashSet<>(subjects),
                     Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION), grantor.getUserId());
         } catch (DBException e) {
@@ -638,7 +638,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public SMDataSourceGrant[] getSubjectConnectionAccess(@NotNull WebSession webSession, @NotNull String subjectId) throws DBWebException {
         try {
-            return webSession.getAdminSecurityController().getSubjectObjectPermissionGrants(subjectId, SMObjects.DATASOURCE)
+            return webSession.getAdminSecurityController().getSubjectObjectPermissionGrants(subjectId, SMObjectType.datasource)
                 .stream()
                 .map(objectPermissionsGrant ->
                     new SMDataSourceGrant(
@@ -666,11 +666,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Cannot grant access in anonymous mode");
         }
         try {
-            webSession.getAdminSecurityController().deleteAllSubjectObjectPermissions(subjectId, SMObjects.DATASOURCE);
+            webSession.getAdminSecurityController().deleteAllSubjectObjectPermissions(subjectId, SMObjectType.datasource);
             webSession.getAdminSecurityController()
                 .setObjectPermissions(
                     new HashSet<>(connections),
-                    SMObjects.DATASOURCE,
+                    SMObjectType.datasource,
                     Set.of(subjectId),
                     Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION),
                     grantor.getUserId());

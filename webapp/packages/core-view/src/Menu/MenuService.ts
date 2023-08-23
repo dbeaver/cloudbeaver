@@ -83,7 +83,12 @@ export class MenuService {
     return creators.reduce<MenuCreatorItem[]>(
       (items, creator) => {
         if (creator.orderItems) {
-          return creator.orderItems(context, items);
+          return creator.orderItems(context, [...items]).filter(item => {
+            if (isAction(item)) {
+              return items.includes(item);
+            }
+            return true;
+          });
         }
         return items;
       },
