@@ -163,7 +163,9 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
               untracked(() => {
                 this.sqlDialectInfoService.loadSqlDialectInfo(key).then(async dialect => {
-                  await this.updateParserScriptsThrottle();
+                  try {
+                    await this.updateParserScriptsThrottle();
+                  } catch {}
                 });
               });
             }
