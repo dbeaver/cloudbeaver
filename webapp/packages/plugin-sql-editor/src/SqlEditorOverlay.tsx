@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 import {
   Button,
   getComputed,
-  Loader,
   Overlay,
   OverlayActions,
   OverlayHeader,
@@ -20,10 +19,7 @@ import {
   OverlayHeaderSubTitle,
   OverlayHeaderTitle,
   OverlayMessage,
-  useExecutor,
   useResource,
-  useSplitUserState,
-  useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import {
@@ -39,7 +35,6 @@ import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
 import { SqlEditorService } from './SqlEditorService';
-import { useDataSource } from './useDataSource';
 
 const viewerStyles = css`
   OverlayActions {
@@ -58,7 +53,6 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
   const dataSource = sqlDataSourceService.get(state.editorId);
   const executionContextId = dataSource?.executionContext?.id;
 
-  useDataSource(dataSource);
   const connection = useResource(
     SqlEditorOverlay,
     ConnectionInfoResource,
