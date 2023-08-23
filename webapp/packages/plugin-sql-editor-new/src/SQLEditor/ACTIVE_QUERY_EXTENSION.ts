@@ -29,6 +29,10 @@ export const ACTIVE_QUERY_EXTENSION: StateField<DecorationSet> = StateField.defi
 
     for (const effect of transaction.effects) {
       if (effect.is(ACTIVE_QUERY_EFFECT_ADD)) {
+        if (effect.value.from === effect.value.to) {
+          return value;
+        }
+
         value = value.update({
           add: [ACTIVE_QUERY_DECORATION.range(effect.value.from, effect.value.to)],
         });
