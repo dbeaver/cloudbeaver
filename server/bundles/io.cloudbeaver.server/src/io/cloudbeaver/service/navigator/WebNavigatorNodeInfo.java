@@ -41,6 +41,7 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
 import org.jkiss.dbeaver.registry.DataSourceFolder;
 import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
 import java.nio.file.Path;
@@ -86,13 +87,14 @@ public class WebNavigatorNodeInfo {
 
     @Property
     public String getPlainName() { // for renaming node
+        String plainName = null;
         if (node instanceof DBNDatabaseNode) {
-            return ((DBNDatabaseNode) node).getPlainNodeName(true, false);
+            plainName = ((DBNDatabaseNode) node).getPlainNodeName(true, false);
         }
         if (node instanceof DBNResourceManagerResource) {
-            return IOUtils.getFileNameWithoutExtension(Path.of(getName()));
+            plainName = IOUtils.getFileNameWithoutExtension(Path.of(getName()));
         }
-        return null;
+        return CommonUtils.equalObjects(plainName, getName()) ? null : plainName;
     }
 
     @Property
