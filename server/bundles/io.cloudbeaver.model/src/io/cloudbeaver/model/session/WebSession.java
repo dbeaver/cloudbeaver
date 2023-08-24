@@ -31,6 +31,7 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
+import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
@@ -41,6 +42,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPEvent;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
@@ -60,10 +62,7 @@ import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
-import org.jkiss.dbeaver.model.security.SMAdminController;
-import org.jkiss.dbeaver.model.security.SMConstants;
-import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMObjects;
+import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
@@ -400,7 +399,7 @@ public class WebSession extends BaseWebSession
     private Set<String> readAccessibleConnectionIds() {
         try {
             return getSecurityController()
-                .getAllAvailableObjectsPermissions(SMObjects.DATASOURCE)
+                .getAllAvailableObjectsPermissions(SMObjectType.datasource)
                 .stream()
                 .map(SMObjectPermissions::getObjectId)
                 .collect(Collectors.toSet());
@@ -461,6 +460,29 @@ public class WebSession extends BaseWebSession
 
     private synchronized void refreshAccessibleConnectionIds() {
         this.accessibleConnectionIds = readAccessibleConnectionIds();
+    }
+
+    public synchronized void addAccessibleConnectionToCache(@NotNull String dsId) {
+        this.accessibleConnectionIds.add(dsId);
+        var registry = getProjectById(WebAppUtils.getGlobalProjectId()).getDataSourceRegistry();
+        var dataSource = registry.getDataSource(dsId);
+        if (dataSource != null) {
+            connections.put(dsId, new WebConnectionInfo(this, dataSource));
+            // reflect changes is navigator model
+            registry.notifyDataSourceListeners(new DBPEvent(DBPEvent.Action.OBJECT_ADD, dataSource, true));
+        }
+    }
+
+    public synchronized void removeAccessibleConnectionFromCache(@NotNull String dsId) {
+        var registry = getProjectById(WebAppUtils.getGlobalProjectId()).getDataSourceRegistry();
+        var dataSource = registry.getDataSource(dsId);
+        if (dataSource != null) {
+            this.accessibleConnectionIds.remove(dsId);
+            connections.remove(dsId);
+            // reflect changes is navigator model
+            registry.notifyDataSourceListeners(new DBPEvent(DBPEvent.Action.OBJECT_REMOVE, dataSource));
+            dataSource.dispose();
+        }
     }
 
     private synchronized void authAsAnonymousUser() throws DBException {

@@ -53,6 +53,7 @@ const style = css`
     }
     &[|errorHidden] {
       pointer-events: none;
+      overflow: hidden;
     }
   }
   error-body {

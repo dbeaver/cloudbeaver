@@ -41,7 +41,7 @@ import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMObjects;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.registry.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -183,7 +183,7 @@ public class LocalResourceController implements RMController {
         if (credentialsProvider.hasPermission(DBWConstants.PERMISSION_ADMIN) || credentialsProvider.hasPermission(RMConstants.PERMISSION_RM_ADMIN)) {
             return new ArrayList<>(Arrays.asList(listAllSharedProjects()));
         }
-        var accessibleSharedProjects = getSecurityController().getAllAvailableObjectsPermissions(SMObjects.PROJECT);
+        var accessibleSharedProjects = getSecurityController().getAllAvailableObjectsPermissions(SMObjectType.project);
 
         return accessibleSharedProjects
             .stream()
@@ -238,7 +238,7 @@ public class LocalResourceController implements RMController {
         }
         String[] permissions = getSecurityController().getObjectPermissions(activeUserCreds.getUserId(),
             projectId,
-            SMObjects.PROJECT
+            SMObjectType.project
         ).getPermissions();
         return Arrays.stream(permissions).map(RMProjectPermission::fromPermission).collect(Collectors.toSet());
     }
@@ -311,7 +311,7 @@ public class LocalResourceController implements RMController {
             try {
                 log.debug("Deleting project '" + projectId + "'");
                 IOUtils.deleteDirectory(targetPath);
-                getSecurityController().deleteAllObjectPermissions(projectId, SMObjects.PROJECT);
+                getSecurityController().deleteAllObjectPermissions(projectId, SMObjectType.project);
                 synchronized (projectRegistries) {
                     projectRegistries.remove(projectId);
                 }
@@ -365,7 +365,6 @@ public class LocalResourceController implements RMController {
             projectMetadata.getMetadataFolder(false),
             () -> {
                 DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
-                registry.refreshConfig();
                 registry.checkForErrors();
                 DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
                 Predicate<DBPDataSourceContainer> filter = null;
