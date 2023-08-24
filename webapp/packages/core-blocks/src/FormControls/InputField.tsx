@@ -10,6 +10,7 @@ import { forwardRef, useCallback, useContext, useLayoutEffect, useRef, useState 
 import styled, { use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
@@ -150,7 +151,7 @@ export const InputField: InputFieldType = observer(
     }
 
     useLayoutEffect(() => {
-      if (uncontrolled && value && inputRef.current) {
+      if (uncontrolled && isNotNullDefined(value) && inputRef.current) {
         inputRef.current.value = value;
       }
     });
