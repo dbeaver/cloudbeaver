@@ -40,7 +40,7 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
   rejectDialog,
 }: DialogComponentProps<IPayload, string | number>) {
   const clipboardService = useService(ClipboardService);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const [value, setValue] = useState<string | number>(payload.defaultValue);
   const handleApply = useCallback(() => resolveDialog(value), [value, resolveDialog]);

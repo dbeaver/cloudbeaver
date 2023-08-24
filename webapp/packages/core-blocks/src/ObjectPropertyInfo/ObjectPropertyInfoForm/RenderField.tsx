@@ -33,6 +33,7 @@ interface RenderFieldProps {
   showRememberTip?: boolean;
   saved?: boolean;
   className?: string;
+  canShowPassword?: boolean;
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
 
@@ -81,6 +82,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   showRememberTip,
   saved,
   className,
+  canShowPassword,
   onFocus,
 }) {
   const translate = useTranslate();
@@ -239,7 +241,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     return (
       <InputField
         type={password ? 'password' : 'text'}
-        title={state[property.id!]}
+        title={password ? property.description || property.displayName : state[property.id!]}
         labelTooltip={property.description || property.displayName}
         name={property.id!}
         state={state}
@@ -251,6 +253,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
         mod="surface"
         className={className}
+        canShowPassword={canShowPassword}
         onFocus={onFocus}
       >
         {property.displayName}
@@ -261,7 +264,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   return (
     <InputField
       type={password ? 'password' : 'text'}
-      title={value}
+      title={password ? property.description || property.displayName : value}
       labelTooltip={property.description || property.displayName}
       name={property.id!}
       value={value}
@@ -272,6 +275,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
       mod="surface"
       className={className}
+      canShowPassword={canShowPassword}
       onFocus={onFocus}
     >
       {property.displayName}
