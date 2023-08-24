@@ -12,6 +12,7 @@ import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlCompletionProposal, SqlDialectInfo, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 import { createLastPromiseGetter, LastPromiseGetter, throttleAsync } from '@cloudbeaver/core-utils';
@@ -34,6 +35,7 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly connectionExecutionContextService: ConnectionExecutionContextService;
   readonly sqlQueryService: SqlQueryService;
   readonly sqlEditorService: SqlEditorService;
+  readonly notificationService: NotificationService;
   readonly sqlExecutionPlanService: SqlExecutionPlanService;
   readonly commonDialogService: CommonDialogService;
   readonly sqlResultTabsService: SqlResultTabsService;
@@ -61,6 +63,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const sqlQueryService = useService(SqlQueryService);
   const sqlDialectInfoService = useService(SqlDialectInfoService);
   const sqlEditorService = useService(SqlEditorService);
+  const notificationService = useService(NotificationService);
   const sqlExecutionPlanService = useService(SqlExecutionPlanService);
   const sqlResultTabsService = useService(SqlResultTabsService);
   const commonDialogService = useService(CommonDialogService);
@@ -365,7 +368,14 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return;
         }
 
-        const { queries } = await this.parseScript([connectionId, script], () => this.sqlEditorService.parseSQLScript(connectionId, script));
+        const { queries } = await this.parseScript([connectionId, script], async () => {
+          try {
+            return await this.sqlEditorService.parseSQLScript(connectionId, script);
+          } catch (exception: any) {
+            this.notificationService.logException(exception, 'Failed to parse SQL script');
+            throw exception;
+          }
+        });
 
         if (this.parser.actualScript === script) {
           this.parser.setQueries(queries);
