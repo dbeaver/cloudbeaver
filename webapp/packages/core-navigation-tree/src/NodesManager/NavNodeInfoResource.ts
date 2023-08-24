@@ -198,3 +198,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
 export function getNodeDisplayName(node: NavNode): string {
   return node.name ?? node.id;
 }
+
+export function getNodePlainName(node: NavNode): string {
+  return node.plainName ?? getNodeDisplayName(node);
+}
