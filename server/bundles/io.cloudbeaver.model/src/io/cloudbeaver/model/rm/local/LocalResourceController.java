@@ -312,6 +312,9 @@ public class LocalResourceController implements RMController {
                 log.debug("Deleting project '" + projectId + "'");
                 IOUtils.deleteDirectory(targetPath);
                 getSecurityController().deleteAllObjectPermissions(projectId, SMObjects.PROJECT);
+                synchronized (projectRegistries) {
+                    projectRegistries.remove(projectId);
+                }
             } catch (IOException e) {
                 throw new DBException("Error deleting project '" + project.getName() + "'", e);
             }
@@ -362,6 +365,7 @@ public class LocalResourceController implements RMController {
             projectMetadata.getMetadataFolder(false),
             () -> {
                 DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
+                registry.refreshConfig();
                 registry.checkForErrors();
                 DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
                 Predicate<DBPDataSourceContainer> filter = null;
