@@ -28,6 +28,7 @@ interface IData {
   adminPageActive: boolean;
   providers: AuthProvider[];
   federatedProviders: AuthProvider[];
+  tabIds: string[];
 
   login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) => Promise<void>;
   loginFederated: (provider: AuthProvider, configuration: AuthProviderConfiguration, onClose?: () => void) => Promise<void>;
@@ -209,12 +210,14 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       exception: observable.ref,
       authenticating: observable.ref,
       authTask: observable.ref,
+      tabIds: observable.ref,
       configure: computed,
       adminPageActive: observable.ref,
     },
     {
       state,
       adminPageActive,
+      tabIds,
       providers: activeProviders,
       federatedProviders,
     },

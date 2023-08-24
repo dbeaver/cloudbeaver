@@ -87,7 +87,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
 
   const additional = userInfo.data !== null && state.activeProvider?.id !== undefined && !userInfo.hasToken(state.activeProvider.id);
 
-  const showTabs = dialogData.providers.length + dialogData.federatedProviders.length > 1;
+  const showTabs = dialogData.tabIds.length > 1;
   const federate = state.tabId === FEDERATED_AUTH;
 
   let dialogTitle = translate('authentication_login_dialog_title');
@@ -126,7 +126,22 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
 
   function renderForm(provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) {
     if (!provider) {
-      return <TextPlaceholder>{translate('authentication_select_provider')}</TextPlaceholder>;
+      if (dialogData.tabIds.length === 0) {
+        return (
+          <TextPlaceholder>
+            {translate('authentication_configure')}
+            <Link
+              onClick={() => {
+                navToSettings();
+              }}
+            >
+              {translate('ui_configure')}
+            </Link>
+          </TextPlaceholder>
+        );
+      } else {
+        return <TextPlaceholder>{translate('authentication_select_provider')}</TextPlaceholder>;
+      }
     }
 
     if (dialogData.configure) {
