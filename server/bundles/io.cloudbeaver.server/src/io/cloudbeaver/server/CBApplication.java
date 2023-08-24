@@ -47,10 +47,7 @@ import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.security.SMAdminController;
-import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
-import org.jkiss.dbeaver.model.security.SMConstants;
-import org.jkiss.dbeaver.model.security.SMObjects;
+import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent;
@@ -881,11 +878,11 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             String anonymousTeamId = appConfig.getAnonymousUserTeam();
             var securityController = getSecurityController();
             for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
-                var datasourcePermissions = securityController.getObjectPermissions(anonymousTeamId, ds.getId(), SMObjects.DATASOURCE);
+                var datasourcePermissions = securityController.getObjectPermissions(anonymousTeamId, ds.getId(), SMObjectType.datasource);
                 if (ArrayUtils.isEmpty(datasourcePermissions.getPermissions())) {
                     securityController.setObjectPermissions(
                         Set.of(ds.getId()),
-                        SMObjects.DATASOURCE,
+                        SMObjectType.datasource,
                         Set.of(anonymousTeamId),
                         Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION),
                         adminName
@@ -912,10 +909,10 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                 }
                 List<String> permissions = JSONUtils.getStringList(permissionsConfiguration, dataSourceId);
                 var securityController = getSecurityController();
-                securityController.deleteAllObjectPermissions(dataSourceId, SMObjects.DATASOURCE);
+                securityController.deleteAllObjectPermissions(dataSourceId, SMObjectType.datasource);
                 securityController.setObjectPermissions(
                     Set.of(dataSourceId),
-                    SMObjects.DATASOURCE,
+                    SMObjectType.datasource,
                     new HashSet<>(permissions),
                     Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION),
                     CBConstants.ADMIN_AUTO_GRANT
