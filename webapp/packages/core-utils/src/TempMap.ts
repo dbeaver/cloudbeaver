@@ -43,8 +43,9 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
     this.entriesTemp = cacheValue();
     this.valuesTemp = cacheValue();
 
-    makeObservable<this, 'deleted'>(this, {
+    makeObservable<this, 'deleted' | 'scheduleFlush'>(this, {
       deleted: observable.shallow,
+      scheduleFlush: action,
     });
   }
 
