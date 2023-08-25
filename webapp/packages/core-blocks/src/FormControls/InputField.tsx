@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useCallback, useContext, useState } from 'react';
+import { forwardRef, useCallback, useContext, useLayoutEffect, useRef, useState } from 'react';
 import styled, { use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
@@ -19,6 +20,7 @@ import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useCombinedHandler } from '../useCombinedHandler';
+import { useMergeRefs } from '../useMergeRefs';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
 import { useStyles } from '../useStyles';
@@ -35,8 +37,9 @@ type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 
     description?: string;
     labelTooltip?: string;
     mod?: 'surface';
-    ref?: React.Ref<HTMLInputElement>;
+    ref?: React.ForwardedRef<HTMLInputElement>;
     style?: ComponentStyle;
+    canShowPassword?: boolean;
     onCustomCopy?: () => void;
   };
 
@@ -66,7 +69,7 @@ interface InputFieldType {
 }
 
 export const InputField: InputFieldType = observer(
-  forwardRef(function InputField(
+  forwardRef<HTMLInputElement>(function InputField(
     {
       name,
       style,
@@ -84,12 +87,15 @@ export const InputField: InputFieldType = observer(
       labelTooltip,
       mod,
       autoHide,
+      canShowPassword = true,
       onChange,
       onCustomCopy,
       ...rest
     }: ControlledProps | ObjectProps<any, any>,
-    ref: React.Ref<HTMLInputElement>,
+    ref,
   ) {
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const mergedRef = useMergeRefs(inputRef, ref);
     const capsLock = useCapsLockTracker();
     const [passwordRevealed, setPasswordRevealed] = useState(false);
     const translate = useTranslate();
@@ -127,9 +133,8 @@ export const InputField: InputFieldType = observer(
     const handleBlur = useCombinedHandler(rest.onBlur, capsLock.handleBlur);
     const handleKeyDown = useCombinedHandler(rest.onKeyDown, capsLock.handleKeyDown, context?.keyDown);
 
-    if (autoHide && !isControlPresented(name, state, defaultValue)) {
-      return null;
-    }
+    const passwordType = rest.type === 'password';
+    const uncontrolled = passwordType && !canShowPassword;
 
     let value: any = valueControlled ?? defaultValue ?? undefined;
 
@@ -141,10 +146,18 @@ export const InputField: InputFieldType = observer(
       value = mapState(value);
     }
 
-    const showRevealPasswordButton = rest.type === 'password' && !rest.readOnly;
-
-    if (showRevealPasswordButton && capsLock.warn) {
+    if (passwordType && !rest.readOnly && capsLock.warn) {
       description = translate('ui_capslock_on');
+    }
+
+    useLayoutEffect(() => {
+      if (uncontrolled && isNotNullDefined(value) && inputRef.current) {
+        inputRef.current.value = value;
+      }
+    });
+
+    if (autoHide && !isControlPresented(name, state, defaultValue)) {
+      return null;
     }
 
     return styled(propStyles)(
@@ -155,11 +168,11 @@ export const InputField: InputFieldType = observer(
         </div>
         <div data-testid="input-container" className={styles.inputContainer}>
           <input
-            ref={ref}
+            ref={mergedRef}
             {...rest}
             type={passwordRevealed ? 'text' : rest.type}
             name={name}
-            value={value ?? ''}
+            value={uncontrolled ? undefined : value ?? ''}
             className={styles.input}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -172,7 +185,7 @@ export const InputField: InputFieldType = observer(
               <Loader small />
             </div>
           )}
-          {showRevealPasswordButton && (
+          {passwordType && canShowPassword && (
             <div data-testid="icon-container" title={translate('ui_reveal_password')} className={styles.iconContainer} onClick={revealPassword}>
               <Icon name={passwordRevealed ? 'password-hide' : 'password-show'} viewBox="0 0 16 16" className={styles.icon} />
             </div>
@@ -183,7 +196,7 @@ export const InputField: InputFieldType = observer(
             </div>
           )}
         </div>
-        {(description || showRevealPasswordButton) && (
+        {(description || passwordType) && (
           <div data-testid="field-description" className={s(styles, { fieldDescription: true, valid: !error, invalid: error })}>
             {description}
           </div>
