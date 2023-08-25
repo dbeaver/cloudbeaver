@@ -462,12 +462,26 @@ export function useResource<
     };
   }, []);
 
-  useEffect(() => {
-    refObj.use(key);
-    if (result.canLoad && !result.isError()) {
-      result.load();
-    }
-  }, [result.canLoad]);
+  useEffect(
+    () =>
+      reaction(
+        () => ({
+          canLoad: result.canLoad,
+          loadKey: propertiesRef.key,
+        }),
+        ({ canLoad, loadKey }) => {
+          refObj.use(loadKey);
+          if (canLoad && !result.isError()) {
+            result.load();
+          }
+        },
+        {
+          fireImmediately: true,
+          delay: 100,
+        },
+      ),
+    [],
+  );
 
   if (actions?.forceSuspense) {
     result.data;
