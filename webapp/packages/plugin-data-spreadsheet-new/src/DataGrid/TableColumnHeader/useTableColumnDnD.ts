@@ -28,7 +28,7 @@ interface TableColumnDnD {
 
 export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number, columnKey: IResultSetColumnKey | null): TableColumnDnD {
   const context = useDataContext();
-  const resultSetViewAction = model.source.getAction(resultIndex, ResultSetViewAction);
+  const resultSetViewAction = model.source.tryGetAction(resultIndex, ResultSetViewAction);
 
   context.set(DATA_CONTEXT_DV_DDM, model);
   context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex);
@@ -49,7 +49,7 @@ export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number
     onDrop(context) {
       const dndColumnKey = context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
 
-      if (columnKey && dndColumnKey) {
+      if (columnKey && dndColumnKey && resultSetViewAction) {
         resultSetViewAction.setColumnOrder(dndColumnKey, resultSetViewAction.columnIndex(columnKey));
       }
     },
@@ -62,7 +62,7 @@ export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number
   if (columnKey && dndBox.state.isOver && dndBox.state.context) {
     const dndColumnKey = dndBox.state.context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
 
-    if (dndColumnKey && resultSetViewAction.columnIndex(columnKey) > resultSetViewAction.columnIndex(dndColumnKey)) {
+    if (resultSetViewAction && dndColumnKey && resultSetViewAction.columnIndex(columnKey) > resultSetViewAction.columnIndex(dndColumnKey)) {
       side = 'right';
     } else {
       side = 'left';
