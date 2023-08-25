@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AuthProvider, AuthProviderConfiguration, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { ErrorMessage, Link, SubmittingForm, TextPlaceholder, useErrorDetails, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { ErrorMessage, getComputed, Link, SubmittingForm, TextPlaceholder, useErrorDetails, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import {
   CommonDialogBody,
@@ -87,7 +87,8 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
 
   const additional = userInfo.data !== null && state.activeProvider?.id !== undefined && !userInfo.hasToken(state.activeProvider.id);
 
-  const showTabs = dialogData.tabIds.length > 1;
+  const showTabs = getComputed(() => dialogData.tabIds.length > 1);
+  const emptyTabs = getComputed(() => dialogData.tabIds.length === 0);
   const federate = state.tabId === FEDERATED_AUTH;
 
   let dialogTitle: string = translate('authentication_login_dialog_title');
@@ -130,7 +131,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
 
   function renderForm(provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) {
     if (!provider) {
-      if (dialogData.tabIds.length === 0) {
+      if (emptyTabs) {
         return (
           <TextPlaceholder>
             {translate('authentication_configure')}

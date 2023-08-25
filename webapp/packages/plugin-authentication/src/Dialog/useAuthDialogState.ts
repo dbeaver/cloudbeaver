@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, observable } from 'mobx';
+import { action, computed, observable, untracked } from 'mobx';
 import { useEffect } from 'react';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
@@ -15,6 +15,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, UserInfo } from '@cloudbeaver/core-sdk';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { FEDERATED_AUTH } from './FEDERATED_AUTH';
 
@@ -102,11 +103,13 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
   if (federatedProviders.length > 0) {
     tabIds.push(FEDERATED_AUTH);
   }
+
   const state = useObservableRef<IState>(
     () => ({
       tabId: null,
       activeProvider: null,
       activeConfiguration: null,
+      tabIds,
       credentials: {
         profile: '0',
         credentials: {},
@@ -148,8 +151,14 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       credentials: observable,
       setActiveProvider: action,
     },
-    { tabIds },
+    false,
   );
+
+  untracked(() => {
+    if (!isArraysEqual(state.tabIds, tabIds, undefined, true)) {
+      state.tabIds = tabIds;
+    }
+  });
 
   const data = useObservableRef<IData>(
     () => ({
