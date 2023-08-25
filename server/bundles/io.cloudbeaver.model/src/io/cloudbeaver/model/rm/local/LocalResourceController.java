@@ -365,6 +365,7 @@ public class LocalResourceController implements RMController {
             projectMetadata.getMetadataFolder(false),
             () -> {
                 DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
+                registry.refreshConfig();
                 registry.checkForErrors();
                 DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
                 Predicate<DBPDataSourceContainer> filter = null;
