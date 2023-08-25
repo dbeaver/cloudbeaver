@@ -5,6 +5,7 @@ export default [
   ['authentication_authenticate', 'Autentica'],
   ['authentication_authorizing', 'Authorizing...'],
   ['authentication_auth_federated', 'Federated'],
+  ['authentication_auth_additional', 'Additional'],
   ['authentication_request_token', 'Autenticazione addizionale richiesta'],
   ['authentication_user_name', 'Nome utente'],
   ['authentication_user_role', 'Role'],
