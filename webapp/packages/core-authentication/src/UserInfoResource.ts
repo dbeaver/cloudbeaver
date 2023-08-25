@@ -18,7 +18,6 @@ import {
   GraphQLService,
   ResourceKeySimple,
   ResourceKeyUtils,
-  UserAuthToken,
   UserInfo,
 } from '@cloudbeaver/core-sdk';
 
@@ -108,13 +107,8 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     });
 
     if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
-      if (this.data === null || linkUser) {
-        this.resetIncludes();
-        this.markOutdated();
-      } else {
-        this.data.authTokens.push(...(authInfo.userTokens as UserAuthToken[]));
-      }
-
+      this.resetIncludes();
+      this.markOutdated();
       this.sessionDataResource.markOutdated();
     }
 
@@ -150,13 +144,8 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
         const authInfo = await activeTask;
 
         if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
-          if (this.data === null) {
-            this.resetIncludes();
-            this.setData(await this.loader());
-          } else {
-            this.data.authTokens.push(...(authInfo.userTokens as UserAuthToken[]));
-          }
-
+          this.resetIncludes();
+          this.setData(await this.loader());
           this.sessionDataResource.markOutdated();
         }
 
@@ -175,10 +164,8 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     });
 
     runInAction(() => {
-      if (!provider || (this.data?.authTokens.length || 0) <= 1) {
-        this.setData(null);
-        this.resetIncludes();
-      }
+      this.resetIncludes();
+      this.markOutdated();
       this.sessionDataResource.markOutdated();
     });
   }
