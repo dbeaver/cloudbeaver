@@ -5,6 +5,7 @@ export default [
   ['authentication_authenticate', 'Аутентифицироваться'],
   ['authentication_authorizing', 'Авторизация...'],
   ['authentication_auth_federated', 'Федеративная'],
+  ['authentication_auth_additional', 'Дополнительная'],
   ['authentication_select_provider', 'Выберите способ аутентификации'],
   ['authentication_configure', 'Пожалуйста настройте способы аутентификации'],
   ['authentication_provider_disabled', 'Способ аутентификации отключен'],
