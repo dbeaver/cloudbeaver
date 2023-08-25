@@ -17,6 +17,7 @@ import { commonDialogBaseStyle, commonDialogThemeStyle } from './styles';
 interface Props {
   title?: string;
   subTitle?: string | React.ReactNode;
+  tooltip?: string;
   icon?: string;
   viewBox?: string;
   bigIcon?: boolean;
@@ -28,6 +29,7 @@ interface Props {
 export const CommonDialogHeader = observer<Props>(function CommonDialogHeader({
   title,
   subTitle,
+  tooltip,
   icon,
   viewBox,
   bigIcon,
@@ -38,7 +40,7 @@ export const CommonDialogHeader = observer<Props>(function CommonDialogHeader({
   const translate = useTranslate();
 
   return styled(useStyles(commonDialogThemeStyle, commonDialogBaseStyle, dialogStyles, style))(
-    <header className={className}>
+    <header title={tooltip} className={className}>
       <icon-container>{icon && <IconOrImage {...use({ bigIcon })} icon={icon} viewBox={viewBox} />}</icon-container>
       <header-title>
         <h3>{translate(title)}</h3>

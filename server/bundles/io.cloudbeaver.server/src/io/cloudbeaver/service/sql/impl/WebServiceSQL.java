@@ -51,6 +51,7 @@ import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSWrapper;
+import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -188,7 +189,8 @@ public class WebServiceSQL implements DBWServiceSQL {
         if (dataSource == null) {
             throw new DBWebException("DataSource is null: can't format SQL query");
         }
-        return SQLFormatUtils.formatSQL(dataSource, query);
+        String indent = RuntimeUtils.isWindows() ? null : "\t";
+        return SQLFormatUtils.formatSQL(dataSource, query, indent);
     }
 
     @Override
