@@ -1,6 +1,7 @@
 fragment NavNodeInfo on NavigatorNodeInfo {
   id
   name
+  plainName
   hasChildren
   nodeType
   icon

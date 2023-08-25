@@ -38,6 +38,8 @@ const styles = css`
   }
 `;
 
+const PASSWORD_PLACEHOLDER = '••••••';
+
 export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(function UserInfo({ controller, editing }) {
   const style = useStyles(styles);
   const translate = useTranslate();
@@ -73,8 +75,9 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
                 name="password"
                 state={controller.credentials}
                 autoComplete="new-password"
-                placeholder={editing ? '••••••' : ''}
+                placeholder={editing ? PASSWORD_PLACEHOLDER : ''}
                 disabled={controller.isSaving}
+                canShowPassword={controller.credentials['password'] !== ''}
                 mod="surface"
                 keepSize
                 tiny
@@ -86,7 +89,8 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
                 type="password"
                 name="passwordRepeat"
                 state={controller.credentials}
-                placeholder={editing ? '••••••' : ''}
+                placeholder={editing ? PASSWORD_PLACEHOLDER : ''}
+                canShowPassword={controller.credentials['passwordRepeat'] !== ''}
                 disabled={controller.isSaving}
                 mod="surface"
                 keepSize
