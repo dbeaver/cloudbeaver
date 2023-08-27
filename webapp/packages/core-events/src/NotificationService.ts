@@ -59,6 +59,14 @@ export class NotificationService {
       }
     }
 
+    if (options.details !== undefined) {
+      const notification = this.notificationList.values.find(notification => notification.details === options.details);
+
+      if (notification) {
+        return notification;
+      }
+    }
+
     if (options.uuid !== undefined) {
       const notification = this.notificationList.values.find(notification => notification.uuid === options.uuid);
 
