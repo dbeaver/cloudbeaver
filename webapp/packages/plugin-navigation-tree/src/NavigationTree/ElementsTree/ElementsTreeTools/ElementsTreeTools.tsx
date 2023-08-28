@@ -7,63 +7,41 @@
  */
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled from 'reshadow';
 
-import { ACTION_ICON_BUTTON_STYLES, IconButton, PlaceholderElement, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  ACTION_ICON_BUTTON_STYLES,
+  IconButton,
+  IconButtonStyles,
+  PlaceholderElement,
+  s,
+  SContext,
+  StyleRegistry,
+  useS,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE';
 import type { IElementsTree } from '../useElementsTree';
 import { ElementsTreeFilter } from './ElementsTreeFilter';
+import ElementsTreeToolsStyles from './ElementsTreeTools.m.css';
 import { ElementsTreeToolsMenu } from './ElementsTreeToolsMenu';
 import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT';
 import type { IElementsTreeSettingsProps } from './NavigationTreeSettings/ElementsTreeSettingsService';
 import { NavigationTreeSettings } from './NavigationTreeSettings/NavigationTreeSettings';
 
-const toolsStyles = css`
-  [|primary] {
-    composes: theme-text-primary from global;
-  }
-  tools {
-    composes: theme-background-surface from global;
-    display: block;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-  actions {
-    display: flex;
-    flex-direction: row;
-  }
-  fill {
-    flex: 1;
-  }
-  IconButton {
-    & Icon,
-    & StaticImage {
-      transition: transform 0.3s ease-in-out;
-    }
-
-    &[|opened] Icon,
-    &[|opened] StaticImage {
-      transform: rotate(180deg);
-    }
-
-    &[|loading] Icon,
-    &[|loading] StaticImage {
-      animation: rotating 1.5s linear infinite;
-    }
-  }
-  @keyframes rotating {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-`;
+const registry: StyleRegistry = [
+  [
+    IconButtonStyles,
+    {
+      mode: 'append',
+      styles: [ElementsTreeToolsStyles],
+    },
+  ],
+];
 
 interface Props {
   tree: IElementsTree;
@@ -75,7 +53,8 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
   const root = tree.root;
   const translate = useTranslate();
   const [opened, setOpen] = useState(false);
-  const styles = useStyles(ACTION_ICON_BUTTON_STYLES, toolsStyles, style);
+  const deprecatedStyles = useStyles(ACTION_ICON_BUTTON_STYLES, style);
+  const styles = useS(ElementsTreeToolsStyles);
 
   useCaptureViewContext(context => {
     context?.set(DATA_CONTEXT_NAV_TREE_ROOT, tree.baseRoot);
@@ -84,34 +63,34 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
 
   const loading = tree.isLoading();
 
-  return styled(styles)(
-    <tools>
-      <actions>
-        {tree.settings?.configurable && (
+  return styled(deprecatedStyles)(
+    <SContext registry={registry}>
+      <tools className={s(styles, { tools: true })}>
+        <actions className={s(styles, { actions: true })}>
+          {tree.settings?.configurable && (
+            <IconButton
+              name="/icons/settings_cog_sm.svg"
+              title={translate('ui_settings')}
+              className={s(styles, { IconButton: true, opened, primary: true })}
+              img
+              onClick={() => setOpen(!opened)}
+            />
+          )}
+          <div className={s(styles, { fill: true })} />
+          <ElementsTreeToolsMenu tree={tree} />
           <IconButton
-            name="/icons/settings_cog_sm.svg"
-            title={translate('ui_settings')}
-            style={toolsStyles}
+            name="/icons/refresh_sm.svg#root"
+            title={translate('app_navigationTree_refresh')}
+            disabled={loading}
+            className={s(styles, { IconButton: true, loading, primary: true })}
             img
-            onClick={() => setOpen(!opened)}
-            {...use({ opened, primary: true })}
+            onClick={() => tree.refresh(root)}
           />
-        )}
-        <fill />
-        <ElementsTreeToolsMenu tree={tree} />
-        <IconButton
-          name="/icons/refresh_sm.svg#root"
-          title={translate('app_navigationTree_refresh')}
-          style={toolsStyles}
-          disabled={loading}
-          img
-          onClick={() => tree.refresh(root)}
-          {...use({ primary: true, loading })}
-        />
-      </actions>
-      {tree.settings && opened && <NavigationTreeSettings tree={tree} elements={settingsElements} style={style} />}
-      <ElementsTreeFilter tree={tree} style={style} />
-      {children}
-    </tools>,
+        </actions>
+        {tree.settings && opened && <NavigationTreeSettings tree={tree} elements={settingsElements} style={style} />}
+        <ElementsTreeFilter tree={tree} style={style} />
+        {children}
+      </tools>
+    </SContext>,
   );
 });

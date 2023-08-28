@@ -163,6 +163,7 @@ export * from './StatusMessage';
 export * from './ExceptionMessage';
 export * from './getComputed';
 export * from './IconButton';
+export { default as IconButtonStyles } from './IconButton.m.css';
 export * from './IconOrImage';
 export * from './s';
 export * from './SContext';

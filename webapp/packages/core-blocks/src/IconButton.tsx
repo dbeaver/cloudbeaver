@@ -6,33 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 import { Button, ButtonProps } from 'reakit/Button';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Icon } from './Icon';
+import { s } from './s';
 import { StaticImage } from './StaticImage';
+import { useS } from './useS';
 import { useStyles } from './useStyles';
-
-const styles = css`
-  Button {
-    color: inherit;
-    outline: none;
-    border: none;
-    background: none;
-    cursor: pointer;
-    padding: 0;
-    margin: 4px;
-    height: 16px;
-    width: 16px;
-
-    & Icon,
-    & StaticImage {
-      width: 100%;
-      height: 100%;
-    }
-  }
-`;
+import IconButtonStyles from './IconButton.m.css';
 
 interface Props {
   name: string;
@@ -41,11 +24,13 @@ interface Props {
   style?: ComponentStyle;
 }
 
-export function IconButton({ name, img, viewBox, style, ...rest }: Props & ButtonProps) {
-  return styled(useStyles(styles, style))(
-    <Button {...rest}>
-      {img && <StaticImage icon={name} />}
-      {!img && <Icon name={name} viewBox={viewBox} />}
+export function IconButton({ name, img, viewBox, style, className, ...rest }: Props & ButtonProps) {
+  const styles = useS(IconButtonStyles);
+
+  return styled(useStyles(style))(
+    <Button {...rest} className={s(styles, { IconButton: true }, className)}>
+      {img && <StaticImage className={s(styles, { StaticImage: true })} icon={name} />}
+      {!img && <Icon className={s(styles, { Icon: true })} name={name} viewBox={viewBox} />}
     </Button>,
   );
 }

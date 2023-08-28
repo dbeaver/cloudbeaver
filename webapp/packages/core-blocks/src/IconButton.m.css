@@ -1,0 +1,17 @@
+.IconButton {
+  color: inherit;
+  outline: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 4px;
+  height: 16px;
+  width: 16px;
+
+  & .Icon,
+  & .StaticImage {
+    width: 100%;
+    height: 100%;
+  }
+}
