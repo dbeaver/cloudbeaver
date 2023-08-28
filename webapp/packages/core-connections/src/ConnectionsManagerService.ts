@@ -65,14 +65,10 @@ export class ConnectionsManagerService {
   }
 
   async requireConnection(key: IConnectionInfoParams): Promise<Connection | null> {
-    try {
-      const context = await this.connectionExecutor.execute(key);
-      const connection = context.getContext(this.connectionContext);
+    const context = await this.connectionExecutor.execute(key);
+    const connection = context.getContext(this.connectionContext);
 
-      return connection.connection;
-    } catch {
-      return null;
-    }
+    return connection.connection;
   }
 
   addOpenedConnection(connection: Connection): void {
