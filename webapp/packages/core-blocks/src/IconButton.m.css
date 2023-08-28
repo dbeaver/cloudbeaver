@@ -1,4 +1,4 @@
-.IconButton {
+.iconButton {
   color: inherit;
   outline: none;
   border: none;
@@ -9,8 +9,8 @@
   height: 16px;
   width: 16px;
 
-  & .Icon,
-  & .StaticImage {
+  & .icon,
+  & .staticImage {
     width: 100%;
     height: 100%;
   }

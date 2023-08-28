@@ -20,11 +20,11 @@ interface Props extends IElementsTreeSettingsProps {
 
 export const NavigationTreeSettings = observer<Props>(function NavigationTreeSettings({ elements, tree, style, className }) {
   const elementsTreeSettingsService = useService(ElementsTreeSettingsService);
-  const newStyles = useS(NavigationTreeSettingsStyles);
+  const styles = useS(NavigationTreeSettingsStyles);
 
   return (
-    <div className={s(newStyles, { settings: true }, className)}>
-      <Group className={s(newStyles, { Group: true, groupPadding: true })} keepSize gap dense>
+    <div className={s(styles, { settings: true }, className)}>
+      <Group className={s(styles, { group: true, groupPadding: true })} keepSize gap dense>
         <Loader suspense>
           <Placeholder container={elementsTreeSettingsService.placeholder} elements={elements} tree={tree} style={style} />
         </Loader>

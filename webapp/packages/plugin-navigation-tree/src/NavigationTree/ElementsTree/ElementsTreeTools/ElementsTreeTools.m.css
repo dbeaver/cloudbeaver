@@ -19,33 +19,3 @@
 .fill {
   flex: 1;
 }
-
-.IconButton {
-  & .Icon,
-  & .StaticImage {
-    transition: transform 0.3s ease-in-out;
-  }
-
-  &.loading {
-    & .Icon,
-    & .StaticImage {
-      animation: rotating 1.5s linear infinite;
-    }
-  }
-
-  &.opened {
-    & .Icon,
-    & .StaticImage {
-      transform: rotate(180deg);
-    }
-  }
-}
-
-@keyframes rotating {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}

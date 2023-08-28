@@ -28,9 +28,9 @@ export function IconButton({ name, img, viewBox, style, className, ...rest }: Pr
   const styles = useS(IconButtonStyles);
 
   return styled(useStyles(style))(
-    <Button {...rest} className={s(styles, { IconButton: true }, className)}>
-      {img && <StaticImage className={s(styles, { StaticImage: true })} icon={name} />}
-      {!img && <Icon className={s(styles, { Icon: true })} name={name} viewBox={viewBox} />}
+    <Button {...rest} className={s(styles, { iconButton: true }, className)}>
+      {img && <StaticImage className={s(styles, { staticImage: true })} icon={name} />}
+      {!img && <Icon className={s(styles, { icon: true })} name={name} viewBox={viewBox} />}
     </Button>,
   );
 }
