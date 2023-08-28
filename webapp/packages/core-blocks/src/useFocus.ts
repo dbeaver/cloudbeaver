@@ -64,12 +64,12 @@ export function useFocus<T extends HTMLElement>({ autofocus, focusFirstChild, on
       focusFirstChild() {
         if (this.reference !== null && optionsRef.focusFirstChild) {
           const firstFocusable = this.reference.querySelectorAll<T>(`
-            button:not([disabled=disabled]), 
+            button:not([disabled]):not([disabled=disabled]), 
             [href], 
-            input:not([disabled=disabled]):not([readonly=readonly]), 
-            select:not([disabled=disabled]):not([readonly=readonly]), 
-            textarea:not([disabled=disabled]):not([readonly=readonly]), 
-            [tabndex]:not([tabndex="-1"])`);
+            input:not([disabled]):not([readonly]):not([disabled=disabled]):not([readonly=readonly]), 
+            select:not([disabled]):not([readonly]):not([disabled=disabled]):not([readonly=readonly]), 
+            textarea:not([disabled]):not([readonly]):not([disabled=disabled]):not([readonly=readonly]), 
+            [tabindex]:not([tabindex="-1"])`);
 
           let tabIndex = -1;
           let lastElement: T | undefined;
