@@ -86,6 +86,7 @@ public class CBDatabase {
 
     private String instanceId;
     private SMAdminController adminSecurityController;
+    private SQLDialect dialect;
 
     public CBDatabase(WebApplication application, CBDatabaseConfig databaseConfiguration) {
         this.application = application;
@@ -178,7 +179,7 @@ public class CBDatabase {
         } catch (SQLException e) {
             throw new DBException("Error initializing connection pool");
         }
-        SQLDialect dialect = driver.getScriptDialect().createInstance();
+        dialect = driver.getScriptDialect().createInstance();
 
         try (Connection connection = cbDataSource.getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
@@ -540,6 +541,11 @@ public class CBDatabase {
     @NotNull
     public String normalizeTableNames(@NotNull String sql) {
         return CommonUtils.normalizeTableNames(sql, databaseConfiguration.getSchema());
+    }
+
+    @NotNull
+    public SQLDialect getDialect() {
+        return dialect;
     }
     
 }

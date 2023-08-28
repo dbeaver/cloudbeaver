@@ -352,10 +352,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER"
-                    + buildUsersFilter(filter) + "\nORDER BY USER_ID LIMIT ? OFFSET ?"))) {
+                    + buildUsersFilter(filter) + "\nORDER BY USER_ID " + getOffsetLimit()))) {
                 int parameterIndex = setUsersFilterValues(dbStat, filter, 1);
-                dbStat.setInt(parameterIndex++, filter.getPage().getLimit());
                 dbStat.setInt(parameterIndex++, filter.getPage().getOffset());
+                dbStat.setInt(parameterIndex++, filter.getPage().getLimit());
 
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
@@ -399,6 +399,13 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error while loading users", e);
         }
+    }
+
+    private String getOffsetLimit() {
+        if (ArrayUtils.containsIgnoreCase(new String[] {"sqlserver", "oracle"}, database.getDialect().getDialectId())) {
+            return "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        }
+        return "OFFSET ? LIMIT ?";
     }
 
     private String buildUsersFilter(SMUserFilter filter) {
@@ -2579,9 +2586,10 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                     "WHERE EXISTS " +
                     "(SELECT 1 FROM {table_prefix}CB_AUTH_ATTEMPT AA " +
                     "LEFT JOIN {table_prefix}CB_AUTH_TOKEN CAT ON AA.SESSION_ID = CAT.SESSION_ID " +
-                    "WHERE (CAT.REFRESH_TOKEN_EXPIRATION_TIME < NOW() OR CAT.EXPIRATION_TIME IS NULL) " +
+                    "WHERE (CAT.REFRESH_TOKEN_EXPIRATION_TIME < ? OR CAT.EXPIRATION_TIME IS NULL) " +
                     "AND AA.AUTH_ID=AAI.AUTH_ID AND AUTH_STATUS='" + SMAuthStatus.EXPIRED + "') " +
                     "AND CREATE_TIME<?"),
+                Timestamp.valueOf(LocalDateTime.now()),
                 Timestamp.valueOf(LocalDateTime.now().minusMinutes(smConfig.getExpiredAuthAttemptInfoTtl()))
             );
         } catch (SQLException e) {
