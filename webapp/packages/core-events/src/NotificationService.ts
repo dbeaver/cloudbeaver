@@ -25,6 +25,8 @@ import {
 import { ProcessNotificationController } from './ProcessNotificationController';
 
 export const DELAY_DELETING = 1000;
+const TIMESTAMP_DIFFERENCE_THRESHOLD = 100;
+
 @injectable()
 export class NotificationService {
   // todo change to common new Map()
@@ -60,10 +62,13 @@ export class NotificationService {
     }
 
     if (options.details !== undefined) {
-      const notification = this.notificationList.values.find(notification => notification.details === options.details);
+      const currentTime = options.timestamp || Date.now();
+      const previousNotification = this.notificationList.values.reverse().find(notification => notification.details === options.details);
 
-      if (notification) {
-        return notification;
+      if (previousNotification) {
+        if (currentTime - previousNotification.timestamp < TIMESTAMP_DIFFERENCE_THRESHOLD) {
+          return previousNotification;
+        }
       }
     }
 
