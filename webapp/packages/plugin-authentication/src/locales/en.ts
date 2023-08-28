@@ -5,6 +5,7 @@ export default [
   ['authentication_authenticate', 'Authenticate'],
   ['authentication_authorizing', 'Authorizing...'],
   ['authentication_auth_federated', 'Federated'],
+  ['authentication_auth_additional', 'Additional'],
   ['authentication_select_provider', 'Select available provider'],
   ['authentication_configure', 'Please configure authentication methods'],
   ['authentication_provider_disabled', 'Authentication method is disabled'],

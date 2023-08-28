@@ -121,8 +121,9 @@ export const UserForm = observer<Props>(function UserForm({ user, editing = fals
         </connection-top-bar>
         <content-box>
           <SubmittingForm ref={focusedRef}>
-            <TabPanelList style={style} />
-            <Loader loading={controller.isLoading} overlay />
+            <Loader loading={controller.isLoading || !controller.configured}>
+              <TabPanelList style={style} />
+            </Loader>
           </SubmittingForm>
         </content-box>
       </box>

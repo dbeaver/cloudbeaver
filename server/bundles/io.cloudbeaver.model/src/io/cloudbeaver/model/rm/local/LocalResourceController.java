@@ -312,6 +312,9 @@ public class LocalResourceController implements RMController {
                 log.debug("Deleting project '" + projectId + "'");
                 IOUtils.deleteDirectory(targetPath);
                 getSecurityController().deleteAllObjectPermissions(projectId, SMObjectType.project);
+                synchronized (projectRegistries) {
+                    projectRegistries.remove(projectId);
+                }
             } catch (IOException e) {
                 throw new DBException("Error deleting project '" + project.getName() + "'", e);
             }
@@ -362,6 +365,7 @@ public class LocalResourceController implements RMController {
             projectMetadata.getMetadataFolder(false),
             () -> {
                 DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
+                registry.refreshConfig();
                 registry.checkForErrors();
                 DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
                 Predicate<DBPDataSourceContainer> filter = null;
@@ -861,9 +865,13 @@ public class LocalResourceController implements RMController {
         return type.getPrefix() + "_" + projectName;
     }
 
+    @Nullable
     private RMProject makeProjectFromId(String projectId, boolean loadPermissions) throws DBException {
         var projectName = parseProjectName(projectId);
         var projectPath = getProjectPath(projectId);
+        if (!Files.exists(projectPath)) {
+            return null;
+        }
         Set<RMProjectPermission> permissions = Set.of();
         if (loadPermissions && credentialsProvider.getActiveUserCredentials() != null) {
             permissions = getProjectPermissions(projectId, projectName.getType());

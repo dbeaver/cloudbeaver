@@ -5,6 +5,7 @@ export default [
   ['authentication_authenticate', '认证'],
   ['authentication_authorizing', 'Authorizing...'],
   ['authentication_auth_federated', '联合认证'],
+  ['authentication_auth_additional', 'Additional'],
   ['authentication_select_provider', '选择可用提供者'],
   ['authentication_configure', '请配置认证方法'],
   ['authentication_provider_disabled', '认证方法已禁用'],
