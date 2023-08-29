@@ -70,7 +70,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
 
   const grantedConnections = getComputed(() => connections.filter(connection => state.state.grantedSubjects.includes(connection.id)));
 
-  useAutoLoad(state, selected && !loaded);
+  useAutoLoad(GrantedConnections, state, selected && !loaded);
 
   if (!selected) {
     return null;

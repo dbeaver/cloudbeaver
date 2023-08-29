@@ -159,15 +159,18 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         this.reactionDisposer = autorun(() => {
           const executionContext = this.dataSource?.executionContext;
           if (executionContext) {
-            const key = createConnectionParam(executionContext.projectId, executionContext.connectionId);
+            const context = this.connectionExecutionContextService.get(executionContext.id)?.context;
+            if (context) {
+              const key = createConnectionParam(context.projectId, context.connectionId);
 
-            untracked(() => {
-              this.sqlDialectInfoService.loadSqlDialectInfo(key).then(async dialect => {
-                try {
-                  await this.updateParserScriptsThrottle();
-                } catch {}
+              untracked(() => {
+                this.sqlDialectInfoService.loadSqlDialectInfo(key).then(async () => {
+                  try {
+                    await this.updateParserScriptsThrottle();
+                  } catch {}
+                });
               });
-            });
+            }
           }
         });
       },
@@ -240,9 +243,11 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
         const query = this.getSubQuery();
 
-        await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
-          this.sqlQueryService.executeEditorQuery(this.state, query.query, false),
-        );
+        try {
+          await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
+            this.sqlQueryService.executeEditorQuery(this.state, query.query, false),
+          );
+        } catch {}
       },
 
       async loadDatabaseDataModels(): Promise<void> {
@@ -269,9 +274,11 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
         const query = this.getSubQuery();
 
-        await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
-          this.sqlQueryService.executeEditorQuery(this.state, query.query, true),
-        );
+        try {
+          await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
+            this.sqlQueryService.executeEditorQuery(this.state, query.query, true),
+          );
+        } catch {}
       },
 
       async showExecutionPlan(): Promise<void> {
@@ -284,9 +291,11 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         const query = this.getSubQuery();
 
-        await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
-          this.sqlExecutionPlanService.executeExecutionPlan(this.state, query.query),
-        );
+        try {
+          await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
+            this.sqlExecutionPlanService.executeExecutionPlan(this.state, query.query),
+          );
+        } catch {}
       },
 
       async switchEditing(): Promise<void> {

@@ -7,7 +7,7 @@
  */
 import { action, makeObservable, runInAction } from 'mobx';
 
-import { AppAuthService } from '@cloudbeaver/core-authentication';
+import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import {
   CachedMapAllKey,
@@ -39,6 +39,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    userInfoResource: UserInfoResource,
     appAuthService: AppAuthService,
   ) {
     super();
@@ -58,6 +59,9 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 
     appAuthService.requireAuthentication(this);
 
+    userInfoResource.onUserChange.addHandler(() => {
+      this.clear();
+    });
     connectionInfoResource.onItemUpdate.addHandler(this.updateConnectionContexts.bind(this));
     connectionInfoResource.onItemDelete.addHandler(this.deleteConnectionContexts.bind(this));
 
