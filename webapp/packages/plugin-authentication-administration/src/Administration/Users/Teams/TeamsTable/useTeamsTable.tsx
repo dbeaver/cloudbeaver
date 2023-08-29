@@ -66,7 +66,9 @@ export function useTeamsTable(): Readonly<State> {
         }
 
         const teamNames = deletionList.map(name => `"${name}"`).join(', ');
-        const message = `${translate('administration_teams_delete_confirmation')}${teamNames}. ${translate('ui_are_you_sure')}`;
+        const message = `${translate('administration_teams_delete_confirmation')}${teamNames}.\n${translate(
+          'administration_teams_delete_confirmation_users_note',
+        )}.\n${translate('ui_are_you_sure')}`;
         const result = await dialogService.open(ConfirmationDialogDelete, {
           title: 'ui_data_delete_confirmation',
           message,
@@ -79,7 +81,7 @@ export function useTeamsTable(): Readonly<State> {
 
         try {
           this.processing = true;
-          await resource.resource.deleteTeam(resourceKeyList(deletionList));
+          await resource.resource.deleteTeam(resourceKeyList(deletionList), { force: true });
 
           this.tableState.unselect();
           this.tableState.unexpand(deletionList);

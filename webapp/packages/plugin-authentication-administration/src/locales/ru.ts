@@ -97,6 +97,7 @@ export default [
   ['administration_teams_refresh_tooltip', 'Обновить список команд'],
   ['administration_teams_delete_tooltip', 'Удалить выбранные команды'],
   ['administration_teams_delete_confirmation', 'Вы собираетесь удалить следующие команды: '],
+  ['administration_teams_delete_confirmation_users_note', 'Обратите внимание, что в некоторых командах могут быть пользователи'],
 
   ['administration_teams_team_granted_users_tab_title', 'Пользователи'],
   ['administration_teams_team_granted_users_search_placeholder', 'Поиск по ID пользователя...'],
