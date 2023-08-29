@@ -42,7 +42,7 @@ const navigationTreeStyles = css`
     display: flex;
     flex: 1;
     flex-direction: column;
-    overflow: auto;
+    overflow: hidden;
   }
 
   ElementsTree {

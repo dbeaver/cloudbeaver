@@ -177,7 +177,7 @@ public class CBPlatform extends BasePlatformImpl {
             this.queryManager.dispose();
             //queryManager = null;
         }
-        DataSourceProviderRegistry.getInstance().dispose();
+        DataSourceProviderRegistry.dispose();
 
         if (workspace != null) {
             try {
