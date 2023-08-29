@@ -84,7 +84,10 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
                     env.getArgument("teamName"),
                     env.getArgument("description")))
             .dataFetcher("deleteTeam",
-                env -> getService(env).deleteTeam(getWebSession(env), env.getArgument("teamId")))
+                env -> getService(env).deleteTeam(
+                    getWebSession(env),
+                    env.getArgument("teamId"),
+                    CommonUtils.toBoolean(env.getArgument("force"))))
 
             .dataFetcher("grantUserTeam",
                 env -> getService(env).grantUserTeam(getWebSession(env), env.getArgument("userId"), env.getArgument("teamId")))

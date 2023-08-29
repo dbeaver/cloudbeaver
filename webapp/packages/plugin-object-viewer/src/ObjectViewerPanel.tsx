@@ -13,6 +13,7 @@ import styled, { css } from 'reshadow';
 import { Button, getComputed, Loader, TextPlaceholder, useObservableRef, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { BASE_TAB_STYLES, TabPanel, TabsBox, useTabLocalState } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
@@ -41,6 +42,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   const dbObjectPagesService = useService(DBObjectPageService);
   const connectionsManagerService = useService(ConnectionsManagerService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
+  const notificationService = useService(NotificationService);
   const innerTabState = useTabLocalState(() => new MetadataMap<string, any>());
 
   const objectId = tab.handlerState.objectId;
@@ -94,6 +96,8 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
 
     try {
       await connectionsManagerService.requireConnection(connectionKey);
+    } catch (exception: any) {
+      notificationService.logException(exception);
     } finally {
       state.connecting = false;
     }

@@ -95,6 +95,7 @@ export default [
   ['administration_teams_refresh_tooltip', 'Refresh team list'],
   ['administration_teams_delete_tooltip', 'Delete selected teams'],
   ['administration_teams_delete_confirmation', "You're going to delete these teams: "],
+  ['administration_teams_delete_confirmation_users_note', 'Note that users will lose their team affiliation and all associated permissions'],
 
   ['administration_teams_team_granted_users_tab_title', 'Users'],
   ['administration_teams_team_granted_users_search_placeholder', 'Search for user ID...'],
