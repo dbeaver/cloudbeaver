@@ -75,13 +75,12 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         return sqlDataSourceService.get(this.state.editorId);
       },
       get dialect(): SqlDialectInfo | undefined {
-        if (!this.dataSource?.executionContext) {
+        const executionContext = this.dataSource?.executionContext;
+        if (!executionContext) {
           return undefined;
         }
 
-        return this.sqlDialectInfoService.getDialectInfo(
-          createConnectionParam(this.dataSource.executionContext.projectId, this.dataSource.executionContext.connectionId),
-        );
+        return this.sqlDialectInfoService.getDialectInfo(createConnectionParam(executionContext.projectId, executionContext.connectionId));
       },
 
       get activeSegmentMode(): ISQLEditorMode {
@@ -158,20 +157,17 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         this.parser.setScript(this.value);
 
         this.reactionDisposer = autorun(() => {
-          if (this.dataSource?.executionContext?.id) {
-            const context = this.connectionExecutionContextService.get(this.dataSource.executionContext.id);
+          const executionContext = this.dataSource?.executionContext;
+          if (executionContext) {
+            const key = createConnectionParam(executionContext.projectId, executionContext.connectionId);
 
-            if (context) {
-              const key = createConnectionParam(this.dataSource.executionContext.projectId, this.dataSource.executionContext.connectionId);
-
-              untracked(() => {
-                this.sqlDialectInfoService.loadSqlDialectInfo(key).then(async dialect => {
-                  try {
-                    await this.updateParserScriptsThrottle();
-                  } catch {}
-                });
+            untracked(() => {
+              this.sqlDialectInfoService.loadSqlDialectInfo(key).then(async dialect => {
+                try {
+                  await this.updateParserScriptsThrottle();
+                } catch {}
               });
-            }
+            });
           }
         });
       },
@@ -192,13 +188,19 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       parseScript: createLastPromiseGetter(),
 
       getHintProposals: throttleAsync(async function getHintProposals(this: ISQLEditorDataPrivate, position, simple) {
-        if (!this.dataSource?.executionContext) {
+        const executionContext = this.dataSource?.executionContext;
+        if (!executionContext) {
           return [];
         }
 
-        const { connectionId, id } = this.dataSource.executionContext;
-
-        const hints = await this.sqlEditorService.getAutocomplete(connectionId, id, this.value, position, MAX_HINTS_LIMIT, simple);
+        const hints = await this.sqlEditorService.getAutocomplete(
+          executionContext.connectionId,
+          executionContext.id,
+          this.value,
+          position,
+          MAX_HINTS_LIMIT,
+          simple,
+        );
 
         this.hintsLimitIsMet = hints.length >= MAX_HINTS_LIMIT;
 
@@ -474,6 +476,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       sqlEditorService,
       sqlExecutionPlanService,
       sqlResultTabsService,
+      notificationService,
       commonDialogService,
     },
   );

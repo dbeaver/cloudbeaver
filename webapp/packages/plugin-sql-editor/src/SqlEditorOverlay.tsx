@@ -52,11 +52,12 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
   const sqlDataSourceService = useService(SqlDataSourceService);
   const dataSource = sqlDataSourceService.get(state.editorId);
   const executionContextId = dataSource?.executionContext?.id;
+  const executionContext = dataSource?.executionContext;
 
   const connection = useResource(
     SqlEditorOverlay,
     ConnectionInfoResource,
-    dataSource?.executionContext ? createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId) : null,
+    executionContext ? createConnectionParam(executionContext.projectId, executionContext.connectionId) : null,
   );
   const driver = useResource(SqlEditorOverlay, DBDriverResource, connection.tryGetData?.driverId ?? null);
 

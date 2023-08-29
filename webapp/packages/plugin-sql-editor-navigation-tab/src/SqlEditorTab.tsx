@@ -10,7 +10,7 @@ import { useContext } from 'react';
 import styled from 'reshadow';
 
 import { s, useStyles } from '@cloudbeaver/core-blocks';
-import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext, useDataContext } from '@cloudbeaver/core-view';
@@ -32,12 +32,10 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
 
   const dataSource = sqlDataSourceService.get(tab.handlerState.editorId);
   let connection: Connection | undefined;
+  const executionContext = dataSource?.executionContext;
 
-  if (dataSource?.executionContext) {
-    connection = connectionInfo.get({
-      projectId: dataSource.executionContext.projectId,
-      connectionId: dataSource.executionContext.connectionId,
-    });
+  if (executionContext) {
+    connection = connectionInfo.get(createConnectionParam(executionContext.projectId, executionContext.connectionId));
   }
 
   const name = getSqlEditorName(tab.handlerState, dataSource, connection);

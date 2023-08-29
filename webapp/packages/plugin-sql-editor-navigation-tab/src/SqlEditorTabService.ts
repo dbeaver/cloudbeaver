@@ -155,9 +155,10 @@ export class SqlEditorTabService extends Bootstrap {
 
     for (const tab of tabs) {
       const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+      const executionContext = dataSource?.executionContext;
 
-      if (dataSource?.executionContext) {
-        const contextConnection = createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId);
+      if (executionContext) {
+        const contextConnection = createConnectionParam(executionContext.projectId, executionContext.connectionId);
 
         if (this.connectionInfoResource.isIntersect(key, contextConnection)) {
           this.resetConnectionInfo(tab);
@@ -168,12 +169,13 @@ export class SqlEditorTabService extends Bootstrap {
 
   private getNavNode(tab: ITab<ISqlEditorTabState>) {
     const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+    const executionContext = dataSource?.executionContext;
 
-    if (!dataSource?.executionContext) {
+    if (!executionContext) {
       return;
     }
 
-    const { projectId, connectionId, defaultCatalog, defaultSchema } = dataSource.executionContext;
+    const { projectId, connectionId, defaultCatalog, defaultSchema } = executionContext;
     const connectionKey = createConnectionParam(projectId, connectionId);
 
     const connection = this.connectionInfoResource.get(connectionKey);
@@ -222,19 +224,20 @@ export class SqlEditorTabService extends Bootstrap {
 
     for (const tab of tabs) {
       const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId)!;
-      const executionContext = this.connectionExecutionContextService.get(dataSource.executionContext!.id);
+      const executionContext = this.connectionExecutionContextService.get(dataSource.executionContext!.id)?.context;
 
-      if (!executionContext?.context) {
-        if (dataSource.executionContext) {
-          const contextConnection = createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId);
+      if (!executionContext) {
+        const executionContext = dataSource.executionContext;
+        if (executionContext) {
+          const contextConnection = createConnectionParam(executionContext.projectId, executionContext.connectionId);
 
           if (!this.connectionInfoResource.has(contextConnection)) {
             this.resetConnectionInfo(tab);
           }
         }
       } else {
-        dataSource.setExecutionContext({ ...executionContext.context });
-        this.attachToProject(tab, executionContext.context.projectId);
+        dataSource.setExecutionContext({ ...executionContext });
+        this.attachToProject(tab, executionContext.projectId);
       }
     }
   }
@@ -250,11 +253,12 @@ export class SqlEditorTabService extends Bootstrap {
 
     for (const tab of tabs) {
       const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId)!;
+      const executionContext = dataSource.executionContext;
 
-      if (dataSource.executionContext) {
-        const contextConnection = createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId);
+      if (executionContext) {
+        const contextConnection = createConnectionParam(executionContext.projectId, executionContext.connectionId);
 
-        if (ResourceKeyUtils.isIntersect(key, dataSource.executionContext!.id) && !this.connectionInfoResource.has(contextConnection)) {
+        if (ResourceKeyUtils.isIntersect(key, executionContext.id) && !this.connectionInfoResource.has(contextConnection)) {
           this.resetConnectionInfo(tab);
         }
       }
@@ -286,11 +290,12 @@ export class SqlEditorTabService extends Bootstrap {
     }
 
     const dataSource = this.sqlDataSourceService.create(tab.handlerState, tab.handlerState.datasourceKey);
+    const executionContext = dataSource.executionContext;
 
-    if (dataSource.executionContext) {
+    if (executionContext) {
       await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
 
-      const contextConnection = createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId);
+      const contextConnection = createConnectionParam(executionContext.projectId, executionContext.connectionId);
 
       if (!this.connectionInfoResource.has(contextConnection)) {
         this.resetConnectionInfo(tab);
@@ -321,13 +326,13 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private getConnectionId(tab: ITab<ISqlEditorTabState>): IConnectionInfoParams | undefined {
-    const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+    const context = this.sqlDataSourceService.get(tab.handlerState.editorId)?.executionContext;
 
-    if (!dataSource?.executionContext) {
+    if (!context) {
       return undefined;
     }
 
-    return createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId);
+    return createConnectionParam(context.projectId, context.connectionId);
   }
 
   private getObjectCatalogId(tab: ITab<ISqlEditorTabState>) {
@@ -422,12 +427,13 @@ export class SqlEditorTabService extends Bootstrap {
     if (data.state === 'before') {
       for (const tab of this.sqlEditorTabs) {
         const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+        const executionContext = dataSource?.executionContext;
 
-        if (!dataSource?.executionContext) {
+        if (!executionContext) {
           continue;
         }
 
-        const connectionKey = createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId);
+        const connectionKey = createConnectionParam(executionContext.projectId, executionContext.connectionId);
 
         if (!this.connectionInfoResource.isIntersect(connectionsKey, connectionKey)) {
           continue;

@@ -118,13 +118,11 @@ export class SqlEditorService {
 
   getName(tabState: ISqlEditorTabState): string {
     const dataSource = this.sqlDataSourceService.get(tabState.editorId);
+    const executionContext = dataSource?.executionContext;
     let connection: Connection | undefined;
 
-    if (dataSource?.executionContext) {
-      connection = this.connectionInfoResource.get({
-        projectId: dataSource.executionContext.projectId,
-        connectionId: dataSource.executionContext.connectionId,
-      });
+    if (executionContext) {
+      connection = this.connectionInfoResource.get(createConnectionParam(executionContext.projectId, executionContext.connectionId));
     }
 
     return getSqlEditorName(tabState, dataSource, connection);
@@ -186,21 +184,22 @@ export class SqlEditorService {
     return this.sqlDataSourceService.executeAction(
       state.editorId,
       async dataSource => {
-        if (!dataSource.executionContext) {
+        const executionContext = dataSource?.executionContext;
+        if (!executionContext) {
           console.error('executeEditorQuery executionContext is not provided');
           return;
         }
 
-        await this.connectionExecutionContextResource.load(ConnectionExecutionContextProjectKey(dataSource.executionContext.projectId));
+        await this.connectionExecutionContextResource.load(ConnectionExecutionContextProjectKey(executionContext.projectId));
 
-        if (this.connectionExecutionContextResource.has(dataSource.executionContext.id)) {
-          return this.connectionExecutionContextService.get(dataSource.executionContext.id);
+        if (this.connectionExecutionContextResource.has(executionContext.id)) {
+          return this.connectionExecutionContextService.get(executionContext.id);
         }
 
         const context = await this.initContext(
-          createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId),
-          dataSource.executionContext.defaultCatalog,
-          dataSource.executionContext.defaultSchema,
+          createConnectionParam(executionContext.projectId, executionContext.connectionId),
+          executionContext.defaultCatalog,
+          executionContext.defaultSchema,
         );
 
         if (!context?.context) {

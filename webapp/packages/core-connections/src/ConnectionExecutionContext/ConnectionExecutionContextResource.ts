@@ -25,11 +25,14 @@ import { flat } from '@cloudbeaver/core-utils';
 
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '../ConnectionInfoResource';
 import type { IConnectionInfoParams } from '../IConnectionsResource';
-import type { IConnectionExecutionContextInfo } from './IConnectionExecutionContextInfo';
 
 export const ConnectionExecutionContextProjectKey = resourceKeyAliasFactory('@connection-folder/project', (projectId: string) => ({ projectId }));
 
 export const NOT_INITIALIZED_CONTEXT_ID = '-1';
+export type IConnectionExecutionContextInfo = SqlContextInfo & {
+  defaultCatalog?: string | null;
+  defaultSchema?: string | null;
+};
 
 @injectable()
 export class ConnectionExecutionContextResource extends CachedMapResource<string, IConnectionExecutionContextInfo> {
@@ -128,17 +131,6 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     });
   }
 
-  async refreshAll(): Promise<IConnectionExecutionContextInfo[]> {
-    this.resetIncludes();
-    await this.refresh(CachedMapAllKey);
-    return this.values;
-  }
-
-  refreshAllLazy(): void {
-    this.resetIncludes();
-    this.markOutdated(CachedMapAllKey);
-  }
-
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, IConnectionExecutionContextInfo>> {
     const contextsList: IConnectionExecutionContextInfo[] = [];
     let projectId: string | undefined;
@@ -218,7 +210,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   }
 }
 
-function getBaseContext(context: SqlContextInfo): IConnectionExecutionContextInfo {
+function getBaseContext(context: IConnectionExecutionContextInfo): IConnectionExecutionContextInfo {
   return {
     ...context,
   };
