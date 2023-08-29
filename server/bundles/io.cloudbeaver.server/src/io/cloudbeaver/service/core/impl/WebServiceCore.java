@@ -23,7 +23,6 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebDataSourceProviderInfo;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
@@ -461,17 +460,34 @@ public class WebServiceCore implements DBWServiceCore {
 
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
 
+        // we should check that the config has changed but not check for password changes
+        dataSource.setSharedCredentials(config.isSharedCredentials());
+        dataSource.setSavePassword(config.isSaveCredentials());
+        boolean sharedCredentials = dataSource.isSharedCredentials() || !dataSource.getProject()
+            .isUseSecretStorage() && dataSource.isSavePassword();
+        if (sharedCredentials) {
+            //we must notify about the shared password change
+            WebServiceUtils.saveAuthProperties(
+                dataSource,
+                dataSource.getConnectionConfiguration(),
+                config.getCredentials(),
+                config.isSaveCredentials(),
+                config.isSharedCredentials()
+            );
+        }
         boolean sendEvent = !((DataSourceDescriptor) dataSource).equalSettings(oldDataSource);
+        if (!sharedCredentials) {
+            // secret controller is responsible for notification, password changes applied after checks
+            WebServiceUtils.saveAuthProperties(
+                dataSource,
+                dataSource.getConnectionConfiguration(),
+                config.getCredentials(),
+                config.isSaveCredentials(),
+                config.isSharedCredentials()
+            );
+        }
+
         WSDataSourceProperty property = getDatasourceEventProperty(oldDataSource, dataSource);
-
-
-        WebServiceUtils.saveAuthProperties(
-            dataSource,
-            dataSource.getConnectionConfiguration(),
-            config.getCredentials(),
-            config.isSaveCredentials(),
-            config.isSharedCredentials()
-        );
 
         try {
             sessionRegistry.updateDataSource(dataSource);
