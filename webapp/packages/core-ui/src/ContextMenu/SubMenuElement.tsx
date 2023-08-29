@@ -32,7 +32,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
 
     const handler = subMenuData.handler;
     const hidden = getComputed(() => handler?.isHidden?.(subMenuData.context));
-    useAutoLoad(subMenuData.loaders, !hidden, visible);
+    useAutoLoad(SubMenuElement, subMenuData.loaders, !hidden, visible);
 
     const handlers = useObjectRef(
       () => ({

@@ -25,6 +25,7 @@ import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
@@ -40,6 +41,7 @@ import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
+import org.jkiss.dbeaver.model.runtime.DBRRunnableParametrized;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -52,6 +54,7 @@ import java.util.stream.Collectors;
  */
 public class WebConnectionInfo {
 
+    private static final Log log = Log.getLog(WebConnectionInfo.class);
     public static final String SECURED_VALUE = "********";
     private final WebSession session;
     private final DBPDataSourceContainer dataSourceContainer;
@@ -63,6 +66,7 @@ public class WebConnectionInfo {
 
     private transient Map<String, Object> savedAuthProperties;
     private transient List<WebNetworkHandlerConfigInput> savedNetworkCredentials;
+    private transient List<DBRRunnableParametrized<WebConnectionInfo>> closeListeners = null;
 
     public WebConnectionInfo(WebSession session, DBPDataSourceContainer ds) {
         this.session = session;
@@ -361,9 +365,23 @@ public class WebConnectionInfo {
         this.savedNetworkCredentials = networkCredentials;
     }
 
-    public void clearSavedCredentials() {
+    public void clearCache() {
         this.savedAuthProperties = null;
         this.savedNetworkCredentials = null;
+        this.fireCloseListeners();
+    }
+
+    public void fireCloseListeners() {
+        if (closeListeners != null) {
+            for (DBRRunnableParametrized<WebConnectionInfo> listener : closeListeners) {
+                try {
+                    listener.run(this);
+                } catch (Exception e) {
+                    log.debug(e);
+                }
+            }
+            closeListeners = null;
+        }
     }
 
     @Property
@@ -417,4 +435,12 @@ public class WebConnectionInfo {
         return appConfig.isShowReadOnlyConnectionInfo();
 
     }
+
+    public void addCloseListener(DBRRunnableParametrized<WebConnectionInfo> listener) {
+        if (closeListeners == null) {
+            closeListeners = new ArrayList<>();
+        }
+        closeListeners.add(listener);
+    }
+
 }

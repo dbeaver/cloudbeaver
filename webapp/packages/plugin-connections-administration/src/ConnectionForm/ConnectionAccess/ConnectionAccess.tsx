@@ -54,7 +54,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
 
   const { selected } = useTab(tabId);
 
-  useAutoLoad(state, selected);
+  useAutoLoad(ConnectionAccess, state, selected);
 
   const users = useResource(ConnectionAccess, UsersResource, CachedResourcePageListKey(0, 1000).setTarget(UsersResourceFilterKey()), {
     active: selected,

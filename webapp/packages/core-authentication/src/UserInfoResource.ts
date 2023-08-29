@@ -163,11 +163,9 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
       configuration,
     });
 
-    runInAction(() => {
-      this.resetIncludes();
-      this.markOutdated();
-      this.sessionDataResource.markOutdated();
-    });
+    this.resetIncludes();
+    this.setData(await this.loader());
+    this.sessionDataResource.markOutdated();
   }
 
   async setConfigurationParameter(key: string, value: any): Promise<UserInfo | null> {

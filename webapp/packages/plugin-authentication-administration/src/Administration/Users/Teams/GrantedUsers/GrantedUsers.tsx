@@ -61,7 +61,7 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
     users.data.filter<AdminUser>((user): user is AdminUser => !!user && state.state.grantedUsers.includes(user.userId)),
   );
 
-  useAutoLoad(state, selected && !state.state.loaded);
+  useAutoLoad(GrantedUsers, state, selected && !state.state.loaded);
 
   if (!selected) {
     return null;

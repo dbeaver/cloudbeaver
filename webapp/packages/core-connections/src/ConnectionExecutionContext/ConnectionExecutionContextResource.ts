@@ -7,7 +7,7 @@
  */
 import { action, makeObservable, runInAction } from 'mobx';
 
-import { AppAuthService } from '@cloudbeaver/core-authentication';
+import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import {
   CachedMapAllKey,
@@ -25,17 +25,21 @@ import { flat } from '@cloudbeaver/core-utils';
 
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '../ConnectionInfoResource';
 import type { IConnectionInfoParams } from '../IConnectionsResource';
-import type { IConnectionExecutionContextInfo } from './IConnectionExecutionContextInfo';
 
 export const ConnectionExecutionContextProjectKey = resourceKeyAliasFactory('@connection-folder/project', (projectId: string) => ({ projectId }));
 
 export const NOT_INITIALIZED_CONTEXT_ID = '-1';
+export type IConnectionExecutionContextInfo = SqlContextInfo & {
+  defaultCatalog?: string | null;
+  defaultSchema?: string | null;
+};
 
 @injectable()
 export class ConnectionExecutionContextResource extends CachedMapResource<string, IConnectionExecutionContextInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    userInfoResource: UserInfoResource,
     appAuthService: AppAuthService,
   ) {
     super();
@@ -55,6 +59,9 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 
     appAuthService.requireAuthentication(this);
 
+    userInfoResource.onUserChange.addHandler(() => {
+      this.clear();
+    });
     connectionInfoResource.onItemUpdate.addHandler(this.updateConnectionContexts.bind(this));
     connectionInfoResource.onItemDelete.addHandler(this.deleteConnectionContexts.bind(this));
 
@@ -126,17 +133,6 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
       this.markOutdated(); // TODO: should be removed, currently multiple contexts for same connection may change catalog/schema for all contexts of connection
       this.delete(contextId);
     });
-  }
-
-  async refreshAll(): Promise<IConnectionExecutionContextInfo[]> {
-    this.resetIncludes();
-    await this.refresh(CachedMapAllKey);
-    return this.values;
-  }
-
-  refreshAllLazy(): void {
-    this.resetIncludes();
-    this.markOutdated(CachedMapAllKey);
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, IConnectionExecutionContextInfo>> {
@@ -218,7 +214,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   }
 }
 
-function getBaseContext(context: SqlContextInfo): IConnectionExecutionContextInfo {
+function getBaseContext(context: IConnectionExecutionContextInfo): IConnectionExecutionContextInfo {
   return {
     ...context,
   };

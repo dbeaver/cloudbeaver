@@ -91,9 +91,10 @@ export function useGroupingDataModel(
         if (columns.length !== 0 && functions.length !== 0 && sourceResultId) {
           const executionContext = sourceModel.source.executionContext;
           model.model.source.setExecutionContext(executionContext).setSupportedDataFormats(connectionInfo?.supportedDataFormats ?? []);
+          const context = executionContext?.context;
 
-          if (executionContext?.context) {
-            const connectionKey = createConnectionParam(executionContext.context.projectId, executionContext.context.connectionId);
+          if (context) {
+            const connectionKey = createConnectionParam(context.projectId, context.connectionId);
 
             model.model
               .setOptions({
