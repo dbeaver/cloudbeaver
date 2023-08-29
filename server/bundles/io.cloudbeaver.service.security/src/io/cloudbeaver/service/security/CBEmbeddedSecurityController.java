@@ -1794,35 +1794,37 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 detectedAuthRole = autoAssign.getAuthRole();
             }
 
-            var userIdFromCreds = findOrCreateExternalUserByCredentials(
-                authProvider,
-                authAttemptSessionInfo.getSessionParams(),
-                userAuthData,
-                finishAuthMonitor,
-                activeUserId,
-                activeUserId == null,
-                detectedAuthRole,
-                providerConfig
-            );
+            if (isMainAuthSession) {
+                var userIdFromCreds = findOrCreateExternalUserByCredentials(
+                    authProvider,
+                    authAttemptSessionInfo.getSessionParams(),
+                    userAuthData,
+                    finishAuthMonitor,
+                    activeUserId,
+                    activeUserId == null,
+                    detectedAuthRole,
+                    providerConfig
+                );
 
-            if (userIdFromCreds == null) {
-                var error = "Invalid user credentials";
-                updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
-                return SMAuthInfo.error(authId, error);
-            }
-
-            if (autoAssign != null && !CommonUtils.isEmpty(autoAssign.getExternalTeamIds())) {
-                if (allTeams == null) {
-                    allTeams = readAllTeams();
+                if (userIdFromCreds == null) {
+                    var error = "Invalid user credentials";
+                    updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
+                    return SMAuthInfo.error(authId, error);
                 }
-                autoUpdateUserTeams(authProvider, autoAssign, userIdFromCreds, allTeams);
-            }
 
-            if (activeUserId == null) {
-                activeUserId = userIdFromCreds;
+                if (autoAssign != null && !CommonUtils.isEmpty(autoAssign.getExternalTeamIds())) {
+                    if (allTeams == null) {
+                        allTeams = readAllTeams();
+                    }
+                    autoUpdateUserTeams(authProvider, autoAssign, userIdFromCreds, allTeams);
+                }
+
+                if (activeUserId == null) {
+                    activeUserId = userIdFromCreds;
+                }
+                storedUserData.put(authConfiguration,
+                    saveSecuredCreds ? userAuthData : filterSecuredUserData(userAuthData, getAuthProvider(authProviderId)));
             }
-            storedUserData.put(authConfiguration,
-                saveSecuredCreds ? userAuthData : filterSecuredUserData(userAuthData, getAuthProvider(authProviderId)));
         }
 
         String tokenAuthRole = updateUserAuthRoleIfNeeded(activeUserId, detectedAuthRole);
