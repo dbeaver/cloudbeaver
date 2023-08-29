@@ -68,9 +68,13 @@ public class WebServiceRM implements DBWServiceRM {
     @Override
     public RMProject getProject(@NotNull WebSession webSession, @NotNull String projectId) throws DBWebException {
         try {
-            return getResourceController(webSession).getProject(projectId, false, false);
+            var project = getResourceController(webSession).getProject(projectId, false, false);
+            if (project == null) {
+                throw new DBWebException("Project not found " + projectId);
+            }
+            return project;
         } catch (DBException e) {
-            throw new DBWebException("Error reading list of accessible projects", e);
+            throw new DBWebException("Error reading project", e);
         }
     }
 

@@ -43,17 +43,12 @@ export class ConnectionAuthService extends Dependency {
   private async connectionDialog(connectionKey: IConnectionInfoParams, context: IExecutionContextProvider<IConnectionInfoParams | null>) {
     const connection = context.getContext(this.connectionsManagerService.connectionContext);
 
-    try {
-      const tempConnection = await this.auth(connectionKey);
+    const newConnection = await this.auth(connectionKey);
 
-      if (!tempConnection?.connected) {
-        return;
-      }
-      connection.connection = tempConnection;
-    } catch (exception: any) {
-      this.notificationService.logException(exception);
-      throw exception;
+    if (!newConnection?.connected) {
+      return;
     }
+    connection.connection = newConnection;
   }
 
   async auth(key: IConnectionInfoParams, resetCredentials?: boolean): Promise<Connection | null> {
