@@ -134,7 +134,7 @@ extend type Query {
 
     createTeam(teamId: ID!, teamName: String, description: String): AdminTeamInfo!
     updateTeam(teamId: ID!, teamName: String, description: String): AdminTeamInfo!
-    deleteTeam(teamId: ID!): Boolean
+    deleteTeam(teamId: ID!, force: Boolean): Boolean
 
     grantUserTeam(userId: ID!, teamId: ID!): Boolean
     revokeUserTeam(userId: ID!, teamId: ID!): Boolean
