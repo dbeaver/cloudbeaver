@@ -52,6 +52,7 @@ export class UserFormController implements IInitializableController, IDestructib
   enabled: boolean;
   statusMessage: IStatusMessage | null;
   partsState: MetadataMap<string, any>;
+  configured: boolean;
 
   get connections(): DatabaseConnection[] {
     return this.connectionInfoResource.values
@@ -108,6 +109,7 @@ export class UserFormController implements IInitializableController, IDestructib
     this.connectionAccessChanged = false;
     this.connectionAccessLoaded = false;
     this.statusMessage = null;
+    this.configured = false;
 
     makeObservable(this, {
       selectedConnections: observable,
@@ -116,23 +118,25 @@ export class UserFormController implements IInitializableController, IDestructib
       isLoading: observable,
       credentials: observable,
       enabled: observable.ref,
+      configured: observable.ref,
       statusMessage: observable,
       connections: computed,
       teams: computed,
     });
   }
 
-  init(): void {
-    this.userFormService.onFormInit.execute();
+  async init(): Promise<void> {
+    await this.userFormService.onFormInit.execute();
+    this.configured = true;
   }
 
-  update(user: AdminUserInfo, editing: boolean, collapse: () => void): void {
+  async update(user: AdminUserInfo, editing: boolean, collapse: () => void): Promise<void> {
     const prevUser = this.user;
     this.user = user;
     this.editing = editing;
     this.collapse = collapse;
     if (prevUser !== this.user) {
-      this.loadTeams();
+      await this.loadTeams();
     }
   }
 
@@ -348,6 +352,7 @@ export class UserFormController implements IInitializableController, IDestructib
 
   private async loadTeams() {
     try {
+      this.isLoading = true;
       await this.teamsResource.load(CachedMapAllKey);
       await this.loadUser();
     } catch (exception: any) {

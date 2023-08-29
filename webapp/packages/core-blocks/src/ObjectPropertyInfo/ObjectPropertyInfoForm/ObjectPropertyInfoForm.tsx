@@ -30,6 +30,7 @@ interface ObjectPropertyFormProps extends ILayoutSizeProps {
   autoHide?: boolean;
   showRememberTip?: boolean;
   hideEmptyPlaceholder?: boolean;
+  canShowPassword?: boolean;
   isSaved?: (property: ObjectPropertyInfo) => boolean;
   onFocus?: (name: string) => void;
 }
@@ -46,6 +47,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
   autoHide,
   showRememberTip,
   hideEmptyPlaceholder,
+  canShowPassword,
   isSaved,
   onFocus,
   ...rest
@@ -84,6 +86,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
             readOnly={readOnly}
             autoHide={autoHide}
             showRememberTip={showRememberTip}
+            canShowPassword={canShowPassword}
             saved={isSaved?.(property)}
             onFocus={handleFocus}
           />

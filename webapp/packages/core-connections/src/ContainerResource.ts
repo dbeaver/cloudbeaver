@@ -17,6 +17,7 @@ import {
   resourceKeyList,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-sdk';
+import { isNull } from '@cloudbeaver/core-utils';
 
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from './ConnectionInfoResource';
 import type { IConnectionInfoParams } from './IConnectionsResource';
@@ -124,7 +125,7 @@ export class ContainerResource extends CachedMapResource<ObjectContainerParams, 
       typeof key === 'object' &&
       typeof key.projectId === 'string' &&
       ['string'].includes(typeof key.connectionId) &&
-      ['string', 'undefined'].includes(typeof key.catalogId)
+      (['string', 'undefined'].includes(typeof key.catalogId) || isNull(key.catalogId))
     );
   }
 }
