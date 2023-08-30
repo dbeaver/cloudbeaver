@@ -38,8 +38,6 @@ export function useFocus<T extends HTMLElement>({ autofocus, focusFirstChild, on
       setRef(ref: T | null) {
         if (this.reference !== ref) {
           this.reference = ref;
-
-          this.updateFocus();
         }
       },
       updateFocus() {
@@ -133,6 +131,8 @@ export function useFocus<T extends HTMLElement>({ autofocus, focusFirstChild, on
 
     reference.addEventListener('focusin', focusHandler);
     reference.addEventListener('focusout', blurHandler);
+
+    state.updateFocus();
 
     return () => {
       reference.removeEventListener('focusin', focusHandler);
