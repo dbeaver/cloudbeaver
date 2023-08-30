@@ -21,19 +21,15 @@
     },
     {
       "label": "Run DevServer CE",
+      "group": "build",
+      "isBackground": true,
       "type": "shell",
       "command": "yarn",
-      "args": [
-        "dev",
-        "--",
-        "--",
-        "--env",
-        "server=${input:stage.ce}",
-        "--host",
-        "0.0.0.0"
-      ],
-      "isBackground": true,
+      "args": ["dev"],
       "options": {
+        "env": {
+          "server": "${input:stage.ce}"
+        },
         "cwd": "${workspaceFolder}/webapp/packages/product-default"
       }
     },
