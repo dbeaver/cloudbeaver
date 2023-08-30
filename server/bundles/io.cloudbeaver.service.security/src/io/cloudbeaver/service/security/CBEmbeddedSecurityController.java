@@ -1803,9 +1803,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 if (activeUserId == null) {
                     activeUserId = userIdFromCreds;
                 }
-                storedUserData.put(authConfiguration,
-                    saveSecuredCreds ? userAuthData : filterSecuredUserData(userAuthData, getAuthProvider(authProviderId)));
             }
+            storedUserData.put(authConfiguration,
+                saveSecuredCreds ? userAuthData : filterSecuredUserData(userAuthData, getAuthProvider(authProviderId)));
         }
 
         String tokenAuthRole = updateUserAuthRoleIfNeeded(activeUserId, detectedAuthRole);
