@@ -35,7 +35,8 @@ if (fs.existsSync(certPath) && fs.existsSync(keyPath)) {
 }
 
 module.exports = (env, argv) => {
-  const urlObject = new URL(env.server);
+  const envServer = env.server ?? process.env.server;
+  const urlObject = new URL(envServer);
 
   return merge(commonConfig(env, argv), {
     mode: 'development',
@@ -57,7 +58,7 @@ module.exports = (env, argv) => {
       server,
       proxy: {
         '/api': {
-          target: env.server,
+          target: envServer,
         },
         '/api/ws': {
           target: `${urlObject.protocol === 'https:' ? 'wss:' : 'ws:'}//${urlObject.hostname}:${urlObject.port}/api/ws`,
