@@ -223,6 +223,17 @@ public class WebServiceUtils extends WebCommonUtils {
         boolean saveCredentials,
         boolean sharedCredentials
     ) {
+        saveAuthProperties(dataSourceContainer, configuration, authProperties, saveCredentials, sharedCredentials, false);
+    }
+
+    public static void saveAuthProperties(
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration configuration,
+        @Nullable Map<String, Object> authProperties,
+        boolean saveCredentials,
+        boolean sharedCredentials,
+        boolean isTest
+    ) {
         dataSourceContainer.setSavePassword(saveCredentials);
         dataSourceContainer.setSharedCredentials(sharedCredentials);
         if (!saveCredentials) {
@@ -242,12 +253,14 @@ public class WebServiceUtils extends WebCommonUtils {
             // Read save credentials
             DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
 
-            var currentAuthProps = new HashMap<String, String>();
-            for (Map.Entry<String, Object> stringObjectEntry : authProperties.entrySet()) {
-                var value = stringObjectEntry.getValue() == null ? null : stringObjectEntry.getValue().toString();
-                currentAuthProps.put(stringObjectEntry.getKey(), value);
+            if (isTest) {
+                var currentAuthProps = new HashMap<String, String>();
+                for (Map.Entry<String, Object> stringObjectEntry : authProperties.entrySet()) {
+                    var value = stringObjectEntry.getValue() == null ? null : stringObjectEntry.getValue().toString();
+                    currentAuthProps.put(stringObjectEntry.getKey(), value);
+                }
+                configuration.setAuthProperties(currentAuthProps);
             }
-            configuration.setAuthProperties(currentAuthProps);
             if (!authProperties.isEmpty()) {
 
                 // Make new Gson parser with type adapters to deserialize into existing credentials
