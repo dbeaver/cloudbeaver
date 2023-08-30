@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class PlatformTest {
+public class ConnectionsTest {
 
     public static final String GQL_TEMPLATE_CREATE_CONNECTION = "createConnection.json";
     public static final String GQL_TEMPLATE_DELETE_CONNECTION = "deleteConnection.json";
@@ -52,12 +52,16 @@ public class PlatformTest {
 
     @Test
     public void testBCreateConnection() throws Exception {
-        HttpClient client = CEServerTestSuite.getClient();
+        HttpClient client = CEServerTestSuite.createClient();
+        WebTestUtils.authenticateUser(
+            client, CEServerTestSuite.getScriptsPath(), CEServerTestSuite.GQL_API_URL);
+
         List<Map<String, Object>> connections = getUserConnections(client);
         Map<String, Object> addedConnection = createConnection(client);
         if (!getUserConnections(client).contains(addedConnection)) {
             throw new Exception("The new connection was not added");
         }
+
         boolean deleteConnection = deleteConnection(client, CommonUtils.toString(addedConnection.get("id")));
         if (!deleteConnection) {
             throw new Exception("The new connection was not deleted");

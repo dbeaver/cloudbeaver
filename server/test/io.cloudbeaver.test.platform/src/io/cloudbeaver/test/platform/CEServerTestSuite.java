@@ -33,7 +33,7 @@ import java.nio.file.Path;
 @RunWith(Suite.class)
 @Suite.SuiteClasses(
     {
-        PlatformTest.class,
+        ConnectionsTest.class,
         AuthenticationTest.class,
         ResourceManagerTest.class,
         RMLockTest.class
@@ -63,10 +63,7 @@ public class CEServerTestSuite {
                 testApp.start(null);
             });
             thread.start();
-            client = HttpClient.newBuilder()
-                .cookieHandler(new CookieManager())
-                .version(HttpClient.Version.HTTP_2)
-                .build();
+            client = createClient();
             long startTime = System.currentTimeMillis();
             long endTime = 0;
             while (true) {
@@ -95,6 +92,13 @@ public class CEServerTestSuite {
 
     public static HttpClient getClient() {
         return client;
+    }
+
+    public static HttpClient createClient() {
+        return HttpClient.newBuilder()
+            .cookieHandler(new CookieManager())
+            .version(HttpClient.Version.HTTP_2)
+            .build();
     }
 
     public static Path getScriptsPath() {
