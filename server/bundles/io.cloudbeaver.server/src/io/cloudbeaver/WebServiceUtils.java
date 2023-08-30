@@ -264,25 +264,6 @@ public class WebServiceUtils extends WebCommonUtils {
         }
     }
 
-    public static void updateConnectionFromConfig(DBPDataSourceContainer dataSource, WebConnectionConfig config) throws DBWebException {
-        setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
-        dataSource.setName(config.getName());
-        dataSource.setDescription(config.getDescription());
-        if (config.getFolder() != null) {
-            dataSource.setFolder(dataSource.getRegistry().getFolder(config.getFolder()));
-        } else {
-            dataSource.setFolder(null);
-        }
-        getGlobalDataSourceRegistry().getAllFolders().clear();
-        saveAuthProperties(
-            dataSource,
-            dataSource.getConnectionConfiguration(),
-            config.getCredentials(),
-            config.isSaveCredentials(),
-            config.isSharedCredentials()
-        );
-    }
-
     public static DBNBrowseSettings parseNavigatorSettings(Map<String, Object> settingsMap) {
         return gson.fromJson(
             gson.toJsonTree(settingsMap), DataSourceNavigatorSettings.class);

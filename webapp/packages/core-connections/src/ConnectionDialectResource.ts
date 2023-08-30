@@ -12,14 +12,13 @@ import {
   CachedMapAllKey,
   CachedMapResource,
   GraphQLService,
-  isResourceKeyList,
   ResourceKey,
   resourceKeyList,
   ResourceKeyUtils,
   SqlDialectInfo,
 } from '@cloudbeaver/core-sdk';
 
-import type { IConnectionExecutionContextInfo } from './ConnectionExecutionContext/IConnectionExecutionContextInfo';
+import type { IConnectionExecutionContextInfo } from './ConnectionExecutionContext/ConnectionExecutionContextResource';
 import {
   ConnectionInfoActiveProjectKey,
   ConnectionInfoProjectKey,

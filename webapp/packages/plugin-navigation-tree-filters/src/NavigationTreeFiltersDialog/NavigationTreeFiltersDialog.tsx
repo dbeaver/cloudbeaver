@@ -32,7 +32,7 @@ export const NavigationTreeFiltersDialog = observer<DialogComponentProps<Payload
   const navTreeResource = useService(NavTreeResource);
   const state = useFilters(payload.node.id);
 
-  useAutoLoad(state);
+  useAutoLoad(NavigationTreeFiltersDialog, state);
 
   async function submit() {
     try {
