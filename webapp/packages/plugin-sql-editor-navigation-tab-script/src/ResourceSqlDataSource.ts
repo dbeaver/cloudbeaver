@@ -17,7 +17,7 @@ import { TaskScheduler } from '@cloudbeaver/core-executor';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { debounce, getPathName, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
+import { debounce, getPathName, isArraysEqual, isNotNullDefined, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
 import { BaseSqlDataSource, ESqlDataSourceFeatures, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 
@@ -75,10 +75,8 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   get executionContext(): IConnectionExecutionContextInfo | undefined {
-    if (
-      this.state.executionContext &&
-      !this.connectionInfoResource.has(createConnectionParam(this.state.executionContext.projectId, this.state.executionContext.connectionId))
-    ) {
+    const executionContext = this.state?.executionContext;
+    if (!executionContext || !this.connectionInfoResource.has(createConnectionParam(executionContext.projectId, executionContext.connectionId))) {
       return undefined;
     }
     return this.state.executionContext;
@@ -228,9 +226,13 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   setExecutionContext(executionContext: IConnectionExecutionContextInfo | undefined): void {
-    executionContext = JSON.parse(JSON.stringify(toJS(executionContext) ?? {}));
+    if (executionContext) {
+      executionContext = JSON.parse(JSON.stringify(toJS(executionContext) ?? {}));
+    }
 
-    if (this.resourceKey && executionContext?.projectId && getRmResourceKey(this.resourceKey).projectId !== executionContext.projectId) {
+    const projectId = executionContext?.projectId;
+
+    if (this.resourceKey && isNotNullDefined(projectId) && getRmResourceKey(this.resourceKey).projectId !== projectId) {
       throw new Error('Resource SQL Data Source and Execution context projects don\t match');
     }
 

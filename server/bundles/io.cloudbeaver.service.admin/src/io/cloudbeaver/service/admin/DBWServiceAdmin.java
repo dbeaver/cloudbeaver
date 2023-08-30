@@ -81,7 +81,7 @@ public interface DBWServiceAdmin extends DBWService {
     AdminTeamInfo updateTeam(@NotNull WebSession webSession, String teamId, String teamName, String description) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean deleteTeam(@NotNull WebSession webSession, String teamId) throws DBWebException;
+    boolean deleteTeam(@NotNull WebSession webSession, String teamId, boolean force) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean grantUserTeam(@NotNull WebSession webSession, String user, String team) throws DBWebException;
