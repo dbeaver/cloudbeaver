@@ -25,7 +25,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -69,7 +68,7 @@ public class WebSQLProcessor implements WebSessionProvider {
     private final SQLRuleManager ruleManager;
     private final Map<String, WebSQLContextInfo> contexts = new LinkedHashMap<>();
 
-    private AtomicInteger contextId = new AtomicInteger();
+    private final AtomicInteger contextId = new AtomicInteger();
 
     WebSQLProcessor(@NotNull WebSession webSession, @NotNull WebConnectionInfo connection) {
         this.webSession = webSession;

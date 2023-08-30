@@ -141,6 +141,12 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
         }
     }
 
+    @Override
+    protected void dispose(boolean reflect) {
+        RMEventManager.removeEventListener(this);
+        super.dispose(reflect);
+    }
+
     private void deleteResourceNode(RMProject project, String resourcePath) {
         if (resourcePath == null) {
             return;

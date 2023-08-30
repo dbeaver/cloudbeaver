@@ -7,7 +7,7 @@
  */
 import { action, makeObservable, observable, runInAction } from 'mobx';
 
-import { AppAuthService } from '@cloudbeaver/core-authentication';
+import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
@@ -88,6 +88,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     sessionDataResource: SessionDataResource,
     appAuthService: AppAuthService,
     connectionInfoEventHandler: ConnectionInfoEventHandler,
+    userInfoResource: UserInfoResource,
   ) {
     super();
 
@@ -109,6 +110,9 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     this.onItemDelete.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
 
+    userInfoResource.onUserChange.addHandler(() => {
+      this.clear();
+    });
     appAuthService.requireAuthentication(this);
     this.sync(
       this.projectInfoResource,

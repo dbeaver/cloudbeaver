@@ -35,7 +35,7 @@ export class ScriptPreviewService {
   }
 
   private async tryGetScript(model: IDatabaseDataModel, resultIndex: number): Promise<string> {
-    const executionContext = model.source.executionContext;
+    const executionContext = model.source.executionContext?.context;
 
     if (!executionContext) {
       throw new Error('Execution context is not provided');
@@ -48,9 +48,9 @@ export class ScriptPreviewService {
     }
 
     const updateVariables: UpdateResultsDataBatchScriptMutationVariables = {
-      projectId: executionContext.context!.projectId,
-      connectionId: executionContext.context!.connectionId,
-      contextId: executionContext.context!.id,
+      projectId: executionContext.projectId,
+      connectionId: executionContext.connectionId,
+      contextId: executionContext.id,
       resultsId: result.id,
     };
     let editor: ResultSetEditAction | DocumentEditAction | undefined;

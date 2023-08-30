@@ -12,6 +12,7 @@ import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlCompletionProposal, SqlDialectInfo, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 import { createLastPromiseGetter, LastPromiseGetter, throttleAsync } from '@cloudbeaver/core-utils';
@@ -34,6 +35,7 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly connectionExecutionContextService: ConnectionExecutionContextService;
   readonly sqlQueryService: SqlQueryService;
   readonly sqlEditorService: SqlEditorService;
+  readonly notificationService: NotificationService;
   readonly sqlExecutionPlanService: SqlExecutionPlanService;
   readonly commonDialogService: CommonDialogService;
   readonly sqlResultTabsService: SqlResultTabsService;
@@ -61,6 +63,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const sqlQueryService = useService(SqlQueryService);
   const sqlDialectInfoService = useService(SqlDialectInfoService);
   const sqlEditorService = useService(SqlEditorService);
+  const notificationService = useService(NotificationService);
   const sqlExecutionPlanService = useService(SqlExecutionPlanService);
   const sqlResultTabsService = useService(SqlResultTabsService);
   const commonDialogService = useService(CommonDialogService);
@@ -72,13 +75,12 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         return sqlDataSourceService.get(this.state.editorId);
       },
       get dialect(): SqlDialectInfo | undefined {
-        if (!this.dataSource?.executionContext) {
+        const executionContext = this.dataSource?.executionContext;
+        if (!executionContext) {
           return undefined;
         }
 
-        return this.sqlDialectInfoService.getDialectInfo(
-          createConnectionParam(this.dataSource.executionContext.projectId, this.dataSource.executionContext.connectionId),
-        );
+        return this.sqlDialectInfoService.getDialectInfo(createConnectionParam(executionContext.projectId, executionContext.connectionId));
       },
 
       get activeSegmentMode(): ISQLEditorMode {
@@ -155,15 +157,17 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         this.parser.setScript(this.value);
 
         this.reactionDisposer = autorun(() => {
-          if (this.dataSource?.executionContext?.id) {
-            const context = this.connectionExecutionContextService.get(this.dataSource.executionContext.id);
-
+          const executionContext = this.dataSource?.executionContext;
+          if (executionContext) {
+            const context = this.connectionExecutionContextService.get(executionContext.id)?.context;
             if (context) {
-              const key = createConnectionParam(this.dataSource.executionContext.projectId, this.dataSource.executionContext.connectionId);
+              const key = createConnectionParam(context.projectId, context.connectionId);
 
               untracked(() => {
-                this.sqlDialectInfoService.loadSqlDialectInfo(key).then(async dialect => {
-                  await this.updateParserScriptsThrottle();
+                this.sqlDialectInfoService.loadSqlDialectInfo(key).then(async () => {
+                  try {
+                    await this.updateParserScriptsThrottle();
+                  } catch {}
                 });
               });
             }
@@ -187,13 +191,19 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       parseScript: createLastPromiseGetter(),
 
       getHintProposals: throttleAsync(async function getHintProposals(this: ISQLEditorDataPrivate, position, simple) {
-        if (!this.dataSource?.executionContext) {
+        const executionContext = this.dataSource?.executionContext;
+        if (!executionContext) {
           return [];
         }
 
-        const { connectionId, id } = this.dataSource.executionContext;
-
-        const hints = await this.sqlEditorService.getAutocomplete(connectionId, id, this.value, position, MAX_HINTS_LIMIT, simple);
+        const hints = await this.sqlEditorService.getAutocomplete(
+          executionContext.connectionId,
+          executionContext.id,
+          this.value,
+          position,
+          MAX_HINTS_LIMIT,
+          simple,
+        );
 
         this.hintsLimitIsMet = hints.length >= MAX_HINTS_LIMIT;
 
@@ -233,9 +243,11 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
         const query = this.getSubQuery();
 
-        await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
-          this.sqlQueryService.executeEditorQuery(this.state, query.query, false),
-        );
+        try {
+          await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
+            this.sqlQueryService.executeEditorQuery(this.state, query.query, false),
+          );
+        } catch {}
       },
 
       async loadDatabaseDataModels(): Promise<void> {
@@ -262,9 +274,11 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
         const query = this.getSubQuery();
 
-        await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
-          this.sqlQueryService.executeEditorQuery(this.state, query.query, true),
-        );
+        try {
+          await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
+            this.sqlQueryService.executeEditorQuery(this.state, query.query, true),
+          );
+        } catch {}
       },
 
       async showExecutionPlan(): Promise<void> {
@@ -277,9 +291,11 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         const query = this.getSubQuery();
 
-        await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
-          this.sqlExecutionPlanService.executeExecutionPlan(this.state, query.query),
-        );
+        try {
+          await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
+            this.sqlExecutionPlanService.executeExecutionPlan(this.state, query.query),
+          );
+        } catch {}
       },
 
       async switchEditing(): Promise<void> {
@@ -363,7 +379,14 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return;
         }
 
-        const { queries } = await this.parseScript([connectionId, script], () => this.sqlEditorService.parseSQLScript(connectionId, script));
+        const { queries } = await this.parseScript([connectionId, script], async () => {
+          try {
+            return await this.sqlEditorService.parseSQLScript(connectionId, script);
+          } catch (exception: any) {
+            this.notificationService.logException(exception, 'Failed to parse SQL script');
+            throw exception;
+          }
+        });
 
         if (this.parser.actualScript === script) {
           this.parser.setQueries(queries);
@@ -462,6 +485,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       sqlEditorService,
       sqlExecutionPlanService,
       sqlResultTabsService,
+      notificationService,
       commonDialogService,
     },
   );

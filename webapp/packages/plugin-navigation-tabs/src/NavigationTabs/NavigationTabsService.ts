@@ -140,7 +140,7 @@ export class NavigationTabsService extends View<ITab> {
       currentTab: computed,
       currentTabId: computed,
       tabIdList: computed<string[]>({
-        equals: isArraysEqual,
+        equals: (a, b) => isArraysEqual(a, b, undefined, true),
       }),
       openTab: action,
       selectTab: action,

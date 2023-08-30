@@ -114,7 +114,7 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
 
   const { selected } = useTab(tabId);
 
-  useAutoLoad(loadableState, selected);
+  useAutoLoad(OriginInfoPanel, loadableState, selected);
 
   if (!selected) {
     return null;
