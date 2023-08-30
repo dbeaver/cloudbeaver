@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { ILoadableState, isLoadableStateHasException } from '@cloudbeaver/core-utils';
 
@@ -15,7 +15,8 @@ export interface IAutoLoadable extends ILoadableState {
   load: () => void;
 }
 
-export function useAutoLoad(state: IAutoLoadable | IAutoLoadable[], enabled = true, lazy = false) {
+export function useAutoLoad(component: { name: string }, state: IAutoLoadable | IAutoLoadable[], enabled = true, lazy = false) {
+  const [loadFunctionName] = useState(`${component.name}.useAutoLoad(...)` as const);
   if (!Array.isArray(state)) {
     state = [state];
   }
@@ -28,18 +29,24 @@ export function useAutoLoad(state: IAutoLoadable | IAutoLoadable[], enabled = tr
   }
 
   useEffect(() => {
-    if (!enabled) {
-      return;
-    }
+    const obj = {
+      [loadFunctionName]: () => {
+        if (!enabled) {
+          return;
+        }
 
-    for (const loader of state as IAutoLoadable[]) {
-      if (isLoadableStateHasException(loader) || (loader.lazy === true && !lazy)) {
-        continue;
-      }
+        for (const loader of state as IAutoLoadable[]) {
+          if (isLoadableStateHasException(loader) || (loader.lazy === true && !lazy)) {
+            continue;
+          }
 
-      if (!loader.isLoaded() || loader.isOutdated?.() === true) {
-        loader.load();
-      }
-    }
+          if (!loader.isLoaded() || loader.isOutdated?.() === true) {
+            loader.load();
+          }
+        }
+      },
+    };
+
+    obj[loadFunctionName]();
   });
 }
