@@ -217,7 +217,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public boolean deleteTeam(@NotNull WebSession webSession, String teamId) throws DBWebException {
+    public boolean deleteTeam(@NotNull WebSession webSession, String teamId, boolean force) throws DBWebException {
         try {
             webSession.addInfoMessage("Delete team - " + teamId);
 
@@ -226,7 +226,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             if (Arrays.stream(userTeams).anyMatch(team -> team.getTeamId().equals(teamId))) {
                 throw new DBWebException("You can not delete your own team");
             }
-            adminSecurityController.deleteTeam(teamId);
+            adminSecurityController.deleteTeam(teamId, force);
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error deleting team", e);

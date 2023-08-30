@@ -76,10 +76,11 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     return this.get(teamId)!;
   }
 
-  async deleteTeam(key: ResourceKeySimple<string>): Promise<Map<string, TeamInfo>> {
+  async deleteTeam(key: ResourceKeySimple<string>, options?: { force: boolean }): Promise<Map<string, TeamInfo>> {
     await ResourceKeyUtils.forEachAsync(key, async key => {
       await this.graphQLService.sdk.deleteTeam({
         teamId: key,
+        force: options?.force ?? false,
       });
       this.delete(key);
     });
