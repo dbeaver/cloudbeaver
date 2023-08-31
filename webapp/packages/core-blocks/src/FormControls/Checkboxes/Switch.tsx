@@ -27,6 +27,7 @@ const switchMod = {
 interface IBaseProps {
   mod?: Array<keyof typeof switchMod>;
   description?: React.ReactNode;
+  inverse?: boolean;
 }
 
 interface SwitchType {
@@ -45,10 +46,11 @@ export const Switch: SwitchType = observer(function Switch({
   defaultChecked,
   className,
   children,
-  onChange,
+  inverse,
   mod = [],
   autoHide,
   disabled,
+  onChange,
   ...rest
 }: IBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
   const checkboxState = useCheckboxState({
@@ -58,6 +60,7 @@ export const Switch: SwitchType = observer(function Switch({
     defaultChecked,
     state,
     name,
+    inverse,
     onChange,
   });
   rest = filterLayoutFakeProps(rest);
