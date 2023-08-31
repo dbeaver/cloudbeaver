@@ -23,7 +23,6 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebDataSourceProviderInfo;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
@@ -334,7 +333,7 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Error connecting to database", e);
         } finally {
             dataSourceContainer.setSavePassword(oldSavePassword);
-            connectionInfo.clearSavedCredentials();
+            connectionInfo.clearCache();
         }
         // Mark all specified network configs as saved
         boolean[] saveConfig = new boolean[1];
@@ -461,17 +460,34 @@ public class WebServiceCore implements DBWServiceCore {
 
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
 
+        // we should check that the config has changed but not check for password changes
+        dataSource.setSharedCredentials(config.isSharedCredentials());
+        dataSource.setSavePassword(config.isSaveCredentials());
+        boolean sharedCredentials = dataSource.isSharedCredentials() || !dataSource.getProject()
+            .isUseSecretStorage() && dataSource.isSavePassword();
+        if (sharedCredentials) {
+            //we must notify about the shared password change
+            WebServiceUtils.saveAuthProperties(
+                dataSource,
+                dataSource.getConnectionConfiguration(),
+                config.getCredentials(),
+                config.isSaveCredentials(),
+                config.isSharedCredentials()
+            );
+        }
         boolean sendEvent = !((DataSourceDescriptor) dataSource).equalSettings(oldDataSource);
+        if (!sharedCredentials) {
+            // secret controller is responsible for notification, password changes applied after checks
+            WebServiceUtils.saveAuthProperties(
+                dataSource,
+                dataSource.getConnectionConfiguration(),
+                config.getCredentials(),
+                config.isSaveCredentials(),
+                config.isSharedCredentials()
+            );
+        }
+
         WSDataSourceProperty property = getDatasourceEventProperty(oldDataSource, dataSource);
-
-
-        WebServiceUtils.saveAuthProperties(
-            dataSource,
-            dataSource.getConnectionConfiguration(),
-            config.getCredentials(),
-            config.isSaveCredentials(),
-            config.isSharedCredentials()
-        );
 
         try {
             sessionRegistry.updateDataSource(dataSource);
@@ -644,7 +660,8 @@ public class WebServiceCore implements DBWServiceCore {
                 testDataSource.getConnectionConfiguration(),
                 connectionConfig.getCredentials(),
                 true,
-                false
+                false,
+                true
             );
         } else {
             testDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
@@ -732,7 +749,10 @@ public class WebServiceCore implements DBWServiceCore {
 
     @NotNull
     private WebConnectionInfo closeAndDeleteConnection(
-        WebSession webSession, String projectId, String connectionId, boolean forceDelete
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String connectionId,
+        boolean forceDelete
     ) throws DBWebException {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, connectionId);
 
@@ -754,7 +774,7 @@ public class WebServiceCore implements DBWServiceCore {
             webSession.removeConnection(connectionInfo);
         } else {
             // Just reset saved credentials
-            connectionInfo.clearSavedCredentials();
+            connectionInfo.clearCache();
         }
 
         return connectionInfo;

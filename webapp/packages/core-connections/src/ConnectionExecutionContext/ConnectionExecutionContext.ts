@@ -9,9 +9,8 @@ import { computed, makeObservable, observable } from 'mobx';
 
 import type { ITask, TaskScheduler } from '@cloudbeaver/core-executor';
 
-import type { ConnectionExecutionContextResource } from './ConnectionExecutionContextResource';
+import type { ConnectionExecutionContextResource, IConnectionExecutionContextInfo } from './ConnectionExecutionContextResource';
 import type { IConnectionExecutionContext } from './IConnectionExecutionContext';
-import type { IConnectionExecutionContextInfo } from './IConnectionExecutionContextInfo';
 
 export class ConnectionExecutionContext implements IConnectionExecutionContext {
   get context(): IConnectionExecutionContextInfo | undefined {

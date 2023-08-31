@@ -51,7 +51,7 @@ export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(
   forwardRef(function MenuBar({ menu, nestedMenuSettings, rtl, className, ...props }, ref) {
     const styles = useS(style);
     const items = menu.items;
-    useAutoLoad(menu.loaders);
+    useAutoLoad(MenuBar, menu.loaders);
 
     if (!items.length) {
       return null;

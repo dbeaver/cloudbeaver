@@ -7,7 +7,7 @@
  */
 import type { ITask } from '@cloudbeaver/core-executor';
 
-import type { IConnectionExecutionContextInfo } from './IConnectionExecutionContextInfo';
+import type { IConnectionExecutionContextInfo } from './ConnectionExecutionContextResource';
 
 export interface IConnectionExecutionContext {
   readonly context: IConnectionExecutionContextInfo | undefined;

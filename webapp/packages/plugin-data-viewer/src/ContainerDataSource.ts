@@ -79,6 +79,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     }
 
     const executionContext = await this.ensureContextCreated();
+    const context = executionContext.context!;
     const offset = this.offset;
     const limit = this.count;
 
@@ -86,8 +87,8 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
     if (
       prevResults.length === 1 &&
-      prevResults[0].contextId === executionContext.context!.id &&
-      prevResults[0].connectionId === executionContext.context?.connectionId &&
+      prevResults[0].contextId === context.id &&
+      prevResults[0].connectionId === context.connectionId &&
       prevResults[0].id !== null
     ) {
       firstResultId = prevResults[0].id;
@@ -95,8 +96,8 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
     const task = this.asyncTaskInfoService.create(async () => {
       const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer({
-        connectionId: executionContext.context!.connectionId,
-        contextId: executionContext.context!.id,
+        connectionId: context.connectionId,
+        contextId: context.id,
         containerNodePath: options.containerNodePath,
         resultId: firstResultId,
         filter: {
