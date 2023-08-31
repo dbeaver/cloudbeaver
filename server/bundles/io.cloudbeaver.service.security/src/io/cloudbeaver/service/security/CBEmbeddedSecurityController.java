@@ -216,13 +216,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error saving user teams in database", e);
         }
-        var event = WSSubjectPermissionEvent.update(
-            getSmSessionId(),
-            getUserId(),
-            SMSubjectType.user,
-            userId
-        );
-        application.getEventController().addEvent(event);
+        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user, false);
     }
 
 
@@ -599,13 +593,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error while updating user authentication role", e);
         }
-        var event = WSSubjectPermissionEvent.update(
-            getSmSessionId(),
-            getUserId(),
-            SMSubjectType.user,
-            userId
-        );
-        application.getEventController().addEvent(event);
+        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user, false);
     }
 
 
@@ -1040,13 +1028,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             throw new DBCException("Error deleting team from database", e);
         }
         if (force) {
-            var event = WSSubjectPermissionEvent.update(
-                getSmSessionId(),
-                getUserId(),
-                SMSubjectType.team,
-                teamId
-            );
-            application.getEventController().addEvent(event);
+            addSubjectPermissionsUpdateEvent(teamId, SMSubjectType.team, false);
         }
     }
 
@@ -1082,6 +1064,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error saving subject permissions in database", e);
         }
+        addSubjectPermissionsUpdateEvent(subjectId, null, false);
     }
 
     private void insertPermissions(Connection dbCon, String subjectId, String[] permissionIds, String grantorId) throws SQLException {
@@ -2230,6 +2213,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @NotNull String grantor
     ) throws DBException {
         if (CommonUtils.isEmpty(objectIds)) {
+            subjectIds.forEach(id -> addSubjectPermissionsUpdateEvent(id, null, true));
             return;
         } else if (CommonUtils.isEmpty(subjectIds)) {
             addObjectPermissionsUpdateEvent(objectIds, objectType);
@@ -2277,6 +2261,30 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error granting object permissions", e);
         }
+    }
+
+
+
+    private void addSubjectPermissionsUpdateEvent(
+        @NotNull String subjectId,
+        @Nullable SMSubjectType subjectType,
+        boolean subjectConnectionsChanged
+    ) {
+        if (subjectType == null) {
+            subjectType = getSubjectType(subjectId);
+        }
+        if (subjectType == null) {
+            log.error("Subject type is not found for subject '" + subjectId + "'");
+            return;
+        }
+        var event = WSSubjectPermissionEvent.update(
+            getSmSessionId(),
+            getUserId(),
+            subjectType,
+            subjectId,
+            subjectConnectionsChanged
+        );
+        application.getEventController().addEvent(event);
     }
 
     private void addObjectPermissionsUpdateEvent(@NotNull Set<String> objectIds, @NotNull SMObjectType objectType) {
@@ -2629,6 +2637,25 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             log.error("Error getting all subject ids from database", e);
             return Set.of();
+        }
+    }
+
+    private SMSubjectType getSubjectType(@NotNull String subjectId) {
+        try (Connection dbCon = database.openConnection()) {
+            Set<String> result = new HashSet<>();
+            String sqlBuilder = "SELECT SUBJECT_TYPE FROM {table_prefix}CB_AUTH_SUBJECT U WHERE SUBJECT_ID = ?";
+            try (var dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder))) {
+                dbStat.setString(1, subjectId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    if (dbResult.next()) {
+                        return SMSubjectType.fromCode(dbResult.getString(1));
+                    }
+                }
+            };
+            return null;
+        } catch (SQLException e) {
+            log.error("Error getting all subject ids from database", e);
+            return null;
         }
     }
 
