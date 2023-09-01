@@ -13,7 +13,6 @@ import {
   CachedMapAllKey,
   CachedMapResource,
   GraphQLService,
-  ResourceKey,
   resourceKeyList,
 } from '@cloudbeaver/core-sdk';
 
