@@ -178,6 +178,9 @@ module.exports = (env, argv) => {
       pathinfo: false,
     },
     resolve: {
+      alias: {
+        'react-dom$': 'react-dom/profiling',
+      },
       extensions: ['.ts', '.tsx', '.js'],
       modules: nodeModules,
       // alias: {

@@ -96,5 +96,10 @@ module.exports = (env, argv) => {
       }),
       ...workboxPlugin,
     ],
+    resolve: {
+      alias: {
+        'react-dom$': 'react-dom/profiling',
+      }
+    }
   });
 };
