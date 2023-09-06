@@ -34,9 +34,6 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
   if (resultTab) {
     const group = state.resultGroups.find(group => group.groupId === resultTab.groupId)!;
 
-    console.log('resultTab', resultTab);
-    console.log('group', group);
-
     return styled(style)(
       <result-panel>
         <RenderProvider>
