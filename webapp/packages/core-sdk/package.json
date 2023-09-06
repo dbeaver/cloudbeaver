@@ -34,7 +34,8 @@
     "@graphql-codegen/typescript": "~4.0.1",
     "@graphql-codegen/typescript-graphql-files-modules": "~2.2.1",
     "@graphql-codegen/typescript-graphql-request": "~5.0.0",
-    "@graphql-codegen/typescript-operations": "~4.0.1"
+    "@graphql-codegen/typescript-operations": "~4.0.1",
+    "@parcel/watcher": "~2.3.0"
   },
   "peerDependencies": {
     "mobx": "~6.x.x"
