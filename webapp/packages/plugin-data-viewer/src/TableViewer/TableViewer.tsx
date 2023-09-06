@@ -7,9 +7,10 @@
  */
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useEffect } from 'react';
+import { forwardRef, Profiler, useContext, useEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
+import { RenderContext } from '@cloudbeaver/core-app';
 import {
   getComputed,
   Loader,
@@ -121,6 +122,7 @@ export const TableViewer = observer<Props, HTMLDivElement>(
     },
     ref,
   ) {
+    const { onRenderCallback, tabId } = useContext(RenderContext);
     const dataPresentationService = useService(DataPresentationService);
     const tableViewerStorageService = useService(TableViewerStorageService);
     const dataModel = tableViewerStorageService.get(tableId);
@@ -275,14 +277,25 @@ export const TableViewer = observer<Props, HTMLDivElement>(
               <Pane>
                 <pane-content {...use({ grid: true })}>
                   <Loader suspense>
-                    <TableGrid
-                      model={dataModel}
-                      actions={dataTableActions}
-                      dataFormat={dataFormat}
-                      presentation={presentation}
-                      resultIndex={resultIndex}
-                      simple={simple}
-                    />
+                    <Profiler
+                      id={tabId as any}
+                      onRender={(...args) => {
+                        // @ts-ignore
+                        onRenderCallback(...args, {
+                          loading: dataModel?.isLoading(),
+                          tabId
+                        });
+                      }}
+                    >
+                      <TableGrid
+                        model={dataModel}
+                        actions={dataTableActions}
+                        dataFormat={dataFormat}
+                        presentation={presentation}
+                        resultIndex={resultIndex}
+                        simple={simple}
+                      />
+                    </Profiler>
                   </Loader>
                   <TableError model={dataModel} loading={loading} />
                   <Loader

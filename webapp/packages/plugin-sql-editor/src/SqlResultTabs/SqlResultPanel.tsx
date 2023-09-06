@@ -8,6 +8,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { RenderProvider } from '@cloudbeaver/core-app';
+
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlExecutionPlanPanel } from './ExecutionPlan/SqlExecutionPlanPanel';
 import { SqlResultSetPanel } from './SqlResultSetPanel';
@@ -32,9 +34,14 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
   if (resultTab) {
     const group = state.resultGroups.find(group => group.groupId === resultTab.groupId)!;
 
+    console.log('resultTab', resultTab);
+    console.log('group', group);
+
     return styled(style)(
       <result-panel>
-        <SqlResultSetPanel resultTab={resultTab} group={group} />
+        <RenderProvider>
+          <SqlResultSetPanel resultTab={resultTab} group={group} />
+        </RenderProvider>
       </result-panel>,
     );
   }

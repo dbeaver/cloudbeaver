@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import styled, { css } from 'reshadow';
 
+import { RenderContext } from '@cloudbeaver/core-app';
 import { TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IResultGroup, IResultTab } from '../ISqlEditorTabState';
@@ -29,6 +30,9 @@ export const SqlResultSetPanel = observer<Props>(function SqlResultSetPanel({ gr
   const [presentationId, setPresentation] = useState('');
   const [valuePresentationId, setValuePresentation] = useState<string | null>(null);
 
+  const { setTabId } = useContext(RenderContext);
+
+  setTabId(resultTab.tabId as any);
   return styled(styles)(
     <TableViewerLoader
       tableId={group.modelId}
