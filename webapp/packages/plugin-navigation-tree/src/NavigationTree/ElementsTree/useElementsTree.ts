@@ -153,6 +153,15 @@ export function useElementsTree(options: IOptions): IElementsTree {
   options.expandStateGetters = useMemo(() => options.expandStateGetters || [], [...(options.expandStateGetters || [])]);
   const state = options.localState || localTreeNodesState;
 
+  async function handleLoadChildren(id: string, manual: boolean): Promise<boolean> {
+    try {
+      return await options.loadChildren(id, manual);
+    } catch (exception: any) {
+      notificationService.logException(exception);
+      return false;
+    }
+  }
+
   const functionsRef = useObjectRef({
     async loadTree(nodeId: string) {
       elementsTree.loading = true;
@@ -194,7 +203,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
                 return;
               }
 
-              const loaded = await options.loadChildren(child, false);
+              const loaded = await handleLoadChildren(child, false);
 
               if (!loaded) {
                 const node = navNodeInfoResource.get(child);
@@ -530,7 +539,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         if (!leaf && this.settings?.foldersTree && expandableOrExpanded) {
           const nodeId = node.id;
 
-          const loaded = await options.loadChildren(node.id, true);
+          const loaded = await handleLoadChildren(node.id, false);
           if (loaded) {
             this.setFilter('');
             options.folderExplorer.open(path, nodeId);
@@ -549,7 +558,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
         try {
           if (state || (this.filtering && !treeNodeState.showInFilter)) {
-            state = await options.loadChildren(node.id, true);
+            state = await handleLoadChildren(node.id, true);
           }
 
           if (this.filtering) {
@@ -611,7 +620,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       async loadPath(path: string[], lastNode?: string): Promise<string | undefined> {
         let lastLoadedNode: string | undefined;
         for (const nodeId of path) {
-          const loaded = await options.loadChildren(nodeId, false);
+          const loaded = await handleLoadChildren(nodeId, false);
 
           if (!loaded) {
             return lastLoadedNode;
