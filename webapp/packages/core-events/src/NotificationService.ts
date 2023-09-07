@@ -198,6 +198,15 @@ export class NotificationService {
     console.error(exception);
   }
 
+  throwSilently(exception: Error | GQLError | undefined | null): void {
+    this.logError({
+      title: '',
+      details: exception,
+      isSilent: true,
+    });
+    throw exception;
+  }
+
   close(id: number, delayDeleting = true): void {
     // TODO: emit event or something
 
