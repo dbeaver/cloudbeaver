@@ -236,7 +236,9 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_CONNECTION_DATA_CONTAINER_SELECTOR],
-      isApplicable: () => this.connectionSchemaManagerService.isObjectCatalogChangeable && !!this.connectionSchemaManagerService.objectContainerList,
+      isApplicable: () =>
+        (this.connectionSchemaManagerService.isObjectCatalogChangeable || this.connectionSchemaManagerService.isObjectSchemaChangeable) &&
+        !!this.connectionSchemaManagerService.objectContainerList,
       getItems: (context, items) => {
         items = [...items];
 
