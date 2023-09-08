@@ -71,7 +71,7 @@ export const Origin: PlaceholderComponent<IUserDetailsInfoProps> = observer(func
   return (
     <>
       {user.origins.map(origin => (
-        <container
+        <div
           key={origin.type + origin.subType}
           title={origin.displayName}
           className={s(styles, { container: true })}
@@ -79,7 +79,7 @@ export const Origin: PlaceholderComponent<IUserDetailsInfoProps> = observer(func
         >
           <OriginIcon className={s(styles, { originIcon: true })} origin={origin} />
           <Icon className={s(styles, { icon: true })} name="reject" viewBox="0 0 16 16" />
-        </container>
+        </div>
       ))}
     </>
   );

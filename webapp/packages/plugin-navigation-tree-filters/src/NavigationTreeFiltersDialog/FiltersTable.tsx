@@ -36,7 +36,7 @@ export const FiltersTable = observer<Props>(function FiltersTable({ title, filte
 
   return (
     <Group className={styles.group} box medium overflow>
-      <container className={s(style, { container: true })}>
+      <div className={s(style, { container: true })}>
         <header className={s(style, { header: true })}>
           <h4 className={s(style, { headerTitle: true })}>{title}</h4>
           <SubmittingForm className={s(style, { submittingForm: true })} onSubmit={add}>
@@ -62,7 +62,7 @@ export const FiltersTable = observer<Props>(function FiltersTable({ title, filte
             </TableBody>
           </Table>
         </div>
-      </container>
+      </div>
     </Group>
   );
 });
