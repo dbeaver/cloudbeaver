@@ -45,6 +45,8 @@ public class SqlLogStateJob extends AbstractJob {
     private final DBCStatement dbcStatement;
     private final DBCServerOutputReader dbcServerOutputReader;
 
+    private volatile boolean shouldCancel = false;
+
     public SqlLogStateJob(WebSession webSession, DBCExecutionContext dbcExecutionContext, DBCStatement dbcStatement,
                           DBCServerOutputReader dbcServerOutputReader) {
         super("Sql log state job");
@@ -58,13 +60,21 @@ public class SqlLogStateJob extends AbstractJob {
     protected IStatus run(DBRProgressMonitor monitor) {
         if (!DBWorkbench.getPlatform().isShuttingDown()) {
             try {
-                if (!dbcStatement.isStatementClosed()) {
+                if (!dbcStatement.isStatementClosed() ) {
                     dumpOutput(monitor);
+                } else {
+                    shouldCancel = true;
                 }
             } catch (Exception e) {
                 log.debug(e);
             }
             schedule(100);
+        } else {
+            shouldCancel = true;
+        }
+
+        if (shouldCancel) {
+            return Status.CANCEL_STATUS;
         }
 
         return Status.OK_STATUS;

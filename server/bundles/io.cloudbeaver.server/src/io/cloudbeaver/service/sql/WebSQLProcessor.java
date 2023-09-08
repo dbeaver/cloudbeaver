@@ -210,7 +210,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     {
                         SqlLogStateJob sqlLogStateJob = null;
                         if (readLogs) {
-                            final DBPDataSource dataSource = context.getDataSource();
+                            DBPDataSource dataSource = context.getDataSource();
                             DBCServerOutputReader dbcServerOutputReader = DBUtils.getAdapter(DBCServerOutputReader.class, dataSource);
                             if (dbcServerOutputReader == null) {
                                 dbcServerOutputReader = new DefaultServerOutputReader();
