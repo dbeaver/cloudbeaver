@@ -90,7 +90,10 @@ public class SqlLogStateJob extends AbstractJob {
                                 messages.clear();
                             }
                         });
-                        webSession.addSessionEvent(new WSLogSenderEvent(String.valueOf(executionContext.getContextId()), messages, System.currentTimeMillis()));
+                        webSession.addSessionEvent(new WSLogSenderEvent(
+                            String.valueOf(executionContext.getContextId()),
+                            messages,
+                            System.currentTimeMillis()));
                     }
                 } catch (DBCException e) {
                     log.error(e);
