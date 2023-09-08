@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.exec.output.DBCOutputWriter;
 import org.jkiss.dbeaver.model.exec.output.DBCServerOutputReader;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.websocket.event.WSServerOutputLogInfo;
 import org.jkiss.dbeaver.model.websocket.event.session.WSLogSenderEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
@@ -88,11 +89,11 @@ public class SqlLogStateJob extends AbstractJob {
             if (outputReader != null && outputReader.isAsyncOutputReadSupported() && executionContext != null) {
                 try {
                     if (dbcStatement != null && !dbcStatement.isStatementClosed()) {
-                        List<String> messages = new ArrayList<>();
+                        List<WSServerOutputLogInfo> messages = new ArrayList<>();
                         outputReader.readServerOutput(monitor, executionContext, null, dbcStatement, new DBCOutputWriter() {
                             @Override
                             public void println(@Nullable DBCOutputSeverity severity, @Nullable String message) {
-                                messages.add(message);
+                                messages.add(new WSServerOutputLogInfo(severity.getName(), message));
                             }
 
                             @Override
