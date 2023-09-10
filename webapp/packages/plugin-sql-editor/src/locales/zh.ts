@@ -7,6 +7,7 @@ export default [
   ['sql_editor_placeholder', '使用Ctrl + Enter执行查询以查看结果'],
   ['sql_editor_hint_empty', 'There is no proposals...'],
   ['sql_editor_execution_plan_button_tooltip', '解释执行计划（Shift + Ctrl + E）'],
+  ['sql_editor_output_button_tooltip', 'Show server output (Shift + Ctrl + O)'],
   ['sql_editor_sql_execution_button_tooltip', '执行SQL语句（Ctrl + Enter）'],
   ['sql_editor_sql_execution_new_tab_button_tooltip', '在新选项卡中执行SQL语句（Ctrl + \\）（Shift + Ctrl + Enter）'],
   ['sql_editor_sql_execution_script_button_tooltip', '执行SQL脚本（Alt + X）'],

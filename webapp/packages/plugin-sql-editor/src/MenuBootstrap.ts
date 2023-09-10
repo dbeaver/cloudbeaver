@@ -22,11 +22,13 @@ import { ACTION_SQL_EDITOR_EXECUTE_NEW } from './actions/ACTION_SQL_EDITOR_EXECU
 import { ACTION_SQL_EDITOR_EXECUTE_SCRIPT } from './actions/ACTION_SQL_EDITOR_EXECUTE_SCRIPT';
 import { ACTION_SQL_EDITOR_FORMAT } from './actions/ACTION_SQL_EDITOR_FORMAT';
 import { ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN';
+import { ACTION_SQL_EDITOR_SHOW_OUTPUT } from './actions/ACTION_SQL_EDITOR_SHOW_OUTPUT';
 import { KEY_BINDING_SQL_EDITOR_EXECUTE } from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE';
 import { KEY_BINDING_SQL_EDITOR_EXECUTE_NEW } from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_NEW';
 import { KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT';
 import { KEY_BINDING_SQL_EDITOR_FORMAT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_FORMAT';
 import { KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN';
+import { KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT';
 import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA';
 
@@ -57,11 +59,13 @@ export class MenuBootstrap extends Bootstrap {
             ACTION_SQL_EDITOR_EXECUTE_NEW,
             ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
             ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+            ACTION_SQL_EDITOR_SHOW_OUTPUT,
           ].includes(action)
         ) {
           return false;
         }
 
+        // TODO we have to add check for output action ?
         if (
           !sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.query) &&
           [ACTION_SQL_EDITOR_EXECUTE, ACTION_SQL_EDITOR_EXECUTE_NEW, ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN].includes(action)
@@ -77,6 +81,7 @@ export class MenuBootstrap extends Bootstrap {
           ACTION_REDO,
           ACTION_UNDO,
           ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+          ACTION_SQL_EDITOR_SHOW_OUTPUT,
         ].includes(action);
       },
       isDisabled: (context, action) => !context.has(DATA_CONTEXT_SQL_EDITOR_DATA),
@@ -135,6 +140,13 @@ export class MenuBootstrap extends Bootstrap {
       handler: this.sqlEditorActionHandler.bind(this),
     });
 
+    this.keyBindingService.addKeyBindingHandler({
+      id: 'sql-editor-show-output',
+      binding: KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT,
+      isBindingApplicable: (contexts, action) => action === ACTION_SQL_EDITOR_SHOW_OUTPUT,
+      handler: this.sqlEditorActionHandler.bind(this),
+    });
+
     // this.menuService.addCreator({
     //   isApplicable: context => (
     //     context.tryGet(DATA_CONTEXT_SQL_EDITOR_DATA) !== undefined
@@ -178,6 +190,10 @@ export class MenuBootstrap extends Bootstrap {
         data.dataSource?.history.redo();
         break;
       case ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN:
+        data.showExecutionPlan();
+        break;
+      case ACTION_SQL_EDITOR_SHOW_OUTPUT:
+        // TODO change it to show output
         data.showExecutionPlan();
         break;
     }

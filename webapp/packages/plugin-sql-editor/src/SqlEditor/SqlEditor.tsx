@@ -185,6 +185,11 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
                     <StaticImage icon="/icons/sql_execution_plan.svg" />
                   </button>
                 )}
+                {isQuery && data.dialect?.supportsExplainExecutionPlan && (
+                  <button disabled={disabled} title={translate('sql_editor_output_button_tooltip')} onClick={data.showExecutionPlan}>
+                    <StaticImage icon="/icons/sql_execution_plan.svg" />
+                  </button>
+                )}
               </>
             )}
             <SqlEditorActionsMenu state={state} />
