@@ -99,7 +99,7 @@ public class SqlOutputLogReaderJob extends AbstractJob {
                             }
                         });
                         webSession.addSessionEvent(new WSOutputDBLogEvent(
-                            String.valueOf(dbcExecutionContext.getContextId()),
+                            dbcExecutionContext.getContextId(),
                             messages,
                             System.currentTimeMillis()));
                     }
