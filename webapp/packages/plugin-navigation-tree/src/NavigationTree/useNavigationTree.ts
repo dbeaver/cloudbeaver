@@ -7,6 +7,7 @@
  */
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import type { NavNode } from '@cloudbeaver/core-navigation-tree';
 
 import { NavigationTreeService } from './NavigationTreeService';
@@ -22,13 +23,19 @@ const bindActions: Array<keyof INavigationTree> = ['handleOpen', 'handleSelect',
 
 export function useNavigationTree(): INavigationTree {
   const navigationTreeService = useService(NavigationTreeService);
+  const notificationService = useService(NotificationService);
 
   return useObjectRef<INavigationTree>(
     () => ({
       navigationTreeService,
       async handleOpen(node: NavNode, folder: boolean) {
         if (!folder) {
-          await this.navigationTreeService.navToNode(node.id, node.parentId);
+          try {
+            await this.navigationTreeService.navToNode(node.id, node.parentId);
+          } catch (exception: any) {
+            notificationService.logException(exception);
+            throw exception;
+          }
         }
       },
       handleSelect(node: NavNode, state: boolean) {
