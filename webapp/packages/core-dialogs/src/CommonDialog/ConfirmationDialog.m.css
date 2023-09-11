@@ -1,0 +1,8 @@
+.footer {
+  align-items: center;
+  gap: 16px;
+}
+
+.fill {
+  flex: 1;
+}

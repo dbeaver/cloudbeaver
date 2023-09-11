@@ -1,0 +1,64 @@
+.container {
+  box-sizing: border-box;
+  display: flex;
+  outline: none;
+}
+
+.dialog {
+  composes: theme-background-surface theme-text-on-surface theme-elevation-z10 from global;
+  border-radius: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  border: none;
+  height: auto;
+  max-height: 100%;
+  max-width: 748px;
+  padding: 0px;
+
+  &.small {
+    min-width: 404px;
+    min-height: 262px;
+    max-height: max(100vh - 48px, 262px);
+
+    &.fixedSize {
+      width: 404px;
+      height: 262px;
+    }
+    &.fixedWidth {
+      width: 404px;
+    }
+  }
+  &.medium {
+    min-width: 576px;
+    min-height: 374px;
+    max-height: max(100vh - 48px, 374px);
+
+    &.fixedSize {
+      width: 576px;
+      height: 374px;
+    }
+    &.fixedWidth {
+      width: 576px;
+    }
+  }
+  &.large {
+    min-width: 720px;
+    min-height: 468px;
+    max-height: max(100vh - 48px, 468px);
+
+    &.fixedSize {
+      width: 720px;
+      height: 468px;
+    }
+    &.fixedWidth {
+      width: 720px;
+    }
+  }
+}
+
+.loader {
+  height: 100%;
+}

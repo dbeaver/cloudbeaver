@@ -6,13 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-blocks';
+import { s, useS } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
-import { dialogStyles } from '../styles';
-import { commonDialogBaseStyle, commonDialogThemeStyle } from './styles';
+import styles from './CommonDialogFooter.m.css';
 
 interface Props {
   className?: string;
@@ -21,5 +19,7 @@ interface Props {
 }
 
 export const CommonDialogFooter = observer<Props>(function CommonDialogFooter({ children, className, style }) {
-  return styled(useStyles(commonDialogThemeStyle, commonDialogBaseStyle, dialogStyles, style))(<footer className={className}>{children}</footer>);
+  const computedStyles = useS(styles, style);
+
+  return <footer className={s(computedStyles, { footer: true }, className)}>{children}</footer>;
 });
