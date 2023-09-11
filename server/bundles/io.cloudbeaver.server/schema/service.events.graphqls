@@ -156,6 +156,22 @@ type CBProjectsActiveEvent implements CBClientEvent {
     projectIds: [String!]! # list of active projects
 }
 
+# Database output log event
+type CBDatabaseOutputLogEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    executionContextId: String!
+    messages: [WSOutputLogInfo!]!
+    eventTimestamp: Int!
+}
+
+# Define the type for WSOutputLogInfo
+extend type WSOutputLogInfo {
+    severity: String
+    message: String
+    # Add more fields as needed
+}
+
 extend type Query {
     emptyEvent: Boolean
 }

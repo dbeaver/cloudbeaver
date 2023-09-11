@@ -86,10 +86,8 @@ public class SqlOutputLogReaderJob extends AbstractJob {
                         dbcServerOutputReader.readServerOutput(monitor, dbcExecutionContext, null, dbcStatement, new DBCOutputWriter() {
                             @Override
                             public void println(@Nullable DBCOutputSeverity severity, @Nullable String message) {
-                                if (severity != null) {
+                                if ( message != null && severity != null) {
                                     messages.add(new WSOutputLogInfo(severity.getName(), message));
-                                } else {
-                                    messages.add(new WSOutputLogInfo("UNKNOWN", message));
                                 }
                             }
 
