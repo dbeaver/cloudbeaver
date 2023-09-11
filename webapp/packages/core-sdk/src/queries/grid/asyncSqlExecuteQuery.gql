@@ -13,6 +13,7 @@ mutation asyncSqlExecuteQuery(
         resultId: $resultId
         filter: $filter
         dataFormat: $dataFormat
+        readLogs: true
     ) {
         ...AsyncTaskInfo
     }

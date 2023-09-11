@@ -28,6 +28,8 @@ export * from './SqlEditor/SQL_EDITOR_TOOLS_MENU';
 export * from './SqlEditor/SQLEditorModeContext';
 export * from './SqlResultTabs/DATA_CONTEXT_SQL_EDITOR_RESULT_ID';
 export * from './SqlResultTabs/SqlResultTabsService';
+export * from './SqlResultTabs/SqlOutputLogs/SqlOutputLogsEventHandler';
+export * from './SqlResultTabs/SqlOutputLogs/SqlOutputLogsResource';
 export * from './DATA_CONTEXT_SQL_EDITOR_STATE';
 export * from './getSqlEditorName';
 export * from './QueryDataSource';
