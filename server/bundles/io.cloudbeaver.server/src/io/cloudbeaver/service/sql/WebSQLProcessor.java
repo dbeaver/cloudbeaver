@@ -20,7 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
-import io.cloudbeaver.server.jobs.SqlLogStateJob;
+import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -208,15 +208,15 @@ public class WebSQLProcessor implements WebSessionProvider {
                         webDataFilter.getOffset(),
                         webDataFilter.getLimit()))
                     {
-                        SqlLogStateJob sqlLogStateJob = null;
+                        SqlOutputLogReaderJob sqlOutputLogReaderJob = null;
                         if (readLogs) {
                             DBPDataSource dataSource = context.getDataSource();
                             DBCServerOutputReader dbcServerOutputReader = DBUtils.getAdapter(DBCServerOutputReader.class, dataSource);
                             if (dbcServerOutputReader == null) {
                                 dbcServerOutputReader = new DefaultServerOutputReader();
                             }
-                            sqlLogStateJob = new SqlLogStateJob(webSession, context, dbStat, dbcServerOutputReader);
-                            sqlLogStateJob.schedule();
+                            sqlOutputLogReaderJob = new SqlOutputLogReaderJob(webSession, context, dbStat, dbcServerOutputReader);
+                            sqlOutputLogReaderJob.schedule();
                         }
                         // Set query timeout
                         int queryTimeout = (int) session.getDataSource().getContainer().getPreferenceStore()
@@ -237,8 +237,8 @@ public class WebSQLProcessor implements WebSessionProvider {
                         boolean hasResultSet = dbStat.executeStatement();
 
                         // Wait SqlLogStateJob, if its starts
-                        if (sqlLogStateJob != null) {
-                            sqlLogStateJob.join();
+                        if (sqlOutputLogReaderJob != null) {
+                            sqlOutputLogReaderJob.join();
                         }
                         fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat);
                     } catch (DBException e) {

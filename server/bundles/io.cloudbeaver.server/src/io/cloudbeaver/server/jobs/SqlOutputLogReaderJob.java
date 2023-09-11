@@ -19,6 +19,7 @@ package io.cloudbeaver.server.jobs;
 import io.cloudbeaver.model.session.WebSession;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -29,25 +30,31 @@ import org.jkiss.dbeaver.model.exec.output.DBCOutputWriter;
 import org.jkiss.dbeaver.model.exec.output.DBCServerOutputReader;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.websocket.event.WSServerOutputLogInfo;
-import org.jkiss.dbeaver.model.websocket.event.session.WSLogSenderEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSOutputLogInfo;
+import org.jkiss.dbeaver.model.websocket.event.session.WSDBOutputLogEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class SqlLogStateJob extends AbstractJob {
+public class SqlOutputLogReaderJob extends AbstractJob {
 
-    private static final Log log = Log.getLog(SqlLogStateJob.class);
+    private static final Log log = Log.getLog(SqlOutputLogReaderJob.class);
 
+    @NotNull
     private final WebSession webSession;
+    @NotNull
     private final DBCExecutionContext dbcExecutionContext;
+    @NotNull
     private final DBCStatement dbcStatement;
+    @NotNull
     private final DBCServerOutputReader dbcServerOutputReader;
 
-    public SqlLogStateJob(WebSession webSession, DBCExecutionContext dbcExecutionContext, DBCStatement dbcStatement,
-                          DBCServerOutputReader dbcServerOutputReader) {
+    public SqlOutputLogReaderJob(@NotNull WebSession webSession,
+                                 @NotNull DBCExecutionContext dbcExecutionContext,
+                                 @NotNull DBCStatement dbcStatement,
+                                 @NotNull DBCServerOutputReader dbcServerOutputReader) {
         super("Sql log state job");
         this.webSession = webSession;
         this.dbcExecutionContext = dbcExecutionContext;
@@ -64,7 +71,7 @@ public class SqlLogStateJob extends AbstractJob {
                     schedule(100);
                 }
             } catch (Exception e) {
-                log.debug(e);
+                log.debug("Failed to execute job " + e.getMessage(), e);
             }
         }
         return Status.OK_STATUS;
@@ -72,17 +79,18 @@ public class SqlLogStateJob extends AbstractJob {
 
     private void dumpOutput(DBRProgressMonitor monitor) {
         if (!monitor.isCanceled()) {
-            DBCServerOutputReader outputReader = dbcServerOutputReader;
-            final DBCExecutionContext executionContext = dbcExecutionContext;
-
-            if (outputReader != null && outputReader.isAsyncOutputReadSupported() && executionContext != null) {
+            if (dbcServerOutputReader.isAsyncOutputReadSupported()) {
                 try {
-                    if (dbcStatement != null && !dbcStatement.isStatementClosed()) {
-                        List<WSServerOutputLogInfo> messages = new ArrayList<>();
-                        outputReader.readServerOutput(monitor, executionContext, null, dbcStatement, new DBCOutputWriter() {
+                    if (!dbcStatement.isStatementClosed()) {
+                        List<WSOutputLogInfo> messages = new ArrayList<>();
+                        dbcServerOutputReader.readServerOutput(monitor, dbcExecutionContext, null, dbcStatement, new DBCOutputWriter() {
                             @Override
                             public void println(@Nullable DBCOutputSeverity severity, @Nullable String message) {
-                                messages.add(new WSServerOutputLogInfo(severity.getName(), message));
+                                if (severity != null) {
+                                    messages.add(new WSOutputLogInfo(severity.getName(), message));
+                                } else {
+                                    messages.add(new WSOutputLogInfo("UNKNOWN", message));
+                                }
                             }
 
                             @Override
@@ -90,8 +98,8 @@ public class SqlLogStateJob extends AbstractJob {
                                 messages.clear();
                             }
                         });
-                        webSession.addSessionEvent(new WSLogSenderEvent(
-                            String.valueOf(executionContext.getContextId()),
+                        webSession.addSessionEvent(new WSDBOutputLogEvent(
+                            String.valueOf(dbcExecutionContext.getContextId()),
                             messages,
                             System.currentTimeMillis()));
                     }
