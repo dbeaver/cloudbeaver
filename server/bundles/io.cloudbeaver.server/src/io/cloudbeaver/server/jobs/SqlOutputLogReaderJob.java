@@ -31,7 +31,7 @@ import org.jkiss.dbeaver.model.exec.output.DBCServerOutputReader;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.websocket.event.WSOutputLogInfo;
-import org.jkiss.dbeaver.model.websocket.event.session.WSDBOutputLogEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.WSOutputDBLogEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.util.ArrayList;
@@ -98,7 +98,7 @@ public class SqlOutputLogReaderJob extends AbstractJob {
                                 messages.clear();
                             }
                         });
-                        webSession.addSessionEvent(new WSDBOutputLogEvent(
+                        webSession.addSessionEvent(new WSOutputDBLogEvent(
                             String.valueOf(dbcExecutionContext.getContextId()),
                             messages,
                             System.currentTimeMillis()));
