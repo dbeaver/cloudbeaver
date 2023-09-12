@@ -9,5 +9,4 @@ import type { IReactCodeMirrorProps } from './IReactCodemirrorProps';
 
 export interface IEditorProps extends IReactCodeMirrorProps {
   className?: string;
-  useDefaultExtensions?: boolean;
 }
