@@ -30,7 +30,7 @@ export const OutputLogsPanel = observer<Props>(function SqlOutputLogsPanel({ out
     <div className={s(styles, { container: true })}>
       <OutputLogsToolbar state={state} />
       <div className={s(styles, { editorContainer: true })}>
-        {data && <EditorLoader value={state.resultValue} foldGutter={false} highlightActiveLine={false} readonly />}
+        {data && <EditorLoader value={state.resultValue} foldGutter={false} highlightActiveLine={false} lineWrapping readonly />}
       </div>
     </div>
   );

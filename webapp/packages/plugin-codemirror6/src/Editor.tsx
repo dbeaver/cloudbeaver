@@ -28,10 +28,12 @@ const defaultExtensionsFlags: IDefaultExtensions = {
   crosshairCursor: true,
   foldGutter: true,
   highlightActiveLineGutter: true,
+  highlightSelectionMatches: true,
   highlightActiveLine: true,
   indentOnInput: true,
   rectangularSelection: true,
   keymap: true,
+  lineWrapping: false,
 };
 
 export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
@@ -47,10 +49,12 @@ export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
       crosshairCursor,
       foldGutter,
       highlightActiveLineGutter,
+      highlightSelectionMatches,
       highlightActiveLine,
       indentOnInput,
       rectangularSelection,
       keymap,
+      lineWrapping,
       ...rest
     },
     ref,
@@ -68,10 +72,12 @@ export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
         crosshairCursor,
         foldGutter,
         highlightActiveLineGutter,
+        highlightSelectionMatches,
         highlightActiveLine,
         indentOnInput,
         rectangularSelection,
         keymap,
+        lineWrapping,
       }).filter(([, value]) => value !== undefined),
     );
 

@@ -11,7 +11,7 @@ import { highlightSelectionMatches } from '@codemirror/search';
 import { Compartment, Extension } from '@codemirror/state';
 import {
   crosshairCursor,
-  dropCursor,
+  dropCursor, EditorView,
   highlightActiveLine,
   highlightActiveLineGutter,
   highlightSpecialChars,
@@ -44,10 +44,12 @@ export interface IDefaultExtensions {
   crosshairCursor?: boolean;
   foldGutter?: boolean;
   highlightActiveLineGutter?: boolean;
+  highlightSelectionMatches?: boolean;
   highlightActiveLine?: boolean;
   indentOnInput?: boolean;
   rectangularSelection?: boolean;
   keymap?: boolean;
+  lineWrapping?: boolean;
 }
 
 const extensionMap = {
@@ -57,6 +59,7 @@ const extensionMap = {
   syntaxHighlighting: () => syntaxHighlighting(classHighlighter),
   bracketMatching,
   dropCursor,
+  highlightSelectionMatches,
   crosshairCursor,
   foldGutter: () =>
     foldGutter({
@@ -82,6 +85,7 @@ const extensionMap = {
   indentOnInput,
   rectangularSelection,
   keymap: () => keymap.of(DEFAULT_KEY_MAP),
+  lineWrapping: () => EditorView.lineWrapping,
 };
 
 const DEFAULT_EXTENSIONS_COMPARTMENT = new Compartment();
