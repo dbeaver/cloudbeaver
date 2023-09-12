@@ -6,9 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
- @import "@cloudbeaver/core-theming/src/styles/theme-dark";
- @import "base-react-grid";
- 
- :global .#{$theme-class} {
-   @include base-react-grid;
- }
+@import '@cloudbeaver/core-theming/src/styles/theme-dark';
+@import 'base-react-grid';
+
+:global .#{$theme-class} {
+  @include base-react-grid;
+
+  .cb-react-grid-theme {
+    --rdg-color-scheme: dark;
+  }
+}
