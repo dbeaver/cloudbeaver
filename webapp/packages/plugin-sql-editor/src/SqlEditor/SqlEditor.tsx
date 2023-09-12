@@ -29,7 +29,7 @@ import type { ISqlEditorProps } from './ISqlEditorProps';
 import { SqlEditorActionsMenu } from './SqlEditorActionsMenu';
 import { SqlEditorTools } from './SqlEditorTools';
 import { useSqlEditor } from './useSqlEditor';
-import {OutputLogsResource} from "../SqlResultTabs/OutputLogs/OutputLogsResource";
+import { OutputLogsResource } from '../SqlResultTabs/OutputLogs/OutputLogsResource';
 
 const styles = css`
   button,

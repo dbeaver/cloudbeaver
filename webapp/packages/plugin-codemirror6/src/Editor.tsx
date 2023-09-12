@@ -18,14 +18,32 @@ import { EDITOR_BASE_STYLES } from './theme';
 import { useCodemirrorExtensions } from './useCodemirrorExtensions';
 import { type IDefaultExtensions, useEditorDefaultExtensions } from './useEditorDefaultExtensions';
 
+const defaultExtensionsFlags: IDefaultExtensions = {
+  lineNumbers: false,
+  tooltips: true,
+  highlightSpecialChars: true,
+  syntaxHighlighting: true,
+  bracketMatching: true,
+  dropCursor: true,
+  crosshairCursor: true,
+  foldGutter: true,
+  highlightActiveLineGutter: true,
+  highlightActiveLine: true,
+  indentOnInput: true,
+  rectangularSelection: true,
+  keymap: true,
+};
+
 export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
-  forwardRef(function Editor({ lineNumbers, extensions, useDefaultExtensions = true, ...rest }, ref) {
+  forwardRef(function Editor({ extensions, ...rest }, ref) {
     extensions = useCodemirrorExtensions(extensions);
 
-    const defaultExtensions = useEditorDefaultExtensions({ lineNumbers });
-    if (useDefaultExtensions) {
-      extensions.set(...defaultExtensions);
-    }
+    const defaultExtensions = useEditorDefaultExtensions({
+      ...defaultExtensionsFlags,
+      ...rest,
+    });
+
+    extensions.set(...defaultExtensions);
 
     return styled(EDITOR_BASE_STYLES)(
       <wrapper className={clsx('editor', rest.className)}>

@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2023 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 import { action, computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
@@ -5,7 +12,7 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 import type { IOutputLog } from './OutputLogsResource';
 
 export interface SqlOutputLogsPanelState {
-  searchValue: any;
+  searchValue: string;
   setSearchValue: (value: string) => void;
   selectedLogTypes: OutputLogType[];
   readonly resultValue: string;
@@ -15,8 +22,7 @@ export interface SqlOutputLogsPanelState {
 
 export const OUTPUT_LOG_TYPES = ['Debug', 'Log', 'Info', 'Notice', 'Warning', 'Error'] as const;
 export type OutputLogType = (typeof OUTPUT_LOG_TYPES)[number];
-export const useOutputLogsPanelState = (outputLogs: IOutputLog[]) => {
-  return useObservableRef<SqlOutputLogsPanelState>(
+export const useOutputLogsPanelState = (outputLogs: IOutputLog[]) => useObservableRef<SqlOutputLogsPanelState>(
     () => ({
       searchValue: '',
       selectedLogTypes: [...OUTPUT_LOG_TYPES],
@@ -51,4 +57,3 @@ export const useOutputLogsPanelState = (outputLogs: IOutputLog[]) => {
     },
     false,
   );
-};

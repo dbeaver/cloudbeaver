@@ -36,53 +36,66 @@ DEFAULT_KEY_MAP.push({
 
 export interface IDefaultExtensions {
   lineNumbers?: boolean;
+  tooltips?: boolean;
+  highlightSpecialChars?: boolean;
+  syntaxHighlighting?: boolean;
+  bracketMatching?: boolean;
+  dropCursor?: boolean;
+  crosshairCursor?: boolean;
+  foldGutter?: boolean;
+  highlightActiveLineGutter?: boolean;
+  highlightActiveLine?: boolean;
+  indentOnInput?: boolean;
+  rectangularSelection?: boolean;
+  keymap?: boolean;
 }
+
+const extensionMap = {
+  lineNumbers,
+  tooltips: () => tooltips({ parent: document.body }),
+  highlightSpecialChars,
+  syntaxHighlighting: () => syntaxHighlighting(classHighlighter),
+  bracketMatching,
+  dropCursor,
+  crosshairCursor,
+  foldGutter: () =>
+    foldGutter({
+      markerDOM: (open: boolean) => {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttributeNS(null, 'viewBox', '0 0 15 8');
+        svg.style.maxWidth = '100%';
+        svg.style.maxHeight = '100%';
+
+        const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', GlobalConstants.absoluteUrl('/icons/icons.svg#angle'));
+        svg.appendChild(use);
+
+        const element = document.createElement('div');
+        element.appendChild(svg);
+        element.className = clsx('cm-gutterElement-icon', open ? 'cm-foldGutter-open' : 'cm-foldGutter-folded');
+
+        return element;
+      },
+    }),
+  highlightActiveLineGutter,
+  highlightActiveLine,
+  indentOnInput,
+  rectangularSelection,
+  keymap: () => keymap.of(DEFAULT_KEY_MAP),
+};
 
 const DEFAULT_EXTENSIONS_COMPARTMENT = new Compartment();
 
 /** Provides the necessary extensions to establish a basic editor */
 export function useEditorDefaultExtensions(options?: IDefaultExtensions): [Compartment, Extension] {
   return useMemo(() => {
-    const extensions = [];
-    if (options?.lineNumbers) {
-      extensions.push(lineNumbers());
-    }
-
-    extensions.push(
-      tooltips({
-        parent: document.body,
-      }),
-      highlightSpecialChars(),
-      highlightSelectionMatches(),
-      syntaxHighlighting(classHighlighter),
-      bracketMatching(),
-      dropCursor(),
-      crosshairCursor(),
-      foldGutter({
-        markerDOM: (open: boolean) => {
-          const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-          svg.setAttributeNS(null, 'viewBox', '0 0 15 8');
-          svg.style.maxWidth = '100%';
-          svg.style.maxHeight = '100%';
-
-          const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-          use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', GlobalConstants.absoluteUrl('/icons/icons.svg#angle'));
-          svg.appendChild(use);
-
-          const element = document.createElement('div');
-          element.appendChild(svg);
-          element.className = clsx('cm-gutterElement-icon', open ? 'cm-foldGutter-open' : 'cm-foldGutter-folded');
-
-          return element;
-        },
-      }),
-      highlightActiveLineGutter(),
-      highlightActiveLine(),
-      indentOnInput(),
-      rectangularSelection(),
-      keymap.of(DEFAULT_KEY_MAP),
-    );
-
+    const extensions = Object.entries(options || {})
+      .filter(([, isEnabled]) => isEnabled)
+      .map(([key]) => {
+        const extensionFunction = extensionMap[key as keyof typeof extensionMap];
+        return extensionFunction?.();
+      })
+      .filter(Boolean);
     return [DEFAULT_EXTENSIONS_COMPARTMENT, extensions];
-  }, [options?.lineNumbers]);
+  }, [options]);
 }
