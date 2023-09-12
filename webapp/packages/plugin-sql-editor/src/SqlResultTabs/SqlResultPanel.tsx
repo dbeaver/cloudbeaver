@@ -10,6 +10,7 @@ import styled, { css } from 'reshadow';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlExecutionPlanPanel } from './ExecutionPlan/SqlExecutionPlanPanel';
+import { OutputLogsPanel } from './OutputLogs/OutputLogsPanel';
 import { SqlResultSetPanel } from './SqlResultSetPanel';
 import { SqlScriptStatisticsPanel } from './SqlScriptStatisticsPanel';
 
@@ -55,6 +56,14 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
     return styled(style)(
       <result-panel>
         <SqlScriptStatisticsPanel tab={statisticsTab} />
+      </result-panel>,
+    );
+  }
+
+  if (state.outputLogsTab) {
+    return styled(style)(
+      <result-panel>
+        <OutputLogsPanel outputLogsTab={state.outputLogsTab} />
       </result-panel>,
     );
   }

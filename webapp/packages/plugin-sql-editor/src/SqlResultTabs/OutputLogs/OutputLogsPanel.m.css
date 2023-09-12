@@ -1,0 +1,13 @@
+.container {
+  composes: theme-background-secondary from global;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.editorContainer {
+  padding: 8px;
+  overflow: auto;
+  height: 100%;
+}

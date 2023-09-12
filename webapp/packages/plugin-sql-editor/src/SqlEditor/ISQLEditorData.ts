@@ -56,6 +56,7 @@ export interface ISQLEditorData {
   executeQuery(): Promise<void>;
   executeQueryNewTab(): Promise<void>;
   showExecutionPlan(): Promise<void>;
+  showOutputLogs(): Promise<void>;
   executeScript(): Promise<void>;
   switchEditing(): Promise<void>;
   getHintProposals(position: number, simple: boolean): Promise<SQLProposal[]>;

@@ -19,10 +19,13 @@ import { useCodemirrorExtensions } from './useCodemirrorExtensions';
 import { type IDefaultExtensions, useEditorDefaultExtensions } from './useEditorDefaultExtensions';
 
 export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
-  forwardRef(function Editor({ lineNumbers, extensions, ...rest }, ref) {
+  forwardRef(function Editor({ lineNumbers, extensions, useDefaultExtensions = true, ...rest }, ref) {
     extensions = useCodemirrorExtensions(extensions);
+
     const defaultExtensions = useEditorDefaultExtensions({ lineNumbers });
-    extensions.set(...defaultExtensions);
+    if (useDefaultExtensions) {
+      extensions.set(...defaultExtensions);
+    }
 
     return styled(EDITOR_BASE_STYLES)(
       <wrapper className={clsx('editor', rest.className)}>

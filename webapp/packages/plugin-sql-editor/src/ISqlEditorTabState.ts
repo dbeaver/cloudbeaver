@@ -41,6 +41,11 @@ export interface IExecutionPlanTab {
   options?: Record<string, any>;
 }
 
+export interface IOutputLogsTab {
+  tabId: string;
+  order: number;
+}
+
 export interface ISqlEditorTabState {
   editorId: string;
   datasourceKey: string;
@@ -54,6 +59,7 @@ export interface ISqlEditorTabState {
   resultTabs: IResultTab[];
   statisticsTabs: IStatisticsTab[];
   executionPlanTabs: IExecutionPlanTab[];
+  outputLogsTab?: IOutputLogsTab;
 
   // mode
   currentModeId?: string;

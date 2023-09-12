@@ -25,6 +25,7 @@ import { SqlDialectInfoService } from '../SqlDialectInfoService';
 import { SqlEditorService } from '../SqlEditorService';
 import { ISQLScriptSegment, SQLParser } from '../SQLParser';
 import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
+import { OutputLogsService } from '../SqlResultTabs/OutputLogs/OutputLogsService';
 import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
 import type { ICursor, ISQLEditorData } from './ISQLEditorData';
@@ -68,6 +69,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const sqlResultTabsService = useService(SqlResultTabsService);
   const commonDialogService = useService(CommonDialogService);
   const sqlDataSourceService = useService(SqlDataSourceService);
+  const sqlOutputLogsService = useService(OutputLogsService);
 
   const data = useObservableRef<ISQLEditorDataPrivate>(
     () => ({
@@ -298,6 +300,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         } catch {}
       },
 
+      async showOutputLogs(): Promise<void> {
+        sqlOutputLogsService.showOutputLogs(this.state);
+      },
+
       async switchEditing(): Promise<void> {
         this.dataSource?.setEditing(!this.dataSource.isEditing());
       },
@@ -465,6 +471,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       executeQuery: action.bound,
       executeQueryNewTab: action.bound,
       showExecutionPlan: action.bound,
+      showOutputLogs: action.bound,
       executeScript: action.bound,
       switchEditing: action.bound,
       dialect: computed,

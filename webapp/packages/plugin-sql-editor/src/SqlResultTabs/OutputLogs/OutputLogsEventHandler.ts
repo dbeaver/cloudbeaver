@@ -12,13 +12,12 @@ import type { CbSessionLogEvent as ISessionLogEvent } from '@cloudbeaver/core-sd
 export { type ISessionLogEvent };
 
 @injectable()
-export class SqlOutputLogsEventHandler extends TopicEventHandler<ISessionLogEvent, ISessionEvent> {
+export class OutputLogsEventHandler extends TopicEventHandler<ISessionLogEvent, ISessionEvent> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbOutputLog, sessionEventSource);
   }
 
   map(event: any) {
-    console.log('map', event);
     return event;
   }
 }

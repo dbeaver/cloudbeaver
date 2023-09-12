@@ -17,8 +17,10 @@ import { SqlEditorService } from './SqlEditorService';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService';
 import { SqlEditorView } from './SqlEditorView';
 import { SqlExecutionPlanService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
-import { SqlOutputLogsEventHandler } from './SqlResultTabs/SqlOutputLogs/SqlOutputLogsEventHandler';
-import { SqlOutputLogsResource } from './SqlResultTabs/SqlOutputLogs/SqlOutputLogsResource';
+import { OutputFilterMenuBootstrap } from './SqlResultTabs/OutputLogs/OutputFilterMenuBootstrap';
+import { OutputLogsEventHandler } from './SqlResultTabs/OutputLogs/OutputLogsEventHandler';
+import { OutputLogsResource } from './SqlResultTabs/OutputLogs/OutputLogsResource';
+import { OutputLogsService } from './SqlResultTabs/OutputLogs/OutputLogsService';
 import { SqlQueryResultService } from './SqlResultTabs/SqlQueryResultService';
 import { SqlQueryService } from './SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
@@ -42,7 +44,9 @@ export const sqlEditorPluginManifest: PluginManifest = {
     MenuBootstrap,
     SqlDataSourceService,
     LocalStorageSqlDataSourceBootstrap,
-    SqlOutputLogsEventHandler,
-    SqlOutputLogsResource,
+    OutputLogsEventHandler,
+    OutputLogsResource,
+    OutputLogsService,
+    OutputFilterMenuBootstrap,
   ],
 };
