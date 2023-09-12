@@ -34,7 +34,6 @@ export class OutputFilterMenuBootstrap extends Bootstrap {
               },
               {
                 onSelect: () => {
-                  console.log(context.get(OUTPUT_LOGS_PANEL_STATE));
                   if (state.selectedLogTypes.includes(logType)) {
                     state.setSelectedLogTypes(state.selectedLogTypes.filter(type => type !== logType));
                     return;

@@ -32,7 +32,6 @@ export class OutputLogsResource extends CachedDataResource<IOutputLog[]> {
     sqlOutputLogsEventHandler.onEvent(
       ServerEventId.CbDatabaseOutputLogUpdated,
       (event: IOutputLogEvent) => {
-        console.log('event', event);
         this.setData((this.data || []).concat(event.messages));
         this.markOutdated();
       },

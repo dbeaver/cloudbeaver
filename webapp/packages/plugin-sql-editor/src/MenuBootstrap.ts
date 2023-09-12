@@ -194,7 +194,7 @@ export class MenuBootstrap extends Bootstrap {
         break;
       case ACTION_SQL_EDITOR_SHOW_OUTPUT:
         // TODO change it to show output
-        data.showExecutionPlan();
+        data.showOutputLogs();
         break;
     }
   }
