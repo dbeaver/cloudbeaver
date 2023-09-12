@@ -18,24 +18,6 @@ import { EDITOR_BASE_STYLES } from './theme';
 import { useCodemirrorExtensions } from './useCodemirrorExtensions';
 import { type IDefaultExtensions, useEditorDefaultExtensions } from './useEditorDefaultExtensions';
 
-const defaultExtensionsFlags: IDefaultExtensions = {
-  lineNumbers: false,
-  tooltips: true,
-  highlightSpecialChars: true,
-  syntaxHighlighting: true,
-  bracketMatching: true,
-  dropCursor: true,
-  crosshairCursor: true,
-  foldGutter: true,
-  highlightActiveLineGutter: true,
-  highlightSelectionMatches: true,
-  highlightActiveLine: true,
-  indentOnInput: true,
-  rectangularSelection: true,
-  keymap: true,
-  lineWrapping: false,
-};
-
 export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
   forwardRef(function Editor(
     {
@@ -81,10 +63,7 @@ export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
       }).filter(([, value]) => value !== undefined),
     );
 
-    const defaultExtensions = useEditorDefaultExtensions({
-      ...defaultExtensionsFlags,
-      ...filteredDefaultExtensionsFlagsFromProps,
-    });
+    const defaultExtensions = useEditorDefaultExtensions(filteredDefaultExtensionsFlagsFromProps);
 
     extensions.set(...defaultExtensions);
 

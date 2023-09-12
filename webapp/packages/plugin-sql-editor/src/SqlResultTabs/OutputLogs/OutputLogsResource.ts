@@ -7,39 +7,26 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerEventId } from '@cloudbeaver/core-root';
-import { CachedDataResource, CbServerEvent, GraphQLService } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, CbDatabaseOutputLogEvent, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { OutputLogsEventHandler } from './OutputLogsEventHandler';
-import type { OutputLogType } from './useOutputLogsPanelState';
-
-export interface IOutputLog {
-  message: string;
-  severity: OutputLogType;
-}
-
-interface IOutputLogEvent extends CbServerEvent {
-  eventTimestamp: number;
-  timestamp: number;
-  asyncTaskId: number;
-  messages: IOutputLog[];
-}
 
 @injectable()
-export class OutputLogsResource extends CachedDataResource<IOutputLog[]> {
+export class OutputLogsResource extends CachedDataResource<CbDatabaseOutputLogEvent[]> {
   constructor(sqlOutputLogsEventHandler: OutputLogsEventHandler, private readonly graphQLService: GraphQLService) {
     super(() => []);
 
     sqlOutputLogsEventHandler.onEvent(
       ServerEventId.CbDatabaseOutputLogUpdated,
-      (event: IOutputLogEvent) => {
-        this.setData((this.data || []).concat(event.messages));
+      (event: CbDatabaseOutputLogEvent) => {
+        this.setData((this.data || []).concat(event));
       },
       undefined,
       this,
     );
   }
 
-  protected async loader(): Promise<IOutputLog[]> {
+  protected async loader(): Promise<CbDatabaseOutputLogEvent[]> {
     return this.data;
   }
 }

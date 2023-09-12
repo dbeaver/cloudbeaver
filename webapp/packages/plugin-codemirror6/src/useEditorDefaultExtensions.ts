@@ -11,7 +11,8 @@ import { highlightSelectionMatches } from '@codemirror/search';
 import { Compartment, Extension } from '@codemirror/state';
 import {
   crosshairCursor,
-  dropCursor, EditorView,
+  dropCursor,
+  EditorView,
   highlightActiveLine,
   highlightActiveLineGutter,
   highlightSpecialChars,
@@ -33,6 +34,24 @@ DEFAULT_KEY_MAP.push({
   key: 'Mod-s',
   run: () => true,
 });
+
+const defaultExtensionsFlags: IDefaultExtensions = {
+  lineNumbers: false,
+  tooltips: true,
+  highlightSpecialChars: true,
+  syntaxHighlighting: true,
+  bracketMatching: true,
+  dropCursor: true,
+  crosshairCursor: true,
+  foldGutter: true,
+  highlightActiveLineGutter: true,
+  highlightSelectionMatches: true,
+  highlightActiveLine: true,
+  indentOnInput: true,
+  rectangularSelection: true,
+  keymap: true,
+  lineWrapping: false,
+};
 
 export interface IDefaultExtensions {
   lineNumbers?: boolean;
@@ -93,7 +112,7 @@ const DEFAULT_EXTENSIONS_COMPARTMENT = new Compartment();
 /** Provides the necessary extensions to establish a basic editor */
 export function useEditorDefaultExtensions(options?: IDefaultExtensions): [Compartment, Extension] {
   return useMemo(() => {
-    const extensions = Object.entries(options || {})
+    const extensions = Object.entries({ ...defaultExtensionsFlags, ...options } || {})
       .filter(([, isEnabled]) => isEnabled)
       .map(([key]) => {
         const extensionFunction = extensionMap[key as keyof typeof extensionMap];

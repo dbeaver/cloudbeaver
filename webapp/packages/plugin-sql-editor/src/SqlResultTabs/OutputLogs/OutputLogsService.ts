@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
+import type { CbDatabaseOutputLogEvent } from '@cloudbeaver/core-sdk';
 
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
 import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService';
@@ -53,5 +54,14 @@ export class OutputLogsService {
     });
 
     return id;
+  }
+
+  getOutputLogs(events: CbDatabaseOutputLogEvent[], editorState: ISqlEditorTabState) {
+    const dataSource = this.sqlDataSourceService.get(editorState.editorId);
+
+    return events
+      .filter(event => event.contextId === dataSource?.executionContext?.id)
+      .map(event => event.messages)
+      .flat();
   }
 }

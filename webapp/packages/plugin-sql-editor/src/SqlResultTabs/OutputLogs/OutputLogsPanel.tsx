@@ -5,26 +5,30 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { highlightSelectionMatches } from '@codemirror/search';
 import { observer } from 'mobx-react-lite';
 
 import { s, useResource, useS } from '@cloudbeaver/core-blocks';
-import { EditorLoader, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
+import { useService } from '@cloudbeaver/core-di';
+import { EditorLoader } from '@cloudbeaver/plugin-codemirror6';
 
-import type { IOutputLogsTab } from '../../ISqlEditorTabState';
+import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
 import style from './OutputLogsPanel.m.css';
 import { OutputLogsResource } from './OutputLogsResource';
+import { OutputLogsService } from './OutputLogsService';
 import { OutputLogsToolbar } from './OutputLogsToolbar';
 import { useOutputLogsPanelState } from './useOutputLogsPanelState';
 
 interface Props {
-  outputLogsTab: IOutputLogsTab;
+  sqlEditorTabState: ISqlEditorTabState;
 }
 
-export const OutputLogsPanel = observer<Props>(function SqlOutputLogsPanel({ outputLogsTab }) {
+export const OutputLogsPanel = observer<Props>(function SqlOutputLogsPanel({ sqlEditorTabState }) {
   const styles = useS(style);
+  const outputLogsService = useService(OutputLogsService);
   const { data } = useResource(SqlOutputLogsPanel, OutputLogsResource, undefined);
-  const state = useOutputLogsPanelState(data);
+  const outputLogs = outputLogsService.getOutputLogs(data, sqlEditorTabState);
+
+  const state = useOutputLogsPanelState(outputLogs);
 
   return (
     <div className={s(styles, { container: true })}>

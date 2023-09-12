@@ -8,21 +8,23 @@
 import { action, computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
-
-import type { IOutputLog } from './OutputLogsResource';
+import type { WsOutputLogInfo } from '@cloudbeaver/core-sdk';
 
 export interface SqlOutputLogsPanelState {
   searchValue: string;
   setSearchValue: (value: string) => void;
+  logMessages: WsOutputLogInfo['message'][];
   selectedLogTypes: OutputLogType[];
   readonly resultValue: string;
   setSelectedLogTypes: (value: OutputLogType[]) => void;
-  readonly filteredLogs: IOutputLog[];
+  readonly filteredLogs: WsOutputLogInfo[];
 }
 
 export const OUTPUT_LOG_TYPES = ['Debug', 'Log', 'Info', 'Notice', 'Warning', 'Error'] as const;
 export type OutputLogType = (typeof OUTPUT_LOG_TYPES)[number];
-export const useOutputLogsPanelState = (outputLogs: IOutputLog[]) => useObservableRef<SqlOutputLogsPanelState>(
+
+export const useOutputLogsPanelState = (outputLogs: WsOutputLogInfo[]) =>
+  useObservableRef<SqlOutputLogsPanelState>(
     () => ({
       searchValue: '',
       selectedLogTypes: [...OUTPUT_LOG_TYPES],
@@ -34,10 +36,10 @@ export const useOutputLogsPanelState = (outputLogs: IOutputLog[]) => useObservab
       },
       get filteredLogs() {
         return outputLogs.filter(log => {
-          if (this.selectedLogTypes.length > 0 && !this.selectedLogTypes.includes(log.severity)) {
+          if (this.selectedLogTypes.length > 0 && !this.selectedLogTypes.includes(log?.severity as OutputLogType)) {
             return false;
           }
-          if (this.searchValue.length > 0 && !log.message.includes(this.searchValue)) {
+          if (this.searchValue.length > 0 && !log?.message?.includes(this.searchValue)) {
             return false;
           }
           return true;

@@ -14,7 +14,7 @@ export { type ISessionLogEvent };
 @injectable()
 export class OutputLogsEventHandler extends TopicEventHandler<ISessionLogEvent, ISessionEvent> {
   constructor(sessionEventSource: SessionEventSource) {
-    super(SessionEventTopic.CbOutputLog, sessionEventSource);
+    super(SessionEventTopic.CbDatabaseOutputLog, sessionEventSource);
   }
 
   map(event: any) {

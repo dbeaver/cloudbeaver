@@ -63,7 +63,7 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
   if (state.outputLogsTab) {
     return styled(style)(
       <result-panel>
-        <OutputLogsPanel outputLogsTab={state.outputLogsTab} />
+        <OutputLogsPanel sqlEditorTabState={state} />
       </result-panel>,
     );
   }
