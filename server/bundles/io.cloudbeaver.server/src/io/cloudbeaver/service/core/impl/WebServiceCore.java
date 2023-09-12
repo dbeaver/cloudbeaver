@@ -660,7 +660,8 @@ public class WebServiceCore implements DBWServiceCore {
                 testDataSource.getConnectionConfiguration(),
                 connectionConfig.getCredentials(),
                 true,
-                false
+                false,
+                true
             );
         } else {
             testDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
