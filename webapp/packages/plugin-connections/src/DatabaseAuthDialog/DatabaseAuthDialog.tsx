@@ -6,33 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { ErrorMessage, Loader, SubmittingForm, useAdministrationSettings, useFocus, useStyles } from '@cloudbeaver/core-blocks';
+import { ErrorMessage, Loader, s, SubmittingForm, useAdministrationSettings, useFocus, useS } from '@cloudbeaver/core-blocks';
 import { IConnectionInfoParams, useConnectionInfo, useDBDriver } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 
 import { ConnectionAuthenticationFormLoader } from '../ConnectionAuthentication/ConnectionAuthenticationFormLoader';
+import style from './DatabaseAuthDialog.m.css';
 import { DBAuthDialogController } from './DBAuthDialogController';
 import { DBAuthDialogFooter } from './DBAuthDialogFooter';
-
-const styles = css`
-  SubmittingForm {
-    overflow: auto;
-    margin: auto;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  ConnectionAuthenticationFormLoader {
-    align-content: center;
-  }
-  ErrorMessage {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-    flex: 1;
-  }
-`;
 
 interface Payload {
   connection: IConnectionInfoParams;
@@ -43,6 +26,7 @@ interface Payload {
 export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function DatabaseAuthDialog({ payload, options, rejectDialog, resolveDialog }) {
   const connection = useConnectionInfo(payload.connection);
   const controller = useController(DBAuthDialogController, payload.connection, payload.networkHandlers, resolveDialog);
+  const styles = useS(style);
 
   const { driver } = useDBDriver(connection.connectionInfo?.driverId || '');
   const { credentialsSavingEnabled } = useAdministrationSettings();
@@ -54,7 +38,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
     authModelId = connection.connectionInfo?.authModel || driver?.defaultAuthModel || null;
   }
 
-  return styled(useStyles(styles))(
+  return (
     <CommonDialogWrapper size="large">
       <CommonDialogHeader
         title="connections_database_authentication"
@@ -63,7 +47,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
         onReject={options?.persistent ? undefined : rejectDialog}
       />
       <CommonDialogBody>
-        <SubmittingForm ref={focusedRef} onSubmit={controller.login}>
+        <SubmittingForm ref={focusedRef} className={s(styles, { submittingForm: true })} onSubmit={controller.login}>
           {!connection.isLoaded() || connection.isLoading() || !controller.configured ? (
             <Loader />
           ) : (
@@ -74,6 +58,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
               networkHandlers={payload.networkHandlers}
               formId={`${payload.connection.projectId}:${payload.connection.connectionId}`}
               allowSaveCredentials={credentialsSavingEnabled}
+              className={s(styles, { connectionAuthenticationFormLoader: true })}
               disabled={controller.isAuthenticating}
               hideFeatures={['nonSecuredProperty']}
             />
@@ -83,10 +68,15 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
       <CommonDialogFooter>
         <DBAuthDialogFooter isAuthenticating={controller.isAuthenticating} onLogin={controller.login}>
           {controller.error.responseMessage && (
-            <ErrorMessage text={controller.error.responseMessage} hasDetails={controller.error.hasDetails} onShowDetails={controller.showDetails} />
+            <ErrorMessage
+              className={s(styles, { errorMessage: true })}
+              text={controller.error.responseMessage}
+              hasDetails={controller.error.hasDetails}
+              onShowDetails={controller.showDetails}
+            />
           )}
         </DBAuthDialogFooter>
       </CommonDialogFooter>
-    </CommonDialogWrapper>,
+    </CommonDialogWrapper>
   );
 });

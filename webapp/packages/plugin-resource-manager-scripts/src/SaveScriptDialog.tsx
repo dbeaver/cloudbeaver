@@ -7,17 +7,10 @@
  */
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Button, Container, InputField, SubmittingForm, Translate, useFocus, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Fill, InputField, SubmittingForm, Translate, useFocus, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
-
-const style = css`
-  fill {
-    flex: 1;
-  }
-`;
 
 export interface ISaveScriptDialogResult {
   name: string;
@@ -86,7 +79,7 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
 
   const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
 
-  return styled(style)(
+  return (
     <CommonDialogWrapper size="small" className={className} fixedWidth>
       <CommonDialogHeader title={translate('plugin_resource_manager_scripts_save_script')} icon="/icons/sql_script_m.svg" onReject={rejectDialog} />
       <CommonDialogBody>
@@ -121,11 +114,11 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
         <Button type="button" mod={['outlined']} onClick={rejectDialog}>
           <Translate token="ui_processing_cancel" />
         </Button>
-        <fill />
+        <Fill />
         <Button type="button" mod={['unelevated']} disabled={!state.valid} onClick={state.submit}>
           <Translate token="ui_processing_save" />
         </Button>
       </CommonDialogFooter>
-    </CommonDialogWrapper>,
+    </CommonDialogWrapper>
   );
 });

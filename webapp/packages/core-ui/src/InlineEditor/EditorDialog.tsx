@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Button, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import {
   CommonDialogBody,
   CommonDialogFooter,
@@ -19,24 +18,14 @@ import {
   DialogComponentProps,
 } from '@cloudbeaver/core-dialogs';
 
-const styles = css`
-  textarea {
-    width: 100% !important;
-    min-height: 250px;
-    box-sizing: border-box;
-  }
-  CommonDialogFooter {
-    align-items: center;
-    justify-content: flex-end;
-    gap: 24px;
-  }
-`;
+import style from './EditorDialog.m.css';
 
 export const EditorDialog: DialogComponent<string, string> = observer(function EditorDialog({
   payload,
   resolveDialog,
   rejectDialog,
 }: DialogComponentProps<string, string>) {
+  const styles = useS(style);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [value, setValue] = useState(payload);
   const handleChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => setValue(event.target.value), []);
@@ -47,13 +36,13 @@ export const EditorDialog: DialogComponent<string, string> = observer(function E
     setTimeout(() => textareaRef.current?.focus(), 100);
   }, []);
 
-  return styled(useStyles(styles))(
+  return (
     <CommonDialogWrapper>
       <CommonDialogHeader title="app_shared_inlineEditor_dialog_title" onReject={rejectDialog} />
       <CommonDialogBody>
-        <textarea ref={textareaRef} value={value} onChange={handleChange} />
+        <textarea ref={textareaRef} className={s(styles, { textarea: true })} value={value} onChange={handleChange} />
       </CommonDialogBody>
-      <CommonDialogFooter>
+      <CommonDialogFooter className={s(styles, { footer: true })}>
         <Button type="button" mod={['outlined']} onClick={rejectDialog}>
           {translate('app_shared_inlineEditor_dialog_cancel')}
         </Button>
@@ -61,6 +50,6 @@ export const EditorDialog: DialogComponent<string, string> = observer(function E
           {translate('app_shared_inlineEditor_dialog_apply')}
         </Button>
       </CommonDialogFooter>
-    </CommonDialogWrapper>,
+    </CommonDialogWrapper>
   );
 });

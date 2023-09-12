@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Button, s, Translate, useFocus, useS } from '@cloudbeaver/core-blocks';
+import { Button, Fill, s, Translate, useFocus, useS } from '@cloudbeaver/core-blocks';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
 import { CommonDialogBody } from './CommonDialog/CommonDialogBody';
@@ -48,7 +48,7 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Dial
         <Button type="button" mod={['outlined']} onClick={rejectDialog}>
           <Translate token={cancelActionText || 'ui_processing_cancel'} />
         </Button>
-        <fill className={s(styles, { fill: true })} />
+        <Fill />
         {payload.extraStatus !== undefined && (
           <Button type="button" mod={['outlined']} onClick={() => resolveDialog(payload.extraStatus)}>
             <Translate token={cancelActionText || 'ui_no'} />

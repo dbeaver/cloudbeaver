@@ -9,7 +9,7 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
-import { Button, Container, InputField, s, SubmittingForm, useFocus, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Fill, InputField, s, SubmittingForm, useFocus, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { throttleAsync } from '@cloudbeaver/core-utils';
 
 import { CommonDialogBody } from './CommonDialog/CommonDialogBody';
@@ -109,7 +109,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
         <Button type="button" mod={['outlined']} onClick={rejectDialog}>
           {translate('ui_processing_cancel')}
         </Button>
-        <div className={s(styles, { fill: true })} />
+        <Fill />
         <Button type="button" mod={['unelevated']} disabled={!state.valid} onClick={() => resolveDialog(state.value)}>
           {translate(confirmActionText || (create ? 'ui_create' : 'ui_rename'))}
         </Button>
