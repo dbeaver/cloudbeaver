@@ -166,7 +166,7 @@ type CBDatabaseOutputLogEvent implements CBServerEvent {
 }
 
 # Define the type for WSOutputLogInfo
-extend type WSOutputLogInfo {
+type WSOutputLogInfo {
     severity: String
     message: String
     # Add more fields as needed
