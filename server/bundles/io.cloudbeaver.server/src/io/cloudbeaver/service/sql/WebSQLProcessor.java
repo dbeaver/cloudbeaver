@@ -215,7 +215,8 @@ public class WebSQLProcessor implements WebSessionProvider {
                             if (dbcServerOutputReader == null) {
                                 dbcServerOutputReader = new DefaultServerOutputReader();
                             }
-                            sqlOutputLogReaderJob = new SqlOutputLogReaderJob(webSession, context, dbStat, dbcServerOutputReader);
+                            sqlOutputLogReaderJob = new SqlOutputLogReaderJob(
+                                webSession, context, dbStat, dbcServerOutputReader, contextInfo.getId());
                             sqlOutputLogReaderJob.schedule();
                         }
                         // Set query timeout

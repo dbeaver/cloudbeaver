@@ -50,16 +50,20 @@ public class SqlOutputLogReaderJob extends AbstractJob {
     private final DBCStatement dbcStatement;
     @NotNull
     private final DBCServerOutputReader dbcServerOutputReader;
+    @NotNull
+    private final String contextInfoId;
 
     public SqlOutputLogReaderJob(@NotNull WebSession webSession,
                                  @NotNull DBCExecutionContext dbcExecutionContext,
                                  @NotNull DBCStatement dbcStatement,
-                                 @NotNull DBCServerOutputReader dbcServerOutputReader) {
+                                 @NotNull DBCServerOutputReader dbcServerOutputReader,
+                                 @NotNull String contextInfoId) {
         super("Sql log state job");
         this.webSession = webSession;
         this.dbcExecutionContext = dbcExecutionContext;
         this.dbcStatement = dbcStatement;
         this.dbcServerOutputReader = dbcServerOutputReader;
+        this.contextInfoId = contextInfoId;
     }
 
     @Override
@@ -97,7 +101,7 @@ public class SqlOutputLogReaderJob extends AbstractJob {
                             }
                         });
                         webSession.addSessionEvent(new WSOutputDBLogEvent(
-                            dbcExecutionContext.getContextId(),
+                            contextInfoId,
                             messages,
                             System.currentTimeMillis()));
                     }

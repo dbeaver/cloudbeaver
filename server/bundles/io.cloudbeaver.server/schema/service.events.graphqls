@@ -160,7 +160,7 @@ type CBProjectsActiveEvent implements CBClientEvent {
 type CBDatabaseOutputLogEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
-    executionContextId: String!
+    contextId: String!
     messages: [WSOutputLogInfo!]!
     eventTimestamp: Int!
 }
