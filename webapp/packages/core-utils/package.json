@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@timohausmann/quadtree-ts": "~2.0.0-beta.1",
-    "clsx": "~1.2.1",
+    "clsx": "~2.0.0",
     "fast-deep-equal": "~3.1.3",
     "md5": "~2.3.0",
     "underscore": "^1.13.6",
@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@types/md5": "~2.3.2",
-    "@types/uuid": "~9.0.1",
-    "@types/underscore": "^1.11.5"
+    "@types/uuid": "~9.0.3",
+    "@types/underscore": "^1.11.9"
   }
 }

@@ -92,6 +92,11 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
       const result = results.find(result => result.uniqueResultId === key);
 
       for (const action of actions) {
+        if (!(action.constructor as any).dataFormat.includes(result?.dataFormat)) {
+          this.actions.delete(key);
+          continue;
+        }
+
         action.updateResults(results);
 
         if (!result) {

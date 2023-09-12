@@ -23,19 +23,19 @@
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-executor": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
-    "axios": "~1.4.0",
+    "axios": "~1.5.0",
     "graphql": "~16.x.x",
     "graphql-request": "~6.1.0"
   },
   "devDependencies": {
     "@graphql-codegen/add": "~5.0.0",
-    "@graphql-codegen/cli": "~4.0.1",
+    "@graphql-codegen/cli": "~5.0.0",
     "@graphql-codegen/near-operation-file-preset": "~2.5.0",
-    "@graphql-codegen/typescript": "~3.0.2",
+    "@graphql-codegen/typescript": "~4.0.1",
     "@graphql-codegen/typescript-graphql-files-modules": "~2.2.1",
     "@graphql-codegen/typescript-graphql-request": "~5.0.0",
-    "@graphql-codegen/typescript-operations": "~3.0.2",
-    "@parcel/watcher": "^2.2.0"
+    "@graphql-codegen/typescript-operations": "~4.0.1",
+    "@parcel/watcher": "~2.3.0"
   },
   "peerDependencies": {
     "mobx": "~6.x.x"
