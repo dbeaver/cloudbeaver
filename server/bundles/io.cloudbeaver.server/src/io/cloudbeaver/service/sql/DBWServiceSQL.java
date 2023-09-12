@@ -94,7 +94,9 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull String sql,
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
-        @Nullable WebDataFormat dataFormat) throws DBException;
+        @Nullable WebDataFormat dataFormat,
+        boolean readLogs,
+        @NotNull WebSession webSession) throws DBException;
 
     @WebAction
     WebAsyncTaskInfo asyncReadDataFromContainer(

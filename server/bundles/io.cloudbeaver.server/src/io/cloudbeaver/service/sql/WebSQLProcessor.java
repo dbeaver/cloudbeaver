@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
+import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -31,10 +32,12 @@ import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.exec.output.DBCServerOutputReader;
 import org.jkiss.dbeaver.model.exec.plan.DBCPlan;
 import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlanner;
 import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlannerConfiguration;
 import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
+import org.jkiss.dbeaver.model.impl.DefaultServerOutputReader;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -152,7 +155,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull String sql,
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
-        @Nullable WebDataFormat dataFormat) throws DBWebException {
+        @Nullable WebDataFormat dataFormat,
+        @NotNull WebSession webSession,
+        boolean readLogs) throws DBWebException {
         if (filter == null) {
             // Use default filter
             filter = new WebSQLDataFilter();
@@ -203,6 +208,16 @@ public class WebSQLProcessor implements WebSessionProvider {
                         webDataFilter.getOffset(),
                         webDataFilter.getLimit()))
                     {
+                        SqlOutputLogReaderJob sqlOutputLogReaderJob = null;
+                        if (readLogs) {
+                            DBPDataSource dataSource = context.getDataSource();
+                            DBCServerOutputReader dbcServerOutputReader = DBUtils.getAdapter(DBCServerOutputReader.class, dataSource);
+                            if (dbcServerOutputReader == null) {
+                                dbcServerOutputReader = new DefaultServerOutputReader();
+                            }
+                            sqlOutputLogReaderJob = new SqlOutputLogReaderJob(webSession, context, dbStat, dbcServerOutputReader);
+                            sqlOutputLogReaderJob.schedule();
+                        }
                         // Set query timeout
                         int queryTimeout = (int) session.getDataSource().getContainer().getPreferenceStore()
                             .getDouble(WebSQLConstants.QUOTA_PROP_SQL_QUERY_TIMEOUT);
@@ -220,6 +235,11 @@ public class WebSQLProcessor implements WebSessionProvider {
                         }
 
                         boolean hasResultSet = dbStat.executeStatement();
+
+                        // Wait SqlLogStateJob, if its starts
+                        if (sqlOutputLogReaderJob != null) {
+                            sqlOutputLogReaderJob.join();
+                        }
                         fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat);
                     } catch (DBException e) {
                         throw new InvocationTargetException(e);
