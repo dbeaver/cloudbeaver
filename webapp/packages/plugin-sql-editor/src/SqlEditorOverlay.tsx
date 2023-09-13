@@ -31,6 +31,7 @@ import {
   getRealExecutionContextId,
 } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
@@ -47,6 +48,7 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
   const translate = useTranslate();
   const sqlEditorService = useService(SqlEditorService);
   const sqlDataSourceService = useService(SqlDataSourceService);
+  const notificationService = useService(NotificationService);
   const dataSource = sqlDataSourceService.get(state.editorId);
   const executionContextId = dataSource?.executionContext?.id;
   const executionContext = dataSource?.executionContext;
@@ -74,7 +76,11 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
   }
 
   async function init() {
-    await sqlEditorService.initEditorConnection(state);
+    try {
+      await sqlEditorService.initEditorConnection(state);
+    } catch (exception: any) {
+      notificationService.logException(exception);
+    }
   }
 
   const dataContainer = getComputed(() =>
