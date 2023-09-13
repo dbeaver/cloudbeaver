@@ -19,9 +19,10 @@ interface Props extends Omit<TabListOptions, keyof TabStateReturn> {
   'aria-label'?: string;
   style?: ComponentStyle;
   childrenFirst?: boolean;
+  className?: string;
 }
 
-export const TabList = observer<React.PropsWithChildren<Props>>(function TabList({ style, children, childrenFirst, ...props }) {
+export const TabList = observer<React.PropsWithChildren<Props>>(function TabList({ style, className, children, childrenFirst, ...props }) {
   const state = useContext(TabsContext);
 
   if (!state) {
@@ -31,7 +32,7 @@ export const TabList = observer<React.PropsWithChildren<Props>>(function TabList
   if (state.container) {
     const displayed = state.container.getDisplayed(state.props);
     return (
-      <BaseTabList {...props} {...state.state} area-label={props['aria-label'] ?? state.container.areaLabel}>
+      <BaseTabList {...props} {...state.state} className={className} area-label={props['aria-label'] ?? state.container.areaLabel}>
         {childrenFirst && children}
         {displayed
           .map(
@@ -61,7 +62,7 @@ export const TabList = observer<React.PropsWithChildren<Props>>(function TabList
   }
 
   return (
-    <BaseTabList {...props} {...state.state}>
+    <BaseTabList {...props} className={className} {...state.state}>
       {children}
     </BaseTabList>
   );

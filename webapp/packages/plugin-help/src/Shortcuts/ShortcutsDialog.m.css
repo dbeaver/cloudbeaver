@@ -1,0 +1,17 @@
+.button {
+  margin-left: auto;
+}
+.container {
+  composes: theme-typography--body2 from global;
+  gap: 32px;
+}
+.group {
+  gap: 16px;
+}
+.groupTitle,
+.group {
+  padding: 0 !important;
+}
+.groupTitle {
+  font-weight: bold;
+}

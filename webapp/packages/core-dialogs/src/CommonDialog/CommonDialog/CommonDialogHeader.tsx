@@ -6,13 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { use } from 'reshadow';
 
-import { Icon, IconOrImage, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Icon, IconOrImage, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
-import { dialogStyles } from '../styles';
-import { commonDialogBaseStyle, commonDialogThemeStyle } from './styles';
+import styles from './CommonDialogHeader.m.css';
 
 interface Props {
   title?: string;
@@ -38,19 +36,22 @@ export const CommonDialogHeader = observer<Props>(function CommonDialogHeader({
   style,
 }) {
   const translate = useTranslate();
+  const computedStyles = useS(styles, style);
 
-  return styled(useStyles(commonDialogThemeStyle, commonDialogBaseStyle, dialogStyles, style))(
-    <header title={tooltip} className={className}>
-      <icon-container>{icon && <IconOrImage {...use({ bigIcon })} icon={icon} viewBox={viewBox} />}</icon-container>
-      <header-title>
-        <h3>{translate(title)}</h3>
+  return (
+    <header title={tooltip} className={s(computedStyles, { header: true }, className)}>
+      <div className={s(computedStyles, { iconContainer: true })}>
+        {icon && <IconOrImage className={s(computedStyles, { icon: true, bigIcon })} icon={icon} viewBox={viewBox} />}
+      </div>
+      <div className={s(computedStyles, { headerTitleContainer: true })}>
+        <h3 className={s(computedStyles, { headerTitle: true })}>{translate(title)}</h3>
         {onReject && (
-          <reject>
+          <div className={s(computedStyles, { reject: true })}>
             <Icon name="cross" viewBox="0 0 16 16" onClick={onReject} />
-          </reject>
+          </div>
         )}
-      </header-title>
-      {subTitle && <sub-title>{typeof subTitle === 'string' ? translate(subTitle) : subTitle}</sub-title>}
-    </header>,
+      </div>
+      {subTitle && <div className={s(computedStyles, { subTitle: true })}>{typeof subTitle === 'string' ? translate(subTitle) : subTitle}</div>}
+    </header>
   );
 });

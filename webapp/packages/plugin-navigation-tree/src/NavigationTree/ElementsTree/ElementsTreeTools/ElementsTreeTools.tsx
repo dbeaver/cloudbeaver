@@ -11,6 +11,7 @@ import styled from 'reshadow';
 
 import {
   ACTION_ICON_BUTTON_STYLES,
+  Fill,
   IconButton,
   IconButtonStyles,
   PlaceholderElement,
@@ -77,7 +78,7 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
               onClick={() => setOpen(!opened)}
             />
           )}
-          <div className={s(styles, { fill: true })} />
+          <Fill />
           <ElementsTreeToolsMenu tree={tree} />
           <IconButton
             name="/icons/refresh_sm.svg#root"

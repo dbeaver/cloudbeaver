@@ -7,40 +7,16 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
-import { ErrorMessage, IProperty, PropertiesTable, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { ErrorMessage, IProperty, PropertiesTable, s, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 import type { DataTransferOutputSettings, DataTransferProcessorInfo, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 import { ITabData, Tab, TabList, TabsState, TabTitle, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { OutputOptionsForm } from './OutputOptionsForm';
+import style from './ProcessorConfigureDialog.m.css';
 import { ProcessorConfigureDialogFooter } from './ProcessorConfigureDialogFooter';
-
-const styles = css`
-  PropertiesTable {
-    flex: 1;
-    overflow: hidden;
-    padding: 12px 0;
-  }
-  message {
-    margin: auto;
-  }
-  ErrorMessage {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-    position: sticky;
-    bottom: 0;
-    padding: 8px 24px;
-  }
-
-  TabList {
-    margin: 0 10px;
-  }
-
-  ObjectPropertyInfoForm {
-    margin: 12px 0;
-  }
-`;
 
 interface Props {
   processor: DataTransferProcessorInfo;
@@ -73,6 +49,8 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
   onExport,
 }) {
   const translate = useTranslate();
+  const styles = useS(style);
+
   const title = `${translate('data_transfer_dialog_configuration_title')} (${processor.name})`;
   const [currentTabId, setCurrentTabId] = useState(SETTINGS_TABS.EXTRACTION);
 
@@ -92,13 +70,13 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
     }
   }
 
-  return styled(useStyles(UNDERLINE_TAB_STYLES, styles))(
+  return styled(useStyles(UNDERLINE_TAB_STYLES))(
     <CommonDialogWrapper size="large" fixedSize>
       <CommonDialogHeader title={title} onReject={onClose} />
       <CommonDialogBody noOverflow noBodyPadding>
         {!processor.isBinary ? (
           <TabsState currentTabId={currentTabId} onChange={handleTabChange}>
-            <TabList aria-label="Export Settings tabs">
+            <TabList className={s(styles, { tabList: true })} aria-label="Export Settings tabs">
               <Tab tabId={SETTINGS_TABS.EXTRACTION} style={UNDERLINE_TAB_STYLES}>
                 <TabTitle>{translate('data_transfer_format_settings')}</TabTitle>
               </Tab>
@@ -109,12 +87,19 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
           </TabsState>
         ) : null}
         {currentTabId === SETTINGS_TABS.EXTRACTION ? (
-          <PropertiesTable properties={properties} propertiesState={processorProperties} />
+          <PropertiesTable className={s(styles, { propertiesTable: true })} properties={properties} propertiesState={processorProperties} />
         ) : (
           <OutputOptionsForm outputSettings={outputSettings} />
         )}
 
-        {error.responseMessage && <ErrorMessage text={error.responseMessage} hasDetails={error.hasDetails} onShowDetails={onShowDetails} />}
+        {error.responseMessage && (
+          <ErrorMessage
+            className={s(styles, { errorMessage: true })}
+            text={error.responseMessage}
+            hasDetails={error.hasDetails}
+            onShowDetails={onShowDetails}
+          />
+        )}
       </CommonDialogBody>
       <CommonDialogFooter>
         <ProcessorConfigureDialogFooter
