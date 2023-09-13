@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Button, InputField, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, InputField, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import {
   CommonDialogBody,
@@ -21,13 +20,7 @@ import {
 } from '@cloudbeaver/core-dialogs';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 
-export const dialogStyle = css`
-  CommonDialogFooter {
-    align-items: center;
-    justify-content: flex-end;
-    gap: 24px;
-  }
-`;
+import style from './FilterCustomValueDialog.m.css';
 
 interface IPayload {
   inputTitle: string;
@@ -40,6 +33,7 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
   rejectDialog,
 }: DialogComponentProps<IPayload, string | number>) {
   const clipboardService = useService(ClipboardService);
+  const styles = useS(style);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const [value, setValue] = useState<string | number>(payload.defaultValue);
@@ -60,7 +54,7 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
     inputRef.current?.focus();
   }, []);
 
-  return styled(dialogStyle)(
+  return (
     <CommonDialogWrapper size="small">
       <CommonDialogHeader title="data_grid_table_context_menu_filter_dialog_title" onReject={rejectDialog} />
       <CommonDialogBody noOverflow>
@@ -68,7 +62,7 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
           {payload.inputTitle}
         </InputField>
       </CommonDialogBody>
-      <CommonDialogFooter>
+      <CommonDialogFooter className={s(styles, { footer: true })}>
         {clipboardService.clipboardAvailable && clipboardService.state !== 'denied' && (
           <Button type="button" mod={['outlined']} onClick={getValueFromClipboard}>
             {translate('ui_clipboard')}
@@ -81,6 +75,6 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
           {translate('ui_processing_ok')}
         </Button>
       </CommonDialogFooter>
-    </CommonDialogWrapper>,
+    </CommonDialogWrapper>
   );
 });

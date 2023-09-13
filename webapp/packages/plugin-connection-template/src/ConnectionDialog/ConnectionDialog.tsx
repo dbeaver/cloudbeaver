@@ -6,39 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { ErrorMessage, Loader, SubmittingForm, useAdministrationSettings, useFocus, useTranslate } from '@cloudbeaver/core-blocks';
+import { ErrorMessage, Loader, s, SubmittingForm, useAdministrationSettings, useFocus, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ConnectionAuthenticationFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionController, ConnectionStep } from './ConnectionController';
+import style from './ConnectionDialog.m.css';
 import { ConnectionDialogFooter } from './ConnectionDialogFooter';
 import { TemplateConnectionSelector } from './TemplateConnectionSelector/TemplateConnectionSelector';
 
-const styles = css`
-  SubmittingForm,
-  center {
-    display: flex;
-    flex: 1;
-    margin: auto;
-  }
-  center {
-    box-sizing: border-box;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  ConnectionAuthenticationFormLoader {
-    align-content: center;
-  }
-  ErrorMessage {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-  }
-`;
-
 export const ConnectionDialog: DialogComponent<null, null> = observer(function ConnectionDialog({ rejectDialog }) {
+  const styles = useS(style);
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const controller = useController(ConnectionController, rejectDialog);
   const translate = useTranslate();
@@ -50,7 +30,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
     subtitle = controller.template.name;
   }
 
-  return styled(styles)(
+  return (
     <CommonDialogWrapper size="large" fixedSize>
       <CommonDialogHeader
         title="basicConnection_connectionDialog_newConnection"
@@ -69,9 +49,11 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
         )}
         {controller.step === ConnectionStep.Connection &&
           (!controller.authModel ? (
-            <center>{controller.isConnecting && translate('basicConnection_connectionDialog_connecting_message')}</center>
+            <center className={s(styles, { center: true })}>
+              {controller.isConnecting && translate('basicConnection_connectionDialog_connecting_message')}
+            </center>
           ) : (
-            <SubmittingForm ref={focusedRef} onSubmit={controller.onConnect}>
+            <SubmittingForm ref={focusedRef} className={s(styles, { submittingForm: true })} onSubmit={controller.onConnect}>
               <ConnectionAuthenticationFormLoader
                 config={controller.config}
                 authModelId={controller.authModel.id}
@@ -79,6 +61,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
                 formId={controller.template?.id}
                 allowSaveCredentials={credentialsSavingEnabled}
                 disabled={controller.isConnecting}
+                className={s(styles, { connectionAuthenticationFormLoader: true })}
               />
             </SubmittingForm>
           ))}
@@ -86,7 +69,12 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
       {controller.step === ConnectionStep.Connection && (
         <CommonDialogFooter>
           {controller.responseMessage && (
-            <ErrorMessage text={controller.responseMessage} hasDetails={controller.hasDetails} onShowDetails={controller.onShowDetails} />
+            <ErrorMessage
+              text={controller.responseMessage}
+              className={s(styles, { errorMessage: true })}
+              hasDetails={controller.hasDetails}
+              onShowDetails={controller.onShowDetails}
+            />
           )}
           <ConnectionDialogFooter
             isConnecting={controller.isConnecting}
@@ -95,6 +83,6 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
           />
         </CommonDialogFooter>
       )}
-    </CommonDialogWrapper>,
+    </CommonDialogWrapper>
   );
 });
