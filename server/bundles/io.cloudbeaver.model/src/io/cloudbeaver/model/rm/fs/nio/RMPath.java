@@ -18,39 +18,55 @@ package io.cloudbeaver.model.rm.fs.nio;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.nio.NIOPath;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.*;
+import java.nio.file.FileStore;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.List;
 
-public class RMPath implements Path {
-    private final RMNioFileSystem rmNioFileSystem;
+public class RMPath extends NIOPath {
+    @NotNull
+    private final RMNIOFileSystem rmNioFileSystem;
     @NotNull
     private final RMProject rmProject;
     @NotNull
     private final List<RMResource> parentResources;
     @Nullable
     private final RMResource rmResource;
+    @NotNull
+    private final FileStore fileStore;
 
-    public RMPath(@NotNull RMProject rmProject) {
-        this.rmProject = rmProject;
+    public RMPath(
+        @NotNull RMNIOFileSystem rmNioFileSystem
+    ) {
+        this.rmNioFileSystem = rmNioFileSystem;
+        this.rmProject = rmNioFileSystem.getProject();
+        this.fileStore = new RMNIOProjectFileStore(rmProject);
         this.parentResources = List.of();
         this.rmResource = null;
     }
 
-    public RMPath(@NotNull RMProject rmProject, @NotNull List<RMResource> parentResources, @Nullable RMResource rmResource) {
-        this.rmProject = rmProject;
+    public RMPath(
+        @NotNull RMNIOFileSystem rmNioFileSystem,
+        @NotNull List<RMResource> parentResources,
+        @NotNull RMResource rmResource
+    ) {
+        this.rmNioFileSystem = rmNioFileSystem;
+        this.rmProject = rmNioFileSystem.getProject();
         this.parentResources = parentResources;
         this.rmResource = rmResource;
+        this.fileStore = new RMNIOResourceFileStore(rmResource);
     }
 
     @Override
-    public FileSystem getFileSystem() {
-        throw rmNioFileSystem;
+    public RMNIOFileSystem getFileSystem() {
+        return rmNioFileSystem;
     }
 
     @Override
@@ -60,7 +76,7 @@ public class RMPath implements Path {
 
     @Override
     public Path getRoot() {
-        return new RMPath(rmProject);
+        return new RMPath(rmNioFileSystem);
     }
 
     @Override
@@ -78,7 +94,7 @@ public class RMPath implements Path {
             return getRoot();
         }
         var parentResource = parentResources.get(parentResources.size() - 1);
-        return new RMPath(rmProject, parentResources.subList(0, parentResources.size() - 1), parentResource);
+        return new RMPath(rmNioFileSystem, parentResources.subList(0, parentResources.size() - 1), parentResource);
     }
 
     @Override
@@ -87,38 +103,26 @@ public class RMPath implements Path {
     }
 
     @Override
-    public Path getName(int index) {
-        return null;
-    }
-
-    @Override
-    public Path subpath(int beginIndex, int endIndex) {
-        return null;
-    }
-
-    @Override
     public boolean startsWith(@NotNull Path other) {
-        return false;
-    }
-
-    @Override
-    public boolean endsWith(@NotNull Path other) {
-        return false;
+        if (!(other instanceof RMPath)) {
+            return false;
+        }
+        return toString().startsWith(other.toString());
     }
 
     @Override
     public Path normalize() {
-        return null;
+        return this;
     }
 
     @Override
     public Path resolve(@NotNull Path other) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Path relativize(@NotNull Path other) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -127,9 +131,11 @@ public class RMPath implements Path {
         var uriBuilder = new StringBuilder(fileSystem.provider().getScheme())
             .append("://")
             .append(rmProject.getId());
-        parentResources.forEach(resource -> uriBuilder.append(resource.getName()).append(fileSystem.getSeparator()));
-        if (rmResource != null) {
-            uriBuilder.append(rmProject.getName());
+
+        String rmResourcePath = getResourcePath();
+        if (rmResourcePath != null) {
+            uriBuilder.append(fileSystem.getSeparator())
+                .append(rmResourcePath);
         }
 
         return URI.create(uriBuilder.toString());
@@ -148,20 +154,37 @@ public class RMPath implements Path {
         return toAbsolutePath();
     }
 
-    @Override
-    public WatchKey register(@NotNull WatchService watcher, @NotNull WatchEvent.Kind<?>[] events, WatchEvent.Modifier... modifiers) throws
-        IOException {
-        throw new UnsupportedOperationException();
+    public FileStore getFileStore() {
+        return fileStore;
     }
 
-    @Override
-    public int compareTo(@NotNull Path other) {
-        return toString().compareTo(other.toString());
+    @Nullable
+    public String getResourcePath() {
+        StringBuilder pathBuilder = new StringBuilder();
+        parentResources.forEach(resource -> pathBuilder.append(resource.getName()).append(getFileSystem().getSeparator()));
+        if (rmResource != null) {
+            pathBuilder.append(rmProject.getName());
+        }
+        String path = pathBuilder.toString();
+        return CommonUtils.nullIfEmpty(path);
+    }
+
+    public boolean isProject() {
+        return rmResource == null;
     }
 
     @NotNull
-    @Override
-    public String toString() {
-        return toUri().toString();
+    public RMProject getRmProject() {
+        return rmProject;
+    }
+
+    @NotNull
+    public List<RMResource> getParentResources() {
+        return parentResources;
+    }
+
+    @Nullable
+    public RMResource getRmResource() {
+        return rmResource;
     }
 }

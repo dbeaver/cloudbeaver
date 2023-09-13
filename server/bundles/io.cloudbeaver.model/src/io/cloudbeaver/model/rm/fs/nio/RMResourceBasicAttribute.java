@@ -16,35 +16,33 @@
  */
 package io.cloudbeaver.model.rm.fs.nio;
 
-import org.jkiss.dbeaver.model.nio.DBNioFileStore;
+import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.nio.NIOFileBasicAttribute;
 import org.jkiss.dbeaver.model.rm.RMResource;
 
-import java.io.IOException;
+import java.nio.file.attribute.FileTime;
 
-public class RMNioFileStore extends DBNioFileStore {
+public class RMResourceBasicAttribute extends NIOFileBasicAttribute {
+
+    @NotNull
     private final RMResource rmResource;
 
-    public RMNioFileStore(RMResource rmResource) {
+    public RMResourceBasicAttribute(@NotNull RMResource rmResource) {
         this.rmResource = rmResource;
     }
 
     @Override
-    public String name() {
-        return rmResource.getName();
+    public FileTime lastModifiedTime() {
+        return FileTime.fromMillis(rmResource.getLastModified());
     }
 
     @Override
-    public String type() {
-        return "rmfs";
+    public boolean isDirectory() {
+        return rmResource.isFolder();
     }
 
     @Override
-    public boolean isReadOnly() {
-        return false;
-    }
-
-    @Override
-    public long getTotalSpace() throws IOException {
+    public long size() {
         return rmResource.getLength();
     }
 }
