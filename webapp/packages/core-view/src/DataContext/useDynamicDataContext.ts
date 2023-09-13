@@ -8,12 +8,12 @@
 import { untracked } from 'mobx';
 import { useEffect, useState } from 'react';
 
-import { DataContext } from './DataContext';
 import { DynamicDataContext } from './DynamicDataContext';
 import type { IDataContext } from './IDataContext';
+import { TempDataContext } from './TempDataContext';
 
 export function useDynamicDataContext(context: IDataContext | undefined, capture: (context: IDataContext) => void): void {
-  const [state] = useState(() => new DynamicDataContext(context || new DataContext()));
+  const [state] = useState(() => new DynamicDataContext(context || new TempDataContext()));
 
   untracked(() => {
     if (context) {
@@ -25,5 +25,5 @@ export function useDynamicDataContext(context: IDataContext | undefined, capture
     capture(state);
   });
 
-  useEffect(() => () => state.flush(), []);
+  useEffect(() => () => state.clear(), []);
 }

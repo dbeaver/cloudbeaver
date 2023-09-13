@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import styled, { use } from 'reshadow';
-
-import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './TableHeader.m.css';
 
 interface Props {
   fixed?: boolean;
@@ -15,9 +15,11 @@ interface Props {
 }
 
 export const TableHeader: React.FC<React.PropsWithChildren<Props>> = function TableHeader({ fixed, children, className }) {
-  return styled(BASE_TABLE_STYLES)(
-    <thead className={className} {...use({ fixed })}>
+  const styles = useS(style);
+
+  return (
+    <thead className={s(styles, { fixed, tableHeader: true }, className)}>
       <tr>{children}</tr>
-    </thead>,
+    </thead>
   );
 };

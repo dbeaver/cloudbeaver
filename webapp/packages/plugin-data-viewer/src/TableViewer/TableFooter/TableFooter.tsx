@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
+import { getComputed, SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { IDataContext } from '@cloudbeaver/core-view';
 
@@ -99,7 +99,7 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
     }
   }, [model.countGain]);
 
-  const disabled = model.isLoading() || model.isDisabled(resultIndex);
+  const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
 
   return styled(tableFooterStyles)(
     <ToolsPanel>

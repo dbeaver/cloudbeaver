@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { AnnotationsMap, makeObservable, runInAction, untracked } from 'mobx';
-import { useState } from 'react';
+import { action, AnnotationsMap, makeObservable, runInAction, untracked } from 'mobx';
+import { useLayoutEffect, useState } from 'react';
 
 export function useObservableRef<T extends Record<any, any>>(
   init: () => T & ThisType<T>,
@@ -79,19 +79,21 @@ export function useObservableRef<T extends Record<any, any>>(
     return state;
   });
 
-  if (update) {
-    runInAction(() => {
-      assign(state, update);
+  useLayoutEffect(
+    action(() => {
+      if (update) {
+        assign(state, update);
 
-      if (Array.isArray(bind)) {
-        bind = bind.filter(key => (key as any) in (update as T));
+        if (Array.isArray(bind)) {
+          bind = bind.filter(key => (key as any) in (update as T));
 
-        if (bind.length > 0) {
-          bindFunctions(state, bind);
+          if (bind.length > 0) {
+            bindFunctions(state, bind);
+          }
         }
       }
-    });
-  }
+    }),
+  );
 
   return state;
 }

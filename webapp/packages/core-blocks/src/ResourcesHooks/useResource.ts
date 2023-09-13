@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { action, comparer, computed, observable, reaction, toJS, untracked } from 'mobx';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useDeferredValue, useEffect, useState } from 'react';
 
 import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import {
@@ -462,26 +462,15 @@ export function useResource<
     };
   }, []);
 
-  useEffect(
-    () =>
-      reaction(
-        () => ({
-          canLoad: result.canLoad,
-          loadKey: propertiesRef.key,
-        }),
-        ({ canLoad, loadKey }) => {
-          refObj.use(loadKey);
-          if (canLoad && !result.isError()) {
-            result.load();
-          }
-        },
-        {
-          fireImmediately: true,
-          delay: 100,
-        },
-      ),
-    [],
-  );
+  const canLoad = useDeferredValue(getComputed(() => result.canLoad));
+  const loadKey = useDeferredValue(getComputed(() => propertiesRef.key));
+
+  useEffect(() => {
+    refObj.use(loadKey);
+    if (canLoad && !result.isError()) {
+      result.load();
+    }
+  }, [canLoad, loadKey]);
 
   if (actions?.forceSuspense) {
     result.data;

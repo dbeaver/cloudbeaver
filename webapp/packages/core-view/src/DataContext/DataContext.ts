@@ -26,6 +26,7 @@ export class DataContext implements IDataContext {
     makeObservable<this, 'map'>(this, {
       set: action,
       delete: action,
+      clear: action,
       map: observable.shallow,
       fallback: observable.ref,
     });
@@ -35,12 +36,20 @@ export class DataContext implements IDataContext {
     this.fallback = fallback;
   }
 
+  hasOwn(context: DataContextGetter<any>): boolean {
+    return this.map.has(context);
+  }
+
   has(context: DataContextGetter<any>, nested = true): boolean {
-    if (nested) {
-      return this.map.has(context) || this.fallback?.has(context) || false;
+    if (this.hasOwn(context)) {
+      return true;
     }
 
-    return this.map.has(context);
+    if (nested && this.fallback?.has(context)) {
+      return true;
+    }
+
+    return false;
   }
 
   hasValue<T>(context: DataContextGetter<T>, value: T, nested = true): boolean {
@@ -48,7 +57,7 @@ export class DataContext implements IDataContext {
     let provider: IDataContextProvider = this;
 
     while (true) {
-      if (provider.map.get(context) === value) {
+      if (provider.getOwn(context) === value) {
         return true;
       }
 
@@ -65,10 +74,12 @@ export class DataContext implements IDataContext {
     let provider: IDataContextProvider = this;
 
     while (true) {
-      const value = provider.map.get(context);
+      if (provider.hasOwn(context)) {
+        const value = provider.getOwn(context)!;
 
-      if (predicate(value)) {
-        return value;
+        if (predicate(value)) {
+          return value;
+        }
       }
 
       if (provider.fallback) {
@@ -80,7 +91,7 @@ export class DataContext implements IDataContext {
   }
 
   set<T>(context: DataContextGetter<T>, value: T): DeleteVersionedContextCallback {
-    const data = this.map.get(context);
+    const data = this.getOwn(context);
     let version = this.versions.get(context);
 
     if (data === value) {
@@ -104,6 +115,10 @@ export class DataContext implements IDataContext {
     return this;
   }
 
+  getOwn<T>(context: DataContextGetter<T>): T | undefined {
+    return this.map.get(context);
+  }
+
   get<T>(context: DataContextGetter<T>): T {
     if (!this.map.has(context)) {
       const defaultValue = context();
@@ -119,7 +134,7 @@ export class DataContext implements IDataContext {
       throw new Error("Context doesn't exists");
     }
 
-    return this.map.get(context);
+    return this.getOwn(context)!;
   }
 
   tryGet<T>(context: DataContextGetter<T>): T | undefined {
@@ -129,6 +144,11 @@ export class DataContext implements IDataContext {
       }
     }
 
-    return this.map.get(context);
+    return this.getOwn(context);
+  }
+
+  clear(): void {
+    this.map.clear();
+    this.versions.clear();
   }
 }

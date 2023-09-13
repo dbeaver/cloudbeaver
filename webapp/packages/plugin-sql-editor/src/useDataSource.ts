@@ -7,7 +7,7 @@
  */
 import { useEffect } from 'react';
 
-import { useObservableRef } from '@cloudbeaver/core-blocks';
+import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource';
@@ -15,25 +15,6 @@ import { SqlEditorService } from './SqlEditorService';
 
 export function useDataSource(dataSource?: ISqlDataSource) {
   const sqlEditorService = useService(SqlEditorService);
-  const refObj = useObservableRef(
-    () => ({
-      async load(refresh?: boolean) {
-        if (!this.dataSource || this.dataSource.isLoading()) {
-          return;
-        }
-
-        if (refresh) {
-          this.dataSource.markOutdated();
-        }
-
-        await this.dataSource.load();
-      },
-    }),
-    {},
-    {
-      dataSource,
-    },
-  );
 
   // TODO: getComputed skips update somehow ...
   const outdated = dataSource && (dataSource.isOutdated() || !dataSource.isLoaded()) && !dataSource.isLoading();
@@ -44,7 +25,9 @@ export function useDataSource(dataSource?: ISqlDataSource) {
     }
 
     if (!dataSource.exception || (Array.isArray(dataSource.exception) && !dataSource.exception.some(Boolean))) {
-      refObj.load();
+      if (!dataSource?.isLoading()) {
+        dataSource.load();
+      }
     }
   });
 

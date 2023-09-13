@@ -25,7 +25,7 @@
     "@cloudbeaver/core-root": "~0.1.0"
   },
   "peerDependencies": {
-    "@testing-library/jest-dom": "~5.x.x",
+    "@testing-library/jest-dom": "~6.x.x",
     "mobx": "~6.x.x"
   }
 }
