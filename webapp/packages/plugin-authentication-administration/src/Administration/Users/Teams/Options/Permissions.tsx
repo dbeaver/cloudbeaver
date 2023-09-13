@@ -6,27 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
 import { PermissionsResource } from '@cloudbeaver/core-administration';
-import { FieldCheckbox, Group, GroupTitle, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { FieldCheckbox, Group, GroupTitle, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import type { ITeamFormProps } from '../ITeamFormProps';
-
-const styles = css`
-  caption {
-    composes: theme-text-text-hint-on-light theme-typography--caption from global;
-  }
-`;
 
 export const Permissions = observer<ITeamFormProps>(function Permissions({ state }) {
   const translate = useTranslate();
   const permissionsResource = useResource(Permissions, PermissionsResource, CachedMapAllKey);
 
-  const style = useStyles(styles);
-
-  return styled(style)(
+  return (
     <Group small gap>
       <GroupTitle>{translate('administration_teams_team_permissions')}</GroupTitle>
       {permissionsResource.resource.values.map(permission => {
@@ -52,16 +43,15 @@ export const Permissions = observer<ITeamFormProps>(function Permissions({ state
             id={permission.id}
             value={permission.id}
             title={tooltip}
+            label={label}
             name="teamPermissions"
             state={state.config}
             readOnly={state.readonly}
             disabled={state.disabled}
-          >
-            {label}
-            {caption ? <caption>{caption}</caption> : null}
-          </FieldCheckbox>
+            caption={caption}
+          />
         );
       })}
-    </Group>,
+    </Group>
   );
 });

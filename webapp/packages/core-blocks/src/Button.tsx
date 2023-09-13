@@ -13,6 +13,7 @@ import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { IconOrImage } from './IconOrImage';
 import { Loader } from './Loader/Loader';
+import { useObjectRef } from './useObjectRef';
 import { useObservableRef } from './useObservableRef';
 import { useStyles } from './useStyles';
 
@@ -123,16 +124,12 @@ export const Button = observer<ButtonProps>(function Button({
   className,
   ...rest
 }) {
+  const handlersRef = useObjectRef({ onClick });
   const state = useObservableRef(
     () => ({
       loading: false,
-    }),
-    {
-      loading: observable.ref,
-    },
-    {
       click(e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement | HTMLDivElement>) {
-        const returnValue = onClick?.(e);
+        const returnValue = handlersRef.onClick?.(e);
 
         if (returnValue instanceof Promise) {
           if (loader) {
@@ -143,7 +140,11 @@ export const Button = observer<ButtonProps>(function Button({
           }
         }
       },
+    }),
+    {
+      loading: observable.ref,
     },
+    false,
     ['click'],
   );
 

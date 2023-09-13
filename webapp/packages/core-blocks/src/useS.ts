@@ -5,13 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useContext, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
-import { BaseStyles, ComponentStyle, Style, ThemeService } from '@cloudbeaver/core-theming';
+import { BaseStyles, ClassCollection, ComponentStyle, Style, ThemeSelector, ThemeService } from '@cloudbeaver/core-theming';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { SContextReact } from './SContext';
 import { useExecutor } from './useExecutor';
+
+const stylesCache = new MetadataMap<string, Map<ThemeSelector<any>, Promise<undefined | BaseStyles | BaseStyles[]>>>(() => new Map());
 
 type Intersect<T> = (T extends any ? (x: T) => 0 : never) extends (x: infer R) => 0
   ? R extends Record<string, string>
@@ -60,6 +63,8 @@ export function useS<T extends ComponentStyle[]>(...componentStyles: [...T]): Ex
     ],
   });
 
+  const staticStyles: BaseStyles[] = [];
+  const themedStyles: Array<Promise<undefined | BaseStyles | BaseStyles[]>> = [];
   let changed = lastThemeRef.current !== currentThemeId || filteredStyles.length !== stylesRef.current.length;
   for (let i = 0; !changed && i < filteredStyles.length; i++) {
     changed = stylesRef.current[i] !== filteredStyles[i];
@@ -68,11 +73,20 @@ export function useS<T extends ComponentStyle[]>(...componentStyles: [...T]): Ex
   if (changed) {
     stylesRef.current = filteredStyles;
     lastThemeRef.current = currentThemeId;
-    const staticStyles: BaseStyles[] = [];
-    const themedStyles: Array<Promise<undefined | BaseStyles | BaseStyles[]>> = [];
 
     for (const style of filteredStyles) {
-      const data = typeof style === 'object' ? style : style(currentThemeId);
+      let data: ClassCollection<Record<string, string>> | Promise<undefined | BaseStyles | BaseStyles[]>;
+
+      if (typeof style === 'object') {
+        data = style;
+      } else {
+        if (!stylesCache.get(currentThemeId).has(style)) {
+          data = style(currentThemeId);
+          stylesCache.get(currentThemeId).set(style, style(currentThemeId));
+        } else {
+          data = stylesCache.get(currentThemeId).get(style)!;
+        }
+      }
 
       if (data instanceof Promise) {
         themedStyles.push(data);
@@ -81,14 +95,16 @@ export function useS<T extends ComponentStyle[]>(...componentStyles: [...T]): Ex
       }
     }
     loadedStyles.current = staticStyles.flat(Infinity);
+  }
 
-    if (themedStyles.length > 0) {
+  useEffect(() => {
+    if (changed && themedStyles.length > 0) {
       Promise.all(themedStyles).then(styles => {
         loadedStyles.current = [staticStyles, styles].flat(Infinity).filter(Boolean) as BaseStyles[];
         forceUpdate(patch + 1);
       });
     }
-  }
+  });
 
   const styles = useMemo(() => combineStyles(loadedStyles.current), [patch, loadedStyles.current]);
 
