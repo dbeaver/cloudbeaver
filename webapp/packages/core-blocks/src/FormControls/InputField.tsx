@@ -12,7 +12,7 @@ import styled, { use } from 'reshadow';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { getLayoutProps } from '../Containers/filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { Icon } from '../Icon';
@@ -100,6 +100,7 @@ export const InputField: InputFieldType = observer(
     const [passwordRevealed, setPasswordRevealed] = useState(false);
     const translate = useTranslate();
     const layoutProps = getLayoutProps(rest);
+    rest = filterLayoutFakeProps(rest);
     const propStyles = useStyles(style);
     const styles = useS(inputFieldStyle, formControlStyles, elementsSizeStyles);
     const context = useContext(FormContext);

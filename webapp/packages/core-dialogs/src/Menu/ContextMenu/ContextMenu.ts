@@ -36,7 +36,6 @@ export class ContextMenu {
   }
 
   constructMenuWithContext<T>(panelId: string, context: IMenuContext<T>): IMenuPanel {
-    context.contextId = context.contextId || uuid();
     return this.constructMenuPanelWithContext(panelId, context);
   }
 
@@ -59,7 +58,8 @@ export class ContextMenu {
 
   private constructMenuPanelWithContext<T>(panelId: string, context: IMenuContext<T>): IMenuPanel {
     const panel = this.menuStore.getPanel(panelId);
-    return new ContextMenuPanel(`${panelId}-${context.contextId!}-panel`, () => this.constructMenuItems(panel.menuItems.values, context));
+    const contextId = context.contextId || uuid();
+    return new ContextMenuPanel(`${panelId}-${contextId}-panel`, () => this.constructMenuItems(panel.menuItems.values, context));
   }
 
   private constructMenuItems<T>(menuItems: Array<IContextMenuItem<any>>, context: IMenuContext<T>): ComputedMenuItemModel[] {

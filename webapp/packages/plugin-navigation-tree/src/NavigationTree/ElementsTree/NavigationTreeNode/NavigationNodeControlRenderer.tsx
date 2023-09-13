@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useContext, useDeferredValue, useEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useContext, useDeferredValue, useEffect, useRef, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { getComputed, TreeNodeContext, useObjectRef } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNodeContext, useMergeRefs, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
@@ -49,50 +49,55 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
     const navNodeInfoResource = useService(NavNodeInfoResource);
     const observer = useRef<IntersectionObserver | null>(null);
 
+    const setElementRef = useCallback((ref: HTMLDivElement | null) => {
+      if (elementRef.current) {
+        observer.current?.unobserve(elementRef.current);
+      }
+
+      elementRef.current = ref;
+
+      if (elementRef.current) {
+        observer.current?.observe(elementRef.current);
+      }
+    }, []);
+    const mergedRef = useMergeRefs(setElementRef, ref);
+
     if (!contextRef.context) {
       throw new Error('ElementsTreeContext not found');
     }
 
+    const root = contextRef.context?.getTreeRoot();
+
     useEffect(() => {
-      if (elementRef.current) {
-        observer.current = new IntersectionObserver(
-          entries => {
-            for (const entry of entries) {
-              if (entry.target === elementRef.current) {
-                if (entry.isIntersecting) {
-                  setSize(-1);
-                } else {
-                  setSize(elementRef.current.offsetHeight);
-                }
+      observer.current = new IntersectionObserver(
+        entries => {
+          for (const entry of entries) {
+            if (entry.target === elementRef.current) {
+              if (entry.isIntersecting) {
+                setSize(-1);
+              } else {
+                setSize(Math.ceil(elementRef.current.offsetHeight));
               }
             }
-          },
-          {
-            root: contextRef.context?.getTreeRoot(),
-            threshold: 0,
-          },
-        );
+          }
+        },
+        {
+          root,
+          threshold: 0,
+        },
+      );
+
+      if (elementRef.current) {
         observer.current.observe(elementRef.current);
       }
+
       return () => observer.current?.disconnect();
-    });
-
-    function setRef(element: HTMLDivElement | null) {
-      elementRef.current = element;
-
-      if (ref) {
-        if (typeof ref === 'function') {
-          ref(element);
-        } else {
-          ref.current = element;
-        }
-      }
-    }
+    }, [root]);
 
     const displayed = useDeferredValue(size !== -1);
 
     if (displayed) {
-      return <div ref={setRef} style={{ height: `${size}px` }} />;
+      return <div ref={mergedRef} style={{ height: `${size}px` }} />;
     }
 
     const Control = navNode.control || externalControl || NavigationNodeControlLoader;
@@ -104,7 +109,7 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
     }
 
     return styled(styles)(
-      <Control ref={setRef} {...use({ outdated })} nodeInfo={nodeInfo} dndElement={dragging} style={style} node={node} onClick={onClickHandler} />,
+      <Control ref={mergedRef} {...use({ outdated })} nodeInfo={nodeInfo} dndElement={dragging} style={style} node={node} onClick={onClickHandler} />,
     );
   }),
 );

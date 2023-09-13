@@ -170,18 +170,14 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   setDetails(keyObject: ResourceKeySimple<string>, state: boolean): void {
-    ResourceKeyUtils.forEach(keyObject, key => {
-      const children = resourceKeyList(this.getNestedChildren(key));
-      this.navNodeInfoResource.setDetails(children, state);
+    const list = resourceKeyList(ResourceKeyUtils.mapArray(keyObject, key => this.getNestedChildren(key)).flat());
+    this.navNodeInfoResource.setDetails(list, state);
 
-      ResourceKeyUtils.forEach(children, key => {
-        const metadata = this.metadata.get(key);
-
-        if (!metadata.withDetails && state) {
-          metadata.outdated = true;
-        }
-        metadata.withDetails = state;
-      });
+    this.updateMetadata(list, metadata => {
+      if (!metadata.withDetails && state) {
+        metadata.outdated = true;
+      }
+      metadata.withDetails = state;
     });
   }
 
@@ -501,7 +497,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       }
 
       for (const node of data) {
-        const metadata = this.metadata.get(node.parentPath);
+        const metadata = this.getMetadata(node.parentPath);
 
         this.setDetails(resourceKeyList([node.navNodeInfo.id, ...node.navNodeChildren.map(node => node.id)]), metadata.withDetails);
       }
@@ -519,7 +515,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
         data.map(data => this.insertSlice(data, offset, limit)),
       );
     } else {
-      const metadata = this.metadata.get(data.parentPath);
+      const metadata = this.getMetadata(data.parentPath);
 
       this.setDetails(resourceKeyList([data.navNodeInfo.id, ...data.navNodeChildren.map(node => node.id)]), metadata.withDetails);
 
@@ -547,7 +543,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   private async loadNodeChildren(parentPath: string, offset: number, limit: number): Promise<NavNodeChildrenQuery> {
-    const metadata = this.metadata.get(parentPath);
+    const metadata = this.getMetadata(parentPath);
     const { navNodeChildren, navNodeInfo } = await this.graphQLService.sdk.navNodeChildren({
       parentPath,
       offset,

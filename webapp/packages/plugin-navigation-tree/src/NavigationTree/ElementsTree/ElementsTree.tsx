@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import {
@@ -145,7 +145,7 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
 }) {
   const navTreeResource = useService(NavTreeResource);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const treeRootRef = useRef<HTMLDivElement>(null);
+  const [treeRootRef, setTreeRootRef] = useState<HTMLDivElement | null>(null);
   const folderExplorer = useElementsTreeFolderExplorer(baseRoot, settings);
 
   const root = folderExplorer.state.folder;
@@ -190,9 +190,9 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
       folderExplorer,
       selectionTree,
       control,
-      getTreeRoot: () => treeRootRef.current,
+      getTreeRoot: () => treeRootRef,
     }),
-    [tree, folderExplorer, selectionTree, control],
+    [tree, folderExplorer, selectionTree, control, treeRootRef],
   );
 
   const getName = useCallback((folder: string) => navNodeInfoResource.get(folder)?.name || 'Not found', [navNodeInfoResource]);
@@ -220,7 +220,7 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   return styled(useStyles(TREE_NODE_STYLES, styles, style))(
     <>
       <ElementsTreeTools tree={tree} settingsElements={settingsElements} style={style} />
-      <tree-box ref={treeRootRef} {...use({ big })}>
+      <tree-box ref={setTreeRootRef} {...use({ big })}>
         <ElementsTreeContext.Provider value={context}>
           <box className={className}>
             <FolderExplorer state={folderExplorer}>

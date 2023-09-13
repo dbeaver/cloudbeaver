@@ -103,6 +103,8 @@ export function useUsersTable(filters: IUserFilters) {
     }),
     {
       loading: observable.ref,
+      usersLoader: observable.ref,
+      loadableState: observable.ref,
       users: computed<AdminUser[]>({ equals: (first, second) => isArraysEqual(first, second, undefined, true) }),
       update: action.bound,
       delete: action.bound,

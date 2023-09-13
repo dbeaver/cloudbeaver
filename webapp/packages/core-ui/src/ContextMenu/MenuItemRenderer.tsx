@@ -101,7 +101,7 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
     const extraProps = item.getExtraProps?.();
 
     return (
-      <MenuItem id={item.id} aria-label={item.label} hidden={item.hidden} disabled={item.disabled} onClick={onClick} {...extraProps}>
+      <MenuItem id={item.id} aria-label={item.label} hidden={item.hidden} disabled={item.disabled} onClick={() => onClick()}>
         <MenuItemElement label={item.label} icon={IconComponent ? <IconComponent item={item} {...extraProps} /> : item.icon} tooltip={item.tooltip} />
       </MenuItem>
     );
