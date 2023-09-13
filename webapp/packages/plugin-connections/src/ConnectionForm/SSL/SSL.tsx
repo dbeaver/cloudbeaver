@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import React from 'react';
 import styled, { css } from 'reshadow';
 
 import {
@@ -78,7 +79,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
           )}
 
           {categories.map(category => (
-            <>
+            <React.Fragment key={category}>
               <GroupTitle keepSize>{category}</GroupTitle>
               <ObjectPropertyInfoForm
                 state={handlerState.properties}
@@ -91,7 +92,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
                 showRememberTip
                 small
               />
-            </>
+            </React.Fragment>
           ))}
 
           {credentialsSavingEnabled && (

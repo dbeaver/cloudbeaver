@@ -158,7 +158,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
 
         this.flushTask = null;
       }),
-      300,
+      0,
     );
   }
 }

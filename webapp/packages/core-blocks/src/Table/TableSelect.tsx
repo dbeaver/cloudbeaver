@@ -11,7 +11,6 @@ import styled, { css } from 'reshadow';
 
 import { Checkbox } from '../FormControls/Checkboxes/Checkbox';
 import { useTranslate } from '../localization/useTranslate';
-import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 import { TableContext } from './TableContext';
 
 interface Props {
@@ -36,10 +35,7 @@ export const TableSelect = observer<Props>(function TableSelect({ id, disabled, 
     throw new Error('Context must be provided');
   }
 
-  return styled(
-    BASE_TABLE_STYLES,
-    styles,
-  )(
+  return styled(styles)(
     <Checkbox
       id={id}
       className={className}

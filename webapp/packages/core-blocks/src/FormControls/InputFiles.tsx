@@ -12,7 +12,7 @@ import styled, { css, use } from 'reshadow';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Button } from '../Button';
-import { getLayoutProps } from '../Containers/filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { useTranslate } from '../localization/useTranslate';
@@ -110,6 +110,7 @@ export const InputFiles: InputFilesType = observer(
     refInherit: React.Ref<HTMLInputElement>,
   ) {
     const layoutProps = getLayoutProps(rest);
+    rest = filterLayoutFakeProps(rest);
     const ref = useRefInherit<HTMLInputElement>(refInherit);
     const [innerState, setInnerState] = useState<FileList | null>(null);
     const translate = useTranslate();

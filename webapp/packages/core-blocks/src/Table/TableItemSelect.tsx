@@ -12,7 +12,6 @@ import styled, { css } from 'reshadow';
 import { EventContext } from '@cloudbeaver/core-events';
 
 import { Checkbox } from '../FormControls/Checkboxes/Checkbox';
-import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
 import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
@@ -24,7 +23,7 @@ interface Props {
   className?: string;
 }
 
-const checkboxStyles = css`
+const styles = css`
   Checkbox {
     margin-left: -10px;
     margin-right: -10px;
@@ -34,6 +33,7 @@ const checkboxStyles = css`
 export const TableItemSelect = observer<Props>(function TableItemSelect({ checked, disabled, tooltip, className }) {
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
+
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLInputElement>) => {
       if (!context) {
@@ -51,10 +51,7 @@ export const TableItemSelect = observer<Props>(function TableItemSelect({ checke
     return null;
   }
 
-  return styled(
-    BASE_TABLE_STYLES,
-    checkboxStyles,
-  )(
+  return styled(styles)(
     <Checkbox
       className={className}
       title={tooltip}

@@ -9,35 +9,40 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
+import { DataContext } from './DataContext';
 import type { DataContextGetter } from './DataContextGetter';
 import type { DeleteVersionedContextCallback, IDataContext } from './IDataContext';
 import type { IDataContextProvider } from './IDataContextProvider';
 
-export class DataContext implements IDataContext {
+export class TempDataContext implements IDataContext {
   readonly map: Map<DataContextGetter<any>, any>;
   private readonly versions: MetadataMap<DataContextGetter<any>, number>;
+  target: IDataContext;
   fallback?: IDataContextProvider;
+  private flushTimeout: any;
 
   constructor(fallback?: IDataContextProvider) {
     this.map = new Map();
     this.versions = new MetadataMap(() => 0);
+    this.target = new DataContext(fallback);
     this.fallback = fallback;
 
-    makeObservable<this, 'map'>(this, {
+    makeObservable<this>(this, {
+      target: observable.ref,
       set: action,
       delete: action,
       clear: action,
-      map: observable.shallow,
-      fallback: observable.ref,
+      flush: action,
     });
   }
 
   setFallBack(fallback?: IDataContextProvider): void {
     this.fallback = fallback;
+    this.planFlush();
   }
 
   hasOwn(context: DataContextGetter<any>): boolean {
-    return this.map.has(context);
+    return this.map.has(context) || this.target.hasOwn(context);
   }
 
   has(context: DataContextGetter<any>, nested = true): boolean {
@@ -90,6 +95,14 @@ export class DataContext implements IDataContext {
     }
   }
 
+  getOwn<T>(context: DataContextGetter<T>): T | undefined {
+    if (this.map.has(context)) {
+      return this.map.get(context);
+    }
+
+    return this.target.getOwn(context);
+  }
+
   set<T>(context: DataContextGetter<T>, value: T): DeleteVersionedContextCallback {
     const data = this.getOwn(context);
     let version = this.versions.get(context);
@@ -101,6 +114,7 @@ export class DataContext implements IDataContext {
     version++;
     this.map.set(context, value);
     this.versions.set(context, version);
+    this.planFlush();
 
     return this.delete.bind(this, context, version);
   }
@@ -111,16 +125,13 @@ export class DataContext implements IDataContext {
     }
 
     this.map.delete(context);
+    this.planFlush();
 
     return this;
   }
 
-  getOwn<T>(context: DataContextGetter<T>): T | undefined {
-    return this.map.get(context);
-  }
-
   get<T>(context: DataContextGetter<T>): T {
-    if (!this.map.has(context)) {
+    if (!this.hasOwn(context)) {
       const defaultValue = context();
 
       if (defaultValue !== undefined) {
@@ -138,7 +149,7 @@ export class DataContext implements IDataContext {
   }
 
   tryGet<T>(context: DataContextGetter<T>): T | undefined {
-    if (!this.map.has(context)) {
+    if (!this.hasOwn(context)) {
       if (this.fallback) {
         return this.fallback.tryGet(context);
       }
@@ -150,5 +161,26 @@ export class DataContext implements IDataContext {
   clear(): void {
     this.map.clear();
     this.versions.clear();
+    this.planFlush();
+  }
+
+  flush(): void {
+    clearTimeout(this.flushTimeout);
+    this.target.clear();
+    this.target.setFallBack(this.fallback);
+
+    for (const [key, value] of this.map) {
+      this.target.set(key, value);
+    }
+  }
+
+  private planFlush(): void {
+    if (this.flushTimeout) {
+      clearTimeout(this.flushTimeout);
+    }
+
+    this.flushTimeout = setTimeout(() => {
+      this.flush();
+    }, 0);
   }
 }
