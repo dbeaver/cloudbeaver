@@ -16,7 +16,12 @@ import * as t from '@babel/types';
 type FunctionType = t.FunctionDeclaration | t.FunctionExpression | t.ArrowFunctionExpression;
 
 function addTestIdAttribute(node: t.JSXOpeningElement, name: string): void {
-  if (!hasDataAttribute(node, DEFAULT_DATA_TESTID)) {
+  if (
+    t.isJSXIdentifier(node.name) &&
+    node.name.name !== 'Fragment' &&
+    node.name.name !== '_Fragment' &&
+    !hasDataAttribute(node, DEFAULT_DATA_TESTID)
+  ) {
     const dataAttribute = createDataAttribute(name, DEFAULT_DATA_TESTID);
     const indexOf = node.attributes.findIndex(attribute => t.isJSXSpreadAttribute(attribute));
     if (indexOf !== -1) {
@@ -105,6 +110,9 @@ export default function plugin(): PluginObj {
       CallExpression(p) {
         p.traverse({
           JSXOpeningElement({ node }) {
+            if (t.isJSXOpeningFragment(node)) {
+              return;
+            }
             addTestIdAttribute(node, getElementName(node.name));
           },
         });

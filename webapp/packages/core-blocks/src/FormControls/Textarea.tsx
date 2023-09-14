@@ -11,7 +11,7 @@ import styled, { css, use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
-import { getLayoutProps } from '../Containers/filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { s } from '../s';
@@ -91,6 +91,7 @@ export const Textarea: TextareaType = observer(function Textarea({
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
   const layoutProps = getLayoutProps(rest);
+  rest = filterLayoutFakeProps(rest);
   const sizeStyles = useS(elementsSizeStyles);
   const context = useContext(FormContext);
 

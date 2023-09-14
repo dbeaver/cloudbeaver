@@ -6,14 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { OVERLAY_BASE_STYLES } from './OVERLAY_BASE_STYLES';
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './OverlayActions.m.css';
 
 interface Props {
   className?: string;
 }
 
 export const OverlayActions = observer<React.PropsWithChildren<Props>>(function OverlayActions({ className, children }) {
-  return styled(OVERLAY_BASE_STYLES)(<actions className={className}>{children}</actions>);
+  const styles = useS(style);
+
+  return <div className={s(styles, { actions: true }, className)}>{children}</div>;
 });

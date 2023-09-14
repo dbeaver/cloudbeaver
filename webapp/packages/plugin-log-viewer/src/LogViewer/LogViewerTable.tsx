@@ -8,16 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import {
-  BASE_TABLE_STYLES,
-  MenuBarSmallItem,
-  Table,
-  TableBody,
-  TableColumnHeader,
-  TableHeader,
-  useStyles,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { MenuBarSmallItem, Table, TableBody, TableColumnHeader, TableHeader, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { ILogEntry } from './ILogEntry';
 import { LogEntry } from './LogEntry';
@@ -69,7 +60,7 @@ interface Props {
 }
 export const LogViewerTable = observer<Props>(function LogViewerTable({ items, selectedItem, onItemSelect, onClear, className }) {
   const translate = useTranslate();
-  const style = useStyles(BASE_TABLE_STYLES, styles);
+  const style = useStyles(styles);
 
   return styled(style)(
     <wrapper className={className}>

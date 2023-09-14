@@ -8,14 +8,12 @@
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useContext, useEffect } from 'react';
 import { Dialog, useDialogState } from 'reakit/Dialog';
-import styled, { use } from 'reshadow';
 
-import { Loader, useStyles } from '@cloudbeaver/core-blocks';
+import { Loader, s, useS } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { DialogContext } from '../DialogContext';
-import { dialogStyles } from '../styles';
-import { commonDialogBaseStyle, commonDialogThemeStyle } from './styles';
+import styles from './CommonDialogWrapper.m.css';
 
 export interface CommonDialogWrapperProps {
   size?: 'small' | 'medium' | 'large';
@@ -29,6 +27,7 @@ export interface CommonDialogWrapperProps {
 
 export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivElement>(
   forwardRef(function CommonDialogWrapper({ size = 'medium', fixedSize, fixedWidth, 'aria-label': ariaLabel, className, children, style }, ref) {
+    const computedStyles = useS(styles, style);
     const context = useContext(DialogContext);
     const dialogState = useDialogState({ visible: true });
 
@@ -38,12 +37,28 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivEle
       }
     });
 
-    return styled(useStyles(commonDialogThemeStyle, commonDialogBaseStyle, dialogStyles, style))(
-      <Dialog {...dialogState} ref={ref} aria-label={ariaLabel} visible={context.visible} hideOnClickOutside={false} modal={false}>
-        <dialog className={className} {...use({ size, fixedSize, fixedWidth })}>
-          <Loader suspense>{children}</Loader>
+    return (
+      <Dialog
+        {...dialogState}
+        ref={ref}
+        aria-label={ariaLabel}
+        className={s(computedStyles, { container: true })}
+        visible={context.visible}
+        hideOnClickOutside={false}
+        modal={false}
+      >
+        <dialog
+          className={s(
+            computedStyles,
+            { dialog: true, small: size === 'small', medium: size === 'medium', large: size === 'large', fixedSize, fixedWidth },
+            className,
+          )}
+        >
+          <Loader className={s(computedStyles, { loader: true })} suspense>
+            {children}
+          </Loader>
         </dialog>
-      </Dialog>,
+      </Dialog>
     );
   }),
 );

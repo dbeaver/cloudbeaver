@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Button, Loader, StatusMessage, SubmittingForm, useFocus, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
@@ -96,7 +97,9 @@ export const UserForm = observer<Props>(function UserForm({ user, editing = fals
   const controller = useController(UserFormController);
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
-  controller.update(user, editing, onCancel);
+  useEffect(() => {
+    controller.update(user, editing, onCancel);
+  });
 
   return styled(styles)(
     <TabsState localState={controller.partsState} container={service.tabsContainer} user={user} controller={controller} editing={editing}>
