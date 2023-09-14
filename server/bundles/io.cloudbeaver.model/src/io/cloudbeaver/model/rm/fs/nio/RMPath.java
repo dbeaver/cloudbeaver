@@ -20,58 +20,40 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.nio.NIOPath;
 import org.jkiss.dbeaver.model.rm.RMProject;
-import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.FileStore;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Arrays;
 
 public class RMPath extends NIOPath {
     @NotNull
     private final RMNIOFileSystem rmNioFileSystem;
     @NotNull
     private final RMProject rmProject;
-    @NotNull
-    private final List<RMResource> parentResources;
-    @Nullable
-    private final RMResource rmResource;
-    @NotNull
-    private final FileStore fileStore;
 
     public RMPath(
         @NotNull RMNIOFileSystem rmNioFileSystem
     ) {
+        super(null);
         this.rmNioFileSystem = rmNioFileSystem;
         this.rmProject = rmNioFileSystem.getProject();
-        this.fileStore = new RMNIOProjectFileStore(rmProject);
-        this.parentResources = List.of();
-        this.rmResource = null;
     }
 
     public RMPath(
         @NotNull RMNIOFileSystem rmNioFileSystem,
-        @NotNull List<RMResource> parentResources,
-        @NotNull RMResource rmResource
+        @NotNull String path
     ) {
+        super(path);
         this.rmNioFileSystem = rmNioFileSystem;
         this.rmProject = rmNioFileSystem.getProject();
-        this.parentResources = parentResources;
-        this.rmResource = rmResource;
-        this.fileStore = new RMNIOResourceFileStore(rmResource);
     }
 
     @Override
     public RMNIOFileSystem getFileSystem() {
         return rmNioFileSystem;
-    }
-
-    @Override
-    public boolean isAbsolute() {
-        return true;
     }
 
     @Override
@@ -87,19 +69,22 @@ public class RMPath extends NIOPath {
     @Override
     public Path getParent() {
         // project is root and have no parent
-        if (rmResource == null) {
+        if (isProject()) {
             return null;
         }
-        if (CommonUtils.isEmpty(parentResources)) {
-            return getRoot();
+
+        String[] parts = pathParts();
+        if (parts.length == 1) {
+            return new RMPath(rmNioFileSystem); // project is parent
         }
-        var parentResource = parentResources.get(parentResources.size() - 1);
-        return new RMPath(rmNioFileSystem, parentResources.subList(0, parentResources.size() - 1), parentResource);
+        //return parent folder
+        String[] parentParts = Arrays.copyOfRange(parts, 0, parts.length - 1);
+        return new RMPath(rmNioFileSystem, String.join(getFileSystem().getSeparator(), parentParts));
     }
 
     @Override
     public int getNameCount() {
-        return parentResources.size() + (rmResource == null ? 0 : 1);
+        return pathParts().length;
     }
 
     @Override
@@ -116,13 +101,23 @@ public class RMPath extends NIOPath {
     }
 
     @Override
-    public Path resolve(@NotNull Path other) {
-        throw new UnsupportedOperationException();
+    public Path resolve(Path other) {
+        RMPath rmOther = (RMPath) other;
+        if (!rmOther.rmProject.getId().equals(rmProject.getId())) {
+            throw new IllegalArgumentException("Cannot resolve path from other project");
+        }
+        return resolve(rmOther.getResourcePath());
     }
 
     @Override
-    public Path relativize(@NotNull Path other) {
-        throw new UnsupportedOperationException();
+    public Path resolve(String other) {
+        if (CommonUtils.isEmpty(other)) {
+            return this;
+        }
+        return new RMPath(
+            rmNioFileSystem,
+            resolveString(other)
+        );
     }
 
     @Override
@@ -146,7 +141,7 @@ public class RMPath extends NIOPath {
         if (isAbsolute()) {
             return this;
         }
-        throw new IllegalStateException();
+        return new RMPath(rmNioFileSystem, "/" + path);
     }
 
     @Override
@@ -154,37 +149,42 @@ public class RMPath extends NIOPath {
         return toAbsolutePath();
     }
 
-    public FileStore getFileStore() {
-        return fileStore;
+    @Override
+    public Path getName(int index) {
+        String[] parts = pathParts();
+        if (index < 0 || index > parts.length) {
+            throw new IllegalArgumentException("Invalid index value: " + index);
+        }
+        return new RMPath(rmNioFileSystem, parts[index]);
+    }
+
+    @Override
+    public Path subpath(int beginIndex, int endIndex) {
+        String[] parts = pathParts();
+        if (beginIndex < 0 || beginIndex > parts.length) {
+            throw new IllegalArgumentException("Invalid begin index value: " + beginIndex);
+        }
+
+        if (endIndex < 0 || endIndex > parts.length || endIndex < beginIndex) {
+            throw new IllegalArgumentException("Invalid end index value: " + endIndex);
+        }
+
+        String[] subParts = Arrays.copyOfRange(parts, beginIndex, endIndex);
+        
+        return new RMPath(rmNioFileSystem, String.join(getFileSystem().getSeparator(), subParts));
     }
 
     @Nullable
     public String getResourcePath() {
-        StringBuilder pathBuilder = new StringBuilder();
-        parentResources.forEach(resource -> pathBuilder.append(resource.getName()).append(getFileSystem().getSeparator()));
-        if (rmResource != null) {
-            pathBuilder.append(rmProject.getName());
-        }
-        String path = pathBuilder.toString();
-        return CommonUtils.nullIfEmpty(path);
+        return path;
     }
 
     public boolean isProject() {
-        return rmResource == null;
+        return CommonUtils.isEmpty(path);
     }
 
     @NotNull
     public RMProject getRmProject() {
         return rmProject;
-    }
-
-    @NotNull
-    public List<RMResource> getParentResources() {
-        return parentResources;
-    }
-
-    @Nullable
-    public RMResource getRmResource() {
-        return rmResource;
     }
 }
