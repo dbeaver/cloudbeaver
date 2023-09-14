@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import { Fragment } from 'react';
 
 import { AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
 import { Icon, PlaceholderComponent, s, StaticImage, useS, useTranslate } from '@cloudbeaver/core-blocks';
@@ -15,32 +15,26 @@ import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@c
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 
-import type { IUserDetailsInfoProps } from '../../UsersAdministrationService';
-import style from './Origin.m.css';
+import type { IUserDetailsInfoProps } from '../UsersAdministrationService';
+import style from './UserCredentialsList.m.css';
 
-const USER_DETAILS_STYLES = css`
-  StaticImage {
-    width: 24px;
-    height: 24px;
-  }
-`;
-
-interface IOriginIconProps {
+interface IUserCredentialsProps {
   origin: ObjectOrigin;
   className?: string;
 }
 
-export const OriginIcon = observer<IOriginIconProps>(function Origin({ origin, className }) {
+export const UserCredentials = observer<IUserCredentialsProps>(function UserCredentials({ origin, className }) {
   const translate = useTranslate();
+  const styles = useS(style);
 
   const isLocal = origin.type === AUTH_PROVIDER_LOCAL_ID;
   const icon = isLocal ? '/icons/local_connection.svg' : origin.icon;
   const title = isLocal ? translate('authentication_administration_user_local') : origin.displayName;
 
-  return styled(USER_DETAILS_STYLES)(<StaticImage key={origin.type + origin.subType} icon={icon} title={title} className={className} />);
+  return <StaticImage icon={icon} title={title} className={s(styles, { staticImage: true }, className)} />;
 });
 
-export const Origin: PlaceholderComponent<IUserDetailsInfoProps> = observer(function Origin({ user }) {
+export const UserCredentialsList: PlaceholderComponent<IUserDetailsInfoProps> = observer(function UserCredentialsList({ user }) {
   const translate = useTranslate();
   const usersResource = useService(UsersResource);
   const commonDialogService = useService(CommonDialogService);
@@ -69,7 +63,7 @@ export const Origin: PlaceholderComponent<IUserDetailsInfoProps> = observer(func
   }
 
   return (
-    <>
+    <Fragment key="user-credentials-list">
       {user.origins.map(origin => (
         <div
           key={origin.type + origin.subType}
@@ -77,10 +71,10 @@ export const Origin: PlaceholderComponent<IUserDetailsInfoProps> = observer(func
           className={s(styles, { container: true })}
           onClick={() => onDelete(origin.type, origin.displayName)}
         >
-          <OriginIcon className={s(styles, { originIcon: true })} origin={origin} />
+          <UserCredentials className={s(styles, { originIcon: true })} origin={origin} />
           <Icon className={s(styles, { icon: true })} name="reject" viewBox="0 0 16 16" />
         </div>
       ))}
-    </>
+    </Fragment>
   );
 });

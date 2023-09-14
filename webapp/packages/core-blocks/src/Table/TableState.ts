@@ -51,13 +51,8 @@ export class TableState {
       selectedList: computed,
       expandedList: computed,
       unselect: action,
-      unexpand: action,
+      collapse: action,
     });
-  }
-
-  expand(key: string, value: boolean) {
-    this.expanded.set(key, value);
-    this.onExpand.execute({ key, value });
   }
 
   unselect(key?: Key): Map<string, boolean> {
@@ -76,7 +71,12 @@ export class TableState {
     return this.selected;
   }
 
-  unexpand(key?: Key): Map<string, boolean> {
+  expand(key: string, value: boolean) {
+    this.expanded.set(key, value);
+    this.onExpand.execute({ key, value });
+  }
+
+  collapse(key?: Key): Map<string, boolean> {
     if (key === undefined) {
       this.expanded.clear();
     } else {
@@ -93,7 +93,7 @@ export class TableState {
   }
 
   reset() {
-    this.unexpand();
+    this.collapse();
     this.unselect();
   }
 }

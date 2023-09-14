@@ -55,14 +55,14 @@ export const UsersTable = observer<Props>(function UsersTable({
         {displayAuthRole && <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>}
         <TableColumnHeader>{translate('authentication_user_team')}</TableColumnHeader>
         <TableColumnHeader>{translate('authentication_user_enabled')}</TableColumnHeader>
-        <TableColumnHeader />
+        <TableColumnHeader>{translate('authentication_user_credentials')}</TableColumnHeader>
       </TableHeader>
       <TableBody>
         {users.map(user => (
           <User key={user.userId} user={user} displayAuthRole={displayAuthRole} />
         ))}
         {(loading || users.length === 0) && (
-          <TableItem item="load-more">
+          <TableItem item="empty">
             <TableColumnValue colSpan={colSpan} centerContent flex>
               {translate(loading ? 'ui_processing_loading' : 'authentication_administration_users_empty')}
             </TableColumnValue>

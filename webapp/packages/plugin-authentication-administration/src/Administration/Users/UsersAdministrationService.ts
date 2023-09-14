@@ -16,9 +16,9 @@ import { CreateTeamService } from './Teams/CreateTeamService';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 import { CreateUserService } from './UsersTable/CreateUserService';
 
-const Origin = React.lazy(async () => {
-  const { Origin } = await import('./UsersTable/UserDetailsInfo/Origin');
-  return { default: Origin };
+const UserCredentialsList = React.lazy(async () => {
+  const { UserCredentialsList } = await import('./UsersTable/UserCredentialsList');
+  return { default: UserCredentialsList };
 });
 
 const UsersDrawerItem = React.lazy(async () => {
@@ -75,7 +75,7 @@ export class UsersAdministrationService extends Bootstrap {
       getContentComponent: () => UsersAdministration,
       getDrawerComponent: () => UsersDrawerItem,
     });
-    this.userDetailsInfoPlaceholder.add(Origin, 0);
+    this.userDetailsInfoPlaceholder.add(UserCredentialsList, 0);
   }
 
   load(): void | Promise<void> {}
