@@ -20,6 +20,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.nio.ByteArrayChannel;
 import org.jkiss.dbeaver.model.nio.NIOFileSystemProvider;
+import org.jkiss.dbeaver.model.nio.NIOUtils;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
@@ -33,9 +34,13 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
+
     @NotNull
     private final RMController rmController;
 
@@ -55,7 +60,20 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
 
     @Override
     public FileSystem getFileSystem(URI uri) {
-        return null;
+        validateUri(uri);
+        String projectId = uri.getAuthority();
+        if (CommonUtils.isEmpty(projectId)) {
+            throw new IllegalArgumentException("Project is not specified in URI");
+        }
+        try {
+            RMProject rmProject = rmController.getProject(projectId, false, false);
+            if (rmProject == null) {
+                throw new IllegalArgumentException("Project not exist " + projectId);
+            }
+            return new RMNIOFileSystem(rmProject, rmController, this);
+        } catch (Exception e) {
+            throw new FileSystemNotFoundException("RM file system not found: " + e.getMessage());
+        }
     }
 
     @Override
@@ -75,15 +93,7 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
             if (CommonUtils.isEmpty(resourcePath)) {
                 return new RMPath(rmNioFileSystem);
             } else {
-                var rmResourcePath = rmController.getResourcePath(
-                    rmProject.getId(),
-                    resourcePath
-                );
-
-                return new RMPath(rmNioFileSystem,
-                    Arrays.asList(rmResourcePath).subList(0, rmResourcePath.length - 1),
-                    rmResourcePath[resourcePath.length() - 1]
-                );
+                return new RMPath(rmNioFileSystem, resourcePath);
             }
         } catch (DBException e) {
             throw new RuntimeException(e);
@@ -105,24 +115,25 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
     public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter<? super Path> filter) throws IOException {
         RMPath rmDir = (RMPath) dir;
         String rmDirPath = rmDir.getResourcePath();
-        List<RMResource> parents = new ArrayList<>(rmDir.getParentResources());
-        if (!rmDir.isProject()) {
-            parents.add(rmDir.getRmResource());
-        }
+        String separator = rmDir.getFileSystem().getSeparator();
 
         return new DirectoryStream<>() {
             @Override
             public Iterator<Path> iterator() {
                 var rmController = rmDir.getFileSystem().getRmController();
                 try {
-                    var resources = rmController.listResources(rmDir.getRmProject().getId(),
+                    var resources = rmController.listResources(
+                        rmDir.getRmProject().getId(),
                         rmDirPath,
                         null,
                         false,
                         false,
-                        false);
+                        false
+                    );
                     return Arrays.stream(resources)
-                        .map(rmResource -> (Path) new RMPath(rmDir.getFileSystem(), parents, rmResource))
+                        .map(rmResource -> (Path) new RMPath(rmDir.getFileSystem(),
+                            NIOUtils.resolve(separator, rmDirPath, rmResource.getName())
+                        ))
                         .iterator();
                 } catch (DBException e) {
                     throw new RuntimeException("Failed to read resources from rm path: " + e.getMessage(), e);
@@ -190,7 +201,20 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
 
     @Override
     public FileStore getFileStore(Path path) throws IOException {
-        return ((RMPath) path).getFileStore();
+        RMPath rmPath = (RMPath) path;
+        if (rmPath.isProject()) {
+            return new RMNIOProjectFileStore(rmPath.getRmProject());
+        } else {
+            try {
+                RMResource rmResource = rmController.getResource(rmPath.getRmProject().getId(), rmPath.getResourcePath());
+                if (rmResource == null) {
+                    throw new FileNotFoundException();
+                }
+                return new RMNIOResourceFileStore(rmResource);
+            } catch (DBException e) {
+                throw new IOException("Failed to ");
+            }
+        }
     }
 
     @Override
@@ -210,7 +234,15 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
             if (!rmPath.isProject()) {
                 return type.cast(new RMProjectBasicAttribute(rmPath.getRmProject()));
             } else {
-                return type.cast(new RMResourceBasicAttribute(rmPath.getRmResource()));
+                try {
+                    RMResource rmResource = rmController.getResource(rmPath.getRmProject().getId(), rmPath.getResourcePath());
+                    if (rmResource == null) {
+                        return null;
+                    }
+                    return type.cast(new RMResourceBasicAttribute(rmResource));
+                } catch (DBException e) {
+                    throw new IOException("Failed to read resource attribute: " + e.getMessage(), e);
+                }
             }
         }
         return null;
