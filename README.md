@@ -22,64 +22,40 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
-### CloudBeaver 23.1.5 - 2023-08-21
+### CloudBeaver 23.2.0 - 2023-09-04
 
-- The ability to use custom functions in the Grouping panel has been added;
-- Pagination has been added to the Navigation tree and metadata viewer, allowing working with more than 1000 database items;
-- "Connection Management" tab has been renamed to "Connection Templates" - now only connection templates are displayed;
-- Custom settings have been added to the interface for the following dialogue connections: SQLite, DB2, SQL Server, MySQL, Oracle and PostgreSQL;
-- The ability to rearrange columns in the Data Editor has been added;
-- Different bug fixes and enhancements have been made.
+Changes since 23.1.0
 
-### CloudBeaver 23.1.4 - 2023-08-07
-
-- The SSL option is now available for establishing connections in MySQL and PostgreSQL.
-- The filters for the Navigation tree now allow hiding and showing schemas within the interface.
-- Access permissions can be specified for pre-configured connections via the configuration file.
-- Reverse Proxy authentication now includes the option to provide users' First name and Last name.
-- Trino driver has been upgraded to version 421.
-- Different bug fixes and enhancements have been made.
-
-### CloudBeaver 23.1.3 - 2023-07-24
-
-- Users can simultaneously edit resources, allowing them to work together;
-- We have improved the UX in the search bar - users can delete a query or request by clicking on the cross icon;
-- The search request considers file names and exclude the .sql file extension for now;
-- Different bug fixes and enhancements have been made.
-
-### CloudBeaver 23.1.2 - 2023-07-10
-
-- We have improved the SQL Editor functionality by adding support for displaying tables with nested arrays of objects;
-- The ability to compress files during export allows for faster download speeds, particularly for larger files;
-- New Settings panel displays the product configuration settings such as Minimum fetch size, Maximum fetch size, and Default fetch size from the Data Editor;
-- Different bug fixes and enhancements have been made.
-
-### CloudBeaver 23.1.1 - 2023-06-26
-
-- Connections are consistently displayed now when they are pre-configured into the workspace in the Global Configuration json file.
-- Different bug fixes and enhancements have been made.
-
-### CloudBeaver 23.1.0 - 2023-06-05
-
-Changes since 23.0.0
-
-- Data viewer:
-  - New grouping panel menu was added in the Data Viewer. This panel extracts unique values from the database column for count. Users can drag and drop the column to the grouping panel and get the results immediately. Sorting, filtering and exporting of the results are available on the Grouping panel. 
+- Performance:
+   - Pagination has been added to the Navigation tree and metadata viewer, allowing working with more than 1000 database items;
+- Access Management:
+   - Access permissions can be specified for pre-configured connections via the configuration file;
+   - Reverse Proxy authentication now includes the option to provide users' First name and Last name;
+- Authorization:
+   - The SSL option is now available for establishing connections in MySQL, PostgreSQL, Clickhouse;
+- Connections:
+   - Connections are consistently displayed now when they are pre-configured into the workspace in the Global Configuration json file
+- Navigation tree:
+   - The filters for the Navigation tree now allow hiding and showing schemas within the interface.
+   - The search request considers file names and excludes the .sql file extension for now;
+- Data Editor:
+   - The ability to rearrange columns in the Data Editor has been added;
+   - The ability to use custom functions in the Grouping panel has been added;
+- Administration:
+   - New Settings panel displays the product configuration settings such as Minimum fetch size, Maximum fetch size, and Default fetch size from the Data Editor;
+   - "Connection Management" tab has been renamed to "Connection Templates" - now only connection templates are displayed;
 - SQL Editor:
-  - We improved the performance of the SQL-editor - as a result, handling scripts with up to 10 000 lines does not present any challenges;
-  - In the SQL-editor, pressing Tab/Space followed by Enter now causes the cursor to move to a new line;
-  - In the SQL editor, when the cursor goes back on the query, the previous hints are displayed;
-  - Error when running SQL with semicolon has been fixed.
-- Connections:
-  - If there is an error in saving the data, the tab for the chosen connection dialog will stay open to allow corrections;
-  - The URL-configuration for PostgreSQL now correctly displays only a single database.
+   - Users can simultaneously edit resources for now, allowing them to work together;
+   - Support for displaying tables with nested arrays of objects has been added;
+   - The ability to compress export files allowed to increase in download speed, especially for larger files;
+   - UX in the search bar has been improved  - users can delete a query or request by clicking on the cross icon;
 - Driver management:
-  - The CE version now offers the updated sqlite-jdbc driver, version 3.41.2;
-  - CloudBeaver has the option to connect to H2 database version 2;
-  - The internal CloudBeaver database is upgraded to the newest H2 version 2 to avoid vulnerability issues. The database will be safely upgraded automatically for the servers with default configurations. You can perform this upgrade manually if you have a custom configuration for this database in your infrastructure.
-- Connections:
-  - Option to increase the maximum size of text files displayed in the value panel (using the sqlTextPreviewMaxLength parameter) has been added;
-  - Support for custom logging configuration has been added. An external configuration file can be used instead of the default configuration.
+   - Custom settings have been added to the interface for the following dialogue connections: SQLite, DB2, SQL Server, MySQL, Oracle and PostgreSQL;
+   - Trino driver has been updated;
+- Security:
+   - Password autofill functionality was removed;
+   - The "eye" icon for password fields has been removed - the passwords entered into fields will not be displayed in the interface for now;
+- Many small bug fixes, enhancements, and improvements have been made
 
 
 ### Old CloudBeaver releases

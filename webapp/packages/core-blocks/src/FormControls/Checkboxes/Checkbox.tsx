@@ -16,9 +16,11 @@ import { CheckboxMarkup, CheckboxMod } from './CheckboxMarkup';
 import { CheckboxOnChangeEvent, useCheckboxState } from './useCheckboxState';
 
 export interface CheckboxBaseProps {
+  caption?: string;
   mod?: CheckboxMod[];
   ripple?: boolean;
   indeterminate?: boolean;
+  inverse?: boolean;
   style?: ComponentStyle;
 }
 
@@ -62,6 +64,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   checked,
   defaultChecked,
   children,
+  inverse,
   mod,
   ripple,
   className,
@@ -77,6 +80,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
     defaultChecked,
     state,
     name,
+    inverse,
     onChange,
   });
 

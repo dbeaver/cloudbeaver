@@ -8,18 +8,16 @@
 import { observer } from 'mobx-react-lite';
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { DialogBackdrop } from 'reakit/Dialog';
-import styled from 'reshadow';
 
-import { ErrorBoundary, Loader, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import { ErrorBoundary, Loader, s, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { commonDialogContainerStyles } from './CommonDialog/styles';
 import { CommonDialogService, DialogInternal } from './CommonDialogService';
 import { DialogContext, IDialogContext } from './DialogContext';
-import { dialogStyles } from './styles';
+import style from './DialogsPortal.m.css';
 
 export const DialogsPortal = observer(function DialogsPortal() {
-  const styles = useStyles(dialogStyles);
+  const styles = useS(style);
   const commonDialogService = useService(CommonDialogService);
   const focusedElementRef = useRef<HTMLElement | null>(null);
 
@@ -81,12 +79,12 @@ export const DialogsPortal = observer(function DialogsPortal() {
     };
   }, [activeDialog]);
 
-  return styled(styles)(
-    <Loader suspense overlay>
-      <DialogBackdrop visible={!!activeDialog} onMouseDown={state.backdropClick}>
-        <inner-box>
+  return (
+    <Loader className={s(styles, { loader: true })} suspense overlay>
+      <DialogBackdrop className={s(styles, { backdrop: true })} visible={!!activeDialog} onMouseDown={state.backdropClick}>
+        <div className={s(styles, { innerBox: true })}>
           {commonDialogService.dialogs.map((dialog, i, arr) => (
-            <ErrorBoundary key={dialog.id} styles={commonDialogContainerStyles} remount onClose={state.reject}>
+            <ErrorBoundary key={dialog.id} className={s(styles, { error: true })} remount onClose={state.reject}>
               <NestedDialog
                 key={dialog.id}
                 visible={i === arr.length - 1}
@@ -96,9 +94,9 @@ export const DialogsPortal = observer(function DialogsPortal() {
               />
             </ErrorBoundary>
           ))}
-        </inner-box>
+        </div>
       </DialogBackdrop>
-    </Loader>,
+    </Loader>
   );
 });
 

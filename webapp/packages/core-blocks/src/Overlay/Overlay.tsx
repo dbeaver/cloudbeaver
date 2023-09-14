@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { use } from 'reshadow';
 
-import { OVERLAY_BASE_STYLES } from './OVERLAY_BASE_STYLES';
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './Overlay.m.css';
 
 interface Props {
   active?: boolean;
@@ -17,13 +18,11 @@ interface Props {
 }
 
 export const Overlay = observer<React.PropsWithChildren<Props>>(function Overlay({ active, fill, className, children }) {
-  if (!active) {
-    return null;
-  }
+  const styles = useS(style);
 
-  return styled(OVERLAY_BASE_STYLES)(
-    <overlay className={className} {...use({ active, fill })}>
-      <box>{children}</box>
-    </overlay>,
+  return (
+    <div className={s(styles, { overlay: true, active, fill }, className)}>
+      <div className={s(styles, { box: true })}>{children}</div>
+    </div>
   );
 });

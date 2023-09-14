@@ -48,6 +48,9 @@ const checkboxStyles = css`
     composes: theme-typography--body2 from global;
     cursor: pointer;
   }
+  checkbox-caption {
+    composes: theme-text-text-hint-on-light theme-typography--caption from global;
+  }
 `;
 
 const checkboxMod: Record<CheckboxMod, any> = {
@@ -93,6 +96,7 @@ const checkboxState = {
 
 interface ICheckboxMarkupProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'style'> {
   label?: string;
+  caption?: string;
   indeterminate?: boolean;
   ripple?: boolean;
   mod?: CheckboxMod[];
@@ -111,6 +115,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
   ripple = true,
   style,
   readOnly,
+  caption,
   ...rest
 }) {
   const styles = useS(CheckboxMarkupStyles);
@@ -145,6 +150,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
       {label && (id || rest.name) && (
         <checkbox-label as="label" htmlFor={id || rest.name}>
           {label}
+          {caption && <checkbox-caption>{caption}</checkbox-caption>}
         </checkbox-label>
       )}
     </checkbox-container>,

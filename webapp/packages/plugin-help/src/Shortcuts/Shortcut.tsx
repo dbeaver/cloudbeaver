@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import React from 'react';
 import styled, { css } from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-blocks';
@@ -51,10 +52,10 @@ export const Shortcut: React.FC<Props> = function Shortcut({ shortcut }) {
       <shortcut-label>{translate(shortcut.label)}</shortcut-label>
       <shortcut-content>
         {shortcut.code.map((code, index) => (
-          <>
+          <React.Fragment key={code}>
             {index > 0 && <span>{translate('ui_or')}</span>}
             <shortcut-code>{code}</shortcut-code>
-          </>
+          </React.Fragment>
         ))}
       </shortcut-content>
     </shortcut-container>,

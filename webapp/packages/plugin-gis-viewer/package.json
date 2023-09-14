@@ -33,8 +33,8 @@
     "reshadow": "~0.x.x"
   },
   "devDependencies": {
-    "@types/leaflet": "^1.9.3",
+    "@types/leaflet": "^1.9.4",
     "@types/react-leaflet": "~3.0.0",
-    "@types/wellknown": "~0.5.4"
+    "@types/wellknown": "~0.5.5"
   }
 }

@@ -35,6 +35,7 @@ export * from './DataContext/DataContext';
 export * from './DataContext/DynamicDataContext';
 export * from './DataContext/IDataContext';
 export * from './DataContext/IDataContextProvider';
+export * from './DataContext/TempDataContext';
 export * from './DataContext/useDataContext';
 export * from './DataContext/useDynamicDataContext';
 export * from './LoadableStateContext/DATA_CONTEXT_LOADABLE_STATE';

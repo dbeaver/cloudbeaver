@@ -1,0 +1,40 @@
+.wrapper {
+  min-height: 520px !important;
+  max-height: max(100vh - 48px, 520px) !important;
+}
+.submittingForm {
+  overflow: auto;
+  margin: auto;
+}
+.submittingForm,
+.authProviderForm {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.tabList {
+  composes: theme-background-surface theme-text-on-surface from global;
+  justify-content: center;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.tab {
+  &:global([aria-selected='true']) {
+    font-weight: 500 !important;
+  }
+}
+.authProviderForm {
+  flex-direction: column;
+  padding: 18px 24px;
+}
+.configurationsList {
+  overflow: auto;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  max-height: 400px;
+}
+.errorMessage {
+  composes: theme-background-secondary theme-text-on-secondary from global;
+  flex: 1;
+}

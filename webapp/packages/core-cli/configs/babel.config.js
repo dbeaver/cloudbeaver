@@ -61,6 +61,7 @@ module.exports = api => {
       [
         '@babel/preset-react',
         {
+          development: devMode,
           runtime: 'automatic',
         },
       ],

@@ -17,6 +17,7 @@ export type CheckboxStateOptions<TKey extends string> = {
   defaultValue: string | undefined;
   checked: boolean | undefined;
   defaultChecked: boolean | undefined;
+  inverse: boolean | undefined;
 } & (
   | {
       state: undefined;
@@ -56,12 +57,20 @@ export function useCheckboxState<TKey extends string>(options: CheckboxStateOpti
     }
   }
 
+  if (options.inverse) {
+    checked = !checked;
+  }
+
   return useObjectRef<ICheckboxState>(
     () => ({
       checked,
       change(event: React.ChangeEvent<HTMLInputElement>) {
-        const { state, name, value, onChange, count, context } = optionsRef;
-        const checked = event.target.checked;
+        const { inverse, state, name, value, onChange, count, context } = optionsRef;
+        let checked = event.target.checked;
+
+        if (inverse) {
+          checked = !checked;
+        }
 
         if (state !== undefined && name !== undefined) {
           const currentState = state[name as TKey];

@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useDeferredValue, useEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { getComputed, TreeNode, useStyles } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNode, useMergeRefs, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { useDNDData } from '@cloudbeaver/core-ui';
@@ -63,6 +63,8 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     },
   });
 
+  const controlRef = useMergeRefs(navNode.ref, dndData.setTargetRef);
+
   const dndBox = useNavTreeDropBox(node, {
     expanded: navNode.expanded,
     expand: navNode.expand,
@@ -73,12 +75,6 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
 
   if (navNode.leaf || !navNode.loaded) {
     externalExpanded = false;
-  }
-
-  function setRef(refObj: HTMLDivElement | null) {
-    //@ts-expect-error ignore
-    navNode.ref.current = refObj;
-    dndData.setTargetRef(refObj);
   }
 
   const hasNodes = getComputed(() => !!dndBox.state.context && dndBox.state.canDrop && dndBox.state.isOverCurrent);
@@ -112,7 +108,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     >
       {/* <DNDPreview data={dndData} src="/icons/empty.svg" /> */}
       <NavigationNodeControlRenderer
-        ref={setRef}
+        ref={controlRef}
         navNode={navNode}
         dragging={dndData.state.isDragging}
         control={externalControl}
