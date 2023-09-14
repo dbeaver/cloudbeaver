@@ -13,7 +13,6 @@ import { AuthConfigurationsAdministrationService } from './Administration/Identi
 import { CreateAuthConfigurationService } from './Administration/IdentityProviders/CreateAuthConfigurationService';
 import { AuthConfigurationOptionsTabService } from './Administration/IdentityProviders/Options/AuthConfigurationOptionsTabService';
 import { ServerConfigurationAuthenticationBootstrap } from './Administration/ServerConfiguration/ServerConfigurationAuthenticationBootstrap';
-import { CreateMetaParameterService } from './Administration/Users/MetaParameters/CreateMetaParameterService';
 import { CreateTeamService } from './Administration/Users/Teams/CreateTeamService';
 import { GrantedConnectionsTabService } from './Administration/Users/Teams/GrantedConnections/GrantedConnectionsTabService';
 import { GrantedUsersTabService } from './Administration/Users/Teams/GrantedUsers/GrantedUsersTabService';
@@ -43,7 +42,6 @@ export const manifest: PluginManifest = {
     UsersAdministrationNavigationService,
     ServerConfigurationAuthenticationBootstrap,
     UserFormService,
-    CreateMetaParameterService,
     UserFormBaseBootstrap,
     AuthConfigurationsAdministrationService,
     CreateAuthConfigurationService,
