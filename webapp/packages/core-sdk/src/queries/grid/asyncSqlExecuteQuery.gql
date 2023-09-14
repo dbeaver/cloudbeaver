@@ -5,6 +5,7 @@ mutation asyncSqlExecuteQuery(
     $resultId: ID
     $filter: SQLDataFilter
     $dataFormat: ResultDataFormat
+    $readLogs: Boolean
 ) {
     taskInfo: asyncSqlExecuteQuery(
         connectionId: $connectionId
@@ -13,7 +14,7 @@ mutation asyncSqlExecuteQuery(
         resultId: $resultId
         filter: $filter
         dataFormat: $dataFormat
-        readLogs: true
+        readLogs: $readLogs
     ) {
         ...AsyncTaskInfo
     }

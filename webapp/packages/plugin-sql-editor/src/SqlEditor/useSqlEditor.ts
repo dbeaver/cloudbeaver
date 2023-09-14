@@ -25,6 +25,7 @@ import { SqlDialectInfoService } from '../SqlDialectInfoService';
 import { SqlEditorService } from '../SqlEditorService';
 import { ISQLScriptSegment, SQLParser } from '../SQLParser';
 import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
+import { OUTPUT_LOGS_TAB_ID } from '../SqlResultTabs/OutputLogs/OUTPUT_LOGS_TAB_ID';
 import { OutputLogsService } from '../SqlResultTabs/OutputLogs/OutputLogsService';
 import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
@@ -316,9 +317,11 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
 
         if (this.state.tabs.length) {
+          const processableTabs = this.state.tabs.filter(tab => tab.id !== OUTPUT_LOGS_TAB_ID);
+
           const result = await this.commonDialogService.open(ConfirmationDialog, {
             title: 'sql_editor_close_result_tabs_dialog_title',
-            message: `Do you want to close ${this.state.tabs.length} tabs before executing script?`,
+            message: `Do you want to close ${processableTabs.length} tabs before executing script?`,
             confirmActionText: 'ui_yes',
             extraStatus: 'no',
           });
@@ -329,8 +332,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
             if (!state) {
               return;
             }
-
-            this.sqlResultTabsService.removeResultTabs(this.state);
+            
+            this.sqlResultTabsService.removeResultTabs(this.state, [OUTPUT_LOGS_TAB_ID]);
           } else if (result === DialogueStateResult.Rejected) {
             return;
           }

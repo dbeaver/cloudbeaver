@@ -10,33 +10,39 @@ import { action, computed, observable } from 'mobx';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import type { WsOutputLogInfo } from '@cloudbeaver/core-sdk';
 
+import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
+
 export interface SqlOutputLogsPanelState {
   searchValue: string;
   setSearchValue: (value: string) => void;
   logMessages: WsOutputLogInfo['message'][];
-  selectedLogTypes: OutputLogType[];
+  selectedLogTypes: IOutputLogType[];
   readonly resultValue: string;
-  setSelectedLogTypes: (value: OutputLogType[]) => void;
+  setSelectedLogTypes: (value: IOutputLogType[]) => void;
   readonly filteredLogs: WsOutputLogInfo[];
 }
 
 export const OUTPUT_LOG_TYPES = ['Debug', 'Log', 'Info', 'Notice', 'Warning', 'Error'] as const;
-export type OutputLogType = (typeof OUTPUT_LOG_TYPES)[number];
+export type IOutputLogType = (typeof OUTPUT_LOG_TYPES)[number];
 
-export const useOutputLogsPanelState = (outputLogs: WsOutputLogInfo[]) =>
+export const useOutputLogsPanelState = (outputLogs: WsOutputLogInfo[], sqlEditorTabState: ISqlEditorTabState) =>
   useObservableRef<SqlOutputLogsPanelState>(
     () => ({
       searchValue: '',
-      selectedLogTypes: [...OUTPUT_LOG_TYPES],
+      get selectedLogTypes() {
+        return sqlEditorTabState.outputLogsTab?.selectedLogTypes || [];
+      },
       setSearchValue(value: string) {
         this.searchValue = value;
       },
-      setSelectedLogTypes(value: OutputLogType[]) {
-        this.selectedLogTypes = value;
+      setSelectedLogTypes(value: IOutputLogType[]) {
+        if (sqlEditorTabState.outputLogsTab) {
+          sqlEditorTabState.outputLogsTab.selectedLogTypes = value;
+        }
       },
       get filteredLogs() {
         return outputLogs.filter(log => {
-          if (this.selectedLogTypes.length > 0 && !this.selectedLogTypes.includes(log?.severity as OutputLogType)) {
+          if (this.selectedLogTypes.length > 0 && !this.selectedLogTypes.includes(log?.severity as IOutputLogType)) {
             return false;
           }
           if (this.searchValue.length > 0 && !log?.message?.includes(this.searchValue)) {
@@ -51,7 +57,7 @@ export const useOutputLogsPanelState = (outputLogs: WsOutputLogInfo[]) =>
     }),
     {
       searchValue: observable.ref,
-      selectedLogTypes: observable.ref,
+      selectedLogTypes: computed,
       setSearchValue: action.bound,
       setSelectedLogTypes: action.bound,
       filteredLogs: computed,

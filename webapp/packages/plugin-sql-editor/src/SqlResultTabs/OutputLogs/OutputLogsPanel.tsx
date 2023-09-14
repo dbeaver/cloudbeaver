@@ -28,7 +28,7 @@ export const OutputLogsPanel = observer<Props>(function SqlOutputLogsPanel({ sql
   const { data } = useResource(SqlOutputLogsPanel, OutputLogsResource, undefined);
   const outputLogs = outputLogsService.getOutputLogs(data, sqlEditorTabState);
 
-  const state = useOutputLogsPanelState(outputLogs);
+  const state = useOutputLogsPanelState(outputLogs, sqlEditorTabState);
 
   return (
     <div className={s(styles, { container: true })}>

@@ -5,28 +5,59 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { ConnectionExecutionContextResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerEventId } from '@cloudbeaver/core-root';
-import { CachedDataResource, CbDatabaseOutputLogEvent, GraphQLService } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, CbDatabaseOutputLogEvent } from '@cloudbeaver/core-sdk';
 
 import { OutputLogsEventHandler } from './OutputLogsEventHandler';
 
+export interface IOutputLog {
+  message: string;
+  severity: string;
+  contextId: string;
+  timestamp: number;
+}
+
 @injectable()
-export class OutputLogsResource extends CachedDataResource<CbDatabaseOutputLogEvent[]> {
-  constructor(sqlOutputLogsEventHandler: OutputLogsEventHandler, private readonly graphQLService: GraphQLService) {
+export class OutputLogsResource extends CachedDataResource<IOutputLog[]> {
+  constructor(
+    sqlOutputLogsEventHandler: OutputLogsEventHandler,
+    private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
+  ) {
     super(() => []);
 
     sqlOutputLogsEventHandler.onEvent(
       ServerEventId.CbDatabaseOutputLogUpdated,
       (event: CbDatabaseOutputLogEvent) => {
-        this.setData((this.data || []).concat(event));
+        this.collectMessagesFromEvent(event);
       },
       undefined,
       this,
     );
+
+    // hack, we need to call this.use() to initialize resource at startup
+    this.use(undefined);
+
+    this.connectionExecutionContextResource.onItemDelete.addHandler(key => {
+      this.setData(this.data.filter(log => log.contextId !== key));
+    });
   }
 
-  protected async loader(): Promise<CbDatabaseOutputLogEvent[]> {
+  private collectMessagesFromEvent(event: CbDatabaseOutputLogEvent) {
+    const newLogs = event.messages.map(message => ({
+      message: message.message,
+      severity: message.severity,
+      contextId: event.contextId,
+      timestamp: event.eventTimestamp,
+    })) as IOutputLog[];
+
+    const updatedData: IOutputLog[] = (this.data || []).concat(newLogs);
+
+    this.setData(updatedData);
+  }
+
+  protected async loader(): Promise<IOutputLog[]> {
     return this.data;
   }
 }

@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { ISessionEvent, SessionEventSource, SessionEventTopic, TopicEventHandler } from '@cloudbeaver/core-root';
-import type { CbSessionLogEvent as ISessionLogEvent } from '@cloudbeaver/core-sdk';
+import type { CbDatabaseOutputLogEvent, CbSessionLogEvent as ISessionLogEvent } from '@cloudbeaver/core-sdk';
 
 export { type ISessionLogEvent };
 
@@ -17,7 +17,7 @@ export class OutputLogsEventHandler extends TopicEventHandler<ISessionLogEvent, 
     super(SessionEventTopic.CbDatabaseOutputLog, sessionEventSource);
   }
 
-  map(event: any) {
+  map(event: CbDatabaseOutputLogEvent) {
     return event;
   }
 }

@@ -11,6 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 
 import type { ISqlEditorResultTab, ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlExecutionPlanService } from './ExecutionPlan/SqlExecutionPlanService';
+import { OutputLogsService } from './OutputLogs/OutputLogsService';
 import { SqlQueryResultService } from './SqlQueryResultService';
 import { SqlQueryService } from './SqlQueryService';
 
@@ -20,6 +21,7 @@ export class SqlResultTabsService {
     private readonly sqlQueryService: SqlQueryService,
     private readonly sqlQueryResultService: SqlQueryResultService,
     private readonly sqlExecutionPlanService: SqlExecutionPlanService,
+    private readonly sqlOutputLogsService: OutputLogsService,
   ) {
     makeObservable(this, {
       removeResultTabs: action,
@@ -62,8 +64,10 @@ export class SqlResultTabsService {
     return true;
   }
 
-  removeResultTabs(state: ISqlEditorTabState): void {
-    for (const tab of state.tabs.slice()) {
+  removeResultTabs(state: ISqlEditorTabState, excludedTabIds?: string[]): void {
+    const notExcludedTabs = state.tabs.filter(tab => !excludedTabIds?.includes(tab.id));
+
+    for (const tab of notExcludedTabs) {
       this.removeTab(state, tab);
     }
   }
@@ -74,6 +78,7 @@ export class SqlResultTabsService {
     this.sqlQueryService.removeStatisticsTab(state, tab.id);
     this.sqlQueryResultService.removeResultTab(state, tab.id);
     this.sqlExecutionPlanService.removeExecutionPlanTab(state, tab.id);
+    this.sqlOutputLogsService.removeOutputLogsTab(state, tab.id);
 
     if (state.currentTabId === tab.id) {
       if (state.tabs.length > 0) {

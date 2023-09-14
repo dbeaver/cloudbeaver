@@ -6,62 +6,98 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import type { CbDatabaseOutputLogEvent } from '@cloudbeaver/core-sdk';
+import { ActionService, MenuService } from '@cloudbeaver/core-view';
 
+import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../../DATA_CONTEXT_SQL_EDITOR_STATE';
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
+import { ESqlDataSourceFeatures } from '../../SqlDataSource/ESqlDataSourceFeatures';
 import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService';
+import { SQL_EDITOR_ACTIONS_MENU } from '../../SqlEditor/SQL_EDITOR_ACTIONS_MENU';
+import { ACTION_SHOW_OUTPUT_LOGS } from './ACTION_SHOW_OUTPUT_LOGS';
+import { OUTPUT_LOGS_TAB_ID } from './OUTPUT_LOGS_TAB_ID';
+import type { IOutputLog } from './OutputLogsResource';
+import { OUTPUT_LOG_TYPES } from './useOutputLogsPanelState';
 
 @injectable()
 export class OutputLogsService {
-  constructor(private readonly sqlDataSourceService: SqlDataSourceService) {}
+  constructor(
+    private readonly sqlDataSourceService: SqlDataSourceService,
+    private readonly actionService: ActionService,
+    private readonly menuService: MenuService,
+  ) {
+    this.registerOutputLogsAction();
+  }
+
+  private registerOutputLogsAction() {
+    this.actionService.addHandler({
+      id: 'output-logs-handler',
+      isActionApplicable: (context, action): boolean => {
+        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+
+        if (state && action === ACTION_SHOW_OUTPUT_LOGS) {
+          const sqlDataSource = this.sqlDataSourceService.get(state.editorId);
+          const isQuery = sqlDataSource?.hasFeature(ESqlDataSourceFeatures.query);
+          const isExecutable = sqlDataSource?.hasFeature(ESqlDataSourceFeatures.executable);
+
+          if (isQuery && isExecutable) {
+            return true;
+          }
+        }
+
+        return false;
+      },
+
+      handler: async (context, action) => {
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+
+        if (action === ACTION_SHOW_OUTPUT_LOGS) {
+          this.showOutputLogs(state);
+        }
+      },
+    });
+
+    this.menuService.addCreator({
+      menus: [SQL_EDITOR_ACTIONS_MENU],
+      getItems: (context, items) => [...items, ACTION_SHOW_OUTPUT_LOGS],
+    });
+  }
 
   async showOutputLogs(editorState: ISqlEditorTabState): Promise<void> {
-    const tabId = this.createOutputLogsTab(editorState);
-    editorState.currentTabId = tabId;
+    this.createOutputLogsTab(editorState);
+    editorState.currentTabId = OUTPUT_LOGS_TAB_ID;
   }
 
   removeOutputLogsTab(state: ISqlEditorTabState, tabId: string): void {
-    const outputLogsTab = state.tabs.find(outputLogsTab => outputLogsTab.id === tabId);
-
-    if (outputLogsTab) {
-      state.tabs.splice(state.tabs.indexOf(outputLogsTab), 1);
+    if (tabId === OUTPUT_LOGS_TAB_ID) {
+      state.outputLogsTab = undefined;
     }
   }
 
   private createOutputLogsTab(state: ISqlEditorTabState) {
-    const dataSource = this.sqlDataSourceService.get(state.editorId);
-    if (!dataSource) {
-      throw new Error('SQL Data Source is not provided');
-    }
-
-    const id = 'output-logs';
     const order = Math.max(0, ...state.tabs.map(tab => tab.order + 1));
 
-    if (state.tabs.find(tab => tab.id === id)) {
+    if (state.tabs.find(tab => tab.id === OUTPUT_LOGS_TAB_ID)) {
       return;
     }
 
-    state.outputLogsTab = {
-      tabId: id,
+    if (state.outputLogsTab) {
+      return;
+    }
+
+    const tab = {
+      id: OUTPUT_LOGS_TAB_ID,
+      name: 'Output',
+      icon: 'table-icon',
       order,
     };
 
-    state.tabs.push({
-      id,
-      name: 'Output',
-      icon: 'execution-plan-tab', // todo change icon
-      order,
-    });
-
-    return id;
+    state.outputLogsTab = { ...tab, selectedLogTypes: [...OUTPUT_LOG_TYPES] };
+    state.tabs.push({ ...tab });
   }
 
-  getOutputLogs(events: CbDatabaseOutputLogEvent[], editorState: ISqlEditorTabState) {
+  getOutputLogs(events: IOutputLog[], editorState: ISqlEditorTabState) {
     const dataSource = this.sqlDataSourceService.get(editorState.editorId);
 
-    return events
-      .filter(event => event.contextId === dataSource?.executionContext?.id)
-      .map(event => event.messages)
-      .flat();
+    return events.filter(event => event.contextId === dataSource?.executionContext?.id);
   }
 }

@@ -9,14 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import {
-  getComputed,
-  preventFocusHandler,
-  StaticImage,
-  useResource,
-  useSplit,
-  useTranslate
-} from '@cloudbeaver/core-blocks';
+import { getComputed, preventFocusHandler, StaticImage, useSplit, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
@@ -29,7 +22,6 @@ import type { ISqlEditorProps } from './ISqlEditorProps';
 import { SqlEditorActionsMenu } from './SqlEditorActionsMenu';
 import { SqlEditorTools } from './SqlEditorTools';
 import { useSqlEditor } from './useSqlEditor';
-import { OutputLogsResource } from '../SqlResultTabs/OutputLogs/OutputLogsResource';
 
 const styles = css`
   button,
@@ -117,7 +109,6 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   const sqlEditorModeService = useService(SqlEditorModeService);
   const data = useSqlEditor(state);
   const [modesState] = useState(() => new MetadataMap<string, any>());
-  useResource(SqlEditor, OutputLogsResource, undefined);
 
   useMemo(() => {
     modesState.sync(state.modeState);
@@ -194,10 +185,6 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
                     <StaticImage icon="/icons/sql_execution_plan.svg" />
                   </button>
                 )}
-                {/*TODO update icon*/}
-                <button disabled={disabled} title={translate('sql_editor_output_logs_button_tooltip')} onClick={data.showOutputLogs}>
-                  <StaticImage icon="/icons/sql_execution_plan.svg" />
-                </button>
               </>
             )}
             <SqlEditorActionsMenu state={state} />
