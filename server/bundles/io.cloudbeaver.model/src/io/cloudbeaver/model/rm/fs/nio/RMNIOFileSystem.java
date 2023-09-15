@@ -17,6 +17,9 @@
 package io.cloudbeaver.model.rm.fs.nio;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.nio.NIOFileSystem;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
@@ -24,6 +27,7 @@ import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileStore;
@@ -32,12 +36,22 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.List;
 
 public class RMNIOFileSystem extends NIOFileSystem {
-    private final RMProject rmProject;
+    private static final Log log = Log.getLog(RMNIOFileSystem.class);
+    @NotNull
+    private final String rmProjectId;
+    @NotNull
     private final RMController rmController;
+    @NotNull
     private final RMNIOFileSystemProvider rmNioFileSystemProvider;
+    @Nullable
+    private RMProject rmProject;
 
-    public RMNIOFileSystem(RMProject rmProject, RMController rmController, RMNIOFileSystemProvider rmNioFileSystemProvider) {
-        this.rmProject = rmProject;
+    public RMNIOFileSystem(
+        @NotNull String rmProjectId,
+        @NotNull RMController rmController,
+        @NotNull RMNIOFileSystemProvider rmNioFileSystemProvider
+    ) {
+        this.rmProjectId = rmProjectId;
         this.rmController = rmController;
         this.rmNioFileSystemProvider = rmNioFileSystemProvider;
     }
@@ -59,7 +73,11 @@ public class RMNIOFileSystem extends NIOFileSystem {
 
     @Override
     public boolean isReadOnly() {
-        return rmProject.hasProjectPermission(RMProjectPermission.RESOURCE_EDIT.getPermissionId());
+        try {
+            return getRmProject().hasProjectPermission(RMProjectPermission.RESOURCE_EDIT.getPermissionId());
+        } catch (IOException e) {
+            return true;
+        }
     }
 
     @Override
@@ -69,9 +87,15 @@ public class RMNIOFileSystem extends NIOFileSystem {
 
     @Override
     public Iterable<FileStore> getFileStores() {
-        return List.of(new RMNIOProjectFileStore(rmProject));
+        try {
+            return List.of(new RMNIOProjectFileStore(getRmProject()));
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+        return List.of();
     }
 
+    @NotNull
     @Override
     public Path getPath(@NotNull String first, @NotNull String... more) {
         if (CommonUtils.isEmpty(first)) {
@@ -81,7 +105,7 @@ public class RMNIOFileSystem extends NIOFileSystem {
         uriBuilder.append(
                 provider().getScheme()
             ).append("://")
-            .append(rmProject.getId())
+            .append(rmProjectId)
             .append(getSeparator())
             .append(first);
         if (!ArrayUtils.isEmpty(more)) {
@@ -92,11 +116,30 @@ public class RMNIOFileSystem extends NIOFileSystem {
         return provider().getPath(URI.create(uriBuilder.toString()));
     }
 
+    @NotNull
     public RMController getRmController() {
         return rmController;
     }
 
-    public RMProject getProject() {
-        return rmProject;
+    @NotNull
+    public String getRmProjectId() {
+        return rmProjectId;
+    }
+
+    @NotNull
+    public synchronized RMProject getRmProject() throws IOException {
+        if (rmProject != null) {
+            return rmProject;
+        }
+        try {
+            RMProject project = rmController.getProject(getRmProjectId(), false, false);
+            if (project == null) {
+                throw new FileNotFoundException("Project not exist: " + getRmProjectId());
+            }
+            rmProject = project;
+            return rmProject;
+        } catch (DBException e) {
+            throw new IOException("Failed to get project:" + e.getMessage(), e);
+        }
     }
 }

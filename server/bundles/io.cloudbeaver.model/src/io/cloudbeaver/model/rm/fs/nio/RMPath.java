@@ -19,7 +19,6 @@ package io.cloudbeaver.model.rm.fs.nio;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.nio.NIOPath;
-import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
@@ -31,24 +30,23 @@ import java.util.Arrays;
 public class RMPath extends NIOPath {
     @NotNull
     private final RMNIOFileSystem rmNioFileSystem;
-    @NotNull
-    private final RMProject rmProject;
+    private final String rmProjectId;
 
     public RMPath(
         @NotNull RMNIOFileSystem rmNioFileSystem
     ) {
-        super(null);
+        super(null, rmNioFileSystem);
         this.rmNioFileSystem = rmNioFileSystem;
-        this.rmProject = rmNioFileSystem.getProject();
+        this.rmProjectId = rmNioFileSystem.getRmProjectId();
     }
 
     public RMPath(
         @NotNull RMNIOFileSystem rmNioFileSystem,
         @NotNull String path
     ) {
-        super(path);
+        super(path, rmNioFileSystem);
         this.rmNioFileSystem = rmNioFileSystem;
-        this.rmProject = rmNioFileSystem.getProject();
+        this.rmProjectId = rmNioFileSystem.getRmProjectId();
     }
 
     @Override
@@ -58,6 +56,9 @@ public class RMPath extends NIOPath {
 
     @Override
     public Path getRoot() {
+        if (isProjectPath()) {
+            return null;
+        }
         return new RMPath(rmNioFileSystem);
     }
 
@@ -69,7 +70,7 @@ public class RMPath extends NIOPath {
     @Override
     public Path getParent() {
         // project is root and have no parent
-        if (isProject()) {
+        if (isProjectPath()) {
             return null;
         }
 
@@ -103,7 +104,7 @@ public class RMPath extends NIOPath {
     @Override
     public Path resolve(Path other) {
         RMPath rmOther = (RMPath) other;
-        if (!rmOther.rmProject.getId().equals(rmProject.getId())) {
+        if (!rmOther.rmProjectId.equals(rmProjectId)) {
             throw new IllegalArgumentException("Cannot resolve path from other project");
         }
         return resolve(rmOther.getResourcePath());
@@ -125,7 +126,7 @@ public class RMPath extends NIOPath {
         var fileSystem = getFileSystem();
         var uriBuilder = new StringBuilder(fileSystem.provider().getScheme())
             .append("://")
-            .append(rmProject.getId());
+            .append(rmProjectId);
 
         String rmResourcePath = getResourcePath();
         if (rmResourcePath != null) {
@@ -150,6 +151,12 @@ public class RMPath extends NIOPath {
     }
 
     @Override
+    public Path relativize(@NotNull Path other) {
+        var relativeUri = toUri().resolve(other.toUri());
+        return new RMPath(rmNioFileSystem, relativeUri.getPath());
+    }
+
+    @Override
     public Path getName(int index) {
         String[] parts = pathParts();
         if (index < 0 || index > parts.length) {
@@ -170,7 +177,7 @@ public class RMPath extends NIOPath {
         }
 
         String[] subParts = Arrays.copyOfRange(parts, beginIndex, endIndex);
-        
+
         return new RMPath(rmNioFileSystem, String.join(getFileSystem().getSeparator(), subParts));
     }
 
@@ -179,12 +186,12 @@ public class RMPath extends NIOPath {
         return path;
     }
 
-    public boolean isProject() {
+    public boolean isProjectPath() {
         return CommonUtils.isEmpty(path);
     }
 
     @NotNull
-    public RMProject getRmProject() {
-        return rmProject;
+    public String getRmProjectId() {
+        return rmProjectId;
     }
 }
