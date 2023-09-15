@@ -9,18 +9,13 @@ import { injectable } from '@cloudbeaver/core-di';
 
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
 import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService';
-import { IOutputLogType, OUTPUT_LOG_TYPES } from './IOutputLogTypes';
+import { OUTPUT_LOG_TYPES } from './IOutputLogTypes';
 import { OUTPUT_LOGS_TAB_ID } from './OUTPUT_LOGS_TAB_ID';
 import type { IOutputLog } from './OutputLogsResource';
 
 @injectable()
 export class OutputLogsService {
   constructor(private readonly sqlDataSourceService: SqlDataSourceService) {}
-  setSelectedLogTypes(state: ISqlEditorTabState, logType: IOutputLogType) {
-    if (state.outputLogsTab) {
-      state.outputLogsTab.selectedLogTypes = state.outputLogsTab.selectedLogTypes.filter(type => type !== logType);
-    }
-  }
 
   async showOutputLogs(editorState: ISqlEditorTabState): Promise<void> {
     this.createOutputLogsTab(editorState);

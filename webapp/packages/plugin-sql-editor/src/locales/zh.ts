@@ -8,6 +8,7 @@ export default [
   ['sql_editor_hint_empty', 'There is no proposals...'],
   ['sql_editor_execution_plan_button_tooltip', '解释执行计划（Shift + Ctrl + E）'],
   ['sql_editor_output_logs_button_tooltip', 'Show server output (Shift + Ctrl + O)'],
+  ['sql_editor_output_logs_tab_title', 'Output'],
   ['sql_editor_output_logs_input_placeholder', 'Enter a part of a message to search for here'],
   ['sql_editor_sql_execution_button_tooltip', '执行SQL语句（Ctrl + Enter）'],
   ['sql_editor_sql_execution_new_tab_button_tooltip', '在新选项卡中执行SQL语句（Ctrl + \\）（Shift + Ctrl + Enter）'],
