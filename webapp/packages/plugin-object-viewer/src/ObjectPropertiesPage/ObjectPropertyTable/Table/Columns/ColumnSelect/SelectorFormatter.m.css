@@ -6,7 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import "@cloudbeaver/core-theming/src/styles/theme-light";
-@import "base-common-dialog";
-
-@include base-common-dialog;
+.container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.checkbox {
+  margin-left: -10px;
+  margin-right: -10px;
+}

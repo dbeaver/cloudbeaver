@@ -6,13 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-blocks';
+import { s, useS } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
-import { dialogStyles } from '../styles';
-import { commonDialogBaseStyle, commonDialogThemeStyle } from './styles';
+import styles from './CommonDialogBody.m.css';
 
 interface Props {
   noBodyPadding?: boolean;
@@ -23,12 +21,14 @@ interface Props {
 }
 
 export const CommonDialogBody = observer<Props>(function CommonDialogBody({ noBodyPadding, noOverflow, className, children, style }) {
-  return styled(useStyles(commonDialogThemeStyle, commonDialogBaseStyle, dialogStyles, style))(
-    <dialog-body className={className} {...use({ 'no-padding': noBodyPadding, 'no-overflow': noOverflow })}>
-      <dialog-body-overflow-box>
-        <dialog-body-content>{children}</dialog-body-content>
-        {!noOverflow && <dialog-body-overflow />}
-      </dialog-body-overflow-box>
-    </dialog-body>,
+  const computedStyles = useS(styles, style);
+
+  return (
+    <div className={s(computedStyles, { body: true, noBodyPadding, noOverflow }, className)}>
+      <div className={s(computedStyles, { dialogBodyOverflowBox: true })}>
+        <div className={s(computedStyles, { dialogBodyContent: true })}>{children}</div>
+        {!noOverflow && <div className={s(computedStyles, { dialogBodyOverflow: true })} />}
+      </div>
+    </div>
   );
 });

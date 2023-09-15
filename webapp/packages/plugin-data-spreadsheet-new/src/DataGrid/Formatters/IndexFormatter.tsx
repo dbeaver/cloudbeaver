@@ -8,11 +8,11 @@
 import { useContext } from 'react';
 
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
-import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
+import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { CellContext } from '../CellRenderer/CellContext';
 
-export const IndexFormatter: React.FC<FormatterProps<IResultSetRowKey>> = function IndexFormatter(props) {
+export const IndexFormatter: React.FC<RenderCellProps<IResultSetRowKey>> = function IndexFormatter(props) {
   const context = useContext(CellContext);
 
   return <div>{context.position.rowIdx + 1}</div>;

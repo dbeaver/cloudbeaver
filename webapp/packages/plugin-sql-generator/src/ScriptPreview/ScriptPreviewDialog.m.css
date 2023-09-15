@@ -1,0 +1,14 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+}
+.sqlCodeEditorLoader {
+  height: 100%;
+  width: 100%;
+}
+.footer {
+  gap: 24px;
+}

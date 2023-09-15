@@ -118,6 +118,7 @@ export * from './FormControls/Checkboxes/useCheckboxState';
 export * from './FormControls/BASE_DROPDOWN_STYLES';
 export * from './FormControls/FormBox';
 export * from './FormControls/Filter';
+export * from './Fill';
 
 export * from './Containers/Container';
 export * from './Containers/Group';
