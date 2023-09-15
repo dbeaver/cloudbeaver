@@ -10,11 +10,12 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ServerEventId } from '@cloudbeaver/core-root';
 import { CachedDataResource, CbDatabaseOutputLogEvent } from '@cloudbeaver/core-sdk';
 
+import type { IOutputLogType } from './IOutputLogTypes';
 import { OutputLogsEventHandler } from './OutputLogsEventHandler';
 
 export interface IOutputLog {
   message: string;
-  severity: string;
+  severity: IOutputLogType;
   contextId: string;
   timestamp: number;
 }

@@ -8,8 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
-import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { InlineEditor } from '@cloudbeaver/core-ui';
+import { Container, Icon, InputField, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import style from './OutputLogsToolbar.m.css';
 import { OutputLogsFilterMenu } from './OutputLogTypesFilterMenu';
@@ -24,17 +23,21 @@ export const OutputLogsToolbar = observer<Props>(function SqlOutputLogsToolbar({
   const translate = useTranslate();
 
   return (
-    <div className={s(styles, { container: true })}>
-      <InlineEditor
-        className={s(styles, { inlineEditor: true })}
+    <Container noWrap center gap dense keepSize>
+      <InputField
         value={state.searchValue}
         placeholder={translate('sql_editor_output_logs_input_placeholder')}
-        hideSave
-        hideCancel
-        simple
-        onChange={state.setSearchValue}
+        icon={
+          <div className={s(styles, { searchIcon: true })}>
+            <Icon name="search" viewBox="0 0 24 24" />
+          </div>
+        }
+        fill
+        onChange={value => state.setSearchValue(value.toString())}
       />
-      <OutputLogsFilterMenu state={state} />
-    </div>
+      <Container keepSize>
+        <OutputLogsFilterMenu state={state} />
+      </Container>
+    </Container>
   );
 });

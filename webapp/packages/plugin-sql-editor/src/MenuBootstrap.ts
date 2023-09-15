@@ -140,13 +140,6 @@ export class MenuBootstrap extends Bootstrap {
       handler: this.sqlEditorActionHandler.bind(this),
     });
 
-    this.keyBindingService.addKeyBindingHandler({
-      id: 'sql-editor-show-output',
-      binding: KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT,
-      isBindingApplicable: (contexts, action) => action === ACTION_SQL_EDITOR_SHOW_OUTPUT,
-      handler: this.sqlEditorActionHandler.bind(this),
-    });
-
     // this.menuService.addCreator({
     //   isApplicable: context => (
     //     context.tryGet(DATA_CONTEXT_SQL_EDITOR_DATA) !== undefined
@@ -191,10 +184,6 @@ export class MenuBootstrap extends Bootstrap {
         break;
       case ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN:
         data.showExecutionPlan();
-        break;
-      case ACTION_SQL_EDITOR_SHOW_OUTPUT:
-        // TODO change it to show output
-        data.showOutputLogs();
         break;
     }
   }

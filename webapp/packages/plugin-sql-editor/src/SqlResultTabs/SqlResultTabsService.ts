@@ -65,9 +65,10 @@ export class SqlResultTabsService {
   }
 
   removeResultTabs(state: ISqlEditorTabState, excludedTabIds?: string[]): void {
-    const notExcludedTabs = state.tabs.filter(tab => !excludedTabIds?.includes(tab.id));
-
-    for (const tab of notExcludedTabs) {
+    for (const tab of state.tabs) {
+      if (excludedTabIds?.includes(tab.id)) {
+        continue;
+      }
       this.removeTab(state, tab);
     }
   }

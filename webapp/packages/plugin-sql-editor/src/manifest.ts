@@ -17,7 +17,7 @@ import { SqlEditorService } from './SqlEditorService';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService';
 import { SqlEditorView } from './SqlEditorView';
 import { SqlExecutionPlanService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
-import { OutputFilterMenuBootstrap } from './SqlResultTabs/OutputLogs/OutputFilterMenuBootstrap';
+import { OutputMenuBootstrap } from './SqlResultTabs/OutputLogs/OutputMenuBootstrap';
 import { OutputLogsEventHandler } from './SqlResultTabs/OutputLogs/OutputLogsEventHandler';
 import { OutputLogsResource } from './SqlResultTabs/OutputLogs/OutputLogsResource';
 import { OutputLogsService } from './SqlResultTabs/OutputLogs/OutputLogsService';
@@ -47,6 +47,6 @@ export const sqlEditorPluginManifest: PluginManifest = {
     OutputLogsEventHandler,
     OutputLogsResource,
     OutputLogsService,
-    OutputFilterMenuBootstrap,
+    OutputMenuBootstrap,
   ],
 };

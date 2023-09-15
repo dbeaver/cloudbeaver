@@ -43,27 +43,24 @@ export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
   ) {
     extensions = useCodemirrorExtensions(extensions);
 
-    const filteredDefaultExtensionsFlagsFromProps = Object.fromEntries(
-      Object.entries({
-        lineNumbers,
-        tooltips,
-        highlightSpecialChars,
-        syntaxHighlighting,
-        bracketMatching,
-        dropCursor,
-        crosshairCursor,
-        foldGutter,
-        highlightActiveLineGutter,
-        highlightSelectionMatches,
-        highlightActiveLine,
-        indentOnInput,
-        rectangularSelection,
-        keymap,
-        lineWrapping,
-      }).filter(([, value]) => value !== undefined),
-    );
 
-    const defaultExtensions = useEditorDefaultExtensions(filteredDefaultExtensionsFlagsFromProps);
+    const defaultExtensions = useEditorDefaultExtensions({
+      lineNumbers,
+      tooltips,
+      highlightSpecialChars,
+      syntaxHighlighting,
+      bracketMatching,
+      dropCursor,
+      crosshairCursor,
+      foldGutter,
+      highlightActiveLineGutter,
+      highlightSelectionMatches,
+      highlightActiveLine,
+      indentOnInput,
+      rectangularSelection,
+      keymap,
+      lineWrapping,
+    });
 
     extensions.set(...defaultExtensions);
 

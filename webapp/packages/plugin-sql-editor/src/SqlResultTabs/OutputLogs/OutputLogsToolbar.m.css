@@ -1,16 +1,6 @@
-.container {
+.searchIcon {
+  width: 24px;
+  height: 24px;
   display: flex;
-  align-content: center;
-  justify-content: center;
-  align-items: center;
-  padding: 8px 8px 0 8px;
-  gap: 8px;
-
-  & > .inlineEditor {
-    height: 24px;
-  }
-}
-
-.inlineEditor {
-  composes: theme-background-surface theme-text-on-surface from global;
+  border-radius: var(--theme-menu-bar-small-action-radius);
 }

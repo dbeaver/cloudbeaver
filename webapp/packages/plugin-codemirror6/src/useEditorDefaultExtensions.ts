@@ -22,9 +22,9 @@ import {
   tooltips,
 } from '@codemirror/view';
 import { classHighlighter } from '@lezer/highlight';
-import { useMemo } from 'react';
+import { useRef } from 'react';
 
-import { clsx, GlobalConstants } from '@cloudbeaver/core-utils';
+import { clsx, GlobalConstants, isObjectsEqual } from '@cloudbeaver/core-utils';
 
 // @TODO allow to configure bindings outside of the component
 const DEFAULT_KEY_MAP = defaultKeymap.filter(binding => binding.mac !== 'Ctrl-f' && binding.key !== 'Mod-Enter');
@@ -111,14 +111,25 @@ const DEFAULT_EXTENSIONS_COMPARTMENT = new Compartment();
 
 /** Provides the necessary extensions to establish a basic editor */
 export function useEditorDefaultExtensions(options?: IDefaultExtensions): [Compartment, Extension] {
-  return useMemo(() => {
-    const extensions = Object.entries({ ...defaultExtensionsFlags, ...options } || {})
-      .filter(([, isEnabled]) => isEnabled)
-      .map(([key]) => {
-        const extensionFunction = extensionMap[key as keyof typeof extensionMap];
-        return extensionFunction?.();
-      })
-      .filter(Boolean);
-    return [DEFAULT_EXTENSIONS_COMPARTMENT, extensions];
-  }, [options]);
+  const previousOptions = useRef(options);
+  const isOptionsChanged = !isObjectsEqual(options, previousOptions.current);
+  const extensions = useRef<[Compartment, Extension] | null>(null);
+
+  if (isOptionsChanged || extensions.current === null) {
+    previousOptions.current = options;
+    extensions.current = createExtensions(options);
+  }
+
+  return extensions.current;
+}
+
+function createExtensions(options?: IDefaultExtensions): [Compartment, Extension] {
+  const extensions = Object.entries(defaultExtensionsFlags)
+    .filter(([key, isEnabled]) => options?.[key as keyof typeof options] ?? isEnabled)
+    .map(([key]) => {
+      const extensionFunction = extensionMap[key as keyof typeof extensionMap];
+      return extensionFunction?.();
+    })
+    .filter(Boolean);
+  return [DEFAULT_EXTENSIONS_COMPARTMENT, extensions];
 }

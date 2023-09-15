@@ -301,10 +301,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         } catch {}
       },
 
-      async showOutputLogs(): Promise<void> {
-        sqlOutputLogsService.showOutputLogs(this.state);
-      },
-
       async switchEditing(): Promise<void> {
         this.dataSource?.setEditing(!this.dataSource.isEditing());
       },
@@ -332,7 +328,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
             if (!state) {
               return;
             }
-            
+
             this.sqlResultTabsService.removeResultTabs(this.state, [OUTPUT_LOGS_TAB_ID]);
           } else if (result === DialogueStateResult.Rejected) {
             return;
@@ -474,7 +470,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       executeQuery: action.bound,
       executeQueryNewTab: action.bound,
       showExecutionPlan: action.bound,
-      showOutputLogs: action.bound,
       executeScript: action.bound,
       switchEditing: action.bound,
       dialect: computed,
