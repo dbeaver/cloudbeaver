@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useContext, useDeferredValue, useMemo } from 'react';
-import styled from 'reshadow';
 
-import { getComputed, TREE_NODE_STYLES, TreeNodeNested, TreeNodeNestedMessage, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNodeNested, TreeNodeNestedMessage, useTranslate } from '@cloudbeaver/core-blocks';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { ElementsTreeContext } from '../../ElementsTreeContext';
@@ -20,11 +19,12 @@ interface Props {
   component: NavTreeNodeComponent;
   path: string[];
   root?: boolean;
+  big?: boolean;
   className?: string;
 }
 
 export const NavigationNodeNested = observer(
-  forwardRef<HTMLDivElement, Props>(function NavigationNodeNested({ nodeId, component, path, root, className }, ref) {
+  forwardRef<HTMLDivElement, Props>(function NavigationNodeNested({ nodeId, component, path, root, big, className }, ref) {
     const treeContext = useContext(ElementsTreeContext);
     const translate = useTranslate();
 
@@ -50,20 +50,20 @@ export const NavigationNodeNested = observer(
     empty = useDeferredValue(empty);
 
     if (nodeId !== undefined && rootFolder) {
-      return styled(TREE_NODE_STYLES)(<NavigationNode nodeId={nodeId} path={path} expanded />);
+      return <NavigationNode nodeId={nodeId} path={path} expanded />;
     }
 
-    return styled(TREE_NODE_STYLES)(
-      <TreeNodeNested ref={ref} root={root} className={className}>
+    return (
+      <TreeNodeNested ref={ref} root={root} big={big} className={className}>
         {children.map(child => (
-          <NavigationNode key={child} nodeId={child} path={nextPath} />
+          <NavigationNode key={child} nodeId={child} big={big} path={nextPath} />
         ))}
         {empty && (
-          <TreeNodeNestedMessage>
+          <TreeNodeNestedMessage big={big}>
             {translate(nodeId === undefined ? 'app_navigationTree_connection_group_user' : 'app_navigationTree_node_empty')}
           </TreeNodeNestedMessage>
         )}
-      </TreeNodeNested>,
+      </TreeNodeNested>
     );
   }),
 );

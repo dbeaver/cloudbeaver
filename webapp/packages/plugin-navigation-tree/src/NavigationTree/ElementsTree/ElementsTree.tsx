@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo, useState } from 'react';
-import styled, { css, use } from 'reshadow';
 
 import {
   EventTreeNodeClickFlag,
@@ -16,11 +15,11 @@ import {
   FolderExplorer,
   FolderExplorerPath,
   PlaceholderElement,
+  s,
   Translate,
-  TREE_NODE_STYLES,
   TreeNodeNested,
   TreeNodeNestedMessage,
-  useStyles,
+  useS,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
@@ -28,6 +27,7 @@ import { EObjectFeature, type NavNode, NavNodeInfoResource, NavTreeResource, ROO
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { useNavTreeDropBox } from '../useNavTreeDropBox';
+import styles from './ElementsTree.m.css';
 import { ElementsTreeContentLoader } from './ElementsTreeContentLoader';
 import { ElementsTreeContext, IElementsTreeContext } from './ElementsTreeContext';
 import { elementsTreeNameFilter } from './elementsTreeNameFilter';
@@ -42,63 +42,6 @@ import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimi
 import { useDropOutside } from './useDropOutside';
 import { IElementsTreeOptions, useElementsTree } from './useElementsTree';
 import { useElementsTreeFolderExplorer } from './useElementsTreeFolderExplorer';
-
-const styles = css`
-  box {
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-  }
-
-  tree {
-    position: relative;
-    box-sizing: border-box;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-
-    & tree-elements {
-      position: relative;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-  }
-
-  tree-box {
-    flex: 1;
-    overflow: auto;
-    display: flex;
-    width: 250px;
-    min-width: 100%;
-    max-width: 100%;
-  }
-
-  FolderExplorerPath {
-    padding: 0 4px 8px 4px;
-  }
-
-  drop-outside {
-    composes: theme-border-color-background from global;
-    border: dashed 2px;
-    border-radius: var(--theme-group-element-radius);
-    margin: 12px;
-    box-sizing: border-box;
-    position: relative;
-
-    &[|bottom] {
-      order: 2;
-    }
-
-    &:not([|showDropOutside]) {
-      display: none;
-    }
-    &[|active] {
-      border-color: var(--theme-positive) !important;
-    }
-  }
-`;
 
 export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWithChildren {
   root?: string;
@@ -143,6 +86,7 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   onSelect,
   onFilter,
 }) {
+  const computedStyles = useS(styles, style);
   const navTreeResource = useService(NavTreeResource);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const [treeRootRef, setTreeRootRef] = useState<HTMLDivElement | null>(null);
@@ -217,45 +161,49 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
     tree.resetSelection();
   }
 
-  return styled(useStyles(TREE_NODE_STYLES, styles, style))(
+  return (
     <>
       <ElementsTreeTools tree={tree} settingsElements={settingsElements} style={style} />
-      <tree-box ref={setTreeRootRef} {...use({ big })}>
+      <div ref={setTreeRootRef} className={s(computedStyles, { treeBox: true, big })}>
         <ElementsTreeContext.Provider value={context}>
-          <box className={className}>
+          <div className={s(computedStyles, { box: true }, className)}>
             <FolderExplorer state={folderExplorer}>
-              <tree ref={dropOutside.mouse.reference} onClick={handleClick}>
-                {settings?.showFolderExplorerPath && <FolderExplorerPath getName={getName} canSkip={canSkip} />}
-                <drop-outside
+              <div ref={dropOutside.mouse.reference} className={s(computedStyles, { tree: true })} onClick={handleClick}>
+                {settings?.showFolderExplorerPath && (
+                  <FolderExplorerPath className={s(computedStyles, { folderExplorerPath: true })} getName={getName} canSkip={canSkip} />
+                )}
+                <div
                   ref={dndBox.setRef}
-                  {...use({
+                  className={s(computedStyles, {
+                    dropOutside: true,
                     showDropOutside: dropOutside.showDropOutside,
-                    active: dropOutside.zoneActive,
+                    active: !!dropOutside.zoneActive,
                     bottom: dropOutside.bottom,
                   })}
                 >
-                  <TreeNodeNested root>
-                    <TreeNodeNestedMessage>
+                  <TreeNodeNested big={big} root>
+                    <TreeNodeNestedMessage big={big}>
                       <Translate token="app_navigationTree_drop_here" />
                     </TreeNodeNestedMessage>
                   </TreeNodeNested>
-                </drop-outside>
+                </div>
                 <ElementsTreeContentLoader context={context} emptyPlaceholder={emptyPlaceholder} childrenState={tree}>
-                  <tree-elements>
+                  <div className={s(computedStyles, { treeElements: true })}>
                     <NavigationNodeNested
                       ref={dropOutside.nestedRef}
                       nodeId={root}
                       component={NavigationNodeElement}
                       path={folderExplorer.state.path}
+                      big={big}
                       root
                     />
-                  </tree-elements>
+                  </div>
                 </ElementsTreeContentLoader>
-              </tree>
+              </div>
             </FolderExplorer>
-          </box>
+          </div>
         </ElementsTreeContext.Provider>
-      </tree-box>
-    </>,
+      </div>
+    </>
   );
 });

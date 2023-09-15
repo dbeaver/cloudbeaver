@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { getComputed, Translate, TREE_NODE_STYLES, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
+import { getComputed, Translate, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT, ProjectsService } from '@cloudbeaver/core-projects';
@@ -78,10 +78,10 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
   const hideProjects = elementsTreeContext?.tree.settings?.projects === false && !isDragging;
 
   if (!node) {
-    return styled(TREE_NODE_STYLES)(
+    return (
       <TreeNodeNestedMessage>
         <Translate token="app_navigationTree_node_not_found" />
-      </TreeNodeNestedMessage>,
+      </TreeNodeNestedMessage>
     );
   }
 

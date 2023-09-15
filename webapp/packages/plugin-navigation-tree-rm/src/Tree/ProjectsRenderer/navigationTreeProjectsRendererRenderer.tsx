@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { getComputed, Translate, TREE_NODE_STYLES, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
+import { getComputed, Translate, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
@@ -23,9 +23,9 @@ import {
   NavigationNodeRendererLoader,
   useNode,
 } from '@cloudbeaver/plugin-navigation-tree';
+import type { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
-import type { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 const nestedStyles = css`
   TreeNode {
@@ -105,10 +105,10 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
   const singleProject = projectsService.activeProjects.length === 1;
 
   if (!node) {
-    return styled(TREE_NODE_STYLES)(
+    return (
       <TreeNodeNestedMessage>
         <Translate token="app_navigationTree_node_not_found" />
-      </TreeNodeNestedMessage>,
+      </TreeNodeNestedMessage>
     );
   }
 

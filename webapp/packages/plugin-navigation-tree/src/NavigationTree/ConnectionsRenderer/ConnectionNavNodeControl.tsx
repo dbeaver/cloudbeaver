@@ -13,7 +13,6 @@ import {
   ConnectionImageWithMask,
   getComputed,
   Loader,
-  TREE_NODE_STYLES,
   TreeNodeContext,
   TreeNodeControl,
   TreeNodeIcon,
@@ -58,10 +57,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
       treeNodeContext.select();
     }
 
-    return styled(
-      TREE_NODE_STYLES,
-      NAVIGATION_NODE_CONTROL_STYLES,
-    )(
+    return styled(NAVIGATION_NODE_CONTROL_STYLES)(
       <TreeNodeControl ref={ref} className={className} onClick={onClick} onContextMenu={handleContextMenuOpen} {...use({ dragging: dndElement })}>
         <NavigationNodeExpand nodeId={node.id} />
         <TreeNodeIcon {...use({ connected })}>

@@ -10,11 +10,14 @@ import React, { forwardRef, useContext } from 'react';
 
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
+import { s } from '../../s';
+import { useS } from '../../useS';
 import { EventTreeNodeClickFlag } from './EventTreeNodeClickFlag';
 import { EventTreeNodeExpandFlag } from './EventTreeNodeExpandFlag';
 import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
 import type { ITreeNodeState } from './ITreeNodeState';
 import { TreeNodeContext } from './TreeNodeContext';
+import style from './TreeNodeControl.m.css';
 
 const KEY = {
   ENTER: 'Enter',
@@ -34,6 +37,7 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
     { title, group, disabled, loading, selected, expanded, externalExpanded, leaf, onClick, onMouseDown, className, children, big, ...rest },
     ref,
   ) {
+    const styles = useS(style);
     const context = useContext(TreeNodeContext);
 
     if (!context) {
@@ -112,7 +116,7 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
         tabIndex={0}
         title={title}
         aria-selected={context.selected}
-        className={className}
+        className={s(styles, { treeNodeControl: true, big }, className)}
         onClick={handleClick}
         onMouseDown={handleMouseDown}
         onKeyDown={handleEnter}

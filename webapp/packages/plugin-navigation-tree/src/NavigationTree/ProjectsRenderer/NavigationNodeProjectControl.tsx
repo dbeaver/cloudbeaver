@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { getComputed, TREE_NODE_STYLES, TreeNodeContext, TreeNodeControl, TreeNodeName, useMouseContextMenu } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeName, useMouseContextMenu } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
@@ -92,10 +92,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
       return null;
     }
 
-    return styled(
-      TREE_NODE_STYLES,
-      styles,
-    )(
+    return styled(styles)(
       <TreeNodeControl
         ref={ref}
         onClick={handleClick}

@@ -1,0 +1,41 @@
+.treeNodeControl {
+  composes: theme-ripple theme-ripple-selectable from global;
+  box-sizing: border-box;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  padding: 2px 0 2px 0;
+  user-select: none;
+  white-space: nowrap;
+  position: initial !important;
+  outline: none;
+
+  &::before {
+    left: 0 !important;
+    top: auto !important;
+    height: inherit !important;
+    width: 100% !important;
+  }
+
+  &.dragging {
+    opacity: 0.6;
+  }
+
+  &.big {
+    height: 46px;
+    padding: 0px 16px;
+
+    & + * {
+      padding-left: 24px;
+    }
+  }
+
+  &.editing::before {
+    display: none;
+  }
+
+  & > * {
+    margin-right: 0;
+    margin-left: 4px;
+  }
+}

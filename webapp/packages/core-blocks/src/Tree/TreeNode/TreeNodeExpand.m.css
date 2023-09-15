@@ -1,0 +1,28 @@
+.treeNodeExpand {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  opacity: 0.5;
+  width: 16px;
+  height: 16px;
+  transform: rotate(-90deg);
+  &.small {
+    display: block;
+  }
+
+  &.big {
+    margin-right: 8px;
+    margin-left: 8px;
+  }
+
+  &.expanded {
+    transform: rotate(0deg);
+  }
+}
+
+.icon {
+  cursor: pointer;
+  height: 100%;
+  width: 100%;
+}

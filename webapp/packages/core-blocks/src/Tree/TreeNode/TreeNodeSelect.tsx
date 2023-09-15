@@ -7,21 +7,16 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled, { css } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
 
 import { Checkbox } from '../../FormControls/Checkboxes/Checkbox';
 import { Loader } from '../../Loader/Loader';
+import { s } from '../../s';
+import { useS } from '../../useS';
 import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
 import { TreeNodeContext } from './TreeNodeContext';
-
-const styles = css`
-  Loader {
-    width: 40px;
-    height: 40px;
-  }
-`;
+import style from './TreeNodeSelect.m.css';
 
 interface Props {
   group?: boolean;
@@ -30,6 +25,7 @@ interface Props {
   indeterminate?: boolean;
   disabled?: boolean;
   loadIndicator?: boolean;
+  big?: boolean;
   className?: string;
 }
 
@@ -40,8 +36,10 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
   indeterminate,
   disabled,
   loadIndicator,
+  big,
   className,
 }) {
+  const styles = useS(style);
   const context = useContext(TreeNodeContext);
 
   if (!context) {
@@ -67,9 +65,13 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
     EventContext.set(event, EventTreeNodeSelectFlag);
   }
 
-  return styled(styles)(
-    <div className={className} onClick={handleClick} onDoubleClick={handleDbClick}>
-      {loading ? <Loader small /> : <Checkbox checked={selected} indeterminate={indeterminate} disabled={disabled} onChange={handleSelect} />}
-    </div>,
+  return (
+    <div className={s(styles, { treeNodeSelect: true, big }, className)} onClick={handleClick} onDoubleClick={handleDbClick}>
+      {loading ? (
+        <Loader className={s(styles, { loader: true })} small />
+      ) : (
+        <Checkbox checked={selected} indeterminate={indeterminate} disabled={disabled} onChange={handleSelect} />
+      )}
+    </div>
   );
 });

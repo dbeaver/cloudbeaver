@@ -1,0 +1,19 @@
+.treeNodeIcon {
+  position: relative;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+
+  &.big {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    margin-left: 8px;
+  }
+}
+
+.staticImage {
+  position: relative;
+  height: 100%;
+}

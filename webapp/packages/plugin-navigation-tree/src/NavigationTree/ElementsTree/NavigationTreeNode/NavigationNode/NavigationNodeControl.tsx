@@ -13,7 +13,6 @@ import styled, { use } from 'reshadow';
 import {
   getComputed,
   Loader,
-  TREE_NODE_STYLES,
   TreeNodeContext,
   TreeNodeControl,
   TreeNodeIcon,
@@ -129,10 +128,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
 
     const attributes = { [DATA_ATTRIBUTE_NODE_EDITING]: editing };
 
-    return styled(
-      TREE_NODE_STYLES,
-      NAVIGATION_NODE_CONTROL_STYLES,
-    )(
+    return styled(NAVIGATION_NODE_CONTROL_STYLES)(
       <TreeNodeControl
         ref={ref}
         {...attributes}
