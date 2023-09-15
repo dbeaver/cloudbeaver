@@ -87,7 +87,7 @@ export class OutputLogsService {
     const tab = {
       id: OUTPUT_LOGS_TAB_ID,
       name: 'Output',
-      icon: 'table-icon',
+      icon: '/icons/sql_output_logs.svg',
       order,
     };
 
