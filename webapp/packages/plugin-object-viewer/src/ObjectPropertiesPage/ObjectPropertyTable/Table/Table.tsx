@@ -15,6 +15,7 @@ import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { isDefined, TextTools } from '@cloudbeaver/core-utils';
 import DataGrid from '@cloudbeaver/plugin-react-data-grid';
+import '@cloudbeaver/plugin-react-data-grid/lib/lib/styles.css';
 
 import { getValue } from '../../helpers';
 import { ObjectPropertyTableFooter } from '../ObjectPropertyTableFooter';
@@ -117,8 +118,8 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     width: Math.min(300, measuredCells[index]),
     minWidth: 40,
     resizable: true,
-    formatter: CellFormatter,
-    headerRenderer: HeaderRenderer,
+    renderCell: props => <CellFormatter {...props} />,
+    renderHeaderCell: props => <HeaderRenderer {...props} />,
   }));
 
   const tableData = useTableData(dataColumns, CUSTOM_COLUMNS);

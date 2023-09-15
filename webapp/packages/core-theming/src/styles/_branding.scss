@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-@mixin stripes-background($color) {
+@mixin stripes-background($color, $important: false) {
   // background-image: linear-gradient(
   //   45deg,
   //   transparent 37.5%,
@@ -18,7 +18,7 @@
   //   $color 100%
   // );
   // background-size: 8px 8px;
-  background-color: $color;
+  background-color: $color #{if($important, '!important', '')};
 }
 
 @mixin delimiter($color) {

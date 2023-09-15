@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import '@cloudbeaver/core-theming/src/styles/theme-dark';
-@import 'base-metadata-grid';
-
-:global .#{$theme-class} {
-  @include base-metadata-grid;
-
-  .cb-metadata-grid-theme {
-    --rdg-color-scheme: dark;
-  }
+.container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.checkbox {
+  margin-left: -10px;
+  margin-right: -10px;
 }
