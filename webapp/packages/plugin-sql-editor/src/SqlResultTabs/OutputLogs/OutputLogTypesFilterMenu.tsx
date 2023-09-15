@@ -12,7 +12,6 @@ import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
 import { OUTPUT_LOGS_FILTER_MENU } from './OUTPUT_LOGS_FILTER_MENU';
-import { OUTPUT_LOGS_PANEL_STATE } from './OUTPUT_LOGS_PANEL_STATE';
 import style from './OutputLogTypesFilterMenu.m.css';
 import type { SqlOutputLogsPanelState } from './useOutputLogsPanelState';
 
@@ -25,7 +24,6 @@ export const OutputLogsFilterMenu = observer<Props>(function OutputLogTypesFilte
   const menu = useMenu({
     menu: OUTPUT_LOGS_FILTER_MENU,
   });
-  menu.context.set(OUTPUT_LOGS_PANEL_STATE, state);
 
   return (
     <ContextMenu className={s(styles, { contextMenu: true })} menu={menu} placement="bottom-end" modal>
