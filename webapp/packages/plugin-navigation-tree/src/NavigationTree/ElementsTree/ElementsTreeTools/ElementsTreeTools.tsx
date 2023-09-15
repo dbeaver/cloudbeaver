@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import styled from 'reshadow';
 
 import {
-  ACTION_ICON_BUTTON_STYLES,
+  ActionIconButtonStyles,
   Fill,
   IconButton,
   IconButtonStyles,
@@ -55,8 +55,8 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
   const root = tree.root;
   const translate = useTranslate();
   const [opened, setOpen] = useState(false);
-  const deprecatedStyles = useStyles(ACTION_ICON_BUTTON_STYLES, style);
-  const styles = useS(ElementsTreeToolsStyles, ElementsTreeToolsIconButtonStyles);
+  const deprecatedStyles = useStyles(style);
+  const styles = useS(ElementsTreeToolsStyles, ElementsTreeToolsIconButtonStyles, ActionIconButtonStyles);
 
   useCaptureViewContext(context => {
     context?.set(DATA_CONTEXT_NAV_TREE_ROOT, tree.baseRoot);
@@ -73,7 +73,7 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
             <IconButton
               name="/icons/settings_cog_sm.svg"
               title={translate('ui_settings')}
-              className={s(styles, { primary: true, opened })}
+              className={s(styles, { primary: true, actionIconButton: true, opened })}
               img
               onClick={() => setOpen(!opened)}
             />
@@ -84,7 +84,7 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
             name="/icons/refresh_sm.svg#root"
             title={translate('app_navigationTree_refresh')}
             disabled={loading}
-            className={s(styles, { primary: true, loading })}
+            className={s(styles, { primary: true, actionIconButton: true, loading })}
             img
             onClick={() => tree.refresh(root)}
           />

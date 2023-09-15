@@ -6,20 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Filter, useFocus, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Filter, s, useFocus, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { IElementsTree } from '../useElementsTree';
-
-const filterStyle = css`
-  filter-box {
-    composes: theme-background-surface from global;
-    padding: 8px 12px;
-    flex: 0 0 auto;
-  }
-`;
+import styles from './ElementsTreeFilter.m.css';
 
 interface Props {
   tree: IElementsTree;
@@ -30,15 +22,15 @@ interface Props {
 export const ElementsTreeFilter = observer<Props>(function ElementsTreeFilter({ tree, style, className }) {
   const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const translate = useTranslate();
-  const styles = useStyles(filterStyle, style);
+  const computedStyles = useS(styles, style);
 
   if (!tree.settings?.filter) {
     return null;
   }
 
-  return styled(styles)(
-    <filter-box ref={focusedRef} className={className} as="div">
+  return (
+    <div ref={focusedRef} className={s(computedStyles, { filterBox: true }, className)}>
       <Filter placeholder={translate('app_navigationTree_search')} value={tree.filter} max onFilter={value => tree.setFilter(value as string)} />
-    </filter-box>,
+    </div>
   );
 });

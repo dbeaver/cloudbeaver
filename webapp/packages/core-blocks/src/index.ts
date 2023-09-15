@@ -25,6 +25,7 @@ export * from './ConnectionImageWithMask/ConnectionImageWithMask';
 export { default as ConnectionImageWithMaskSvgStyles } from './ConnectionImageWithMask/ConnectionImageWithMaskSvg.m.css';
 
 export * from './Menu/ACTION_ICON_BUTTON_STYLES';
+export { default as ActionIconButtonStyles } from './ActionIconButton.m.css';
 export * from './Menu/Menu';
 export { default as MenuStyles } from './Menu/Menu.m.css';
 export * from './Menu/MenuBarSmallItem';

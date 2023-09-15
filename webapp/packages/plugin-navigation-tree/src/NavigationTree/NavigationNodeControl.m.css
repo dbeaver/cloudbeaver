@@ -1,0 +1,31 @@
+.treeNodeControl:hover > .portal,
+.treeNodeControl[aria-selected='true'] > .portal,
+.portal:focus-within {
+  visibility: visible;
+}
+
+.treeNodeName {
+  height: 100%;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.editing {
+    padding: 0;
+    overflow: visible;
+    margin-left: 2px;
+  }
+}
+
+.portal {
+  position: relative;
+  box-sizing: border-box;
+  margin-left: auto !important;
+  margin-right: 8px !important;
+  visibility: hidden;
+}
+
+.nameBox {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
