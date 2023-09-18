@@ -61,3 +61,10 @@
   flex-grow: 0;
   flex-basis: auto;
 }
+
+.noGrow,
+.field.noGrow,
+.container.noGrow,
+.container > .noGrow {
+  flex-grow: 0;
+}
