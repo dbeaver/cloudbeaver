@@ -43,6 +43,8 @@ import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
+import org.jkiss.dbeaver.model.websocket.event.WSErrorEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.registry.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
@@ -959,12 +961,25 @@ public class LocalResourceController implements RMController {
 
     protected <T> T doFileReadOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
-            try {
-                fileHandler.beforeFileRead(projectId, file);
-            } catch (Exception e) {
-                log.error("Error before file reading", e);
+//            try {
+//                fileHandler.beforeFileRead(projectId, file);
+//            } catch (Exception e) {
+            if (credentialsProvider.getActiveUserCredentials() != null) {
+                WebAppUtils.getWebApplication().getEventController().addEvent(
+                    new WSErrorEvent(
+                        WSEventType.SESSION_LOG_MESSAGE_ADDED,
+                        credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                        credentialsProvider.getActiveUserCredentials().getUserId(),
+                        "123")); //e.getMessage()));
+            } else {
+                WebAppUtils.getWebApplication().getEventController().addEvent(
+                    new WSErrorEvent(
+                        WSEventType.SESSION_LOG_MESSAGE_ADDED,
+                        "123")); //e.getMessage()));
             }
         }
+//                log.error("Error before file reading", e);
+//            }
         return operation.doOperation();
     }
 
