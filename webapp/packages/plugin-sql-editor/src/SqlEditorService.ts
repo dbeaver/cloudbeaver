@@ -72,6 +72,7 @@ export class SqlEditorService {
       resultTabs: observable([]),
       executionPlanTabs: observable([]),
       statisticsTabs: observable([]),
+      outputLogsTab: undefined,
       currentModeId: undefined,
       modeState: observable([]),
     });

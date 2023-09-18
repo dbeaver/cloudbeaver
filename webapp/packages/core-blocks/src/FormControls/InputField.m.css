@@ -29,6 +29,15 @@
     height: 100%;
   }
 }
+
+.customIconContainer {
+  composes: iconContainer;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  cursor: auto;
+}
+
 .input[disabled] + .iconContainer {
   cursor: auto;
   opacity: 0.8;
