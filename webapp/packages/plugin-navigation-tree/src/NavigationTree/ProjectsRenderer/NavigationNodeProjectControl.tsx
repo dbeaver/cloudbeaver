@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext } from 'react';
-import styled, { css, use } from 'reshadow';
 
-import { getComputed, TreeNodeContext, TreeNodeControl, TreeNodeName, useMouseContextMenu } from '@cloudbeaver/core-blocks';
+import { getComputed, s, TreeNodeContext, TreeNodeControl, TreeNodeName, useMouseContextMenu, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
@@ -18,43 +17,11 @@ import { ElementsTreeContext } from '../ElementsTree/ElementsTreeContext';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../ElementsTree/NavigationNodeComponent';
 import { isDraggingInsideProject } from '../ElementsTree/NavigationTreeNode/isDraggingInsideProject';
 import { TreeNodeMenuLoader } from '../ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenuLoader';
-
-const styles = css`
-  TreeNodeControl {
-    transition: opacity 0.3s ease;
-    opacity: 1;
-
-    &[|outdated] {
-      opacity: 0.5;
-    }
-  }
-  TreeNodeControl:hover > portal,
-  TreeNodeControl:global([aria-selected='true']) > portal,
-  portal:focus-within {
-    visibility: visible;
-  }
-  TreeNodeName {
-    composes: theme-text-text-hint-on-light theme-typography--caption from global;
-    height: 100%;
-    max-width: 250px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  portal {
-    position: relative;
-    box-sizing: border-box;
-    margin-left: auto !important;
-    margin-right: 8px !important;
-    visibility: hidden;
-  }
-  name-box {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-`;
+import style from './NavigationNodeProjectControl.m.css';
 
 export const NavigationNodeProjectControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(
   forwardRef(function NavigationNodeProjectControl({ node, dndElement, dndPlaceholder, className }, ref) {
+    const styles = useS(style);
     const mouseContextMenu = useMouseContextMenu();
     const treeNodeContext = useContext(TreeNodeContext);
     const elementsTreeContext = useContext(ElementsTreeContext);
@@ -92,24 +59,23 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
       return null;
     }
 
-    return styled(styles)(
+    return (
       <TreeNodeControl
         ref={ref}
         onClick={handleClick}
         onDoubleClick={handleDbClick}
         onContextMenu={handleContextMenuOpen}
-        {...use({ outdated, dragging: dndElement })}
-        className={className}
+        className={s(styles, { treeNodeControl: true, outdated }, className)}
       >
-        <TreeNodeName title={node.name}>
-          <name-box>{node.name}</name-box>
+        <TreeNodeName className={s(styles, { treeNodeName: true })} title={node.name}>
+          <div className={s(styles, { nameBox: true })}>{node.name}</div>
         </TreeNodeName>
         {!dndPlaceholder && (
-          <portal onClick={handlePortalClick}>
+          <div className={s(styles, { portal: true })} onClick={handlePortalClick}>
             <TreeNodeMenuLoader mouseContextMenu={mouseContextMenu} node={node} selected={selected} />
-          </portal>
+          </div>
         )}
-      </TreeNodeControl>,
+      </TreeNodeControl>
     );
   }),
 );

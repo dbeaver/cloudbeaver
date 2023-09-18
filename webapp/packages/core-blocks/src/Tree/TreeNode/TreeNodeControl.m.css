@@ -17,10 +17,6 @@
     width: 100% !important;
   }
 
-  &.editing::before {
-    display: none;
-  }
-
   & > * {
     margin-right: 0;
     margin-left: 4px;

@@ -134,14 +134,13 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
       <TreeNodeControl
         ref={ref}
         {...attributes}
-        className={s(styles, { treeNodeControl: true }, className)}
-        editing={editing}
+        className={s(styles, { treeNodeControl: true, dragging: !!dndElement, editing }, className)}
         onClick={onClick}
         onContextMenu={handleContextMenuOpen}
       >
         <NavigationNodeExpand nodeId={node.id} />
         <TreeNodeIcon icon={icon} />
-        <TreeNodeName title={title} className={s(styles, { treeNodeName: true, editing })}>
+        <TreeNodeName title={title} className={s(styles, { treeNodeName: true })}>
           <Loader suspense inline fullSize>
             {editing ? (
               <NavigationNodeEditorLoader name={getNodePlainName(node)} disabled={saving} onSave={editingState.save} onClose={editingState.cancel} />

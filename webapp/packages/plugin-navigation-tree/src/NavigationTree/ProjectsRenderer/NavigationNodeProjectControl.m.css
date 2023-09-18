@@ -1,16 +1,9 @@
-.treeNodeControl.dragging {
-  opacity: 0.6;
-}
+.treeNodeControl {
+  transition: opacity 0.3s ease;
+  opacity: 1;
 
-.treeNodeControl.editing {
-  &::before {
-    display: none;
-  }
-
-  & .treeNodeName {
-    padding: 0;
-    overflow: visible;
-    margin-left: 2px;
+  &.outdated {
+    opacity: 0.5;
   }
 }
 
@@ -21,8 +14,9 @@
 }
 
 .treeNodeName {
+  composes: theme-text-text-hint-on-light theme-typography--caption from global;
   height: 100%;
-  max-width: 320px;
+  max-width: 250px;
   overflow: hidden;
   text-overflow: ellipsis;
 }

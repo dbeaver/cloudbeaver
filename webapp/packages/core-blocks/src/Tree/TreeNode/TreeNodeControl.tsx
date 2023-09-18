@@ -28,13 +28,12 @@ interface Props extends ITreeNodeState {
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   onMouseDown?: (event: React.MouseEvent<HTMLDivElement>) => void;
   className?: string;
-  editing?: boolean;
   children?: React.ReactNode;
 }
 
 export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>(
   forwardRef(function TreeNodeControl(
-    { title, group, disabled, loading, selected, expanded, externalExpanded, leaf, onClick, onMouseDown, className, children, editing, ...rest },
+    { title, group, disabled, loading, selected, expanded, externalExpanded, leaf, onClick, onMouseDown, className, children, ...rest },
     ref,
   ) {
     const styles = useS(style);
@@ -116,7 +115,7 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
         tabIndex={0}
         title={title}
         aria-selected={context.selected}
-        className={s(styles, { treeNodeControl: true, editing }, className)}
+        className={s(styles, { treeNodeControl: true }, className)}
         onClick={handleClick}
         onMouseDown={handleMouseDown}
         onKeyDown={handleEnter}

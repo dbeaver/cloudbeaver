@@ -61,7 +61,12 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
     }
 
     return (
-      <TreeNodeControl ref={ref} className={s(styles, { treeNodeControl: true }, className)} onClick={onClick} onContextMenu={handleContextMenuOpen}>
+      <TreeNodeControl
+        ref={ref}
+        className={s(styles, { treeNodeControl: true, dragging: !!dndElement }, className)}
+        onClick={onClick}
+        onContextMenu={handleContextMenuOpen}
+      >
         <NavigationNodeExpand nodeId={node.id} />
         <TreeNodeIcon>
           <ConnectionImageWithMask icon={icon} connected={connected} maskId="tree-node-icon" />
