@@ -136,7 +136,6 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
         {...attributes}
         className={s(styles, { treeNodeControl: true }, className)}
         editing={editing}
-        dragging={!!dndElement}
         onClick={onClick}
         onContextMenu={handleContextMenuOpen}
       >
@@ -152,9 +151,9 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
           </Loader>
         </TreeNodeName>
         {!editing && !dndPlaceholder && (
-          <portal className={s(styles, { portal: true })} onClick={handlePortalClick}>
+          <div className={s(styles, { portal: true })} onClick={handlePortalClick}>
             <TreeNodeMenuLoader mouseContextMenu={mouseContextMenu} node={node} actions={nodeActions} selected={selected} />
-          </portal>
+          </div>
         )}
       </TreeNodeControl>
     );

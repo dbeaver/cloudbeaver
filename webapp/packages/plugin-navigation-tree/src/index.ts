@@ -28,6 +28,7 @@ export * from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeTools
 export * from './NavigationTree/ElementsTree/elementsTreeNameFilter';
 export * from './NavigationTree/NavigationTreeBootstrap';
 export * from './NavigationTree/NavigationTreeService';
+export { default as ElementsTreeToolsStyles } from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeTools.m.css';
 export { default as ElementsTreeFilterStyles } from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeFilter.m.css';
 
 export * from './NavigationTree/NavigationTreeLoader';

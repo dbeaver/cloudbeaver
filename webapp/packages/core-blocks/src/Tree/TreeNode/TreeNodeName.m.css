@@ -5,10 +5,4 @@
   display: flex;
   align-items: center;
   margin-right: 4px;
-
-  &.big {
-    margin: 0;
-    padding-right: 8px;
-    padding-left: 8px;
-  }
 }

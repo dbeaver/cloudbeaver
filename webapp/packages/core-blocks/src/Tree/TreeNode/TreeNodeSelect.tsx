@@ -25,7 +25,6 @@ interface Props {
   indeterminate?: boolean;
   disabled?: boolean;
   loadIndicator?: boolean;
-  big?: boolean;
   className?: string;
 }
 
@@ -36,7 +35,6 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
   indeterminate,
   disabled,
   loadIndicator,
-  big,
   className,
 }) {
   const styles = useS(style);
@@ -66,7 +64,7 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
   }
 
   return (
-    <div className={s(styles, { treeNodeSelect: true, big }, className)} onClick={handleClick} onDoubleClick={handleDbClick}>
+    <div className={s(styles, { treeNodeSelect: true }, className)} onClick={handleClick} onDoubleClick={handleDbClick}>
       {loading ? (
         <Loader className={s(styles, { loader: true })} small />
       ) : (

@@ -1,8 +1,4 @@
 .treeNodeNestedMessage {
   composes: theme-typography--caption from global;
   padding: 4px 12px;
-
-  &.big {
-    padding: 4px 24px;
-  }
 }

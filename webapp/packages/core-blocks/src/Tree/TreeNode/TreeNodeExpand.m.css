@@ -11,11 +11,6 @@
     display: block;
   }
 
-  &.big {
-    margin-right: 8px;
-    margin-left: 8px;
-  }
-
   &.expanded {
     transform: rotate(0deg);
   }

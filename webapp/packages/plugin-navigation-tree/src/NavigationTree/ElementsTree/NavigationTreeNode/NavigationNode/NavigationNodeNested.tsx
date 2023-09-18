@@ -19,12 +19,11 @@ interface Props {
   component: NavTreeNodeComponent;
   path: string[];
   root?: boolean;
-  big?: boolean;
   className?: string;
 }
 
 export const NavigationNodeNested = observer(
-  forwardRef<HTMLDivElement, Props>(function NavigationNodeNested({ nodeId, component, path, root, big, className }, ref) {
+  forwardRef<HTMLDivElement, Props>(function NavigationNodeNested({ nodeId, component, path, root, className }, ref) {
     const treeContext = useContext(ElementsTreeContext);
     const translate = useTranslate();
 
@@ -54,12 +53,12 @@ export const NavigationNodeNested = observer(
     }
 
     return (
-      <TreeNodeNested ref={ref} root={root} big={big} className={className}>
+      <TreeNodeNested ref={ref} root={root} className={className}>
         {children.map(child => (
-          <NavigationNode key={child} nodeId={child} big={big} path={nextPath} />
+          <NavigationNode key={child} nodeId={child} path={nextPath} />
         ))}
         {empty && (
-          <TreeNodeNestedMessage big={big}>
+          <TreeNodeNestedMessage>
             {translate(nodeId === undefined ? 'app_navigationTree_connection_group_user' : 'app_navigationTree_node_empty')}
           </TreeNodeNestedMessage>
         )}

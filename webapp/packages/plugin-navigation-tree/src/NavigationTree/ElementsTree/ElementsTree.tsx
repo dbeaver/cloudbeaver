@@ -48,7 +48,6 @@ export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWith
   selectionTree?: boolean;
   control?: NavTreeControlComponent;
   emptyPlaceholder?: React.FC;
-  big?: boolean;
   style?: ComponentStyle;
   className?: string;
   settingsElements?: PlaceholderElement<IElementsTreeSettingsProps>[];
@@ -71,7 +70,6 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   renderers = [],
   expandStateGetters,
   settingsElements,
-  big,
   style,
   className,
   getChildren,
@@ -164,7 +162,7 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   return (
     <>
       <ElementsTreeTools tree={tree} settingsElements={settingsElements} style={style} />
-      <div ref={setTreeRootRef} className={s(computedStyles, { treeBox: true, big })}>
+      <div ref={setTreeRootRef} className={s(computedStyles, { treeBox: true })}>
         <ElementsTreeContext.Provider value={context}>
           <div className={s(computedStyles, { box: true }, className)}>
             <FolderExplorer state={folderExplorer}>
@@ -181,8 +179,8 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
                     bottom: dropOutside.bottom,
                   })}
                 >
-                  <TreeNodeNested big={big} root>
-                    <TreeNodeNestedMessage big={big}>
+                  <TreeNodeNested root>
+                    <TreeNodeNestedMessage>
                       <Translate token="app_navigationTree_drop_here" />
                     </TreeNodeNestedMessage>
                   </TreeNodeNested>
@@ -194,7 +192,6 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
                       nodeId={root}
                       component={NavigationNodeElement}
                       path={folderExplorer.state.path}
-                      big={big}
                       root
                     />
                   </div>

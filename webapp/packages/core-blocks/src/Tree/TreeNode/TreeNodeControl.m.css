@@ -17,19 +17,6 @@
     width: 100% !important;
   }
 
-  &.dragging {
-    opacity: 0.6;
-  }
-
-  &.big {
-    height: 46px;
-    padding: 0px 16px;
-
-    & + * {
-      padding-left: 24px;
-    }
-  }
-
   &.editing::before {
     display: none;
   }
