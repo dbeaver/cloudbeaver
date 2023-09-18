@@ -8,32 +8,18 @@
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
-import styled, { css, use } from 'reshadow';
 
+import { s, useS } from '@cloudbeaver/core-blocks';
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
-import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
+import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { EditingContext } from '../../../Editing/EditingContext';
 import { CellContext } from '../../CellRenderer/CellContext';
 import { DataGridContext } from '../../DataGridContext';
 import { TableDataContext } from '../../TableDataContext';
+import style from './BooleanFormatter.m.css';
 
-const styles = css`
-  boolean-formatter {
-    cursor: pointer;
-  }
-  boolean-formatter[|disabled] {
-    cursor: auto;
-  }
-  boolean-formatter[|boolean] {
-    font-family: monospace;
-    white-space: pre;
-    line-height: 1;
-    vertical-align: text-top;
-  }
-`;
-
-export const BooleanFormatter = observer<FormatterProps<IResultSetRowKey>>(function BooleanFormatter({ column, row }) {
+export const BooleanFormatter = observer<RenderCellProps<IResultSetRowKey>>(function BooleanFormatter({ column, row }) {
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const editingContext = useContext(EditingContext);
@@ -42,6 +28,8 @@ export const BooleanFormatter = observer<FormatterProps<IResultSetRowKey>>(funct
   if (!context || !tableDataContext || !editingContext || !cellContext.cell) {
     throw new Error('Contexts required');
   }
+
+  const styles = useS(style);
 
   const formatter = tableDataContext.format;
   const rawValue = useMemo(
@@ -68,15 +56,9 @@ export const BooleanFormatter = observer<FormatterProps<IResultSetRowKey>>(funct
     tableDataContext.editor.set(cellContext.cell, nextValue);
   }
 
-  return styled(styles)(
-    <boolean-formatter
-      className={value === null ? 'cell-null' : undefined}
-      as="span"
-      title={stringifiedValue}
-      onClick={toggleValue}
-      {...use({ disabled, boolean: value !== null })}
-    >
+  return (
+    <span className={s(styles, { booleanFormatter: true, nullValue: value === null, disabled })} title={stringifiedValue} onClick={toggleValue}>
       {valueRepresentation}
-    </boolean-formatter>,
+    </span>
   );
 });

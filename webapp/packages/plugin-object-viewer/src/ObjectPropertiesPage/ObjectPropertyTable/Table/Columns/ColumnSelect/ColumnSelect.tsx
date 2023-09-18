@@ -16,6 +16,6 @@ export const ColumnSelect: ICustomColumn = {
   maxWidth: 40,
   minWidth: 40,
   frozen: true,
-  formatter: SelectorFormatter,
+  renderCell: props => <SelectorFormatter {...props} />,
   order: 0,
 };

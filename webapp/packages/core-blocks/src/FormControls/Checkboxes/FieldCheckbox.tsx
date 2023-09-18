@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { getLayoutProps } from '../../Containers/filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from '../../Containers/filterLayoutFakeProps';
 import elementsSizeStyles from '../../Containers/shared/ElementsSize.m.css';
 import { s } from '../../s';
 import { useS } from '../../useS';
@@ -20,18 +20,21 @@ export const FieldCheckbox: CheckboxType = function FieldCheckbox({
   ...rest
 }: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
   const layoutProps = getLayoutProps(rest);
+  const checkboxProps = filterLayoutFakeProps(rest);
   const styles = useS(elementsSizeStyles, formControlStyles, fieldCheckboxStyles);
 
-  if (rest.autoHide && !isControlPresented(rest.name, rest.state)) {
+  if (checkboxProps.autoHide && !isControlPresented(checkboxProps.name, checkboxProps.state)) {
     return null;
   }
 
   return (
     <div data-testid="field" className={s(styles, { field: true, ...layoutProps }, className)}>
-      <Checkbox {...(rest as CheckboxBaseProps & ICheckboxControlledProps)} className={styles.checkbox} />
-      <label data-testid="field-label" htmlFor={rest.id || rest.name} title={rest.title} className={styles.fieldLabel}>
-        {children}
-      </label>
+      <Checkbox {...(checkboxProps as CheckboxBaseProps & ICheckboxControlledProps)} className={styles.checkbox} />
+      {children && (
+        <label data-testid="field-label" htmlFor={checkboxProps.id || checkboxProps.name} title={checkboxProps.title} className={styles.fieldLabel}>
+          {children}
+        </label>
+      )}
     </div>
   );
 };

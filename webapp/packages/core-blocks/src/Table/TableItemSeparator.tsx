@@ -6,9 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { use } from 'reshadow';
 
-import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
+import { s } from '../s';
+import { useS } from '../useS';
+import cellStyles from './TableColumnValue.m.css';
+import rowStyles from './TableItem.m.css';
 
 interface Props {
   colSpan?: number;
@@ -24,11 +26,13 @@ export const TableItemSeparator = observer<React.PropsWithChildren<Props>>(funct
   onClick,
   onDoubleClick,
 }) {
-  return styled(BASE_TABLE_STYLES)(
-    <tr {...use({ noHover: true })} className={className} onClick={onClick} onDoubleClick={onDoubleClick}>
-      <td colSpan={colSpan} {...use({ expandArea: true })}>
+  const styles = useS(rowStyles, cellStyles);
+
+  return (
+    <tr className={s(styles, { noHover: true, row: true }, className)} onClick={onClick} onDoubleClick={onDoubleClick}>
+      <td colSpan={colSpan} className={s(styles, { expandArea: true, cell: true })}>
         {children}
       </td>
-    </tr>,
+    </tr>
   );
 });

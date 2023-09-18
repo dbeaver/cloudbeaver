@@ -6,19 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Loader } from '@cloudbeaver/core-blocks';
+import { Loader, s, useS } from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogHeader, CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
 
 import type { IDriver } from './Driver';
 import { DriverSelector } from './DriverSelector';
-
-const styles = css`
-  DriverSelector {
-    flex: 1;
-  }
-`;
+import styles from './DriverSelectorDialog.m.css';
 
 interface IProps {
   title: string;
@@ -29,13 +23,15 @@ interface IProps {
 }
 
 export const DriverSelectorDialog = observer<IProps>(function DriverSelectorDialog({ title, drivers, isLoading, onSelect, onClose }) {
-  return styled(styles)(
+  const style = useS(styles);
+
+  return (
     <CommonDialogWrapper size="large" fixedSize>
       <CommonDialogHeader title={title} onReject={onClose} />
       <CommonDialogBody noBodyPadding noOverflow>
         {isLoading && <Loader />}
-        {!isLoading && <DriverSelector drivers={drivers} onSelect={onSelect} />}
+        {!isLoading && <DriverSelector className={s(style, { driverSelector: true })} drivers={drivers} onSelect={onSelect} />}
       </CommonDialogBody>
-    </CommonDialogWrapper>,
+    </CommonDialogWrapper>
   );
 });

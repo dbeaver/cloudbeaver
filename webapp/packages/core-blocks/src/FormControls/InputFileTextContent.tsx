@@ -13,7 +13,7 @@ import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { blobToData, bytesToSize } from '@cloudbeaver/core-utils';
 
 import { Button } from '../Button';
-import { getLayoutProps } from '../Containers/filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { IconButton } from '../IconButton';
@@ -96,6 +96,7 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
   const [error, setError] = useState<Error | null>(null);
 
   const layoutProps = getLayoutProps(rest);
+  rest = filterLayoutFakeProps(rest);
   const styles = useStyles(INPUT_FILE_FIELD_STYLES, baseFormControlStyles, style, error ? baseInvalidFormControlStyles : baseValidFormControlStyles);
   const sizeStyles = useS(elementsSizeStyles);
 
