@@ -44,6 +44,7 @@ const checkboxStyles = css`
   checkbox-container {
     display: flex;
     align-items: center;
+    height: 32px;
   }
   checkbox-label {
     composes: theme-typography--body2 from global;

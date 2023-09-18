@@ -206,7 +206,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 >
                   {translate('connections_connection_configuration')}
               </Combobox>*/}
-                  <FormFieldDescription label={translate('connections_connection_configuration')} tiny fill>
+                  <FormFieldDescription label={translate('connections_connection_configuration')} tiny>
                     <Container gap>
                       <RadioGroup name="configurationType" state={config}>
                         {driverConfiguration.map(conf => (
