@@ -961,25 +961,25 @@ public class LocalResourceController implements RMController {
 
     protected <T> T doFileReadOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
-//            try {
-//                fileHandler.beforeFileRead(projectId, file);
-//            } catch (Exception e) {
-            if (credentialsProvider.getActiveUserCredentials() != null) {
-                WebAppUtils.getWebApplication().getEventController().addEvent(
-                    new WSErrorEvent(
-                        WSEventType.SESSION_LOG_MESSAGE_ADDED,
-                        credentialsProvider.getActiveUserCredentials().getSmSessionId(),
-                        credentialsProvider.getActiveUserCredentials().getUserId(),
-                        "123")); //e.getMessage()));
-            } else {
-                WebAppUtils.getWebApplication().getEventController().addEvent(
-                    new WSErrorEvent(
-                        WSEventType.SESSION_LOG_MESSAGE_ADDED,
-                        "123")); //e.getMessage()));
+            try {
+                fileHandler.beforeFileRead(projectId, file);
+            } catch (Exception e) {
+                if (credentialsProvider.getActiveUserCredentials() != null) {
+                    WebAppUtils.getWebApplication().getEventController().addEvent(
+                        new WSErrorEvent(
+                            WSEventType.SESSION_LOG_MESSAGE_ADDED,
+                            credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                            credentialsProvider.getActiveUserCredentials().getUserId(),
+                            e.getMessage()));
+                } else {
+                    WebAppUtils.getWebApplication().getEventController().addEvent(
+                        new WSErrorEvent(
+                            WSEventType.SESSION_LOG_MESSAGE_ADDED,
+                            e.getMessage()));
+                }
+                log.error("Error before file reading", e);
             }
         }
-//                log.error("Error before file reading", e);
-//            }
         return operation.doOperation();
     }
 
