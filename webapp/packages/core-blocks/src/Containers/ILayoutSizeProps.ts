@@ -15,4 +15,5 @@ export interface ILayoutSizeProps {
   large?: boolean;
   maximum?: boolean;
   fill?: boolean;
+  noGrow?: boolean;
 }
