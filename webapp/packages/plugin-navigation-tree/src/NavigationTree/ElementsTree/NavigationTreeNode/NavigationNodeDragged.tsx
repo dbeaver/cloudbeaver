@@ -7,16 +7,17 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
 
-import { getComputed, TreeNode, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import { getComputed, s, TreeNode, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 
 import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
 import { transformNodeInfo } from '../transformNodeInfo';
 import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
+import style from './NavigationNodeDragged.m.css';
 
-export const NavigationNodeDragged: NavigationNodeComponent = observer(function NavigationNode({ node, className, control: externalControl, style }) {
+export const NavigationNodeDragged: NavigationNodeComponent = observer(function NavigationNode({ node, className, control: externalControl }) {
+  const styles = useS(style);
   const contextRef = useObjectRef({
     context: useContext(ElementsTreeContext),
   });
@@ -25,10 +26,10 @@ export const NavigationNodeDragged: NavigationNodeComponent = observer(function 
   const Control = control || externalControl || NavigationNodeControlLoader;
   const nodeInfo = transformNodeInfo(node, contextRef.context?.tree.nodeInfoTransformers ?? []);
 
-  return styled(useStyles(style))(
-    <TreeNode externalExpanded={false} className={className} leaf>
+  return (
+    <TreeNode externalExpanded={false} className={s(styles, { treeNode: true }, className)} leaf>
       {/* <DNDPreview data={dndData} src="/icons/empty.svg" /> */}
       <Control nodeInfo={nodeInfo} node={node} dndPlaceholder />
-    </TreeNode>,
+    </TreeNode>
   );
 });
