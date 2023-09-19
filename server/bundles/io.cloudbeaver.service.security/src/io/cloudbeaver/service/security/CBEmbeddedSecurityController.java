@@ -352,7 +352,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER"
-                    + buildUsersFilter(filter) + "\nORDER BY USER_ID " + getOffsetLimit()))) {
+                    + buildUsersFilter(filter) + "\nORDER BY USER_ID " + database.getDialect().getOffsetLimitQueryPart()))) {
                 int parameterIndex = setUsersFilterValues(dbStat, filter, 1);
                 dbStat.setInt(parameterIndex++, filter.getPage().getOffset());
                 dbStat.setInt(parameterIndex++, filter.getPage().getLimit());
@@ -399,13 +399,6 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error while loading users", e);
         }
-    }
-
-    private String getOffsetLimit() {
-        if (ArrayUtils.containsIgnoreCase(new String[] {"sqlserver", "oracle"}, database.getDialect().getDialectId())) {
-            return "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        }
-        return "OFFSET ? LIMIT ?";
     }
 
     private String buildUsersFilter(SMUserFilter filter) {
