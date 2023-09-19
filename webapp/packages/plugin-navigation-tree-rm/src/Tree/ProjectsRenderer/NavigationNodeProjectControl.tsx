@@ -98,7 +98,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
         ref={ref}
         onClick={handleClick}
         onContextMenu={handleContextMenuOpen}
-        className={s(styles, { treeNodeControl: true, outdated }, className)}
+        className={s(styles, { treeNodeControl: true, outdated,  }, className)}
       >
         <TreeNodeName title={name} className={s(styles, { treeNodeName: true })}>
           <div className={s(styles, { nameBox: true })}>{name}</div>

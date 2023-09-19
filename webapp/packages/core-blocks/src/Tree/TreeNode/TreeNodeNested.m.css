@@ -7,8 +7,4 @@
     padding: 0;
     display: block;
   }
-
-  &.expanded {
-    display: block;
-  }
 }

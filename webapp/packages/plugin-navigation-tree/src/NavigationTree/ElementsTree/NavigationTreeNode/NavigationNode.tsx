@@ -93,7 +93,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       showInFilter={navNode.showInFilter}
       externalExpanded={externalExpanded}
       leaf={navNode.leaf}
-      className={s(styles, { treeNode: true, hovered: hasNodes }, className)}
+      className={s(styles, { treeNode: true, hovered: hasNodes, expanded: externalExpanded ?? navNode.expanded }, className)}
       onExpand={navNode.expand}
       onClick={navNode.click}
       onOpen={navNode.open}
@@ -101,7 +101,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     >
       {/* <DNDPreview data={dndData} src="/icons/empty.svg" /> */}
       <NavigationNodeControlRenderer ref={controlRef} navNode={navNode} dragging={dndData.state.isDragging} control={externalControl} node={node} />
-      {expanded && <NavigationNodeNested nodeId={node.id} path={path} component={component} />}
+      {expanded && <NavigationNodeNested nodeId={node.id} path={path} component={component} className={s(styles, { navNodeNested: true })} />}
     </TreeNode>
   );
 });

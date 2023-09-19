@@ -4,13 +4,5 @@
   &.project:only-child,
   &.hideProjects {
     margin-top: 0px;
-
-    & > .control {
-      display: none;
-    }
-  }
-
-  & > .navigationNodeNested {
-    padding-left: 0;
   }
 }
