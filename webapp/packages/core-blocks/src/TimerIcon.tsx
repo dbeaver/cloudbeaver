@@ -6,79 +6,27 @@
  * you may not use this file except in compliance with the License.
  */
 import type React from 'react';
-import styled, { css } from 'reshadow';
-
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Icon } from './Icon';
-import { useStyles } from './useStyles';
-
-const style = css`
-  timer {
-    position: relative;
-    width: 16px;
-    height: 16px;
-    overflow: hidden;
-
-    & > Icon {
-      width: 16px;
-      height: 16px;
-    }
-
-    & state {
-      opacity: 0;
-
-      & > Icon {
-        width: 12px;
-        height: 12px;
-      }
-    }
-  }
-  state,
-  interval {
-    position: absolute;
-    right: 0;
-    top: 0;
-    display: flex;
-    width: 16px;
-    height: 16px;
-    justify-content: center;
-    align-items: center;
-  }
-  timer:hover {
-    & state {
-      opacity: 1;
-    }
-    & interval {
-      opacity: 0;
-    }
-  }
-  interval {
-    font-size: 8px;
-    font-weight: bold;
-    line-height: normal;
-    justify-content: center;
-    align-items: center;
-  }
-`;
+import { s } from './s';
+import style from './TimerIcon.m.css';
+import { useS } from './useS';
 
 interface Props {
   state: 'play' | 'stop';
   interval: number;
-  styles?: ComponentStyle;
 }
 
-export const TimerIcon: React.FC<Props & React.ButtonHTMLAttributes<HTMLDivElement>> = function TimerIcon({ state, interval, styles, ...rest }) {
-  return styled(
-    style,
-    useStyles(styles),
-  )(
-    <timer {...rest}>
-      <Icon name="/icons/timer_m.svg#root" viewBox="0 0 24 24" />
-      <state>
-        <Icon name={`/icons/timer-${state}_m.svg#root`} viewBox="0 0 12 12" />
-      </state>
-      <interval>{interval}</interval>
-    </timer>,
+export const TimerIcon: React.FC<Props & React.ButtonHTMLAttributes<HTMLDivElement>> = function TimerIcon({ state, interval, ...rest }) {
+  const styles = useS(style);
+
+  return (
+    <div className={s(styles, { timer: true })} {...rest}>
+      <Icon className={s(styles, { icon: true })} name="/icons/timer_m.svg#root" viewBox="0 0 24 24" />
+      <div className={s(styles, { state: true })}>
+        <Icon className={s(styles, { icon: true })} name={`/icons/timer-${state}_m.svg#root`} viewBox="0 0 12 12" />
+      </div>
+      <div className={s(styles, { interval: true })}>{interval}</div>
+    </div>
   );
 };
