@@ -1,0 +1,10 @@
+.infoItem {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+.iconOrImage {
+  width: 24px;
+  height: 24px;
+  margin-right: 16px;
+}
