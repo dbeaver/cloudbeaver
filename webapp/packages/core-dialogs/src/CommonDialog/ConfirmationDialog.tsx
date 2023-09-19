@@ -5,9 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import styled, { css } from 'reshadow';
-
-import { Button, Translate, useFocus, useStyles } from '@cloudbeaver/core-blocks';
+import { Button, Fill, s, Translate, useFocus, useS } from '@cloudbeaver/core-blocks';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
 import { CommonDialogBody } from './CommonDialog/CommonDialogBody';
@@ -15,17 +13,7 @@ import { CommonDialogFooter } from './CommonDialog/CommonDialogFooter';
 import { CommonDialogHeader } from './CommonDialog/CommonDialogHeader';
 import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
 import type { DialogComponent, DialogueStateResult } from './CommonDialogService';
-
-const style = css`
-  CommonDialogFooter {
-    align-items: center;
-    gap: 16px;
-  }
-
-  fill {
-    flex: 1;
-  }
-`;
+import style from './ConfirmationDialog.m.css';
 
 export interface ConfirmationDialogPayload {
   icon?: string;
@@ -46,20 +34,21 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Dial
   rejectDialog,
   className,
 }) {
+  const styles = useS(style);
   const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const { icon, title, subTitle, bigIcon, viewBox, message, confirmActionText, cancelActionText } = payload;
 
-  return styled(useStyles(style))(
+  return (
     <CommonDialogWrapper ref={focusedRef} size="small" className={className} fixedWidth>
       <CommonDialogHeader title={title} subTitle={subTitle} icon={icon} viewBox={viewBox} bigIcon={bigIcon} onReject={rejectDialog} />
       <CommonDialogBody>
         <Translate token={message} />
       </CommonDialogBody>
-      <CommonDialogFooter>
+      <CommonDialogFooter className={s(styles, { footer: true })}>
         <Button type="button" mod={['outlined']} onClick={rejectDialog}>
           <Translate token={cancelActionText || 'ui_processing_cancel'} />
         </Button>
-        <fill />
+        <Fill />
         {payload.extraStatus !== undefined && (
           <Button type="button" mod={['outlined']} onClick={() => resolveDialog(payload.extraStatus)}>
             <Translate token={cancelActionText || 'ui_no'} />
@@ -69,6 +58,6 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Dial
           <Translate token={confirmActionText || 'ui_processing_ok'} />
         </Button>
       </CommonDialogFooter>
-    </CommonDialogWrapper>,
+    </CommonDialogWrapper>
   );
 };

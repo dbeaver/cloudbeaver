@@ -7,14 +7,15 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useCallback, useContext } from 'react';
-import styled, { use } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
 
+import { s } from '../s';
 import { useObjectRef } from '../useObjectRef';
-import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
+import { useS } from '../useS';
 import { EventTableItemExpandFlag } from './EventTableItemExpandFlag';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
+import style from './TableColumnValue.m.css';
 import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
 
@@ -34,6 +35,7 @@ export const TableColumnValue = observer<Props, HTMLTableCellElement>(
     const tableContext = useContext(TableContext);
     const context = useContext(TableItemContext);
     const props = useObjectRef({ onClick, onDoubleClick });
+    const styles = useS(style);
 
     const handleClick = useCallback(
       (event: React.MouseEvent<HTMLTableCellElement>) => {
@@ -61,19 +63,18 @@ export const TableColumnValue = observer<Props, HTMLTableCellElement>(
       return null;
     }
 
-    return styled(BASE_TABLE_STYLES)(
+    return (
       <td
-        align={align}
-        className={className}
-        {...use({ centerContent, ellipsis })}
         ref={ref}
+        align={align}
+        className={s(styles, { centerContent, ellipsis, cell: true }, className)}
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
         {...rest}
       >
-        {flex && <td-flex className={className}>{children}</td-flex>}
+        {flex && <div className={s(styles, { tdFlex: true, centerContent, ellipsis }, className)}>{children}</div>}
         {!flex && children}
-      </td>,
+      </td>
     );
   }),
 );

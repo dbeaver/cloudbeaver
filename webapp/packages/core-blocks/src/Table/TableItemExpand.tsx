@@ -7,17 +7,18 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
-import styled, { use } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
 
 import { Icon } from '../Icon';
 import { useTranslate } from '../localization/useTranslate';
-import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
+import { s } from '../s';
+import { useS } from '../useS';
 import { EventTableItemExpandFlag } from './EventTableItemExpandFlag';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
 import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
+import style from './TableItemExpand.m.css';
 
 interface Props {
   onExpand?: (item: any, state: boolean) => void;
@@ -29,6 +30,8 @@ export const TableItemExpand = observer<Props>(function TableItemExpand({ onExpa
   const translate = useTranslate();
   const tableContext = useContext(TableContext);
   const context = useContext(TableItemContext);
+  const styles = useS(style);
+
   if (!context) {
     throw new Error('TableContext must be provided');
   }
@@ -51,9 +54,9 @@ export const TableItemExpand = observer<Props>(function TableItemExpand({ onExpa
     [tableContext, context, onExpand, disabled],
   );
 
-  return styled(BASE_TABLE_STYLES)(
-    <table-item-expand-box className={className} title={translate('ui_expand')} onClick={handleClick}>
-      <Icon name="angle" viewBox="0 0 15 8" {...use({ expanded: context.isExpanded() })} />
-    </table-item-expand-box>,
+  return (
+    <div className={s(styles, { tableItemExpandBox: true }, className)} title={translate('ui_expand')} onClick={handleClick}>
+      <Icon name="angle" viewBox="0 0 15 8" className={s(styles, { tableItemExpandBoxIcon: true, expanded: context.isExpanded() })} />
+    </div>
   );
 });

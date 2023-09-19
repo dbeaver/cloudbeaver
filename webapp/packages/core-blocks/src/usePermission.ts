@@ -5,11 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useService } from '@cloudbeaver/core-di';
-import { PermissionsService } from '@cloudbeaver/core-root';
+import { SessionPermissionsResource } from '@cloudbeaver/core-root';
+
+import { useResource } from './ResourcesHooks/useResource';
 
 export function usePermission(key: string): boolean {
-  const permissionsService = useService(PermissionsService);
+  const sessionPermissionsResource = useResource(usePermission, SessionPermissionsResource, undefined);
 
-  return permissionsService.has(key);
+  return sessionPermissionsResource.data.has(key);
 }

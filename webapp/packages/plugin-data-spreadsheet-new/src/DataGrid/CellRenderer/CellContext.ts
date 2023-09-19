@@ -18,6 +18,7 @@ export interface ICellContext {
   position: CellPosition;
   isEditing: boolean;
   isSelected: boolean;
+  isFocused: boolean;
   editionState: DatabaseEditChangeType | null;
 }
 

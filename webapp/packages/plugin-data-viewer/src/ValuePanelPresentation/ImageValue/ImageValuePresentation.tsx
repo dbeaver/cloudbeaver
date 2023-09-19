@@ -162,6 +162,8 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
         canSave: computed,
         truncated: computed,
         stretch: observable.ref,
+        model: observable.ref,
+        resultIndex: observable.ref,
         toggleStretch: action.bound,
         save: action.bound,
       },

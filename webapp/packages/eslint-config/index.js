@@ -7,5 +7,5 @@
  */
 
 module.exports = {
-  extends: './eslint-config.json'
-}
+  extends: './eslint-config.json',
+};

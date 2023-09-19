@@ -1009,23 +1009,32 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
     @Override
-    public void deleteTeam(String teamId) throws DBCException {
+    public void deleteTeam(String teamId, boolean force) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT COUNT(*) FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?")
-            )) {
-                dbStat.setString(1, teamId);
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    if (dbResult.next()) {
-                        int userCount = dbResult.getInt(1);
-                        if (userCount > 0) {
-                            throw new DBCException("Team can't be deleted. There are " + userCount + " user(s) who have this team. Un-assign team first.");
+            if (!force) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    database.normalizeTableNames("SELECT COUNT(*) FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?")
+                )) {
+                    dbStat.setString(1, teamId);
+                    try (ResultSet dbResult = dbStat.executeQuery()) {
+                        if (dbResult.next()) {
+                            int userCount = dbResult.getInt(1);
+                            if (userCount > 0) {
+                                throw new DBCException("Team can't be deleted. There are " + userCount +
+                                    " user(s) who have this team. Un-assign team first.");
+                            }
                         }
                     }
                 }
             }
-
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                if (force) {
+                    JDBCUtils.executeStatement(
+                        dbCon,
+                        database.normalizeTableNames("DELETE FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?"),
+                        teamId
+                    );
+                }
                 deleteAuthSubject(dbCon, teamId);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames("DELETE FROM {table_prefix}CB_TEAM WHERE TEAM_ID=?"))) {
@@ -1036,6 +1045,15 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
         } catch (SQLException e) {
             throw new DBCException("Error deleting team from database", e);
+        }
+        if (force) {
+            var event = WSSubjectPermissionEvent.update(
+                getSmSessionId(),
+                getUserId(),
+                SMSubjectType.team,
+                teamId
+            );
+            application.getEventController().addEvent(event);
         }
     }
 
@@ -1775,40 +1793,41 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
 
             userAuthData.putAll((Map<String, Object>) authInfo.getAuthData().get(authConfiguration));
-            SMAutoAssign autoAssign = isMainAuthSession
-                ? getAutoAssignUserData(authProvider, providerConfig, userAuthData, finishAuthMonitor)
-                //do not auto assign user data if it an additional auth
-                : null;
-            if (autoAssign != null) {
-                detectedAuthRole = autoAssign.getAuthRole();
-            }
 
-            var userIdFromCreds = findOrCreateExternalUserByCredentials(
-                authProvider,
-                authAttemptSessionInfo.getSessionParams(),
-                userAuthData,
-                finishAuthMonitor,
-                activeUserId,
-                activeUserId == null,
-                detectedAuthRole,
-                providerConfig
-            );
-
-            if (userIdFromCreds == null) {
-                var error = "Invalid user credentials";
-                updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
-                return SMAuthInfo.error(authId, error);
-            }
-
-            if (autoAssign != null && !CommonUtils.isEmpty(autoAssign.getExternalTeamIds())) {
-                if (allTeams == null) {
-                    allTeams = readAllTeams();
+            if (isMainAuthSession) {
+                SMAutoAssign autoAssign =
+                    getAutoAssignUserData(authProvider, providerConfig, userAuthData, finishAuthMonitor);
+                if (autoAssign != null) {
+                    detectedAuthRole = autoAssign.getAuthRole();
                 }
-                autoUpdateUserTeams(authProvider, autoAssign, userIdFromCreds, allTeams);
-            }
 
-            if (activeUserId == null) {
-                activeUserId = userIdFromCreds;
+                var userIdFromCreds = findOrCreateExternalUserByCredentials(
+                    authProvider,
+                    authAttemptSessionInfo.getSessionParams(),
+                    userAuthData,
+                    finishAuthMonitor,
+                    activeUserId,
+                    activeUserId == null,
+                    detectedAuthRole,
+                    providerConfig
+                );
+
+                if (userIdFromCreds == null) {
+                    var error = "Invalid user credentials";
+                    updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
+                    return SMAuthInfo.error(authId, error);
+                }
+
+                if (autoAssign != null && !CommonUtils.isEmpty(autoAssign.getExternalTeamIds())) {
+                    if (allTeams == null) {
+                        allTeams = readAllTeams();
+                    }
+                    autoUpdateUserTeams(authProvider, autoAssign, userIdFromCreds, allTeams);
+                }
+
+                if (activeUserId == null) {
+                    activeUserId = userIdFromCreds;
+                }
             }
             storedUserData.put(authConfiguration,
                 saveSecuredCreds ? userAuthData : filterSecuredUserData(userAuthData, getAuthProvider(authProviderId)));

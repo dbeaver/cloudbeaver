@@ -16,41 +16,23 @@
   -webkit-user-select: none;
 
   .cb-react-grid-theme {
-    font-family: inherit;
-    outline: 0;
-    height: 100%;
-    background-color: inherit;
-    border: none;
+    outline: 0 !important;
+    height: 100% !important;
+    background-color: inherit !important;
+    border: none !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
 
     .rdg-header-row,
     .rdg-row {
-      background-color: transparent;
+      background-color: var(--theme-surface) !important;
+    }
+    * {
+      font-size: inherit !important;
+      font-family: inherit !important;
     }
     .rdg-cell.rdg-cell-frozen {
-      box-shadow: none;
-    }
-
-    .text-formatter {
-      display: flex;
-      align-items: center;
-      & a {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 16px;
-        height: 24px;
-        margin-right: 8px;
-      }
-      & svg {
-        width: 12px;
-        height: 12px;
-      }
-    }
-
-    .text-formatter__value {
-      overflow: hidden;
-      white-space: pre;
-      text-overflow: ellipsis;
+      box-shadow: none !important;
     }
 
     .rdg-cell-editing {

@@ -8,9 +8,8 @@
 import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Button, ErrorMessage, Loader, useClipboard, useErrorDetails, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, ErrorMessage, Loader, s, useClipboard, useErrorDetails, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
@@ -19,38 +18,8 @@ import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
 
+import style from './GeneratedSqlDialog.m.css';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource';
-
-const styles = css`
-  footer-container {
-    display: flex;
-    width: min-content;
-    flex: 1;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 24px;
-  }
-  buttons {
-    flex: 0 0 auto;
-    display: flex;
-    gap: 24px;
-  }
-  ErrorMessage {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-    flex: 1;
-  }
-  wrapper {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-    overflow: auto;
-  }
-  SQLCodeEditorLoader {
-    height: 100%;
-    width: 100%;
-  }
-`;
 
 interface Payload {
   generatorId: string;
@@ -60,6 +29,7 @@ interface Payload {
 export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(function GeneratedSqlDialog({ rejectDialog, payload }) {
   const translate = useTranslate();
   const copy = useClipboard();
+  const styles = useS(style);
 
   const sqlDialectInfoService = useService(SqlDialectInfoService);
   const sqlGeneratorsResource = useService(SqlGeneratorsResource);
@@ -119,31 +89,36 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
     });
   });
 
-  return styled(styles)(
+  return (
     <CommonDialogWrapper size="large">
       <CommonDialogHeader title="app_shared_sql_generators_dialog_title" icon="sql-script" onReject={rejectDialog} />
       <CommonDialogBody noOverflow noBodyPadding>
-        <wrapper>
+        <div className={s(styles, { wrapper: true })}>
           <Loader loading={state.loading}>
-            {() => styled(styles)(<SQLCodeEditorLoader value={state.query} extensions={extensions} readonly />)}
+            {() => <SQLCodeEditorLoader className={s(styles, { sqlCodeEditorLoader: true })} value={state.query} extensions={extensions} readonly />}
           </Loader>
-        </wrapper>
+        </div>
       </CommonDialogBody>
       <CommonDialogFooter>
-        <footer-container>
+        <div className={s(styles, { footerContainer: true })}>
           {state.error.responseMessage && (
-            <ErrorMessage text={state.error.responseMessage} hasDetails={error.hasDetails} onShowDetails={error.open} />
+            <ErrorMessage
+              className={s(styles, { errorMessage: true })}
+              text={state.error.responseMessage}
+              hasDetails={error.hasDetails}
+              onShowDetails={error.open}
+            />
           )}
-          <buttons>
+          <div className={s(styles, { buttons: true })}>
             <Button mod={['outlined']} onClick={() => copy(state.query, true)}>
               {translate('ui_copy_to_clipboard')}
             </Button>
             <Button mod={['unelevated']} onClick={rejectDialog}>
               {translate('ui_close')}
             </Button>
-          </buttons>
-        </footer-container>
+          </div>
+        </div>
       </CommonDialogFooter>
-    </CommonDialogWrapper>,
+    </CommonDialogWrapper>
   );
 });

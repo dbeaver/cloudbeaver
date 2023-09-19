@@ -32,7 +32,7 @@ export type NavTreeControlProps = {
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 };
 
-export type NavTreeControlComponent = React.FC<NavTreeControlProps>;
+export type NavTreeControlComponent = React.ForwardRefExoticComponent<NavTreeControlProps>;
 
 export type NavigationNodeComponent = React.FC<{
   node: NavNode;

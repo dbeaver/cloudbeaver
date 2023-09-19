@@ -7,12 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import styled, { css } from 'reshadow';
 
 import {
   Button,
   getComputed,
-  Loader,
   Overlay,
   OverlayActions,
   OverlayHeader,
@@ -20,10 +18,9 @@ import {
   OverlayHeaderSubTitle,
   OverlayHeaderTitle,
   OverlayMessage,
-  useExecutor,
+  s,
   useResource,
-  useSplitUserState,
-  useStyles,
+  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import {
@@ -34,35 +31,32 @@ import {
   getRealExecutionContextId,
 } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
+import style from './SqlEditorOverlay.m.css';
 import { SqlEditorService } from './SqlEditorService';
-import { useDataSource } from './useDataSource';
-
-const viewerStyles = css`
-  OverlayActions {
-    justify-content: space-between;
-  }
-`;
 
 interface Props {
   state: ISqlEditorTabState;
 }
 
 export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ state }) {
+  const styles = useS(style);
   const translate = useTranslate();
   const sqlEditorService = useService(SqlEditorService);
   const sqlDataSourceService = useService(SqlDataSourceService);
+  const notificationService = useService(NotificationService);
   const dataSource = sqlDataSourceService.get(state.editorId);
   const executionContextId = dataSource?.executionContext?.id;
+  const executionContext = dataSource?.executionContext;
 
-  useDataSource(dataSource);
   const connection = useResource(
     SqlEditorOverlay,
     ConnectionInfoResource,
-    dataSource?.executionContext ? createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId) : null,
+    executionContext ? createConnectionParam(executionContext.projectId, executionContext.connectionId) : null,
   );
   const driver = useResource(SqlEditorOverlay, DBDriverResource, connection.tryGetData?.driverId ?? null);
 
@@ -82,7 +76,11 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
   }
 
   async function init() {
-    await sqlEditorService.initEditorConnection(state);
+    try {
+      await sqlEditorService.initEditorConnection(state);
+    } catch (exception: any) {
+      notificationService.logException(exception);
+    }
   }
 
   const dataContainer = getComputed(() =>
@@ -95,7 +93,7 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
     }
   }, [connected, initExecutionContext]);
 
-  return styled(viewerStyles)(
+  return (
     <Overlay active={initExecutionContext && !connection.tryGetData?.connected}>
       <OverlayHeader>
         <OverlayHeaderIcon icon={driver.tryGetData?.icon} />
@@ -103,7 +101,7 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
         {dataContainer && <OverlayHeaderSubTitle>{dataContainer}</OverlayHeaderSubTitle>}
       </OverlayHeader>
       <OverlayMessage>{translate('sql_editor_restore_message')}</OverlayMessage>
-      <OverlayActions>
+      <OverlayActions className={s(styles, { overlayActions: true })}>
         <Button type="button" mod={['outlined']} loader onClick={cancelConnection}>
           {translate('ui_processing_cancel')}
         </Button>
@@ -111,6 +109,6 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
           {translate('sql_editor_restore')}
         </Button>
       </OverlayActions>
-    </Overlay>,
+    </Overlay>
   );
 });
