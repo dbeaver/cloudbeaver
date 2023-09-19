@@ -1769,40 +1769,41 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             }
 
             userAuthData.putAll((Map<String, Object>) authInfo.getAuthData().get(authConfiguration));
-            SMAutoAssign autoAssign = isMainAuthSession
-                ? getAutoAssignUserData(authProvider, providerConfig, userAuthData, finishAuthMonitor)
-                //do not auto assign user data if it an additional auth
-                : null;
-            if (autoAssign != null) {
-                detectedAuthRole = autoAssign.getAuthRole();
-            }
 
-            var userIdFromCreds = findOrCreateExternalUserByCredentials(
-                authProvider,
-                authAttemptSessionInfo.getSessionParams(),
-                userAuthData,
-                finishAuthMonitor,
-                activeUserId,
-                activeUserId == null,
-                detectedAuthRole,
-                providerConfig
-            );
-
-            if (userIdFromCreds == null) {
-                var error = "Invalid user credentials";
-                updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
-                return SMAuthInfo.error(authId, error);
-            }
-
-            if (autoAssign != null && !CommonUtils.isEmpty(autoAssign.getExternalTeamIds())) {
-                if (allTeams == null) {
-                    allTeams = readAllTeams();
+            if (isMainAuthSession) {
+                SMAutoAssign autoAssign =
+                    getAutoAssignUserData(authProvider, providerConfig, userAuthData, finishAuthMonitor);
+                if (autoAssign != null) {
+                    detectedAuthRole = autoAssign.getAuthRole();
                 }
-                autoUpdateUserTeams(authProvider, autoAssign, userIdFromCreds, allTeams);
-            }
 
-            if (activeUserId == null) {
-                activeUserId = userIdFromCreds;
+                var userIdFromCreds = findOrCreateExternalUserByCredentials(
+                    authProvider,
+                    authAttemptSessionInfo.getSessionParams(),
+                    userAuthData,
+                    finishAuthMonitor,
+                    activeUserId,
+                    activeUserId == null,
+                    detectedAuthRole,
+                    providerConfig
+                );
+
+                if (userIdFromCreds == null) {
+                    var error = "Invalid user credentials";
+                    updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
+                    return SMAuthInfo.error(authId, error);
+                }
+
+                if (autoAssign != null && !CommonUtils.isEmpty(autoAssign.getExternalTeamIds())) {
+                    if (allTeams == null) {
+                        allTeams = readAllTeams();
+                    }
+                    autoUpdateUserTeams(authProvider, autoAssign, userIdFromCreds, allTeams);
+                }
+
+                if (activeUserId == null) {
+                    activeUserId = userIdFromCreds;
+                }
             }
             storedUserData.put(authConfiguration,
                 saveSecuredCreds ? userAuthData : filterSecuredUserData(userAuthData, getAuthProvider(authProviderId)));

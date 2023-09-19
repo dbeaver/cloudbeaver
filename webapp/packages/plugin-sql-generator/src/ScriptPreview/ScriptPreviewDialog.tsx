@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Button, useClipboard, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Fill, s, useClipboard, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionDialectResource, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
@@ -16,25 +15,7 @@ import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
 
-const styles = css`
-  wrapper {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-    overflow: auto;
-  }
-  SQLCodeEditorLoader {
-    height: 100%;
-    width: 100%;
-  }
-  fill {
-    flex: 1;
-  }
-  CommonDialogFooter {
-    gap: 24px;
-  }
-`;
+import style from './ScriptPreviewDialog.m.css';
 
 interface Payload {
   script: string;
@@ -44,6 +25,7 @@ interface Payload {
 export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(function ScriptPreviewDialog({ rejectDialog, payload }) {
   const translate = useTranslate();
   const copy = useClipboard();
+  const styles = useS(style);
 
   const connectionExecutionContextService = useService(ConnectionExecutionContextService);
   const context = connectionExecutionContextService.get(payload.model.source.executionContext?.context?.id ?? '');
@@ -62,19 +44,25 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
     rejectDialog();
   };
 
-  return styled(styles)(
+  return (
     <CommonDialogWrapper size="large">
       <CommonDialogHeader title="data_viewer_script_preview_dialog_title" icon="sql-script" onReject={rejectDialog} />
       <CommonDialogBody noBodyPadding noOverflow>
-        <wrapper>
-          <SQLCodeEditorLoader value={payload.script} extensions={extensions} lineNumbers readonly />
-        </wrapper>
+        <div className={s(styles, { wrapper: true })}>
+          <SQLCodeEditorLoader
+            className={s(styles, { sqlCodeEditorLoader: true })}
+            value={payload.script}
+            extensions={extensions}
+            lineNumbers
+            readonly
+          />
+        </div>
       </CommonDialogBody>
-      <CommonDialogFooter>
+      <CommonDialogFooter className={s(styles, { footer: true })}>
         <Button mod={['unelevated']} onClick={apply}>
           {translate('ui_apply')}
         </Button>
-        <fill />
+        <Fill />
         <Button mod={['outlined']} onClick={() => copy(payload.script, true)}>
           {translate('ui_copy_to_clipboard')}
         </Button>
@@ -82,6 +70,6 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
           {translate('ui_close')}
         </Button>
       </CommonDialogFooter>
-    </CommonDialogWrapper>,
+    </CommonDialogWrapper>
   );
 });

@@ -27,6 +27,6 @@
   },
   "peerDependencies": {
     "mobx": "~6.x.x",
-    "@testing-library/jest-dom": "~5.x.x"
+    "@testing-library/jest-dom": "~6.x.x"
   }
 }

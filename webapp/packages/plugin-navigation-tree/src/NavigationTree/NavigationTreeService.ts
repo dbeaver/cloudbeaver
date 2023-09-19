@@ -72,53 +72,43 @@ export class NavigationTreeService extends View<string> {
     await this.navNodeManagerService.navToNode(id, parentId);
   }
 
-  async loadNestedNodes(id = ROOT_NODE_PATH, tryConnect?: boolean, notify = true): Promise<boolean> {
-    try {
-      if (this.isConnectionNode(id)) {
-        let connection = this.connectionInfoResource.getConnectionForNode(id);
+  async loadNestedNodes(id = ROOT_NODE_PATH, tryConnect?: boolean): Promise<boolean> {
+    if (this.isConnectionNode(id)) {
+      let connection = this.connectionInfoResource.getConnectionForNode(id);
 
-        if (connection) {
-          connection = await this.connectionInfoResource.load(createConnectionParam(connection));
-        } else {
-          return false;
-        }
-
-        if (!connection.connected) {
-          if (!tryConnect) {
-            return false;
-          }
-
-          try {
-            const connected = await this.tryInitConnection(createConnectionParam(connection));
-            if (!connected) {
-              return false;
-            }
-          } catch {
-            return false;
-          }
-        }
-      }
-
-      await this.navTreeResource.waitLoad();
-
-      if (tryConnect && this.navTreeResource.getException(id)) {
-        this.navTreeResource.markOutdated(id);
-      }
-
-      const parents = this.navNodeInfoResource.getParents(id);
-
-      if (parents.length > 0 && !this.navNodeInfoResource.has(id)) {
+      if (connection) {
+        connection = await this.connectionInfoResource.load(createConnectionParam(connection));
+      } else {
         return false;
       }
 
-      await this.navTreeResource.load(CachedResourcePageKey(CACHED_RESOURCE_DEFAULT_PAGE_OFFSET, this.navTreeResource.childrenLimit).setTarget(id));
-      return true;
-    } catch (exception: any) {
-      if (notify) {
-        this.notificationService.logException(exception);
+      if (!connection.connected) {
+        if (!tryConnect) {
+          return false;
+        }
+
+        const connected = await this.tryInitConnection(createConnectionParam(connection));
+        if (!connected) {
+          return false;
+        }
       }
     }
-    return false;
+
+    await this.navTreeResource.waitLoad();
+
+    if (tryConnect && this.navTreeResource.getException(id)) {
+      this.navTreeResource.markOutdated(id);
+    }
+
+    const parents = this.navNodeInfoResource.getParents(id);
+
+    if (parents.length > 0 && !this.navNodeInfoResource.has(id)) {
+      return false;
+    }
+
+    await this.navTreeResource.load(CachedResourcePageKey(CACHED_RESOURCE_DEFAULT_PAGE_OFFSET, this.navTreeResource.childrenLimit).setTarget(id));
+
+    return true;
   }
 
   selectNode(id: string, multiple?: boolean): void {

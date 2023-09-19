@@ -6,10 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
 import { AuthProvider, AuthProviderConfiguration, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { ErrorMessage, getComputed, Link, SubmittingForm, TextPlaceholder, useErrorDetails, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  ErrorMessage,
+  getComputed,
+  Link,
+  s,
+  SubmittingForm,
+  TextPlaceholder,
+  useErrorDetails,
+  useS,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import {
   CommonDialogBody,
@@ -23,60 +34,19 @@ import { BASE_TAB_STYLES, Tab, TabList, TabsState, TabTitle, UNDERLINE_TAB_BIG_S
 
 import { AuthenticationService } from '../AuthenticationService';
 import type { IAuthOptions } from '../IAuthOptions';
+import style from './AuthDialog.m.css';
 import { AuthDialogFooter } from './AuthDialogFooter';
 import { AuthProviderForm } from './AuthProviderForm/AuthProviderForm';
 import { ConfigurationsList } from './AuthProviderForm/ConfigurationsList';
 import { FEDERATED_AUTH } from './FEDERATED_AUTH';
 import { getAuthProviderTabId, useAuthDialogState } from './useAuthDialogState';
 
-const styles = css`
-  CommonDialogWrapper {
-    min-height: 520px !important;
-    max-height: max(100vh - 48px, 520px) !important;
-  }
-  SubmittingForm {
-    overflow: auto;
-    margin: auto;
-  }
-  SubmittingForm,
-  AuthProviderForm {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  TabList {
-    composes: theme-background-surface theme-text-on-surface from global;
-    justify-content: center;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-  Tab {
-    &:global([aria-selected='true']) {
-      font-weight: 500 !important;
-    }
-  }
-  AuthProviderForm {
-    flex-direction: column;
-    padding: 18px 24px;
-  }
-  ConfigurationsList {
-    overflow: auto;
-    margin-top: 12px;
-    margin-bottom: 12px;
-    max-height: 400px;
-  }
-  ErrorMessage {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-    flex: 1;
-  }
-`;
-
 export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function AuthDialog({
   payload: { providerId, configurationId, linkUser = false, accessRequest = false },
   options,
   rejectDialog,
 }) {
+  const styles = useS(style);
   const dialogData = useAuthDialogState(accessRequest, providerId, configurationId);
   const errorDetails = useErrorDetails(dialogData.exception);
   const authenticationService = useService(AuthenticationService);
@@ -171,14 +141,14 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
     );
   }
 
-  return styled(useStyles(BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES))(
+  return styled(useStyles(BASE_TAB_STYLES, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES))(
     <TabsState
       currentTabId={state.tabId}
       onChange={tabData => {
         state.setTabId(tabData.tabId);
       }}
     >
-      <CommonDialogWrapper size="large" aria-label={translate('authentication_login_dialog_title')}>
+      <CommonDialogWrapper className={s(styles, { wrapper: true })} size="large" aria-label={translate('authentication_login_dialog_title')}>
         <CommonDialogHeader
           title={dialogTitle}
           tooltip={tooltip}
@@ -188,7 +158,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
         />
         <CommonDialogBody noBodyPadding>
           {showTabs && (
-            <TabList aria-label="Auth providers">
+            <TabList className={s(styles, { tabList: true })} aria-label="Auth providers">
               {dialogData.providers
                 .map(provider => {
                   if (provider.configurable) {
@@ -200,6 +170,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
                           tabId={tabId}
                           title={configuration.displayName}
                           disabled={dialogData.authenticating}
+                          className={s(styles, { tab: true })}
                           onClick={() => {
                             state.setActiveProvider(provider, configuration);
                           }}
@@ -215,6 +186,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
                       tabId={provider.id}
                       title={provider.description || provider.label}
                       disabled={dialogData.authenticating}
+                      className={s(styles, { tab: true })}
                       onClick={() => {
                         state.setActiveProvider(provider, null);
                       }}
@@ -229,6 +201,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
                   key={FEDERATED_AUTH}
                   tabId={FEDERATED_AUTH}
                   title={translate('authentication_auth_federated')}
+                  className={s(styles, { tab: true })}
                   disabled={dialogData.authenticating}
                   onClick={() => {
                     state.setActiveProvider(null, null);
@@ -246,11 +219,14 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
               activeConfiguration={state.activeConfiguration}
               providers={dialogData.federatedProviders}
               authTask={dialogData.authTask}
+              className={s(styles, { configurationsList: true })}
               login={login}
               onClose={rejectDialog}
             />
           ) : (
-            <SubmittingForm onSubmit={() => login(linkUser)}>{renderForm(state.activeProvider, state.activeConfiguration)}</SubmittingForm>
+            <SubmittingForm className={s(styles, { submittingForm: true })} onSubmit={() => login(linkUser)}>
+              {renderForm(state.activeProvider, state.activeConfiguration)}
+            </SubmittingForm>
           )}
         </CommonDialogBody>
         {!federate && (
@@ -258,6 +234,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
             <AuthDialogFooter authAvailable={!dialogData.configure} isAuthenticating={dialogData.authenticating} onLogin={() => login(linkUser)}>
               {errorDetails.name && (
                 <ErrorMessage
+                  className={s(styles, { errorMessage: true })}
                   text={errorDetails.message || errorDetails.name}
                   hasDetails={errorDetails.hasDetails}
                   onShowDetails={errorDetails.open}

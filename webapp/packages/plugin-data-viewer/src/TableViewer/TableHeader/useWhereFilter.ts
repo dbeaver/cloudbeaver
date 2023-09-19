@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed } from 'mobx';
+import { action, computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 
@@ -68,6 +68,8 @@ export function useWhereFilter(model: IDatabaseDataModel<IDatabaseDataOptions, a
       },
     }),
     {
+      model: observable.ref,
+      resultIndex: observable.ref,
       filter: computed,
       constraints: computed,
       disabled: computed,

@@ -241,7 +241,7 @@ export class ConnectionNavNodeService extends Dependency {
       connection = await this.connectionsManagerService.requireConnection(createConnectionParam(connection));
 
       if (!connection?.connected) {
-        throw new Error('Connection not established');
+        ExecutorInterrupter.interrupt(contexts);
       }
     }
   }

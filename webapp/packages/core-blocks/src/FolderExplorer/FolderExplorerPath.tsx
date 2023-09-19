@@ -7,10 +7,11 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
 
+import { s } from '../s';
+import { useS } from '../useS';
 import { FolderExplorerContext } from './FolderExplorerContext';
-import { folderExplorerStyles } from './folderExplorerStyles';
+import style from './FolderExplorerPath.m.css';
 import { FolderName } from './FolderName';
 
 interface Props {
@@ -20,6 +21,7 @@ interface Props {
 }
 
 export const FolderExplorerPath = observer<Props>(function FolderExplorerPath({ getName, canSkip, className }) {
+  const styles = useS(style);
   const context = useContext(FolderExplorerContext);
 
   if (!context) {
@@ -60,5 +62,5 @@ export const FolderExplorerPath = observer<Props>(function FolderExplorerPath({ 
     }
   }
 
-  return styled(folderExplorerStyles)(<folder-explorer-path className={className}>{pathElements}</folder-explorer-path>);
+  return <div className={s(styles, { folderExplorerPath: true }, className)}>{pathElements}</div>;
 });

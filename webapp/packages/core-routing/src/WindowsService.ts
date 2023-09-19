@@ -18,7 +18,7 @@ interface IWindowInfo {
 @injectable()
 export class WindowsService {
   private readonly windows: Map<string, IWindowInfo>;
-  private trackWindowClose?: NodeJS.Timer;
+  private trackWindowClose?: ReturnType<typeof setTimeout>;
 
   constructor() {
     this.windows = new Map();

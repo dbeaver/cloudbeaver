@@ -27,6 +27,7 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 import type { DataGridHandle, Position } from '@cloudbeaver/plugin-react-data-grid';
 import DataGrid from '@cloudbeaver/plugin-react-data-grid';
+import '@cloudbeaver/plugin-react-data-grid/lib/lib/styles.css';
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
@@ -293,7 +294,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
       if (selectionAction.isFocused(key)) {
         const rowTop = rowIdx * rowHeight;
         const gridDiv = dataGridDivRef.current;
-        dataGridRef.current?.scrollToColumn(idx);
+        dataGridRef.current?.scrollToCell({ idx });
 
         if (gridDiv) {
           if (rowTop < gridDiv.scrollTop - rowHeight + headerHeight) {
@@ -364,10 +365,10 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     const column = tableData.getColumn(position.idx);
     const row = tableData.getRow(position.rowIdx);
 
-    if (column && row) {
+    if (column?.columnDataIndex && row) {
       selectionAction.focus({
         row,
-        column: { index: 0, ...column.columnDataIndex },
+        column: { ...column.columnDataIndex },
       });
     }
   };
@@ -432,14 +433,14 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
                 defaultColumnOptions={{
                   minWidth: 80,
                   resizable: true,
-                  formatter: CellFormatter,
+                  renderCell: props => <CellFormatter {...props} />,
                 }}
                 rows={tableData.rows}
                 rowKeyGetter={ResultSetDataKeysUtils.serialize}
                 headerRowHeight={headerHeight}
                 rowHeight={rowHeight}
-                components={{
-                  cellRenderer: CellRenderer,
+                renderers={{
+                  renderCell: (key, props) => <CellRenderer key={key} {...props} />,
                 }}
                 onSelectedCellChange={handleFocusChange}
                 onColumnResize={(idx, width) => columnResize.execute({ column: idx, width })}
