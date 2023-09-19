@@ -179,6 +179,9 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
     @Override
     public void delete(Path path) throws IOException {
         RMPath rmPath = (RMPath) path;
+        if (rmPath.isRmRootPath()) {
+            throw new IOException("Can not delete root rm directory");
+        }
         try {
             String rmProjectId = rmPath.getRmProjectId();
             var rmController = rmPath.getFileSystem().getRmController();
@@ -269,8 +272,8 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
                     return type.cast(new RMRootBasicAttribute());
                 }
                 if (rmPath.isProjectPath()) {
-                    boolean projectExist = rmController.getProject(rmPath.getRmProjectId(), false, false) != null;
-                    if (!projectExist) {
+                    boolean projectNotExist = rmController.getProject(rmPath.getRmProjectId(), false, false) == null;
+                    if (projectNotExist) {
                         throw new FileNotFoundException();
                     }
                     return type.cast(new RMRootBasicAttribute());
