@@ -216,7 +216,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error saving user teams in database", e);
         }
-        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user, false);
+        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
     }
 
 
@@ -593,7 +593,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error while updating user authentication role", e);
         }
-        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user, false);
+        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
     }
 
 
@@ -1028,7 +1028,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             throw new DBCException("Error deleting team from database", e);
         }
         if (force) {
-            addSubjectPermissionsUpdateEvent(teamId, SMSubjectType.team, false);
+            addSubjectPermissionsUpdateEvent(teamId, SMSubjectType.team);
         }
     }
 
@@ -1064,7 +1064,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         } catch (SQLException e) {
             throw new DBCException("Error saving subject permissions in database", e);
         }
-        addSubjectPermissionsUpdateEvent(subjectId, null, false);
+        addSubjectPermissionsUpdateEvent(subjectId, null);
     }
 
     private void insertPermissions(Connection dbCon, String subjectId, String[] permissionIds, String grantorId) throws SQLException {
@@ -2214,7 +2214,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @NotNull String grantor
     ) throws DBException {
         if (CommonUtils.isEmpty(objectIds)) {
-            subjectIds.forEach(id -> addSubjectPermissionsUpdateEvent(id, null, true));
+            subjectIds.forEach(id -> addSubjectPermissionsUpdateEvent(id, null));
             return;
         } else if (CommonUtils.isEmpty(subjectIds)) {
             addObjectPermissionsUpdateEvent(objectIds, objectType);
@@ -2266,11 +2266,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
 
 
-    private void addSubjectPermissionsUpdateEvent(
-        @NotNull String subjectId,
-        @Nullable SMSubjectType subjectType,
-        boolean subjectConnectionsChanged
-    ) {
+    private void addSubjectPermissionsUpdateEvent(@NotNull String subjectId, @Nullable SMSubjectType subjectType) {
         if (subjectType == null) {
             subjectType = getSubjectType(subjectId);
         }
@@ -2282,8 +2278,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             getSmSessionId(),
             getUserId(),
             subjectType,
-            subjectId,
-            subjectConnectionsChanged
+            subjectId
         );
         application.getEventController().addEvent(event);
     }
