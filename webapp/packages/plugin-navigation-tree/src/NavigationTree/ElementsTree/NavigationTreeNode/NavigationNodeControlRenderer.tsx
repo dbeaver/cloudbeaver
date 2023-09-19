@@ -11,12 +11,11 @@ import { forwardRef, useCallback, useContext, useDeferredValue, useEffect, useRe
 import { getComputed, s, TreeNodeContext, useMergeRefs, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { NavTreeControlComponent } from '../NavigationNodeComponent';
 import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
-import styles from './NavigationNodeControlRenderer.m.css';
+import style from './NavigationNodeControlRenderer.m.css';
 import type { INavigationNode } from './useNavigationNode';
 
 interface Props {
@@ -24,12 +23,11 @@ interface Props {
   navNode: INavigationNode;
   dragging?: boolean;
   control?: NavTreeControlComponent | undefined;
-  style?: ComponentStyle;
 }
 
 export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
-  forwardRef(function NavigationNodeControlRenderer({ node, navNode, dragging, control: externalControl, style }, ref) {
-    const computedStyles = useS(styles, style);
+  forwardRef(function NavigationNodeControlRenderer({ node, navNode, dragging, control: externalControl }, ref) {
+    const styles = useS(style);
     const elementRef = useRef<HTMLDivElement | null>(null);
     const [size, setSize] = useState(24);
     const contextRef = useObjectRef({
@@ -101,10 +99,9 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
     return (
       <Control
         ref={mergedRef}
-        className={s(computedStyles, { control: true, outdated })}
+        className={s(styles, { control: true, outdated })}
         nodeInfo={nodeInfo}
         dndElement={dragging}
-        style={style}
         node={node}
         onClick={onClickHandler}
       />

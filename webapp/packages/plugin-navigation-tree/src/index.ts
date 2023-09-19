@@ -30,6 +30,8 @@ export * from './NavigationTree/NavigationTreeBootstrap';
 export * from './NavigationTree/NavigationTreeService';
 export { default as ElementsTreeToolsStyles } from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeTools.m.css';
 export { default as ElementsTreeFilterStyles } from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeFilter.m.css';
+export { default as NavigationNodeNestedStyles } from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeNested.m.css';
+export { default as NavigationNodeControlRendererStyles } from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNodeControlRenderer.m.css';
 
 export * from './NavigationTree/NavigationTreeLoader';
 

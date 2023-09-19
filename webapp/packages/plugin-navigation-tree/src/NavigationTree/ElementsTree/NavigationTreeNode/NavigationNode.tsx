@@ -16,7 +16,7 @@ import { useDataContext } from '@cloudbeaver/core-view';
 
 import { useNavTreeDropBox } from '../../useNavTreeDropBox';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
-import styles from './NavigationNode.m.css';
+import style from './NavigationNode.m.css';
 import { DATA_ATTRIBUTE_NODE_EDITING } from './NavigationNode/DATA_ATTRIBUTE_NODE_EDITING';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
 import { NavigationNodeControlRenderer } from './NavigationNodeControlRenderer';
@@ -29,9 +29,8 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   control: externalControl,
   expanded: externalExpanded,
   className,
-  style,
 }) {
-  const computedStyles = useS(styles, style);
+  const styles = useS(style);
   const navNodeManagerService = useService(NavNodeManagerService);
   const navNode = useNavigationNode(node, path);
   const context = useDataContext();
@@ -94,21 +93,14 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       showInFilter={navNode.showInFilter}
       externalExpanded={externalExpanded}
       leaf={navNode.leaf}
-      className={s(computedStyles, { treeNode: true, hovered: hasNodes }, className)}
+      className={s(styles, { treeNode: true, hovered: hasNodes }, className)}
       onExpand={navNode.expand}
       onClick={navNode.click}
       onOpen={navNode.open}
       onSelect={navNode.select}
     >
       {/* <DNDPreview data={dndData} src="/icons/empty.svg" /> */}
-      <NavigationNodeControlRenderer
-        ref={controlRef}
-        navNode={navNode}
-        dragging={dndData.state.isDragging}
-        control={externalControl}
-        style={style}
-        node={node}
-      />
+      <NavigationNodeControlRenderer ref={controlRef} navNode={navNode} dragging={dndData.state.isDragging} control={externalControl} node={node} />
       {expanded && <NavigationNodeNested nodeId={node.id} path={path} component={component} />}
     </TreeNode>
   );

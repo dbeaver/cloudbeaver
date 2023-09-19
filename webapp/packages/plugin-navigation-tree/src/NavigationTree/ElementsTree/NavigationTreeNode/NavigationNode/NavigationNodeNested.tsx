@@ -8,11 +8,12 @@
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useContext, useDeferredValue, useMemo } from 'react';
 
-import { getComputed, TreeNodeNested, TreeNodeNestedMessage, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, s, TreeNodeNested, TreeNodeNestedMessage, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { ElementsTreeContext } from '../../ElementsTreeContext';
 import type { NavTreeNodeComponent } from '../../NavigationNodeComponent';
+import style from './NavigationNodeNested.m.css';
 
 interface Props {
   nodeId?: string;
@@ -24,6 +25,7 @@ interface Props {
 
 export const NavigationNodeNested = observer(
   forwardRef<HTMLDivElement, Props>(function NavigationNodeNested({ nodeId, component, path, root, className }, ref) {
+    const styles = useS(style);
     const treeContext = useContext(ElementsTreeContext);
     const translate = useTranslate();
 
@@ -53,7 +55,7 @@ export const NavigationNodeNested = observer(
     }
 
     return (
-      <TreeNodeNested ref={ref} root={root} className={className}>
+      <TreeNodeNested ref={ref} root={root} className={s(styles, { navigationNodeNested: true }, className)}>
         {children.map(child => (
           <NavigationNode key={child} nodeId={child} path={nextPath} />
         ))}

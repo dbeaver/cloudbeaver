@@ -60,10 +60,12 @@ module.exports = (env, argv) => {
       proxy: {
         '/api': {
           target: envServer,
+          secure: false,
         },
         '/api/ws': {
           target: `${urlObject.protocol === 'https:' ? 'wss:' : 'ws:'}//${urlObject.hostname}:${urlObject.port}/api/ws`,
           ws: true,
+          secure: false,
         },
       },
       onListening: function (devServer, ...args) {

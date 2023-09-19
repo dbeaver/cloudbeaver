@@ -1,3 +1,5 @@
-.treeNode.hovered ::before {
-  opacity: 0.16;
+.treeNode {
+  & .hovered ::before {
+    opacity: 0.16;
+  }
 }
