@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
 import { IconOrImage } from './IconOrImage';
-import style from './infoItem.m.css';
+import style from './InfoItem.m.css';
 import { useTranslate } from './localization/useTranslate';
 import { s } from './s';
 import { useS } from './useS';
