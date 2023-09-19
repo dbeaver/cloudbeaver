@@ -11,86 +11,19 @@ import styled, { css, use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import style from './Button.m.css';
 import { IconOrImage } from './IconOrImage';
 import { Loader } from './Loader/Loader';
+import { s } from './s';
 import { useObjectRef } from './useObjectRef';
 import { useObservableRef } from './useObservableRef';
+import { useS } from './useS';
 import { useStyles } from './useStyles';
 
-const buttonStyles = css`
-  button-label {
-    composes: theme-button__label from global;
-  }
-  button-icon {
-    composes: theme-button__icon from global;
-  }
-  ripple {
-    composes: theme-button_ripple from global;
-  }
-  Button {
-    composes: theme-button from global;
-    display: flex;
+type buttonMod = Array<'raised' | 'unelevated' | 'outlined' | 'secondary'>;
 
-    & IconOrImage {
-      width: 100%;
-    }
-
-    &[disabled] IconOrImage {
-      opacity: 0.5;
-    }
-
-    & Loader,
-    & button-label {
-      transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
-    }
-
-    & Loader {
-      position: absolute;
-      opacity: 0 !important;
-    }
-
-    & button-label {
-      line-height: 1;
-      opacity: 1;
-    }
-
-    &[|loading] {
-      & Loader {
-        opacity: 1 !important;
-      }
-
-      & button-label {
-        opacity: 0;
-      }
-    }
-
-    &[href] {
-      text-decoration: none !important;
-    }
-  }
-`;
-
-const buttonMod = {
-  raised: css`
-    Button {
-      composes: theme-button_raised from global;
-    }
-  `,
-  unelevated: css`
-    Button {
-      composes: theme-button_unelevated from global;
-    }
-  `,
-  outlined: css`
-    Button {
-      composes: theme-button_outlined from global;
-    }
-  `,
-  secondary: css`
-    Button {
-      composes: theme-button_secondary from global;
-    }
-  `,
+type buttonModMap = {
+  [key in buttonMod[number]]: boolean;
 };
 
 type ButtonProps = (React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement> &
@@ -100,7 +33,7 @@ type ButtonProps = (React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorEle
   icon?: string;
   viewBox?: string;
   styles?: ComponentStyle;
-  mod?: Array<keyof typeof buttonMod>;
+  mod?: buttonMod;
   tag?: 'button' | 'a' | 'div';
   href?: string;
   target?: '_blank' | '_self' | '_parent' | '_top';
@@ -114,7 +47,7 @@ export const Button = observer<ButtonProps>(function Button({
   icon,
   viewBox,
   mod,
-  styles,
+  styles: oldStyles,
   tag = 'button',
   type = 'button',
   disabled = false,
@@ -124,6 +57,7 @@ export const Button = observer<ButtonProps>(function Button({
   className,
   ...rest
 }) {
+  const styles = useS(style);
   const handlersRef = useObjectRef({ onClick });
   const state = useObservableRef(
     () => ({
@@ -154,17 +88,40 @@ export const Button = observer<ButtonProps>(function Button({
     disabled = true;
   }
 
+  const modMap = mod?.reduce((map, mod) => {
+    map[mod] = true;
+    return map;
+  }, {} as buttonModMap);
+
   const Button = tag;
-  return styled(useStyles(styles, buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
-    <Button {...rest} type={type} disabled={disabled} {...use({ loading })} className={className} onClick={state.click}>
-      <ripple />
-      {icon && (
-        <button-icon>
-          <IconOrImage icon={icon} viewBox={viewBox} />
-        </button-icon>
+  return styled(useStyles(oldStyles))(
+    <Button
+      {...rest}
+      type={type}
+      disabled={disabled}
+      {...use({ loading })}
+      className={s(
+        styles,
+        {
+          button: true,
+          raised: modMap?.raised,
+          outlined: modMap?.outlined,
+          secondary: modMap?.secondary,
+          unelevated: modMap?.unelevated,
+          loading,
+        },
+        className,
       )}
-      <button-label as="span">{children}</button-label>
-      <Loader small />
+      onClick={state.click}
+    >
+      <div className={s(styles, { ripple: true })} />
+      {icon && (
+        <div className={s(styles, { buttonIcon: true, disabled }, className)}>
+          <IconOrImage icon={icon} viewBox={viewBox} />
+        </div>
+      )}
+      <span className={s(styles, { buttonLabel: true }, className)}>{children}</span>
+      <Loader className={s(styles, { loader: true })} small />
     </Button>,
   );
 });
