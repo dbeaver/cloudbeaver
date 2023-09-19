@@ -6,11 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { forwardRef, useLayoutEffect } from 'react';
-import styled, { css, use } from 'reshadow';
 
 import { uuid } from '@cloudbeaver/core-utils';
 
+import { s } from './s';
+import style from './UploadArea.m.css';
 import { useRefInherit } from './useRefInherit';
+import { useS } from './useS';
 
 interface Props extends Omit<React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, 'value'> {
   value?: FileList | null;
@@ -19,21 +21,11 @@ interface Props extends Omit<React.DetailedHTMLProps<React.InputHTMLAttributes<H
   reset?: boolean;
 }
 
-const styles = css`
-  label {
-    cursor: pointer;
-    width: fit-content;
-
-    &[|disabled] {
-      cursor: default;
-    }
-  }
-`;
-
 export const UploadArea = forwardRef<HTMLInputElement, Props>(function UploadArea(
   { id = uuid(), value, reset, children, className, ...rest },
   refInherit,
 ) {
+  const styles = useS(style);
   const ref = useRefInherit<HTMLInputElement>(refInherit);
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,12 +45,12 @@ export const UploadArea = forwardRef<HTMLInputElement, Props>(function UploadAre
     }
   });
 
-  return styled(styles)(
+  return (
     <>
       <input ref={ref} {...rest} type="file" id={id} hidden onChange={handleChange} />
-      <label htmlFor={id} {...use({ disabled: rest.disabled })} className={className} title={rest.title}>
+      <label className={s(styles, { label: true, disabled: rest.disabled }, className)} htmlFor={id} title={rest.title}>
         {children}
       </label>
-    </>,
+    </>
   );
 });
