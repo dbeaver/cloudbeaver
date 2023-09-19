@@ -24,10 +24,9 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { EObjectFeature, type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { useNavTreeDropBox } from '../useNavTreeDropBox';
-import styles from './ElementsTree.m.css';
+import style from './ElementsTree.m.css';
 import { ElementsTreeContentLoader } from './ElementsTreeContentLoader';
 import { ElementsTreeContext, IElementsTreeContext } from './ElementsTreeContext';
 import { elementsTreeNameFilter } from './elementsTreeNameFilter';
@@ -48,7 +47,6 @@ export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWith
   selectionTree?: boolean;
   control?: NavTreeControlComponent;
   emptyPlaceholder?: React.FC;
-  style?: ComponentStyle;
   className?: string;
   settingsElements?: PlaceholderElement<IElementsTreeSettingsProps>[];
   navNodeFilterCompare?: NavNodeFilterCompareFn;
@@ -70,7 +68,6 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   renderers = [],
   expandStateGetters,
   settingsElements,
-  style,
   className,
   getChildren,
   loadChildren,
@@ -84,7 +81,7 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   onSelect,
   onFilter,
 }) {
-  const computedStyles = useS(styles, style);
+  const styles = useS(style);
   const navTreeResource = useService(NavTreeResource);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const [treeRootRef, setTreeRootRef] = useState<HTMLDivElement | null>(null);
@@ -161,18 +158,18 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
 
   return (
     <>
-      <ElementsTreeTools tree={tree} settingsElements={settingsElements} style={style} />
-      <div ref={setTreeRootRef} className={s(computedStyles, { treeBox: true })}>
+      <ElementsTreeTools tree={tree} settingsElements={settingsElements} />
+      <div ref={setTreeRootRef} className={s(styles, { treeBox: true })}>
         <ElementsTreeContext.Provider value={context}>
-          <div className={s(computedStyles, { box: true }, className)}>
+          <div className={s(styles, { box: true }, className)}>
             <FolderExplorer state={folderExplorer}>
-              <div ref={dropOutside.mouse.reference} className={s(computedStyles, { tree: true })} onClick={handleClick}>
+              <div ref={dropOutside.mouse.reference} className={s(styles, { tree: true })} onClick={handleClick}>
                 {settings?.showFolderExplorerPath && (
-                  <FolderExplorerPath className={s(computedStyles, { folderExplorerPath: true })} getName={getName} canSkip={canSkip} />
+                  <FolderExplorerPath className={s(styles, { folderExplorerPath: true })} getName={getName} canSkip={canSkip} />
                 )}
                 <div
                   ref={dndBox.setRef}
-                  className={s(computedStyles, {
+                  className={s(styles, {
                     dropOutside: true,
                     showDropOutside: dropOutside.showDropOutside,
                     active: !!dropOutside.zoneActive,
@@ -186,7 +183,7 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
                   </TreeNodeNested>
                 </div>
                 <ElementsTreeContentLoader context={context} emptyPlaceholder={emptyPlaceholder} childrenState={tree}>
-                  <div className={s(computedStyles, { treeElements: true })}>
+                  <div className={s(styles, { treeElements: true })}>
                     <NavigationNodeNested
                       ref={dropOutside.nestedRef}
                       nodeId={root}

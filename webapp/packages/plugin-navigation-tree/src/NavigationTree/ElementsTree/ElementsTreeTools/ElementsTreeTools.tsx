@@ -67,8 +67,8 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
 
   return styled(deprecatedStyles)(
     <SContext registry={registry}>
-      <tools className={s(styles, { tools: true })}>
-        <actions className={s(styles, { actions: true })}>
+      <div className={s(styles, { tools: true })}>
+        <div className={s(styles, { actions: true })}>
           {tree.settings?.configurable && (
             <IconButton
               name="/icons/settings_cog_sm.svg"
@@ -88,11 +88,11 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
             img
             onClick={() => tree.refresh(root)}
           />
-        </actions>
+        </div>
         {tree.settings && opened && <NavigationTreeSettings tree={tree} elements={settingsElements} style={style} />}
         <ElementsTreeFilter tree={tree} style={style} />
         {children}
-      </tools>
+      </div>
     </SContext>,
   );
 });
