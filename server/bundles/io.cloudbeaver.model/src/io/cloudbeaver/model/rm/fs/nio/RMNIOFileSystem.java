@@ -37,7 +37,8 @@ import java.util.List;
 
 public class RMNIOFileSystem extends NIOFileSystem {
     private static final Log log = Log.getLog(RMNIOFileSystem.class);
-    @NotNull
+    @Nullable
+    // null for root rm:// path
     private final String rmProjectId;
     @NotNull
     private final RMController rmController;
@@ -47,7 +48,7 @@ public class RMNIOFileSystem extends NIOFileSystem {
     private RMProject rmProject;
 
     public RMNIOFileSystem(
-        @NotNull String rmProjectId,
+        @Nullable String rmProjectId,
         @NotNull RMController rmController,
         @NotNull RMNIOFileSystemProvider rmNioFileSystemProvider
     ) {
@@ -102,12 +103,12 @@ public class RMNIOFileSystem extends NIOFileSystem {
             throw new IllegalArgumentException("Empty path");
         }
         StringBuilder uriBuilder = new StringBuilder();
-        uriBuilder.append(
-                provider().getScheme()
-            ).append("://")
-            .append(rmProjectId)
-            .append(getSeparator())
-            .append(first);
+        uriBuilder.append(provider().getScheme()).append("://");
+        if (rmProjectId != null) {
+            uriBuilder.append(rmProjectId).append(getSeparator());
+
+        }
+        uriBuilder.append(first);
         if (!ArrayUtils.isEmpty(more)) {
             uriBuilder
                 .append(getSeparator())
@@ -121,7 +122,7 @@ public class RMNIOFileSystem extends NIOFileSystem {
         return rmController;
     }
 
-    @NotNull
+    @Nullable
     public String getRmProjectId() {
         return rmProjectId;
     }
@@ -131,10 +132,13 @@ public class RMNIOFileSystem extends NIOFileSystem {
         if (rmProject != null) {
             return rmProject;
         }
+        if (rmProjectId == null) {
+            throw new IOException("Project id not specified");
+        }
         try {
-            RMProject project = rmController.getProject(getRmProjectId(), false, false);
+            RMProject project = rmController.getProject(rmProjectId, false, false);
             if (project == null) {
-                throw new FileNotFoundException("Project not exist: " + getRmProjectId());
+                throw new FileNotFoundException("Project not exist: " + rmProjectId);
             }
             rmProject = project;
             return rmProject;
