@@ -16,21 +16,11 @@
  */
 package io.cloudbeaver.model.rm.fs.nio;
 
-import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.nio.NIOFileBasicAttribute;
-import org.jkiss.dbeaver.model.rm.RMProject;
 
 import java.nio.file.attribute.FileTime;
 
-public class RMProjectBasicAttribute extends NIOFileBasicAttribute {
-
-    @NotNull
-    private final RMProject rmProject;
-
-    public RMProjectBasicAttribute(@NotNull RMProject rmProject) {
-        this.rmProject = rmProject;
-    }
-
+public class RMRootBasicAttribute extends NIOFileBasicAttribute {
     @Override
     public FileTime lastModifiedTime() {
         throw new UnsupportedOperationException();

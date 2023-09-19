@@ -18,6 +18,7 @@ package io.cloudbeaver.model.rm.fs.nio;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.nio.NIOPath;
 import org.jkiss.utils.CommonUtils;
 
@@ -30,6 +31,7 @@ import java.util.Arrays;
 public class RMPath extends NIOPath {
     @NotNull
     private final RMNIOFileSystem rmNioFileSystem;
+    @Nullable
     private final String rmProjectId;
 
     public RMPath(
@@ -186,12 +188,18 @@ public class RMPath extends NIOPath {
         return path;
     }
 
+    public boolean isRmRootPath() {
+        return rmProjectId == null && CommonUtils.isEmpty(path);
+    }
     public boolean isProjectPath() {
-        return CommonUtils.isEmpty(path);
+        return rmProjectId != null && CommonUtils.isEmpty(path);
     }
 
     @NotNull
-    public String getRmProjectId() {
+    public String getRmProjectId() throws DBException {
+        if (rmProjectId == null) {
+            throw new DBException("Project id not specified");
+        }
         return rmProjectId;
     }
 }

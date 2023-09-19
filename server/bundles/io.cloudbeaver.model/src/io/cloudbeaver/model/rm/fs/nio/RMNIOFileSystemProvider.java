@@ -62,7 +62,7 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
         validateUri(uri);
         String projectId = uri.getAuthority();
         if (CommonUtils.isEmpty(projectId)) {
-            throw new IllegalArgumentException("Project is not specified in URI");
+            projectId = null;
         }
         try {
             return new RMNIOFileSystem(projectId, rmController, this);
@@ -76,10 +76,13 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
         validateUri(uri);
         String projectId = uri.getAuthority();
         if (CommonUtils.isEmpty(projectId)) {
-            throw new IllegalArgumentException("Project is not specified in URI");
+            projectId = null;
         }
         RMNIOFileSystem rmNioFileSystem = new RMNIOFileSystem(projectId, rmController, this);
         String resourcePath = uri.getPath();
+        if (CommonUtils.isNotEmpty(resourcePath) && projectId == null) {
+            throw new IllegalArgumentException("Project is not specified in URI");
+        }
         if (CommonUtils.isEmpty(resourcePath)) {
             return new RMPath(rmNioFileSystem);
         } else {
@@ -122,19 +125,31 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
             public Iterator<Path> iterator() {
                 var rmController = rmDir.getFileSystem().getRmController();
                 try {
-                    var resources = rmController.listResources(
-                        rmDir.getRmProjectId(),
-                        rmDirPath,
-                        null,
-                        false,
-                        false,
-                        false
-                    );
-                    return Arrays.stream(resources)
-                        .map(rmResource -> (Path) new RMPath(rmDir.getFileSystem(),
-                            NIOUtils.resolve(separator, rmDirPath, rmResource.getName())
-                        ))
-                        .iterator();
+                    if (rmDir.isRmRootPath()) {
+                        return Arrays.stream(rmController.listAccessibleProjects())
+                            .map(rmProject -> (Path) new RMPath(
+                                    new RMNIOFileSystem(
+                                        rmProject.getId(),
+                                        rmController,
+                                        RMNIOFileSystemProvider.this
+                                    )
+                                )
+                            ).iterator();
+                    } else {
+                        var resources = rmController.listResources(
+                            rmDir.getRmProjectId(),
+                            rmDirPath,
+                            null,
+                            false,
+                            false,
+                            false
+                        );
+                        return Arrays.stream(resources)
+                            .map(rmResource -> (Path) new RMPath(rmDir.getFileSystem(),
+                                NIOUtils.resolve(separator, rmDirPath, rmResource.getName())
+                            ))
+                            .iterator();
+                    }
                 } catch (DBException e) {
                     throw new RuntimeException("Failed to read resources from rm path: " + e.getMessage(), e);
                 }
@@ -164,8 +179,8 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
     @Override
     public void delete(Path path) throws IOException {
         RMPath rmPath = (RMPath) path;
-        String rmProjectId = rmPath.getRmProjectId();
         try {
+            String rmProjectId = rmPath.getRmProjectId();
             var rmController = rmPath.getFileSystem().getRmController();
             if (rmPath.isProjectPath()) {
                 rmController.deleteProject(rmProjectId);
@@ -250,12 +265,15 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
         if (type == BasicFileAttributes.class) {
             RMPath rmPath = (RMPath) path;
             try {
+                if (rmPath.isRmRootPath()) {
+                    return type.cast(new RMRootBasicAttribute());
+                }
                 if (rmPath.isProjectPath()) {
                     boolean projectExist = rmController.getProject(rmPath.getRmProjectId(), false, false) != null;
                     if (!projectExist) {
                         throw new FileNotFoundException();
                     }
-                    return type.cast(new RMProjectBasicAttribute(rmPath.getFileSystem().getRmProject()));
+                    return type.cast(new RMRootBasicAttribute());
                 } else {
                     RMResource rmResource = rmController.getResource(rmPath.getRmProjectId(), rmPath.getResourcePath());
                     if (rmResource == null) {

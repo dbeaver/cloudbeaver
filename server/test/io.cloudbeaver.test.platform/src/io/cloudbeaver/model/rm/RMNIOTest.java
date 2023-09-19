@@ -82,7 +82,7 @@ public class RMNIOTest {
     }
 
     @Test
-    public void projectPathTest() {
+    public void projectPathTest() throws DBException {
         var projectUri = getProjectUri();
         RMPath path = (RMPath) rmFsProvider.getPath(projectUri);
         Assert.assertEquals(path.getRmProjectId(), testProject.getId());
@@ -155,7 +155,8 @@ public class RMNIOTest {
         Assert.assertTrue(Files.exists(scriptPath));
         Assert.assertNotNull(rm.getResource(testProject.getId(), script));
 
-        //set content
+        //set content rm://s_test_project/test_script.sql
+
         String sql = "select " + SecurityUtils.getRandom().nextInt(1000);
         Files.writeString(scriptPath, sql);
         String dataFromNio = Files.readString(scriptPath);
