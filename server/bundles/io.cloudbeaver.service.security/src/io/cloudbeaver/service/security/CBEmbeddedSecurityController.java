@@ -2628,7 +2628,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                         result.add(dbResult.getString(1));
                     }
                 }
-            };
+            }
             return result;
         } catch (SQLException e) {
             log.error("Error getting all subject ids from database", e);
@@ -2647,7 +2647,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                         return SMSubjectType.fromCode(dbResult.getString(1));
                     }
                 }
-            };
+            }
             return null;
         } catch (SQLException e) {
             log.error("Error getting all subject ids from database", e);

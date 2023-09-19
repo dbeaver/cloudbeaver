@@ -18,6 +18,7 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -41,8 +42,8 @@ public class WSSubjectPermissionUpdatedEventHandler extends WSDefaultEventHandle
         }
         activeUserSession.refreshUserData();
         var newUserPermissions = activeUserSession.getUserContext().getUserPermissions();
-        if (!CommonUtils.equalObjects(oldUserPermissions, newUserPermissions) ||
-            !newUserPermissions.contains(DBWConstants.PERMISSION_ADMIN)) {
+        boolean shouldUpdateData = !(SMUtils.isAdmin(oldUserPermissions) && SMUtils.isAdmin(newUserPermissions));
+        if (shouldUpdateData) {
             super.updateSessionData(activeUserSession, event);
         }
     }
