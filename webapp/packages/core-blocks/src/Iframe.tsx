@@ -6,17 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import type { DetailedHTMLProps, IframeHTMLAttributes } from 'react';
-import styled, { css } from 'reshadow';
 
-import { useStyles } from './useStyles';
-
-const styles = css`
-  iframe {
-    composes: theme-border-color-background from global;
-    border: 1px solid;
-  }
-`;
+import style from './iframe.m.css';
+import { s } from './s';
+import { useS } from './useS';
 
 export const Iframe: React.FC<DetailedHTMLProps<IframeHTMLAttributes<HTMLIFrameElement>, HTMLIFrameElement>> = function Iframe(props) {
-  return styled(useStyles(styles))(<iframe {...props} />);
+  const styles = useS(style);
+
+  return <iframe className={s(styles, { iframe: true })} {...props} />;
 };
