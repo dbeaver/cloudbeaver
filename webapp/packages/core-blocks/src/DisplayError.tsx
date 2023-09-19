@@ -6,38 +6,27 @@
  * you may not use this file except in compliance with the License.
  */
 import type React from 'react';
-import styled, { css, use } from 'reshadow';
 
 import { ENotificationType } from '@cloudbeaver/core-events';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { AppRefreshButton } from './AppRefreshButton';
 import style from './DisplayError.m.css';
 import { s } from './s';
 import { NotificationMark } from './Snackbars/NotificationMark';
 import { useS } from './useS';
-import { useStyles } from './useStyles';
 
 interface Props {
   root?: boolean;
   error?: Error;
   errorInfo?: React.ErrorInfo;
   className?: string;
-  styles?: ComponentStyle;
 }
 
-export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function DisplayError({
-  root,
-  children,
-  error,
-  errorInfo,
-  className,
-  styles: stylesProp,
-}) {
+export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function DisplayError({ root, children, error, errorInfo, className }) {
   const styles = useS(style);
   const stack = errorInfo?.componentStack || error?.stack;
 
-  return styled(useStyles(stylesProp))(
+  return (
     <div className={s(styles, { error: true, root }, className)}>
       <div className={s(styles, { errorInnerBlock: true })}>
         <NotificationMark className={s(styles, { notificationMark: true })} type={ENotificationType.Error} />
@@ -52,6 +41,6 @@ export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function D
           </div>
         )}
       </div>
-    </div>,
+    </div>
   );
 };
