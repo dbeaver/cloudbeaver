@@ -30,7 +30,7 @@ export const OutputLogsPanel = observer<Props>(function SqlOutputLogsPanel({ sql
 
   return (
     <Container className="theme-background-secondary" parent vertical gap dense>
-      <OutputLogsToolbar state={state} />
+      <OutputLogsToolbar state={state} sqlEditorTabState={sqlEditorTabState}/>
       <Group overflow box>
         {data && <EditorLoader value={state.resultValue} foldGutter={false} highlightActiveLine={false} lineWrapping readonly />}
       </Group>

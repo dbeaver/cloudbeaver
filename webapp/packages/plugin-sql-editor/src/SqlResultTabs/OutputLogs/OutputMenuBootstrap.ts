@@ -35,8 +35,13 @@ export class OutputMenuBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [OUTPUT_LOGS_FILTER_MENU],
       getItems: context => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
-        const outputLogsTabState = state.outputLogsTab;
+        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+
+        if (!state) {
+          return [];
+        }
+
+        const outputLogsTabState = state?.outputLogsTab;
         const items = [];
 
         for (const logType of OUTPUT_LOG_TYPES) {
